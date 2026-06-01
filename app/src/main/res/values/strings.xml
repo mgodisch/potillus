@@ -69,17 +69,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Export date</string>
     <string name="pdf_meta_period">Period</string>
-    <string name="pdf_meta_gender">Sex</string>
     <string name="pdf_meta_limit">Limit</string>
     <string name="pdf_meta_weight">Body weight</string>
-    <string name="pdf_meta_custom_limit">Custom</string>
     <string name="pdf_kpi_total">Total alcohol</string>
     <string name="pdf_kpi_avg_day">Avg per day</string>
     <string name="pdf_kpi_avg_drink_day">Avg per drinking day</string>
     <string name="pdf_kpi_drink_days">Drinking days</string>
     <string name="pdf_kpi_abstinent_days">Abstinent days</string>
-    <string name="pdf_kpi_over_who">Days > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Days > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Binge days (>%1$s g)</string>
     <string name="pdf_col_month">Month</string>
     <string name="pdf_col_drink_days">Drinking days</string>
@@ -126,18 +122,7 @@
     <string name="theme_night">Dark</string>
     <string name="day_change_time">Day change time</string>
     <string name="day_starts_at">New day starts at</string>
-    <string name="gender">Sex</string>
-    <string name="male">Male</string>
-    <string name="female">Female</string>
-    <string name="limit_mode">Medical guideline</string>
-    <string name="limit_who">WHO – risk level</string>
-    <string name="limit_dhs">DHS – low risk</string>
-    <string name="limit_custom">Custom</string>
-    <string name="custom_limit_grams">My daily limit in grams</string>
-    <string name="weekly_limit_section">Weekly limit</string>
-    <string name="weekly_limit_enabled">Enable weekly limit</string>
     <string name="weekly_limit_grams">Weekly limit in grams</string>
-    <string name="weekly_limit">Week</string>
     <string name="biometric">Access lock</string>
     <string name="biometric_lock">Biometric lock</string>
     <string name="biometric_desc">Lock the app with fingerprint or face recognition</string>
@@ -161,8 +146,6 @@
     <string name="biometric_subtitle">Please authenticate</string>
 
     <!-- WHO note -->
-    <string name="who_note">The WHO (2023) states: There is no safe level of alcohol consumption. The risk value shown here is a practical reference point, not a safety threshold.</string>
-    <string name="who_values">Risk value: ♂ ≤ %1$s g, ♀ ≤ %2$s g per day.</string>
     <string name="pdf_months_truncated">Showing %1$d of %2$d months – older data available in CSV/backup</string>
 
     <!-- Year calendar legend -->
@@ -200,21 +183,24 @@
     <string name="csv_col_grams">Grams_alcohol</string>
     <string name="csv_col_note">Note</string>
     <string name="pdf_unit_g_per_day">g/day</string>
-    <string name="unit_g_per_day">g/day</string>
-
-    <string name="days_over_limit_who">Days over limit (WHO)</string>
-    <string name="days_over_limit_dhs">Days over limit (DHS)</string>
-    <string name="days_over_limit_custom">Days over configured limit</string>
-    <string name="dhs_note">The DHS recommends: men should not drink more than 24 g, women not more than 12 g of pure alcohol per day. At least two days per week should be alcohol-free.</string>
     <string name="drink_days_label">drink days this week</string>
     <string name="drink_days_setting">Max. drink days/week</string>
-    <string name="drink_days_who_dhs_note">Recommendation: max. 5 drink days per week (≥ 2 abstinent days)</string>
-    <string name="weekly_gram_mode_title">Weekly gram limit</string>
-    <string name="weekly_gram_mode_desc">Progress bar and indicators use the weekly budget (max. drink days &#215; daily limit)</string>
-
     <!-- Device-transfer Keystore migration warning (shown once if settings appear empty after a recent install) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Personal data</string>
     <string name="week_starts_on">Week starts on</string>
+    <string name="limits">Limits</string>
+    <string name="daily_limit_grams">Daily limit in grams</string>
+    <string name="limit_caption_day">%1$s g/day</string>
+    <string name="limit_caption_week">%1$s g/week</string>
+    <string name="days_over_daily_limit">Days over daily limit</string>
+    <string name="days_over_weekly_limit">Days over weekly limit</string>
+    <string name="days_over_drink_day_limit">Days over drink-day limit</string>
+    <string name="pdf_unit_g_per_week">g/week</string>
+    <string name="pdf_meta_drink_days_suffix">drink days/wk</string>
+    <string name="pdf_kpi_over_daily">Days > daily (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Days > weekly (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Days > %1$d drink days</string>
+    <string name="pdf_col_over_daily">> day</string>
 </resources>

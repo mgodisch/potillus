@@ -81,7 +81,7 @@ data class CalendarUiState(
     val selectedDate: String?                   = null,
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
     val totalGramsSelected: Double              = 0.0,
-    val limitInfo: LimitInfo                    = LimitInfo(LimitMode.WHO, 20.0),
+    val limitInfo: LimitInfo                    = LimitInfo(20.0, 100.0, 5),
     /** First day of the week (ISO 1 = Monday … 7 = Sunday) for grid alignment. */
     val weekStartDay: Int                       = 1
 )

@@ -28,11 +28,12 @@ requires no access to your smartphone's camera, microphone, location, or
 similar features—not even network access.
 
 You can predefine drinks and log them either while drinking or retroactively
-with a corrected time. You can define your daily and weekly limits or use the
-recommendations of the World Health Organization (WHO) or the German Center for
-Addiction Issues (DHS). Using a traffic light system, Libellus Potionis helps
-you drink up to your limit without exceeding it. If you enter your weight,
-Libellus Potionis estimates your current blood alcohol concentration (BAC).
+with a corrected time. You define three limits that always apply together: a
+daily limit and a weekly limit (both in grams of pure alcohol) and a maximum
+number of drinking days per week. Using a traffic light system, Libellus
+Potionis helps you drink up to your limit without exceeding it. If you enter
+your weight, Libellus Potionis estimates your current blood alcohol
+concentration (BAC).
 
 Upon request, Libellus Potionis generates a report for your addiction
 counselor, providing a statistical analysis of your drinking habits, clearly
@@ -40,12 +41,20 @@ presented on two PDF pages. If the built-in statistics are not sufficient, you
 can export your data as a CSV dataset for further processing in tools like
 LibreOffice Calc.
 
+## User's Guide
+
+See the [USERSGUIDE.md \[en\]](USERSGUIDE.md), [\[de\]](USERSGUIDE-de.md) for
+how to use Libellus Potionis.
+
+## Changes
+
+Changes are documented in [CHANGELOG.md](CHANGELOG.md).
+
 Libellus Potionis was developed for Android 15 and tested with the Fairphone 4
-and Google Pixel 10 Pro running GrapheneOS.
+and Google Pixel 10 Pro running GrapheneOS. The source code can be found at the
+[canonical repository at codeberg.org](https://codeberg.org/godisch/potillus/).
 
-**Changes:** [CHANGELOG.md](CHANGELOG.md)
-
-**License:**
+## License
 
 Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
@@ -62,4 +71,3 @@ details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <https://www.gnu.org/licenses/>.
-

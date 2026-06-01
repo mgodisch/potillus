@@ -83,17 +83,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Ranar fitarwa</string>
     <string name="pdf_meta_period">Lokaci</string>
-    <string name="pdf_meta_gender">Jinsi</string>
     <string name="pdf_meta_limit">Iyaka</string>
     <string name="pdf_meta_weight">Nauyin jiki</string>
-    <string name="pdf_meta_custom_limit">Keɓantacce</string>
     <string name="pdf_kpi_total">Jimlar barasa</string>
     <string name="pdf_kpi_avg_day">Matsakaici kowace rana</string>
     <string name="pdf_kpi_avg_drink_day">Matsakaici kowace rana ta sha</string>
     <string name="pdf_kpi_drink_days">Ranakun sha</string>
     <string name="pdf_kpi_abstinent_days">Ranakun ƙauracewa</string>
-    <string name="pdf_kpi_over_who">Ranakun > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Ranakun > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Ranakun binge (>%1$s g)</string>
     <string name="pdf_col_month">Wata</string>
     <string name="pdf_col_drink_days">Ranakun sha</string>
@@ -140,18 +136,7 @@
     <string name="theme_night">Duhu</string>
     <string name="day_change_time">Lokacin canzawa rana</string>
     <string name="day_starts_at">Sabuwar rana tana farawa da</string>
-    <string name="gender">Jinsi</string>
-    <string name="male">Namiji</string>
-    <string name="female">Mace</string>
-    <string name="limit_mode">Jagorar likita</string>
-    <string name="limit_who">WHO – matakin haɗari</string>
-    <string name="limit_dhs">DHS – ƙarancin haɗari</string>
-    <string name="limit_custom">Keɓantacce</string>
-    <string name="custom_limit_grams">Iyakana ta yau da kullum a cikin gram</string>
-    <string name="weekly_limit_section">Iyakar mako</string>
-    <string name="weekly_limit_enabled">Kunna iyakar mako</string>
     <string name="weekly_limit_grams">Iyakar mako a cikin gram</string>
-    <string name="weekly_limit">Mako</string>
     <string name="biometric">Kulle shiga</string>
     <string name="biometric_lock">Kulle na halitta</string>
     <string name="biometric_desc">Kulle app ɗin da yatsa ko gane fuska</string>
@@ -175,8 +160,6 @@
     <string name="biometric_subtitle">Da fatan tabbatar da asalinku</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) ta ce: Babu matakin aminci na shan barasa. Darajar haɗari da aka nuna a nan ita ce wurin ambato na aiki, ba iyakar aminci ba.</string>
-    <string name="who_values">Darajar haɗari: ♂ ≤ %1$s g, ♀ ≤ %2$s g kowace rana.</string>
     <string name="pdf_months_truncated">Ana nuna watanni %1$d daga %2$d – bayanai na tsufa suna samuwa a CSV/ajiyar kwafi</string>
 
     <!-- Year calendar legend -->
@@ -213,20 +196,24 @@
     <string name="csv_col_grams">Gram_barasa</string>
     <string name="csv_col_note">Bayani</string>
     <string name="pdf_unit_g_per_day">g/rana</string>
-    <string name="unit_g_per_day">g/rana</string>
-
-    <string name="days_over_limit_who">Ranakun sama da iyaka (WHO)</string>
-    <string name="days_over_limit_dhs">Ranakun sama da iyaka (DHS)</string>
-    <string name="days_over_limit_custom">Ranakun sama da iyaka da aka saita</string>
-    <string name="dhs_note">DHS ta ba da shawarwari: maza bai kamata su sha fiye da gram 24 ba, mata bai kamata su sha fiye da gram 12 na barasa mai tsarki kowace rana. Aƙalla kwana biyu a mako ya kamata su kasance ba tare da barasa ba.</string>
     <string name="drink_days_label">ranakun sha wannan mako</string>
     <string name="drink_days_setting">Mafi girma ranakun sha/mako</string>
-    <string name="drink_days_who_dhs_note">Shawara: mafi girma ranakun sha 5 a mako (≥ kwanaki 2 na ƙauracewa)</string>
-    <string name="weekly_gram_mode_title">Iyakar gram ta mako</string>
-    <string name="weekly_gram_mode_desc">Mashigin ci gaba da alamu suna amfani da kasafin mako (mafi girma ranakun sha &#215; iyaka ta yau da kullum)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Bayanan kai</string>
     <string name="week_starts_on">Mako yana farawa</string>
+    <string name="limits">Iyaka</string>
+    <string name="daily_limit_grams">Iyakar yau da kullum a giram</string>
+    <string name="limit_caption_day">%1$s g/rana</string>
+    <string name="limit_caption_week">%1$s g/mako</string>
+    <string name="days_over_daily_limit">Kwanaki sama da iyakar yini</string>
+    <string name="days_over_weekly_limit">Kwanaki sama da iyakar mako</string>
+    <string name="days_over_drink_day_limit">Kwanaki sama da iyakar kwanakin sha</string>
+    <string name="pdf_unit_g_per_week">g/mako</string>
+    <string name="pdf_meta_drink_days_suffix">kwanakin sha/mako</string>
+    <string name="pdf_kpi_over_daily">Kwanaki > yini (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Kwanaki > mako (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Kwanaki > %1$d kwanakin sha</string>
+    <string name="pdf_col_over_daily">> yini</string>
 </resources>

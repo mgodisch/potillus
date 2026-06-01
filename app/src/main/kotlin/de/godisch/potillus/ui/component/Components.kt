@@ -32,11 +32,12 @@ package de.godisch.potillus.ui.component
 //
 // FILE ORGANISATION:
 //   Each section contains composables or helpers for one concern:
-//     - LimitMode localised label  (domain → UI label translation)
 //     - Category icon              (DrinkCategory → Material icon)
 //     - Favourites quick bar       (TodayScreen & CalendarScreen)
 //     - Entry list item            (TodayScreen & CalendarScreen)
-//     - Limit progress bar         (TodayScreen)
+//     - Limit progress bar         (TodayScreen & CalendarScreen)
+//     - Traffic-light capacity dot (TodayScreen, DrinksScreen, AddEditEntryDialog)
+//     - Drink-days progress bar    (TodayScreen)
 // =============================================================================
 
 import androidx.compose.foundation.background
@@ -62,7 +63,6 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
-import de.godisch.potillus.domain.model.LimitMode
 import de.godisch.potillus.domain.model.TrafficLight
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.errorColor
@@ -71,51 +71,6 @@ import de.godisch.potillus.ui.theme.warningColor
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-
-// ════════════════════════════════════════════════════════════════════════════
-// LIMIT MODE – localised label
-// ════════════════════════════════════════════════════════════════════════════
-
-/**
- * Returns the localised display label for this [LimitMode].
- *
- * Defined as a `@Composable` extension function on [LimitMode] so callers
- * can write `limitInfo.mode.localizedLabel()` instead of a when-expression
- * scattered through every screen.
- *
- * WHY @Composable?
- *   [stringResource] can only be called inside a Composable context because
- *   it reads from the current [androidx.compose.ui.platform.LocalContext].
- *   The function is therefore @Composable itself to make this dependency
- *   explicit and to satisfy the Compose compiler.
- *
- * The domain model ([LimitInfo]) deliberately carries no UI label so it
- * stays free of Android / Compose dependencies and is easily unit-testable.
- */
-@Composable
-fun LimitMode.localizedLabel(): String = when (this) {
-    LimitMode.WHO    -> stringResource(R.string.limit_who)
-    LimitMode.DHS    -> stringResource(R.string.limit_dhs)
-    LimitMode.CUSTOM -> stringResource(R.string.limit_custom)
-}
-
-/**
- * Returns a **short** label for use in compact UI elements such as the
- * [LimitBar] gram label line.
- *
- * WHO and DHS are international acronyms – the same abbreviation is used in
- * every locale. CUSTOM falls back to the already-short [R.string.limit_custom]
- * string (e.g. "Custom" / "Eigenes").
- *
- * Use [localizedLabel] where the full descriptive name is needed
- * (e.g. the Settings screen dropdown).
- */
-@Composable
-fun LimitMode.shortLabel(): String = when (this) {
-    LimitMode.WHO    -> "WHO"
-    LimitMode.DHS    -> "DHS"
-    LimitMode.CUSTOM -> ""   // custom mode: only the gram value is shown, no prefix
-}
 
 // ════════════════════════════════════════════════════════════════════════════
 // CATEGORY ICON
@@ -175,7 +130,7 @@ fun DrinkCategoryIcon(
  * Returns the localised display label for this [DrinkCategory].
  *
  * Used in [AddEditDrinkDialog] and the category donut chart legend.
- * Like [LimitMode.localizedLabel], this is @Composable because it calls
+ * Like [DrinkCategoryIcon], this is @Composable because it calls
  * [stringResource].
  */
 @Composable
@@ -326,12 +281,16 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * A labelled horizontal progress bar showing how much of an alcohol limit has been consumed.
+ * A labelled horizontal progress bar showing how much of a gram limit has been consumed.
+ *
+ * This is a generic bar used for both the daily and the weekly gram limit; the
+ * caller supplies the consumed amount, the limit, and a pre-formatted right-hand
+ * [caption] (e.g. "20 g/day" or "100 g/week").
  *
  * Colour semantics:
  *   - < 75 %  → primary (calm blue)
  *   - 75–99 % → warning (amber)
- *   - ≥ 100 % → error (red)  – limit exceeded
+ *   - ≥ 100 % → error (red)  – limit reached or exceeded
  *
  * The [LinearProgressIndicator] receives a clamped [0f, 1f] fraction so it never
  * overflows visually, even when [totalGrams] > [limitGrams]. The colour switch at
@@ -340,26 +299,17 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
  * @param totalGrams  Grams consumed in the current period.
  * @param limitGrams  The threshold to compare against. Clamped to ≥ 1.0 internally
  *                    to prevent division-by-zero when the limit is not yet configured.
- * @param label       Short label shown next to the limit value (e.g. "DHS", "Limit").
+ * @param caption     Right-hand caption shown above the bar (already formatted).
+ * @param leftSuffix  Optional text appended to the consumed-grams label on the left,
+ *                    e.g. a week range "(25.5.–31.5.)". Empty by default.
  * @param modifier    Optional layout modifier for the outer [Column].
  */
 @Composable
 fun LimitBar(
     totalGrams: Double,
     limitGrams: Double,
-    label: String = "Limit",
-    /** When non-empty (weekly gram mode), shown as "(weekRange)" on the left side. */
-    weekRange: String = "",
-    /**
-     * The per-day limit, shown on the right-hand side as
-     * `"$label ($dailyLimitGrams g/day)"` (or just `"($dailyLimitGrams g/day)"`
-     * when [label] is empty, i.e. CUSTOM mode).
-     *
-     * In daily mode pass [limitGrams] directly.
-     * In weekly mode pass the *daily* limit (not the week budget) so the
-     * displayed "X g/day" value always refers to the per-day threshold.
-     */
-    dailyLimitGrams: Double,
+    caption: String,
+    leftSuffix: String = "",
     modifier: Modifier = Modifier
 ) {
     // coerceAtLeast(1.0): guard against limitGrams = 0 (not configured).
@@ -370,26 +320,15 @@ fun LimitBar(
         fraction < 1.0f  -> warningColor()
         else             -> dangerRedColor()
     }
-    val perDayUnit = stringResource(R.string.unit_g_per_day)
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            // Left side: consumed grams, with the week range in parentheses when
-            // weekly gram mode is active (e.g. "0,0 g (25.5.–31.5.)").
-            val leftText = if (weekRange.isNotEmpty())
-                "${"%.1f".format(totalGrams)} g ($weekRange)"
+            val leftText = if (leftSuffix.isNotEmpty())
+                "${"%.1f".format(totalGrams)} g $leftSuffix"
             else
                 "${"%.1f".format(totalGrams)} g"
             Text(leftText, style = MaterialTheme.typography.bodySmall)
-            // Right side: short mode name + daily limit with per-day unit,
-            // e.g. "WHO (20 g/Tag)" — intentionally short so it fits on one line
-            // alongside "0,0 g (25.5.–31.5.)".
-            // Empty label (CUSTOM mode): show only "(10 g/Tag)".
-            val rightText = if (label.isEmpty())
-                "(${"%.0f".format(dailyLimitGrams)} $perDayUnit)"
-            else
-                "$label (${"%.0f".format(dailyLimitGrams)} $perDayUnit)"
             Text(
-                rightText,
+                caption,
                 style    = MaterialTheme.typography.bodySmall,
                 color    = MaterialTheme.colorScheme.onSurfaceVariant,
                 // Guaranteed minimum visual gap from the left text so the two

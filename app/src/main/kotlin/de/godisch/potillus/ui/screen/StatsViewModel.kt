@@ -74,12 +74,17 @@ data class StatsUiState(
     val totalGrams: Double                        = 0.0,
     val avgPerDay: Double                         = 0.0,
     val avgPerDrinkDay: Double                    = 0.0,
-    val daysOverLimit: Int                        = 0,
+    /** Days whose own total exceeds the daily gram limit. */
+    val daysOverDailyLimit: Int                   = 0,
+    /** Consumption days on/after the week's weekly-gram-limit was reached. */
+    val daysOverWeeklyLimit: Int                  = 0,
+    /** Consumption days beyond the allowed number of drink days in their week. */
+    val daysOverDrinkDayLimit: Int                = 0,
     val abstinentDays: Int                        = 0,
     val currentStreak: Int                        = 0,
     val longestStreak: Int                        = 0,
     val trendPercent: Double                      = 0.0,
-    val limitInfo: LimitInfo                      = LimitInfo(LimitMode.WHO, 20.0),
+    val limitInfo: LimitInfo                      = LimitInfo(20.0, 100.0, 5),
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
     // Defaults for the export date-range dialog (CSV/PDF export lives on this
@@ -276,13 +281,26 @@ class StatsViewModel(
                 .mapValues { (_, es) -> es.sumOf { it.gramsAlcohol } }
                 .filter { it.value > 0.0 }
 
+            // All three limits are evaluated together over the period's days.
+            // Daily is a per-day check; weekly and drink-day are accumulated per
+            // week (delimited by the configured week start).
+            val violations = AlcoholCalculator.countLimitViolations(
+                summaries           = current,
+                dailyLimitGrams     = limitInfo.limitGrams,
+                weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
+                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
+                weekStartDay        = settings.weekStartDay
+            )
+
             StatsUiState(
                 period            = period,
                 dataPoints        = current,
                 totalGrams        = totalGrams,
                 avgPerDay         = if (totalDays > 0) totalGrams / totalDays else 0.0,
                 avgPerDrinkDay    = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
-                daysOverLimit     = current.count { it.totalGrams > limitInfo.limitGrams },
+                daysOverDailyLimit    = violations.daysOverDailyLimit,
+                daysOverWeeklyLimit   = violations.daysOverWeeklyLimit,
+                daysOverDrinkDayLimit = violations.daysOverDrinkDayLimit,
                 abstinentDays     = (totalDays - drinkDays).coerceAtLeast(0),
                 // Pass statsFloor so the streak starts at the recording-start date
                 // when there are no drink entries yet (implicit abstinence assumption).

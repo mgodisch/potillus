@@ -87,17 +87,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Ngày xuất</string>
     <string name="pdf_meta_period">Khoảng thời gian</string>
-    <string name="pdf_meta_gender">Giới tính</string>
     <string name="pdf_meta_limit">Giới hạn</string>
     <string name="pdf_meta_weight">Cân nặng</string>
-    <string name="pdf_meta_custom_limit">Tùy chỉnh</string>
     <string name="pdf_kpi_total">Tổng cồn</string>
     <string name="pdf_kpi_avg_day">Trung bình mỗi ngày</string>
     <string name="pdf_kpi_avg_drink_day">Trung bình mỗi ngày uống</string>
     <string name="pdf_kpi_drink_days">Ngày uống rượu</string>
     <string name="pdf_kpi_abstinent_days">Ngày kiêng rượu</string>
-    <string name="pdf_kpi_over_who">Ngày vượt WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Ngày vượt DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Ngày uống quá nhiều (>%1$s g)</string>
     <string name="pdf_col_month">Tháng</string>
     <string name="pdf_col_drink_days">Ngày uống</string>
@@ -144,18 +140,7 @@
     <string name="theme_night">Tối</string>
     <string name="day_change_time">Thời điểm đổi ngày</string>
     <string name="day_starts_at">Ngày mới bắt đầu lúc</string>
-    <string name="gender">Giới tính</string>
-    <string name="male">Nam</string>
-    <string name="female">Nữ</string>
-    <string name="limit_mode">Hướng dẫn y tế</string>
-    <string name="limit_who">WHO – mức rủi ro</string>
-    <string name="limit_dhs">DHS – rủi ro thấp</string>
-    <string name="limit_custom">Tùy chỉnh</string>
-    <string name="custom_limit_grams">Giới hạn hàng ngày của tôi (gam)</string>
-    <string name="weekly_limit_section">Giới hạn hàng tuần</string>
-    <string name="weekly_limit_enabled">Bật giới hạn hàng tuần</string>
     <string name="weekly_limit_grams">Giới hạn hàng tuần (gam)</string>
-    <string name="weekly_limit">Tuần</string>
     <string name="biometric">Khóa truy cập</string>
     <string name="biometric_lock">Khóa sinh trắc học</string>
     <string name="biometric_desc">Khóa ứng dụng bằng vân tay hoặc nhận dạng khuôn mặt</string>
@@ -179,8 +164,6 @@
     <string name="biometric_subtitle">Vui lòng xác thực</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) khẳng định: Không có mức độ tiêu thụ cồn nào là an toàn. Giá trị rủi ro hiển thị ở đây là điểm tham chiếu thực tế, không phải ngưỡng an toàn.</string>
-    <string name="who_values">Giá trị rủi ro: ♂ ≤ %1$s g, ♀ ≤ %2$s g mỗi ngày.</string>
     <string name="pdf_months_truncated">Hiển thị %1$d trong %2$d tháng – dữ liệu cũ hơn có trong CSV/sao lưu</string>
 
     <!-- Year calendar legend -->
@@ -217,20 +200,24 @@
     <string name="csv_col_grams">Gam_cồn</string>
     <string name="csv_col_note">Ghi chú</string>
     <string name="pdf_unit_g_per_day">g/ngày</string>
-    <string name="unit_g_per_day">g/ngày</string>
-
-    <string name="days_over_limit_who">Ngày vượt giới hạn WHO</string>
-    <string name="days_over_limit_dhs">Ngày vượt giới hạn DHS</string>
-    <string name="days_over_limit_custom">Ngày vượt giới hạn tùy chỉnh</string>
-    <string name="dhs_note">Khuyến nghị DHS: Nam giới không nên uống quá 24 g và nữ giới không quá 12 g cồn nguyên chất mỗi ngày. Nên có ít nhất hai ngày không uống rượu mỗi tuần.</string>
     <string name="drink_days_label">Ngày uống rượu trong tuần này</string>
     <string name="drink_days_setting">Số ngày uống tối đa/tuần</string>
-    <string name="drink_days_who_dhs_note">Khuyến nghị: tối đa 5 ngày uống mỗi tuần (≥ 2 ngày kiêng)</string>
-    <string name="weekly_gram_mode_title">Giới hạn gam hàng tuần</string>
-    <string name="weekly_gram_mode_desc">Thanh tiến trình và chỉ báo dựa trên ngân sách hàng tuần (số ngày uống tối đa &#215; giới hạn hàng ngày)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Dữ liệu cá nhân</string>
     <string name="week_starts_on">Tuần bắt đầu vào</string>
+    <string name="limits">Giới hạn</string>
+    <string name="daily_limit_grams">Giới hạn hằng ngày (gram)</string>
+    <string name="limit_caption_day">%1$s g/ngày</string>
+    <string name="limit_caption_week">%1$s g/tuần</string>
+    <string name="days_over_daily_limit">Số ngày vượt giới hạn ngày</string>
+    <string name="days_over_weekly_limit">Số ngày vượt giới hạn tuần</string>
+    <string name="days_over_drink_day_limit">Số ngày vượt giới hạn ngày uống</string>
+    <string name="pdf_unit_g_per_week">g/tuần</string>
+    <string name="pdf_meta_drink_days_suffix">ngày uống/tuần</string>
+    <string name="pdf_kpi_over_daily">Ngày > ngày (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Ngày > tuần (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Ngày > %1$d ngày uống</string>
+    <string name="pdf_col_over_daily">> ngày</string>
 </resources>

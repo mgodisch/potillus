@@ -122,9 +122,10 @@ fun AddEditEntryDialog(
     val trafficLight = if (capacity != null && selectedDrink != null && volume > 0) {
         AlcoholCalculator.trafficLight(
             gramsPerDrink       = previewGrams,
-            consumedGrams       = capacity.effectiveConsumedGrams,
-            gramBudget          = capacity.effectiveBudgetGrams,
-            rawTodayGrams       = capacity.todayGrams,
+            todayGrams          = capacity.todayGrams,
+            dailyLimitGrams     = capacity.dailyLimitGrams,
+            weeklyTotalGrams    = capacity.weeklyTotalGrams,
+            weeklyLimitGrams    = capacity.weeklyLimitGrams,
             drinkDaysThisWeek   = capacity.drinkDaysThisWeek,
             maxDrinkDaysPerWeek = capacity.maxDrinkDaysPerWeek
         )

@@ -27,7 +27,7 @@ package de.godisch.potillus.ui.screen
 //
 // SCOPE:
 //   These tests exercise the statistical computations exposed by StatsViewModel:
-//   period selector, totalGrams, average, daysOverLimit, abstinent days,
+//   period selector, totalGrams, average, days-over-limit counts, abstinent days,
 //   streaks, and trend percentage.
 //
 //   All tests use fixed date strings so they do not depend on the wall-clock
@@ -46,7 +46,6 @@ import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
-import de.godisch.potillus.domain.model.LimitMode
 import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeDrinkRepository
 import de.godisch.potillus.fake.FakeEntryRepository
@@ -122,13 +121,12 @@ class StatsViewModelTest {
         entryRepo = FakeEntryRepository()
         drinkRepo = FakeDrinkRepository()
         // Use a fixed statsFromDate so streak calculations are deterministic.
-        // day-change boundary at 04:00; WHO limit for MALE = 20 g.
+        // day-change boundary at 04:00; default daily limit = 20 g.
         prefs = FakeAppPreferences(
             AppSettings(
                 dayChangeHour = 4,
                 dayChangeMinute = 0,
-                statsFromDate = "2026-01-01",
-                limitMode = LimitMode.WHO
+                statsFromDate = "2026-01-01"
             )
         )
     }
@@ -151,7 +149,7 @@ class StatsViewModelTest {
             assertEquals(StatsPeriod.WEEK, state.period)
             assertEquals(0.0, state.totalGrams, 0.001)
             assertEquals(0.0, state.avgPerDay, 0.001)
-            assertEquals(0, state.daysOverLimit)
+            assertEquals(0, state.daysOverDailyLimit)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -179,14 +177,14 @@ class StatsViewModelTest {
         }
     }
 
-    // ── totalGrams and daysOverLimit ──────────────────────────────────────────
+    // ── totalGrams and days-over-daily-limit ─────────────────────────────────
 
     /**
-     * When entries are added that exceed the WHO daily limit, daysOverLimit
+     * When entries are added that exceed the daily limit, daysOverDailyLimit
      * reflects the correct count.
      *
-     * WHO male limit = 20 g. An entry with 25 g on a single day should produce
-     * daysOverLimit = 1.
+     * Default daily limit = 20 g. An entry with 25 g on a single day should
+     * produce daysOverDailyLimit = 1.
      *
      * TEACHING NOTE:
      *   This test is intentionally independent of the wall-clock date. It adds
@@ -204,7 +202,7 @@ class StatsViewModelTest {
         vm.uiState.test {
             val state = awaitItem()
             assertEquals(25.0, state.totalGrams, 0.001)
-            assertEquals(1, state.daysOverLimit)
+            assertEquals(1, state.daysOverDailyLimit)
             cancelAndIgnoreRemainingEvents()
         }
     }

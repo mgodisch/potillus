@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Vientipäivä</string>
     <string name="pdf_meta_period">Jakso</string>
-    <string name="pdf_meta_gender">Sukupuoli</string>
     <string name="pdf_meta_limit">Raja</string>
     <string name="pdf_meta_weight">Paino</string>
-    <string name="pdf_meta_custom_limit">Mukautettu</string>
     <string name="pdf_kpi_total">Kokonaisalkoholi</string>
     <string name="pdf_kpi_avg_day">Kesk. päivässä</string>
     <string name="pdf_kpi_avg_drink_day">Kesk. juomapäivässä</string>
     <string name="pdf_kpi_drink_days">Juomapäivät</string>
     <string name="pdf_kpi_abstinent_days">Raittiuspäivät</string>
-    <string name="pdf_kpi_over_who">Päivät > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Päivät > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Humalapäivät (>%1$s g)</string>
     <string name="pdf_col_month">Kuukausi</string>
     <string name="pdf_col_drink_days">Juomapäivät</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Tumma</string>
     <string name="day_change_time">Päivänvaihtumisaika</string>
     <string name="day_starts_at">Uusi päivä alkaa klo</string>
-    <string name="gender">Sukupuoli</string>
-    <string name="male">Mies</string>
-    <string name="female">Nainen</string>
-    <string name="limit_mode">Lääketieteellinen ohje</string>
-    <string name="limit_who">WHO – riskiraja</string>
-    <string name="limit_dhs">DHS – matala riski</string>
-    <string name="limit_custom">Mukautettu</string>
-    <string name="custom_limit_grams">Päiväraja grammoina</string>
-    <string name="weekly_limit_section">Viikkoraja</string>
-    <string name="weekly_limit_enabled">Ota viikkoraja käyttöön</string>
     <string name="weekly_limit_grams">Viikkoraja grammoina</string>
-    <string name="weekly_limit">Viikko</string>
     <string name="biometric">Lukitus</string>
     <string name="biometric_lock">Biometrinen lukitus</string>
     <string name="biometric_desc">Lukitse sovellus sormenjäljellä tai kasvoilla</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Kirjaudu sisään</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">WHO (2023) toteaa: Alkoholin kulutukselle ei ole turvallista tasoa. Tässä näytetty riski-arvo on käytännön viitearvo, ei turvallisuusraja.</string>
-    <string name="who_values">Riskiarvo: ♂ ≤ %1$s g, ♀ ≤ %2$s g päivässä.</string>
-    <string name="dhs_note">DHS suosittelee: miesten ei tulisi juoda enempää kuin 24 g, naisten ei enempää kuin 12 g puhdasta alkoholia päivässä. Vähintään kahden päivän viikossa tulisi olla alkoholiton.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Näytetään %1$d/%2$d kuukautta – vanhemmat tiedot CSV:ssä/varmuuskopiossa</string>
     <string name="year_calendar_no_entry">ei merkintää</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grammia_alkoholia</string>
     <string name="csv_col_note">Muistiinpano</string>
     <string name="pdf_unit_g_per_day">g/päivä</string>
-    <string name="unit_g_per_day">g/päivä</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Päivät rajan yli (WHO)</string>
-    <string name="days_over_limit_dhs">Päivät rajan yli (DHS)</string>
-    <string name="days_over_limit_custom">Päivät määritetyn rajan yli</string>
     <string name="drink_days_label">juomapäivät tällä viikolla</string>
     <string name="drink_days_setting">Maks. juomapäivät/viikko</string>
-    <string name="drink_days_who_dhs_note">Suositus: enintään 5 juomapäivää viikossa (≥ 2 alkoholitonta päivää)</string>
-    <string name="weekly_gram_mode_title">Viikoittainen grammaraja</string>
-    <string name="weekly_gram_mode_desc">Edistymispalkki ja indikaattorit käyttävät viikoittaista budjettia (maks. juomapäivät &#215; päiväraja)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Henkilötiedot</string>
     <string name="week_starts_on">Viikko alkaa</string>
+    <string name="limits">Rajat</string>
+    <string name="daily_limit_grams">Päivittäinen raja grammoina</string>
+    <string name="limit_caption_day">%1$s g/pv</string>
+    <string name="limit_caption_week">%1$s g/vko</string>
+    <string name="days_over_daily_limit">Päivät yli päivärajan</string>
+    <string name="days_over_weekly_limit">Päivät yli viikkorajan</string>
+    <string name="days_over_drink_day_limit">Päivät yli juomapäivärajan</string>
+    <string name="pdf_unit_g_per_week">g/vko</string>
+    <string name="pdf_meta_drink_days_suffix">juomapäivää/vko</string>
+    <string name="pdf_kpi_over_daily">Päivät > pv (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Päivät > vko (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Päivät > %1$d juomapäivää</string>
+    <string name="pdf_col_over_daily">> pv</string>
 </resources>

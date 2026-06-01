@@ -66,7 +66,7 @@ import okio.Buffer
 // WHY ENCRYPTED?
 //   DataStore writes a Protobuf file to the app's private storage. On a rooted
 //   device or via ADB with USB debugging enabled, that file can be read in
-//   plain text. This app stores health-sensitive data (body weight, gender,
+//   plain text. This app stores health-sensitive data (body weight and
 //   alcohol-limit preferences) so application-level encryption is appropriate
 //   on top of Android's mandatory File-Based Encryption (FBE).
 //
@@ -227,16 +227,21 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         internal val KEY_THEME          = stringPreferencesKey("theme_mode")
         internal val KEY_DAY_HOUR       = intPreferencesKey("day_change_hour")
         internal val KEY_DAY_MINUTE     = intPreferencesKey("day_change_minute")
-        internal val KEY_GENDER         = stringPreferencesKey("gender")
-        internal val KEY_LIMIT_MODE     = stringPreferencesKey("limit_mode")
-        internal val KEY_CUSTOM_LIMIT   = doublePreferencesKey("custom_limit_grams")
-        internal val KEY_CUSTOM_MAX_DAYS   = intPreferencesKey("custom_max_drink_days")
-        internal val KEY_WEEKLY_GRAM_MODE  = booleanPreferencesKey("weekly_gram_mode")
+        // KEY_DAILY_LIMIT keeps the historical key name "custom_limit_grams" so
+        // that a user's previously configured daily limit survives the upgrade to
+        // the always-on three-limit model.
+        internal val KEY_DAILY_LIMIT    = doublePreferencesKey("custom_limit_grams")
+        internal val KEY_WEEKLY_LIMIT   = doublePreferencesKey("weekly_limit_grams")
+        // KEY_MAX_DRINK_DAYS keeps the historical key name "custom_max_drink_days".
+        internal val KEY_MAX_DRINK_DAYS = intPreferencesKey("custom_max_drink_days")
         internal val KEY_BIOMETRIC      = booleanPreferencesKey("biometric_lock")
         internal val KEY_LANGUAGE       = stringPreferencesKey("language")
         internal val KEY_WEIGHT_KG      = doublePreferencesKey("weight_kg")
         internal val KEY_STATS_FROM     = stringPreferencesKey("stats_from_date")
         internal val KEY_WEEK_START     = intPreferencesKey("week_start_day")
+        // Removed in the three-limit refactor: "gender", "limit_mode" and
+        // "weekly_gram_mode". Any leftover values for those keys in an existing
+        // DataStore file are simply ignored by settingsFlow below.
     }
 
     /**
@@ -309,19 +314,17 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      */
     override val settingsFlow: Flow<AppSettings> = dataStore.data.map { prefs ->
         AppSettings(
-            themeMode          = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
-            dayChangeHour      = prefs[KEY_DAY_HOUR]       ?: 4,
-            dayChangeMinute    = prefs[KEY_DAY_MINUTE]     ?: 0,
-            gender             = runCatching { Gender.valueOf(prefs[KEY_GENDER] ?: "") }.getOrDefault(Gender.MALE),
-            limitMode          = runCatching { LimitMode.valueOf(prefs[KEY_LIMIT_MODE] ?: "") }.getOrDefault(LimitMode.WHO),
-            customLimitGrams   = prefs[KEY_CUSTOM_LIMIT]   ?: 20.0,
-            customMaxDrinkDays = prefs[KEY_CUSTOM_MAX_DAYS]  ?: 5,
-            weeklyGramMode     = prefs[KEY_WEEKLY_GRAM_MODE] ?: false,
-            biometricEnabled   = prefs[KEY_BIOMETRIC]      ?: false,
-            language           = prefs[KEY_LANGUAGE]       ?: "",
-            weightKg           = prefs[KEY_WEIGHT_KG]      ?: 0.0,
-            statsFromDate      = prefs[KEY_STATS_FROM]    ?: installDate,
-            weekStartDay       = prefs[KEY_WEEK_START]     ?: 1
+            themeMode           = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
+            dayChangeHour       = prefs[KEY_DAY_HOUR]        ?: 4,
+            dayChangeMinute     = prefs[KEY_DAY_MINUTE]      ?: 0,
+            dailyLimitGrams     = prefs[KEY_DAILY_LIMIT]     ?: 20.0,
+            weeklyLimitGrams    = prefs[KEY_WEEKLY_LIMIT]    ?: 100.0,
+            maxDrinkDaysPerWeek = prefs[KEY_MAX_DRINK_DAYS]  ?: 5,
+            biometricEnabled    = prefs[KEY_BIOMETRIC]       ?: false,
+            language            = prefs[KEY_LANGUAGE]        ?: "",
+            weightKg            = prefs[KEY_WEIGHT_KG]       ?: 0.0,
+            statsFromDate       = prefs[KEY_STATS_FROM]      ?: installDate,
+            weekStartDay        = prefs[KEY_WEEK_START]      ?: 1
         )
     }
 
@@ -337,14 +340,12 @@ class AppPreferences(private val context: Context) : IAppPreferences {
     // inline via coerceIn(...) so the valid bounds are visible at a glance.
 
     override suspend fun setTheme(mode: ThemeMode)      = save { it[KEY_THEME]          = mode.name }
-    override suspend fun setGender(g: Gender)           = save { it[KEY_GENDER]         = g.name }
-    override suspend fun setLimitMode(m: LimitMode)     = save { it[KEY_LIMIT_MODE]     = m.name }
-    override suspend fun setCustomLimit(g: Double)      = save { it[KEY_CUSTOM_LIMIT]   = g.coerceIn(1.0, 500.0) }
+    override suspend fun setDailyLimit(g: Double)       = save { it[KEY_DAILY_LIMIT]    = g.coerceIn(1.0, 500.0) }
+    override suspend fun setWeeklyLimit(g: Double)      = save { it[KEY_WEEKLY_LIMIT]   = g.coerceIn(1.0, 3500.0) }
     override suspend fun setBiometric(v: Boolean)       = save { it[KEY_BIOMETRIC]      = v }
     override suspend fun setLanguage(lang: String)      = save { it[KEY_LANGUAGE]       = lang }
     override suspend fun setWeightKg(kg: Double)        = save { it[KEY_WEIGHT_KG]      = kg.coerceIn(1.0, 500.0) }
-    override suspend fun setCustomMaxDrinkDays(days: Int) = save { it[KEY_CUSTOM_MAX_DAYS] = days.coerceIn(1, 7) }
-    override suspend fun setWeeklyGramMode(v: Boolean)    = save { it[KEY_WEEKLY_GRAM_MODE] = v }
+    override suspend fun setMaxDrinkDaysPerWeek(days: Int) = save { it[KEY_MAX_DRINK_DAYS] = days.coerceIn(1, 7) }
 
     /**
      * Writes day-change hour and minute in a single atomic transaction.

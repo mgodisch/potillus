@@ -79,17 +79,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">রপ্তানির তারিখ</string>
     <string name="pdf_meta_period">সময়কাল</string>
-    <string name="pdf_meta_gender">লিঙ্গ</string>
     <string name="pdf_meta_limit">সীমা</string>
     <string name="pdf_meta_weight">শরীরের ওজন</string>
-    <string name="pdf_meta_custom_limit">কাস্টম</string>
     <string name="pdf_kpi_total">মোট অ্যালকোহল</string>
     <string name="pdf_kpi_avg_day">প্রতিদিন গড়</string>
     <string name="pdf_kpi_avg_drink_day">পানের দিনে গড়</string>
     <string name="pdf_kpi_drink_days">পানের দিন</string>
     <string name="pdf_kpi_abstinent_days">বিরত দিন</string>
-    <string name="pdf_kpi_over_who">দিন > WHO (%1$s গ্রাম)</string>
-    <string name="pdf_kpi_over_dhs">দিন > DHS (%1$s গ্রাম)</string>
     <string name="pdf_kpi_binge">বিঞ্জ দিন (>%1$s গ্রাম)</string>
     <string name="pdf_col_month">মাস</string>
     <string name="pdf_col_drink_days">পানের দিন</string>
@@ -136,18 +132,7 @@
     <string name="theme_night">অন্ধকার</string>
     <string name="day_change_time">দিন পরিবর্তনের সময়</string>
     <string name="day_starts_at">নতুন দিন শুরু হয়</string>
-    <string name="gender">লিঙ্গ</string>
-    <string name="male">পুরুষ</string>
-    <string name="female">মহিলা</string>
-    <string name="limit_mode">চিকিৎসা নির্দেশিকা</string>
-    <string name="limit_who">WHO – ঝুঁকির মাত্রা</string>
-    <string name="limit_dhs">DHS – কম ঝুঁকি</string>
-    <string name="limit_custom">কাস্টম</string>
-    <string name="custom_limit_grams">আমার দৈনিক সীমা গ্রামে</string>
-    <string name="weekly_limit_section">সাপ্তাহিক সীমা</string>
-    <string name="weekly_limit_enabled">সাপ্তাহিক সীমা সক্রিয় করুন</string>
     <string name="weekly_limit_grams">সাপ্তাহিক সীমা গ্রামে</string>
-    <string name="weekly_limit">সপ্তাহ</string>
     <string name="biometric">অ্যাক্সেস লক</string>
     <string name="biometric_lock">বায়োমেট্রিক লক</string>
     <string name="biometric_desc">আঙুলের ছাপ বা মুখ শনাক্তকরণ দিয়ে অ্যাপ লক করুন</string>
@@ -171,8 +156,6 @@
     <string name="biometric_subtitle">অনুগ্রহ করে প্রমাণীকরণ করুন</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (২০২৩) বলেছে: অ্যালকোহল গ্রহণের কোনো নিরাপদ মাত্রা নেই। এখানে দেখানো ঝুঁকির মান একটি ব্যবহারিক রেফারেন্স পয়েন্ট, নিরাপত্তার সীমা নয়।</string>
-    <string name="who_values">ঝুঁকির মান: ♂ ≤ %1$s g, ♀ ≤ %2$s g প্রতিদিন।</string>
     <string name="pdf_months_truncated">%2$d মাসের মধ্যে %1$d দেখানো হচ্ছে – পুরানো ডেটা CSV/ব্যাকআপে পাওয়া যাবে</string>
 
     <!-- Year calendar legend -->
@@ -209,20 +192,24 @@
     <string name="csv_col_grams">গ্রাম_অ্যালকোহল</string>
     <string name="csv_col_note">নোট</string>
     <string name="pdf_unit_g_per_day">গ্রাম/দিন</string>
-    <string name="unit_g_per_day">গ্রাম/দিন</string>
-
-    <string name="days_over_limit_who">সীমা অতিক্রমের দিন (WHO)</string>
-    <string name="days_over_limit_dhs">সীমা অতিক্রমের দিন (DHS)</string>
-    <string name="days_over_limit_custom">নির্ধারিত সীমা অতিক্রমের দিন</string>
-    <string name="dhs_note">DHS সুপারিশ করে: পুরুষরা প্রতিদিন ২৪ গ্রামের বেশি, মহিলারা ১২ গ্রামের বেশি বিশুদ্ধ অ্যালকোহল পান না করুন। সপ্তাহে অন্তত দুদিন অ্যালকোহলমুক্ত থাকুন।</string>
     <string name="drink_days_label">এই সপ্তাহে পানের দিন</string>
     <string name="drink_days_setting">সর্বোচ্চ পানের দিন/সপ্তাহ</string>
-    <string name="drink_days_who_dhs_note">সুপারিশ: সপ্তাহে সর্বোচ্চ ৫ দিন (≥ ২টি বিরত দিন)</string>
-    <string name="weekly_gram_mode_title">সাপ্তাহিক গ্রাম সীমা</string>
-    <string name="weekly_gram_mode_desc">প্রগতি বার এবং সংকেতক সাপ্তাহিক বাজেট ব্যবহার করে (সর্বোচ্চ পানের দিন &#215; দৈনিক সীমা)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">ব্যক্তিগত তথ্য</string>
     <string name="week_starts_on">সপ্তাহ শুরু হয়</string>
+    <string name="limits">সীমা</string>
+    <string name="daily_limit_grams">গ্রামে দৈনিক সীমা</string>
+    <string name="limit_caption_day">%1$s g/দিন</string>
+    <string name="limit_caption_week">%1$s g/সপ্তাহ</string>
+    <string name="days_over_daily_limit">দৈনিক সীমার বেশি দিন</string>
+    <string name="days_over_weekly_limit">সাপ্তাহিক সীমার বেশি দিন</string>
+    <string name="days_over_drink_day_limit">পানের দিনের সীমার বেশি দিন</string>
+    <string name="pdf_unit_g_per_week">g/সপ্তাহ</string>
+    <string name="pdf_meta_drink_days_suffix">পানের দিন/সপ্তাহ</string>
+    <string name="pdf_kpi_over_daily">দিন > দৈনিক (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">দিন > সাপ্তাহিক (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">দিন > %1$d পানের দিন</string>
+    <string name="pdf_col_over_daily">> দিন</string>
 </resources>

@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Ekspordikuupäev</string>
     <string name="pdf_meta_period">Periood</string>
-    <string name="pdf_meta_gender">Sugu</string>
     <string name="pdf_meta_limit">Limiit</string>
     <string name="pdf_meta_weight">Kehakaal</string>
-    <string name="pdf_meta_custom_limit">Kohandatud</string>
     <string name="pdf_kpi_total">Kogu alkohol</string>
     <string name="pdf_kpi_avg_day">Keskm. päevas</string>
     <string name="pdf_kpi_avg_drink_day">Keskm. joomispäevas</string>
     <string name="pdf_kpi_drink_days">Joomispäevad</string>
     <string name="pdf_kpi_abstinent_days">Hoidumispäevad</string>
-    <string name="pdf_kpi_over_who">Päevad > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Päevad > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Liigjoomispäevad (>%1$s g)</string>
     <string name="pdf_col_month">Kuu</string>
     <string name="pdf_col_drink_days">Joomispäevad</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Tume</string>
     <string name="day_change_time">Päevavahetuse kellaaeg</string>
     <string name="day_starts_at">Uus päev algab kell</string>
-    <string name="gender">Sugu</string>
-    <string name="male">Mees</string>
-    <string name="female">Naine</string>
-    <string name="limit_mode">Meditsiiniline juhend</string>
-    <string name="limit_who">WHO – riskitase</string>
-    <string name="limit_dhs">DHS – madal risk</string>
-    <string name="limit_custom">Kohandatud</string>
-    <string name="custom_limit_grams">Minu päevane limiit grammides</string>
-    <string name="weekly_limit_section">Nädalane limiit</string>
-    <string name="weekly_limit_enabled">Luba nädalane limiit</string>
     <string name="weekly_limit_grams">Nädalane limiit grammides</string>
-    <string name="weekly_limit">Nädal</string>
     <string name="biometric">Luku</string>
     <string name="biometric_lock">Biomeetriline luku</string>
     <string name="biometric_desc">Lukusta rakendus sõrmejälje või näoga</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Palun autentige</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">WHO (2023) kinnitab: Alkoholi tarbimiseks pole turvalist taset. Siin kuvatud riskiväärtus on praktiline viitetase, mitte ohutuslävi.</string>
-    <string name="who_values">Riskiväärtus: ♂ ≤ %1$s g, ♀ ≤ %2$s g päevas.</string>
-    <string name="dhs_note">DHS soovitab: mehed ei tohiks juua rohkem kui 24 g, naised mitte rohkem kui 12 g puhast alkoholi päevas. Vähemalt kaks päeva nädalas peaks olema alkoholivabad.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Näidatakse %1$d/%2$d kuud – vanemad andmed on CSV-s/varukopias</string>
     <string name="year_calendar_no_entry">kanne puudub</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grammid_alkoholi</string>
     <string name="csv_col_note">Märkus</string>
     <string name="pdf_unit_g_per_day">g/päev</string>
-    <string name="unit_g_per_day">g/päev</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Päevad üle piiri (WHO)</string>
-    <string name="days_over_limit_dhs">Päevad üle piiri (DHS)</string>
-    <string name="days_over_limit_custom">Päevad üle seadistatud piiri</string>
     <string name="drink_days_label">joomispäevad sel nädalal</string>
     <string name="drink_days_setting">Maks. joomispäevad/nädal</string>
-    <string name="drink_days_who_dhs_note">Soovitus: maks. 5 joomispäeva nädalas (≥ 2 alkoholivaba päeva)</string>
-    <string name="weekly_gram_mode_title">Nädalane grammipiirang</string>
-    <string name="weekly_gram_mode_desc">Edenemisnäidik ja indikaatorid kasutavad nädalast eelarvet (maks. joomispäevad &#215; päevalimiit)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Isikuandmed</string>
     <string name="week_starts_on">Nädal algab</string>
+    <string name="limits">Piirid</string>
+    <string name="daily_limit_grams">Päevane piir grammides</string>
+    <string name="limit_caption_day">%1$s g/päev</string>
+    <string name="limit_caption_week">%1$s g/nädal</string>
+    <string name="days_over_daily_limit">Päevad üle päevase piiri</string>
+    <string name="days_over_weekly_limit">Päevad üle nädalase piiri</string>
+    <string name="days_over_drink_day_limit">Päevad üle joomispäevade piiri</string>
+    <string name="pdf_unit_g_per_week">g/nädal</string>
+    <string name="pdf_meta_drink_days_suffix">joomispäeva/näd.</string>
+    <string name="pdf_kpi_over_daily">Päevad > päev (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Päevad > nädal (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Päevad > %1$d joomispäeva</string>
+    <string name="pdf_col_over_daily">> päev</string>
 </resources>

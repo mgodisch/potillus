@@ -76,17 +76,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">تاريخ التصدير</string>
     <string name="pdf_meta_period">الفترة</string>
-    <string name="pdf_meta_gender">الجنس</string>
     <string name="pdf_meta_limit">الحد</string>
     <string name="pdf_meta_weight">وزن الجسم</string>
-    <string name="pdf_meta_custom_limit">مخصص</string>
     <string name="pdf_kpi_total">إجمالي الكحول</string>
     <string name="pdf_kpi_avg_day">متوسط يومي</string>
     <string name="pdf_kpi_avg_drink_day">متوسط أيام الشرب</string>
     <string name="pdf_kpi_drink_days">أيام الشرب</string>
     <string name="pdf_kpi_abstinent_days">أيام الامتناع</string>
-    <string name="pdf_kpi_over_who">أيام > WHO (%1$s غ)</string>
-    <string name="pdf_kpi_over_dhs">أيام > DHS (%1$s غ)</string>
     <string name="pdf_kpi_binge">أيام الإفراط (>%1$s غ)</string>
     <string name="pdf_col_month">الشهر</string>
     <string name="pdf_col_drink_days">أيام الشرب</string>
@@ -133,18 +129,7 @@
     <string name="theme_night">داكن</string>
     <string name="day_change_time">وقت تغيير اليوم</string>
     <string name="day_starts_at">يبدأ اليوم الجديد في</string>
-    <string name="gender">الجنس</string>
-    <string name="male">ذكر</string>
-    <string name="female">أنثى</string>
-    <string name="limit_mode">المبدأ التوجيهي الطبي</string>
-    <string name="limit_who">WHO – مستوى الخطر</string>
-    <string name="limit_dhs">DHS – مخاطر منخفضة</string>
-    <string name="limit_custom">مخصص</string>
-    <string name="custom_limit_grams">حدي اليومي بالغرامات</string>
-    <string name="weekly_limit_section">الحد الأسبوعي</string>
-    <string name="weekly_limit_enabled">تفعيل الحد الأسبوعي</string>
     <string name="weekly_limit_grams">الحد الأسبوعي بالغرامات</string>
-    <string name="weekly_limit">الأسبوع</string>
     <string name="biometric">قفل الوصول</string>
     <string name="biometric_lock">القفل البيومتري</string>
     <string name="biometric_desc">قفل التطبيق ببصمة الإصبع أو التعرف على الوجه</string>
@@ -168,8 +153,6 @@
     <string name="biometric_subtitle">يرجى المصادقة</string>
 
     <!-- WHO note -->
-    <string name="who_note">تؤكد منظمة الصحة العالمية (2023): لا توجد كمية آمنة من الكحول. قيمة الخطر المعروضة هنا نقطة مرجعية عملية وليست حدًا للسلامة.</string>
-    <string name="who_values">قيمة الخطر: ♂ ≤ %1$s غ، ♀ ≤ %2$s غ يوميًا.</string>
     <string name="pdf_months_truncated">عرض %1$d من أصل %2$d شهرًا – البيانات الأقدم متاحة في CSV/النسخ الاحتياطي</string>
 
     <!-- Year calendar legend -->
@@ -206,20 +189,24 @@
     <string name="csv_col_grams">غرام_كحول</string>
     <string name="csv_col_note">ملاحظة</string>
     <string name="pdf_unit_g_per_day">غ/يوم</string>
-    <string name="unit_g_per_day">غ/يوم</string>
-
-    <string name="days_over_limit_who">أيام تجاوز حد WHO</string>
-    <string name="days_over_limit_dhs">أيام تجاوز حد DHS</string>
-    <string name="days_over_limit_custom">أيام تجاوز الحد المخصص</string>
-    <string name="dhs_note">توصية DHS: لا يشرب الرجال أكثر من 24 غ والنساء أكثر من 12 غ من الكحول النقي يوميًا. يجب أن يكون هناك يومان على الأقل خاليان من الكحول أسبوعيًا.</string>
     <string name="drink_days_label">أيام الشرب هذا الأسبوع</string>
     <string name="drink_days_setting">الحد الأقصى لأيام الشرب/الأسبوع</string>
-    <string name="drink_days_who_dhs_note">توصية: الحد الأقصى 5 أيام شرب في الأسبوع (≥ يومان من الامتناع)</string>
-    <string name="weekly_gram_mode_title">الحد الأسبوعي بالغرامات</string>
-    <string name="weekly_gram_mode_desc">يستخدم شريط التقدم والمؤشرات الميزانية الأسبوعية (الحد الأقصى لأيام الشرب &#215; الحد اليومي)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">البيانات الشخصية</string>
     <string name="week_starts_on">يبدأ الأسبوع يوم</string>
+    <string name="limits">الحدود</string>
+    <string name="daily_limit_grams">الحد اليومي بالجرامات</string>
+    <string name="limit_caption_day">%1$s g/يوم</string>
+    <string name="limit_caption_week">%1$s g/أسبوع</string>
+    <string name="days_over_daily_limit">أيام فوق الحد اليومي</string>
+    <string name="days_over_weekly_limit">أيام فوق الحد الأسبوعي</string>
+    <string name="days_over_drink_day_limit">أيام فوق حد أيام الشرب</string>
+    <string name="pdf_unit_g_per_week">g/أسبوع</string>
+    <string name="pdf_meta_drink_days_suffix">أيام شرب/أسبوع</string>
+    <string name="pdf_kpi_over_daily">أيام > يومي (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">أيام > أسبوعي (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">أيام > %1$d أيام شرب</string>
+    <string name="pdf_col_over_daily">> يوم</string>
 </resources>

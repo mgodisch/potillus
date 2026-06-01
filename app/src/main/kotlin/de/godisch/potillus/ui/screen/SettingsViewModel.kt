@@ -62,7 +62,6 @@ import de.godisch.potillus.data.prefs.IAppPreferences
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
-import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.ExportResult
@@ -172,39 +171,12 @@ class SettingsViewModel(
     fun setThemeMode(m: ThemeMode)        = viewModelScope.launch { prefs.setTheme(m) }
     /** Persists the day-change time (hour [h], minute [m]) atomically. */
     fun setDayChangeTime(h: Int, m: Int)  = viewModelScope.launch { prefs.setDayChangeTime(h, m) }
-    /** Persists the user's biological sex [g] (used by the Widmark BAC model). */
-    fun setGender(g: Gender)              = viewModelScope.launch { prefs.setGender(g) }
-    /**
-     * Changes the active limit mode.
-     *
-     * When the user selects [LimitMode.CUSTOM] for the first time (i.e. the
-     * previous mode was WHO or DHS), [customLimitGrams] and [customMaxDrinkDays]
-     * are pre-seeded with the current WHO values for the user's gender.
-     * This gives a sensible, clinically grounded starting point rather than an
-     * arbitrary placeholder. The user can then adjust the values freely.
-     *
-     * If the user switches back to WHO/DHS and then selects CUSTOM again, the
-     * WHO values are re-applied – a predictable "reset to standard" behaviour.
-     */
-    fun setLimitMode(m: LimitMode) = viewModelScope.launch {
-        if (m == LimitMode.CUSTOM) {
-            val settings = prefs.settingsFlow.first()
-            if (settings.limitMode != LimitMode.CUSTOM) {
-                // Pre-seed with WHO daily gram limit for current gender
-                val whoGrams = if (settings.gender == Gender.FEMALE)
-                    AlcoholCalculator.WHO_LIMIT_FEMALE else AlcoholCalculator.WHO_LIMIT_MALE
-                prefs.setCustomLimit(whoGrams)
-                prefs.setCustomMaxDrinkDays(5)
-            }
-        }
-        prefs.setLimitMode(m)
-    }
-    /** Persists the custom daily limit in grams [g] (clamped in AppPreferences). */
-    fun setCustomLimit(g: Double)         = viewModelScope.launch { prefs.setCustomLimit(g) }
-    /** Persists the custom maximum number of drink days per week [days] (1–7). */
-    fun setCustomMaxDrinkDays(days: Int) = viewModelScope.launch { prefs.setCustomMaxDrinkDays(days) }
-    /** Enables/disables weekly (vs daily) gram-budget evaluation. */
-    fun setWeeklyGramMode(v: Boolean)    = viewModelScope.launch { prefs.setWeeklyGramMode(v) }
+    /** Persists the daily pure-alcohol limit in grams [g] (clamped in AppPreferences). */
+    fun setDailyLimit(g: Double)          = viewModelScope.launch { prefs.setDailyLimit(g) }
+    /** Persists the weekly pure-alcohol limit in grams [g] (clamped in AppPreferences). */
+    fun setWeeklyLimit(g: Double)         = viewModelScope.launch { prefs.setWeeklyLimit(g) }
+    /** Persists the maximum number of drink days per week [days] (1–7). */
+    fun setMaxDrinkDaysPerWeek(days: Int) = viewModelScope.launch { prefs.setMaxDrinkDaysPerWeek(days) }
     /** Enables/disables the biometric app lock. */
     fun setBiometric(v: Boolean)          = viewModelScope.launch { prefs.setBiometric(v) }
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */

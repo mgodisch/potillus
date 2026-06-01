@@ -1,0 +1,119 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Benutzer-HOWTO
+
+Willkommen bei Libellus Potionis, dem persönlichen Protokollanten deines
+Alkoholkonsums! Diese Seite beschreibt die Features und Funktionen der App.
+
+## Highlights
+
+Libellus Potionis ist Open Source. Der Quellcode ist von jederman einsehbar und
+überprüfbar. Libellus Potionis ist datenschutzfreundlich. Es benötigt keine
+Berechtigungen, nicht an Kamera oder Mikrofon, nicht an GPS oder Netzwerk.
+Libellus Potionis ist sicher: Alle Daten werden verschlüsselt abgelegt, der
+Zugriff auf die App kann mittels Fingerabdrucks eingeschränkt werden. Libellus
+Potionis unterstützt dich beim Rantrinken an dein Limit, indem er dir jederzeit
+verrät, ob "la petite sœur" in deinem Limit noch drin ist. Libellus Potionis
+unterstützt dich bei deiner Suchtberatungsstelle, in dem er auf Wunsch dein
+komplettes Trinkverhalten auf einem zweiseitigen PDF darlegt. Libellus Potionis
+ist gratis und werbefrei.
+
+Libellus Potionis setzt Android 15 oder höher voraus. Es wird vom Autor
+kontinuierlich auf einem Google Pixel 10 Pro unter GrapheneOS genutzt und
+zusätzlich auf einem Fairphone 4 getestet. 
+
+## Screen "Heute"
+
+Auf diesem Screen findest du eine Liste deiner heute genossenen alkoholischen
+Getränke. Sollte dir beim Einbuchen ein Fehler unterlaufen sein, so lassen
+diese sich hier auch editieren oder löschen. Mit der Plus-Taste fügst du
+weitere Getränke hinzu.
+
+Über der Getränkeliste findest du eine Übersicht zum heutigen Tag mit folgenden
+Informationen: die heute bereits genossene Menge Alkohols (in Gramm), die heute
+bereits genossene Menge Alkohols bezogen auf dein Tages- und Wochenlimit (in
+Gramm und als Balken-Chart), die bisherige Anzahl der Tage mit Alkoholkonsum in
+dieser Woche bezogen auf dein Limit (als Zahl und als Balken-Chart).
+
+## Screen "Kalender"
+
+Auf diesem Screen findest du den Kalender. Tage, an denen getrunken wurde sind
+mit einem blauen (unkritische Menge) oder roten Punkt (über Limit)
+gekennzeichnet. Wenn du einen Tag auswählst, werden die jeweiligen Getränke
+gelistet und können ggf. korrigiert oder gelöscht werden. Auch das
+nachträgliche Hinzufügen von konsumierten Getränken ist möglich.
+
+## Screen "Statistik"
+
+Dieser Screen zeigt statistische Auswertungen über deinen Alkoholkonsum,
+wählbar nach Woche, Monat oder Jahr. Es ist ein CSV-Export möglich, um die
+Daten in einer Tabellenkalkulation weiterzuverarbeiten. Daneben ist jedoch auch
+ein PDF-Export möglich, welche das Trinkverhalten in einem für eine
+Suchtberatung hilfreichen Format aufarbeitet.
+
+## Screen "Getränke"
+
+Dieser Screen beinhaltet die Liste der Getränke. Die App wird mit einem Set
+international gebräuchlicher Getränke ausgeliefert. Diese können alle geändert
+oder auch gelöscht werden. Mit dem Plus kannst du ein neues Getränk definieren.
+Mit einem Tap auf ein Getränk öffnet sich ein Dialog, um dieses als konsumiert
+einzubuchen.
+
+## Screen "Einstellungen"
+
+Das Einstellungs-Menü ist über das Zahnrad-Symbol oben rechts zu erreichen.
+Libellus Potionis ermöglicht folgende Einstellungen:
+
+### Persönliche Daten
+
+In dieser Kategorie kann das eigene Körpergewicht notiert werden, um den
+Blutalkoholwert näherungsweise nach der
+[Widmark-Formel](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
+berechnen zu lassen.
+
+### Grenzwerte
+
+In dieser Kategorie sind die Limits zu notieren, die für den eigenen
+Alkoholkonsum gelten sollen. Einzutragen sind: maximales Tageslimit in Gramm
+reinen Alkohols, maximales Wochenlimit, maximale Trinktage pro Woche. Alle
+Limits gelten. Auf dem Heute-Screen sind entsprechend drei Fortschrittsbalken
+zu sehen. Wer nicht weiß, was er hier einstellen soll, kann sich auf
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+von den in unterschiedlichen Ländern geltenden Empfehlungen inspirieren lassen.
+
+### Statistik
+
+Bei den statistischen Einstellungen kann festgelegt werden, um welche Uhrzeit
+ein neuer Tag beginnt, so dass beispielsweise ein Getränk um 1 Uhr nachts noch
+zum Vortag zählt, mit welchem Tag die Woche beginnen soll und -- für
+Neujahrsvorsätze -- ab wann die Daten ausgewertet werden sollen.
+
+### Backup
+
+Alle Daten können als JSON exportiert und auch wieder importiert werden.
+
+### Erscheinungsbild
+
+In dieser Kategorie kann die biometrische Sperre für die App aktiviert werden,
+außerdem das Farbschema und die Sprache unabhängig von den Systemeinstellungen
+gesetzt werden.

@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Eksporto data</string>
     <string name="pdf_meta_period">Laikotarpis</string>
-    <string name="pdf_meta_gender">Lytis</string>
     <string name="pdf_meta_limit">Riba</string>
     <string name="pdf_meta_weight">Kūno svoris</string>
-    <string name="pdf_meta_custom_limit">Pasirinktinis</string>
     <string name="pdf_kpi_total">Visas alkoholis</string>
     <string name="pdf_kpi_avg_day">Vid. per dieną</string>
     <string name="pdf_kpi_avg_drink_day">Vid. per gėrimo dieną</string>
     <string name="pdf_kpi_drink_days">Gėrimo dienos</string>
     <string name="pdf_kpi_abstinent_days">Susilaikymo dienos</string>
-    <string name="pdf_kpi_over_who">Dienos > PSO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dienos > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Girtavimo dienos (>%1$s g)</string>
     <string name="pdf_col_month">Mėnuo</string>
     <string name="pdf_col_drink_days">Gėrimo dienos</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Tamsi</string>
     <string name="day_change_time">Dienos keitimo laikas</string>
     <string name="day_starts_at">Nauja diena prasideda</string>
-    <string name="gender">Lytis</string>
-    <string name="male">Vyras</string>
-    <string name="female">Moteris</string>
-    <string name="limit_mode">Medicinos gairė</string>
-    <string name="limit_who">PSO – rizikos lygis</string>
-    <string name="limit_dhs">DHS – žema rizika</string>
-    <string name="limit_custom">Pasirinktinis</string>
-    <string name="custom_limit_grams">Mano dienos riba gramais</string>
-    <string name="weekly_limit_section">Savaitės riba</string>
-    <string name="weekly_limit_enabled">Įjungti savaitės ribą</string>
     <string name="weekly_limit_grams">Savaitės riba gramais</string>
-    <string name="weekly_limit">Savaitė</string>
     <string name="biometric">Užraktas</string>
     <string name="biometric_lock">Biometrinis užraktas</string>
     <string name="biometric_desc">Užrakinti programą piršto antspaudu arba veidu</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Prašome autentifikuotis</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">PSO (2023) teigia: Nėra saugaus alkoholio vartojimo lygio. Čia parodyta rizikos reikšmė yra praktinė orientacinė vertė, o ne saugumo riba.</string>
-    <string name="who_values">Rizikos vertė: ♂ ≤ %1$s g, ♀ ≤ %2$s g per dieną.</string>
-    <string name="dhs_note">DHS rekomenduoja: vyrai neturėtų gerti daugiau nei 24 g, moterys ne daugiau nei 12 g gryno alkoholio per dieną. Bent dvi dienos per savaitę turėtų būti be alkoholio.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Rodoma %1$d iš %2$d mėnesių – senesni duomenys CSV/atsarginėje kopijoje</string>
     <string name="year_calendar_no_entry">nėra įrašo</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Gramai_alkoholio</string>
     <string name="csv_col_note">Pastaba</string>
     <string name="pdf_unit_g_per_day">g/dieną</string>
-    <string name="unit_g_per_day">g/dieną</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Dienos viršijant ribą (PSO)</string>
-    <string name="days_over_limit_dhs">Dienos viršijant ribą (DHS)</string>
-    <string name="days_over_limit_custom">Dienos viršijant nustatytą ribą</string>
     <string name="drink_days_label">gėrimo dienos šią savaitę</string>
     <string name="drink_days_setting">Maks. gėrimo dienos/savaitė</string>
-    <string name="drink_days_who_dhs_note">Rekomendacija: maks. 5 gėrimo dienų per savaitę (≥ 2 dienos be alkoholio)</string>
-    <string name="weekly_gram_mode_title">Savaitinis gramų limitas</string>
-    <string name="weekly_gram_mode_desc">Pažangos juosta ir indikatoriai naudoja savaitinį biudžetą (maks. gėrimo dienos &#215; dienos riba)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Asmens duomenys</string>
     <string name="week_starts_on">Savaitė prasideda</string>
+    <string name="limits">Ribos</string>
+    <string name="daily_limit_grams">Dienos riba gramais</string>
+    <string name="limit_caption_day">%1$s g/d.</string>
+    <string name="limit_caption_week">%1$s g/sav.</string>
+    <string name="days_over_daily_limit">Dienos virš dienos ribos</string>
+    <string name="days_over_weekly_limit">Dienos virš savaitės ribos</string>
+    <string name="days_over_drink_day_limit">Dienos virš gėrimo dienų ribos</string>
+    <string name="pdf_unit_g_per_week">g/sav.</string>
+    <string name="pdf_meta_drink_days_suffix">gėrimo dienų/sav.</string>
+    <string name="pdf_kpi_over_daily">Dienos > d. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dienos > sav. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dienos > %1$d gėrimo dienų</string>
+    <string name="pdf_col_over_daily">> d.</string>
 </resources>

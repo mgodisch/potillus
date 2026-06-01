@@ -81,17 +81,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Eksportdato</string>
     <string name="pdf_meta_period">Periode</string>
-    <string name="pdf_meta_gender">Kjønn</string>
     <string name="pdf_meta_limit">Grense</string>
     <string name="pdf_meta_weight">Kroppsvekt</string>
-    <string name="pdf_meta_custom_limit">Tilpasset</string>
     <string name="pdf_kpi_total">Total alkohol</string>
     <string name="pdf_kpi_avg_day">Gj.snitt per dag</string>
     <string name="pdf_kpi_avg_drink_day">Gj.snitt per drikkedag</string>
     <string name="pdf_kpi_drink_days">Drikkdager</string>
     <string name="pdf_kpi_abstinent_days">Avholdsdager</string>
-    <string name="pdf_kpi_over_who">Dager > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dager > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Binge-dager (>%1$s g)</string>
     <string name="pdf_col_month">Måned</string>
     <string name="pdf_col_drink_days">Drikkdager</string>
@@ -138,18 +134,7 @@
     <string name="theme_night">Mørk</string>
     <string name="day_change_time">Tidspunkt for dagsskifte</string>
     <string name="day_starts_at">Ny dag starter klokken</string>
-    <string name="gender">Kjønn</string>
-    <string name="male">Mann</string>
-    <string name="female">Kvinne</string>
-    <string name="limit_mode">Medisinsk retningslinje</string>
-    <string name="limit_who">WHO – risikonivå</string>
-    <string name="limit_dhs">DHS – lav risiko</string>
-    <string name="limit_custom">Tilpasset</string>
-    <string name="custom_limit_grams">Min daglige grense i gram</string>
-    <string name="weekly_limit_section">Ukesgrense</string>
-    <string name="weekly_limit_enabled">Aktiver ukesgrense</string>
     <string name="weekly_limit_grams">Ukesgrense i gram</string>
-    <string name="weekly_limit">Uke</string>
     <string name="biometric">Tilgangslås</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeravtrykk eller ansiktsgjenkjenning</string>
@@ -173,8 +158,6 @@
     <string name="biometric_subtitle">Vennligst autentiser</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) fastslår: Det finnes ingen trygg mengde alkohol. Risikoverdien som vises her er et praktisk referansepunkt, ikke en sikkerhetsterskel.</string>
-    <string name="who_values">Risikoverdi: ♂ ≤ %1$s g, ♀ ≤ %2$s g per dag.</string>
     <string name="pdf_months_truncated">Viser %1$d av %2$d måneder – eldre data tilgjengelig i CSV/sikkerhetskopi</string>
 
     <!-- Year calendar legend -->
@@ -211,20 +194,24 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Notat</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
-    <string name="unit_g_per_day">g/dag</string>
-
-    <string name="days_over_limit_who">Dager over grense (WHO)</string>
-    <string name="days_over_limit_dhs">Dager over grense (DHS)</string>
-    <string name="days_over_limit_custom">Dager over konfigurert grense</string>
-    <string name="dhs_note">DHS anbefaler: menn bør ikke drikke mer enn 24 g, kvinner ikke mer enn 12 g ren alkohol per dag. Minst to dager per uke bør være alkoholfrie.</string>
     <string name="drink_days_label">drikkdager denne uken</string>
     <string name="drink_days_setting">Maks. drikkdager/uke</string>
-    <string name="drink_days_who_dhs_note">Anbefaling: maks. 5 drikkdager per uke (≥ 2 avholdsdager)</string>
-    <string name="weekly_gram_mode_title">Ukesgramgrense</string>
-    <string name="weekly_gram_mode_desc">Fremdriftslinje og indikatorer bruker ukebudsjettet (maks. drikkdager &#215; dagsgrense)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Personlige data</string>
     <string name="week_starts_on">Uken starter på</string>
+    <string name="limits">Grenser</string>
+    <string name="daily_limit_grams">Daglig grense i gram</string>
+    <string name="limit_caption_day">%1$s g/dag</string>
+    <string name="limit_caption_week">%1$s g/uke</string>
+    <string name="days_over_daily_limit">Dager over daglig grense</string>
+    <string name="days_over_weekly_limit">Dager over ukentlig grense</string>
+    <string name="days_over_drink_day_limit">Dager over grense for drikkedager</string>
+    <string name="pdf_unit_g_per_week">g/uke</string>
+    <string name="pdf_meta_drink_days_suffix">drikkedager/uke</string>
+    <string name="pdf_kpi_over_daily">Dager > dag (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dager > uke (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dager > %1$d drikkedager</string>
+    <string name="pdf_col_over_daily">> dag</string>
 </resources>

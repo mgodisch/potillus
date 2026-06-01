@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Datum izvoza</string>
     <string name="pdf_meta_period">Obdobje</string>
-    <string name="pdf_meta_gender">Spol</string>
     <string name="pdf_meta_limit">Omejitev</string>
     <string name="pdf_meta_weight">Telesna teža</string>
-    <string name="pdf_meta_custom_limit">Po meri</string>
     <string name="pdf_kpi_total">Skupni alkohol</string>
     <string name="pdf_kpi_avg_day">Povp. na dan</string>
     <string name="pdf_kpi_avg_drink_day">Povp. na dan pitja</string>
     <string name="pdf_kpi_drink_days">Dnevi pitja</string>
     <string name="pdf_kpi_abstinent_days">Dnevi vzdržnosti</string>
-    <string name="pdf_kpi_over_who">Dnevi > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dnevi > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Dnevi pivskega opoja (>%1$s g)</string>
     <string name="pdf_col_month">Mesec</string>
     <string name="pdf_col_drink_days">Dnevi pitja</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Temna</string>
     <string name="day_change_time">Čas menjave dneva</string>
     <string name="day_starts_at">Nov dan se začne ob</string>
-    <string name="gender">Spol</string>
-    <string name="male">Moški</string>
-    <string name="female">Ženski</string>
-    <string name="limit_mode">Medicinska smernica</string>
-    <string name="limit_who">WHO – raven tveganja</string>
-    <string name="limit_dhs">DHS – nizko tveganje</string>
-    <string name="limit_custom">Po meri</string>
-    <string name="custom_limit_grams">Moja dnevna meja v gramih</string>
-    <string name="weekly_limit_section">Tedenska meja</string>
-    <string name="weekly_limit_enabled">Omogoči tedensko mejo</string>
     <string name="weekly_limit_grams">Tedenska meja v gramih</string>
-    <string name="weekly_limit">Teden</string>
     <string name="biometric">Zaklepanje</string>
     <string name="biometric_lock">Biometrično zaklepanje</string>
     <string name="biometric_desc">Zakleni aplikacijo z odtisom prsta ali obrazom</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Prosimo, se avtenticirajte</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">WHO (2023) navaja: Ni varne ravni uživanja alkohola. Tu prikazana vrednost tveganja je praktična referenčna vrednost, ne varnostni prag.</string>
-    <string name="who_values">Vrednost tveganja: ♂ ≤ %1$s g, ♀ ≤ %2$s g na dan.</string>
-    <string name="dhs_note">DHS priporoča: moški ne bi smeli piti več kot 24 g, ženske ne več kot 12 g čistega alkohola na dan. Vsaj dva dni na teden bi morala biti brez alkohola.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Prikazano je %1$d od %2$d mesecev – starejši podatki so v CSV/varnostni kopiji</string>
     <string name="year_calendar_no_entry">ni vnosa</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grami_alkohola</string>
     <string name="csv_col_note">Opomba</string>
     <string name="pdf_unit_g_per_day">g/dan</string>
-    <string name="unit_g_per_day">g/dan</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Dnevi nad mejo (WHO)</string>
-    <string name="days_over_limit_dhs">Dnevi nad mejo (DHS)</string>
-    <string name="days_over_limit_custom">Dnevi nad nastavljeno mejo</string>
     <string name="drink_days_label">dnevi pitja ta teden</string>
     <string name="drink_days_setting">Maks. dnevi pitja/teden</string>
-    <string name="drink_days_who_dhs_note">Priporočilo: maks. 5 dni pitja na teden (≥ 2 dneva brez alkohola)</string>
-    <string name="weekly_gram_mode_title">Tedenski gramski limit</string>
-    <string name="weekly_gram_mode_desc">Vrstica napredka in indikatorji uporabljajo tedenski proračun (maks. dnevi pitja &#215; dnevna meja)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Osebni podatki</string>
     <string name="week_starts_on">Teden se začne</string>
+    <string name="limits">Omejitve</string>
+    <string name="daily_limit_grams">Dnevna omejitev v gramih</string>
+    <string name="limit_caption_day">%1$s g/dan</string>
+    <string name="limit_caption_week">%1$s g/teden</string>
+    <string name="days_over_daily_limit">Dnevi nad dnevno omejitvijo</string>
+    <string name="days_over_weekly_limit">Dnevi nad tedensko omejitvijo</string>
+    <string name="days_over_drink_day_limit">Dnevi nad omejitvijo dni pitja</string>
+    <string name="pdf_unit_g_per_week">g/teden</string>
+    <string name="pdf_meta_drink_days_suffix">dni pitja/teden</string>
+    <string name="pdf_kpi_over_daily">Dnevi > dan (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dnevi > teden (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dnevi > %1$d dni pitja</string>
+    <string name="pdf_col_over_daily">> dan</string>
 </resources>

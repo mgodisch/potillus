@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Dışa aktarma tarihi</string>
     <string name="pdf_meta_period">Dönem</string>
-    <string name="pdf_meta_gender">Cinsiyet</string>
     <string name="pdf_meta_limit">Sınır</string>
     <string name="pdf_meta_weight">Vücut ağırlığı</string>
-    <string name="pdf_meta_custom_limit">Özel</string>
     <string name="pdf_kpi_total">Toplam alkol</string>
     <string name="pdf_kpi_avg_day">Günlük ortalama</string>
     <string name="pdf_kpi_avg_drink_day">İçki günü ortalaması</string>
     <string name="pdf_kpi_drink_days">İçki günleri</string>
     <string name="pdf_kpi_abstinent_days">Kaçınma günleri</string>
-    <string name="pdf_kpi_over_who">WHO üstü gün (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">DHS üstü gün (%1$s g)</string>
     <string name="pdf_kpi_binge">Aşırı içki günleri (>%1$s g)</string>
     <string name="pdf_col_month">Ay</string>
     <string name="pdf_col_drink_days">İçki günleri</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Koyu</string>
     <string name="day_change_time">Gün değişim saati</string>
     <string name="day_starts_at">Yeni gün başlangıcı</string>
-    <string name="gender">Cinsiyet</string>
-    <string name="male">Erkek</string>
-    <string name="female">Kadın</string>
-    <string name="limit_mode">Tıbbi kılavuz</string>
-    <string name="limit_who">WHO – risk düzeyi</string>
-    <string name="limit_dhs">DHS – düşük risk</string>
-    <string name="limit_custom">Özel</string>
-    <string name="custom_limit_grams">Günlük sınırım (gram)</string>
-    <string name="weekly_limit_section">Haftalık sınır</string>
-    <string name="weekly_limit_enabled">Haftalık sınırı etkinleştir</string>
     <string name="weekly_limit_grams">Haftalık sınır (gram)</string>
-    <string name="weekly_limit">Hafta</string>
     <string name="biometric">Erişim kilidi</string>
     <string name="biometric_lock">Biyometrik kilit</string>
     <string name="biometric_desc">Uygulamayı parmak izi veya yüz tanıma ile kilitle</string>
@@ -180,8 +165,6 @@
     <string name="biometric_subtitle">Lütfen kimlik doğrulayın</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) şunu belirtmektedir: Güvenli alkol miktarı diye bir şey yoktur. Burada gösterilen risk değeri pratik bir referans noktasıdır, güvenlik sınırı değildir.</string>
-    <string name="who_values">Risk değeri: ♂ ≤ %1$s g, ♀ ≤ %2$s g günde.</string>
     <string name="pdf_months_truncated">%2$d ayın %1$d tanesi gösteriliyor – eski veriler CSV/yedekte mevcut</string>
 
     <!-- Year calendar legend -->
@@ -218,20 +201,24 @@
     <string name="csv_col_grams">Gram_alkol</string>
     <string name="csv_col_note">Not</string>
     <string name="pdf_unit_g_per_day">g/gün</string>
-    <string name="unit_g_per_day">g/gün</string>
-
-    <string name="days_over_limit_who">WHO sınırını aşan günler</string>
-    <string name="days_over_limit_dhs">DHS sınırını aşan günler</string>
-    <string name="days_over_limit_custom">Özel sınırı aşan günler</string>
-    <string name="dhs_note">DHS tavsiyesi: Erkekler günde 24 g\'dan, kadınlar 12 g\'dan fazla saf alkol tüketmemelidir. Haftada en az iki gün alkol tüketilmemesi önerilir.</string>
     <string name="drink_days_label">Bu haftaki içki günleri</string>
     <string name="drink_days_setting">Maks. içki günü/hafta</string>
-    <string name="drink_days_who_dhs_note">Tavsiye: haftada maks. 5 içki günü (≥ 2 kaçınma günü)</string>
-    <string name="weekly_gram_mode_title">Haftalık gram sınırı</string>
-    <string name="weekly_gram_mode_desc">İlerleme çubuğu ve göstergeler haftalık bütçeyi (maks. içki günü &#215; günlük sınır) temel alır</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Kişisel veriler</string>
     <string name="week_starts_on">Hafta başlangıcı</string>
+    <string name="limits">Limitler</string>
+    <string name="daily_limit_grams">Gram cinsinden günlük limit</string>
+    <string name="limit_caption_day">%1$s g/gün</string>
+    <string name="limit_caption_week">%1$s g/hafta</string>
+    <string name="days_over_daily_limit">Günlük limitin üzerindeki günler</string>
+    <string name="days_over_weekly_limit">Haftalık limitin üzerindeki günler</string>
+    <string name="days_over_drink_day_limit">İçki günü limitinin üzerindeki günler</string>
+    <string name="pdf_unit_g_per_week">g/hafta</string>
+    <string name="pdf_meta_drink_days_suffix">içki günü/hf.</string>
+    <string name="pdf_kpi_over_daily">Gün > gün (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Gün > hafta (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Gün > %1$d içki günü</string>
+    <string name="pdf_col_over_daily">> gün</string>
 </resources>

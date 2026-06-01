@@ -165,12 +165,14 @@ fun CalendarScreen(vm: CalendarViewModel = viewModel(), onOpenSettings: () -> Un
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
-                                    totalGrams      = state.totalGramsSelected,
-                                    limitGrams      = state.limitInfo.limitGrams,
-                                    label           = state.limitInfo.mode.shortLabel(),
-                                    // Calendar shows a single historical day: no week range,
-                                    // but use the new daily-limit format for consistency.
-                                    dailyLimitGrams = state.limitInfo.limitGrams
+                                    // Calendar shows a single historical day: only the
+                                    // daily gram limit is meaningful here.
+                                    totalGrams = state.totalGramsSelected,
+                                    limitGrams = state.limitInfo.limitGrams,
+                                    caption    = stringResource(
+                                        R.string.limit_caption_day,
+                                        "%.0f".format(state.limitInfo.limitGrams)
+                                    )
                                 )
                             }
                         }
@@ -221,12 +223,14 @@ fun CalendarScreen(vm: CalendarViewModel = viewModel(), onOpenSettings: () -> Un
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
-                                    totalGrams      = state.totalGramsSelected,
-                                    limitGrams      = state.limitInfo.limitGrams,
-                                    label           = state.limitInfo.mode.shortLabel(),
-                                    // Calendar shows a single historical day: no week range,
-                                    // but use the new daily-limit format for consistency.
-                                    dailyLimitGrams = state.limitInfo.limitGrams
+                                    // Calendar shows a single historical day: only the
+                                    // daily gram limit is meaningful here.
+                                    totalGrams = state.totalGramsSelected,
+                                    limitGrams = state.limitInfo.limitGrams,
+                                    caption    = stringResource(
+                                        R.string.limit_caption_day,
+                                        "%.0f".format(state.limitInfo.limitGrams)
+                                    )
                                 )
                             }
                         }

@@ -80,17 +80,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Tarikh eksport</string>
     <string name="pdf_meta_period">Tempoh</string>
-    <string name="pdf_meta_gender">Jantina</string>
     <string name="pdf_meta_limit">Had</string>
     <string name="pdf_meta_weight">Berat badan</string>
-    <string name="pdf_meta_custom_limit">Tersuai</string>
     <string name="pdf_kpi_total">Jumlah alkohol</string>
     <string name="pdf_kpi_avg_day">Purata sehari</string>
     <string name="pdf_kpi_avg_drink_day">Purata sehari minum</string>
     <string name="pdf_kpi_drink_days">Hari minum</string>
     <string name="pdf_kpi_abstinent_days">Hari pantang</string>
-    <string name="pdf_kpi_over_who">Hari > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Hari > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Hari binge (>%1$s g)</string>
     <string name="pdf_col_month">Bulan</string>
     <string name="pdf_col_drink_days">Hari minum</string>
@@ -137,18 +133,7 @@
     <string name="theme_night">Gelap</string>
     <string name="day_change_time">Masa pertukaran hari</string>
     <string name="day_starts_at">Hari baru bermula pada</string>
-    <string name="gender">Jantina</string>
-    <string name="male">Lelaki</string>
-    <string name="female">Perempuan</string>
-    <string name="limit_mode">Panduan perubatan</string>
-    <string name="limit_who">WHO – paras risiko</string>
-    <string name="limit_dhs">DHS – risiko rendah</string>
-    <string name="limit_custom">Tersuai</string>
-    <string name="custom_limit_grams">Had harian saya dalam gram</string>
-    <string name="weekly_limit_section">Had mingguan</string>
-    <string name="weekly_limit_enabled">Aktifkan had mingguan</string>
     <string name="weekly_limit_grams">Had mingguan dalam gram</string>
-    <string name="weekly_limit">Minggu</string>
     <string name="biometric">Kunci akses</string>
     <string name="biometric_lock">Kunci biometrik</string>
     <string name="biometric_desc">Kunci apl dengan cap jari atau pengecaman wajah</string>
@@ -172,8 +157,6 @@
     <string name="biometric_subtitle">Sila sahkan identiti</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) menyatakan: Tiada tahap pengambilan alkohol yang selamat. Nilai risiko yang ditunjukkan di sini adalah titik rujukan praktikal, bukan ambang keselamatan.</string>
-    <string name="who_values">Nilai risiko: ♂ ≤ %1$s g, ♀ ≤ %2$s g sehari.</string>
     <string name="pdf_months_truncated">Menunjukkan %1$d daripada %2$d bulan – data lama tersedia dalam CSV/sandaran</string>
 
     <!-- Year calendar legend -->
@@ -210,20 +193,24 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/hari</string>
-    <string name="unit_g_per_day">g/hari</string>
-
-    <string name="days_over_limit_who">Hari melebihi had (WHO)</string>
-    <string name="days_over_limit_dhs">Hari melebihi had (DHS)</string>
-    <string name="days_over_limit_custom">Hari melebihi had yang ditetapkan</string>
-    <string name="dhs_note">DHS mengesyorkan: lelaki tidak minum lebih daripada 24 g, wanita tidak lebih daripada 12 g alkohol tulen sehari. Sekurang-kurangnya dua hari seminggu harus bebas alkohol.</string>
     <string name="drink_days_label">hari minum minggu ini</string>
     <string name="drink_days_setting">Maks. hari minum/minggu</string>
-    <string name="drink_days_who_dhs_note">Cadangan: maks. 5 hari minum seminggu (≥ 2 hari pantang)</string>
-    <string name="weekly_gram_mode_title">Had mingguan (gram)</string>
-    <string name="weekly_gram_mode_desc">Bar kemajuan dan penunjuk menggunakan bajet mingguan (maks. hari minum &#215; had harian)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data peribadi</string>
     <string name="week_starts_on">Minggu bermula pada</string>
+    <string name="limits">Had</string>
+    <string name="daily_limit_grams">Had harian dalam gram</string>
+    <string name="limit_caption_day">%1$s g/hari</string>
+    <string name="limit_caption_week">%1$s g/minggu</string>
+    <string name="days_over_daily_limit">Hari melebihi had harian</string>
+    <string name="days_over_weekly_limit">Hari melebihi had mingguan</string>
+    <string name="days_over_drink_day_limit">Hari melebihi had hari minum</string>
+    <string name="pdf_unit_g_per_week">g/minggu</string>
+    <string name="pdf_meta_drink_days_suffix">hari minum/mgg</string>
+    <string name="pdf_kpi_over_daily">Hari > harian (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Hari > mingguan (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Hari > %1$d hari minum</string>
+    <string name="pdf_col_over_daily">> hari</string>
 </resources>

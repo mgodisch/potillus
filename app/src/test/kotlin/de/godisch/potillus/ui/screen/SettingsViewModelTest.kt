@@ -26,7 +26,7 @@ package de.godisch.potillus.ui.screen
 // =============================================================================
 //
 // SettingsViewModel has the most complex logic of all five ViewModels:
-//   - Preference writes (setTheme, setGender, setLimitMode with pre-seeding, …)
+//   - Preference writes (setTheme, setDailyLimit, setWeeklyLimit, setMaxDrinkDaysPerWeek, …)
 //   - Export status / share target state via _exportStatus / _shareTarget
 //   - Backup import in REPLACE and MERGE modes
 //   - Error localisation via StringProvider
@@ -122,10 +122,24 @@ class SettingsViewModelTest {
         assertEquals(ThemeMode.NIGHT, prefs.currentSettings.themeMode)
     }
 
-    @Test fun `setGender writes gender to prefs`() = runTest(dispatcher) {
+    @Test fun `setDailyLimit writes daily limit to prefs`() = runTest(dispatcher) {
         val vm = buildVm()
-        vm.setGender(Gender.FEMALE)
-        assertEquals(Gender.FEMALE, prefs.currentSettings.gender)
+        vm.setDailyLimit(25.0)
+        assertEquals(25.0, prefs.currentSettings.dailyLimitGrams, 0.001)
+    }
+
+    @Test fun `setWeeklyLimit writes weekly limit to prefs`() = runTest(dispatcher) {
+        val vm = buildVm()
+        vm.setWeeklyLimit(140.0)
+        assertEquals(140.0, prefs.currentSettings.weeklyLimitGrams, 0.001)
+    }
+
+    @Test fun `setMaxDrinkDaysPerWeek writes and clamps to prefs`() = runTest(dispatcher) {
+        val vm = buildVm()
+        vm.setMaxDrinkDaysPerWeek(4)
+        assertEquals(4, prefs.currentSettings.maxDrinkDaysPerWeek)
+        vm.setMaxDrinkDaysPerWeek(9)               // out of range → clamped to 7
+        assertEquals(7, prefs.currentSettings.maxDrinkDaysPerWeek)
     }
 
     @Test fun `setWeightKg writes weight to prefs`() = runTest(dispatcher) {
@@ -142,41 +156,22 @@ class SettingsViewModelTest {
         assertEquals(30, s.dayChangeMinute)
     }
 
-    // ── setLimitMode pre-seeding ──────────────────────────────────────────────
+    // ── Limit value clamping (delegated to AppPreferences) ────────────────────
 
-    @Test fun `setLimitMode CUSTOM pre-seeds WHO limits when switching from WHO`() = runTest(dispatcher) {
-        prefs = FakeAppPreferences(AppSettings(limitMode = LimitMode.WHO, gender = Gender.MALE))
+    @Test fun `setDailyLimit clamps into 1 to 500`() = runTest(dispatcher) {
         val vm = buildVm()
-        vm.setLimitMode(LimitMode.CUSTOM)
-
-        val s = prefs.currentSettings
-        assertEquals(LimitMode.CUSTOM, s.limitMode)
-        // WHO male limit = 20.0 g – should be pre-seeded as customLimitGrams
-        assertEquals(20.0, s.customLimitGrams, 0.001)
-        assertEquals(5,    s.customMaxDrinkDays)
+        vm.setDailyLimit(9000.0)
+        assertEquals(500.0, prefs.currentSettings.dailyLimitGrams, 0.001)
+        vm.setDailyLimit(0.0)
+        assertEquals(1.0, prefs.currentSettings.dailyLimitGrams, 0.001)
     }
 
-    @Test fun `setLimitMode CUSTOM does NOT overwrite existing custom values when already CUSTOM`() = runTest(dispatcher) {
-        prefs = FakeAppPreferences(AppSettings(
-            limitMode       = LimitMode.CUSTOM,
-            customLimitGrams = 15.0,
-            customMaxDrinkDays = 3
-        ))
+    @Test fun `setWeeklyLimit clamps into 1 to 3500`() = runTest(dispatcher) {
         val vm = buildVm()
-        vm.setLimitMode(LimitMode.CUSTOM)   // switch to CUSTOM while already CUSTOM
-
-        val s = prefs.currentSettings
-        // Values must remain unchanged – the pre-seeding guard should skip this path.
-        assertEquals(15.0, s.customLimitGrams, 0.001)
-        assertEquals(3,    s.customMaxDrinkDays)
-    }
-
-    @Test fun `setLimitMode WHO does not touch customLimitGrams`() = runTest(dispatcher) {
-        prefs = FakeAppPreferences(AppSettings(customLimitGrams = 12.0))
-        val vm = buildVm()
-        vm.setLimitMode(LimitMode.WHO)
-        assertEquals(LimitMode.WHO, prefs.currentSettings.limitMode)
-        assertEquals(12.0, prefs.currentSettings.customLimitGrams, 0.001)
+        vm.setWeeklyLimit(9000.0)
+        assertEquals(3500.0, prefs.currentSettings.weeklyLimitGrams, 0.001)
+        vm.setWeeklyLimit(0.0)
+        assertEquals(1.0, prefs.currentSettings.weeklyLimitGrams, 0.001)
     }
 
     // ── Export status / share target ──────────────────────────────────────────
@@ -261,9 +256,9 @@ class SettingsViewModelTest {
         val vm = buildVm()
         vm.uiState.test {
             awaitItem()  // initial
-            vm.setGender(Gender.FEMALE)
+            vm.setDailyLimit(33.0)
             val state = awaitItem()
-            assertEquals(Gender.FEMALE, state.settings.gender)
+            assertEquals(33.0, state.settings.dailyLimitGrams, 0.001)
             cancelAndIgnoreRemainingEvents()
         }
     }

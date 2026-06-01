@@ -69,7 +69,7 @@ import java.time.temporal.TemporalAdjusters
 data class TodayUiState(
     val entries: List<ConsumptionEntry>  = emptyList(),
     val totalGrams: Double               = 0.0,
-    val limitInfo: LimitInfo             = LimitInfo(LimitMode.WHO, 20.0),
+    val limitInfo: LimitInfo             = LimitInfo(20.0, 100.0, 5),
     /** Number of distinct Mon–Sun days this week with ≥1 entry (today included if applicable). */
     val drinkDaysThisWeek: Int           = 0,
     val weeklyTotalGrams: Double         = 0.0,
@@ -195,7 +195,7 @@ class TodayViewModel(
             val bac: Double? = if (settings.weightKg > 0 && alcoholEntries.isNotEmpty()) {
                 val firstTs      = alcoholEntries.minOf { it.timestampMillis }
                 val hoursElapsed = (nowMillis - firstTs) / AlcoholCalculator.MILLIS_PER_HOUR
-                AlcoholCalculator.calculateBAC(totalGrams, settings.weightKg, settings.gender, hoursElapsed)
+                AlcoholCalculator.calculateBAC(totalGrams, settings.weightKg, hoursElapsed)
             } else null
 
             TodayUiState(

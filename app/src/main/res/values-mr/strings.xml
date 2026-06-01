@@ -80,17 +80,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">निर्यात तारीख</string>
     <string name="pdf_meta_period">कालावधी</string>
-    <string name="pdf_meta_gender">लिंग</string>
     <string name="pdf_meta_limit">मर्यादा</string>
     <string name="pdf_meta_weight">शरीराचे वजन</string>
-    <string name="pdf_meta_custom_limit">सानुकूल</string>
     <string name="pdf_kpi_total">एकूण अल्कोहोल</string>
     <string name="pdf_kpi_avg_day">दररोज सरासरी</string>
     <string name="pdf_kpi_avg_drink_day">पिण्याच्या दिवसाची सरासरी</string>
     <string name="pdf_kpi_drink_days">पिण्याचे दिवस</string>
     <string name="pdf_kpi_abstinent_days">संयमाचे दिवस</string>
-    <string name="pdf_kpi_over_who">दिवस > WHO (%1$s ग्रॅम)</string>
-    <string name="pdf_kpi_over_dhs">दिवस > DHS (%1$s ग्रॅम)</string>
     <string name="pdf_kpi_binge">बिंज दिवस (>%1$s ग्रॅम)</string>
     <string name="pdf_col_month">महिना</string>
     <string name="pdf_col_drink_days">पिण्याचे दिवस</string>
@@ -137,18 +133,7 @@
     <string name="theme_night">गडद</string>
     <string name="day_change_time">दिवस बदलण्याची वेळ</string>
     <string name="day_starts_at">नवीन दिवस सुरू होतो</string>
-    <string name="gender">लिंग</string>
-    <string name="male">पुरुष</string>
-    <string name="female">स्त्री</string>
-    <string name="limit_mode">वैद्यकीय मार्गदर्शक तत्त्व</string>
-    <string name="limit_who">WHO – जोखीम पातळी</string>
-    <string name="limit_dhs">DHS – कमी जोखीम</string>
-    <string name="limit_custom">सानुकूल</string>
-    <string name="custom_limit_grams">माझी दैनिक मर्यादा ग्रॅममध्ये</string>
-    <string name="weekly_limit_section">साप्ताहिक मर्यादा</string>
-    <string name="weekly_limit_enabled">साप्ताहिक मर्यादा सक्षम करा</string>
     <string name="weekly_limit_grams">साप्ताहिक मर्यादा ग्रॅममध्ये</string>
-    <string name="weekly_limit">आठवडा</string>
     <string name="biometric">प्रवेश लॉक</string>
     <string name="biometric_lock">बायोमेट्रिक लॉक</string>
     <string name="biometric_desc">बोटाचा ठसा किंवा चेहरा ओळखीने ॲप लॉक करा</string>
@@ -172,8 +157,6 @@
     <string name="biometric_subtitle">कृपया प्रमाणित करा</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (२०२३) म्हणते: अल्कोहोल सेवनाची कोणतीही सुरक्षित पातळी नाही. येथे दाखवलेले जोखीम मूल्य एक व्यावहारिक संदर्भ बिंदू आहे, सुरक्षिततेची मर्यादा नाही.</string>
-    <string name="who_values">जोखीम मूल्य: ♂ ≤ %1$s g, ♀ ≤ %2$s g दररोज.</string>
     <string name="pdf_months_truncated">%2$d पैकी %1$d महिने दाखवत आहे – जुना डेटा CSV/बॅकअपमध्ये उपलब्ध</string>
 
     <!-- Year calendar legend -->
@@ -210,20 +193,24 @@
     <string name="csv_col_grams">ग्रॅम_अल्कोहोल</string>
     <string name="csv_col_note">नोट</string>
     <string name="pdf_unit_g_per_day">ग्रॅम/दिवस</string>
-    <string name="unit_g_per_day">ग्रॅम/दिवस</string>
-
-    <string name="days_over_limit_who">मर्यादेपेक्षा जास्त दिवस (WHO)</string>
-    <string name="days_over_limit_dhs">मर्यादेपेक्षा जास्त दिवस (DHS)</string>
-    <string name="days_over_limit_custom">कॉन्फिगर केलेल्या मर्यादेपेक्षा जास्त दिवस</string>
-    <string name="dhs_note">DHS शिफारस करते: पुरुषांनी दररोज २४ ग्रॅमपेक्षा जास्त, महिलांनी १२ ग्रॅमपेक्षा जास्त शुद्ध अल्कोहोल पिऊ नये. आठवड्यातून किमान दोन दिवस अल्कोहोलपासून मुक्त असावेत.</string>
     <string name="drink_days_label">या आठवड्यातील पिण्याचे दिवस</string>
     <string name="drink_days_setting">कमाल पिण्याचे दिवस/आठवडा</string>
-    <string name="drink_days_who_dhs_note">शिफारस: आठवड्यातून कमाल ५ पिण्याचे दिवस (≥ २ संयमाचे दिवस)</string>
-    <string name="weekly_gram_mode_title">साप्ताहिक ग्रॅम मर्यादा</string>
-    <string name="weekly_gram_mode_desc">प्रगती पट्टी आणि निर्देशक साप्ताहिक बजेट वापरतात (कमाल पिण्याचे दिवस &#215; दैनिक मर्यादा)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">वैयक्तिक माहिती</string>
     <string name="week_starts_on">आठवडा सुरू होतो</string>
+    <string name="limits">मर्यादा</string>
+    <string name="daily_limit_grams">ग्रॅममधील दैनिक मर्यादा</string>
+    <string name="limit_caption_day">%1$s g/दिवस</string>
+    <string name="limit_caption_week">%1$s g/आठवडा</string>
+    <string name="days_over_daily_limit">दैनिक मर्यादेपेक्षा जास्त दिवस</string>
+    <string name="days_over_weekly_limit">साप्ताहिक मर्यादेपेक्षा जास्त दिवस</string>
+    <string name="days_over_drink_day_limit">पिण्याच्या दिवसांच्या मर्यादेपेक्षा जास्त दिवस</string>
+    <string name="pdf_unit_g_per_week">g/आठवडा</string>
+    <string name="pdf_meta_drink_days_suffix">पिण्याचे दिवस/आ.</string>
+    <string name="pdf_kpi_over_daily">दिवस > दैनिक (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">दिवस > साप्ता. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">दिवस > %1$d पिण्याचे दिवस</string>
+    <string name="pdf_col_over_daily">> दिवस</string>
 </resources>

@@ -72,10 +72,10 @@ fun TodayScreen(vm: TodayViewModel = viewModel(), onOpenSettings: () -> Unit = {
     val capacity = DrinkCapacity(
         todayGrams          = state.totalGrams,
         dailyLimitGrams     = state.limitInfo.limitGrams,
-        drinkDaysThisWeek   = state.drinkDaysThisWeek,
-        maxDrinkDaysPerWeek = state.limitInfo.maxDrinkDaysPerWeek,
         weeklyTotalGrams    = state.weeklyTotalGrams,
-        weeklyGramMode      = state.settings.weeklyGramMode
+        weeklyLimitGrams    = state.limitInfo.weeklyLimitGrams,
+        drinkDaysThisWeek   = state.drinkDaysThisWeek,
+        maxDrinkDaysPerWeek = state.limitInfo.maxDrinkDaysPerWeek
     )
 
     Scaffold(
@@ -138,24 +138,29 @@ fun TodayScreen(vm: TodayViewModel = viewModel(), onOpenSettings: () -> Unit = {
                             )
                         }
                         Spacer(Modifier.height(8.dp))
-                        // Gram progress bar:
-                        //   Daily mode:  today's grams vs. daily limit.
-                        //   Weekly mode: this-week total vs. maxDrinkDays × dailyLimit.
-                        //
-                        // Label format:
-                        //   Left:  "0,0 g" in daily mode;
-                        //          "0,0 g (25.5.–31.5.)" in weekly mode.
-                        //   Right: "WHO – Risikowert (20 g/Tag)" – the (XX/YY g)
-                        //          gender-ambiguous range was removed; the actual
-                        //          per-gender daily limit is shown dynamically.
+                        // Three progress bars, one per active limit:
+                        //   1. Daily gram limit   – today's grams vs. daily limit.
+                        //   2. Weekly gram limit  – this week's grams vs. weekly limit.
+                        //   3. Drink days         – distinct drink days vs. max per week.
                         LimitBar(
-                            totalGrams      = capacity.effectiveConsumedGrams,
-                            limitGrams      = capacity.effectiveBudgetGrams,
-                            label           = state.limitInfo.mode.shortLabel(),
-                            weekRange       = if (state.settings.weeklyGramMode) state.weeklyRangeLabel else "",
-                            dailyLimitGrams = state.limitInfo.limitGrams
+                            totalGrams = state.totalGrams,
+                            limitGrams = state.limitInfo.limitGrams,
+                            caption    = stringResource(
+                                R.string.limit_caption_day,
+                                "%.0f".format(state.limitInfo.limitGrams)
+                            )
                         )
-                        // Drink-days bar: always shown, independent of gram mode.
+                        Spacer(Modifier.height(10.dp))
+                        LimitBar(
+                            totalGrams = state.weeklyTotalGrams,
+                            limitGrams = state.limitInfo.weeklyLimitGrams,
+                            caption    = stringResource(
+                                R.string.limit_caption_week,
+                                "%.0f".format(state.limitInfo.weeklyLimitGrams)
+                            ),
+                            leftSuffix = if (state.weeklyRangeLabel.isNotEmpty()) "(${state.weeklyRangeLabel})" else ""
+                        )
+                        // Drink-days bar: distinct drink days this week vs. the max.
                         Spacer(Modifier.height(10.dp))
                         DrinkDaysBar(
                             drinkDays    = state.drinkDaysThisWeek,

@@ -90,17 +90,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data de exportação</string>
     <string name="pdf_meta_period">Período</string>
-    <string name="pdf_meta_gender">Sexo</string>
     <string name="pdf_meta_limit">Limite</string>
     <string name="pdf_meta_weight">Peso corporal</string>
-    <string name="pdf_meta_custom_limit">Personalizado</string>
     <string name="pdf_kpi_total">Álcool total</string>
     <string name="pdf_kpi_avg_day">Média por dia</string>
     <string name="pdf_kpi_avg_drink_day">Média por dia de consumo</string>
     <string name="pdf_kpi_drink_days">Dias de consumo</string>
     <string name="pdf_kpi_abstinent_days">Dias de abstinência</string>
-    <string name="pdf_kpi_over_who">Dias > OMS (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dias > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Dias de binge (>%1$s g)</string>
     <string name="pdf_col_month">Mês</string>
     <string name="pdf_col_drink_days">Dias de consumo</string>
@@ -147,18 +143,7 @@
     <string name="theme_night">Escuro</string>
     <string name="day_change_time">Horário de virada do dia</string>
     <string name="day_starts_at">Novo dia começa às</string>
-    <string name="gender">Sexo</string>
-    <string name="male">Masculino</string>
-    <string name="female">Feminino</string>
-    <string name="limit_mode">Diretriz médica</string>
-    <string name="limit_who">OMS – nível de risco</string>
-    <string name="limit_dhs">DHS – baixo risco</string>
-    <string name="limit_custom">Personalizado</string>
-    <string name="custom_limit_grams">Meu limite diário em gramas</string>
-    <string name="weekly_limit_section">Limite semanal</string>
-    <string name="weekly_limit_enabled">Ativar limite semanal</string>
     <string name="weekly_limit_grams">Limite semanal em gramas</string>
-    <string name="weekly_limit">Semana</string>
     <string name="biometric">Bloqueio de acesso</string>
     <string name="biometric_lock">Bloqueio biométrico</string>
     <string name="biometric_desc">Bloquear o app com impressão digital ou reconhecimento facial</string>
@@ -182,8 +167,6 @@
     <string name="biometric_subtitle">Por favor, autentique-se</string>
 
     <!-- WHO note -->
-    <string name="who_note">A OMS (2023) afirma: não existe quantidade segura de álcool. O valor de risco exibido aqui é um ponto de referência prático, não um limiar de segurança.</string>
-    <string name="who_values">Valor de risco: ♂ ≤ %1$s g, ♀ ≤ %2$s g por dia.</string>
     <string name="pdf_months_truncated">Exibindo %1$d de %2$d meses – dados mais antigos disponíveis em CSV/backup</string>
 
     <!-- Year calendar legend -->
@@ -220,20 +203,24 @@
     <string name="csv_col_grams">Gramas_álcool</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/dia</string>
-    <string name="unit_g_per_day">g/dia</string>
-
-    <string name="days_over_limit_who">Dias acima do limite (OMS)</string>
-    <string name="days_over_limit_dhs">Dias acima do limite (DHS)</string>
-    <string name="days_over_limit_custom">Dias acima do limite configurado</string>
-    <string name="dhs_note">O DHS recomenda: homens não devem beber mais de 24 g e mulheres mais de 12 g de álcool puro por dia. Pelo menos dois dias por semana devem ser sem álcool.</string>
     <string name="drink_days_label">dias de consumo esta semana</string>
     <string name="drink_days_setting">Máx. dias de consumo/semana</string>
-    <string name="drink_days_who_dhs_note">Recomendação: máx. 5 dias de consumo por semana (≥ 2 dias sem álcool)</string>
-    <string name="weekly_gram_mode_title">Limite semanal (gramas)</string>
-    <string name="weekly_gram_mode_desc">A barra e os indicadores usam o orçamento semanal (dias máx. &#215; limite diário)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Dados pessoais</string>
     <string name="week_starts_on">A semana começa</string>
+    <string name="limits">Limites</string>
+    <string name="daily_limit_grams">Limite diário em gramas</string>
+    <string name="limit_caption_day">%1$s g/dia</string>
+    <string name="limit_caption_week">%1$s g/sem.</string>
+    <string name="days_over_daily_limit">Dias acima do limite diário</string>
+    <string name="days_over_weekly_limit">Dias acima do limite semanal</string>
+    <string name="days_over_drink_day_limit">Dias acima do limite de dias de consumo</string>
+    <string name="pdf_unit_g_per_week">g/sem.</string>
+    <string name="pdf_meta_drink_days_suffix">dias de consumo/sem.</string>
+    <string name="pdf_kpi_over_daily">Dias > dia (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dias > sem. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dias > %1$d dias consumo</string>
+    <string name="pdf_col_over_daily">> dia</string>
 </resources>

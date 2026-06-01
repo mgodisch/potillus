@@ -80,10 +80,10 @@ fun DrinksScreen(
     val capacity = DrinkCapacity(
         todayGrams          = todayState.totalGrams,
         dailyLimitGrams     = todayState.limitInfo.limitGrams,
-        drinkDaysThisWeek   = todayState.drinkDaysThisWeek,
-        maxDrinkDaysPerWeek = todayState.limitInfo.maxDrinkDaysPerWeek,
         weeklyTotalGrams    = todayState.weeklyTotalGrams,
-        weeklyGramMode      = todayState.settings.weeklyGramMode
+        weeklyLimitGrams    = todayState.limitInfo.weeklyLimitGrams,
+        drinkDaysThisWeek   = todayState.drinkDaysThisWeek,
+        maxDrinkDaysPerWeek = todayState.limitInfo.maxDrinkDaysPerWeek
     )
 
     // Collect one-shot events from the ViewModel and show a Snackbar when a
@@ -210,9 +210,10 @@ fun DrinksScreen(
                             // recomposition (new entry, day change, settings change).
                             val light = AlcoholCalculator.trafficLight(
                                 gramsPerDrink       = AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent),
-                                consumedGrams       = capacity.effectiveConsumedGrams,
-                                gramBudget          = capacity.effectiveBudgetGrams,
-                                rawTodayGrams       = capacity.todayGrams,
+                                todayGrams          = capacity.todayGrams,
+                                dailyLimitGrams     = capacity.dailyLimitGrams,
+                                weeklyTotalGrams    = capacity.weeklyTotalGrams,
+                                weeklyLimitGrams    = capacity.weeklyLimitGrams,
                                 drinkDaysThisWeek   = capacity.drinkDaysThisWeek,
                                 maxDrinkDaysPerWeek = capacity.maxDrinkDaysPerWeek
                             )

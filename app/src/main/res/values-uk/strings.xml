@@ -79,17 +79,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Дата експорту</string>
     <string name="pdf_meta_period">Період</string>
-    <string name="pdf_meta_gender">Стать</string>
     <string name="pdf_meta_limit">Ліміт</string>
     <string name="pdf_meta_weight">Вага тіла</string>
-    <string name="pdf_meta_custom_limit">Власний</string>
     <string name="pdf_kpi_total">Загальний алкоголь</string>
     <string name="pdf_kpi_avg_day">Сер. за день</string>
     <string name="pdf_kpi_avg_drink_day">Сер. за день вживання</string>
     <string name="pdf_kpi_drink_days">Дні вживання</string>
     <string name="pdf_kpi_abstinent_days">Дні утримання</string>
-    <string name="pdf_kpi_over_who">Дні > ВООЗ (%1$s г)</string>
-    <string name="pdf_kpi_over_dhs">Дні > DHS (%1$s г)</string>
     <string name="pdf_kpi_binge">Дні надмірного вживання (>%1$s г)</string>
     <string name="pdf_col_month">Місяць</string>
     <string name="pdf_col_drink_days">Дні вживання</string>
@@ -136,18 +132,7 @@
     <string name="theme_night">Темна</string>
     <string name="day_change_time">Час зміни дня</string>
     <string name="day_starts_at">Новий день починається о</string>
-    <string name="gender">Стать</string>
-    <string name="male">Чоловіча</string>
-    <string name="female">Жіноча</string>
-    <string name="limit_mode">Медичні рекомендації</string>
-    <string name="limit_who">ВООЗ – рівень ризику</string>
-    <string name="limit_dhs">DHS – низький ризик</string>
-    <string name="limit_custom">Власний</string>
-    <string name="custom_limit_grams">Мій добовий ліміт у грамах</string>
-    <string name="weekly_limit_section">Тижневий ліміт</string>
-    <string name="weekly_limit_enabled">Увімкнути тижневий ліміт</string>
     <string name="weekly_limit_grams">Тижневий ліміт у грамах</string>
-    <string name="weekly_limit">Тиждень</string>
     <string name="biometric">Блокування доступу</string>
     <string name="biometric_lock">Біометричне блокування</string>
     <string name="biometric_desc">Блокувати додаток відбитком пальця або розпізнаванням обличчя</string>
@@ -171,8 +156,6 @@
     <string name="biometric_subtitle">Будь ласка, пройдіть автентифікацію</string>
 
     <!-- WHO note -->
-    <string name="who_note">ВООЗ (2023) зазначає: безпечного рівня споживання алкоголю не існує. Значення ризику, показане тут, є практичною точкою відліку, а не порогом безпеки.</string>
-    <string name="who_values">Значення ризику: ♂ ≤ %1$s г, ♀ ≤ %2$s г на день.</string>
     <string name="pdf_months_truncated">Показано %1$d з %2$d місяців – старіші дані доступні в CSV/резервній копії</string>
 
     <!-- Year calendar legend -->
@@ -209,20 +192,24 @@
     <string name="csv_col_grams">Грами_алкоголю</string>
     <string name="csv_col_note">Примітка</string>
     <string name="pdf_unit_g_per_day">г/день</string>
-    <string name="unit_g_per_day">г/день</string>
-
-    <string name="days_over_limit_who">Дні понад ліміт (ВООЗ)</string>
-    <string name="days_over_limit_dhs">Дні понад ліміт (DHS)</string>
-    <string name="days_over_limit_custom">Дні понад власний ліміт</string>
-    <string name="dhs_note">DHS рекомендує: чоловіки не повинні вживати більше 24 г, жінки — більше 12 г чистого алкоголю на день. Щонайменше два дні на тиждень мають бути без алкоголю.</string>
     <string name="drink_days_label">дні вживання цього тижня</string>
     <string name="drink_days_setting">Макс. днів вживання/тиждень</string>
-    <string name="drink_days_who_dhs_note">Рекомендація: макс. 5 днів вживання на тиждень (≥ 2 дні утримання)</string>
-    <string name="weekly_gram_mode_title">Тижневий ліміт (грами)</string>
-    <string name="weekly_gram_mode_desc">Індикатор і сигнали використовують тижневий бюджет (макс. дні вживання &#215; добовий ліміт)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Особисті дані</string>
     <string name="week_starts_on">Тиждень починається з</string>
+    <string name="limits">Ліміти</string>
+    <string name="daily_limit_grams">Денний ліміт у грамах</string>
+    <string name="limit_caption_day">%1$s г/день</string>
+    <string name="limit_caption_week">%1$s г/тиж.</string>
+    <string name="days_over_daily_limit">Днів понад денний ліміт</string>
+    <string name="days_over_weekly_limit">Днів понад тижневий ліміт</string>
+    <string name="days_over_drink_day_limit">Днів понад ліміт питних днів</string>
+    <string name="pdf_unit_g_per_week">г/тиж.</string>
+    <string name="pdf_meta_drink_days_suffix">питних днів/тиж.</string>
+    <string name="pdf_kpi_over_daily">Днів > день (%1$s г)</string>
+    <string name="pdf_kpi_over_weekly">Днів > тиж. (%1$s г)</string>
+    <string name="pdf_kpi_over_drink_days">Днів > %1$d питних днів</string>
+    <string name="pdf_col_over_daily">> день</string>
 </resources>

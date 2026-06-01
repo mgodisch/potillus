@@ -92,17 +92,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">วันที่ส่งออก</string>
     <string name="pdf_meta_period">ช่วงเวลา</string>
-    <string name="pdf_meta_gender">เพศ</string>
     <string name="pdf_meta_limit">ขีดจำกัด</string>
     <string name="pdf_meta_weight">น้ำหนักตัว</string>
-    <string name="pdf_meta_custom_limit">กำหนดเอง</string>
     <string name="pdf_kpi_total">แอลกอฮอล์รวม</string>
     <string name="pdf_kpi_avg_day">เฉลี่ยต่อวัน</string>
     <string name="pdf_kpi_avg_drink_day">เฉลี่ยต่อวันที่ดื่ม</string>
     <string name="pdf_kpi_drink_days">วันที่ดื่ม</string>
     <string name="pdf_kpi_abstinent_days">วันที่งดดื่ม</string>
-    <string name="pdf_kpi_over_who">วันเกิน WHO (%1$s กรัม)</string>
-    <string name="pdf_kpi_over_dhs">วันเกิน DHS (%1$s กรัม)</string>
     <string name="pdf_kpi_binge">วันดื่มมากเกินไป (>%1$s กรัม)</string>
     <string name="pdf_col_month">เดือน</string>
     <string name="pdf_col_drink_days">วันที่ดื่ม</string>
@@ -149,18 +145,7 @@
     <string name="theme_night">มืด</string>
     <string name="day_change_time">เวลาเปลี่ยนวัน</string>
     <string name="day_starts_at">วันใหม่เริ่มเวลา</string>
-    <string name="gender">เพศ</string>
-    <string name="male">ชาย</string>
-    <string name="female">หญิง</string>
-    <string name="limit_mode">แนวทางทางการแพทย์</string>
-    <string name="limit_who">WHO – ระดับความเสี่ยง</string>
-    <string name="limit_dhs">DHS – ความเสี่ยงต่ำ</string>
-    <string name="limit_custom">กำหนดเอง</string>
-    <string name="custom_limit_grams">ขีดจำกัดรายวันของฉัน (กรัม)</string>
-    <string name="weekly_limit_section">ขีดจำกัดรายสัปดาห์</string>
-    <string name="weekly_limit_enabled">เปิดใช้ขีดจำกัดรายสัปดาห์</string>
     <string name="weekly_limit_grams">ขีดจำกัดรายสัปดาห์ (กรัม)</string>
-    <string name="weekly_limit">สัปดาห์</string>
     <string name="biometric">ล็อกการเข้าถึง</string>
     <string name="biometric_lock">ล็อกด้วยไบโอเมตริก</string>
     <string name="biometric_desc">ล็อกแอปด้วยลายนิ้วมือหรือการจดจำใบหน้า</string>
@@ -184,8 +169,6 @@
     <string name="biometric_subtitle">กรุณายืนยันตัวตน</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) ระบุว่า: ไม่มีปริมาณแอลกอฮอล์ที่ปลอดภัย ค่าความเสี่ยงที่แสดงที่นี่เป็นจุดอ้างอิงเชิงปฏิบัติ ไม่ใช่เกณฑ์ความปลอดภัย</string>
-    <string name="who_values">ค่าความเสี่ยง: ♂ ≤ %1$s g, ♀ ≤ %2$s g ต่อวัน</string>
     <string name="pdf_months_truncated">แสดง %1$d จาก %2$d เดือน — ข้อมูลเก่าอยู่ใน CSV/ข้อมูลสำรอง</string>
 
     <!-- Year calendar legend -->
@@ -222,20 +205,24 @@
     <string name="csv_col_grams">กรัม_แอลกอฮอล์</string>
     <string name="csv_col_note">หมายเหตุ</string>
     <string name="pdf_unit_g_per_day">กรัม/วัน</string>
-    <string name="unit_g_per_day">กรัม/วัน</string>
-
-    <string name="days_over_limit_who">วันที่เกินขีดจำกัด WHO</string>
-    <string name="days_over_limit_dhs">วันที่เกินขีดจำกัด DHS</string>
-    <string name="days_over_limit_custom">วันที่เกินขีดจำกัดที่กำหนดเอง</string>
-    <string name="dhs_note">คำแนะนำ DHS: ผู้ชายไม่ควรดื่มแอลกอฮอล์บริสุทธิ์เกิน 24 กรัม และผู้หญิงไม่เกิน 12 กรัมต่อวัน ควรมีอย่างน้อยสองวันต่อสัปดาห์ที่ไม่ดื่มแอลกอฮอล์</string>
     <string name="drink_days_label">วันที่ดื่มในสัปดาห์นี้</string>
     <string name="drink_days_setting">จำนวนวันดื่มสูงสุด/สัปดาห์</string>
-    <string name="drink_days_who_dhs_note">คำแนะนำ: ดื่มได้สูงสุด 5 วันต่อสัปดาห์ (งดดื่มอย่างน้อย 2 วัน)</string>
-    <string name="weekly_gram_mode_title">ขีดจำกัดกรัมรายสัปดาห์</string>
-    <string name="weekly_gram_mode_desc">แถบความคืบหน้าและตัวบ่งชี้อ้างอิงงบประมาณรายสัปดาห์ (วันดื่มสูงสุด &#215; ขีดจำกัดรายวัน)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">ข้อมูลส่วนตัว</string>
     <string name="week_starts_on">สัปดาห์เริ่มต้นวัน</string>
+    <string name="limits">ขีดจำกัด</string>
+    <string name="daily_limit_grams">ขีดจำกัดต่อวัน (กรัม)</string>
+    <string name="limit_caption_day">%1$s g/วัน</string>
+    <string name="limit_caption_week">%1$s g/สัปดาห์</string>
+    <string name="days_over_daily_limit">วันที่เกินขีดจำกัดต่อวัน</string>
+    <string name="days_over_weekly_limit">วันที่เกินขีดจำกัดต่อสัปดาห์</string>
+    <string name="days_over_drink_day_limit">วันที่เกินขีดจำกัดวันดื่ม</string>
+    <string name="pdf_unit_g_per_week">g/สัปดาห์</string>
+    <string name="pdf_meta_drink_days_suffix">วันดื่ม/สัปดาห์</string>
+    <string name="pdf_kpi_over_daily">วัน > วัน (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">วัน > สัปดาห์ (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">วัน > %1$d วันดื่ม</string>
+    <string name="pdf_col_over_daily">> วัน</string>
 </resources>

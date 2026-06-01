@@ -82,17 +82,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Útflutningsdagsetning</string>
     <string name="pdf_meta_period">Tímabil</string>
-    <string name="pdf_meta_gender">Kyn</string>
     <string name="pdf_meta_limit">Mörk</string>
     <string name="pdf_meta_weight">Líkamsþyngd</string>
-    <string name="pdf_meta_custom_limit">Sérsniðin</string>
     <string name="pdf_kpi_total">Heildarmagnalkóhóls</string>
     <string name="pdf_kpi_avg_day">Meðaltal á dag</string>
     <string name="pdf_kpi_avg_drink_day">Meðaltal á drykktardag</string>
     <string name="pdf_kpi_drink_days">Drykkjudagar</string>
     <string name="pdf_kpi_abstinent_days">Afþyktardagar</string>
-    <string name="pdf_kpi_over_who">Dagar > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dagar > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Glápsdagar (>%1$s g)</string>
     <string name="pdf_col_month">Mánuður</string>
     <string name="pdf_col_drink_days">Drykkjudagar</string>
@@ -139,18 +135,7 @@
     <string name="theme_night">Dökkt</string>
     <string name="day_change_time">Tími dagsskipta</string>
     <string name="day_starts_at">Nýr dagur hefst klukkan</string>
-    <string name="gender">Kyn</string>
-    <string name="male">Karl</string>
-    <string name="female">Kona</string>
-    <string name="limit_mode">Læknisfræðilegar leiðbeiningar</string>
-    <string name="limit_who">WHO – áhættugildi</string>
-    <string name="limit_dhs">DHS – lág áhætta</string>
-    <string name="limit_custom">Sérsniðin</string>
-    <string name="custom_limit_grams">Mitt dagleg mörk í grömmum</string>
-    <string name="weekly_limit_section">Vikuleg mörk</string>
-    <string name="weekly_limit_enabled">Virkja vikuleg mörk</string>
     <string name="weekly_limit_grams">Vikuleg mörk í grömmum</string>
-    <string name="weekly_limit">Vika</string>
     <string name="biometric">Aðgangslás</string>
     <string name="biometric_lock">Líffræðilegur lás</string>
     <string name="biometric_desc">Læstu forritið með fingrafari eða andlitsgreiningu</string>
@@ -174,8 +159,6 @@
     <string name="biometric_subtitle">Vinsamlegast sannvottaðu þig</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) segir: Það er engin örugg neysla alkóhóls. Áhættugildi sem sýnt er hér er hagnýtt viðmiðunargildi, ekki öryggismörk.</string>
-    <string name="who_values">Áhættugildi: ♂ ≤ %1$s g, ♀ ≤ %2$s g á dag.</string>
     <string name="pdf_months_truncated">Sýni %1$d af %2$d mánuðum – eldri gögn aðgengileg í CSV/öryggisafriti</string>
 
     <!-- Year calendar legend -->
@@ -212,20 +195,24 @@
     <string name="csv_col_grams">Grömm_alkóhóls</string>
     <string name="csv_col_note">Athugasemd</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
-    <string name="unit_g_per_day">g/dag</string>
-
-    <string name="days_over_limit_who">Dagar yfir mörkum (WHO)</string>
-    <string name="days_over_limit_dhs">Dagar yfir mörkum (DHS)</string>
-    <string name="days_over_limit_custom">Dagar yfir stilltum mörkum</string>
-    <string name="dhs_note">DHS mælir með: karlar ættu ekki að drekka meira en 24 g, konur ekki meira en 12 g hreins alkóhóls á dag. Að minnsta kosti tveir dagar á viku ættu að vera alkóhólfríir.</string>
     <string name="drink_days_label">drykkjudagar þessa vikuna</string>
     <string name="drink_days_setting">Hám. drykkjudagar/viku</string>
-    <string name="drink_days_who_dhs_note">Mæling: hám. 5 drykkjudagar á viku (≥ 2 afþyktardagar)</string>
-    <string name="weekly_gram_mode_title">Vikuleg grömm-mörk</string>
-    <string name="weekly_gram_mode_desc">Framvindustikan og vísar nota vikufjárheimild (hám. drykkjudagar &#215; dagleg mörk)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Persónuupplýsingar</string>
     <string name="week_starts_on">Vika byrjar á</string>
+    <string name="limits">Mörk</string>
+    <string name="daily_limit_grams">Dagleg mörk í grömmum</string>
+    <string name="limit_caption_day">%1$s g/dag</string>
+    <string name="limit_caption_week">%1$s g/viku</string>
+    <string name="days_over_daily_limit">Dagar yfir daglegum mörkum</string>
+    <string name="days_over_weekly_limit">Dagar yfir vikulegum mörkum</string>
+    <string name="days_over_drink_day_limit">Dagar yfir mörkum drykkjudaga</string>
+    <string name="pdf_unit_g_per_week">g/viku</string>
+    <string name="pdf_meta_drink_days_suffix">drykkjudagar/viku</string>
+    <string name="pdf_kpi_over_daily">Dagar > dagur (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dagar > vika (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dagar > %1$d drykkjudagar</string>
+    <string name="pdf_col_over_daily">> dagur</string>
 </resources>

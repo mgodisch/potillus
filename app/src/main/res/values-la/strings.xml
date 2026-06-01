@@ -73,17 +73,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Dies exportationis</string>
     <string name="pdf_meta_period">Tempus</string>
-    <string name="pdf_meta_gender">Sexus</string>
     <string name="pdf_meta_limit">Limes</string>
     <string name="pdf_meta_weight">Pondus corporis</string>
-    <string name="pdf_meta_custom_limit">Proprium</string>
     <string name="pdf_kpi_total">Alcohol totus</string>
     <string name="pdf_kpi_avg_day">Med. per diem</string>
     <string name="pdf_kpi_avg_drink_day">Med. per diem potandi</string>
     <string name="pdf_kpi_drink_days">Dies potandi</string>
     <string name="pdf_kpi_abstinent_days">Dies abstinentiae</string>
-    <string name="pdf_kpi_over_who">Dies > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dies > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Dies binge (>%1$s g)</string>
     <string name="pdf_col_month">Mensis</string>
     <string name="pdf_col_drink_days">Dies potandi</string>
@@ -130,18 +126,7 @@
     <string name="theme_night">Nocturnum</string>
     <string name="day_change_time">Hora mutationis diei</string>
     <string name="day_starts_at">Dies novus incipit hora</string>
-    <string name="gender">Sexus</string>
-    <string name="male">Masculinus</string>
-    <string name="female">Femininus</string>
-    <string name="limit_mode">Consilium medicum</string>
-    <string name="limit_who">OMS – gradus periculi</string>
-    <string name="limit_dhs">DHS – periculum exile</string>
-    <string name="limit_custom">Ad voluntatem</string>
-    <string name="custom_limit_grams">Modus meus diurnus in grammis</string>
-    <string name="weekly_limit_section">Modus hebdomadarius</string>
-    <string name="weekly_limit_enabled">Modum hebdomadarium adhibere</string>
     <string name="weekly_limit_grams">Modus hebdomadarius in grammis</string>
-    <string name="weekly_limit">Hebdomas</string>
     <string name="biometric">Custodia accessus</string>
     <string name="biometric_lock">Custodia biometrica</string>
     <string name="biometric_desc">Applicatio dactyloscopio vel vultu claudatur</string>
@@ -159,8 +144,6 @@
     <string name="import_merge">Adde</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Quaeso te comprobato</string>
-    <string name="who_note">OMS (MMXXIII) docet: nulla mensura alcoholis tuta est. Valor hic ostensus est norma practica, non limes innocuitatis.</string>
-    <string name="who_values">Valor periculi: ♂ ≤ %1$s g, ♀ ≤ %2$s g in die.</string>
     <string name="pdf_months_truncated">Ostendo %1$d ex %2$d mensibus – data antiquiora in CSV/backup praesto sunt</string>
 
     <!-- Legenda calendarii annui -->
@@ -198,20 +181,24 @@
     <string name="csv_col_grams">Massa_alcohol</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/die</string>
-    <string name="unit_g_per_day">g/die</string>
-
-    <string name="days_over_limit_who">Dies supra limitem (OMS)</string>
-    <string name="days_over_limit_dhs">Dies supra limitem (DHS)</string>
-    <string name="days_over_limit_custom">Dies supra limitem statutum</string>
-    <string name="dhs_note">DHS suadet: viri non plus quam XXIV g, feminae non plus quam XII g alcoholis puri per diem bibant. Saltem duos dies per hebdomadem sine alcohole sint.</string>
     <string name="drink_days_label">dies potus huius hebdomadis</string>
     <string name="drink_days_setting">Max. dies/hebdomadem</string>
-    <string name="drink_days_who_dhs_note">Suadetur: max. V dies potus per hebdomadem (≥ II dies abstinentiae)</string>
-    <string name="weekly_gram_mode_title">Finis hebdomadalis (grammata)</string>
-    <string name="weekly_gram_mode_desc">Virga et indices ad budgetum hebdomadis pertinent</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data personalia</string>
     <string name="week_starts_on">Hebdomas incipit die</string>
+    <string name="limits">Limites</string>
+    <string name="daily_limit_grams">Limes cotidianus in grammatis</string>
+    <string name="limit_caption_day">%1$s g/die</string>
+    <string name="limit_caption_week">%1$s g/hebd.</string>
+    <string name="days_over_daily_limit">Dies supra limitem cotidianum</string>
+    <string name="days_over_weekly_limit">Dies supra limitem hebdomadalem</string>
+    <string name="days_over_drink_day_limit">Dies supra limitem dierum bibendi</string>
+    <string name="pdf_unit_g_per_week">g/hebd.</string>
+    <string name="pdf_meta_drink_days_suffix">dies bibendi/hebd.</string>
+    <string name="pdf_kpi_over_daily">Dies > die (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dies > hebd. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dies > %1$d dies bibendi</string>
+    <string name="pdf_col_over_daily">> die</string>
 </resources>

@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Dátum exportu</string>
     <string name="pdf_meta_period">Obdobie</string>
-    <string name="pdf_meta_gender">Pohlavie</string>
     <string name="pdf_meta_limit">Limit</string>
     <string name="pdf_meta_weight">Telesná hmotnosť</string>
-    <string name="pdf_meta_custom_limit">Vlastný</string>
     <string name="pdf_kpi_total">Celkový alkohol</string>
     <string name="pdf_kpi_avg_day">Prier. za deň</string>
     <string name="pdf_kpi_avg_drink_day">Prier. za deň pitia</string>
     <string name="pdf_kpi_drink_days">Dni pitia</string>
     <string name="pdf_kpi_abstinent_days">Dni abstinencie</string>
-    <string name="pdf_kpi_over_who">Dni > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dni > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Dni intenzívneho pitia (>%1$s g)</string>
     <string name="pdf_col_month">Mesiac</string>
     <string name="pdf_col_drink_days">Dni pitia</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Tmavá</string>
     <string name="day_change_time">Čas zmeny dňa</string>
     <string name="day_starts_at">Nový deň začína o</string>
-    <string name="gender">Pohlavie</string>
-    <string name="male">Muž</string>
-    <string name="female">Žena</string>
-    <string name="limit_mode">Medicínska smernica</string>
-    <string name="limit_who">WHO – úroveň rizika</string>
-    <string name="limit_dhs">DHS – nízke riziko</string>
-    <string name="limit_custom">Vlastný</string>
-    <string name="custom_limit_grams">Môj denný limit v gramoch</string>
-    <string name="weekly_limit_section">Týždenný limit</string>
-    <string name="weekly_limit_enabled">Povoliť týždenný limit</string>
     <string name="weekly_limit_grams">Týždenný limit v gramoch</string>
-    <string name="weekly_limit">Týždeň</string>
     <string name="biometric">Uzamknutie</string>
     <string name="biometric_lock">Biometrické uzamknutie</string>
     <string name="biometric_desc">Uzamknutie aplikácie odtlačkom prsta alebo tvárou</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Prosím, overte svoju totožnosť</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">WHO (2023) uvádza: Neexistuje bezpečná úroveň spotreby alkoholu. Tu zobrazená riziková hodnota je praktický orientačný bod, nie bezpečnostný prah.</string>
-    <string name="who_values">Riziková hodnota: ♂ ≤ %1$s g, ♀ ≤ %2$s g za deň.</string>
-    <string name="dhs_note">DHS odporúča: muži by nemali piť viac ako 24 g, ženy nie viac ako 12 g čistého alkoholu za deň. Aspoň dva dni v týždni by mali byť bez alkoholu.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Zobrazuje sa %1$d z %2$d mesiacov – staršie dáta sú v CSV/zálohe</string>
     <string name="year_calendar_no_entry">bez záznamu</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Gramy_alkoholu</string>
     <string name="csv_col_note">Poznámka</string>
     <string name="pdf_unit_g_per_day">g/deň</string>
-    <string name="unit_g_per_day">g/deň</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Dni nad limitom (WHO)</string>
-    <string name="days_over_limit_dhs">Dni nad limitom (DHS)</string>
-    <string name="days_over_limit_custom">Dni nad nastaveným limitom</string>
     <string name="drink_days_label">dni pitia tento týždeň</string>
     <string name="drink_days_setting">Max. dni pitia/týždeň</string>
-    <string name="drink_days_who_dhs_note">Odporúčanie: max. 5 dní pitia za týždeň (≥ 2 dni bez alkoholu)</string>
-    <string name="weekly_gram_mode_title">Týždenný gramový limit</string>
-    <string name="weekly_gram_mode_desc">Panel priebehu a indikátory používajú týždenný rozpočet (max. dni pitia &#215; denný limit)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Osobné údaje</string>
     <string name="week_starts_on">Týždeň začína</string>
+    <string name="limits">Limity</string>
+    <string name="daily_limit_grams">Denný limit v gramoch</string>
+    <string name="limit_caption_day">%1$s g/deň</string>
+    <string name="limit_caption_week">%1$s g/týž.</string>
+    <string name="days_over_daily_limit">Dni nad denným limitom</string>
+    <string name="days_over_weekly_limit">Dni nad týždenným limitom</string>
+    <string name="days_over_drink_day_limit">Dni nad limitom dní pitia</string>
+    <string name="pdf_unit_g_per_week">g/týž.</string>
+    <string name="pdf_meta_drink_days_suffix">dni pitia/týž.</string>
+    <string name="pdf_kpi_over_daily">Dni > deň (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dni > týž. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dni > %1$d dní pitia</string>
+    <string name="pdf_col_over_daily">> deň</string>
 </resources>

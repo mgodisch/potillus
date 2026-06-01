@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Дата на експорт</string>
     <string name="pdf_meta_period">Период</string>
-    <string name="pdf_meta_gender">Пол</string>
     <string name="pdf_meta_limit">Лимит</string>
     <string name="pdf_meta_weight">Телесно тегло</string>
-    <string name="pdf_meta_custom_limit">Персонализиран</string>
     <string name="pdf_kpi_total">Общ алкохол</string>
     <string name="pdf_kpi_avg_day">Ср. на ден</string>
     <string name="pdf_kpi_avg_drink_day">Ср. на ден с пиене</string>
     <string name="pdf_kpi_drink_days">Дни с пиене</string>
     <string name="pdf_kpi_abstinent_days">Дни на въздържание</string>
-    <string name="pdf_kpi_over_who">Дни > СЗО (%1$s г)</string>
-    <string name="pdf_kpi_over_dhs">Дни > DHS (%1$s г)</string>
     <string name="pdf_kpi_binge">Дни на запой (>%1$s г)</string>
     <string name="pdf_col_month">Месец</string>
     <string name="pdf_col_drink_days">Дни с пиене</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Тъмна</string>
     <string name="day_change_time">Час за смяна на деня</string>
     <string name="day_starts_at">Новият ден започва в</string>
-    <string name="gender">Пол</string>
-    <string name="male">Мъжки</string>
-    <string name="female">Женски</string>
-    <string name="limit_mode">Медицинска насока</string>
-    <string name="limit_who">СЗО – ниво на риска</string>
-    <string name="limit_dhs">DHS – нисък риск</string>
-    <string name="limit_custom">Персонализиран</string>
-    <string name="custom_limit_grams">Моят дневен лимит в грамове</string>
-    <string name="weekly_limit_section">Седмичен лимит</string>
-    <string name="weekly_limit_enabled">Активиране на седмичния лимит</string>
     <string name="weekly_limit_grams">Седмичен лимит в грамове</string>
-    <string name="weekly_limit">Седмица</string>
     <string name="biometric">Заключване</string>
     <string name="biometric_lock">Биометрично заключване</string>
     <string name="biometric_desc">Заключване на приложението с пръстов отпечатък или лице</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Моля, удостоверете се</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">СЗО (2023) заявява: Няма безопасно ниво на консумация на алкохол. Показаната стойност на риска е практически ориентир, не праг на безопасност.</string>
-    <string name="who_values">Рискова стойност: ♂ ≤ %1$s г, ♀ ≤ %2$s г на ден.</string>
-    <string name="dhs_note">DHS препоръчва: мъжете не трябва да пият повече от 24 г, жените не повече от 12 г чист алкохол на ден. Поне два дни в седмицата трябва да са без алкохол.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Показани са %1$d от %2$d месеца – по-старите данни са в CSV/архив</string>
     <string name="year_calendar_no_entry">без запис</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Gramy_alkohol</string>
     <string name="csv_col_note">Бележка</string>
     <string name="pdf_unit_g_per_day">г/ден</string>
-    <string name="unit_g_per_day">г/ден</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Дни над лимита (СЗО)</string>
-    <string name="days_over_limit_dhs">Дни над лимита (DHS)</string>
-    <string name="days_over_limit_custom">Дни над конфигурирания лимит</string>
     <string name="drink_days_label">дни с пиене тази седмица</string>
     <string name="drink_days_setting">Макс. дни с пиене/седмица</string>
-    <string name="drink_days_who_dhs_note">Препоръка: макс. 5 дни с пиене на седмица (≥ 2 дни без алкохол)</string>
-    <string name="weekly_gram_mode_title">Седмичен лимит (грамове)</string>
-    <string name="weekly_gram_mode_desc">Лентата за напредък и индикаторите използват седмичния бюджет (макс. дни с пиене &#215; дневен лимит)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Лични данни</string>
     <string name="week_starts_on">Седмицата започва в</string>
+    <string name="limits">Лимити</string>
+    <string name="daily_limit_grams">Дневен лимит в грамове</string>
+    <string name="limit_caption_day">%1$s г/ден</string>
+    <string name="limit_caption_week">%1$s г/седм.</string>
+    <string name="days_over_daily_limit">Дни над дневния лимит</string>
+    <string name="days_over_weekly_limit">Дни над седмичния лимит</string>
+    <string name="days_over_drink_day_limit">Дни над лимита на дни с пиене</string>
+    <string name="pdf_unit_g_per_week">г/седм.</string>
+    <string name="pdf_meta_drink_days_suffix">дни с пиене/седм.</string>
+    <string name="pdf_kpi_over_daily">Дни > ден (%1$s г)</string>
+    <string name="pdf_kpi_over_weekly">Дни > седм. (%1$s г)</string>
+    <string name="pdf_kpi_over_drink_days">Дни > %1$d дни с пиене</string>
+    <string name="pdf_col_over_daily">> ден</string>
 </resources>

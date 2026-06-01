@@ -82,17 +82,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Ọjọ́ ìfisílẹ̀</string>
     <string name="pdf_meta_period">Àkókò</string>
-    <string name="pdf_meta_gender">Ìbálòpọ̀</string>
     <string name="pdf_meta_limit">Ìdíwọ̀</string>
     <string name="pdf_meta_weight">Ìwọ̀n ara</string>
-    <string name="pdf_meta_custom_limit">Àdánwò</string>
     <string name="pdf_kpi_total">Àpapọ̀ ọtí</string>
     <string name="pdf_kpi_avg_day">Apapọ̀ fún ọjọ́ kọ̀ọ̀kan</string>
     <string name="pdf_kpi_avg_drink_day">Apapọ̀ fún ọjọ́ mímu kọ̀ọ̀kan</string>
     <string name="pdf_kpi_drink_days">Àwọn ọjọ́ mímu</string>
     <string name="pdf_kpi_abstinent_days">Àwọn ọjọ́ ìdáwọ́dúró</string>
-    <string name="pdf_kpi_over_who">Àwọn ọjọ́ > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Àwọn ọjọ́ > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Àwọn ọjọ́ binge (>%1$s g)</string>
     <string name="pdf_col_month">Oṣù</string>
     <string name="pdf_col_drink_days">Àwọn ọjọ́ mímu</string>
@@ -139,18 +135,7 @@
     <string name="theme_night">Òkùnkùn</string>
     <string name="day_change_time">Àkókò ìyípadà ọjọ́</string>
     <string name="day_starts_at">Ọjọ́ tuntun bẹ̀rẹ̀ ní</string>
-    <string name="gender">Ìbálòpọ̀</string>
-    <string name="male">Ọkùnrin</string>
-    <string name="female">Obìnrin</string>
-    <string name="limit_mode">Ìtọ́sọ́nà ìṣègùn</string>
-    <string name="limit_who">WHO – ìpele ewu</string>
-    <string name="limit_dhs">DHS – ewu kékeré</string>
-    <string name="limit_custom">Àdánwò</string>
-    <string name="custom_limit_grams">Ìdíwọ̀ mi ojoojúmọ̀ ní gram</string>
-    <string name="weekly_limit_section">Ìdíwọ̀ ọ̀sẹ̀</string>
-    <string name="weekly_limit_enabled">Ṣí ìdíwọ̀ ọ̀sẹ̀</string>
     <string name="weekly_limit_grams">Ìdíwọ̀ ọ̀sẹ̀ ní gram</string>
-    <string name="weekly_limit">Ọ̀sẹ̀</string>
     <string name="biometric">Àmúrágbẹ̀dẹ ìwọlé</string>
     <string name="biometric_lock">Àmúrágbẹ̀dẹ biolójì</string>
     <string name="biometric_desc">Tiẹ àfọwọ́pín tàbí ìmọ̀ ìhàngbé kún ìtẹ́wọ́gba àwọn ẹ̀rọ</string>
@@ -174,8 +159,6 @@
     <string name="biometric_subtitle">Jọ̀wọ́ fìdí rẹ múlẹ̀</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) sọ pé: Kò sí ìpele tó ní ìdáàbò bò fún mímu ọtí. Iye ewu tí a ṣe àfihàn níhìn-ín jẹ́ àmìpẹlẹ̀ tó wúlò, kìí ṣe ìpele ìdáàbòbò.</string>
-    <string name="who_values">Iye eewu: ♂ ≤ %1$s g, ♀ ≤ %2$s g lójúmọ́.</string>
     <string name="pdf_months_truncated">Ní ìfihàn oṣù %1$d nínú %2$d – àlàyé àtijọ́ wà ní CSV/ẹ̀dà ìfipamọ́</string>
 
     <!-- Year calendar legend -->
@@ -212,20 +195,24 @@
     <string name="csv_col_grams">Gram_ọtí</string>
     <string name="csv_col_note">Àkíyèsí</string>
     <string name="pdf_unit_g_per_day">g/ọjọ́</string>
-    <string name="unit_g_per_day">g/ọjọ́</string>
-
-    <string name="days_over_limit_who">Àwọn ọjọ́ tó ju ìdíwọ̀ lọ (WHO)</string>
-    <string name="days_over_limit_dhs">Àwọn ọjọ́ tó ju ìdíwọ̀ lọ (DHS)</string>
-    <string name="days_over_limit_custom">Àwọn ọjọ́ tó ju ìdíwọ̀ tí a tò sílẹ̀ lọ</string>
-    <string name="dhs_note">DHS dábàá pé: àwọn ọkùnrin kò gbọdọ̀ mu ju g 24 lọ, àwọn obìnrin kò gbọdọ̀ mu ju g 12 lọ nínú ọtí tó mọ́ lójoojúmọ̀. O kéré jù ọjọ́ méjì lọ nínú ọ̀sẹ̀ gbọdọ̀ jẹ́ ọjọ́ tí kò ní ọtí.</string>
     <string name="drink_days_label">àwọn ọjọ́ mímu ọ̀sẹ̀ yìí</string>
     <string name="drink_days_setting">Àwọn ọjọ́ mímu ó pọ̀/ọ̀sẹ̀</string>
-    <string name="drink_days_who_dhs_note">Ìdábàá: ó pọ̀ jù ọjọ́ mímu 5 lọ nínú ọ̀sẹ̀ (≥ àwọn ọjọ́ ìdáwọ́dúró 2)</string>
-    <string name="weekly_gram_mode_title">Ìdíwọ̀ gram ọ̀sẹ̀</string>
-    <string name="weekly_gram_mode_desc">Ọ̀pá ìlosíwájú àti àwọn àmì ń lo isuna ọ̀sẹ̀ (ó pọ̀ jù àwọn ọjọ́ mímu &#215; ìdíwọ̀ ojoojúmọ̀)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Àlàyé ara ẹni</string>
     <string name="week_starts_on">Ọ̀sẹ̀ bẹ̀rẹ̀ ní</string>
+    <string name="limits">Àwọn òpin</string>
+    <string name="daily_limit_grams">Òpin ojoojúmọ́ ní gíráàmù</string>
+    <string name="limit_caption_day">%1$s g/ọjọ́</string>
+    <string name="limit_caption_week">%1$s g/ọ̀sẹ̀</string>
+    <string name="days_over_daily_limit">Àwọn ọjọ́ tó kọjá òpin ojoojúmọ́</string>
+    <string name="days_over_weekly_limit">Àwọn ọjọ́ tó kọjá òpin ọ̀sọ̀ọ̀sẹ̀</string>
+    <string name="days_over_drink_day_limit">Àwọn ọjọ́ tó kọjá òpin ọjọ́ mímu</string>
+    <string name="pdf_unit_g_per_week">g/ọ̀sẹ̀</string>
+    <string name="pdf_meta_drink_days_suffix">ọjọ́ mímu/ọ̀sẹ̀</string>
+    <string name="pdf_kpi_over_daily">Ọjọ́ > ojoojúmọ́ (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Ọjọ́ > ọ̀sẹ̀ (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Ọjọ́ > %1$d ọjọ́ mímu</string>
+    <string name="pdf_col_over_daily">> ọjọ́</string>
 </resources>

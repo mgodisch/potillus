@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">匯出日期</string>
     <string name="pdf_meta_period">期間</string>
-    <string name="pdf_meta_gender">性別</string>
     <string name="pdf_meta_limit">限制值</string>
     <string name="pdf_meta_weight">體重</string>
-    <string name="pdf_meta_custom_limit">自訂</string>
     <string name="pdf_kpi_total">總酒精攝取量</string>
     <string name="pdf_kpi_avg_day">每日平均</string>
     <string name="pdf_kpi_avg_drink_day">飲酒日平均</string>
     <string name="pdf_kpi_drink_days">飲酒日數</string>
     <string name="pdf_kpi_abstinent_days">戒酒日數</string>
-    <string name="pdf_kpi_over_who">超過 WHO 天數（%1$s 公克）</string>
-    <string name="pdf_kpi_over_dhs">超過 DHS 天數（%1$s 公克）</string>
     <string name="pdf_kpi_binge">豪飲日數（>%1$s 公克）</string>
     <string name="pdf_col_month">月份</string>
     <string name="pdf_col_drink_days">飲酒日數</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">深色</string>
     <string name="day_change_time">換日時間</string>
     <string name="day_starts_at">新一天從以下時間開始</string>
-    <string name="gender">性別</string>
-    <string name="male">男性</string>
-    <string name="female">女性</string>
-    <string name="limit_mode">醫療準則</string>
-    <string name="limit_who">WHO──風險值</string>
-    <string name="limit_dhs">DHS──低風險</string>
-    <string name="limit_custom">自訂</string>
-    <string name="custom_limit_grams">我的每日限制（公克）</string>
-    <string name="weekly_limit_section">每週限制</string>
-    <string name="weekly_limit_enabled">啟用每週限制</string>
     <string name="weekly_limit_grams">每週限制（公克）</string>
-    <string name="weekly_limit">週</string>
     <string name="biometric">存取鎖定</string>
     <string name="biometric_lock">生物辨識鎖定</string>
     <string name="biometric_desc">以指紋或臉部辨識鎖定應用程式</string>
@@ -180,8 +165,6 @@
     <string name="biometric_subtitle">請進行身份驗證</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO（2023）指出：飲酒沒有安全劑量。此處顯示的風險值為實用參考基準，並非安全閾值。</string>
-    <string name="who_values">風險值：♂ ≤ %1$s g，♀ ≤ %2$s g／天。</string>
     <string name="pdf_months_truncated">顯示 %2$d 個月中的 %1$d 個──較舊的資料可在 CSV／備份中取得</string>
 
     <!-- Year calendar legend -->
@@ -218,20 +201,24 @@
     <string name="csv_col_grams">公克_酒精</string>
     <string name="csv_col_note">備注</string>
     <string name="pdf_unit_g_per_day">公克／天</string>
-    <string name="unit_g_per_day">公克／天</string>
-
-    <string name="days_over_limit_who">超過限制天數（WHO）</string>
-    <string name="days_over_limit_dhs">超過限制天數（DHS）</string>
-    <string name="days_over_limit_custom">超過設定限制天數</string>
-    <string name="dhs_note">DHS 建議：男性每日純酒精攝取量不應超過 24 公克，女性不應超過 12 公克。每週應至少有兩天不飲酒。</string>
     <string name="drink_days_label">本週飲酒日數</string>
     <string name="drink_days_setting">每週最多飲酒日數</string>
-    <string name="drink_days_who_dhs_note">建議：每週最多 5 個飲酒日（≥ 2 個戒酒日）</string>
-    <string name="weekly_gram_mode_title">每週公克限制</string>
-    <string name="weekly_gram_mode_desc">進度列與指示燈使用每週預算（最多飲酒日數 &#215; 每日限制）</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">個人資料</string>
     <string name="week_starts_on">一週開始於</string>
+    <string name="limits">上限</string>
+    <string name="daily_limit_grams">每日上限（公克）</string>
+    <string name="limit_caption_day">%1$s 公克/天</string>
+    <string name="limit_caption_week">%1$s 公克/週</string>
+    <string name="days_over_daily_limit">超過每日上限的天數</string>
+    <string name="days_over_weekly_limit">超過每週上限的天數</string>
+    <string name="days_over_drink_day_limit">超過飲酒天數上限的天數</string>
+    <string name="pdf_unit_g_per_week">公克/週</string>
+    <string name="pdf_meta_drink_days_suffix">飲酒天數/週</string>
+    <string name="pdf_kpi_over_daily">天 > 日 (%1$s 公克)</string>
+    <string name="pdf_kpi_over_weekly">天 > 週 (%1$s 公克)</string>
+    <string name="pdf_kpi_over_drink_days">天 > %1$d 飲酒天</string>
+    <string name="pdf_col_over_daily">> 日</string>
 </resources>

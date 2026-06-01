@@ -81,17 +81,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">ఎగుమతి తేదీ</string>
     <string name="pdf_meta_period">కాలం</string>
-    <string name="pdf_meta_gender">లింగం</string>
     <string name="pdf_meta_limit">పరిమితి</string>
     <string name="pdf_meta_weight">శరీర బరువు</string>
-    <string name="pdf_meta_custom_limit">అనుకూలం</string>
     <string name="pdf_kpi_total">మొత్తం ఆల్కహాల్</string>
     <string name="pdf_kpi_avg_day">రోజువారీ సగటు</string>
     <string name="pdf_kpi_avg_drink_day">తాగే రోజు సగటు</string>
     <string name="pdf_kpi_drink_days">తాగే రోజులు</string>
     <string name="pdf_kpi_abstinent_days">విరమణ రోజులు</string>
-    <string name="pdf_kpi_over_who">రోజులు > WHO (%1$s గ్రా)</string>
-    <string name="pdf_kpi_over_dhs">రోజులు > DHS (%1$s గ్రా)</string>
     <string name="pdf_kpi_binge">బింగ్ రోజులు (>%1$s గ్రా)</string>
     <string name="pdf_col_month">నెల</string>
     <string name="pdf_col_drink_days">తాగే రోజులు</string>
@@ -138,18 +134,7 @@
     <string name="theme_night">చీకటి</string>
     <string name="day_change_time">రోజు మారే సమయం</string>
     <string name="day_starts_at">కొత్త రోజు ప్రారంభమవుతుంది</string>
-    <string name="gender">లింగం</string>
-    <string name="male">పురుషుడు</string>
-    <string name="female">స్త్రీ</string>
-    <string name="limit_mode">వైద్య మార్గదర్శకాలు</string>
-    <string name="limit_who">WHO – ప్రమాద స్థాయి</string>
-    <string name="limit_dhs">DHS – తక్కువ ప్రమాదం</string>
-    <string name="limit_custom">అనుకూలం</string>
-    <string name="custom_limit_grams">నా రోజువారీ పరిమితి గ్రాములలో</string>
-    <string name="weekly_limit_section">వారపు పరిమితి</string>
-    <string name="weekly_limit_enabled">వారపు పరిమితిని ప్రారంభించు</string>
     <string name="weekly_limit_grams">వారపు పరిమితి గ్రాములలో</string>
-    <string name="weekly_limit">వారం</string>
     <string name="biometric">యాక్సెస్ లాక్</string>
     <string name="biometric_lock">బయోమెట్రిక్ లాక్</string>
     <string name="biometric_desc">వేలిముద్ర లేదా ముఖ గుర్తింపుతో యాప్‌ని లాక్ చేయండి</string>
@@ -173,8 +158,6 @@
     <string name="biometric_subtitle">దయచేసి ధృవీకరించండి</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) చెప్పింది: ఆల్కహాల్ వినియోగానికి సురక్షితమైన స్థాయి అంటూ ఏదీ లేదు. ఇక్కడ చూపబడిన ప్రమాద విలువ ఒక ఆచరణాత్మక సూచన బిందువు, భద్రతా పరిమితి కాదు.</string>
-    <string name="who_values">ప్రమాద విలువ: ♂ ≤ %1$s g, ♀ ≤ %2$s g రోజుకు.</string>
     <string name="pdf_months_truncated">%2$d నెలల్లో %1$d చూపిస్తోంది – పాత డేటా CSV/బ్యాకప్‌లో అందుబాటులో ఉంది</string>
 
     <!-- Year calendar legend -->
@@ -211,20 +194,24 @@
     <string name="csv_col_grams">గ్రా_ఆల్కహాల్</string>
     <string name="csv_col_note">గమనిక</string>
     <string name="pdf_unit_g_per_day">గ్రా/రోజు</string>
-    <string name="unit_g_per_day">గ్రా/రోజు</string>
-
-    <string name="days_over_limit_who">పరిమితి దాటిన రోజులు (WHO)</string>
-    <string name="days_over_limit_dhs">పరిమితి దాటిన రోజులు (DHS)</string>
-    <string name="days_over_limit_custom">కాన్ఫిగర్ చేయబడిన పరిమితి దాటిన రోజులు</string>
-    <string name="dhs_note">DHS సిఫార్సు చేస్తోంది: పురుషులు రోజుకు 24 గ్రాముల కంటే ఎక్కువ, స్త్రీలు 12 గ్రాముల కంటే ఎక్కువ స్వచ్ఛమైన ఆల్కహాల్ తాగకూడదు. వారంలో కనీసం రెండు రోజులు ఆల్కహాల్ లేకుండా ఉండాలి.</string>
     <string name="drink_days_label">ఈ వారంలో తాగే రోజులు</string>
     <string name="drink_days_setting">గరిష్టం తాగే రోజులు/వారం</string>
-    <string name="drink_days_who_dhs_note">సిఫార్సు: వారానికి గరిష్టం 5 తాగే రోజులు (≥ 2 విరమణ రోజులు)</string>
-    <string name="weekly_gram_mode_title">వారపు గ్రాముల పరిమితి</string>
-    <string name="weekly_gram_mode_desc">పురోగతి పట్టీ మరియు సూచికలు వారపు బడ్జెట్ ఉపయోగిస్తాయి (గరిష్టం తాగే రోజులు &#215; రోజువారీ పరిమితి)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">వ్యక్తిగత డేటా</string>
     <string name="week_starts_on">వారం ప్రారంభమయ్యే రోజు</string>
+    <string name="limits">పరిమితులు</string>
+    <string name="daily_limit_grams">గ్రాములలో రోజువారీ పరిమితి</string>
+    <string name="limit_caption_day">%1$s g/రోజు</string>
+    <string name="limit_caption_week">%1$s g/వారం</string>
+    <string name="days_over_daily_limit">రోజువారీ పరిమితి దాటిన రోజులు</string>
+    <string name="days_over_weekly_limit">వారపు పరిమితి దాటిన రోజులు</string>
+    <string name="days_over_drink_day_limit">తాగే రోజుల పరిమితి దాటిన రోజులు</string>
+    <string name="pdf_unit_g_per_week">g/వారం</string>
+    <string name="pdf_meta_drink_days_suffix">తాగే రోజులు/వా.</string>
+    <string name="pdf_kpi_over_daily">రోజులు > రోజు (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">రోజులు > వారం (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">రోజులు > %1$d తాగే రోజులు</string>
+    <string name="pdf_col_over_daily">> రోజు</string>
 </resources>

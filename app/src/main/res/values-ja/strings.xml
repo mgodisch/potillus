@@ -86,17 +86,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">エクスポート日</string>
     <string name="pdf_meta_period">期間</string>
-    <string name="pdf_meta_gender">性別</string>
     <string name="pdf_meta_limit">上限値</string>
     <string name="pdf_meta_weight">体重</string>
-    <string name="pdf_meta_custom_limit">カスタム</string>
     <string name="pdf_kpi_total">総アルコール量</string>
     <string name="pdf_kpi_avg_day">1日平均</string>
     <string name="pdf_kpi_avg_drink_day">飲酒日平均</string>
     <string name="pdf_kpi_drink_days">飲酒日数</string>
     <string name="pdf_kpi_abstinent_days">断酒日数</string>
-    <string name="pdf_kpi_over_who">WHO超過日数（%1$s g）</string>
-    <string name="pdf_kpi_over_dhs">DHS超過日数（%1$s g）</string>
     <string name="pdf_kpi_binge">過度飲酒日数（>%1$s g）</string>
     <string name="pdf_col_month">月</string>
     <string name="pdf_col_drink_days">飲酒日数</string>
@@ -143,18 +139,7 @@
     <string name="theme_night">ダーク</string>
     <string name="day_change_time">日付切り替え時刻</string>
     <string name="day_starts_at">新しい日の開始時刻</string>
-    <string name="gender">性別</string>
-    <string name="male">男性</string>
-    <string name="female">女性</string>
-    <string name="limit_mode">医学的ガイドライン</string>
-    <string name="limit_who">WHO – リスク値</string>
-    <string name="limit_dhs">DHS – 低リスク</string>
-    <string name="limit_custom">カスタム</string>
-    <string name="custom_limit_grams">1日の上限（グラム）</string>
-    <string name="weekly_limit_section">週間上限</string>
-    <string name="weekly_limit_enabled">週間上限を有効にする</string>
     <string name="weekly_limit_grams">週間上限（グラム）</string>
-    <string name="weekly_limit">週</string>
     <string name="biometric">アクセスロック</string>
     <string name="biometric_lock">生体認証ロック</string>
     <string name="biometric_desc">指紋または顔認証でアプリをロックする</string>
@@ -178,8 +163,6 @@
     <string name="biometric_subtitle">認証してください</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO（2023年）は「安全なアルコール摂取量は存在しない」と述べています。ここに表示されるリスク値は実用的な目安であり、安全基準ではありません。</string>
-    <string name="who_values">リスク値: ♂ ≤ %1$s g、♀ ≤ %2$s g／日。</string>
     <string name="pdf_months_truncated">%2$d か月中 %1$d か月を表示 — 古いデータは CSV／バックアップで確認できます</string>
 
     <!-- Year calendar legend -->
@@ -216,20 +199,24 @@
     <string name="csv_col_grams">グラム_アルコール</string>
     <string name="csv_col_note">メモ</string>
     <string name="pdf_unit_g_per_day">g／日</string>
-    <string name="unit_g_per_day">g／日</string>
-
-    <string name="days_over_limit_who">WHO 上限超過日数</string>
-    <string name="days_over_limit_dhs">DHS 上限超過日数</string>
-    <string name="days_over_limit_custom">カスタム上限超過日数</string>
-    <string name="dhs_note">DHS 推奨：男性は1日あたり純アルコール 24 g 以下、女性は 12 g 以下。週に少なくとも2日は断酒することが推奨されます。</string>
     <string name="drink_days_label">今週の飲酒日数</string>
     <string name="drink_days_setting">週最大飲酒日数</string>
-    <string name="drink_days_who_dhs_note">推奨：週最大 5 日（断酒日 ≥ 2 日）</string>
-    <string name="weekly_gram_mode_title">週間グラム上限</string>
-    <string name="weekly_gram_mode_desc">進捗バーとインジケーターは週間予算（最大飲酒日数 &#215; 1日上限）を基準にします</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">個人データ</string>
     <string name="week_starts_on">週の開始曜日</string>
+    <string name="limits">上限</string>
+    <string name="daily_limit_grams">1日の上限（グラム）</string>
+    <string name="limit_caption_day">%1$s g/日</string>
+    <string name="limit_caption_week">%1$s g/週</string>
+    <string name="days_over_daily_limit">1日の上限を超えた日数</string>
+    <string name="days_over_weekly_limit">週の上限を超えた日数</string>
+    <string name="days_over_drink_day_limit">飲酒日数の上限を超えた日数</string>
+    <string name="pdf_unit_g_per_week">g/週</string>
+    <string name="pdf_meta_drink_days_suffix">飲酒日/週</string>
+    <string name="pdf_kpi_over_daily">日 > 日 (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">日 > 週 (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">日 > %1$d 飲酒日</string>
+    <string name="pdf_col_over_daily">> 日</string>
 </resources>

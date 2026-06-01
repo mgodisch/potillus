@@ -83,17 +83,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Dyddiad allforio</string>
     <string name="pdf_meta_period">Cyfnod</string>
-    <string name="pdf_meta_gender">Rhyw</string>
     <string name="pdf_meta_limit">Terfyn</string>
     <string name="pdf_meta_weight">Pwysau\'r corff</string>
-    <string name="pdf_meta_custom_limit">Cyfaddas</string>
     <string name="pdf_kpi_total">Cyfanswm alcohol</string>
     <string name="pdf_kpi_avg_day">Cyfartaledd y dydd</string>
     <string name="pdf_kpi_avg_drink_day">Cyfartaledd y diwrnod yfed</string>
     <string name="pdf_kpi_drink_days">Diwrnodau yfed</string>
     <string name="pdf_kpi_abstinent_days">Diwrnodau ymatal</string>
-    <string name="pdf_kpi_over_who">Diwrnodau > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Diwrnodau > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Diwrnodau binge (>%1$s g)</string>
     <string name="pdf_col_month">Mis</string>
     <string name="pdf_col_drink_days">Diwrnodau yfed</string>
@@ -140,18 +136,7 @@
     <string name="theme_night">Tywyll</string>
     <string name="day_change_time">Amser newid diwrnod</string>
     <string name="day_starts_at">Mae diwrnod newydd yn dechrau am</string>
-    <string name="gender">Rhyw</string>
-    <string name="male">Gwryw</string>
-    <string name="female">Benyw</string>
-    <string name="limit_mode">Canllawiau meddygol</string>
-    <string name="limit_who">WHO – lefel risg</string>
-    <string name="limit_dhs">DHS – risg isel</string>
-    <string name="limit_custom">Cyfaddas</string>
-    <string name="custom_limit_grams">Fy nherfyn dyddiol mewn gramau</string>
-    <string name="weekly_limit_section">Terfyn wythnosol</string>
-    <string name="weekly_limit_enabled">Galluogi terfyn wythnosol</string>
     <string name="weekly_limit_grams">Terfyn wythnosol mewn gramau</string>
-    <string name="weekly_limit">Wythnos</string>
     <string name="biometric">Clo mynediad</string>
     <string name="biometric_lock">Clo biometrig</string>
     <string name="biometric_desc">Cloi\'r ap â phrint bys neu adnabod wyneb</string>
@@ -175,8 +160,6 @@
     <string name="biometric_subtitle">Dilysiwch eich hun os gwelwch yn dda</string>
 
     <!-- WHO note -->
-    <string name="who_note">Mae\'r WHO (2023) yn nodi: Nid oes lefel ddiogel o yfed alcohol. Mae\'r gwerth risg a ddangosir yma yn bwynt cyfeirio ymarferol, nid trothwy diogelwch.</string>
-    <string name="who_values">Gwerth risg: ♂ ≤ %1$s g, ♀ ≤ %2$s g y dydd.</string>
     <string name="pdf_months_truncated">Yn dangos %1$d o %2$d mis – mae data hŷn ar gael yn y CSV/copi wrth gefn</string>
 
     <!-- Year calendar legend -->
@@ -213,20 +196,24 @@
     <string name="csv_col_grams">Gramau_alcohol</string>
     <string name="csv_col_note">Nodyn</string>
     <string name="pdf_unit_g_per_day">g/diwrnod</string>
-    <string name="unit_g_per_day">g/diwrnod</string>
-
-    <string name="days_over_limit_who">Diwrnodau dros y terfyn (WHO)</string>
-    <string name="days_over_limit_dhs">Diwrnodau dros y terfyn (DHS)</string>
-    <string name="days_over_limit_custom">Diwrnodau dros y terfyn cyfundrefinol</string>
-    <string name="dhs_note">Mae DHS yn argymell: ni ddylai dynion yfed mwy na 24 g, na menywod fwy na 12 g o alcohol pur y dydd. Dylai o leiaf ddau ddiwrnod yr wythnos fod heb alcohol.</string>
     <string name="drink_days_label">diwrnodau yfed yr wythnos hon</string>
     <string name="drink_days_setting">Uchaf. diwrnodau yfed/wythnos</string>
-    <string name="drink_days_who_dhs_note">Argymhelliad: uchaf. 5 diwrnod yfed yr wythnos (≥ 2 ddiwrnod ymatal)</string>
-    <string name="weekly_gram_mode_title">Terfyn gramau wythnosol</string>
-    <string name="weekly_gram_mode_desc">Mae\'r bar cynnydd a\'r dangosyddion yn defnyddio\'r gyllideb wythnosol (uchaf. diwrnodau yfed &#215; terfyn dyddiol)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data personol</string>
     <string name="week_starts_on">Mae\'r wythnos yn dechrau ar</string>
+    <string name="limits">Terfynau</string>
+    <string name="daily_limit_grams">Terfyn dyddiol mewn gramau</string>
+    <string name="limit_caption_day">%1$s g/dydd</string>
+    <string name="limit_caption_week">%1$s g/wythnos</string>
+    <string name="days_over_daily_limit">Dyddiau dros y terfyn dyddiol</string>
+    <string name="days_over_weekly_limit">Dyddiau dros y terfyn wythnosol</string>
+    <string name="days_over_drink_day_limit">Dyddiau dros derfyn y dyddiau yfed</string>
+    <string name="pdf_unit_g_per_week">g/wythnos</string>
+    <string name="pdf_meta_drink_days_suffix">dyddiau yfed/wyth.</string>
+    <string name="pdf_kpi_over_daily">Dyddiau > dydd (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dyddiau > wyth. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dyddiau > %1$d dyddiau yfed</string>
+    <string name="pdf_col_over_daily">> dydd</string>
 </resources>

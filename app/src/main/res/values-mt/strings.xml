@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data tal-esportazzjoni</string>
     <string name="pdf_meta_period">Perjodu</string>
-    <string name="pdf_meta_gender">Sess</string>
     <string name="pdf_meta_limit">Limitu</string>
     <string name="pdf_meta_weight">Piż tal-ġisem</string>
-    <string name="pdf_meta_custom_limit">Mfassal</string>
     <string name="pdf_kpi_total">Alkoħol totali</string>
     <string name="pdf_kpi_avg_day">Medja fil-jum</string>
     <string name="pdf_kpi_avg_drink_day">Medja fil-jum tax-xorb</string>
     <string name="pdf_kpi_drink_days">Ijiem tax-xorb</string>
     <string name="pdf_kpi_abstinent_days">Ijiem ta\' astensjoni</string>
-    <string name="pdf_kpi_over_who">Ijiem > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Ijiem > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Ijiem binge (>%1$s g)</string>
     <string name="pdf_col_month">Xahar</string>
     <string name="pdf_col_drink_days">Ijiem tax-xorb</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Skura</string>
     <string name="day_change_time">Ħin tal-bidla tal-jum</string>
     <string name="day_starts_at">Jum ġdid jibda fi</string>
-    <string name="gender">Sess</string>
-    <string name="male">Maskil</string>
-    <string name="female">Femminil</string>
-    <string name="limit_mode">Linja gwida medika</string>
-    <string name="limit_who">WHO – livell ta\' riskju</string>
-    <string name="limit_dhs">DHS – riskju baxx</string>
-    <string name="limit_custom">Mfassal</string>
-    <string name="custom_limit_grams">Il-limitu tiegħi fil-ġurnata f\'gramma</string>
-    <string name="weekly_limit_section">Limitu tal-ġimgħa</string>
-    <string name="weekly_limit_enabled">Attiva l-limitu tal-ġimgħa</string>
     <string name="weekly_limit_grams">Limitu tal-ġimgħa f\'gramma</string>
-    <string name="weekly_limit">Ġimgħa</string>
     <string name="biometric">Serq</string>
     <string name="biometric_lock">Serq bijometrika</string>
     <string name="biometric_desc">Agħlaq l-app b\'marki tas-swaba\' jew uċuħ</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Jekk jogħġbok awtentika</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">L-WHO (2023) tgħid: M\'hemm l-ebda livell sikur ta\' konsum tal-alkoħol. Il-valur tar-riskju muri hawnhekk huwa punt ta\' referenza prattiku, mhux limitu ta\' sikurezza.</string>
-    <string name="who_values">Valur ta\' riskju: ♂ ≤ %1$s g, ♀ ≤ %2$s g kuljum.</string>
-    <string name="dhs_note">Id-DHS tirrakkomanda: l-irġiel ma għandhomx jixorbu aktar minn 24 g, in-nisa mhux aktar minn 12 g ta\' alkoħol pur kuljum. Tal-inqas jumejn fil-ġimgħa għandhom ikunu mingħajr alkoħol.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Jintwerew %1$d minn %2$d xhur – data eqdem disponibbli fil-CSV/backup</string>
     <string name="year_calendar_no_entry">ebda dħul</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Gramma_alkoħol</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/jum</string>
-    <string name="unit_g_per_day">g/jum</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Ijiem fuq il-limitu (WHO)</string>
-    <string name="days_over_limit_dhs">Ijiem fuq il-limitu (DHS)</string>
-    <string name="days_over_limit_custom">Ijiem fuq il-limitu kkonfigurat</string>
     <string name="drink_days_label">ijiem tax-xorb din il-ġimgħa</string>
     <string name="drink_days_setting">Maks. ijiem tax-xorb/ġimgħa</string>
-    <string name="drink_days_who_dhs_note">Rakkomandazzjoni: maks. 5 ijiem tax-xorb fil-ġimgħa (≥ 2 ijiem mingħajr alkoħol)</string>
-    <string name="weekly_gram_mode_title">Limitu tal-ġimgħa (gramma)</string>
-    <string name="weekly_gram_mode_desc">Il-bar tal-progress u l-indikaturi jużaw il-baġit tal-ġimgħa (maks. ijiem tax-xorb &#215; limitu tal-ġurnata)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Dejta personali</string>
     <string name="week_starts_on">Il-ġimgħa tibda</string>
+    <string name="limits">Limiti</string>
+    <string name="daily_limit_grams">Limitu ta\' kuljum fi grammi</string>
+    <string name="limit_caption_day">%1$s g/jum</string>
+    <string name="limit_caption_week">%1$s g/ġimgħa</string>
+    <string name="days_over_daily_limit">Jiem \'il fuq mil-limitu ta\' kuljum</string>
+    <string name="days_over_weekly_limit">Jiem \'il fuq mil-limitu fil-ġimgħa</string>
+    <string name="days_over_drink_day_limit">Jiem \'il fuq mil-limitu tal-jiem tax-xorb</string>
+    <string name="pdf_unit_g_per_week">g/ġimgħa</string>
+    <string name="pdf_meta_drink_days_suffix">jiem tax-xorb/ġim.</string>
+    <string name="pdf_kpi_over_daily">Jiem > jum (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Jiem > ġim. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Jiem > %1$d jiem tax-xorb</string>
+    <string name="pdf_col_over_daily">> jum</string>
 </resources>

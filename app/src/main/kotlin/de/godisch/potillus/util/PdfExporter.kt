@@ -74,7 +74,7 @@ object PdfExporter {
      * @param entries   All consumption entries for the requested date range.
      *                  Must be non-empty (the caller is responsible for checking).
      * @param drinks    Full drink catalogue for category look-ups.
-     * @param settings  Current user preferences (gender, limit mode, weight, …).
+     * @param settings  Current user preferences (limits, weight, week start, …).
      * @return [ExportResult] with filename and MediaStore URI on success, null on I/O error.
      *         The caller is responsible for checking that [entries] is non-empty before
      *         calling this function (an empty list causes an immediate null return).
@@ -172,19 +172,16 @@ object PdfExporter {
         // Metadata block
         val firstDate = entries.minOf { it.logicalDate }
         val lastDate  = entries.maxOf { it.logicalDate }
-        val genderStr = context.getString(if (settings.gender == Gender.MALE) R.string.male else R.string.female)
-        val limitMode = when (settings.limitMode) {
-            LimitMode.WHO    -> "WHO"
-            LimitMode.DHS    -> "DHS"
-            LimitMode.CUSTOM -> context.getString(R.string.pdf_meta_custom_limit)
-        }
-        val limitGrams = AlcoholCalculator.getLimitInfo(settings).limitGrams
+        val limitInfo = AlcoholCalculator.getLimitInfo(settings)
+        val perDay    = context.getString(R.string.pdf_unit_g_per_day)
+        val perWeek   = context.getString(R.string.pdf_unit_g_per_week)
 
         y = drawMeta(c, y, listOf(
             context.getString(R.string.pdf_meta_export_date) to LocalDate.now().format(DATE_FMT),
             context.getString(R.string.pdf_meta_period)      to "${parseDate(firstDate).format(DATE_FMT)} – ${parseDate(lastDate).format(DATE_FMT)}",
-            context.getString(R.string.pdf_meta_gender)      to genderStr,
-            context.getString(R.string.pdf_meta_limit)       to "$limitMode (${limitGrams.fmt1()} ${context.getString(R.string.pdf_unit_g_per_day)})",
+            context.getString(R.string.pdf_meta_limit)       to
+                "${limitInfo.limitGrams.fmt1()} $perDay · ${limitInfo.weeklyLimitGrams.fmt1()} $perWeek · " +
+                "${limitInfo.maxDrinkDaysPerWeek} ${context.getString(R.string.pdf_meta_drink_days_suffix)}",
             context.getString(R.string.pdf_meta_weight)      to if (settings.weightKg > 0) "${settings.weightKg.fmt1()} kg" else "–"
         ))
 
@@ -200,12 +197,19 @@ object PdfExporter {
         val avgPerDay   = if (totalDays > 0) totalGrams / totalDays else 0.0
         val avgDrinkDay = if (drinkDays > 0) totalGrams / drinkDays else 0.0
 
-        val whoLimit  = if (settings.gender == Gender.FEMALE) AlcoholCalculator.WHO_LIMIT_FEMALE else AlcoholCalculator.WHO_LIMIT_MALE
-        val dhsLimit  = if (settings.gender == Gender.FEMALE) AlcoholCalculator.DHS_LIMIT_FEMALE else AlcoholCalculator.DHS_LIMIT_MALE
-        val binge     = AlcoholCalculator.bingeThreshold(settings.gender)
-        val overWho   = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > whoLimit }
-        val overDhs   = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > dhsLimit }
-        val bingeDays = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > binge }
+        // Per-day summaries feed the shared limit-violation counter so the PDF and
+        // the Statistics screen report identical figures.
+        val daySummaries = byDate.map { (date, es) ->
+            DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size)
+        }
+        val violations = AlcoholCalculator.countLimitViolations(
+            summaries           = daySummaries,
+            dailyLimitGrams     = limitInfo.limitGrams,
+            weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
+            maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
+            weekStartDay        = settings.weekStartDay
+        )
+        val bingeDays = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > AlcoholCalculator.BINGE_THRESHOLD }
 
         y = drawKpiGrid(c, y, listOf(
             KPI(context.getString(R.string.pdf_kpi_total),          "${totalGrams.fmt1()} g"),
@@ -213,9 +217,14 @@ object PdfExporter {
             KPI(context.getString(R.string.pdf_kpi_avg_drink_day),  "${avgDrinkDay.fmt1()} g"),
             KPI(context.getString(R.string.pdf_kpi_drink_days),     "$drinkDays"),
             KPI(context.getString(R.string.pdf_kpi_abstinent_days), "$abstDays"),
-            KPI(context.getString(R.string.pdf_kpi_over_who, whoLimit.fmt0()), "$overWho", overWho > 0),
-            KPI(context.getString(R.string.pdf_kpi_over_dhs, dhsLimit.fmt0()), "$overDhs", overDhs > 0),
-            KPI(context.getString(R.string.pdf_kpi_binge, binge.fmt0()),       "$bingeDays", bingeDays > 0)
+            KPI(context.getString(R.string.pdf_kpi_over_daily, limitInfo.limitGrams.fmt0()),
+                "${violations.daysOverDailyLimit}", violations.daysOverDailyLimit > 0),
+            KPI(context.getString(R.string.pdf_kpi_over_weekly, limitInfo.weeklyLimitGrams.fmt0()),
+                "${violations.daysOverWeeklyLimit}", violations.daysOverWeeklyLimit > 0),
+            KPI(context.getString(R.string.pdf_kpi_over_drink_days, limitInfo.maxDrinkDaysPerWeek),
+                "${violations.daysOverDrinkDayLimit}", violations.daysOverDrinkDayLimit > 0),
+            KPI(context.getString(R.string.pdf_kpi_binge, AlcoholCalculator.BINGE_THRESHOLD.fmt0()),
+                "$bingeDays", bingeDays > 0)
         ))
 
         // Monthly table
@@ -231,7 +240,7 @@ object PdfExporter {
             context.getString(R.string.pdf_col_drink_days),
             context.getString(R.string.pdf_col_total_g),
             context.getString(R.string.pdf_col_avg_g_day),
-            "> DHS"
+            context.getString(R.string.pdf_col_over_daily)
         )
         val colW = floatArrayOf(100f, 70f, 70f, 70f, 70f)
 
@@ -253,7 +262,7 @@ object PdfExporter {
             val mDate  = LocalDate.parse("$monthKey-01")
             val mDays  = mDate.lengthOfMonth()
             val mGrams = days.sumOf { it.value.sumOf { e -> e.gramsAlcohol } }
-            val mOver  = days.count { it.value.sumOf { e -> e.gramsAlcohol } > dhsLimit }
+            val mOver  = days.count { it.value.sumOf { e -> e.gramsAlcohol } > limitInfo.limitGrams }
             y = drawTableRow(c, y, listOf(
                 mDate.format(MONTH_FMT),
                 "${days.size}",
@@ -282,7 +291,7 @@ object PdfExporter {
                 val mGrams = days.sumOf { it.value.sumOf { e -> e.gramsAlcohol } }
                 k.substring(5, 7) + "." + k.substring(2, 4) to mGrams / mDays
             }
-            y = drawSparkline(c, y, monthAvgs, dhsLimit)
+            y = drawSparkline(c, y, monthAvgs, limitInfo.limitGrams)
         }
 
         drawFooter(c, context.getString(R.string.pdf_footer1))
@@ -395,7 +404,7 @@ object PdfExporter {
         y += 12f
         y = drawSectionTitle(c, y, context.getString(R.string.pdf_section_risk))
 
-        val binge         = AlcoholCalculator.bingeThreshold(settings.gender)
+        val binge         = AlcoholCalculator.BINGE_THRESHOLD
         val bingeDays     = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > binge }
         val allDates      = byDate.keys.sorted()
         val today         = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)

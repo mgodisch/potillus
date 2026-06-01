@@ -29,7 +29,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,9 +57,9 @@ import de.godisch.potillus.l10n.SupportedLocales
 
 /**
  * Settings tab, organised into five sections:
- *   1. Personal data   – sex, body weight
- *   2. Medical guideline – WHO / DHS / custom limit, daily-vs-weekly mode
- *   3. Statistics       – day-change time, statistics-start date
+ *   1. Personal data    – body weight (used by the BAC estimate)
+ *   2. Limits           – daily / weekly gram limits and max drink-days per week
+ *   3. Statistics       – day-change time, week start, statistics-start date
  *   4. Backup           – JSON import / export
  *   5. Appearance       – biometric access lock, theme, language
  *
@@ -86,8 +85,9 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
     // saver handles it. (The two dropdown-`expanded` flags further below stay plain
     // `remember`: a collapsed menu on recreation is trivially re-openable.)
     var showTimePicker      by rememberSaveable { mutableStateOf(false) }
-    var showCustomLimit     by rememberSaveable { mutableStateOf(false) }
-    var showCustomMaxDays   by rememberSaveable { mutableStateOf(false) }
+    var showDailyLimit      by rememberSaveable { mutableStateOf(false) }
+    var showWeeklyLimit     by rememberSaveable { mutableStateOf(false) }
+    var showMaxDrinkDays    by rememberSaveable { mutableStateOf(false) }
     var showWeightInput     by rememberSaveable { mutableStateOf(false) }
     var showImportMode      by rememberSaveable { mutableStateOf(false) }
     var showStatDatePicker  by rememberSaveable { mutableStateOf(false) }
@@ -190,20 +190,10 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier            = Modifier.fillMaxSize().padding(paddingValues)
         ) {
-            // ── 1. Personal data (sex + body weight) ──────────────
+            // ── 1. Personal data (body weight) ──────────────────────
             item { SettingsSectionHeader(stringResource(R.string.personal_data)) }
             item {
                 SettingsCard {
-                    Text(stringResource(R.string.gender), style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(4.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(Gender.MALE to R.string.male, Gender.FEMALE to R.string.female).forEach { (g, res) ->
-                            FilterChip(selected = settings.gender == g, onClick = { vm.setGender(g) },
-                                label = { Text(stringResource(res)) }, modifier = Modifier.weight(1f))
-                        }
-                    }
-                    Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.body_weight) + ": " +
@@ -215,103 +205,38 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
                 }
             }
 
-            // ── 2. Medical guideline / limit ────────────────────
-            item { SettingsSectionHeader(stringResource(R.string.limit_mode)) }
+            // ── 2. Limits (always all three at once) ─────────────
+            // Daily gram limit AND weekly gram limit AND max drink-days/week are
+            // all in force simultaneously; there is no guideline mode or toggle.
+            item { SettingsSectionHeader(stringResource(R.string.limits)) }
             item {
                 SettingsCard {
-                    Text(stringResource(R.string.limit_mode), style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    // Daily gram limit
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.daily_limit_grams) + ": ${settings.dailyLimitGrams.toInt()} g",
+                            style = MaterialTheme.typography.bodyMedium)
+                        IconButton(onClick = { showDailyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
+                    }
                     Spacer(Modifier.height(4.dp))
-                    listOf(
-                        LimitMode.WHO    to R.string.limit_who,
-                        LimitMode.DHS    to R.string.limit_dhs,
-                        LimitMode.CUSTOM to R.string.limit_custom
-                    ).forEach { (mode, res) ->
-                        Row(Modifier.fillMaxWidth().clickable { vm.setLimitMode(mode) }.padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = settings.limitMode == mode, onClick = { vm.setLimitMode(mode) })
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(res), style = MaterialTheme.typography.bodyMedium)
-                        }
+                    // Weekly gram limit
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.weekly_limit_grams) + ": ${settings.weeklyLimitGrams.toInt()} g",
+                            style = MaterialTheme.typography.bodyMedium)
+                        IconButton(onClick = { showWeeklyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
-                    if (settings.limitMode == LimitMode.CUSTOM) {
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.custom_limit_grams) + ": ${settings.customLimitGrams.toInt()} g",
-                                style = MaterialTheme.typography.bodyMedium)
-                            IconButton(onClick = {showCustomLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
+                    Spacer(Modifier.height(4.dp))
+                    // Max drink days per week
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.drink_days_setting) + ": ${settings.maxDrinkDaysPerWeek}",
+                            style = MaterialTheme.typography.bodyMedium)
+                        IconButton(onClick = { showMaxDrinkDays = true }) {
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary)
                         }
-                        Spacer(Modifier.height(4.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.drink_days_setting) + ": ${settings.customMaxDrinkDays}",
-                                style = MaterialTheme.typography.bodyMedium)
-                            IconButton(onClick = { showCustomMaxDays = true }) {
-                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary)
-                            }
-                        }
-                    }
-                    if (settings.limitMode == LimitMode.WHO) {
-                        Spacer(Modifier.height(8.dp))
-                        // (d) WHO note formatted like DHS: the risk-value figures are
-                        // folded unobtrusively into the start of the explanatory note
-                        // (one muted bodySmall paragraph) instead of the former prominent
-                        // bodyMedium "heading" line. Values come from AlcoholCalculator
-                        // (single source of truth), formatted as integers (e.g. 20 / 10).
-                        Text(
-                            stringResource(
-                                R.string.who_values,
-                                "%.0f".format(AlcoholCalculator.WHO_LIMIT_MALE),
-                                "%.0f".format(AlcoholCalculator.WHO_LIMIT_FEMALE)
-                            ) + " " + stringResource(R.string.who_note),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(stringResource(R.string.drink_days_who_dhs_note), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    if (settings.limitMode == LimitMode.DHS) {
-                        Spacer(Modifier.height(8.dp))
-                        Text(stringResource(R.string.dhs_note), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(Modifier.height(4.dp))
-                        Text(stringResource(R.string.drink_days_who_dhs_note), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
 
-            // ── Daily vs. weekly gram mode ────────────────────
-            item {
-                SettingsCard {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.weekly_gram_mode_title),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                stringResource(R.string.weekly_gram_mode_desc),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Switch(
-                            checked         = settings.weeklyGramMode,
-                            onCheckedChange = { vm.setWeeklyGramMode(it) }
-                        )
-                    }
-                }
-            }
-
-            // ── 3. Statistics (day-change time + stats-start date) ────
-            // NOTE: a configurable week-start day is a planned enhancement; the app
-            // currently uses ISO weeks (Monday) throughout.
+            // ── 3. Statistics (day-change time + week start + stats-start date) ────
             item { SettingsSectionHeader(stringResource(R.string.statistics)) }
             item {
                 SettingsCard {
@@ -489,23 +414,33 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
             onDismiss     = { showTimePicker = false }
         )
     }
-    if (showCustomLimit) {
+    if (showDailyLimit) {
         GramsInputDialog(
-            title     = stringResource(R.string.custom_limit_grams),
-            initial   = settings.customLimitGrams,
-            onConfirm = { v -> vm.setCustomLimit(v); showCustomLimit = false },
-            onDismiss = { showCustomLimit = false }
+            title     = stringResource(R.string.daily_limit_grams),
+            initial   = settings.dailyLimitGrams,
+            onConfirm = { v -> vm.setDailyLimit(v); showDailyLimit = false },
+            onDismiss = { showDailyLimit = false }
         )
     }
-    if (showCustomMaxDays) {
+    if (showWeeklyLimit) {
+        GramsInputDialog(
+            title     = stringResource(R.string.weekly_limit_grams),
+            initial   = settings.weeklyLimitGrams,
+            maxValue  = 3500.0,
+            onConfirm = { v -> vm.setWeeklyLimit(v); showWeeklyLimit = false },
+            onDismiss = { showWeeklyLimit = false }
+        )
+    }
+    if (showMaxDrinkDays) {
         // Integer picker 1–7 reuses the existing GramsInputDialog re-purposed as an int input.
         // The value is stored as an integer but GramsInputDialog takes/returns Double –
         // we round to Int on confirm.
         GramsInputDialog(
             title     = stringResource(R.string.drink_days_setting),
-            initial   = settings.customMaxDrinkDays.toDouble(),
-            onConfirm = { v -> vm.setCustomMaxDrinkDays(v.toInt().coerceIn(1, 7)); showCustomMaxDays = false },
-            onDismiss = { showCustomMaxDays = false }
+            initial   = settings.maxDrinkDaysPerWeek.toDouble(),
+            suffix    = "",
+            onConfirm = { v -> vm.setMaxDrinkDaysPerWeek(v.toInt().coerceIn(1, 7)); showMaxDrinkDays = false },
+            onDismiss = { showMaxDrinkDays = false }
         )
     }
     if (showWeightInput) {

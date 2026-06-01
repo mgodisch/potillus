@@ -80,7 +80,7 @@ util/          ← Export helpers (CSV, PDF, JSON backup)
 - **KDoc:** all public classes, functions, and properties must have a KDoc comment.
   Use `@param`, `@return`, and `@throws` where relevant.
 - **Constants:** domain constants (limit values, Widmark coefficients) belong in
-  `AlcoholCalculator` as `const val` with units in the name or KDoc (e.g. `WHO_LIMIT_MALE = 20.0` g).
+  `AlcoholCalculator` as `const val` with units in the name or KDoc (e.g. `BINGE_THRESHOLD = 48.0` g).
 - **Default values:** default values in `AppSettings` and `AppPreferences` must match.
   When adding a new preference key, add the default in both places at the same time.
 - **Enum persistence:** enums stored in Room or DataStore must be stored by their

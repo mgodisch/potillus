@@ -187,13 +187,21 @@ fun StatsScreen(vm: StatsViewModel = viewModel(), onOpenSettings: () -> Unit = {
                         StatRow(stringResource(R.string.avg_per_drink_day), "${"%.1f".format(state.avgPerDrinkDay)} g")
                         HorizontalDivider()
                         StatRow(
-                            when (state.limitInfo.mode) {
-                                de.godisch.potillus.domain.model.LimitMode.WHO    -> stringResource(R.string.days_over_limit_who)
-                                de.godisch.potillus.domain.model.LimitMode.DHS    -> stringResource(R.string.days_over_limit_dhs)
-                                de.godisch.potillus.domain.model.LimitMode.CUSTOM -> stringResource(R.string.days_over_limit_custom)
-                            },
-                            state.daysOverLimit.toString(),
-                            valueColor = if (state.daysOverLimit > 0) errorColor() else successColor()
+                            stringResource(R.string.days_over_daily_limit),
+                            state.daysOverDailyLimit.toString(),
+                            valueColor = if (state.daysOverDailyLimit > 0) errorColor() else successColor()
+                        )
+                        HorizontalDivider()
+                        StatRow(
+                            stringResource(R.string.days_over_weekly_limit),
+                            state.daysOverWeeklyLimit.toString(),
+                            valueColor = if (state.daysOverWeeklyLimit > 0) errorColor() else successColor()
+                        )
+                        HorizontalDivider()
+                        StatRow(
+                            stringResource(R.string.days_over_drink_day_limit),
+                            state.daysOverDrinkDayLimit.toString(),
+                            valueColor = if (state.daysOverDrinkDayLimit > 0) errorColor() else successColor()
                         )
                         HorizontalDivider()
                         StatRow(

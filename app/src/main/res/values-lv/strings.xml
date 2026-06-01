@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Eksportēšanas datums</string>
     <string name="pdf_meta_period">Periods</string>
-    <string name="pdf_meta_gender">Dzimums</string>
     <string name="pdf_meta_limit">Limits</string>
     <string name="pdf_meta_weight">Ķermeņa svars</string>
-    <string name="pdf_meta_custom_limit">Pielāgots</string>
     <string name="pdf_kpi_total">Kopējais alkohols</string>
     <string name="pdf_kpi_avg_day">Vid. dienā</string>
     <string name="pdf_kpi_avg_drink_day">Vid. dzēriena dienā</string>
     <string name="pdf_kpi_drink_days">Dzēriena dienas</string>
     <string name="pdf_kpi_abstinent_days">Atturēšanās dienas</string>
-    <string name="pdf_kpi_over_who">Dienas > PVO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Dienas > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Reibšanas dienas (>%1$s g)</string>
     <string name="pdf_col_month">Mēnesis</string>
     <string name="pdf_col_drink_days">Dzēriena dienas</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Tumšā</string>
     <string name="day_change_time">Dienas maiņas laiks</string>
     <string name="day_starts_at">Jaunā diena sākas plkst.</string>
-    <string name="gender">Dzimums</string>
-    <string name="male">Vīrietis</string>
-    <string name="female">Sieviete</string>
-    <string name="limit_mode">Medicīniskā vadlīnija</string>
-    <string name="limit_who">PVO – riska līmenis</string>
-    <string name="limit_dhs">DHS – zems risks</string>
-    <string name="limit_custom">Pielāgots</string>
-    <string name="custom_limit_grams">Mans dienas limits gramos</string>
-    <string name="weekly_limit_section">Nedēļas limits</string>
-    <string name="weekly_limit_enabled">Iespējot nedēļas limitu</string>
     <string name="weekly_limit_grams">Nedēļas limits gramos</string>
-    <string name="weekly_limit">Nedēļa</string>
     <string name="biometric">Bloķēšana</string>
     <string name="biometric_lock">Biometriskā bloķēšana</string>
     <string name="biometric_desc">Bloķēt lietotni ar pirkstu nospiedumu vai seju</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Lūdzu, autentificējieties</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">PVO (2023) norāda: Alkohola patēriņam nav drošs līmenis. Šeit parādītā riska vērtība ir praktisks orientieris, nevis drošības robeža.</string>
-    <string name="who_values">Riska vērtība: ♂ ≤ %1$s g, ♀ ≤ %2$s g dienā.</string>
-    <string name="dhs_note">DHS iesaka: vīriešiem nevajadzētu dzert vairāk par 24 g, sievietēm – ne vairāk par 12 g tīra alkohola dienā. Vismaz divas dienas nedēļā jābūt bez alkohola.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Rāda %1$d no %2$d mēnešiem – vecāki dati CSV/dublējumā</string>
     <string name="year_calendar_no_entry">nav ieraksta</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grami_alkohola</string>
     <string name="csv_col_note">Piezīme</string>
     <string name="pdf_unit_g_per_day">g/dienā</string>
-    <string name="unit_g_per_day">g/dienā</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Dienas virs limita (PVO)</string>
-    <string name="days_over_limit_dhs">Dienas virs limita (DHS)</string>
-    <string name="days_over_limit_custom">Dienas virs konfigurētā limita</string>
     <string name="drink_days_label">dzēriena dienas šonedēļ</string>
     <string name="drink_days_setting">Maks. dzēriena dienas/nedēļa</string>
-    <string name="drink_days_who_dhs_note">Ieteikums: maks. 5 dzēriena dienas nedēļā (≥ 2 bez alkohola)</string>
-    <string name="weekly_gram_mode_title">Nedēļas gramu limits</string>
-    <string name="weekly_gram_mode_desc">Progresa josla un indikatori izmanto nedēļas budžetu (maks. dzēriena dienas &#215; dienas limits)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Personas dati</string>
     <string name="week_starts_on">Nedēļa sākas</string>
+    <string name="limits">Ierobežojumi</string>
+    <string name="daily_limit_grams">Dienas ierobežojums gramos</string>
+    <string name="limit_caption_day">%1$s g/dienā</string>
+    <string name="limit_caption_week">%1$s g/nedēļā</string>
+    <string name="days_over_daily_limit">Dienas virs dienas ierobežojuma</string>
+    <string name="days_over_weekly_limit">Dienas virs nedēļas ierobežojuma</string>
+    <string name="days_over_drink_day_limit">Dienas virs dzeršanas dienu ierobežojuma</string>
+    <string name="pdf_unit_g_per_week">g/nedēļā</string>
+    <string name="pdf_meta_drink_days_suffix">dzeršanas dienas/ned.</string>
+    <string name="pdf_kpi_over_daily">Dienas > diena (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dienas > nedēļa (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Dienas > %1$d dzeršanas dienas</string>
+    <string name="pdf_col_over_daily">> diena</string>
 </resources>

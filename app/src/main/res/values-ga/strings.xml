@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Dáta easpórtála</string>
     <string name="pdf_meta_period">Tréimhse</string>
-    <string name="pdf_meta_gender">Inscne</string>
     <string name="pdf_meta_limit">Teorainn</string>
     <string name="pdf_meta_weight">Meáchan coirp</string>
-    <string name="pdf_meta_custom_limit">Saincheaptha</string>
     <string name="pdf_kpi_total">Alcól iomlán</string>
     <string name="pdf_kpi_avg_day">Meánach in aghaidh an lae</string>
     <string name="pdf_kpi_avg_drink_day">Meánach in aghaidh lae óil</string>
     <string name="pdf_kpi_drink_days">Laethanta óil</string>
     <string name="pdf_kpi_abstinent_days">Laethanta staonadh</string>
-    <string name="pdf_kpi_over_who">Laethanta > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Laethanta > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Laethanta binge (>%1$s g)</string>
     <string name="pdf_col_month">Mí</string>
     <string name="pdf_col_drink_days">Laethanta óil</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Dorcha</string>
     <string name="day_change_time">Am athraithe an lae</string>
     <string name="day_starts_at">Tosaíonn lá nua ag</string>
-    <string name="gender">Inscne</string>
-    <string name="male">Fireann</string>
-    <string name="female">Baineann</string>
-    <string name="limit_mode">Treoir leighis</string>
-    <string name="limit_who">WHO – leibhéal riosca</string>
-    <string name="limit_dhs">DHS – riosca íseal</string>
-    <string name="limit_custom">Saincheaptha</string>
-    <string name="custom_limit_grams">Mo theorainn laethúil i grama</string>
-    <string name="weekly_limit_section">Teorainn sheachtainiúil</string>
-    <string name="weekly_limit_enabled">Cumasaigh teorainn sheachtainiúil</string>
     <string name="weekly_limit_grams">Teorainn sheachtainiúil i grama</string>
-    <string name="weekly_limit">Seachtain</string>
     <string name="biometric">Glas</string>
     <string name="biometric_lock">Glas bithmhéadrach</string>
     <string name="biometric_desc">Glais an aip le méarlorg nó aitheantas aghaidhe</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Déan fíordheimhniú</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">Deir WHO (2023): Níl leibhéal sábháilte tomhaltais alcóil ann. Is tagarmharc praiticiúil é an luach riosca a thaispeántar anseo, ní tairseach sábháilteachta.</string>
-    <string name="who_values">Luach riosca: ♂ ≤ %1$s g, ♀ ≤ %2$s g sa lá.</string>
-    <string name="dhs_note">Mollaíonn DHS: níor cheart do fhir níos mó ná 24 g a ól, do mhná níos mó ná 12 g d\'alcól íon in aghaidh an lae. Ba cheart go mbeadh dhá lá ar a laghad in aghaidh na seachtaine saor ó alcól.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Léirítear %1$d de %2$d mí – sonraí níos sine ar fáil sa CSV/cúltaca</string>
     <string name="year_calendar_no_entry">gan iontráil</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grama_alcóil</string>
     <string name="csv_col_note">Nóta</string>
     <string name="pdf_unit_g_per_day">g/lá</string>
-    <string name="unit_g_per_day">g/lá</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Laethanta thar an teorainn (WHO)</string>
-    <string name="days_over_limit_dhs">Laethanta thar an teorainn (DHS)</string>
-    <string name="days_over_limit_custom">Laethanta thar an teorainn chumtha</string>
     <string name="drink_days_label">laethanta óil an tseachtain seo</string>
     <string name="drink_days_setting">Uasmhéid laethanta óil/seachtain</string>
-    <string name="drink_days_who_dhs_note">Moladh: 5 lá óil ar a mhéad in aghaidh na seachtaine (≥ 2 lá gan alcól)</string>
-    <string name="weekly_gram_mode_title">Teorainn sheachtainiúil (grama)</string>
-    <string name="weekly_gram_mode_desc">Úsáideann an barra dul chun cinn agus na táscairí an buiséad seachtainiúil (uasmhéid laethanta óil &#215; teorainn laethúil)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Sonraí pearsanta</string>
     <string name="week_starts_on">Tosaíonn an tseachtain ar</string>
+    <string name="limits">Teorainneacha</string>
+    <string name="daily_limit_grams">Teorainn laethúil i ngraim</string>
+    <string name="limit_caption_day">%1$s g/lá</string>
+    <string name="limit_caption_week">%1$s g/sht.</string>
+    <string name="days_over_daily_limit">Laethanta os cionn na teorann laethúil</string>
+    <string name="days_over_weekly_limit">Laethanta os cionn na teorann seachtainiúil</string>
+    <string name="days_over_drink_day_limit">Laethanta os cionn theorainn na laethanta óil</string>
+    <string name="pdf_unit_g_per_week">g/sht.</string>
+    <string name="pdf_meta_drink_days_suffix">laethanta óil/sht.</string>
+    <string name="pdf_kpi_over_daily">Laethanta > lá (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Laethanta > sht. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Laethanta > %1$d lá óil</string>
+    <string name="pdf_col_over_daily">> lá</string>
 </resources>

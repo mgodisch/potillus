@@ -35,7 +35,7 @@ package de.godisch.potillus.domain.model
 // NAMING CONVENTION:
 //   Types that describe "what something is" (DrinkDefinition, ConsumptionEntry)
 //   use nouns. Types that describe "a computed result" (LimitInfo, DrinkCapacity)
-//   use the result noun. Enums use singular form (Gender, ThemeMode).
+//   use the result noun. Enums use singular form (ThemeMode, TrafficLight).
 // =============================================================================
 
 /**
@@ -131,22 +131,23 @@ data class DaySummary(
 )
 
 /**
- * Alcohol-limit guideline to apply.
+ * The three limit-violation day counts for a statistics period, produced by
+ * [de.godisch.potillus.domain.AlcoholCalculator.countLimitViolations].
  *
- * - [WHO]    – World Health Organisation daily guidelines (20 g ♂ / 10 g ♀).
- * - [DHS]    – Deutsche Hauptstelle für Suchtfragen (24 g ♂ / 12 g ♀).
- * - [CUSTOM] – User-defined daily gram limit and max drink-days per week.
+ * @param daysOverDailyLimit     Days whose own total exceeds the daily gram limit.
+ * @param daysOverWeeklyLimit    Consumption days on which the running weekly total
+ *                               had already reached or was pushed past the weekly
+ *                               gram limit (the over-shooting day and every later
+ *                               consumption day in that week).
+ * @param daysOverDrinkDayLimit  Consumption days beyond the allowed number of drink
+ *                               days in their week (e.g. the 6th and 7th drink day
+ *                               when the limit is 5).
  */
-enum class LimitMode { WHO, DHS, CUSTOM }
-
-/**
- * Biological sex used in the Widmark BAC formula and limit selection.
- *
- * The Widmark r-coefficient differs between [MALE] (0.7) and [FEMALE] (0.6),
- * reflecting differences in average body-water ratio. Medical guidelines
- * (WHO, DHS) also specify different daily gram limits per sex.
- */
-enum class Gender    { MALE, FEMALE }
+data class LimitViolations(
+    val daysOverDailyLimit: Int,
+    val daysOverWeeklyLimit: Int,
+    val daysOverDrinkDayLimit: Int
+)
 
 /**
  * Application colour-scheme preference.
@@ -158,17 +159,22 @@ enum class Gender    { MALE, FEMALE }
 enum class ThemeMode { SYSTEM, DAY, NIGHT }
 
 /**
- * The resolved, active limit.
+ * The resolved set of active drinking limits.
  *
- * @param mode                 Which guideline is active.
+ * All three limits are always in force simultaneously (there is no longer a
+ * WHO / DHS / custom mode and no daily-vs-weekly toggle): a day or a week is
+ * "within limits" only when none of the three thresholds is exceeded.
+ *
  * @param limitGrams           Daily pure-alcohol limit in grams.
- * @param maxDrinkDaysPerWeek  Max drink days / week. WHO and DHS always use 5
- *                             (mandating at least 2 abstinent days per week).
- *                             Custom mode uses [AppSettings.customMaxDrinkDays].
+ * @param weeklyLimitGrams     Weekly pure-alcohol limit in grams (Mon–Sun, or the
+ *                             configured week start). Independent of [limitGrams]
+ *                             rather than derived from it.
+ * @param maxDrinkDaysPerWeek  Maximum number of distinct drink days per week
+ *                             (a drink day is any day with > 0 g consumed).
  */
 data class LimitInfo(
-    val mode: LimitMode,
     val limitGrams: Double,
+    val weeklyLimitGrams: Double,
     val maxDrinkDaysPerWeek: Int = 5
 )
 
@@ -183,39 +189,35 @@ enum class TrafficLight { GREEN, YELLOW, RED }
 /**
  * Today's consumption snapshot used for traffic-light calculation.
  *
- * @param todayGrams           Grams consumed today (used for the drink-day check
- *                             and as the base gram value in daily mode).
- * @param dailyLimitGrams      Daily gram limit as configured.
- * @param drinkDaysThisWeek    Distinct Mon–Sun days with ≥1 entry this week.
- * @param maxDrinkDaysPerWeek  Max drink days/week from [LimitInfo].
- * @param weeklyTotalGrams     Grams consumed Mon–Sun this week (used in weekly mode).
- * @param weeklyGramMode       When true the gram check uses [weeklyTotalGrams] vs
- *                             [maxDrinkDaysPerWeek] × [dailyLimitGrams].
+ * All three limits ([dailyLimitGrams], [weeklyLimitGrams], [maxDrinkDaysPerWeek])
+ * are evaluated together; see [AlcoholCalculator.trafficLight].
  *
- * COMPUTED HELPERS:
- *   [effectiveConsumedGrams] – the "used" side of the gram comparison.
- *   [effectiveBudgetGrams]   – the "budget" side of the gram comparison.
- *   Both automatically select the correct values for the current mode.
+ * @param todayGrams           Grams consumed today. Used for the daily gram check
+ *                             and to decide whether today already counts as a drink day.
+ * @param dailyLimitGrams      Daily gram limit.
+ * @param weeklyTotalGrams     Grams consumed this week (including today).
+ * @param weeklyLimitGrams     Weekly gram limit.
+ * @param drinkDaysThisWeek    Distinct days this week with > 0 g consumed (today included
+ *                             when today already has alcohol entries).
+ * @param maxDrinkDaysPerWeek  Maximum allowed drink days per week.
  *
- * NOTE: the drink-day check always uses raw [todayGrams], NOT the effective value,
- * because it must know whether *today specifically* already counts as a drink day.
- * In weekly mode a drink logged on Monday must not make Tuesday look like a drink day.
+ * COMPUTED HELPER:
+ *   [todayIsDrinkDay] – whether today already counts as a drink day, derived from
+ *   [todayGrams]. The traffic-light drink-day check uses this so that a day which
+ *   is already "spent" does not get blocked for further drinks, while still blocking
+ *   a brand-new drink day once the weekly drink-day budget is exhausted.
  */
 data class DrinkCapacity(
     val todayGrams: Double,
     val dailyLimitGrams: Double,
+    val weeklyTotalGrams: Double,
+    val weeklyLimitGrams: Double,
     val drinkDaysThisWeek: Int,
-    val maxDrinkDaysPerWeek: Int,
-    val weeklyTotalGrams: Double = 0.0,
-    val weeklyGramMode: Boolean  = false
+    val maxDrinkDaysPerWeek: Int
 ) {
-    /** Grams to compare against the budget (daily total or weekly total). */
-    val effectiveConsumedGrams: Double
-        get() = if (weeklyGramMode) weeklyTotalGrams else todayGrams
-
-    /** Gram budget to compare against (daily limit or weekly budget). */
-    val effectiveBudgetGrams: Double
-        get() = if (weeklyGramMode) maxDrinkDaysPerWeek * dailyLimitGrams else dailyLimitGrams
+    /** True when today already has > 0 g of alcohol logged, i.e. it is already a drink day. */
+    val todayIsDrinkDay: Boolean
+        get() = todayGrams > 0.0
 }
 
 /**
@@ -224,19 +226,24 @@ data class DrinkCapacity(
  * Default values match the first-launch state before any key is written to
  * DataStore, so the UI always has a consistent initial state.
  *
- * @param weeklyGramMode  When true the gram progress bar and traffic-light bullets
- *                        use the weekly total vs. [customMaxDrinkDays × dailyLimit].
- *                        Abstinent-days-per-week logic is unaffected by this flag.
+ * LIMITS:
+ *   Three independent limits are always active at the same time — there is no
+ *   guideline mode (WHO/DHS/custom) and no daily-vs-weekly toggle any more:
+ *     - [dailyLimitGrams]     pure-alcohol grams allowed per day (default 20).
+ *     - [weeklyLimitGrams]    pure-alcohol grams allowed per week (default 100).
+ *     - [maxDrinkDaysPerWeek] distinct drink days allowed per week (default 5).
+ *
+ * @param dailyLimitGrams     Daily pure-alcohol limit in grams.
+ * @param weeklyLimitGrams    Weekly pure-alcohol limit in grams.
+ * @param maxDrinkDaysPerWeek Maximum number of drink days per week (1–7).
  */
 data class AppSettings(
     val themeMode: ThemeMode        = ThemeMode.SYSTEM,
     val dayChangeHour: Int          = 4,
     val dayChangeMinute: Int        = 0,
-    val gender: Gender              = Gender.MALE,
-    val limitMode: LimitMode        = LimitMode.WHO,
-    val customLimitGrams: Double    = 20.0,
-    val customMaxDrinkDays: Int     = 5,
-    val weeklyGramMode: Boolean     = false,
+    val dailyLimitGrams: Double     = 20.0,
+    val weeklyLimitGrams: Double    = 100.0,
+    val maxDrinkDaysPerWeek: Int    = 5,
     val statsFromDate: String       = "",
     val biometricEnabled: Boolean   = false,
     /**

@@ -85,17 +85,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Zäitraum</string>
-    <string name="pdf_meta_gender">Geschlecht</string>
     <string name="pdf_meta_limit">Grenzwäert</string>
     <string name="pdf_meta_weight">Kierpergewiicht</string>
-    <string name="pdf_meta_custom_limit">Personaliséiert</string>
     <string name="pdf_kpi_total">Gesamtalkohol</string>
     <string name="pdf_kpi_avg_day">Ø pro Dag</string>
     <string name="pdf_kpi_avg_drink_day">Ø pro Drénkdag</string>
     <string name="pdf_kpi_drink_days">Drénkdeeg</string>
     <string name="pdf_kpi_abstinent_days">Abstinenzdeeg</string>
-    <string name="pdf_kpi_over_who">Deeg > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Deeg > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Binge-Deeg (>%1$s g)</string>
     <string name="pdf_col_month">Mount</string>
     <string name="pdf_col_drink_days">Drénkdeeg</string>
@@ -142,18 +138,7 @@
     <string name="theme_night">Nuecht</string>
     <string name="day_change_time">Dagswiessel-Zäit</string>
     <string name="day_starts_at">Neien Dag fänkt un ëm</string>
-    <string name="gender">Geschlecht</string>
-    <string name="male">Männlech</string>
-    <string name="female">Weiblech</string>
-    <string name="limit_mode">Medizineschen Grenzwäert</string>
-    <string name="limit_who">WHO – Risikowäert</string>
-    <string name="limit_dhs">DHS – risikoaarm</string>
-    <string name="limit_custom">Personaliséiert</string>
-    <string name="custom_limit_grams">Mäi Daglimit a Gramm</string>
-    <string name="weekly_limit_section">Wochelimit</string>
-    <string name="weekly_limit_enabled">Wochelimit aktivéieren</string>
     <string name="weekly_limit_grams">Wochelimit a Gramm</string>
-    <string name="weekly_limit">Woch</string>
     <string name="biometric">Zougangsspär</string>
     <string name="biometric_lock">Biometresch Spär</string>
     <string name="biometric_desc">App beim Opmaache mat Fangerofdrock oder Gesiicht spären</string>
@@ -177,8 +162,6 @@
     <string name="biometric_subtitle">Sëlwer w.e.g. authentifizéieren</string>
 
     <!-- WHO note -->
-    <string name="who_note">D\'WHO (2023) erkläert: Et gëtt keng sécher Quantitéit Alkohol. De Risikowäert, deen hei ugewise gëtt, ass e praktesche Referenzwäert, keen Onbedenklechkeetsgrenzwäert.</string>
-    <string name="who_values">Risikowäert: ♂ ≤ %1$s g, ♀ ≤ %2$s g pro Dag.</string>
     <string name="pdf_months_truncated">Weist %1$d vun %2$d Méint – méi al Daten am CSV/Backup verfügbar</string>
 
     <!-- Year calendar legend -->
@@ -215,20 +198,24 @@
     <string name="csv_col_grams">Gramm_Alkohol</string>
     <string name="csv_col_note">Notiz</string>
     <string name="pdf_unit_g_per_day">g/Dag</string>
-    <string name="unit_g_per_day">g/Dag</string>
-
-    <string name="days_over_limit_who">Deeg iwwer Limit (WHO)</string>
-    <string name="days_over_limit_dhs">Deeg iwwer Limit (DHS)</string>
-    <string name="days_over_limit_custom">Deeg iwwer konfiguréiertem Limit</string>
-    <string name="dhs_note">D\'DHS empfeelt: Männer sollten net méi wéi 24 g, Fraen net méi wéi 12 g reinen Alkohol pro Dag drénken. U mindestens zwee Deeg pro Woch sollt keen Alkohol gedronk ginn.</string>
     <string name="drink_days_label">Drénkdeeg dës Woch</string>
     <string name="drink_days_setting">Max. Drénkdeeg/Woch</string>
-    <string name="drink_days_who_dhs_note">Empfehlung: max. 5 Drénkdeeg pro Woch (≥ 2 Abstinenzdeeg)</string>
-    <string name="weekly_gram_mode_title">Wochelimit (Gramm)</string>
-    <string name="weekly_gram_mode_desc">Fortschrëttsbalken a Indikatoren bezéie sech op de Wochebudget (max. Drénkdeeg &#215; Daglimit)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Perséinlech Daten</string>
     <string name="week_starts_on">Woch fänkt un mat</string>
+    <string name="limits">Limitten</string>
+    <string name="daily_limit_grams">Dageslimit a Gramm</string>
+    <string name="limit_caption_day">%1$s g/Dag</string>
+    <string name="limit_caption_week">%1$s g/Woch</string>
+    <string name="days_over_daily_limit">Deeg iwwer dem Dageslimit</string>
+    <string name="days_over_weekly_limit">Deeg iwwer dem Wochelimit</string>
+    <string name="days_over_drink_day_limit">Deeg iwwer dem Limit vun den Drénkdeeg</string>
+    <string name="pdf_unit_g_per_week">g/Woch</string>
+    <string name="pdf_meta_drink_days_suffix">Drénkdeeg/Woch</string>
+    <string name="pdf_kpi_over_daily">Deeg > Dag (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Deeg > Woch (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Deeg > %1$d Drénkdeeg</string>
+    <string name="pdf_col_over_daily">> Dag</string>
 </resources>

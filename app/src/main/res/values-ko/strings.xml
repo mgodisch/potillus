@@ -86,17 +86,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">내보내기 날짜</string>
     <string name="pdf_meta_period">기간</string>
-    <string name="pdf_meta_gender">성별</string>
     <string name="pdf_meta_limit">한도</string>
     <string name="pdf_meta_weight">체중</string>
-    <string name="pdf_meta_custom_limit">사용자 지정</string>
     <string name="pdf_kpi_total">총 알코올</string>
     <string name="pdf_kpi_avg_day">일 평균</string>
     <string name="pdf_kpi_avg_drink_day">음주일 평균</string>
     <string name="pdf_kpi_drink_days">음주일 수</string>
     <string name="pdf_kpi_abstinent_days">금주일 수</string>
-    <string name="pdf_kpi_over_who">WHO 초과일 (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">DHS 초과일 (%1$s g)</string>
     <string name="pdf_kpi_binge">과음일 (>%1$s g)</string>
     <string name="pdf_col_month">월</string>
     <string name="pdf_col_drink_days">음주일 수</string>
@@ -143,18 +139,7 @@
     <string name="theme_night">다크</string>
     <string name="day_change_time">날짜 변경 시간</string>
     <string name="day_starts_at">새 날 시작 시간</string>
-    <string name="gender">성별</string>
-    <string name="male">남성</string>
-    <string name="female">여성</string>
-    <string name="limit_mode">의학적 가이드라인</string>
-    <string name="limit_who">WHO – 위험 수준</string>
-    <string name="limit_dhs">DHS – 저위험</string>
-    <string name="limit_custom">사용자 지정</string>
-    <string name="custom_limit_grams">나의 일일 한도 (그램)</string>
-    <string name="weekly_limit_section">주간 한도</string>
-    <string name="weekly_limit_enabled">주간 한도 활성화</string>
     <string name="weekly_limit_grams">주간 한도 (그램)</string>
-    <string name="weekly_limit">주</string>
     <string name="biometric">액세스 잠금</string>
     <string name="biometric_lock">생체 인증 잠금</string>
     <string name="biometric_desc">지문 또는 얼굴 인식으로 앱 잠금</string>
@@ -178,8 +163,6 @@
     <string name="biometric_subtitle">인증하세요</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO(2023)는 "안전한 알코올 섭취량은 없다"고 명시합니다. 여기 표시된 위험값은 실용적인 기준점이며 안전 기준이 아닙니다.</string>
-    <string name="who_values">위험 수치: ♂ ≤ %1$s g, ♀ ≤ %2$s g / 일.</string>
     <string name="pdf_months_truncated">%2$d개월 중 %1$d개월 표시 – 오래된 데이터는 CSV/백업에서 확인 가능</string>
 
     <!-- Year calendar legend -->
@@ -216,20 +199,24 @@
     <string name="csv_col_grams">그램_알코올</string>
     <string name="csv_col_note">메모</string>
     <string name="pdf_unit_g_per_day">g/일</string>
-    <string name="unit_g_per_day">g/일</string>
-
-    <string name="days_over_limit_who">WHO 한도 초과일 수</string>
-    <string name="days_over_limit_dhs">DHS 한도 초과일 수</string>
-    <string name="days_over_limit_custom">사용자 지정 한도 초과일 수</string>
-    <string name="dhs_note">DHS 권장: 남성은 하루 순수 알코올 24 g 이하, 여성은 12 g 이하로 제한하세요. 주 최소 2일은 금주하는 것이 권장됩니다.</string>
     <string name="drink_days_label">이번 주 음주일 수</string>
     <string name="drink_days_setting">주 최대 음주일 수</string>
-    <string name="drink_days_who_dhs_note">권장: 주 최대 5일 음주 (금주일 ≥ 2일)</string>
-    <string name="weekly_gram_mode_title">주간 그램 한도</string>
-    <string name="weekly_gram_mode_desc">진행 표시줄 및 표시기는 주간 예산 (최대 음주일 수 &#215; 일일 한도)을 기준으로 합니다</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">개인 데이터</string>
     <string name="week_starts_on">주 시작 요일</string>
+    <string name="limits">한도</string>
+    <string name="daily_limit_grams">일일 한도(그램)</string>
+    <string name="limit_caption_day">%1$s g/일</string>
+    <string name="limit_caption_week">%1$s g/주</string>
+    <string name="days_over_daily_limit">일일 한도 초과 일수</string>
+    <string name="days_over_weekly_limit">주간 한도 초과 일수</string>
+    <string name="days_over_drink_day_limit">음주일 한도 초과 일수</string>
+    <string name="pdf_unit_g_per_week">g/주</string>
+    <string name="pdf_meta_drink_days_suffix">음주일/주</string>
+    <string name="pdf_kpi_over_daily">일 > 일일 (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">일 > 주간 (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">일 > %1$d 음주일</string>
+    <string name="pdf_col_over_daily">> 일</string>
 </resources>

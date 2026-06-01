@@ -81,17 +81,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Tarehe ya usafirishaji</string>
     <string name="pdf_meta_period">Kipindi</string>
-    <string name="pdf_meta_gender">Jinsia</string>
     <string name="pdf_meta_limit">Kikomo</string>
     <string name="pdf_meta_weight">Uzito wa mwili</string>
-    <string name="pdf_meta_custom_limit">Maalum</string>
     <string name="pdf_kpi_total">Jumla ya pombe</string>
     <string name="pdf_kpi_avg_day">Wastani kwa siku</string>
     <string name="pdf_kpi_avg_drink_day">Wastani kwa siku ya kunywa</string>
     <string name="pdf_kpi_drink_days">Siku za kunywa</string>
     <string name="pdf_kpi_abstinent_days">Siku za kujiepusha</string>
-    <string name="pdf_kpi_over_who">Siku > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Siku > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Siku za binge (>%1$s g)</string>
     <string name="pdf_col_month">Mwezi</string>
     <string name="pdf_col_drink_days">Siku za kunywa</string>
@@ -138,18 +134,7 @@
     <string name="theme_night">Giza</string>
     <string name="day_change_time">Wakati wa mabadiliko ya siku</string>
     <string name="day_starts_at">Siku mpya inaanza saa</string>
-    <string name="gender">Jinsia</string>
-    <string name="male">Kiume</string>
-    <string name="female">Kike</string>
-    <string name="limit_mode">Mwongozo wa kimatibabu</string>
-    <string name="limit_who">WHO – kiwango cha hatari</string>
-    <string name="limit_dhs">DHS – hatari ndogo</string>
-    <string name="limit_custom">Maalum</string>
-    <string name="custom_limit_grams">Kikomo changu cha kila siku kwa gramu</string>
-    <string name="weekly_limit_section">Kikomo cha kila wiki</string>
-    <string name="weekly_limit_enabled">Wezesha kikomo cha wiki</string>
     <string name="weekly_limit_grams">Kikomo cha wiki kwa gramu</string>
-    <string name="weekly_limit">Wiki</string>
     <string name="biometric">Kufuli ya ufikiaji</string>
     <string name="biometric_lock">Kufuli ya kibayometriki</string>
     <string name="biometric_desc">Funga programu kwa alama ya kidole au utambuzi wa uso</string>
@@ -173,8 +158,6 @@
     <string name="biometric_subtitle">Tafadhali thibitisha utambulisho</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) inasema: Hakuna kiwango salama cha matumizi ya pombe. Thamani ya hatari inayoonyeshwa hapa ni kumbukumbu ya vitendo, si kizingiti cha usalama.</string>
-    <string name="who_values">Thamani ya hatari: ♂ ≤ %1$s g, ♀ ≤ %2$s g kwa siku.</string>
     <string name="pdf_months_truncated">Inaonyesha %1$d kati ya miezi %2$d – data ya zamani inapatikana katika CSV/hifadhi nakala</string>
 
     <!-- Year calendar legend -->
@@ -211,20 +194,24 @@
     <string name="csv_col_grams">Gramu_pombe</string>
     <string name="csv_col_note">Kumbuka</string>
     <string name="pdf_unit_g_per_day">g/siku</string>
-    <string name="unit_g_per_day">g/siku</string>
-
-    <string name="days_over_limit_who">Siku zilizozidi kikomo (WHO)</string>
-    <string name="days_over_limit_dhs">Siku zilizozidi kikomo (DHS)</string>
-    <string name="days_over_limit_custom">Siku zilizozidi kikomo kilichowekwa</string>
-    <string name="dhs_note">DHS inapendekeza: wanaume wasinywe zaidi ya g 24, wanawake wasinywe zaidi ya g 12 za pombe safi kwa siku. Angalau siku mbili kwa wiki zisiwe na pombe.</string>
     <string name="drink_days_label">siku za kunywa wiki hii</string>
     <string name="drink_days_setting">Upeo siku za kunywa/wiki</string>
-    <string name="drink_days_who_dhs_note">Pendekezo: upeo siku 5 za kunywa kwa wiki (≥ siku 2 za kujiepusha)</string>
-    <string name="weekly_gram_mode_title">Kikomo cha gramu cha wiki</string>
-    <string name="weekly_gram_mode_desc">Upau wa maendeleo na viashiria hutumia bajeti ya wiki (upeo siku za kunywa &#215; kikomo cha kila siku)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data binafsi</string>
     <string name="week_starts_on">Wiki huanza</string>
+    <string name="limits">Vikomo</string>
+    <string name="daily_limit_grams">Kikomo cha kila siku kwa gramu</string>
+    <string name="limit_caption_day">%1$s g/siku</string>
+    <string name="limit_caption_week">%1$s g/wiki</string>
+    <string name="days_over_daily_limit">Siku zilizozidi kikomo cha kila siku</string>
+    <string name="days_over_weekly_limit">Siku zilizozidi kikomo cha kila wiki</string>
+    <string name="days_over_drink_day_limit">Siku zilizozidi kikomo cha siku za kunywa</string>
+    <string name="pdf_unit_g_per_week">g/wiki</string>
+    <string name="pdf_meta_drink_days_suffix">siku za kunywa/wiki</string>
+    <string name="pdf_kpi_over_daily">Siku > siku (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Siku > wiki (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Siku > %1$d siku za kunywa</string>
+    <string name="pdf_col_over_daily">> siku</string>
 </resources>

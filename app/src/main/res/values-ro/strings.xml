@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data export</string>
     <string name="pdf_meta_period">Perioadă</string>
-    <string name="pdf_meta_gender">Sex</string>
     <string name="pdf_meta_limit">Limită</string>
     <string name="pdf_meta_weight">Greutate corporală</string>
-    <string name="pdf_meta_custom_limit">Personalizat</string>
     <string name="pdf_kpi_total">Alcool total</string>
     <string name="pdf_kpi_avg_day">Medie pe zi</string>
     <string name="pdf_kpi_avg_drink_day">Medie pe zi de băut</string>
     <string name="pdf_kpi_drink_days">Zile de băut</string>
     <string name="pdf_kpi_abstinent_days">Zile de abstinență</string>
-    <string name="pdf_kpi_over_who">Zile > OMS (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Zile > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Zile binge (>%1$s g)</string>
     <string name="pdf_col_month">Lună</string>
     <string name="pdf_col_drink_days">Zile de băut</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Întunecată</string>
     <string name="day_change_time">Ora schimbării zilei</string>
     <string name="day_starts_at">Ziua nouă începe la</string>
-    <string name="gender">Sex</string>
-    <string name="male">Masculin</string>
-    <string name="female">Feminin</string>
-    <string name="limit_mode">Ghid medical</string>
-    <string name="limit_who">OMS – nivel de risc</string>
-    <string name="limit_dhs">DHS – risc scăzut</string>
-    <string name="limit_custom">Personalizat</string>
-    <string name="custom_limit_grams">Limita mea zilnică în grame</string>
-    <string name="weekly_limit_section">Limită săptămânală</string>
-    <string name="weekly_limit_enabled">Activează limita săptămânală</string>
     <string name="weekly_limit_grams">Limită săptămânală în grame</string>
-    <string name="weekly_limit">Săptămână</string>
     <string name="biometric">Blocare</string>
     <string name="biometric_lock">Blocare biometrică</string>
     <string name="biometric_desc">Blochează aplicația cu amprentă sau față</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Vă rugăm să vă autentificați</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">OMS (2023) afirmă: Nu există un nivel sigur de consum de alcool. Valoarea de risc afișată este un reper practic, nu un prag de siguranță.</string>
-    <string name="who_values">Valoare de risc: ♂ ≤ %1$s g, ♀ ≤ %2$s g pe zi.</string>
-    <string name="dhs_note">DHS recomandă: bărbații nu trebuie să consume mai mult de 24 g, iar femeile nu mai mult de 12 g alcool pur pe zi. Cel puțin două zile pe săptămână trebuie să fie fără alcool.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">Se afișează %1$d din %2$d luni – datele mai vechi sunt în CSV/copie de rezervă</string>
     <string name="year_calendar_no_entry">fără înregistrare</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Grame_alcool</string>
     <string name="csv_col_note">Notă</string>
     <string name="pdf_unit_g_per_day">g/zi</string>
-    <string name="unit_g_per_day">g/zi</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Zile peste limită (OMS)</string>
-    <string name="days_over_limit_dhs">Zile peste limită (DHS)</string>
-    <string name="days_over_limit_custom">Zile peste limita configurată</string>
     <string name="drink_days_label">zile de băut săptămâna aceasta</string>
     <string name="drink_days_setting">Max. zile de băut/săptămână</string>
-    <string name="drink_days_who_dhs_note">Recomandare: max. 5 zile de băut pe săptămână (≥ 2 zile fără alcool)</string>
-    <string name="weekly_gram_mode_title">Limită săptămânală (grame)</string>
-    <string name="weekly_gram_mode_desc">Bara de progres și indicatorii folosesc bugetul săptămânal (max. zile de băut &#215; limita zilnică)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Date personale</string>
     <string name="week_starts_on">Săptămâna începe</string>
+    <string name="limits">Limite</string>
+    <string name="daily_limit_grams">Limită zilnică în grame</string>
+    <string name="limit_caption_day">%1$s g/zi</string>
+    <string name="limit_caption_week">%1$s g/săpt.</string>
+    <string name="days_over_daily_limit">Zile peste limita zilnică</string>
+    <string name="days_over_weekly_limit">Zile peste limita săptămânală</string>
+    <string name="days_over_drink_day_limit">Zile peste limita zilelor de consum</string>
+    <string name="pdf_unit_g_per_week">g/săpt.</string>
+    <string name="pdf_meta_drink_days_suffix">zile de consum/săpt.</string>
+    <string name="pdf_kpi_over_daily">Zile > zi (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Zile > săpt. (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Zile > %1$d zile de consum</string>
+    <string name="pdf_col_over_daily">> zi</string>
 </resources>

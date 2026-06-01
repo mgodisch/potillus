@@ -88,17 +88,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Exportálás dátuma</string>
     <string name="pdf_meta_period">Időszak</string>
-    <string name="pdf_meta_gender">Nem</string>
     <string name="pdf_meta_limit">Korlát</string>
     <string name="pdf_meta_weight">Testsúly</string>
-    <string name="pdf_meta_custom_limit">Egyéni</string>
     <string name="pdf_kpi_total">Összes alkohol</string>
     <string name="pdf_kpi_avg_day">Átl. naponta</string>
     <string name="pdf_kpi_avg_drink_day">Átl. ivónaponta</string>
     <string name="pdf_kpi_drink_days">Ivónapok</string>
     <string name="pdf_kpi_abstinent_days">Tartózkodási napok</string>
-    <string name="pdf_kpi_over_who">Napok > WHO (%1$s g)</string>
-    <string name="pdf_kpi_over_dhs">Napok > DHS (%1$s g)</string>
     <string name="pdf_kpi_binge">Ivászati napok (>%1$s g)</string>
     <string name="pdf_col_month">Hónap</string>
     <string name="pdf_col_drink_days">Ivónapok</string>
@@ -145,18 +141,7 @@
     <string name="theme_night">Sötét</string>
     <string name="day_change_time">Napváltás ideje</string>
     <string name="day_starts_at">Az új nap elkezdődik</string>
-    <string name="gender">Nem</string>
-    <string name="male">Férfi</string>
-    <string name="female">Nő</string>
-    <string name="limit_mode">Orvosi iráncikk</string>
-    <string name="limit_who">WHO – kockázati szint</string>
-    <string name="limit_dhs">DHS – alacsony kockázat</string>
-    <string name="limit_custom">Egyéni</string>
-    <string name="custom_limit_grams">Napi limitom grammban</string>
-    <string name="weekly_limit_section">Heti korlát</string>
-    <string name="weekly_limit_enabled">Heti korlát engedélyezése</string>
     <string name="weekly_limit_grams">Heti korlát grammban</string>
-    <string name="weekly_limit">Hét</string>
     <string name="biometric">Zárolás</string>
     <string name="biometric_lock">Biometrikus zárolás</string>
     <string name="biometric_desc">Az alkalmazás zárolása ujjlenyomattal vagy arccal</string>
@@ -180,10 +165,6 @@
     <string name="biometric_subtitle">Kérjük, hitelesítse magát</string>
 
     <!-- Medical guidelines -->
-    <string name="who_note">A WHO (2023) kijelenti: Nincs biztonságos alkoholfogyasztási szint. Az itt megjelenített kockázati érték egy praktikus tájékozódási pont, nem egy biztonsági küszöb.</string>
-    <string name="who_values">Kockázati érték: ♂ ≤ %1$s g, ♀ ≤ %2$s g naponta.</string>
-    <string name="dhs_note">A DHS ajánlja: a férfiak ne igyanak naponta 24 g-nál, a nők ne igyanak 12 g-nál több tiszta alkoholt. Hetente legalább két napnak alkoholmentesnek kell lennie.</string>
-
     <!-- Miscellaneous -->
     <string name="pdf_months_truncated">%1$d/%2$d hónap látható – régebbi adatok CSV-ben/biztonsági mentésben</string>
     <string name="year_calendar_no_entry">nincs bejegyzés</string>
@@ -221,20 +202,25 @@
     <string name="csv_col_grams">Gramm_alkohol</string>
     <string name="csv_col_note">Megjegyzés</string>
     <string name="pdf_unit_g_per_day">g/nap</string>
-    <string name="unit_g_per_day">g/nap</string>
-
     <!-- Drinking-days and weekly gram mode -->
-    <string name="days_over_limit_who">Limit feletti napok (WHO)</string>
-    <string name="days_over_limit_dhs">Limit feletti napok (DHS)</string>
-    <string name="days_over_limit_custom">Konfigurált limit feletti napok</string>
     <string name="drink_days_label">ivónapok ezen a héten</string>
     <string name="drink_days_setting">Max. ivónapok/hét</string>
-    <string name="drink_days_who_dhs_note">Javaslat: max. 5 ivónap hetente (≥ 2 alkoholmentes nap)</string>
-    <string name="weekly_gram_mode_title">Heti gramm-korlát</string>
-    <string name="weekly_gram_mode_desc">A folyamatjelző és az indikátorok a heti keretet használják (max. ivónapok &#215; napi korlát)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Személyes adatok</string>
     <string name="week_starts_on">A hét kezdőnapja</string>
+    <string name="limits">Korlátok</string>
+    <string name="daily_limit_grams">Napi korlát grammban</string>
+    <string name="limit_caption_day">%1$s g/nap</string>
+    <string name="limit_caption_week">%1$s g/hét</string>
+    <string name="days_over_daily_limit">Napok a napi korlát felett</string>
+    <string name="days_over_weekly_limit">Napok a heti korlát felett</string>
+    <string name="days_over_drink_day_limit">Napok az ivónapok korlátja felett</string>
+    <string name="pdf_unit_g_per_week">g/hét</string>
+    <string name="pdf_meta_drink_days_suffix">ivónap/hét</string>
+    <string name="pdf_kpi_over_daily">Napok > napi (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Napok > heti (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Napok > %1$d ivónap</string>
+    <string name="pdf_col_over_daily">> nap</string>
 </resources>

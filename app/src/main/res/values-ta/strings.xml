@@ -82,17 +82,13 @@
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">ஏற்றுமதி தேதி</string>
     <string name="pdf_meta_period">காலம்</string>
-    <string name="pdf_meta_gender">பாலினம்</string>
     <string name="pdf_meta_limit">வரம்பு</string>
     <string name="pdf_meta_weight">உடல் எடை</string>
-    <string name="pdf_meta_custom_limit">தனிப்பயன்</string>
     <string name="pdf_kpi_total">மொத்த ஆல்கஹால்</string>
     <string name="pdf_kpi_avg_day">தினசரி சராசரி</string>
     <string name="pdf_kpi_avg_drink_day">குடிக்கும் நாளில் சராசரி</string>
     <string name="pdf_kpi_drink_days">குடிக்கும் நாட்கள்</string>
     <string name="pdf_kpi_abstinent_days">தவிர்ப்பு நாட்கள்</string>
-    <string name="pdf_kpi_over_who">நாட்கள் > WHO (%1$s கிராம்)</string>
-    <string name="pdf_kpi_over_dhs">நாட்கள் > DHS (%1$s கிராம்)</string>
     <string name="pdf_kpi_binge">பிங்க் நாட்கள் (>%1$s கிராம்)</string>
     <string name="pdf_col_month">மாதம்</string>
     <string name="pdf_col_drink_days">குடிக்கும் நாட்கள்</string>
@@ -139,18 +135,7 @@
     <string name="theme_night">இருள்</string>
     <string name="day_change_time">நாள் மாற்ற நேரம்</string>
     <string name="day_starts_at">புதிய நாள் தொடங்குகிறது</string>
-    <string name="gender">பாலினம்</string>
-    <string name="male">ஆண்</string>
-    <string name="female">பெண்</string>
-    <string name="limit_mode">மருத்துவ வழிகாட்டி</string>
-    <string name="limit_who">WHO – ஆபத்து நிலை</string>
-    <string name="limit_dhs">DHS – குறைந்த ஆபத்து</string>
-    <string name="limit_custom">தனிப்பயன்</string>
-    <string name="custom_limit_grams">என்னுடைய தினசரி வரம்பு கிராமில்</string>
-    <string name="weekly_limit_section">வார வரம்பு</string>
-    <string name="weekly_limit_enabled">வார வரம்பை இயக்கு</string>
     <string name="weekly_limit_grams">வார வரம்பு கிராமில்</string>
-    <string name="weekly_limit">வாரம்</string>
     <string name="biometric">அணுகல் பூட்டு</string>
     <string name="biometric_lock">பயோமெட்ரிக் பூட்டு</string>
     <string name="biometric_desc">கட்டை விரல் அச்சு அல்லது முகம் அடையாளம் மூலம் ஆப்பை பூட்டவும்</string>
@@ -174,8 +159,6 @@
     <string name="biometric_subtitle">தயவுசெய்து அங்கீகரிக்கவும்</string>
 
     <!-- WHO note -->
-    <string name="who_note">WHO (2023) கூறுகிறது: ஆல்கஹால் உட்கொள்ளலுக்கு பாதுகாப்பான அளவு எதுவும் இல்லை. இங்கே காட்டப்படும் ஆபத்து மதிப்பு ஒரு நடைமுறை குறிப்பு புள்ளியாகும், பாதுகாப்பு வரம்பு அல்ல.</string>
-    <string name="who_values">ஆபத்து மதிப்பு: ♂ ≤ %1$s g, ♀ ≤ %2$s g ஒரு நாளைக்கு.</string>
     <string name="pdf_months_truncated">%2$d மாதங்களில் %1$d காட்டுகிறது – பழைய தரவு CSV/காப்புப்பிரதியில் உள்ளது</string>
 
     <!-- Year calendar legend -->
@@ -212,20 +195,24 @@
     <string name="csv_col_grams">கிராம்_ஆல்கஹால்</string>
     <string name="csv_col_note">குறிப்பு</string>
     <string name="pdf_unit_g_per_day">கிராம்/நாள்</string>
-    <string name="unit_g_per_day">கிராம்/நாள்</string>
-
-    <string name="days_over_limit_who">வரம்பை தாண்டிய நாட்கள் (WHO)</string>
-    <string name="days_over_limit_dhs">வரம்பை தாண்டிய நாட்கள் (DHS)</string>
-    <string name="days_over_limit_custom">அமைக்கப்பட்ட வரம்பை தாண்டிய நாட்கள்</string>
-    <string name="dhs_note">DHS பரிந்துரைக்கிறது: ஆண்கள் தினமும் 24 கிராமுக்கு மேலும், பெண்கள் 12 கிராமுக்கு மேலும் தூய ஆல்கஹால் குடிக்கக்கூடாது. வாரத்தில் குறைந்தது இரண்டு நாட்கள் ஆல்கஹால் இல்லாமல் இருக்க வேண்டும்.</string>
     <string name="drink_days_label">இந்த வாரத்தில் குடிக்கும் நாட்கள்</string>
     <string name="drink_days_setting">அதிகபட்சம் குடிக்கும் நாட்கள்/வாரம்</string>
-    <string name="drink_days_who_dhs_note">பரிந்துரை: வாரத்தில் அதிகபட்சம் 5 குடிக்கும் நாட்கள் (≥ 2 தவிர்ப்பு நாட்கள்)</string>
-    <string name="weekly_gram_mode_title">வார கிராம் வரம்பு</string>
-    <string name="weekly_gram_mode_desc">முன்னேற்றப் பட்டை மற்றும் காட்டிகள் வார பட்ஜெட்டைப் பயன்படுத்துகின்றன (அதிகபட்சம் குடிக்கும் நாட்கள் &#215; தினசரி வரம்பு)</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">தனிப்பட்ட தரவு</string>
     <string name="week_starts_on">வாரம் தொடங்கும் நாள்</string>
+    <string name="limits">வரம்புகள்</string>
+    <string name="daily_limit_grams">கிராமில் தினசரி வரம்பு</string>
+    <string name="limit_caption_day">%1$s g/நாள்</string>
+    <string name="limit_caption_week">%1$s g/வாரம்</string>
+    <string name="days_over_daily_limit">தினசரி வரம்பை மீறிய நாட்கள்</string>
+    <string name="days_over_weekly_limit">வார வரம்பை மீறிய நாட்கள்</string>
+    <string name="days_over_drink_day_limit">குடி நாட்கள் வரம்பை மீறிய நாட்கள்</string>
+    <string name="pdf_unit_g_per_week">g/வாரம்</string>
+    <string name="pdf_meta_drink_days_suffix">குடி நாட்கள்/வா.</string>
+    <string name="pdf_kpi_over_daily">நாட்கள் > தினம் (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">நாட்கள் > வாரம் (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">நாட்கள் > %1$d குடி நாட்கள்</string>
+    <string name="pdf_col_over_daily">> நாள்</string>
 </resources>
