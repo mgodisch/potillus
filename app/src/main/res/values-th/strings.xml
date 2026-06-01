@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Thai (th) — translated from values-de/ (German source of truth).
+
+    Script notes:
+    • Thai script (อักษรไทย) is an abugida written left-to-right with no spaces
+      between words. Android renders Thai via the bundled Noto Sans Thai font
+      from API 21+; no extra configuration needed.
+    • Thai uses no spaces between words, so word-wrapping is handled by the
+      Android text engine's line-break algorithm (ICU), which correctly
+      identifies Thai word boundaries. Do NOT add artificial spaces between
+      Thai words — this would be incorrect and look wrong to native readers.
+    • Register: polite formal (ราชาศัพท์ is too formal; standard written Thai
+      uses ท่าน/คุณ + ครับ/ค่ะ particles; in UI strings the particles are
+      omitted as per Thai app-UI convention, keeping strings gender-neutral).
+    • "Binge drinking" → ดื่มแอลกอฮอล์มากเกินไป (public-health phrasing).
+    • DHS is kept as "DHS"; WHO is written "WHO" (both used in Thai public health
+      as foreign-organisation abbreviations).
+    • day_change_time_value: Thai uses the same HH:MM 24-hour format; no suffix
+      is needed (the German "Uhr" has no direct Thai equivalent in 24-h context).
+    • Numbers: Thai has its own digit set (๐๑๒๓๔๕๖๗๘๙) but the international
+      Arabic numerals (0–9) are standard in modern Thai UI/app contexts and are
+      what Android's format strings (%1$d, %1$s) produce by default.
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">วันนี้</string>
+    <string name="calendar">ปฏิทิน</string>
+    <string name="statistics">สถิติ</string>
+    <string name="drinks">เครื่องดื่ม</string>
+    <string name="settings">การตั้งค่า</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">รวมวันนี้</string>
+    <string name="grams_alcohol">กรัม แอลกอฮอล์</string>
+    <string name="entries_today">รายการวันนี้</string>
+    <string name="no_entries_today">ยังไม่มีรายการวันนี้\nแตะ + เพื่อเพิ่มรายการ</string>
+    <string name="no_entries_day">ไม่มีรายการสำหรับวันนี้</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">เพิ่มรายการโปรดอย่างรวดเร็ว</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">การประมาณค่าแอลกอฮอล์ในเลือด</string>
+    <string name="bac_disclaimer">ค่าประมาณ · อย่าใช้ตัดสินใจขับรถ</string>
+    <string name="stats_from_section">ช่วงเวลาสถิติ</string>
+    <string name="stats_from_label">สถิติตั้งแต่</string>
+    <string name="stats_from_desc">รายการก่อนวันที่นี้จะถูกแยกออกจากสถิติทั้งหมด</string>
+    <string name="bac_section">เครื่องประมาณค่าแอลกอฮอล์ในเลือด (Widmark)</string>
+    <string name="bac_desc">ต้องใช้น้ำหนักตัวในการประมาณค่า ค่านี้เป็นการประมาณทางคณิตศาสตร์ ไม่ใช่การวัดจริง</string>
+    <string name="body_weight">น้ำหนักตัว</string>
+    <string name="not_set">ยังไม่ได้ตั้งค่า</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">เพิ่มรายการ</string>
+    <string name="edit_entry">แก้ไขรายการ</string>
+    <string name="drink">เครื่องดื่ม</string>
+    <string name="select_drink">เลือกเครื่องดื่ม…</string>
+    <string name="volume_ml">ปริมาณ</string>
+    <string name="time">เวลา</string>
+    <string name="pure_alcohol">กรัม แอลกอฮอล์บริสุทธิ์</string>
+    <string name="note">หมายเหตุ (ไม่บังคับ)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">เพิ่มเครื่องดื่ม</string>
+    <string name="edit_drink">แก้ไขเครื่องดื่ม</string>
+    <string name="drink_name">ชื่อ</string>
+    <string name="alcohol_percent">ปริมาณแอลกอฮอล์</string>
+    <string name="favorite">รายการโปรด</string>
+    <string name="no_drinks">ยังไม่ได้กำหนดเครื่องดื่มใดๆ</string>
+    <string name="category">หมวดหมู่</string>
+    <string name="category_beer">เบียร์</string>
+    <string name="category_wine">ไวน์ / สปาร์กลิ้ง</string>
+    <string name="category_spirits">สุรา</string>
+    <string name="category_longdrink">ลองดริงก์ / ผสม</string>
+    <string name="category_liqueur">ลิเคียร์</string>
+    <string name="category_other">อื่นๆ</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">สรุปการบริโภคแอลกอฮอล์</string>
+    <string name="pdf_section_kpis">ข้อมูลหลัก</string>
+    <string name="pdf_section_months">ภาพรวมรายเดือน</string>
+    <string name="pdf_section_trend">แนวโน้มระยะยาว (เฉลี่ย กรัม/เดือน)</string>
+    <string name="pdf_section_categories">หมวดหมู่เครื่องดื่ม</string>
+    <string name="pdf_section_daytime">รูปแบบการบริโภค: ช่วงเวลาของวัน</string>
+    <string name="pdf_section_weekday">โปรไฟล์วันในสัปดาห์ (เฉลี่ย กรัม แอลกอฮอล์)</string>
+    <string name="pdf_section_risk">การบริโภคที่มีความเสี่ยง &amp; การงดดื่ม</string>
+    <string name="pdf_footer1">เป็นเพียงค่าประมาณ ไม่ควรใช้เพื่อการขับขี่หรือการวินิจฉัยโรค</string>
+    <string name="pdf_footer2">สร้างด้วย Libellus Potionis (Potillus) ค่าประมาณ — ไม่ใช่การวินิจฉัยทางการแพทย์</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">วันที่ส่งออก</string>
+    <string name="pdf_meta_period">ช่วงเวลา</string>
+    <string name="pdf_meta_gender">เพศ</string>
+    <string name="pdf_meta_limit">ขีดจำกัด</string>
+    <string name="pdf_meta_weight">น้ำหนักตัว</string>
+    <string name="pdf_meta_custom_limit">กำหนดเอง</string>
+    <string name="pdf_kpi_total">แอลกอฮอล์รวม</string>
+    <string name="pdf_kpi_avg_day">เฉลี่ยต่อวัน</string>
+    <string name="pdf_kpi_avg_drink_day">เฉลี่ยต่อวันที่ดื่ม</string>
+    <string name="pdf_kpi_drink_days">วันที่ดื่ม</string>
+    <string name="pdf_kpi_abstinent_days">วันที่งดดื่ม</string>
+    <string name="pdf_kpi_over_who">วันเกิน WHO (%1$s กรัม)</string>
+    <string name="pdf_kpi_over_dhs">วันเกิน DHS (%1$s กรัม)</string>
+    <string name="pdf_kpi_binge">วันดื่มมากเกินไป (>%1$s กรัม)</string>
+    <string name="pdf_col_month">เดือน</string>
+    <string name="pdf_col_drink_days">วันที่ดื่ม</string>
+    <string name="pdf_col_total_g">รวม กรัม</string>
+    <string name="pdf_col_avg_g_day">เฉลี่ย กรัม/วัน</string>
+    <string name="pdf_meta_first_drink">ดื่มครั้งแรก (เฉลี่ย)</string>
+    <string name="pdf_meta_last_drink">ดื่มครั้งสุดท้าย (เฉลี่ย)</string>
+    <string name="pdf_meta_before_18">สัดส่วนก่อน 17:00 น.</string>
+    <string name="pdf_meta_after_18">สัดส่วนตั้งแต่ 17:00 น.</string>
+    <string name="pdf_meta_binge_days">วันดื่มมากเกินไป (>%1$s กรัม)</string>
+    <string name="pdf_meta_longest_abstinence">ช่วงงดดื่มนานที่สุด</string>
+    <string name="pdf_meta_current_abstinence">การงดดื่มปัจจุบัน</string>
+    <string name="pdf_days_suffix">วัน</string>
+
+    <!-- Actions -->
+    <string name="save">บันทึก</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="back">ย้อนกลับ</string>
+    <string name="delete">ลบ</string>
+    <string name="change">เปลี่ยน</string>
+    <string name="delete_confirm">ลบ "%1$s" หรือไม่?</string>
+    <string name="no_data">ไม่มีข้อมูลสำหรับช่วงเวลานี้</string>
+
+    <!-- Stats -->
+    <string name="week">สัปดาห์</string>
+    <string name="month">เดือน</string>
+    <string name="year">ปี</string>
+    <string name="total_period">รวมในช่วงเวลา</string>
+    <string name="avg_per_day">เฉลี่ยต่อวัน</string>
+    <string name="avg_per_drink_day">เฉลี่ยต่อวันที่ดื่ม</string>
+    <string name="abstinent_days">วันที่งดดื่ม</string>
+    <string name="stats_category_breakdown">หมวดหมู่</string>
+    <string name="streak_trend">การงดดื่ม &amp; แนวโน้ม</string>
+    <string name="current_streak">การงดดื่มปัจจุบัน</string>
+    <string name="longest_streak">การงดดื่มนานที่สุด</string>
+    <string name="days_count">%1$d วัน</string>
+    <string name="trend_vs_prev">แนวโน้มเทียบกับช่วงก่อนหน้า</string>
+
+    <!-- Settings -->
+    <string name="appearance">รูปลักษณ์</string>
+    <string name="theme_mode">ชุดสี</string>
+    <string name="theme_system">ระบบ</string>
+    <string name="theme_day">สว่าง</string>
+    <string name="theme_night">มืด</string>
+    <string name="day_change_time">เวลาเปลี่ยนวัน</string>
+    <string name="day_starts_at">วันใหม่เริ่มเวลา</string>
+    <string name="gender">เพศ</string>
+    <string name="male">ชาย</string>
+    <string name="female">หญิง</string>
+    <string name="limit_mode">แนวทางทางการแพทย์</string>
+    <string name="limit_who">WHO – ระดับความเสี่ยง</string>
+    <string name="limit_dhs">DHS – ความเสี่ยงต่ำ</string>
+    <string name="limit_custom">กำหนดเอง</string>
+    <string name="custom_limit_grams">ขีดจำกัดรายวันของฉัน (กรัม)</string>
+    <string name="weekly_limit_section">ขีดจำกัดรายสัปดาห์</string>
+    <string name="weekly_limit_enabled">เปิดใช้ขีดจำกัดรายสัปดาห์</string>
+    <string name="weekly_limit_grams">ขีดจำกัดรายสัปดาห์ (กรัม)</string>
+    <string name="weekly_limit">สัปดาห์</string>
+    <string name="biometric">ล็อกการเข้าถึง</string>
+    <string name="biometric_lock">ล็อกด้วยไบโอเมตริก</string>
+    <string name="biometric_desc">ล็อกแอปด้วยลายนิ้วมือหรือการจดจำใบหน้า</string>
+    <string name="language">ภาษา</string>
+    <string name="export">ส่งออกข้อมูล</string>
+    <string name="export_desc">ส่งออกรายการไปยังโฟลเดอร์ดาวน์โหลด</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">สำรองข้อมูล</string>
+    <string name="backup_desc">สำรองข้อมูลทั้งหมด (รายการ + เครื่องดื่ม) เป็นไฟล์ JSON</string>
+    <string name="backup_export">ส่งออก</string>
+    <string name="backup_import">นำเข้า</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">จะนำเข้าข้อมูลอย่างไร?</string>
+    <string name="import_replace">แทนที่</string>
+    <string name="import_merge">เพิ่ม</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">กรุณายืนยันตัวตน</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) ระบุว่า: ไม่มีปริมาณแอลกอฮอล์ที่ปลอดภัย ค่าความเสี่ยงที่แสดงที่นี่เป็นจุดอ้างอิงเชิงปฏิบัติ ไม่ใช่เกณฑ์ความปลอดภัย</string>
+    <string name="who_values">ค่าความเสี่ยง: ♂ ≤ %1$s g, ♀ ≤ %2$s g ต่อวัน</string>
+    <string name="pdf_months_truncated">แสดง %1$d จาก %2$d เดือน — ข้อมูลเก่าอยู่ใน CSV/ข้อมูลสำรอง</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">ไม่มีรายการ</string>
+    <string name="year_calendar_under_limit">ต่ำกว่าขีดจำกัด</string>
+    <string name="year_calendar_over_limit">เกินขีดจำกัด</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">ไม่มีรายการสำหรับส่งออก</string>
+    <string name="export_failed">การส่งออกล้มเหลว</string>
+    <string name="backup_failed">การสำรองข้อมูลล้มเหลว</string>
+    <string name="import_success_replace">นำเข้า %1$d รายการแล้ว</string>
+    <string name="import_success_merge">นำเข้า %1$d รายการ ข้าม %2$d รายการ</string>
+    <string name="import_error_could_not_read">ไม่สามารถอ่านไฟล์ได้</string>
+    <string name="import_error_empty">ไฟล์สำรองข้อมูลว่างเปล่า</string>
+    <string name="import_error_invalid_json">รูปแบบ JSON ไม่ถูกต้อง</string>
+    <string name="import_error_version_too_high">ไม่รองรับเวอร์ชันสำรองข้อมูล %1$d (สูงสุด %2$d)</string>
+    <string name="import_error_file_too_large">ไฟล์สำรองข้อมูลใหญ่เกินไป (สูงสุด %1$d MB)</string>
+    <string name="import_error_read">ข้อผิดพลาดในการอ่าน: %1$s</string>
+    <string name="drink_delete_blocked">"{name}" มี {count} รายการและไม่สามารถลบได้</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">ชื่อเครื่องดื่มต้องไม่ว่างเปล่า</string>
+    <string name="drink_validation_name_too_long">ชื่อเครื่องดื่มยาวเกินไป (สูงสุด 100 ตัวอักษร)</string>
+    <string name="drink_validation_volume_range">ปริมาณต้องอยู่ระหว่าง 1 มล. ถึง 10,000 มล.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">ปริมาณแอลกอฮอล์ต้องอยู่ระหว่าง 0% ถึง 100%</string>
+    <string name="drink_validation_alcohol_invalid">ปริมาณแอลกอฮอล์ไม่ใช่ตัวเลขที่ถูกต้อง</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">วันที่</string>
+    <string name="csv_col_time">เวลา</string>
+    <string name="csv_col_drink">เครื่องดื่ม</string>
+    <string name="csv_col_category">หมวดหมู่</string>
+    <string name="csv_col_volume_ml">ปริมาณ_มล</string>
+    <string name="csv_col_alcohol_pct">แอลกอฮอล์_%</string>
+    <string name="csv_col_grams">กรัม_แอลกอฮอล์</string>
+    <string name="csv_col_note">หมายเหตุ</string>
+    <string name="pdf_unit_g_per_day">กรัม/วัน</string>
+    <string name="unit_g_per_day">กรัม/วัน</string>
+
+    <string name="days_over_limit_who">วันที่เกินขีดจำกัด WHO</string>
+    <string name="days_over_limit_dhs">วันที่เกินขีดจำกัด DHS</string>
+    <string name="days_over_limit_custom">วันที่เกินขีดจำกัดที่กำหนดเอง</string>
+    <string name="dhs_note">คำแนะนำ DHS: ผู้ชายไม่ควรดื่มแอลกอฮอล์บริสุทธิ์เกิน 24 กรัม และผู้หญิงไม่เกิน 12 กรัมต่อวัน ควรมีอย่างน้อยสองวันต่อสัปดาห์ที่ไม่ดื่มแอลกอฮอล์</string>
+    <string name="drink_days_label">วันที่ดื่มในสัปดาห์นี้</string>
+    <string name="drink_days_setting">จำนวนวันดื่มสูงสุด/สัปดาห์</string>
+    <string name="drink_days_who_dhs_note">คำแนะนำ: ดื่มได้สูงสุด 5 วันต่อสัปดาห์ (งดดื่มอย่างน้อย 2 วัน)</string>
+    <string name="weekly_gram_mode_title">ขีดจำกัดกรัมรายสัปดาห์</string>
+    <string name="weekly_gram_mode_desc">แถบความคืบหน้าและตัวบ่งชี้อ้างอิงงบประมาณรายสัปดาห์ (วันดื่มสูงสุด &#215; ขีดจำกัดรายวัน)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">ข้อมูลส่วนตัว</string>
+    <string name="week_starts_on">สัปดาห์เริ่มต้นวัน</string>
+</resources>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Bulgarian (Български)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Днес</string>
+    <string name="calendar">Календар</string>
+    <string name="statistics">Статистика</string>
+    <string name="drinks">Напитки</string>
+    <string name="settings">Настройки</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Общо днес</string>
+    <string name="grams_alcohol">г алкохол</string>
+    <string name="entries_today">Записи днес</string>
+    <string name="no_entries_today">Няма записи за днес.\nДокоснете + за добавяне.</string>
+    <string name="no_entries_day">Няма записи за този ден.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Бързо добавяне от предпочитани</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Оценка на ПАК</string>
+    <string name="bac_disclaimer">Оценка · не за решения при шофиране</string>
+    <string name="stats_from_section">Период на статистиката</string>
+    <string name="stats_from_label">Статистика от</string>
+    <string name="stats_from_desc">Записите преди тази дата се изключват от всички статистики.</string>
+    <string name="bac_section">Оценка на ПАК (Widmark)</string>
+    <string name="bac_desc">За оценката е необходимо телесното тегло. Това е математическо приближение, не измерване.</string>
+    <string name="body_weight">Телесно тегло</string>
+    <string name="not_set">не е зададено</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Добавяне на запис</string>
+    <string name="edit_entry">Редактиране на запис</string>
+    <string name="drink">Напитка</string>
+    <string name="select_drink">Изберете напитка …</string>
+    <string name="volume_ml">Количество</string>
+    <string name="time">Час</string>
+    <string name="pure_alcohol">г чист алкохол</string>
+    <string name="note">Бележка (по избор)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Добавяне на напитка</string>
+    <string name="edit_drink">Редактиране на напитка</string>
+    <string name="drink_name">Наименование</string>
+    <string name="alcohol_percent">Съдържание на алкохол</string>
+    <string name="favorite">Предпочитана</string>
+    <string name="no_drinks">Няма дефинирани напитки.</string>
+    <string name="category">Категория</string>
+    <string name="category_beer">Бира</string>
+    <string name="category_wine">Вино / Пенливо</string>
+    <string name="category_spirits">Спиртни напитки</string>
+    <string name="category_longdrink">Лонгдринк / Микс</string>
+    <string name="category_liqueur">Ликьор</string>
+    <string name="category_other">Друго</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Обобщение на алкохола</string>
+    <string name="pdf_section_kpis">Основни показатели</string>
+    <string name="pdf_section_months">Месечен преглед</string>
+    <string name="pdf_section_trend">Дългосрочна тенденция (ср. г/месец)</string>
+    <string name="pdf_section_categories">Категории напитки</string>
+    <string name="pdf_section_daytime">Модел на потребление: час от деня</string>
+    <string name="pdf_section_weekday">Профил по дни от седмицата (ср. г алкохол)</string>
+    <string name="pdf_section_risk">Рисково потребление и въздържание</string>
+    <string name="pdf_footer1">Само оценки. Не за шофиране или диагностични цели.</string>
+    <string name="pdf_footer2">Създадено с Libellus Potionis (Potillus). Оценки – не медицинска диагноза.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Дата на експорт</string>
+    <string name="pdf_meta_period">Период</string>
+    <string name="pdf_meta_gender">Пол</string>
+    <string name="pdf_meta_limit">Лимит</string>
+    <string name="pdf_meta_weight">Телесно тегло</string>
+    <string name="pdf_meta_custom_limit">Персонализиран</string>
+    <string name="pdf_kpi_total">Общ алкохол</string>
+    <string name="pdf_kpi_avg_day">Ср. на ден</string>
+    <string name="pdf_kpi_avg_drink_day">Ср. на ден с пиене</string>
+    <string name="pdf_kpi_drink_days">Дни с пиене</string>
+    <string name="pdf_kpi_abstinent_days">Дни на въздържание</string>
+    <string name="pdf_kpi_over_who">Дни > СЗО (%1$s г)</string>
+    <string name="pdf_kpi_over_dhs">Дни > DHS (%1$s г)</string>
+    <string name="pdf_kpi_binge">Дни на запой (>%1$s г)</string>
+    <string name="pdf_col_month">Месец</string>
+    <string name="pdf_col_drink_days">Дни с пиене</string>
+    <string name="pdf_col_total_g">Общо г</string>
+    <string name="pdf_col_avg_g_day">Ср. г/ден</string>
+    <string name="pdf_meta_first_drink">Ср. първа напитка</string>
+    <string name="pdf_meta_last_drink">Ср. последна напитка</string>
+    <string name="pdf_meta_before_18">Дял преди 17:00</string>
+    <string name="pdf_meta_after_18">Дял от 17:00</string>
+    <string name="pdf_meta_binge_days">Дни на запой (>%1$s г)</string>
+    <string name="pdf_meta_longest_abstinence">Най-дълго въздържание</string>
+    <string name="pdf_meta_current_abstinence">Текущо въздържание</string>
+    <string name="pdf_days_suffix">дни</string>
+
+    <!-- Actions -->
+    <string name="save">Запазване</string>
+    <string name="cancel">Отказ</string>
+    <string name="back">Назад</string>
+    <string name="delete">Изтриване</string>
+    <string name="change">Промяна</string>
+    <string name="delete_confirm">„%1$s“ наистина ли да изтрия?</string>
+    <string name="no_data">Няма данни за този период.</string>
+
+    <!-- Stats -->
+    <string name="week">Седмица</string>
+    <string name="month">Месец</string>
+    <string name="year">Година</string>
+    <string name="total_period">Общо за периода</string>
+    <string name="avg_per_day">Средно на ден</string>
+    <string name="avg_per_drink_day">Средно на ден с пиене</string>
+    <string name="abstinent_days">Дни на въздържание</string>
+    <string name="stats_category_breakdown">Категории</string>
+    <string name="streak_trend">Въздържание и тенденция</string>
+    <string name="current_streak">Текущо въздържание</string>
+    <string name="longest_streak">Най-дълго въздържание</string>
+    <string name="days_count">%1$d дни</string>
+    <string name="trend_vs_prev">Тенденция спрямо предишния период</string>
+
+    <!-- Settings -->
+    <string name="appearance">Изглед</string>
+    <string name="theme_mode">Цветова схема</string>
+    <string name="theme_system">Системна</string>
+    <string name="theme_day">Светла</string>
+    <string name="theme_night">Тъмна</string>
+    <string name="day_change_time">Час за смяна на деня</string>
+    <string name="day_starts_at">Новият ден започва в</string>
+    <string name="gender">Пол</string>
+    <string name="male">Мъжки</string>
+    <string name="female">Женски</string>
+    <string name="limit_mode">Медицинска насока</string>
+    <string name="limit_who">СЗО – ниво на риска</string>
+    <string name="limit_dhs">DHS – нисък риск</string>
+    <string name="limit_custom">Персонализиран</string>
+    <string name="custom_limit_grams">Моят дневен лимит в грамове</string>
+    <string name="weekly_limit_section">Седмичен лимит</string>
+    <string name="weekly_limit_enabled">Активиране на седмичния лимит</string>
+    <string name="weekly_limit_grams">Седмичен лимит в грамове</string>
+    <string name="weekly_limit">Седмица</string>
+    <string name="biometric">Заключване</string>
+    <string name="biometric_lock">Биометрично заключване</string>
+    <string name="biometric_desc">Заключване на приложението с пръстов отпечатък или лице</string>
+    <string name="language">Език</string>
+    <string name="export">Експорт на данни</string>
+    <string name="export_desc">Експортиране на записи в папката „Изтегляния"</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Архив</string>
+    <string name="backup_desc">Пълен архив (записи + напитки) като JSON файл</string>
+    <string name="backup_export">Експортиране</string>
+    <string name="backup_import">Импортиране</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Как да бъдат импортирани данните?</string>
+    <string name="import_replace">Замяна</string>
+    <string name="import_merge">Добавяне</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Моля, удостоверете се</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">СЗО (2023) заявява: Няма безопасно ниво на консумация на алкохол. Показаната стойност на риска е практически ориентир, не праг на безопасност.</string>
+    <string name="who_values">Рискова стойност: ♂ ≤ %1$s г, ♀ ≤ %2$s г на ден.</string>
+    <string name="dhs_note">DHS препоръчва: мъжете не трябва да пият повече от 24 г, жените не повече от 12 г чист алкохол на ден. Поне два дни в седмицата трябва да са без алкохол.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Показани са %1$d от %2$d месеца – по-старите данни са в CSV/архив</string>
+    <string name="year_calendar_no_entry">без запис</string>
+    <string name="year_calendar_under_limit">под лимита</string>
+    <string name="year_calendar_over_limit">над лимита</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Няма записи за експортиране.</string>
+    <string name="export_failed">Експортирането е неуспешно.</string>
+    <string name="backup_failed">Архивирането е неуспешно.</string>
+    <string name="import_success_replace">%1$d запис/а импортиран/и.</string>
+    <string name="import_success_merge">%1$d импортирани, %2$d пропуснати.</string>
+    <string name="import_error_could_not_read">Файлът не може да бъде прочетен.</string>
+    <string name="import_error_empty">Файлът с архива е празен.</string>
+    <string name="import_error_invalid_json">Невалиден JSON формат.</string>
+    <string name="import_error_version_too_high">Версия на архива %1$d не се поддържа (макс. %2$d).</string>
+    <string name="import_error_file_too_large">Файлът с архива е твърде голям (макс. %1$d МБ).</string>
+    <string name="import_error_read">Грешка при четене: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ има {count} записа и не може да бъде изтрита.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Името на напитката не може да е празно.</string>
+    <string name="drink_validation_name_too_long">Името на напитката е твърде дълго (макс. 100 знака).</string>
+    <string name="drink_validation_volume_range">Обемът трябва да е между 1 мл и 10 000 мл.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Съдържанието на алкохол трябва да е между 0 % и 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Съдържанието на алкохол не е валидно число.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d ч.</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Дата</string>
+    <string name="csv_col_time">Час</string>
+    <string name="csv_col_drink">Напитка</string>
+    <string name="csv_col_category">Категория</string>
+    <string name="csv_col_volume_ml">Količestvo_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gramy_alkohol</string>
+    <string name="csv_col_note">Бележка</string>
+    <string name="pdf_unit_g_per_day">г/ден</string>
+    <string name="unit_g_per_day">г/ден</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Дни над лимита (СЗО)</string>
+    <string name="days_over_limit_dhs">Дни над лимита (DHS)</string>
+    <string name="days_over_limit_custom">Дни над конфигурирания лимит</string>
+    <string name="drink_days_label">дни с пиене тази седмица</string>
+    <string name="drink_days_setting">Макс. дни с пиене/седмица</string>
+    <string name="drink_days_who_dhs_note">Препоръка: макс. 5 дни с пиене на седмица (≥ 2 дни без алкохол)</string>
+    <string name="weekly_gram_mode_title">Седмичен лимит (грамове)</string>
+    <string name="weekly_gram_mode_desc">Лентата за напредък и индикаторите използват седмичния бюджет (макс. дни с пиене &#215; дневен лимит)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Лични данни</string>
+    <string name="week_starts_on">Седмицата започва в</string>
+</resources>

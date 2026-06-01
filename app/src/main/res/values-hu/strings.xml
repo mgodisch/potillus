@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Hungarian (Magyar)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Ma</string>
+    <string name="calendar">Naptár</string>
+    <string name="statistics">Statisztika</string>
+    <string name="drinks">Italok</string>
+    <string name="settings">Beállítások</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Mai összesen</string>
+    <string name="grams_alcohol">g alkohol</string>
+    <string name="entries_today">Mai bejegyzések</string>
+    <string name="no_entries_today">Ma még nincs bejegyzés.\nÉrintse a + gombot a hozzáadáshoz.</string>
+    <string name="no_entries_day">Erre a napra nincs bejegyzés.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Kedvencek gyors hozzáadása</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">VÉA becslés</string>
+    <string name="bac_disclaimer">Becslés · nem vezetési döntéshez</string>
+    <string name="stats_from_section">Statisztikai időszak</string>
+    <string name="stats_from_label">Statisztika ettől</string>
+    <string name="stats_from_desc">Az ezen dátum előtti bejegyzések ki vannak zárva az összes statisztikából.</string>
+    <string name="bac_section">VÉA becslő (Widmark)</string>
+    <string name="bac_desc">A becsléshez testsúlyra van szükség. Ez matematikai közelítés, nem mérés.</string>
+    <string name="body_weight">Testsúly</string>
+    <string name="not_set">nincs megadva</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Bejegyzés hozzáadása</string>
+    <string name="edit_entry">Bejegyzés szerkesztése</string>
+    <string name="drink">Ital</string>
+    <string name="select_drink">Válasszon italt …</string>
+    <string name="volume_ml">Mennyiség</string>
+    <string name="time">Idő</string>
+    <string name="pure_alcohol">g tiszta alkohol</string>
+    <string name="note">Megjegyzés (nem kötelező)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Ital hozzáadása</string>
+    <string name="edit_drink">Ital szerkesztése</string>
+    <string name="drink_name">Megnevezés</string>
+    <string name="alcohol_percent">Alkoholtartalom</string>
+    <string name="favorite">Kedvenc</string>
+    <string name="no_drinks">Még nincsenek italok megadva.</string>
+    <string name="category">Kategória</string>
+    <string name="category_beer">Sör</string>
+    <string name="category_wine">Bor / Pezsgő</string>
+    <string name="category_spirits">Égetett szeszek</string>
+    <string name="category_longdrink">Longdrink / Mix</string>
+    <string name="category_liqueur">Likőr</string>
+    <string name="category_other">Egyéb</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Alkohol-összefoglaló</string>
+    <string name="pdf_section_kpis">Fő mutatók</string>
+    <string name="pdf_section_months">Havi áttekintés</string>
+    <string name="pdf_section_trend">Hosszú távú trend (átl. g/hó)</string>
+    <string name="pdf_section_categories">Ital-kategóriák</string>
+    <string name="pdf_section_daytime">Fogyasztási minta: napszak</string>
+    <string name="pdf_section_weekday">Hét napjai szerinti profil (átl. g alkohol)</string>
+    <string name="pdf_section_risk">Kockázatos fogyasztás és tartózkodás</string>
+    <string name="pdf_footer1">Csak becslések. Nem vezetési vagy diagnosztikai célokra.</string>
+    <string name="pdf_footer2">A Libellus Potionis (Potillus) alkalmazással készült. Becslések – nem orvosi diagnózis.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Exportálás dátuma</string>
+    <string name="pdf_meta_period">Időszak</string>
+    <string name="pdf_meta_gender">Nem</string>
+    <string name="pdf_meta_limit">Korlát</string>
+    <string name="pdf_meta_weight">Testsúly</string>
+    <string name="pdf_meta_custom_limit">Egyéni</string>
+    <string name="pdf_kpi_total">Összes alkohol</string>
+    <string name="pdf_kpi_avg_day">Átl. naponta</string>
+    <string name="pdf_kpi_avg_drink_day">Átl. ivónaponta</string>
+    <string name="pdf_kpi_drink_days">Ivónapok</string>
+    <string name="pdf_kpi_abstinent_days">Tartózkodási napok</string>
+    <string name="pdf_kpi_over_who">Napok > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Napok > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Ivászati napok (>%1$s g)</string>
+    <string name="pdf_col_month">Hónap</string>
+    <string name="pdf_col_drink_days">Ivónapok</string>
+    <string name="pdf_col_total_g">Összesen g</string>
+    <string name="pdf_col_avg_g_day">Átl. g/nap</string>
+    <string name="pdf_meta_first_drink">Átl. első ital</string>
+    <string name="pdf_meta_last_drink">Átl. utolsó ital</string>
+    <string name="pdf_meta_before_18">Arány 17:00 előtt</string>
+    <string name="pdf_meta_after_18">Arány 17:00 után</string>
+    <string name="pdf_meta_binge_days">Ivászati napok (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Leghosszabb tartózkodási időszak</string>
+    <string name="pdf_meta_current_abstinence">Jelenlegi tartózkodás</string>
+    <string name="pdf_days_suffix">nap</string>
+
+    <!-- Actions -->
+    <string name="save">Mentés</string>
+    <string name="cancel">Mégse</string>
+    <string name="back">Vissza</string>
+    <string name="delete">Törlés</string>
+    <string name="change">Módosítás</string>
+    <string name="delete_confirm">Valóban töröljem: „%1$s“?</string>
+    <string name="no_data">Erre az időszakra nincs adat.</string>
+
+    <!-- Stats -->
+    <string name="week">Hét</string>
+    <string name="month">Hónap</string>
+    <string name="year">Év</string>
+    <string name="total_period">Összesen az időszakban</string>
+    <string name="avg_per_day">Napi átlag</string>
+    <string name="avg_per_drink_day">Napi átlag ivónapon</string>
+    <string name="abstinent_days">Tartózkodási napok</string>
+    <string name="stats_category_breakdown">Kategóriák</string>
+    <string name="streak_trend">Tartózkodás és trend</string>
+    <string name="current_streak">Jelenlegi tartózkodás</string>
+    <string name="longest_streak">Leghosszabb tartózkodás</string>
+    <string name="days_count">%1$d nap</string>
+    <string name="trend_vs_prev">Trend az előző időszakhoz képest</string>
+
+    <!-- Settings -->
+    <string name="appearance">Megjelenés</string>
+    <string name="theme_mode">Színséma</string>
+    <string name="theme_system">Rendszer</string>
+    <string name="theme_day">Világos</string>
+    <string name="theme_night">Sötét</string>
+    <string name="day_change_time">Napváltás ideje</string>
+    <string name="day_starts_at">Az új nap elkezdődik</string>
+    <string name="gender">Nem</string>
+    <string name="male">Férfi</string>
+    <string name="female">Nő</string>
+    <string name="limit_mode">Orvosi iráncikk</string>
+    <string name="limit_who">WHO – kockázati szint</string>
+    <string name="limit_dhs">DHS – alacsony kockázat</string>
+    <string name="limit_custom">Egyéni</string>
+    <string name="custom_limit_grams">Napi limitom grammban</string>
+    <string name="weekly_limit_section">Heti korlát</string>
+    <string name="weekly_limit_enabled">Heti korlát engedélyezése</string>
+    <string name="weekly_limit_grams">Heti korlát grammban</string>
+    <string name="weekly_limit">Hét</string>
+    <string name="biometric">Zárolás</string>
+    <string name="biometric_lock">Biometrikus zárolás</string>
+    <string name="biometric_desc">Az alkalmazás zárolása ujjlenyomattal vagy arccal</string>
+    <string name="language">Nyelv</string>
+    <string name="export">Adatok exportálása</string>
+    <string name="export_desc">Bejegyzések exportálása a Letöltések mappába</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Biztonsági mentés</string>
+    <string name="backup_desc">Teljes biztonsági mentés (bejegyzések + italok) JSON-fájlként</string>
+    <string name="backup_export">Exportálás</string>
+    <string name="backup_import">Importálás</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Hogyan importálódjanak az adatok?</string>
+    <string name="import_replace">Csere</string>
+    <string name="import_merge">Hozzáadás</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Kérjük, hitelesítse magát</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">A WHO (2023) kijelenti: Nincs biztonságos alkoholfogyasztási szint. Az itt megjelenített kockázati érték egy praktikus tájékozódási pont, nem egy biztonsági küszöb.</string>
+    <string name="who_values">Kockázati érték: ♂ ≤ %1$s g, ♀ ≤ %2$s g naponta.</string>
+    <string name="dhs_note">A DHS ajánlja: a férfiak ne igyanak naponta 24 g-nál, a nők ne igyanak 12 g-nál több tiszta alkoholt. Hetente legalább két napnak alkoholmentesnek kell lennie.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">%1$d/%2$d hónap látható – régebbi adatok CSV-ben/biztonsági mentésben</string>
+    <string name="year_calendar_no_entry">nincs bejegyzés</string>
+    <string name="year_calendar_under_limit">korlát alatt</string>
+    <string name="year_calendar_over_limit">korlát felett</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Nincsenek exportálható bejegyzések.</string>
+    <string name="export_failed">Az exportálás nem sikerült.</string>
+    <string name="backup_failed">A biztonsági mentés nem sikerült.</string>
+    <string name="import_success_replace">%1$d bejegyzés importálva.</string>
+    <string name="import_success_merge">%1$d importálva, %2$d átugorva.</string>
+    <string name="import_error_could_not_read">A fájl nem olvasható.</string>
+    <string name="import_error_empty">A biztonsági mentési fájl üres.</string>
+    <string name="import_error_invalid_json">Érvénytelen JSON-formátum.</string>
+    <string name="import_error_version_too_high">A biztonsági mentés verziója %1$d nem támogatott (max. %2$d).</string>
+    <string name="import_error_file_too_large">A biztonsági mentési fájl túl nagy (max. %1$d MB).</string>
+    <string name="import_error_read">Olvasási hiba: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ {count} bejegyzéssel rendelkezik és nem törölhető.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Az ital neve nem lehet üres.</string>
+    <string name="drink_validation_name_too_long">Az ital neve túl hosszú (max. 100 karakter).</string>
+    <string name="drink_validation_volume_range">A mennyiség 1 ml és 10 000 ml között kell legyen.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Az alkoholtartalom 0 % és 100 % között kell legyen.</string>
+    <string name="drink_validation_alcohol_invalid">Az alkoholtartalom nem érvényes szám.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Dátum</string>
+    <string name="csv_col_time">Idő</string>
+    <string name="csv_col_drink">Ital</string>
+    <string name="csv_col_category">Kategória</string>
+    <string name="csv_col_volume_ml">Mennyiség_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gramm_alkohol</string>
+    <string name="csv_col_note">Megjegyzés</string>
+    <string name="pdf_unit_g_per_day">g/nap</string>
+    <string name="unit_g_per_day">g/nap</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Limit feletti napok (WHO)</string>
+    <string name="days_over_limit_dhs">Limit feletti napok (DHS)</string>
+    <string name="days_over_limit_custom">Konfigurált limit feletti napok</string>
+    <string name="drink_days_label">ivónapok ezen a héten</string>
+    <string name="drink_days_setting">Max. ivónapok/hét</string>
+    <string name="drink_days_who_dhs_note">Javaslat: max. 5 ivónap hetente (≥ 2 alkoholmentes nap)</string>
+    <string name="weekly_gram_mode_title">Heti gramm-korlát</string>
+    <string name="weekly_gram_mode_desc">A folyamatjelző és az indikátorok a heti keretet használják (max. ivónapok &#215; napi korlát)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Személyes adatok</string>
+    <string name="week_starts_on">A hét kezdőnapja</string>
+</resources>

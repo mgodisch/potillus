@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Estonian (Eesti)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Täna</string>
+    <string name="calendar">Kalender</string>
+    <string name="statistics">Statistika</string>
+    <string name="drinks">Joogid</string>
+    <string name="settings">Seaded</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Kokku täna</string>
+    <string name="grams_alcohol">g alkoholi</string>
+    <string name="entries_today">Kanded täna</string>
+    <string name="no_entries_today">Täna pole ühtki kannet.\nPuudutage + lisamiseks.</string>
+    <string name="no_entries_day">Sellel päeval pole kandeid.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Lemmikute kiire lisamine</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">VAS-i hinnang</string>
+    <string name="bac_disclaimer">Hinnang · mitte sõiduotsusteks</string>
+    <string name="stats_from_section">Statistikaperiood</string>
+    <string name="stats_from_label">Statistika alates</string>
+    <string name="stats_from_desc">Kanded enne seda kuupäeva jäetakse kõikidest statistikatest välja.</string>
+    <string name="bac_section">VAS-i hindaja (Widmark)</string>
+    <string name="bac_desc">Hinnangu jaoks on vajalik kehakaal. See on matemaatiline lähend, mitte mõõtmine.</string>
+    <string name="body_weight">Kehakaal</string>
+    <string name="not_set">seadistamata</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Lisa kanne</string>
+    <string name="edit_entry">Muuda kannet</string>
+    <string name="drink">Jook</string>
+    <string name="select_drink">Vali jook …</string>
+    <string name="volume_ml">Kogus</string>
+    <string name="time">Kellaaeg</string>
+    <string name="pure_alcohol">g puhast alkoholi</string>
+    <string name="note">Märkus (valikuline)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Lisa jook</string>
+    <string name="edit_drink">Muuda jooki</string>
+    <string name="drink_name">Nimetus</string>
+    <string name="alcohol_percent">Alkoholisisaldus</string>
+    <string name="favorite">Lemmik</string>
+    <string name="no_drinks">Jooke pole veel määratud.</string>
+    <string name="category">Kategooria</string>
+    <string name="category_beer">Õlu</string>
+    <string name="category_wine">Vein / Vahuvein</string>
+    <string name="category_spirits">Kanged alkohoolid</string>
+    <string name="category_longdrink">Longdrink / Segu</string>
+    <string name="category_liqueur">Liköör</string>
+    <string name="category_other">Muu</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Alkoholi kokkuvõte</string>
+    <string name="pdf_section_kpis">Põhinäitajad</string>
+    <string name="pdf_section_months">Kuine ülevaade</string>
+    <string name="pdf_section_trend">Pikaajaline trend (kesk. g/kuu)</string>
+    <string name="pdf_section_categories">Jookide kategooriad</string>
+    <string name="pdf_section_daytime">Tarbimine: kellaaeg</string>
+    <string name="pdf_section_weekday">Nädalapäeva profiil (kesk. g alkoholi)</string>
+    <string name="pdf_section_risk">Riskantsed tarbimine ja hoidumine</string>
+    <string name="pdf_footer1">Ainult hinnangud. Mitte sõitmiseks ega diagnostilistel eesmärkidel.</string>
+    <string name="pdf_footer2">Loodud rakendusega Libellus Potionis (Potillus). Hinnangud – mitte meditsiiniline diagnoos.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Ekspordikuupäev</string>
+    <string name="pdf_meta_period">Periood</string>
+    <string name="pdf_meta_gender">Sugu</string>
+    <string name="pdf_meta_limit">Limiit</string>
+    <string name="pdf_meta_weight">Kehakaal</string>
+    <string name="pdf_meta_custom_limit">Kohandatud</string>
+    <string name="pdf_kpi_total">Kogu alkohol</string>
+    <string name="pdf_kpi_avg_day">Keskm. päevas</string>
+    <string name="pdf_kpi_avg_drink_day">Keskm. joomispäevas</string>
+    <string name="pdf_kpi_drink_days">Joomispäevad</string>
+    <string name="pdf_kpi_abstinent_days">Hoidumispäevad</string>
+    <string name="pdf_kpi_over_who">Päevad > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Päevad > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Liigjoomispäevad (>%1$s g)</string>
+    <string name="pdf_col_month">Kuu</string>
+    <string name="pdf_col_drink_days">Joomispäevad</string>
+    <string name="pdf_col_total_g">Kokku g</string>
+    <string name="pdf_col_avg_g_day">Keskm. g/päev</string>
+    <string name="pdf_meta_first_drink">Kesk. esimene jook</string>
+    <string name="pdf_meta_last_drink">Kesk. viimane jook</string>
+    <string name="pdf_meta_before_18">Osakaal enne 17:00</string>
+    <string name="pdf_meta_after_18">Osakaal alates 17:00</string>
+    <string name="pdf_meta_binge_days">Liigjoomispäevad (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Pikim hoidumisperiood</string>
+    <string name="pdf_meta_current_abstinence">Praegune hoidumine</string>
+    <string name="pdf_days_suffix">päeva</string>
+
+    <!-- Actions -->
+    <string name="save">Salvesta</string>
+    <string name="cancel">Tühista</string>
+    <string name="back">Tagasi</string>
+    <string name="delete">Kustuta</string>
+    <string name="change">Muuda</string>
+    <string name="delete_confirm">Kustutada „%1$s“?</string>
+    <string name="no_data">Selle perioodi kohta pole andmeid.</string>
+
+    <!-- Stats -->
+    <string name="week">Nädal</string>
+    <string name="month">Kuu</string>
+    <string name="year">Aasta</string>
+    <string name="total_period">Kokku perioodi jooksul</string>
+    <string name="avg_per_day">Keskmine päevas</string>
+    <string name="avg_per_drink_day">Keskmine joomispäevas</string>
+    <string name="abstinent_days">Hoidumispäevad</string>
+    <string name="stats_category_breakdown">Kategooriad</string>
+    <string name="streak_trend">Hoidumine ja trend</string>
+    <string name="current_streak">Praegune hoidumine</string>
+    <string name="longest_streak">Pikim hoidumisperiood</string>
+    <string name="days_count">%1$d päeva</string>
+    <string name="trend_vs_prev">Trend võrreldes eelmise perioodiga</string>
+
+    <!-- Settings -->
+    <string name="appearance">Välimus</string>
+    <string name="theme_mode">Värviskeemi</string>
+    <string name="theme_system">Süsteem</string>
+    <string name="theme_day">Hele</string>
+    <string name="theme_night">Tume</string>
+    <string name="day_change_time">Päevavahetuse kellaaeg</string>
+    <string name="day_starts_at">Uus päev algab kell</string>
+    <string name="gender">Sugu</string>
+    <string name="male">Mees</string>
+    <string name="female">Naine</string>
+    <string name="limit_mode">Meditsiiniline juhend</string>
+    <string name="limit_who">WHO – riskitase</string>
+    <string name="limit_dhs">DHS – madal risk</string>
+    <string name="limit_custom">Kohandatud</string>
+    <string name="custom_limit_grams">Minu päevane limiit grammides</string>
+    <string name="weekly_limit_section">Nädalane limiit</string>
+    <string name="weekly_limit_enabled">Luba nädalane limiit</string>
+    <string name="weekly_limit_grams">Nädalane limiit grammides</string>
+    <string name="weekly_limit">Nädal</string>
+    <string name="biometric">Luku</string>
+    <string name="biometric_lock">Biomeetriline luku</string>
+    <string name="biometric_desc">Lukusta rakendus sõrmejälje või näoga</string>
+    <string name="language">Keel</string>
+    <string name="export">Andmete eksport</string>
+    <string name="export_desc">Ekspordi kanded kausta Allalaadimised</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Varukoopia</string>
+    <string name="backup_desc">Täielik varukoopia (kanded + joogid) JSON-failina</string>
+    <string name="backup_export">Ekspordi</string>
+    <string name="backup_import">Impordi</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Kuidas andmeid importida?</string>
+    <string name="import_replace">Asenda</string>
+    <string name="import_merge">Lisa</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Palun autentige</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">WHO (2023) kinnitab: Alkoholi tarbimiseks pole turvalist taset. Siin kuvatud riskiväärtus on praktiline viitetase, mitte ohutuslävi.</string>
+    <string name="who_values">Riskiväärtus: ♂ ≤ %1$s g, ♀ ≤ %2$s g päevas.</string>
+    <string name="dhs_note">DHS soovitab: mehed ei tohiks juua rohkem kui 24 g, naised mitte rohkem kui 12 g puhast alkoholi päevas. Vähemalt kaks päeva nädalas peaks olema alkoholivabad.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Näidatakse %1$d/%2$d kuud – vanemad andmed on CSV-s/varukopias</string>
+    <string name="year_calendar_no_entry">kanne puudub</string>
+    <string name="year_calendar_under_limit">alla limiidi</string>
+    <string name="year_calendar_over_limit">limiidist üle</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Pole kandeid eksportimiseks.</string>
+    <string name="export_failed">Eksport ebaõnnestus.</string>
+    <string name="backup_failed">Varukoopia loomine ebaõnnestus.</string>
+    <string name="import_success_replace">%1$d kannet imporditud.</string>
+    <string name="import_success_merge">%1$d imporditud, %2$d vahele jäetud.</string>
+    <string name="import_error_could_not_read">Faili ei saa lugeda.</string>
+    <string name="import_error_empty">Varukoopiafail on tühi.</string>
+    <string name="import_error_invalid_json">Vigane JSON-formaat.</string>
+    <string name="import_error_version_too_high">Varukoopiavesrsioon %1$d ei ole toetatud (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Varukoopiafail on liiga suur (maks. %1$d MB).</string>
+    <string name="import_error_read">Lugemistõrge: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ on {count} kannet ja seda ei saa kustutada.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Joogi nimi ei tohi olla tühi.</string>
+    <string name="drink_validation_name_too_long">Joogi nimi on liiga pikk (maks. 100 tähemärki).</string>
+    <string name="drink_validation_volume_range">Kogus peab olema vahemikus 1 ml kuni 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Alkoholisisaldus peab olema vahemikus 0 % kuni 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Alkoholisisaldus ei ole kehtiv arv.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Kuupäev</string>
+    <string name="csv_col_time">Kellaaeg</string>
+    <string name="csv_col_drink">Jook</string>
+    <string name="csv_col_category">Kategooria</string>
+    <string name="csv_col_volume_ml">Kogus_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Grammid_alkoholi</string>
+    <string name="csv_col_note">Märkus</string>
+    <string name="pdf_unit_g_per_day">g/päev</string>
+    <string name="unit_g_per_day">g/päev</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Päevad üle piiri (WHO)</string>
+    <string name="days_over_limit_dhs">Päevad üle piiri (DHS)</string>
+    <string name="days_over_limit_custom">Päevad üle seadistatud piiri</string>
+    <string name="drink_days_label">joomispäevad sel nädalal</string>
+    <string name="drink_days_setting">Maks. joomispäevad/nädal</string>
+    <string name="drink_days_who_dhs_note">Soovitus: maks. 5 joomispäeva nädalas (≥ 2 alkoholivaba päeva)</string>
+    <string name="weekly_gram_mode_title">Nädalane grammipiirang</string>
+    <string name="weekly_gram_mode_desc">Edenemisnäidik ja indikaatorid kasutavad nädalast eelarvet (maks. joomispäevad &#215; päevalimiit)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Isikuandmed</string>
+    <string name="week_starts_on">Nädal algab</string>
+</resources>

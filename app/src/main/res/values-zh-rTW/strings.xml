@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Chinese, Traditional — zh-TW
+    Script : Traditional Chinese characters (繁體中文); LTR (mixed LTR/vertical
+             in print, but Android uses horizontal LTR layout for UI strings).
+    Approx.: ~25 M speakers (Taiwan, Hong Kong, Macau; global diaspora).
+    Register: Standard Modern Mandarin as written in Taiwan (國語; using ROC
+              orthographic conventions).  Hong Kong usage differs primarily in
+              vocabulary loanwords; the Taiwan register is the wider standard.
+    Android qualifier: values-zh-rTW (Android resource syntax; BCP-47 tag is
+              "zh-TW").
+    Notes  : Traditional characters differ substantially from Simplified (zh-CN)
+             in stroke count and in some cases in meaning; this file must NOT
+             be derived by automatic conversion from values-zh-rCN.  All strings
+             are independently translated.
+             "Binge drinking" → 酗酒 / 豪飲 — the clinical term 豪飲 is preferred
+             in formal health contexts; 酗酒 carries a stronger negative
+             connotation and is used colloquially.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">今天</string>
+    <string name="calendar">行事曆</string>
+    <string name="statistics">統計</string>
+    <string name="drinks">飲品</string>
+    <string name="settings">設定</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">今日總計</string>
+    <string name="grams_alcohol">公克 酒精</string>
+    <string name="entries_today">今日記錄</string>
+    <string name="no_entries_today">今天尚無記錄。\n點擊 + 新增記錄。</string>
+    <string name="no_entries_day">此日無記錄。</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">快速新增最愛</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC 估算</string>
+    <string name="bac_disclaimer">估算值・不適用於駕駛判斷</string>
+    <string name="stats_from_section">統計期間</string>
+    <string name="stats_from_label">統計起始日</string>
+    <string name="stats_from_desc">此日期之前的記錄將從所有統計中排除。</string>
+    <string name="bac_section">BAC 估算器（Widmark）</string>
+    <string name="bac_desc">估算需要體重數值。此為數學近似值，並非實際測量結果。</string>
+    <string name="body_weight">體重</string>
+    <string name="not_set">未設定</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">新增記錄</string>
+    <string name="edit_entry">編輯記錄</string>
+    <string name="drink">飲品</string>
+    <string name="select_drink">選擇飲品……</string>
+    <string name="volume_ml">份量</string>
+    <string name="time">時間</string>
+    <string name="pure_alcohol">公克 純酒精</string>
+    <string name="note">備注（選填）</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">新增飲品</string>
+    <string name="edit_drink">編輯飲品</string>
+    <string name="drink_name">名稱</string>
+    <string name="alcohol_percent">酒精濃度</string>
+    <string name="favorite">最愛</string>
+    <string name="no_drinks">尚未定義任何飲品。</string>
+    <string name="category">類別</string>
+    <string name="category_beer">啤酒</string>
+    <string name="category_wine">葡萄酒／氣泡酒</string>
+    <string name="category_spirits">烈酒</string>
+    <string name="category_longdrink">長飲／調酒</string>
+    <string name="category_liqueur">利口酒</string>
+    <string name="category_other">其他</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">飲酒摘要</string>
+    <string name="pdf_section_kpis">關鍵數據</string>
+    <string name="pdf_section_months">每月概覽</string>
+    <string name="pdf_section_trend">長期趨勢（平均 公克／月）</string>
+    <string name="pdf_section_categories">飲品類別</string>
+    <string name="pdf_section_daytime">飲用模式：一天時段</string>
+    <string name="pdf_section_weekday">星期分布（平均 公克 酒精）</string>
+    <string name="pdf_section_risk">高風險飲用 &amp; 戒酒</string>
+    <string name="pdf_footer1">僅供估算。不適用於駕駛判斷或診斷目的。</string>
+    <string name="pdf_footer2">由 Libellus Potionis（Potillus）產生。估算值──並非醫療診斷。</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">匯出日期</string>
+    <string name="pdf_meta_period">期間</string>
+    <string name="pdf_meta_gender">性別</string>
+    <string name="pdf_meta_limit">限制值</string>
+    <string name="pdf_meta_weight">體重</string>
+    <string name="pdf_meta_custom_limit">自訂</string>
+    <string name="pdf_kpi_total">總酒精攝取量</string>
+    <string name="pdf_kpi_avg_day">每日平均</string>
+    <string name="pdf_kpi_avg_drink_day">飲酒日平均</string>
+    <string name="pdf_kpi_drink_days">飲酒日數</string>
+    <string name="pdf_kpi_abstinent_days">戒酒日數</string>
+    <string name="pdf_kpi_over_who">超過 WHO 天數（%1$s 公克）</string>
+    <string name="pdf_kpi_over_dhs">超過 DHS 天數（%1$s 公克）</string>
+    <string name="pdf_kpi_binge">豪飲日數（>%1$s 公克）</string>
+    <string name="pdf_col_month">月份</string>
+    <string name="pdf_col_drink_days">飲酒日數</string>
+    <string name="pdf_col_total_g">總計 公克</string>
+    <string name="pdf_col_avg_g_day">平均 公克／日</string>
+    <string name="pdf_meta_first_drink">平均首杯時間</string>
+    <string name="pdf_meta_last_drink">平均末杯時間</string>
+    <string name="pdf_meta_before_18">17:00 前比例</string>
+    <string name="pdf_meta_after_18">17:00 後比例</string>
+    <string name="pdf_meta_binge_days">豪飲日數（>%1$s 公克）</string>
+    <string name="pdf_meta_longest_abstinence">最長戒酒期</string>
+    <string name="pdf_meta_current_abstinence">目前戒酒期</string>
+    <string name="pdf_days_suffix">天</string>
+
+    <!-- Actions -->
+    <string name="save">儲存</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+    <string name="delete">刪除</string>
+    <string name="change">修改</string>
+    <string name="delete_confirm">確定要刪除「%1$s」嗎？</string>
+    <string name="no_data">此期間無資料。</string>
+
+    <!-- Stats -->
+    <string name="week">週</string>
+    <string name="month">月</string>
+    <string name="year">年</string>
+    <string name="total_period">期間總計</string>
+    <string name="avg_per_day">每日平均</string>
+    <string name="avg_per_drink_day">每個飲酒日平均</string>
+    <string name="abstinent_days">戒酒日數</string>
+    <string name="stats_category_breakdown">類別</string>
+    <string name="streak_trend">戒酒 &amp; 趨勢</string>
+    <string name="current_streak">目前戒酒期</string>
+    <string name="longest_streak">最長戒酒期</string>
+    <string name="days_count">%1$d 天</string>
+    <string name="trend_vs_prev">與上一期間相比趨勢</string>
+
+    <!-- Settings -->
+    <string name="appearance">外觀</string>
+    <string name="theme_mode">顏色主題</string>
+    <string name="theme_system">跟隨系統</string>
+    <string name="theme_day">淺色</string>
+    <string name="theme_night">深色</string>
+    <string name="day_change_time">換日時間</string>
+    <string name="day_starts_at">新一天從以下時間開始</string>
+    <string name="gender">性別</string>
+    <string name="male">男性</string>
+    <string name="female">女性</string>
+    <string name="limit_mode">醫療準則</string>
+    <string name="limit_who">WHO──風險值</string>
+    <string name="limit_dhs">DHS──低風險</string>
+    <string name="limit_custom">自訂</string>
+    <string name="custom_limit_grams">我的每日限制（公克）</string>
+    <string name="weekly_limit_section">每週限制</string>
+    <string name="weekly_limit_enabled">啟用每週限制</string>
+    <string name="weekly_limit_grams">每週限制（公克）</string>
+    <string name="weekly_limit">週</string>
+    <string name="biometric">存取鎖定</string>
+    <string name="biometric_lock">生物辨識鎖定</string>
+    <string name="biometric_desc">以指紋或臉部辨識鎖定應用程式</string>
+    <string name="language">語言</string>
+    <string name="export">資料匯出</string>
+    <string name="export_desc">將記錄匯出至下載資料夾</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">備份</string>
+    <string name="backup_desc">完整備份（記錄 + 飲品）為 JSON 檔案</string>
+    <string name="backup_export">匯出</string>
+    <string name="backup_import">匯入</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">資料應如何匯入？</string>
+    <string name="import_replace">取代</string>
+    <string name="import_merge">新增</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">請進行身份驗證</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO（2023）指出：飲酒沒有安全劑量。此處顯示的風險值為實用參考基準，並非安全閾值。</string>
+    <string name="who_values">風險值：♂ ≤ %1$s g，♀ ≤ %2$s g／天。</string>
+    <string name="pdf_months_truncated">顯示 %2$d 個月中的 %1$d 個──較舊的資料可在 CSV／備份中取得</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">無記錄</string>
+    <string name="year_calendar_under_limit">低於限制</string>
+    <string name="year_calendar_over_limit">超過限制</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">沒有可匯出的記錄。</string>
+    <string name="export_failed">匯出失敗。</string>
+    <string name="backup_failed">備份失敗。</string>
+    <string name="import_success_replace">已匯入 %1$d 筆記錄。</string>
+    <string name="import_success_merge">已匯入 %1$d 筆，略過 %2$d 筆。</string>
+    <string name="import_error_could_not_read">無法讀取檔案。</string>
+    <string name="import_error_empty">備份檔案為空。</string>
+    <string name="import_error_invalid_json">無效的 JSON 格式。</string>
+    <string name="import_error_version_too_high">不支援備份版本 %1$d（最高 %2$d）。</string>
+    <string name="import_error_file_too_large">備份檔案過大（最大 %1$d MB）。</string>
+    <string name="import_error_read">讀取錯誤：%1$s</string>
+    <string name="drink_delete_blocked">\u300c{name}\u300d 有 {count} 筆記錄，無法刪除。</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">飲品名稱不能為空白。</string>
+    <string name="drink_validation_name_too_long">飲品名稱過長（最多 100 個字元）。</string>
+    <string name="drink_validation_volume_range">份量必須在 1 毫升至 10,000 毫升之間。</string>
+    <string name="drink_validation_alcohol_range" formatted="false">酒精濃度必須在 0% 至 100% 之間。</string>
+    <string name="drink_validation_alcohol_invalid">酒精濃度非有效數字。</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">日期</string>
+    <string name="csv_col_time">時間</string>
+    <string name="csv_col_drink">飲品</string>
+    <string name="csv_col_category">類別</string>
+    <string name="csv_col_volume_ml">份量_毫升</string>
+    <string name="csv_col_alcohol_pct">酒精_%</string>
+    <string name="csv_col_grams">公克_酒精</string>
+    <string name="csv_col_note">備注</string>
+    <string name="pdf_unit_g_per_day">公克／天</string>
+    <string name="unit_g_per_day">公克／天</string>
+
+    <string name="days_over_limit_who">超過限制天數（WHO）</string>
+    <string name="days_over_limit_dhs">超過限制天數（DHS）</string>
+    <string name="days_over_limit_custom">超過設定限制天數</string>
+    <string name="dhs_note">DHS 建議：男性每日純酒精攝取量不應超過 24 公克，女性不應超過 12 公克。每週應至少有兩天不飲酒。</string>
+    <string name="drink_days_label">本週飲酒日數</string>
+    <string name="drink_days_setting">每週最多飲酒日數</string>
+    <string name="drink_days_who_dhs_note">建議：每週最多 5 個飲酒日（≥ 2 個戒酒日）</string>
+    <string name="weekly_gram_mode_title">每週公克限制</string>
+    <string name="weekly_gram_mode_desc">進度列與指示燈使用每週預算（最多飲酒日數 &#215; 每日限制）</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">個人資料</string>
+    <string name="week_starts_on">一週開始於</string>
+</resources>

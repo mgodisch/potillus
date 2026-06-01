@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Vietnamese (vi) — translated from values-de/ (German source of truth).
+
+    Script notes:
+    • Vietnamese uses an extended Latin alphabet (Chữ Quốc ngữ) with a large
+      set of combining diacritics: acute (´), grave (`), hook (̉), tilde (~),
+      and dot-below (.) applied to six base vowels (a, ă, â, e, ê, i, o, ô,
+      ơ, u, ư, y) plus the letter đ. All characters are Unicode and render
+      correctly on Android without extra font configuration.
+    • Register: polite (lịch sự) using "bạn" (you, informal-polite) as is
+      standard for Vietnamese consumer app UIs.
+    • "Binge drinking" → uống quá nhiều (public-health phrasing in Vietnamese).
+    • DHS is kept as "DHS"; WHO as "WHO" (both used in Vietnamese public health).
+    • day_change_time_value: Vietnamese uses no clock suffix in 24-hour format;
+      HH:MM is used as-is.
+    • Tonal marks are essential for meaning — every diacritic must be preserved
+      exactly. Do NOT strip diacritics when editing this file.
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Hôm nay</string>
+    <string name="calendar">Lịch</string>
+    <string name="statistics">Thống kê</string>
+    <string name="drinks">Đồ uống</string>
+    <string name="settings">Cài đặt</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Tổng hôm nay</string>
+    <string name="grams_alcohol">g cồn</string>
+    <string name="entries_today">Mục nhập hôm nay</string>
+    <string name="no_entries_today">Chưa có mục nhập hôm nay.\nNhấn + để thêm mục nhập.</string>
+    <string name="no_entries_day">Không có mục nhập cho ngày này.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Thêm yêu thích nhanh</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Ước tính nồng độ cồn trong máu</string>
+    <string name="bac_disclaimer">Ước tính · không dùng để quyết định lái xe</string>
+    <string name="stats_from_section">Khoảng thời gian thống kê</string>
+    <string name="stats_from_label">Thống kê từ ngày</string>
+    <string name="stats_from_desc">Các mục nhập trước ngày này sẽ bị loại khỏi mọi thống kê.</string>
+    <string name="bac_section">Ước tính nồng độ cồn (Widmark)</string>
+    <string name="bac_desc">Cần có cân nặng để ước tính. Giá trị này là xấp xỉ toán học, không phải phép đo.</string>
+    <string name="body_weight">Cân nặng</string>
+    <string name="not_set">chưa đặt</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Thêm mục nhập</string>
+    <string name="edit_entry">Sửa mục nhập</string>
+    <string name="drink">Đồ uống</string>
+    <string name="select_drink">Chọn đồ uống…</string>
+    <string name="volume_ml">Số lượng</string>
+    <string name="time">Thời gian</string>
+    <string name="pure_alcohol">g cồn nguyên chất</string>
+    <string name="note">Ghi chú (tùy chọn)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Thêm đồ uống</string>
+    <string name="edit_drink">Sửa đồ uống</string>
+    <string name="drink_name">Tên</string>
+    <string name="alcohol_percent">Hàm lượng cồn</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="no_drinks">Chưa có đồ uống nào được xác định.</string>
+    <string name="category">Danh mục</string>
+    <string name="category_beer">Bia</string>
+    <string name="category_wine">Rượu vang / Sủi bọt</string>
+    <string name="category_spirits">Rượu mạnh</string>
+    <string name="category_longdrink">Đồ uống dài / Pha trộn</string>
+    <string name="category_liqueur">Rượu mùi</string>
+    <string name="category_other">Khác</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Tóm tắt tiêu thụ cồn</string>
+    <string name="pdf_section_kpis">Dữ liệu chính</string>
+    <string name="pdf_section_months">Tổng quan theo tháng</string>
+    <string name="pdf_section_trend">Xu hướng dài hạn (trung bình g/tháng)</string>
+    <string name="pdf_section_categories">Danh mục đồ uống</string>
+    <string name="pdf_section_daytime">Mô hình tiêu thụ: thời điểm trong ngày</string>
+    <string name="pdf_section_weekday">Hồ sơ theo ngày trong tuần (trung bình g cồn)</string>
+    <string name="pdf_section_risk">Tiêu thụ có rủi ro &amp; Kiêng rượu</string>
+    <string name="pdf_footer1">Chỉ là ước tính. Không dùng cho mục đích lái xe hoặc chẩn đoán.</string>
+    <string name="pdf_footer2">Được tạo bằng Libellus Potionis (Potillus). Ước tính – không phải chẩn đoán y tế.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Ngày xuất</string>
+    <string name="pdf_meta_period">Khoảng thời gian</string>
+    <string name="pdf_meta_gender">Giới tính</string>
+    <string name="pdf_meta_limit">Giới hạn</string>
+    <string name="pdf_meta_weight">Cân nặng</string>
+    <string name="pdf_meta_custom_limit">Tùy chỉnh</string>
+    <string name="pdf_kpi_total">Tổng cồn</string>
+    <string name="pdf_kpi_avg_day">Trung bình mỗi ngày</string>
+    <string name="pdf_kpi_avg_drink_day">Trung bình mỗi ngày uống</string>
+    <string name="pdf_kpi_drink_days">Ngày uống rượu</string>
+    <string name="pdf_kpi_abstinent_days">Ngày kiêng rượu</string>
+    <string name="pdf_kpi_over_who">Ngày vượt WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Ngày vượt DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Ngày uống quá nhiều (>%1$s g)</string>
+    <string name="pdf_col_month">Tháng</string>
+    <string name="pdf_col_drink_days">Ngày uống</string>
+    <string name="pdf_col_total_g">Tổng g</string>
+    <string name="pdf_col_avg_g_day">Trung bình g/ngày</string>
+    <string name="pdf_meta_first_drink">Lần uống đầu (trung bình)</string>
+    <string name="pdf_meta_last_drink">Lần uống cuối (trung bình)</string>
+    <string name="pdf_meta_before_18">Tỷ lệ trước 17:00</string>
+    <string name="pdf_meta_after_18">Tỷ lệ từ 17:00</string>
+    <string name="pdf_meta_binge_days">Ngày uống quá nhiều (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Giai đoạn kiêng rượu dài nhất</string>
+    <string name="pdf_meta_current_abstinence">Kiêng rượu hiện tại</string>
+    <string name="pdf_days_suffix">ngày</string>
+
+    <!-- Actions -->
+    <string name="save">Lưu</string>
+    <string name="cancel">Hủy</string>
+    <string name="back">Quay lại</string>
+    <string name="delete">Xóa</string>
+    <string name="change">Thay đổi</string>
+    <string name="delete_confirm">Xóa "%1$s"?</string>
+    <string name="no_data">Không có dữ liệu cho khoảng thời gian này.</string>
+
+    <!-- Stats -->
+    <string name="week">Tuần</string>
+    <string name="month">Tháng</string>
+    <string name="year">Năm</string>
+    <string name="total_period">Tổng trong khoảng thời gian</string>
+    <string name="avg_per_day">Trung bình mỗi ngày</string>
+    <string name="avg_per_drink_day">Trung bình mỗi ngày uống</string>
+    <string name="abstinent_days">Ngày kiêng rượu</string>
+    <string name="stats_category_breakdown">Danh mục</string>
+    <string name="streak_trend">Kiêng rượu &amp; Xu hướng</string>
+    <string name="current_streak">Kiêng rượu hiện tại</string>
+    <string name="longest_streak">Kiêng rượu dài nhất</string>
+    <string name="days_count">%1$d ngày</string>
+    <string name="trend_vs_prev">Xu hướng so với kỳ trước</string>
+
+    <!-- Settings -->
+    <string name="appearance">Giao diện</string>
+    <string name="theme_mode">Bảng màu</string>
+    <string name="theme_system">Hệ thống</string>
+    <string name="theme_day">Sáng</string>
+    <string name="theme_night">Tối</string>
+    <string name="day_change_time">Thời điểm đổi ngày</string>
+    <string name="day_starts_at">Ngày mới bắt đầu lúc</string>
+    <string name="gender">Giới tính</string>
+    <string name="male">Nam</string>
+    <string name="female">Nữ</string>
+    <string name="limit_mode">Hướng dẫn y tế</string>
+    <string name="limit_who">WHO – mức rủi ro</string>
+    <string name="limit_dhs">DHS – rủi ro thấp</string>
+    <string name="limit_custom">Tùy chỉnh</string>
+    <string name="custom_limit_grams">Giới hạn hàng ngày của tôi (gam)</string>
+    <string name="weekly_limit_section">Giới hạn hàng tuần</string>
+    <string name="weekly_limit_enabled">Bật giới hạn hàng tuần</string>
+    <string name="weekly_limit_grams">Giới hạn hàng tuần (gam)</string>
+    <string name="weekly_limit">Tuần</string>
+    <string name="biometric">Khóa truy cập</string>
+    <string name="biometric_lock">Khóa sinh trắc học</string>
+    <string name="biometric_desc">Khóa ứng dụng bằng vân tay hoặc nhận dạng khuôn mặt</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="export">Xuất dữ liệu</string>
+    <string name="export_desc">Xuất các mục nhập vào thư mục Tải xuống</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Sao lưu</string>
+    <string name="backup_desc">Sao lưu đầy đủ (mục nhập + đồ uống) dưới dạng tệp JSON</string>
+    <string name="backup_export">Xuất</string>
+    <string name="backup_import">Nhập</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Nhập dữ liệu như thế nào?</string>
+    <string name="import_replace">Thay thế</string>
+    <string name="import_merge">Thêm vào</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Vui lòng xác thực</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) khẳng định: Không có mức độ tiêu thụ cồn nào là an toàn. Giá trị rủi ro hiển thị ở đây là điểm tham chiếu thực tế, không phải ngưỡng an toàn.</string>
+    <string name="who_values">Giá trị rủi ro: ♂ ≤ %1$s g, ♀ ≤ %2$s g mỗi ngày.</string>
+    <string name="pdf_months_truncated">Hiển thị %1$d trong %2$d tháng – dữ liệu cũ hơn có trong CSV/sao lưu</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">không có mục nhập</string>
+    <string name="year_calendar_under_limit">dưới giới hạn</string>
+    <string name="year_calendar_over_limit">trên giới hạn</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Không có mục nhập nào để xuất.</string>
+    <string name="export_failed">Xuất thất bại.</string>
+    <string name="backup_failed">Sao lưu thất bại.</string>
+    <string name="import_success_replace">Đã nhập %1$d mục nhập.</string>
+    <string name="import_success_merge">Đã nhập %1$d, bỏ qua %2$d.</string>
+    <string name="import_error_could_not_read">Không thể đọc tệp.</string>
+    <string name="import_error_empty">Tệp sao lưu trống.</string>
+    <string name="import_error_invalid_json">Định dạng JSON không hợp lệ.</string>
+    <string name="import_error_version_too_high">Phiên bản sao lưu %1$d không được hỗ trợ (tối đa %2$d).</string>
+    <string name="import_error_file_too_large">Tệp sao lưu quá lớn (tối đa %1$d MB).</string>
+    <string name="import_error_read">Lỗi đọc: %1$s</string>
+    <string name="drink_delete_blocked">"{name}" có {count} mục nhập và không thể xóa.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Tên đồ uống không được để trống.</string>
+    <string name="drink_validation_name_too_long">Tên đồ uống quá dài (tối đa 100 ký tự).</string>
+    <string name="drink_validation_volume_range">Số lượng phải từ 1 ml đến 10.000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Hàm lượng cồn phải từ 0% đến 100%.</string>
+    <string name="drink_validation_alcohol_invalid">Hàm lượng cồn không phải là số hợp lệ.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Ngày</string>
+    <string name="csv_col_time">Thời gian</string>
+    <string name="csv_col_drink">Đồ uống</string>
+    <string name="csv_col_category">Danh mục</string>
+    <string name="csv_col_volume_ml">Số_lượng_ml</string>
+    <string name="csv_col_alcohol_pct">Cồn_%</string>
+    <string name="csv_col_grams">Gam_cồn</string>
+    <string name="csv_col_note">Ghi chú</string>
+    <string name="pdf_unit_g_per_day">g/ngày</string>
+    <string name="unit_g_per_day">g/ngày</string>
+
+    <string name="days_over_limit_who">Ngày vượt giới hạn WHO</string>
+    <string name="days_over_limit_dhs">Ngày vượt giới hạn DHS</string>
+    <string name="days_over_limit_custom">Ngày vượt giới hạn tùy chỉnh</string>
+    <string name="dhs_note">Khuyến nghị DHS: Nam giới không nên uống quá 24 g và nữ giới không quá 12 g cồn nguyên chất mỗi ngày. Nên có ít nhất hai ngày không uống rượu mỗi tuần.</string>
+    <string name="drink_days_label">Ngày uống rượu trong tuần này</string>
+    <string name="drink_days_setting">Số ngày uống tối đa/tuần</string>
+    <string name="drink_days_who_dhs_note">Khuyến nghị: tối đa 5 ngày uống mỗi tuần (≥ 2 ngày kiêng)</string>
+    <string name="weekly_gram_mode_title">Giới hạn gam hàng tuần</string>
+    <string name="weekly_gram_mode_desc">Thanh tiến trình và chỉ báo dựa trên ngân sách hàng tuần (số ngày uống tối đa &#215; giới hạn hàng ngày)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Dữ liệu cá nhân</string>
+    <string name="week_starts_on">Tuần bắt đầu vào</string>
+</resources>

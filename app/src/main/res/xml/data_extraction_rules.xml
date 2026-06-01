@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!--
+        Cloud backup (Android 12+, relevant if allowBackup is ever set to true):
+        Exclude the database and DataStore file – both contain personal health data.
+        NOTE: domain="datastore" (not "sharedpref") – this app uses Jetpack DataStore,
+        whose backing file sits in the datastore/ subdirectory, not shared_prefs/.
+    -->
+    <cloud-backup>
+        <exclude domain="database"  path="potillus.db"/>
+        <exclude domain="datastore" path="potillus_settings.preferences_pb"/>
+    </cloud-backup>
+    <!--
+        Device-to-device transfer:
+        Include the database, its passphrase file, and the DataStore so that
+        a device migration is seamless.
+
+        WHY THREE FILES?
+          potillus.db                    – the SQLCipher-encrypted Room database.
+          potillus_db_key (sharedpref)   – plain SharedPreferences file that stores
+                                       the SQLCipher passphrase as a Keystore-sealed
+                                       AES-256-GCM envelope (IV || ciphertext+tag),
+                                       Base64-encoded. Without this file the database
+                                       cannot be decrypted on the target device.
+          potillus_settings…(datastore)  – encrypted DataStore (user preferences).
+
+        PREREQUISITE: Android's D2D transfer must also migrate the Keystore entries:
+          potillus_db_passphrase_key     (AES-256-GCM key that seals the DB passphrase)
+          potillus_prefs_key             (AES-256-GCM key for the DataStore serialiser)
+        Both keys are eligible for migration because neither is created with
+        setUserAuthenticationRequired(true). On Android 9+ devices this migration
+        typically happens automatically during a cable-based setup transfer.
+
+        FALLBACK: if Keystore migration is not supported by the target device OEM,
+        users should use Settings → Export Backup (JSON) and re-import on the new
+        device. The JSON backup path is always reliable and device-independent.
+    -->
+    <device-transfer>
+        <include domain="database"   path="potillus.db"/>
+        <include domain="sharedpref" path="potillus_db_key"/>
+        <include domain="datastore"  path="potillus_settings.preferences_pb"/>
+    </device-transfer>
+</data-extraction-rules>

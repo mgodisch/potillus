@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Telugu (తెలుగు) — te
+    Script : Telugu script; LTR.  Rendered via Noto Sans Telugu (bundled API 21+).
+    Approx.: ~83 M L1 speakers (Andhra Pradesh, Telangana/India; diaspora).
+    Register: Standard Modern Telugu (ఆధునిక వ్యవహారిక తెలుగు) as used in
+              formal writing and broadcast media.
+    Notes  : Telugu is an abugida; Android's ICU handles conjuncts correctly.
+             Three grammatical genders (masculine, feminine, neuter).  Polite
+             second-person pronoun మీరు used throughout UI.
+             "Binge drinking" → అతిగా మద్యపానం చేయడం.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">నేడు</string>
+    <string name="calendar">క్యాలెండర్</string>
+    <string name="statistics">గణాంకాలు</string>
+    <string name="drinks">పానీయాలు</string>
+    <string name="settings">సెట్టింగులు</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">నేటి మొత్తం</string>
+    <string name="grams_alcohol">గ్రా ఆల్కహాల్</string>
+    <string name="entries_today">నేటి నమోదులు</string>
+    <string name="no_entries_today">నేడు ఇంకా నమోదులు లేవు.\nనమోదు జోడించడానికి + నొక్కండి.</string>
+    <string name="no_entries_day">ఈ రోజుకు నమోదులు లేవు.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">ఇష్టమైనవి త్వరగా జోడించు</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC అంచనా</string>
+    <string name="bac_disclaimer">అంచనా · వాహన నడిపే నిర్ణయాలకు కాదు</string>
+    <string name="stats_from_section">గణాంకాల కాలం</string>
+    <string name="stats_from_label">గణాంకాలు నుండి</string>
+    <string name="stats_from_desc">ఈ తేదీకి ముందు నమోదులు అన్ని గణాంకాల నుండి మినహాయించబడతాయి.</string>
+    <string name="bac_section">BAC అంచనాకారుడు (Widmark)</string>
+    <string name="bac_desc">అంచనాకు శరీర బరువు అవసరం. ఇది గణిత సూత్రీకరణ, కొలత కాదు.</string>
+    <string name="body_weight">శరీర బరువు</string>
+    <string name="not_set">సెట్ చేయబడలేదు</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">నమోదు జోడించు</string>
+    <string name="edit_entry">నమోదు సవరించు</string>
+    <string name="drink">పానీయం</string>
+    <string name="select_drink">పానీయం ఎంచుకోండి …</string>
+    <string name="volume_ml">మొత్తం</string>
+    <string name="time">సమయం</string>
+    <string name="pure_alcohol">గ్రా స్వచ్ఛమైన ఆల్కహాల్</string>
+    <string name="note">గమనిక (ఐచ్ఛికం)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">పానీయం జోడించు</string>
+    <string name="edit_drink">పానీయం సవరించు</string>
+    <string name="drink_name">పేరు</string>
+    <string name="alcohol_percent">ఆల్కహాల్ శాతం</string>
+    <string name="favorite">ఇష్టమైనది</string>
+    <string name="no_drinks">ఇంకా పానీయాలు నిర్వచించబడలేదు.</string>
+    <string name="category">వర్గం</string>
+    <string name="category_beer">బీర్</string>
+    <string name="category_wine">వైన్ / స్పార్క్లింగ్</string>
+    <string name="category_spirits">స్పిరిట్స్</string>
+    <string name="category_longdrink">లాంగ్‌డ్రింక్ / మిక్స్</string>
+    <string name="category_liqueur">లిక్కర్</string>
+    <string name="category_other">ఇతరాలు</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">ఆల్కహాల్ సారాంశం</string>
+    <string name="pdf_section_kpis">ముఖ్య సంఖ్యలు</string>
+    <string name="pdf_section_months">నెలవారీ అవలోకనం</string>
+    <string name="pdf_section_trend">దీర్ఘకాలిక ధోరణి (సగటు గ్రా/నెల)</string>
+    <string name="pdf_section_categories">పానీయాల వర్గాలు</string>
+    <string name="pdf_section_daytime">వినియోగ నమూనా: రోజు సమయం</string>
+    <string name="pdf_section_weekday">వారం రోజుల ప్రొఫైల్ (సగటు గ్రా ఆల్కహాల్)</string>
+    <string name="pdf_section_risk">ప్రమాదకర వినియోగం &amp; విరమణ</string>
+    <string name="pdf_footer1">అంచనాలు మాత్రమే. వాహన నడిపే లేదా రోగనిర్ధారణ ప్రయోజనాల కోసం కాదు.</string>
+    <string name="pdf_footer2">Libellus Potionis (Potillus) తో తయారు చేయబడింది. అంచనాలు – వైద్య రోగనిర్ధారణ కాదు.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">ఎగుమతి తేదీ</string>
+    <string name="pdf_meta_period">కాలం</string>
+    <string name="pdf_meta_gender">లింగం</string>
+    <string name="pdf_meta_limit">పరిమితి</string>
+    <string name="pdf_meta_weight">శరీర బరువు</string>
+    <string name="pdf_meta_custom_limit">అనుకూలం</string>
+    <string name="pdf_kpi_total">మొత్తం ఆల్కహాల్</string>
+    <string name="pdf_kpi_avg_day">రోజువారీ సగటు</string>
+    <string name="pdf_kpi_avg_drink_day">తాగే రోజు సగటు</string>
+    <string name="pdf_kpi_drink_days">తాగే రోజులు</string>
+    <string name="pdf_kpi_abstinent_days">విరమణ రోజులు</string>
+    <string name="pdf_kpi_over_who">రోజులు > WHO (%1$s గ్రా)</string>
+    <string name="pdf_kpi_over_dhs">రోజులు > DHS (%1$s గ్రా)</string>
+    <string name="pdf_kpi_binge">బింగ్ రోజులు (>%1$s గ్రా)</string>
+    <string name="pdf_col_month">నెల</string>
+    <string name="pdf_col_drink_days">తాగే రోజులు</string>
+    <string name="pdf_col_total_g">మొత్తం గ్రా</string>
+    <string name="pdf_col_avg_g_day">సగటు గ్రా/రోజు</string>
+    <string name="pdf_meta_first_drink">సగటు మొదటి పానీయం</string>
+    <string name="pdf_meta_last_drink">సగటు చివరి పానీయం</string>
+    <string name="pdf_meta_before_18">17:00 కి ముందు వాటా</string>
+    <string name="pdf_meta_after_18">17:00 నుండి వాటా</string>
+    <string name="pdf_meta_binge_days">అతిగా తాగిన రోజులు (>%1$s గ్రా)</string>
+    <string name="pdf_meta_longest_abstinence">అత్యంత దీర్ఘమైన విరమణ</string>
+    <string name="pdf_meta_current_abstinence">ప్రస్తుత విరమణ</string>
+    <string name="pdf_days_suffix">రోజులు</string>
+
+    <!-- Actions -->
+    <string name="save">సేవ్ చేయి</string>
+    <string name="cancel">రద్దు చేయి</string>
+    <string name="back">వెనుకకు</string>
+    <string name="delete">తొలగించు</string>
+    <string name="change">మార్చు</string>
+    <string name="delete_confirm">\"%1$s\" ని నిజంగా తొలగించాలా?</string>
+    <string name="no_data">ఈ కాలానికి డేటా లేదు.</string>
+
+    <!-- Stats -->
+    <string name="week">వారం</string>
+    <string name="month">నెల</string>
+    <string name="year">సంవత్సరం</string>
+    <string name="total_period">కాలంలో మొత్తం</string>
+    <string name="avg_per_day">రోజువారీ సగటు</string>
+    <string name="avg_per_drink_day">ప్రతి తాగే రోజుకు సగటు</string>
+    <string name="abstinent_days">విరమణ రోజులు</string>
+    <string name="stats_category_breakdown">వర్గాలు</string>
+    <string name="streak_trend">విరమణ &amp; ధోరణి</string>
+    <string name="current_streak">ప్రస్తుత విరమణ</string>
+    <string name="longest_streak">అత్యంత దీర్ఘమైన విరమణ</string>
+    <string name="days_count">%1$d రోజులు</string>
+    <string name="trend_vs_prev">మునుపటి కాలంతో పోల్చినప్పుడు ధోరణి</string>
+
+    <!-- Settings -->
+    <string name="appearance">రూపాన్ని</string>
+    <string name="theme_mode">రంగు పథకం</string>
+    <string name="theme_system">సిస్టమ్</string>
+    <string name="theme_day">కాంతి</string>
+    <string name="theme_night">చీకటి</string>
+    <string name="day_change_time">రోజు మారే సమయం</string>
+    <string name="day_starts_at">కొత్త రోజు ప్రారంభమవుతుంది</string>
+    <string name="gender">లింగం</string>
+    <string name="male">పురుషుడు</string>
+    <string name="female">స్త్రీ</string>
+    <string name="limit_mode">వైద్య మార్గదర్శకాలు</string>
+    <string name="limit_who">WHO – ప్రమాద స్థాయి</string>
+    <string name="limit_dhs">DHS – తక్కువ ప్రమాదం</string>
+    <string name="limit_custom">అనుకూలం</string>
+    <string name="custom_limit_grams">నా రోజువారీ పరిమితి గ్రాములలో</string>
+    <string name="weekly_limit_section">వారపు పరిమితి</string>
+    <string name="weekly_limit_enabled">వారపు పరిమితిని ప్రారంభించు</string>
+    <string name="weekly_limit_grams">వారపు పరిమితి గ్రాములలో</string>
+    <string name="weekly_limit">వారం</string>
+    <string name="biometric">యాక్సెస్ లాక్</string>
+    <string name="biometric_lock">బయోమెట్రిక్ లాక్</string>
+    <string name="biometric_desc">వేలిముద్ర లేదా ముఖ గుర్తింపుతో యాప్‌ని లాక్ చేయండి</string>
+    <string name="language">భాష</string>
+    <string name="export">డేటా ఎగుమతి</string>
+    <string name="export_desc">డౌన్‌లోడ్స్ ఫోల్డర్‌కు నమోదులు ఎగుమతి చేయండి</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">బ్యాకప్</string>
+    <string name="backup_desc">JSON ఫైల్‌గా పూర్తి బ్యాకప్ (నమోదులు + పానీయాలు)</string>
+    <string name="backup_export">ఎగుమతి</string>
+    <string name="backup_import">దిగుమతి</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">డేటాను ఎలా దిగుమతి చేయాలి?</string>
+    <string name="import_replace">భర్తీ చేయి</string>
+    <string name="import_merge">జోడించు</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">దయచేసి ధృవీకరించండి</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) చెప్పింది: ఆల్కహాల్ వినియోగానికి సురక్షితమైన స్థాయి అంటూ ఏదీ లేదు. ఇక్కడ చూపబడిన ప్రమాద విలువ ఒక ఆచరణాత్మక సూచన బిందువు, భద్రతా పరిమితి కాదు.</string>
+    <string name="who_values">ప్రమాద విలువ: ♂ ≤ %1$s g, ♀ ≤ %2$s g రోజుకు.</string>
+    <string name="pdf_months_truncated">%2$d నెలల్లో %1$d చూపిస్తోంది – పాత డేటా CSV/బ్యాకప్‌లో అందుబాటులో ఉంది</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">నమోదు లేదు</string>
+    <string name="year_calendar_under_limit">పరిమితి కింద</string>
+    <string name="year_calendar_over_limit">పరిమితి దాటింది</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">ఎగుమతి చేయడానికి నమోదులు లేవు.</string>
+    <string name="export_failed">ఎగుమతి విఫలమైంది.</string>
+    <string name="backup_failed">బ్యాకప్ విఫలమైంది.</string>
+    <string name="import_success_replace">%1$d నమోదులు దిగుమతి చేయబడ్డాయి.</string>
+    <string name="import_success_merge">%1$d దిగుమతి, %2$d దాటవేయబడింది.</string>
+    <string name="import_error_could_not_read">ఫైల్ చదవడం సాధ్యపడలేదు.</string>
+    <string name="import_error_empty">బ్యాకప్ ఫైల్ ఖాళీగా ఉంది.</string>
+    <string name="import_error_invalid_json">చెల్లని JSON ఆకృతి.</string>
+    <string name="import_error_version_too_high">బ్యాకప్ వెర్షన్ %1$d మద్దతు లేదు (గరిష్టం %2$d).</string>
+    <string name="import_error_file_too_large">బ్యాకప్ ఫైల్ చాలా పెద్దది (గరిష్టం %1$d MB).</string>
+    <string name="import_error_read">చదవడంలో లోపం: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d కి {count} నమోదులు ఉన్నాయి మరియు తొలగించడం సాధ్యం కాదు.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">పానీయం పేరు ఖాళీగా ఉండకూడదు.</string>
+    <string name="drink_validation_name_too_long">పానీయం పేరు చాలా పొడవుగా ఉంది (గరిష్టం 100 అక్షరాలు).</string>
+    <string name="drink_validation_volume_range">మొత్తం 1 ml మరియు 10,000 ml మధ్య ఉండాలి.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">ఆల్కహాల్ శాతం 0% మరియు 100% మధ్య ఉండాలి.</string>
+    <string name="drink_validation_alcohol_invalid">ఆల్కహాల్ శాతం చెల్లుబాటు అయ్యే సంఖ్య కాదు.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">తేదీ</string>
+    <string name="csv_col_time">సమయం</string>
+    <string name="csv_col_drink">పానీయం</string>
+    <string name="csv_col_category">వర్గం</string>
+    <string name="csv_col_volume_ml">మొత్తం_ml</string>
+    <string name="csv_col_alcohol_pct">ఆల్కహాల్_%</string>
+    <string name="csv_col_grams">గ్రా_ఆల్కహాల్</string>
+    <string name="csv_col_note">గమనిక</string>
+    <string name="pdf_unit_g_per_day">గ్రా/రోజు</string>
+    <string name="unit_g_per_day">గ్రా/రోజు</string>
+
+    <string name="days_over_limit_who">పరిమితి దాటిన రోజులు (WHO)</string>
+    <string name="days_over_limit_dhs">పరిమితి దాటిన రోజులు (DHS)</string>
+    <string name="days_over_limit_custom">కాన్ఫిగర్ చేయబడిన పరిమితి దాటిన రోజులు</string>
+    <string name="dhs_note">DHS సిఫార్సు చేస్తోంది: పురుషులు రోజుకు 24 గ్రాముల కంటే ఎక్కువ, స్త్రీలు 12 గ్రాముల కంటే ఎక్కువ స్వచ్ఛమైన ఆల్కహాల్ తాగకూడదు. వారంలో కనీసం రెండు రోజులు ఆల్కహాల్ లేకుండా ఉండాలి.</string>
+    <string name="drink_days_label">ఈ వారంలో తాగే రోజులు</string>
+    <string name="drink_days_setting">గరిష్టం తాగే రోజులు/వారం</string>
+    <string name="drink_days_who_dhs_note">సిఫార్సు: వారానికి గరిష్టం 5 తాగే రోజులు (≥ 2 విరమణ రోజులు)</string>
+    <string name="weekly_gram_mode_title">వారపు గ్రాముల పరిమితి</string>
+    <string name="weekly_gram_mode_desc">పురోగతి పట్టీ మరియు సూచికలు వారపు బడ్జెట్ ఉపయోగిస్తాయి (గరిష్టం తాగే రోజులు &#215; రోజువారీ పరిమితి)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">వ్యక్తిగత డేటా</string>
+    <string name="week_starts_on">వారం ప్రారంభమయ్యే రోజు</string>
+</resources>

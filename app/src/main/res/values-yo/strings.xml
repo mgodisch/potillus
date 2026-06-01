@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Yoruba (Yorùbá) — yo
+    Script : Latin with tonal diacritics (à á â è é ê ì í î ò ó ô ù ú û ṣ ẹ ọ ṃ ṇ);
+             LTR.  Tonal diacritics are semantically essential — do NOT strip them.
+    Approx.: ~47 M L1 speakers (Nigeria, Benin, Togo; diaspora).
+    Register: Standard Modern Yoruba (Yorùbá Ìjọba) as used in broadcast media
+              and education.
+    Notes  : Yoruba is a tonal language; the three tones (high ´, mid no mark,
+             low `) are written but are frequently omitted in casual digital text.
+             These translations include full tonal marking for correctness.
+             "Binge drinking" → mímu ọtí líle jù / mímu ọtí púpọ̀.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Òní</string>
+    <string name="calendar">Kalẹ́ńdà</string>
+    <string name="statistics">Ìṣirò</string>
+    <string name="drinks">Ohun mímu</string>
+    <string name="settings">Ètò</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Àpapọ̀ òní</string>
+    <string name="grams_alcohol">g ọtí</string>
+    <string name="entries_today">Àwọn ìforúkọsílẹ̀ òní</string>
+    <string name="no_entries_today">Kò sí ìforúkọsílẹ̀ òní síbẹ̀.\nTẹ + láti ṣàfikún ìforúkọsílẹ̀.</string>
+    <string name="no_entries_day">Kò sí ìforúkọsílẹ̀ fún ọjọ́ yìí.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Fi àwọn ayanfẹ́ kún ní ìyára</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Ìfojúsùn BAC</string>
+    <string name="bac_disclaimer">Ìfojúsùn · kìí ṣe fún àwọn ìpinnu ìwakọ̀</string>
+    <string name="stats_from_section">Àkókò ìṣirò</string>
+    <string name="stats_from_label">Ìṣirò láti</string>
+    <string name="stats_from_desc">Àwọn ìforúkọsílẹ̀ ṣáájú ọjọ́ yìí ni a yọ kúrò nínú gbogbo ìṣirò.</string>
+    <string name="bac_section">Ọ̀nà ìfojúsùn BAC (Widmark)</string>
+    <string name="bac_desc">A nílò ìwọ̀n ara fún ìfojúsùn. Èyí jẹ́ ìsúnmọ̀ ìṣirò, kìí ṣe wíwọn.</string>
+    <string name="body_weight">Ìwọ̀n ara</string>
+    <string name="not_set">a kò tò sílẹ̀</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Fi ìforúkọsílẹ̀ kún</string>
+    <string name="edit_entry">Ṣàtúnṣe ìforúkọsílẹ̀</string>
+    <string name="drink">Ohun mímu</string>
+    <string name="select_drink">Yan ohun mímu kan …</string>
+    <string name="volume_ml">Iye</string>
+    <string name="time">Àkókò</string>
+    <string name="pure_alcohol">g ọtí tó mọ́</string>
+    <string name="note">Àkíyèsí (àṣàyàn)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Fi ohun mímu kún</string>
+    <string name="edit_drink">Ṣàtúnṣe ohun mímu</string>
+    <string name="drink_name">Orúkọ</string>
+    <string name="alcohol_percent">Iye ọtí</string>
+    <string name="favorite">Ayanfẹ́</string>
+    <string name="no_drinks">Kò sí ohun mímu tí a ti ṣàlàyé síbẹ̀.</string>
+    <string name="category">Ẹ̀ka</string>
+    <string name="category_beer">Bíà</string>
+    <string name="category_wine">Wáìnì / Alafẹfẹ</string>
+    <string name="category_spirits">Ọtí líle</string>
+    <string name="category_longdrink">Longdrink / Àdápọ̀</string>
+    <string name="category_liqueur">Likọ̀ọ̀</string>
+    <string name="category_other">Àwọn mìíràn</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Àkópọ̀ Ọtí</string>
+    <string name="pdf_section_kpis">Àwọn Nọ́mbà Pàtàkì</string>
+    <string name="pdf_section_months">Àgbéyẹ̀wò Oṣooṣu</string>
+    <string name="pdf_section_trend">Ìgbòkègbodò Ìgbà Pípẹ́ (apapọ̀ g/oṣù)</string>
+    <string name="pdf_section_categories">Àwọn Ẹ̀ka Ohun Mímu</string>
+    <string name="pdf_section_daytime">Àpẹẹrẹ Ìlò: Àkókò Ọjọ́</string>
+    <string name="pdf_section_weekday">Ìwòye Ọjọ́ Ọ̀sẹ̀ (apapọ̀ g ọtí)</string>
+    <string name="pdf_section_risk">Ìlò Tó Léwu &amp; Ìdáwọ́dúró</string>
+    <string name="pdf_footer1">Ìfojúsùn nìkàn. Kìí ṣe fún àwọn ète ìwakọ̀ tàbí ìṣàyẹ̀wò àìsàn.</string>
+    <string name="pdf_footer2">A ṣẹ̀dá pẹ̀lú Libellus Potionis (Potillus). Ìfojúsùn – kìí ṣe ìwádìí àìsàn ìṣègùn.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Ọjọ́ ìfisílẹ̀</string>
+    <string name="pdf_meta_period">Àkókò</string>
+    <string name="pdf_meta_gender">Ìbálòpọ̀</string>
+    <string name="pdf_meta_limit">Ìdíwọ̀</string>
+    <string name="pdf_meta_weight">Ìwọ̀n ara</string>
+    <string name="pdf_meta_custom_limit">Àdánwò</string>
+    <string name="pdf_kpi_total">Àpapọ̀ ọtí</string>
+    <string name="pdf_kpi_avg_day">Apapọ̀ fún ọjọ́ kọ̀ọ̀kan</string>
+    <string name="pdf_kpi_avg_drink_day">Apapọ̀ fún ọjọ́ mímu kọ̀ọ̀kan</string>
+    <string name="pdf_kpi_drink_days">Àwọn ọjọ́ mímu</string>
+    <string name="pdf_kpi_abstinent_days">Àwọn ọjọ́ ìdáwọ́dúró</string>
+    <string name="pdf_kpi_over_who">Àwọn ọjọ́ > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Àwọn ọjọ́ > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Àwọn ọjọ́ binge (>%1$s g)</string>
+    <string name="pdf_col_month">Oṣù</string>
+    <string name="pdf_col_drink_days">Àwọn ọjọ́ mímu</string>
+    <string name="pdf_col_total_g">Àpapọ̀ g</string>
+    <string name="pdf_col_avg_g_day">Apapọ̀ g/ọjọ́</string>
+    <string name="pdf_meta_first_drink">Apapọ̀ ohun mímu àkọ́kọ́</string>
+    <string name="pdf_meta_last_drink">Apapọ̀ ohun mímu ìkẹyìn</string>
+    <string name="pdf_meta_before_18">Ìdá ṣáájú 17:00</string>
+    <string name="pdf_meta_after_18">Ìdá láti 17:00</string>
+    <string name="pdf_meta_binge_days">Àwọn ọjọ́ mímu ọtí púpọ̀ (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Ìdáwọ́dúró tó gùn jù</string>
+    <string name="pdf_meta_current_abstinence">Ìdáwọ́dúró lọ́wọ́lọ́wọ́</string>
+    <string name="pdf_days_suffix">àwọn ọjọ́</string>
+
+    <!-- Actions -->
+    <string name="save">Pamọ́</string>
+    <string name="cancel">Fagi lé</string>
+    <string name="back">Padà</string>
+    <string name="delete">Parẹ́</string>
+    <string name="change">Ṣàyípadà</string>
+    <string name="delete_confirm">Parẹ́ \"%1$s\" gẹ́gẹ́bí?</string>
+    <string name="no_data">Kò sí àlàyé fún àkókò yìí.</string>
+
+    <!-- Stats -->
+    <string name="week">Ọ̀sẹ̀</string>
+    <string name="month">Oṣù</string>
+    <string name="year">Ọdún</string>
+    <string name="total_period">Àpapọ̀ nínú àkókò</string>
+    <string name="avg_per_day">Apapọ̀ fún ọjọ́ kọ̀ọ̀kan</string>
+    <string name="avg_per_drink_day">Apapọ̀ fún ọjọ́ mímu kọ̀ọ̀kan</string>
+    <string name="abstinent_days">Àwọn ọjọ́ ìdáwọ́dúró</string>
+    <string name="stats_category_breakdown">Àwọn ẹ̀ka</string>
+    <string name="streak_trend">Ìdáwọ́dúró &amp; Ìgbòkègbodò</string>
+    <string name="current_streak">Ìdáwọ́dúró lọ́wọ́lọ́wọ́</string>
+    <string name="longest_streak">Ìdáwọ́dúró tó gùn jù</string>
+    <string name="days_count">Ọjọ́ %1$d</string>
+    <string name="trend_vs_prev">Ìgbòkègbodò tó bá àkókò tó ṣáájú ṣe ìfiwéra</string>
+
+    <!-- Settings -->
+    <string name="appearance">Ìrísí</string>
+    <string name="theme_mode">Ètò àwọ̀</string>
+    <string name="theme_system">Ètò</string>
+    <string name="theme_day">Ìmọ́lẹ̀</string>
+    <string name="theme_night">Òkùnkùn</string>
+    <string name="day_change_time">Àkókò ìyípadà ọjọ́</string>
+    <string name="day_starts_at">Ọjọ́ tuntun bẹ̀rẹ̀ ní</string>
+    <string name="gender">Ìbálòpọ̀</string>
+    <string name="male">Ọkùnrin</string>
+    <string name="female">Obìnrin</string>
+    <string name="limit_mode">Ìtọ́sọ́nà ìṣègùn</string>
+    <string name="limit_who">WHO – ìpele ewu</string>
+    <string name="limit_dhs">DHS – ewu kékeré</string>
+    <string name="limit_custom">Àdánwò</string>
+    <string name="custom_limit_grams">Ìdíwọ̀ mi ojoojúmọ̀ ní gram</string>
+    <string name="weekly_limit_section">Ìdíwọ̀ ọ̀sẹ̀</string>
+    <string name="weekly_limit_enabled">Ṣí ìdíwọ̀ ọ̀sẹ̀</string>
+    <string name="weekly_limit_grams">Ìdíwọ̀ ọ̀sẹ̀ ní gram</string>
+    <string name="weekly_limit">Ọ̀sẹ̀</string>
+    <string name="biometric">Àmúrágbẹ̀dẹ ìwọlé</string>
+    <string name="biometric_lock">Àmúrágbẹ̀dẹ biolójì</string>
+    <string name="biometric_desc">Tiẹ àfọwọ́pín tàbí ìmọ̀ ìhàngbé kún ìtẹ́wọ́gba àwọn ẹ̀rọ</string>
+    <string name="language">Èdè</string>
+    <string name="export">Ìfisílẹ̀ àlàyé</string>
+    <string name="export_desc">Fi àwọn ìforúkọsílẹ̀ sílẹ̀ sí àpò Downloads</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Ẹ̀dà ìfipamọ́</string>
+    <string name="backup_desc">Ẹ̀dà ìfipamọ́ pípé (ìforúkọsílẹ̀ + ohun mímu) gẹ́gẹ́ bí fáìlì JSON</string>
+    <string name="backup_export">Fipamọ́</string>
+    <string name="backup_import">Fàyọ wọlé</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Báwo ni a ṣe gbọdọ̀ mú àlàyé wọlé?</string>
+    <string name="import_replace">Rọ́pò</string>
+    <string name="import_merge">Fi kún</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Jọ̀wọ́ fìdí rẹ múlẹ̀</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) sọ pé: Kò sí ìpele tó ní ìdáàbò bò fún mímu ọtí. Iye ewu tí a ṣe àfihàn níhìn-ín jẹ́ àmìpẹlẹ̀ tó wúlò, kìí ṣe ìpele ìdáàbòbò.</string>
+    <string name="who_values">Iye eewu: ♂ ≤ %1$s g, ♀ ≤ %2$s g lójúmọ́.</string>
+    <string name="pdf_months_truncated">Ní ìfihàn oṣù %1$d nínú %2$d – àlàyé àtijọ́ wà ní CSV/ẹ̀dà ìfipamọ́</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">kò sí ìforúkọsílẹ̀</string>
+    <string name="year_calendar_under_limit">ní ìsàlẹ̀ ìdíwọ̀</string>
+    <string name="year_calendar_over_limit">ju ìdíwọ̀ lọ</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Kò sí ìforúkọsílẹ̀ fún ìfisílẹ̀.</string>
+    <string name="export_failed">Ìfisílẹ̀ kùnà.</string>
+    <string name="backup_failed">Ẹ̀dà ìfipamọ́ kùnà.</string>
+    <string name="import_success_replace">A mú ìforúkọsílẹ̀ %1$d wọlé.</string>
+    <string name="import_success_merge">A mú %1$d wọlé, a fò %2$d.</string>
+    <string name="import_error_could_not_read">A kò lè ka fáìlì náà.</string>
+    <string name="import_error_empty">Fáìlì ẹ̀dà ìfipamọ́ ṣofo.</string>
+    <string name="import_error_invalid_json">Ọ̀nà JSON tí kò tọ́.</string>
+    <string name="import_error_version_too_high">Àtúnṣe ẹ̀dà ìfipamọ́ %1$d kò ní àtìlẹ́yìn (ó pọ̀ jù %2$d).</string>
+    <string name="import_error_file_too_large">Fáìlì ẹ̀dà ìfipamọ́ tóbi jù (ó pọ̀ jù %1$d MB).</string>
+    <string name="import_error_read">Àṣìṣe kíka: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d ní àwọn ìforúkọsílẹ̀ {count} tí a kò lè parẹ́.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Orúkọ ohun mímu kò gbọdọ̀ ṣofo.</string>
+    <string name="drink_validation_name_too_long">Orúkọ ohun mímu gùn jù (ó pọ̀ jù àwọn lẹ́tà 100).</string>
+    <string name="drink_validation_volume_range">Iye gbọdọ̀ wà láàárín ml 1 àti ml 10 000.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Iye ọtí gbọdọ̀ wà láàárín 0 % àti 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Iye ọtí kìí ṣe nọ́mbà tó tọ́.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Ọjọ́</string>
+    <string name="csv_col_time">Àkókò</string>
+    <string name="csv_col_drink">Ohun mímu</string>
+    <string name="csv_col_category">Ẹ̀ka</string>
+    <string name="csv_col_volume_ml">Ìwọ̀n_ml</string>
+    <string name="csv_col_alcohol_pct">Ọtí_%</string>
+    <string name="csv_col_grams">Gram_ọtí</string>
+    <string name="csv_col_note">Àkíyèsí</string>
+    <string name="pdf_unit_g_per_day">g/ọjọ́</string>
+    <string name="unit_g_per_day">g/ọjọ́</string>
+
+    <string name="days_over_limit_who">Àwọn ọjọ́ tó ju ìdíwọ̀ lọ (WHO)</string>
+    <string name="days_over_limit_dhs">Àwọn ọjọ́ tó ju ìdíwọ̀ lọ (DHS)</string>
+    <string name="days_over_limit_custom">Àwọn ọjọ́ tó ju ìdíwọ̀ tí a tò sílẹ̀ lọ</string>
+    <string name="dhs_note">DHS dábàá pé: àwọn ọkùnrin kò gbọdọ̀ mu ju g 24 lọ, àwọn obìnrin kò gbọdọ̀ mu ju g 12 lọ nínú ọtí tó mọ́ lójoojúmọ̀. O kéré jù ọjọ́ méjì lọ nínú ọ̀sẹ̀ gbọdọ̀ jẹ́ ọjọ́ tí kò ní ọtí.</string>
+    <string name="drink_days_label">àwọn ọjọ́ mímu ọ̀sẹ̀ yìí</string>
+    <string name="drink_days_setting">Àwọn ọjọ́ mímu ó pọ̀/ọ̀sẹ̀</string>
+    <string name="drink_days_who_dhs_note">Ìdábàá: ó pọ̀ jù ọjọ́ mímu 5 lọ nínú ọ̀sẹ̀ (≥ àwọn ọjọ́ ìdáwọ́dúró 2)</string>
+    <string name="weekly_gram_mode_title">Ìdíwọ̀ gram ọ̀sẹ̀</string>
+    <string name="weekly_gram_mode_desc">Ọ̀pá ìlosíwájú àti àwọn àmì ń lo isuna ọ̀sẹ̀ (ó pọ̀ jù àwọn ọjọ́ mímu &#215; ìdíwọ̀ ojoojúmọ̀)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Àlàyé ara ẹni</string>
+    <string name="week_starts_on">Ọ̀sẹ̀ bẹ̀rẹ̀ ní</string>
+</resources>

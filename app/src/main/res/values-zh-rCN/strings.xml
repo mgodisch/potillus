@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">今天</string>
+    <string name="calendar">日历</string>
+    <string name="statistics">统计</string>
+    <string name="drinks">饮品</string>
+    <string name="settings">设置</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">今日合计</string>
+    <string name="grams_alcohol">克酒精</string>
+    <string name="entries_today">今日记录</string>
+    <string name="no_entries_today">今天还没有记录。\n点击 + 添加记录。</string>
+    <string name="no_entries_day">该日没有记录。</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">快速添加收藏</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">血液酒精浓度估算</string>
+    <string name="bac_disclaimer">估算值 · 不用于驾驶判断</string>
+    <string name="stats_from_section">统计时间段</string>
+    <string name="stats_from_label">统计起始</string>
+    <string name="stats_from_desc">此日期之前的记录将从所有统计中排除。</string>
+    <string name="bac_section">血液酒精浓度估算（Widmark）</string>
+    <string name="bac_desc">估算需要体重数据。此值为数学近似，非实际测量结果。</string>
+    <string name="body_weight">体重</string>
+    <string name="not_set">未设置</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">添加记录</string>
+    <string name="edit_entry">编辑记录</string>
+    <string name="drink">饮品</string>
+    <string name="select_drink">选择饮品 …</string>
+    <string name="volume_ml">数量</string>
+    <string name="time">时间</string>
+    <string name="pure_alcohol">克纯酒精</string>
+    <string name="note">备注（可选）</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">添加饮品</string>
+    <string name="edit_drink">编辑饮品</string>
+    <string name="drink_name">名称</string>
+    <string name="alcohol_percent">酒精含量</string>
+    <string name="favorite">收藏</string>
+    <string name="no_drinks">尚未定义任何饮品。</string>
+    <string name="category">类别</string>
+    <string name="category_beer">啤酒</string>
+    <string name="category_wine">葡萄酒 / 起泡酒</string>
+    <string name="category_spirits">烈酒</string>
+    <string name="category_longdrink">长饮 / 混合</string>
+    <string name="category_liqueur">利口酒</string>
+    <string name="category_other">其他</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">酒精摘要</string>
+    <string name="pdf_section_kpis">核心数据</string>
+    <string name="pdf_section_months">月度概览</string>
+    <string name="pdf_section_trend">长期趋势（平均克/月）</string>
+    <string name="pdf_section_categories">饮品类别</string>
+    <string name="pdf_section_daytime">消费模式：一天中的时间</string>
+    <string name="pdf_section_weekday">工作日分布（平均克酒精）</string>
+    <string name="pdf_section_risk">风险饮酒 &amp; 戒断</string>
+    <string name="pdf_footer1">仅供估算。不用于驾驶或诊断目的。</string>
+    <string name="pdf_footer2">由 Libellus Potionis（Potillus）生成。估算值——非医学诊断。</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">导出日期</string>
+    <string name="pdf_meta_period">时间段</string>
+    <string name="pdf_meta_gender">性别</string>
+    <string name="pdf_meta_limit">限制</string>
+    <string name="pdf_meta_weight">体重</string>
+    <string name="pdf_meta_custom_limit">自定义</string>
+    <string name="pdf_kpi_total">总酒精量</string>
+    <string name="pdf_kpi_avg_day">每日平均</string>
+    <string name="pdf_kpi_avg_drink_day">每饮酒日平均</string>
+    <string name="pdf_kpi_drink_days">饮酒天数</string>
+    <string name="pdf_kpi_abstinent_days">戒酒天数</string>
+    <string name="pdf_kpi_over_who">超WHO天数（%1$s 克）</string>
+    <string name="pdf_kpi_over_dhs">超DHS天数（%1$s 克）</string>
+    <string name="pdf_kpi_binge">暴饮天数（>%1$s 克）</string>
+    <string name="pdf_col_month">月份</string>
+    <string name="pdf_col_drink_days">饮酒天数</string>
+    <string name="pdf_col_total_g">总克数</string>
+    <string name="pdf_col_avg_g_day">平均克/天</string>
+    <string name="pdf_meta_first_drink">平均首次饮酒</string>
+    <string name="pdf_meta_last_drink">平均末次饮酒</string>
+    <string name="pdf_meta_before_18">17:00 前比例</string>
+    <string name="pdf_meta_after_18">17:00 后比例</string>
+    <string name="pdf_meta_binge_days">暴饮天数（>%1$s 克）</string>
+    <string name="pdf_meta_longest_abstinence">最长戒酒期</string>
+    <string name="pdf_meta_current_abstinence">当前戒酒期</string>
+    <string name="pdf_days_suffix">天</string>
+
+    <!-- Actions -->
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+    <string name="delete">删除</string>
+    <string name="change">更改</string>
+    <string name="delete_confirm">确定删除"%1$s"？</string>
+    <string name="no_data">该时间段没有数据。</string>
+
+    <!-- Stats -->
+    <string name="week">周</string>
+    <string name="month">月</string>
+    <string name="year">年</string>
+    <string name="total_period">时间段总计</string>
+    <string name="avg_per_day">每日平均</string>
+    <string name="avg_per_drink_day">每饮酒日平均</string>
+    <string name="abstinent_days">戒酒天数</string>
+    <string name="stats_category_breakdown">类别</string>
+    <string name="streak_trend">戒断 &amp; 趋势</string>
+    <string name="current_streak">当前戒酒</string>
+    <string name="longest_streak">最长戒酒</string>
+    <string name="days_count">%1$d 天</string>
+    <string name="trend_vs_prev">与上一周期对比趋势</string>
+
+    <!-- Settings -->
+    <string name="appearance">外观</string>
+    <string name="theme_mode">配色方案</string>
+    <string name="theme_system">系统</string>
+    <string name="theme_day">浅色</string>
+    <string name="theme_night">深色</string>
+    <string name="day_change_time">换日时间</string>
+    <string name="day_starts_at">新的一天开始于</string>
+    <string name="gender">性别</string>
+    <string name="male">男性</string>
+    <string name="female">女性</string>
+    <string name="limit_mode">医学指导方针</string>
+    <string name="limit_who">WHO – 风险等级</string>
+    <string name="limit_dhs">DHS – 低风险</string>
+    <string name="limit_custom">自定义</string>
+    <string name="custom_limit_grams">我的每日限量（克）</string>
+    <string name="weekly_limit_section">每周限量</string>
+    <string name="weekly_limit_enabled">启用每周限量</string>
+    <string name="weekly_limit_grams">每周限量（克）</string>
+    <string name="weekly_limit">周</string>
+    <string name="biometric">访问锁定</string>
+    <string name="biometric_lock">生物识别锁定</string>
+    <string name="biometric_desc">通过指纹或面部识别锁定应用</string>
+    <string name="language">语言</string>
+    <string name="export">数据导出</string>
+    <string name="export_desc">将记录导出到下载文件夹</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">备份</string>
+    <string name="backup_desc">完整备份（记录 + 饮品）为 JSON 文件</string>
+    <string name="backup_export">导出</string>
+    <string name="backup_import">导入</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">如何导入数据？</string>
+    <string name="import_replace">替换</string>
+    <string name="import_merge">追加</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">请进行身份验证</string>
+
+    <!-- WHO note -->
+    <string name="who_note">世卫组织（2023年）指出：饮酒没有安全量。此处显示的风险值是一个实用参考点，不是安全阈值。</string>
+    <string name="who_values">风险值：♂ ≤ %1$s g，♀ ≤ %2$s g／天。</string>
+    <string name="pdf_months_truncated">显示 %2$d 个月中的 %1$d 个——较旧数据可在 CSV/备份中获取</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">无记录</string>
+    <string name="year_calendar_under_limit">低于限量</string>
+    <string name="year_calendar_over_limit">超过限量</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">没有可导出的记录。</string>
+    <string name="export_failed">导出失败。</string>
+    <string name="backup_failed">备份失败。</string>
+    <string name="import_success_replace">已导入 %1$d 条记录。</string>
+    <string name="import_success_merge">已导入 %1$d 条，跳过 %2$d 条。</string>
+    <string name="import_error_could_not_read">无法读取文件。</string>
+    <string name="import_error_empty">备份文件为空。</string>
+    <string name="import_error_invalid_json">无效的 JSON 格式。</string>
+    <string name="import_error_version_too_high">不支持备份版本 %1$d（最高支持 %2$d）。</string>
+    <string name="import_error_file_too_large">备份文件过大（最大 %1$d MB）。</string>
+    <string name="import_error_read">读取错误：%1$s</string>
+    <string name="drink_delete_blocked">"%{name}"有 {count} 条记录，无法删除。</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">饮品名称不能为空。</string>
+    <string name="drink_validation_name_too_long">饮品名称过长（最多 100 个字符）。</string>
+    <string name="drink_validation_volume_range">数量必须在 1 毫升到 10,000 毫升之间。</string>
+    <string name="drink_validation_alcohol_range" formatted="false">酒精含量必须在 0% 到 100% 之间。</string>
+    <string name="drink_validation_alcohol_invalid">酒精含量不是有效数字。</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">日期</string>
+    <string name="csv_col_time">时间</string>
+    <string name="csv_col_drink">饮品</string>
+    <string name="csv_col_category">类别</string>
+    <string name="csv_col_volume_ml">数量_ml</string>
+    <string name="csv_col_alcohol_pct">酒精_%</string>
+    <string name="csv_col_grams">克_酒精</string>
+    <string name="csv_col_note">备注</string>
+    <string name="pdf_unit_g_per_day">克/天</string>
+    <string name="unit_g_per_day">克/天</string>
+
+    <string name="days_over_limit_who">超WHO限量天数</string>
+    <string name="days_over_limit_dhs">超DHS限量天数</string>
+    <string name="days_over_limit_custom">超自定义限量天数</string>
+    <string name="dhs_note">DHS 建议：男性每日纯酒精摄入不超过 24 克，女性不超过 12 克。每周至少两天不饮酒。</string>
+    <string name="drink_days_label">本周饮酒天数</string>
+    <string name="drink_days_setting">每周最多饮酒天数</string>
+    <string name="drink_days_who_dhs_note">建议：每周最多 5 个饮酒日（≥ 2 个戒酒日）</string>
+    <string name="weekly_gram_mode_title">每周克数限量</string>
+    <string name="weekly_gram_mode_desc">进度条和指示器使用每周预算（最多饮酒天数 &#215; 每日限量）</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">个人数据</string>
+    <string name="week_starts_on">一周开始于</string>
+</resources>

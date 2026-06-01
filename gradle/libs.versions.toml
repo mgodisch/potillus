@@ -1,0 +1,197 @@
+# =============================================================================
+# libs.versions.toml – Centralised dependency version management (Gradle Version Catalog)
+# =============================================================================
+#
+# PURPOSE:
+#   All library versions are defined in ONE place.
+#   In build.gradle.kts files you write e.g. "libs.core.ktx"
+#   instead of "androidx.core:core-ktx:1.13.0".
+#   This prevents version conflicts and simplifies upgrades.
+#
+# SECTIONS:
+#   [versions]   – Version strings as named constants
+#   [libraries]  – Libraries that reference [versions]
+#   [plugins]    – Build plugins (Gradle, Kotlin, KSP)
+#
+# KOTLIN NOTE:
+#   "version.ref = ..." refers to a key from [versions].
+#   Missing catalog entries cause Gradle sync to fail.
+# =============================================================================
+
+[versions]
+# Android Gradle Plugin – compiles Kotlin/Java → APK
+agp                 = "8.13.2"
+
+# Kotlin compiler and standard library
+kotlin              = "2.0.21"
+
+# KSP = Kotlin Symbol Processing
+# Replaces kapt (Annotation Processor); faster, less RAM usage.
+# Used by Room to generate DAO implementations at build time.
+# IMPORTANT: KSP version must exactly match the Kotlin version:
+#   Format: <kotlin-version>-<ksp-patch>
+ksp                 = "2.0.21-1.0.28"
+
+# Jetpack Compose BOM (Bill of Materials)
+# A BOM pins compatible versions for all Compose modules.
+# Individual Compose dependencies don't need their own version numbers –
+# the BOM determines them automatically.
+compose-bom         = "2025.05.01"
+
+# AndroidX core libraries
+core-ktx            = "1.13.1"   # Kotlin extensions for Android APIs
+appcompat           = "1.7.0"    # Back-compat + BiometricPrompt
+activity-compose    = "1.9.0"    # Bridge between Activity and Compose
+
+# Lifecycle: ViewModel + LiveData + state observation
+lifecycle           = "2.8.2"
+
+# Navigation: Compose-based screen navigation
+# 2.8.0+ required for type-safe routes (@Serializable data objects)
+navigation-compose  = "2.8.9"
+
+# Room: SQLite abstraction layer (ORM-like)
+room                = "2.7.1"
+
+# DataStore: asynchronous key-value store (successor to SharedPreferences)
+datastore           = "1.1.1"
+
+# Biometric: fingerprint and face recognition
+biometric           = "1.1.0"
+
+# NOTE (SEC-04): androidx.security:security-crypto was removed in v0.37 (Google
+# deprecated it in April 2025 in favour of using the Android Keystore directly).
+# See KeystoreSecretStore for the replacement primitive.
+
+# SQLCipher: application-level AES-256 encryption for the Room database.
+# Distributed as a pre-built native library inside an AAR (@aar classifier).
+sqlcipher           = "4.5.4"
+
+# androidx.sqlite: SupportSQLiteDatabase adapter required by SQLCipher.
+sqlite              = "2.4.0"
+
+# ── Instrumented (androidTest) test stack — TEST-01 ───────────────────────────
+# androidx.test.ext:junit provides AndroidJUnit4 + ext assertions. The Compose
+# UI-test artifacts (ui-test-junit4 / ui-test-manifest) are version-managed by
+# the Compose BOM, so they need no version here.
+androidx-test-ext-junit = "1.2.1"
+
+[libraries]
+# ── AndroidX base ─────────────────────────────────────────────────────────────
+# core-ktx: Kotlin extension functions for Android APIs
+core-ktx                    = { group = "androidx.core",          name = "core-ktx",                    version.ref = "core-ktx" }
+
+# appcompat: required for AppCompatActivity (BiometricPrompt) and
+# runtime locale switching via AppCompatDelegate
+appcompat                   = { group = "androidx.appcompat",     name = "appcompat",                   version.ref = "appcompat" }
+
+# activity-compose: setContent { } to launch Compose UI
+activity-compose            = { group = "androidx.activity",      name = "activity-compose",            version.ref = "activity-compose" }
+
+# ── Jetpack Compose ───────────────────────────────────────────────────────────
+# BOM is included as "platform()" – no individual version.ref needed
+compose-bom                 = { group = "androidx.compose",       name = "compose-bom",                 version.ref = "compose-bom" }
+
+# Core UI primitives: Box, Row, Column, Canvas, Modifier, etc.
+compose-ui                  = { group = "androidx.compose.ui",    name = "ui" }
+compose-ui-graphics         = { group = "androidx.compose.ui",    name = "ui-graphics" }
+
+# Preview annotation (@Preview) – IDE only, not shipped in APK
+compose-ui-tooling-preview  = { group = "androidx.compose.ui",    name = "ui-tooling-preview" }
+
+# Material Design 3: MaterialTheme, Surface, Button, Card, etc.
+compose-material3           = { group = "androidx.compose.material3", name = "material3" }
+
+# Extended icons: Icons.Default.Edit, Icons.Default.Delete, etc.
+compose-material-icons      = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+# Tooling: debug builds only (Layout Inspector, recomposition counter)
+compose-ui-tooling          = { group = "androidx.compose.ui",    name = "ui-tooling" }
+
+# ── Lifecycle & ViewModel ─────────────────────────────────────────────────────
+# lifecycle-runtime-ktx: lifecycleScope, repeatOnLifecycle
+lifecycle-runtime-ktx       = { group = "androidx.lifecycle",     name = "lifecycle-runtime-ktx",       version.ref = "lifecycle" }
+
+# lifecycle-runtime-compose: collectAsStateWithLifecycle()
+# Observes Flow/LiveData and returns Compose State;
+# stops automatically when the app is in the background (saves battery)
+lifecycle-runtime-compose   = { group = "androidx.lifecycle",     name = "lifecycle-runtime-compose",   version.ref = "lifecycle" }
+
+# lifecycle-viewmodel-compose: viewModel() composable function
+lifecycle-viewmodel-compose = { group = "androidx.lifecycle",     name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+# Compose Navigation: NavHost, NavController, composable { } routes
+navigation-compose          = { group = "androidx.navigation",    name = "navigation-compose",          version.ref = "navigation-compose" }
+
+# kotlinx-serialization-core: required by Navigation 2.8+ for type-safe
+# @Serializable route objects. The -core artefact is sufficient; -json is
+# not needed because Navigation handles its own serialisation internally.
+# Version is aligned with Kotlin 2.0.21 (serialization 1.7.x is the
+# compatible series for that compiler release).
+kotlinx-serialization-core  = { group = "org.jetbrains.kotlinx",  name = "kotlinx-serialization-core", version = "1.7.3" }
+
+# ── Room (SQLite database) ────────────────────────────────────────────────────
+# room-runtime: core runtime (open database, transactions)
+room-runtime                = { group = "androidx.room",          name = "room-runtime",                version.ref = "room" }
+
+# room-ktx: coroutine support for Room (suspend functions in DAOs)
+room-ktx                    = { group = "androidx.room",          name = "room-ktx",                    version.ref = "room" }
+
+# room-compiler: KSP processor that generates DAOImpl classes at build time
+# MUST be added as "ksp(...)", not "implementation(...)"
+room-compiler               = { group = "androidx.room",          name = "room-compiler",               version.ref = "room" }
+
+# room-testing: MigrationTestHelper for instrumented Room migration tests
+# (androidTestImplementation only). Validates each Migration against the
+# committed schema JSONs in app/schemas/.
+room-testing                = { group = "androidx.room",          name = "room-testing",                version.ref = "room" }
+
+# ── DataStore ─────────────────────────────────────────────────────────────────
+# Preferences DataStore: type-safe key-value persistence
+# Writes asynchronously to a Protobuf file (no ANR risk)
+datastore-preferences       = { group = "androidx.datastore",     name = "datastore-preferences",       version.ref = "datastore" }
+
+# ── Biometrics ────────────────────────────────────────────────────────────────
+# BiometricPrompt API: fingerprint, face, PIN/pattern as fallback
+biometric                   = { group = "androidx.biometric",     name = "biometric",                   version.ref = "biometric" }
+
+# SQLCipher: transparent AES-256 page-level encryption for Room / SQLite.
+# @aar classifier required: the artifact contains pre-built native libraries.
+sqlcipher                   = { group = "net.zetetic",            name = "android-database-sqlcipher",  version.ref = "sqlcipher" }
+
+# androidx.sqlite: SupportSQLiteDatabase adapter needed by SQLCipher's
+# SupportFactory to integrate with Room's database helper infrastructure.
+sqlite                      = { group = "androidx.sqlite",        name = "sqlite",                      version.ref = "sqlite" }
+
+# ── Instrumented (androidTest) test stack — TEST-01 ───────────────────────────
+# androidx-test-ext-junit: AndroidJUnit4 runner glue + assertions.
+androidx-test-ext-junit     = { group = "androidx.test.ext",      name = "junit",                       version.ref = "androidx-test-ext-junit" }
+
+# compose-ui-test-junit4: createAndroidComposeRule / createComposeRule + the
+# onNodeWith* finders and performClick/assert* actions. BOM-managed (no version).
+compose-ui-test-junit4      = { group = "androidx.compose.ui",    name = "ui-test-junit4" }
+
+# compose-ui-test-manifest: supplies the empty test Activity used by
+# createComposeRule(); must be a debugImplementation so it is merged into the
+# debug (test) manifest only. BOM-managed (no version).
+compose-ui-test-manifest    = { group = "androidx.compose.ui",    name = "ui-test-manifest" }
+
+[plugins]
+# AGP: Android Gradle Plugin – core of the Android build system
+android-application = { id = "com.android.application",             version.ref = "agp" }
+
+# Kotlin Android plugin – enables Kotlin compilation for Android
+kotlin-android      = { id = "org.jetbrains.kotlin.android",        version.ref = "kotlin" }
+
+# Kotlin Compose plugin – activates the Compose compiler (Kotlin 1.9.20+)
+# Without this plugin, @Composable annotations are not processed
+kotlin-compose      = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+# Kotlin Serialization plugin – processes @Serializable annotations.
+# Required for type-safe Navigation 2.8+ routes.
+# Uses the same Kotlin version as the other Kotlin plugins.
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# KSP plugin – fast annotation processor, required by Room
+ksp                 = { id = "com.google.devtools.ksp",             version.ref = "ksp" }

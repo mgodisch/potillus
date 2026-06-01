@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Latvian (Latviešu)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Šodien</string>
+    <string name="calendar">Kalendārs</string>
+    <string name="statistics">Statistika</string>
+    <string name="drinks">Dzērieni</string>
+    <string name="settings">Iestatījumi</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Kopā šodien</string>
+    <string name="grams_alcohol">g alkohola</string>
+    <string name="entries_today">Ieraksti šodien</string>
+    <string name="no_entries_today">Šodien nav ierakstu.\nPieskarieties +, lai pievienotu.</string>
+    <string name="no_entries_day">Šai dienai nav ierakstu.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Ātri pievienot no izlases</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC novērtējums</string>
+    <string name="bac_disclaimer">Novērtējums · neizmantot braukšanas lēmumiem</string>
+    <string name="stats_from_section">Statistikas periods</string>
+    <string name="stats_from_label">Statistika no</string>
+    <string name="stats_from_desc">Ieraksti pirms šī datuma tiek izslēgti no visām statistikām.</string>
+    <string name="bac_section">BAC novērtētājs (Widmark)</string>
+    <string name="bac_desc">Novērtēšanai nepieciešams ķermeņa svars. Tas ir matemātisks tuvinājums, nevis mērījums.</string>
+    <string name="body_weight">Ķermeņa svars</string>
+    <string name="not_set">nav iestatīts</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Pievienot ierakstu</string>
+    <string name="edit_entry">Rediģēt ierakstu</string>
+    <string name="drink">Dzēriens</string>
+    <string name="select_drink">Izvēlieties dzērienu …</string>
+    <string name="volume_ml">Daudzums</string>
+    <string name="time">Laiks</string>
+    <string name="pure_alcohol">g tīra alkohola</string>
+    <string name="note">Piezīme (neobligāta)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Pievienot dzērienu</string>
+    <string name="edit_drink">Rediģēt dzērienu</string>
+    <string name="drink_name">Nosaukums</string>
+    <string name="alcohol_percent">Alkohola saturs</string>
+    <string name="favorite">Izlase</string>
+    <string name="no_drinks">Dzērieni vēl nav definēti.</string>
+    <string name="category">Kategorija</string>
+    <string name="category_beer">Alus</string>
+    <string name="category_wine">Vīns / Dzirkstošais</string>
+    <string name="category_spirits">Stiprie alkoholi</string>
+    <string name="category_longdrink">Garais dzēriens / Miks</string>
+    <string name="category_liqueur">Liķieris</string>
+    <string name="category_other">Cits</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Alkohola kopsavilkums</string>
+    <string name="pdf_section_kpis">Galvenie rādītāji</string>
+    <string name="pdf_section_months">Mēneša pārskats</string>
+    <string name="pdf_section_trend">Ilgtermiņa tendence (vid. g/mēn.)</string>
+    <string name="pdf_section_categories">Dzērienu kategorijas</string>
+    <string name="pdf_section_daytime">Patēriņa modelis: diennakts laiks</string>
+    <string name="pdf_section_weekday">Nedēļas dienu profils (vid. g alkohola)</string>
+    <string name="pdf_section_risk">Riskants patēriņš un atturēšanās</string>
+    <string name="pdf_footer1">Tikai novērtējumi. Nav izmantojami braukšanai vai diagnostikas nolūkos.</string>
+    <string name="pdf_footer2">Izveidots ar Libellus Potionis (Potillus). Novērtējumi – nav medicīnisks slēdziens.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Eksportēšanas datums</string>
+    <string name="pdf_meta_period">Periods</string>
+    <string name="pdf_meta_gender">Dzimums</string>
+    <string name="pdf_meta_limit">Limits</string>
+    <string name="pdf_meta_weight">Ķermeņa svars</string>
+    <string name="pdf_meta_custom_limit">Pielāgots</string>
+    <string name="pdf_kpi_total">Kopējais alkohols</string>
+    <string name="pdf_kpi_avg_day">Vid. dienā</string>
+    <string name="pdf_kpi_avg_drink_day">Vid. dzēriena dienā</string>
+    <string name="pdf_kpi_drink_days">Dzēriena dienas</string>
+    <string name="pdf_kpi_abstinent_days">Atturēšanās dienas</string>
+    <string name="pdf_kpi_over_who">Dienas > PVO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dienas > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Reibšanas dienas (>%1$s g)</string>
+    <string name="pdf_col_month">Mēnesis</string>
+    <string name="pdf_col_drink_days">Dzēriena dienas</string>
+    <string name="pdf_col_total_g">Kopā g</string>
+    <string name="pdf_col_avg_g_day">Vid. g/dienā</string>
+    <string name="pdf_meta_first_drink">Vid. pirmais dzēriens</string>
+    <string name="pdf_meta_last_drink">Vid. pēdējais dzēriens</string>
+    <string name="pdf_meta_before_18">Īpatsvars pirms 17:00</string>
+    <string name="pdf_meta_after_18">Īpatsvars no 17:00</string>
+    <string name="pdf_meta_binge_days">Reibšanas dienas (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Garākais atturēšanās periods</string>
+    <string name="pdf_meta_current_abstinence">Pašreizējā atturēšanās</string>
+    <string name="pdf_days_suffix">dienas</string>
+
+    <!-- Actions -->
+    <string name="save">Saglabāt</string>
+    <string name="cancel">Atcelt</string>
+    <string name="back">Atpakaļ</string>
+    <string name="delete">Dzēst</string>
+    <string name="change">Mainīt</string>
+    <string name="delete_confirm">Tiešām dzēst „%1$s“?</string>
+    <string name="no_data">Šim periodam nav datu.</string>
+
+    <!-- Stats -->
+    <string name="week">Nedēļa</string>
+    <string name="month">Mēnesis</string>
+    <string name="year">Gads</string>
+    <string name="total_period">Kopā periodā</string>
+    <string name="avg_per_day">Vidēji dienā</string>
+    <string name="avg_per_drink_day">Vidēji dzēriena dienā</string>
+    <string name="abstinent_days">Atturēšanās dienas</string>
+    <string name="stats_category_breakdown">Kategorijas</string>
+    <string name="streak_trend">Atturēšanās un tendence</string>
+    <string name="current_streak">Pašreizējā atturēšanās</string>
+    <string name="longest_streak">Garākā atturēšanās</string>
+    <string name="days_count">%1$d dienas</string>
+    <string name="trend_vs_prev">Tendence salīdzinājumā ar iepriekšējo periodu</string>
+
+    <!-- Settings -->
+    <string name="appearance">Izskats</string>
+    <string name="theme_mode">Krāsu shēma</string>
+    <string name="theme_system">Sistēma</string>
+    <string name="theme_day">Gaišā</string>
+    <string name="theme_night">Tumšā</string>
+    <string name="day_change_time">Dienas maiņas laiks</string>
+    <string name="day_starts_at">Jaunā diena sākas plkst.</string>
+    <string name="gender">Dzimums</string>
+    <string name="male">Vīrietis</string>
+    <string name="female">Sieviete</string>
+    <string name="limit_mode">Medicīniskā vadlīnija</string>
+    <string name="limit_who">PVO – riska līmenis</string>
+    <string name="limit_dhs">DHS – zems risks</string>
+    <string name="limit_custom">Pielāgots</string>
+    <string name="custom_limit_grams">Mans dienas limits gramos</string>
+    <string name="weekly_limit_section">Nedēļas limits</string>
+    <string name="weekly_limit_enabled">Iespējot nedēļas limitu</string>
+    <string name="weekly_limit_grams">Nedēļas limits gramos</string>
+    <string name="weekly_limit">Nedēļa</string>
+    <string name="biometric">Bloķēšana</string>
+    <string name="biometric_lock">Biometriskā bloķēšana</string>
+    <string name="biometric_desc">Bloķēt lietotni ar pirkstu nospiedumu vai seju</string>
+    <string name="language">Valoda</string>
+    <string name="export">Datu eksports</string>
+    <string name="export_desc">Eksportēt ierakstus mapē Lejupielādes</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Dublējums</string>
+    <string name="backup_desc">Pilns dublējums (ieraksti + dzērieni) kā JSON fails</string>
+    <string name="backup_export">Eksportēt</string>
+    <string name="backup_import">Importēt</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Kā importēt datus?</string>
+    <string name="import_replace">Aizstāt</string>
+    <string name="import_merge">Pievienot</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Lūdzu, autentificējieties</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">PVO (2023) norāda: Alkohola patēriņam nav drošs līmenis. Šeit parādītā riska vērtība ir praktisks orientieris, nevis drošības robeža.</string>
+    <string name="who_values">Riska vērtība: ♂ ≤ %1$s g, ♀ ≤ %2$s g dienā.</string>
+    <string name="dhs_note">DHS iesaka: vīriešiem nevajadzētu dzert vairāk par 24 g, sievietēm – ne vairāk par 12 g tīra alkohola dienā. Vismaz divas dienas nedēļā jābūt bez alkohola.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Rāda %1$d no %2$d mēnešiem – vecāki dati CSV/dublējumā</string>
+    <string name="year_calendar_no_entry">nav ieraksta</string>
+    <string name="year_calendar_under_limit">zem limita</string>
+    <string name="year_calendar_over_limit">virs limita</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Nav eksportējamu ierakstu.</string>
+    <string name="export_failed">Eksports neizdevās.</string>
+    <string name="backup_failed">Dublēšana neizdevās.</string>
+    <string name="import_success_replace">%1$d ieraksti importēti.</string>
+    <string name="import_success_merge">%1$d importēti, %2$d izlaisti.</string>
+    <string name="import_error_could_not_read">Failu nevar nolasīt.</string>
+    <string name="import_error_empty">Dublējuma fails ir tukšs.</string>
+    <string name="import_error_invalid_json">Nepareizs JSON formāts.</string>
+    <string name="import_error_version_too_high">Dublējuma versija %1$d netiek atbalstīta (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Dublējuma fails ir pārāk liels (maks. %1$d MB).</string>
+    <string name="import_error_read">Lasīšanas kļūda: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ ir {count} ieraksti un to nevar dzēst.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Dzēriena nosaukums nedrīkst būt tukšs.</string>
+    <string name="drink_validation_name_too_long">Dzēriena nosaukums ir pārāk garš (maks. 100 rakstzīmes).</string>
+    <string name="drink_validation_volume_range">Tilpumam jābūt no 1 ml līdz 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Alkohola saturam jābūt no 0 % līdz 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Alkohola saturs nav derīgs skaitlis.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Datums</string>
+    <string name="csv_col_time">Laiks</string>
+    <string name="csv_col_drink">Dzēriens</string>
+    <string name="csv_col_category">Kategorija</string>
+    <string name="csv_col_volume_ml">Daudzums_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohols_%</string>
+    <string name="csv_col_grams">Grami_alkohola</string>
+    <string name="csv_col_note">Piezīme</string>
+    <string name="pdf_unit_g_per_day">g/dienā</string>
+    <string name="unit_g_per_day">g/dienā</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Dienas virs limita (PVO)</string>
+    <string name="days_over_limit_dhs">Dienas virs limita (DHS)</string>
+    <string name="days_over_limit_custom">Dienas virs konfigurētā limita</string>
+    <string name="drink_days_label">dzēriena dienas šonedēļ</string>
+    <string name="drink_days_setting">Maks. dzēriena dienas/nedēļa</string>
+    <string name="drink_days_who_dhs_note">Ieteikums: maks. 5 dzēriena dienas nedēļā (≥ 2 bez alkohola)</string>
+    <string name="weekly_gram_mode_title">Nedēļas gramu limits</string>
+    <string name="weekly_gram_mode_desc">Progresa josla un indikatori izmanto nedēļas budžetu (maks. dzēriena dienas &#215; dienas limits)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Personas dati</string>
+    <string name="week_starts_on">Nedēļa sākas</string>
+</resources>

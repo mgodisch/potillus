@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        BERECHTIGUNGEN – minimales Profil:
+        - Keine Netzwerk-Permission
+        - Keine Kamera, kein Mikrofon, kein Standort
+        - Keine Telefon-Permissions
+    -->
+
+    <!--
+        Biometrie: USE_FINGERPRINT war seit API 28 deprecated und ist bei
+        minSdk 35 vollständig obsolet. Nur USE_BIOMETRIC wird benötigt.
+    -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- CSV-Export in Downloads-Ordner (MediaStore, kein WRITE_EXTERNAL_STORAGE nötig ab API 29) -->
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════════
+        HOW TO ADD A NEW LANGUAGE — checklist (all three steps are required)
+        ═══════════════════════════════════════════════════════════════════════
+
+        Step 1 – String resources
+          Create app/src/main/res/values-<bcp47>/strings.xml and translate all
+          181 string keys.  Use values-de/strings.xml as the source of truth.
+          (The exact count is asserted by LocaleSyncTest; if this comment and the
+           test ever disagree, the test wins.)
+          BCP-47 resource qualifier examples:
+            • values-fr/          → French
+            • values-pt/          → Portuguese (European)
+            • values-pt-rBR/      → Portuguese (Brazilian)   ← note the "r"
+            • values-zh-rCN/      → Chinese Simplified
+            • values-sr-rLatn/    → Serbian (Latin script)
+
+        Step 2 – locale_config.xml   ← THIS IS THE STEP MOST OFTEN FORGOTTEN
+          Add a <locale android:name="…"/> entry to
+          app/src/main/res/xml/locale_config.xml.
+          Without this entry the language is INVISIBLE in:
+            • Android's per-app language picker
+              (Settings → Apps → Potillus → Language, API 33+)
+            • the in-app language selector
+              (SettingsScreen → AppCompatDelegate)
+          The android:name value is a plain BCP-47 tag — no "r" prefix,
+          hyphen not underscore:
+            • values-pt-rBR/ → android:name="pt-BR"
+            • values-zh-rCN/ → android:name="zh-CN"
+
+        Step 3 – RTL languages only (Arabic, Hebrew, Persian, Urdu, …)
+          Verify android:supportsRtl="true" is set on <application> below
+          (it already is).  No further code changes are needed; Compose and
+          the Android framework mirror the layout automatically.
+        ═══════════════════════════════════════════════════════════════════════
+    -->
+    <application
+        android:name=".PotillusApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Potillus"
+        android:localeConfig="@xml/locale_config"> <!-- ← Step 2 above: keep locale_config.xml in sync! -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            Für AppCompat-Lokalisierungssystem (Sprachumschaltung zur Laufzeit).
+            autoStoreLocales=true: Android speichert die Wahl automatisch.
+        -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+    </application>
+</manifest>

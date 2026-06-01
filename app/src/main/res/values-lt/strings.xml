@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Lithuanian (Lietuvių)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Šiandien</string>
+    <string name="calendar">Kalendorius</string>
+    <string name="statistics">Statistika</string>
+    <string name="drinks">Gėrimai</string>
+    <string name="settings">Nustatymai</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Iš viso šiandien</string>
+    <string name="grams_alcohol">g alkoholio</string>
+    <string name="entries_today">Įrašai šiandien</string>
+    <string name="no_entries_today">Šiandien nėra įrašų.\nPalieskite + norėdami pridėti.</string>
+    <string name="no_entries_day">Šiai dienai nėra įrašų.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Greitas pridėjimas iš mėgstamų</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC įvertinimas</string>
+    <string name="bac_disclaimer">Įvertinimas · ne vairavimo sprendimams</string>
+    <string name="stats_from_section">Statistikos laikotarpis</string>
+    <string name="stats_from_label">Statistika nuo</string>
+    <string name="stats_from_desc">Įrašai iki šios datos neįtraukiami į jokias statistikas.</string>
+    <string name="bac_section">BAC įvertintuvas (Widmark)</string>
+    <string name="bac_desc">Įvertinimui reikalingas kūno svoris. Tai matematinis artinys, o ne matavimas.</string>
+    <string name="body_weight">Kūno svoris</string>
+    <string name="not_set">nenustatyta</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Pridėti įrašą</string>
+    <string name="edit_entry">Redaguoti įrašą</string>
+    <string name="drink">Gėrimas</string>
+    <string name="select_drink">Pasirinkite gėrimą …</string>
+    <string name="volume_ml">Kiekis</string>
+    <string name="time">Laikas</string>
+    <string name="pure_alcohol">g gryno alkoholio</string>
+    <string name="note">Pastaba (neprivaloma)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Pridėti gėrimą</string>
+    <string name="edit_drink">Redaguoti gėrimą</string>
+    <string name="drink_name">Pavadinimas</string>
+    <string name="alcohol_percent">Alkoholio kiekis</string>
+    <string name="favorite">Mėgstamiausias</string>
+    <string name="no_drinks">Gėrimų dar nenustatyta.</string>
+    <string name="category">Kategorija</string>
+    <string name="category_beer">Alus</string>
+    <string name="category_wine">Vynas / Putojantis</string>
+    <string name="category_spirits">Stiprieji gėrimai</string>
+    <string name="category_longdrink">Ilgas gėrimas / Miksas</string>
+    <string name="category_liqueur">Likeris</string>
+    <string name="category_other">Kita</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Alkoholio santrauka</string>
+    <string name="pdf_section_kpis">Pagrindiniai rodikliai</string>
+    <string name="pdf_section_months">Mėnesio apžvalga</string>
+    <string name="pdf_section_trend">Ilgalaikė tendencija (vid. g/mėn.)</string>
+    <string name="pdf_section_categories">Gėrimų kategorijos</string>
+    <string name="pdf_section_daytime">Vartojimo modelis: paros laikas</string>
+    <string name="pdf_section_weekday">Savaitės dienų profilis (vid. g alkoholio)</string>
+    <string name="pdf_section_risk">Rizkingtas vartojimas ir susilaikymas</string>
+    <string name="pdf_footer1">Tik įvertinimai. Ne vairavimui ar diagnostikos tikslais.</string>
+    <string name="pdf_footer2">Sukurta su Libellus Potionis (Potillus). Įvertinimai – ne medicininė diagnozė.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Eksporto data</string>
+    <string name="pdf_meta_period">Laikotarpis</string>
+    <string name="pdf_meta_gender">Lytis</string>
+    <string name="pdf_meta_limit">Riba</string>
+    <string name="pdf_meta_weight">Kūno svoris</string>
+    <string name="pdf_meta_custom_limit">Pasirinktinis</string>
+    <string name="pdf_kpi_total">Visas alkoholis</string>
+    <string name="pdf_kpi_avg_day">Vid. per dieną</string>
+    <string name="pdf_kpi_avg_drink_day">Vid. per gėrimo dieną</string>
+    <string name="pdf_kpi_drink_days">Gėrimo dienos</string>
+    <string name="pdf_kpi_abstinent_days">Susilaikymo dienos</string>
+    <string name="pdf_kpi_over_who">Dienos > PSO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dienos > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Girtavimo dienos (>%1$s g)</string>
+    <string name="pdf_col_month">Mėnuo</string>
+    <string name="pdf_col_drink_days">Gėrimo dienos</string>
+    <string name="pdf_col_total_g">Iš viso g</string>
+    <string name="pdf_col_avg_g_day">Vid. g/dieną</string>
+    <string name="pdf_meta_first_drink">Vid. pirmas gėrimas</string>
+    <string name="pdf_meta_last_drink">Vid. paskutinis gėrimas</string>
+    <string name="pdf_meta_before_18">Dalis iki 17:00</string>
+    <string name="pdf_meta_after_18">Dalis nuo 17:00</string>
+    <string name="pdf_meta_binge_days">Girtavimo dienos (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Ilgiausias susilaikymo laikotarpis</string>
+    <string name="pdf_meta_current_abstinence">Dabartinis susilaikymas</string>
+    <string name="pdf_days_suffix">dienų</string>
+
+    <!-- Actions -->
+    <string name="save">Išsaugoti</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="back">Atgal</string>
+    <string name="delete">Ištrinti</string>
+    <string name="change">Keisti</string>
+    <string name="delete_confirm">Ar tikrai ištrinti „%1$s“?</string>
+    <string name="no_data">Šiam laikotarpiui nėra duomenų.</string>
+
+    <!-- Stats -->
+    <string name="week">Savaitė</string>
+    <string name="month">Mėnuo</string>
+    <string name="year">Metai</string>
+    <string name="total_period">Iš viso per laikotarpį</string>
+    <string name="avg_per_day">Vidurkis per dieną</string>
+    <string name="avg_per_drink_day">Vidurkis per gėrimo dieną</string>
+    <string name="abstinent_days">Susilaikymo dienos</string>
+    <string name="stats_category_breakdown">Kategorijos</string>
+    <string name="streak_trend">Susilaikymas ir tendencija</string>
+    <string name="current_streak">Dabartinis susilaikymas</string>
+    <string name="longest_streak">Ilgiausias susilaikymas</string>
+    <string name="days_count">%1$d dienų</string>
+    <string name="trend_vs_prev">Tendencija, palyginti su ankstesniu laikotarpiu</string>
+
+    <!-- Settings -->
+    <string name="appearance">Išvaizda</string>
+    <string name="theme_mode">Spalvų schema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_day">Šviesi</string>
+    <string name="theme_night">Tamsi</string>
+    <string name="day_change_time">Dienos keitimo laikas</string>
+    <string name="day_starts_at">Nauja diena prasideda</string>
+    <string name="gender">Lytis</string>
+    <string name="male">Vyras</string>
+    <string name="female">Moteris</string>
+    <string name="limit_mode">Medicinos gairė</string>
+    <string name="limit_who">PSO – rizikos lygis</string>
+    <string name="limit_dhs">DHS – žema rizika</string>
+    <string name="limit_custom">Pasirinktinis</string>
+    <string name="custom_limit_grams">Mano dienos riba gramais</string>
+    <string name="weekly_limit_section">Savaitės riba</string>
+    <string name="weekly_limit_enabled">Įjungti savaitės ribą</string>
+    <string name="weekly_limit_grams">Savaitės riba gramais</string>
+    <string name="weekly_limit">Savaitė</string>
+    <string name="biometric">Užraktas</string>
+    <string name="biometric_lock">Biometrinis užraktas</string>
+    <string name="biometric_desc">Užrakinti programą piršto antspaudu arba veidu</string>
+    <string name="language">Kalba</string>
+    <string name="export">Duomenų eksportas</string>
+    <string name="export_desc">Eksportuoti įrašus į aplanką Atsisiuntimai</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Atsarginė kopija</string>
+    <string name="backup_desc">Pilna atsarginė kopija (įrašai + gėrimai) kaip JSON failas</string>
+    <string name="backup_export">Eksportuoti</string>
+    <string name="backup_import">Importuoti</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Kaip importuoti duomenis?</string>
+    <string name="import_replace">Pakeisti</string>
+    <string name="import_merge">Pridėti</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Prašome autentifikuotis</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">PSO (2023) teigia: Nėra saugaus alkoholio vartojimo lygio. Čia parodyta rizikos reikšmė yra praktinė orientacinė vertė, o ne saugumo riba.</string>
+    <string name="who_values">Rizikos vertė: ♂ ≤ %1$s g, ♀ ≤ %2$s g per dieną.</string>
+    <string name="dhs_note">DHS rekomenduoja: vyrai neturėtų gerti daugiau nei 24 g, moterys ne daugiau nei 12 g gryno alkoholio per dieną. Bent dvi dienos per savaitę turėtų būti be alkoholio.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Rodoma %1$d iš %2$d mėnesių – senesni duomenys CSV/atsarginėje kopijoje</string>
+    <string name="year_calendar_no_entry">nėra įrašo</string>
+    <string name="year_calendar_under_limit">žemiau ribos</string>
+    <string name="year_calendar_over_limit">virš ribos</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Nėra įrašų eksportavimui.</string>
+    <string name="export_failed">Eksportas nepavyko.</string>
+    <string name="backup_failed">Atsarginė kopija nepavyko.</string>
+    <string name="import_success_replace">%1$d įrašai importuoti.</string>
+    <string name="import_success_merge">%1$d importuoti, %2$d praleisti.</string>
+    <string name="import_error_could_not_read">Failo nepavyko perskaityti.</string>
+    <string name="import_error_empty">Atsarginės kopijos failas yra tuščias.</string>
+    <string name="import_error_invalid_json">Neteisingas JSON formatas.</string>
+    <string name="import_error_version_too_high">Atsarginės kopijos versija %1$d nepalaikoma (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Atsarginės kopijos failas per didelis (maks. %1$d MB).</string>
+    <string name="import_error_read">Skaitymo klaida: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ turi {count} įrašų ir negali būti ištrinta.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Gėrimo pavadinimas negali būti tuščias.</string>
+    <string name="drink_validation_name_too_long">Gėrimo pavadinimas per ilgas (maks. 100 simbolių).</string>
+    <string name="drink_validation_volume_range">Tūris turi būti nuo 1 ml iki 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Alkoholio kiekis turi būti nuo 0 % iki 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Alkoholio kiekis nėra tinkamas skaičius.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Data</string>
+    <string name="csv_col_time">Laikas</string>
+    <string name="csv_col_drink">Gėrimas</string>
+    <string name="csv_col_category">Kategorija</string>
+    <string name="csv_col_volume_ml">Kiekis_ml</string>
+    <string name="csv_col_alcohol_pct">Alkoholis_%</string>
+    <string name="csv_col_grams">Gramai_alkoholio</string>
+    <string name="csv_col_note">Pastaba</string>
+    <string name="pdf_unit_g_per_day">g/dieną</string>
+    <string name="unit_g_per_day">g/dieną</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Dienos viršijant ribą (PSO)</string>
+    <string name="days_over_limit_dhs">Dienos viršijant ribą (DHS)</string>
+    <string name="days_over_limit_custom">Dienos viršijant nustatytą ribą</string>
+    <string name="drink_days_label">gėrimo dienos šią savaitę</string>
+    <string name="drink_days_setting">Maks. gėrimo dienos/savaitė</string>
+    <string name="drink_days_who_dhs_note">Rekomendacija: maks. 5 gėrimo dienų per savaitę (≥ 2 dienos be alkoholio)</string>
+    <string name="weekly_gram_mode_title">Savaitinis gramų limitas</string>
+    <string name="weekly_gram_mode_desc">Pažangos juosta ir indikatoriai naudoja savaitinį biudžetą (maks. gėrimo dienos &#215; dienos riba)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Asmens duomenys</string>
+    <string name="week_starts_on">Savaitė prasideda</string>
+</resources>

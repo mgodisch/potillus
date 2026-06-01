@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ukrainian (uk) — Cyrillic script.
+    The existing Russian locale (values-ru/) already exercises the Cyrillic
+    font stack, so no additional font or rendering work is required.
+    Key differences from Russian to watch out for:
+      • Ukrainian uses "і" (U+0456) and "ї" (U+0457), not found in Russian.
+      • Genitive plural of "день" (day) is "днів" in Ukrainian vs "дней" in Russian.
+      • "Налаштування" (settings) vs Russian "Настройки".
+      • "Зберегти" (save) vs Russian "Сохранить".
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Сьогодні</string>
+    <string name="calendar">Календар</string>
+    <string name="statistics">Статистика</string>
+    <string name="drinks">Напої</string>
+    <string name="settings">Налаштування</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Разом сьогодні</string>
+    <string name="grams_alcohol">г алкоголю</string>
+    <string name="entries_today">Записи сьогодні</string>
+    <string name="no_entries_today">Сьогодні ще немає записів.\nНатисніть + щоб додати запис.</string>
+    <string name="no_entries_day">Немає записів за цей день.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Швидке додавання обраного</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Оцінка рівня алкоголю в крові</string>
+    <string name="bac_disclaimer">Оцінка · не для рішень щодо водіння</string>
+    <string name="stats_from_section">Період статистики</string>
+    <string name="stats_from_label">Статистика від</string>
+    <string name="stats_from_desc">Записи до цієї дати виключаються з усієї статистики.</string>
+    <string name="bac_section">Оцінювач рівня алкоголю (Widmark)</string>
+    <string name="bac_desc">Для оцінки потрібна вага тіла. Це математичне наближення, а не вимірювання.</string>
+    <string name="body_weight">Вага тіла</string>
+    <string name="not_set">не встановлено</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Додати запис</string>
+    <string name="edit_entry">Редагувати запис</string>
+    <string name="drink">Напій</string>
+    <string name="select_drink">Оберіть напій …</string>
+    <string name="volume_ml">Кількість</string>
+    <string name="time">Час</string>
+    <string name="pure_alcohol">г чистого алкоголю</string>
+    <string name="note">Примітка (необов\'язково)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Додати напій</string>
+    <string name="edit_drink">Редагувати напій</string>
+    <string name="drink_name">Назва</string>
+    <string name="alcohol_percent">Вміст алкоголю</string>
+    <string name="favorite">Обране</string>
+    <string name="no_drinks">Ще не визначено жодного напою.</string>
+    <string name="category">Категорія</string>
+    <string name="category_beer">Пиво</string>
+    <string name="category_wine">Вино / Ігристе</string>
+    <string name="category_spirits">Міцні напої</string>
+    <string name="category_longdrink">Лонгдринк / Мікс</string>
+    <string name="category_liqueur">Лікер</string>
+    <string name="category_other">Інше</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Підсумок алкоголю</string>
+    <string name="pdf_section_kpis">Ключові показники</string>
+    <string name="pdf_section_months">Місячний огляд</string>
+    <string name="pdf_section_trend">Довгостроковий тренд (сер. г/місяць)</string>
+    <string name="pdf_section_categories">Категорії напоїв</string>
+    <string name="pdf_section_daytime">Модель споживання: час доби</string>
+    <string name="pdf_section_weekday">Профіль за днями тижня (сер. г алкоголю)</string>
+    <string name="pdf_section_risk">Ризикове споживання &amp; Утримання</string>
+    <string name="pdf_footer1">Тільки оцінки. Не для водіння чи діагностики.</string>
+    <string name="pdf_footer2">Створено за допомогою Libellus Potionis (Potillus). Оцінки — не медичний діагноз.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Дата експорту</string>
+    <string name="pdf_meta_period">Період</string>
+    <string name="pdf_meta_gender">Стать</string>
+    <string name="pdf_meta_limit">Ліміт</string>
+    <string name="pdf_meta_weight">Вага тіла</string>
+    <string name="pdf_meta_custom_limit">Власний</string>
+    <string name="pdf_kpi_total">Загальний алкоголь</string>
+    <string name="pdf_kpi_avg_day">Сер. за день</string>
+    <string name="pdf_kpi_avg_drink_day">Сер. за день вживання</string>
+    <string name="pdf_kpi_drink_days">Дні вживання</string>
+    <string name="pdf_kpi_abstinent_days">Дні утримання</string>
+    <string name="pdf_kpi_over_who">Дні > ВООЗ (%1$s г)</string>
+    <string name="pdf_kpi_over_dhs">Дні > DHS (%1$s г)</string>
+    <string name="pdf_kpi_binge">Дні надмірного вживання (>%1$s г)</string>
+    <string name="pdf_col_month">Місяць</string>
+    <string name="pdf_col_drink_days">Дні вживання</string>
+    <string name="pdf_col_total_g">Всього г</string>
+    <string name="pdf_col_avg_g_day">Сер. г/день</string>
+    <string name="pdf_meta_first_drink">Перший напій (сер.)</string>
+    <string name="pdf_meta_last_drink">Останній напій (сер.)</string>
+    <string name="pdf_meta_before_18">Частка до 17:00</string>
+    <string name="pdf_meta_after_18">Частка від 17:00</string>
+    <string name="pdf_meta_binge_days">Дні надмірного вживання (>%1$s г)</string>
+    <string name="pdf_meta_longest_abstinence">Найдовше утримання</string>
+    <string name="pdf_meta_current_abstinence">Поточне утримання</string>
+    <string name="pdf_days_suffix">днів</string>
+
+    <!-- Actions -->
+    <string name="save">Зберегти</string>
+    <string name="cancel">Скасувати</string>
+    <string name="back">Назад</string>
+    <string name="delete">Видалити</string>
+    <string name="change">Змінити</string>
+    <string name="delete_confirm">Справді видалити «%1$s»?</string>
+    <string name="no_data">Немає даних за цей період.</string>
+
+    <!-- Stats -->
+    <string name="week">Тиждень</string>
+    <string name="month">Місяць</string>
+    <string name="year">Рік</string>
+    <string name="total_period">Разом за період</string>
+    <string name="avg_per_day">Середнє за день</string>
+    <string name="avg_per_drink_day">Середнє за день вживання</string>
+    <string name="abstinent_days">Дні утримання</string>
+    <string name="stats_category_breakdown">Категорії</string>
+    <string name="streak_trend">Утримання &amp; Тренд</string>
+    <string name="current_streak">Поточне утримання</string>
+    <string name="longest_streak">Найдовше утримання</string>
+    <string name="days_count">%1$d днів</string>
+    <string name="trend_vs_prev">Тренд порівняно з попереднім періодом</string>
+
+    <!-- Settings -->
+    <string name="appearance">Зовнішній вигляд</string>
+    <string name="theme_mode">Колірна схема</string>
+    <string name="theme_system">Система</string>
+    <string name="theme_day">Світла</string>
+    <string name="theme_night">Темна</string>
+    <string name="day_change_time">Час зміни дня</string>
+    <string name="day_starts_at">Новий день починається о</string>
+    <string name="gender">Стать</string>
+    <string name="male">Чоловіча</string>
+    <string name="female">Жіноча</string>
+    <string name="limit_mode">Медичні рекомендації</string>
+    <string name="limit_who">ВООЗ – рівень ризику</string>
+    <string name="limit_dhs">DHS – низький ризик</string>
+    <string name="limit_custom">Власний</string>
+    <string name="custom_limit_grams">Мій добовий ліміт у грамах</string>
+    <string name="weekly_limit_section">Тижневий ліміт</string>
+    <string name="weekly_limit_enabled">Увімкнути тижневий ліміт</string>
+    <string name="weekly_limit_grams">Тижневий ліміт у грамах</string>
+    <string name="weekly_limit">Тиждень</string>
+    <string name="biometric">Блокування доступу</string>
+    <string name="biometric_lock">Біометричне блокування</string>
+    <string name="biometric_desc">Блокувати додаток відбитком пальця або розпізнаванням обличчя</string>
+    <string name="language">Мова</string>
+    <string name="export">Експорт даних</string>
+    <string name="export_desc">Експортувати записи до папки Завантаження</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Резервна копія</string>
+    <string name="backup_desc">Повна резервна копія (записи + напої) як файл JSON</string>
+    <string name="backup_export">Експортувати</string>
+    <string name="backup_import">Імпортувати</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Як імпортувати дані?</string>
+    <string name="import_replace">Замінити</string>
+    <string name="import_merge">Додати</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Будь ласка, пройдіть автентифікацію</string>
+
+    <!-- WHO note -->
+    <string name="who_note">ВООЗ (2023) зазначає: безпечного рівня споживання алкоголю не існує. Значення ризику, показане тут, є практичною точкою відліку, а не порогом безпеки.</string>
+    <string name="who_values">Значення ризику: ♂ ≤ %1$s г, ♀ ≤ %2$s г на день.</string>
+    <string name="pdf_months_truncated">Показано %1$d з %2$d місяців – старіші дані доступні в CSV/резервній копії</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">немає запису</string>
+    <string name="year_calendar_under_limit">нижче ліміту</string>
+    <string name="year_calendar_over_limit">вище ліміту</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Немає записів для експорту.</string>
+    <string name="export_failed">Помилка експорту.</string>
+    <string name="backup_failed">Помилка резервного копіювання.</string>
+    <string name="import_success_replace">%1$d записів імпортовано.</string>
+    <string name="import_success_merge">%1$d імпортовано, %2$d пропущено.</string>
+    <string name="import_error_could_not_read">Не вдалося прочитати файл.</string>
+    <string name="import_error_empty">Файл резервної копії порожній.</string>
+    <string name="import_error_invalid_json">Невірний формат JSON.</string>
+    <string name="import_error_version_too_high">Версія резервної копії %1$d не підтримується (макс. %2$d).</string>
+    <string name="import_error_file_too_large">Файл резервної копії завеликий (макс. %1$d МБ).</string>
+    <string name="import_error_read">Помилка читання: %1$s</string>
+    <string name="drink_delete_blocked">«{name}» має {count} записів і не може бути видалений.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Назва напою не може бути порожньою.</string>
+    <string name="drink_validation_name_too_long">Назва напою занадто довга (макс. 100 символів).</string>
+    <string name="drink_validation_volume_range">Кількість повинна бути від 1 мл до 10 000 мл.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Вміст алкоголю повинен бути від 0% до 100%.</string>
+    <string name="drink_validation_alcohol_invalid">Вміст алкоголю не є допустимим числом.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Дата</string>
+    <string name="csv_col_time">Час</string>
+    <string name="csv_col_drink">Напій</string>
+    <string name="csv_col_category">Категорія</string>
+    <string name="csv_col_volume_ml">Кількість_мл</string>
+    <string name="csv_col_alcohol_pct">Алкоголь_%</string>
+    <string name="csv_col_grams">Грами_алкоголю</string>
+    <string name="csv_col_note">Примітка</string>
+    <string name="pdf_unit_g_per_day">г/день</string>
+    <string name="unit_g_per_day">г/день</string>
+
+    <string name="days_over_limit_who">Дні понад ліміт (ВООЗ)</string>
+    <string name="days_over_limit_dhs">Дні понад ліміт (DHS)</string>
+    <string name="days_over_limit_custom">Дні понад власний ліміт</string>
+    <string name="dhs_note">DHS рекомендує: чоловіки не повинні вживати більше 24 г, жінки — більше 12 г чистого алкоголю на день. Щонайменше два дні на тиждень мають бути без алкоголю.</string>
+    <string name="drink_days_label">дні вживання цього тижня</string>
+    <string name="drink_days_setting">Макс. днів вживання/тиждень</string>
+    <string name="drink_days_who_dhs_note">Рекомендація: макс. 5 днів вживання на тиждень (≥ 2 дні утримання)</string>
+    <string name="weekly_gram_mode_title">Тижневий ліміт (грами)</string>
+    <string name="weekly_gram_mode_desc">Індикатор і сигнали використовують тижневий бюджет (макс. дні вживання &#215; добовий ліміт)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Особисті дані</string>
+    <string name="week_starts_on">Тиждень починається з</string>
+</resources>

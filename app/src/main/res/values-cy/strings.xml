@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Welsh (Cymraeg) — cy
+    Script : Latin (+ â ê î ô û ŵ ŷ); LTR.
+    Approx.: ~900 000 L1 speakers; ~870 000 additional L2 speakers (Wales, UK).
+    Register: Standard Welsh (Cymraeg Safonol), following the Welsh Language
+              Commissioner's guidelines for clear, accessible public language.
+    Notes  : Welsh mutations (initial consonant changes triggered by grammar) are
+             applied correctly throughout.  Welsh has both masculine and feminine
+             grammatical gender.  "Binge drinking" → yfed yn ormodol / sbri yfed
+             — the neutral formal term yfed yn ormodol is used here.
+             Welsh word order is VSO (Verb-Subject-Object) in main clauses;
+             translations follow natural Welsh syntax.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Heddiw</string>
+    <string name="calendar">Calendr</string>
+    <string name="statistics">Ystadegau</string>
+    <string name="drinks">Diodydd</string>
+    <string name="settings">Gosodiadau</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Cyfanswm heddiw</string>
+    <string name="grams_alcohol">g alcohol</string>
+    <string name="entries_today">Cofnodion heddiw</string>
+    <string name="no_entries_today">Dim cofnodion heddiw eto.\nTapiwch + i ychwanegu cofnod.</string>
+    <string name="no_entries_day">Dim cofnodion ar gyfer y diwrnod hwn.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Ychwanegu\'n gyflym – ffefrynnau</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Amcangyfrif BAC</string>
+    <string name="bac_disclaimer">Amcangyfrif · nid ar gyfer penderfyniadau gyrru</string>
+    <string name="stats_from_section">Cyfnod ystadegau</string>
+    <string name="stats_from_label">Ystadegau o</string>
+    <string name="stats_from_desc">Caiff cofnodion cyn y dyddiad hwn eu heithrio o\'r holl ystadegau.</string>
+    <string name="bac_section">Cyfrifydd BAC (Widmark)</string>
+    <string name="bac_desc">Mae angen pwysau\'r corff ar gyfer yr amcangyfrif. Brasamcan mathemategol yw hwn, nid mesuriad.</string>
+    <string name="body_weight">Pwysau\'r corff</string>
+    <string name="not_set">heb ei osod</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Ychwanegu cofnod</string>
+    <string name="edit_entry">Golygu cofnod</string>
+    <string name="drink">Diod</string>
+    <string name="select_drink">Dewiswch ddiod …</string>
+    <string name="volume_ml">Swm</string>
+    <string name="time">Amser</string>
+    <string name="pure_alcohol">g alcohol pur</string>
+    <string name="note">Nodyn (dewisol)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Ychwanegu diod</string>
+    <string name="edit_drink">Golygu diod</string>
+    <string name="drink_name">Enw</string>
+    <string name="alcohol_percent">Cynnwys alcohol</string>
+    <string name="favorite">Hoff ddiod</string>
+    <string name="no_drinks">Dim diodydd wedi\'u diffinio eto.</string>
+    <string name="category">Categori</string>
+    <string name="category_beer">Cwrw</string>
+    <string name="category_wine">Gwin / Pefriog</string>
+    <string name="category_spirits">Gwirodydd</string>
+    <string name="category_longdrink">Longdrink / Cymysgedd</string>
+    <string name="category_liqueur">Licŵr</string>
+    <string name="category_other">Arall</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Crynodeb Alcohol</string>
+    <string name="pdf_section_kpis">Prif Ffigurau</string>
+    <string name="pdf_section_months">Trosolwg Misol</string>
+    <string name="pdf_section_trend">Tuedd Hirdymor (cyfartaledd g/mis)</string>
+    <string name="pdf_section_categories">Categorïau Diodydd</string>
+    <string name="pdf_section_daytime">Patrwm Defnydd: Amser y Dydd</string>
+    <string name="pdf_section_weekday">Proffil Diwrnod yr Wythnos (cyfartaledd g alcohol)</string>
+    <string name="pdf_section_risk">Defnydd Peryglus &amp; Ymataliad</string>
+    <string name="pdf_footer1">Amcangyfrifon yn unig. Nid ar gyfer penderfyniadau gyrru na diagnosis.</string>
+    <string name="pdf_footer2">Crëwyd gyda Libellus Potionis (Potillus). Amcangyfrifon – nid diagnosis meddygol.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Dyddiad allforio</string>
+    <string name="pdf_meta_period">Cyfnod</string>
+    <string name="pdf_meta_gender">Rhyw</string>
+    <string name="pdf_meta_limit">Terfyn</string>
+    <string name="pdf_meta_weight">Pwysau\'r corff</string>
+    <string name="pdf_meta_custom_limit">Cyfaddas</string>
+    <string name="pdf_kpi_total">Cyfanswm alcohol</string>
+    <string name="pdf_kpi_avg_day">Cyfartaledd y dydd</string>
+    <string name="pdf_kpi_avg_drink_day">Cyfartaledd y diwrnod yfed</string>
+    <string name="pdf_kpi_drink_days">Diwrnodau yfed</string>
+    <string name="pdf_kpi_abstinent_days">Diwrnodau ymatal</string>
+    <string name="pdf_kpi_over_who">Diwrnodau > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Diwrnodau > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Diwrnodau binge (>%1$s g)</string>
+    <string name="pdf_col_month">Mis</string>
+    <string name="pdf_col_drink_days">Diwrnodau yfed</string>
+    <string name="pdf_col_total_g">Cyfanswm g</string>
+    <string name="pdf_col_avg_g_day">Cyfartaledd g/diwrnod</string>
+    <string name="pdf_meta_first_drink">Cyfartaledd diod gyntaf</string>
+    <string name="pdf_meta_last_drink">Cyfartaledd diod olaf</string>
+    <string name="pdf_meta_before_18">Cyfran cyn 17:00</string>
+    <string name="pdf_meta_after_18">Cyfran o 17:00</string>
+    <string name="pdf_meta_binge_days">Diwrnodau yfed yn ormodol (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Ymataliad hiraf</string>
+    <string name="pdf_meta_current_abstinence">Ymataliad presennol</string>
+    <string name="pdf_days_suffix">diwrnod</string>
+
+    <!-- Actions -->
+    <string name="save">Cadw</string>
+    <string name="cancel">Canslo</string>
+    <string name="back">Yn ôl</string>
+    <string name="delete">Dileu</string>
+    <string name="change">Newid</string>
+    <string name="delete_confirm">Dileu \"%1$s\" go iawn?</string>
+    <string name="no_data">Dim data ar gyfer y cyfnod hwn.</string>
+
+    <!-- Stats -->
+    <string name="week">Wythnos</string>
+    <string name="month">Mis</string>
+    <string name="year">Blwyddyn</string>
+    <string name="total_period">Cyfanswm yn y cyfnod</string>
+    <string name="avg_per_day">Cyfartaledd y dydd</string>
+    <string name="avg_per_drink_day">Cyfartaledd pob diwrnod yfed</string>
+    <string name="abstinent_days">Diwrnodau ymatal</string>
+    <string name="stats_category_breakdown">Categorïau</string>
+    <string name="streak_trend">Ymataliad &amp; Tuedd</string>
+    <string name="current_streak">Ymataliad presennol</string>
+    <string name="longest_streak">Ymataliad hiraf</string>
+    <string name="days_count">%1$d diwrnod</string>
+    <string name="trend_vs_prev">Tuedd o\'i gymharu â\'r cyfnod blaenorol</string>
+
+    <!-- Settings -->
+    <string name="appearance">Ymddangosiad</string>
+    <string name="theme_mode">Cynllun lliw</string>
+    <string name="theme_system">System</string>
+    <string name="theme_day">Golau</string>
+    <string name="theme_night">Tywyll</string>
+    <string name="day_change_time">Amser newid diwrnod</string>
+    <string name="day_starts_at">Mae diwrnod newydd yn dechrau am</string>
+    <string name="gender">Rhyw</string>
+    <string name="male">Gwryw</string>
+    <string name="female">Benyw</string>
+    <string name="limit_mode">Canllawiau meddygol</string>
+    <string name="limit_who">WHO – lefel risg</string>
+    <string name="limit_dhs">DHS – risg isel</string>
+    <string name="limit_custom">Cyfaddas</string>
+    <string name="custom_limit_grams">Fy nherfyn dyddiol mewn gramau</string>
+    <string name="weekly_limit_section">Terfyn wythnosol</string>
+    <string name="weekly_limit_enabled">Galluogi terfyn wythnosol</string>
+    <string name="weekly_limit_grams">Terfyn wythnosol mewn gramau</string>
+    <string name="weekly_limit">Wythnos</string>
+    <string name="biometric">Clo mynediad</string>
+    <string name="biometric_lock">Clo biometrig</string>
+    <string name="biometric_desc">Cloi\'r ap â phrint bys neu adnabod wyneb</string>
+    <string name="language">Iaith</string>
+    <string name="export">Allforio data</string>
+    <string name="export_desc">Allforio cofnodion i\'r ffolder Llwytho i Lawr</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Copi wrth gefn</string>
+    <string name="backup_desc">Copi wrth gefn llawn (cofnodion + diodydd) fel ffeil JSON</string>
+    <string name="backup_export">Allforio</string>
+    <string name="backup_import">Mewnforio</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Sut dylid mewnforio\'r data?</string>
+    <string name="import_replace">Disodli</string>
+    <string name="import_merge">Ychwanegu</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Dilysiwch eich hun os gwelwch yn dda</string>
+
+    <!-- WHO note -->
+    <string name="who_note">Mae\'r WHO (2023) yn nodi: Nid oes lefel ddiogel o yfed alcohol. Mae\'r gwerth risg a ddangosir yma yn bwynt cyfeirio ymarferol, nid trothwy diogelwch.</string>
+    <string name="who_values">Gwerth risg: ♂ ≤ %1$s g, ♀ ≤ %2$s g y dydd.</string>
+    <string name="pdf_months_truncated">Yn dangos %1$d o %2$d mis – mae data hŷn ar gael yn y CSV/copi wrth gefn</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">dim cofnod</string>
+    <string name="year_calendar_under_limit">o dan y terfyn</string>
+    <string name="year_calendar_over_limit">uwchlaw\'r terfyn</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Dim cofnodion i\'w hallforio.</string>
+    <string name="export_failed">Methodd yr allforio.</string>
+    <string name="backup_failed">Methodd y copi wrth gefn.</string>
+    <string name="import_success_replace">Mewnforiwyd %1$d cofnod.</string>
+    <string name="import_success_merge">Mewnforiwyd %1$d, hepgorwyd %2$d.</string>
+    <string name="import_error_could_not_read">Nid oedd modd darllen y ffeil.</string>
+    <string name="import_error_empty">Mae ffeil y copi wrth gefn yn wag.</string>
+    <string name="import_error_invalid_json">Fformat JSON annilys.</string>
+    <string name="import_error_version_too_high">Nid yw fersiwn copi wrth gefn %1$d yn cael ei gefnogi (uchaf. %2$d).</string>
+    <string name="import_error_file_too_large">Mae ffeil y copi wrth gefn yn rhy fawr (uchaf. %1$d MB).</string>
+    <string name="import_error_read">Gwall darllen: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d mae ganddo {count} cofnod ac ni ellir ei ddileu.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Ni chaiff enw\'r ddiod fod yn wag.</string>
+    <string name="drink_validation_name_too_long">Mae enw\'r ddiod yn rhy hir (uchaf. 100 nod).</string>
+    <string name="drink_validation_volume_range">Rhaid i\'r swm fod rhwng 1 ml a 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Rhaid i\'r cynnwys alcohol fod rhwng 0 % a 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Nid yw\'r cynnwys alcohol yn rhif dilys.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Dyddiad</string>
+    <string name="csv_col_time">Amser</string>
+    <string name="csv_col_drink">Diod</string>
+    <string name="csv_col_category">Categori</string>
+    <string name="csv_col_volume_ml">Cyfaint_ml</string>
+    <string name="csv_col_alcohol_pct">Alcohol_%</string>
+    <string name="csv_col_grams">Gramau_alcohol</string>
+    <string name="csv_col_note">Nodyn</string>
+    <string name="pdf_unit_g_per_day">g/diwrnod</string>
+    <string name="unit_g_per_day">g/diwrnod</string>
+
+    <string name="days_over_limit_who">Diwrnodau dros y terfyn (WHO)</string>
+    <string name="days_over_limit_dhs">Diwrnodau dros y terfyn (DHS)</string>
+    <string name="days_over_limit_custom">Diwrnodau dros y terfyn cyfundrefinol</string>
+    <string name="dhs_note">Mae DHS yn argymell: ni ddylai dynion yfed mwy na 24 g, na menywod fwy na 12 g o alcohol pur y dydd. Dylai o leiaf ddau ddiwrnod yr wythnos fod heb alcohol.</string>
+    <string name="drink_days_label">diwrnodau yfed yr wythnos hon</string>
+    <string name="drink_days_setting">Uchaf. diwrnodau yfed/wythnos</string>
+    <string name="drink_days_who_dhs_note">Argymhelliad: uchaf. 5 diwrnod yfed yr wythnos (≥ 2 ddiwrnod ymatal)</string>
+    <string name="weekly_gram_mode_title">Terfyn gramau wythnosol</string>
+    <string name="weekly_gram_mode_desc">Mae\'r bar cynnydd a\'r dangosyddion yn defnyddio\'r gyllideb wythnosol (uchaf. diwrnodau yfed &#215; terfyn dyddiol)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Data personol</string>
+    <string name="week_starts_on">Mae\'r wythnos yn dechrau ar</string>
+</resources>

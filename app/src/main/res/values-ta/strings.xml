@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Tamil (தமிழ்) — ta
+    Script : Tamil script; LTR.  Rendered via Noto Sans Tamil (bundled API 21+).
+    Approx.: ~87 M L1 speakers (Tamil Nadu/India, Sri Lanka, Singapore, Malaysia,
+             diaspora).
+    Register: Standard Modern Tamil (செந்தமிழ்), used in formal writing and
+              broadcast media.
+    Notes  : Tamil is a classical language with a rich literary tradition.  The
+             script is an abugida; Android's ICU handles shaping correctly.
+             Honorifics: நீங்கள்-form (polite plural) used throughout for the
+             user-facing UI.  "Binge drinking" → அதிகப்படியான மது அருந்துதல்.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">இன்று</string>
+    <string name="calendar">நாட்காட்டி</string>
+    <string name="statistics">புள்ளிவிவரம்</string>
+    <string name="drinks">பானங்கள்</string>
+    <string name="settings">அமைப்புகள்</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">இன்றைய மொத்தம்</string>
+    <string name="grams_alcohol">கிராம் ஆல்கஹால்</string>
+    <string name="entries_today">இன்றைய பதிவுகள்</string>
+    <string name="no_entries_today">இன்று இன்னும் பதிவுகள் இல்லை.\nபதிவு சேர்க்க + அழுத்தவும்.</string>
+    <string name="no_entries_day">இந்த நாளுக்கு பதிவுகள் இல்லை.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">விருப்பங்களை விரைவாக சேர்</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC மதிப்பீடு</string>
+    <string name="bac_disclaimer">மதிப்பீடு · வாகன ஓட்டும் முடிவுகளுக்கு அல்ல</string>
+    <string name="stats_from_section">புள்ளிவிவர காலம்</string>
+    <string name="stats_from_label">புள்ளிவிவரம் தொடங்கி</string>
+    <string name="stats_from_desc">இந்த தேதிக்கு முன்பான பதிவுகள் அனைத்து புள்ளிவிவரங்களிலிருந்தும் விலக்கப்படும்.</string>
+    <string name="bac_section">BAC மதிப்பிடுவி (Widmark)</string>
+    <string name="bac_desc">மதிப்பீட்டிற்கு உடல் எடை தேவை. இது கணிதமுறை தோராயமாகும், அளவீடு அல்ல.</string>
+    <string name="body_weight">உடல் எடை</string>
+    <string name="not_set">அமைக்கப்படவில்லை</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">பதிவு சேர்</string>
+    <string name="edit_entry">பதிவு திருத்து</string>
+    <string name="drink">பானம்</string>
+    <string name="select_drink">பானம் தேர்ந்தெடுக்கவும் …</string>
+    <string name="volume_ml">அளவு</string>
+    <string name="time">நேரம்</string>
+    <string name="pure_alcohol">கிராம் தூய ஆல்கஹால்</string>
+    <string name="note">குறிப்பு (விரும்பினால்)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">பானம் சேர்</string>
+    <string name="edit_drink">பானம் திருத்து</string>
+    <string name="drink_name">பெயர்</string>
+    <string name="alcohol_percent">ஆல்கஹால் உள்ளடக்கம்</string>
+    <string name="favorite">விருப்பம்</string>
+    <string name="no_drinks">இன்னும் எந்த பானமும் வரையறுக்கப்படவில்லை.</string>
+    <string name="category">வகை</string>
+    <string name="category_beer">பீர்</string>
+    <string name="category_wine">ஒயின் / ஸ்பார்க்லிங்</string>
+    <string name="category_spirits">ஸ்பிரிட்ஸ்</string>
+    <string name="category_longdrink">லாங்க்ட்ரிங்க் / கலவை</string>
+    <string name="category_liqueur">லிக்கர்</string>
+    <string name="category_other">மற்றவை</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">ஆல்கஹால் சுருக்கம்</string>
+    <string name="pdf_section_kpis">முக்கிய எண்கள்</string>
+    <string name="pdf_section_months">மாதாந்திர கண்ணோட்டம்</string>
+    <string name="pdf_section_trend">நீண்டகால போக்கு (சராசரி கிராம்/மாதம்)</string>
+    <string name="pdf_section_categories">பானங்களின் வகைகள்</string>
+    <string name="pdf_section_daytime">உட்கொள்ளும் முறை: நாளின் நேரம்</string>
+    <string name="pdf_section_weekday">வாரநாள் சுயவிவரம் (சராசரி கிராம் ஆல்கஹால்)</string>
+    <string name="pdf_section_risk">ஆபத்தான உட்கொள்ளல் &amp; தவிர்ப்பு</string>
+    <string name="pdf_footer1">மதிப்பீடுகள் மட்டுமே. வாகன ஓட்டுவதற்கு அல்லது நோய் கண்டறிதலுக்கு அல்ல.</string>
+    <string name="pdf_footer2">Libellus Potionis (Potillus) மூலம் உருவாக்கப்பட்டது. மதிப்பீடுகள் – மருத்துவ நோயறிதல் அல்ல.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">ஏற்றுமதி தேதி</string>
+    <string name="pdf_meta_period">காலம்</string>
+    <string name="pdf_meta_gender">பாலினம்</string>
+    <string name="pdf_meta_limit">வரம்பு</string>
+    <string name="pdf_meta_weight">உடல் எடை</string>
+    <string name="pdf_meta_custom_limit">தனிப்பயன்</string>
+    <string name="pdf_kpi_total">மொத்த ஆல்கஹால்</string>
+    <string name="pdf_kpi_avg_day">தினசரி சராசரி</string>
+    <string name="pdf_kpi_avg_drink_day">குடிக்கும் நாளில் சராசரி</string>
+    <string name="pdf_kpi_drink_days">குடிக்கும் நாட்கள்</string>
+    <string name="pdf_kpi_abstinent_days">தவிர்ப்பு நாட்கள்</string>
+    <string name="pdf_kpi_over_who">நாட்கள் > WHO (%1$s கிராம்)</string>
+    <string name="pdf_kpi_over_dhs">நாட்கள் > DHS (%1$s கிராம்)</string>
+    <string name="pdf_kpi_binge">பிங்க் நாட்கள் (>%1$s கிராம்)</string>
+    <string name="pdf_col_month">மாதம்</string>
+    <string name="pdf_col_drink_days">குடிக்கும் நாட்கள்</string>
+    <string name="pdf_col_total_g">மொத்த கிராம்</string>
+    <string name="pdf_col_avg_g_day">சராசரி கிராம்/நாள்</string>
+    <string name="pdf_meta_first_drink">சராசரி முதல் பானம்</string>
+    <string name="pdf_meta_last_drink">சராசரி கடைசி பானம்</string>
+    <string name="pdf_meta_before_18">17:00 க்கு முன் பங்கு</string>
+    <string name="pdf_meta_after_18">17:00 இலிருந்து பங்கு</string>
+    <string name="pdf_meta_binge_days">அதிகப்படியான குடிக்கும் நாட்கள் (>%1$s கிராம்)</string>
+    <string name="pdf_meta_longest_abstinence">மிக நீண்ட தவிர்ப்பு</string>
+    <string name="pdf_meta_current_abstinence">தற்போதைய தவிர்ப்பு</string>
+    <string name="pdf_days_suffix">நாட்கள்</string>
+
+    <!-- Actions -->
+    <string name="save">சேமி</string>
+    <string name="cancel">ரத்துசெய்</string>
+    <string name="back">பின்செல்</string>
+    <string name="delete">நீக்கு</string>
+    <string name="change">மாற்று</string>
+    <string name="delete_confirm">\"%1$s\" ஐ உண்மையிலேயே நீக்கவா?</string>
+    <string name="no_data">இந்த காலகட்டத்திற்கு தரவு இல்லை.</string>
+
+    <!-- Stats -->
+    <string name="week">வாரம்</string>
+    <string name="month">மாதம்</string>
+    <string name="year">ஆண்டு</string>
+    <string name="total_period">காலகட்டத்தில் மொத்தம்</string>
+    <string name="avg_per_day">தினசரி சராசரி</string>
+    <string name="avg_per_drink_day">ஒவ்வொரு குடிக்கும் நாளுக்கும் சராசரி</string>
+    <string name="abstinent_days">தவிர்ப்பு நாட்கள்</string>
+    <string name="stats_category_breakdown">வகைகள்</string>
+    <string name="streak_trend">தவிர்ப்பு &amp; போக்கு</string>
+    <string name="current_streak">தற்போதைய தவிர்ப்பு</string>
+    <string name="longest_streak">மிக நீண்ட தவிர்ப்பு</string>
+    <string name="days_count">%1$d நாட்கள்</string>
+    <string name="trend_vs_prev">முந்தைய காலகட்டத்துடன் ஒப்பிட்டால் போக்கு</string>
+
+    <!-- Settings -->
+    <string name="appearance">தோற்றம்</string>
+    <string name="theme_mode">நிற திட்டம்</string>
+    <string name="theme_system">சிஸ்டம்</string>
+    <string name="theme_day">ஒளி</string>
+    <string name="theme_night">இருள்</string>
+    <string name="day_change_time">நாள் மாற்ற நேரம்</string>
+    <string name="day_starts_at">புதிய நாள் தொடங்குகிறது</string>
+    <string name="gender">பாலினம்</string>
+    <string name="male">ஆண்</string>
+    <string name="female">பெண்</string>
+    <string name="limit_mode">மருத்துவ வழிகாட்டி</string>
+    <string name="limit_who">WHO – ஆபத்து நிலை</string>
+    <string name="limit_dhs">DHS – குறைந்த ஆபத்து</string>
+    <string name="limit_custom">தனிப்பயன்</string>
+    <string name="custom_limit_grams">என்னுடைய தினசரி வரம்பு கிராமில்</string>
+    <string name="weekly_limit_section">வார வரம்பு</string>
+    <string name="weekly_limit_enabled">வார வரம்பை இயக்கு</string>
+    <string name="weekly_limit_grams">வார வரம்பு கிராமில்</string>
+    <string name="weekly_limit">வாரம்</string>
+    <string name="biometric">அணுகல் பூட்டு</string>
+    <string name="biometric_lock">பயோமெட்ரிக் பூட்டு</string>
+    <string name="biometric_desc">கட்டை விரல் அச்சு அல்லது முகம் அடையாளம் மூலம் ஆப்பை பூட்டவும்</string>
+    <string name="language">மொழி</string>
+    <string name="export">தரவு ஏற்றுமதி</string>
+    <string name="export_desc">பதிவுகளை பதிவிறக்கம் கோப்புறைக்கு ஏற்றுமதி செய்யவும்</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">காப்புப்பிரதி</string>
+    <string name="backup_desc">JSON கோப்பாக முழு காப்புப்பிரதி (பதிவுகள் + பானங்கள்)</string>
+    <string name="backup_export">ஏற்றுமதி</string>
+    <string name="backup_import">இறக்குமதி</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">தரவை எவ்வாறு இறக்குமதி செய்ய வேண்டும்?</string>
+    <string name="import_replace">மாற்றவும்</string>
+    <string name="import_merge">சேர்க்கவும்</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">தயவுசெய்து அங்கீகரிக்கவும்</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) கூறுகிறது: ஆல்கஹால் உட்கொள்ளலுக்கு பாதுகாப்பான அளவு எதுவும் இல்லை. இங்கே காட்டப்படும் ஆபத்து மதிப்பு ஒரு நடைமுறை குறிப்பு புள்ளியாகும், பாதுகாப்பு வரம்பு அல்ல.</string>
+    <string name="who_values">ஆபத்து மதிப்பு: ♂ ≤ %1$s g, ♀ ≤ %2$s g ஒரு நாளைக்கு.</string>
+    <string name="pdf_months_truncated">%2$d மாதங்களில் %1$d காட்டுகிறது – பழைய தரவு CSV/காப்புப்பிரதியில் உள்ளது</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">பதிவு இல்லை</string>
+    <string name="year_calendar_under_limit">வரம்புக்கு கீழே</string>
+    <string name="year_calendar_over_limit">வரம்பை தாண்டியது</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">ஏற்றுமதி செய்ய பதிவுகள் இல்லை.</string>
+    <string name="export_failed">ஏற்றுமதி தோல்வியடைந்தது.</string>
+    <string name="backup_failed">காப்புப்பிரதி தோல்வியடைந்தது.</string>
+    <string name="import_success_replace">%1$d பதிவுகள் இறக்குமதி செய்யப்பட்டன.</string>
+    <string name="import_success_merge">%1$d இறக்குமதி, %2$d தவிர்க்கப்பட்டது.</string>
+    <string name="import_error_could_not_read">கோப்பை படிக்க முடியவில்லை.</string>
+    <string name="import_error_empty">காப்புப்பிரதி கோப்பு காலியாக உள்ளது.</string>
+    <string name="import_error_invalid_json">தவறான JSON வடிவம்.</string>
+    <string name="import_error_version_too_high">காப்புப்பிரதி பதிப்பு %1$d ஆதரிக்கப்படவில்லை (அதிகபட்சம் %2$d).</string>
+    <string name="import_error_file_too_large">காப்புப்பிரதி கோப்பு மிகவும் பெரியது (அதிகபட்சம் %1$d MB).</string>
+    <string name="import_error_read">படிக்கும் பிழை: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d இல் {count} பதிவுகள் உள்ளன, நீக்க முடியாது.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">பானத்தின் பெயர் காலியாக இருக்கக்கூடாது.</string>
+    <string name="drink_validation_name_too_long">பானத்தின் பெயர் மிகவும் நீளமாக உள்ளது (அதிகபட்சம் 100 எழுத்துகள்).</string>
+    <string name="drink_validation_volume_range">அளவு 1 மிலி மற்றும் 10,000 மிலி இடையில் இருக்க வேண்டும்.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">ஆல்கஹால் உள்ளடக்கம் 0% மற்றும் 100% இடையில் இருக்க வேண்டும்.</string>
+    <string name="drink_validation_alcohol_invalid">ஆல்கஹால் உள்ளடக்கம் செல்லுபடியாகும் எண் அல்ல.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">தேதி</string>
+    <string name="csv_col_time">நேரம்</string>
+    <string name="csv_col_drink">பானம்</string>
+    <string name="csv_col_category">வகை</string>
+    <string name="csv_col_volume_ml">அளவு_மிலி</string>
+    <string name="csv_col_alcohol_pct">ஆல்கஹால்_%</string>
+    <string name="csv_col_grams">கிராம்_ஆல்கஹால்</string>
+    <string name="csv_col_note">குறிப்பு</string>
+    <string name="pdf_unit_g_per_day">கிராம்/நாள்</string>
+    <string name="unit_g_per_day">கிராம்/நாள்</string>
+
+    <string name="days_over_limit_who">வரம்பை தாண்டிய நாட்கள் (WHO)</string>
+    <string name="days_over_limit_dhs">வரம்பை தாண்டிய நாட்கள் (DHS)</string>
+    <string name="days_over_limit_custom">அமைக்கப்பட்ட வரம்பை தாண்டிய நாட்கள்</string>
+    <string name="dhs_note">DHS பரிந்துரைக்கிறது: ஆண்கள் தினமும் 24 கிராமுக்கு மேலும், பெண்கள் 12 கிராமுக்கு மேலும் தூய ஆல்கஹால் குடிக்கக்கூடாது. வாரத்தில் குறைந்தது இரண்டு நாட்கள் ஆல்கஹால் இல்லாமல் இருக்க வேண்டும்.</string>
+    <string name="drink_days_label">இந்த வாரத்தில் குடிக்கும் நாட்கள்</string>
+    <string name="drink_days_setting">அதிகபட்சம் குடிக்கும் நாட்கள்/வாரம்</string>
+    <string name="drink_days_who_dhs_note">பரிந்துரை: வாரத்தில் அதிகபட்சம் 5 குடிக்கும் நாட்கள் (≥ 2 தவிர்ப்பு நாட்கள்)</string>
+    <string name="weekly_gram_mode_title">வார கிராம் வரம்பு</string>
+    <string name="weekly_gram_mode_desc">முன்னேற்றப் பட்டை மற்றும் காட்டிகள் வார பட்ஜெட்டைப் பயன்படுத்துகின்றன (அதிகபட்சம் குடிக்கும் நாட்கள் &#215; தினசரி வரம்பு)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">தனிப்பட்ட தரவு</string>
+    <string name="week_starts_on">வாரம் தொடங்கும் நாள்</string>
+</resources>

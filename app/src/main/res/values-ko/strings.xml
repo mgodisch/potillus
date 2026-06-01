@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Korean (ko) — translated from values-de/ (German source of truth).
+
+    Script notes:
+    • Hangul (한글) is used throughout. Android renders Hangul via the bundled
+      Noto Sans KR font on API 21+; no extra configuration needed.
+    • Register: polite formal (합쇼체 / 해요체) as is standard for Korean app UIs.
+    • "Binge drinking" → 과음 (gwa-eum) — established Korean public-health term.
+    • DHS is kept as "DHS"; WHO as "WHO" (both widely used in Korean).
+    • Units: ml, g, % are kept as-is (internationally understood in Korea).
+    • day_change_time_value: Korean clock notation uses 시 (si) for hour and
+      분 (bun) for minute, but the app displays HH:MM numerically, so the
+      German "Uhr" suffix is simply omitted.
+    • Counters: Korean uses 개 (gae) for general items; days use 일 (il) or
+      the Sino-Korean 일 depending on context. "일" is used for pdf_days_suffix
+      and days_count to match the numeric context.
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">오늘</string>
+    <string name="calendar">달력</string>
+    <string name="statistics">통계</string>
+    <string name="drinks">음료</string>
+    <string name="settings">설정</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">오늘 합계</string>
+    <string name="grams_alcohol">g 알코올</string>
+    <string name="entries_today">오늘의 기록</string>
+    <string name="no_entries_today">오늘 기록이 없습니다.\n+ 를 탭하여 기록을 추가하세요.</string>
+    <string name="no_entries_day">이 날의 기록이 없습니다.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">즐겨찾기 빠른 추가</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">혈중 알코올 농도 추정</string>
+    <string name="bac_disclaimer">추정값 · 운전 판단에 사용하지 마세요</string>
+    <string name="stats_from_section">통계 기간</string>
+    <string name="stats_from_label">통계 시작일</string>
+    <string name="stats_from_desc">이 날짜 이전의 기록은 모든 통계에서 제외됩니다.</string>
+    <string name="bac_section">혈중 알코올 농도 추정 (Widmark)</string>
+    <string name="bac_desc">추정에는 체중이 필요합니다. 이 값은 수학적 근사치이며 측정값이 아닙니다.</string>
+    <string name="body_weight">체중</string>
+    <string name="not_set">설정 안 됨</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">기록 추가</string>
+    <string name="edit_entry">기록 편집</string>
+    <string name="drink">음료</string>
+    <string name="select_drink">음료 선택…</string>
+    <string name="volume_ml">양</string>
+    <string name="time">시간</string>
+    <string name="pure_alcohol">g 순수 알코올</string>
+    <string name="note">메모 (선택 사항)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">음료 추가</string>
+    <string name="edit_drink">음료 편집</string>
+    <string name="drink_name">이름</string>
+    <string name="alcohol_percent">알코올 함량</string>
+    <string name="favorite">즐겨찾기</string>
+    <string name="no_drinks">아직 등록된 음료가 없습니다.</string>
+    <string name="category">카테고리</string>
+    <string name="category_beer">맥주</string>
+    <string name="category_wine">와인 / 스파클링</string>
+    <string name="category_spirits">증류주</string>
+    <string name="category_longdrink">롱드링크 / 믹스</string>
+    <string name="category_liqueur">리큐르</string>
+    <string name="category_other">기타</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">알코올 요약</string>
+    <string name="pdf_section_kpis">핵심 데이터</string>
+    <string name="pdf_section_months">월별 개요</string>
+    <string name="pdf_section_trend">장기 추세 (평균 g/월)</string>
+    <string name="pdf_section_categories">음료 카테고리</string>
+    <string name="pdf_section_daytime">소비 패턴: 시간대</string>
+    <string name="pdf_section_weekday">요일별 프로필 (평균 g 알코올)</string>
+    <string name="pdf_section_risk">위험 음주 &amp; 금주</string>
+    <string name="pdf_footer1">추정값만. 운전 또는 진단 목적으로 사용하지 마세요.</string>
+    <string name="pdf_footer2">Libellus Potionis (Potillus)로 작성. 추정값 — 의학적 진단 아님.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">내보내기 날짜</string>
+    <string name="pdf_meta_period">기간</string>
+    <string name="pdf_meta_gender">성별</string>
+    <string name="pdf_meta_limit">한도</string>
+    <string name="pdf_meta_weight">체중</string>
+    <string name="pdf_meta_custom_limit">사용자 지정</string>
+    <string name="pdf_kpi_total">총 알코올</string>
+    <string name="pdf_kpi_avg_day">일 평균</string>
+    <string name="pdf_kpi_avg_drink_day">음주일 평균</string>
+    <string name="pdf_kpi_drink_days">음주일 수</string>
+    <string name="pdf_kpi_abstinent_days">금주일 수</string>
+    <string name="pdf_kpi_over_who">WHO 초과일 (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">DHS 초과일 (%1$s g)</string>
+    <string name="pdf_kpi_binge">과음일 (>%1$s g)</string>
+    <string name="pdf_col_month">월</string>
+    <string name="pdf_col_drink_days">음주일 수</string>
+    <string name="pdf_col_total_g">합계 g</string>
+    <string name="pdf_col_avg_g_day">평균 g/일</string>
+    <string name="pdf_meta_first_drink">첫 음주 (평균)</string>
+    <string name="pdf_meta_last_drink">마지막 음주 (평균)</string>
+    <string name="pdf_meta_before_18">17:00 이전 비율</string>
+    <string name="pdf_meta_after_18">17:00 이후 비율</string>
+    <string name="pdf_meta_binge_days">과음일 (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">최장 금주 기간</string>
+    <string name="pdf_meta_current_abstinence">현재 금주 기간</string>
+    <string name="pdf_days_suffix">일</string>
+
+    <!-- Actions -->
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+    <string name="back">뒤로</string>
+    <string name="delete">삭제</string>
+    <string name="change">변경</string>
+    <string name="delete_confirm">"%1$s"을(를) 정말 삭제하시겠습니까?</string>
+    <string name="no_data">이 기간의 데이터가 없습니다.</string>
+
+    <!-- Stats -->
+    <string name="week">주</string>
+    <string name="month">월</string>
+    <string name="year">년</string>
+    <string name="total_period">기간 합계</string>
+    <string name="avg_per_day">일 평균</string>
+    <string name="avg_per_drink_day">음주일 평균</string>
+    <string name="abstinent_days">금주일 수</string>
+    <string name="stats_category_breakdown">카테고리</string>
+    <string name="streak_trend">금주 &amp; 추세</string>
+    <string name="current_streak">현재 금주</string>
+    <string name="longest_streak">최장 금주</string>
+    <string name="days_count">%1$d 일</string>
+    <string name="trend_vs_prev">이전 기간 대비 추세</string>
+
+    <!-- Settings -->
+    <string name="appearance">외관</string>
+    <string name="theme_mode">색상 구성</string>
+    <string name="theme_system">시스템</string>
+    <string name="theme_day">라이트</string>
+    <string name="theme_night">다크</string>
+    <string name="day_change_time">날짜 변경 시간</string>
+    <string name="day_starts_at">새 날 시작 시간</string>
+    <string name="gender">성별</string>
+    <string name="male">남성</string>
+    <string name="female">여성</string>
+    <string name="limit_mode">의학적 가이드라인</string>
+    <string name="limit_who">WHO – 위험 수준</string>
+    <string name="limit_dhs">DHS – 저위험</string>
+    <string name="limit_custom">사용자 지정</string>
+    <string name="custom_limit_grams">나의 일일 한도 (그램)</string>
+    <string name="weekly_limit_section">주간 한도</string>
+    <string name="weekly_limit_enabled">주간 한도 활성화</string>
+    <string name="weekly_limit_grams">주간 한도 (그램)</string>
+    <string name="weekly_limit">주</string>
+    <string name="biometric">액세스 잠금</string>
+    <string name="biometric_lock">생체 인증 잠금</string>
+    <string name="biometric_desc">지문 또는 얼굴 인식으로 앱 잠금</string>
+    <string name="language">언어</string>
+    <string name="export">데이터 내보내기</string>
+    <string name="export_desc">기록을 다운로드 폴더로 내보내기</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">백업</string>
+    <string name="backup_desc">전체 백업 (기록 + 음료)을 JSON 파일로 저장</string>
+    <string name="backup_export">내보내기</string>
+    <string name="backup_import">가져오기</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">데이터를 어떻게 가져오시겠습니까?</string>
+    <string name="import_replace">교체</string>
+    <string name="import_merge">추가</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">인증하세요</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO(2023)는 "안전한 알코올 섭취량은 없다"고 명시합니다. 여기 표시된 위험값은 실용적인 기준점이며 안전 기준이 아닙니다.</string>
+    <string name="who_values">위험 수치: ♂ ≤ %1$s g, ♀ ≤ %2$s g / 일.</string>
+    <string name="pdf_months_truncated">%2$d개월 중 %1$d개월 표시 – 오래된 데이터는 CSV/백업에서 확인 가능</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">기록 없음</string>
+    <string name="year_calendar_under_limit">한도 이하</string>
+    <string name="year_calendar_over_limit">한도 초과</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">내보낼 기록이 없습니다.</string>
+    <string name="export_failed">내보내기에 실패했습니다.</string>
+    <string name="backup_failed">백업에 실패했습니다.</string>
+    <string name="import_success_replace">%1$d 개의 기록을 가져왔습니다.</string>
+    <string name="import_success_merge">%1$d 개 가져오기, %2$d 개 건너뜀.</string>
+    <string name="import_error_could_not_read">파일을 읽을 수 없습니다.</string>
+    <string name="import_error_empty">백업 파일이 비어 있습니다.</string>
+    <string name="import_error_invalid_json">잘못된 JSON 형식입니다.</string>
+    <string name="import_error_version_too_high">백업 버전 %1$d는 지원되지 않습니다 (최대 %2$d).</string>
+    <string name="import_error_file_too_large">백업 파일이 너무 큽니다 (최대 %1$d MB).</string>
+    <string name="import_error_read">읽기 오류: %1$s</string>
+    <string name="drink_delete_blocked">"{name}"에 {count}개의 기록이 있어 삭제할 수 없습니다.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">음료 이름을 입력해 주세요.</string>
+    <string name="drink_validation_name_too_long">음료 이름이 너무 깁니다 (최대 100자).</string>
+    <string name="drink_validation_volume_range">양은 1 ml에서 10,000 ml 사이여야 합니다.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">알코올 함량은 0%에서 100% 사이여야 합니다.</string>
+    <string name="drink_validation_alcohol_invalid">알코올 함량이 유효한 숫자가 아닙니다.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">날짜</string>
+    <string name="csv_col_time">시간</string>
+    <string name="csv_col_drink">음료</string>
+    <string name="csv_col_category">카테고리</string>
+    <string name="csv_col_volume_ml">양_ml</string>
+    <string name="csv_col_alcohol_pct">알코올_%</string>
+    <string name="csv_col_grams">그램_알코올</string>
+    <string name="csv_col_note">메모</string>
+    <string name="pdf_unit_g_per_day">g/일</string>
+    <string name="unit_g_per_day">g/일</string>
+
+    <string name="days_over_limit_who">WHO 한도 초과일 수</string>
+    <string name="days_over_limit_dhs">DHS 한도 초과일 수</string>
+    <string name="days_over_limit_custom">사용자 지정 한도 초과일 수</string>
+    <string name="dhs_note">DHS 권장: 남성은 하루 순수 알코올 24 g 이하, 여성은 12 g 이하로 제한하세요. 주 최소 2일은 금주하는 것이 권장됩니다.</string>
+    <string name="drink_days_label">이번 주 음주일 수</string>
+    <string name="drink_days_setting">주 최대 음주일 수</string>
+    <string name="drink_days_who_dhs_note">권장: 주 최대 5일 음주 (금주일 ≥ 2일)</string>
+    <string name="weekly_gram_mode_title">주간 그램 한도</string>
+    <string name="weekly_gram_mode_desc">진행 표시줄 및 표시기는 주간 예산 (최대 음주일 수 &#215; 일일 한도)을 기준으로 합니다</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">개인 데이터</string>
+    <string name="week_starts_on">주 시작 요일</string>
+</resources>

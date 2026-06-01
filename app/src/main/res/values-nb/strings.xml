@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Norwegian Bokmål — nb
+    Script : Latin; LTR.
+    Approx.: ~5 M speakers (Norway).
+    Register: Standard Bokmål (riksmål-influenced written standard).
+    Notes  : Android tag "nb" covers Bokmål, which is used by ~85–90 % of
+             Norwegian writers.  Nynorsk ("nn") has a separate tag but is not
+             added here due to its small share.  "Binge drinking" → episodisk
+             stordrinking / fyllefest — the formal term episodisk stordrinking
+             is used in health-care contexts and is preferred here.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">I dag</string>
+    <string name="calendar">Kalender</string>
+    <string name="statistics">Statistikk</string>
+    <string name="drinks">Drikker</string>
+    <string name="settings">Innstillinger</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Dagens total</string>
+    <string name="grams_alcohol">g alkohol</string>
+    <string name="entries_today">Dagens registreringer</string>
+    <string name="no_entries_today">Ingen registreringer i dag ennå.\nTrykk på + for å legge til en registrering.</string>
+    <string name="no_entries_day">Ingen registreringer for denne dagen.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Hurtigtilgang favoritter</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC-estimat</string>
+    <string name="bac_disclaimer">Estimat · ikke for kjørebeslutninger</string>
+    <string name="stats_from_section">Statistikkperiode</string>
+    <string name="stats_from_label">Statistikk fra</string>
+    <string name="stats_from_desc">Registreringer før denne datoen utelates fra all statistikk.</string>
+    <string name="bac_section">BAC-kalkulator (Widmark)</string>
+    <string name="bac_desc">Kroppsvekt er nødvendig for estimatet. Dette er en matematisk tilnærming, ikke en måling.</string>
+    <string name="body_weight">Kroppsvekt</string>
+    <string name="not_set">ikke angitt</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Legg til registrering</string>
+    <string name="edit_entry">Rediger registrering</string>
+    <string name="drink">Drikk</string>
+    <string name="select_drink">Velg en drikk …</string>
+    <string name="volume_ml">Mengde</string>
+    <string name="time">Tidspunkt</string>
+    <string name="pure_alcohol">g ren alkohol</string>
+    <string name="note">Notat (valgfritt)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Legg til drikk</string>
+    <string name="edit_drink">Rediger drikk</string>
+    <string name="drink_name">Navn</string>
+    <string name="alcohol_percent">Alkoholinnhold</string>
+    <string name="favorite">Favoritt</string>
+    <string name="no_drinks">Ingen drikker definert ennå.</string>
+    <string name="category">Kategori</string>
+    <string name="category_beer">Øl</string>
+    <string name="category_wine">Vin / Musserende</string>
+    <string name="category_spirits">Brennevin</string>
+    <string name="category_longdrink">Longdrink / Mix</string>
+    <string name="category_liqueur">Likør</string>
+    <string name="category_other">Annet</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Alkoholsammendrag</string>
+    <string name="pdf_section_kpis">Nøkkeltall</string>
+    <string name="pdf_section_months">Månedlig oversikt</string>
+    <string name="pdf_section_trend">Langsiktig trend (gj.snitt g/mnd)</string>
+    <string name="pdf_section_categories">Drikkekategorier</string>
+    <string name="pdf_section_daytime">Konsummønster: Tid på dagen</string>
+    <string name="pdf_section_weekday">Ukedagsprofil (gj.snitt g alkohol)</string>
+    <string name="pdf_section_risk">Risikoforbruk &amp; avholdenhet</string>
+    <string name="pdf_footer1">Kun estimater. Ikke til bruk for kjørebeslutninger eller diagnoseformål.</string>
+    <string name="pdf_footer2">Laget med Libellus Potionis (Potillus). Estimater – ikke medisinsk diagnose.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Eksportdato</string>
+    <string name="pdf_meta_period">Periode</string>
+    <string name="pdf_meta_gender">Kjønn</string>
+    <string name="pdf_meta_limit">Grense</string>
+    <string name="pdf_meta_weight">Kroppsvekt</string>
+    <string name="pdf_meta_custom_limit">Tilpasset</string>
+    <string name="pdf_kpi_total">Total alkohol</string>
+    <string name="pdf_kpi_avg_day">Gj.snitt per dag</string>
+    <string name="pdf_kpi_avg_drink_day">Gj.snitt per drikkedag</string>
+    <string name="pdf_kpi_drink_days">Drikkdager</string>
+    <string name="pdf_kpi_abstinent_days">Avholdsdager</string>
+    <string name="pdf_kpi_over_who">Dager > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dager > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Binge-dager (>%1$s g)</string>
+    <string name="pdf_col_month">Måned</string>
+    <string name="pdf_col_drink_days">Drikkdager</string>
+    <string name="pdf_col_total_g">Total g</string>
+    <string name="pdf_col_avg_g_day">Gj.snitt g/dag</string>
+    <string name="pdf_meta_first_drink">Gj.snitt første drink</string>
+    <string name="pdf_meta_last_drink">Gj.snitt siste drink</string>
+    <string name="pdf_meta_before_18">Andel før 17:00</string>
+    <string name="pdf_meta_after_18">Andel fra 17:00</string>
+    <string name="pdf_meta_binge_days">Episodisk stordrikking-dager (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Lengste avholdsperiode</string>
+    <string name="pdf_meta_current_abstinence">Nåværende avholdenhet</string>
+    <string name="pdf_days_suffix">dager</string>
+
+    <!-- Actions -->
+    <string name="save">Lagre</string>
+    <string name="cancel">Avbryt</string>
+    <string name="back">Tilbake</string>
+    <string name="delete">Slett</string>
+    <string name="change">Endre</string>
+    <string name="delete_confirm">Slett virkelig \"%1$s\"?</string>
+    <string name="no_data">Ingen data for denne perioden.</string>
+
+    <!-- Stats -->
+    <string name="week">Uke</string>
+    <string name="month">Måned</string>
+    <string name="year">År</string>
+    <string name="total_period">Total i perioden</string>
+    <string name="avg_per_day">Gjennomsnitt per dag</string>
+    <string name="avg_per_drink_day">Gjennomsnitt per drikkedag</string>
+    <string name="abstinent_days">Avholdsdager</string>
+    <string name="stats_category_breakdown">Kategorier</string>
+    <string name="streak_trend">Avholdenhet &amp; Trend</string>
+    <string name="current_streak">Nåværende avholdenhet</string>
+    <string name="longest_streak">Lengste avholdenhet</string>
+    <string name="days_count">%1$d dager</string>
+    <string name="trend_vs_prev">Trend sammenlignet med forrige periode</string>
+
+    <!-- Settings -->
+    <string name="appearance">Utseende</string>
+    <string name="theme_mode">Fargevalg</string>
+    <string name="theme_system">System</string>
+    <string name="theme_day">Lys</string>
+    <string name="theme_night">Mørk</string>
+    <string name="day_change_time">Tidspunkt for dagsskifte</string>
+    <string name="day_starts_at">Ny dag starter klokken</string>
+    <string name="gender">Kjønn</string>
+    <string name="male">Mann</string>
+    <string name="female">Kvinne</string>
+    <string name="limit_mode">Medisinsk retningslinje</string>
+    <string name="limit_who">WHO – risikonivå</string>
+    <string name="limit_dhs">DHS – lav risiko</string>
+    <string name="limit_custom">Tilpasset</string>
+    <string name="custom_limit_grams">Min daglige grense i gram</string>
+    <string name="weekly_limit_section">Ukesgrense</string>
+    <string name="weekly_limit_enabled">Aktiver ukesgrense</string>
+    <string name="weekly_limit_grams">Ukesgrense i gram</string>
+    <string name="weekly_limit">Uke</string>
+    <string name="biometric">Tilgangslås</string>
+    <string name="biometric_lock">Biometrisk lås</string>
+    <string name="biometric_desc">Lås appen med fingeravtrykk eller ansiktsgjenkjenning</string>
+    <string name="language">Språk</string>
+    <string name="export">Dataeksport</string>
+    <string name="export_desc">Eksporter registreringer til Nedlastinger-mappen</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Sikkerhetskopiering</string>
+    <string name="backup_desc">Fullstendig sikkerhetskopi (registreringer + drikker) som JSON-fil</string>
+    <string name="backup_export">Eksporter</string>
+    <string name="backup_import">Importer</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Hvordan skal dataene importeres?</string>
+    <string name="import_replace">Erstatt</string>
+    <string name="import_merge">Legg til</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Vennligst autentiser</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) fastslår: Det finnes ingen trygg mengde alkohol. Risikoverdien som vises her er et praktisk referansepunkt, ikke en sikkerhetsterskel.</string>
+    <string name="who_values">Risikoverdi: ♂ ≤ %1$s g, ♀ ≤ %2$s g per dag.</string>
+    <string name="pdf_months_truncated">Viser %1$d av %2$d måneder – eldre data tilgjengelig i CSV/sikkerhetskopi</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">ingen registrering</string>
+    <string name="year_calendar_under_limit">under grense</string>
+    <string name="year_calendar_over_limit">over grense</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Ingen registreringer å eksportere.</string>
+    <string name="export_failed">Eksport mislyktes.</string>
+    <string name="backup_failed">Sikkerhetskopiering mislyktes.</string>
+    <string name="import_success_replace">%1$d registreringer importert.</string>
+    <string name="import_success_merge">%1$d importert, %2$d hoppet over.</string>
+    <string name="import_error_could_not_read">Filen kunne ikke leses.</string>
+    <string name="import_error_empty">Sikkerhetskopifilen er tom.</string>
+    <string name="import_error_invalid_json">Ugyldig JSON-format.</string>
+    <string name="import_error_version_too_high">Sikkerhetskopiversjon %1$d støttes ikke (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Sikkerhetskopifilen er for stor (maks. %1$d MB).</string>
+    <string name="import_error_read">Lesefeil: %1$s</string>
+    <string name="drink_delete_blocked">\u201e{name}\u201c har {count} registreringer og kan ikke slettes.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Drikknavnet kan ikke være tomt.</string>
+    <string name="drink_validation_name_too_long">Drikknavnet er for langt (maks. 100 tegn).</string>
+    <string name="drink_validation_volume_range">Mengden må være mellom 1 ml og 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Alkoholinnholdet må være mellom 0 % og 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Alkoholinnholdet er ikke et gyldig tall.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Dato</string>
+    <string name="csv_col_time">Tidspunkt</string>
+    <string name="csv_col_drink">Drikk</string>
+    <string name="csv_col_category">Kategori</string>
+    <string name="csv_col_volume_ml">Volum_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gram_alkohol</string>
+    <string name="csv_col_note">Notat</string>
+    <string name="pdf_unit_g_per_day">g/dag</string>
+    <string name="unit_g_per_day">g/dag</string>
+
+    <string name="days_over_limit_who">Dager over grense (WHO)</string>
+    <string name="days_over_limit_dhs">Dager over grense (DHS)</string>
+    <string name="days_over_limit_custom">Dager over konfigurert grense</string>
+    <string name="dhs_note">DHS anbefaler: menn bør ikke drikke mer enn 24 g, kvinner ikke mer enn 12 g ren alkohol per dag. Minst to dager per uke bør være alkoholfrie.</string>
+    <string name="drink_days_label">drikkdager denne uken</string>
+    <string name="drink_days_setting">Maks. drikkdager/uke</string>
+    <string name="drink_days_who_dhs_note">Anbefaling: maks. 5 drikkdager per uke (≥ 2 avholdsdager)</string>
+    <string name="weekly_gram_mode_title">Ukesgramgrense</string>
+    <string name="weekly_gram_mode_desc">Fremdriftslinje og indikatorer bruker ukebudsjettet (maks. drikkdager &#215; dagsgrense)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Personlige data</string>
+    <string name="week_starts_on">Uken starter på</string>
+</resources>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Maltese (Malti)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Illum</string>
+    <string name="calendar">Kalendarju</string>
+    <string name="statistics">Statistiċi</string>
+    <string name="drinks">Xorb</string>
+    <string name="settings">Settings</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Total llum</string>
+    <string name="grams_alcohol">g alkoħol</string>
+    <string name="entries_today">Dħuliet illum</string>
+    <string name="no_entries_today">Ebda dħuliet illum.\nAgħfas + biex żżid wieħed.</string>
+    <string name="no_entries_day">Ebda dħuliet għal dan il-jum.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Żid malajr mill-favoriti</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Stima BAC</string>
+    <string name="bac_disclaimer">Stima · mhux għal deċiżjonijiet tas-sewqan</string>
+    <string name="stats_from_section">Perjodu statistiċi</string>
+    <string name="stats_from_label">Statistiċi minn</string>
+    <string name="stats_from_desc">Dħuliet qabel din id-data huma esklużi mill-istatistiċi kollha.</string>
+    <string name="bac_section">Estimatur BAC (Widmark)</string>
+    <string name="bac_desc">Il-piż tal-ġisem meħtieġ għall-istima. Din hija approssimazzjoni matematika, mhux kejl.</string>
+    <string name="body_weight">Piż tal-ġisem</string>
+    <string name="not_set">mhux imwaqqaf</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Żid dħul</string>
+    <string name="edit_entry">Editja dħul</string>
+    <string name="drink">Xorb</string>
+    <string name="select_drink">Agħżel xorb …</string>
+    <string name="volume_ml">Kwantità</string>
+    <string name="time">Ħin</string>
+    <string name="pure_alcohol">g alkoħol pur</string>
+    <string name="note">Nota (fakultattiva)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Żid xorb</string>
+    <string name="edit_drink">Editja xorb</string>
+    <string name="drink_name">Isem</string>
+    <string name="alcohol_percent">Kontenut tal-alkoħol</string>
+    <string name="favorite">Favorit</string>
+    <string name="no_drinks">Ebda xorb definit s\'issa.</string>
+    <string name="category">Kategorija</string>
+    <string name="category_beer">Birra</string>
+    <string name="category_wine">Inbid / Frizzante</string>
+    <string name="category_spirits">Spiritati</string>
+    <string name="category_longdrink">Longdrink / Taħlita</string>
+    <string name="category_liqueur">Likur</string>
+    <string name="category_other">Ieħor</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Sommarju tal-alkoħol</string>
+    <string name="pdf_section_kpis">Figuri ewlenin</string>
+    <string name="pdf_section_months">Ħarsa ġenerali fix-xahar</string>
+    <string name="pdf_section_trend">Tendenza fit-tul (medja g/xahar)</string>
+    <string name="pdf_section_categories">Kategoriji xorb</string>
+    <string name="pdf_section_daytime">Mudell tal-konsum: ħin tal-ġurnata</string>
+    <string name="pdf_section_weekday">Profil tal-jum tal-ġimgħa (medja g alkoħol)</string>
+    <string name="pdf_section_risk">Konsum riskjuż u astensjoni</string>
+    <string name="pdf_footer1">Stimi biss. Mhux għal sewqan jew skopijiet dijanjostiċi.</string>
+    <string name="pdf_footer2">Maħluq b\'Libellus Potionis (Potillus). Stimi – mhux dijanjosi mediċina.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Data tal-esportazzjoni</string>
+    <string name="pdf_meta_period">Perjodu</string>
+    <string name="pdf_meta_gender">Sess</string>
+    <string name="pdf_meta_limit">Limitu</string>
+    <string name="pdf_meta_weight">Piż tal-ġisem</string>
+    <string name="pdf_meta_custom_limit">Mfassal</string>
+    <string name="pdf_kpi_total">Alkoħol totali</string>
+    <string name="pdf_kpi_avg_day">Medja fil-jum</string>
+    <string name="pdf_kpi_avg_drink_day">Medja fil-jum tax-xorb</string>
+    <string name="pdf_kpi_drink_days">Ijiem tax-xorb</string>
+    <string name="pdf_kpi_abstinent_days">Ijiem ta\' astensjoni</string>
+    <string name="pdf_kpi_over_who">Ijiem > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Ijiem > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Ijiem binge (>%1$s g)</string>
+    <string name="pdf_col_month">Xahar</string>
+    <string name="pdf_col_drink_days">Ijiem tax-xorb</string>
+    <string name="pdf_col_total_g">Total g</string>
+    <string name="pdf_col_avg_g_day">Medja g/jum</string>
+    <string name="pdf_meta_first_drink">Medja l-ewwel xorba</string>
+    <string name="pdf_meta_last_drink">Medja l-aħħar xorba</string>
+    <string name="pdf_meta_before_18">Sehem qabel 17:00</string>
+    <string name="pdf_meta_after_18">Sehem minn 17:00</string>
+    <string name="pdf_meta_binge_days">Ijiem binge (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">L-itwal perjodu ta\' astensjoni</string>
+    <string name="pdf_meta_current_abstinence">Astensjoni kurrenti</string>
+    <string name="pdf_days_suffix">ijiem</string>
+
+    <!-- Actions -->
+    <string name="save">Issejvja</string>
+    <string name="cancel">Ikkanċella</string>
+    <string name="back">Lura</string>
+    <string name="delete">Ħassar</string>
+    <string name="change">Ibdel</string>
+    <string name="delete_confirm">Tassew tħassar “%1$s”?</string>
+    <string name="no_data">Ebda data għal dan il-perjodu.</string>
+
+    <!-- Stats -->
+    <string name="week">Ġimgħa</string>
+    <string name="month">Xahar</string>
+    <string name="year">Sena</string>
+    <string name="total_period">Total fil-perjodu</string>
+    <string name="avg_per_day">Medja fil-jum</string>
+    <string name="avg_per_drink_day">Medja fil-jum tax-xorb</string>
+    <string name="abstinent_days">Ijiem ta\' astensjoni</string>
+    <string name="stats_category_breakdown">Kategoriji</string>
+    <string name="streak_trend">Astensjoni u tendenza</string>
+    <string name="current_streak">Astensjoni kurrenti</string>
+    <string name="longest_streak">L-itwal astensjoni</string>
+    <string name="days_count">%1$d ijiem</string>
+    <string name="trend_vs_prev">Tendenza meta mqabbel mal-perjodu preċedenti</string>
+
+    <!-- Settings -->
+    <string name="appearance">Dehra</string>
+    <string name="theme_mode">Skema tal-kuluri</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_day">Ċara</string>
+    <string name="theme_night">Skura</string>
+    <string name="day_change_time">Ħin tal-bidla tal-jum</string>
+    <string name="day_starts_at">Jum ġdid jibda fi</string>
+    <string name="gender">Sess</string>
+    <string name="male">Maskil</string>
+    <string name="female">Femminil</string>
+    <string name="limit_mode">Linja gwida medika</string>
+    <string name="limit_who">WHO – livell ta\' riskju</string>
+    <string name="limit_dhs">DHS – riskju baxx</string>
+    <string name="limit_custom">Mfassal</string>
+    <string name="custom_limit_grams">Il-limitu tiegħi fil-ġurnata f\'gramma</string>
+    <string name="weekly_limit_section">Limitu tal-ġimgħa</string>
+    <string name="weekly_limit_enabled">Attiva l-limitu tal-ġimgħa</string>
+    <string name="weekly_limit_grams">Limitu tal-ġimgħa f\'gramma</string>
+    <string name="weekly_limit">Ġimgħa</string>
+    <string name="biometric">Serq</string>
+    <string name="biometric_lock">Serq bijometrika</string>
+    <string name="biometric_desc">Agħlaq l-app b\'marki tas-swaba\' jew uċuħ</string>
+    <string name="language">Lingwa</string>
+    <string name="export">Esportazzjoni tad-data</string>
+    <string name="export_desc">Esporta d-dħuliet fil-folder Downloads</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Backup</string>
+    <string name="backup_desc">Backup sħiħ (dħuliet + xorb) bħala fajl JSON</string>
+    <string name="backup_export">Esporta</string>
+    <string name="backup_import">Importa</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Kif timporta d-data?</string>
+    <string name="import_replace">Ibdel</string>
+    <string name="import_merge">Żid</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Jekk jogħġbok awtentika</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">L-WHO (2023) tgħid: M\'hemm l-ebda livell sikur ta\' konsum tal-alkoħol. Il-valur tar-riskju muri hawnhekk huwa punt ta\' referenza prattiku, mhux limitu ta\' sikurezza.</string>
+    <string name="who_values">Valur ta\' riskju: ♂ ≤ %1$s g, ♀ ≤ %2$s g kuljum.</string>
+    <string name="dhs_note">Id-DHS tirrakkomanda: l-irġiel ma għandhomx jixorbu aktar minn 24 g, in-nisa mhux aktar minn 12 g ta\' alkoħol pur kuljum. Tal-inqas jumejn fil-ġimgħa għandhom ikunu mingħajr alkoħol.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Jintwerew %1$d minn %2$d xhur – data eqdem disponibbli fil-CSV/backup</string>
+    <string name="year_calendar_no_entry">ebda dħul</string>
+    <string name="year_calendar_under_limit">taħt il-limitu</string>
+    <string name="year_calendar_over_limit">fuq il-limitu</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Ebda dħuliet biex tesporta.</string>
+    <string name="export_failed">L-esportazzjoni falliet.</string>
+    <string name="backup_failed">Il-backup falla.</string>
+    <string name="import_success_replace">%1$d dħuliet importati.</string>
+    <string name="import_success_merge">%1$d importati, %2$d mqabeż.</string>
+    <string name="import_error_could_not_read">Il-fajl ma setax jinqara.</string>
+    <string name="import_error_empty">Il-fajl tal-backup huwa vojt.</string>
+    <string name="import_error_invalid_json">Format JSON invalidu.</string>
+    <string name="import_error_version_too_high">Il-verżjoni tal-backup %1$d mhix appoġġjata (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Il-fajl tal-backup huwa kbir wisq (maks. %1$d MB).</string>
+    <string name="import_error_read">Żball fil-qari: %1$s</string>
+    <string name="drink_delete_blocked">“{name}” għandha {count} dħuliet u ma tistax tiġi ħassra.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">L-isem tax-xorb ma jistax ikun vojt.</string>
+    <string name="drink_validation_name_too_long">L-isem tax-xorb hu twil wisq (maks. 100 karattru).</string>
+    <string name="drink_validation_volume_range">Il-volum irid ikun bejn 1 ml u 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Il-kontenut tal-alkoħol irid ikun bejn 0 % u 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Il-kontenut tal-alkoħol mhuwiex numru validu.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Data</string>
+    <string name="csv_col_time">Ħin</string>
+    <string name="csv_col_drink">Xorb</string>
+    <string name="csv_col_category">Kategorija</string>
+    <string name="csv_col_volume_ml">Kwantità_ml</string>
+    <string name="csv_col_alcohol_pct">Alkoħol_%</string>
+    <string name="csv_col_grams">Gramma_alkoħol</string>
+    <string name="csv_col_note">Nota</string>
+    <string name="pdf_unit_g_per_day">g/jum</string>
+    <string name="unit_g_per_day">g/jum</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Ijiem fuq il-limitu (WHO)</string>
+    <string name="days_over_limit_dhs">Ijiem fuq il-limitu (DHS)</string>
+    <string name="days_over_limit_custom">Ijiem fuq il-limitu kkonfigurat</string>
+    <string name="drink_days_label">ijiem tax-xorb din il-ġimgħa</string>
+    <string name="drink_days_setting">Maks. ijiem tax-xorb/ġimgħa</string>
+    <string name="drink_days_who_dhs_note">Rakkomandazzjoni: maks. 5 ijiem tax-xorb fil-ġimgħa (≥ 2 ijiem mingħajr alkoħol)</string>
+    <string name="weekly_gram_mode_title">Limitu tal-ġimgħa (gramma)</string>
+    <string name="weekly_gram_mode_desc">Il-bar tal-progress u l-indikaturi jużaw il-baġit tal-ġimgħa (maks. ijiem tax-xorb &#215; limitu tal-ġurnata)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Dejta personali</string>
+    <string name="week_starts_on">Il-ġimgħa tibda</string>
+</resources>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    strings.xml – Slovak (Slovenčina)
+    =========================================================================
+    This file contains translations for all string resources defined in
+    values/strings.xml (the German source of truth). The authoritative
+    key set is enforced by LocaleSyncTest.
+
+    TRANSLATION NOTES:
+      · WHO / DHS are kept as abbreviations (internationally recognised).
+      · BAC (Blood Alcohol Concentration) is rendered in each language's
+        preferred term where one exists; otherwise the abbreviation is kept.
+      · {name} and {count} in drink_delete_blocked are custom
+        substitution placeholders handled by the code (not Android format args).
+      · %1$s / %1$d / %1$02d etc. are standard Android format arguments and
+        must be preserved verbatim in every translation.
+      · &#215; is the multiplication sign ×; keep it as-is.
+    =========================================================================
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Dnes</string>
+    <string name="calendar">Kalendár</string>
+    <string name="statistics">Štatistika</string>
+    <string name="drinks">Nápoje</string>
+    <string name="settings">Nastavenia</string>
+
+    <!-- Today screen -->
+    <string name="total_today">Celkom dnes</string>
+    <string name="grams_alcohol">g alkoholu</string>
+    <string name="entries_today">Záznamy dnes</string>
+    <string name="no_entries_today">Zatiaľ žiadne záznamy dnes.\nKlepnite na + pre pridanie.</string>
+    <string name="no_entries_day">Pre tento deň nie sú žiadne záznamy.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Rýchle pridanie z obľúbených</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Odhad BAC</string>
+    <string name="bac_disclaimer">Odhad · nie pre rozhodnutia o šoférovaní</string>
+    <string name="stats_from_section">Obdobie štatistiky</string>
+    <string name="stats_from_label">Štatistika od</string>
+    <string name="stats_from_desc">Záznamy pred týmto dátumom sú vylúčené zo všetkých štatistík.</string>
+    <string name="bac_section">Odhadovač BAC (Widmark)</string>
+    <string name="bac_desc">Na odhad je potrebná telesná hmotnosť. Ide o matematickú aproximáciu, nie meranie.</string>
+    <string name="body_weight">Telesná hmotnosť</string>
+    <string name="not_set">nie je nastavené</string>
+
+    <!-- Entry dialog -->
+    <string name="add_entry">Pridať záznam</string>
+    <string name="edit_entry">Upraviť záznam</string>
+    <string name="drink">Nápoj</string>
+    <string name="select_drink">Vyberte nápoj …</string>
+    <string name="volume_ml">Množstvo</string>
+    <string name="time">Čas</string>
+    <string name="pure_alcohol">g čistého alkoholu</string>
+    <string name="note">Poznámka (voliteľné)</string>
+
+    <!-- Drink dialog -->
+    <string name="add_drink">Pridať nápoj</string>
+    <string name="edit_drink">Upraviť nápoj</string>
+    <string name="drink_name">Názov</string>
+    <string name="alcohol_percent">Obsah alkoholu</string>
+    <string name="favorite">Obľúbený</string>
+    <string name="no_drinks">Zatiaľ žiadne nápoje.</string>
+    <string name="category">Kategória</string>
+    <string name="category_beer">Pivo</string>
+    <string name="category_wine">Víno / Šumivé</string>
+    <string name="category_spirits">Liehoviny</string>
+    <string name="category_longdrink">Longdrink / Mix</string>
+    <string name="category_liqueur">Likér</string>
+    <string name="category_other">Iné</string>
+
+    <!-- PDF export -->
+    <string name="pdf_title">Súhrn alkoholu</string>
+    <string name="pdf_section_kpis">Kľúčové ukazovatele</string>
+    <string name="pdf_section_months">Mesačný prehľad</string>
+    <string name="pdf_section_trend">Dlhodobý trend (prier. g/mes.)</string>
+    <string name="pdf_section_categories">Kategórie nápojov</string>
+    <string name="pdf_section_daytime">Vzorec spotreby: čas dňa</string>
+    <string name="pdf_section_weekday">Profil podľa dní v týždni (prier. g alkoholu)</string>
+    <string name="pdf_section_risk">Rizikové pitie a abstinencia</string>
+    <string name="pdf_footer1">Iba odhady. Nie na účely jazdy ani diagnostiky.</string>
+    <string name="pdf_footer2">Vytvorené s Libellus Potionis (Potillus). Odhady – nie lekárska diagnóza.</string>
+
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Dátum exportu</string>
+    <string name="pdf_meta_period">Obdobie</string>
+    <string name="pdf_meta_gender">Pohlavie</string>
+    <string name="pdf_meta_limit">Limit</string>
+    <string name="pdf_meta_weight">Telesná hmotnosť</string>
+    <string name="pdf_meta_custom_limit">Vlastný</string>
+    <string name="pdf_kpi_total">Celkový alkohol</string>
+    <string name="pdf_kpi_avg_day">Prier. za deň</string>
+    <string name="pdf_kpi_avg_drink_day">Prier. za deň pitia</string>
+    <string name="pdf_kpi_drink_days">Dni pitia</string>
+    <string name="pdf_kpi_abstinent_days">Dni abstinencie</string>
+    <string name="pdf_kpi_over_who">Dni > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dni > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Dni intenzívneho pitia (>%1$s g)</string>
+    <string name="pdf_col_month">Mesiac</string>
+    <string name="pdf_col_drink_days">Dni pitia</string>
+    <string name="pdf_col_total_g">Celkom g</string>
+    <string name="pdf_col_avg_g_day">Prier. g/deň</string>
+    <string name="pdf_meta_first_drink">Prier. prvý nápoj</string>
+    <string name="pdf_meta_last_drink">Prier. posledný nápoj</string>
+    <string name="pdf_meta_before_18">Podiel pred 17:00</string>
+    <string name="pdf_meta_after_18">Podiel od 17:00</string>
+    <string name="pdf_meta_binge_days">Dni intenzívneho pitia (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Najdlhšie obdobie abstinencie</string>
+    <string name="pdf_meta_current_abstinence">Aktuálna abstinencia</string>
+    <string name="pdf_days_suffix">dní</string>
+
+    <!-- Actions -->
+    <string name="save">Uložiť</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="back">Späť</string>
+    <string name="delete">Odstrániť</string>
+    <string name="change">Zmeniť</string>
+    <string name="delete_confirm">Naozaj odstrániť „%1$s“?</string>
+    <string name="no_data">Pre toto obdobie nie sú žiadne údaje.</string>
+
+    <!-- Stats -->
+    <string name="week">Týždeň</string>
+    <string name="month">Mesiac</string>
+    <string name="year">Rok</string>
+    <string name="total_period">Celkom v období</string>
+    <string name="avg_per_day">Priemer za deň</string>
+    <string name="avg_per_drink_day">Priemer za deň pitia</string>
+    <string name="abstinent_days">Dni abstinencie</string>
+    <string name="stats_category_breakdown">Kategórie</string>
+    <string name="streak_trend">Abstinencia a trend</string>
+    <string name="current_streak">Aktuálna abstinencia</string>
+    <string name="longest_streak">Najdlhšia abstinencia</string>
+    <string name="days_count">%1$d dní</string>
+    <string name="trend_vs_prev">Trend v porovnaní s predchádzajúcim obdobím</string>
+
+    <!-- Settings -->
+    <string name="appearance">Vzhľad</string>
+    <string name="theme_mode">Farebná schéma</string>
+    <string name="theme_system">Systém</string>
+    <string name="theme_day">Svetlá</string>
+    <string name="theme_night">Tmavá</string>
+    <string name="day_change_time">Čas zmeny dňa</string>
+    <string name="day_starts_at">Nový deň začína o</string>
+    <string name="gender">Pohlavie</string>
+    <string name="male">Muž</string>
+    <string name="female">Žena</string>
+    <string name="limit_mode">Medicínska smernica</string>
+    <string name="limit_who">WHO – úroveň rizika</string>
+    <string name="limit_dhs">DHS – nízke riziko</string>
+    <string name="limit_custom">Vlastný</string>
+    <string name="custom_limit_grams">Môj denný limit v gramoch</string>
+    <string name="weekly_limit_section">Týždenný limit</string>
+    <string name="weekly_limit_enabled">Povoliť týždenný limit</string>
+    <string name="weekly_limit_grams">Týždenný limit v gramoch</string>
+    <string name="weekly_limit">Týždeň</string>
+    <string name="biometric">Uzamknutie</string>
+    <string name="biometric_lock">Biometrické uzamknutie</string>
+    <string name="biometric_desc">Uzamknutie aplikácie odtlačkom prsta alebo tvárou</string>
+    <string name="language">Jazyk</string>
+    <string name="export">Export dát</string>
+    <string name="export_desc">Exportovať záznamy do priečinka Stiahnuté</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Záloha</string>
+    <string name="backup_desc">Úplná záloha (záznamy + nápoje) ako súbor JSON</string>
+    <string name="backup_export">Exportovať</string>
+    <string name="backup_import">Importovať</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Ako importovať dáta?</string>
+    <string name="import_replace">Nahradiť</string>
+    <string name="import_merge">Pridať</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Prosím, overte svoju totožnosť</string>
+
+    <!-- Medical guidelines -->
+    <string name="who_note">WHO (2023) uvádza: Neexistuje bezpečná úroveň spotreby alkoholu. Tu zobrazená riziková hodnota je praktický orientačný bod, nie bezpečnostný prah.</string>
+    <string name="who_values">Riziková hodnota: ♂ ≤ %1$s g, ♀ ≤ %2$s g za deň.</string>
+    <string name="dhs_note">DHS odporúča: muži by nemali piť viac ako 24 g, ženy nie viac ako 12 g čistého alkoholu za deň. Aspoň dva dni v týždni by mali byť bez alkoholu.</string>
+
+    <!-- Miscellaneous -->
+    <string name="pdf_months_truncated">Zobrazuje sa %1$d z %2$d mesiacov – staršie dáta sú v CSV/zálohe</string>
+    <string name="year_calendar_no_entry">bez záznamu</string>
+    <string name="year_calendar_under_limit">pod limitom</string>
+    <string name="year_calendar_over_limit">nad limitom</string>
+
+    <!-- Export / import status messages -->
+    <string name="export_no_entries">Žiadne záznamy na export.</string>
+    <string name="export_failed">Export zlyhal.</string>
+    <string name="backup_failed">Zálohovanie zlyhalo.</string>
+    <string name="import_success_replace">%1$d záznamov importovaných.</string>
+    <string name="import_success_merge">%1$d importovaných, %2$d preskočených.</string>
+    <string name="import_error_could_not_read">Súbor sa nedá čítať.</string>
+    <string name="import_error_empty">Záložný súbor je prázdny.</string>
+    <string name="import_error_invalid_json">Neplatný formát JSON.</string>
+    <string name="import_error_version_too_high">Záložná verzia %1$d nie je podporovaná (max. %2$d).</string>
+    <string name="import_error_file_too_large">Záložný súbor je príliš veľký (max. %1$d MB).</string>
+    <string name="import_error_read">Chyba čítania: %1$s</string>
+    <string name="drink_delete_blocked">„{name}“ má {count} záznamov a nemôže byť odstránené.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Názov nápoja nesmie byť prázdny.</string>
+    <string name="drink_validation_name_too_long">Názov nápoja je príliš dlhý (max. 100 znakov).</string>
+    <string name="drink_validation_volume_range">Objem musí byť medzi 1 ml a 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Obsah alkoholu musí byť medzi 0 % a 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Obsah alkoholu nie je platné číslo.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+
+    <!-- CSV column headers -->
+    <string name="csv_col_date">Dátum</string>
+    <string name="csv_col_time">Čas</string>
+    <string name="csv_col_drink">Nápoj</string>
+    <string name="csv_col_category">Kategória</string>
+    <string name="csv_col_volume_ml">Množstvo_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gramy_alkoholu</string>
+    <string name="csv_col_note">Poznámka</string>
+    <string name="pdf_unit_g_per_day">g/deň</string>
+    <string name="unit_g_per_day">g/deň</string>
+
+    <!-- Drinking-days and weekly gram mode -->
+    <string name="days_over_limit_who">Dni nad limitom (WHO)</string>
+    <string name="days_over_limit_dhs">Dni nad limitom (DHS)</string>
+    <string name="days_over_limit_custom">Dni nad nastaveným limitom</string>
+    <string name="drink_days_label">dni pitia tento týždeň</string>
+    <string name="drink_days_setting">Max. dni pitia/týždeň</string>
+    <string name="drink_days_who_dhs_note">Odporúčanie: max. 5 dní pitia za týždeň (≥ 2 dni bez alkoholu)</string>
+    <string name="weekly_gram_mode_title">Týždenný gramový limit</string>
+    <string name="weekly_gram_mode_desc">Panel priebehu a indikátory používajú týždenný rozpočet (max. dni pitia &#215; denný limit)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Osobné údaje</string>
+    <string name="week_starts_on">Týždeň začína</string>
+</resources>

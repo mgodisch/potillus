@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Faroese (Føroyskt) — fo
+    Script : Latin (+ á í ó ú ý æ ø); LTR.
+    Approx.: ~75 000 speakers (Faroe Islands + diaspora).
+    Register: Standard Faroese (Faroese Language Committee norms).
+    Notes  : Faroese is the official language of the Faroe Islands, an autonomous
+             territory of Denmark.  It has four cases and grammatical gender
+             (masculine, feminine, neuter).  "Binge drinking" → óhóvliga
+             drakking / drukkin — the neutral clinical term óhóvliga drakking
+             is preferred in health contexts.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Í dag</string>
+    <string name="calendar">Dagatal</string>
+    <string name="statistics">Støddfrøði</string>
+    <string name="drinks">Drákkir</string>
+    <string name="settings">Innstillingar</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Samtals í dag</string>
+    <string name="grams_alcohol">g alkohol</string>
+    <string name="entries_today">Innførslur í dag</string>
+    <string name="no_entries_today">Einki innfært í dag enná.\nTrýst á + fyri at leggja innførslu aftrat.</string>
+    <string name="no_entries_day">Einki innfært henda dagin.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Skjótprent uppáhald</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">BAC-metnaður</string>
+    <string name="bac_disclaimer">Metnaður · ikki fyri akstursbeslutningar</string>
+    <string name="stats_from_section">Støddfrøðitíðarbil</string>
+    <string name="stats_from_label">Støddfrøði frá</string>
+    <string name="stats_from_desc">Innførslur áðrenn henda dagsetningina eru utilukaðar frá øllum støddfrøðum.</string>
+    <string name="bac_section">BAC-roknaður (Widmark)</string>
+    <string name="bac_desc">Líkamsvekt er neyðug fyri metnað. Hetta er matematisk nálging, ikki mæling.</string>
+    <string name="body_weight">Líkamsvekt</string>
+    <string name="not_set">ikki sett</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Legg innførslu aftrat</string>
+    <string name="edit_entry">Rætta innførslu</string>
+    <string name="drink">Drikkur</string>
+    <string name="select_drink">Vel drikkur …</string>
+    <string name="volume_ml">Mengd</string>
+    <string name="time">Tíð</string>
+    <string name="pure_alcohol">g reinur alkohol</string>
+    <string name="note">Viðmerking (valfrítt)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Legg drikkur aftrat</string>
+    <string name="edit_drink">Rætta drikkur</string>
+    <string name="drink_name">Navn</string>
+    <string name="alcohol_percent">Alkoholtæla</string>
+    <string name="favorite">Uppáhald</string>
+    <string name="no_drinks">Einki drákkir skrásettur enná.</string>
+    <string name="category">Bólkur</string>
+    <string name="category_beer">Øl</string>
+    <string name="category_wine">Vín / Froyðivín</string>
+    <string name="category_spirits">Brennivín</string>
+    <string name="category_longdrink">Longdrink / Blanda</string>
+    <string name="category_liqueur">Likør</string>
+    <string name="category_other">Annað</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Alkohol-samantekt</string>
+    <string name="pdf_section_kpis">Kjarnatal</string>
+    <string name="pdf_section_months">Mánaðarligur yvirlit</string>
+    <string name="pdf_section_trend">Langtíðar þróun (meðaltal g/mánaður)</string>
+    <string name="pdf_section_categories">Drikkabólkar</string>
+    <string name="pdf_section_daytime">Nýtslumynstur: Tíð dagsins</string>
+    <string name="pdf_section_weekday">Vikudagsprofíl (meðaltal g alkohol)</string>
+    <string name="pdf_section_risk">Áhættubrúk &amp; Avhald</string>
+    <string name="pdf_footer1">Bert metnaður. Ikki fyri akstur ella diagnósu.</string>
+    <string name="pdf_footer2">Gjørt við Libellus Potionis (Potillus). Metnaður – ikki læknafrøðilig diagnósa.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Útflutningsdagur</string>
+    <string name="pdf_meta_period">Tíðarbil</string>
+    <string name="pdf_meta_gender">Kyn</string>
+    <string name="pdf_meta_limit">Mørk</string>
+    <string name="pdf_meta_weight">Líkamsvekt</string>
+    <string name="pdf_meta_custom_limit">Tillagað</string>
+    <string name="pdf_kpi_total">Samlaður alkohol</string>
+    <string name="pdf_kpi_avg_day">Meðaltal um dagin</string>
+    <string name="pdf_kpi_avg_drink_day">Meðaltal um drikkjudag</string>
+    <string name="pdf_kpi_drink_days">Drikkjudagar</string>
+    <string name="pdf_kpi_abstinent_days">Avhaldsdagar</string>
+    <string name="pdf_kpi_over_who">Dagar > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dagar > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Binge-dagar (>%1$s g)</string>
+    <string name="pdf_col_month">Mánaður</string>
+    <string name="pdf_col_drink_days">Drikkjudagar</string>
+    <string name="pdf_col_total_g">Samlaður g</string>
+    <string name="pdf_col_avg_g_day">Meðaltal g/dag</string>
+    <string name="pdf_meta_first_drink">Meðaltal fyrsti drikkur</string>
+    <string name="pdf_meta_last_drink">Meðaltal seinastur drikkur</string>
+    <string name="pdf_meta_before_18">Partur áðrenn 17:00</string>
+    <string name="pdf_meta_after_18">Partur frá 17:00</string>
+    <string name="pdf_meta_binge_days">Óhóvliga drakkinga-dagar (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Lengsta avhald</string>
+    <string name="pdf_meta_current_abstinence">Nuvurandi avhald</string>
+    <string name="pdf_days_suffix">dagar</string>
+
+    <!-- Actions -->
+    <string name="save">Goym</string>
+    <string name="cancel">Ávenda</string>
+    <string name="back">Aftur</string>
+    <string name="delete">Strika</string>
+    <string name="change">Broyta</string>
+    <string name="delete_confirm">Strika veruleika \"%1$s\"?</string>
+    <string name="no_data">Einki data fyri hetta tíðarbil.</string>
+
+    <!-- Stats -->
+    <string name="week">Vika</string>
+    <string name="month">Mánaður</string>
+    <string name="year">Ár</string>
+    <string name="total_period">Samtals í tíðarbilinum</string>
+    <string name="avg_per_day">Meðaltal um dagin</string>
+    <string name="avg_per_drink_day">Meðaltal um hvønn drikkjudag</string>
+    <string name="abstinent_days">Avhaldsdagar</string>
+    <string name="stats_category_breakdown">Bólkar</string>
+    <string name="streak_trend">Avhald &amp; Þróun</string>
+    <string name="current_streak">Nuvurandi avhald</string>
+    <string name="longest_streak">Lengsta avhald</string>
+    <string name="days_count">%1$d dagar</string>
+    <string name="trend_vs_prev">Þróun samanborið við seinasta tíðarbil</string>
+
+    <!-- Settings -->
+    <string name="appearance">Útlit</string>
+    <string name="theme_mode">Litaætlan</string>
+    <string name="theme_system">Kerfið</string>
+    <string name="theme_day">Ljóst</string>
+    <string name="theme_night">Dimmur</string>
+    <string name="day_change_time">Tíð dagsskiftar</string>
+    <string name="day_starts_at">Nýggjur dagur byrjar klokkan</string>
+    <string name="gender">Kyn</string>
+    <string name="male">Karl</string>
+    <string name="female">Kvinna</string>
+    <string name="limit_mode">Læknafrøðileg leiðsögn</string>
+    <string name="limit_who">WHO – áhættugildi</string>
+    <string name="limit_dhs">DHS – lágur áhætta</string>
+    <string name="limit_custom">Tillagað</string>
+    <string name="custom_limit_grams">Mítt dagsleg mørk í gramum</string>
+    <string name="weekly_limit_section">Vikumørk</string>
+    <string name="weekly_limit_enabled">Virkja vikumørk</string>
+    <string name="weekly_limit_grams">Vikumørk í gramum</string>
+    <string name="weekly_limit">Vika</string>
+    <string name="biometric">Atgongulás</string>
+    <string name="biometric_lock">Lívfrøðiligur lás</string>
+    <string name="biometric_desc">Lás appina við fingrafari ella andlitskenning</string>
+    <string name="language">Mál</string>
+    <string name="export">Datagongd</string>
+    <string name="export_desc">Flyt innførslur til Niðurhal-mappuna</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Tryggingarkopia</string>
+    <string name="backup_desc">Fullnøkt tryggingarkopia (innførslur + drákkir) sum JSON-fíla</string>
+    <string name="backup_export">Flyt út</string>
+    <string name="backup_import">Flyt inn</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Hvussu skal datan flytast inn?</string>
+    <string name="import_replace">Skift út</string>
+    <string name="import_merge">Legg aftrat</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Vátta teg v.b.</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) sigur: Eingin trygg nýtsla av alkoholi er til. Áhættugildi, sum vísast her, er praktiskt viðmið, ikki trygdarmark.</string>
+    <string name="who_values">Vandavirði: ♂ ≤ %1$s g, ♀ ≤ %2$s g um dagin.</string>
+    <string name="pdf_months_truncated">Vísi %1$d av %2$d mánaðum – eldri data liggur í CSV/tryggingarkopia</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">einki innfært</string>
+    <string name="year_calendar_under_limit">undir mørkum</string>
+    <string name="year_calendar_over_limit">yvir mørkum</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Einki at flyta út.</string>
+    <string name="export_failed">Útflutningur mistókst.</string>
+    <string name="backup_failed">Tryggingarkopia mistókst.</string>
+    <string name="import_success_replace">%1$d innførslur fluttar inn.</string>
+    <string name="import_success_merge">%1$d fluttar inn, %2$d sloppnar.</string>
+    <string name="import_error_could_not_read">Ikki mátti lesa fíluna.</string>
+    <string name="import_error_empty">Tryggingarkopia-fílan er tóm.</string>
+    <string name="import_error_invalid_json">Ógyldugt JSON-snið.</string>
+    <string name="import_error_version_too_high">Tryggingarkopia-útgáva %1$d er ikki stødd (max. %2$d).</string>
+    <string name="import_error_file_too_large">Tryggingarkopia-fílan er stór of (max. %1$d MB).</string>
+    <string name="import_error_read">Lesvillu: %1$s</string>
+    <string name="drink_delete_blocked">\u201e{name}\u201c hevur {count} innførslur og kann ikki strikast.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Navn á drikkinum má ikki vera tómt.</string>
+    <string name="drink_validation_name_too_long">Navn á drikkinum er stórt of langt (max. 100 tákn).</string>
+    <string name="drink_validation_volume_range">Mengdin skal vera millum 1 ml og 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Alkoholtælan skal vera millum 0 % og 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Alkoholtælan er ikki gyldugt tal.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Dagur</string>
+    <string name="csv_col_time">Tíð</string>
+    <string name="csv_col_drink">Drikkur</string>
+    <string name="csv_col_category">Bólkur</string>
+    <string name="csv_col_volume_ml">Mengd_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gram_alkohol</string>
+    <string name="csv_col_note">Viðmerking</string>
+    <string name="pdf_unit_g_per_day">g/dag</string>
+    <string name="unit_g_per_day">g/dag</string>
+
+    <string name="days_over_limit_who">Dagar yvir mørkum (WHO)</string>
+    <string name="days_over_limit_dhs">Dagar yvir mørkum (DHS)</string>
+    <string name="days_over_limit_custom">Dagar yvir stilltum mørkum</string>
+    <string name="dhs_note">DHS mælir til: men dreki ikki meira enn 24 g, kvinnur ikki meira enn 12 g reinan alkohol um dagin. Minst tveir dagar í vikuni skulu vera án alkohols.</string>
+    <string name="drink_days_label">drikkjudagar hesa vikuna</string>
+    <string name="drink_days_setting">Max. drikkjudagar/viku</string>
+    <string name="drink_days_who_dhs_note">Tilmæli: max. 5 drikkjudagar í vikuni (≥ 2 avhaldsdagar)</string>
+    <string name="weekly_gram_mode_title">Vikugramma-mørk</string>
+    <string name="weekly_gram_mode_desc">Framgongustikan og vísar nýta vikuútreikning (max. drikkjudagar &#215; dagsleg mørk)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Persónlig dáta</string>
+    <string name="week_starts_on">Vikan byrjar</string>
+</resources>

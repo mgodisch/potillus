@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Malay (Bahasa Malaysia / Bahasa Melayu) — ms
+    Script : Latin (Rumi); LTR.
+    Approx.: ~290 M L1+L2 speakers (Malaysia, Brunei, Singapore, Indonesia overlap).
+    Register: formal/written standard (bahasa baku).
+    Notes  : Indonesian (id) and Malay share significant vocabulary but differ in
+             spelling conventions, loanwords, and register.  These strings follow
+             the Malaysian standard.  "Binge drinking" → minum minuman keras secara
+             berlebihan.
+    Source : Translated from values-de/strings.xml (German source of truth).
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Hari ini</string>
+    <string name="calendar">Kalendar</string>
+    <string name="statistics">Statistik</string>
+    <string name="drinks">Minuman</string>
+    <string name="settings">Tetapan</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Jumlah hari ini</string>
+    <string name="grams_alcohol">g alkohol</string>
+    <string name="entries_today">Entri hari ini</string>
+    <string name="no_entries_today">Tiada entri hari ini.\nKetik + untuk menambah entri.</string>
+    <string name="no_entries_day">Tiada entri untuk hari ini.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Tambah segera kegemaran</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Anggaran BAC</string>
+    <string name="bac_disclaimer">Anggaran · bukan untuk keputusan memandu</string>
+    <string name="stats_from_section">Tempoh statistik</string>
+    <string name="stats_from_label">Statistik dari</string>
+    <string name="stats_from_desc">Entri sebelum tarikh ini dikecualikan daripada semua statistik.</string>
+    <string name="bac_section">Penganggaran BAC (Widmark)</string>
+    <string name="bac_desc">Berat badan diperlukan untuk anggaran. Ini adalah penghampiran matematik, bukan ukuran sebenar.</string>
+    <string name="body_weight">Berat badan</string>
+    <string name="not_set">tidak ditetapkan</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Tambah entri</string>
+    <string name="edit_entry">Edit entri</string>
+    <string name="drink">Minuman</string>
+    <string name="select_drink">Pilih minuman …</string>
+    <string name="volume_ml">Jumlah</string>
+    <string name="time">Masa</string>
+    <string name="pure_alcohol">g alkohol tulen</string>
+    <string name="note">Nota (pilihan)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Tambah minuman</string>
+    <string name="edit_drink">Edit minuman</string>
+    <string name="drink_name">Nama</string>
+    <string name="alcohol_percent">Kandungan alkohol</string>
+    <string name="favorite">Kegemaran</string>
+    <string name="no_drinks">Tiada minuman ditakrifkan lagi.</string>
+    <string name="category">Kategori</string>
+    <string name="category_beer">Bir</string>
+    <string name="category_wine">Wain / Berbuih</string>
+    <string name="category_spirits">Minuman keras</string>
+    <string name="category_longdrink">Longdrink / Campuran</string>
+    <string name="category_liqueur">Likeur</string>
+    <string name="category_other">Lain-lain</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Ringkasan Alkohol</string>
+    <string name="pdf_section_kpis">Angka Utama</string>
+    <string name="pdf_section_months">Gambaran Bulanan</string>
+    <string name="pdf_section_trend">Tren Jangka Panjang (purata g/bulan)</string>
+    <string name="pdf_section_categories">Kategori Minuman</string>
+    <string name="pdf_section_daytime">Corak Pengambilan: Masa Hari</string>
+    <string name="pdf_section_weekday">Profil Hari Minggu (purata g alkohol)</string>
+    <string name="pdf_section_risk">Pengambilan Berisiko &amp; Pantang</string>
+    <string name="pdf_footer1">Anggaran sahaja. Bukan untuk tujuan pemanduan atau diagnostik.</string>
+    <string name="pdf_footer2">Dibuat dengan Libellus Potionis (Potillus). Anggaran – bukan diagnosis perubatan.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Tarikh eksport</string>
+    <string name="pdf_meta_period">Tempoh</string>
+    <string name="pdf_meta_gender">Jantina</string>
+    <string name="pdf_meta_limit">Had</string>
+    <string name="pdf_meta_weight">Berat badan</string>
+    <string name="pdf_meta_custom_limit">Tersuai</string>
+    <string name="pdf_kpi_total">Jumlah alkohol</string>
+    <string name="pdf_kpi_avg_day">Purata sehari</string>
+    <string name="pdf_kpi_avg_drink_day">Purata sehari minum</string>
+    <string name="pdf_kpi_drink_days">Hari minum</string>
+    <string name="pdf_kpi_abstinent_days">Hari pantang</string>
+    <string name="pdf_kpi_over_who">Hari > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Hari > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Hari binge (>%1$s g)</string>
+    <string name="pdf_col_month">Bulan</string>
+    <string name="pdf_col_drink_days">Hari minum</string>
+    <string name="pdf_col_total_g">Jumlah g</string>
+    <string name="pdf_col_avg_g_day">Purata g/hari</string>
+    <string name="pdf_meta_first_drink">Purata minuman pertama</string>
+    <string name="pdf_meta_last_drink">Purata minuman terakhir</string>
+    <string name="pdf_meta_before_18">Bahagian sebelum 17:00</string>
+    <string name="pdf_meta_after_18">Bahagian dari 17:00</string>
+    <string name="pdf_meta_binge_days">Hari binge drinking (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Pantang terpanjang</string>
+    <string name="pdf_meta_current_abstinence">Pantang semasa</string>
+    <string name="pdf_days_suffix">hari</string>
+
+    <!-- Actions -->
+    <string name="save">Simpan</string>
+    <string name="cancel">Batal</string>
+    <string name="back">Kembali</string>
+    <string name="delete">Padam</string>
+    <string name="change">Ubah</string>
+    <string name="delete_confirm">Padamkan \"%1$s\" secara kekal?</string>
+    <string name="no_data">Tiada data untuk tempoh ini.</string>
+
+    <!-- Stats -->
+    <string name="week">Minggu</string>
+    <string name="month">Bulan</string>
+    <string name="year">Tahun</string>
+    <string name="total_period">Jumlah dalam tempoh</string>
+    <string name="avg_per_day">Purata sehari</string>
+    <string name="avg_per_drink_day">Purata setiap hari minum</string>
+    <string name="abstinent_days">Hari pantang</string>
+    <string name="stats_category_breakdown">Kategori</string>
+    <string name="streak_trend">Pantang &amp; Tren</string>
+    <string name="current_streak">Pantang semasa</string>
+    <string name="longest_streak">Pantang terpanjang</string>
+    <string name="days_count">%1$d hari</string>
+    <string name="trend_vs_prev">Tren berbanding tempoh sebelumnya</string>
+
+    <!-- Settings -->
+    <string name="appearance">Penampilan</string>
+    <string name="theme_mode">Skema warna</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_day">Cerah</string>
+    <string name="theme_night">Gelap</string>
+    <string name="day_change_time">Masa pertukaran hari</string>
+    <string name="day_starts_at">Hari baru bermula pada</string>
+    <string name="gender">Jantina</string>
+    <string name="male">Lelaki</string>
+    <string name="female">Perempuan</string>
+    <string name="limit_mode">Panduan perubatan</string>
+    <string name="limit_who">WHO – paras risiko</string>
+    <string name="limit_dhs">DHS – risiko rendah</string>
+    <string name="limit_custom">Tersuai</string>
+    <string name="custom_limit_grams">Had harian saya dalam gram</string>
+    <string name="weekly_limit_section">Had mingguan</string>
+    <string name="weekly_limit_enabled">Aktifkan had mingguan</string>
+    <string name="weekly_limit_grams">Had mingguan dalam gram</string>
+    <string name="weekly_limit">Minggu</string>
+    <string name="biometric">Kunci akses</string>
+    <string name="biometric_lock">Kunci biometrik</string>
+    <string name="biometric_desc">Kunci apl dengan cap jari atau pengecaman wajah</string>
+    <string name="language">Bahasa</string>
+    <string name="export">Eksport data</string>
+    <string name="export_desc">Eksport entri ke folder Muat Turun</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Sandaran</string>
+    <string name="backup_desc">Sandaran penuh (entri + minuman) sebagai fail JSON</string>
+    <string name="backup_export">Eksport</string>
+    <string name="backup_import">Import</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Bagaimana data harus diimport?</string>
+    <string name="import_replace">Ganti</string>
+    <string name="import_merge">Tambah</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Sila sahkan identiti</string>
+
+    <!-- WHO note -->
+    <string name="who_note">WHO (2023) menyatakan: Tiada tahap pengambilan alkohol yang selamat. Nilai risiko yang ditunjukkan di sini adalah titik rujukan praktikal, bukan ambang keselamatan.</string>
+    <string name="who_values">Nilai risiko: ♂ ≤ %1$s g, ♀ ≤ %2$s g sehari.</string>
+    <string name="pdf_months_truncated">Menunjukkan %1$d daripada %2$d bulan – data lama tersedia dalam CSV/sandaran</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">tiada entri</string>
+    <string name="year_calendar_under_limit">di bawah had</string>
+    <string name="year_calendar_over_limit">melebihi had</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Tiada entri untuk dieksport.</string>
+    <string name="export_failed">Eksport gagal.</string>
+    <string name="backup_failed">Sandaran gagal.</string>
+    <string name="import_success_replace">%1$d entri diimport.</string>
+    <string name="import_success_merge">%1$d diimport, %2$d dilangkau.</string>
+    <string name="import_error_could_not_read">Fail tidak dapat dibaca.</string>
+    <string name="import_error_empty">Fail sandaran kosong.</string>
+    <string name="import_error_invalid_json">Format JSON tidak sah.</string>
+    <string name="import_error_version_too_high">Versi sandaran %1$d tidak disokong (maks. %2$d).</string>
+    <string name="import_error_file_too_large">Fail sandaran terlalu besar (maks. %1$d MB).</string>
+    <string name="import_error_read">Ralat baca: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d mempunyai {count} entri dan tidak dapat dipadam.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Nama minuman tidak boleh kosong.</string>
+    <string name="drink_validation_name_too_long">Nama minuman terlalu panjang (maks. 100 aksara).</string>
+    <string name="drink_validation_volume_range">Jumlah mesti antara 1 ml dan 10 000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">Kandungan alkohol mesti antara 0 % dan 100 %.</string>
+    <string name="drink_validation_alcohol_invalid">Kandungan alkohol bukan nombor yang sah.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Tarikh</string>
+    <string name="csv_col_time">Masa</string>
+    <string name="csv_col_drink">Minuman</string>
+    <string name="csv_col_category">Kategori</string>
+    <string name="csv_col_volume_ml">Isipadu_ml</string>
+    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_grams">Gram_alkohol</string>
+    <string name="csv_col_note">Nota</string>
+    <string name="pdf_unit_g_per_day">g/hari</string>
+    <string name="unit_g_per_day">g/hari</string>
+
+    <string name="days_over_limit_who">Hari melebihi had (WHO)</string>
+    <string name="days_over_limit_dhs">Hari melebihi had (DHS)</string>
+    <string name="days_over_limit_custom">Hari melebihi had yang ditetapkan</string>
+    <string name="dhs_note">DHS mengesyorkan: lelaki tidak minum lebih daripada 24 g, wanita tidak lebih daripada 12 g alkohol tulen sehari. Sekurang-kurangnya dua hari seminggu harus bebas alkohol.</string>
+    <string name="drink_days_label">hari minum minggu ini</string>
+    <string name="drink_days_setting">Maks. hari minum/minggu</string>
+    <string name="drink_days_who_dhs_note">Cadangan: maks. 5 hari minum seminggu (≥ 2 hari pantang)</string>
+    <string name="weekly_gram_mode_title">Had mingguan (gram)</string>
+    <string name="weekly_gram_mode_desc">Bar kemajuan dan penunjuk menggunakan bajet mingguan (maks. hari minum &#215; had harian)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Data peribadi</string>
+    <string name="week_starts_on">Minggu bermula pada</string>
+</resources>

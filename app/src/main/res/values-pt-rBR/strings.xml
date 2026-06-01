@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Brazilian Portuguese (pt-rBR).
+    Android uses the region qualifier "rBR" to distinguish this variant from
+    European Portuguese (values-pt/).  When a device is set to pt-BR, Android
+    resolves resources in this order: values-pt-rBR → values-pt → values/.
+    Therefore only strings that actually differ from European Portuguese need
+    to be listed here; Android will fall back to values-pt/ for the rest.
+    However, to keep the file self-contained and to make future maintenance
+    easier, all 175 strings are included.
+
+    Key differences from European Portuguese (pt):
+      • "Definições" → "Configurações"  (settings)
+      • "Registos"   → "Registros"      (entries – EP uses -os)
+      • "Guardar"    → "Salvar"         (save)
+      • "Eliminar"   → "Excluir"        (delete)
+      • "Ficheiro"   → "Arquivo"        (file)
+      • "Transferências" → "Downloads"  (download folder)
+      • "Teor alcoólico" → "Teor alcoólico" (same, kept)
+      • Informal "você" register replaces EP "toque"/"selecione" imperatives
+        with the equivalent Brazilian forms.
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigation -->
+    <string name="today">Hoje</string>
+    <string name="calendar">Calendário</string>
+    <string name="statistics">Estatísticas</string>
+    <string name="drinks">Bebidas</string>
+    <string name="settings">Configurações</string>
+
+    <!-- Today Screen -->
+    <string name="total_today">Total hoje</string>
+    <string name="grams_alcohol">g de álcool</string>
+    <string name="entries_today">Registros de hoje</string>
+    <string name="no_entries_today">Nenhum registro hoje.\nToque em + para adicionar.</string>
+    <string name="no_entries_day">Nenhum registro para este dia.</string>
+
+    <!-- Favourites -->
+    <string name="favorites_quick">Adicionar favoritos rapidamente</string>
+
+    <!-- BAC estimate -->
+    <string name="bac_estimate">Estimativa de teor alcoólico</string>
+    <string name="bac_disclaimer">Estimativa · não usar para direção</string>
+    <string name="stats_from_section">Período de estatísticas</string>
+    <string name="stats_from_label">Estatísticas a partir de</string>
+    <string name="stats_from_desc">Registros anteriores a esta data são excluídos de todas as estatísticas.</string>
+    <string name="bac_section">Calculadora de teor alcoólico (Widmark)</string>
+    <string name="bac_desc">O peso corporal é necessário para a estimativa. É uma aproximação matemática, não uma medição.</string>
+    <string name="body_weight">Peso corporal</string>
+    <string name="not_set">não definido</string>
+
+    <!-- Entry Dialog -->
+    <string name="add_entry">Adicionar registro</string>
+    <string name="edit_entry">Editar registro</string>
+    <string name="drink">Bebida</string>
+    <string name="select_drink">Selecione uma bebida …</string>
+    <string name="volume_ml">Quantidade</string>
+    <string name="time">Horário</string>
+    <string name="pure_alcohol">g de álcool puro</string>
+    <string name="note">Nota (opcional)</string>
+
+    <!-- Drink Dialog -->
+    <string name="add_drink">Adicionar bebida</string>
+    <string name="edit_drink">Editar bebida</string>
+    <string name="drink_name">Nome</string>
+    <string name="alcohol_percent">Teor alcoólico</string>
+    <string name="favorite">Favorito</string>
+    <string name="no_drinks">Nenhuma bebida definida ainda.</string>
+    <string name="category">Categoria</string>
+    <string name="category_beer">Cerveja</string>
+    <string name="category_wine">Vinho / Espumante</string>
+    <string name="category_spirits">Destilados</string>
+    <string name="category_longdrink">Longdrink / Mix</string>
+    <string name="category_liqueur">Licor</string>
+    <string name="category_other">Outros</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Resumo de álcool</string>
+    <string name="pdf_section_kpis">Dados principais</string>
+    <string name="pdf_section_months">Visão geral mensal</string>
+    <string name="pdf_section_trend">Tendência de longo prazo (média g/mês)</string>
+    <string name="pdf_section_categories">Categorias de bebidas</string>
+    <string name="pdf_section_daytime">Padrão de consumo: horário do dia</string>
+    <string name="pdf_section_weekday">Perfil por dia da semana (média g de álcool)</string>
+    <string name="pdf_section_risk">Consumo de risco &amp; Abstinência</string>
+    <string name="pdf_footer1">Valores estimados. Não usar para direção ou diagnóstico.</string>
+    <string name="pdf_footer2">Criado com Libellus Potionis (Potillus). Estimativas – sem diagnóstico médico.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Data de exportação</string>
+    <string name="pdf_meta_period">Período</string>
+    <string name="pdf_meta_gender">Sexo</string>
+    <string name="pdf_meta_limit">Limite</string>
+    <string name="pdf_meta_weight">Peso corporal</string>
+    <string name="pdf_meta_custom_limit">Personalizado</string>
+    <string name="pdf_kpi_total">Álcool total</string>
+    <string name="pdf_kpi_avg_day">Média por dia</string>
+    <string name="pdf_kpi_avg_drink_day">Média por dia de consumo</string>
+    <string name="pdf_kpi_drink_days">Dias de consumo</string>
+    <string name="pdf_kpi_abstinent_days">Dias de abstinência</string>
+    <string name="pdf_kpi_over_who">Dias > OMS (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dias > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Dias de binge (>%1$s g)</string>
+    <string name="pdf_col_month">Mês</string>
+    <string name="pdf_col_drink_days">Dias de consumo</string>
+    <string name="pdf_col_total_g">Total g</string>
+    <string name="pdf_col_avg_g_day">Média g/dia</string>
+    <string name="pdf_meta_first_drink">Primeira bebida (média)</string>
+    <string name="pdf_meta_last_drink">Última bebida (média)</string>
+    <string name="pdf_meta_before_18">Parcela antes das 17h</string>
+    <string name="pdf_meta_after_18">Parcela a partir das 17h</string>
+    <string name="pdf_meta_binge_days">Dias de binge (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Maior período de abstinência</string>
+    <string name="pdf_meta_current_abstinence">Abstinência atual</string>
+    <string name="pdf_days_suffix">dias</string>
+
+    <!-- Actions -->
+    <string name="save">Salvar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="back">Voltar</string>
+    <string name="delete">Excluir</string>
+    <string name="change">Alterar</string>
+    <string name="delete_confirm">Excluir "%1$s"?</string>
+    <string name="no_data">Sem dados para este período.</string>
+
+    <!-- Stats -->
+    <string name="week">Semana</string>
+    <string name="month">Mês</string>
+    <string name="year">Ano</string>
+    <string name="total_period">Total no período</string>
+    <string name="avg_per_day">Média por dia</string>
+    <string name="avg_per_drink_day">Média por dia de consumo</string>
+    <string name="abstinent_days">Dias de abstinência</string>
+    <string name="stats_category_breakdown">Categorias</string>
+    <string name="streak_trend">Abstinência &amp; Tendência</string>
+    <string name="current_streak">Abstinência atual</string>
+    <string name="longest_streak">Maior abstinência</string>
+    <string name="days_count">%1$d dias</string>
+    <string name="trend_vs_prev">Tendência vs. período anterior</string>
+
+    <!-- Settings -->
+    <string name="appearance">Aparência</string>
+    <string name="theme_mode">Esquema de cores</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_day">Claro</string>
+    <string name="theme_night">Escuro</string>
+    <string name="day_change_time">Horário de virada do dia</string>
+    <string name="day_starts_at">Novo dia começa às</string>
+    <string name="gender">Sexo</string>
+    <string name="male">Masculino</string>
+    <string name="female">Feminino</string>
+    <string name="limit_mode">Diretriz médica</string>
+    <string name="limit_who">OMS – nível de risco</string>
+    <string name="limit_dhs">DHS – baixo risco</string>
+    <string name="limit_custom">Personalizado</string>
+    <string name="custom_limit_grams">Meu limite diário em gramas</string>
+    <string name="weekly_limit_section">Limite semanal</string>
+    <string name="weekly_limit_enabled">Ativar limite semanal</string>
+    <string name="weekly_limit_grams">Limite semanal em gramas</string>
+    <string name="weekly_limit">Semana</string>
+    <string name="biometric">Bloqueio de acesso</string>
+    <string name="biometric_lock">Bloqueio biométrico</string>
+    <string name="biometric_desc">Bloquear o app com impressão digital ou reconhecimento facial</string>
+    <string name="language">Idioma</string>
+    <string name="export">Exportação de dados</string>
+    <string name="export_desc">Exportar registros para a pasta Downloads</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Backup</string>
+    <string name="backup_desc">Backup completo (registros + bebidas) como arquivo JSON</string>
+    <string name="backup_export">Exportar</string>
+    <string name="backup_import">Importar</string>
+
+    <!-- Import mode -->
+    <string name="import_mode_question">Como deseja importar os dados?</string>
+    <string name="import_replace">Substituir</string>
+    <string name="import_merge">Adicionar</string>
+
+    <!-- Biometric Prompt -->
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Por favor, autentique-se</string>
+
+    <!-- WHO note -->
+    <string name="who_note">A OMS (2023) afirma: não existe quantidade segura de álcool. O valor de risco exibido aqui é um ponto de referência prático, não um limiar de segurança.</string>
+    <string name="who_values">Valor de risco: ♂ ≤ %1$s g, ♀ ≤ %2$s g por dia.</string>
+    <string name="pdf_months_truncated">Exibindo %1$d de %2$d meses – dados mais antigos disponíveis em CSV/backup</string>
+
+    <!-- Year calendar legend -->
+    <string name="year_calendar_no_entry">sem registro</string>
+    <string name="year_calendar_under_limit">abaixo do limite</string>
+    <string name="year_calendar_over_limit">acima do limite</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Nenhum registro para exportar.</string>
+    <string name="export_failed">Falha na exportação.</string>
+    <string name="backup_failed">Falha no backup.</string>
+    <string name="import_success_replace">%1$d registros importados.</string>
+    <string name="import_success_merge">%1$d importados, %2$d ignorados.</string>
+    <string name="import_error_could_not_read">Não foi possível ler o arquivo.</string>
+    <string name="import_error_empty">O arquivo de backup está vazio.</string>
+    <string name="import_error_invalid_json">Formato JSON inválido.</string>
+    <string name="import_error_version_too_high">A versão do backup %1$d não é suportada (máx. %2$d).</string>
+    <string name="import_error_file_too_large">O arquivo de backup é muito grande (máx. %1$d MB).</string>
+    <string name="import_error_read">Erro de leitura: %1$s</string>
+    <string name="drink_delete_blocked">"{name}" tem {count} registros e não pode ser excluído.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">O nome da bebida não pode estar vazio.</string>
+    <string name="drink_validation_name_too_long">O nome da bebida é muito longo (máx. 100 caracteres).</string>
+    <string name="drink_validation_volume_range">A quantidade deve estar entre 1 ml e 10.000 ml.</string>
+    <string name="drink_validation_alcohol_range" formatted="false">O teor alcoólico deve estar entre 0% e 100%.</string>
+    <string name="drink_validation_alcohol_invalid">O teor alcoólico não é um número válido.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Data</string>
+    <string name="csv_col_time">Horário</string>
+    <string name="csv_col_drink">Bebida</string>
+    <string name="csv_col_category">Categoria</string>
+    <string name="csv_col_volume_ml">Quantidade_ml</string>
+    <string name="csv_col_alcohol_pct">Álcool_%</string>
+    <string name="csv_col_grams">Gramas_álcool</string>
+    <string name="csv_col_note">Nota</string>
+    <string name="pdf_unit_g_per_day">g/dia</string>
+    <string name="unit_g_per_day">g/dia</string>
+
+    <string name="days_over_limit_who">Dias acima do limite (OMS)</string>
+    <string name="days_over_limit_dhs">Dias acima do limite (DHS)</string>
+    <string name="days_over_limit_custom">Dias acima do limite configurado</string>
+    <string name="dhs_note">O DHS recomenda: homens não devem beber mais de 24 g e mulheres mais de 12 g de álcool puro por dia. Pelo menos dois dias por semana devem ser sem álcool.</string>
+    <string name="drink_days_label">dias de consumo esta semana</string>
+    <string name="drink_days_setting">Máx. dias de consumo/semana</string>
+    <string name="drink_days_who_dhs_note">Recomendação: máx. 5 dias de consumo por semana (≥ 2 dias sem álcool)</string>
+    <string name="weekly_gram_mode_title">Limite semanal (gramas)</string>
+    <string name="weekly_gram_mode_desc">A barra e os indicadores usam o orçamento semanal (dias máx. &#215; limite diário)</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Dados pessoais</string>
+    <string name="week_starts_on">A semana começa</string>
+</resources>

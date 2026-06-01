@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lingua Latina Classica – Potillus
+    Latinitas Classica (saec. I a.C.–I p.C.)
+    Notae: vocabula technica necessitate cogente e Graeco vel nova formatione
+-->
+<resources>
+    <string name="app_name">Potillus</string>
+
+    <!-- Navigatio -->
+    <string name="today">Hodie</string>
+    <string name="calendar">Fasti</string>
+    <string name="statistics">Rationes</string>
+    <string name="drinks">Potiones</string>
+    <string name="settings">Optiones</string>
+
+    <!-- Pagina Hodiei -->
+    <string name="total_today">Summa hodiei diei</string>
+    <string name="grams_alcohol">g alcoholis</string>
+    <string name="entries_today">Notae hodiei diei</string>
+    <string name="no_entries_today">Nullae notae hodie.\nTange + ut notam addas.</string>
+    <string name="no_entries_day">Nullae notae huius diei.</string>
+
+    <!-- Selectio Celeris -->
+    <string name="favorites_quick">Electa praeferenda</string>
+
+    <!-- Aestimatio Alcoholis in Sanguine -->
+    <string name="bac_estimate">Aestimatio alcoholis in sanguine</string>
+    <string name="bac_disclaimer">Aestimatio · noli ad vehicula gubernanda uti</string>
+    <string name="stats_from_section">Tempus statisticorum</string>
+    <string name="stats_from_label">Statistica ab</string>
+    <string name="stats_from_desc">Notitiae ante hanc diem ex omnibus statisticis excluduntur.</string>
+    <string name="bac_section">Aestimator alcoholis (Widmark)</string>
+    <string name="bac_desc">Pondus corporis ad aestimationem necessarium est. Haec est approximatio mathematica, non mensura vera.</string>
+    <string name="body_weight">Pondus corporis</string>
+    <string name="not_set">non definitum</string>
+
+    <!-- Dialogi -->
+    <string name="add_entry">Adde notam</string>
+    <string name="edit_entry">Muta notam</string>
+    <string name="drink">Potio</string>
+    <string name="select_drink">Elige potionem…</string>
+    <string name="volume_ml">Modus</string>
+    <string name="time">Hora</string>
+    <string name="pure_alcohol">g alcoholis puri</string>
+    <string name="note">Adnotatio (si placet)</string>
+
+    <string name="add_drink">Adde potionem</string>
+    <string name="edit_drink">Muta potionem</string>
+    <string name="drink_name">Nomen</string>
+    <string name="alcohol_percent">Contentus alcoholis</string>
+    <string name="favorite">Praelecta</string>
+    <string name="no_drinks">Nullae potiones definitae sunt.</string>
+    <string name="category">Genus</string>
+    <string name="category_beer">Cervisia</string>
+    <string name="category_wine">Vinum / Spumans</string>
+    <string name="category_spirits">Spiritus</string>
+    <string name="category_longdrink">Mixtum</string>
+    <string name="category_liqueur">Liquamen</string>
+    <string name="category_other">Alia</string>
+
+    <!-- PDF exportare -->
+    <string name="pdf_title">Summa alcoholis</string>
+    <string name="pdf_section_kpis">Data principalia</string>
+    <string name="pdf_section_months">Conspectus menstruus</string>
+    <string name="pdf_section_trend">Tendentia longa (med. g/mense)</string>
+    <string name="pdf_section_categories">Genera potionum</string>
+    <string name="pdf_section_daytime">Schema temporis diei</string>
+    <string name="pdf_section_weekday">Schema dierum (med. g alcoholis)</string>
+    <string name="pdf_section_risk">Usus periculosus &amp; abstinentia</string>
+    <string name="pdf_footer1">Aestimationes solum. Non pro iudicio navigandi vel diagnosi.</string>
+    <string name="pdf_footer2">Factum cum Libellus Potionis (Potillus). Aestimationes – non diagnosis medica.</string>
+    <!-- PDF metadata / KPI labels -->
+    <string name="pdf_meta_export_date">Dies exportationis</string>
+    <string name="pdf_meta_period">Tempus</string>
+    <string name="pdf_meta_gender">Sexus</string>
+    <string name="pdf_meta_limit">Limes</string>
+    <string name="pdf_meta_weight">Pondus corporis</string>
+    <string name="pdf_meta_custom_limit">Proprium</string>
+    <string name="pdf_kpi_total">Alcohol totus</string>
+    <string name="pdf_kpi_avg_day">Med. per diem</string>
+    <string name="pdf_kpi_avg_drink_day">Med. per diem potandi</string>
+    <string name="pdf_kpi_drink_days">Dies potandi</string>
+    <string name="pdf_kpi_abstinent_days">Dies abstinentiae</string>
+    <string name="pdf_kpi_over_who">Dies > WHO (%1$s g)</string>
+    <string name="pdf_kpi_over_dhs">Dies > DHS (%1$s g)</string>
+    <string name="pdf_kpi_binge">Dies binge (>%1$s g)</string>
+    <string name="pdf_col_month">Mensis</string>
+    <string name="pdf_col_drink_days">Dies potandi</string>
+    <string name="pdf_col_total_g">Totum g</string>
+    <string name="pdf_col_avg_g_day">Med. g/die</string>
+    <string name="pdf_meta_first_drink">Med. prima potio</string>
+    <string name="pdf_meta_last_drink">Med. ultima potio</string>
+    <string name="pdf_meta_before_18">Ante H. XI</string>
+    <string name="pdf_meta_after_18">Post H. XI</string>
+    <string name="pdf_meta_binge_days">Dies binge (>%1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Abstinentia maxima</string>
+    <string name="pdf_meta_current_abstinence">Abstinentia hodierna</string>
+    <string name="pdf_days_suffix">dies</string>
+
+    <!-- Actiones -->
+    <string name="save">Serva</string>
+    <string name="cancel">Omitte</string>
+    <string name="back">Retro</string>
+    <string name="delete">Dele</string>
+    <string name="change">Muta</string>
+    <string name="delete_confirm">Dele « %1$s »?</string>
+    <string name="no_data">Nulla data huius temporis.</string>
+
+    <!-- Statisticae -->
+    <string name="week">Hebdomas</string>
+    <string name="month">Mensis</string>
+    <string name="year">Annus</string>
+    <string name="total_period">Summa temporis</string>
+    <string name="avg_per_day">Media per diem</string>
+    <string name="avg_per_drink_day">Media per diem potandi</string>
+    <string name="abstinent_days">Dies abstinentiae</string>
+    <string name="stats_category_breakdown">Categoriae</string>
+    <string name="streak_trend">Abstinentia et progressus</string>
+    <string name="current_streak">Abstinentia praesens</string>
+    <string name="longest_streak">Abstinentia longissima</string>
+    <string name="days_count">%1$d dies</string>
+    <string name="trend_vs_prev">Progressus versus tempus prius</string>
+
+    <!-- Optiones -->
+    <string name="appearance">Aspectus</string>
+    <string name="theme_mode">Schema colorum</string>
+    <string name="theme_system">Ex systemate</string>
+    <string name="theme_day">Diurnum</string>
+    <string name="theme_night">Nocturnum</string>
+    <string name="day_change_time">Hora mutationis diei</string>
+    <string name="day_starts_at">Dies novus incipit hora</string>
+    <string name="gender">Sexus</string>
+    <string name="male">Masculinus</string>
+    <string name="female">Femininus</string>
+    <string name="limit_mode">Consilium medicum</string>
+    <string name="limit_who">OMS – gradus periculi</string>
+    <string name="limit_dhs">DHS – periculum exile</string>
+    <string name="limit_custom">Ad voluntatem</string>
+    <string name="custom_limit_grams">Modus meus diurnus in grammis</string>
+    <string name="weekly_limit_section">Modus hebdomadarius</string>
+    <string name="weekly_limit_enabled">Modum hebdomadarium adhibere</string>
+    <string name="weekly_limit_grams">Modus hebdomadarius in grammis</string>
+    <string name="weekly_limit">Hebdomas</string>
+    <string name="biometric">Custodia accessus</string>
+    <string name="biometric_lock">Custodia biometrica</string>
+    <string name="biometric_desc">Applicatio dactyloscopio vel vultu claudatur</string>
+    <string name="language">Lingua</string>
+    <string name="export">Exportatio datorum</string>
+    <string name="export_desc">Notas in fasciculum Downloadorum exporta</string>
+    <string name="export_csv">CSV</string>
+    <string name="export_pdf">PDF</string>
+    <string name="backup_section">Apographum</string>
+    <string name="backup_desc">Apographum plenum (notae et potiones) in forma JSON</string>
+    <string name="backup_export">Exporta</string>
+    <string name="backup_import">Importa</string>
+    <string name="import_mode_question">Quomodo data importanda sunt?</string>
+    <string name="import_replace">Restitue</string>
+    <string name="import_merge">Adde</string>
+    <string name="biometric_title">Libellus Potionis</string>
+    <string name="biometric_subtitle">Quaeso te comprobato</string>
+    <string name="who_note">OMS (MMXXIII) docet: nulla mensura alcoholis tuta est. Valor hic ostensus est norma practica, non limes innocuitatis.</string>
+    <string name="who_values">Valor periculi: ♂ ≤ %1$s g, ♀ ≤ %2$s g in die.</string>
+    <string name="pdf_months_truncated">Ostendo %1$d ex %2$d mensibus – data antiquiora in CSV/backup praesto sunt</string>
+
+    <!-- Legenda calendarii annui -->
+    <string name="year_calendar_no_entry">nulla notatio</string>
+    <string name="year_calendar_under_limit">intra limitem</string>
+    <string name="year_calendar_over_limit">ultra limitem</string>
+
+    <!-- Export and backup messages -->
+    <string name="export_no_entries">Nulla exportanda sunt.</string>
+    <string name="export_failed">Exportatio defecit.</string>
+    <string name="backup_failed">Subsidium defecit.</string>
+    <string name="import_success_replace">%1$d scripta importata.</string>
+    <string name="import_success_merge">%1$d importata, %2$d omissa.</string>
+    <string name="import_error_could_not_read">Fasciculus legi non potuit.</string>
+    <string name="import_error_empty">Fasciculus subsidii vacuus est.</string>
+    <string name="import_error_invalid_json">Forma JSON invalida.</string>
+    <string name="import_error_version_too_high">Versio subsidii %1$d non sustinetur (max. %2$d).</string>
+    <!-- Defined in the German source of truth and mirrored into every locale. -->
+    <string name="import_error_file_too_large">Fasciculus subsidiarius nimis magnus est (max. %1$d MB).</string>
+    <string name="import_error_read">Error lectionis: %1$s</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d {count} scripta habet et deleri non potest.</string>
+    <!-- Validation error messages for the Add/Edit Drink form -->
+    <string name="drink_validation_name_blank">Nomen potus vacuum esse non potest.</string>
+    <string name="drink_validation_name_too_long">Nomen potus nimis longum est (max. centum litterae).</string>
+    <string name="drink_validation_volume_range">Mensura inter unum et decem milia miliaria esse debet.</string>
+    <string name="drink_validation_alcohol_range">Gradus alcoholis inter nullum et centum centesimas esse debet.</string>
+    <string name="drink_validation_alcohol_invalid">Gradus alcoholis numerus validus non est.</string>
+    <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <string name="csv_col_date">Dies</string>
+    <string name="csv_col_time">Hora</string>
+    <string name="csv_col_drink">Potio</string>
+    <string name="csv_col_category">Genus</string>
+    <string name="csv_col_volume_ml">Volumen_ml</string>
+    <string name="csv_col_alcohol_pct">Alcohol_%</string>
+    <string name="csv_col_grams">Massa_alcohol</string>
+    <string name="csv_col_note">Nota</string>
+    <string name="pdf_unit_g_per_day">g/die</string>
+    <string name="unit_g_per_day">g/die</string>
+
+    <string name="days_over_limit_who">Dies supra limitem (OMS)</string>
+    <string name="days_over_limit_dhs">Dies supra limitem (DHS)</string>
+    <string name="days_over_limit_custom">Dies supra limitem statutum</string>
+    <string name="dhs_note">DHS suadet: viri non plus quam XXIV g, feminae non plus quam XII g alcoholis puri per diem bibant. Saltem duos dies per hebdomadem sine alcohole sint.</string>
+    <string name="drink_days_label">dies potus huius hebdomadis</string>
+    <string name="drink_days_setting">Max. dies/hebdomadem</string>
+    <string name="drink_days_who_dhs_note">Suadetur: max. V dies potus per hebdomadem (≥ II dies abstinentiae)</string>
+    <string name="weekly_gram_mode_title">Finis hebdomadalis (grammata)</string>
+    <string name="weekly_gram_mode_desc">Virga et indices ad budgetum hebdomadis pertinent</string>
+    <!-- Device-transfer warning (translate title and body) -->
+    <string name="device_transfer_warning_title">Settings not restored?</string>
+    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="personal_data">Data personalia</string>
+    <string name="week_starts_on">Hebdomas incipit die</string>
+</resources>

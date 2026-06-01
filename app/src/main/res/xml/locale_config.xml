@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Every locale listed here appears in Android's per-app language picker
+    (Settings → Apps → Potillus → Language, API 33+) and in the in-app language
+    selector driven by AppCompatDelegate.setApplicationLocales().
+
+    Rules:
+    - One <locale> entry per values-XX/ or values-XX-rYY/ resource directory.
+    - The android:name value must match the BCP-47 tag Android derives from
+      the resource qualifier:
+        values-pt      → "pt"
+        values-pt-rBR  → "pt-BR"   (region separator is "-", not "-r")
+        values-zh-rCN  → "zh-CN"
+    - Latin (la) is included as a novelty locale; it has a full translation.
+    - Keep this list sorted: base locales alphabetically, region variants
+      immediately after their base.
+
+    NOTE
+    This list and the values-XX/ resource directories must stay in sync:
+    every translated directory needs exactly one <locale> entry here, or
+    the language is invisible in the per-app picker even though its
+    strings.xml exists. LocaleSyncTest enforces this in both directions.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Arabic — RTL; supportsRtl="true" in AndroidManifest handles mirroring -->
+    <locale android:name="ar"/>
+    <!-- Bengali — rendered via Noto Sans Bengali (API 21+) -->
+    <locale android:name="bn"/>
+    <!-- Bulgarian -->
+    <locale android:name="bg"/>
+    <!-- Hausa (Boko Latin orthography) — lingua franca of West/Central Africa -->
+    <locale android:name="ha"/>
+    <!-- Croatian -->
+    <locale android:name="hr"/>
+    <!-- Czech -->
+    <locale android:name="cs"/>
+    <!-- Welsh (Cymraeg) — official language of Wales -->
+    <locale android:name="cy"/>
+    <!-- Danish -->
+    <locale android:name="da"/>
+    <!-- German (primary development language / string source of truth) -->
+    <locale android:name="de"/>
+    <!-- Greek -->
+    <locale android:name="el"/>
+    <!-- English (base locale / fallback) -->
+    <locale android:name="en"/>
+    <!-- Spanish -->
+    <locale android:name="es"/>
+    <!-- Estonian -->
+    <locale android:name="et"/>
+    <!-- Finnish -->
+    <locale android:name="fi"/>
+    <!-- Faroese (Føroyskt) — official language of the Faroe Islands -->
+    <locale android:name="fo"/>
+    <!-- French -->
+    <locale android:name="fr"/>
+    <!-- Irish -->
+    <locale android:name="ga"/>
+    <!-- Hebrew — RTL -->
+    <locale android:name="he"/>
+    <!-- Hindi — Devanagari script, rendered via Noto Sans Devanagari (API 21+) -->
+    <locale android:name="hi"/>
+    <!-- Croatian already listed above -->
+    <!-- Hungarian -->
+    <locale android:name="hu"/>
+    <!-- Indonesian -->
+    <locale android:name="id"/>
+    <!-- Icelandic (Íslenska) -->
+    <locale android:name="is"/>
+    <!-- Italian -->
+    <locale android:name="it"/>
+    <!-- Latin (novelty locale) -->
+    <!-- Japanese -->
+    <locale android:name="ja"/>
+    <!-- Korean -->
+    <locale android:name="ko"/>
+    <locale android:name="la"/>
+    <!-- Luxembourgish (Lëtzebuergesch) — national language of Luxembourg -->
+    <locale android:name="lb"/>
+    <!-- Lithuanian -->
+    <locale android:name="lt"/>
+    <!-- Latvian -->
+    <locale android:name="lv"/>
+    <!-- Malay (Bahasa Melayu) — Standard Malaysian -->
+    <locale android:name="ms"/>
+    <!-- Maltese -->
+    <locale android:name="mt"/>
+    <!-- Marathi (मराठी) — Devanagari script (Noto Sans Devanagari, API 21+) -->
+    <locale android:name="mr"/>
+    <!-- Norwegian Bokmål —  ~85–90% of Norwegian writers use Bokmål -->
+    <locale android:name="nb"/>
+    <!-- Dutch -->
+    <locale android:name="nl"/>
+    <!-- Polish -->
+    <locale android:name="pl"/>
+    <!-- Portuguese — European -->
+    <locale android:name="pt"/>
+    <!-- Portuguese — Brazilian (region variant; Android resolves pt-rBR before pt) -->
+    <locale android:name="pt-BR"/>
+    <!-- Romanian -->
+    <locale android:name="ro"/>
+    <!-- Russian -->
+    <locale android:name="ru"/>
+    <!-- Slovak -->
+    <locale android:name="sk"/>
+    <!-- Slovenian -->
+    <locale android:name="sl"/>
+    <!-- Swedish -->
+    <locale android:name="sv"/>
+    <!-- Swahili (Kiswahili) — lingua franca of East/Central Africa -->
+    <locale android:name="sw"/>
+    <!-- Tamil (தமிழ்) — Tamil script (Noto Sans Tamil, API 21+) -->
+    <locale android:name="ta"/>
+    <!-- Telugu (తెలుగు) — Telugu script (Noto Sans Telugu, API 21+) -->
+    <locale android:name="te"/>
+    <!-- Thai -->
+    <locale android:name="th"/>
+    <!-- Turkish -->
+    <locale android:name="tr"/>
+    <!-- Ukrainian — Cyrillic; same font stack as Russian -->
+    <locale android:name="uk"/>
+    <!-- Vietnamese -->
+    <locale android:name="vi"/>
+    <!-- Yoruba (Yorùbá) — tonal diacritics must not be stripped -->
+    <locale android:name="yo"/>
+    <!-- Chinese — Simplified (Mainland China / Singapore) -->
+    <locale android:name="zh-CN"/>
+    <!-- Chinese — Traditional (Taiwan / Hong Kong / Macau) -->
+    <locale android:name="zh-TW"/>
+</locale-config>
