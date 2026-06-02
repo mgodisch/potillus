@@ -66,7 +66,12 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarScreen(vm: CalendarViewModel = viewModel(), onOpenSettings: () -> Unit = {}) {
+fun CalendarScreen(
+    vm: CalendarViewModel = viewModel(),
+    onOpenSettings: () -> Unit = {},
+    onOpenHelp: () -> Unit = {},
+    onOpenLicense: () -> Unit = {}
+) {
     val state   by vm.uiState.collectAsStateWithLifecycle()
     val drinks  by vm.drinks.collectAsStateWithLifecycle()
     // `showAdd` is rememberSaveable so an open add-entry dialog survives
@@ -97,10 +102,12 @@ fun CalendarScreen(vm: CalendarViewModel = viewModel(), onOpenSettings: () -> Un
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings),
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    AppOverflowMenu(
+                        onOpenSettings = onOpenSettings,
+                        onOpenHelp     = onOpenHelp,
+                        onOpenLicense  = onOpenLicense,
+                        tint           = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             )
         },

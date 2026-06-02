@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Päevad > nädal (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Päevad > %1$d joomispäeva</string>
     <string name="pdf_col_over_daily">> päev</string>
+    <string name="menu">Menüü</string>
+    <string name="help">Abi</string>
+    <string name="license">Litsents</string>
 </resources>

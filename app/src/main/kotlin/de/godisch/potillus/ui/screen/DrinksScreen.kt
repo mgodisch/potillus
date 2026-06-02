@@ -57,7 +57,9 @@ import de.godisch.potillus.ui.theme.warningColor
 fun DrinksScreen(
     vm: DrinksViewModel = viewModel(),
     todayVm: TodayViewModel = viewModel(),
-    onOpenSettings: () -> Unit = {}
+    onOpenSettings: () -> Unit = {},
+    onOpenHelp: () -> Unit = {},
+    onOpenLicense: () -> Unit = {}
 ) {
     val state        by vm.uiState.collectAsStateWithLifecycle()
     val todayState   by todayVm.uiState.collectAsStateWithLifecycle()
@@ -148,10 +150,12 @@ fun DrinksScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings),
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    AppOverflowMenu(
+                        onOpenSettings = onOpenSettings,
+                        onOpenHelp     = onOpenHelp,
+                        onOpenLicense  = onOpenLicense,
+                        tint           = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             )
         },

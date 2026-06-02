@@ -202,4 +202,7 @@
     <string name="pdf_kpi_over_weekly">दिन > साप्ताहिक (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">दिन > %1$d पीने के दिन</string>
     <string name="pdf_col_over_daily">> दिन</string>
+    <string name="menu">मेनू</string>
+    <string name="help">सहायता</string>
+    <string name="license">लाइसेंस</string>
 </resources>

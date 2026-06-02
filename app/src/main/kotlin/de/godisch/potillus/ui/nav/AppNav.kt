@@ -95,8 +95,12 @@ import kotlinx.serialization.Serializable
 sealed interface Screen {
     /** The four swipeable top-level screens, hosted together in a HorizontalPager. */
     @Serializable data object Home     : Screen
-    /** Settings, opened via the gear icon and pushed on top of [Home]. */
+    /** Settings, opened via the overflow menu and pushed on top of [Home]. */
     @Serializable data object Settings : Screen
+    /** In-app user guide ("Help"), pushed on top of [Home] from the overflow menu. */
+    @Serializable data object Help     : Screen
+    /** LICENSE viewer ("License"), pushed on top of [Home] from the overflow menu. */
+    @Serializable data object License  : Screen
 }
 
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
@@ -151,13 +155,34 @@ fun AppNavigation(
                 calendarVm     = calendarVm,
                 statsVm        = statsVm,
                 drinksVm       = drinksVm,
-                // Push Settings on top so the system Back button / Up arrow
-                // returns to Home on whichever page the user opened it from.
-                onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } }
+                // Push each overflow-menu destination on top so the system Back
+                // button / Up arrow returns to Home on whichever page it was
+                // opened from.
+                onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
+                onOpenHelp     = { navController.navigate(Screen.Help)     { launchSingleTop = true } },
+                onOpenLicense  = { navController.navigate(Screen.License)  { launchSingleTop = true } }
             )
         }
         composable<Screen.Settings> {
             SettingsScreen(settingsVm, onBack = { navController.navigateUp() })
+        }
+        composable<Screen.Help> {
+            // The user guide is Markdown and locale-resolved (raw/raw-xx).
+            DocumentViewerScreen(
+                titleRes         = R.string.help,
+                rawRes           = R.raw.usersguide,
+                renderAsMarkdown = true,
+                onBack           = { navController.navigateUp() }
+            )
+        }
+        composable<Screen.License> {
+            // LICENSE is plain text and always the (English) default raw/license.md.
+            DocumentViewerScreen(
+                titleRes         = R.string.license,
+                rawRes           = R.raw.license,
+                renderAsMarkdown = true,
+                onBack           = { navController.navigateUp() }
+            )
         }
     }
 }
@@ -183,7 +208,9 @@ private fun MainPagerHost(
     calendarVm: CalendarViewModel,
     statsVm: StatsViewModel,
     drinksVm: DrinksViewModel,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenHelp: () -> Unit,
+    onOpenLicense: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { mainPages.size })
     val scope      = rememberCoroutineScope()
@@ -216,10 +243,10 @@ private fun MainPagerHost(
             modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) { page ->
             when (page) {
-                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings)
-                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings)
-                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings)
-                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings)
+                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
+                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
+                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
+                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
             }
         }
     }

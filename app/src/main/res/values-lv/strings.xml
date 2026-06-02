@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Dienas > nedēļa (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dienas > %1$d dzeršanas dienas</string>
     <string name="pdf_col_over_daily">> diena</string>
+    <string name="menu">Izvēlne</string>
+    <string name="help">Palīdzība</string>
+    <string name="license">Licence</string>
 </resources>

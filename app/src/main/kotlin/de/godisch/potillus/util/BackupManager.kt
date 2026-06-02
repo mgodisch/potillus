@@ -137,6 +137,11 @@ object BackupManager {
         val fileName = "potillus_backup_${FILE_FMT.format(now)}.json"
 
         val root = JSONObject().apply {
+            // Non-evaluated GPLv3 notice. JSON has no comment syntax, so the
+            // header is carried as a dedicated "_comment" array; importers
+            // (including ours) read only the known keys and ignore it. See
+            // GplNotice for the rationale.
+            put("_comment", JSONArray(GplNotice.HEADER_LINES))
             put("version", BACKUP_VERSION)
             put("exportedAt", now.toString())
             put("drinks", JSONArray().also { arr ->

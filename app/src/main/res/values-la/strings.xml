@@ -201,4 +201,7 @@
     <string name="pdf_kpi_over_weekly">Dies > hebd. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dies > %1$d dies bibendi</string>
     <string name="pdf_col_over_daily">> die</string>
+    <string name="menu">Index</string>
+    <string name="help">Auxilium</string>
+    <string name="license">Licentia</string>
 </resources>

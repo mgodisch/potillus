@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Dias > sem. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dias > %1$d dias consumo</string>
     <string name="pdf_col_over_daily">> dia</string>
+    <string name="menu">Menu</string>
+    <string name="help">Ajuda</string>
+    <string name="license">Licença</string>
 </resources>

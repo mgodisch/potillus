@@ -216,4 +216,7 @@
     <string name="pdf_kpi_over_weekly">Kwanaki > mako (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Kwanaki > %1$d kwanakin sha</string>
     <string name="pdf_col_over_daily">> yini</string>
+    <string name="menu">Menu</string>
+    <string name="help">Taimako</string>
+    <string name="license">Lasisi</string>
 </resources>

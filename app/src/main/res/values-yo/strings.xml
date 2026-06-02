@@ -215,4 +215,7 @@
     <string name="pdf_kpi_over_weekly">Ọjọ́ > ọ̀sẹ̀ (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Ọjọ́ > %1$d ọjọ́ mímu</string>
     <string name="pdf_col_over_daily">> ọjọ́</string>
+    <string name="menu">Àkójọ</string>
+    <string name="help">Ìrànlọ́wọ́</string>
+    <string name="license">Ìwé àṣẹ</string>
 </resources>

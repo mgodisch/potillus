@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Dni > týž. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dni > %1$d dní pitia</string>
     <string name="pdf_col_over_daily">> deň</string>
+    <string name="menu">Ponuka</string>
+    <string name="help">Pomocník</string>
+    <string name="license">Licencia</string>
 </resources>

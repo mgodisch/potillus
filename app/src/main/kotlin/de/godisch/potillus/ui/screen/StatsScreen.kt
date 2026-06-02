@@ -25,8 +25,6 @@ import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -58,7 +56,12 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen(vm: StatsViewModel = viewModel(), onOpenSettings: () -> Unit = {}) {
+fun StatsScreen(
+    vm: StatsViewModel = viewModel(),
+    onOpenSettings: () -> Unit = {},
+    onOpenHelp: () -> Unit = {},
+    onOpenLicense: () -> Unit = {}
+) {
     val state by vm.uiState.collectAsStateWithLifecycle()
     val exportStatus by vm.exportStatus.collectAsStateWithLifecycle()
     val shareTarget  by vm.shareTarget.collectAsStateWithLifecycle()
@@ -123,10 +126,12 @@ fun StatsScreen(vm: StatsViewModel = viewModel(), onOpenSettings: () -> Unit = {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings),
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    AppOverflowMenu(
+                        onOpenSettings = onOpenSettings,
+                        onOpenHelp     = onOpenHelp,
+                        onOpenLicense  = onOpenLicense,
+                        tint           = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             )
         }

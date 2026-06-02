@@ -203,4 +203,7 @@
     <string name="pdf_kpi_over_weekly">Days > weekly (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Days > %1$d drink days</string>
     <string name="pdf_col_over_daily">> day</string>
+    <string name="menu">Menu</string>
+    <string name="help">Help</string>
+    <string name="license">License</string>
 </resources>

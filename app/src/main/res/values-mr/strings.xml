@@ -213,4 +213,7 @@
     <string name="pdf_kpi_over_weekly">दिवस > साप्ता. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">दिवस > %1$d पिण्याचे दिवस</string>
     <string name="pdf_col_over_daily">> दिवस</string>
+    <string name="menu">मेनू</string>
+    <string name="help">मदत</string>
+    <string name="license">परवाना</string>
 </resources>

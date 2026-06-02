@@ -20,6 +20,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
+<!-- GENERATED FILE -- do not edit. Source: docs/guide/usersguide.de.md.in (run `make guides`). -->
+
 # Libellus Potionis "Potillus" -- Benutzer-HOWTO
 
 Willkommen bei Libellus Potionis, dem persönlichen Protokollanten deines
@@ -40,7 +42,7 @@ ist gratis und werbefrei.
 
 Libellus Potionis setzt Android 15 oder höher voraus. Es wird vom Autor
 kontinuierlich auf einem Google Pixel 10 Pro unter GrapheneOS genutzt und
-zusätzlich auf einem Fairphone 4 getestet. 
+zusätzlich auf einem Fairphone 4 getestet.
 
 ## Screen "Heute"
 
@@ -81,7 +83,7 @@ einzubuchen.
 
 ## Screen "Einstellungen"
 
-Das Einstellungs-Menü ist über das Zahnrad-Symbol oben rechts zu erreichen.
+Das Einstellungs-Menü ist über das Menü-Symbol (☰) oben rechts zu erreichen.
 Libellus Potionis ermöglicht folgende Einstellungen:
 
 ### Persönliche Daten
@@ -91,13 +93,14 @@ Blutalkoholwert näherungsweise nach der
 [Widmark-Formel](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
 berechnen zu lassen.
 
-### Grenzwerte
+### Limits
 
 In dieser Kategorie sind die Limits zu notieren, die für den eigenen
 Alkoholkonsum gelten sollen. Einzutragen sind: maximales Tageslimit in Gramm
 reinen Alkohols, maximales Wochenlimit, maximale Trinktage pro Woche. Alle
-Limits gelten. Auf dem Heute-Screen sind entsprechend drei Fortschrittsbalken
-zu sehen. Wer nicht weiß, was er hier einstellen soll, kann sich auf
+Limits gelten. Auf dem "Heute"-Screen sind entsprechend drei
+Fortschrittsbalken zu sehen. Wer nicht weiß, was er hier einstellen soll, kann
+sich auf
 [Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
 von den in unterschiedlichen Ländern geltenden Empfehlungen inspirieren lassen.
 

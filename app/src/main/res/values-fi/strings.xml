@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Päivät > vko (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Päivät > %1$d juomapäivää</string>
     <string name="pdf_col_over_daily">> pv</string>
+    <string name="menu">Valikko</string>
+    <string name="help">Ohje</string>
+    <string name="license">Lisenssi</string>
 </resources>

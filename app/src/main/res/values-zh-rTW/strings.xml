@@ -221,4 +221,7 @@
     <string name="pdf_kpi_over_weekly">天 > 週 (%1$s 公克)</string>
     <string name="pdf_kpi_over_drink_days">天 > %1$d 飲酒天</string>
     <string name="pdf_col_over_daily">> 日</string>
+    <string name="menu">選單</string>
+    <string name="help">說明</string>
+    <string name="license">授權</string>
 </resources>

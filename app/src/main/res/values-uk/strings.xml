@@ -212,4 +212,7 @@
     <string name="pdf_kpi_over_weekly">Днів > тиж. (%1$s г)</string>
     <string name="pdf_kpi_over_drink_days">Днів > %1$d питних днів</string>
     <string name="pdf_col_over_daily">> день</string>
+    <string name="menu">Меню</string>
+    <string name="help">Довідка</string>
+    <string name="license">Ліцензія</string>
 </resources>

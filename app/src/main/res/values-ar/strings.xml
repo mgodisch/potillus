@@ -209,4 +209,7 @@
     <string name="pdf_kpi_over_weekly">أيام > أسبوعي (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">أيام > %1$d أيام شرب</string>
     <string name="pdf_col_over_daily">> يوم</string>
+    <string name="menu">القائمة</string>
+    <string name="help">مساعدة</string>
+    <string name="license">الترخيص</string>
 </resources>

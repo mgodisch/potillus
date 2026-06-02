@@ -218,4 +218,7 @@
     <string name="pdf_kpi_over_weekly">Deeg > Woch (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Deeg > %1$d Drénkdeeg</string>
     <string name="pdf_col_over_daily">> Dag</string>
+    <string name="menu">Menü</string>
+    <string name="help">Hëllef</string>
+    <string name="license">Lizenz</string>
 </resources>

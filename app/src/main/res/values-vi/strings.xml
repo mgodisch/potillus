@@ -220,4 +220,7 @@
     <string name="pdf_kpi_over_weekly">Ngày > tuần (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Ngày > %1$d ngày uống</string>
     <string name="pdf_col_over_daily">> ngày</string>
+    <string name="menu">Menu</string>
+    <string name="help">Trợ giúp</string>
+    <string name="license">Giấy phép</string>
 </resources>

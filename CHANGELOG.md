@@ -26,6 +26,110 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.58.0
+
+Added a localized, build-time-templated in-app user guide system and an
+in-app viewer for it; replaced the per-screen settings gear with a single
+overflow (burger) menu that also opens the guide and the license; embedded a
+GPLv3 notice in the JSON and PDF exports; and fixed a text bug in the English
+source guide.
+
+### Added
+
+- **In-app user guides under `res/raw`.** The user guide now ships as a raw
+  resource (`R.raw.usersguide`) so it can be displayed inside the app later. As
+  with `strings.xml`, the file is locale-qualified: the English guide lives in
+  `res/raw/usersguide.md` (the resource default) and each translated guide in
+  `res/raw-<locale>/usersguide.md`. Because the app sets a per-app locale via
+  `AppCompatDelegate.setApplicationLocales`, Android resolves the matching
+  `raw-xx` directory automatically — exactly the mechanism already used for
+  strings.
+- **Single-source guide templates** in `docs/guide/usersguide.<lang>.md.in`.
+  Every on-screen name (screen titles, settings-section headers) is written as a
+  `{{key}}` token instead of a hard-coded word, so a guide can never drift away
+  from the label the app actually shows.
+- **Build-time renderer `tools/render-guide.py`.** It resolves each `{{key}}`
+  against the *matching* locale's `strings.xml`, undoes Android's string
+  escaping (e.g. French `Aujourd\'hui` → `Aujourd'hui`), and fails loudly on an
+  unknown key. It writes the in-app `res/raw[-xx]/usersguide.md` copies (license
+  header stripped for clean on-device rendering) and regenerates the
+  repository-facing `USERSGUIDE.md` / `USERSGUIDE-de.md` (header kept, plus a
+  "generated — do not edit" banner). Writes are content-diffed (no needless
+  touches) and a `--check` mode lets CI verify the committed guides are in sync.
+- **Curated 14-language core set** with real translations: English (base), plus
+  German, French, Spanish, Italian, Dutch, Portuguese, Brazilian Portuguese,
+  Russian, Polish, Swedish, Danish, Norwegian Bokmål and Czech. Every other
+  supported language deliberately has no `raw-xx`, so the app falls back to the
+  English guide via normal resource resolution rather than showing
+  machine-quality text.
+- **Makefile integration.** A new `guides` target regenerates the guides and is
+  now a prerequisite of every build, so the shipped guides are always in sync;
+  `check-guides` runs the renderer in verification mode for CI. Help text and
+  `.PHONY` updated accordingly.
+- **Overflow menu (`AppOverflowMenu`).** The four main screens previously each
+  carried an identical settings gear in their top bar. They now share one
+  composable that shows a burger icon (`Icons.Default.Menu`) opening a dropdown
+  with three entries: **Settings**, **Help** and **License**. The menu holds no
+  navigation logic of its own — it invokes callbacks supplied by
+  `AppNavigation` — so the four screens stay free of navigation dependencies.
+- **In-app guide & license viewer (`DocumentViewerScreen`).** A single,
+  reusable read-only screen backs both new menu entries. *Help* renders the
+  locale-resolved `R.raw.usersguide` as Markdown; *License* shows
+  `R.raw.license` as plain monospaced text. Both are pushed on top of Home with
+  an Up arrow, mirroring Settings, and are wired as two new type-safe routes
+  (`Screen.Help`, `Screen.License`).
+- **Minimal Markdown renderer (`MarkdownText`).** A small, dependency-free
+  composable renders exactly the Markdown subset the guides use (ATX headings,
+  reflowed paragraphs, `[text](url)` links). Adding no third-party library keeps
+  the app dependency-light, in line with its privacy-minimal design; the
+  unsupported-syntax boundary is documented in the file.
+- **Bundled license (`res/raw/license.md`).** A verbatim copy of the
+  project-root `LICENSE.md`, produced by a `cp` step in the Makefile's `guides`
+  target. It is intentionally **not** translated or locale-qualified, so
+  `R.raw.license` always resolves to the original (English) GPLv3 text;
+  `check-guides` now also fails if the copy drifts from the root file.
+- **GPLv3 notice in exports (`GplNotice`).** Exports now carry the project's
+  GPLv3 header as a non-evaluated notice. The **JSON backup** gains a top-level
+  `_comment` array (JSON has no comment syntax, and the importer already ignores
+  unknown keys, so this round-trips safely). The **PDF report** gains a small
+  one-line notice in the footer of every page (`FOOTER_RESERVE` raised from 30
+  to 42 pt to make room). The **CSV export deliberately carries no notice**, as
+  CSV has no portable comment convention and a leading line would surface as a
+  spurious data row in spreadsheet importers.
+- **Three new UI strings** (`menu`, `help`, `license`) added across all 52
+  locales (the base plus 51 translations), so per-locale `strings.xml` parity is
+  preserved (now 172 strings each, up from 169).
+
+### Changed
+
+- **Settings is now reached via the overflow menu**, not a dedicated gear icon.
+  The gear `IconButton` was removed from all four main screens; `StatsScreen`'s
+  now-unused icon imports were dropped.
+- **Guide wording updated to match the new menu.** Every guide template's
+  "gear/cog icon" phrasing was replaced with "menu icon (☰)" and the guides
+  regenerated, so the shipped text describes the actual UI.
+
+- **English source guide had stray heading echoes.** Several paragraphs ended
+  with a duplicated fragment of the following heading (e.g. "… functions of the
+  app. Highlights", "… on a Fairphone 4. \"Today\" Screen", "… the Widmark
+  formula. Limits"). These were removed while templating; the German guide was
+  already clean.
+
+### Notes
+
+- The in-app Markdown *viewer* deferred when the guide files were first added
+  is now implemented (see `DocumentViewerScreen` / `MarkdownText` above), so the
+  guide is readable directly inside the app rather than only via
+  `resources.openRawResource`.
+- This version *does* change `strings.xml`: three UI strings were added to every
+  locale, raising the `LocaleSyncTest`-checked parity from 169 to 172 strings.
+  `res/raw` (the guide and license copies) remains outside that test.
+- The GPLv3 notice embedded in exports is kept in English on purpose — it is a
+  legal notice rather than UI chrome, so it lives in code (`GplNotice`), not in
+  the translatable `strings.xml`.
+
+---
+
 ## v0.57.0
 
 Replaced the gender + guideline-mode limit system with three always-active,

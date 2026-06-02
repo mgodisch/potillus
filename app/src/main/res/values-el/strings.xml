@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">Ημέρες > εβδ. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Ημέρες > %1$d ημέρες κατανάλωσης</string>
     <string name="pdf_col_over_daily">> ημέρα</string>
+    <string name="menu">Μενού</string>
+    <string name="help">Βοήθεια</string>
+    <string name="license">Άδεια</string>
 </resources>

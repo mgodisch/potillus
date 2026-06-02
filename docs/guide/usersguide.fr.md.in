@@ -1,0 +1,122 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Guide de l'utilisateur
+
+Bienvenue dans Libellus Potionis, le journal personnel de votre consommation
+d'alcool ! Cette page décrit les caractéristiques et les fonctions de
+l'application.
+
+## Points forts
+
+Libellus Potionis est open source. Le code source peut être consulté et vérifié
+par tout le monde. Libellus Potionis respecte la vie privée. Il ne requiert
+aucune autorisation, ni pour l'appareil photo ou le microphone, ni pour le GPS
+ou l'accès au réseau. Libellus Potionis est sûr : toutes les données sont
+stockées sous forme chiffrée, et l'accès à l'application peut être restreint à
+l'aide d'une empreinte digitale. Libellus Potionis vous aide à doser votre
+consommation jusqu'à votre limite en vous indiquant à tout moment si
+« la petite sœur » tient encore dans votre budget. Libellus Potionis vous
+accompagne dans votre suivi en addictologie en fournissant, sur demande, un
+rapport PDF complet de deux pages sur vos habitudes de consommation. Libellus
+Potionis est gratuit et sans publicité.
+
+Libellus Potionis nécessite Android 15 ou une version ultérieure. Il est
+utilisé en continu par l'auteur sur un Google Pixel 10 Pro sous GrapheneOS et
+testé en complément sur un Fairphone 4.
+
+## Écran « {{today}} »
+
+Sur cet écran, vous trouverez la liste des boissons alcoolisées que vous avez
+consommées aujourd'hui. Si vous avez commis une erreur en enregistrant une
+boisson, vous pouvez modifier ou supprimer les entrées ici. Utilisez le bouton
+plus pour ajouter d'autres boissons.
+
+Au-dessus de la liste des boissons, vous trouverez un aperçu de la journée en
+cours avec les informations suivantes : la quantité d'alcool déjà consommée
+aujourd'hui (en grammes), cette même quantité par rapport à vos limites
+journalière et hebdomadaire (en grammes et sous forme de barre de
+progression), et le nombre de jours de consommation d'alcool jusqu'à présent
+cette semaine par rapport à votre limite (sous forme de nombre et de barre de
+progression).
+
+## Écran « {{calendar}} »
+
+Sur cet écran, vous trouverez le calendrier. Les jours où de l'alcool a été
+consommé sont marqués d'un point bleu (quantité non critique) ou d'un point
+rouge (limite dépassée). En sélectionnant un jour, les boissons correspondantes
+s'affichent et peuvent, si nécessaire, être corrigées ou supprimées. Il est
+également possible d'ajouter des boissons consommées a posteriori.
+
+## Écran « {{statistics}} »
+
+Cet écran présente des analyses statistiques de votre consommation d'alcool,
+filtrables par semaine, mois ou année. Un export CSV est disponible pour
+traiter les données dans un tableur. De plus, un export PDF est proposé, qui met
+en forme vos habitudes de consommation dans une présentation adaptée au suivi en
+addictologie.
+
+## Écran « {{drinks}} »
+
+Cet écran contient la liste des boissons. L'application est préconfigurée avec
+un ensemble de boissons courantes à l'international. Toutes peuvent être
+modifiées ou supprimées. Vous pouvez définir une nouvelle boisson à l'aide de
+l'icône plus. Un appui sur une boisson ouvre une boîte de dialogue permettant de
+l'enregistrer comme consommée.
+
+## Écran « {{settings}} »
+
+Le menu des paramètres est accessible via l'icône de menu (☰) en haut à droite. Libellus Potionis propose les options de configuration
+suivantes :
+
+### {{personal_data}}
+
+Dans cette catégorie, vous pouvez indiquer votre poids corporel afin d'estimer
+votre alcoolémie selon la formule de Widmark.
+
+### {{limits}}
+
+Dans cette catégorie, vous saisissez les limites qui s'appliquent à votre
+consommation d'alcool. Les champs à renseigner sont : la limite journalière
+maximale en grammes d'alcool pur, la limite hebdomadaire maximale et le nombre
+maximal de jours de consommation par semaine. Toutes les limites s'appliquent
+simultanément. En conséquence, trois barres de progression sont visibles sur
+l'écran « {{today}} ». Si vous ne savez pas quoi configurer ici, vous pouvez
+vous inspirer des recommandations de différents pays sur Wikipédia.
+
+### {{statistics}}
+
+Les paramètres statistiques vous permettent de définir l'heure à laquelle
+commence un nouveau jour (afin qu'une boisson prise à 1 h du matin compte encore
+pour la veille, par exemple), le jour où la semaine doit commencer et — pour les
+bonnes résolutions du Nouvel An — la date à partir de laquelle l'analyse des
+données doit débuter.
+
+### {{backup_section}}
+
+Toutes les données peuvent être exportées au format JSON puis réimportées.
+
+### {{appearance}}
+
+Dans cette catégorie, vous pouvez activer le verrouillage biométrique de
+l'application. Vous pouvez en outre définir le thème de couleurs et la langue
+indépendamment des paramètres du système.

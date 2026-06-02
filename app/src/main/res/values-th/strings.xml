@@ -225,4 +225,7 @@
     <string name="pdf_kpi_over_weekly">วัน > สัปดาห์ (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">วัน > %1$d วันดื่ม</string>
     <string name="pdf_col_over_daily">> วัน</string>
+    <string name="menu">เมนู</string>
+    <string name="help">ความช่วยเหลือ</string>
+    <string name="license">สัญญาอนุญาต</string>
 </resources>

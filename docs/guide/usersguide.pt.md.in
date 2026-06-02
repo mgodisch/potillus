@@ -1,0 +1,114 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Manual do utilizador
+
+Bem-vindo ao Libellus Potionis, o registo pessoal do teu consumo de álcool! Esta
+página descreve as características e funções da aplicação.
+
+## Destaques
+
+O Libellus Potionis é de código aberto. O código-fonte pode ser consultado e
+verificado por qualquer pessoa. O Libellus Potionis respeita a privacidade. Não
+requer quaisquer permissões: nem para a câmara ou o microfone, nem para o GPS ou
+o acesso à rede. O Libellus Potionis é seguro: todos os dados são guardados de
+forma cifrada e o acesso à aplicação pode ser restringido através da impressão
+digital. O Libellus Potionis ajuda-te a dosear-te até ao teu limite, indicando a
+qualquer momento se «la petite sœur» ainda cabe no teu orçamento. O Libellus
+Potionis apoia-te no acompanhamento em consultas de adições, fornecendo, a
+pedido, um relatório PDF completo de duas páginas sobre os teus hábitos de
+consumo. O Libellus Potionis é gratuito e sem publicidade.
+
+O Libellus Potionis requer o Android 15 ou superior. É utilizado de forma
+contínua pelo autor num Google Pixel 10 Pro com GrapheneOS e testado
+adicionalmente num Fairphone 4.
+
+## Ecrã "{{today}}"
+
+Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
+cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
+aqui. Usa o botão mais para adicionar mais bebidas.
+
+Acima da lista de bebidas encontras uma visão geral do dia atual com as
+seguintes informações: a quantidade de álcool já consumida hoje (em gramas),
+essa mesma quantidade em relação aos teus limites diário e semanal (em gramas e
+como barra de progresso) e o número de dias com consumo de álcool até agora esta
+semana em relação ao teu limite (como número e como barra de progresso).
+
+## Ecrã "{{calendar}}"
+
+Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
+assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
+(limite ultrapassado). Ao selecionar um dia, são apresentadas as respetivas
+bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
+adicionar bebidas consumidas de forma retroativa.
+
+## Ecrã "{{statistics}}"
+
+Este ecrã mostra análises estatísticas do teu consumo de álcool, filtráveis por
+semana, mês ou ano. Está disponível uma exportação CSV para continuar a
+processar os dados numa folha de cálculo. Além disso, é fornecida uma exportação
+PDF que apresenta os hábitos de consumo num formato adequado ao acompanhamento
+em adições.
+
+## Ecrã "{{drinks}}"
+
+Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
+conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
+eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
+bebida, abre-se uma caixa de diálogo para a registar como consumida.
+
+## Ecrã "{{settings}}"
+
+O menu de definições é acessível através do ícone de menu (☰) no canto superior direito. O Libellus Potionis disponibiliza as seguintes opções de
+configuração:
+
+### {{personal_data}}
+
+Nesta categoria podes anotar o teu peso corporal para estimar a tua concentração
+de álcool no sangue através da fórmula de Widmark.
+
+### {{limits}}
+
+Nesta categoria introduzes os limites que se aplicam ao teu consumo de álcool. Os
+campos a preencher são: o limite diário máximo em gramas de álcool puro, o limite
+semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
+se aplicam em simultâneo. Por conseguinte, no ecrã "{{today}}" são visíveis três
+barras de progresso. Se não tiveres a certeza do que configurar aqui, podes
+inspirar-te nas recomendações de vários países na Wikipédia.
+
+### {{statistics}}
+
+As definições estatísticas permitem-te definir a hora a que começa um novo dia
+(para que, por exemplo, uma bebida à 1:00 da manhã ainda conte para o dia
+anterior), o dia em que a semana deve começar e — para as resoluções de Ano Novo
+— a data a partir da qual a análise dos dados deve começar.
+
+### {{backup_section}}
+
+Todos os dados podem ser exportados como JSON e novamente importados.
+
+### {{appearance}}
+
+Nesta categoria podes ativar o bloqueio biométrico da aplicação. Além disso,
+podes definir o tema de cores e o idioma independentemente das definições do
+sistema.

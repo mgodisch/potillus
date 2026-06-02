@@ -216,4 +216,7 @@
     <string name="pdf_kpi_over_weekly">Dyddiau > wyth. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dyddiau > %1$d dyddiau yfed</string>
     <string name="pdf_col_over_daily">> dydd</string>
+    <string name="menu">Dewislen</string>
+    <string name="help">Cymorth</string>
+    <string name="license">Trwydded</string>
 </resources>

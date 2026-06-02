@@ -219,4 +219,7 @@
     <string name="pdf_kpi_over_weekly">일 > 주간 (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">일 > %1$d 음주일</string>
     <string name="pdf_col_over_daily">> 일</string>
+    <string name="menu">메뉴</string>
+    <string name="help">도움말</string>
+    <string name="license">라이선스</string>
 </resources>

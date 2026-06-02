@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">Dny > týd. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dny > %1$d dnů pití</string>
     <string name="pdf_col_over_daily">> den</string>
+    <string name="menu">Nabídka</string>
+    <string name="help">Nápověda</string>
+    <string name="license">Licence</string>
 </resources>

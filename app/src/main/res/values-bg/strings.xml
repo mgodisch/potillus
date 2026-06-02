@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Дни > седм. (%1$s г)</string>
     <string name="pdf_kpi_over_drink_days">Дни > %1$d дни с пиене</string>
     <string name="pdf_col_over_daily">> ден</string>
+    <string name="menu">Меню</string>
+    <string name="help">Помощ</string>
+    <string name="license">Лиценз</string>
 </resources>

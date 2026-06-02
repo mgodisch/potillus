@@ -53,7 +53,12 @@ import de.godisch.potillus.ui.theme.warningColor
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodayScreen(vm: TodayViewModel = viewModel(), onOpenSettings: () -> Unit = {}) {
+fun TodayScreen(
+    vm: TodayViewModel = viewModel(),
+    onOpenSettings: () -> Unit = {},
+    onOpenHelp: () -> Unit = {},
+    onOpenLicense: () -> Unit = {}
+) {
     val state  by vm.uiState.collectAsStateWithLifecycle()
     val drinks by vm.drinks.collectAsStateWithLifecycle()
     val lastUsedDrink by vm.lastUsedDrink.collectAsStateWithLifecycle()
@@ -88,10 +93,12 @@ fun TodayScreen(vm: TodayViewModel = viewModel(), onOpenSettings: () -> Unit = {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings),
-                            tint = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    AppOverflowMenu(
+                        onOpenSettings = onOpenSettings,
+                        onOpenHelp     = onOpenHelp,
+                        onOpenLicense  = onOpenLicense,
+                        tint           = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             )
         },

@@ -27,6 +27,7 @@ help:
 	@echo "  make debug        build debug APK"
 	@echo "  make release      build release APK (unsigned)"
 	@echo "  make unit-test    run JVM unit tests (no device needed)"
+	@echo "  make guides       regenerate the localized user guides"
 	@echo "  make test-device  run instrumented tests (device/emulator needed)"
 	@echo "  make test         run all tests (device needed)"
 	@echo "  make clean        clear the Gradle build cache"
@@ -67,9 +68,9 @@ export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform
 GRADLE_OPTS ?= -Xmx2g -Xms512m
 export GRADLE_OPTS
 
-.PHONY: help prereq java android debug release test unit-test test-device install-debug clean
+.PHONY: help prereq java android guides check-guides debug release test unit-test test-device install install-debug push clean
 
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar guides
 
 java:
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
@@ -80,6 +81,24 @@ android: \
 	${ANDROID_HOME}/platform-tools \
 	${ANDROID_HOME}/platforms/android-35 \
 	${ANDROID_HOME}/platforms/android-36
+
+# Regenerate the localized user guides from their templates in docs/guide/.
+# Resolves the {{screen-name}} tokens against the matching strings.xml so the
+# guides (root USERSGUIDE*.md and the in-app res/raw[-xx]/usersguide.md copies)
+# can never drift from the labels the app actually shows. Runs on every build
+# (it is a prerequisite of `prereq`) and is a no-op when nothing changed.
+guides:
+	python3 tools/render-guide.py
+	# LICENSE.md is shown verbatim by the in-app "License" viewer. It is NOT
+	# translated and NOT locale-qualified: always the project-root LICENSE.md,
+	# copied to the default raw/ so R.raw.license resolves to it for every locale.
+	cp LICENSE.md app/src/main/res/raw/license.md
+
+# CI helper: fail if the committed guides are not in sync with the templates
+# and strings.xml (does not write anything).
+check-guides:
+	python3 tools/render-guide.py --check
+	cmp -s LICENSE.md app/src/main/res/raw/license.md
 
 debug: app/build/outputs/apk/debug/app-debug.apk
 
@@ -111,10 +130,17 @@ test-device: prereq
 	REPORT="app/build/reports/androidTests/connected/index.html"
 	./gradlew connectedDebugAndroidTest --no-daemon
 
+install: install-debug
+
 install-debug: app/build/outputs/apk/debug/app-debug.apk
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
 	test "$${DEV_COUNT:-0}" -ne 0
 	adb install -r $<
 
+push:
+	git push && git push --tags
+
 clean: prereq
 	./gradlew clean --no-daemon
+	rm app/src/main/res/raw/license.md
+	rm app/src/main/res/raw*/usersguide.md

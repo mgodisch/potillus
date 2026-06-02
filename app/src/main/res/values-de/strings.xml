@@ -202,4 +202,7 @@
     <string name="pdf_kpi_over_weekly">Tage > Woche (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Tage > %1$d Trinktage</string>
     <string name="pdf_col_over_daily">> Tag</string>
+    <string name="menu">Menü</string>
+    <string name="help">Hilfe</string>
+    <string name="license">Lizenz</string>
 </resources>

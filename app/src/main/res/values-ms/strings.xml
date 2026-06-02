@@ -213,4 +213,7 @@
     <string name="pdf_kpi_over_weekly">Hari > mingguan (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Hari > %1$d hari minum</string>
     <string name="pdf_col_over_daily">> hari</string>
+    <string name="menu">Menu</string>
+    <string name="help">Bantuan</string>
+    <string name="license">Lesen</string>
 </resources>

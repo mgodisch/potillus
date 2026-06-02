@@ -214,4 +214,7 @@
     <string name="pdf_kpi_over_weekly">Dager > uke (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dager > %1$d drikkedager</string>
     <string name="pdf_col_over_daily">> dag</string>
+    <string name="menu">Meny</string>
+    <string name="help">Hjelp</string>
+    <string name="license">Lisens</string>
 </resources>

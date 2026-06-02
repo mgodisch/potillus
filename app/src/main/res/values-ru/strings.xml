@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">Дней > нед. (%1$s г)</string>
     <string name="pdf_kpi_over_drink_days">Дней > %1$d питейных дней</string>
     <string name="pdf_col_over_daily">> день</string>
+    <string name="menu">Меню</string>
+    <string name="help">Справка</string>
+    <string name="license">Лицензия</string>
 </resources>

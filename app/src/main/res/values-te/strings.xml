@@ -214,4 +214,7 @@
     <string name="pdf_kpi_over_weekly">రోజులు > వారం (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">రోజులు > %1$d తాగే రోజులు</string>
     <string name="pdf_col_over_daily">> రోజు</string>
+    <string name="menu">మెను</string>
+    <string name="help">సహాయం</string>
+    <string name="license">లైసెన్స్</string>
 </resources>

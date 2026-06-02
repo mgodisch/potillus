@@ -1,0 +1,109 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Uživatelská příručka
+
+Vítejte v Libellus Potionis, osobním deníku vaší spotřeby alkoholu! Tato stránka
+popisuje vlastnosti a funkce aplikace.
+
+## Hlavní přednosti
+
+Libellus Potionis je open source. Zdrojový kód si může prohlédnout a ověřit
+kdokoli. Libellus Potionis je šetrný k soukromí. Nevyžaduje žádná oprávnění, ani
+ke kameře či mikrofonu, ani k GPS nebo přístupu k síti. Libellus Potionis je
+bezpečný: všechna data se ukládají šifrovaně a přístup k aplikaci lze omezit
+otiskem prstu. Libellus Potionis vám pomáhá dávkovat se až k vašemu limitu tím,
+že vám kdykoli prozradí, zda se „la petite sœur" ještě vejde do vašeho rozpočtu.
+Libellus Potionis vás podporuje při léčbě závislosti tím, že na požádání poskytne
+podrobnou dvoustránkovou zprávu PDF o vašich pijáckých návycích. Libellus
+Potionis je zdarma a bez reklam.
+
+Libellus Potionis vyžaduje Android 15 nebo novější. Autor jej průběžně používá na
+zařízení Google Pixel 10 Pro se systémem GrapheneOS a navíc jej testuje na
+Fairphone 4.
+
+## Obrazovka „{{today}}"
+
+Na této obrazovce najdete seznam alkoholických nápojů, které jste si dnes
+dopřáli. Pokud jste při zaznamenávání nápoje udělali chybu, můžete zde záznamy
+upravit nebo odstranit. Tlačítkem plus přidáte další nápoje.
+
+Nad seznamem nápojů najdete přehled aktuálního dne s následujícími informacemi:
+množství alkoholu již dnes zkonzumovaného (v gramech), totéž množství ve vztahu k
+vašim denním a týdenním limitům (v gramech a jako ukazatel průběhu) a počet dní s
+konzumací alkoholu v tomto týdnu ve vztahu k vašemu limitu (jako číslo a jako
+ukazatel průběhu).
+
+## Obrazovka „{{calendar}}"
+
+Na této obrazovce najdete kalendář. Dny, kdy se pil alkohol, jsou označeny modrým
+bodem (nekritické množství) nebo červeným bodem (překročený limit). Po výběru dne
+se zobrazí příslušné nápoje, které lze v případě potřeby opravit nebo odstranit.
+Je také možné zpětně přidat zkonzumované nápoje.
+
+## Obrazovka „{{statistics}}"
+
+Tato obrazovka zobrazuje statistická vyhodnocení vaší spotřeby alkoholu, která
+lze filtrovat podle týdne, měsíce nebo roku. K dispozici je export do CSV pro
+další zpracování dat v tabulkovém procesoru. Kromě toho je nabízen export do PDF,
+který zpracovává pijácké návyky do podoby vhodné pro poradnu pro závislosti.
+
+## Obrazovka „{{drinks}}"
+
+Tato obrazovka obsahuje seznam nápojů. Aplikace se dodává s přednastavenou sadou
+mezinárodně běžných nápojů. Všechny lze upravit nebo odstranit. Pomocí ikony plus
+můžete definovat nový nápoj. Klepnutím na nápoj se otevře dialog pro jeho
+zaznamenání jako zkonzumovaného.
+
+## Obrazovka „{{settings}}"
+
+Nabídka nastavení je dostupná přes ikonu nabídky (☰) vpravo nahoře. Libellus
+Potionis nabízí následující možnosti konfigurace:
+
+### {{personal_data}}
+
+V této kategorii můžete uvést svou tělesnou hmotnost, aby bylo možné přibližně
+vypočítat koncentraci alkoholu v krvi podle Widmarkova vzorce.
+
+### {{limits}}
+
+V této kategorii zadáváte limity, které platí pro vaši spotřebu alkoholu. Pole k
+vyplnění jsou: maximální denní limit v gramech čistého alkoholu, maximální týdenní
+limit a maximální počet dní pití za týden. Všechny limity platí současně. Proto
+jsou na obrazovce „{{today}}" vidět tři ukazatele průběhu. Pokud si nejste jisti,
+co zde nastavit, můžete se inspirovat doporučeními různých zemí na Wikipedii.
+
+### {{statistics}}
+
+Statistická nastavení umožňují určit, v kolik hodin začíná nový den (aby se
+například nápoj v 1:00 ráno ještě počítal k předchozímu dni), den, kterým má
+začínat týden, a — pro novoroční předsevzetí — datum, od kterého se mají data
+vyhodnocovat.
+
+### {{backup_section}}
+
+Všechna data lze exportovat jako JSON a znovu naimportovat.
+
+### {{appearance}}
+
+V této kategorii můžete aktivovat biometrický zámek aplikace. Kromě toho můžete
+nastavit barevné téma a jazyk nezávisle na nastavení systému.

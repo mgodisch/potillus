@@ -223,4 +223,7 @@
     <string name="pdf_kpi_over_weekly">Jiem > ġim. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Jiem > %1$d jiem tax-xorb</string>
     <string name="pdf_col_over_daily">> jum</string>
+    <string name="menu">Menu</string>
+    <string name="help">Għajnuna</string>
+    <string name="license">Liċenzja</string>
 </resources>

@@ -221,4 +221,7 @@
     <string name="pdf_kpi_over_weekly">Gün > hafta (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Gün > %1$d içki günü</string>
     <string name="pdf_col_over_daily">> gün</string>
+    <string name="menu">Menü</string>
+    <string name="help">Yardım</string>
+    <string name="license">Lisans</string>
 </resources>

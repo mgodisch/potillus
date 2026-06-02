@@ -219,4 +219,7 @@
     <string name="pdf_kpi_over_weekly">日 > 週 (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">日 > %1$d 飲酒日</string>
     <string name="pdf_col_over_daily">> 日</string>
+    <string name="menu">メニュー</string>
+    <string name="help">ヘルプ</string>
+    <string name="license">ライセンス</string>
 </resources>

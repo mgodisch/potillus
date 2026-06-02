@@ -202,4 +202,7 @@
     <string name="pdf_kpi_over_weekly">天 > 周 (%1$s 克)</string>
     <string name="pdf_kpi_over_drink_days">天 > %1$d 饮酒天</string>
     <string name="pdf_col_over_daily">> 日</string>
+    <string name="menu">菜单</string>
+    <string name="help">帮助</string>
+    <string name="license">许可证</string>
 </resources>

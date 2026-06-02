@@ -212,4 +212,7 @@
     <string name="pdf_kpi_over_weekly">দিন > সাপ্তাহিক (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">দিন > %1$d পানের দিন</string>
     <string name="pdf_col_over_daily">> দিন</string>
+    <string name="menu">মেনু</string>
+    <string name="help">সাহায্য</string>
+    <string name="license">লাইসেন্স</string>
 </resources>

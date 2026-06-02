@@ -215,4 +215,7 @@
     <string name="pdf_kpi_over_weekly">நாட்கள் > வாரம் (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">நாட்கள் > %1$d குடி நாட்கள்</string>
     <string name="pdf_col_over_daily">> நாள்</string>
+    <string name="menu">மெனு</string>
+    <string name="help">உதவி</string>
+    <string name="license">உரிமம்</string>
 </resources>

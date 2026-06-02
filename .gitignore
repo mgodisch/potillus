@@ -4,3 +4,5 @@
 /.gradle
 /.kotlin
 /app/build
+/app/src/main/res/raw*/license.md
+/app/src/main/res/raw*/usersguide.md

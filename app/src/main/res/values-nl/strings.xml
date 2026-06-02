@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">Dagen > week (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dagen > %1$d drinkdagen</string>
     <string name="pdf_col_over_daily">> dag</string>
+    <string name="menu">Menu</string>
+    <string name="help">Help</string>
+    <string name="license">Licentie</string>
 </resources>

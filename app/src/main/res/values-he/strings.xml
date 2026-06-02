@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">ימים > שבועי (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">ימים > %1$d ימי שתייה</string>
     <string name="pdf_col_over_daily">> יום</string>
+    <string name="menu">תפריט</string>
+    <string name="help">עזרה</string>
+    <string name="license">רישיון</string>
 </resources>

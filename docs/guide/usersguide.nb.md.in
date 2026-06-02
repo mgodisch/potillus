@@ -1,0 +1,111 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Brukerveiledning
+
+Velkommen til Libellus Potionis, den personlige loggboken for alkoholforbruket
+ditt! Denne siden beskriver appens egenskaper og funksjoner.
+
+## Høydepunkter
+
+Libellus Potionis er åpen kildekode. Kildekoden kan ses og kontrolleres av hvem
+som helst. Libellus Potionis er personvernvennlig. Den krever ingen tillatelser,
+verken til kamera eller mikrofon eller til GPS eller nettverkstilgang. Libellus
+Potionis er sikker: alle data lagres kryptert, og tilgangen til appen kan
+begrenses med et fingeravtrykk. Libellus Potionis hjelper deg med å dosere deg
+opp til grensen din ved når som helst å fortelle deg om "la petite sœur"
+fortsatt er innenfor budsjettet ditt. Libellus Potionis støtter deg i
+rusbehandlingen ved på forespørsel å levere en omfattende, tosidig PDF-rapport
+over drikkevanene dine. Libellus Potionis er gratis og reklamefri.
+
+Libellus Potionis krever Android 15 eller nyere. Den brukes løpende av
+forfatteren på en Google Pixel 10 Pro med GrapheneOS og testes i tillegg på en
+Fairphone 4.
+
+## Skjerm "{{today}}"
+
+På denne skjermen finner du en liste over de alkoholholdige drikkene du har nytt
+i dag. Hvis du gjorde en feil da du registrerte en drikk, kan du redigere eller
+slette oppføringene her. Bruk plussknappen for å legge til flere drikker.
+
+Over drikkelisten finner du en oversikt over den aktuelle dagen med følgende
+informasjon: mengden alkohol som allerede er inntatt i dag (i gram), den samme
+mengden i forhold til dags- og ukegrensene dine (i gram og som fremdriftslinje)
+samt antall dager med alkoholforbruk hittil denne uken i forhold til grensen din
+(som tall og som fremdriftslinje).
+
+## Skjerm "{{calendar}}"
+
+På denne skjermen finner du kalenderen. Dager da det ble inntatt alkohol, er
+merket med en blå prikk (ikke-kritisk mengde) eller en rød prikk (grensen
+overskredet). Når du velger en dag, vises de tilhørende drikkene, som om
+nødvendig kan korrigeres eller slettes. Det er også mulig å legge til inntatte
+drikker i ettertid.
+
+## Skjerm "{{statistics}}"
+
+Denne skjermen viser statistiske analyser av alkoholforbruket ditt, som kan
+filtreres etter uke, måned eller år. En CSV-eksport er tilgjengelig for videre
+behandling av dataene i et regneark. I tillegg tilbys en PDF-eksport som
+presenterer drikkevanene i et format som egner seg for rusbehandling.
+
+## Skjerm "{{drinks}}"
+
+Denne skjermen inneholder listen over drikker. Appen leveres forhåndskonfigurert
+med et sett internasjonalt vanlige drikker. Alle kan endres eller slettes. Med
+plussikonet kan du definere en ny drikk. Når du trykker på en drikk, åpnes en
+dialog der du kan registrere den som inntatt.
+
+## Skjerm "{{settings}}"
+
+Innstillingsmenyen er tilgjengelig via menyikonet (☰) øverst til høyre. Libellus
+Potionis tilbyr følgende konfigurasjonsmuligheter:
+
+### {{personal_data}}
+
+I denne kategorien kan du notere kroppsvekten din for å beregne
+alkoholkonsentrasjonen i blodet tilnærmet ved hjelp av Widmark-formelen.
+
+### {{limits}}
+
+I denne kategorien angir du grensene som gjelder for alkoholforbruket ditt.
+Feltene som skal fylles ut, er: den maksimale daglige grensen i gram ren alkohol,
+den maksimale ukentlige grensen og det maksimale antallet drikkedager per uke.
+Alle grenser gjelder samtidig. Derfor vises tre fremdriftslinjer på skjermen
+"{{today}}". Hvis du er usikker på hva du skal stille inn her, kan du hente
+inspirasjon fra ulike lands anbefalinger på Wikipedia.
+
+### {{statistics}}
+
+De statistiske innstillingene lar deg fastsette tidspunktet da en ny dag begynner
+(slik at for eksempel en drikk kl. 01.00 om natten fortsatt teller med til dagen
+før), dagen uken skal begynne på, og — til nyttårsforsetter — datoen dataanalysen
+skal begynne fra.
+
+### {{backup_section}}
+
+Alle data kan eksporteres som JSON og importeres igjen.
+
+### {{appearance}}
+
+I denne kategorien kan du aktivere den biometriske låsen for appen. I tillegg kan
+du stille inn fargetema og språk uavhengig av systeminnstillingene.

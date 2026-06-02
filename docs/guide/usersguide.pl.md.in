@@ -1,0 +1,113 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Podręcznik użytkownika
+
+Witamy w Libellus Potionis, osobistym dzienniku spożycia alkoholu! Ta strona
+opisuje cechy i funkcje aplikacji.
+
+## Najważniejsze cechy
+
+Libellus Potionis jest oprogramowaniem open source. Kod źródłowy może obejrzeć i
+zweryfikować każdy. Libellus Potionis dba o prywatność. Nie wymaga żadnych
+uprawnień: ani do aparatu czy mikrofonu, ani do GPS czy dostępu do sieci.
+Libellus Potionis jest bezpieczny: wszystkie dane są przechowywane w postaci
+zaszyfrowanej, a dostęp do aplikacji można ograniczyć odciskiem palca. Libellus
+Potionis pomaga dawkować spożycie aż do Twojego limitu, informując w każdej
+chwili, czy „la petite sœur" wciąż mieści się w Twoim budżecie. Libellus
+Potionis wspiera Cię podczas terapii uzależnień, dostarczając na życzenie pełny,
+dwustronicowy raport PDF o Twoich nawykach picia. Libellus Potionis jest
+bezpłatny i wolny od reklam.
+
+Libellus Potionis wymaga systemu Android 15 lub nowszego. Autor używa go na
+bieżąco na urządzeniu Google Pixel 10 Pro z GrapheneOS i dodatkowo testuje na
+Fairphone 4.
+
+## Ekran „{{today}}"
+
+Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
+przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
+Użyj przycisku plus, aby dodać kolejne napoje.
+
+Nad listą napojów znajdziesz przegląd bieżącego dnia z następującymi
+informacjami: ilość alkoholu już spożytego dzisiaj (w gramach), ta sama ilość w
+odniesieniu do Twojego limitu dziennego i tygodniowego (w gramach i jako pasek
+postępu) oraz liczba dni ze spożyciem alkoholu w tym tygodniu w odniesieniu do
+Twojego limitu (jako liczba i jako pasek postępu).
+
+## Ekran „{{calendar}}"
+
+Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
+niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
+Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby można
+poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
+wsteczną.
+
+## Ekran „{{statistics}}"
+
+Ten ekran przedstawia analizy statystyczne Twojego spożycia alkoholu, z
+możliwością filtrowania według tygodnia, miesiąca lub roku. Dostępny jest eksport
+CSV, aby dalej przetwarzać dane w arkuszu kalkulacyjnym. Ponadto oferowany jest
+eksport PDF, który przedstawia nawyki picia w układzie odpowiednim dla terapii
+uzależnień.
+
+## Ekran „{{drinks}}"
+
+Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
+skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
+można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
+Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty.
+
+## Ekran „{{settings}}"
+
+Menu ustawień jest dostępne przez ikonę menu (☰) w prawym górnym rogu.
+Libellus Potionis udostępnia następujące opcje konfiguracji:
+
+### {{personal_data}}
+
+W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
+stężenie alkoholu we krwi według wzoru Widmarka.
+
+### {{limits}}
+
+W tej kategorii wprowadzasz limity obowiązujące dla Twojego spożycia alkoholu.
+Pola do wypełnienia to: maksymalny limit dzienny w gramach czystego alkoholu,
+maksymalny limit tygodniowy oraz maksymalna liczba dni picia w tygodniu.
+Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}"
+widoczne są trzy paski postępu. Jeśli nie wiesz, co tutaj ustawić, możesz
+zainspirować się zaleceniami różnych krajów w Wikipedii.
+
+### {{statistics}}
+
+Ustawienia statystyczne pozwalają określić godzinę, o której rozpoczyna się nowy
+dzień (tak aby na przykład napój o 1:00 w nocy nadal liczył się do dnia
+poprzedniego), dzień, od którego ma się zaczynać tydzień, oraz — na potrzeby
+noworocznych postanowień — datę, od której ma się rozpoczynać analiza danych.
+
+### {{backup_section}}
+
+Wszystkie dane można wyeksportować jako JSON i ponownie zaimportować.
+
+### {{appearance}}
+
+W tej kategorii możesz włączyć blokadę biometryczną aplikacji. Ponadto możesz
+ustawić motyw kolorystyczny i język niezależnie od ustawień systemowych.

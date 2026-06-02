@@ -53,7 +53,7 @@ object PdfExporter {
     private const val H              = 842f
     private const val MARGIN         = 50f
     private const val CW             = W - 2 * MARGIN   // 495
-    private const val FOOTER_RESERVE = 30f  // pts reserved for the footer at the bottom of each page
+    private const val FOOTER_RESERVE = 42f  // pts reserved for the footer at the bottom of each page (license line + separator + disclaimer)
 
     private val EXPORT_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
     private val DATE_FMT   = DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT).withLocale(java.util.Locale.getDefault())
@@ -639,6 +639,12 @@ object PdfExporter {
      * @param text  Footer disclaimer string (localised via string resources in the caller).
      */
     private fun drawFooter(c: Canvas, text: String) {
+        // Small, non-prominent GPLv3 notice drawn above the separator on every
+        // page. FOOTER_RESERVE accounts for this extra line so page content
+        // never overlaps it. Kept in English (legal text); see GplNotice.
+        val licensePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = C_GREY; textSize = 6f }
+        c.drawText(GplNotice.PDF_FOOTER, MARGIN, H - 30f, licensePaint)
+
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = C_GREY; textSize = 7.5f }
         c.drawLine(MARGIN, H - 25f, W - MARGIN, H - 25f, Paint().apply { color = C_LGREY })
         c.drawText(text, MARGIN, H - 12f, p)

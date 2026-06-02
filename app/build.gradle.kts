@@ -82,10 +82,6 @@ android {
     // 36 = Android 16 (latest API at development time)
     compileSdk        = 36
 
-    // buildToolsVersion: explicitly set to 36.0.0 so that D8 recognises API levels
-    // 35/36 and does not emit "API level not supported" warnings.
-    buildToolsVersion = "36.0.0"
-
     defaultConfig {
         // applicationId: normally matches namespace but can differ.
         // For simple projects it is identical to namespace.
@@ -109,10 +105,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 50
+        versionCode = 51
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.57.0"
+        versionName = "0.58.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)

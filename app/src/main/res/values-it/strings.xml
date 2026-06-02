@@ -172,4 +172,7 @@
     <string name="pdf_kpi_over_weekly">Giorni > sett. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Giorni > %1$d giorni consumo</string>
     <string name="pdf_col_over_daily">> giorno</string>
+    <string name="menu">Menu</string>
+    <string name="help">Aiuto</string>
+    <string name="license">Licenza</string>
 </resources>
