@@ -23,14 +23,17 @@
 #
 help:
 	@echo "Libellus Potionis build targets:"
-	@echo "  make              build debug APK (default)"
-	@echo "  make debug        build debug APK"
-	@echo "  make release      build release APK (unsigned)"
-	@echo "  make unit-test    run JVM unit tests (no device needed)"
-	@echo "  make guides       regenerate the localized user guides"
-	@echo "  make test-device  run instrumented tests (device/emulator needed)"
-	@echo "  make test         run all tests (device needed)"
-	@echo "  make clean        clear the Gradle build cache"
+	@echo "  make                build debug APK (default)"
+	@echo "  make debug          build debug APK"
+	@echo "  make release        build release APK (unsigned)"
+	@echo "  make unit-test      run JVM unit tests (no device needed)"
+	@echo "  make guides         regenerate the localized user guides"
+	@echo "  make test-device    run instrumented tests (device/emulator needed)"
+	@echo "  make test           run all tests (device needed)"
+	@echo "  make install-debug  install debug APK on device (device needed)"
+	@echo "  make install        install debug APK on device (device needed)"
+	@echo "  make clean          clear the Gradle build cache"
+	@echo "  make dist-clean     clear all non-repo files"
 	@echo ""
 	@echo "Override the SDK path with:  make ANDROID_HOME=/path/to/android-sdk"
 #
@@ -68,9 +71,7 @@ export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform
 GRADLE_OPTS ?= -Xmx2g -Xms512m
 export GRADLE_OPTS
 
-.PHONY: help prereq java android guides check-guides debug release test unit-test test-device install install-debug push clean
-
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar guides
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/license.md guides
 
 java:
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
@@ -82,6 +83,13 @@ android: \
 	${ANDROID_HOME}/platforms/android-35 \
 	${ANDROID_HOME}/platforms/android-36
 
+# LICENSE.md is shown verbatim by the in-app "License" viewer. It is NOT
+# translated and NOT locale-qualified: always the project-root LICENSE.md,
+# copied to the default raw/ so R.raw.license resolves to it for every locale.
+app/src/main/res/raw/license.md: LICENSE.md
+	mkdir -p app/src/main/res/raw
+	cp -a $< $@
+
 # Regenerate the localized user guides from their templates in docs/guide/.
 # Resolves the {{screen-name}} tokens against the matching strings.xml so the
 # guides (root USERSGUIDE*.md and the in-app res/raw[-xx]/usersguide.md copies)
@@ -89,10 +97,6 @@ android: \
 # (it is a prerequisite of `prereq`) and is a no-op when nothing changed.
 guides:
 	python3 tools/render-guide.py
-	# LICENSE.md is shown verbatim by the in-app "License" viewer. It is NOT
-	# translated and NOT locale-qualified: always the project-root LICENSE.md,
-	# copied to the default raw/ so R.raw.license resolves to it for every locale.
-	cp LICENSE.md app/src/main/res/raw/license.md
 
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything).
@@ -142,5 +146,9 @@ push:
 
 clean: prereq
 	./gradlew clean --no-daemon
-	rm app/src/main/res/raw/license.md
+
+dist-clean: clean
+	rm app/src/main/res/raw*/license.md
 	rm app/src/main/res/raw*/usersguide.md
+
+.PHONY: help prereq java android guides check-guides debug release test unit-test test-device install install-debug push clean dist-clean

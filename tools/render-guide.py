@@ -82,8 +82,8 @@ TPL  = os.path.join(ROOT, "docs", "guide")
 # language deliberately has no `raw-xx`, so the app falls back to the English
 # guide via Android's normal resource resolution.
 LANGS = [
-    ("en",    "values",        "raw",        "USERSGUIDE.md"),
-    ("de",    "values-de",     "raw-de",     "USERSGUIDE-de.md"),
+    ("en",    "values",        "raw",        None),
+    ("de",    "values-de",     "raw-de",     None),
     ("fr",    "values-fr",     "raw-fr",     None),
     ("es",    "values-es",     "raw-es",     None),
     ("it",    "values-it",     "raw-it",     None),
@@ -96,6 +96,7 @@ LANGS = [
     ("da",    "values-da",     "raw-da",     None),
     ("nb",    "values-nb",     "raw-nb",     None),
     ("cs",    "values-cs",     "raw-cs",     None),
+    ("la",    "values-la",     "raw-la",     None),
 ]
 
 TOKEN_RE = re.compile(r"\{\{([a-z0-9_]+)\}\}")

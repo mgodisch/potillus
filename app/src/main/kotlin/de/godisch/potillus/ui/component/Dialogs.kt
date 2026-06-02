@@ -148,7 +148,7 @@ fun AddEditEntryDialog(
                         label         = { Text(stringResource(R.string.drink)) },
                         leadingIcon   = selectedDrink?.let { { DrinkCategoryIcon(it.category) } },
                         trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = drinkDropdownOpen) },
-                        modifier      = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                        modifier      = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                     )
                     ExposedDropdownMenu(
                         expanded         = drinkDropdownOpen,
@@ -395,7 +395,7 @@ fun AddEditDrinkDialog(
                         label = { Text(stringResource(R.string.category)) },
                         leadingIcon = { DrinkCategoryIcon(category) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catExpanded) },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                     )
                     ExposedDropdownMenu(expanded = catExpanded, onDismissRequest = { catExpanded = false }) {
                         DrinkCategory.entries.forEach { cat ->

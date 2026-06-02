@@ -142,20 +142,18 @@ class PotillusApp : Application() {
     //   a cable transfer. The result: the app opens with a blank database and factory-
     //   default settings — all data is silently inaccessible, with no error message.
     //
-    // DETECTION HEURISTIC:
-    //   A "failed transfer" looks like: the package was installed recently (within
-    //   INSTALL_RECENCY_MS) AND the DataStore still has its default values
-    //   (language empty, weightKg == 0.0). On a genuine first install these
-    //   conditions also hold, so this is a heuristic — not a definitive diagnosis.
-    //   We intentionally avoid false-positive prevention by showing a non-alarming,
-    //   easily dismissible info message.
+    // DETECTION (authoritative, not a heuristic):
+    //   A failed transfer is detected directly: a sealed passphrase envelope is
+    //   present in storage (restored from backup) but cannot be decrypted with the
+    //   local Keystore key (AppDatabase.hasSealedPassphrase == true &&
+    //   canOpenSealedPassphrase == false). A genuine first install has no envelope
+    //   at all, so it never triggers the warning — this is what fixes the earlier
+    //   false positive that showed "Settings not restored?" on every fresh install.
+    //   The message is still worded to be reassuring and dismissible.
     //
     // HOW IT IS CONSUMED:
     //   MainActivity observes deviceTransferWarning. When true, it shows a
-    //   one-time, dismissible SnackBar/Dialog:
-    //     "Some settings could not be restored from your previous device.
-    //      If this is a new installation, you can ignore this. Otherwise,
-    //      please re-import your backup via Settings → Restore Backup."
+    //   one-time, dismissible dialog (device_transfer_warning_title/_body).
     //   The flag is cleared on dismiss (dismissDeviceTransferWarning()).
 
     private val _deviceTransferWarning = MutableStateFlow(false)
@@ -184,92 +182,63 @@ class PotillusApp : Application() {
         // applyLanguageOnFirstLaunch(). Without a default dispatcher on applicationScope,
         // every consumer must specify the dispatcher at the launch site.
         applicationScope.launch(Dispatchers.IO) {
-            // Read the startup settings snapshot ONCE, BEFORE any startup
-            // task mutates DataStore, and share it between both tasks.
-            //
-            // WHY: applyLanguageOnFirstLaunch() WRITES `language` on first launch.
-            // If checkForDeviceTransferFailure() read settings AFTER it, the
-            // `language.isEmpty()` half of its heuristic would already be false, so
-            // the device-transfer warning could never fire — the device-transfer safety net
-            // was silently dead. Capturing the pre-write snapshot restores the
-            // intended behaviour. (As originally designed, the warning also shows on
-            // a genuine first install — the message is worded to be safe to ignore
-            // in that case. A future refinement could distinguish "DataStore file
-            // present but un-decryptable" from "no file yet" to suppress the
-            // first-install case.)
+            // applyLanguageOnFirstLaunch() needs the startup settings snapshot.
+            // checkForDeviceTransferFailure() is independent of settings — it probes
+            // the encrypted passphrase envelope directly — so ordering no longer
+            // matters between the two.
             val startupSettings = appPreferences.settingsFlow.first()
             applyLanguageOnFirstLaunch(startupSettings)
-            checkForDeviceTransferFailure(startupSettings)
+            checkForDeviceTransferFailure()
         }
     }
 
     /**
-     * Checks whether the current install might be a device-transfer where the
-     * Android Keystore keys did not migrate.
+     * Detects a device transfer in which the Android Keystore key did not migrate,
+     * and surfaces [deviceTransferWarning] if so.
      *
-     * The check is intentionally conservative: it only sets [deviceTransferWarning]
-     * when the package was installed very recently AND DataStore still holds default
-     * values. A genuine first install also satisfies these conditions, so the message
-     * is worded to be safe to dismiss ("if this is a new installation, ignore this").
+     * The signal is authoritative, not a heuristic: a sealed passphrase envelope
+     * is present in storage (restored from an Android backup) but cannot be
+     * decrypted with this device's Keystore key. A genuine first install has no
+     * envelope at all and therefore never triggers the warning — which fixes the
+     * earlier false positive where a fresh install showed "Settings not restored?".
      *
-     * Receives the startup settings snapshot taken in [onCreate] BEFORE
-     * [applyLanguageOnFirstLaunch] runs, so the `language.isEmpty()` signal is not
-     * masked by the first-launch language write. The pure decision lives in
-     * [shouldWarnDeviceTransfer] so it can be unit-tested without an Android runtime.
-     *
-     * Called once per app process start, on Dispatchers.IO.
-     *
-     * @param startupSettings The settings snapshot captured before any startup write.
+     * The pure decision lives in [shouldWarnDeviceTransfer] so it can be
+     * unit-tested without an Android runtime. Called once per app process start,
+     * on Dispatchers.IO.
      */
-    private fun checkForDeviceTransferFailure(startupSettings: AppSettings) {
-        // Only check briefly after install; after that the user has clearly interacted
-        // and would have noticed missing data themselves.
-        val installMs = try {
-            packageManager.getPackageInfo(packageName, 0).firstInstallTime
-        } catch (_: Exception) {
-            return   // cannot read install time → skip check
-        }
-        val ageMs = System.currentTimeMillis() - installMs
-        if (shouldWarnDeviceTransfer(ageMs, INSTALL_RECENCY_MS, startupSettings.language, startupSettings.weightKg)) {
+    private fun checkForDeviceTransferFailure() {
+        val present     = AppDatabase.hasSealedPassphrase(this)
+        val decryptable = AppDatabase.canOpenSealedPassphrase(this)
+        if (shouldWarnDeviceTransfer(present, decryptable)) {
             _deviceTransferWarning.value = true
         }
     }
 
     companion object {
         /**
-         * Maximum age of the package installation (in ms) within which a
-         * "possible device transfer" heuristic is active.
-         * 15 minutes covers the typical cable-based transfer setup duration.
-         */
-        private const val INSTALL_RECENCY_MS = 15L * 60 * 1_000   // 15 minutes
-
-        /**
          * Pure decision function for the device-transfer warning.
          *
-         * Returns `true` when ALL hold:
-         *  - the install is recent: [installAgeMs] is within `[0, recencyWindowMs]`
-         *    (a negative age from a backwards clock adjustment is treated as
-         *    "not recent" rather than firing spuriously),
-         *  - the stored UI [language] is still empty (DataStore never written), and
-         *  - the stored [weightKg] is still the unset default (`0.0`).
+         * Returns `true` only when a sealed passphrase envelope EXISTS but is NOT
+         * decryptable — the unambiguous signature of a backup/device transfer in
+         * which the hardware-bound Keystore key did not come along. The other two
+         * states are safe and stay silent:
+         *  - [sealedEnvelopePresent] == false: no envelope yet → a genuine first
+         *    install (the case that used to false-positive), and
+         *  - [passphraseDecryptable] == true: the envelope opens fine → normal run.
          *
-         * Factored out of [checkForDeviceTransferFailure] so the heuristic can be
-         * exercised by a plain JVM unit test (no Android Context, no Application
-         * instance) — see `PotillusAppHeuristicTest`.
+         * Side-effect-free, so it runs in the fast JVM unit-test executor without an
+         * Android Context or Application instance — see `PotillusAppHeuristicTest`.
+         * The two inputs are produced by [AppDatabase.hasSealedPassphrase] and
+         * [AppDatabase.canOpenSealedPassphrase].
          *
-         * @param installAgeMs    Milliseconds since first install.
-         * @param recencyWindowMs Upper bound of the "recent install" window.
-         * @param language        Stored UI-language tag ("" = never set).
-         * @param weightKg        Stored body weight (0.0 = unset).
+         * @param sealedEnvelopePresent Whether a passphrase envelope is persisted.
+         * @param passphraseDecryptable Whether that envelope opens with the local key.
          */
         @VisibleForTesting
         internal fun shouldWarnDeviceTransfer(
-            installAgeMs: Long,
-            recencyWindowMs: Long,
-            language: String,
-            weightKg: Double
-        ): Boolean =
-            installAgeMs in 0..recencyWindowMs && language.isEmpty() && weightKg == 0.0
+            sealedEnvelopePresent: Boolean,
+            passphraseDecryptable: Boolean
+        ): Boolean = sealedEnvelopePresent && !passphraseDecryptable
     }
 
     /**

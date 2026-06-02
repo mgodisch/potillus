@@ -19,39 +19,90 @@
 # =============================================================================
 
 [versions]
-# Android Gradle Plugin – compiles Kotlin/Java → APK
-agp                 = "8.13.2"
+# Android Gradle Plugin – compiles Kotlin/Java → APK.
+# 9.2.x is a major step up from 8.x: it requires Gradle 9.x (lock-step major
+# upgrade — see gradle/wrapper/gradle-wrapper.properties, now 9.4.1), JDK 17+
+# (we use 21), and supports compileSdk up to API 36.1 (we use 36). AGP 9 also
+# ships "built-in Kotlin" (it compiles Kotlin itself), which is why the
+# org.jetbrains.kotlin.android plugin is removed in this version — see the
+# kotlin block below and the buildscript override in the root build.gradle.kts.
+agp                 = "9.2.0"
 
-# Kotlin compiler and standard library
-kotlin              = "2.0.21"
+# Kotlin compiler and standard library.
+# 2.3.21 is the current patch of the Kotlin 2.3 line (Dec 2025 feature release
+# 2.3.0, March 2026 tooling release 2.3.20, followed by the 2.3.21 bug-fix).
+# NOTE: this drives several other versions that MUST move together with the
+# compiler — see ksp, kotlinx-serialization-core, kotlinx-coroutines-test and
+# kotlin-test below. The Kotlin Compose compiler plugin (kotlin-compose) and the
+# serialization plugin (kotlin-serialization) are versioned via this same key,
+# so bumping Kotlin automatically bumps the Compose compiler to 2.3.21, which is
+# the compiler that pairs with the Compose 1.11 runtime pulled in by the BOM.
+#
+# AGP 9 INTERACTION (built-in Kotlin): AGP 9 compiles Kotlin itself and bundles
+# KGP 2.2.10 as a floor. To make the built-in compiler use OUR version (2.3.21)
+# instead of the bundled 2.2.10, the root build.gradle.kts pins the Kotlin
+# Gradle plugin on the buildscript classpath. That pin is a hard-coded "2.3.21"
+# (a Gradle buildscript block cannot read this version catalog), so it MUST be
+# kept in sync with the value here whenever Kotlin is bumped.
+kotlin              = "2.3.21"
 
 # KSP = Kotlin Symbol Processing
 # Replaces kapt (Annotation Processor); faster, less RAM usage.
 # Used by Room to generate DAO implementations at build time.
-# IMPORTANT: KSP version must exactly match the Kotlin version:
-#   Format: <kotlin-version>-<ksp-patch>
-ksp                 = "2.0.21-1.0.28"
+#
+# VERSION SCHEME CHANGED (was previously coupled to Kotlin):
+#   Up to and including the 2.0.21-1.0.28 series, KSP versions were written as
+#   "<kotlin-version>-<ksp-patch>" and had to match the Kotlin version exactly.
+#   Since KSP 2.3.0, KSP is decoupled from the Kotlin version: the plugin now
+#   carries a plain "<major>.<minor>.<patch>" version (e.g. 2.3.7) and a single
+#   release is compatible with Kotlin 2.2.* and newer. Therefore we no longer
+#   mirror the Kotlin version here; 2.3.7 is simply the latest KSP release and
+#   is compatible with the Kotlin 2.3.21 compiler selected above.
+ksp                 = "2.3.7"
 
 # Jetpack Compose BOM (Bill of Materials)
 # A BOM pins compatible versions for all Compose modules.
 # Individual Compose dependencies don't need their own version numbers –
 # the BOM determines them automatically.
-compose-bom         = "2025.05.01"
+# 2026.04.01 maps the core Compose modules (ui, foundation, material3, runtime,
+# animation) to 1.11.0. Two consequences matter for this project:
+#   1. The Compose compiler that processes @Composable must be 1.11-compatible;
+#      it is, because it ships with the Kotlin 2.3.21 plugin selected above.
+#   2. The Compose UI-test framework switches its v2 test APIs ON BY DEFAULT.
+#      The default test dispatcher inside the Compose test rule changes from
+#      UnconfinedTestDispatcher (eager) to StandardTestDispatcher (queued), so
+#      instrumented UI tests must explicitly drain the queue before asserting on
+#      state mutated by an interaction. See EntryListItemUiTest for the pattern.
+compose-bom         = "2026.04.01"
 
 # AndroidX core libraries
-core-ktx            = "1.13.1"   # Kotlin extensions for Android APIs
-appcompat           = "1.7.0"    # Back-compat + BiometricPrompt
-activity-compose    = "1.9.0"    # Bridge between Activity and Compose
+core-ktx            = "1.18.0"   # Kotlin extensions for Android APIs (was 1.13.1)
+appcompat           = "1.7.0"    # Back-compat + BiometricPrompt (current stable)
+activity-compose    = "1.12.3"   # Bridge between Activity and Compose (was 1.9.0;
+                                 # 1.12.2 fixes an OnBackPressedCallback crash)
 
-# Lifecycle: ViewModel + LiveData + state observation
-lifecycle           = "2.8.2"
+# Lifecycle: ViewModel + LiveData + state observation.
+# 2.10.0 is the current stable (was 2.8.2). Single key drives lifecycle-runtime-ktx,
+# lifecycle-runtime-compose and lifecycle-viewmodel-compose. Note: 2.9 moved the
+# core Lifecycle APIs to a Kotlin-Multiplatform layout; the Android artifacts and
+# the APIs this app uses (collectAsStateWithLifecycle, viewModel()) are unchanged.
+lifecycle           = "2.10.0"
 
-# Navigation: Compose-based screen navigation
-# 2.8.0+ required for type-safe routes (@Serializable data objects)
+# Navigation: Compose-based screen navigation.
+# 2.8.0+ required for type-safe routes (@Serializable data objects). Kept at 2.8.9:
+# androidx.navigation 2.9.x is still in alpha, so 2.8.9 is the current stable.
 navigation-compose  = "2.8.9"
 
-# Room: SQLite abstraction layer (ORM-like)
-room                = "2.7.1"
+# Room: SQLite abstraction layer (ORM-like).
+# 2.8.4 is the latest Room 2.x (was 2.7.1). Room 2.x is in maintenance mode;
+# Room 3.0 is a separate package (androidx.room3) and is not adopted here. 2.8.x
+# keeps the SupportSQLite APIs, so the SQLCipher SupportOpenHelperFactory
+# integration in AppDatabase still works. NOTE: room-ktx was merged into
+# room-runtime as of 2.x's later releases (the artifact is now empty), so the
+# room-ktx library entry and dependency are removed — its coroutine/Flow APIs now
+# ship inside room-runtime. Paired here with androidx.sqlite 2.6.2 (see below),
+# which is the combination Google documents for Room 2.8.4.
+room                = "2.8.4"
 
 # DataStore: asynchronous key-value store (successor to SharedPreferences)
 datastore           = "1.1.1"
@@ -64,17 +115,43 @@ biometric           = "1.1.0"
 # See KeystoreSecretStore for the replacement primitive.
 
 # SQLCipher: application-level AES-256 encryption for the Room database.
-# Distributed as a pre-built native library inside an AAR (@aar classifier).
-sqlcipher           = "4.5.4"
+# Distributed as a pre-built native library inside an AAR.
+#
+# ARTIFACT MIGRATION (was net.zetetic:android-database-sqlcipher 4.5.4):
+# The old "android-database-sqlcipher" library was deprecated in 2022, reached
+# end-of-life in 2023, and — crucially — its native .so libraries are NOT built
+# for 16 KB memory page sizes. Android 15+ devices can run with 16 KB pages, and
+# Google Play requires 16 KB support for apps targeting Android 15+; an unaligned
+# .so crashes at runtime on such devices. The maintained replacement is
+# net.zetetic:sqlcipher-android, which has shipped 16 KB-aligned native libraries
+# since 4.6.1. Pinned to 4.15.0, the current community release, paired with
+# androidx.sqlite 2.6.2 below (the combination documented in the sqlcipher-android
+# README). See the AppDatabase.kt code for the SupportOpenHelperFactory usage.
+sqlcipher           = "4.15.0"
 
-# androidx.sqlite: SupportSQLiteDatabase adapter required by SQLCipher.
-sqlite              = "2.4.0"
+# androidx.sqlite: the SupportSQLiteOpenHelper adapter SQLCipher implements, and
+# the low-level SQLite API Room builds on. 2.6.2 is the version Google documents
+# alongside Room 2.8.4 and the sqlcipher-android README documents alongside 4.15.0.
+sqlite              = "2.6.2"
 
 # ── Instrumented (androidTest) test stack — TEST-01 ───────────────────────────
 # androidx.test.ext:junit provides AndroidJUnit4 + ext assertions. The Compose
 # UI-test artifacts (ui-test-junit4 / ui-test-manifest) are version-managed by
 # the Compose BOM, so they need no version here.
 androidx-test-ext-junit = "1.2.1"
+
+# ── Previously inline-pinned versions, consolidated here (single source of truth) ──
+# These were hard-coded as string literals in app/build.gradle.kts; the rationale
+# for each is documented at the dependency's usage site. Note: kotlin-test has no
+# entry of its own — its library coordinate references the `kotlin` version above,
+# so it can never drift from the compiler version.
+tracing                 = "1.1.0"     # androidx.tracing (see TEST classpath note)
+junit                   = "4.13.2"    # JUnit 4 (JVM unit tests)
+coroutines-test         = "1.11.0"    # kotlinx-coroutines-test
+turbine                 = "1.2.0"     # Flow/StateFlow test assertions
+org-json                = "20240303"  # real org.json impl for JVM unit tests
+androidx-test-runner    = "1.6.2"     # androidTest runner
+espresso-core           = "3.6.1"     # androidTest Espresso core
 
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────
@@ -127,16 +204,21 @@ navigation-compose          = { group = "androidx.navigation",    name = "naviga
 # kotlinx-serialization-core: required by Navigation 2.8+ for type-safe
 # @Serializable route objects. The -core artefact is sufficient; -json is
 # not needed because Navigation handles its own serialisation internally.
-# Version is aligned with Kotlin 2.0.21 (serialization 1.7.x is the
-# compatible series for that compiler release).
-kotlinx-serialization-core  = { group = "org.jetbrains.kotlinx",  name = "kotlinx-serialization-core", version = "1.7.3" }
+#
+# COMPATIBILITY FIX (was 1.7.3): kotlinx.serialization ships a compiler plugin
+# (org.jetbrains.kotlin.plugin.serialization, versioned via the kotlin key) and
+# a runtime, and the two are bound by Kotlin's forward-compatibility rule: a
+# runtime built with Kotlin 2.Y works with 2.(Y+1) but not 2.(Y+2). The old
+# 1.7.3 runtime was built against Kotlin 2.0, so it is NOT valid under the
+# Kotlin 2.3.21 compiler. 1.11.0 is the current runtime, built against Kotlin
+# 2.2.x, and is therefore compatible with 2.3.21.
+kotlinx-serialization-core  = { group = "org.jetbrains.kotlinx",  name = "kotlinx-serialization-core", version = "1.11.0" }
 
 # ── Room (SQLite database) ────────────────────────────────────────────────────
-# room-runtime: core runtime (open database, transactions)
+# room-runtime: core runtime (open database, transactions). As of Room 2.8 this
+# also contains the former room-ktx APIs (coroutine/Flow support), so there is no
+# separate room-ktx entry — it was merged in and the standalone artifact is empty.
 room-runtime                = { group = "androidx.room",          name = "room-runtime",                version.ref = "room" }
-
-# room-ktx: coroutine support for Room (suspend functions in DAOs)
-room-ktx                    = { group = "androidx.room",          name = "room-ktx",                    version.ref = "room" }
 
 # room-compiler: KSP processor that generates DAOImpl classes at build time
 # MUST be added as "ksp(...)", not "implementation(...)"
@@ -157,8 +239,11 @@ datastore-preferences       = { group = "androidx.datastore",     name = "datast
 biometric                   = { group = "androidx.biometric",     name = "biometric",                   version.ref = "biometric" }
 
 # SQLCipher: transparent AES-256 page-level encryption for Room / SQLite.
-# @aar classifier required: the artifact contains pre-built native libraries.
-sqlcipher                   = { group = "net.zetetic",            name = "android-database-sqlcipher",  version.ref = "sqlcipher" }
+# Uses the maintained "sqlcipher-android" artifact (the deprecated, EOL
+# "android-database-sqlcipher" did not support 16 KB page sizes). The AAR ships
+# pre-built native libraries; if Gradle ever fails to resolve the native AAR,
+# append the explicit "@aar" artifact type to this coordinate.
+sqlcipher                   = { group = "net.zetetic",            name = "sqlcipher-android",           version.ref = "sqlcipher" }
 
 # androidx.sqlite: SupportSQLiteDatabase adapter needed by SQLCipher's
 # SupportFactory to integrate with Room's database helper infrastructure.
@@ -177,12 +262,25 @@ compose-ui-test-junit4      = { group = "androidx.compose.ui",    name = "ui-tes
 # debug (test) manifest only. BOM-managed (no version).
 compose-ui-test-manifest    = { group = "androidx.compose.ui",    name = "ui-test-manifest" }
 
+# ── Previously inline-pinned coordinates, now catalog-managed ──────────────────
+# kotlin-test references the `kotlin` version so it always matches the compiler.
+tracing                     = { group = "androidx.tracing",       name = "tracing",                     version.ref = "tracing" }
+junit                       = { group = "junit",                  name = "junit",                       version.ref = "junit" }
+kotlin-test                 = { group = "org.jetbrains.kotlin",   name = "kotlin-test",                 version.ref = "kotlin" }
+kotlinx-coroutines-test     = { group = "org.jetbrains.kotlinx",  name = "kotlinx-coroutines-test",     version.ref = "coroutines-test" }
+turbine                     = { group = "app.cash.turbine",       name = "turbine",                     version.ref = "turbine" }
+org-json                    = { group = "org.json",               name = "json",                        version.ref = "org-json" }
+androidx-test-runner        = { group = "androidx.test",          name = "runner",                      version.ref = "androidx-test-runner" }
+espresso-core               = { group = "androidx.test.espresso", name = "espresso-core",               version.ref = "espresso-core" }
+
 [plugins]
 # AGP: Android Gradle Plugin – core of the Android build system
 android-application = { id = "com.android.application",             version.ref = "agp" }
 
-# Kotlin Android plugin – enables Kotlin compilation for Android
-kotlin-android      = { id = "org.jetbrains.kotlin.android",        version.ref = "kotlin" }
+# NOTE: there is intentionally no kotlin-android alias. As of AGP 9, Kotlin
+# support is built into the Android plugin, so org.jetbrains.kotlin.android is
+# neither applied nor declared. The Kotlin compiler version is instead pinned
+# via the buildscript classpath in the root build.gradle.kts (see `kotlin`).
 
 # Kotlin Compose plugin – activates the Compose compiler (Kotlin 1.9.20+)
 # Without this plugin, @Composable annotations are not processed

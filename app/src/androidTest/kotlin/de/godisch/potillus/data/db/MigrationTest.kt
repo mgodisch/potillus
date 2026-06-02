@@ -44,7 +44,7 @@
  *
  * SQLCIPHER NOTE
  *   The production database is encrypted with SQLCipher, so the MigrationTestHelper
- *   is given a [SupportFactory] (with a throwaway test passphrase) as its
+ *   is given a [SupportOpenHelperFactory] (with a throwaway test passphrase) as its
  *   open-helper factory; otherwise it could not open the encrypted test DB.
  *
  * RUNNING
@@ -56,7 +56,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -76,31 +76,40 @@ class MigrationTest {
 
         /**
          * Throwaway passphrase for the encrypted test database. This is NOT a
-         * real secret — it only lets SQLCipher's [SupportFactory] open the
-         * disposable migration-test DB created by the helper.
+         * real secret — it only lets SQLCipher's [SupportOpenHelperFactory] open
+         * the disposable migration-test DB created by the helper.
          */
         val TEST_PASSPHRASE: ByteArray = "migration-test-passphrase".toByteArray()
+
+        init {
+            // sqlcipher-android requires the native library to be loaded before
+            // the encrypted database is opened. Doing it in the companion init
+            // guarantees it runs before the @get:Rule helper field is initialised.
+            System.loadLibrary("sqlcipher")
+        }
     }
 
     /**
      * Creates/opens the historical schema versions from the exported JSONs.
-     * The [SupportFactory] makes the helper open the (encrypted) test DB the
-     * same way the production code does.
+     * The [SupportOpenHelperFactory] makes the helper open the (encrypted) test
+     * DB the same way the production code does.
      */
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         AppDatabase::class.java,
         emptyList(),
-        // SupportFactory(passphrase, hook, clearPassphrase = false):
-        // MigrationTestHelper opens the database more than once — createDatabase()
-        // builds it at the old version and closes it, then runMigrationsAndValidate()
-        // reopens it. The single-argument SupportFactory(passphrase) constructor
-        // ZEROES the passphrase byte[] after the first open (a hardening default), so
-        // the reopen fails with "The passphrase appears to be cleared". Passing
-        // clearPassphrase = false keeps the throwaway test passphrase usable across
-        // the multiple opens this test performs.
-        SupportFactory(TEST_PASSPHRASE, null, false)
+        // sqlcipher-android's SupportOpenHelperFactory has no clearPassphrase
+        // toggle. The old SupportFactory zeroed the passphrase byte[] after the
+        // first open by default (so the single-arg form broke reuse, and the test
+        // had to pass clearPassphrase = false). The new library does not clear the
+        // passphrase, so the single-argument constructor is safe across the
+        // multiple opens this test performs: createDatabase() builds the DB at the
+        // old version and closes it, then runMigrationsAndValidate() reopens it.
+        // NOTE: the new 3-arg constructor's last Boolean is enableWriteAheadLogging,
+        // NOT clearPassphrase — do not reintroduce a `false` here expecting the old
+        // meaning.
+        SupportOpenHelperFactory(TEST_PASSPHRASE)
     )
 
     /**

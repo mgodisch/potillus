@@ -1,0 +1,116 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- Quomodo Computatro Utaris
+
+Salveto apud Libellum Potionis, qui usum tuum vini et potionum alcoholicarum
+diligenter annotat! Haec pagina rationes et vires huius programmata declarat.
+
+## Praecipua et insignia
+
+Libellus Potionis omnibus patet (quod Open Source dicitur). Codicem ipsum
+cuilibet inspicere atque examinare licet. Libellus Potionis summam secreti
+curam habet atque tuetur. Nullas enim potestates aut facultates exigit: non
+machinam photographicam, non vocis exceptaculum, non locorum indiciatorem
+(GPS), non coniunctionem interretialem. Libellus Potionis tutissimus est: omnia
+enim data et notae in occulto ac scrambled scripta servantur; aditus autem ad
+hoc programma digiti impressione coerceri potest. Libellus Potionis te adiuvat,
+ut intra fines ac modum tuum bibas, cum quovis tempore tibi indicet, utrum illa
+"sororcula" (la petite sœur) intra modum constitutum adhuc capi possit necne.
+Libellus Potionis magno usui est medicis aut iis, qui consilia de temperantia
+dant, cum postulantibus totum bibendi ordinem ac consuetudinem in folio duplici
+formati PDF commonstret. Libellus Potionis gratis et sine ullis praeconiorum
+criminibus praebetur.
+
+Libellus Potionis systema Android 15 aut superius postulat. Is ipse, qui hoc
+programma composuit, eo continenter utitur in mobili telegrapho Google Pixel 10
+Pro sub systemate GrapheneOS, ac praeterea in Fairphone 4 id periclitatur.
+
+## Tabula "{{today}}"
+
+In hac tabula indicem reperies potionum alcoholicarum, quibus hodierno die
+indulsisti. Si qua nota per errorem inscripta erit, hic eam emendare aut omnino
+delere poteris. Signo plus (+) addito novas potiones adscribes.
+
+Supra indicem potionum conspectus totius diei ponitur, qui haec demonstrat:
+quantitatem alcoholis hodie assumptam (per grammata digestam); eandem
+quantitatem cum modo tuo diurno et hebdomadali comparatam (cum numeris tum
+diagrammatis rectangulis); numerum dierum huius hebdomadis, quibus alcohol
+cepisti, cum fine constituto comparatum (numeris et diagrammate expressum).
+
+## Tabula "{{calendar}}"
+
+In hac tabula calendarium continetur. Dies, quibus bibisti, puncto caeruleo (si
+intra modum bibisti) aut puncto rubro (si modum excessisti) notantur. Si quem
+diem elegeris, potiones eo die sumptae commonstrantur, ut eas corrigere aut
+delere possis. Etiam postea potiones antea sumptas addere licet.
+
+## Tabula "{{statistics}}"
+
+Haec tabula rationes mathematicas et statisticas usus tui ostendit, quas per
+hebdomadas, menses aut annos partitione videre potes. Data in formam CSV
+proferre licet, ut in tabulis calculatoriis tractentur. Praeterea omnia in
+formam PDF mutari possunt, qua scriptura consuetudo bibendi ita exponitur, ut
+iis, qui de temperantia vel sanatione consulunt, maxime utilitas afferatur.
+
+## Tabula "{{drinks}}"
+
+Hic index potionum continetur. Hoc programma cum copia potionum per orbem
+terrarum usitatarum traditur. Hae omnes immutari aut deleri possunt. Signo plus
+(+) novam potionem ipse definire potes. Leviter tabulam tangendo (quod Tap
+dicitur), fenestra aperitur, ut eam potionem a te sumptam esse adscribas.
+
+## Tabula "{{settings}}"
+
+Menu optionum per symbolum trium linearum (☰) in superiore parte ad dextram
+situm invenitur. Libellus Potionis has optiones dat:
+
+### {{personal_data}}
+
+In hoc loco pondus corporis tui adscribi potest, ut quantitas alcoholis in
+sanguine secundum regulam Widmarkianam proxime computetur.
+
+### {{limits}}
+
+In hoc loco fines ac modi adscribendi sunt, quos in bibendo servare vis.
+Notandi sunt: finis summus diurnus (in grammatis alcoholis puri), finis summus
+hebdomadalis, et maximus dierum numerus per hebdomadam, quibus bibere licet.
+Omnes hi fines valent. In tabula "{{today}}" tria diagrammata progressus
+ostenduntur. Qui nescit quid hic constituat, in pagina Wikipedia exemplis ac
+praeceptis variarum gentium moveri potest.
+
+### {{statistics}}
+
+In optionibus statisticis definiri potest, qua hora novus dies incipiat (ut,
+exempli gratia, potio hora prima noctis sumpta adhuc ad diem praeteritum
+pertineat), quo die hebdomada incipere debeat, et – quod pertinet ad consilia
+novi anni – ex quo tempore data computari oporteat.
+
+### {{backup_section}}
+
+Omnia data in formam JSON exportari atque inde rursus importari possunt.
+
+### {{appearance}}
+
+In hac parte cautio biometrica ad programma claudendum excitari potest, et
+praeterea colorum habitus ac lingua eligi possunt, sine respectu communium
+systematis optionum.

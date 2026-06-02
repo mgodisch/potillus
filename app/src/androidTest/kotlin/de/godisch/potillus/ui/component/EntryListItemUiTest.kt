@@ -47,6 +47,24 @@
  *   3. Finders + assertions/actions — `onNodeWithText`, `onNodeWithContentDescription`,
  *      then `assertIsDisplayed()` / `performClick()`.
  *
+ * SYNCHRONISATION (v2 testing APIs — Compose 1.11 / BOM 2026.04.01)
+ *   Starting with this BOM the Compose test framework enables its *v2* testing
+ *   APIs by default, which changes the default test dispatcher from
+ *   UnconfinedTestDispatcher (runs coroutines/recompositions eagerly) to
+ *   StandardTestDispatcher (queues them until the virtual clock advances). The
+ *   practical rule of thumb:
+ *     - Finders that end in an assertion on a *node* (e.g. `assertIsDisplayed()`)
+ *       are safe as-is: the finder synchronises (waits for idle) before it reads
+ *       the tree, so a queued initial composition is flushed for us.
+ *     - When a test asserts on state held OUTSIDE the composition — here a plain
+ *       Kotlin `var` mutated by a click callback — there is no implicit idle
+ *       sync, so under v2 the click may still be queued when we read the counter.
+ *       We therefore wrap the assertion in `composeTestRule.runOnIdle { }`, which
+ *       first waits for the UI to become idle (draining the queued click) and
+ *       then runs the assertion on the main thread. Under the old v1 dispatcher
+ *       this was unnecessary because everything ran eagerly; the wrapper is the
+ *       forward-compatible pattern and is harmless under either dispatcher.
+ *
  * RUNNING
  *   ./gradlew connectedDebugAndroidTest   (requires a connected device/emulator)
  */
@@ -55,7 +73,7 @@ package de.godisch.potillus.ui.component
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -82,6 +100,14 @@ class EntryListItemUiTest {
      * explicitly via an ActivityScenario, which reliably establishes a Compose
      * hierarchy on real devices. The bare rule was observed to fail on-device with
      * "No compose hierarchies found".
+     *
+     * This uses the v2 factory (androidx.compose.ui.test.junit4.v2): since Compose
+     * 1.11 the v1 factories are deprecated. v2 establishes the test environment on
+     * a StandardTestDispatcher (queued coroutines) instead of v1's
+     * UnconfinedTestDispatcher (immediate execution); the assertions that depend on
+     * recomposition are already wrapped in runOnIdle {} to stay correct under it.
+     * Only the environment factory changed — the finders, actions, setContent and
+     * runOnIdle below are the same APIs as before.
      */
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
@@ -136,7 +162,12 @@ class EntryListItemUiTest {
             .onNodeWithContentDescription(context.getString(R.string.edit_entry))
             .performClick()
 
-        assertTrue("onEdit should be invoked exactly once", editClicks == 1)
+        // The counter is plain state outside the composition, so we must wait for
+        // the UI to be idle (v2 StandardTestDispatcher queues the click) before
+        // reading it. runOnIdle waits, then runs the assertion on the main thread.
+        composeTestRule.runOnIdle {
+            assertTrue("onEdit should be invoked exactly once", editClicks == 1)
+        }
     }
 
     /** Tapping the delete (trash) icon must invoke the onDelete callback exactly once. */
@@ -151,6 +182,10 @@ class EntryListItemUiTest {
             .onNodeWithContentDescription(context.getString(R.string.delete))
             .performClick()
 
-        assertTrue("onDelete should be invoked exactly once", deleteClicks == 1)
+        // See tappingEdit_invokesOnEdit: drain the queued click before asserting
+        // on the out-of-composition counter under the v2 test dispatcher.
+        composeTestRule.runOnIdle {
+            assertTrue("onDelete should be invoked exactly once", deleteClicks == 1)
+        }
     }
 }

@@ -37,17 +37,21 @@
 //     3. dependencies { } – external libraries
 // =============================================================================
 
+// JvmTarget enum used by the Kotlin `compilerOptions` DSL (see the top-level
+// `kotlin { }` block further down). In a Gradle Kotlin DSL build script, import
+// statements must appear before the `plugins { }` block.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 // ── 1. Plugins ────────────────────────────────────────────────────────────────
 // Plugins are Gradle extensions that add new build capabilities.
 // "alias(libs.plugins.xxx)" refers to an entry in gradle/libs.versions.toml.
 plugins {
     // Android Application Plugin:
     // Enables the "android { }" block and knows how to build an APK.
+    // As of AGP 9 this plugin also provides built-in Kotlin support, so the
+    // separate org.jetbrains.kotlin.android plugin is no longer applied (the
+    // Kotlin compiler version is pinned in the root build.gradle.kts).
     alias(libs.plugins.android.application)
-
-    // Kotlin Android Plugin:
-    // Enables the Kotlin compiler for Android source code.
-    alias(libs.plugins.kotlin.android)
 
     // Kotlin Compose Compiler Plugin:
     // Required so that @Composable functions are compiled correctly.
@@ -188,9 +192,10 @@ android {
     }
 
     // Kotlin compiler target: must match compileOptions.targetCompatibility.
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+    // NOTE: the old `kotlinOptions { jvmTarget = "21" }` proxy (a String setter)
+    // was removed by the Kotlin 2.3 Gradle plugin — it is now a hard compile
+    // error, not a warning. The replacement lives in the top-level `kotlin { }`
+    // block below, using the type-safe `compilerOptions` DSL.
 
     // buildFeatures: enable/disable optional build capabilities
     buildFeatures {
@@ -221,7 +226,12 @@ android {
     //   fails with "Cannot find the schema file in the assets folder".
     sourceSets {
         getByName("androidTest") {
-            assets.srcDirs(files("$projectDir/schemas"))
+            // AGP 9 deprecates AndroidSourceSet.srcDirs(...) in favour of the
+            // `directories` mutable set, to which you append String paths with
+            // `+=` (instead of passing a FileCollection via files(...)). The
+            // resolved location is identical — app/schemas exposed as androidTest
+            // assets — only the DSL changed.
+            assets.directories += "$projectDir/schemas"
         }
     }
 
@@ -240,6 +250,19 @@ android {
     }
 }
 
+// ── 2b. Kotlin compiler options ───────────────────────────────────────────────
+// Replacement for the removed `android { kotlinOptions { jvmTarget = "21" } }`.
+// `kotlin { }` is the Kotlin Gradle plugin's own extension (top-level, a sibling
+// of `android { }`). `compilerOptions.jvmTarget` is a typed Gradle Property of
+// type JvmTarget, so we assign the JvmTarget.JVM_21 enum constant rather than the
+// old "21" string. This must stay in sync with compileOptions.targetCompatibility
+// (JavaVersion.VERSION_21) in the android { } block above.
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
 // ── 3. Dependencies ───────────────────────────────────────────────────────────
 // "implementation":      available at runtime, not exported to dependent modules
 // "ksp":                 build-time only (code generation), not in APK
@@ -255,7 +278,7 @@ dependencies {
     // dependency resolution fail. Raising the app's own runtime to 1.1.0 makes the
     // mirrored constraint 1.1.0 too, satisfying androidx.test. (tracing is a tiny
     // diagnostic library; 1.1.0 is backward-compatible with 1.0.0.)
-    implementation("androidx.tracing:tracing:1.1.0")
+    implementation(libs.tracing)
 
     // ── Kotlin & AndroidX Base ────────────────────────────────────────────────
     // core-ktx: Kotlin extension functions for Android APIs
@@ -295,8 +318,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
 
     // ── Room (SQLite) ─────────────────────────────────────────────────────────
-    implementation(libs.room.runtime)   // core runtime
-    implementation(libs.room.ktx)       // coroutine support
+    // room-runtime also provides the coroutine/Flow APIs (suspend DAOs etc.) that
+    // used to live in the separate room-ktx artifact; room-ktx was merged into
+    // room-runtime in Room 2.8 and is no longer declared.
+    implementation(libs.room.runtime)
 
     // room-compiler: KSP generates DAO implementations → build time only
     ksp(libs.room.compiler)
@@ -309,16 +334,16 @@ dependencies {
 
     // ── Security ──────────────────────────────────────────────────────────────
     //
-    // SQLCipher: application-level AES-256 encryption for the Room database.
-    //   SupportFactory wraps Room's SQLite helper so every read/write goes
-    //   through the cipher transparently. The passphrase is a 32-byte random
-    //   value sealed by the Android Keystore (KeystoreSecretStore) and stored as
-    //   a Base64 envelope in a plain SharedPreferences file (see AppDatabase.kt).
-    // Migrated to version catalog (libs.versions.toml → sqlcipher).
-    // @aar is handled via the catalog artifact classifier field.
+    // SQLCipher (net.zetetic:sqlcipher-android): application-level AES-256
+    //   encryption for the Room database. SupportOpenHelperFactory wraps Room's
+    //   SQLite helper so every read/write goes through the cipher transparently.
+    //   The passphrase is a 32-byte random value sealed by the Android Keystore
+    //   (KeystoreSecretStore) and stored as a Base64 envelope in a plain
+    //   SharedPreferences file (see AppDatabase.kt). The native library is loaded
+    //   explicitly via System.loadLibrary("sqlcipher") before the DB is opened.
     implementation(libs.sqlcipher)
-    // androidx.sqlite is required by SQLCipher as the SupportSQLiteDatabase
-    // adapter; it replaces Android's own bundled SQLite JNI bindings.
+    // androidx.sqlite provides the SupportSQLiteOpenHelper interfaces SQLCipher
+    // implements and the low-level SQLite API Room builds on.
     implementation(libs.sqlite)
 
     // NOTE: androidx.security:security-crypto is intentionally not used (Google deprecated it).
@@ -333,16 +358,26 @@ dependencies {
     // Stripped from release builds by R8/ProGuard
     debugImplementation(libs.compose.ui.tooling)
     // ── Unit Tests (JVM) ──────────────────────────────────────────────────────
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
+    testImplementation(libs.junit)
+    // kotlin-test tracks the Kotlin compiler version: its catalog coordinate
+    // references the `kotlin` version (libs.versions.toml), so the stdlib-test
+    // artifact can never drift from the compiler and trigger a metadata mismatch.
+    testImplementation(libs.kotlin.test)
 
     // kotlinx-coroutines-test: runTest, UnconfinedTestDispatcher, advanceUntilIdle
     // Required for testing ViewModels that use viewModelScope and StateFlow.
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    // Bumped from 1.9.0: that release was built against Kotlin 2.0 and, by the
+    // same forward-compatibility rule that affects serialization above, is not
+    // guaranteed to load under the Kotlin 2.3.21 compiler. 1.11.0 is the current
+    // release (built against Kotlin 2.2.x) and is compatible with 2.3.21. The
+    // test-dispatcher semantics (StandardTestDispatcher as the runTest default,
+    // advanceUntilIdle, UnconfinedTestDispatcher) are unchanged across this bump,
+    // so the existing JVM unit tests keep behaving identically.
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // turbine: concise Flow / SharedFlow / StateFlow assertions in tests.
     // Replaces verbose backgroundScope + collect {} boilerplate.
-    testImplementation("app.cash.turbine:turbine:1.2.0")
+    testImplementation(libs.turbine)
 
     // org.json: the SDK's android.jar ships only STUB org.json classes that throw
     // "not mocked" in local unit tests. BackupManager parses and builds JSON with
@@ -350,7 +385,7 @@ dependencies {
     // implementation on the unit-test classpath. This is the same reference
     // implementation Android uses at runtime, and it takes precedence over the
     // stub for unit tests.
-    testImplementation("org.json:json:20240303")
+    testImplementation(libs.org.json)
 
     // ── Instrumented UI Tests (androidTest) ─────────────────────────
     // These run on a device/emulator. The Compose BOM (added again here for the
@@ -368,8 +403,8 @@ dependencies {
     // SDK 35 and can leave that registry unpopulated, surfacing as
     // "No compose hierarchies found". Aligning them with the modern test
     // infrastructure is the supported configuration. androidTest-only.
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.espresso.core)
 
     // room-testing: MigrationTestHelper validates each Room Migration against the
     // committed schema JSONs (app/schemas/), so a broken migration fails the test

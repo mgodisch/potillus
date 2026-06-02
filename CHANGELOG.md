@@ -26,6 +26,305 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.59.0
+
+Toolchain modernisation for 2026, delivered as a sequence of incremental,
+build-on-each-other steps under one version:
+
+  - **Part 1:** raise the Kotlin compiler, KSP, the Compose BOM
+    and the Kotlin-coupled test libraries, and adapt the instrumented UI tests
+    to the Compose v2 testing APIs. The build system (AGP 8.13.2, Gradle
+    8.14.5) is deliberately left untouched.
+  - **Part 2:** Gradle 8.14.5 → 9.4.1 + AGP 8.13.2 → 9.2.0
+    together (lock-step major upgrade), removing the now-redundant
+    `kotlin-android` plugin and adopting AGP 9 built-in Kotlin, with the Kotlin
+    compiler version pinned to 2.3.21 via a buildscript override; plus the AGP 9
+    `srcDirs` → `directories` source-set fix.
+  - **SQLCipher migration (this change):** move off the deprecated, EOL
+    `android-database-sqlcipher` to the maintained `sqlcipher-android` for
+    16 KB page-size compliance.
+  - **Part 3 — hygiene (this change):** consolidate the inline-pinned
+    dependency versions into the version catalog and drop the obsolete
+    `suppressUnsupportedCompileSdk` flag. (Enabling the Gradle configuration
+    cache is kept as a separate, optional follow-up.)
+  - **Dependency freshening:** raise the explicitly-versioned
+    AndroidX core libraries (core-ktx, activity-compose, lifecycle) to current
+    stable. (navigation-compose stays at 2.8.9 — androidx.navigation 2.9 is still
+    in alpha, so 2.8.9 is the current stable.)
+  - **SQLCipher / SQLite / Room currency (this change):** raise the database
+    stack to the current coordinated set — sqlcipher-android 4.15.0,
+    androidx.sqlite 2.6.2 and Room 2.8.4 — and drop the merged room-ktx artifact.
+
+### Changed
+
+- **Kotlin 2.0.21 → 2.3.21.** Current patch of the Kotlin 2.3 line. Because the
+  Compose compiler plugin and the serialization plugin are versioned via the
+  same catalog key, this also moves the Compose compiler to 2.3.21, which is the
+  compiler that pairs with the Compose 1.11 runtime (see below).
+- **KSP 2.0.21-1.0.28 → 2.3.7.** Adopts KSP's new, Kotlin-decoupled version
+  scheme (since KSP 2.3.0 a single release supports Kotlin 2.2.* and newer), so
+  the version no longer mirrors the compiler version.
+- **Compose BOM 2025.05.01 → 2026.04.01.** Pins the core Compose modules to
+  1.11.0.
+
+### Fixed
+
+- **Serialization runtime incompatible with the new compiler.**
+  `kotlinx-serialization-core` was pinned to 1.7.3 (built against Kotlin 2.0).
+  Kotlin's forward-compatibility rule (a runtime built with 2.Y supports 2.(Y+1)
+  but not 2.(Y+2)) makes 1.7.3 invalid under the 2.3.21 compiler. Bumped to
+  1.11.0 (built against Kotlin 2.2.x).
+- **Coroutines test runtime incompatible with the new compiler.**
+  `kotlinx-coroutines-test` 1.9.0 (Kotlin 2.0) falls under the same rule; bumped
+  to 1.11.0. Dispatcher semantics are unchanged, so the JVM unit tests behave
+  identically.
+- **`kotlin-test` version drift.** The literal `2.0.21` test dependency was
+  updated to `2.3.21` to match the compiler and avoid a metadata mismatch.
+- **Build script: removed `kotlinOptions` String setter.** The Kotlin 2.3
+  Gradle plugin turns `android { kotlinOptions { jvmTarget = "21" } }` from a
+  deprecation warning into a hard script-compilation error. Migrated to the
+  type-safe `compilerOptions` DSL in a new top-level `kotlin { }` block
+  (`jvmTarget.set(JvmTarget.JVM_21)`), with the matching
+  `org.jetbrains.kotlin.gradle.dsl.JvmTarget` import. This DSL migration was
+  originally earmarked for part 3 but is mandatory here because the 2.3 compiler
+  makes the old form non-compiling.
+- **Instrumented UI tests under the Compose v2 testing APIs.** BOM 2026.04.01
+  enables the v2 testing APIs by default, switching the Compose test
+  dispatcher from `UnconfinedTestDispatcher` (eager) to `StandardTestDispatcher`
+  (queued). In `EntryListItemUiTest`, the two click tests asserted on a plain
+  counter immediately after `performClick()`; that read could now race the
+  queued click. The assertions are wrapped in `composeTestRule.runOnIdle { }`,
+  which drains the queue before reading. Node-based assertions
+  (`assertIsDisplayed()`) were left unchanged because finders synchronise
+  implicitly.
+- **Stale documentation.** The `libs.versions.toml` comment claiming KSP must
+  use the `<kotlin-version>-<ksp-patch>` format and "must exactly match the
+  Kotlin version" was corrected to describe the decoupled scheme.
+
+### Notes
+
+- Building part 1 on AGP 8.13.2 emits a deprecation warning about the
+  `org.jetbrains.kotlin.android` plugin: from Kotlin 2.3.0 onward the plugin is
+  redundant on AGP versions that ship built-in Kotlin. This is expected and is
+  resolved in part 2; it is a warning, not an error, on AGP 8.x.
+- Room (2.7.1) and SQLite (2.4.0) are unchanged and run on KSP 2.3.7. A full
+  compile + `connectedDebugAndroidTest` on the target toolchain is the
+  authoritative verification step for this part.
+
+### Changed (part 2 — build system)
+
+- **Gradle 8.14.5 → 9.4.1.** Mandatory lock-step partner for AGP 9: moving from
+  AGP 8.x to 9.x requires a Gradle 8.x → 9.x major upgrade that cannot be
+  bypassed. 9.4.1 is the version Google's current AGP setup guide recommends.
+- **AGP 8.13.2 → 9.2.0.** Major upgrade. JDK 17+ (we use 21) and compileSdk up
+  to API 36.1 (we use 36) are satisfied.
+- **Adopted AGP 9 built-in Kotlin; removed the `kotlin-android` plugin.** AGP 9
+  compiles Kotlin itself, so `org.jetbrains.kotlin.android` is no longer applied
+  (app and root) nor declared in the version catalog. Keeping it under AGP 9
+  would be a hard error (duplicate `kotlin` extension), not just a warning —
+  this resolves the deprecation warning noted for part 1.
+- **Pinned the built-in Kotlin compiler to 2.3.21 via a buildscript override.**
+  AGP 9 bundles KGP 2.2.10 as a floor. To keep the 2.3.21 compiler established
+  in part 1 (the Compose/serialization plugins and test libraries are aligned to
+  it), the root `build.gradle.kts` adds the officially documented override
+  `buildscript { dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21") } }`.
+  The Compose, serialization and KSP plugins continue to be applied via the
+  version catalog and are unchanged.
+- **Fixed AGP 9 source-set deprecation.** The first green AGP 9 build emitted
+  `'fun srcDirs(...)' is deprecated. Use 'directories' mutable set instead`.
+  The androidTest schema-assets line was migrated from
+  `assets.srcDirs(files("$projectDir/schemas"))` to
+  `assets.directories += "$projectDir/schemas"`. Same resolved location, AGP 9
+  DSL. (The build also logs an informational note that `libsqlcipher.so` and two
+  other prebuilt native libraries cannot be stripped of debug symbols; that is
+  expected and requires no change.)
+
+### Notes (part 2)
+
+- The buildscript Kotlin pin is a hard-coded literal because a Gradle
+  `buildscript` block cannot read the version catalog. It must be kept in sync
+  with `kotlin` in `libs.versions.toml` on every future Kotlin bump; both spots
+  carry a comment to that effect.
+- KGP 2.3.21 is officially fully tested with Gradle only up to 9.3.0, so on
+  9.4.1 benign Kotlin deprecation warnings are possible. Dropping the wrapper to
+  9.3.0 would avoid them if AGP 9.2 accepts it; 9.4.1 was chosen to match
+  Google's recommendation.
+- KSP (2.3.7) is applied via the plugins block as before. Because 2.3.7 is above
+  AGP's built-in KSP floor it is not force-upgraded; if a build ever reports a
+  KGP/KSP mismatch, add the commented KSP `classpath(...)` line provided in the
+  root `build.gradle.kts`.
+- `android.builtInKotlin=false` is deliberately NOT set: built-in Kotlin is
+  adopted, not opted out of (the opt-out is removed in AGP 10, mid-2026).
+- No use of the removed AGP 9 variant APIs (`applicationVariants`, etc.) was
+  found, so no DSL changes were required to configure under AGP 9. As always, a
+  full compile + `connectedDebugAndroidTest` on the target toolchain is the
+  authoritative verification step.
+
+### Changed (SQLCipher migration — 16 KB page-size compliance)
+
+- **`net.zetetic:android-database-sqlcipher:4.5.4` → `net.zetetic:sqlcipher-android:4.10.0`.**
+  The old artifact was deprecated in 2022 and reached end-of-life in 2023; its
+  native libraries are not built for 16 KB memory pages. Android 15+ devices can
+  run with 16 KB pages and Google Play requires 16 KB support for apps targeting
+  Android 15+, so the unaligned `libsqlcipher.so` (flagged by the strip step in
+  the build log) is a real runtime/release risk. The maintained replacement
+  `sqlcipher-android` ships 16 KB-aligned libraries (since 4.6.1).
+- **`AppDatabase.kt` adapted to the new API.** The package moved from
+  `net.sqlcipher.database` to `net.zetetic.database.sqlcipher`, and the Room
+  integration class changed from `SupportFactory` to `SupportOpenHelperFactory`
+  (same constructor: a passphrase `ByteArray`, zeroed immediately after). The
+  new library also requires the native library to be loaded explicitly, so
+  `System.loadLibrary("sqlcipher")` is called once before the factory is built.
+  No schema, passphrase, or Keystore logic changed, so existing encrypted
+  databases open unchanged.
+- **Instrumented test (`MigrationTest.kt`) migrated too.** It also used the old
+  `net.sqlcipher.database.SupportFactory`. Switched to `SupportOpenHelperFactory`
+  with `System.loadLibrary("sqlcipher")` in the companion `init`. IMPORTANT
+  semantic change: the old `SupportFactory(passphrase, hook, clearPassphrase)`
+  third argument was `clearPassphrase` (the test passed `false` to keep the
+  passphrase reusable across multiple opens); the new
+  `SupportOpenHelperFactory(passphrase, hook, enableWriteAheadLogging)` third
+  argument is unrelated (WAL). The new library has no passphrase-clearing toggle
+  and does not zero the passphrase, so the single-argument constructor is now
+  used and is safe across the test's repeated opens.
+
+### Notes (SQLCipher migration)
+
+- `androidx.sqlite` is deliberately left at 2.4.0 to keep this step a focused
+  artifact swap. Newer `sqlcipher-android` releases (4.15.0) are paired with
+  `androidx.sqlite` 2.6.2; raising both together is deferred to the optional
+  dependency-freshening step. If the build reports a `SupportSQLiteOpenHelper`
+  API mismatch, bump `sqlite` alongside.
+- If Gradle fails to resolve the native AAR, append `@aar` to the `sqlcipher`
+  library coordinate (a comment in `libs.versions.toml` notes this).
+- Verification is necessarily on-device: a `connectedDebugAndroidTest` run
+  (which exercises the encrypted Room database and the migration test) confirms
+  the native library loads and decryption still works.
+
+### Changed (part 3 — hygiene)
+
+- **Consolidated inline-pinned dependency versions into the version catalog.**
+  Eight dependencies were previously declared as string literals in
+  `app/build.gradle.kts` (`androidx.tracing`, `junit`, `kotlin-test`,
+  `kotlinx-coroutines-test`, `turbine`, `org.json`, `androidx.test:runner`,
+  `espresso-core`). They now live in `gradle/libs.versions.toml` and are
+  referenced via `libs.*` accessors. Resolved versions are unchanged, so this is
+  behaviour-neutral; the per-dependency rationale comments stay at the usage
+  site. `kotlin-test` now references the `kotlin` version (`version.ref`), so it
+  can no longer drift from the compiler version.
+- **Removed the obsolete `android.suppressUnsupportedCompileSdk=36` flag.** It
+  silenced an "untested compileSdk" warning that no longer applies: AGP 9.2
+  officially supports compileSdk up to API 36.1, and the project uses 36.
+
+### Notes (part 3)
+
+- This step touches only `gradle.properties`, the version catalog and dependency
+  declarations; no source code changes. It is behaviour-neutral and should not
+  alter the build graph beyond removing the (now unnecessary) warning
+  suppression.
+- The Gradle configuration cache (suggested by the build output) is intentionally
+  not enabled here. It can surface incompatibilities (e.g. with the buildscript
+  Kotlin override, KSP, or Room) and is best introduced as its own isolated,
+  separately-tested change.
+
+### Changed (dependency freshening — AndroidX core)
+
+- **core-ktx 1.13.1 → 1.18.0**, **activity-compose 1.9.0 → 1.12.3**,
+  **lifecycle 2.8.2 → 2.10.0** (current stable as of mid-2026). These were a year
+  or more behind the SDK-36 / Kotlin-2.3 / Compose-1.11 baseline. Verified against
+  the official AndroidX release notes; pre-release versions were deliberately
+  avoided (core 1.19, lifecycle 2.11 are still rc/beta).
+- **navigation-compose kept at 2.8.9.** androidx.navigation 2.9.x is still in
+  alpha, so 2.8.9 is the current stable — no bump warranted. (Not to be confused
+  with the JetBrains `org.jetbrains.androidx.navigation` 2.9.x KMP fork, which is
+  a different artifact.)
+
+### Notes (dependency freshening)
+
+- This is a pure version bump in the catalog; no source changes. Still, it crosses
+  real minor versions (notably lifecycle 2.9's Kotlin-Multiplatform repackaging),
+  so it must be built and instrument-tested. The APIs this app uses
+  (`collectAsStateWithLifecycle`, `viewModel()`, `setContent`) are unchanged.
+- activity-compose and lifecycle were bumped together on purpose: activity 1.12
+  depends transitively on a recent lifecycle, so pinning lifecycle to 2.10.0 keeps
+  the catalog's declared version aligned with what actually resolves.
+- Other explicitly-versioned libraries were left as-is: appcompat 1.7.0 and
+  biometric 1.1.0 are the current stables; Room 2.7.1, DataStore 1.1.1 and the
+  SQLCipher/SQLite pair are working and were out of scope here. Raising the
+  SQLCipher/SQLite pair to the very latest (`sqlcipher-android` 4.15.0 +
+  `androidx.sqlite` 2.6.2) remains available as a separate, coordinated change.
+
+### Changed (SQLCipher / SQLite / Room currency)
+
+- **sqlcipher-android 4.10.0 → 4.15.0**, **androidx.sqlite 2.4.0 → 2.6.2**,
+  **Room 2.7.1 → 2.8.4** — bumped together as one coordinated set. 2.6.2 is the
+  androidx.sqlite version Google documents for Room 2.8.4 and Zetetic documents
+  for sqlcipher-android 4.15.0, so the three move in lockstep to avoid a
+  Room ↔ androidx.sqlite binary-compatibility skew.
+- **Removed the `room-ktx` dependency and catalog entry.** As of Room 2.8 the
+  room-ktx APIs (coroutine/Flow support, suspend DAOs) are merged into
+  room-runtime and the standalone artifact is empty. No code change is needed —
+  the same APIs now resolve from room-runtime.
+- **Corrected a stale comment** in `app/build.gradle.kts` that still referred to
+  the old `SupportFactory` and an `@aar` classifier; it now describes
+  `SupportOpenHelperFactory` and the explicit `System.loadLibrary` step.
+
+### Notes (SQLCipher / SQLite / Room currency)
+
+- Room 2.8.x is the final Room 2.x line (maintenance mode); Room 3.0 is a
+  separate package (`androidx.room3`) and is deliberately not adopted. 2.8.x
+  retains the SupportSQLite APIs, so the SQLCipher `SupportOpenHelperFactory`
+  integration in `AppDatabase` and `MigrationTest` works unchanged.
+- This crosses a Room minor version and the androidx.sqlite 2.5→2.6 line, so it
+  must be built and instrument-tested. The migration test (which opens the
+  encrypted DB through SQLCipher and validates the Room schema migration) is the
+  key check. No schema, DAO, entity, passphrase or Keystore code changed.
+- Verified against the official Room and sqlcipher-android documentation; no
+  pre-release versions were used.
+
+### Changed (Compose v2 test rule)
+
+- **`EntryListItemUiTest` now uses the v2 `createAndroidComposeRule`.** Since
+  Compose 1.11 (Compose BOM 2026.04.01, adopted in part 1) the v1 test
+  environment factories are deprecated in favour of the
+  `androidx.compose.ui.test.junit4.v2` package. Only the import changed: the v2
+  factories are the sole part of the testing surface that moved, while the
+  finders, actions, `setContent` and `runOnIdle` stay on their existing APIs. The
+  v2 environment runs composition on a StandardTestDispatcher; the
+  recomposition-dependent assertions were already wrapped in `runOnIdle {}` in
+  part 1, so no test logic needed to change.
+
+### Fixed (false "Settings not restored?" on first install)
+
+- **The device-transfer warning no longer fires on a genuine first install.**
+  Previously the warning was driven by a heuristic — install younger than 15
+  minutes AND `language` empty AND `weightKg == 0.0` — and a fresh install
+  satisfies all three, so every first launch showed "Settings not restored?".
+  The check now uses an authoritative signal instead: a sealed passphrase
+  envelope is *present* in storage (restored from an Android backup) but cannot
+  be *decrypted* with this device's Keystore key — the actual signature of a
+  transfer where the hardware-bound key did not migrate. A first install has no
+  envelope at all, so the warning stays silent.
+- **Implementation.** `AppDatabase` gains two read-only probes,
+  `hasSealedPassphrase()` and `canOpenSealedPassphrase()` (the latter attempts
+  `KeystoreSecretStore.open` and returns false on `GeneralSecurityException` /
+  malformed blob, zeroing the plaintext). `PotillusApp.checkForDeviceTransferFailure()`
+  consumes them; the pure decision `shouldWarnDeviceTransfer(present, decryptable)`
+  is `present && !decryptable`. The install-recency window (`INSTALL_RECENCY_MS`)
+  and the settings-based heuristic are removed, and `onCreate` no longer needs the
+  pre-write settings snapshot for this check.
+- **Tests.** `PotillusAppHeuristicTest` was rewritten to lock in the new truth
+  table (present+undecryptable → warn; absent → silent; present+decryptable →
+  silent). It remains a pure JVM test.
+- **Display language unchanged but worth noting:** the dialog is shown via
+  `stringResource`, i.e. resolved against the system/configuration locale. That is
+  the correct behaviour here, because in the failure scenario the user's stored
+  language preference lives in the encrypted store that cannot be read. The
+  message strings are currently English in every locale (translation is tracked
+  separately).
+
+---
+
 ## v0.58.0
 
 Added a localized, build-time-templated in-app user guide system and an

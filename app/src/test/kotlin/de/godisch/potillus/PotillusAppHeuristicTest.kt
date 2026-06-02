@@ -22,20 +22,23 @@
 package de.godisch.potillus
 
 // =============================================================================
-// PotillusAppHeuristicTest.kt — device-transfer heuristic (pure JVM)
+// PotillusAppHeuristicTest.kt — device-transfer decision (pure JVM)
 // =============================================================================
 //
-// These tests exercise the pure decision function PotillusApp.shouldWarnDeviceTransfer
-// extracted for testability. Because the function is side-effect-free arithmetic over a
-// Long/Long/String/Double, it needs no Android Context and no Application instance,
-// so it runs in the fast JVM unit-test executor (./gradlew :app:test).
+// These tests exercise the pure decision function PotillusApp.shouldWarnDeviceTransfer,
+// extracted for testability. It is side-effect-free boolean logic over two flags,
+// so it needs no Android Context and no Application instance and runs in the fast
+// JVM unit-test executor (./gradlew :app:test).
 //
 // WHAT IT GUARDS
-//   The combined condition (recent install AND empty language AND unset weight)
-//   used to be evaluated AFTER applyLanguageOnFirstLaunch() had already written a
-//   language, so language.isEmpty() was effectively always false and the warning
-//   never fired. The fix reads the settings snapshot before that write; these tests
-//   lock in the truth table so the heuristic cannot silently regress again.
+//   The warning must fire ONLY for a real device transfer in which the Keystore
+//   key did not migrate: a sealed passphrase envelope is present (restored from
+//   backup) but cannot be decrypted. It must NOT fire on a genuine first install
+//   (no envelope at all) — the previous install-age/default-values heuristic did,
+//   producing a spurious "Settings not restored?" on every fresh install. These
+//   tests lock in the truth table so that regression cannot return.
+//   The two input flags are produced at runtime by AppDatabase.hasSealedPassphrase
+//   and AppDatabase.canOpenSealedPassphrase.
 // =============================================================================
 
 import org.junit.Assert.assertFalse
@@ -44,63 +47,41 @@ import org.junit.Test
 
 class PotillusAppHeuristicTest {
 
-    private val window = 15L * 60 * 1_000   // mirror INSTALL_RECENCY_MS (15 min)
-
     @Test
-    fun `warns when install is recent and DataStore is at defaults`() {
+    fun `warns when an envelope is present but cannot be decrypted`() {
+        // Device transfer: SharedPreferences envelope restored, Keystore key gone.
         assertTrue(
             PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = 60_000L, recencyWindowMs = window, language = "", weightKg = 0.0
+                sealedEnvelopePresent = true, passphraseDecryptable = false
             )
         )
     }
 
     @Test
-    fun `does not warn when a language has already been chosen`() {
+    fun `does not warn on a genuine first install (no envelope)`() {
         assertFalse(
             PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = 60_000L, recencyWindowMs = window, language = "de", weightKg = 0.0
+                sealedEnvelopePresent = false, passphraseDecryptable = false
             )
         )
     }
 
     @Test
-    fun `does not warn when a body weight has been set`() {
+    fun `does not warn in the normal case (envelope present and decryptable)`() {
         assertFalse(
             PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = 60_000L, recencyWindowMs = window, language = "", weightKg = 72.0
+                sealedEnvelopePresent = true, passphraseDecryptable = true
             )
         )
     }
 
     @Test
-    fun `does not warn when the install is older than the recency window`() {
+    fun `does not warn for the impossible absent-but-decryptable state`() {
+        // Cannot occur in practice (nothing to decrypt when absent), but the pure
+        // function must still be safe: absence dominates.
         assertFalse(
             PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = window + 1, recencyWindowMs = window, language = "", weightKg = 0.0
-            )
-        )
-    }
-
-    @Test
-    fun `does not warn on a negative install age (clock skew)`() {
-        assertFalse(
-            PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = -1L, recencyWindowMs = window, language = "", weightKg = 0.0
-            )
-        )
-    }
-
-    @Test
-    fun `warns at the exact window boundary and at age zero`() {
-        assertTrue(
-            PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = window, recencyWindowMs = window, language = "", weightKg = 0.0
-            )
-        )
-        assertTrue(
-            PotillusApp.shouldWarnDeviceTransfer(
-                installAgeMs = 0L, recencyWindowMs = window, language = "", weightKg = 0.0
+                sealedEnvelopePresent = false, passphraseDecryptable = true
             )
         )
     }

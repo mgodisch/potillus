@@ -33,7 +33,8 @@ import de.godisch.potillus.data.db.entity.EntryEntity
 import de.godisch.potillus.data.security.KeystoreSecretStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.security.GeneralSecurityException
 import java.security.SecureRandom
 
 // =============================================================================
@@ -120,6 +121,50 @@ abstract class AppDatabase : RoomDatabase() {
         private val passphraseStore = KeystoreSecretStore(PASSPHRASE_KEY_ALIAS)
 
         /**
+         * Whether a sealed passphrase envelope is currently persisted.
+         *
+         * `false` means none has ever been written — i.e. a genuine first install
+         * (or freshly cleared data). `true` means a previous run, or an Android
+         * backup/device-transfer restore, left an envelope behind.
+         *
+         * Read-only: this never generates, seals, or persists anything.
+         */
+        fun hasSealedPassphrase(context: Context): Boolean =
+            context.getSharedPreferences(PASSPHRASE_PREFS, Context.MODE_PRIVATE)
+                .getString(PASSPHRASE_KEY, null) != null
+
+        /**
+         * Whether the persisted passphrase envelope can actually be decrypted with
+         * this device's Keystore key.
+         *
+         * Returns `false` when there is no envelope (first install) OR when an
+         * envelope exists but cannot be opened. The latter is the signature of a
+         * device transfer where the hardware-bound Keystore key did not migrate:
+         * the SharedPreferences envelope was restored from backup, but the key to
+         * open it is gone, so [KeystoreSecretStore.open] throws.
+         *
+         * Combined with [hasSealedPassphrase], the caller can distinguish the two
+         * `false` cases — see [PotillusApp.shouldWarnDeviceTransfer].
+         *
+         * Read-only probe: the decrypted bytes are zeroed immediately and nothing
+         * is persisted. (Opening does lazily create the Keystore key if it is
+         * absent, exactly as the normal open path does; this has no observable
+         * effect on the stored envelope.)
+         */
+        fun canOpenSealedPassphrase(context: Context): Boolean {
+            val prefs = context.getSharedPreferences(PASSPHRASE_PREFS, Context.MODE_PRIVATE)
+            val storedB64 = prefs.getString(PASSPHRASE_KEY, null) ?: return false
+            return try {
+                passphraseStore.open(Base64.decode(storedB64, Base64.NO_WRAP)).fill(0)
+                true
+            } catch (_: GeneralSecurityException) {
+                false   // envelope present but undecryptable → Keystore key did not migrate
+            } catch (_: IllegalArgumentException) {
+                false   // malformed/truncated envelope (e.g. a partial restore)
+            }
+        }
+
+        /**
          * Retrieves the database passphrase, generating and persisting a new
          * 32-byte random value (sealed by the Android Keystore) if none exists.
          *
@@ -148,7 +193,7 @@ abstract class AppDatabase : RoomDatabase() {
          *
          * MEMORY HYGIENE:
          *   The returned [ByteArray] is zeroed by the caller immediately after
-         *   [SupportFactory] has consumed it, so the plaintext passphrase has the
+         *   [SupportOpenHelperFactory] has consumed it, so the plaintext passphrase has the
          *   shortest possible lifetime in the JVM heap.
          */
         private fun getOrCreatePassphrase(context: Context): ByteArray {
@@ -195,11 +240,11 @@ abstract class AppDatabase : RoomDatabase() {
          * every call while remaining thread-safe on first creation.
          *
          * ENCRYPTION:
-         *   A [SupportFactory] is constructed from the Keystore-backed passphrase
+         *   A [SupportOpenHelperFactory] is constructed from the Keystore-backed passphrase
          *   and passed to [Room.databaseBuilder]. Every read and write from that
          *   point is transparently encrypted with SQLCipher (AES-256-CBC + HMAC-SHA1
          *   page authentication). The passphrase byte array is zeroed immediately
-         *   after [SupportFactory] receives it.
+         *   after [SupportOpenHelperFactory] receives it.
          *
          * @param context          Application context – must be the application context
          *                         (not an Activity context) to avoid a memory leak.
@@ -209,8 +254,13 @@ abstract class AppDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: run {
                     val passphrase = getOrCreatePassphrase(context.applicationContext)
-                    val factory    = SupportFactory(passphrase)
-                    passphrase.fill(0)   // zero our copy; SupportFactory holds its own
+                    // sqlcipher-android requires the native library to be loaded
+                    // explicitly before first use (the old android-database-sqlcipher
+                    // did this implicitly). System.loadLibrary is idempotent, and
+                    // getInstance's run{} block executes only once for the singleton.
+                    System.loadLibrary("sqlcipher")
+                    val factory    = SupportOpenHelperFactory(passphrase)
+                    passphrase.fill(0)   // zero our copy; the factory holds its own
 
                     Room.databaseBuilder(
                         context.applicationContext,
