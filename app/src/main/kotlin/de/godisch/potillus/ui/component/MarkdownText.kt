@@ -99,7 +99,10 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // paragraph into a single, screen-wrapped string.
                     text = renderInline(block.replace(Regex("\\s*\\R\\s*"), " ").trim()),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    // 12.dp leaves a clear blank-line gap between paragraphs (the
+                    // source separates them with a blank line); a touch more than
+                    // the previous 8.dp without being a full empty text line.
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
         }

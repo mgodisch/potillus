@@ -22,6 +22,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
 
+**v0.60.0**
+
 Libellus Potionis is your digital probation officer for alcohol consumption.
 Libellus Potionis is a privacy-friendly, free, open-source, and ad-free app. It
 requires no access to your smartphone's camera, microphone, location, or

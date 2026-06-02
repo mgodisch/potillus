@@ -132,6 +132,16 @@ object AlcoholCalculator {
      */
     private fun Double.roundTo2Decimals(): Double = (this * 100.0).roundToLong() / 100.0
 
+    /**
+     * Rounds a [Double] to one decimal place (0.1 g).
+     *
+     * Used for alcohol gram values. One decimal is the precision the UI displays
+     * ("20.0 g") AND the precision every daily-limit / binge comparison uses, so
+     * the number a user sees is exactly the number that is compared against the
+     * limit. See [calculateGrams] for why this matters.
+     */
+    private fun Double.roundTo1Decimal(): Double = (this * 10.0).roundToLong() / 10.0
+
     // ── Public functions ──────────────────────────────────────────────────────
 
     /**
@@ -139,16 +149,21 @@ object AlcoholCalculator {
      *
      * Formula: g = V [ml] × (p [%] ÷ 100) × 0.789 [g/ml]
      *
-     * The result is rounded to two decimal places and stored in the database
-     * so that aggregate SUM() queries are numerically stable.
+     * The result is rounded to ONE decimal place (0.1 g). This is deliberate and
+     * fixes a visible inconsistency: the UI shows grams with one decimal (e.g.
+     * "20.0 g"), but the daily-limit and binge checks compare the stored grams
+     * against the limit. With the previous two-decimal precision, 188 ml at 13.5 %
+     * stored 20.02 g, which displayed as "20.0 g" yet counted as over a 20 g limit
+     * — an exceedance the user could not see. Rounding to 0.1 g at the source means
+     * the displayed value and every comparison use exactly the same number.
      *
      * @param volumeMl       Volume of the drink in millilitres.
      * @param alcoholPercent Alcohol by volume (ABV) as a percentage, e.g. 4.9.
-     * @return               Grams of pure alcohol, rounded to 2 decimal places.
+     * @return               Grams of pure alcohol, rounded to one decimal place (0.1 g).
      */
     fun calculateGrams(volumeMl: Int, alcoholPercent: Double): Double {
         val rawGrams = volumeMl.toDouble() * (alcoholPercent / 100.0) * ETHANOL_DENSITY
-        return rawGrams.roundTo2Decimals()
+        return rawGrams.roundTo1Decimal()
     }
 
     /**

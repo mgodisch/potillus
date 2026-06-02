@@ -23,47 +23,55 @@ render-guide.py -- build-time renderer for the localized user guides.
 
 WHAT IT DOES
 ------------
-The user guides live as *templates* under ``docs/guide/usersguide.<lang>.md.in``.
-The prose in each template is already translated, but every on-screen name
-(screen titles, settings-section headers) is written as a ``{{key}}`` token
+The user guides live as *templates* under ``docs/guide/``: a code-less default
+``usersguide.md.in`` (English) and one ``usersguide.<tag>.md.in`` per translated
+language. The prose in each template is already translated, but every on-screen
+name (screen titles, settings-section headers) is written as a ``{{key}}`` token
 instead of a hard-coded word. This script resolves those tokens from the
-*matching* ``strings.xml`` of the app so the guides can never drift away from
-the labels the app actually shows.
+*matching* ``strings.xml`` so the guides can never drift from the labels the app
+actually shows.
 
-For every language it produces:
+LANGUAGE DISCOVERY (no hard-coded list)
+---------------------------------------
+The set of languages is discovered automatically from the template files present
+under ``docs/guide/``. The code-less ``usersguide.md.in`` is the default and
+feeds the unqualified ``values`` / ``raw`` resource directories. Each
+``usersguide.<tag>.md.in`` feeds ``values-<q>`` / ``raw-<q>``, where ``<q>`` is
+the Android resource qualifier for the BCP-47 tag: a bare language is unchanged
+(``de`` -> ``de``) and a region tag ``ll-RR`` becomes ``ll-rRR`` (``pt-BR`` ->
+``pt-rBR``). Adding a new ``usersguide.xx.md.in`` (with a matching ``values-xx``)
+is therefore picked up automatically -- no edit to this script needed.
 
-  * ``app/src/main/res/<raw_dir>/usersguide.md`` -- the in-app copy, with the
-    license-comment header stripped (so a Markdown viewer shows clean text).
-    Android resolves the locale-qualified ``raw``/``raw-xx`` directory the same
-    way it resolves ``values``/``values-xx``, so the running app picks the
-    guide for the active (per-app) language automatically.
-  * the repository copy at the project root (``USERSGUIDE.md`` /
-    ``USERSGUIDE-de.md``) -- only for English and German, and *with* the header
-    kept, because those two are the human-maintained GitHub-facing documents.
+OUTPUT & WHEN IT IS (RE)GENERATED
+---------------------------------
+For every language it writes ``app/src/main/res/<raw_dir>/usersguide.md`` -- the
+in-app copy, with the license-comment header stripped so a Markdown viewer shows
+clean text. Android resolves the locale-qualified ``raw``/``raw-xx`` directory
+the same way it resolves ``values``/``values-xx``, so the running app picks the
+guide for the active (per-app) language automatically.
 
-WHY A SEPARATE STEP (NOT GRADLE ``expand``)
--------------------------------------------
-Gradle's resource pipeline does not read values from ``strings.xml`` for us,
-and Markdown files are not processed by the Android toolchain at all. A small,
-self-contained generator invoked from the Makefile keeps the docs independent
-of the heavy Android build and makes the substitution logic explicit and
-testable.
+In normal (write) mode an output is regenerated only when it is missing or older
+than its inputs -- that is, when the template **or** the matching ``strings.xml``
+has a newer modification time than the existing ``usersguide.md``. ``--check``
+ignores timestamps and compares *content* (so CI fails whenever a committed guide
+would differ, regardless of file mtimes).
 
 TOKEN RESOLUTION & ANDROID ESCAPING
 -----------------------------------
 String values in ``strings.xml`` carry Android's own escaping on top of XML:
-an apostrophe is stored as ``\\'`` (e.g. French ``Aujourd\\'hui``), a quote as
-``\\"``, and a literal backslash as ``\\\\``. The XML parser resolves entities
-such as ``&amp;`` for us, but the Android-level backslash escapes must be undone
-here -- otherwise a stray backslash would leak into the rendered guide.
+an apostrophe is stored as ``\\'``, a quote as ``\\"``, and a literal backslash
+as ``\\\\``. The XML parser resolves entities such as ``&amp;`` for us, but the
+Android-level backslash escapes must be undone here.
 
 USAGE
 -----
-    python3 tools/render-guide.py            # write/refresh all outputs
-    python3 tools/render-guide.py --check     # verify outputs are up to date
-                                              # (exit 1 if anything would change)
+    python3 tools/render-guide.py            # write/refresh outputs whose
+                                             # template or strings.xml changed
+    python3 tools/render-guide.py --check    # verify outputs are up to date
+                                             # (exit 1 if anything would change)
 """
 
+import glob
 import os
 import re
 import sys
@@ -74,32 +82,43 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES  = os.path.join(ROOT, "app", "src", "main", "res")
 TPL  = os.path.join(ROOT, "docs", "guide")
 
-# (language tag, values dir, raw dir, repository-root output or None)
-#
-# English is the resource *default*, so it lives in the unqualified `values`
-# and `raw` directories. The remaining entries are the curated core set for
-# which a real, human-quality translation exists; every other supported
-# language deliberately has no `raw-xx`, so the app falls back to the English
-# guide via Android's normal resource resolution.
-LANGS = [
-    ("en",    "values",        "raw",        None),
-    ("de",    "values-de",     "raw-de",     None),
-    ("fr",    "values-fr",     "raw-fr",     None),
-    ("es",    "values-es",     "raw-es",     None),
-    ("it",    "values-it",     "raw-it",     None),
-    ("nl",    "values-nl",     "raw-nl",     None),
-    ("pt",    "values-pt",     "raw-pt",     None),
-    ("pt-BR", "values-pt-rBR", "raw-pt-rBR", None),
-    ("ru",    "values-ru",     "raw-ru",     None),
-    ("pl",    "values-pl",     "raw-pl",     None),
-    ("sv",    "values-sv",     "raw-sv",     None),
-    ("da",    "values-da",     "raw-da",     None),
-    ("nb",    "values-nb",     "raw-nb",     None),
-    ("cs",    "values-cs",     "raw-cs",     None),
-    ("la",    "values-la",     "raw-la",     None),
-]
-
 TOKEN_RE = re.compile(r"\{\{([a-z0-9_]+)\}\}")
+
+
+def android_qualifier(tag: str) -> str:
+    """Map a BCP-47-ish language tag to its Android resource qualifier.
+
+    A bare language ("de", "la") is returned unchanged; a language+region tag
+    ("pt-BR") becomes the Android form with the region marked by ``r``
+    ("pt-rBR"). This mirrors how ``values-xx`` / ``raw-xx`` directories are named.
+    """
+    parts = tag.split("-")
+    if len(parts) == 2:
+        return f"{parts[0]}-r{parts[1]}"
+    return tag
+
+
+def discover_languages():
+    """Discover guide templates and derive their resource directories.
+
+    Returns a list of ``(label, template_path, values_dir, raw_dir)`` sorted by
+    file name. The code-less ``usersguide.md.in`` yields the unqualified
+    ``values`` / ``raw`` directories (the English default); ``label`` is a human
+    string used only in messages.
+    """
+    langs = []
+    for path in sorted(glob.glob(os.path.join(TPL, "usersguide*.md.in"))):
+        name = os.path.basename(path)
+        # Strip the fixed prefix/suffix; what remains is ".<tag>" or "".
+        middle = name[len("usersguide"):-len(".md.in")]
+        tag = middle[1:] if middle.startswith(".") else ""
+        if tag:
+            q = android_qualifier(tag)
+            values_dir, raw_dir, label = f"values-{q}", f"raw-{q}", tag
+        else:
+            values_dir, raw_dir, label = "values", "raw", "en (default)"
+        langs.append((label, path, values_dir, raw_dir))
+    return langs
 
 
 def unescape_android(value: str) -> str:
@@ -139,31 +158,13 @@ def strip_header(text: str) -> str:
     return text.lstrip("\n")
 
 
-def banner_after_header(text: str, lang: str) -> str:
-    """Insert a 'generated file' banner right after the license header.
-
-    Used only for the repository-root copies so a maintainer who opens
-    ``USERSGUIDE.md`` is told to edit the template instead. The in-app ``raw``
-    copies are left banner-free for the cleanest possible on-device rendering.
-    """
-    note = (
-        f"<!-- GENERATED FILE -- do not edit. "
-        f"Source: docs/guide/usersguide.{lang}.md.in (run `make guides`). -->"
-    )
-    end = text.find("-->")
-    if text.lstrip().startswith("<!--") and end != -1:
-        head, tail = text[: end + 3], text[end + 3:]
-        return f"{head}\n\n{note}{tail}"
-    return f"{note}\n\n{text}"
-
-
-def render(template_text: str, strings: dict, lang: str) -> str:
+def render(template_text: str, strings: dict, label: str) -> str:
     """Replace every ``{{key}}`` with the matching, unescaped string value."""
     def repl(m):
         key = m.group(1)
         if key not in strings:
             sys.exit(
-                f"render-guide: [{lang}] unknown string key '{{{{{key}}}}}'. "
+                f"render-guide: [{label}] unknown string key '{{{{{key}}}}}'. "
                 f"Add <string name=\"{key}\"> to the locale or fix the template."
             )
         return strings[key]
@@ -192,28 +193,35 @@ def write_if_changed(path: str, content: str, check_only: bool) -> bool:
 
 def main() -> int:
     check_only = "--check" in sys.argv[1:]
-    stale = []
 
-    for lang, values_dir, raw_dir, root_out in LANGS:
-        tpl_path = os.path.join(TPL, f"usersguide.{lang}.md.in")
-        if not os.path.exists(tpl_path):
-            sys.exit(f"render-guide: missing template {tpl_path}")
+    langs = discover_languages()
+    if not langs:
+        sys.exit(f"render-guide: no usersguide*.md.in templates found under {TPL}")
+
+    stale = []
+    skipped = 0
+    for label, tpl_path, values_dir, raw_dir in langs:
+        strings_path = os.path.join(RES, values_dir, "strings.xml")
+        if not os.path.exists(strings_path):
+            sys.exit(f"render-guide: [{label}] missing {strings_path}")
+        out_path = os.path.join(RES, raw_dir, "usersguide.md")
+
+        # Write mode: regenerate only when the output is missing or older than
+        # its inputs (template OR strings.xml). --check ignores timestamps and
+        # always compares content below.
+        if not check_only and os.path.exists(out_path):
+            newest_src = max(os.path.getmtime(tpl_path), os.path.getmtime(strings_path))
+            if os.path.getmtime(out_path) >= newest_src:
+                skipped += 1
+                continue
+
         with open(tpl_path, encoding="utf-8") as fh:
             template_text = fh.read()
-
         strings = load_strings(values_dir)
-        rendered = render(template_text, strings, lang)
+        rendered = strip_header(render(template_text, strings, label))
 
-        # In-app copy: header stripped, under res/<raw_dir>/usersguide.md
-        raw_path = os.path.join(RES, raw_dir, "usersguide.md")
-        if write_if_changed(raw_path, strip_header(rendered), check_only):
-            stale.append(os.path.relpath(raw_path, ROOT))
-
-        # Repository copy (English + German only): header kept + generated banner.
-        if root_out:
-            root_path = os.path.join(ROOT, root_out)
-            if write_if_changed(root_path, banner_after_header(rendered, lang), check_only):
-                stale.append(root_out)
+        if write_if_changed(out_path, rendered, check_only):
+            stale.append(os.path.relpath(out_path, ROOT))
 
     if check_only:
         if stale:
@@ -223,7 +231,7 @@ def main() -> int:
                 + "Run `make guides` and commit the result.\n"
             )
             return 1
-        print("render-guide: all guides up to date.")
+        print(f"render-guide: all {len(langs)} guides up to date.")
         return 0
 
     if stale:
@@ -231,7 +239,7 @@ def main() -> int:
         for p in stale:
             print(f"  {p}")
     else:
-        print("render-guide: nothing to do (all guides already current).")
+        print(f"render-guide: nothing to do ({skipped} guides already current).")
     return 0
 
 

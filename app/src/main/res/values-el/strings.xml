@@ -155,8 +155,8 @@
     <string name="drink_days_label">μέρες κατανάλωσης αυτή την εβδομάδα</string>
     <string name="drink_days_setting">Μέγ. μέρες/εβδ.</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Δεν έγινε επαναφορά των ρυθμίσεων;</string>
+    <string name="device_transfer_warning_body">Οι ρυθμίσεις και τα δεδομένα δεν ήταν δυνατό να επαναφερθούν πλήρως από την προηγούμενη συσκευή. Αυτό μπορεί να συμβεί όταν δεν είναι δυνατή η μεταφορά των κρυπτογραφημένων κλειδιών.\n\nΑν πρόκειται για νέα εγκατάσταση, αυτό το μήνυμα μπορεί να αγνοηθεί. Διαφορετικά, εισαγάγετε ξανά το αντίγραφο ασφαλείας από Ρυθμίσεις → Επαναφορά αντιγράφου ασφαλείας.</string>
     <string name="personal_data">Προσωπικά δεδομένα</string>
     <string name="week_starts_on">Η εβδομάδα αρχίζει</string>
     <string name="limits">Όρια</string>

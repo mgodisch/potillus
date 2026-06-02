@@ -155,8 +155,8 @@
     <string name="drink_days_label">drikkdage denne uge</string>
     <string name="drink_days_setting">Maks. drikkdage/uge</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Indstillinger ikke gendannet?</string>
+    <string name="device_transfer_warning_body">Indstillingerne og dataene kunne ikke gendannes helt fra den forrige enhed. Det kan ske, når krypterede nøgler ikke kan overføres.\n\nHvis dette er en ny installation, kan meddelelsen ignoreres. Ellers skal sikkerhedskopien importeres igen via Indstillinger → Gendan sikkerhedskopi.</string>
     <string name="personal_data">Personlige data</string>
     <string name="week_starts_on">Ugen starter på</string>
     <string name="limits">Grænser</string>

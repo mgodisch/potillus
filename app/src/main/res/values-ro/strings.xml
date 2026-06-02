@@ -206,8 +206,8 @@
     <string name="drink_days_label">zile de băut săptămâna aceasta</string>
     <string name="drink_days_setting">Max. zile de băut/săptămână</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Setările nu au fost restaurate?</string>
+    <string name="device_transfer_warning_body">Setările și datele nu au putut fi restaurate complet de pe dispozitivul anterior. Acest lucru se poate întâmpla când cheile criptate nu pot fi transferate.\n\nDacă este o instalare nouă, acest mesaj poate fi ignorat. În caz contrar, reimportați copia de rezervă din Setări → Restaurează backupul.</string>
     <string name="personal_data">Date personale</string>
     <string name="week_starts_on">Săptămâna începe</string>
     <string name="limits">Limite</string>

@@ -21,7 +21,10 @@
 package de.godisch.potillus.ui.component
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -93,6 +96,7 @@ fun AppOverflowMenu(
         // is already dismissed by the time the destination is pushed.
         DropdownMenuItem(
             text = { Text(stringResource(R.string.settings)) },
+            leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenSettings()
@@ -100,6 +104,7 @@ fun AppOverflowMenu(
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.help)) },
+            leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenHelp()
@@ -107,6 +112,7 @@ fun AppOverflowMenu(
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.license)) },
+            leadingIcon = { Icon(Icons.Filled.Gavel, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenLicense()

@@ -204,8 +204,8 @@
     <string name="drink_days_label">本週飲酒日數</string>
     <string name="drink_days_setting">每週最多飲酒日數</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">設定未還原？</string>
+    <string name="device_transfer_warning_body">無法從上一部裝置完整還原設定與資料。當加密金鑰無法轉移時，可能會發生這種情況。\n\n如果這是全新安裝，可以忽略此訊息。否則，請透過 設定 → 還原備份 重新匯入備份。</string>
     <string name="personal_data">個人資料</string>
     <string name="week_starts_on">一週開始於</string>
     <string name="limits">上限</string>

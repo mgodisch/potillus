@@ -206,8 +206,8 @@
     <string name="drink_days_label">ivónapok ezen a héten</string>
     <string name="drink_days_setting">Max. ivónapok/hét</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">A beállítások nem álltak vissza?</string>
+    <string name="device_transfer_warning_body">A beállításokat és az adatokat nem sikerült teljesen visszaállítani az előző eszközről. Ez akkor fordulhat elő, ha a titkosított kulcsok nem vihetők át.\n\nHa ez új telepítés, ez az üzenet figyelmen kívül hagyható. Ellenkező esetben importálja újra a biztonsági mentést a következő helyen: Beállítások → Biztonsági mentés visszaállítása.</string>
     <string name="personal_data">Személyes adatok</string>
     <string name="week_starts_on">A hét kezdőnapja</string>
     <string name="limits">Korlátok</string>

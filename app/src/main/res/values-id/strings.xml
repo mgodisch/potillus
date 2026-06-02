@@ -203,8 +203,8 @@
     <string name="drink_days_label">Hari minum minggu ini</string>
     <string name="drink_days_setting">Maks. hari minum/minggu</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Pengaturan tidak dipulihkan?</string>
+    <string name="device_transfer_warning_body">Pengaturan dan data tidak dapat dipulihkan sepenuhnya dari perangkat sebelumnya. Ini bisa terjadi ketika kunci terenkripsi tidak dapat ditransfer.\n\nJika ini pemasangan baru, pesan ini dapat diabaikan. Jika tidak, impor ulang cadangan melalui Pengaturan → Pulihkan cadangan.</string>
     <string name="personal_data">Data pribadi</string>
     <string name="week_starts_on">Minggu dimulai pada</string>
     <string name="limits">Batas</string>

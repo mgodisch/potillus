@@ -31,26 +31,34 @@ class AlcoholCalculatorTest {
 
     @Test fun `calculateGrams Pils 500ml 4_9pct`() {
         val result = AlcoholCalculator.calculateGrams(500, 4.9)
-        assertEquals(19.32, result, 0.01)
+        assertEquals(19.3, result, 0.001)
     }
 
     @Test fun `calculateGrams Rotwein 200ml 13pct`() {
         val result = AlcoholCalculator.calculateGrams(200, 13.0)
-        assertEquals(20.51, result, 0.01)
+        assertEquals(20.5, result, 0.001)
     }
 
     @Test fun `calculateGrams Whisky 40ml 40pct`() {
         val result = AlcoholCalculator.calculateGrams(40, 40.0)
-        assertEquals(12.62, result, 0.01)
+        assertEquals(12.6, result, 0.001)
     }
 
     @Test fun `calculateGrams alkoholfrei returns zero`() {
         assertEquals(0.0, AlcoholCalculator.calculateGrams(500, 0.0), 0.0)
     }
 
-    @Test fun `calculateGrams rounds to two decimals`() {
+    @Test fun `calculateGrams rounds to one decimal`() {
         val result = AlcoholCalculator.calculateGrams(330, 4.9)
-        assertTrue("Result must have ≤ 2 decimal places", result == Math.round(result * 100.0) / 100.0)
+        assertTrue("Result must have ≤ 1 decimal place", result == Math.round(result * 10.0) / 10.0)
+    }
+
+    @Test fun `calculateGrams 188ml 13_5pct is 20_0 g (not over a 20 g limit)`() {
+        // Regression: 188 × 0.135 × 0.789 = 20.024 g. Previously stored as 20.02
+        // and displayed as "20.0 g", yet counted as over a 20 g limit. With 0.1 g
+        // rounding it is 20.0 g, matching the display and the limit comparison.
+        val result = AlcoholCalculator.calculateGrams(188, 13.5)
+        assertEquals(20.0, result, 0.001)
     }
 
     // ── calculateBAC (Widmark) ─────────────────────────────────────────────────

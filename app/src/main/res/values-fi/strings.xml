@@ -206,8 +206,8 @@
     <string name="drink_days_label">juomapäivät tällä viikolla</string>
     <string name="drink_days_setting">Maks. juomapäivät/viikko</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Asetuksia ei palautettu?</string>
+    <string name="device_transfer_warning_body">Asetuksia ja tietoja ei voitu palauttaa kokonaan edellisestä laitteesta. Näin voi käydä, kun salattuja avaimia ei voida siirtää.\n\nJos kyseessä on uusi asennus, tämän viestin voi ohittaa. Muussa tapauksessa tuo varmuuskopio uudelleen kohdasta Asetukset → Palauta varmuuskopio.</string>
     <string name="personal_data">Henkilötiedot</string>
     <string name="week_starts_on">Viikko alkaa</string>
     <string name="limits">Rajat</string>

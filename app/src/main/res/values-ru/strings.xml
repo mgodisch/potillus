@@ -155,8 +155,8 @@
     <string name="drink_days_label">дней с алкоголем на этой неделе</string>
     <string name="drink_days_setting">Макс. дней/нед.</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Настройки не восстановлены?</string>
+    <string name="device_transfer_warning_body">Настройки и данные не удалось полностью восстановить с предыдущего устройства. Это может произойти, если зашифрованные ключи не удаётся перенести.\n\nЕсли это новая установка, это сообщение можно проигнорировать. В противном случае повторно импортируйте резервную копию через Настройки → Восстановить из резервной копии.</string>
     <string name="personal_data">Личные данные</string>
     <string name="week_starts_on">Неделя начинается с</string>
     <string name="limits">Лимиты</string>

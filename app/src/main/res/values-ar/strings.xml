@@ -192,8 +192,8 @@
     <string name="drink_days_label">أيام الشرب هذا الأسبوع</string>
     <string name="drink_days_setting">الحد الأقصى لأيام الشرب/الأسبوع</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">لم تتم استعادة الإعدادات؟</string>
+    <string name="device_transfer_warning_body">تعذّرت استعادة الإعدادات والبيانات بالكامل من الجهاز السابق. قد يحدث ذلك عندما يتعذّر نقل المفاتيح المشفّرة.\n\nإذا كان هذا تثبيتًا جديدًا، فيمكن تجاهل هذه الرسالة. وإلا، فأعد استيراد النسخة الاحتياطية من الإعدادات ← استعادة النسخة الاحتياطية.</string>
     <string name="personal_data">البيانات الشخصية</string>
     <string name="week_starts_on">يبدأ الأسبوع يوم</string>
     <string name="limits">الحدود</string>

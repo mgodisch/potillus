@@ -26,6 +26,87 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.60.0
+
+A round of fixes and refinements: localized the device-transfer warning, a daily
+limit rounding fix, build-tooling and in-app guide-viewer improvements, and
+overflow-menu icons.
+
+### Changed (version metadata)
+
+- **Corrected the version strings, which had drifted.** `versionName` was still
+  `0.58.0` (a leftover) and is set to `0.60.0`; `versionCode` is bumped 51 → 53;
+  the `app/proguard-rules.pro` header is synced from `v0.56.0` to `v0.60.0`. These
+  must stay in lock-step with the top CHANGELOG entry (enforced by
+  `release-check.sh §1`).
+- **Added the app version to `README.md`** (`v0.60.0` under the title), which had
+  carried no version string at all.
+- **New `version-check` target in the `Makefile`, wired into `prereq`.** It reads
+  the version from the top-most `## vX.Y.Z` CHANGELOG entry and fails the build if
+  `build.gradle.kts` (versionName), the `proguard-rules.pro` header, or the
+  `README.md` title disagree — so version drift is caught on every local build,
+  not just at the release gate.
+
+### Changed (in-app guide viewer)
+
+- **Paragraphs in the Markdown guide viewer now have a clear blank-line gap.**
+  `MarkdownText` separated paragraphs with only 8.dp, which read as cramped; the
+  inter-paragraph spacing is now 12.dp, matching the blank lines that separate
+  paragraphs in the guide source.
+
+### Changed (overflow menu)
+
+- **Leading icons added to the overflow menu items:** a gear before Settings
+  (`Icons.Filled.Settings`), a book before Help (`Icons.AutoMirrored.Filled.MenuBook`)
+  and a gavel before License (`Icons.Filled.Gavel`). The icons are decorative
+  (`contentDescription = null`) since each sits next to its text label. All three
+  come from the already-included `material-icons-extended`.
+
+### Fixed (invisible daily-limit exceedance from rounding)
+
+- **Alcohol grams are now computed at 0.1 g precision instead of 0.01 g.**
+  `AlcoholCalculator.calculateGrams` rounded to two decimals, so e.g. 188 ml at
+  13.5 % stored 20.02 g. The UI displays one decimal ("20.0 g"), but the daily
+  limit and binge checks compared the stored 20.02 g, so a 20 g limit showed as
+  exceeded while the screen still read "20.0 g" — an exceedance the user could not
+  see. `calculateGrams` now rounds to 0.1 g (new `roundTo1Decimal`), so the
+  displayed value and every comparison use the same number. BAC keeps its 0.01 ‰
+  precision (`roundTo2Decimals` is unchanged for `calculateBAC`).
+- **No data migration.** Only newly logged entries are stored at 0.1 g; existing
+  entries are left as-is (to be adjusted manually via a backup edit if desired),
+  per request — no migration code was added.
+- Unit tests in `AlcoholCalculatorTest` updated to the 0.1 g precision, including
+  a regression test for the 188 ml / 13.5 % → 20.0 g case.
+
+### Changed (guide build tooling)
+
+- **`tools/render-guide.py` now discovers languages automatically** from the
+  `docs/guide/usersguide*.md.in` templates instead of a hard-coded list, so
+  adding a language (e.g. the new Latin guide) needs no script edit. The English
+  default template is now the code-less `docs/guide/usersguide.md.in` (renamed
+  from `usersguide.en.md.in`), mapping to the unqualified `values`/`raw`; a tag
+  maps to `values-<q>`/`raw-<q>` with the Android region form (`pt-BR` →
+  `pt-rBR`).
+- **Outputs are regenerated on a timestamp basis:** an in-app `usersguide.md` is
+  rewritten only when its template **or** the matching `strings.xml` is newer
+  than the existing file. `--check` still compares content (for CI).
+- Dropped the dead code for the former root-level `USERSGUIDE.md` /
+  `USERSGUIDE-de.md` copies (those outputs were already removed) and updated the
+  `Makefile` `guides` comment accordingly.
+
+### Changed (localized device-transfer warning)
+
+- **Translated the device-transfer warning** (`device_transfer_warning_title` /
+  `device_transfer_warning_body`), which had been English in every locale, into
+  the major languages: de, fr, es, it, nl, pt, pt-BR, ru, pl, sv, da, nb, cs, fi,
+  el, tr, uk, hu, ro, sk, ja, ko, zh-rCN, zh-rTW, ar, id (26 locales). The
+  remaining locales keep the English text for now. The wording uses the app's
+  neutral/impersonal register (no informal/formal pronoun, matching the existing
+  strings), and the "Settings → …" breadcrumb uses each locale's actual
+  `settings` label so it matches what the app shows.
+
+---
+
 ## v0.59.0
 
 Toolchain modernisation for 2026, delivered as a sequence of incremental,
@@ -322,6 +403,13 @@ build-on-each-other steps under one version:
   language preference lives in the encrypted store that cannot be read. The
   message strings are currently English in every locale (translation is tracked
   separately).
+
+### Added
+
+- **`docs/guide/usersguide.la.md.in` — a Latin translation of the user guide.**
+  The build-time renderer (`tools/render-guide.py`) now emits the Latin guide to
+  `res/raw-la/usersguide.md` (with `values-la` for the on-screen labels), so the
+  app shows it for users whose per-app language is Latin.
 
 ---
 

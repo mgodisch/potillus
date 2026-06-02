@@ -109,10 +109,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 51
+        versionCode = 53
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.58.0"
+        versionName = "0.60.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)

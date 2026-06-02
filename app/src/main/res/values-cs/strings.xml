@@ -155,8 +155,8 @@
     <string name="drink_days_label">dny s alkoholem tento týden</string>
     <string name="drink_days_setting">Max. dní/týden</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Nastavení nebylo obnoveno?</string>
+    <string name="device_transfer_warning_body">Nastavení a data se nepodařilo plně obnovit z předchozího zařízení. K tomu může dojít, když nelze přenést šifrované klíče.\n\nPokud jde o novou instalaci, lze tuto zprávu ignorovat. Jinak prosím znovu naimportujte zálohu přes Nastavení → Obnovit zálohu.</string>
     <string name="personal_data">Osobní údaje</string>
     <string name="week_starts_on">Týden začíná</string>
     <string name="limits">Limity</string>

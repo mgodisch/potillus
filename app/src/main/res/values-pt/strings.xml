@@ -155,8 +155,8 @@
     <string name="drink_days_label">dias de consumo esta semana</string>
     <string name="drink_days_setting">Dias máx./semana</string>
     <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Settings not restored?</string>
-    <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
+    <string name="device_transfer_warning_title">Definições não restauradas?</string>
+    <string name="device_transfer_warning_body">As definições e os dados não puderam ser totalmente restaurados a partir do dispositivo anterior. Isto pode acontecer quando as chaves cifradas não podem ser transferidas.\n\nSe se tratar de uma instalação nova, esta mensagem pode ser ignorada. Caso contrário, voltar a importar a cópia de segurança em Definições → Restaurar cópia de segurança.</string>
     <string name="personal_data">Dados pessoais</string>
     <string name="week_starts_on">A semana começa</string>
     <string name="limits">Limites</string>

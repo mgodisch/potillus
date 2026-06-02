@@ -71,7 +71,7 @@ export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform
 GRADLE_OPTS ?= -Xmx2g -Xms512m
 export GRADLE_OPTS
 
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/license.md guides
+prereq: version-check java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/license.md guides
 
 java:
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
@@ -92,9 +92,11 @@ app/src/main/res/raw/license.md: LICENSE.md
 
 # Regenerate the localized user guides from their templates in docs/guide/.
 # Resolves the {{screen-name}} tokens against the matching strings.xml so the
-# guides (root USERSGUIDE*.md and the in-app res/raw[-xx]/usersguide.md copies)
-# can never drift from the labels the app actually shows. Runs on every build
-# (it is a prerequisite of `prereq`) and is a no-op when nothing changed.
+# in-app res/raw[-xx]/usersguide.md copies can never drift from the labels the
+# app actually shows. The language set is discovered from the template files
+# (no hard-coded list). Runs on every build (a prerequisite of `prereq`); the
+# renderer rewrites an output only when its template or strings.xml is newer, so
+# it is a cheap no-op when nothing changed.
 guides:
 	python3 tools/render-guide.py
 
@@ -103,6 +105,30 @@ guides:
 check-guides:
 	python3 tools/render-guide.py --check
 	cmp -s LICENSE.md app/src/main/res/raw/license.md
+
+# Version consistency. The app version is written in several places that must
+# all match the top-most "## vX.Y.Z" entry in CHANGELOG.md (the single source of
+# truth): build.gradle.kts versionName, the app/proguard-rules.pro header, and
+# the README.md title. This guards against the drift that previously left
+# build.gradle.kts on a stale versionName. Runs on every build via `prereq`.
+# (release-check.sh §1 performs the same comparison for the release gate; this is
+# the fast local pre-build equivalent.)
+version-check:
+	@ref=$$(grep -m1 '^## v' CHANGELOG.md | sed 's/^## v//; s/[[:space:]]*$$//')
+	if [ -z "$$ref" ]; then echo "version-check: no '## vX.Y.Z' entry found in CHANGELOG.md"; exit 1; fi
+	gradle=$$(grep 'versionName' app/build.gradle.kts | grep -v 'Suffix' | grep -oE '"[^"]+"' | head -1 | tr -d '"')
+	proguard=$$(grep -E '^# Version:' app/proguard-rules.pro | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+	readme=$$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1 | tr -d 'v')
+	fail=0
+	for entry in "build.gradle.kts versionName:$$gradle" "app/proguard-rules.pro header:$$proguard" "README.md title:$$readme"; do
+	    where=$${entry%%:*}; got=$${entry##*:}
+	    if [ "$$got" != "$$ref" ]; then
+	        echo "version-check: MISMATCH in $$where — found '$$got', expected '$$ref' (top of CHANGELOG.md)"
+	        fail=1
+	    fi
+	done
+	if [ "$$fail" -ne 0 ]; then echo "version-check: bring every location in sync with the CHANGELOG, then rebuild."; exit 1; fi
+	echo "version-check: all version strings consistent at $$ref"
 
 debug: app/build/outputs/apk/debug/app-debug.apk
 
@@ -151,4 +177,4 @@ dist-clean: clean
 	rm app/src/main/res/raw*/license.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq java android guides check-guides debug release test unit-test test-device install install-debug push clean dist-clean
+.PHONY: help prereq version-check java android guides check-guides debug release test unit-test test-device install install-debug push clean dist-clean
