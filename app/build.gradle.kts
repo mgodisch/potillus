@@ -93,10 +93,37 @@ android {
 
         // minSdk: minimum Android version the APK supports.
         // Devices running an older version cannot install the app.
-        // 35 = Android 15
-        // GrapheneOS users typically have current Pixel devices,
-        // so 35 is a reasonable minimum.
-        minSdk                           = 35
+        //
+        // 30 = Android 11. Lowered from 35 (Android 15) in v0.60.1.
+        //
+        // WHY 30 IS SAFE — every version-sensitive API this app actually uses is
+        // available at API 30 or below, so NO `Build.VERSION.SDK_INT` branches are
+        // required anywhere in the codebase:
+        //   • MediaStore Downloads + RELATIVE_PATH (CsvExporter, PdfExporter,
+        //     BackupManager) — API 29. This is also the FLOOR: it lets the app
+        //     write to the public Downloads folder WITHOUT WRITE_EXTERNAL_STORAGE.
+        //     Going below API 29 would force a storage permission (or the Storage
+        //     Access Framework) and break the app's minimal-permission design, so
+        //     29/30 is a deliberate, principled floor — not an arbitrary one.
+        //   • Android Keystore AES-256-GCM (KeystoreSecretStore) — API 23.
+        //   • androidx.biometric / USE_BIOMETRIC — API 23.
+        //   • WindowCompat edge-to-edge insets (MainActivity) — all API levels.
+        //   • Runtime locale switching via AppCompatDelegate — back-ported to all.
+        //   • Adaptive launcher icons (mipmap-anydpi-v26) with PNG fallbacks — OK.
+        //   • No dynamicColor / Material You, so no API-31 colour branch is needed.
+        //
+        // GRACEFUL DEGRADATION on API 30–32 (documented, no code needed):
+        //   • The SYSTEM per-app language picker (android:localeConfig) is API 33+.
+        //     On 30–32 the in-app language selector (SettingsScreen) still works;
+        //     only the OS Settings integration is absent.
+        //   • android:dataExtractionRules is API 31+ and is ignored on API 30, but
+        //     allowBackup="false" disables backup outright — so no data leaks.
+        //
+        // The library stack imposes its own hard floor of API 23 (AndroidX since
+        // June 2025; Jetpack Compose since inception), so 30 sits comfortably above
+        // it. Reachable devices roughly double versus API 35 (~41% → ~87% of the
+        // worldwide install base, per apilevels.com / Statcounter, April 2026).
+        minSdk                           = 30
 
         // targetSdk: the Android version the app is OPTIMISED for.
         // Android uses this to decide whether to activate compatibility modes.
@@ -109,10 +136,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 53
+        versionCode = 54
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.60.0"
+        versionName = "0.60.1"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)

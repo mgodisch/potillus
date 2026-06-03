@@ -22,7 +22,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
 
-**v0.60.0**
+**v0.60.1**
 
 Libellus Potionis is your digital probation officer for alcohol consumption.
 Libellus Potionis is a privacy-friendly, free, open-source, and ad-free app. It
@@ -48,12 +48,23 @@ LibreOffice Calc.
 See the [USERSGUIDE.md \[en\]](USERSGUIDE.md), [\[de\]](USERSGUIDE-de.md) for
 how to use Libellus Potionis.
 
+## Supported Android versions
+
+Libellus Potionis runs on **Android 11 (API 30) and newer** (`minSdk = 30`,
+`targetSdk = 36`). API 30 is a deliberate floor: it is the lowest level at which
+the app can save CSV/PDF/backup files to the public Downloads folder via
+`MediaStore` *without* requesting any storage permission, which keeps the app's
+minimal-permission promise intact. On Android 11–12 the per-app language picker
+in the system Settings is unavailable (it is an API 33+ feature), but the in-app
+language selector works on every supported version.
+
 ## Changes
 
 Changes are documented in [CHANGELOG.md](CHANGELOG.md).
 
-Libellus Potionis was developed for Android 15 and tested with the Fairphone 4
-and Google Pixel 10 Pro running GrapheneOS. The source code can be found at the
+Libellus Potionis was developed for Android 15, runs on Android 11 and newer,
+and is tested with the Fairphone 4 and Google Pixel 10 Pro running GrapheneOS.
+The source code can be found at the
 [canonical repository at codeberg.org](https://codeberg.org/godisch/potillus/).
 
 ## License

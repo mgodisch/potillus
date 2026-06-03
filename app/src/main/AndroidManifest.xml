@@ -52,6 +52,14 @@
           the Android framework mirror the layout automatically.
         ═══════════════════════════════════════════════════════════════════════
     -->
+
+    <!--
+        API-LEVEL NOTE (minSdk 30): android:dataExtractionRules below is honoured
+        only on API 31+. On API 30 the attribute is silently ignored, but this is
+        harmless — android:allowBackup="false" disables cloud/device-transfer
+        backup outright on EVERY supported version, so no personal health data can
+        leave the device regardless of API level.
+    -->
     <application
         android:name=".PotillusApp"
         android:allowBackup="false"

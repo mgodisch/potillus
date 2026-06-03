@@ -26,6 +26,64 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.60.1
+
+Lowered the minimum supported Android version from 15 to 11 to make the app
+installable on a much larger share of devices, with no functional code changes —
+every version-sensitive API the app uses is already available at the new floor.
+
+### Changed (minimum supported Android version)
+
+- **`minSdk` lowered from 35 (Android 15) to 30 (Android 11)** in
+  `app/build.gradle.kts`. This roughly doubles the reachable worldwide install
+  base (≈41% → ≈87%, per apilevels.com / Statcounter, April 2026 data) while
+  `targetSdk` stays at 36. The previous floor was a policy choice (GrapheneOS
+  Pixel devices), not a technical requirement: the codebase contains no
+  `Build.VERSION.SDK_INT`, `@RequiresApi`, or `@TargetApi` usage, and every
+  version-sensitive API it relies on is available at API 30 or lower
+  (MediaStore Downloads + `RELATIVE_PATH` — API 29; Android Keystore AES-256-GCM
+  — API 23; `androidx.biometric` — API 23; `WindowCompat` edge-to-edge insets —
+  all levels; `AppCompatDelegate` locale switching — back-ported). API 30 is a
+  *principled* floor rather than the lowest possible one: API 29 is the level at
+  which the exporters can write to the public Downloads folder via `MediaStore`
+  **without** any storage permission, so going lower would force a storage
+  permission and break the app's minimal-permission design.
+- **Bumped `versionCode` 53 → 54 and `versionName` 0.60.0 → 0.60.1**, kept in
+  lock-step with the `proguard-rules.pro` header and the `README.md` title
+  (enforced by `release-check.sh §1` / the `version-check` Make target).
+
+### Changed (documentation)
+
+- **Rewrote the `minSdk` rationale comment in `app/build.gradle.kts`** to a
+  teaching-grade explanation: it now enumerates each version-sensitive API with
+  its availability level, explains why no `SDK_INT` branches are needed, and
+  documents the two graceful-degradation cases on API 30–32 (see below).
+- **Added a "Supported Android versions" section to `README.md`** stating the
+  Android 11+ requirement and the reason API 30 is the floor.
+- **Added an API-level note in `AndroidManifest.xml`** explaining that
+  `android:dataExtractionRules` is honoured only on API 31+ and is silently
+  ignored on API 30, which is harmless because `android:allowBackup="false"`
+  disables backup on every supported version.
+
+### Notes (graceful degradation on API 30–32, no code change required)
+
+- The **system per-app language picker** (`android:localeConfig`) is an API 33+
+  feature. On Android 11–12 it is absent, but the in-app language selector in
+  `SettingsScreen` (via `AppCompatDelegate`) works on every supported version.
+- **Cloud/device-transfer backup** is disabled on all versions
+  (`allowBackup="false"`), so the API-31+ `dataExtractionRules` being ignored on
+  API 30 has no security or privacy impact.
+
+### Follow-up (recommended before release)
+
+- Run the unit **and** instrumented test suites (`MigrationTest`,
+  `BackupRepositoryInstrumentedTest`, `EntryListItemUiTest`) on emulators for API
+  30, 31/32, 33, and 34, plus a manual smoke test of CSV/PDF/backup export,
+  biometric unlock, database encryption, and runtime language switching. This QA
+  pass — not code changes — is the main remaining effort of the version drop.
+
+---
+
 ## v0.60.0
 
 A round of fixes and refinements: localized the device-transfer warning, a daily
