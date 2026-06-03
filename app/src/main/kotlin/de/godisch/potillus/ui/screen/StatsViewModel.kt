@@ -51,7 +51,8 @@ import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.util.CsvExporter
 import de.godisch.potillus.util.ExportResult
-import de.godisch.potillus.util.PdfExporter
+import de.godisch.potillus.util.PdfReportBuilder
+import java.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -94,6 +95,19 @@ data class StatsUiState(
     val statsFromDate: String                     = ""
 )
 
+/**
+ * One-shot request to print a PDF report, emitted by [StatsViewModel.exportPdf].
+ *
+ * Carries the fully rendered report [html] (see [de.godisch.potillus.util.PdfReportBuilder])
+ * and the [jobName] used for the print job. The screen consumes it once, opens the
+ * system print dialog via [de.godisch.potillus.util.WebViewPdfPrinter], then calls
+ * [StatsViewModel.clearPrintRequest].
+ */
+data class PdfPrintRequest(
+    val html: String,
+    val jobName: String
+)
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class StatsViewModel(
     private val entryRepo: IEntryRepository,
@@ -125,6 +139,17 @@ class StatsViewModel(
 
     /** Clears the pending share target after the chooser has been shown. */
     fun clearShareTarget() { _shareTarget.value = null }
+
+    // ── PDF print request (one-shot) ──────────────────────────────────────
+    // The PDF report is rendered to HTML here and then handed to the screen,
+    // which loads it into a WebView and opens the system print dialog (Weg 2 /
+    // v0.61.0). Unlike CSV/JSON, the PDF path does NOT write a file itself and
+    // therefore sets no [shareTarget]: the system print UI owns saving/sharing.
+    private val _printRequest = MutableStateFlow<PdfPrintRequest?>(null)
+    val printRequest: StateFlow<PdfPrintRequest?> = _printRequest.asStateFlow()
+
+    /** Clears the pending print request after the screen has opened the print dialog. */
+    fun clearPrintRequest() { _printRequest.value = null }
 
     /**
      * Exports entries within the given inclusive date range as a CSV file in
@@ -160,7 +185,9 @@ class StatsViewModel(
     }
 
     /**
-     * Exports entries within the given inclusive date range as a PDF report.
+     * Renders entries within the given inclusive date range into the HTML report
+     * and emits a [printRequest] so the screen can open the system print dialog
+     * ("Save as PDF" or a real printer). Errors are reported via [exportStatus].
      *
      * @param from Start date inclusive ("YYYY-MM-DD").
      * @param to   End date inclusive ("YYYY-MM-DD").
@@ -173,15 +200,17 @@ class StatsViewModel(
                 _exportStatus.value = ExportStatus.Err(str(R.string.export_no_entries))
                 return@launch
             }
-            val drinks = drinkRepo.drinks.first()
-            val result = withContext(Dispatchers.Default) {
-                PdfExporter.export(appContext, entries, drinks, settings)
+            val drinks  = drinkRepo.drinks.first()
+            val jobName = PdfReportBuilder.jobName(Instant.now())
+            // HTML assembly (template fill) is CPU work, not UI work → off the main thread.
+            val html = withContext(Dispatchers.Default) {
+                runCatching { PdfReportBuilder.buildHtml(appContext, entries, drinks, settings) }
+                    .getOrNull()
             }
-            _exportStatus.value = if (result != null) {
-                _shareTarget.value = result
-                ExportStatus.Done(result.fileName)
+            if (html != null) {
+                _printRequest.value = PdfPrintRequest(html, jobName)
             } else {
-                ExportStatus.Err(str(R.string.export_failed))
+                _exportStatus.value = ExportStatus.Err(str(R.string.export_failed))
             }
         }
     }

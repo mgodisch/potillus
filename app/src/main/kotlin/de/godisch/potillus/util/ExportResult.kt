@@ -28,10 +28,14 @@ import android.net.Uri
 // =============================================================================
 //
 // WHY A SHARED RETURN TYPE?
-//   CsvExporter, PdfExporter, and BackupManager all write a file to the
-//   MediaStore Downloads folder and then offer the file for sharing via an
-//   Intent. By returning the same [ExportResult] type, SettingsViewModel
-//   can handle all three cases with identical code (no if/when on the type).
+//   CsvExporter and BackupManager both write a file to the MediaStore Downloads
+//   folder and then offer it for sharing via an Intent. By returning the same
+//   [ExportResult] type, their callers can handle both cases with identical code
+//   (no if/when on the type).
+//
+//   NOTE (v0.61.0): the PDF report no longer flows through [ExportResult]. It is
+//   rendered to HTML (PdfReportBuilder) and handed to the system print dialog
+//   (WebViewPdfPrinter), which owns saving and sharing the PDF itself.
 //
 // MediaStore vs FileProvider:
 //   On Android 10+, apps should write shared files to MediaStore (via

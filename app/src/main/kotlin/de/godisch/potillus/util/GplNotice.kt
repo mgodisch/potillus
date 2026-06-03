@@ -34,8 +34,8 @@ package de.godisch.potillus.util
  *     [BackupManager.exportToJson]. JSON has no comment syntax, so a dedicated,
  *     parser-ignored field is the faithful equivalent of a non-evaluated
  *     comment: the importer reads only the known keys and skips `_comment`.
- *   - [PDF_FOOTER] is drawn as a small footer line on every page of the PDF
- *     report by [PdfExporter]. A two-page clinical layout has no room for the
+ *   - [PDF_FOOTER] is rendered as a small footer line on every page of the PDF
+ *     report by [PdfReportBuilder]. A two-page clinical layout has no room for the
  *     full header, so this is the notice condensed to a single line.
  *
  *   The CSV export intentionally carries no notice: CSV has no portable comment

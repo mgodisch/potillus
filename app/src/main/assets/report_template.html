@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<!--
+  ===========================================================================
+  Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+  Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+  Licensed under the GNU General Public License v3 or later. See LICENSE.md.
+  ===========================================================================
+
+  PDF REPORT TEMPLATE  —  THIS FILE DEFINES HOW THE REPORT LOOKS.
+  ===========================================================================
+  You can edit the LAYOUT of the PDF report here, by hand, WITHOUT touching any
+  Kotlin code: fonts, sizes, colours, spacing, column widths, the order of the
+  sections, and where pages break are all controlled by the CSS in <style> below
+  and by the HTML structure. After editing, just rebuild the app — the report
+  generator (PdfReportBuilder.kt) loads this file from the APK's assets at runtime.
+
+  WHAT YOU MUST NOT CHANGE (or the report will break):
+    • {{PLACEHOLDER}} tokens — these are filled in with computed numbers and
+      localised labels by PdfReportBuilder. Move them around freely, but do not
+      rename them. An unknown placeholder is left in the PDF verbatim, which is
+      your hint that a name no longer matches.
+    • <!-- repeat:NAME --> … <!-- end:NAME --> blocks — the content between the
+      markers is the template for ONE table row / chart bar and is repeated once
+      per data row. Edit the markup INSIDE a block to restyle every row; keep the
+      markers and their {{PLACEHOLDER}}s intact.
+
+  WHERE THE TEXT COMES FROM:
+    All visible LABELS (titles, column headers, units, …) are injected as
+    placeholders and come from res/values*/strings.xml so the report stays fully
+    localised. Do NOT hard-code human-readable text here — put structure and
+    style here, and translatable text in strings.xml.
+
+  PAGE MODEL:
+    Two logical pages, separated by <div class="page-break">. Content that grows
+    beyond one sheet now flows onto additional pages automatically (the old
+    canvas exporter truncated long tables; this template does not).
+  ===========================================================================
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+    /* ---- Paper & page margins -------------------------------------------- */
+    /* The print framework renders at A4; @page sets the printable margin box.  */
+    @page { size: A4; margin: 14mm 12mm 16mm 12mm; }
+
+    /* ---- Base typography -------------------------------------------------- */
+    * { box-sizing: border-box; }
+    body {
+        font-family: sans-serif;
+        font-size: 9pt;
+        color: #141414;            /* near-black body text */
+        margin: 0;
+        -webkit-print-color-adjust: exact;   /* keep background tints when printing */
+        print-color-adjust: exact;
+    }
+    h1, h2 { margin: 0; }
+
+    /* ---- Colour tokens (edit here to recolour the whole report) ----------- */
+    /* blue   #1e50a0   accent / headers
+       red    #c83232   limit-violation warnings
+       grey   #646464   secondary text
+       lgrey  #dcdcdc   hairlines / borders                                     */
+
+    /* ---- Header bar ------------------------------------------------------- */
+    .header {
+        background: #1e50a0; color: #fff;
+        padding: 6pt 12pt; display: flex; justify-content: space-between;
+        align-items: baseline; margin-bottom: 10pt;
+    }
+    .header .title { font-size: 15pt; font-weight: bold; }
+    .header .page  { font-size: 10pt; }
+
+    /* ---- Section heading + underline -------------------------------------- */
+    .section {
+        color: #1e50a0; font-size: 11pt; font-weight: bold;
+        text-transform: uppercase; letter-spacing: .3pt;
+        border-bottom: 1px solid #dcdcdc; padding-bottom: 3pt;
+        margin: 14pt 0 8pt 0;
+    }
+
+    /* ---- Two-column key/value metadata block ------------------------------ */
+    .meta { width: 100%; border-collapse: collapse; }
+    .meta td { padding: 1.5pt 0; vertical-align: top; }
+    .meta .k { color: #646464; width: 22%; }
+    .meta .v { color: #141414; font-weight: bold; width: 28%; }
+
+    /* ---- KPI grid (4 tiles per row) --------------------------------------- */
+    .kpis { display: flex; flex-wrap: wrap; gap: 4pt; }
+    .kpi {
+        flex: 1 1 22%; min-width: 22%;
+        background: #f5f7fc; border: .5px solid #dcdcdc;
+        padding: 5pt 6pt; border-radius: 1pt;
+    }
+    .kpi .val { color: #1e50a0; font-size: 14pt; font-weight: bold; }
+    .kpi .lab { color: #646464; font-size: 7.5pt; margin-top: 2pt; }
+    .kpi.warn { background: #fff0f0; }
+    .kpi.warn .val { color: #c83232; }
+
+    /* ---- Tables (monthly, category, weekday) ------------------------------ */
+    table.data { width: 100%; border-collapse: collapse; margin-top: 2pt; }
+    table.data th {
+        background: #e6ebf5; color: #1e50a0; font-size: 8pt; font-weight: bold;
+        text-align: left; padding: 3pt 4pt;
+    }
+    table.data td {
+        font-size: 8pt; padding: 2.5pt 4pt; border-bottom: .5px solid #dcdcdc;
+    }
+    table.data tr.warn td { background: #fff5f5; color: #c83232; }
+    /* Right-align every numeric column (all but the first). */
+    table.data th:not(:first-child),
+    table.data td:not(:first-child) { text-align: right; }
+
+    /* ---- Trend bar chart (pure CSS; no image) ----------------------------- */
+    .chart {
+        position: relative; height: 60pt; margin-top: 4pt;
+        display: flex; align-items: flex-end; gap: 3pt;
+        border-bottom: .5px solid #dcdcdc;
+    }
+    .chart .col { flex: 1; display: flex; flex-direction: column;
+                  justify-content: flex-end; align-items: center; height: 100%; }
+    .chart .bar { width: 60%; background: #1e50a0; border-radius: 1pt 1pt 0 0; }
+    .chart .bar.over { background: #c83232; }
+    .chart .lab { font-size: 7pt; color: #646464; margin-top: 2pt; }
+    /* Dashed reference line marking the daily limit; LIMIT_LINE_PCT is its height. */
+    .chart .limit {
+        position: absolute; left: 0; right: 0;
+        border-top: 1px dashed #dc7832;
+    }
+
+    /* ---- Footers ---------------------------------------------------------- */
+    /* GPL notice repeats at the foot of every printed page (running footer). */
+    .gpl {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        font-size: 6pt; color: #646464;
+    }
+    /* Page-specific disclaimer, placed as the last block of each page's content. */
+    .disclaimer {
+        margin-top: 10pt; padding-top: 4pt; border-top: 1px solid #dcdcdc;
+        font-size: 7.5pt; color: #646464;
+    }
+
+    .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- ===================== PAGE 1 ===================== -->
+
+<div class="header">
+    <span class="title">{{TITLE}}</span>
+    <span class="page">1 / 2</span>
+</div>
+
+<!-- Metadata: export date, period, limits, weight -->
+<table class="meta">
+    <tr>
+        <td class="k">{{META_EXPORT_LABEL}}</td><td class="v">{{META_EXPORT_VALUE}}</td>
+        <td class="k">{{META_PERIOD_LABEL}}</td><td class="v">{{META_PERIOD_VALUE}}</td>
+    </tr>
+    <tr>
+        <td class="k">{{META_LIMIT_LABEL}}</td><td class="v">{{META_LIMIT_VALUE}}</td>
+        <td class="k">{{META_WEIGHT_LABEL}}</td><td class="v">{{META_WEIGHT_VALUE}}</td>
+    </tr>
+</table>
+
+<!-- KPI grid -->
+<div class="section">{{SECTION_KPIS}}</div>
+<div class="kpis">
+    <!-- repeat:KPIS -->
+    <div class="{{KPI_CLASS}}">
+        <div class="val">{{KPI_VALUE}}</div>
+        <div class="lab">{{KPI_LABEL}}</div>
+    </div>
+    <!-- end:KPIS -->
+</div>
+
+<!-- Monthly table -->
+<div class="section">{{SECTION_MONTHS}}</div>
+<table class="data">
+    <tr>
+        <th>{{COL_MONTH}}</th>
+        <th>{{COL_DRINK_DAYS}}</th>
+        <th>{{COL_TOTAL_G}}</th>
+        <th>{{COL_AVG_G_DAY}}</th>
+        <th>{{COL_OVER_DAILY}}</th>
+    </tr>
+    <!-- repeat:MONTHS -->
+    <tr class="{{M_ROW_CLASS}}">
+        <td>{{M_MONTH}}</td>
+        <td>{{M_DRINK_DAYS}}</td>
+        <td>{{M_TOTAL}}</td>
+        <td>{{M_AVG}}</td>
+        <td>{{M_OVER}}</td>
+    </tr>
+    <!-- end:MONTHS -->
+</table>
+
+<!-- Trend bar chart (hidden when fewer than two months of data) -->
+<div style="display:{{TREND_DISPLAY}}">
+    <div class="section">{{SECTION_TREND}}</div>
+    <div class="chart">
+        <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
+        <!-- repeat:BARS -->
+        <div class="col">
+            <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
+            <div class="lab">{{BAR_LABEL}}</div>
+        </div>
+        <!-- end:BARS -->
+    </div>
+</div>
+
+<div class="disclaimer">{{FOOTER1}}</div>
+
+<!-- ===================== PAGE 2 ===================== -->
+<div class="page-break"></div>
+
+<div class="header">
+    <span class="title">{{TITLE}}</span>
+    <span class="page">2 / 2</span>
+</div>
+
+<!-- Category breakdown -->
+<div class="section">{{SECTION_CATEGORIES}}</div>
+<table class="data">
+    <tr>
+        <th>{{CAT_HEAD_NAME}}</th>
+        <th>{{CAT_HEAD_G}}</th>
+        <th>{{CAT_HEAD_PCT}}</th>
+    </tr>
+    <!-- repeat:CATEGORIES -->
+    <tr>
+        <td>{{C_NAME}}</td>
+        <td>{{C_G}}</td>
+        <td>{{C_PCT}}</td>
+    </tr>
+    <!-- end:CATEGORIES -->
+</table>
+
+<!-- Time-of-day pattern -->
+<div class="section">{{SECTION_DAYTIME}}</div>
+<table class="meta">
+    <tr>
+        <td class="k">{{DT_FIRST_LABEL}}</td><td class="v">{{DT_FIRST_VALUE}}</td>
+        <td class="k">{{DT_LAST_LABEL}}</td><td class="v">{{DT_LAST_VALUE}}</td>
+    </tr>
+    <tr>
+        <td class="k">{{DT_BEFORE_LABEL}}</td><td class="v">{{DT_BEFORE_VALUE}}</td>
+        <td class="k">{{DT_AFTER_LABEL}}</td><td class="v">{{DT_AFTER_VALUE}}</td>
+    </tr>
+</table>
+
+<!-- Weekday profile -->
+<div class="section">{{SECTION_WEEKDAY}}</div>
+<table class="data">
+    <tr>
+        <!-- repeat:WEEKDAY_HEAD --><th>{{WD_NAME}}</th><!-- end:WEEKDAY_HEAD -->
+    </tr>
+    <tr>
+        <!-- repeat:WEEKDAY_VAL --><td>{{WD_VALUE}}</td><!-- end:WEEKDAY_VAL -->
+    </tr>
+</table>
+
+<!-- Binge & abstinence streaks -->
+<div class="section">{{SECTION_RISK}}</div>
+<table class="meta">
+    <tr>
+        <td class="k">{{RISK_BINGE_LABEL}}</td><td class="v">{{RISK_BINGE_VALUE}}</td>
+        <td class="k">{{RISK_LONGEST_LABEL}}</td><td class="v">{{RISK_LONGEST_VALUE}}</td>
+    </tr>
+    <tr>
+        <td class="k">{{RISK_CURRENT_LABEL}}</td><td class="v">{{RISK_CURRENT_VALUE}}</td>
+        <td class="k"></td><td class="v"></td>
+    </tr>
+</table>
+
+<div class="disclaimer">{{FOOTER2}}</div>
+
+<!-- Running GPL notice at the foot of every page -->
+<div class="gpl">{{GPL_FOOTER}}</div>
+
+</body>
+</html>

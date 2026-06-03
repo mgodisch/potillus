@@ -42,6 +42,7 @@ import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
+import de.godisch.potillus.util.WebViewPdfPrinter
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -65,6 +66,7 @@ fun StatsScreen(
     val state by vm.uiState.collectAsStateWithLifecycle()
     val exportStatus by vm.exportStatus.collectAsStateWithLifecycle()
     val shareTarget  by vm.shareTarget.collectAsStateWithLifecycle()
+    val printRequest by vm.printRequest.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     // Export date-range dialogs (CSV/PDF export lives on the Statistics screen).
@@ -82,38 +84,29 @@ fun StatsScreen(
         }
     }
 
-    // Open the share sheet once after a successful export, then clear the target
-    // so it does not reappear on recomposition. PDFs get an ACTION_VIEW-based
-    // chooser (so PDF readers/printers appear) with an injected ACTION_SEND intent
-    // for messengers/cloud apps; CSV uses a plain ACTION_SEND chooser. (This is the
-    // same logic that previously lived in SettingsScreen for CSV/PDF.)
+    // Open the share sheet once after a successful CSV export, then clear the
+    // target so it does not reappear on recomposition. As of v0.61.0 only CSV
+    // flows through [shareTarget]; the PDF report is handled by the system print
+    // dialog (see the printRequest effect below), so no PDF branch is needed here.
     LaunchedEffect(shareTarget) {
         val target = shareTarget ?: return@LaunchedEffect
-        val intent = if (target.mimeType == "application/pdf") {
-            val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                type = target.mimeType
-                putExtra(Intent.EXTRA_STREAM, target.uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            Intent.createChooser(
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(target.uri, target.mimeType)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                },
-                target.fileName
-            ).apply {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(sendIntent))
-            }
-        } else {
-            ShareCompat.IntentBuilder(context)
-                .setType(target.mimeType)
-                .addStream(target.uri)
-                .setChooserTitle(target.fileName)
-                .createChooserIntent()
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+        val intent = ShareCompat.IntentBuilder(context)
+            .setType(target.mimeType)
+            .addStream(target.uri)
+            .setChooserTitle(target.fileName)
+            .createChooserIntent()
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         context.startActivity(intent)
         vm.clearShareTarget()
+    }
+
+    // Open the system print dialog once a PDF report has been rendered, then clear
+    // the request. The user chooses "Save as PDF" (or a printer) and the file's
+    // destination there — the print framework owns saving/sharing for PDFs.
+    LaunchedEffect(printRequest) {
+        val req = printRequest ?: return@LaunchedEffect
+        WebViewPdfPrinter.print(context, req.html, req.jobName)
+        vm.clearPrintRequest()
     }
 
     Scaffold(

@@ -26,6 +26,83 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.61.0
+
+Reworked the PDF report so its **layout can be edited by hand** without touching
+report code. The report is now authored as an HTML/CSS template under
+`app/src/main/assets/`; computed numbers and localised labels are injected into
+it at runtime, and the result is turned into a PDF through the **Android system
+print dialog**. No third-party PDF library and no extra permission were added,
+preserving the app's no-network, minimal-permission design.
+
+### Changed (PDF export architecture)
+
+- **Hand-editable template.** `app/src/main/assets/report_template.html` defines
+  the two-page A4 report's structure and styling (fonts, colours, spacing, column
+  widths, section order, page breaks). It uses `{{PLACEHOLDER}}` tokens and
+  `<!-- repeat:NAME -->…<!-- end:NAME -->` row blocks; the contract is documented
+  in the file header. Editing it requires only a rebuild, not code changes.
+- **System print dialog instead of silent file write.** The PDF is produced by
+  loading the report HTML into an off-screen `WebView` and calling
+  `PrintManager.print(...)` (`WebViewPdfPrinter`). The user picks *Save as PDF*
+  (or a printer) and the destination in the system UI.
+- **Behaviour preserved.** All figures are computed by the new pure
+  `PdfReportData` layer, which reuses `AlcoholCalculator` and `DayResolver`, so
+  the PDF and the on-screen statistics still agree exactly.
+
+### Added
+
+- `util/PdfReportData.kt` – Context-free computation of every report figure
+  (KPIs, monthly aggregates, category shares, time-of-day, weekday profile,
+  streaks). Unit-tested on the JVM (`PdfReportDataTest`).
+- `util/SimpleTemplate.kt` – a tiny, dependency-free HTML templating engine
+  (scalar placeholders + repeat blocks, with HTML escaping). Unit-tested
+  (`SimpleTemplateTest`).
+- `util/PdfReportBuilder.kt` – resolves localised labels, formats numbers and
+  fills the template; replaces the old canvas-drawing `PdfExporter`.
+- `util/WebViewPdfPrinter.kt` – renders the report HTML via the system print
+  dialog.
+
+### Removed
+
+- `util/PdfExporter.kt` – the previous `android.graphics.Canvas`/`PdfDocument`
+  exporter that hard-coded the layout in Kotlin and drew each element by pixel
+  coordinate.
+
+### UX / behavioural notes
+
+- The PDF export no longer writes a file straight to *Downloads* and no longer
+  opens a share sheet; saving/sharing happen inside the system print dialog. CSV
+  export is unchanged (still writes to Downloads and offers a share sheet).
+- Long monthly tables are no longer truncated to a fixed row budget: the HTML
+  report paginates automatically across pages. The `pdf_months_truncated` string
+  is consequently no longer referenced (left in place; harmless).
+- Per-page footers use the running GPL notice (fixed at the page foot) plus a
+  trailing per-page disclaimer; this is a minor cosmetic change from the old
+  absolute pixel placement and can be restyled in the template.
+
+### Fixed / cleanup
+
+- Removed the now-unreachable PDF branch from the Statistics share effect (PDF no
+  longer flows through `shareTarget`).
+- Updated stale KDoc in `ExportResult.kt` and `GplNotice.kt` that referenced the
+  deleted `PdfExporter`.
+
+### Known limitation (needs on-device QA)
+
+- The `WebView` + `PrintManager` path is runtime-only and **cannot be exercised
+  in unit tests or in this build environment**; it requires verification on a
+  physical device / emulator (report renders, A4 pagination, "Save as PDF"). The
+  pure pieces (`PdfReportData`, `SimpleTemplate`) are covered by JVM unit tests.
+
+### Observation (not changed)
+
+- `SettingsScreen` still contains a dead `application/pdf` branch in its share
+  effect; Settings only exports JSON backups, so it never fires. Left untouched
+  to keep this change scoped to the Statistics PDF export.
+
+---
+
 ## v0.60.1
 
 Lowered the minimum supported Android version from 15 to 11 to make the app
