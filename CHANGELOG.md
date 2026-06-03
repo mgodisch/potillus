@@ -26,6 +26,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.61.2
+
+Moved Android code base into subdirectory android/.
+
 ## v0.61.1
 
 Bug-fix release: corrected off-by-one errors in the abstinence and average

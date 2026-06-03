@@ -1,8 +1,9 @@
 .*.swp
 *.orig
 
-/.gradle
-/.kotlin
-/app/build
-/app/src/main/res/raw*/license.md
-/app/src/main/res/raw*/usersguide.md
+/TODO.md
+/android/.gradle
+/android/.kotlin
+/android/app/build
+/android/app/src/main/res/raw*/license.md
+/android/app/src/main/res/raw*/usersguide.md
