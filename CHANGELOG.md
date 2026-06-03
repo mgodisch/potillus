@@ -26,6 +26,72 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.61.1
+
+Bug-fix release: corrected off-by-one errors in the abstinence and average
+calculations so that the **abstinent-days KPI**, the **average per day**, and the
+**current / longest abstinence streaks** all agree and follow a single, consistent
+rule for how the in-progress current day is treated:
+
+- A day counts as a **drink day** the moment its first drink is logged. At that
+  point today joins the observable period (with the amount consumed so far), so
+  the period is one day longer than the completed days.
+- A day counts as an **abstinent day** only once it has *finished* alcohol-free,
+  i.e. it has reached the next day-change time without any consumption.
+- While today has no drink yet it is undetermined (it may still become either a
+  drink or an abstinent day) and stays out of the period entirely until it finishes.
+
+Formally the period length is `effectivePeriodDays = completedDays + (today is a
+drink day ? 1 : 0)`, and every rate / count is derived from it.
+
+### Fixed
+
+- **Current / longest abstinence over-counted by one day.** `DayResolver`'s
+  tail-gap calculation (last drink day → today) counted the span *including* the
+  last drink day. Since the last drink day is itself a drink day (and today is
+  still in progress), both endpoints must be excluded; the gap now subtracts the
+  drink day (`− 1`, floored at 0), matching the inter-drink-gap convention that
+  already did this. Example: last drink two days ago, none since → current
+  abstinence is now `1` (the single completed dry day), previously `2`.
+- **Abstinent-days KPI and average-per-day were inconsistent with the
+  drink-today case.** The Statistics view divided by / subtracted from a period
+  that excluded the in-progress day, while `totalGrams` and `drinkDays` already
+  *included* a drink logged today. Both are now derived from one explicit
+  `effectivePeriodDays = completedDays + (today is a drink day ? 1 : 0)`:
+  - `avgPerDay = totalGrams / effectivePeriodDays` — previously divided by the
+    completed days only, so logging a drink today divided today's grams over a
+    period that did not include today, overstating the daily average (and showing
+    `0` when the period was just today). Now today extends the period exactly when
+    it is a drink day.
+  - `abstinentDays = effectivePeriodDays − drinkDays` (= completed dry days) — the
+    in-progress day is never counted as abstinent. Per-drink-day averaging still
+    includes today, as intended.
+
+### Changed (documentation / tests)
+
+- Clarified the `DayResolver` KDoc for both abstinence functions to state
+  explicitly that the last drink day and the in-progress current day are both
+  excluded, and rewrote the `StatsViewModel` comment around the previously
+  misleading `coerceAtLeast(0)` note to document the single `effectivePeriodDays`
+  model from which the average and the abstinent-day count are derived.
+- Updated four `DayResolverTest` expectations to the completed-day semantics
+  (last-drink-3-days-ago 3→2, drank-yesterday 1→0, statsFrom-ignored 3→2,
+  tail-gap-included 9→8) and added regression tests for the reported scenario
+  (drink on T−2, today T → current and longest tail = 1) plus a `StatsViewModelTest`
+  case asserting that a drink logged today extends the period for `avgPerDay`.
+
+### Notes
+
+- Behaviour intentionally differs from a naive "days since last drink": the day
+  immediately after a drink day shows `0` and becomes `1` only once the following
+  day has also finished dry. This is the rule that makes the KPI and the streaks
+  consistent.
+- A drink logged before the day-change time on the "statistics start" date falls
+  on the previous logical day and is correctly excluded from the period — this was
+  already handled by the logical-date model and needed no change.
+
+---
+
 ## v0.61.0
 
 Reworked the PDF report so its **layout can be edited by hand** without touching

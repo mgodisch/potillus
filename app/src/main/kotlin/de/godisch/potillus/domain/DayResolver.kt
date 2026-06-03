@@ -91,15 +91,19 @@ object DayResolver {
         date.format(DATE_FORMATTER)
 
     /**
-     * Number of elapsed days without alcohol, counting from the most recent drink
-     * (or from [statsFrom] if there are no drink entries yet).
+     * Number of completed, alcohol-free days since the most recent drink (or since
+     * [statsFrom] if there are no drink entries yet).
      *
      * Returns 0 if:
      * - [sortedDates] is empty AND [statsFrom] is empty or ≥ [today]
      * - [sortedDates] is non-empty AND the last entry equals or exceeds [today]
      *   (the user drank today, so no streak has started yet)
      *
-     * Today is never counted as an elapsed abstinent day (the day is not yet over).
+     * A day counts only once it has finished alcohol-free. Therefore BOTH the last
+     * drink day (a drink day, never abstinent) and the current day (still in
+     * progress, not yet finished) are excluded — only the fully completed dry days
+     * in between are counted. Consequently the day immediately after a drink day is
+     * still 0; the count becomes 1 only on the following day.
      *
      * [statsFrom] semantics: if the user has never logged a drink, the streak
      * starts at [statsFrom] (the "recording start" date). This represents the
@@ -123,8 +127,16 @@ object DayResolver {
         }
         // Drank today (or somehow in the future): streak is 0
         if (sortedDates.last() >= today) return 0
-        // General case: days elapsed since the last drink day
-        return parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt()
+        // Days strictly BETWEEN the last drink day and today, i.e. the completed,
+        // alcohol-free days. Both endpoints are non-abstinent and must be excluded:
+        //   • `today` is excluded automatically (datesUntil's end is exclusive) —
+        //     the current day is still in progress and is not yet a finished day.
+        //   • the last drink day is the *start* of the range and is itself a drink
+        //     day, so the `- 1` drops it.
+        // The guard above guarantees last < today, so the raw count is >= 1 and the
+        // result is >= 0 (coerceAtLeast is defensive).
+        return (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
+            .coerceAtLeast(0)
     }
 
     /**
@@ -143,8 +155,9 @@ object DayResolver {
      *
      * 3. **Tail gap** (last drink → [today]):
      *    Equivalent to the current streak – uses the same formula as
-     *    [computeCurrentAbstinence] for consistency.
-     *    `gap = datesUntil(today).count()` from lastDrink.
+     *    [computeCurrentAbstinence] for consistency. Both endpoints are
+     *    non-abstinent (last drink day; in-progress today), so subtract 1.
+     *    `gap = datesUntil(today).count() − 1` from lastDrink.
      *
      * @param sortedDates  Ascending list of distinct drinking dates ("YYYY-MM-DD").
      * @param today        Logical today. When provided, the tail gap is included.
@@ -178,9 +191,12 @@ object DayResolver {
             max = maxOf(max, gap)
         }
 
-        // 3. Tail gap: last drink → today (same semantics as computeCurrentAbstinence)
+        // 3. Tail gap: last drink → today (same semantics as computeCurrentAbstinence:
+        //    both endpoints are non-abstinent, so exclude today via the exclusive end
+        //    and the last drink day via `- 1`).
         if (today.isNotEmpty() && sortedDates.last() < today) {
-            val gap = parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt()
+            val gap = (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
+                .coerceAtLeast(0)
             max = maxOf(max, gap)
         }
 

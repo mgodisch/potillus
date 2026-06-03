@@ -207,6 +207,33 @@ class StatsViewModelTest {
         }
     }
 
+    /**
+     * A drink logged TODAY makes today a confirmed drink day, so it must join the
+     * statistics period immediately: avgPerDay divides totalGrams by the completed
+     * days PLUS today (effectivePeriodDays = abstinent days + drink days), not by
+     * the completed days alone. Regression for the avgPerDay off-by-one that
+     * surfaced only on days where a drink had already been logged.
+     *
+     * The assertion is wall-clock independent: it checks the invariant
+     * avgPerDay == totalGrams / (abstinentDays + drinkDays) rather than an absolute
+     * value, so it holds whatever weekday the test runs on.
+     */
+    @Test fun `drink today extends the effective period for avgPerDay`() = runTest {
+        val today = java.time.LocalDate.now().toString()
+        entryRepo.add(entry(id = 1, date = today, grams = 24.0))
+
+        val vm = makeVm()
+        vm.uiState.test {
+            val state = awaitItem()
+            assertEquals(1, state.dataPoints.size)            // today counted as a drink day
+            // drinkDays == 1, so the effective period is abstinentDays + 1 (today).
+            val effectivePeriodDays = state.abstinentDays + 1
+            assertEquals(24.0 / effectivePeriodDays, state.avgPerDay, 0.001)
+            assertTrue("today must extend the period (no divide-by-zero)", state.avgPerDay > 0.0)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ── Category breakdown ────────────────────────────────────────────────────
 
     /**

@@ -152,13 +152,21 @@ class DayResolverTest {
         assertEquals(0, DayResolver.computeCurrentAbstinence(listOf("2025-05-22", "2025-05-24"), "2025-05-24"))
     }
 
-    @Test fun `computeCurrentAbstinence 3 days ago`() {
-        // Letzter Trinktag war vor 3 Tagen
-        assertEquals(3, DayResolver.computeCurrentAbstinence(listOf("2025-05-20", "2025-05-21"), "2025-05-24"))
+    @Test fun `computeCurrentAbstinence last drink 3 days ago counts 2 completed dry days`() {
+        // Last drink 2025-05-21, today 2025-05-24. Completed dry days: 05-22, 05-23.
+        // Today (05-24) is in progress and the drink day itself are both excluded → 2.
+        assertEquals(2, DayResolver.computeCurrentAbstinence(listOf("2025-05-20", "2025-05-21"), "2025-05-24"))
     }
 
-    @Test fun `computeCurrentAbstinence 1 day ago`() {
-        assertEquals(1, DayResolver.computeCurrentAbstinence(listOf("2025-05-23"), "2025-05-24"))
+    @Test fun `computeCurrentAbstinence last drink two days ago counts 1`() {
+        // Regression for the reported bug: drink on T-2, none since, today T → exactly
+        // one completed dry day (T-1). Previously this returned 2.
+        assertEquals(1, DayResolver.computeCurrentAbstinence(listOf("2026-01-10"), "2026-01-12"))
+    }
+
+    @Test fun `computeCurrentAbstinence drank yesterday counts 0 today not over`() {
+        // Last drink 2025-05-23, today 2025-05-24: no completed dry day yet → 0.
+        assertEquals(0, DayResolver.computeCurrentAbstinence(listOf("2025-05-23"), "2025-05-24"))
     }
 
     // ── computeLongestAbstinence ────────────────────────────────────────────
@@ -202,8 +210,9 @@ class DayResolverTest {
     }
 
     @Test fun `computeCurrentAbstinence with entries statsFrom is ignored`() {
-        // Letzte Eintrag Mai 21, today Mai 24 → 3 Tage (statsFrom spielt keine Rolle)
-        assertEquals(3, DayResolver.computeCurrentAbstinence(listOf("2025-05-21"), "2025-05-24", "2025-01-01"))
+        // Last entry May 21, today May 24 → completed dry days May 22, May 23 = 2
+        // (statsFrom plays no role once drink entries exist).
+        assertEquals(2, DayResolver.computeCurrentAbstinence(listOf("2025-05-21"), "2025-05-24", "2025-01-01"))
     }
 
     // ── computeLongestAbstinence mit today und statsFrom ─────────────────────
@@ -214,14 +223,20 @@ class DayResolverTest {
     }
 
     @Test fun `computeLongestAbstinence tail gap included`() {
-        // Last entry May 1, today May 10 → tail gap = 9; inter-drink gap irrelevant
-        assertEquals(9, DayResolver.computeLongestAbstinence(listOf("2025-05-01"), "2025-05-10"))
+        // Last entry May 1, today May 10 → completed dry days May 2..May 9 = 8
+        // (last drink day and in-progress today both excluded).
+        assertEquals(8, DayResolver.computeLongestAbstinence(listOf("2025-05-01"), "2025-05-10"))
+    }
+
+    @Test fun `computeLongestAbstinence tail gap two days ago counts 1`() {
+        // Mirror of the reported scenario for the tail gap: drink on T-2, today T → 1.
+        assertEquals(1, DayResolver.computeLongestAbstinence(listOf("2026-01-10"), "2026-01-12"))
     }
 
     @Test fun `computeLongestAbstinence initial gap dominates`() {
         // statsFrom Jan 1, first entry May 1 → initial gap = 120 days (Jan 31 + Feb 28 + Mar 31 + Apr 30)
         // Simpler example: statsFrom May 1, first entry May 11, today May 12
-        // Initial gap = 10, tail gap = 1 → longest = 10
+        // Initial gap = 10 (May 1..May 10), tail gap = 0 → longest = 10
         assertEquals(10, DayResolver.computeLongestAbstinence(listOf("2025-05-11"), "2025-05-12", "2025-05-01"))
     }
 

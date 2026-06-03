@@ -289,21 +289,35 @@ class StatsViewModel(
             // future date. datesUntil() throws IllegalArgumentException when start > end,
             // so we clamp totalDays to 0 and skip the calculation.
             //
-            // half-open interval [effectiveFrom, to) is INTENTIONAL:
-            //   datesUntil(to) excludes `to` (the current logical day), so the
-            //   in-progress day is NOT counted as a completed day for averaging or
-            //   abstinence. `drinkDays` (current.size) DOES include today if a drink
-            //   was logged, so on a day with a drink-today `abstinentDays =
-            //   totalDays - drinkDays` can be one below zero; `coerceAtLeast(0)` below
-            //   absorbs exactly that one-day overlap. Do not "fix" this by making the
-            //   interval inclusive — that would count the unfinished day and shift
-            //   avgPerDay / abstinentDays for every period.
+            // `totalDays` is the number of COMPLETED logical days in the period: the
+            // half-open interval [effectiveFrom, today) deliberately excludes the
+            // in-progress current day (datesUntil's end is exclusive).
             val totalDays = if (effectiveFrom <= to)
                 DayResolver.parseDate(effectiveFrom).datesUntil(DayResolver.parseDate(to)).count().toInt()
             else 0
 
             val totalGrams = current.sumOf { it.totalGrams }
+            // Drink days in the period, INCLUDING today if a drink was logged today
+            // (the daily-summary query is inclusive of `to`, which equals today).
             val drinkDays  = current.size
+
+            // Effective period length for the per-day rate and the abstinent-day count.
+            //
+            // Today is in superposition until it resolves: logging a drink today makes
+            // it a confirmed DRINK day, so it joins the period immediately (with the
+            // amount consumed so far) and the observable period grows by one day. With
+            // no drink yet, today is undetermined — it may still become a drink day or
+            // an abstinent day — so it stays out entirely until it finishes. Hence the
+            // period is exactly the completed days, plus today iff today is a drink day:
+            //
+            //   effectivePeriodDays = totalDays + (today is a drink day ? 1 : 0)
+            //
+            // Everything derived from it is then consistent: `totalGrams` (which
+            // includes today's drinks) is divided by a period that includes today
+            // exactly when those drinks exist, and `abstinentDays` never counts the
+            // unfinished day (effectivePeriodDays − drinkDays = completed dry days).
+            val todayIsDrinkDay     = current.any { it.date == to }
+            val effectivePeriodDays = totalDays + if (todayIsDrinkDay) 1 else 0
 
             val categoryBreakdown = periodEntries
                 .groupBy { e -> drinkMap[e.drinkId]?.category ?: DrinkCategory.OTHER }
@@ -325,12 +339,12 @@ class StatsViewModel(
                 period            = period,
                 dataPoints        = current,
                 totalGrams        = totalGrams,
-                avgPerDay         = if (totalDays > 0) totalGrams / totalDays else 0.0,
+                avgPerDay         = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0,
                 avgPerDrinkDay    = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
                 daysOverDailyLimit    = violations.daysOverDailyLimit,
                 daysOverWeeklyLimit   = violations.daysOverWeeklyLimit,
                 daysOverDrinkDayLimit = violations.daysOverDrinkDayLimit,
-                abstinentDays     = (totalDays - drinkDays).coerceAtLeast(0),
+                abstinentDays     = (effectivePeriodDays - drinkDays).coerceAtLeast(0),
                 // Pass statsFloor so the streak starts at the recording-start date
                 // when there are no drink entries yet (implicit abstinence assumption).
                 currentStreak     = DayResolver.computeCurrentAbstinence(streakDates, today, statsFloor),
