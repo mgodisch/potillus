@@ -70,8 +70,18 @@ package de.godisch.potillus.util
 
 object SimpleTemplate {
 
-    /** Matches a scalar placeholder such as `{{TOTAL_GRAMS}}`. Group 1 is the key. */
-    private val PLACEHOLDER = Regex("""\{\{(\w+)}}""")
+    /**
+     * Matches a scalar placeholder such as `{{TOTAL_GRAMS}}`. Group 1 is the key.
+     *
+     * Every brace is escaped — the closing `\}\}` as well as the opening `\{\{`.
+     * A bare `}` is a harmless literal in the desktop JVM regex engine
+     * (`java.util.regex`, which is what local unit tests run against), but the
+     * ICU-based engine used on Android devices (`com.android.icu.util.regex`) is
+     * stricter and rejects an unescaped `}` with a `PatternSyntaxException`. That
+     * divergence is invisible to JVM tests, so always escape regex metacharacters
+     * here, even the ones the JVM happens to tolerate.
+     */
+    private val PLACEHOLDER = Regex("""\{\{(\w+)\}\}""")
 
     /**
      * Builds the regex for one named repeat block. [RegexOption.DOT_MATCHES_ALL]

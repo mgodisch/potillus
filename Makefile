@@ -21,25 +21,23 @@
 #  Makefile -- Potillus build tooling for Debian GNU/Linux stable
 # =============================================================================
 
-VERSION = $(shell grep '^## v' android/CHANGELOG.md | head -n 1 | cut -c5-)
+VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 
 default:
 	@echo make default does nothing
 
 install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk
 
-/home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk: potillus/app/build/outputs/apk/debug/app-debug.apk
+/home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk: android/app/build/outputs/apk/debug/app-debug.apk
 	cp $< $@
 
 tgz: distclean potillus-$(VERSION).tar.gz
 
-potillus-$(VERSION).tar.gz: potillus/CHANGELOG.md
-	cd ..
-	test ! -e potillus-$(VERSION)
-	mv potillus potillus-$(VERSION)
-	tar czf potillus-$(VERSION).tar.gz --exclude .gradle --exclude .kotlin --exclude android/app/build potillus-$(VERSION)
-	mv potillus-$(VERSION) potillus
-	cd potillus
+potillus-$(VERSION).tar.gz: CHANGELOG.md
+	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build potillus
+
+push:
+	git push && git push --tags
 
 clean:
 	$(MAKE) -C android $@
@@ -49,4 +47,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: default install tgz clean distclean
+.PHONY: default install tgz push clean distclean

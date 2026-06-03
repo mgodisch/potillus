@@ -143,8 +143,12 @@ cd "$SCRIPT_DIR"
 
 # ── File paths (all relative to repo root) ────────────────────────────────────
 BUILD_GRADLE="app/build.gradle.kts"
-CHANGELOG="CHANGELOG.md"
-README="README.md"
+# CHANGELOG.md and README.md live at the repository root, one level above this
+# script's directory (android/). The script cd's into its own dir (SCRIPT_DIR)
+# above, so reference them with `../`. build.gradle.kts and proguard-rules.pro
+# remain relative to android/ (i.e. under app/).
+CHANGELOG="../CHANGELOG.md"
+README="../README.md"
 PROGUARD="app/proguard-rules.pro"
 APPDB_KT="app/src/main/kotlin/de/godisch/potillus/data/db/AppDatabase.kt"
 BACKUP_MANAGER_KT="app/src/main/kotlin/de/godisch/potillus/util/BackupManager.kt"

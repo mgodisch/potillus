@@ -167,14 +167,11 @@ install-debug: app/build/outputs/apk/debug/app-debug.apk
 	test "$${DEV_COUNT:-0}" -ne 0
 	adb install -r $<
 
-push:
-	git push && git push --tags
-
 clean: prereq
 	./gradlew clean --no-daemon
 
-dist-clean: clean
+distclean: clean
 	rm app/src/main/res/raw*/license.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq version-check java android guides check-guides debug release test unit-test test-device install install-debug push clean dist-clean
+.PHONY: help prereq version-check java android guides check-guides debug release test unit-test test-device install install-debug clean distclean

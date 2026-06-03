@@ -315,10 +315,16 @@ fun LimitBar(
     // coerceAtLeast(1.0): guard against limitGrams = 0 (not configured).
     // A limit of 0 would produce NaN; show 0 % fill visually instead.
     val fraction = (totalGrams / limitGrams.coerceAtLeast(1.0)).toFloat().coerceAtLeast(0f)
+    // Red only when the limit is *exceeded* (strictly greater), matching
+    // AlcoholCalculator.countLimitViolations and the calendar/chart over-limit
+    // markers, which all use `totalGrams > limitGrams`. Reaching the limit exactly
+    // is allowed (the limit is what you may consume), so it stays amber. Using the
+    // gram comparison rather than `fraction >= 1f` also avoids float-rounding at
+    // the boundary.
     val barColor = when {
-        fraction < 0.75f -> MaterialTheme.colorScheme.primary
-        fraction < 1.0f  -> warningColor()
-        else             -> dangerRedColor()
+        totalGrams > limitGrams -> dangerRedColor()
+        fraction < 0.75f        -> MaterialTheme.colorScheme.primary
+        else                    -> warningColor()
     }
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -416,9 +422,9 @@ fun TrafficLightDot(
  * have already included alcohol consumption.
  *
  * Colour semantics mirror [LimitBar]:
- *   - < 75 % used  → primary (blue)
- *   - 75–99 % used → warning (amber) – one day left
- *   - ≥ 100 % used → dangerRed – limit reached
+ *   - < 75 % used   → primary (blue)
+ *   - 75–100 % used → warning (amber) – up to and including the last allowed day
+ *   - > 100 % used  → dangerRed – allowance exceeded
  *
  * The bar is always shown (0 drink days is displayed as an empty bar) so the
  * limit is visible even when the week has just started.
@@ -438,10 +444,14 @@ fun DrinkDaysBar(
 ) {
     val fraction = (drinkDays.toFloat() / maxDrinkDays.toFloat().coerceAtLeast(1f))
         .coerceAtLeast(0f)
+    // Red only when the allowance is *exceeded* (strictly more drink days than
+    // permitted), consistent with LimitBar and countLimitViolations. Using exactly
+    // the last allowed drink day (drinkDays == maxDrinkDays) is still within the
+    // limit and stays amber ("at cap, none left"); the next drink day is over.
     val barColor = when {
-        fraction < 0.75f -> MaterialTheme.colorScheme.primary
-        fraction < 1.0f  -> warningColor()
-        else             -> dangerRedColor()
+        drinkDays > maxDrinkDays -> dangerRedColor()
+        fraction < 0.75f         -> MaterialTheme.colorScheme.primary
+        else                     -> warningColor()
     }
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

@@ -19,10 +19,13 @@
       localised labels by PdfReportBuilder. Move them around freely, but do not
       rename them. An unknown placeholder is left in the PDF verbatim, which is
       your hint that a name no longer matches.
-    • <!-- repeat:NAME --> … <!-- end:NAME --> blocks — the content between the
-      markers is the template for ONE table row / chart bar and is repeated once
-      per data row. Edit the markup INSIDE a block to restyle every row; keep the
-      markers and their {{PLACEHOLDER}}s intact.
+    • Repeat blocks, written as a pair of HTML comments "repeat:NAME" and
+      "end:NAME" (an opening comment marker, then the row markup, then a closing
+      one) — the content between the markers is the template for ONE table row /
+      chart bar and is repeated once per data row. Edit the markup INSIDE a block
+      to restyle every row; keep the markers and their {{PLACEHOLDER}}s intact.
+      (This very comment must not contain those markers literally: the first
+      comment-closing sequence would end this documentation block early.)
 
   WHERE THE TEXT COMES FROM:
     All visible LABELS (titles, column headers, units, …) are injected as

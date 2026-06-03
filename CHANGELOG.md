@@ -26,9 +26,66 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.61.3
+
+Bug-fix release. Fixes the PDF export (broken on every device since v0.61.0), the
+limit progress bars turning red one step too early, a self-terminating comment in
+the report template, and two build-tooling paths missed when the code base moved
+into `android/`.
+
+### Fixed
+
+- **PDF export failed on every device** ("Export fehlgeschlagen"). The placeholder
+  regex in `SimpleTemplate` left its closing braces unescaped (`\{\{(\w+)}}`). The
+  desktop JVM regex engine — which local unit tests and `make test` run against —
+  accepts a bare `}`, but the stricter ICU engine on Android devices
+  (`com.android.icu.util.regex`) rejects it with `PatternSyntaxException`. That
+  threw inside `SimpleTemplate`'s static initialiser, failed every
+  `PdfReportBuilder.buildHtml` call, and the exception was swallowed by
+  `runCatching`, surfacing only as a brief "export failed" banner. All braces are
+  now escaped (`\{\{(\w+)\}\}`), which is valid under both engines.
+- **Progress bars turned red when a limit was exactly *reached*** rather than
+  exceeded. `LimitBar` (daily and weekly gram limits) and `DrinkDaysBar` coloured
+  the bar red at `fraction >= 1.0`. Red now means *strictly over* the limit
+  (`totalGrams > limitGrams` / `drinkDays > maxDrinkDays`), matching
+  `AlcoholCalculator.countLimitViolations` and the calendar/chart over-limit
+  markers. Reaching the limit exactly stays amber.
+- **Self-terminating comment in `report_template.html`.** The documentation block
+  at the top contained a literal `repeat:NAME` / `end:NAME` example written with
+  real HTML-comment delimiters, whose first close sequence ended the doc comment
+  early and leaked explanatory prose into the rendered page. The example is now
+  described without literal delimiters. (This was previously masked by the PDF
+  export crashing before it could render.)
+
+### Fixed (build tooling, after the move into `android/`)
+
+- `release-check.sh` looked for `CHANGELOG.md` / `README.md` in its own directory
+  (`android/`), but they live at the repository root; it now reads `../CHANGELOG.md`
+  and `../README.md`, matching the `version-check` Make target.
+- The root `Makefile` `install` target referenced the pre-move APK path
+  `potillus/app/build/...`; corrected to `android/app/build/...`.
+
+### Added
+
+- `SimpleTemplateInstrumentedTest` (androidTest) exercises `SimpleTemplate.render`
+  on-device, so the JVM-vs-ICU regex divergence that caused the PDF crash is caught
+  by `make test`'s `test-device` phase in future — the JVM unit test cannot detect
+  it.
+
+### Notes
+
+- Root cause of the PDF regression was confirmed from an on-device logcat stack
+  trace (`PatternSyntaxException` in `SimpleTemplate.<clinit>`); the pure pipeline
+  (`PdfReportData`, template fill) was never at fault.
+- The WebView + system-print path itself still warrants the usual on-device check
+  now that the report can be generated again: trigger the PDF export, confirm the
+  system print dialog opens, A4 pagination looks right, and "Save as PDF" works.
+
+---
+
 ## v0.61.2
 
-Moved Android code base into subdirectory android/.
+- Moved Android code base into subdirectory android/.
 
 ## v0.61.1
 
