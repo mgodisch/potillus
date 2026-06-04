@@ -26,6 +26,86 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.62.0
+
+Feature release. Replaces the fixed, configurable calendar week with a gliding
+**7-day window** throughout the app, and removes the *"Week starts on …"* setting.
+
+### Rationale
+
+The weekly gram limit and the maximum-drink-days limit were previously evaluated
+per calendar week, resetting on a user-chosen weekday. A fixed reset is easy to
+game (heavy drinking split across the Sunday/Monday boundary landed in two
+separate buckets) and does not reflect continuous health risk. A trailing 7-day
+window — every day judged against itself plus the previous six days — never
+resets, is stricter, and matches how low-risk-drinking guidance is generally
+framed. Removing the setting also simplifies the Settings screen.
+
+### Changed
+
+- **All consumption metrics now use a trailing 7-day window** (today + the
+  previous six calendar days), evaluated continuously:
+  - *Today screen* — the "this week" gram total, drink-day count and the range
+    label now cover the last seven days instead of the current calendar week.
+  - *Statistics screen* — the **WEEK** period is now the rolling last-7-days
+    window (its previous period, used for the trend %, is the seven days before
+    that); MONTH and YEAR are unchanged. The period chip is relabelled **"7 days"**.
+  - *Limits* — the traffic light and the "days over limit" statistics/PDF figures
+    use the rolling window. `AlcoholCalculator.countLimitViolations` was rewritten
+    from a per-calendar-week grouping into an O(n) two-pointer sliding window and
+    no longer takes a `weekStartDay` parameter.
+- **Calendar grid and PDF weekday profile** keep a fixed first weekday for *layout
+  only*; it now follows the **device locale** (via the new
+  `DayResolver.firstDayOfWeekIso()`) instead of the removed setting.
+- User-facing strings reworded from "week" to "7 days" in the English base, German
+  and — best-effort — all other bundled locales:
+  `weekly_limit_grams`, `drink_days_setting`, `drink_days_label`,
+  `limit_caption_week`, `days_over_weekly_limit`, `pdf_unit_g_per_week`,
+  `pdf_kpi_over_weekly`, and the stats period label `week`.
+
+### Removed
+
+- The **"Week starts on <weekday>"** setting and its entire plumbing:
+  `AppSettings.weekStartDay`, `IAppPreferences.setWeekStartDay`,
+  `AppPreferences` key `week_start_day` (its stored value is now ignored — no
+  migration needed; no DB schema change), `SettingsViewModel.setWeekStartDay`,
+  and the Settings UI control.
+- The obsolete `week_starts_on` string was deleted from the base locale **and all
+  51 translations** so the `LocaleSyncTest` key-count/key-set checks stay green.
+
+### Fixed
+
+- Nothing was found broken during the accompanying review pass; see *Notes* for a
+  pre-existing observation that was left as-is to keep this change focused.
+
+### Tests
+
+- `AlcoholCalculatorTest`: the `countLimitViolations` suite was rewritten for the
+  rolling window, adding cases for window-boundary inclusivity (a 6-day gap shares
+  a window, a 7-day gap does not), no gram carry-over beyond the window, and the
+  drink-day count not resetting across a weekday boundary. Expected values were
+  cross-checked against an independent reference implementation.
+- `PdfReportDataTest`: the weekday-order test is now locale-deterministic (asserts
+  against `DayResolver.firstDayOfWeekIso()` instead of a hard-coded Monday), so it
+  passes regardless of the JVM default locale on the build machine.
+
+### Notes / follow-ups
+
+- **Translations:** the reworded limit strings were translated (best-effort) for
+  every bundled locale, preserving each language's existing terminology and only
+  swapping the period token to "7 days". Placeholders (`%1$s`) and locale key sets
+  are unchanged, so the format-arg and `LocaleSyncTest` checks stay green. Two areas
+  intentionally keep their English fallback for now, by agreement: the in-app
+  user's guide (`usersguide*.md`) and the "crypto key unavailable" startup message.
+- **Build not run in this environment.** The change was made and statically
+  reviewed without executing the Android/Gradle toolchain (unavailable in the
+  authoring sandbox). Please run `./gradlew testDebugUnitTest lint` before release.
+- **Pre-existing observation (not changed):** `TodayViewModel` and `StatsViewModel`
+  each retain a `java.time.LocalDate` import that already appeared unused before
+  this change. Left untouched to avoid widening the diff; safe to drop later.
+
+---
+
 ## v0.61.3
 
 Bug-fix release. Fixes the PDF export (broken on every device since v0.61.0), the

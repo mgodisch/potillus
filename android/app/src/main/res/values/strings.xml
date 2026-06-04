@@ -100,7 +100,7 @@
     <string name="no_data">No data for this period.</string>
 
     <!-- Stats -->
-    <string name="week">Week</string>
+    <string name="week">7 days</string>
     <string name="month">Month</string>
     <string name="year">Year</string>
     <string name="total_period">Total in period</string>
@@ -122,7 +122,7 @@
     <string name="theme_night">Dark</string>
     <string name="day_change_time">Day change time</string>
     <string name="day_starts_at">New day starts at</string>
-    <string name="weekly_limit_grams">Weekly limit in grams</string>
+    <string name="weekly_limit_grams">7-day limit in grams</string>
     <string name="biometric">Access lock</string>
     <string name="biometric_lock">Biometric lock</string>
     <string name="biometric_desc">Lock the app with fingerprint or face recognition</string>
@@ -183,24 +183,23 @@
     <string name="csv_col_grams">Grams_alcohol</string>
     <string name="csv_col_note">Note</string>
     <string name="pdf_unit_g_per_day">g/day</string>
-    <string name="drink_days_label">drink days this week</string>
-    <string name="drink_days_setting">Max. drink days/week</string>
+    <string name="drink_days_label">drink days (last 7 days)</string>
+    <string name="drink_days_setting">Max. drink days/7 days</string>
     <!-- Device-transfer Keystore migration warning (shown once if settings appear empty after a recent install) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Personal data</string>
-    <string name="week_starts_on">Week starts on</string>
     <string name="limits">Limits</string>
     <string name="daily_limit_grams">Daily limit in grams</string>
     <string name="limit_caption_day">%1$s g/day</string>
-    <string name="limit_caption_week">%1$s g/week</string>
+    <string name="limit_caption_week">%1$s g/7 days</string>
     <string name="days_over_daily_limit">Days over daily limit</string>
-    <string name="days_over_weekly_limit">Days over weekly limit</string>
+    <string name="days_over_weekly_limit">Days over 7-day limit</string>
     <string name="days_over_drink_day_limit">Days over drink-day limit</string>
-    <string name="pdf_unit_g_per_week">g/week</string>
+    <string name="pdf_unit_g_per_week">g/7 days</string>
     <string name="pdf_meta_drink_days_suffix">drink days/wk</string>
     <string name="pdf_kpi_over_daily">Days > daily (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Days > weekly (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Days > 7-day (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Days > %1$d drink days</string>
     <string name="pdf_col_over_daily">> day</string>
     <string name="menu">Menu</string>

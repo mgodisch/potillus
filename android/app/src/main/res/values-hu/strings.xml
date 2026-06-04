@@ -119,7 +119,7 @@
     <string name="no_data">Erre az időszakra nincs adat.</string>
 
     <!-- Stats -->
-    <string name="week">Hét</string>
+    <string name="week">7 nap</string>
     <string name="month">Hónap</string>
     <string name="year">Év</string>
     <string name="total_period">Összesen az időszakban</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Sötét</string>
     <string name="day_change_time">Napváltás ideje</string>
     <string name="day_starts_at">Az új nap elkezdődik</string>
-    <string name="weekly_limit_grams">Heti korlát grammban</string>
+    <string name="weekly_limit_grams">7 napos korlát grammban</string>
     <string name="biometric">Zárolás</string>
     <string name="biometric_lock">Biometrikus zárolás</string>
     <string name="biometric_desc">Az alkalmazás zárolása ujjlenyomattal vagy arccal</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Megjegyzés</string>
     <string name="pdf_unit_g_per_day">g/nap</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">ivónapok ezen a héten</string>
-    <string name="drink_days_setting">Max. ivónapok/hét</string>
+    <string name="drink_days_label">ivónapok (utolsó 7 nap)</string>
+    <string name="drink_days_setting">Max. ivónapok/7 nap</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">A beállítások nem álltak vissza?</string>
     <string name="device_transfer_warning_body">A beállításokat és az adatokat nem sikerült teljesen visszaállítani az előző eszközről. Ez akkor fordulhat elő, ha a titkosított kulcsok nem vihetők át.\n\nHa ez új telepítés, ez az üzenet figyelmen kívül hagyható. Ellenkező esetben importálja újra a biztonsági mentést a következő helyen: Beállítások → Biztonsági mentés visszaállítása.</string>
     <string name="personal_data">Személyes adatok</string>
-    <string name="week_starts_on">A hét kezdőnapja</string>
     <string name="limits">Korlátok</string>
     <string name="daily_limit_grams">Napi korlát grammban</string>
     <string name="limit_caption_day">%1$s g/nap</string>
-    <string name="limit_caption_week">%1$s g/hét</string>
+    <string name="limit_caption_week">%1$s g/7 nap</string>
     <string name="days_over_daily_limit">Napok a napi korlát felett</string>
-    <string name="days_over_weekly_limit">Napok a heti korlát felett</string>
+    <string name="days_over_weekly_limit">Napok a 7 napos korlát felett</string>
     <string name="days_over_drink_day_limit">Napok az ivónapok korlátja felett</string>
-    <string name="pdf_unit_g_per_week">g/hét</string>
+    <string name="pdf_unit_g_per_week">g/7 nap</string>
     <string name="pdf_meta_drink_days_suffix">ivónap/hét</string>
     <string name="pdf_kpi_over_daily">Napok > napi (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Napok > heti (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Napok > 7 nap (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Napok > %1$d ivónap</string>
     <string name="pdf_col_over_daily">> nap</string>
     <string name="menu">Menü</string>

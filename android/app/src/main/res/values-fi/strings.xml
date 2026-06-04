@@ -119,7 +119,7 @@
     <string name="no_data">Tälle jaksolle ei ole tietoja.</string>
 
     <!-- Stats -->
-    <string name="week">Viikko</string>
+    <string name="week">7 päivää</string>
     <string name="month">Kuukausi</string>
     <string name="year">Vuosi</string>
     <string name="total_period">Yhteensä jaksossa</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tumma</string>
     <string name="day_change_time">Päivänvaihtumisaika</string>
     <string name="day_starts_at">Uusi päivä alkaa klo</string>
-    <string name="weekly_limit_grams">Viikkoraja grammoina</string>
+    <string name="weekly_limit_grams">7 päivän raja grammoina</string>
     <string name="biometric">Lukitus</string>
     <string name="biometric_lock">Biometrinen lukitus</string>
     <string name="biometric_desc">Lukitse sovellus sormenjäljellä tai kasvoilla</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Muistiinpano</string>
     <string name="pdf_unit_g_per_day">g/päivä</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">juomapäivät tällä viikolla</string>
-    <string name="drink_days_setting">Maks. juomapäivät/viikko</string>
+    <string name="drink_days_label">juomapäivät (viimeiset 7 päivää)</string>
+    <string name="drink_days_setting">Maks. juomapäivät/7 pv</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Asetuksia ei palautettu?</string>
     <string name="device_transfer_warning_body">Asetuksia ja tietoja ei voitu palauttaa kokonaan edellisestä laitteesta. Näin voi käydä, kun salattuja avaimia ei voida siirtää.\n\nJos kyseessä on uusi asennus, tämän viestin voi ohittaa. Muussa tapauksessa tuo varmuuskopio uudelleen kohdasta Asetukset → Palauta varmuuskopio.</string>
     <string name="personal_data">Henkilötiedot</string>
-    <string name="week_starts_on">Viikko alkaa</string>
     <string name="limits">Rajat</string>
     <string name="daily_limit_grams">Päivittäinen raja grammoina</string>
     <string name="limit_caption_day">%1$s g/pv</string>
-    <string name="limit_caption_week">%1$s g/vko</string>
+    <string name="limit_caption_week">%1$s g/7 pv</string>
     <string name="days_over_daily_limit">Päivät yli päivärajan</string>
-    <string name="days_over_weekly_limit">Päivät yli viikkorajan</string>
+    <string name="days_over_weekly_limit">Päivät yli 7 päivän rajan</string>
     <string name="days_over_drink_day_limit">Päivät yli juomapäivärajan</string>
-    <string name="pdf_unit_g_per_week">g/vko</string>
+    <string name="pdf_unit_g_per_week">g/7 pv</string>
     <string name="pdf_meta_drink_days_suffix">juomapäivää/vko</string>
     <string name="pdf_kpi_over_daily">Päivät > pv (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Päivät > vko (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Päivät > 7 pv (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Päivät > %1$d juomapäivää</string>
     <string name="pdf_col_over_daily">> pv</string>
     <string name="menu">Valikko</string>

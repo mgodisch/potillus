@@ -206,7 +206,6 @@
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Dữ liệu cá nhân</string>
-    <string name="week_starts_on">Tuần bắt đầu vào</string>
     <string name="limits">Giới hạn</string>
     <string name="daily_limit_grams">Giới hạn hằng ngày (gram)</string>
     <string name="limit_caption_day">%1$s g/ngày</string>

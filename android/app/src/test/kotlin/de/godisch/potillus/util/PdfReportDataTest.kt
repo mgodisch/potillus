@@ -21,6 +21,7 @@
  */
 package de.godisch.potillus.util
 
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -54,7 +55,7 @@ class PdfReportDataTest {
         entry("2026-02-05", 1, 10.0)
     )
     private val drinks = listOf(beer, wine)
-    private val settings = AppSettings()   // dailyLimit 20 g, weekStart Mon, weight 0
+    private val settings = AppSettings()   // dailyLimit 20 g, weight 0 (no week-start setting any more)
 
     private fun build() = PdfReportData.from(entries, drinks, settings)
 
@@ -96,10 +97,16 @@ class PdfReportDataTest {
         assertEquals(48.0, PdfReportData.bingeThreshold, 0.0)
     }
 
-    @Test fun `weekday order starts on the configured first weekday`() {
+    @Test fun `weekday order starts on the locale first weekday and rotates through all seven`() {
         val d = build()
-        assertEquals(1, d.weekdayOrder.first())             // Monday (ISO 1)
-        assertEquals(7, d.weekdayOrder.size)
+        // The first column now follows the device/JVM locale rather than a fixed
+        // Monday, so assert against the same source the production code uses.
+        val expectedFirst = DayResolver.firstDayOfWeekIso()
+        assertEquals(expectedFirst, d.weekdayOrder.first())
+        // Regardless of the start day, the order must be the seven ISO weekdays 1..7
+        // with no gaps or duplicates, rotated to begin at expectedFirst.
+        val expectedOrder = (0..6).map { (expectedFirst - 1 + it) % 7 + 1 }
+        assertEquals(expectedOrder, d.weekdayOrder)
         assertEquals(7, d.weekdayAverages.size)
     }
 

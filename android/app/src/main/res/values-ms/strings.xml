@@ -111,7 +111,7 @@
     <string name="no_data">Tiada data untuk tempoh ini.</string>
 
     <!-- Stats -->
-    <string name="week">Minggu</string>
+    <string name="week">7 hari</string>
     <string name="month">Bulan</string>
     <string name="year">Tahun</string>
     <string name="total_period">Jumlah dalam tempoh</string>
@@ -133,7 +133,7 @@
     <string name="theme_night">Gelap</string>
     <string name="day_change_time">Masa pertukaran hari</string>
     <string name="day_starts_at">Hari baru bermula pada</string>
-    <string name="weekly_limit_grams">Had mingguan dalam gram</string>
+    <string name="weekly_limit_grams">Had 7 hari dalam gram</string>
     <string name="biometric">Kunci akses</string>
     <string name="biometric_lock">Kunci biometrik</string>
     <string name="biometric_desc">Kunci apl dengan cap jari atau pengecaman wajah</string>
@@ -193,24 +193,23 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/hari</string>
-    <string name="drink_days_label">hari minum minggu ini</string>
-    <string name="drink_days_setting">Maks. hari minum/minggu</string>
+    <string name="drink_days_label">hari minum (7 hari lepas)</string>
+    <string name="drink_days_setting">Maks. hari minum/7 hari</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data peribadi</string>
-    <string name="week_starts_on">Minggu bermula pada</string>
     <string name="limits">Had</string>
     <string name="daily_limit_grams">Had harian dalam gram</string>
     <string name="limit_caption_day">%1$s g/hari</string>
-    <string name="limit_caption_week">%1$s g/minggu</string>
+    <string name="limit_caption_week">%1$s g/7 hari</string>
     <string name="days_over_daily_limit">Hari melebihi had harian</string>
-    <string name="days_over_weekly_limit">Hari melebihi had mingguan</string>
+    <string name="days_over_weekly_limit">Hari melebihi had 7 hari</string>
     <string name="days_over_drink_day_limit">Hari melebihi had hari minum</string>
-    <string name="pdf_unit_g_per_week">g/minggu</string>
+    <string name="pdf_unit_g_per_week">g/7 hari</string>
     <string name="pdf_meta_drink_days_suffix">hari minum/mgg</string>
     <string name="pdf_kpi_over_daily">Hari > harian (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Hari > mingguan (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Hari > 7 hari (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Hari > %1$d hari minum</string>
     <string name="pdf_col_over_daily">> hari</string>
     <string name="menu">Menu</string>

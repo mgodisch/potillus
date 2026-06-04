@@ -119,7 +119,7 @@
     <string name="no_data">Ebda data għal dan il-perjodu.</string>
 
     <!-- Stats -->
-    <string name="week">Ġimgħa</string>
+    <string name="week">7 ijiem</string>
     <string name="month">Xahar</string>
     <string name="year">Sena</string>
     <string name="total_period">Total fil-perjodu</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Skura</string>
     <string name="day_change_time">Ħin tal-bidla tal-jum</string>
     <string name="day_starts_at">Jum ġdid jibda fi</string>
-    <string name="weekly_limit_grams">Limitu tal-ġimgħa f\'gramma</string>
+    <string name="weekly_limit_grams">Limitu ta\' 7 ijiem fi gramma</string>
     <string name="biometric">Serq</string>
     <string name="biometric_lock">Serq bijometrika</string>
     <string name="biometric_desc">Agħlaq l-app b\'marki tas-swaba\' jew uċuħ</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/jum</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">ijiem tax-xorb din il-ġimgħa</string>
-    <string name="drink_days_setting">Maks. ijiem tax-xorb/ġimgħa</string>
+    <string name="drink_days_label">ijiem tax-xorb (l-aħħar 7 ijiem)</string>
+    <string name="drink_days_setting">Maks. ijiem tax-xorb/7 ijiem</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Dejta personali</string>
-    <string name="week_starts_on">Il-ġimgħa tibda</string>
     <string name="limits">Limiti</string>
     <string name="daily_limit_grams">Limitu ta\' kuljum fi grammi</string>
     <string name="limit_caption_day">%1$s g/jum</string>
-    <string name="limit_caption_week">%1$s g/ġimgħa</string>
+    <string name="limit_caption_week">%1$s g/7 ijiem</string>
     <string name="days_over_daily_limit">Jiem \'il fuq mil-limitu ta\' kuljum</string>
-    <string name="days_over_weekly_limit">Jiem \'il fuq mil-limitu fil-ġimgħa</string>
+    <string name="days_over_weekly_limit">Jiem \'il fuq mil-limitu ta\' 7 ijiem</string>
     <string name="days_over_drink_day_limit">Jiem \'il fuq mil-limitu tal-jiem tax-xorb</string>
-    <string name="pdf_unit_g_per_week">g/ġimgħa</string>
+    <string name="pdf_unit_g_per_week">g/7 ijiem</string>
     <string name="pdf_meta_drink_days_suffix">jiem tax-xorb/ġim.</string>
     <string name="pdf_kpi_over_daily">Jiem > jum (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Jiem > ġim. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Jiem > 7 ijiem (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Jiem > %1$d jiem tax-xorb</string>
     <string name="pdf_col_over_daily">> jum</string>
     <string name="menu">Menu</string>

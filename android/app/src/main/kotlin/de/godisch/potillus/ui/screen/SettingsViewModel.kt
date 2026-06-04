@@ -185,7 +185,6 @@ class SettingsViewModel(
     fun setWeightKg(kg: Double)           = viewModelScope.launch { prefs.setWeightKg(kg) }
     /** Persists the statistics start date [date] ("YYYY-MM-DD"). */
     fun setStatsFromDate(date: String)    = viewModelScope.launch { prefs.setStatsFromDate(date) }
-    fun setWeekStartDay(day: Int)         = viewModelScope.launch { prefs.setWeekStartDay(day) }
 
     /** Dismisses the export/import status banner. */
     fun clearExportStatus() { _exportStatus.value = null }

@@ -125,7 +125,8 @@ data class PdfReportData(
     // ── Weekday profile ────────────────────────────────────────────────────────
     /**
      * ISO weekday numbers (1 = Mon … 7 = Sun) in display order, rotated so the
-     * first entry is [AppSettings.weekStartDay]. Pairs index-for-index with
+     * first entry is the locale's first weekday (see [de.godisch.potillus.domain.DayResolver.firstDayOfWeekIso]).
+     * Pairs index-for-index with
      * [weekdayAverages].
      */
     val weekdayOrder: List<Int>,
@@ -150,7 +151,7 @@ data class PdfReportData(
          * @param entries  Consumption entries for the (inclusive) date range. Must be
          *                 non-empty; the caller checks this before calling.
          * @param drinks   Drink catalogue, used to map each entry to its category.
-         * @param settings Current limits, weight and week-start configuration.
+         * @param settings Current limits, weight and day-change configuration.
          * @return A fully computed [PdfReportData].
          */
         fun from(
@@ -186,8 +187,7 @@ data class PdfReportData(
                 summaries           = daySummaries,
                 dailyLimitGrams     = limitInfo.limitGrams,
                 weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
-                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
-                weekStartDay        = settings.weekStartDay
+                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek
             )
             val binge     = AlcoholCalculator.BINGE_THRESHOLD
             val bingeDays = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > binge }
@@ -239,8 +239,11 @@ data class PdfReportData(
                 Math.round(times.count { it < 17.0 }.toDouble() / times.size * 100).toInt() else 0
             val pctAfter17 = 100 - pctBefore17
 
-            // ── Weekday profile, rotated to start at the configured first weekday.
-            val ws = settings.weekStartDay
+            // ── Weekday profile, rotated to start at the locale's first weekday.
+            //    The app no longer has a configurable week start, so the column order
+            //    follows the device locale (Mon-first in most of Europe, Sun-first in
+            //    the US, etc.) via DayResolver.firstDayOfWeekIso().
+            val ws = DayResolver.firstDayOfWeekIso()
             val weekdayOrder = (0..6).map { i -> (ws - 1 + i) % 7 + 1 }   // ISO 1..7
             val dayTotals = Array(7) { mutableListOf<Double>() }
             byDate.forEach { (dateStr, es) ->

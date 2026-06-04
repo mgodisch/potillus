@@ -119,7 +119,7 @@
     <string name="no_data">Nu există date pentru această perioadă.</string>
 
     <!-- Stats -->
-    <string name="week">Săptămână</string>
+    <string name="week">7 zile</string>
     <string name="month">Lună</string>
     <string name="year">An</string>
     <string name="total_period">Total în perioadă</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Întunecată</string>
     <string name="day_change_time">Ora schimbării zilei</string>
     <string name="day_starts_at">Ziua nouă începe la</string>
-    <string name="weekly_limit_grams">Limită săptămânală în grame</string>
+    <string name="weekly_limit_grams">Limită pe 7 zile în grame</string>
     <string name="biometric">Blocare</string>
     <string name="biometric_lock">Blocare biometrică</string>
     <string name="biometric_desc">Blochează aplicația cu amprentă sau față</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Notă</string>
     <string name="pdf_unit_g_per_day">g/zi</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">zile de băut săptămâna aceasta</string>
-    <string name="drink_days_setting">Max. zile de băut/săptămână</string>
+    <string name="drink_days_label">zile de băut (ultimele 7 zile)</string>
+    <string name="drink_days_setting">Max. zile de băut/7 zile</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Setările nu au fost restaurate?</string>
     <string name="device_transfer_warning_body">Setările și datele nu au putut fi restaurate complet de pe dispozitivul anterior. Acest lucru se poate întâmpla când cheile criptate nu pot fi transferate.\n\nDacă este o instalare nouă, acest mesaj poate fi ignorat. În caz contrar, reimportați copia de rezervă din Setări → Restaurează backupul.</string>
     <string name="personal_data">Date personale</string>
-    <string name="week_starts_on">Săptămâna începe</string>
     <string name="limits">Limite</string>
     <string name="daily_limit_grams">Limită zilnică în grame</string>
     <string name="limit_caption_day">%1$s g/zi</string>
-    <string name="limit_caption_week">%1$s g/săpt.</string>
+    <string name="limit_caption_week">%1$s g/7 zile</string>
     <string name="days_over_daily_limit">Zile peste limita zilnică</string>
-    <string name="days_over_weekly_limit">Zile peste limita săptămânală</string>
+    <string name="days_over_weekly_limit">Zile peste limita pe 7 zile</string>
     <string name="days_over_drink_day_limit">Zile peste limita zilelor de consum</string>
-    <string name="pdf_unit_g_per_week">g/săpt.</string>
+    <string name="pdf_unit_g_per_week">g/7 zile</string>
     <string name="pdf_meta_drink_days_suffix">zile de consum/săpt.</string>
     <string name="pdf_kpi_over_daily">Zile > zi (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Zile > săpt. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Zile > 7 zile (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Zile > %1$d zile de consum</string>
     <string name="pdf_col_over_daily">> zi</string>
     <string name="menu">Meniu</string>

@@ -107,7 +107,7 @@
     <string name="no_data">لا توجد بيانات لهذه الفترة.</string>
 
     <!-- Stats -->
-    <string name="week">الأسبوع</string>
+    <string name="week">7 أيام</string>
     <string name="month">الشهر</string>
     <string name="year">السنة</string>
     <string name="total_period">إجمالي الفترة</string>
@@ -129,7 +129,7 @@
     <string name="theme_night">داكن</string>
     <string name="day_change_time">وقت تغيير اليوم</string>
     <string name="day_starts_at">يبدأ اليوم الجديد في</string>
-    <string name="weekly_limit_grams">الحد الأسبوعي بالغرامات</string>
+    <string name="weekly_limit_grams">حد 7 أيام بالغرامات</string>
     <string name="biometric">قفل الوصول</string>
     <string name="biometric_lock">القفل البيومتري</string>
     <string name="biometric_desc">قفل التطبيق ببصمة الإصبع أو التعرف على الوجه</string>
@@ -189,24 +189,23 @@
     <string name="csv_col_grams">غرام_كحول</string>
     <string name="csv_col_note">ملاحظة</string>
     <string name="pdf_unit_g_per_day">غ/يوم</string>
-    <string name="drink_days_label">أيام الشرب هذا الأسبوع</string>
-    <string name="drink_days_setting">الحد الأقصى لأيام الشرب/الأسبوع</string>
+    <string name="drink_days_label">أيام الشرب (آخر 7 أيام)</string>
+    <string name="drink_days_setting">الحد الأقصى لأيام الشرب/7 أيام</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">لم تتم استعادة الإعدادات؟</string>
     <string name="device_transfer_warning_body">تعذّرت استعادة الإعدادات والبيانات بالكامل من الجهاز السابق. قد يحدث ذلك عندما يتعذّر نقل المفاتيح المشفّرة.\n\nإذا كان هذا تثبيتًا جديدًا، فيمكن تجاهل هذه الرسالة. وإلا، فأعد استيراد النسخة الاحتياطية من الإعدادات ← استعادة النسخة الاحتياطية.</string>
     <string name="personal_data">البيانات الشخصية</string>
-    <string name="week_starts_on">يبدأ الأسبوع يوم</string>
     <string name="limits">الحدود</string>
     <string name="daily_limit_grams">الحد اليومي بالجرامات</string>
     <string name="limit_caption_day">%1$s g/يوم</string>
-    <string name="limit_caption_week">%1$s g/أسبوع</string>
+    <string name="limit_caption_week">%1$s g/7 أيام</string>
     <string name="days_over_daily_limit">أيام فوق الحد اليومي</string>
-    <string name="days_over_weekly_limit">أيام فوق الحد الأسبوعي</string>
+    <string name="days_over_weekly_limit">أيام فوق حد 7 أيام</string>
     <string name="days_over_drink_day_limit">أيام فوق حد أيام الشرب</string>
-    <string name="pdf_unit_g_per_week">g/أسبوع</string>
+    <string name="pdf_unit_g_per_week">g/7 أيام</string>
     <string name="pdf_meta_drink_days_suffix">أيام شرب/أسبوع</string>
     <string name="pdf_kpi_over_daily">أيام > يومي (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">أيام > أسبوعي (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">أيام > 7 أيام (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">أيام > %1$d أيام شرب</string>
     <string name="pdf_col_over_daily">> يوم</string>
     <string name="menu">القائمة</string>

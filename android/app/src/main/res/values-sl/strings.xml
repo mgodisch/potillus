@@ -119,7 +119,7 @@
     <string name="no_data">Za to obdobje ni podatkov.</string>
 
     <!-- Stats -->
-    <string name="week">Teden</string>
+    <string name="week">7 dni</string>
     <string name="month">Mesec</string>
     <string name="year">Leto</string>
     <string name="total_period">Skupaj v obdobju</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Temna</string>
     <string name="day_change_time">Čas menjave dneva</string>
     <string name="day_starts_at">Nov dan se začne ob</string>
-    <string name="weekly_limit_grams">Tedenska meja v gramih</string>
+    <string name="weekly_limit_grams">Meja za 7 dni v gramih</string>
     <string name="biometric">Zaklepanje</string>
     <string name="biometric_lock">Biometrično zaklepanje</string>
     <string name="biometric_desc">Zakleni aplikacijo z odtisom prsta ali obrazom</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Opomba</string>
     <string name="pdf_unit_g_per_day">g/dan</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">dnevi pitja ta teden</string>
-    <string name="drink_days_setting">Maks. dnevi pitja/teden</string>
+    <string name="drink_days_label">dnevi pitja (zadnjih 7 dni)</string>
+    <string name="drink_days_setting">Maks. dnevi pitja/7 dni</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Osebni podatki</string>
-    <string name="week_starts_on">Teden se začne</string>
     <string name="limits">Omejitve</string>
     <string name="daily_limit_grams">Dnevna omejitev v gramih</string>
     <string name="limit_caption_day">%1$s g/dan</string>
-    <string name="limit_caption_week">%1$s g/teden</string>
+    <string name="limit_caption_week">%1$s g/7 dni</string>
     <string name="days_over_daily_limit">Dnevi nad dnevno omejitvijo</string>
-    <string name="days_over_weekly_limit">Dnevi nad tedensko omejitvijo</string>
+    <string name="days_over_weekly_limit">Dnevi nad mejo za 7 dni</string>
     <string name="days_over_drink_day_limit">Dnevi nad omejitvijo dni pitja</string>
-    <string name="pdf_unit_g_per_week">g/teden</string>
+    <string name="pdf_unit_g_per_week">g/7 dni</string>
     <string name="pdf_meta_drink_days_suffix">dni pitja/teden</string>
     <string name="pdf_kpi_over_daily">Dnevi > dan (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dnevi > teden (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dnevi > 7 dni (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dnevi > %1$d dni pitja</string>
     <string name="pdf_col_over_daily">> dan</string>
     <string name="menu">Meni</string>

@@ -112,7 +112,7 @@
     <string name="no_data">Hakuna data kwa kipindi hiki.</string>
 
     <!-- Stats -->
-    <string name="week">Wiki</string>
+    <string name="week">siku 7</string>
     <string name="month">Mwezi</string>
     <string name="year">Mwaka</string>
     <string name="total_period">Jumla katika kipindi</string>
@@ -134,7 +134,7 @@
     <string name="theme_night">Giza</string>
     <string name="day_change_time">Wakati wa mabadiliko ya siku</string>
     <string name="day_starts_at">Siku mpya inaanza saa</string>
-    <string name="weekly_limit_grams">Kikomo cha wiki kwa gramu</string>
+    <string name="weekly_limit_grams">Kikomo cha siku 7 kwa gramu</string>
     <string name="biometric">Kufuli ya ufikiaji</string>
     <string name="biometric_lock">Kufuli ya kibayometriki</string>
     <string name="biometric_desc">Funga programu kwa alama ya kidole au utambuzi wa uso</string>
@@ -194,24 +194,23 @@
     <string name="csv_col_grams">Gramu_pombe</string>
     <string name="csv_col_note">Kumbuka</string>
     <string name="pdf_unit_g_per_day">g/siku</string>
-    <string name="drink_days_label">siku za kunywa wiki hii</string>
-    <string name="drink_days_setting">Upeo siku za kunywa/wiki</string>
+    <string name="drink_days_label">siku za kunywa (siku 7 zilizopita)</string>
+    <string name="drink_days_setting">Upeo siku za kunywa/siku 7</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data binafsi</string>
-    <string name="week_starts_on">Wiki huanza</string>
     <string name="limits">Vikomo</string>
     <string name="daily_limit_grams">Kikomo cha kila siku kwa gramu</string>
     <string name="limit_caption_day">%1$s g/siku</string>
-    <string name="limit_caption_week">%1$s g/wiki</string>
+    <string name="limit_caption_week">%1$s g/siku 7</string>
     <string name="days_over_daily_limit">Siku zilizozidi kikomo cha kila siku</string>
-    <string name="days_over_weekly_limit">Siku zilizozidi kikomo cha kila wiki</string>
+    <string name="days_over_weekly_limit">Siku zilizozidi kikomo cha siku 7</string>
     <string name="days_over_drink_day_limit">Siku zilizozidi kikomo cha siku za kunywa</string>
-    <string name="pdf_unit_g_per_week">g/wiki</string>
+    <string name="pdf_unit_g_per_week">g/siku 7</string>
     <string name="pdf_meta_drink_days_suffix">siku za kunywa/wiki</string>
     <string name="pdf_kpi_over_daily">Siku > siku (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Siku > wiki (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Siku > siku 7 (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Siku > %1$d siku za kunywa</string>
     <string name="pdf_col_over_daily">> siku</string>
     <string name="menu">Menyu</string>

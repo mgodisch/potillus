@@ -123,7 +123,7 @@
     <string name="no_data">ไม่มีข้อมูลสำหรับช่วงเวลานี้</string>
 
     <!-- Stats -->
-    <string name="week">สัปดาห์</string>
+    <string name="week">7 วัน</string>
     <string name="month">เดือน</string>
     <string name="year">ปี</string>
     <string name="total_period">รวมในช่วงเวลา</string>
@@ -145,7 +145,7 @@
     <string name="theme_night">มืด</string>
     <string name="day_change_time">เวลาเปลี่ยนวัน</string>
     <string name="day_starts_at">วันใหม่เริ่มเวลา</string>
-    <string name="weekly_limit_grams">ขีดจำกัดรายสัปดาห์ (กรัม)</string>
+    <string name="weekly_limit_grams">ขีดจำกัด 7 วัน (กรัม)</string>
     <string name="biometric">ล็อกการเข้าถึง</string>
     <string name="biometric_lock">ล็อกด้วยไบโอเมตริก</string>
     <string name="biometric_desc">ล็อกแอปด้วยลายนิ้วมือหรือการจดจำใบหน้า</string>
@@ -205,24 +205,23 @@
     <string name="csv_col_grams">กรัม_แอลกอฮอล์</string>
     <string name="csv_col_note">หมายเหตุ</string>
     <string name="pdf_unit_g_per_day">กรัม/วัน</string>
-    <string name="drink_days_label">วันที่ดื่มในสัปดาห์นี้</string>
-    <string name="drink_days_setting">จำนวนวันดื่มสูงสุด/สัปดาห์</string>
+    <string name="drink_days_label">วันที่ดื่ม (7 วันล่าสุด)</string>
+    <string name="drink_days_setting">จำนวนวันดื่มสูงสุด/7 วัน</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">ข้อมูลส่วนตัว</string>
-    <string name="week_starts_on">สัปดาห์เริ่มต้นวัน</string>
     <string name="limits">ขีดจำกัด</string>
     <string name="daily_limit_grams">ขีดจำกัดต่อวัน (กรัม)</string>
     <string name="limit_caption_day">%1$s g/วัน</string>
-    <string name="limit_caption_week">%1$s g/สัปดาห์</string>
+    <string name="limit_caption_week">%1$s g/7 วัน</string>
     <string name="days_over_daily_limit">วันที่เกินขีดจำกัดต่อวัน</string>
-    <string name="days_over_weekly_limit">วันที่เกินขีดจำกัดต่อสัปดาห์</string>
+    <string name="days_over_weekly_limit">วันที่เกินขีดจำกัด 7 วัน</string>
     <string name="days_over_drink_day_limit">วันที่เกินขีดจำกัดวันดื่ม</string>
-    <string name="pdf_unit_g_per_week">g/สัปดาห์</string>
+    <string name="pdf_unit_g_per_week">g/7 วัน</string>
     <string name="pdf_meta_drink_days_suffix">วันดื่ม/สัปดาห์</string>
     <string name="pdf_kpi_over_daily">วัน > วัน (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">วัน > สัปดาห์ (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">วัน > 7 วัน (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">วัน > %1$d วันดื่ม</string>
     <string name="pdf_col_over_daily">> วัน</string>
     <string name="menu">เมนู</string>

@@ -117,7 +117,7 @@
     <string name="no_data">이 기간의 데이터가 없습니다.</string>
 
     <!-- Stats -->
-    <string name="week">주</string>
+    <string name="week">7일</string>
     <string name="month">월</string>
     <string name="year">년</string>
     <string name="total_period">기간 합계</string>
@@ -139,7 +139,7 @@
     <string name="theme_night">다크</string>
     <string name="day_change_time">날짜 변경 시간</string>
     <string name="day_starts_at">새 날 시작 시간</string>
-    <string name="weekly_limit_grams">주간 한도 (그램)</string>
+    <string name="weekly_limit_grams">7일 한도 (그램)</string>
     <string name="biometric">액세스 잠금</string>
     <string name="biometric_lock">생체 인증 잠금</string>
     <string name="biometric_desc">지문 또는 얼굴 인식으로 앱 잠금</string>
@@ -199,24 +199,23 @@
     <string name="csv_col_grams">그램_알코올</string>
     <string name="csv_col_note">메모</string>
     <string name="pdf_unit_g_per_day">g/일</string>
-    <string name="drink_days_label">이번 주 음주일 수</string>
-    <string name="drink_days_setting">주 최대 음주일 수</string>
+    <string name="drink_days_label">음주일 수 (최근 7일)</string>
+    <string name="drink_days_setting">7일 최대 음주일 수</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">설정이 복원되지 않았나요?</string>
     <string name="device_transfer_warning_body">이전 기기에서 설정과 데이터를 완전히 복원하지 못했습니다. 암호화된 키를 이전할 수 없는 경우 발생할 수 있습니다.\n\n새로 설치한 경우에는 이 메시지를 무시해도 됩니다. 그렇지 않으면 설정 → 백업 복원 에서 백업을 다시 가져오세요.</string>
     <string name="personal_data">개인 데이터</string>
-    <string name="week_starts_on">주 시작 요일</string>
     <string name="limits">한도</string>
     <string name="daily_limit_grams">일일 한도(그램)</string>
     <string name="limit_caption_day">%1$s g/일</string>
-    <string name="limit_caption_week">%1$s g/주</string>
+    <string name="limit_caption_week">%1$s g/7일</string>
     <string name="days_over_daily_limit">일일 한도 초과 일수</string>
-    <string name="days_over_weekly_limit">주간 한도 초과 일수</string>
+    <string name="days_over_weekly_limit">7일 한도 초과 일수</string>
     <string name="days_over_drink_day_limit">음주일 한도 초과 일수</string>
-    <string name="pdf_unit_g_per_week">g/주</string>
+    <string name="pdf_unit_g_per_week">g/7일</string>
     <string name="pdf_meta_drink_days_suffix">음주일/주</string>
     <string name="pdf_kpi_over_daily">일 > 일일 (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">일 > 주간 (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">일 > 7일 (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">일 > %1$d 음주일</string>
     <string name="pdf_col_over_daily">> 일</string>
     <string name="menu">메뉴</string>

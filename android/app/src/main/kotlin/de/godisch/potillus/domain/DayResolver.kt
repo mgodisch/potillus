@@ -26,6 +26,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 /**
  * Calculates logical dates by applying a configurable day-change time.
@@ -89,6 +91,33 @@ object DayResolver {
     /** Formats a [LocalDate] as "YYYY-MM-DD". */
     fun formatDate(date: LocalDate): String =
         date.format(DATE_FORMATTER)
+
+    /**
+     * The first weekday of the calendar week for the given [locale], as an ISO-8601
+     * weekday number (1 = Monday … 7 = Sunday).
+     *
+     * WHY THIS EXISTS
+     *   As of the rolling-window refactor (v0.62.0) the app no longer has a
+     *   user-configurable "week starts on" setting, and all consumption metrics use
+     *   a gliding 7-day window instead of a fixed calendar week. Two purely *visual*
+     *   features still need a fixed first weekday, though:
+     *     - the calendar month grid (which weekday heads column 0), and
+     *     - the PDF "weekday profile" histogram (the order of its seven bars).
+     *   For those, the natural, locale-aware choice is the convention the user's
+     *   region already uses (Monday in most of Europe, Sunday in the US, Saturday in
+     *   much of the Middle East). [WeekFields.firstDayOfWeek] encodes exactly that.
+     *
+     * WHY A DEFAULT-LOCALE PARAMETER
+     *   Production callers pass nothing and get the device locale. Unit tests can
+     *   inject a fixed [Locale] to make the expected column order deterministic
+     *   regardless of the machine the tests run on.
+     *
+     * @param locale Locale whose week definition is used. Defaults to the JVM /
+     *               device default locale.
+     * @return ISO-8601 weekday number of the locale's first weekday (1..7).
+     */
+    fun firstDayOfWeekIso(locale: Locale = Locale.getDefault()): Int =
+        WeekFields.of(locale).firstDayOfWeek.value
 
     /**
      * Number of completed, alcohol-free days since the most recent drink (or since

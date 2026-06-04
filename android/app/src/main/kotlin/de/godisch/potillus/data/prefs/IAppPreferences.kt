@@ -58,6 +58,4 @@ interface IAppPreferences {
     suspend fun setDayChangeTime(hour: Int, minute: Int)
     /** Persists the statistics start date [date] ("YYYY-MM-DD"). */
     suspend fun setStatsFromDate(date: String)
-    /** Persists the first day of the week [day] (ISO 1 = Monday … 7 = Sunday). */
-    suspend fun setWeekStartDay(day: Int)
 }

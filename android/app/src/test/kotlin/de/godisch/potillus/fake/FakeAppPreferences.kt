@@ -55,6 +55,4 @@ class FakeAppPreferences(
 
     override suspend fun setDayChangeTime(hour: Int, minute: Int) =
         _settings.update { it.copy(dayChangeHour = hour, dayChangeMinute = minute) }
-
-    override suspend fun setWeekStartDay(day: Int) = _settings.update { it.copy(weekStartDay = day.coerceIn(1, 7)) }
 }

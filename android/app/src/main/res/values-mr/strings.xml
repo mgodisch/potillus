@@ -111,7 +111,7 @@
     <string name="no_data">या कालावधीसाठी डेटा नाही.</string>
 
     <!-- Stats -->
-    <string name="week">आठवडा</string>
+    <string name="week">7 दिवस</string>
     <string name="month">महिना</string>
     <string name="year">वर्ष</string>
     <string name="total_period">कालावधीतील एकूण</string>
@@ -133,7 +133,7 @@
     <string name="theme_night">गडद</string>
     <string name="day_change_time">दिवस बदलण्याची वेळ</string>
     <string name="day_starts_at">नवीन दिवस सुरू होतो</string>
-    <string name="weekly_limit_grams">साप्ताहिक मर्यादा ग्रॅममध्ये</string>
+    <string name="weekly_limit_grams">7 दिवसांची मर्यादा ग्रॅममध्ये</string>
     <string name="biometric">प्रवेश लॉक</string>
     <string name="biometric_lock">बायोमेट्रिक लॉक</string>
     <string name="biometric_desc">बोटाचा ठसा किंवा चेहरा ओळखीने ॲप लॉक करा</string>
@@ -193,24 +193,23 @@
     <string name="csv_col_grams">ग्रॅम_अल्कोहोल</string>
     <string name="csv_col_note">नोट</string>
     <string name="pdf_unit_g_per_day">ग्रॅम/दिवस</string>
-    <string name="drink_days_label">या आठवड्यातील पिण्याचे दिवस</string>
-    <string name="drink_days_setting">कमाल पिण्याचे दिवस/आठवडा</string>
+    <string name="drink_days_label">पिण्याचे दिवस (मागील 7 दिवस)</string>
+    <string name="drink_days_setting">कमाल पिण्याचे दिवस/7 दिवस</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">वैयक्तिक माहिती</string>
-    <string name="week_starts_on">आठवडा सुरू होतो</string>
     <string name="limits">मर्यादा</string>
     <string name="daily_limit_grams">ग्रॅममधील दैनिक मर्यादा</string>
     <string name="limit_caption_day">%1$s g/दिवस</string>
-    <string name="limit_caption_week">%1$s g/आठवडा</string>
+    <string name="limit_caption_week">%1$s g/7 दिवस</string>
     <string name="days_over_daily_limit">दैनिक मर्यादेपेक्षा जास्त दिवस</string>
-    <string name="days_over_weekly_limit">साप्ताहिक मर्यादेपेक्षा जास्त दिवस</string>
+    <string name="days_over_weekly_limit">7 दिवसांच्या मर्यादेपेक्षा जास्त दिवस</string>
     <string name="days_over_drink_day_limit">पिण्याच्या दिवसांच्या मर्यादेपेक्षा जास्त दिवस</string>
-    <string name="pdf_unit_g_per_week">g/आठवडा</string>
+    <string name="pdf_unit_g_per_week">g/7 दिवस</string>
     <string name="pdf_meta_drink_days_suffix">पिण्याचे दिवस/आ.</string>
     <string name="pdf_kpi_over_daily">दिवस > दैनिक (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">दिवस > साप्ता. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">दिवस > 7 दिवस (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">दिवस > %1$d पिण्याचे दिवस</string>
     <string name="pdf_col_over_daily">> दिवस</string>
     <string name="menu">मेनू</string>

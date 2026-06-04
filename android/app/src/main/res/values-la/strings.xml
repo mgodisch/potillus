@@ -104,7 +104,7 @@
     <string name="no_data">Nulla data huius temporis.</string>
 
     <!-- Statisticae -->
-    <string name="week">Hebdomas</string>
+    <string name="week">7 dies</string>
     <string name="month">Mensis</string>
     <string name="year">Annus</string>
     <string name="total_period">Summa temporis</string>
@@ -126,7 +126,7 @@
     <string name="theme_night">Nocturnum</string>
     <string name="day_change_time">Hora mutationis diei</string>
     <string name="day_starts_at">Dies novus incipit hora</string>
-    <string name="weekly_limit_grams">Modus hebdomadarius in grammis</string>
+    <string name="weekly_limit_grams">Modus 7 dierum in grammis</string>
     <string name="biometric">Custodia accessus</string>
     <string name="biometric_lock">Custodia biometrica</string>
     <string name="biometric_desc">Applicatio dactyloscopio vel vultu claudatur</string>
@@ -181,24 +181,23 @@
     <string name="csv_col_grams">Massa_alcohol</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/die</string>
-    <string name="drink_days_label">dies potus huius hebdomadis</string>
-    <string name="drink_days_setting">Max. dies/hebdomadem</string>
+    <string name="drink_days_label">dies potus (7 dies proximi)</string>
+    <string name="drink_days_setting">Max. dies/7 dies</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Data personalia</string>
-    <string name="week_starts_on">Hebdomas incipit die</string>
     <string name="limits">Limites</string>
     <string name="daily_limit_grams">Limes cotidianus in grammatis</string>
     <string name="limit_caption_day">%1$s g/die</string>
-    <string name="limit_caption_week">%1$s g/hebd.</string>
+    <string name="limit_caption_week">%1$s g/7 dies</string>
     <string name="days_over_daily_limit">Dies supra limitem cotidianum</string>
-    <string name="days_over_weekly_limit">Dies supra limitem hebdomadalem</string>
+    <string name="days_over_weekly_limit">Dies supra limitem 7 dierum</string>
     <string name="days_over_drink_day_limit">Dies supra limitem dierum bibendi</string>
-    <string name="pdf_unit_g_per_week">g/hebd.</string>
+    <string name="pdf_unit_g_per_week">g/7 dies</string>
     <string name="pdf_meta_drink_days_suffix">dies bibendi/hebd.</string>
     <string name="pdf_kpi_over_daily">Dies > die (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dies > hebd. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dies > 7 dies (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dies > %1$d dies bibendi</string>
     <string name="pdf_col_over_daily">> die</string>
     <string name="menu">Index</string>

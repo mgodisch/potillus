@@ -100,7 +100,7 @@
     <string name="no_data">该时间段没有数据。</string>
 
     <!-- Stats -->
-    <string name="week">周</string>
+    <string name="week">7天</string>
     <string name="month">月</string>
     <string name="year">年</string>
     <string name="total_period">时间段总计</string>
@@ -122,7 +122,7 @@
     <string name="theme_night">深色</string>
     <string name="day_change_time">换日时间</string>
     <string name="day_starts_at">新的一天开始于</string>
-    <string name="weekly_limit_grams">每周限量（克）</string>
+    <string name="weekly_limit_grams">7天限量（克）</string>
     <string name="biometric">访问锁定</string>
     <string name="biometric_lock">生物识别锁定</string>
     <string name="biometric_desc">通过指纹或面部识别锁定应用</string>
@@ -182,24 +182,23 @@
     <string name="csv_col_grams">克_酒精</string>
     <string name="csv_col_note">备注</string>
     <string name="pdf_unit_g_per_day">克/天</string>
-    <string name="drink_days_label">本周饮酒天数</string>
-    <string name="drink_days_setting">每周最多饮酒天数</string>
+    <string name="drink_days_label">饮酒天数（最近7天）</string>
+    <string name="drink_days_setting">7天最多饮酒天数</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">设置未恢复？</string>
     <string name="device_transfer_warning_body">无法从上一台设备完整恢复设置和数据。当加密密钥无法传输时，可能会发生这种情况。\n\n如果这是全新安装，可以忽略此消息。否则，请通过 设置 → 恢复备份 重新导入备份。</string>
     <string name="personal_data">个人数据</string>
-    <string name="week_starts_on">一周开始于</string>
     <string name="limits">限额</string>
     <string name="daily_limit_grams">每日限额（克）</string>
     <string name="limit_caption_day">%1$s 克/天</string>
-    <string name="limit_caption_week">%1$s 克/周</string>
+    <string name="limit_caption_week">%1$s 克/7天</string>
     <string name="days_over_daily_limit">超过每日限额的天数</string>
-    <string name="days_over_weekly_limit">超过每周限额的天数</string>
+    <string name="days_over_weekly_limit">超过7天限额的天数</string>
     <string name="days_over_drink_day_limit">超过饮酒天数限额的天数</string>
-    <string name="pdf_unit_g_per_week">克/周</string>
+    <string name="pdf_unit_g_per_week">克/7天</string>
     <string name="pdf_meta_drink_days_suffix">饮酒天数/周</string>
     <string name="pdf_kpi_over_daily">天 > 日 (%1$s 克)</string>
-    <string name="pdf_kpi_over_weekly">天 > 周 (%1$s 克)</string>
+    <string name="pdf_kpi_over_weekly">天 > 7天 (%1$s 克)</string>
     <string name="pdf_kpi_over_drink_days">天 > %1$d 饮酒天</string>
     <string name="pdf_col_over_daily">> 日</string>
     <string name="menu">菜单</string>

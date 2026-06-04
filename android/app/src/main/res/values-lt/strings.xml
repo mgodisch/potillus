@@ -119,7 +119,7 @@
     <string name="no_data">Šiam laikotarpiui nėra duomenų.</string>
 
     <!-- Stats -->
-    <string name="week">Savaitė</string>
+    <string name="week">7 dienos</string>
     <string name="month">Mėnuo</string>
     <string name="year">Metai</string>
     <string name="total_period">Iš viso per laikotarpį</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tamsi</string>
     <string name="day_change_time">Dienos keitimo laikas</string>
     <string name="day_starts_at">Nauja diena prasideda</string>
-    <string name="weekly_limit_grams">Savaitės riba gramais</string>
+    <string name="weekly_limit_grams">7 dienų riba gramais</string>
     <string name="biometric">Užraktas</string>
     <string name="biometric_lock">Biometrinis užraktas</string>
     <string name="biometric_desc">Užrakinti programą piršto antspaudu arba veidu</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Pastaba</string>
     <string name="pdf_unit_g_per_day">g/dieną</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">gėrimo dienos šią savaitę</string>
-    <string name="drink_days_setting">Maks. gėrimo dienos/savaitė</string>
+    <string name="drink_days_label">gėrimo dienos (paskutinės 7 dienos)</string>
+    <string name="drink_days_setting">Maks. gėrimo dienos/7 d.</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Asmens duomenys</string>
-    <string name="week_starts_on">Savaitė prasideda</string>
     <string name="limits">Ribos</string>
     <string name="daily_limit_grams">Dienos riba gramais</string>
     <string name="limit_caption_day">%1$s g/d.</string>
-    <string name="limit_caption_week">%1$s g/sav.</string>
+    <string name="limit_caption_week">%1$s g/7 d.</string>
     <string name="days_over_daily_limit">Dienos virš dienos ribos</string>
-    <string name="days_over_weekly_limit">Dienos virš savaitės ribos</string>
+    <string name="days_over_weekly_limit">Dienos virš 7 dienų ribos</string>
     <string name="days_over_drink_day_limit">Dienos virš gėrimo dienų ribos</string>
-    <string name="pdf_unit_g_per_week">g/sav.</string>
+    <string name="pdf_unit_g_per_week">g/7 d.</string>
     <string name="pdf_meta_drink_days_suffix">gėrimo dienų/sav.</string>
     <string name="pdf_kpi_over_daily">Dienos > d. (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dienos > sav. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dienos > 7 d. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dienos > %1$d gėrimo dienų</string>
     <string name="pdf_col_over_daily">> d.</string>
     <string name="menu">Meniu</string>

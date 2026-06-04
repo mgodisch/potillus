@@ -82,7 +82,12 @@ data class CalendarUiState(
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
     val totalGramsSelected: Double              = 0.0,
     val limitInfo: LimitInfo                    = LimitInfo(20.0, 100.0, 5),
-    /** First day of the week (ISO 1 = Monday … 7 = Sunday) for grid alignment. */
+    /**
+     * First weekday for month-grid alignment (ISO 1 = Monday … 7 = Sunday).
+     * Derived from the device locale via [DayResolver.firstDayOfWeekIso] — the app
+     * no longer exposes a user setting for this. Affects only the visual column
+     * order of the calendar, not any consumption metric.
+     */
     val weekStartDay: Int                       = 1
 )
 
@@ -174,7 +179,7 @@ class CalendarViewModel(
             CalendarViewMode.MONTH -> DayResolver.formatDate(month.atDay(1)) to DayResolver.formatDate(month.atEndOfMonth())
             CalendarViewMode.YEAR  -> "$year-01-01" to "$year-12-31"
         }
-        CalendarParams(mode, month, year, todayDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, settings.weekStartDay)
+        CalendarParams(mode, month, year, todayDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
     }
     // ── Stage 1: load day summaries for the visible period ────────────────
     // flatMapLatest cancels the previous inner Flow and starts a new one every

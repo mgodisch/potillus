@@ -236,7 +236,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
                 }
             }
 
-            // ── 3. Statistics (day-change time + week start + stats-start date) ────
+            // ── 3. Statistics (day-change time + stats-start date) ────────────────
             item { SettingsSectionHeader(stringResource(R.string.statistics)) }
             item {
                 SettingsCard {
@@ -250,36 +250,6 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
                             )
                         }
                         IconButton(onClick = {showTimePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
-                    }
-                }
-            }
-            item {
-                SettingsCard {
-                    var weekMenuExpanded by remember { mutableStateOf(false) }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.week_starts_on), style = MaterialTheme.typography.bodyMedium)
-                        Box {
-                            OutlinedButton(onClick = { weekMenuExpanded = true }) {
-                                Text(
-                                    java.time.DayOfWeek.of(settings.weekStartDay)
-                                        .getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault())
-                                )
-                            }
-                            DropdownMenu(expanded = weekMenuExpanded, onDismissRequest = { weekMenuExpanded = false }) {
-                                // ISO weekdays 1 (Monday) … 7 (Sunday); localised full names.
-                                (1..7).forEach { iso ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                java.time.DayOfWeek.of(iso)
-                                                    .getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault())
-                                            )
-                                        },
-                                        onClick = { vm.setWeekStartDay(iso); weekMenuExpanded = false }
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }

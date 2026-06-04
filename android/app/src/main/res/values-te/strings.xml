@@ -112,7 +112,7 @@
     <string name="no_data">ఈ కాలానికి డేటా లేదు.</string>
 
     <!-- Stats -->
-    <string name="week">వారం</string>
+    <string name="week">7 రోజులు</string>
     <string name="month">నెల</string>
     <string name="year">సంవత్సరం</string>
     <string name="total_period">కాలంలో మొత్తం</string>
@@ -134,7 +134,7 @@
     <string name="theme_night">చీకటి</string>
     <string name="day_change_time">రోజు మారే సమయం</string>
     <string name="day_starts_at">కొత్త రోజు ప్రారంభమవుతుంది</string>
-    <string name="weekly_limit_grams">వారపు పరిమితి గ్రాములలో</string>
+    <string name="weekly_limit_grams">7 రోజుల పరిమితి గ్రాములలో</string>
     <string name="biometric">యాక్సెస్ లాక్</string>
     <string name="biometric_lock">బయోమెట్రిక్ లాక్</string>
     <string name="biometric_desc">వేలిముద్ర లేదా ముఖ గుర్తింపుతో యాప్‌ని లాక్ చేయండి</string>
@@ -194,24 +194,23 @@
     <string name="csv_col_grams">గ్రా_ఆల్కహాల్</string>
     <string name="csv_col_note">గమనిక</string>
     <string name="pdf_unit_g_per_day">గ్రా/రోజు</string>
-    <string name="drink_days_label">ఈ వారంలో తాగే రోజులు</string>
-    <string name="drink_days_setting">గరిష్టం తాగే రోజులు/వారం</string>
+    <string name="drink_days_label">తాగే రోజులు (గత 7 రోజులు)</string>
+    <string name="drink_days_setting">గరిష్టం తాగే రోజులు/7 రోజులు</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">వ్యక్తిగత డేటా</string>
-    <string name="week_starts_on">వారం ప్రారంభమయ్యే రోజు</string>
     <string name="limits">పరిమితులు</string>
     <string name="daily_limit_grams">గ్రాములలో రోజువారీ పరిమితి</string>
     <string name="limit_caption_day">%1$s g/రోజు</string>
-    <string name="limit_caption_week">%1$s g/వారం</string>
+    <string name="limit_caption_week">%1$s g/7 రోజులు</string>
     <string name="days_over_daily_limit">రోజువారీ పరిమితి దాటిన రోజులు</string>
-    <string name="days_over_weekly_limit">వారపు పరిమితి దాటిన రోజులు</string>
+    <string name="days_over_weekly_limit">7 రోజుల పరిమితి దాటిన రోజులు</string>
     <string name="days_over_drink_day_limit">తాగే రోజుల పరిమితి దాటిన రోజులు</string>
-    <string name="pdf_unit_g_per_week">g/వారం</string>
+    <string name="pdf_unit_g_per_week">g/7 రోజులు</string>
     <string name="pdf_meta_drink_days_suffix">తాగే రోజులు/వా.</string>
     <string name="pdf_kpi_over_daily">రోజులు > రోజు (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">రోజులు > వారం (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">రోజులు > 7 రోజులు (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">రోజులు > %1$d తాగే రోజులు</string>
     <string name="pdf_col_over_daily">> రోజు</string>
     <string name="menu">మెను</string>

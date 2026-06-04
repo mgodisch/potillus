@@ -116,7 +116,7 @@
     <string name="no_data">Keng Daten fir dëse Zäitraum.</string>
 
     <!-- Stats -->
-    <string name="week">Woch</string>
+    <string name="week">7 Deeg</string>
     <string name="month">Mount</string>
     <string name="year">Joer</string>
     <string name="total_period">Gesamt am Zäitraum</string>
@@ -138,7 +138,7 @@
     <string name="theme_night">Nuecht</string>
     <string name="day_change_time">Dagswiessel-Zäit</string>
     <string name="day_starts_at">Neien Dag fänkt un ëm</string>
-    <string name="weekly_limit_grams">Wochelimit a Gramm</string>
+    <string name="weekly_limit_grams">7-Deeg-Limit a Gramm</string>
     <string name="biometric">Zougangsspär</string>
     <string name="biometric_lock">Biometresch Spär</string>
     <string name="biometric_desc">App beim Opmaache mat Fangerofdrock oder Gesiicht spären</string>
@@ -198,24 +198,23 @@
     <string name="csv_col_grams">Gramm_Alkohol</string>
     <string name="csv_col_note">Notiz</string>
     <string name="pdf_unit_g_per_day">g/Dag</string>
-    <string name="drink_days_label">Drénkdeeg dës Woch</string>
-    <string name="drink_days_setting">Max. Drénkdeeg/Woch</string>
+    <string name="drink_days_label">Drénkdeeg (lescht 7 Deeg)</string>
+    <string name="drink_days_setting">Max. Drénkdeeg/7 Deeg</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Perséinlech Daten</string>
-    <string name="week_starts_on">Woch fänkt un mat</string>
     <string name="limits">Limitten</string>
     <string name="daily_limit_grams">Dageslimit a Gramm</string>
     <string name="limit_caption_day">%1$s g/Dag</string>
-    <string name="limit_caption_week">%1$s g/Woch</string>
+    <string name="limit_caption_week">%1$s g/7 Deeg</string>
     <string name="days_over_daily_limit">Deeg iwwer dem Dageslimit</string>
-    <string name="days_over_weekly_limit">Deeg iwwer dem Wochelimit</string>
+    <string name="days_over_weekly_limit">Deeg iwwer dem 7-Deeg-Limit</string>
     <string name="days_over_drink_day_limit">Deeg iwwer dem Limit vun den Drénkdeeg</string>
-    <string name="pdf_unit_g_per_week">g/Woch</string>
+    <string name="pdf_unit_g_per_week">g/7 Deeg</string>
     <string name="pdf_meta_drink_days_suffix">Drénkdeeg/Woch</string>
     <string name="pdf_kpi_over_daily">Deeg > Dag (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Deeg > Woch (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Deeg > 7 Deeg (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Deeg > %1$d Drénkdeeg</string>
     <string name="pdf_col_over_daily">> Dag</string>
     <string name="menu">Menü</string>

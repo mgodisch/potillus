@@ -119,7 +119,7 @@
     <string name="no_data">Pre toto obdobie nie sú žiadne údaje.</string>
 
     <!-- Stats -->
-    <string name="week">Týždeň</string>
+    <string name="week">7 dní</string>
     <string name="month">Mesiac</string>
     <string name="year">Rok</string>
     <string name="total_period">Celkom v období</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tmavá</string>
     <string name="day_change_time">Čas zmeny dňa</string>
     <string name="day_starts_at">Nový deň začína o</string>
-    <string name="weekly_limit_grams">Týždenný limit v gramoch</string>
+    <string name="weekly_limit_grams">Limit na 7 dní v gramoch</string>
     <string name="biometric">Uzamknutie</string>
     <string name="biometric_lock">Biometrické uzamknutie</string>
     <string name="biometric_desc">Uzamknutie aplikácie odtlačkom prsta alebo tvárou</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Poznámka</string>
     <string name="pdf_unit_g_per_day">g/deň</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">dni pitia tento týždeň</string>
-    <string name="drink_days_setting">Max. dni pitia/týždeň</string>
+    <string name="drink_days_label">dni pitia (posledných 7 dní)</string>
+    <string name="drink_days_setting">Max. dni pitia/7 dní</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Nastavenia neboli obnovené?</string>
     <string name="device_transfer_warning_body">Nastavenia a údaje sa nepodarilo úplne obnoviť z predchádzajúceho zariadenia. Môže sa to stať, keď nie je možné preniesť šifrované kľúče.\n\nAk ide o novú inštaláciu, túto správu možno ignorovať. V opačnom prípade znova importujte zálohu cez Nastavenia → Obnoviť zálohu.</string>
     <string name="personal_data">Osobné údaje</string>
-    <string name="week_starts_on">Týždeň začína</string>
     <string name="limits">Limity</string>
     <string name="daily_limit_grams">Denný limit v gramoch</string>
     <string name="limit_caption_day">%1$s g/deň</string>
-    <string name="limit_caption_week">%1$s g/týž.</string>
+    <string name="limit_caption_week">%1$s g/7 dní</string>
     <string name="days_over_daily_limit">Dni nad denným limitom</string>
-    <string name="days_over_weekly_limit">Dni nad týždenným limitom</string>
+    <string name="days_over_weekly_limit">Dni nad limitom na 7 dní</string>
     <string name="days_over_drink_day_limit">Dni nad limitom dní pitia</string>
-    <string name="pdf_unit_g_per_week">g/týž.</string>
+    <string name="pdf_unit_g_per_week">g/7 dní</string>
     <string name="pdf_meta_drink_days_suffix">dni pitia/týž.</string>
     <string name="pdf_kpi_over_daily">Dni > deň (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dni > týž. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dni > 7 dní (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dni > %1$d dní pitia</string>
     <string name="pdf_col_over_daily">> deň</string>
     <string name="menu">Ponuka</string>

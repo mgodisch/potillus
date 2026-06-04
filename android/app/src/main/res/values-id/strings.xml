@@ -118,7 +118,7 @@
     <string name="no_data">Tidak ada data untuk periode ini.</string>
 
     <!-- Stats -->
-    <string name="week">Minggu</string>
+    <string name="week">7 hari</string>
     <string name="month">Bulan</string>
     <string name="year">Tahun</string>
     <string name="total_period">Total periode</string>
@@ -140,7 +140,7 @@
     <string name="theme_night">Gelap</string>
     <string name="day_change_time">Waktu pergantian hari</string>
     <string name="day_starts_at">Hari baru dimulai pukul</string>
-    <string name="weekly_limit_grams">Batas mingguan (gram)</string>
+    <string name="weekly_limit_grams">Batas 7 hari (gram)</string>
     <string name="biometric">Kunci akses</string>
     <string name="biometric_lock">Kunci biometrik</string>
     <string name="biometric_desc">Kunci aplikasi dengan sidik jari atau pengenalan wajah</string>
@@ -200,24 +200,23 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Catatan</string>
     <string name="pdf_unit_g_per_day">g/hari</string>
-    <string name="drink_days_label">Hari minum minggu ini</string>
-    <string name="drink_days_setting">Maks. hari minum/minggu</string>
+    <string name="drink_days_label">hari minum (7 hari terakhir)</string>
+    <string name="drink_days_setting">Maks. hari minum/7 hari</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Pengaturan tidak dipulihkan?</string>
     <string name="device_transfer_warning_body">Pengaturan dan data tidak dapat dipulihkan sepenuhnya dari perangkat sebelumnya. Ini bisa terjadi ketika kunci terenkripsi tidak dapat ditransfer.\n\nJika ini pemasangan baru, pesan ini dapat diabaikan. Jika tidak, impor ulang cadangan melalui Pengaturan → Pulihkan cadangan.</string>
     <string name="personal_data">Data pribadi</string>
-    <string name="week_starts_on">Minggu dimulai pada</string>
     <string name="limits">Batas</string>
     <string name="daily_limit_grams">Batas harian dalam gram</string>
     <string name="limit_caption_day">%1$s g/hari</string>
-    <string name="limit_caption_week">%1$s g/minggu</string>
+    <string name="limit_caption_week">%1$s g/7 hari</string>
     <string name="days_over_daily_limit">Hari di atas batas harian</string>
-    <string name="days_over_weekly_limit">Hari di atas batas mingguan</string>
+    <string name="days_over_weekly_limit">Hari di atas batas 7 hari</string>
     <string name="days_over_drink_day_limit">Hari di atas batas hari minum</string>
-    <string name="pdf_unit_g_per_week">g/minggu</string>
+    <string name="pdf_unit_g_per_week">g/7 hari</string>
     <string name="pdf_meta_drink_days_suffix">hari minum/mgg</string>
     <string name="pdf_kpi_over_daily">Hari > harian (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Hari > mingguan (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Hari > 7 hari (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Hari > %1$d hari minum</string>
     <string name="pdf_col_over_daily">> hari</string>
     <string name="menu">Menu</string>

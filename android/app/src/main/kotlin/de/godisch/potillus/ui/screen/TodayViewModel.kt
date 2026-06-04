@@ -51,10 +51,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
 
 // ════════════════════════════════════════════════════════════════════════════
 // TODAY
@@ -70,7 +68,7 @@ data class TodayUiState(
     val entries: List<ConsumptionEntry>  = emptyList(),
     val totalGrams: Double               = 0.0,
     val limitInfo: LimitInfo             = LimitInfo(20.0, 100.0, 5),
-    /** Number of distinct Mon–Sun days this week with ≥1 entry (today included if applicable). */
+    /** Number of distinct days in the trailing 7-day window with ≥1 entry (today included if applicable). */
     val drinkDaysThisWeek: Int           = 0,
     val weeklyTotalGrams: Double         = 0.0,
     val weeklyRangeLabel: String         = "",
@@ -174,15 +172,20 @@ class TodayViewModel(
     val uiState: StateFlow<TodayUiState> = prefs.settingsFlow.flatMapLatest { settings ->
         val today     = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
-        val weekStart = DayResolver.parseDate(today).with(TemporalAdjusters.previousOrSame(DayOfWeek.of(settings.weekStartDay)))
-        val weekEnd   = weekStart.plusDays(6)
+        // Rolling 7-day window: today plus the previous six calendar days (inclusive).
+        // This replaces the former fixed calendar week so the "weekly" gram total and
+        // drink-day count never reset on a weekday boundary. The field names below
+        // keep the historical "weekly*" spelling to avoid churn; they now denote the
+        // trailing-7-day figures.
+        val windowEnd   = DayResolver.parseDate(today)
+        val windowStart = windowEnd.minusDays(6)
         val fmt       = DateTimeFormatter.ofPattern("d.M.")
-        val weekLabel = "${weekStart.format(fmt)}–${weekEnd.format(fmt)}"
+        val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 
         combine(
             entryRepo.getEntriesForDate(today),
             drinkRepo.drinks,
-            entryRepo.getDailySummaries(DayResolver.formatDate(weekStart), DayResolver.formatDate(weekEnd)),
+            entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
             ticker
         ) { entries, drinks, weeklySummaries, _ ->
             val totalGrams = entries.sumOf { it.gramsAlcohol }

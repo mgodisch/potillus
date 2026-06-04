@@ -112,7 +112,7 @@
     <string name="no_data">Einki data fyri hetta tíðarbil.</string>
 
     <!-- Stats -->
-    <string name="week">Vika</string>
+    <string name="week">7 dagar</string>
     <string name="month">Mánaður</string>
     <string name="year">Ár</string>
     <string name="total_period">Samtals í tíðarbilinum</string>
@@ -134,7 +134,7 @@
     <string name="theme_night">Dimmur</string>
     <string name="day_change_time">Tíð dagsskiftar</string>
     <string name="day_starts_at">Nýggjur dagur byrjar klokkan</string>
-    <string name="weekly_limit_grams">Vikumørk í gramum</string>
+    <string name="weekly_limit_grams">7-daga mørk í gramum</string>
     <string name="biometric">Atgongulás</string>
     <string name="biometric_lock">Lívfrøðiligur lás</string>
     <string name="biometric_desc">Lás appina við fingrafari ella andlitskenning</string>
@@ -194,24 +194,23 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Viðmerking</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
-    <string name="drink_days_label">drikkjudagar hesa vikuna</string>
-    <string name="drink_days_setting">Max. drikkjudagar/viku</string>
+    <string name="drink_days_label">drikkjudagar (seinastu 7 dagar)</string>
+    <string name="drink_days_setting">Max. drikkjudagar/7 dagar</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Persónlig dáta</string>
-    <string name="week_starts_on">Vikan byrjar</string>
     <string name="limits">Mørk</string>
     <string name="daily_limit_grams">Dagligt mark í grommum</string>
     <string name="limit_caption_day">%1$s g/dag</string>
-    <string name="limit_caption_week">%1$s g/viku</string>
+    <string name="limit_caption_week">%1$s g/7 dagar</string>
     <string name="days_over_daily_limit">Dagar yvir dagliga markinum</string>
-    <string name="days_over_weekly_limit">Dagar yvir vikuliga markinum</string>
+    <string name="days_over_weekly_limit">Dagar yvir 7-daga markinum</string>
     <string name="days_over_drink_day_limit">Dagar yvir markinum fyri drekkidagar</string>
-    <string name="pdf_unit_g_per_week">g/viku</string>
+    <string name="pdf_unit_g_per_week">g/7 dagar</string>
     <string name="pdf_meta_drink_days_suffix">drekkidagar/viku</string>
     <string name="pdf_kpi_over_daily">Dagar > dagur (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dagar > vika (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dagar > 7 dagar (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dagar > %1$d drekkidagar</string>
     <string name="pdf_col_over_daily">> dagur</string>
     <string name="menu">Valmynd</string>

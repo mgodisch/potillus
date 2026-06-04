@@ -119,7 +119,7 @@
     <string name="no_data">Selle perioodi kohta pole andmeid.</string>
 
     <!-- Stats -->
-    <string name="week">Nädal</string>
+    <string name="week">7 päeva</string>
     <string name="month">Kuu</string>
     <string name="year">Aasta</string>
     <string name="total_period">Kokku perioodi jooksul</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tume</string>
     <string name="day_change_time">Päevavahetuse kellaaeg</string>
     <string name="day_starts_at">Uus päev algab kell</string>
-    <string name="weekly_limit_grams">Nädalane limiit grammides</string>
+    <string name="weekly_limit_grams">7 päeva limiit grammides</string>
     <string name="biometric">Luku</string>
     <string name="biometric_lock">Biomeetriline luku</string>
     <string name="biometric_desc">Lukusta rakendus sõrmejälje või näoga</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Märkus</string>
     <string name="pdf_unit_g_per_day">g/päev</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">joomispäevad sel nädalal</string>
-    <string name="drink_days_setting">Maks. joomispäevad/nädal</string>
+    <string name="drink_days_label">joomispäevad (viimased 7 päeva)</string>
+    <string name="drink_days_setting">Maks. joomispäevad/7 päeva</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Isikuandmed</string>
-    <string name="week_starts_on">Nädal algab</string>
     <string name="limits">Piirid</string>
     <string name="daily_limit_grams">Päevane piir grammides</string>
     <string name="limit_caption_day">%1$s g/päev</string>
-    <string name="limit_caption_week">%1$s g/nädal</string>
+    <string name="limit_caption_week">%1$s g/7 päeva</string>
     <string name="days_over_daily_limit">Päevad üle päevase piiri</string>
-    <string name="days_over_weekly_limit">Päevad üle nädalase piiri</string>
+    <string name="days_over_weekly_limit">Päevad üle 7 päeva piiri</string>
     <string name="days_over_drink_day_limit">Päevad üle joomispäevade piiri</string>
-    <string name="pdf_unit_g_per_week">g/nädal</string>
+    <string name="pdf_unit_g_per_week">g/7 päeva</string>
     <string name="pdf_meta_drink_days_suffix">joomispäeva/näd.</string>
     <string name="pdf_kpi_over_daily">Päevad > päev (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Päevad > nädal (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Päevad > 7 päeva (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Päevad > %1$d joomispäeva</string>
     <string name="pdf_col_over_daily">> päev</string>
     <string name="menu">Menüü</string>

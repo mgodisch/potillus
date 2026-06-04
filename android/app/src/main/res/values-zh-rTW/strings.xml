@@ -119,7 +119,7 @@
     <string name="no_data">此期間無資料。</string>
 
     <!-- Stats -->
-    <string name="week">週</string>
+    <string name="week">7天</string>
     <string name="month">月</string>
     <string name="year">年</string>
     <string name="total_period">期間總計</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">深色</string>
     <string name="day_change_time">換日時間</string>
     <string name="day_starts_at">新一天從以下時間開始</string>
-    <string name="weekly_limit_grams">每週限制（公克）</string>
+    <string name="weekly_limit_grams">7天限制（公克）</string>
     <string name="biometric">存取鎖定</string>
     <string name="biometric_lock">生物辨識鎖定</string>
     <string name="biometric_desc">以指紋或臉部辨識鎖定應用程式</string>
@@ -201,24 +201,23 @@
     <string name="csv_col_grams">公克_酒精</string>
     <string name="csv_col_note">備注</string>
     <string name="pdf_unit_g_per_day">公克／天</string>
-    <string name="drink_days_label">本週飲酒日數</string>
-    <string name="drink_days_setting">每週最多飲酒日數</string>
+    <string name="drink_days_label">飲酒日數（最近7天）</string>
+    <string name="drink_days_setting">7天最多飲酒日數</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">設定未還原？</string>
     <string name="device_transfer_warning_body">無法從上一部裝置完整還原設定與資料。當加密金鑰無法轉移時，可能會發生這種情況。\n\n如果這是全新安裝，可以忽略此訊息。否則，請透過 設定 → 還原備份 重新匯入備份。</string>
     <string name="personal_data">個人資料</string>
-    <string name="week_starts_on">一週開始於</string>
     <string name="limits">上限</string>
     <string name="daily_limit_grams">每日上限（公克）</string>
     <string name="limit_caption_day">%1$s 公克/天</string>
-    <string name="limit_caption_week">%1$s 公克/週</string>
+    <string name="limit_caption_week">%1$s 公克/7天</string>
     <string name="days_over_daily_limit">超過每日上限的天數</string>
-    <string name="days_over_weekly_limit">超過每週上限的天數</string>
+    <string name="days_over_weekly_limit">超過7天上限的天數</string>
     <string name="days_over_drink_day_limit">超過飲酒天數上限的天數</string>
-    <string name="pdf_unit_g_per_week">公克/週</string>
+    <string name="pdf_unit_g_per_week">公克/7天</string>
     <string name="pdf_meta_drink_days_suffix">飲酒天數/週</string>
     <string name="pdf_kpi_over_daily">天 > 日 (%1$s 公克)</string>
-    <string name="pdf_kpi_over_weekly">天 > 週 (%1$s 公克)</string>
+    <string name="pdf_kpi_over_weekly">天 > 7天 (%1$s 公克)</string>
     <string name="pdf_kpi_over_drink_days">天 > %1$d 飲酒天</string>
     <string name="pdf_col_over_daily">> 日</string>
     <string name="menu">選單</string>

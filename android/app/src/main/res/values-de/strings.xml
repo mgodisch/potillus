@@ -100,7 +100,7 @@
     <string name="no_data">Keine Daten für diesen Zeitraum.</string>
 
     <!-- Stats -->
-    <string name="week">Woche</string>
+    <string name="week">7 Tage</string>
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
     <string name="total_period">Gesamt im Zeitraum</string>
@@ -122,7 +122,7 @@
     <string name="theme_night">Nacht</string>
     <string name="day_change_time">Tageswechsel-Uhrzeit</string>
     <string name="day_starts_at">Neuer Tag beginnt um</string>
-    <string name="weekly_limit_grams">Wochenlimit in Gramm</string>
+    <string name="weekly_limit_grams">7-Tage-Limit in Gramm</string>
     <string name="biometric">Zugangssperre</string>
     <string name="biometric_lock">Biometrische Sperre</string>
     <string name="biometric_desc">App beim Öffnen per Fingerabdruck oder Gesicht sperren</string>
@@ -182,24 +182,23 @@
     <string name="csv_col_grams">Gramm_Alkohol</string>
     <string name="csv_col_note">Notiz</string>
     <string name="pdf_unit_g_per_day">g/Tag</string>
-    <string name="drink_days_label">Trinktage diese Woche</string>
-    <string name="drink_days_setting">Max. Trinktage/Woche</string>
+    <string name="drink_days_label">Trinktage (letzte 7 Tage)</string>
+    <string name="drink_days_setting">Max. Trinktage/7 Tage</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Einstellungen nicht wiederhergestellt?</string>
     <string name="device_transfer_warning_body">Einstellungen und Daten konnten vom vorherigen Gerät nicht vollständig wiederhergestellt werden. Das kann passieren, wenn verschlüsselte Schlüssel nicht übertragen werden können.\n\nBei einer Neuinstallation kann diese Meldung ignoriert werden. Andernfalls das Backup bitte erneut über Einstellungen → Backup wiederherstellen importieren.</string>
     <string name="personal_data">Persönliche Daten</string>
-    <string name="week_starts_on">Woche beginnt mit</string>
     <string name="limits">Limits</string>
     <string name="daily_limit_grams">Tageslimit in Gramm</string>
     <string name="limit_caption_day">%1$s g/Tag</string>
-    <string name="limit_caption_week">%1$s g/Woche</string>
+    <string name="limit_caption_week">%1$s g/7 Tage</string>
     <string name="days_over_daily_limit">Tage über Tageslimit</string>
-    <string name="days_over_weekly_limit">Tage über Wochenlimit</string>
+    <string name="days_over_weekly_limit">Tage über 7-Tage-Limit</string>
     <string name="days_over_drink_day_limit">Tage über Trinktage-Limit</string>
-    <string name="pdf_unit_g_per_week">g/Woche</string>
+    <string name="pdf_unit_g_per_week">g/7 Tage</string>
     <string name="pdf_meta_drink_days_suffix">Trinktage/Wo.</string>
     <string name="pdf_kpi_over_daily">Tage > Tag (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Tage > Woche (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Tage > 7 Tage (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Tage > %1$d Trinktage</string>
     <string name="pdf_col_over_daily">> Tag</string>
     <string name="menu">Menü</string>

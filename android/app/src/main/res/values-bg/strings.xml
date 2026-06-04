@@ -119,7 +119,7 @@
     <string name="no_data">Няма данни за този период.</string>
 
     <!-- Stats -->
-    <string name="week">Седмица</string>
+    <string name="week">7 дни</string>
     <string name="month">Месец</string>
     <string name="year">Година</string>
     <string name="total_period">Общо за периода</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Тъмна</string>
     <string name="day_change_time">Час за смяна на деня</string>
     <string name="day_starts_at">Новият ден започва в</string>
-    <string name="weekly_limit_grams">Седмичен лимит в грамове</string>
+    <string name="weekly_limit_grams">Лимит за 7 дни в грамове</string>
     <string name="biometric">Заключване</string>
     <string name="biometric_lock">Биометрично заключване</string>
     <string name="biometric_desc">Заключване на приложението с пръстов отпечатък или лице</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Бележка</string>
     <string name="pdf_unit_g_per_day">г/ден</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">дни с пиене тази седмица</string>
-    <string name="drink_days_setting">Макс. дни с пиене/седмица</string>
+    <string name="drink_days_label">дни с пиене (последни 7 дни)</string>
+    <string name="drink_days_setting">Макс. дни с пиене/7 дни</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Лични данни</string>
-    <string name="week_starts_on">Седмицата започва в</string>
     <string name="limits">Лимити</string>
     <string name="daily_limit_grams">Дневен лимит в грамове</string>
     <string name="limit_caption_day">%1$s г/ден</string>
-    <string name="limit_caption_week">%1$s г/седм.</string>
+    <string name="limit_caption_week">%1$s г/7 дни</string>
     <string name="days_over_daily_limit">Дни над дневния лимит</string>
-    <string name="days_over_weekly_limit">Дни над седмичния лимит</string>
+    <string name="days_over_weekly_limit">Дни над лимита за 7 дни</string>
     <string name="days_over_drink_day_limit">Дни над лимита на дни с пиене</string>
-    <string name="pdf_unit_g_per_week">г/седм.</string>
+    <string name="pdf_unit_g_per_week">г/7 дни</string>
     <string name="pdf_meta_drink_days_suffix">дни с пиене/седм.</string>
     <string name="pdf_kpi_over_daily">Дни > ден (%1$s г)</string>
-    <string name="pdf_kpi_over_weekly">Дни > седм. (%1$s г)</string>
+    <string name="pdf_kpi_over_weekly">Дни > 7 дни (%1$s г)</string>
     <string name="pdf_kpi_over_drink_days">Дни > %1$d дни с пиене</string>
     <string name="pdf_col_over_daily">> ден</string>
     <string name="menu">Меню</string>

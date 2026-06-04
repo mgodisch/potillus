@@ -238,10 +238,13 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         internal val KEY_LANGUAGE       = stringPreferencesKey("language")
         internal val KEY_WEIGHT_KG      = doublePreferencesKey("weight_kg")
         internal val KEY_STATS_FROM     = stringPreferencesKey("stats_from_date")
-        internal val KEY_WEEK_START     = intPreferencesKey("week_start_day")
         // Removed in the three-limit refactor: "gender", "limit_mode" and
-        // "weekly_gram_mode". Any leftover values for those keys in an existing
-        // DataStore file are simply ignored by settingsFlow below.
+        // "weekly_gram_mode". Removed in the rolling-window refactor (v0.62.0):
+        // "week_start_day" — the app no longer has a configurable first weekday and
+        // uses a gliding 7-day window for all metrics; the calendar grid and PDF
+        // weekday profile derive their first column from the device locale instead.
+        // Any leftover values for those keys in an existing DataStore file are
+        // simply ignored by settingsFlow below.
     }
 
     /**
@@ -323,8 +326,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
             biometricEnabled    = prefs[KEY_BIOMETRIC]       ?: false,
             language            = prefs[KEY_LANGUAGE]        ?: "",
             weightKg            = prefs[KEY_WEIGHT_KG]       ?: 0.0,
-            statsFromDate       = prefs[KEY_STATS_FROM]      ?: installDate,
-            weekStartDay        = prefs[KEY_WEEK_START]      ?: 1
+            statsFromDate       = prefs[KEY_STATS_FROM]      ?: installDate
         )
     }
 
@@ -369,13 +371,6 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      * @param date  ISO-8601 date string ("YYYY-MM-DD").
      */
     override suspend fun setStatsFromDate(date: String) = save { it[KEY_STATS_FROM] = date }
-
-    /**
-     * Persists the first day of the week.
-     *
-     * @param day  ISO-8601 weekday number, clamped to 1 (Monday) … 7 (Sunday).
-     */
-    override suspend fun setWeekStartDay(day: Int) = save { it[KEY_WEEK_START] = day.coerceIn(1, 7) }
 
     /** Thin wrapper around [DataStore.edit] to reduce boilerplate in the setXxx functions. */
     private suspend fun save(block: (MutablePreferences) -> Unit) {

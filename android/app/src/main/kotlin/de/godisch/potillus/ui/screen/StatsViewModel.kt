@@ -58,9 +58,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 
 // ════════════════════════════════════════════════════════════════════════════
 // STATS
@@ -77,9 +75,9 @@ data class StatsUiState(
     val avgPerDrinkDay: Double                    = 0.0,
     /** Days whose own total exceeds the daily gram limit. */
     val daysOverDailyLimit: Int                   = 0,
-    /** Consumption days on/after the week's weekly-gram-limit was reached. */
+    /** Consumption days whose trailing-7-day gram total exceeded the limit. */
     val daysOverWeeklyLimit: Int                  = 0,
-    /** Consumption days beyond the allowed number of drink days in their week. */
+    /** Consumption days exceeding the allowed drink days within their trailing 7-day window. */
     val daysOverDrinkDayLimit: Int                = 0,
     val abstinentDays: Int                        = 0,
     val currentStreak: Int                        = 0,
@@ -256,8 +254,11 @@ class StatsViewModel(
 
         val (from, to, prevFrom, prevTo) = when (period) {
             StatsPeriod.WEEK -> {
-                val from = todayDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.of(settings.weekStartDay)))
-                val pf   = from.minusWeeks(1)
+                // Rolling 7-day window ending today (inclusive): today + previous 6 days.
+                // The previous window is the seven days immediately before it, so the
+                // trend percentage compares two adjacent, equal-length 7-day spans.
+                val from = todayDate.minusDays(6)
+                val pf   = from.minusDays(7)
                 arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
             }
             StatsPeriod.MONTH -> {
@@ -325,14 +326,13 @@ class StatsViewModel(
                 .filter { it.value > 0.0 }
 
             // All three limits are evaluated together over the period's days.
-            // Daily is a per-day check; weekly and drink-day are accumulated per
-            // week (delimited by the configured week start).
+            // Daily is a per-day check; the gram and drink-day limits use a gliding
+            // 7-day window (see AlcoholCalculator.countLimitViolations).
             val violations = AlcoholCalculator.countLimitViolations(
                 summaries           = current,
                 dailyLimitGrams     = limitInfo.limitGrams,
                 weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
-                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
-                weekStartDay        = settings.weekStartDay
+                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek
             )
 
             StatsUiState(

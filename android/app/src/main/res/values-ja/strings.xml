@@ -117,7 +117,7 @@
     <string name="no_data">この期間のデータはありません。</string>
 
     <!-- Stats -->
-    <string name="week">週</string>
+    <string name="week">7日</string>
     <string name="month">月</string>
     <string name="year">年</string>
     <string name="total_period">期間合計</string>
@@ -139,7 +139,7 @@
     <string name="theme_night">ダーク</string>
     <string name="day_change_time">日付切り替え時刻</string>
     <string name="day_starts_at">新しい日の開始時刻</string>
-    <string name="weekly_limit_grams">週間上限（グラム）</string>
+    <string name="weekly_limit_grams">7日間の上限（グラム）</string>
     <string name="biometric">アクセスロック</string>
     <string name="biometric_lock">生体認証ロック</string>
     <string name="biometric_desc">指紋または顔認証でアプリをロックする</string>
@@ -199,24 +199,23 @@
     <string name="csv_col_grams">グラム_アルコール</string>
     <string name="csv_col_note">メモ</string>
     <string name="pdf_unit_g_per_day">g／日</string>
-    <string name="drink_days_label">今週の飲酒日数</string>
-    <string name="drink_days_setting">週最大飲酒日数</string>
+    <string name="drink_days_label">飲酒日数（直近7日間）</string>
+    <string name="drink_days_setting">7日間の最大飲酒日数</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">設定が復元されませんでしたか？</string>
     <string name="device_transfer_warning_body">以前の端末から設定とデータを完全に復元できませんでした。これは、暗号化された鍵を移行できない場合に発生することがあります。\n\n新規インストールの場合は、このメッセージを無視してかまいません。そうでない場合は、設定 → バックアップを復元 からバックアップを再度インポートしてください。</string>
     <string name="personal_data">個人データ</string>
-    <string name="week_starts_on">週の開始曜日</string>
     <string name="limits">上限</string>
     <string name="daily_limit_grams">1日の上限（グラム）</string>
     <string name="limit_caption_day">%1$s g/日</string>
-    <string name="limit_caption_week">%1$s g/週</string>
+    <string name="limit_caption_week">%1$s g/7日</string>
     <string name="days_over_daily_limit">1日の上限を超えた日数</string>
-    <string name="days_over_weekly_limit">週の上限を超えた日数</string>
+    <string name="days_over_weekly_limit">7日間の上限を超えた日数</string>
     <string name="days_over_drink_day_limit">飲酒日数の上限を超えた日数</string>
-    <string name="pdf_unit_g_per_week">g/週</string>
+    <string name="pdf_unit_g_per_week">g/7日</string>
     <string name="pdf_meta_drink_days_suffix">飲酒日/週</string>
     <string name="pdf_kpi_over_daily">日 > 日 (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">日 > 週 (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">日 > 7日 (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">日 > %1$d 飲酒日</string>
     <string name="pdf_col_over_daily">> 日</string>
     <string name="menu">メニュー</string>

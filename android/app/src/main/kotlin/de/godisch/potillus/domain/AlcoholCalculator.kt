@@ -58,8 +58,7 @@ import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.LimitInfo
 import de.godisch.potillus.domain.model.LimitViolations
 import de.godisch.potillus.domain.model.TrafficLight
-import java.time.DayOfWeek
-import java.time.temporal.TemporalAdjusters
+import java.time.LocalDate
 import kotlin.math.roundToLong
 
 object AlcoholCalculator {
@@ -263,21 +262,22 @@ object AlcoholCalculator {
      *
      * All three limits are evaluated together:
      *   1. DAILY gram limit  – how many servings fit into today's remaining grams.
-     *   2. WEEKLY gram limit – how many servings fit into this week's remaining grams.
+     *   2. 7-DAY gram limit  – how many servings fit into the remaining grams of the
+     *      trailing 7-day window (today plus the previous six days).
      *   3. DRINK-DAY limit   – a *gate*, not a per-serving cap. Drinking more on a
      *      day that already counts as a drink day does not consume additional drink
      *      days, so this limit never reduces the green/yellow serving count; it can
-     *      only force [TrafficLight.RED] once the weekly drink-day budget is used up.
+     *      only force [TrafficLight.RED] once the 7-day drink-day budget is used up.
      *
      * DRINK-DAY GATE:
      *   `pastDrinkDays = drinkDaysThisWeek − (todayIsDrinkDay ? 1 : 0)` is the number
-     *   of drink days *before today*. The gate fires (RED) as soon as
-     *   `pastDrinkDays ≥ maxDrinkDaysPerWeek`, which covers both cases the product
-     *   spec calls out:
-     *     - today is not yet a drink day and the week already has `max` drink days
+     *   of drink days *before today* inside the trailing 7-day window. The gate fires
+     *   (RED) as soon as `pastDrinkDays ≥ maxDrinkDaysPerWeek`, which covers both
+     *   cases the product spec calls out:
+     *     - today is not yet a drink day and the window already has `max` drink days
      *       → logging would open a forbidden new drink day; and
      *     - today is already a drink day but there were already `max` drink days in
-     *       the past → today itself is over budget.
+     *       the window before today → today itself is over budget.
      *
      * Alcohol-free drinks ([gramsPerDrink] = 0) always return [TrafficLight.GREEN]:
      * they consume no gram budget and, being 0 g, never turn a day into a drink day.
@@ -285,11 +285,12 @@ object AlcoholCalculator {
      * @param gramsPerDrink       Grams for one serving at the current volume.
      * @param todayGrams          Grams already consumed today.
      * @param dailyLimitGrams     Daily gram limit.
-     * @param weeklyTotalGrams    Grams consumed this week so far (including today).
-     * @param weeklyLimitGrams    Weekly gram limit.
-     * @param drinkDaysThisWeek   Distinct drink days this week (today included when
-     *                            today already has alcohol).
-     * @param maxDrinkDaysPerWeek Maximum allowed drink days per week.
+     * @param weeklyTotalGrams    Grams consumed in the trailing 7-day window so far
+     *                            (including today).
+     * @param weeklyLimitGrams    Gram limit for the trailing 7-day window.
+     * @param drinkDaysThisWeek   Distinct drink days in the trailing 7-day window
+     *                            (today included when today already has alcohol).
+     * @param maxDrinkDaysPerWeek Maximum allowed drink days within the 7-day window.
      * @return                    [TrafficLight] status.
      */
     fun trafficLight(
@@ -330,68 +331,97 @@ object AlcoholCalculator {
         return (remainingGrams.coerceAtLeast(0.0) / gramsPerDrink).toInt()
     }
 
+    /** Length of the gliding consumption window, in days (today + the previous 6). */
+    const val WINDOW_DAYS = 7
+
     /**
      * Counts limit violations across a list of per-day summaries, used by the
      * Statistics screen and the PDF export.
      *
+     * ROLLING 7-DAY WINDOW (changed in v0.62.0)
+     *   The weekly gram limit and the drink-day limit are no longer evaluated per
+     *   fixed calendar week (which reset on a configured weekday). Instead each
+     *   consumption day is judged against the gliding [WINDOW_DAYS]-day window that
+     *   *ends on that day* — i.e. the day itself plus the six calendar days before
+     *   it. This window never "resets" on a weekday boundary, which makes the metric
+     *   harder to game (heavy drinking split across a Sun/Mon boundary no longer
+     *   lands in two separate buckets) and reflects continuous health risk more
+     *   honestly. See CHANGELOG v0.62.0 for the rationale.
+     *
      * The three counts answer:
      *   - [LimitViolations.daysOverDailyLimit]   – days whose own total grams exceed
-     *     [dailyLimitGrams].
-     *   - [LimitViolations.daysOverWeeklyLimit]  – consumption days on which the
-     *     running weekly total (cumulative from the week's start up to and including
-     *     that day) exceeds [weeklyLimitGrams]. The day that pushes the week over the
-     *     limit counts, as do all later consumption days in the same week.
-     *   - [LimitViolations.daysOverDrinkDayLimit] – consumption days whose 1-based
-     *     index within their week is greater than [maxDrinkDaysPerWeek] (e.g. the
-     *     6th and 7th drink day of a week when the limit is 5).
+     *     [dailyLimitGrams]. (Unchanged: a per-day check, independent of any window.)
+     *   - [LimitViolations.daysOverWeeklyLimit]  – consumption days whose trailing
+     *     7-day gram total (this day plus the previous six calendar days) exceeds
+     *     [weeklyLimitGrams].
+     *   - [LimitViolations.daysOverDrinkDayLimit] – consumption days for which the
+     *     number of distinct consumption days inside their trailing 7-day window
+     *     exceeds [maxDrinkDaysPerWeek] (e.g. the day is the 6th drink day within the
+     *     last 7 days when the limit is 5).
      *
      * Only days with > 0 g count as consumption days for the weekly and drink-day
-     * checks (a day with only alcohol-free entries is not a drink day). Weeks are
-     * delimited by [weekStartDay] (ISO 1 = Monday … 7 = Sunday).
+     * checks (a day with only alcohol-free entries is not a drink day and does not
+     * enter the window at all).
      *
-     * EDGE NOTE: when the surrounding period (e.g. a calendar month) starts or ends
-     * mid-week, only the days present in [summaries] contribute to that week's
-     * running total, so a week clipped at a period boundary is evaluated on its
-     * visible days only. This matches how the rest of the statistics screen scopes
-     * its figures to the selected period.
+     * EDGE NOTE (start of history / clipped periods): the window is built only from
+     * the days actually present in [summaries]. Near the first recorded day — or at
+     * the lower edge of a period clipped by the statistics-start date — fewer than
+     * seven days of history exist, so the trailing window simply contains fewer days
+     * and is evaluated on what is visible. This preserves the previous "visible days
+     * only" behaviour and matches how the rest of the statistics screen scopes its
+     * figures to the selected period.
+     *
+     * IMPLEMENTATION (two-pointer sliding window): the consumption days are sorted
+     * ascending once, then a single left pointer trails the current (right) day,
+     * dropping any day that has fallen out of the 7-day window and maintaining the
+     * running gram sum incrementally. This is O(n) over the consumption days rather
+     * than the O(n²) a naïve "re-scan the window for every day" would cost.
      *
      * @param summaries           Per-day summaries in any order; only days present
      *                            are considered.
      * @param dailyLimitGrams     Daily gram limit.
-     * @param weeklyLimitGrams    Weekly gram limit.
-     * @param maxDrinkDaysPerWeek Maximum allowed drink days per week.
-     * @param weekStartDay        First day of the week (ISO 1 = Monday … 7 = Sunday).
+     * @param weeklyLimitGrams    Gram limit for the trailing 7-day window.
+     * @param maxDrinkDaysPerWeek Maximum allowed drink days within any 7-day window.
      * @return                    The three violation counts.
      */
     fun countLimitViolations(
         summaries: List<DaySummary>,
         dailyLimitGrams: Double,
         weeklyLimitGrams: Double,
-        maxDrinkDaysPerWeek: Int,
-        weekStartDay: Int
+        maxDrinkDaysPerWeek: Int
     ): LimitViolations {
         val daysOverDaily = summaries.count { it.totalGrams > dailyLimitGrams }
 
-        val weekStart = DayOfWeek.of(weekStartDay.coerceIn(1, 7))
+        // Consumption days only (> 0 g), sorted ascending by date so the window can
+        // advance with a single forward pass. We parse the ISO date once per day.
+        val days = summaries
+            .filter { it.totalGrams > 0.0 }
+            .map { LocalDate.parse(it.date) to it.totalGrams }
+            .sortedBy { it.first }
+
         var daysOverWeekly   = 0
         var daysOverDrinkDay = 0
 
-        // Group consumption days (> 0 g) by the date their week starts on, then walk
-        // each week chronologically to accumulate the running gram total and the
-        // 1-based drink-day index.
-        summaries
-            .filter { it.totalGrams > 0.0 }
-            .groupBy { java.time.LocalDate.parse(it.date).with(TemporalAdjusters.previousOrSame(weekStart)) }
-            .forEach { (_, weekDays) ->
-                var runningGrams = 0.0
-                var drinkDayIndex = 0
-                weekDays.sortedBy { it.date }.forEach { day ->
-                    runningGrams += day.totalGrams
-                    drinkDayIndex += 1
-                    if (runningGrams > weeklyLimitGrams) daysOverWeekly++
-                    if (drinkDayIndex > maxDrinkDaysPerWeek) daysOverDrinkDay++
-                }
+        // Two-pointer window: [left, right] holds every consumption day whose date is
+        // within the 7-day span ending at the current right-hand day. `windowGrams`
+        // is the running gram sum of exactly those days.
+        var left = 0
+        var windowGrams = 0.0
+        for (right in days.indices) {
+            windowGrams += days[right].second
+            val windowStart = days[right].first.minusDays((WINDOW_DAYS - 1).toLong())
+
+            // Evict days that are now older than the window's first day. After this
+            // loop, days[left..right] are exactly the days inside the trailing window.
+            while (days[left].first < windowStart) {
+                windowGrams -= days[left].second
+                left++
             }
+
+            val windowDrinkDays = right - left + 1
+            if (windowGrams > weeklyLimitGrams)        daysOverWeekly++
+            if (windowDrinkDays > maxDrinkDaysPerWeek) daysOverDrinkDay++
+        }
 
         return LimitViolations(daysOverDaily, daysOverWeekly, daysOverDrinkDay)
     }

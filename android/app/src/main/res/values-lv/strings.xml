@@ -119,7 +119,7 @@
     <string name="no_data">Šim periodam nav datu.</string>
 
     <!-- Stats -->
-    <string name="week">Nedēļa</string>
+    <string name="week">7 dienas</string>
     <string name="month">Mēnesis</string>
     <string name="year">Gads</string>
     <string name="total_period">Kopā periodā</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tumšā</string>
     <string name="day_change_time">Dienas maiņas laiks</string>
     <string name="day_starts_at">Jaunā diena sākas plkst.</string>
-    <string name="weekly_limit_grams">Nedēļas limits gramos</string>
+    <string name="weekly_limit_grams">7 dienu limits gramos</string>
     <string name="biometric">Bloķēšana</string>
     <string name="biometric_lock">Biometriskā bloķēšana</string>
     <string name="biometric_desc">Bloķēt lietotni ar pirkstu nospiedumu vai seju</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Piezīme</string>
     <string name="pdf_unit_g_per_day">g/dienā</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">dzēriena dienas šonedēļ</string>
-    <string name="drink_days_setting">Maks. dzēriena dienas/nedēļa</string>
+    <string name="drink_days_label">dzēriena dienas (pēdējās 7 dienas)</string>
+    <string name="drink_days_setting">Maks. dzēriena dienas/7 d.</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Personas dati</string>
-    <string name="week_starts_on">Nedēļa sākas</string>
     <string name="limits">Ierobežojumi</string>
     <string name="daily_limit_grams">Dienas ierobežojums gramos</string>
     <string name="limit_caption_day">%1$s g/dienā</string>
-    <string name="limit_caption_week">%1$s g/nedēļā</string>
+    <string name="limit_caption_week">%1$s g/7 d.</string>
     <string name="days_over_daily_limit">Dienas virs dienas ierobežojuma</string>
-    <string name="days_over_weekly_limit">Dienas virs nedēļas ierobežojuma</string>
+    <string name="days_over_weekly_limit">Dienas virs 7 dienu ierobežojuma</string>
     <string name="days_over_drink_day_limit">Dienas virs dzeršanas dienu ierobežojuma</string>
-    <string name="pdf_unit_g_per_week">g/nedēļā</string>
+    <string name="pdf_unit_g_per_week">g/7 d.</string>
     <string name="pdf_meta_drink_days_suffix">dzeršanas dienas/ned.</string>
     <string name="pdf_kpi_over_daily">Dienas > diena (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dienas > nedēļa (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dienas > 7 d. (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dienas > %1$d dzeršanas dienas</string>
     <string name="pdf_col_over_daily">> diena</string>
     <string name="menu">Izvēlne</string>

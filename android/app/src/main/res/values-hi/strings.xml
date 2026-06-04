@@ -100,7 +100,7 @@
     <string name="no_data">इस अवधि के लिए कोई डेटा नहीं।</string>
 
     <!-- Stats -->
-    <string name="week">सप्ताह</string>
+    <string name="week">7 दिन</string>
     <string name="month">माह</string>
     <string name="year">वर्ष</string>
     <string name="total_period">अवधि में कुल</string>
@@ -122,7 +122,7 @@
     <string name="theme_night">गहरा</string>
     <string name="day_change_time">दिन बदलने का समय</string>
     <string name="day_starts_at">नया दिन शुरू होता है</string>
-    <string name="weekly_limit_grams">साप्ताहिक सीमा (ग्राम में)</string>
+    <string name="weekly_limit_grams">7 दिनों की सीमा (ग्राम में)</string>
     <string name="biometric">एक्सेस लॉक</string>
     <string name="biometric_lock">बायोमेट्रिक लॉक</string>
     <string name="biometric_desc">फिंगरप्रिंट या चेहरा पहचान से ऐप लॉक करें</string>
@@ -182,24 +182,23 @@
     <string name="csv_col_grams">ग्राम_अल्कोहल</string>
     <string name="csv_col_note">नोट</string>
     <string name="pdf_unit_g_per_day">ग्राम/दिन</string>
-    <string name="drink_days_label">इस सप्ताह पीने के दिन</string>
-    <string name="drink_days_setting">अधिकतम पीने के दिन/सप्ताह</string>
+    <string name="drink_days_label">पीने के दिन (पिछले 7 दिन)</string>
+    <string name="drink_days_setting">अधिकतम पीने के दिन/7 दिन</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">व्यक्तिगत जानकारी</string>
-    <string name="week_starts_on">सप्ताह शुरू होता है</string>
     <string name="limits">सीमाएँ</string>
     <string name="daily_limit_grams">ग्राम में दैनिक सीमा</string>
     <string name="limit_caption_day">%1$s g/दिन</string>
-    <string name="limit_caption_week">%1$s g/सप्ताह</string>
+    <string name="limit_caption_week">%1$s g/7 दिन</string>
     <string name="days_over_daily_limit">दैनिक सीमा से अधिक दिन</string>
-    <string name="days_over_weekly_limit">साप्ताहिक सीमा से अधिक दिन</string>
+    <string name="days_over_weekly_limit">7 दिनों की सीमा से अधिक दिन</string>
     <string name="days_over_drink_day_limit">पीने के दिनों की सीमा से अधिक दिन</string>
-    <string name="pdf_unit_g_per_week">g/सप्ताह</string>
+    <string name="pdf_unit_g_per_week">g/7 दिन</string>
     <string name="pdf_meta_drink_days_suffix">पीने के दिन/सप्ताह</string>
     <string name="pdf_kpi_over_daily">दिन > दैनिक (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">दिन > साप्ताहिक (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">दिन > 7 दिन (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">दिन > %1$d पीने के दिन</string>
     <string name="pdf_col_over_daily">> दिन</string>
     <string name="menu">मेनू</string>

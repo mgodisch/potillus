@@ -34,7 +34,7 @@ install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(V
 tgz: distclean potillus-$(VERSION).tar.gz
 
 potillus-$(VERSION).tar.gz: CHANGELOG.md
-	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build potillus
+	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .git --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build --exclude TODO.md potillus
 
 push:
 	git push && git push --tags

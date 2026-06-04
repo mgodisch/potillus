@@ -166,11 +166,12 @@ enum class ThemeMode { SYSTEM, DAY, NIGHT }
  * "within limits" only when none of the three thresholds is exceeded.
  *
  * @param limitGrams           Daily pure-alcohol limit in grams.
- * @param weeklyLimitGrams     Weekly pure-alcohol limit in grams (Mon–Sun, or the
- *                             configured week start). Independent of [limitGrams]
- *                             rather than derived from it.
- * @param maxDrinkDaysPerWeek  Maximum number of distinct drink days per week
- *                             (a drink day is any day with > 0 g consumed).
+ * @param weeklyLimitGrams     Pure-alcohol limit in grams for a gliding 7-day
+ *                             window (today plus the previous six days), evaluated
+ *                             continuously rather than reset on a fixed weekday.
+ *                             Independent of [limitGrams] rather than derived from it.
+ * @param maxDrinkDaysPerWeek  Maximum number of distinct drink days within any
+ *                             7-day window (a drink day is any day with > 0 g consumed).
  */
 data class LimitInfo(
     val limitGrams: Double,
@@ -195,11 +196,11 @@ enum class TrafficLight { GREEN, YELLOW, RED }
  * @param todayGrams           Grams consumed today. Used for the daily gram check
  *                             and to decide whether today already counts as a drink day.
  * @param dailyLimitGrams      Daily gram limit.
- * @param weeklyTotalGrams     Grams consumed this week (including today).
- * @param weeklyLimitGrams     Weekly gram limit.
- * @param drinkDaysThisWeek    Distinct days this week with > 0 g consumed (today included
- *                             when today already has alcohol entries).
- * @param maxDrinkDaysPerWeek  Maximum allowed drink days per week.
+ * @param weeklyTotalGrams     Grams consumed in the trailing 7-day window (including today).
+ * @param weeklyLimitGrams     Gram limit for the trailing 7-day window.
+ * @param drinkDaysThisWeek    Distinct days with > 0 g in the trailing 7-day window (today
+ *                             included when today already has alcohol entries).
+ * @param maxDrinkDaysPerWeek  Maximum allowed drink days within the 7-day window.
  *
  * COMPUTED HELPER:
  *   [todayIsDrinkDay] – whether today already counts as a drink day, derived from
@@ -230,12 +231,12 @@ data class DrinkCapacity(
  *   Three independent limits are always active at the same time — there is no
  *   guideline mode (WHO/DHS/custom) and no daily-vs-weekly toggle any more:
  *     - [dailyLimitGrams]     pure-alcohol grams allowed per day (default 20).
- *     - [weeklyLimitGrams]    pure-alcohol grams allowed per week (default 100).
- *     - [maxDrinkDaysPerWeek] distinct drink days allowed per week (default 5).
+ *     - [weeklyLimitGrams]    pure-alcohol grams allowed per gliding 7-day window (default 100).
+ *     - [maxDrinkDaysPerWeek] distinct drink days allowed per gliding 7-day window (default 5).
  *
  * @param dailyLimitGrams     Daily pure-alcohol limit in grams.
- * @param weeklyLimitGrams    Weekly pure-alcohol limit in grams.
- * @param maxDrinkDaysPerWeek Maximum number of drink days per week (1–7).
+ * @param weeklyLimitGrams    Pure-alcohol limit in grams for a gliding 7-day window.
+ * @param maxDrinkDaysPerWeek Maximum number of drink days within any 7-day window (1–7).
  */
 data class AppSettings(
     val themeMode: ThemeMode        = ThemeMode.SYSTEM,
@@ -257,13 +258,5 @@ data class AppSettings(
      * `"en"` would contradict the flow fallback and those checks, so it stays empty.
      */
     val language: String            = "",
-    val weightKg: Double            = 0.0,
-    /**
-     * First day of the week, as an ISO-8601 weekday number (1 = Monday …
-     * 7 = Sunday). Affects the weekly statistics window, the "this week"
-     * summary on the Today screen, the calendar grid alignment, and the PDF
-     * weekday profile. Defaults to Monday, which reproduces the app's previous
-     * hard-coded ISO-week behaviour.
-     */
-    val weekStartDay: Int           = 1
+    val weightKg: Double            = 0.0
 )

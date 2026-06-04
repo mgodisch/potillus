@@ -119,7 +119,7 @@
     <string name="no_data">Nema podataka za ovo razdoblje.</string>
 
     <!-- Stats -->
-    <string name="week">Tjedan</string>
+    <string name="week">7 dana</string>
     <string name="month">Mjesec</string>
     <string name="year">Godina</string>
     <string name="total_period">Ukupno u razdoblju</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Tamna</string>
     <string name="day_change_time">Vrijeme promjene dana</string>
     <string name="day_starts_at">Novi dan počinje u</string>
-    <string name="weekly_limit_grams">Tjedni limit u gramima</string>
+    <string name="weekly_limit_grams">Ograničenje za 7 dana u gramima</string>
     <string name="biometric">Zaključavanje</string>
     <string name="biometric_lock">Biometrijsko zaključavanje</string>
     <string name="biometric_desc">Zaključaj aplikaciju otiskom prsta ili licem</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Bilješka</string>
     <string name="pdf_unit_g_per_day">g/dan</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">dana pijenja ovaj tjedan</string>
-    <string name="drink_days_setting">Maks. dani pijenja/tjedan</string>
+    <string name="drink_days_label">dana pijenja (zadnjih 7 dana)</string>
+    <string name="drink_days_setting">Maks. dani pijenja/7 dana</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Osobni podaci</string>
-    <string name="week_starts_on">Tjedan počinje</string>
     <string name="limits">Ograničenja</string>
     <string name="daily_limit_grams">Dnevno ograničenje u gramima</string>
     <string name="limit_caption_day">%1$s g/dan</string>
-    <string name="limit_caption_week">%1$s g/tj.</string>
+    <string name="limit_caption_week">%1$s g/7 dana</string>
     <string name="days_over_daily_limit">Dani iznad dnevnog ograničenja</string>
-    <string name="days_over_weekly_limit">Dani iznad tjednog ograničenja</string>
+    <string name="days_over_weekly_limit">Dani iznad ograničenja za 7 dana</string>
     <string name="days_over_drink_day_limit">Dani iznad ograničenja dana pijenja</string>
-    <string name="pdf_unit_g_per_week">g/tj.</string>
+    <string name="pdf_unit_g_per_week">g/7 dana</string>
     <string name="pdf_meta_drink_days_suffix">dani pijenja/tj.</string>
     <string name="pdf_kpi_over_daily">Dani > dan (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dani > tj. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dani > 7 dana (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dani > %1$d dana pijenja</string>
     <string name="pdf_col_over_daily">> dan</string>
     <string name="menu">Izbornik</string>

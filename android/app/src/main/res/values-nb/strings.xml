@@ -112,7 +112,7 @@
     <string name="no_data">Ingen data for denne perioden.</string>
 
     <!-- Stats -->
-    <string name="week">Uke</string>
+    <string name="week">7 dager</string>
     <string name="month">Måned</string>
     <string name="year">År</string>
     <string name="total_period">Total i perioden</string>
@@ -134,7 +134,7 @@
     <string name="theme_night">Mørk</string>
     <string name="day_change_time">Tidspunkt for dagsskifte</string>
     <string name="day_starts_at">Ny dag starter klokken</string>
-    <string name="weekly_limit_grams">Ukesgrense i gram</string>
+    <string name="weekly_limit_grams">7-dagers grense i gram</string>
     <string name="biometric">Tilgangslås</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeravtrykk eller ansiktsgjenkjenning</string>
@@ -194,24 +194,23 @@
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Notat</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
-    <string name="drink_days_label">drikkdager denne uken</string>
-    <string name="drink_days_setting">Maks. drikkdager/uke</string>
+    <string name="drink_days_label">drikkedager (siste 7 dager)</string>
+    <string name="drink_days_setting">Maks. drikkedager/7 dager</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Innstillinger ikke gjenopprettet?</string>
     <string name="device_transfer_warning_body">Innstillingene og dataene kunne ikke gjenopprettes helt fra den forrige enheten. Dette kan skje når krypterte nøkler ikke kan overføres.\n\nHvis dette er en ny installasjon, kan meldingen ignoreres. Ellers må sikkerhetskopien importeres på nytt via Innstillinger → Gjenopprett sikkerhetskopi.</string>
     <string name="personal_data">Personlige data</string>
-    <string name="week_starts_on">Uken starter på</string>
     <string name="limits">Grenser</string>
     <string name="daily_limit_grams">Daglig grense i gram</string>
     <string name="limit_caption_day">%1$s g/dag</string>
-    <string name="limit_caption_week">%1$s g/uke</string>
+    <string name="limit_caption_week">%1$s g/7 dager</string>
     <string name="days_over_daily_limit">Dager over daglig grense</string>
-    <string name="days_over_weekly_limit">Dager over ukentlig grense</string>
+    <string name="days_over_weekly_limit">Dager over 7-dagers grense</string>
     <string name="days_over_drink_day_limit">Dager over grense for drikkedager</string>
-    <string name="pdf_unit_g_per_week">g/uke</string>
+    <string name="pdf_unit_g_per_week">g/7 dager</string>
     <string name="pdf_meta_drink_days_suffix">drikkedager/uke</string>
     <string name="pdf_kpi_over_daily">Dager > dag (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Dager > uke (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Dager > 7 dager (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Dager > %1$d drikkedager</string>
     <string name="pdf_col_over_daily">> dag</string>
     <string name="menu">Meny</string>

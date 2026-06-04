@@ -119,7 +119,7 @@
     <string name="no_data">Bu dönem için veri yok.</string>
 
     <!-- Stats -->
-    <string name="week">Hafta</string>
+    <string name="week">7 gün</string>
     <string name="month">Ay</string>
     <string name="year">Yıl</string>
     <string name="total_period">Dönem toplamı</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Koyu</string>
     <string name="day_change_time">Gün değişim saati</string>
     <string name="day_starts_at">Yeni gün başlangıcı</string>
-    <string name="weekly_limit_grams">Haftalık sınır (gram)</string>
+    <string name="weekly_limit_grams">7 günlük sınır (gram)</string>
     <string name="biometric">Erişim kilidi</string>
     <string name="biometric_lock">Biyometrik kilit</string>
     <string name="biometric_desc">Uygulamayı parmak izi veya yüz tanıma ile kilitle</string>
@@ -201,24 +201,23 @@
     <string name="csv_col_grams">Gram_alkol</string>
     <string name="csv_col_note">Not</string>
     <string name="pdf_unit_g_per_day">g/gün</string>
-    <string name="drink_days_label">Bu haftaki içki günleri</string>
-    <string name="drink_days_setting">Maks. içki günü/hafta</string>
+    <string name="drink_days_label">içki günleri (son 7 gün)</string>
+    <string name="drink_days_setting">Maks. içki günü/7 gün</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Ayarlar geri yüklenmedi mi?</string>
     <string name="device_transfer_warning_body">Ayarlar ve veriler önceki cihazdan tam olarak geri yüklenemedi. Bu, şifrelenmiş anahtarlar aktarılamadığında olabilir.\n\nBu yeni bir kurulumsa bu ileti yoksayılabilir. Aksi takdirde yedeği Ayarlar → Yedeği geri yükle yolundan yeniden içe aktarın.</string>
     <string name="personal_data">Kişisel veriler</string>
-    <string name="week_starts_on">Hafta başlangıcı</string>
     <string name="limits">Limitler</string>
     <string name="daily_limit_grams">Gram cinsinden günlük limit</string>
     <string name="limit_caption_day">%1$s g/gün</string>
-    <string name="limit_caption_week">%1$s g/hafta</string>
+    <string name="limit_caption_week">%1$s g/7 gün</string>
     <string name="days_over_daily_limit">Günlük limitin üzerindeki günler</string>
-    <string name="days_over_weekly_limit">Haftalık limitin üzerindeki günler</string>
+    <string name="days_over_weekly_limit">7 günlük sınırın üzerindeki günler</string>
     <string name="days_over_drink_day_limit">İçki günü limitinin üzerindeki günler</string>
-    <string name="pdf_unit_g_per_week">g/hafta</string>
+    <string name="pdf_unit_g_per_week">g/7 gün</string>
     <string name="pdf_meta_drink_days_suffix">içki günü/hf.</string>
     <string name="pdf_kpi_over_daily">Gün > gün (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Gün > hafta (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Gün > 7 gün (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Gün > %1$d içki günü</string>
     <string name="pdf_col_over_daily">> gün</string>
     <string name="menu">Menü</string>

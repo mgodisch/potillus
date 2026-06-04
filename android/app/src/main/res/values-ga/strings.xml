@@ -119,7 +119,7 @@
     <string name="no_data">Níl sonraí ar fáil don tréimhse seo.</string>
 
     <!-- Stats -->
-    <string name="week">Seachtain</string>
+    <string name="week">7 lá</string>
     <string name="month">Mí</string>
     <string name="year">Bliain</string>
     <string name="total_period">Iomlán sa tréimhse</string>
@@ -141,7 +141,7 @@
     <string name="theme_night">Dorcha</string>
     <string name="day_change_time">Am athraithe an lae</string>
     <string name="day_starts_at">Tosaíonn lá nua ag</string>
-    <string name="weekly_limit_grams">Teorainn sheachtainiúil i grama</string>
+    <string name="weekly_limit_grams">Teorainn 7 lá i grama</string>
     <string name="biometric">Glas</string>
     <string name="biometric_lock">Glas bithmhéadrach</string>
     <string name="biometric_desc">Glais an aip le méarlorg nó aitheantas aghaidhe</string>
@@ -203,24 +203,23 @@
     <string name="csv_col_note">Nóta</string>
     <string name="pdf_unit_g_per_day">g/lá</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">laethanta óil an tseachtain seo</string>
-    <string name="drink_days_setting">Uasmhéid laethanta óil/seachtain</string>
+    <string name="drink_days_label">laethanta óil (7 lá dheireanacha)</string>
+    <string name="drink_days_setting">Uasmhéid laethanta óil/7 lá</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Settings not restored?</string>
     <string name="device_transfer_warning_body">Your settings and data could not be fully restored from your previous device. This can happen when encrypted keys cannot be transferred.\n\nIf this is a new installation, you can ignore this message. Otherwise, please re-import your backup via Settings → Restore Backup.</string>
     <string name="personal_data">Sonraí pearsanta</string>
-    <string name="week_starts_on">Tosaíonn an tseachtain ar</string>
     <string name="limits">Teorainneacha</string>
     <string name="daily_limit_grams">Teorainn laethúil i ngraim</string>
     <string name="limit_caption_day">%1$s g/lá</string>
-    <string name="limit_caption_week">%1$s g/sht.</string>
+    <string name="limit_caption_week">%1$s g/7 lá</string>
     <string name="days_over_daily_limit">Laethanta os cionn na teorann laethúil</string>
-    <string name="days_over_weekly_limit">Laethanta os cionn na teorann seachtainiúil</string>
+    <string name="days_over_weekly_limit">Laethanta os cionn theorainn 7 lá</string>
     <string name="days_over_drink_day_limit">Laethanta os cionn theorainn na laethanta óil</string>
-    <string name="pdf_unit_g_per_week">g/sht.</string>
+    <string name="pdf_unit_g_per_week">g/7 lá</string>
     <string name="pdf_meta_drink_days_suffix">laethanta óil/sht.</string>
     <string name="pdf_kpi_over_daily">Laethanta > lá (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Laethanta > sht. (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Laethanta > 7 lá (%1$s g)</string>
     <string name="pdf_kpi_over_drink_days">Laethanta > %1$d lá óil</string>
     <string name="pdf_col_over_daily">> lá</string>
     <string name="menu">Roghchlár</string>
