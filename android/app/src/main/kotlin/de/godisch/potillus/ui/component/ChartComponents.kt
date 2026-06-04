@@ -39,9 +39,10 @@ package de.godisch.potillus.ui.component
 //
 // CAPTURING COMPOSABLE COLORS BEFORE CANVAS SCOPE:
 //   MaterialTheme.colorScheme.* and custom theme helpers (warningColor(),
-//   errorColor()) are @Composable and cannot be called inside a Canvas{} lambda
-//   (which is a DrawScope, not a composable context). They must be captured in
-//   local variables in the enclosing @Composable function before entering Canvas.
+//   dangerRedColor()) are @Composable and cannot be called inside a Canvas{}
+//   lambda (which is a DrawScope, not a composable context). They must be
+//   captured in local variables in the enclosing @Composable function before
+//   entering Canvas.
 // =============================================================================
 
 import androidx.compose.foundation.Canvas
@@ -65,7 +66,7 @@ import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.DrinkCategory
-import de.godisch.potillus.ui.theme.errorColor
+import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.warningColor
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -84,7 +85,8 @@ import de.godisch.potillus.ui.theme.warningColor
  *
  * Colour coding:
  * - Bar below limit → [MaterialTheme.colorScheme.primary] (app's accent colour)
- * - Bar above limit → [errorColor] (red)
+ * - Bar above limit → [dangerRedColor] (the saturated red shared with delete
+ *   icons and traffic-light bullets, so all "danger" reds match)
  * - Limit line       → [warningColor] (amber dashed)
  *
  * SCALE:
@@ -121,7 +123,10 @@ fun AlcoholBarChart(
     val maxGrams   = maxOf(dataPoints.maxOf { it.totalGrams }, limitGrams) * 1.15
     val barColor   = MaterialTheme.colorScheme.primary
     val limitColor = warningColor()
-    val overColor  = errorColor()
+    // Over-limit bars use the saturated danger red (same hue as delete icons /
+    // traffic-light bullets) rather than the softer Material `error` colour, so
+    // every "over limit" cue in the app shares one consistent red.
+    val overColor  = dangerRedColor()
 
     Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
         val chartH  = size.height

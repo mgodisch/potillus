@@ -26,6 +26,42 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.62.1
+
+Maintenance release. Small UI consistency fixes, a clearer PDF export file name,
+a menu-icon refresh, and refreshed German localisation.
+
+### Fixed
+
+- **PDF export file name now carries the `.pdf` extension.** The system "Save as
+  PDF" dialog derives its default file name from the print-job name, which
+  previously lacked an extension (e.g. `potillus_report_20260603_1430`).
+  `PdfReportBuilder.jobName()` now appends `.pdf`, so the dialog pre-fills a
+  complete file name.
+
+### Changed
+
+- **Unified the "danger" red across the Statistics screen.** The over-limit
+  chart bars and the over-limit statistics (e.g. *Days over daily limit*,
+  *over weekly limit*, *over drink-day limit*) and the rising-trend percentage
+  now use `dangerRedColor()` — the same saturated red already used by the delete
+  trash icons, traffic-light bullets and calendar over-limit dots — instead of
+  the softer Material `error` colour. Export-error text still uses `errorColor()`,
+  as it denotes a genuine error state rather than a statistic.
+- **Overflow-menu icons refreshed.** The *License* entry now uses the open-book
+  glyph (`MenuBook`), and the *Help* entry uses a medical-cross glyph
+  (`LocalHospital`). The cross inherits the menu's content colour (it is not
+  drawn red), so it blends with the active theme.
+- **German localisation updated.** The German user's guide and
+  `values-de/strings.xml` were revised (provided by the maintainer).
+
+### Release bookkeeping
+
+- `versionName` bumped to `0.62.1`, `versionCode` to `59`; README title and
+  `proguard-rules.pro` header updated to match (release-check.sh §1).
+
+---
+
 ## v0.62.0
 
 Feature release. Replaces the fixed, configurable calendar week with a gliding

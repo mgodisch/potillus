@@ -22,7 +22,7 @@ package de.godisch.potillus.ui.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
@@ -104,7 +104,11 @@ fun AppOverflowMenu(
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.help)) },
-            leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
+            // The help entry uses a medical-cross glyph (the "Red Cross" cross
+            // shape). No explicit `tint` is set, so the icon inherits the menu's
+            // ambient content colour and blends in with the theme — i.e. it is
+            // NOT drawn red, only cross-shaped.
+            leadingIcon = { Icon(Icons.Filled.LocalHospital, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenHelp()
@@ -112,7 +116,10 @@ fun AppOverflowMenu(
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.license)) },
-            leadingIcon = { Icon(Icons.Filled.Gavel, contentDescription = null) },
+            // The license entry now carries the open-book glyph (formerly used by
+            // the help entry); a book reads more naturally as "read the licence
+            // text" than the previous gavel.
+            leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenLicense()

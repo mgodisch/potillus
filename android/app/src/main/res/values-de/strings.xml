@@ -13,7 +13,7 @@
     <string name="total_today">Heute gesamt</string>
     <string name="grams_alcohol">g Alkohol</string>
     <string name="entries_today">Einträge heute</string>
-    <string name="no_entries_today">Noch keine Einträge heute.\nTippe auf + um einen Eintrag hinzuzufügen.</string>
+    <string name="no_entries_today">Noch keine Einträge heute.\nTippe auf „+“, um einen Eintrag hinzuzufügen.</string>
     <string name="no_entries_day">Keine Einträge für diesen Tag.</string>
 
     <!-- Favoriten -->
@@ -21,14 +21,14 @@
 
     <!-- BAC / Promille-Schätzer -->
     <string name="bac_estimate">Promille-Schätzung</string>
-    <string name="bac_disclaimer">Schätzwert · nicht für Fahreignung</string>
+    <string name="bac_disclaimer">Schätzwert · nicht zur Einschätzung der Fahreignung geeignet</string>
     <string name="stats_from_section">Statistikzeitraum</string>
     <string name="stats_from_label">Statistik ab</string>
     <string name="stats_from_desc">Einträge vor diesem Datum werden in allen Statistiken ignoriert.</string>
     <string name="bac_section">Promille-Schätzer (Widmark)</string>
-    <string name="bac_desc">Für die Schätzung wird das Körpergewicht benötigt. Der Wert ist eine mathematische Schätzung und kein Messergebnis.</string>
+    <string name="bac_desc">Für die Schätzung wird das Körpergewicht benötigt. Der Wert ist eine mathematische Annäherung und kein Messergebnis.</string>
     <string name="body_weight">Körpergewicht</string>
-    <string name="not_set">nicht eingestellt</string>
+    <string name="not_set">Nicht eingestellt</string>
 
     <!-- Entry Dialog -->
     <string name="add_entry">Eintrag hinzufügen</string>
@@ -56,7 +56,7 @@
     <string name="category_other">Sonstiges</string>
 
     <!-- PDF-Export -->
-    <string name="pdf_title">Alkohol-Zusammenfassung</string>
+    <string name="pdf_title">Bericht über Alkohol-Konsum</string>
     <string name="pdf_section_kpis">Kerndaten</string>
     <string name="pdf_section_months">Monatsübersicht</string>
     <string name="pdf_section_trend">Langfristiger Trend (Ø g/Monat)</string>
@@ -64,8 +64,9 @@
     <string name="pdf_section_daytime">Konsummuster: Tageszeit</string>
     <string name="pdf_section_weekday">Wochentag-Profil (Ø g Alkohol)</string>
     <string name="pdf_section_risk">Risikokonsum &amp; Abstinenz</string>
-    <string name="pdf_footer1">Schätzwerte. Nicht für Fahreignungs- oder Diagnose-Zwecke.</string>
-    <string name="pdf_footer2">Erstellt mit Libellus Potionis (Potillus). Schätzwerte – keine ärztliche Diagnose.</string>
+    <string name="pdf_footer1">Schätzwerte - keine ärztliche Diagnose. Nicht für Fahreignungs- oder Diagnosezwecke.</string>
+    <string name="pdf_footer2">Erstellt mit Libellus Potionis (Potillus).</string>
+
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Zeitraum</string>
@@ -76,7 +77,7 @@
     <string name="pdf_kpi_avg_drink_day">Ø pro Trinktag</string>
     <string name="pdf_kpi_drink_days">Trinktage</string>
     <string name="pdf_kpi_abstinent_days">Abstinenztage</string>
-    <string name="pdf_kpi_binge">Binge-Tage (>%1$s g)</string>
+    <string name="pdf_kpi_binge">Binge-Tage (&gt; %1$s g)</string>
     <string name="pdf_col_month">Monat</string>
     <string name="pdf_col_drink_days">Trinktage</string>
     <string name="pdf_col_total_g">Gesamt g</string>
@@ -85,7 +86,7 @@
     <string name="pdf_meta_last_drink">Ø letzter Drink</string>
     <string name="pdf_meta_before_18">Anteil vor 17:00 Uhr</string>
     <string name="pdf_meta_after_18">Anteil ab 17:00 Uhr</string>
-    <string name="pdf_meta_binge_days">Binge-Drinking-Tage (>%1$s g)</string>
+    <string name="pdf_meta_binge_days">Binge-Drinking-Tage (&gt; %1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Längste Abstinenzphase</string>
     <string name="pdf_meta_current_abstinence">Aktuelle Abstinenz</string>
     <string name="pdf_days_suffix">Tage</string>
@@ -96,7 +97,7 @@
     <string name="back">Zurück</string>
     <string name="delete">Löschen</string>
     <string name="change">Ändern</string>
-    <string name="delete_confirm">„%1$s" wirklich löschen?</string>
+    <string name="delete_confirm">„%1$s“ wirklich löschen?</string>
     <string name="no_data">Keine Daten für diesen Zeitraum.</string>
 
     <!-- Stats -->
@@ -125,28 +126,28 @@
     <string name="weekly_limit_grams">7-Tage-Limit in Gramm</string>
     <string name="biometric">Zugangssperre</string>
     <string name="biometric_lock">Biometrische Sperre</string>
-    <string name="biometric_desc">App beim Öffnen per Fingerabdruck oder Gesicht sperren</string>
+    <string name="biometric_desc">App beim Öffnen per Fingerabdruck oder Gesichtserkennung sperren</string>
     <string name="language">Sprache</string>
     <string name="export">Datenexport</string>
-    <string name="export_desc">Einträge exportieren in den Downloads-Ordner</string>
+    <string name="export_desc">Einträge exportieren</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Backup</string>
-    <string name="backup_desc">Vollständiges Backup (Einträge + Getränke) als JSON-Datei</string>
+    <string name="backup_desc">Vollständiges Backup (Getränke &amp; Protokoll) als JSON-Datei</string>
     <string name="backup_export">Exportieren</string>
     <string name="backup_import">Importieren</string>
 
     <!-- Import-Modus -->
     <string name="import_mode_question">Wie sollen die Daten importiert werden?</string>
     <string name="import_replace">Ersetzen</string>
-    <string name="import_merge">Hinzufügen</string>
+    <string name="import_merge">Zusammenführen</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Bitte authentifizieren</string>
 
-    <!-- WHO Hinweis -->
-    <string name="pdf_months_truncated">Zeige %1$d der letzten %2$d Monate – ältere Daten im CSV/Backup verfügbar</string>
+    <!-- Export-Hinweis -->
+    <string name="pdf_months_truncated">Zeige %1$d der letzten %2$d Monate – ältere Daten sind im CSV-Export/Backup verfügbar</string>
 
     <!-- Jahreskalender-Legende -->
     <string name="year_calendar_no_entry">kein Eintrag</string>
@@ -158,18 +159,18 @@
     <string name="export_failed">Export fehlgeschlagen.</string>
     <string name="backup_failed">Backup fehlgeschlagen.</string>
     <string name="import_success_replace">%1$d Einträge importiert.</string>
-    <string name="import_success_merge">%1$d importiert, %2$d übersprungen.</string>
+    <string name="import_success_merge">%1$d Einträge importiert, %2$d übersprungen.</string>
     <string name="import_error_could_not_read">Datei konnte nicht gelesen werden.</string>
     <string name="import_error_empty">Backup-Datei ist leer.</string>
     <string name="import_error_invalid_json">Ungültiges JSON-Format.</string>
     <string name="import_error_version_too_high">Backup-Version %1$d wird nicht unterstützt (max. %2$d).</string>
     <string name="import_error_file_too_large">Backup-Datei zu groß (max. %1$d MB).</string>
     <string name="import_error_read">Lesefehler: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c hat {count} Einträge und kann nicht gelöscht werden.</string>
+    <string name="drink_delete_blocked">„{name}“ weist {count} Einträge auf und kann nicht gelöscht werden.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Der Name des Getränks darf nicht leer sein.</string>
     <string name="drink_validation_name_too_long">Der Getränkename ist zu lang (max. 100 Zeichen).</string>
-    <string name="drink_validation_volume_range">Die Menge muss zwischen 1 ml und 10 000 ml liegen.</string>
+    <string name="drink_validation_volume_range">Die Menge muss zwischen 1 ml und 10.000 ml liegen.</string>
     <string name="drink_validation_alcohol_range" formatted="false">Der Alkoholgehalt muss zwischen 0 % und 100 % liegen.</string>
     <string name="drink_validation_alcohol_invalid">Der Alkoholgehalt ist keine gültige Zahl.</string>
     <string name="day_change_time_value">%1$02d:%2$02d Uhr</string>
@@ -178,7 +179,7 @@
     <string name="csv_col_drink">Getränk</string>
     <string name="csv_col_category">Kategorie</string>
     <string name="csv_col_volume_ml">Menge_ml</string>
-    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_alcohol_pct">Alkohol_Prozent</string>
     <string name="csv_col_grams">Gramm_Alkohol</string>
     <string name="csv_col_note">Notiz</string>
     <string name="pdf_unit_g_per_day">g/Tag</string>
@@ -186,7 +187,7 @@
     <string name="drink_days_setting">Max. Trinktage/7 Tage</string>
     <!-- Device-transfer warning (translate title and body) -->
     <string name="device_transfer_warning_title">Einstellungen nicht wiederhergestellt?</string>
-    <string name="device_transfer_warning_body">Einstellungen und Daten konnten vom vorherigen Gerät nicht vollständig wiederhergestellt werden. Das kann passieren, wenn verschlüsselte Schlüssel nicht übertragen werden können.\n\nBei einer Neuinstallation kann diese Meldung ignoriert werden. Andernfalls das Backup bitte erneut über Einstellungen → Backup wiederherstellen importieren.</string>
+    <string name="device_transfer_warning_body">Einstellungen und Daten konnten vom vorherigen Gerät nicht vollständig wiederhergestellt werden. Dies kann passieren, wenn kryptografische Schlüssel nicht übertragen werden können.\n\nBei einer Neuinstallation kann diese Meldung ignoriert werden. Andernfalls importiere das Backup bitte erneut über Einstellungen → Backup → Import.</string>
     <string name="personal_data">Persönliche Daten</string>
     <string name="limits">Limits</string>
     <string name="daily_limit_grams">Tageslimit in Gramm</string>
@@ -196,11 +197,11 @@
     <string name="days_over_weekly_limit">Tage über 7-Tage-Limit</string>
     <string name="days_over_drink_day_limit">Tage über Trinktage-Limit</string>
     <string name="pdf_unit_g_per_week">g/7 Tage</string>
-    <string name="pdf_meta_drink_days_suffix">Trinktage/Wo.</string>
-    <string name="pdf_kpi_over_daily">Tage > Tag (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Tage > 7 Tage (%1$s g)</string>
-    <string name="pdf_kpi_over_drink_days">Tage > %1$d Trinktage</string>
-    <string name="pdf_col_over_daily">> Tag</string>
+    <string name="pdf_meta_drink_days_suffix">Trinktage/7 Tage</string>
+    <string name="pdf_kpi_over_daily">Tage &gt; Tag (%1$s g)</string>
+    <string name="pdf_kpi_over_weekly">Tage &gt; 7 Tage (%1$s g)</string>
+    <string name="pdf_kpi_over_drink_days">Tage &gt; %1$d Trinktage</string>
+    <string name="pdf_col_over_daily">&gt; Tag</string>
     <string name="menu">Menü</string>
     <string name="help">Hilfe</string>
     <string name="license">Lizenz</string>

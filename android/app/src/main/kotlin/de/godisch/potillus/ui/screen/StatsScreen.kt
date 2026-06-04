@@ -40,6 +40,7 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
+import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.util.WebViewPdfPrinter
@@ -187,19 +188,23 @@ fun StatsScreen(
                         StatRow(
                             stringResource(R.string.days_over_daily_limit),
                             state.daysOverDailyLimit.toString(),
-                            valueColor = if (state.daysOverDailyLimit > 0) errorColor() else successColor()
+                            // Over-limit statistics share the saturated danger red
+                            // used by delete icons and traffic-light bullets, instead
+                            // of the softer Material `error` colour, so every "over
+                            // limit" cue in the app looks identical.
+                            valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor()
                         )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.days_over_weekly_limit),
                             state.daysOverWeeklyLimit.toString(),
-                            valueColor = if (state.daysOverWeeklyLimit > 0) errorColor() else successColor()
+                            valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor()
                         )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.days_over_drink_day_limit),
                             state.daysOverDrinkDayLimit.toString(),
-                            valueColor = if (state.daysOverDrinkDayLimit > 0) errorColor() else successColor()
+                            valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor()
                         )
                         HorizontalDivider()
                         StatRow(
@@ -236,7 +241,9 @@ fun StatsScreen(
                             stringResource(R.string.trend_vs_prev),
                             trendText,
                             valueColor = when {
-                                state.trendPercent > 0 -> errorColor()
+                                // A rising trend is a "bad" signal, shown in the same
+                                // saturated danger red as the over-limit statistics.
+                                state.trendPercent > 0 -> dangerRedColor()
                                 state.trendPercent < 0 -> successColor()
                                 else                   -> MaterialTheme.colorScheme.onSurface
                             }
