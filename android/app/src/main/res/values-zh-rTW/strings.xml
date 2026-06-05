@@ -104,8 +104,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">飲用模式：一天時段</string>
     <string name="pdf_section_weekday">星期分布（平均 公克 酒精）</string>
     <string name="pdf_section_risk">高風險飲用 &amp; 戒酒</string>
-    <string name="pdf_footer1">僅供估算。不適用於駕駛判斷或診斷目的。</string>
-    <string name="pdf_footer2">由 Libellus Potionis（Potillus）產生。估算值──並非醫療診斷。</string>
+    <string name="pdf_footer1">僅為估算值，並非醫學診斷。不可用於駕駛適性評估或診斷用途。</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">匯出日期</string>
     <string name="pdf_meta_period">期間</string>

@@ -79,8 +79,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Profil horaire de consommation</string>
     <string name="pdf_section_weekday">Profil hebdomadaire (moy. g alcool)</string>
     <string name="pdf_section_risk">Consommation à risque &amp; abstinence</string>
-    <string name="pdf_footer1">Estimations. Non utilisable pour aptitude à la conduite ou diagnostic.</string>
-    <string name="pdf_footer2">Créé avec Libellus Potionis (Potillus). Estimations – pas un diagnostic médical.</string>
+    <string name="pdf_footer1">Estimations – pas un diagnostic médical. Ne convient pas à l\'évaluation de l\'aptitude à la conduite ni au diagnostic.</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Date d\'export</string>
     <string name="pdf_meta_period">Période</string>

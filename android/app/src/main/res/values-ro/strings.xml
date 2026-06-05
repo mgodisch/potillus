@@ -103,8 +103,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Model de consum: ora zilei</string>
     <string name="pdf_section_weekday">Profil zile săptămână (medie g alcool)</string>
     <string name="pdf_section_risk">Consum de risc și abstinență</string>
-    <string name="pdf_footer1">Numai estimări. Nu pentru conducere sau scopuri de diagnostic.</string>
-    <string name="pdf_footer2">Creat cu Libellus Potionis (Potillus). Estimări – nu un diagnostic medical.</string>
+    <string name="pdf_footer1">Estimări – nu reprezintă un diagnostic medical. Nu se foloseşte pentru evaluarea aptitudinii de a conduce sau în scop diagnostic.</string>
 
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data export</string>

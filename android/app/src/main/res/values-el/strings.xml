@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Πρότυπο κατανάλωσης: ώρα ημέρας</string>
     <string name="pdf_section_weekday">Προφίλ ημέρας εβδομάδας (μέσος g αλκοόλης)</string>
     <string name="pdf_section_risk">Επικίνδυνη κατανάλωση &amp; Αποχή</string>
-    <string name="pdf_footer1">Εκτιμώμενες τιμές. Όχι για οδήγηση ή διαγνωστικούς σκοπούς.</string>
-    <string name="pdf_footer2">Δημιουργήθηκε με Libellus Potionis (Potillus). Εκτιμήσεις – όχι ιατρική διάγνωση.</string>
+    <string name="pdf_footer1">Εκτιμήσεις – όχι ιατρική διάγνωση. Όχι για αξιολόγηση ικανότητας οδήγησης ή διαγνωστικούς σκοπούς.</string>
     <string name="pdf_meta_export_date">Ημερομηνία εξαγωγής</string>
     <string name="pdf_meta_period">Περίοδος</string>
     <string name="pdf_meta_limit">Όριο</string>

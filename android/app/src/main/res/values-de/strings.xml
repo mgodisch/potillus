@@ -85,8 +85,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Konsummuster: Tageszeit</string>
     <string name="pdf_section_weekday">Wochentag-Profil (Ø g Alkohol)</string>
     <string name="pdf_section_risk">Risikokonsum &amp; Abstinenz</string>
-    <string name="pdf_footer1">Schätzwerte - keine ärztliche Diagnose. Nicht für Fahreignungs- oder Diagnosezwecke.</string>
-    <string name="pdf_footer2">Erstellt mit Libellus Potionis (Potillus).</string>
+    <string name="pdf_footer1">Schätzwerte – keine ärztliche Diagnose. Nicht für Fahreignungsbewertung und Diagnosezwecke.</string>
 
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Exportdatum</string>

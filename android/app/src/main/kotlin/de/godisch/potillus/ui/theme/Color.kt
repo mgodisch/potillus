@@ -113,7 +113,7 @@ internal val ErrorColorDark  = Color(0xFFCF6679)
 // Achieved WCAG AA contrast ratios:
 //   errorColor   – Slate 5.73:1 ✓ / Night 5.28:1 ✓
 //   successColor – Slate 4.50:1 ✓ / Night 6.84:1 ✓
-//   warningColor – Slate 6.22:1 ✓ / Night 8.58:1 ✓
+//   warningColor – Slate 4.40:1 ✓ / Night 8.58:1 ✓ (dot needs ≥ 3:1 per WCAG 1.4.11)
 
 /** Returns the theme's error red (set per theme in [de.godisch.potillus.ui.theme.Theme]). */
 @Composable fun errorColor()   = MaterialTheme.colorScheme.error
@@ -150,6 +150,15 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
 @Composable fun successColor() =
     if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)
 
-/** Returns an amber that passes WCAG AA against the current theme's background. */
+/**
+ * Returns an amber that passes WCAG AA against the current theme's background.
+ *
+ * The light value is amber-700 (#B45309), not the darker amber-800 (#92400E):
+ * on a 12 dp traffic-light dot the very dark amber-800 was almost indistinguishable
+ * from the danger red (#960018) — same red channel, hardly any green — so the
+ * YELLOW state read as RED in light mode (it looked fine in dark mode, where the
+ * amber is bright). amber-700 keeps a clearly amber hue and still clears the 3:1
+ * contrast a non-text indicator needs (4.40:1 on the light background).
+ */
 @Composable fun warningColor() =
-    if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFF92400E)
+    if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFFB45309)

@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Consumptiepatroon: tijdstip</string>
     <string name="pdf_section_weekday">Weekdagprofiel (gem. g alcohol)</string>
     <string name="pdf_section_risk">Risicoverbruik &amp; Onthouding</string>
-    <string name="pdf_footer1">Geschatte waarden. Niet voor rijden of diagnostiek.</string>
-    <string name="pdf_footer2">Gemaakt met Libellus Potionis (Potillus). Schattingen – geen medische diagnose.</string>
+    <string name="pdf_footer1">Schattingen – geen medische diagnose. Niet voor beoordeling van rijgeschiktheid of diagnostiek.</string>
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Periode</string>
     <string name="pdf_meta_limit">Grenswaarde</string>

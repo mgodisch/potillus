@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Wzorzec spożycia: pora dnia</string>
     <string name="pdf_section_weekday">Profil dnia tygodnia (śr. g alkoholu)</string>
     <string name="pdf_section_risk">Ryzykowne spożycie &amp; Abstynencja</string>
-    <string name="pdf_footer1">Wartości szacunkowe. Nie do celów diagnostycznych ani do jazdy.</string>
-    <string name="pdf_footer2">Utworzono w Libellus Potionis (Potillus). Szacunki – nie diagnoza medyczna.</string>
+    <string name="pdf_footer1">Szacunki – nie są diagnozą lekarską. Nie do oceny zdolności do prowadzenia pojazdów ani do celów diagnostycznych.</string>
     <string name="pdf_meta_export_date">Data eksportu</string>
     <string name="pdf_meta_period">Okres</string>
     <string name="pdf_meta_limit">Limit</string>

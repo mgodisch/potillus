@@ -102,8 +102,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">소비 패턴: 시간대</string>
     <string name="pdf_section_weekday">요일별 프로필 (평균 g 알코올)</string>
     <string name="pdf_section_risk">위험 음주 &amp; 금주</string>
-    <string name="pdf_footer1">추정값만. 운전 또는 진단 목적으로 사용하지 마세요.</string>
-    <string name="pdf_footer2">Libellus Potionis (Potillus)로 작성. 추정값 — 의학적 진단 아님.</string>
+    <string name="pdf_footer1">추정치이며 의학적 진단이 아닙니다. 운전 적합성 평가나 진단 목적으로 사용할 수 없습니다.</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">내보내기 날짜</string>
     <string name="pdf_meta_period">기간</string>

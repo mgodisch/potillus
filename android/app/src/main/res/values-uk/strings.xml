@@ -95,8 +95,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Модель споживання: час доби</string>
     <string name="pdf_section_weekday">Профіль за днями тижня (сер. г алкоголю)</string>
     <string name="pdf_section_risk">Ризикове споживання &amp; Утримання</string>
-    <string name="pdf_footer1">Тільки оцінки. Не для водіння чи діагностики.</string>
-    <string name="pdf_footer2">Створено за допомогою Libellus Potionis (Potillus). Оцінки — не медичний діагноз.</string>
+    <string name="pdf_footer1">Оцінкові значення — не медичний діагноз. Не для оцінювання придатності до керування транспортом і не для діагностики.</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Дата експорту</string>
     <string name="pdf_meta_period">Період</string>

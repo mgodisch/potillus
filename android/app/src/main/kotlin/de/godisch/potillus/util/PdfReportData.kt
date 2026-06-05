@@ -22,6 +22,9 @@
 package de.godisch.potillus.util
 
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.ChartBucket
+import de.godisch.potillus.domain.ChartBucketing
+import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -111,6 +114,16 @@ data class PdfReportData(
     // ── Monthly breakdown & trend ──────────────────────────────────────────────
     /** Ascending by [MonthStat.monthKey]. The trend chart is shown only when ≥ 2. */
     val months: List<MonthStat>,
+
+    /**
+     * Continuous, gap-free consumption series over [firstDate]..[lastDate] for the
+     * report's time-axis chart. Abstinent days appear as zero buckets. Granularity
+     * is chosen by [ChartBucketing.granularityForSpan] from the span length.
+     */
+    val chartBuckets: List<ChartBucket>,
+
+    /** Bucket width of [chartBuckets]; drives the chart's axis-label format. */
+    val chartGranularity: ChartGranularity,
 
     // ── Category breakdown ──────────────────────────────────────────────────────
     /** Descending by grams. */
@@ -258,6 +271,12 @@ data class PdfReportData(
             val longest  = DayResolver.computeLongestAbstinence(allDates)
             val current  = DayResolver.computeCurrentAbstinence(allDates, today)
 
+            // Time-axis consumption series for the report chart. The span is the
+            // recorded range [firstDate, lastDate]; granularity scales with its
+            // length (daily → weekly → monthly) so the bar count stays readable.
+            val chartGranularity = ChartBucketing.granularityForSpan(totalDays)
+            val chartBuckets     = ChartBucketing.bucketize(daySummaries, firstDate, lastDate, chartGranularity)
+
             return PdfReportData(
                 firstDate         = firstDate,
                 lastDate          = lastDate,
@@ -272,6 +291,8 @@ data class PdfReportData(
                 violations        = violations,
                 bingeDays         = bingeDays,
                 months            = months,
+                chartBuckets      = chartBuckets,
+                chartGranularity  = chartGranularity,
                 categories        = categories,
                 avgFirstDrinkHour = avgFirst,
                 avgLastDrinkHour  = avgLast,

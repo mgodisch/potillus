@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Паттерн потребления: время суток</string>
     <string name="pdf_section_weekday">Профиль по дням недели (ср. г алкоголя)</string>
     <string name="pdf_section_risk">Рискованное потребление &amp; Воздержание</string>
-    <string name="pdf_footer1">Оценочные значения. Не для вождения или диагностики.</string>
-    <string name="pdf_footer2">Создано с Libellus Potionis (Potillus). Оценки – не медицинский диагноз.</string>
+    <string name="pdf_footer1">Оценочные значения — не медицинский диагноз. Не для оценки годности к вождению и не для диагностики.</string>
     <string name="pdf_meta_export_date">Дата экспорта</string>
     <string name="pdf_meta_period">Период</string>
     <string name="pdf_meta_limit">Лимит</string>

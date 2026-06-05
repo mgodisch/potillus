@@ -34,9 +34,13 @@
     style here, and translatable text in strings.xml.
 
   PAGE MODEL:
-    Two logical pages, separated by <div class="page-break">. Content that grows
-    beyond one sheet now flows onto additional pages automatically (the old
-    canvas exporter truncated long tables; this template does not).
+    Two logical pages, each wrapped in <div class="sheet">. A .sheet is a
+    full-height flex column, so the trailing <div class="disclaimer"> (the page
+    footer) is pinned to the bottom edge via margin-top:auto, no matter how much
+    content precedes it. Consecutive sheets force a page break (.sheet + .sheet
+    { page-break-before: always }), and content that overflows one sheet still
+    flows onto additional pages automatically (the old canvas exporter truncated
+    long tables; this template does not).
   ===========================================================================
 -->
 <html>
@@ -125,6 +129,9 @@
     .chart .bar { width: 60%; background: #1e50a0; border-radius: 1pt 1pt 0 0; }
     .chart .bar.over { background: #c83232; }
     .chart .lab { font-size: 7pt; color: #646464; margin-top: 2pt; }
+    /* Green tick marking an abstinent (zero-consumption) bucket, drawn at the
+       baseline in place of a bar. */
+    .chart .tick { color: #2e7d32; font-size: 8pt; line-height: 1; }
     /* Dashed reference line marking the daily limit; LIMIT_LINE_PCT is its height. */
     .chart .limit {
         position: absolute; left: 0; right: 0;
@@ -132,23 +139,33 @@
     }
 
     /* ---- Footers ---------------------------------------------------------- */
-    /* GPL notice repeats at the foot of every printed page (running footer). */
-    .gpl {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        font-size: 6pt; color: #646464;
-    }
-    /* Page-specific disclaimer, placed as the last block of each page's content. */
+    /* Page-specific disclaimer. Inside a .sheet it is pushed to the page bottom
+       (margin-top:auto) so it sits at the foot of the page regardless of how
+       much content precedes it. */
     .disclaimer {
         margin-top: 10pt; padding-top: 4pt; border-top: 1px solid #dcdcdc;
         font-size: 7.5pt; color: #646464;
     }
 
-    .page-break { page-break-before: always; }
+    /* ---- Page sheets ------------------------------------------------------ */
+    /* Each logical page is a full-height flex column so its trailing
+       .disclaimer can be pinned to the bottom edge. min-height matches the
+       printable area: A4 height 297mm minus the 14mm/16mm @page margins = 267mm.
+       NOTE: tuned for A4. For US Letter (≈ 279mm) the printable height differs;
+       footer pinning is best-effort in WebView print and should be verified by
+       exporting a PDF. */
+    .sheet {
+        display: flex; flex-direction: column;
+        min-height: 267mm;
+    }
+    .sheet > .disclaimer { margin-top: auto; }
+    .sheet + .sheet { page-break-before: always; }
 </style>
 </head>
 <body>
 
 <!-- ===================== PAGE 1 ===================== -->
+<div class="sheet">
 
 <div class="header">
     <span class="title">{{TITLE}}</span>
@@ -199,7 +216,8 @@
     <!-- end:MONTHS -->
 </table>
 
-<!-- Trend bar chart (hidden when fewer than two months of data) -->
+<!-- Consumption time-axis chart (always shown; TREND_DISPLAY is always "block").
+     One bar per bucket; abstinent buckets render a green tick at the baseline. -->
 <div style="display:{{TREND_DISPLAY}}">
     <div class="section">{{SECTION_TREND}}</div>
     <div class="chart">
@@ -207,6 +225,7 @@
         <!-- repeat:BARS -->
         <div class="col">
             <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
+            <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
             <div class="lab">{{BAR_LABEL}}</div>
         </div>
         <!-- end:BARS -->
@@ -215,8 +234,10 @@
 
 <div class="disclaimer">{{FOOTER1}}</div>
 
+</div><!-- /sheet (page 1) -->
+
 <!-- ===================== PAGE 2 ===================== -->
-<div class="page-break"></div>
+<div class="sheet">
 
 <div class="header">
     <span class="title">{{TITLE}}</span>
@@ -279,8 +300,7 @@
 
 <div class="disclaimer">{{FOOTER2}}</div>
 
-<!-- Running GPL notice at the foot of every page -->
-<div class="gpl">{{GPL_FOOTER}}</div>
+</div><!-- /sheet (page 2) -->
 
 </body>
 </html>

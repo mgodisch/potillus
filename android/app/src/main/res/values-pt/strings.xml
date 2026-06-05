@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Padrão de consumo: hora do dia</string>
     <string name="pdf_section_weekday">Perfil por dia da semana (média g de álcool)</string>
     <string name="pdf_section_risk">Consumo de risco &amp; Abstinência</string>
-    <string name="pdf_footer1">Valores estimados. Não para conduzir ou diagnóstico.</string>
-    <string name="pdf_footer2">Criado com Libellus Potionis (Potillus). Estimativas – sem diagnóstico médico.</string>
+    <string name="pdf_footer1">Estimativas – não é um diagnóstico médico. Não serve para avaliação de aptidão para conduzir nem para fins de diagnóstico.</string>
     <string name="pdf_meta_export_date">Data de exportação</string>
     <string name="pdf_meta_period">Período</string>
     <string name="pdf_meta_limit">Limite</string>

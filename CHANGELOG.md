@@ -26,6 +26,103 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.64.0
+
+Feature release. Reworks the consumption chart (Statistics screen **and** PDF
+report) into a real, gap-free time axis that also shows abstinent days,
+overhauls the PDF footers, and fixes a colour bug that made the traffic-light
+"caution" state look like "danger" in light mode.
+
+### Added
+
+- **`domain/ChartBucketing.kt`** – a small, Android-free helper shared by the
+  Statistics screen and the PDF export. It expands the sparse per-day summaries
+  (which only contain days *with* entries) into a continuous, gap-free series of
+  buckets covering every day in the period, so abstinent days become explicit
+  zero buckets on a proper time axis. A bucket may be a day, a week or a month;
+  its value is the **mean grams of pure alcohol per calendar day** inside the
+  bucket. Using a per-day average (rather than a per-bucket total) keeps the
+  dashed **daily-limit** reference line directly comparable across all
+  granularities. The object is pure `java.time` + plain data, hence JVM
+  unit-testable.
+
+### Changed
+
+- **Statistics chart now uses a real time axis incl. abstinent days.** WEEK and
+  MONTH render one bar per day; YEAR aggregates into weekly buckets (≈ 52 bars)
+  spanning `max(1 Jan, statsFrom) … today`. Days/weeks with zero consumption are
+  no longer omitted: they are drawn as a small **green tick** at the baseline, so
+  "recorded, nothing consumed" is visually distinct from a tiny bar. Axis labels
+  are **thinned** for dense charts (≤ 12 buckets → one aligned label per bar;
+  more → a handful of evenly spaced labels for context).
+  - `ui/component/ChartComponents.kt`: `AlcoholBarChart` now takes a
+    `List<ChartBucket>` and a `(ChartBucket) -> String` label function instead of
+    a `List<DaySummary>`; renders the abstinence tick and the thinned labels.
+  - `ui/screen/StatsViewModel.kt`: builds the bucket series (`chartBuckets`,
+    `chartGranularity`) in the same `combine` that produces the rest of the UI
+    state. The legacy `dataPoints` field is retained unchanged.
+  - `ui/screen/StatsScreen.kt`: feeds `chartBuckets` to the chart and formats the
+    label per period (weekday / day-of-month / month name).
+- **PDF report: the monthly-average trend chart is replaced by the same
+  time-axis chart and is now shown unconditionally** (previously hidden when
+  there were fewer than two months of data). The export picks a granularity from
+  the recorded span (`≤ 35 days` daily, `≤ 366 days` weekly, else monthly).
+  Abstinent buckets are drawn as a green tick, matching the on-screen chart.
+  - `util/PdfReportData.kt`: adds `chartBuckets` + `chartGranularity` (the
+    existing `months` list is kept for the monthly *table*).
+  - `util/PdfReportBuilder.kt`: emits the bucket bars with per-bucket tick
+    visibility and thinned labels.
+  - `assets/report_template.html`: adds the green-tick markup/CSS to the chart.
+- **PDF footers overhauled.**
+  - **Footer 1** (medical disclaimer) is now translated and present in **all 21
+    locales** (`pdf_footer1`), with new wording: *"Estimates – not a medical
+    diagnosis. Not for fitness-to-drive assessment or diagnostic purposes."*
+  - **Footer 2** is **English-only and never translated**: it is built in code
+    (no longer a string resource) and reads *"Created with Libellus Potionis
+    v&lt;version&gt;, free software under the GNU GPL v3, WITHOUT ANY WARRANTY."*
+    The version is **shortened** to `MAJOR.MINOR.PATCH` via
+    `BuildConfig.VERSION_NAME.substringBefore("-")`, so the debug build's
+    `-debug` suffix is stripped from the printed line.
+  - The separate **running GPL footer was removed**; its GPL / no-warranty notice
+    is folded into Footer 2.
+  - Both footers are now **pinned to the bottom of their page** (page 1 / page 2)
+    regardless of how much content precedes them, via per-page flex `.sheet`
+    wrappers in the template.
+- **Traffic-light "caution" colour fixed in light mode.** `ui/theme/Color.kt`:
+  the light-theme `warningColor()` changed from amber-800 `#92400E` to amber-700
+  `#B45309`. On a 12 dp dot the very dark amber-800 was almost indistinguishable
+  from the danger red `#960018` (same red channel, little green), so the YELLOW
+  state read as RED in light mode. amber-700 keeps a clearly amber hue and still
+  clears the ≥ 3:1 contrast a non-text indicator needs (4.40:1 on the light
+  background). Dark mode was already fine and is unchanged.
+- **`res/values*/strings.xml`**: `pdf_footer1` updated/translated in all locales;
+  `pdf_footer2` removed from all locales (key count drops uniformly 171 → 170, so
+  `LocaleSyncTest` stays green).
+
+### Assumptions
+
+- **Per-day average.** Weekly/monthly bars show the bucket's mean grams per day
+  (not the bucket total), so the daily-limit line stays meaningful at every
+  granularity. A daily bar therefore equals that day's own total, unchanged.
+- **Abstinent = zero in the period, including today.** The current (in-progress)
+  day's empty bucket is also shown as a green tick.
+- **Footer pinning is best-effort and tuned for A4** (`.sheet { min-height:
+  267mm }` = A4 height minus the existing 14/16 mm `@page` margins). On US Letter
+  the printable height differs; per-page footer placement should be verified by
+  exporting a PDF and the `min-height` adjusted if needed.
+
+### Known follow-ups
+
+- The 19 non-German/English `pdf_footer1` translations are **best-effort and
+  should be reviewed by native speakers** before release (consistent with the
+  project's translation-quality policy).
+- The PDF chart heading string `pdf_section_trend` ("…avg g/month") was left
+  untouched to avoid a 21-locale translation churn; its unit wording is now
+  slightly imprecise for daily/weekly charts and is a candidate for a future
+  copy pass.
+
+---
+
 ## v0.63.1
 
 Bug-fix release. Resolves a runtime crash when switching between the bottom-bar

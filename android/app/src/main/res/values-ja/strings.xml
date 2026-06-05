@@ -102,8 +102,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">摂取パターン：時間帯</string>
     <string name="pdf_section_weekday">曜日別プロフィール（平均 g アルコール）</string>
     <string name="pdf_section_risk">危険な飲酒 &amp; 断酒</string>
-    <string name="pdf_footer1">推定値のみ。運転や診断目的には使用しないでください。</string>
-    <string name="pdf_footer2">Libellus Potionis（Potillus）で作成。推定値 — 医学的診断ではありません。</string>
+    <string name="pdf_footer1">推定値であり、医学的診断ではありません。運転適性評価や診断目的には使用できません。</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">エクスポート日</string>
     <string name="pdf_meta_period">期間</string>

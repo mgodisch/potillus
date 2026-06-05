@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Schema di consumo: orario</string>
     <string name="pdf_section_weekday">Profilo giorno della settimana (media g alcol)</string>
     <string name="pdf_section_risk">Consumo a rischio &amp; Astinenza</string>
-    <string name="pdf_footer1">Valori stimati. Non per guidare o diagnosticare.</string>
-    <string name="pdf_footer2">Creato con Libellus Potionis (Potillus). Stime – nessuna diagnosi medica.</string>
+    <string name="pdf_footer1">Stime – non una diagnosi medica. Non per la valutazione dell\'idoneità alla guida né per scopi diagnostici.</string>
     <string name="pdf_meta_export_date">Data esportazione</string>
     <string name="pdf_meta_period">Periodo</string>
     <string name="pdf_meta_limit">Limite</string>

@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Vzorec konzumace: denní doba</string>
     <string name="pdf_section_weekday">Profil dne v týdnu (prům. g alkoholu)</string>
     <string name="pdf_section_risk">Rizikové pití &amp; Abstinence</string>
-    <string name="pdf_footer1">Odhadované hodnoty. Není určeno pro řízení ani diagnostiku.</string>
-    <string name="pdf_footer2">Vytvořeno s Libellus Potionis (Potillus). Odhady – žádná lékařská diagnóza.</string>
+    <string name="pdf_footer1">Odhady – nejde o lékařskou diagnózu. Nepoužívat k posouzení způsobilosti k řízení ani k diagnostice.</string>
     <string name="pdf_meta_export_date">Datum exportu</string>
     <string name="pdf_meta_period">Období</string>
     <string name="pdf_meta_limit">Limit</string>

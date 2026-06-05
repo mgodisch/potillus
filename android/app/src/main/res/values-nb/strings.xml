@@ -97,8 +97,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Konsummønster: Tid på dagen</string>
     <string name="pdf_section_weekday">Ukedagsprofil (gj.snitt g alkohol)</string>
     <string name="pdf_section_risk">Risikoforbruk &amp; avholdenhet</string>
-    <string name="pdf_footer1">Kun estimater. Ikke til bruk for kjørebeslutninger eller diagnoseformål.</string>
-    <string name="pdf_footer2">Laget med Libellus Potionis (Potillus). Estimater – ikke medisinsk diagnose.</string>
+    <string name="pdf_footer1">Anslag – ikke en medisinsk diagnose. Ikke for vurdering av kjøreegnethet eller diagnostikk.</string>
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Eksportdato</string>
     <string name="pdf_meta_period">Periode</string>

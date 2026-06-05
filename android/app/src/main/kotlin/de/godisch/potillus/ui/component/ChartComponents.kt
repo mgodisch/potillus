@@ -64,9 +64,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
-import de.godisch.potillus.domain.model.DaySummary
+import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -74,43 +75,55 @@ import de.godisch.potillus.ui.theme.warningColor
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * Draws a vertical bar chart of daily alcohol consumption with a dashed limit line.
+ * Draws a vertical bar chart of consumption over a real time axis, with a dashed
+ * daily-limit line and explicit markers for abstinent buckets.
+ *
+ * Each bar is one [ChartBucket]: a day (WEEK / MONTH periods) or a whole week
+ * (YEAR period, ≈ 52 bars). Because the series is gap-free (every day in the
+ * period is represented, even those with no entries), the x-axis is a proper
+ * time axis rather than a list of drink days.
  *
  * Layout:
- * - Bars fill the available width equally; each bar's height is proportional
- *   to its [DaySummary.totalGrams] relative to [maxGrams].
- * - A horizontal dashed line marks the [limitGrams] threshold.
- * - A label row below the chart shows one label per day, produced by [labelFn].
- * - When [dataPoints] is empty, a centred "no data" placeholder is shown instead.
+ * - A bar's height is proportional to [ChartBucket.avgPerDay] relative to [maxVal].
+ * - Abstinent buckets ([ChartBucket.isAbstinent], i.e. 0 g) carry NO bar; instead
+ *   a small green tick is drawn at the baseline so "recorded, nothing consumed"
+ *   is visually distinct from a near-zero bar or from missing data.
+ * - A horizontal dashed line marks the daily [limitGrams] threshold. Since bars
+ *   are a per-day average, the line stays comparable for weekly buckets too.
+ * - Axis labels are THINNED for dense charts (see below); [labelFn] formats one
+ *   bucket into a short, locale-specific label.
  *
  * Colour coding:
- * - Bar below limit → [MaterialTheme.colorScheme.primary] (app's accent colour)
- * - Bar above limit → [dangerRedColor] (the saturated red shared with delete
- *   icons and traffic-light bullets, so all "danger" reds match)
- * - Limit line       → [warningColor] (amber dashed)
+ * - avg ≤ limit → [MaterialTheme.colorScheme.primary] (app's accent colour)
+ * - avg > limit → [dangerRedColor] (the saturated red shared with delete icons
+ *   and traffic-light bullets, so all "danger" reds match)
+ * - Limit line  → [warningColor] (amber dashed)
+ * - Abstinent tick → [successColor] (green)
+ *
+ * LABEL THINNING:
+ *   With up to ~53 buckets one label per bar is unreadable. For ≤ 12 buckets
+ *   every bar is labelled and aligned to its column; for more, a small evenly
+ *   spaced subset is shown (axis context rather than per-bar precision).
  *
  * SCALE:
- *   `maxGrams = max(highestDay, limitGrams) × 1.15`
- *   The 1.15 factor adds 15 % headroom above the tallest bar or the limit line
- *   so neither touches the top edge of the canvas.
+ *   `maxVal = max(highestBucketAvg, limitGrams) × 1.15` — 15 % headroom so
+ *   neither the tallest bar nor the limit line touches the top edge.
  *
- * @param dataPoints  Daily summaries to plot. Only days WITH entries are included
- *                    (no zero-bar days); the x-axis spacing is uniform regardless
- *                    of gaps in the data.
+ * @param buckets     Continuous, chronological bucket series (see [ChartBucketing]).
  * @param limitGrams  Daily limit threshold for the dashed line and bar colouring.
- * @param labelFn     Converts a "YYYY-MM-DD" date string to a short axis label
- *                    (e.g. "Mo", "1.", "Jan"). Provided by the calling screen so
- *                    the chart stays locale-agnostic.
+ * @param labelFn     Formats one [ChartBucket] into a short axis label, e.g. "Mo",
+ *                    "1." or "Jan". Provided by the screen so the chart stays
+ *                    locale-agnostic.
  * @param modifier    Optional layout modifier.
  */
 @Composable
 fun AlcoholBarChart(
-    dataPoints: List<DaySummary>,
+    buckets: List<ChartBucket>,
     limitGrams: Double,
-    labelFn: (String) -> String,
+    labelFn: (ChartBucket) -> String,
     modifier: Modifier = Modifier
 ) {
-    if (dataPoints.isEmpty()) {
+    if (buckets.isEmpty()) {
         Box(modifier.height(180.dp), contentAlignment = Alignment.Center) {
             Text(stringResource(R.string.no_data),
                 style = MaterialTheme.typography.bodyMedium,
@@ -120,25 +133,26 @@ fun AlcoholBarChart(
     }
 
     // Capture theme colors before entering Canvas (see file header note)
-    val maxGrams   = maxOf(dataPoints.maxOf { it.totalGrams }, limitGrams) * 1.15
+    val maxVal     = maxOf(buckets.maxOf { it.avgPerDay }, limitGrams) * 1.15
     val barColor   = MaterialTheme.colorScheme.primary
     val limitColor = warningColor()
     // Over-limit bars use the saturated danger red (same hue as delete icons /
     // traffic-light bullets) rather than the softer Material `error` colour, so
     // every "over limit" cue in the app shares one consistent red.
     val overColor  = dangerRedColor()
+    val tickColor  = successColor()
 
     Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
         val chartH  = size.height
         val chartW  = size.width
         // Each bar occupies an equal horizontal slice (spacing = chartW / numBars).
         // The actual bar width is 60 % of the slice to leave gaps between bars.
-        // coerceAtLeast(4f) ensures a minimum 4px bar even with many data points.
-        val spacing = chartW / dataPoints.size
-        val barW    = (spacing * 0.6f).coerceAtLeast(4f)
+        // coerceAtLeast(2f) keeps a hairline bar visible even with ~53 weekly bars.
+        val spacing = chartW / buckets.size
+        val barW    = (spacing * 0.6f).coerceAtLeast(2f)
 
-        // Limit line Y coordinate: distance from the bottom = (limitGrams / maxGrams) * chartH
-        val limitY  = chartH - (limitGrams / maxGrams * chartH).toFloat()
+        // Limit line Y coordinate: distance from the bottom = (limitGrams / maxVal) * chartH
+        val limitY  = chartH - (limitGrams / maxVal * chartH).toFloat()
 
         // Draw dashed horizontal limit line
         drawLine(
@@ -149,34 +163,69 @@ fun AlcoholBarChart(
             pathEffect  = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
         )
 
-        // Draw each bar
-        dataPoints.forEachIndexed { i, day ->
-            // barH: height in pixels; coerceAtLeast(2f) makes even 0.x-gram entries visible
-            val barH  = (day.totalGrams / maxGrams * chartH).toFloat().coerceAtLeast(2f)
-            // Center the bar within its horizontal slice
-            val left  = i * spacing + (spacing - barW) / 2
-            val color = if (day.totalGrams > limitGrams) overColor else barColor
-            drawRoundRect(
-                color        = color,
-                topLeft      = Offset(left, chartH - barH),
-                size         = Size(barW, barH),
-                cornerRadius = CornerRadius(3.dp.toPx())
-            )
+        buckets.forEachIndexed { i, bucket ->
+            val centerX = i * spacing + spacing / 2f
+            if (bucket.isAbstinent) {
+                // Green tick at the baseline: two short strokes forming a check.
+                // Sized to the slice so it stays visible but never overlaps neighbours.
+                val s     = (spacing * 0.30f).coerceIn(2.dp.toPx(), 5.dp.toPx())
+                val baseY = chartH - 1.dp.toPx()
+                val w     = 1.5.dp.toPx()
+                drawLine(tickColor,
+                    Offset(centerX - s, baseY - s * 0.5f),
+                    Offset(centerX - s * 0.25f, baseY), strokeWidth = w)
+                drawLine(tickColor,
+                    Offset(centerX - s * 0.25f, baseY),
+                    Offset(centerX + s, baseY - s), strokeWidth = w)
+            } else {
+                // barH: height in pixels; coerceAtLeast(2f) makes even 0.x-gram bars visible
+                val barH = (bucket.avgPerDay / maxVal * chartH).toFloat().coerceAtLeast(2f)
+                val left = centerX - barW / 2f
+                val color = if (bucket.avgPerDay > limitGrams) overColor else barColor
+                drawRoundRect(
+                    color        = color,
+                    topLeft      = Offset(left, chartH - barH),
+                    size         = Size(barW, barH),
+                    cornerRadius = CornerRadius(3.dp.toPx())
+                )
+            }
         }
     }
 
-    // X-axis label row: one Text per data point, equally spaced
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-        dataPoints.forEach { day ->
-            Text(
-                text      = labelFn(day.date),
-                style     = MaterialTheme.typography.labelSmall,
-                color     = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                maxLines  = 1,
-                overflow  = TextOverflow.Ellipsis,
-                modifier  = Modifier.weight(1f)
-            )
+    // X-axis labels. For a short series, one aligned label per bar; for a dense
+    // series, a handful of evenly spaced labels for axis context.
+    if (buckets.size <= 12) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            buckets.forEach { bucket ->
+                Text(
+                    text      = labelFn(bucket),
+                    style     = MaterialTheme.typography.labelSmall,
+                    color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines  = 1,
+                    overflow  = TextOverflow.Ellipsis,
+                    modifier  = Modifier.weight(1f)
+                )
+            }
+        }
+    } else {
+        // ~6 evenly spaced samples (first … last). Not column-aligned, but readable.
+        val targetLabels = 6
+        val step = ((buckets.size - 1).toFloat() / (targetLabels - 1)).coerceAtLeast(1f)
+        val sampled = (0 until targetLabels)
+            .map { (it * step).toInt().coerceAtMost(buckets.size - 1) }
+            .distinct()
+            .map { buckets[it] }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            sampled.forEach { bucket ->
+                Text(
+                    text     = labelFn(bucket),
+                    style    = MaterialTheme.typography.labelSmall,
+                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

@@ -22,7 +22,10 @@
 package de.godisch.potillus.util
 
 import android.content.Context
+import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.ChartBucket
+import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
@@ -107,8 +110,14 @@ object PdfReportBuilder {
         // ── Header & footers ──────────────────────────────────────────────────
         scalars["TITLE"]      = context.getString(R.string.pdf_title)
         scalars["FOOTER1"]    = context.getString(R.string.pdf_footer1)
-        scalars["FOOTER2"]    = context.getString(R.string.pdf_footer2)
-        scalars["GPL_FOOTER"] = GplNotice.PDF_FOOTER
+        // Footer 2 is intentionally English-only (never localised) and now also
+        // carries the GPL / no-warranty notice that used to be a separate running
+        // footer (GPL_FOOTER), which has been removed. The version is shortened to
+        // MAJOR.MINOR.PATCH — the debug build's "-debug" suffix is stripped — so the
+        // printed line reads cleanly regardless of build type.
+        val appVersion = BuildConfig.VERSION_NAME.substringBefore("-")
+        scalars["FOOTER2"]    = "Created with Libellus Potionis v$appVersion, " +
+            "free software under the GNU GPL v3, WITHOUT ANY WARRANTY."
 
         // ── Section titles ─────────────────────────────────────────────────────
         scalars["SECTION_KPIS"]       = context.getString(R.string.pdf_section_kpis)
@@ -170,24 +179,30 @@ object PdfReportBuilder {
         }
 
         // ── Trend bar chart (only with ≥ 2 months) ──────────────────────────────
-        val showTrend = d.months.size >= 2
-        scalars["TREND_DISPLAY"] = if (showTrend) "block" else "none"
-        if (showTrend) {
+        // ── Consumption-over-time chart (always shown) ──────────────────────────
+        // Replaces the former monthly-average trend chart. Bars are the per-day
+        // average within each bucket (day / week / month, chosen by span length);
+        // abstinent buckets carry a green tick instead of a bar. The dashed line is
+        // the daily limit. Labels are thinned for dense series (see chartLabelIndices).
+        scalars["TREND_DISPLAY"] = "block"
+        run {
             val limit  = d.limitInfo.limitGrams
-            val maxAvg = d.months.maxOf { it.avgPerCalendarDay }
+            val maxAvg = d.chartBuckets.maxOfOrNull { it.avgPerDay } ?: 0.0
             // Headroom of 10% so the tallest bar / limit line never touches the top.
             val maxVal = maxOf(maxAvg, limit) * 1.1
             scalars["LIMIT_LINE_PCT"] = pct(limit, maxVal).fmt0()
-            repeats["BARS"] = d.months.map { m ->
+
+            val labelIdx = chartLabelIndices(d.chartBuckets.size)
+            repeats["BARS"] = d.chartBuckets.mapIndexed { i, b ->
                 mapOf(
-                    // "YYYY-MM" → "MM.YY" (e.g. 2026-01 → "01.26")
-                    "BAR_LABEL"      to "${m.monthKey.substring(5, 7)}.${m.monthKey.substring(2, 4)}",
-                    "BAR_HEIGHT_PCT" to pct(m.avgPerCalendarDay, maxVal).coerceAtLeast(2.0).fmt0(),
-                    "BAR_CLASS"      to if (m.avgPerCalendarDay > limit) "bar over" else "bar"
+                    "BAR_LABEL"        to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b) else "",
+                    "BAR_HEIGHT_PCT"   to if (b.isAbstinent) "0"
+                                          else pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0(),
+                    "BAR_CLASS"        to if (b.avgPerDay > limit) "bar over" else "bar",
+                    // Green abstinence tick shown only for zero-consumption buckets.
+                    "BAR_TICK_DISPLAY" to if (b.isAbstinent) "block" else "none"
                 )
             }
-        } else {
-            repeats["BARS"] = emptyList()
         }
 
         // ── Category table ───────────────────────────────────────────────────────
@@ -254,6 +269,36 @@ object PdfReportBuilder {
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
     private fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
+
+    /**
+     * Indices of the buckets that should carry an x-axis label. For a short
+     * series (≤ 12 bars) every bucket is labelled; for longer series a small,
+     * evenly spaced subset (~8 labels) keeps the axis readable. The first and
+     * last buckets are always included.
+     */
+    private fun chartLabelIndices(n: Int): Set<Int> {
+        if (n <= 0) return emptySet()
+        if (n <= 12) return (0 until n).toSet()
+        val target = 8
+        val step   = ((n - 1).toFloat() / (target - 1)).coerceAtLeast(1f)
+        return (0 until target)
+            .map { (it * step).toInt().coerceAtMost(n - 1) }
+            .toSortedSet()
+            .apply { add(n - 1) }
+    }
+
+    /**
+     * Formats one bucket's first day into a short axis label, chosen by
+     * granularity: day-and-month for daily/weekly buckets ("5.6."), month-and-year
+     * for monthly buckets ("Jun 2026").
+     */
+    private fun chartBucketLabel(granularity: ChartGranularity, b: ChartBucket): String {
+        val ld = LocalDate.parse(b.labelDate)
+        return when (granularity) {
+            ChartGranularity.DAILY, ChartGranularity.WEEKLY -> "${ld.dayOfMonth}.${ld.monthValue}."
+            ChartGranularity.MONTHLY                        -> ld.format(MONTH_FMT)
+        }
+    }
 
     /** Formats fractional hours as "HH:MM" (14.5 → "14:30"). */
     private fun hourToStr(h: Double): String {

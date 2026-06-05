@@ -71,8 +71,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Konsumtionsmönster: tid på dygnet</string>
     <string name="pdf_section_weekday">Veckodagsprofil (snitt g alkohol)</string>
     <string name="pdf_section_risk">Riskkonsumtion &amp; Nykterhet</string>
-    <string name="pdf_footer1">Uppskattade värden. Ej för körning eller diagnostik.</string>
-    <string name="pdf_footer2">Skapad med Libellus Potionis (Potillus). Uppskattningar – ingen medicinsk diagnos.</string>
+    <string name="pdf_footer1">Uppskattningar – inte en medicinsk diagnos. Inte för bedömning av körlämplighet eller diagnostik.</string>
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Period</string>
     <string name="pdf_meta_limit">Gräns</string>

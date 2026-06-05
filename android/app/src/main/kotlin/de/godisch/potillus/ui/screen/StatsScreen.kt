@@ -37,6 +37,7 @@ import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
@@ -158,16 +159,18 @@ fun StatsScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp)) {
-                        val labelFn: (String) -> String = { date ->
+                        val labelFn: (ChartBucket) -> String = { b ->
+                            val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
                             when (state.period) {
-                                StatsPeriod.WEEK  -> LocalDate.parse(date, DayResolver.DATE_FORMATTER)
-                                    .dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-                                StatsPeriod.MONTH -> date.substring(8)   // day-of-month
-                                StatsPeriod.YEAR  -> date.substring(5, 7) // month number
+                                StatsPeriod.WEEK  -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                StatsPeriod.MONTH -> b.labelDate.substring(8)   // day-of-month
+                                // YEAR uses weekly buckets; label the week by its month
+                                // so the thinned axis reads as a month scale.
+                                StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
                             }
                         }
                         AlcoholBarChart(
-                            dataPoints = state.dataPoints,
+                            buckets    = state.chartBuckets,
                             limitGrams = state.limitInfo.limitGrams,
                             labelFn    = labelFn
                         )

@@ -47,6 +47,9 @@ import de.godisch.potillus.data.prefs.IAppPreferences
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.ChartBucket
+import de.godisch.potillus.domain.ChartBucketing
+import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.util.CsvExporter
@@ -70,6 +73,10 @@ enum class StatsPeriod { WEEK, MONTH, YEAR }
 data class StatsUiState(
     val period: StatsPeriod                       = StatsPeriod.WEEK,
     val dataPoints: List<DaySummary>              = emptyList(),
+    /** Gap-free, time-axis bucket series for the consumption chart (incl. abstinent buckets). */
+    val chartBuckets: List<ChartBucket>           = emptyList(),
+    /** Bucket width of [chartBuckets]: DAILY for WEEK/MONTH, WEEKLY for YEAR. */
+    val chartGranularity: ChartGranularity        = ChartGranularity.DAILY,
     val totalGrams: Double                        = 0.0,
     val avgPerDay: Double                         = 0.0,
     val avgPerDrinkDay: Double                    = 0.0,
@@ -335,9 +342,20 @@ class StatsViewModel(
                 maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek
             )
 
+            // Consumption-over-time chart series. WEEK/MONTH show one bar per day;
+            // YEAR aggregates into weekly buckets (≈ 52 bars). The series spans the
+            // full period [effectiveFrom, to], so abstinent days appear as zero
+            // buckets (rendered as a green tick) on a real time axis.
+            val chartGranularity =
+                if (period == StatsPeriod.YEAR) ChartGranularity.WEEKLY else ChartGranularity.DAILY
+            val chartBuckets =
+                ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity)
+
             StatsUiState(
                 period            = period,
                 dataPoints        = current,
+                chartBuckets      = chartBuckets,
+                chartGranularity  = chartGranularity,
                 totalGrams        = totalGrams,
                 avgPerDay         = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0,
                 avgPerDrinkDay    = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
