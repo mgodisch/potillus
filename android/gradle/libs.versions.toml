@@ -153,6 +153,23 @@ org-json                = "20240303"  # real org.json impl for JVM unit tests
 androidx-test-runner    = "1.6.2"     # androidTest runner
 espresso-core           = "3.6.1"     # androidTest Espresso core
 
+# desugar_jdk_libs: the backported JDK class library used by CORE LIBRARY
+# DESUGARING. When isCoreLibraryDesugaringEnabled = true, D8/R8 rewrites calls to
+# newer java.* APIs so they hit this bundled implementation instead of the
+# platform classes. This is what makes java.time methods such as
+# LocalDate.datesUntil(...) (a Java 9 API) available on EVERY supported runtime.
+#
+# Why we need it: java.time on Android is served by the updatable ART mainline
+# module (see /apex/com.android.art/.../core-oj.jar). datesUntil() was backported
+# into a *later* ART revision, so at the same API level a Play-updated device may
+# have it while a fresh emulator image does not — producing a runtime-only
+# NoSuchMethodError. Desugaring removes this dependency on the device's module
+# version by shipping the implementation inside the APK.
+#
+# Version policy: the 2.x line requires AGP 7.4.0+ (we are on AGP 9.2.0, so this
+# is satisfied with a wide margin). Keep this on the latest 2.x patch.
+desugar-jdk-libs        = "2.1.5"     # core library desugaring (java.time backport)
+
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────
 # core-ktx: Kotlin extension functions for Android APIs
@@ -272,6 +289,12 @@ turbine                     = { group = "app.cash.turbine",       name = "turbin
 org-json                    = { group = "org.json",               name = "json",                        version.ref = "org-json" }
 androidx-test-runner        = { group = "androidx.test",          name = "runner",                      version.ref = "androidx-test-runner" }
 espresso-core               = { group = "androidx.test.espresso", name = "espresso-core",               version.ref = "espresso-core" }
+
+# ── Core library desugaring ───────────────────────────────────────────────────
+# Consumed via the special `coreLibraryDesugaring(...)` configuration in
+# app/build.gradle.kts (NOT `implementation`). D8/R8 dexes it into a separate
+# classes file and links the rewritten java.* calls against it.
+desugar-jdk-libs            = { group = "com.android.tools",       name = "desugar_jdk_libs",            version.ref = "desugar-jdk-libs" }
 
 [plugins]
 # AGP: Android Gradle Plugin – core of the Android build system

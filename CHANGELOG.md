@@ -26,6 +26,65 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.63.1
+
+Bug-fix release. Resolves a runtime crash when switching between the bottom-bar
+main screens, and hardens the app against a whole class of `java.time`
+availability problems by enabling **core library desugaring**.
+
+### Rationale
+
+The app crashed with `java.lang.NoSuchMethodError: No virtual method
+datesUntil(...)` shortly after a non-Today main screen was shown. The trigger is
+`java.time.LocalDate.datesUntil(...)`, a Java 9 API used by `StatsViewModel`,
+`DayResolver` and `PdfReportData`.
+
+On Android, `java.time` is provided by the *updatable* ART mainline module
+(`/apex/com.android.art/.../core-oj.jar`). `datesUntil()` was backported into a
+later ART revision, so at one and the same API level a device whose module has
+been updated (e.g. via Google Play system updates) exposes the method, while an
+older emulator system image does not. This is exactly why the crash reproduced
+on an API 30 emulator yet not on physical API 29/30 devices: identical API
+level, different ART module version. Relying on the platform's `java.time` for
+Java 9+ methods is therefore fragile across runtimes.
+
+Core library desugaring removes this dependency on the device's module version:
+D8/R8 rewrites the affected `java.*` calls to resolve against the bundled
+`desugar_jdk_libs` implementation, which is shipped inside the APK and available
+uniformly down to `minSdk`. This fixes the crashing call site **and** every
+other `datesUntil()` (and future Java 9+ `java.time`) usage at once, with no
+changes to the Kotlin sources.
+
+### Fixed
+
+- **App no longer crashes when switching main screens.** Enabling core library
+  desugaring makes `LocalDate.datesUntil(...)` resolve on all supported
+  runtimes, eliminating the `NoSuchMethodError` raised from
+  `StatsViewModel.uiState` (and latent in `DayResolver` and `PdfReportData`).
+
+### Changed
+
+- **`app/build.gradle.kts`**: set `isCoreLibraryDesugaringEnabled = true` in
+  `compileOptions` and added the `coreLibraryDesugaring(libs.desugar.jdk.libs)`
+  dependency.
+- **`gradle/libs.versions.toml`**: added the `desugar-jdk-libs` version
+  (`2.1.5`, 2.x requires AGP 7.4.0+ — satisfied by AGP 9.2.0) and the matching
+  `com.android.tools:desugar_jdk_libs` library coordinate.
+- **Version bump to 0.63.1**: `versionName` (`app/build.gradle.kts`) and the
+  version strings in the README title and the `proguard-rules.pro` header
+  brought in sync with this CHANGELOG (enforced by the `version-check` build
+  step); `versionCode` advanced `60 → 61` for the published APK.
+
+### Notes
+
+- Side effects of desugaring are limited to a small APK-size increase (only the
+  used classes survive R8 shrinking in release builds) and an additional L8 dex
+  step at build time. The supported device range is **unchanged**: desugaring
+  does not raise `minSdk` (it works down to API 21, well below the project's
+  `minSdk = 30`).
+
+---
+
 ## v0.63.0
 
 Localisation-scope release. Reduces the shipped languages to the set whose

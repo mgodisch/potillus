@@ -136,10 +136,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 60
+        versionCode = 61
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.63.0"
+        versionName = "0.63.1"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -216,6 +216,26 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+
+        // Core library desugaring: let D8/R8 rewrite calls to newer java.* APIs
+        // (notably java.time) so they resolve against the bundled desugar_jdk_libs
+        // implementation instead of the platform classes.
+        //
+        // WHY THIS IS REQUIRED:
+        //   The app calls java.time.LocalDate.datesUntil(...) (a Java 9 API) in
+        //   StatsViewModel, DayResolver and PdfReportData. On Android, java.time
+        //   is provided by the *updatable* ART mainline module. datesUntil() was
+        //   backported into a later ART revision, so at one and the same API
+        //   level a device with a newer (Play-updated) module has the method
+        //   while an older emulator system image does not — the missing method
+        //   then crashes at runtime with NoSuchMethodError, but only on the
+        //   affected runtime. Desugaring ships the implementation inside the APK,
+        //   making these APIs available uniformly down to minSdk regardless of
+        //   the device's module version.
+        //
+        //   The matching `coreLibraryDesugaring(...)` dependency is declared in
+        //   the dependencies { } block below; both halves are mandatory.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     // Kotlin compiler target: must match compileOptions.targetCompatibility.
@@ -296,6 +316,15 @@ kotlin {
 // "debugImplementation": debug build only
 // "platform(...)":       BOM – pins versions for all sub-modules
 dependencies {
+
+    // ── Core library desugaring ───────────────────────────────────────────────
+    // Pairs with `isCoreLibraryDesugaringEnabled = true` in compileOptions above.
+    // NOTE the special `coreLibraryDesugaring` configuration: it is NOT a normal
+    // `implementation` dependency. D8/R8 dexes this artifact separately and links
+    // the rewritten java.* calls (e.g. LocalDate.datesUntil) against it, so the
+    // backported APIs work on every supported runtime. With R8 shrinking enabled
+    // in release builds, only the actually-used classes are kept.
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // androidx.tracing: pinned explicitly to 1.1.0. The app would otherwise
     // resolve it transitively (via androidx.activity / androidx.startup) to 1.0.0
