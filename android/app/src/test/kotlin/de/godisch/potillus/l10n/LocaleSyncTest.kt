@@ -50,6 +50,14 @@ package de.godisch.potillus.l10n
 //        truth.  Missing keys mean untranslated UI strings that silently fall
 //        back to German.
 //
+//     4. GUIDE ⇄ STRINGS LANGUAGE PARITY
+//        The set of user-guide templates (docs/guide/usersguide.<tag>.md.in,
+//        with the base usersguide.md.in counting as "en") is identical to the
+//        set of string-resource languages.  Otherwise a language would ship UI
+//        text without an in-app guide, or vice-versa.  This mirrors, on the
+//        JVM/CI path, the same guard that render-guide.py enforces at build
+//        time, so the two layers fail in lock-step.
+//
 // WHY PURE JVM (no Android runtime)?
 //   These tests read the project's resource files from disk using java.io.File
 //   and parse XML with javax.xml.parsers.  No Android framework classes are
@@ -95,6 +103,18 @@ class LocaleSyncTest {
 
         /** The locale_config.xml that drives the system language picker. */
         private val LOCALE_CONFIG: File = File(RES_DIR, "xml/locale_config.xml")
+
+        /**
+         * Directory holding the user-guide templates
+         * (docs/guide/usersguide*.md.in). It lives one level ABOVE the app
+         * module (…/android/docs/guide), i.e. a sibling of the module that
+         * RES_DIR is under, hence the "../docs/guide" hop from the module root.
+         */
+        private val GUIDE_DIR: File = run {
+            val override = System.getProperty("potillus.project.dir")
+            if (override != null) File(override, "../docs/guide")
+            else File("../docs/guide")
+        }
 
         /**
          * Converts an Android resource qualifier to a plain BCP-47 tag.
@@ -429,14 +449,63 @@ class LocaleSyncTest {
      * expected count of 0, masking all completeness failures.  This guard
      * makes that scenario a loud failure instead.
      */
+    // ── Test 8: guide templates and string resources cover the same languages ─
+
+    /**
+     * Returns the set of BCP-47 tags that have a user-guide template under
+     * [GUIDE_DIR]. Template file names already carry the plain BCP-47 tag
+     * (e.g. `usersguide.pt-BR.md.in`, `usersguide.zh-CN.md.in`), so no
+     * qualifier conversion is needed. The code-less base `usersguide.md.in`
+     * maps to the English base locale `"en"` — matching how
+     * [localeTagsFromDirs] treats the unqualified `values/` directory.
+     */
+    private fun guideTagsFromTemplates(): Set<String> {
+        val files = GUIDE_DIR.listFiles { f ->
+            f.isFile && f.name.startsWith("usersguide") && f.name.endsWith(".md.in")
+        } ?: emptyArray()
+        return files.map { f ->
+            val middle = f.name.removePrefix("usersguide").removeSuffix(".md.in")
+            if (middle.startsWith(".")) middle.substring(1) else "en"
+        }.toSet()
+    }
+
+    /**
+     * The user-guide templates and the string-resource directories must cover
+     * exactly the same set of languages (both counting their unqualified base
+     * as English, `"en"`). A language with strings but no guide would open an
+     * empty/fallback guide; a guide with no strings cannot even be rendered
+     * (its `{{tokens}}` have no source). This is the JVM/CI twin of the guard
+     * in `render-guide.py`; keeping both means neither a Gradle test run nor a
+     * plain `make` build can let the two sets drift apart.
+     */
     @Test
-    fun `base strings xml exists and is non-empty`() {
-        if (!BASE_STRINGS.exists()) {
-            fail("Base strings file not found: ${BASE_STRINGS.absolutePath}")
+    fun `guide templates and string resources cover the same languages`() {
+        val guideTags = guideTagsFromTemplates()
+        require(guideTags.isNotEmpty()) {
+            "No user-guide templates found under: ${GUIDE_DIR.absolutePath}"
         }
-        val count = countStrings(BASE_STRINGS)
-        if (count == 0) {
-            fail("Base strings file is empty or unparseable: ${BASE_STRINGS.absolutePath}")
+        val stringTags = localeTagsFromDirs()
+
+        val missingGuide   = (stringTags - guideTags).sorted()  // strings, no guide
+        val missingStrings = (guideTags - stringTags).sorted()  // guide, no strings
+
+        if (missingGuide.isNotEmpty() || missingStrings.isNotEmpty()) {
+            val msg = buildString {
+                appendLine("Guide languages and string-resource languages are out of sync.")
+                if (missingGuide.isNotEmpty()) {
+                    appendLine("strings.xml present but NO guide template:")
+                    missingGuide.forEach {
+                        appendLine("  ✗  $it  → add docs/guide/usersguide.$it.md.in")
+                    }
+                }
+                if (missingStrings.isNotEmpty()) {
+                    appendLine("guide template present but NO strings.xml:")
+                    missingStrings.forEach {
+                        appendLine("  ✗  $it  → add values-<qualifier>/strings.xml or remove the template")
+                    }
+                }
+            }
+            fail(msg.trimEnd())
         }
     }
 }

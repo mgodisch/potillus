@@ -26,6 +26,56 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.63.0
+
+Localisation-scope release. Reduces the shipped languages to the set whose
+translations can be quality-assured against the German/English originals for
+**both** the UI strings and the in-app user guide, and adds a build-time guard
+that keeps the two language sets identical from now on.
+
+### Rationale
+
+Previously the app shipped 51 translated locales, but only a subset could be
+reviewed to a level the project is willing to vouch for across *both* surfaces
+(strings and the long-form guide). Shipping a translation that cannot be
+quality-assured is worse than not shipping it. This release keeps only the
+languages that clear that bar for both surfaces, and writes the missing guides
+for the kept languages so that every shipped language now has a guide.
+
+### Changed
+
+- **Supported languages reduced to 21** (20 locales + the English base):
+  `cs da de el en es fr it ja ko nb nl pl pt pt-BR ro ru sv uk zh-CN zh-TW`.
+- **Seven new user-guide translations** authored from the German source
+  (`usersguide.de.md.in`), token placeholders preserved:
+  `el ja ko ro uk zh-CN zh-TW`. Every kept language now ships a guide.
+- `locale_config.xml` and `SupportedLocales.kt` trimmed to the kept set. The
+  English base stays listed as `en` (no `values-en/`; it resolves to the base
+  `values/`), which remains best practice for the per-app language picker.
+
+### Removed
+
+- **31 languages** dropped from `values-XX/`, `locale_config.xml` and
+  `SupportedLocales.kt` (including Latin, whose guide template and rendered
+  guide were removed too):
+  `ar bg bn cy et fi fo ga ha he hi hr hu id is la lb lt lv mr ms mt sk sl sw ta te th tr vi yo`.
+
+### Added
+
+- **Build-time language-parity guard.** The guide-template language set and the
+  string-resource language set must now be identical (both counting the base as
+  English). Enforced on two layers: `render-guide.py` aborts the build (write
+  and `--check` modes) with a precise diff, and a new `LocaleSyncTest` case does
+  the same on the Gradle/CI path.
+
+### Release bookkeeping
+
+- `versionName` → `0.63.0`, `versionCode` → `60`; README title and
+  `proguard-rules.pro` header updated to match (release-check.sh §1 /
+  `make version-check`).
+
+---
+
 ## v0.62.1
 
 Maintenance release. Small UI consistency fixes, a clearer PDF export file name,

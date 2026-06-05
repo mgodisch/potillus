@@ -96,105 +96,46 @@ object SupportedLocales {
      * (Android falls back to  values/  automatically).
      */
     val ALL: List<Locale> = listOf(
-        // ── Indonesian (also serves as Malay ms fallback) ────────────────────
-        Locale("id",    "Bahasa Indonesia"),
-        // ── Malay (Standard Malaysian; shares vocabulary with Indonesian) ──────
-        Locale("ms",    "Bahasa Melayu"),
-        // ── Welsh (Cymraeg; official language of Wales, UK) ───────────────────
-        Locale("cy",    "Cymraeg"),
-        // ── Danish ───────────────────────────────────────────────────────────────
+        // ── Latin-script autonyms (alphabetical) ─────────────────────────────
+        // ── Danish ───────────────────────────────────────────────────────────
         Locale("da",    "Dansk"),
         // ── German (primary development language / string source of truth) ───
         Locale("de",    "Deutsch"),
-        // ── Estonian ─────────────────────────────────────────────────────────────
-        Locale("et",    "Eesti"),
         // ── English (base locale — no values-en/ dir, falls back to values/) ─
         Locale("en",    "English"),
-        // ── Spanish ──────────────────────────────────────────────────────────────
+        // ── Spanish ──────────────────────────────────────────────────────────
         Locale("es",    "Español"),
-        // ── French ───────────────────────────────────────────────────────────────
+        // ── French ───────────────────────────────────────────────────────────
         Locale("fr",    "Français"),
-        // ── Faroese (Føroyskt; official language of the Faroe Islands) ───────────
-        Locale("fo",    "Føroyskt"),
-        // ── Irish ────────────────────────────────────────────────────────────────
-        Locale("ga",    "Gaeilge"),
-        // ── Hausa (Latin Boko orthography; lingua franca of West/Central Africa) ──
-        Locale("ha",    "Hausa"),
-        // ── Croatian ─────────────────────────────────────────────────────────────
-        Locale("hr",    "Hrvatski"),
-        // ── Italian ──────────────────────────────────────────────────────────────
+        // ── Italian ──────────────────────────────────────────────────────────
         Locale("it",    "Italiano"),
-        // ── Swahili (Kiswahili; lingua franca of East/Central Africa) ────────────
-        Locale("sw",    "Kiswahili"),
-        // ── Latin (novelty locale) ───────────────────────────────────────────────
-        Locale("la",    "Latina"),
-        // ── Latvian ──────────────────────────────────────────────────────────────
-        Locale("lv",    "Latviešu"),
-        // ── Lithuanian ───────────────────────────────────────────────────────────
-        Locale("lt",    "Lietuvių"),
-        // ── Luxembourgish (Lëtzebuergesch; national language of Luxembourg) ──────
-        Locale("lb",    "Lëtzebuergesch"),
-        // ── Hungarian ────────────────────────────────────────────────────────────
-        Locale("hu",    "Magyar"),
-        // ── Maltese ──────────────────────────────────────────────────────────────
-        Locale("mt",    "Malti"),
-        // ── Dutch ────────────────────────────────────────────────────────────────
+        // ── Dutch ────────────────────────────────────────────────────────────
         Locale("nl",    "Nederlands"),
-        // ── Norwegian Bokmål ─────────────────────────────────────────────────────
+        // ── Norwegian Bokmål ─────────────────────────────────────────────────
         Locale("nb",    "Norsk bokmål"),
-        // ── Polish ───────────────────────────────────────────────────────────────
+        // ── Polish ───────────────────────────────────────────────────────────
         Locale("pl",    "Polski"),
-        // ── Portuguese (European) ────────────────────────────────────────────────
+        // ── Portuguese (European) ────────────────────────────────────────────
         Locale("pt",    "Português"),
-        // ── Portuguese (Brazilian) ───────────────────────────────────────────────
+        // ── Portuguese (Brazilian) ───────────────────────────────────────────
         Locale("pt-BR", "Português (Brasil)"),
-        // ── Romanian ─────────────────────────────────────────────────────────────
+        // ── Romanian ─────────────────────────────────────────────────────────
         Locale("ro",    "Română"),
-        // ── Slovak ───────────────────────────────────────────────────────────────
-        Locale("sk",    "Slovenčina"),
-        // ── Slovenian ────────────────────────────────────────────────────────────
-        Locale("sl",    "Slovenščina"),
-        // ── Finnish ──────────────────────────────────────────────────────────────
-        Locale("fi",    "Suomi"),
-        // ── Swedish ──────────────────────────────────────────────────────────────
+        // ── Swedish ──────────────────────────────────────────────────────────
         Locale("sv",    "Svenska"),
-        // ── Vietnamese (Latin + combining tonal diacritics — do not strip!) ───
-        Locale("vi",    "Tiếng Việt"),
-        // ── Turkish (Latin + ç ğ ı İ ö ş ü; dotted-i handled by Android) ────
-        Locale("tr",    "Türkçe"),
-        // ── Yoruba (tonal diacritics are essential — do not strip) ────────────────
-        Locale("yo",    "Yorùbá"),
-        // ── Icelandic (Íslenska) ─────────────────────────────────────────────────
-        Locale("is",    "Íslenska"),
-        // ── Czech ────────────────────────────────────────────────────────────────
+        // ── Czech (Č sorts after the plain-Latin block) ──────────────────────
         Locale("cs",    "Čeština"),
-        // ── Greek ────────────────────────────────────────────────────────────────
+        // ── Greek ────────────────────────────────────────────────────────────
         Locale("el",    "Ελληνικά"),
-        // ── Bulgarian ────────────────────────────────────────────────────────────
-        Locale("bg",    "Български"),
-        // ── Russian ──────────────────────────────────────────────────────────────
+        // ── Cyrillic ─────────────────────────────────────────────────────────
+        // ── Russian ──────────────────────────────────────────────────────────
         Locale("ru",    "Русский"),
         // ── Ukrainian (Cyrillic — same font stack as Russian) ─────────────────
         Locale("uk",    "Українська"),
-        // ── Hebrew ─────────────────────────────────────────── RTL ──────────
-        Locale("he",    "עברית"),
-        // ── Arabic ─────────────────────────────────────────── RTL ──────────
-        Locale("ar",    "العربية"),
-        // ── Hindi (Devanagari — rendered via Noto Sans Devanagari, API 21+) ──
-        Locale("hi",    "हिन्दी"),
-        // ── Bengali (Bengali script — rendered via Noto Sans Bengali, API 21+) ─
-        Locale("bn",    "বাংলা"),
-        // ── Marathi (Devanagari — same font stack as Hindi, API 21+) ─────────────
-        Locale("mr",    "मराठी"),
-        // ── Tamil (Tamil script — rendered via Noto Sans Tamil, API 21+) ──────────
-        Locale("ta",    "தமிழ்"),
-        // ── Telugu (Telugu script — rendered via Noto Sans Telugu, API 21+) ────────
-        Locale("te",    "తెలుగు"),
-        // ── Thai (Thai script — rendered via Noto Sans Thai, API 21+) ────────
-        Locale("th",    "ภาษาไทย"),
+        // ── CJK ──────────────────────────────────────────────────────────────
         // ── Chinese, Simplified (Mainland China / Singapore) ─────────────────
         Locale("zh-CN", "中文（简体）"),
-        // ── Chinese, Traditional (Taiwan / Hong Kong / Macau) ────────────────────
+        // ── Chinese, Traditional (Taiwan / Hong Kong / Macau) ────────────────
         Locale("zh-TW", "中文（繁體）"),
         // ── Japanese (Kanji/Hiragana/Katakana) ───────────────────────────────
         Locale("ja",    "日本語"),

@@ -1,0 +1,108 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
+
+# Libellus Potionis "Potillus" -- ユーザーガイド
+
+Libellus Potionis へようこそ。これはあなたの飲酒量を記録する個人用の記録ツールで
+す。このページではアプリの特徴と機能について説明します。
+
+## 主な特徴
+
+Libellus Potionis はオープンソースです。ソースコードは誰でも閲覧・検証できます。
+Libellus Potionis はプライバシーに配慮しています。カメラやマイク、GPS やネットワー
+クなど、いかなる権限も必要としません。Libellus Potionis は安全です。すべてのデータ
+は暗号化して保存され、アプリへのアクセスは指紋認証で制限できます。Libellus Potionis
+は、「la petite sœur」がまだ予算内に収まっているかをいつでも知らせることで、あなた
+が自分の上限まで節度を保って飲めるよう手助けします。さらに本アプリは、依存症相談機関
+での面談に際して、要望に応じてあなたの飲酒傾向全体を見やすい 2 ページの PDF 文書とし
+てまとめます。Libellus Potionis は完全に無料で、広告もありません。
+
+Libellus Potionis は Android 11 以降を必要とします。作者は GrapheneOS（Android 16）
+を搭載した Google Pixel 10 Pro で継続的に使用しており、加えて Fairphone 4
+（Android 15）と仮想 Pixel 4（Android 11）でもテストしています。
+
+## 「{{today}}」画面
+
+この画面には、あなたが今日飲んだアルコール飲料の一覧が表示されます。入力の際に誤りが
+あった場合は、ここで各エントリを編集または削除できます。プラスボタンでさらに飲み物を
+追加できます。
+
+飲み物一覧の上には、当日の概要が次の情報とともに表示されます。今日すでに摂取したアル
+コール量（グラム）、1 日あたりおよび 7 日間の上限に対して今日すでに摂取した量（グラ
+ムおよび棒グラフ）、ならびに本日と直前 6 日間（移動 7 日間ウィンドウ／移動週）におけ
+る、これまでの飲酒日数を上限に対して示したもの（数値および棒グラフ）です。
+
+## 「{{calendar}}」画面
+
+この画面にはカレンダーが表示されます。アルコールを摂取した日には、青い点（問題のない
+量）または赤い点（上限超過）が付きます。日付を選択すると、その日の飲み物が一覧表示さ
+れ、必要に応じて修正・削除できます。後から飲んだ飲み物を追加することも可能です。
+
+## 「{{statistics}}」画面
+
+この画面には、週・月・年で切り替えられる、あなたの飲酒量の統計分析が表示されます。表
+計算ソフトでさらにデータを処理するために、CSV エクスポートが組み込まれています。さら
+に、依存症相談機関向けに最適化された形式であなたの飲酒傾向を 2 ページにまとめる PDF
+エクスポートも利用できます。
+
+## 「{{drinks}}」画面
+
+この画面には、利用可能な飲み物の一覧が表示されます。本アプリには国際的によく飲まれる
+飲み物がいくつか初めから用意されています。これらは自由に変更・削除できます。プラス記
+号から新しい飲み物を定義できます。飲み物をタップすると、それをそのまま摂取済みとして
+記録するためのダイアログが開きます。
+
+## 「{{settings}}」画面
+
+設定メニューは右上のメニューアイコン（☰）から開けます。Libellus Potionis では次の設
+定が可能です。
+
+### {{personal_data}}
+
+このカテゴリでは、[ウィドマークの式](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
+に基づいて血中アルコール濃度を概算させるために、自分の体重を入力できます。算出された値
+は「{{today}}」画面に表示されます。
+
+### {{limits}}
+
+このカテゴリでは、自分の飲酒に適用したい上限を設定します。入力する項目は、純アルコール
+のグラム数による 1 日の最大上限、7 日間の最大上限、および週あたりの最大飲酒日数です。
+すべての上限は同時に有効になります。「{{today}}」画面には、それに応じて 3 本の進捗バー
+が表示されます。値の目安が必要な場合は、各国で適用されている推奨値を
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+で参考にできます。
+
+### {{statistics}}
+
+統計の設定では、新しい 1 日が何時に始まるか（たとえば午前 1 時の飲み物をまだ前日に数え
+られるように）を指定でき、また、たとえば元日からの再スタートのために、いつの日付以降の
+データを評価するかを指定できます。
+
+### {{backup_section}}
+
+すべてのデータは JSON ファイルとしてエクスポートでき、必要に応じてたとえば別のスマート
+フォンに再びインポートできます。
+
+### {{appearance}}
+
+このカテゴリでは、アプリの生体認証ロックを有効にできるほか、配色と言語をシステム設定と
+は独立して指定できます。

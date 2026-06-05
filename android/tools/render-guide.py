@@ -42,6 +42,19 @@ the Android resource qualifier for the BCP-47 tag: a bare language is unchanged
 ``pt-rBR``). Adding a new ``usersguide.xx.md.in`` (with a matching ``values-xx``)
 is therefore picked up automatically -- no edit to this script needed.
 
+LANGUAGE PARITY GUARD
+---------------------
+The two independent sources of truth for "which languages does Potillus ship"
+are these guide templates and the ``values-<q>/strings.xml`` resource
+directories. They MUST describe exactly the same set of languages (both
+counting the unqualified base, ``values`` / ``usersguide.md.in``, as English
+``en``); otherwise a language could have UI strings but no guide, or a guide
+with no UI strings. Before rendering, :func:`check_language_parity` compares the
+two sets and aborts the build with a precise diff if they diverge. This runs in
+both write and ``--check`` mode, so neither a normal build nor CI can let the
+sets drift apart. (The complementary :class:`LocaleSyncTest` guards the
+strings ⇄ locale_config ⇄ SupportedLocales side on the JVM/CI path.)
+
 OUTPUT & WHEN IT IS (RE)GENERATED
 ---------------------------------
 For every language it writes ``app/src/main/res/<raw_dir>/usersguide.md`` -- the
@@ -88,7 +101,7 @@ TOKEN_RE = re.compile(r"\{\{([a-z0-9_]+)\}\}")
 def android_qualifier(tag: str) -> str:
     """Map a BCP-47-ish language tag to its Android resource qualifier.
 
-    A bare language ("de", "la") is returned unchanged; a language+region tag
+    A bare language ("de", "el") is returned unchanged; a language+region tag
     ("pt-BR") becomes the Android form with the region marked by ``r``
     ("pt-rBR"). This mirrors how ``values-xx`` / ``raw-xx`` directories are named.
     """
@@ -119,6 +132,79 @@ def discover_languages():
             values_dir, raw_dir, label = "values", "raw", "en (default)"
         langs.append((label, path, values_dir, raw_dir))
     return langs
+
+
+# Inverse of android_qualifier(): an Android resource qualifier with a region
+# ("pt-rBR", "zh-rCN") maps back to its BCP-47 tag ("pt-BR", "zh-CN"); a bare
+# language qualifier ("de") is its own tag. Used by the parity guard so the
+# string-resource side and the guide side are compared in the same notation.
+QUALIFIER_REGION_RE = re.compile(r"^([a-z]{2,3})-r([A-Za-z0-9]+)$")
+
+
+def bcp47_from_qualifier(qualifier: str) -> str:
+    """Map an Android resource qualifier back to its BCP-47 tag."""
+    m = QUALIFIER_REGION_RE.match(qualifier)
+    return f"{m.group(1)}-{m.group(2)}" if m else qualifier
+
+
+def strings_languages() -> set:
+    """Set of BCP-47 tags that ship string resources.
+
+    Every ``values-<q>/`` directory contributes one tag, EXCEPT the non-locale
+    qualifiers ``values-night`` and API-level ``values-vNN``. The English base
+    lives in the unqualified ``values/`` (there is deliberately no
+    ``values-en/``), so ``"en"`` is added explicitly -- mirroring how the
+    per-app language picker and :class:`LocaleSyncTest` treat the base locale.
+    """
+    tags = {"en"}
+    for entry in os.listdir(RES):
+        if not entry.startswith("values-"):
+            continue
+        if entry == "values-night" or re.fullmatch(r"values-v\d+", entry):
+            continue
+        tags.add(bcp47_from_qualifier(entry[len("values-"):]))
+    return tags
+
+
+def guide_languages(langs) -> set:
+    """Set of BCP-47 tags that ship a guide template (base template -> ``en``)."""
+    tags = set()
+    for _label, _tpl, values_dir, _raw in langs:
+        if values_dir == "values":
+            tags.add("en")
+        else:
+            tags.add(bcp47_from_qualifier(values_dir[len("values-"):]))
+    return tags
+
+
+def check_language_parity(langs) -> None:
+    """Abort the build when guide languages and string languages diverge.
+
+    See the module docstring's "LANGUAGE PARITY GUARD" section. Both sets count
+    the unqualified base as English (``en``). On any mismatch the build stops
+    with a message naming exactly which side is missing which language, so the
+    fix is unambiguous.
+    """
+    guides = guide_languages(langs)
+    strings = strings_languages()
+    if guides == strings:
+        return
+    lines = ["render-guide: guide languages and string languages are out of sync."]
+    missing_guide = sorted(strings - guides)   # have strings.xml, lack a template
+    missing_strings = sorted(guides - strings)  # have a template, lack strings.xml
+    if missing_guide:
+        lines.append(
+            "  strings.xml present but NO guide template: "
+            + ", ".join(missing_guide)
+            + "\n    -> add docs/guide/usersguide.<tag>.md.in for each"
+        )
+    if missing_strings:
+        lines.append(
+            "  guide template present but NO strings.xml: "
+            + ", ".join(missing_strings)
+            + "\n    -> add the values-<qualifier>/strings.xml or remove the template"
+        )
+    sys.exit("\n".join(lines))
 
 
 def unescape_android(value: str) -> str:
@@ -197,6 +283,11 @@ def main() -> int:
     langs = discover_languages()
     if not langs:
         sys.exit(f"render-guide: no usersguide*.md.in templates found under {TPL}")
+
+    # Hard gate: the guide-template language set and the strings.xml language set
+    # must be identical (see check_language_parity). Runs in both modes so a
+    # normal build and CI both fail fast on any drift.
+    check_language_parity(langs)
 
     stale = []
     skipped = 0
