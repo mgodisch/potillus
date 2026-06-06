@@ -59,6 +59,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,7 +71,6 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.successColor
-import de.godisch.potillus.ui.theme.warningColor
 
 // ════════════════════════════════════════════════════════════════════════════
 // BAR CHART
@@ -97,7 +99,7 @@ import de.godisch.potillus.ui.theme.warningColor
  * - avg ≤ limit → [MaterialTheme.colorScheme.primary] (app's accent colour)
  * - avg > limit → [dangerRedColor] (the saturated red shared with delete icons
  *   and traffic-light bullets, so all "danger" reds match)
- * - Limit line  → [warningColor] (amber dashed)
+ * - Limit line  → [dangerRedColor] (red dashed)
  * - Abstinent tick → [successColor] (green)
  *
  * LABEL THINNING:
@@ -135,7 +137,9 @@ fun AlcoholBarChart(
     // Capture theme colors before entering Canvas (see file header note)
     val maxVal     = maxOf(buckets.maxOf { it.avgPerDay }, limitGrams) * 1.15
     val barColor   = MaterialTheme.colorScheme.primary
-    val limitColor = warningColor()
+    // Daily-limit line in the saturated danger red (was amber) so it reads as a
+    // "do not cross" threshold and matches the over-limit bar colour.
+    val limitColor = dangerRedColor()
     // Over-limit bars use the saturated danger red (same hue as delete icons /
     // traffic-light bullets) rather than the softer Material `error` colour, so
     // every "over limit" cue in the app shares one consistent red.
@@ -253,12 +257,16 @@ fun AlcoholBarChart(
  * @param values   One value per bar, in display order. ≤ 0 ⇒ empty slot (no bar).
  * @param labelFor Axis label for a bar index, or "" to leave it blank — used to
  *                 thin the dense 24-hour axis down to every few hours.
+ * @param showValues When true, each non-empty bar gets its value printed just
+ *                 above it (one decimal). Bar heights then reserve headroom so the
+ *                 topmost label is not clipped.
  * @param modifier Optional layout modifier.
  */
 @Composable
 fun ValueBarChart(
     values: List<Double>,
     labelFor: (Int) -> String,
+    showValues: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
@@ -273,6 +281,11 @@ fun ValueBarChart(
     // coerceAtLeast(0.001): avoids division by zero in the height calculation.
     val maxVal   = (values.maxOrNull() ?: 0.0).coerceAtLeast(0.001)
     val barColor = MaterialTheme.colorScheme.primary
+    // Resolved here (not inside the Canvas DrawScope, which cannot read theme).
+    val valueArgb = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
+    // With value labels, scale bars against a 25%-taller reference so the label
+    // above the tallest bar stays inside the canvas.
+    val heightRef = if (showValues) maxVal * 1.25 else maxVal
 
     Canvas(modifier = modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp, bottom = 4.dp)) {
         val chartH  = size.height
@@ -282,18 +295,32 @@ fun ValueBarChart(
         // the 24-bar hour chart; coerceAtLeast(2f) keeps thin hour bars visible.
         val barW    = (spacing * 0.7f).coerceAtLeast(2f)
 
+        val valuePaint = if (showValues) android.graphics.Paint().apply {
+            isAntiAlias = true
+            color       = valueArgb
+            textAlign   = android.graphics.Paint.Align.CENTER
+            textSize    = 10.sp.toPx()
+        } else null
+
         values.forEachIndexed { i, v ->
             if (v <= 0.0) return@forEachIndexed
             // barH proportional to the tallest bar; coerceAtLeast(2f) keeps a tiny
             // but non-zero value visible.
-            val barH    = (v / maxVal * chartH).toFloat().coerceAtLeast(2f)
+            val barH    = (v / heightRef * chartH).toFloat().coerceAtLeast(2f)
             val centerX = i * spacing + spacing / 2f
+            val barTop  = chartH - barH
             drawRoundRect(
                 color        = barColor,
-                topLeft      = Offset(centerX - barW / 2f, chartH - barH),
+                topLeft      = Offset(centerX - barW / 2f, barTop),
                 size         = Size(barW, barH),
                 cornerRadius = CornerRadius(3.dp.toPx())
             )
+            // Value just above the bar (one decimal), if requested.
+            valuePaint?.let { p ->
+                drawContext.canvas.nativeCanvas.drawText(
+                    "%.1f".format(v), centerX, barTop - 2.dp.toPx(), p
+                )
+            }
         }
     }
 

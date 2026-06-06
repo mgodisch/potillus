@@ -236,4 +236,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">Медіана за день вживання</string>
     <string name="pdf_kpi_avg_drink_days_month">Сер. дні вживання/міс.</string>
     <string name="pdf_kpi_median_drink_days_month">Медіана дні вживання/міс.</string>
+    <string name="pdf_kpi_max_day">Макс. за день</string>
+    <string name="pdf_kpi_max_7days">Макс. за 7 днів</string>
+    <string name="info_dialog_title">Вам подобається цей застосунок?</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">Гаразд</string>
 </resources>

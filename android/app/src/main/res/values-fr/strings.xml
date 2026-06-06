@@ -212,4 +212,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">Médiane par jour de conso.</string>
     <string name="pdf_kpi_avg_drink_days_month">Moy. jours de conso./mois</string>
     <string name="pdf_kpi_median_drink_days_month">Médiane jours de conso./mois</string>
+    <string name="pdf_kpi_max_day">Max. par jour</string>
+    <string name="pdf_kpi_max_7days">Max. sur 7 jours</string>
+    <string name="info_dialog_title">Aimez-vous cette application ?</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">OK</string>
 </resources>

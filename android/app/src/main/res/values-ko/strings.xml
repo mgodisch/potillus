@@ -243,4 +243,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">음주일 중앙값</string>
     <string name="pdf_kpi_avg_drink_days_month">평균 음주일 수/월</string>
     <string name="pdf_kpi_median_drink_days_month">중앙값 음주일 수/월</string>
+    <string name="pdf_kpi_max_day">일 최대</string>
+    <string name="pdf_kpi_max_7days">7일 최대</string>
+    <string name="info_dialog_title">이 앱이 마음에 드시나요?</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">확인</string>
 </resources>

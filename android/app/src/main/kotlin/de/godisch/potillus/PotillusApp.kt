@@ -65,6 +65,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import de.godisch.potillus.l10n.SupportedLocales
+import java.time.LocalDate
 import java.util.Locale
 
 /**
@@ -168,6 +169,20 @@ class PotillusApp : Application() {
     /** Clears [deviceTransferWarning] after the user has dismissed the info message. */
     fun dismissDeviceTransferWarning() { _deviceTransferWarning.value = false }
 
+    // ── Annual info dialog ──────────────────────────────────────────────────────
+    //   Shown at most once per calendar year, and ONLY when the app is opened on
+    //   December 27th (device-local date). If the app is not opened that day, the
+    //   dialog is simply skipped for the year — it is never caught up later. The
+    //   decision is made once per process start in [checkAnnualInfoDialog]; the
+    //   "shown year" is persisted via [IAppPreferences.infoDialogShownYear].
+    private val _infoDialog = MutableStateFlow(false)
+
+    /** Emits `true` when the annual info dialog should be shown. Observed by `MainActivity`. */
+    val infoDialog: StateFlow<Boolean> = _infoDialog.asStateFlow()
+
+    /** Clears [infoDialog] after the user has tapped OK. */
+    fun dismissInfoDialog() { _infoDialog.value = false }
+
     /**
      * Process entry point. Runs the one-shot startup tasks that must happen
      * before the first Activity reads settings: first-launch language detection
@@ -189,6 +204,25 @@ class PotillusApp : Application() {
             val startupSettings = appPreferences.settingsFlow.first()
             applyLanguageOnFirstLaunch(startupSettings)
             checkForDeviceTransferFailure()
+            checkAnnualInfoDialog()
+        }
+    }
+
+    /**
+     * Decides whether to show the annual info dialog. It is shown only when the
+     * device-local date is December 27th and the dialog has not already been shown
+     * this calendar year (tracked via [IAppPreferences.infoDialogShownYear]). The
+     * "shown year" is persisted immediately so the dialog appears at most once per
+     * year and is never caught up if Dec 27 is missed. Runs once per process start
+     * on Dispatchers.IO (the DataStore read/write is suspending).
+     */
+    private suspend fun checkAnnualInfoDialog() {
+        val today = LocalDate.now()
+        if (today.monthValue == 12 && today.dayOfMonth == 27) {
+            if (appPreferences.infoDialogShownYear.first() != today.year) {
+                appPreferences.setInfoDialogShownYear(today.year)
+                _infoDialog.value = true
+            }
         }
     }
 

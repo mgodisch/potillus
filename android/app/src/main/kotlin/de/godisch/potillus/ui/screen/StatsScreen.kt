@@ -259,7 +259,7 @@ fun StatsScreen(
             // ── Time-of-day (hour) bar chart ──────────────────────────────
             // Placed above the weekday chart and the category donut. Shown only
             // when at least one hour has consumption in the selected period.
-            if (state.hourlyGrams.any { it > 0.0 }) {
+            if (state.hourBucketAverages.any { it > 0.0 }) {
                 item {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(16.dp)) {
@@ -270,10 +270,10 @@ fun StatsScreen(
                             )
                             Spacer(Modifier.height(12.dp))
                             ValueBarChart(
-                                values   = state.hourlyGrams,
-                                // Thin the 24-hour axis to every third hour plus the
-                                // final hour (0, 3, 6 … 21, 23) so the labels stay legible.
-                                labelFor = { h -> if (h % 3 == 0 || h == 23) h.toString() else "" }
+                                // Eight 3-hour buckets; average grams/day printed above.
+                                values     = state.hourBucketAverages,
+                                labelFor   = { b -> "${b * 3}\u2013${b * 3 + 3}" },
+                                showValues = true
                             )
                         }
                     }
@@ -301,8 +301,9 @@ fun StatsScreen(
                             }
                             ValueBarChart(
                                 // null (weekday never a drink day) → 0.0 ⇒ empty slot.
-                                values   = state.weekdayAverages.map { it ?: 0.0 },
-                                labelFor = { i -> weekdayLabels.getOrElse(i) { "" } }
+                                values     = state.weekdayAverages.map { it ?: 0.0 },
+                                labelFor   = { i -> weekdayLabels.getOrElse(i) { "" } },
+                                showValues = true
                             )
                         }
                     }

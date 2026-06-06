@@ -247,4 +247,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">Mediană pe zi de băut</string>
     <string name="pdf_kpi_avg_drink_days_month">Medie zile de băut/lună</string>
     <string name="pdf_kpi_median_drink_days_month">Mediană zile de băut/lună</string>
+    <string name="pdf_kpi_max_day">Max. pe zi</string>
+    <string name="pdf_kpi_max_7days">Max. în 7 zile</string>
+    <string name="info_dialog_title">Îți place această aplicație?</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">OK</string>
 </resources>

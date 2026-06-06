@@ -196,4 +196,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">Медиана в день потребления</string>
     <string name="pdf_kpi_avg_drink_days_month">Ср. дней с алкоголем/мес.</string>
     <string name="pdf_kpi_median_drink_days_month">Медиана дней с алкоголем/мес.</string>
+    <string name="pdf_kpi_max_day">Макс. в день</string>
+    <string name="pdf_kpi_max_7days">Макс. за 7 дней</string>
+    <string name="info_dialog_title">Вам нравится это приложение?</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">ОК</string>
 </resources>

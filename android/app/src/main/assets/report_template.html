@@ -135,13 +135,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     table.data td:not(:first-child) { text-align: right; }
 
     /* ---- Bar charts (pure CSS; no images) --------------------------------- */
-    /* Two different charts share this same flex-column-of-bars layout:
-         1. the consumption-over-time "trend" chart (repeat block BARS), and
-         2. the 24-hour time-of-day chart (selector .chart.hours, block HOURS).
-       A chart is a horizontal flex row whose children (.col) are equal-width
-       columns. Each column anchors its .bar to the bottom (align-items:flex-end);
-       the bar's inline `height:NN%` (filled per row by the builder) sets its size
-       relative to the chart's own fixed height (60pt = the 100% reference). */
+    /* The consumption-over-time "trend" chart (repeat block BARS) uses this
+       flex-column-of-bars layout: a horizontal flex row whose children (.col) are
+       equal-width columns, each anchoring its .bar to the bottom; the bar's inline
+       `height:NN%` sets its size relative to the chart's fixed height (60pt). */
     .chart {
         position: relative; height: 60pt; margin-top: 4pt;
         display: flex; align-items: flex-end; gap: 3pt;
@@ -159,14 +156,42 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
        comes from the LIMIT_LINE_PCT placeholder (trend chart only). */
     .chart .limit {
         position: absolute; left: 0; right: 0;
-        border-top: 1px dashed #dc7832;
+        border-top: 1px dashed #c83232;   /* red — same hue as over-limit cues */
     }
-    /* 24-hour variant: 24 thin columns need a smaller gap and a wider bar so the
-       bars stay visible. This chart has no limit line and no abstinence ticks —
-       an hour with no consumption is simply an empty column. */
-    .chart.hours { gap: 1pt; }
-    .chart.hours .bar { width: 84%; }
-    .chart.hours .lab { font-size: 6.5pt; }
+
+    /* Bar chart with the axis labels in a SEPARATE row BELOW the baseline, so a
+       label is never overlapped by its bar (used by the hour-of-day and weekday
+       charts). `.bars` is the plot area (its border-bottom is the x-axis); `.axis`
+       holds one equal-width label cell per bar, column-aligned with the bars via
+       matching `flex:1` + identical `gap`. */
+    .barchart { margin-top: 4pt; }
+    .barchart .bars {
+        position: relative; height: 60pt;
+        display: flex; align-items: flex-end; gap: 1pt;
+        border-bottom: .5px solid #dcdcdc;
+    }
+    .barchart .bars .col { flex: 1; display: flex; flex-direction: column;
+                           justify-content: flex-end; align-items: center; height: 100%; }
+    .barchart .bars .bar { width: 84%; background: #1e50a0; border-radius: 1pt 1pt 0 0; }
+    /* Value printed directly above its bar (weekday chart). */
+    .barchart .bars .v { font-size: 5.5pt; color: #646464; margin-bottom: 1pt; line-height: 1; }
+    .barchart .axis { display: flex; gap: 1pt; margin-top: 2pt; }
+    .barchart .axis .cell { flex: 1; text-align: center; font-size: 5.5pt; color: #646464; }
+    /* Weekday variant: only 7 bars, so they may be a touch narrower and the axis
+       labels (day names) a little larger than the dense 24-hour axis. */
+    .barchart.week .bars .bar { width: 55%; }
+    .barchart.week .axis .cell { font-size: 7pt; }
+    /* Hour variant: 24 value labels are very dense, so shrink them hard. */
+    .barchart.hours .bars .v { font-size: 4pt; }
+
+    /* ---- Category breakdown: half-width table + donut ---------------------- */
+    .cat-row { display: flex; gap: 10pt; align-items: flex-start; margin-top: 2pt; }
+    .cat-row .cat-table { flex: 0 0 48%; }          /* table takes the left half */
+    .cat-row .cat-pie   { flex: 1; display: flex; justify-content: center; align-items: center; }
+    .cat-row .cat-pie .donut { width: 44mm; height: 44mm; }
+    /* Small colour chip in front of each category name = donut legend. */
+    .swatch { display: inline-block; width: 7pt; height: 7pt; border-radius: 1pt;
+              margin-right: 4pt; vertical-align: middle; }
 
     /* ---- Footers ---------------------------------------------------------- */
     /* Page-specific disclaimer. Inside a .sheet it is pushed to the page bottom
@@ -219,10 +244,13 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
   PAGE 2
     Category table .... SECTION_CATEGORIES, CAT_HEAD_NAME/G/PCT
-                        + block CATEGORIES (row: C_NAME, C_G, C_PCT)
-    Time-of-day chart . SECTION_DAYTIME + block HOURS (row: H_HEIGHT_PCT, H_LABEL)
-    Weekday table ..... SECTION_WEEKDAY + block WEEKDAY_HEAD (row: WD_NAME)
-                        and block WEEKDAY_VAL (row: WD_VALUE)
+                        + block CATEGORIES (row: C_NAME, C_COLOR, C_G, C_PCT)
+                        + donut block PIE_SLICES (slice: PIE_FILL, PIE_DASH,
+                        PIE_GAP, PIE_OFFSET)
+    Time-of-day chart . SECTION_DAYTIME + bars block HBARS (H_HEIGHT_PCT)
+                        and axis block HLABELS (H_LABEL)
+    Weekday chart ..... SECTION_WEEKDAY + bars block WDBARS (WD_HEIGHT_PCT,
+                        WD_VALUE) and axis block WDLABELS (WD_NAME)
     Risk block ........ SECTION_RISK, RISK_BINGE_LABEL/VALUE,
                         RISK_LONGEST_LABEL/VALUE, RISK_CURRENT_LABEL/VALUE
     Footer ............ FOOTER2  (English-only; carries the running Android version)
@@ -317,48 +345,76 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <span class="page">2 / 2</span>
 </div>
 
-<!-- Category breakdown -->
+<!-- Category breakdown: half-width table (left) + matching donut (right). The
+     donut is a pure-SVG ring drawn with the stroke-dasharray technique (radius
+     15.9155 → circumference ~100, so each slice's dash length is its percentage;
+     PIE_OFFSET rotates it). Slice colours match the table swatches and the app. -->
 <div class="section">{{SECTION_CATEGORIES}}</div>
-<table class="data">
-    <tr>
-        <th>{{CAT_HEAD_NAME}}</th>
-        <th>{{CAT_HEAD_G}}</th>
-        <th>{{CAT_HEAD_PCT}}</th>
-    </tr>
-    <!-- repeat:CATEGORIES -->
-    <tr>
-        <td>{{C_NAME}}</td>
-        <td>{{C_G}}</td>
-        <td>{{C_PCT}}</td>
-    </tr>
-    <!-- end:CATEGORIES -->
-</table>
-
-<!-- Time-of-day pattern: a 24-bar chart, one bar per clock hour 0..23. This
-     replaced the former "first/last drink" times and the "share before/after
-     17:00" split. Each bar's inline height (H_HEIGHT_PCT) is that hour's grams
-     of pure alcohol relative to the busiest hour; H_LABEL is the hour number on
-     a thinned axis (empty string for the unlabelled hours in between). -->
-<div class="section">{{SECTION_DAYTIME}}</div>
-<div class="chart hours">
-    <!-- repeat:HOURS -->
-    <div class="col">
-        <div class="bar" style="height:{{H_HEIGHT_PCT}}%"></div>
-        <div class="lab">{{H_LABEL}}</div>
+<div class="cat-row">
+    <table class="data cat-table">
+        <tr>
+            <th>{{CAT_HEAD_NAME}}</th>
+            <th>{{CAT_HEAD_G}}</th>
+            <th>{{CAT_HEAD_PCT}}</th>
+        </tr>
+        <!-- repeat:CATEGORIES -->
+        <tr>
+            <td><span class="swatch" style="background:{{C_COLOR}}"></span>{{C_NAME}}</td>
+            <td>{{C_G}}</td>
+            <td>{{C_PCT}}</td>
+        </tr>
+        <!-- end:CATEGORIES -->
+    </table>
+    <div class="cat-pie">
+        <svg viewBox="0 0 42 42" class="donut" role="img" xmlns="http://www.w3.org/2000/svg">
+            <!-- background ring (shows through if percentages don't quite total 100) -->
+            <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#ececec" stroke-width="6"/>
+            <!-- repeat:PIE_SLICES -->
+            <circle cx="21" cy="21" r="15.9155" fill="none"
+                    stroke="{{PIE_FILL}}" stroke-width="6"
+                    stroke-dasharray="{{PIE_DASH}} {{PIE_GAP}}"
+                    stroke-dashoffset="{{PIE_OFFSET}}"></circle>
+            <!-- end:PIE_SLICES -->
+        </svg>
     </div>
-    <!-- end:HOURS -->
 </div>
 
-<!-- Weekday profile -->
+<!-- Time-of-day pattern: 24-bar hour-of-day chart. Bars (HBARS) sit in the plot
+     area; every hour 0..23 is labelled in a separate axis row (HLABELS) BELOW the
+     baseline so labels are never overlapped by the bars. -->
+<div class="section">{{SECTION_DAYTIME}}</div>
+<div class="barchart hours">
+    <div class="bars">
+        <!-- repeat:HBARS -->
+        <div class="col"><div class="v">{{H_VALUE}}</div><div class="bar" style="height:{{H_HEIGHT_PCT}}%"></div></div>
+        <!-- end:HBARS -->
+    </div>
+    <div class="axis">
+        <!-- repeat:HLABELS -->
+        <div class="cell">{{H_LABEL}}</div>
+        <!-- end:HLABELS -->
+    </div>
+</div>
+
+<!-- Weekday profile: bar chart analogous to the hour chart. Each bar (WDBARS)
+     carries its average value above it; the weekday names form the axis row
+     (WDLABELS) below the baseline. -->
 <div class="section">{{SECTION_WEEKDAY}}</div>
-<table class="data">
-    <tr>
-        <!-- repeat:WEEKDAY_HEAD --><th>{{WD_NAME}}</th><!-- end:WEEKDAY_HEAD -->
-    </tr>
-    <tr>
-        <!-- repeat:WEEKDAY_VAL --><td>{{WD_VALUE}}</td><!-- end:WEEKDAY_VAL -->
-    </tr>
-</table>
+<div class="barchart week">
+    <div class="bars">
+        <!-- repeat:WDBARS -->
+        <div class="col">
+            <div class="v">{{WD_VALUE}}</div>
+            <div class="bar" style="height:{{WD_HEIGHT_PCT}}%"></div>
+        </div>
+        <!-- end:WDBARS -->
+    </div>
+    <div class="axis">
+        <!-- repeat:WDLABELS -->
+        <div class="cell">{{WD_NAME}}</div>
+        <!-- end:WDLABELS -->
+    </div>
+</div>
 
 <!-- Binge & abstinence streaks -->
 <div class="section">{{SECTION_RISK}}</div>

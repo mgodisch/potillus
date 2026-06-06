@@ -265,6 +265,19 @@ class MainActivity : AppCompatActivity() {
                             }
                         )
                     }
+                    val showInfoDialog by app.infoDialog.collectAsStateWithLifecycle()
+                    if (showInfoDialog) {
+                        AlertDialog(
+                            onDismissRequest = { app.dismissInfoDialog() },
+                            title   = { Text(stringResource(R.string.info_dialog_title)) },
+                            text    = { Text(stringResource(R.string.info_dialog_body)) },
+                            confirmButton = {
+                                TextButton(onClick = { app.dismissInfoDialog() }) {
+                                    Text(stringResource(R.string.info_dialog_ok))
+                                }
+                            }
+                        )
+                    }
                     MainContent(app)
                 }
             }

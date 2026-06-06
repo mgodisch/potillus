@@ -121,6 +121,10 @@ data class PdfReportData(
     val avgDrinkDaysPerMonth: Double,
     /** Median number of drink days per calendar month across [months]. */
     val medianDrinkDaysPerMonth: Double,
+    /** Highest single-day pure-alcohol total (g) over the period. */
+    val maxPerDay: Double,
+    /** Highest pure-alcohol total (g) in any 7 consecutive calendar days (rolling window). */
+    val maxPer7Days: Double,
 
     // ── Monthly breakdown & trend ──────────────────────────────────────────────
     /** Ascending by [MonthStat.monthKey]. The trend chart is shown only when ≥ 2. */
@@ -299,6 +303,19 @@ data class PdfReportData(
             val avgDrinkDaysPerMonth    = if (drinkDaysPerMonth.isNotEmpty()) drinkDaysPerMonth.average() else 0.0
             val medianDrinkDaysPerMonth = median(drinkDaysPerMonth)
 
+            // Peaks. maxPerDay is the single worst day; maxPer7Days is the worst
+            // *rolling* 7-consecutive-calendar-day window (mirrors the app's 7-day
+            // limit horizon). For a period shorter than 7 days there is no full
+            // window, so the whole-period total is used.
+            val maxPerDay = perDayTotals.maxOrNull() ?: 0.0
+            val maxPer7Days =
+                if (perDayTotals.size <= 7) perDayTotals.sum()
+                else (0..perDayTotals.size - 7).maxOf { start ->
+                    var sum = 0.0
+                    for (i in start until start + 7) sum += perDayTotals[i]
+                    sum
+                }
+
             // ── Weekday profile, rotated to start at the locale's first weekday.
             //    The app no longer has a configurable week start, so the column order
             //    follows the device locale (Mon-first in most of Europe, Sun-first in
@@ -341,6 +358,8 @@ data class PdfReportData(
                 medianPerDrinkDay       = medianPerDrinkDay,
                 avgDrinkDaysPerMonth    = avgDrinkDaysPerMonth,
                 medianDrinkDaysPerMonth = medianDrinkDaysPerMonth,
+                maxPerDay               = maxPerDay,
+                maxPer7Days             = maxPer7Days,
                 months            = months,
                 chartBuckets      = chartBuckets,
                 chartGranularity  = chartGranularity,

@@ -145,4 +145,13 @@ class PdfReportDataTest {
         //   10.0 / 5 = 2.0 g/day  (NOT / 28).
         assertEquals(2.0, months[1].avgPerCalendarDay, 0.001)
     }
+
+    @Test fun `peak consumption fields capture the worst day and worst 7-day window`() {
+        val d = build()
+        // Daily totals are 19.3 (Jan 10), 25.0 (Jan 20), 10.0 (Feb 5); worst day = 25.0.
+        assertEquals(25.0, d.maxPerDay, 0.001)
+        // The three drink days are all > 7 days apart, so no rolling 7-day window holds
+        // two of them; the worst window therefore equals the single heaviest day.
+        assertEquals(25.0, d.maxPer7Days, 0.001)
+    }
 }

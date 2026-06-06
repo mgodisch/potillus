@@ -197,7 +197,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.body_weight) + ": " +
-                            if (settings.weightKg > 0) "${"%.1f".format(settings.weightKg)} kg" else stringResource(R.string.not_set),
+                            if (settings.weightKg > 0) "${settings.weightKg.toInt()} kg" else stringResource(R.string.not_set),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         IconButton(onClick = {showWeightInput = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
@@ -418,7 +418,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
             title        = stringResource(R.string.body_weight),
             initial      = settings.weightKg,
             suffix       = "kg",
-            allowDecimal = true,
+            allowDecimal = false,
             onConfirm    = { v -> vm.setWeightKg(v); showWeightInput = false },
             onDismiss    = { showWeightInput = false }
         )

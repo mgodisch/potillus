@@ -196,4 +196,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_day">Διάμεσος ανά ημέρα κατανάλωσης</string>
     <string name="pdf_kpi_avg_drink_days_month">Μέσος ημέρες κατανάλωσης/μήνα</string>
     <string name="pdf_kpi_median_drink_days_month">Διάμεσος ημέρες κατανάλωσης/μήνα</string>
+    <string name="pdf_kpi_max_day">Μέγ. ανά ημέρα</string>
+    <string name="pdf_kpi_max_7days">Μέγ. σε 7 ημέρες</string>
+    <string name="info_dialog_title">Σας αρέσει αυτή η εφαρμογή;</string>
+    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
+    <string name="info_dialog_ok">Εντάξει</string>
 </resources>

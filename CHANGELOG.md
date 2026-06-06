@@ -26,6 +26,88 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.66.0
+
+PDF-report improvements: the time-of-day chart now labels every hour beneath the
+axis, the weekday profile is shown as a bar chart, the category breakdown is a
+half-width table paired with a colour-matched donut, and two peak-consumption KPIs
+(max per day, max per 7 days) were added. Follow-up changes: a donut rendering fix,
+average-grams bar labels, red limit lines, an eight-bucket on-screen time-of-day
+chart, an annual info dialog, and integer-only body weight.
+
+### Added
+
+- **Annual info dialog.** A once-per-year dialog ("Do you like this App?") shown
+  only when the app is opened on December 27th (device-local date); if that day is
+  missed it is not caught up later. `PotillusApp` decides this once per process
+  start (`checkAnnualInfoDialog()`) and `MainActivity` renders it over the content,
+  mirroring the existing device-transfer dialog. The "last shown year" is persisted
+  through `IAppPreferences.infoDialogShownYear` (new DataStore key
+  `info_dialog_shown_year`; `FakeAppPreferences` updated). New strings
+  `info_dialog_title` / `info_dialog_body` (placeholder) / `info_dialog_ok` in all
+  21 locales, with title and OK localised per language.
+- **Bar value labels.** PDF time-of-day bars and the on-screen `ValueBarChart`
+  (time-of-day + weekday) now print the average grams above each bar
+  (`ValueBarChart` gains a `showValues` flag; bars reserve headroom so labels are
+  not clipped).
+- **Peak-consumption KPIs.** `util/PdfReportData.kt` gains `maxPerDay` (heaviest
+  single calendar day) and `maxPer7Days` (heaviest *rolling* 7-consecutive-day
+  window; the whole-period total when the period is shorter than 7 days).
+  `util/PdfReportBuilder.kt` shows them as two new KPI tiles. New strings
+  `pdf_kpi_max_day`, `pdf_kpi_max_7days` translated into **all 21 locales**.
+- **Category donut in the PDF.** Beside the (now half-width) category table the
+  report draws an SVG donut matching the on-screen chart, using the same per-category
+  colours (`util/PdfReportBuilder.kt` `categoryColor()`, mirroring
+  `ui/component/categoryColors`). The ring is built with the stroke-dasharray
+  technique (`PIE_SLICES` block: `PIE_FILL`, `PIE_DASH`, `PIE_GAP`, `PIE_OFFSET`) so
+  it needs no raster image and survives SimpleTemplate's HTML-escaping. Each table
+  row gets a matching colour swatch (`C_COLOR`) as an inline legend.
+
+### Fixed
+
+- **Donut rendered every slice as a full ring.** The SVG dash values were formatted
+  with the default locale, so on a comma-decimal device `stroke-dasharray="40,00
+  60,00"` was parsed by SVG as four numbers (`40 0 60 0`) — a zero gap that paints
+  the whole circle. The pie geometry is now formatted with `Locale.ROOT`
+  (`util/PdfReportBuilder.kt`).
+
+### Changed
+
+- **On-screen time-of-day chart → eight 3-hour buckets.** The Statistics screen now
+  shows eight buckets (0–3, 3–6 … 21–24), each the **average grams per day** in the
+  period (`StatsViewModel`: `hourBucketAverages` replaces the 24 hourly sums in
+  `StatsUiState`; the divisor is the same `effectivePeriodDays` used for the per-day
+  rate). The PDF time-of-day chart keeps all 24 hourly bars, each labelled with its
+  average grams per day.
+- **Limit lines are now red dashed** (were amber/orange) in both the PDF
+  (`.chart .limit` → `#c83232`) and the app (`AlcoholBarChart` limit line →
+  `dangerRedColor()`), matching the over-limit cue colour.
+- **Body weight is integer-only.** Settings accepts whole numbers only
+  (`GramsInputDialog(allowDecimal = false)`) and displays an integer; the PDF shows
+  the weight as an integer (`roundToInt()`).
+- **Time-of-day chart: all hours labelled, below the axis.**
+  `assets/report_template.html` + `util/PdfReportBuilder.kt`: the chart is split into
+  a bars row (`HBARS`) and a separate axis row (`HLABELS`) rendered *beneath* the
+  baseline, and every hour 0..23 is labelled (previously only every third hour, and
+  the labels sat inside the plot area where tall bars overlapped them). New CSS
+  `.barchart` family; the obsolete `.chart.hours` variant was removed.
+- **Weekday profile is now a bar chart.** Replaces the former one-row table with a
+  bar chart analogous to the hour chart: bars (`WDBARS`) with the average value
+  printed above each bar and the weekday names on the axis row (`WDLABELS`). Bar
+  heights leave 15 % headroom so the value label above the tallest bar still fits.
+- **Category breakdown layout.** The table is now half width (`.cat-row` /
+  `.cat-table`, ~48 %) with the donut occupying the right half.
+
+### Tests
+
+- `test/.../util/PdfReportDataTest.kt`: added a test for `maxPerDay` / `maxPer7Days`.
+- `PdfTemplatePlaceholderTest` continues to guard the template ⇄ builder placeholder
+  contract; it automatically covers the new `HBARS`/`HLABELS`/`WDBARS`/`WDLABELS`/
+  `PIE_SLICES`/`C_COLOR`/`H_VALUE` placeholders and the removal of the old
+  `HOURS`/`WEEKDAY_*` blocks.
+
+---
+
 ## v0.65.0
 
 Feature release. Adds two new charts to the Statistics screen, reworks the PDF

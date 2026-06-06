@@ -238,6 +238,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         internal val KEY_LANGUAGE       = stringPreferencesKey("language")
         internal val KEY_WEIGHT_KG      = doublePreferencesKey("weight_kg")
         internal val KEY_STATS_FROM     = stringPreferencesKey("stats_from_date")
+        internal val KEY_INFO_YEAR      = intPreferencesKey("info_dialog_shown_year")
         // Removed in the three-limit refactor: "gender", "limit_mode" and
         // "weekly_gram_mode". Removed in the rolling-window refactor (v0.62.0):
         // "week_start_day" — the app no longer has a configurable first weekday and
@@ -330,6 +331,10 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         )
     }
 
+    /** Standalone (non-[AppSettings]) flow for the annual info-dialog year (0 = never). */
+    override val infoDialogShownYear: Flow<Int> =
+        dataStore.data.map { it[KEY_INFO_YEAR] ?: 0 }
+
     // ── Write functions ───────────────────────────────────────────────────────
     // Each function calls save{} which wraps DataStore's edit{} for a single key.
     // All are suspend functions – they must be called from a coroutine (typically
@@ -348,6 +353,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
     override suspend fun setLanguage(lang: String)      = save { it[KEY_LANGUAGE]       = lang }
     override suspend fun setWeightKg(kg: Double)        = save { it[KEY_WEIGHT_KG]      = kg.coerceIn(1.0, 500.0) }
     override suspend fun setMaxDrinkDaysPerWeek(days: Int) = save { it[KEY_MAX_DRINK_DAYS] = days.coerceIn(1, 7) }
+    override suspend fun setInfoDialogShownYear(year: Int)  = save { it[KEY_INFO_YEAR]      = year }
 
     /**
      * Writes day-change hour and minute in a single atomic transaction.

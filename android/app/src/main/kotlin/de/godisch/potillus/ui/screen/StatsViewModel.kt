@@ -96,7 +96,8 @@ data class StatsUiState(
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
     /** Pure-alcohol grams per hour-of-day bucket (index 0..23) for the time-of-day chart. */
-    val hourlyGrams: List<Double>                 = List(24) { 0.0 },
+    /** Average grams per day in each of eight 3-hour buckets (0–3, 3–6 … 21–24). */
+    val hourBucketAverages: List<Double>          = List(8) { 0.0 },
     /** ISO weekday numbers (1=Mon..7=Sun) in display order (locale's first weekday first). */
     val weekdayOrder: List<Int>                   = emptyList(),
     /** Average grams per weekday in [weekdayOrder] order; null = weekday never a drink day. */
@@ -350,6 +351,16 @@ class StatsViewModel(
                     .hour
                 hourlyGrams[hour] += e.gramsAlcohol
             }
+            // Collapse the 24 clock hours into eight 3-hour buckets (0–3, 3–6 … 21–24)
+            // and express each as the AVERAGE grams per day in the period (sum in the
+            // bucket ÷ effectivePeriodDays), so the eight bars sum to the overall
+            // average grams/day. divisor ≥ 1 guards the empty-period edge case.
+            val periodDaysDiv = effectivePeriodDays.coerceAtLeast(1)
+            val hourBucketAverages = (0 until 8).map { b ->
+                var sum = 0.0
+                for (h in b * 3 until b * 3 + 3) sum += hourlyGrams[h]
+                sum / periodDaysDiv
+            }
 
             // Weekday profile: average grams on each weekday, rotated so the first
             // column is the locale's first weekday. Computed from the daily summaries
@@ -401,7 +412,7 @@ class StatsViewModel(
                 trendPercent      = computeTrend(totalGrams, previous.sumOf { it.totalGrams }),
                 limitInfo         = limitInfo,
                 categoryBreakdown = categoryBreakdown,
-                hourlyGrams       = hourlyGrams.toList(),
+                hourBucketAverages = hourBucketAverages,
                 weekdayOrder      = weekdayOrder,
                 weekdayAverages   = weekdayAverages,
                 today             = today,

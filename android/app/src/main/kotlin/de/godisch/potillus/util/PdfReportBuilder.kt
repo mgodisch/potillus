@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.roundToInt
 
 // =============================================================================
 // PdfReportBuilder – turns report DATA into report HTML
@@ -147,7 +148,7 @@ object PdfReportBuilder {
         scalars["META_LIMIT_VALUE_7DAYS"] = "${d.limitInfo.weeklyLimitGrams.fmt1()} $perWeek"
         scalars["META_LIMIT_VALUE_DDAYS"] = "${d.limitInfo.maxDrinkDaysPerWeek} ${context.getString(R.string.pdf_meta_drink_days_suffix)}"
         scalars["META_WEIGHT_LABEL"] = context.getString(R.string.pdf_meta_weight)
-        scalars["META_WEIGHT_VALUE"] = if (d.weightKg > 0) "${d.weightKg.fmt1()} kg" else "–"
+        scalars["META_WEIGHT_VALUE"] = if (d.weightKg > 0) "${d.weightKg.roundToInt()} kg" else "–"
 
         // ── KPI tiles ────────────────────────────────────────────────────────────
         // Order and warn flags reproduce the original report exactly.
@@ -166,6 +167,9 @@ object PdfReportBuilder {
             // heavy day that can inflate a plain average.
             kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g"),
             kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
+            // Peaks: worst single day and worst rolling 7-day window.
+            kpi(context.getString(R.string.pdf_kpi_max_day),   "${d.maxPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g"),
             kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
             kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
 
@@ -221,46 +225,88 @@ object PdfReportBuilder {
             }
         }
 
-        // ── Category table ───────────────────────────────────────────────────────
+        // ── Category table + donut ───────────────────────────────────────────────
         scalars["CAT_HEAD_NAME"] = context.getString(R.string.category)
         scalars["CAT_HEAD_G"]    = "g"
         scalars["CAT_HEAD_PCT"]  = "%"
         repeats["CATEGORIES"] = d.categories.map { c ->
             mapOf(
-                "C_NAME" to categoryLabel(context, c.categoryName),
-                "C_G"    to c.grams.fmt1(),
-                "C_PCT"  to "${c.percent} %"
+                "C_NAME"  to categoryLabel(context, c.categoryName),
+                "C_COLOR" to categoryColor(c.categoryName),   // swatch = donut colour
+                "C_G"     to c.grams.fmt1(),
+                "C_PCT"   to "${c.percent} %"
             )
         }
-
-        // ── Time-of-day pattern: 24-bar hour-of-day chart (replaces the former
-        //    "share before / after 17:00" two-number split). Each bar's height is
-        //    that hour's grams relative to the busiest hour; the dedicated CSS class
-        //    `.chart.hours` widens the chart to fit 24 thin columns. Axis labels are
-        //    thinned to every third hour (0, 3, 6 … 21) plus the final hour (23) so
-        //    the 7pt labels stay legible. The section title (SECTION_DAYTIME) is set
-        //    above with the other section headings.
+        // Donut slices (same data, rendered as an SVG ring beside the table). We use
+        // the classic stroke-dasharray technique on concentric <circle>s: with radius
+        // 15.9155 the circumference is ~100, so a slice's dash length is simply its
+        // percentage. PIE_OFFSET = 25 − cumulative rotates the slice so the ring fills
+        // clockwise starting at 12 o'clock. Fractions are taken from grams (not the
+        // rounded integer percents) so the segments butt up exactly.
         run {
-            val maxHour = d.hourlyGrams.maxOrNull() ?: 0.0
-            repeats["HOURS"] = d.hourlyGrams.mapIndexed { hour, grams ->
-                val labelled = hour % 3 == 0 || hour == 23
-                mapOf(
-                    // 0 grams → no bar (height 0); otherwise at least a 2% sliver so a
-                    // small-but-nonzero hour stays visible.
-                    "H_HEIGHT_PCT" to (if (grams <= 0.0) "0"
-                                       else pct(grams, maxHour).coerceAtLeast(2.0).fmt0()),
-                    "H_LABEL"      to (if (labelled) "$hour" else "")
+            val totalCat = d.categories.sumOf { it.grams }
+            var cumulative = 0.0
+            // SVG attributes must use a '.' decimal separator regardless of the device
+            // locale. String.format()/Double.format() honour the *default* locale, so a
+            // German device would emit "40,00" — and SVG treats both ',' and ' ' as list
+            // separators, turning stroke-dasharray="40,00 60,00" into four values
+            // (40 0 60 0): a zero gap that paints the whole ring. Locale.ROOT fixes it.
+            fun svg(x: Double): String = String.format(java.util.Locale.ROOT, "%.2f", x)
+            repeats["PIE_SLICES"] = d.categories.map { c ->
+                val fraction = if (totalCat > 0) c.grams / totalCat * 100.0 else 0.0
+                val slice = mapOf(
+                    "PIE_FILL"   to categoryColor(c.categoryName),
+                    "PIE_DASH"   to svg(fraction),
+                    "PIE_GAP"    to svg(100.0 - fraction),
+                    "PIE_OFFSET" to svg(25.0 - cumulative)
                 )
+                cumulative += fraction
+                slice
             }
         }
 
-        // ── Weekday profile ────────────────────────────────────────────────────
-        repeats["WEEKDAY_HEAD"] = d.weekdayOrder.map { iso ->
-            mapOf("WD_NAME" to DayOfWeek.of(iso)
-                .getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2))
+        // ── Time-of-day pattern: 24-bar hour-of-day chart. Bars and axis labels are
+        //    emitted as two separate repeat blocks (HBARS / HLABELS) so the labels can
+        //    sit in their own row *below* the baseline instead of inside the plot area.
+        //    Every hour 0..23 is now labelled (no thinning). Section title set above.
+        run {
+            val maxHour = d.hourlyGrams.maxOrNull() ?: 0.0
+            // 15 % headroom so the value printed above the tallest bar still fits.
+            val ceiling = maxHour * 1.15
+            val days    = d.totalDays.coerceAtLeast(1)
+            repeats["HBARS"] = d.hourlyGrams.map { grams ->
+                mapOf(
+                    // 0 grams → no bar; otherwise at least a 2% sliver so a small-but-
+                    // nonzero hour stays visible.
+                    "H_HEIGHT_PCT" to (if (grams <= 0.0) "0"
+                                       else pct(grams, ceiling).coerceAtLeast(2.0).fmt0()),
+                    // Average grams per calendar day in this clock hour (blank for an
+                    // hour that never saw any drinking).
+                    "H_VALUE"      to (if (grams <= 0.0) "" else (grams / days).fmt1())
+                )
+            }
+            repeats["HLABELS"] = (0..23).map { hour -> mapOf("H_LABEL" to "$hour") }
         }
-        repeats["WEEKDAY_VAL"] = d.weekdayAverages.map { avg ->
-            mapOf("WD_VALUE" to (avg?.fmt1() ?: "–"))
+
+        // ── Weekday profile: bar chart (analogous to the hour chart). WDBARS carries
+        //    each bar's height and the average value printed above it; WDLABELS is the
+        //    weekday-name axis row. Heights are scaled against maxWeekday × 1.15 so the
+        //    value label above the tallest bar still fits inside the plot height.
+        run {
+            val maxWeekday = d.weekdayAverages.filterNotNull().maxOrNull() ?: 0.0
+            val ceiling    = maxWeekday * 1.15
+            repeats["WDBARS"] = d.weekdayAverages.map { avg ->
+                mapOf(
+                    "WD_HEIGHT_PCT" to (if (avg == null || avg <= 0.0) "0"
+                                        else pct(avg, ceiling).coerceAtLeast(2.0).fmt0()),
+                    // Value above the bar; blank for a weekday that was never a drink day.
+                    "WD_VALUE"      to (avg?.fmt1() ?: "")
+                )
+            }
+            repeats["WDLABELS"] = d.weekdayOrder.map { iso ->
+                mapOf("WD_NAME" to DayOfWeek.of(iso)
+                    .getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2))
+            }
         }
 
         // ── Binge & abstinence streaks ───────────────────────────────────────────
@@ -293,6 +339,21 @@ object PdfReportBuilder {
             else        -> R.string.category_other
         }
     )
+
+    /**
+     * Hex colour for a [DrinkCategory] name, matching the on-screen donut palette
+     * (de.godisch.potillus.ui.component.categoryColors) so the PDF donut and the app
+     * use the same colours. Escape-safe (no `< > & " '`), so it can flow through
+     * SimpleTemplate into an SVG `stroke`/CSS `background`.
+     */
+    private fun categoryColor(name: String): String = when (name) {
+        "BEER"      -> "#F59E0B"   // amber-500
+        "WINE"      -> "#9333EA"   // purple-600
+        "SPIRITS"   -> "#EF4444"   // red-500
+        "LONGDRINK" -> "#3B82F6"   // blue-500
+        "LIQUEUR"   -> "#10B981"   // emerald-500
+        else        -> "#6B7280"   // gray-500 (OTHER)
+    }
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
     private fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
