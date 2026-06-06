@@ -151,14 +151,26 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
     if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)
 
 /**
- * Returns an amber that passes WCAG AA against the current theme's background.
+ * Returns an amber/gold that passes WCAG AA against the current theme's background.
  *
- * The light value is amber-700 (#B45309), not the darker amber-800 (#92400E):
- * on a 12 dp traffic-light dot the very dark amber-800 was almost indistinguishable
- * from the danger red (#960018) — same red channel, hardly any green — so the
- * YELLOW state read as RED in light mode (it looked fine in dark mode, where the
- * amber is bright). amber-700 keeps a clearly amber hue and still clears the 3:1
- * contrast a non-text indicator needs (4.40:1 on the light background).
+ * LIGHT value = gold #A67C00 (R166 G124 B0).
+ *   The earlier amber-700 (#B45309) still read as orange-red on the small
+ *   traffic-light dot: its red channel (180) dominated its green (83), so YELLOW
+ *   sat too close to the danger red (#960018). #A67C00 raises the green channel
+ *   relative to red and drops blue to zero, shifting the hue clearly towards
+ *   gold/yellow while staying dark enough to keep contrast.
+ *
+ *   The tension is fundamental on this bluish-white canvas: a *brighter* yellow
+ *   has higher luminance and therefore LOWER contrast against the light
+ *   background, so a pure neon yellow can never satisfy WCAG. #A67C00 is the
+ *   compromise — visibly yellow yet still compliant:
+ *     • vs background #EDF0F8 : 3.35:1  (≥ 3:1 required for a non-text indicator,
+ *                                        WCAG 1.4.11); vs a white card it is 3.82:1.
+ *     • vs danger red #960018 : 2.38:1  (well separated, so the two dots no longer
+ *                                        look alike).
+ *
+ * DARK value = #E8A020 (unchanged): on the near-black Nacht canvas a bright amber
+ * already has ample contrast and an unmistakably yellow hue.
  */
 @Composable fun warningColor() =
-    if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFFB45309)
+    if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFFA67C00)

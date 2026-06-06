@@ -118,10 +118,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">飲酒日数</string>
     <string name="pdf_col_total_g">合計 g</string>
     <string name="pdf_col_avg_g_day">平均 g／日</string>
-    <string name="pdf_meta_first_drink">最初の飲酒（平均）</string>
-    <string name="pdf_meta_last_drink">最後の飲酒（平均）</string>
-    <string name="pdf_meta_before_18">17:00 前の割合</string>
-    <string name="pdf_meta_after_18">17:00 以降の割合</string>
     <string name="pdf_meta_binge_days">過度飲酒日数（>%1$s g）</string>
     <string name="pdf_meta_longest_abstinence">最長断酒期間</string>
     <string name="pdf_meta_current_abstinence">現在の断酒期間</string>
@@ -241,4 +237,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">メニュー</string>
     <string name="help">ヘルプ</string>
     <string name="license">ライセンス</string>
+    <string name="stats_time_of_day">時間帯</string>
+    <string name="stats_weekday">曜日</string>
+    <string name="pdf_kpi_median_day">1日中央値</string>
+    <string name="pdf_kpi_median_drink_day">飲酒日中央値</string>
+    <string name="pdf_kpi_avg_drink_days_month">平均 飲酒日数／月</string>
+    <string name="pdf_kpi_median_drink_days_month">中央値 飲酒日数／月</string>
 </resources>

@@ -21,7 +21,7 @@
 
 # =============================================================================
 # proguard-rules.pro – R8 / ProGuard rules for Libellus Potionis
-# Version: v0.64.0  (keep in sync with build.gradle.kts versionName)
+# Version: v0.65.0  (keep in sync with build.gradle.kts versionName)
 # =============================================================================
 #
 # R8 is Android's code shrinker/obfuscator (successor to ProGuard).

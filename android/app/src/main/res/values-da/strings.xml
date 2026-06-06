@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Drikkdage</string>
     <string name="pdf_col_total_g">Total g</string>
     <string name="pdf_col_avg_g_day">Gns. g/dag</string>
-    <string name="pdf_meta_first_drink">Gns. første drik</string>
-    <string name="pdf_meta_last_drink">Gns. sidste drik</string>
-    <string name="pdf_meta_before_18">Andel før 17:00</string>
-    <string name="pdf_meta_after_18">Andel fra 17:00</string>
     <string name="pdf_meta_binge_days">Binge-dage (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Længste afholdenhed</string>
     <string name="pdf_meta_current_abstinence">Aktuel afholdenhed</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Menu</string>
     <string name="help">Hjælp</string>
     <string name="license">Licens</string>
+    <string name="stats_time_of_day">Tidspunkt</string>
+    <string name="stats_weekday">Ugedag</string>
+    <string name="pdf_kpi_median_day">Median pr. dag</string>
+    <string name="pdf_kpi_median_drink_day">Median pr. drikkdag</string>
+    <string name="pdf_kpi_avg_drink_days_month">Gns. drikkdage/måned</string>
+    <string name="pdf_kpi_median_drink_days_month">Median drikkdage/måned</string>
 </resources>

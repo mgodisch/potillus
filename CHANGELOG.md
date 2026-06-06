@@ -26,6 +26,118 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.65.0
+
+Feature release. Adds two new charts to the Statistics screen, reworks the PDF
+report's time-of-day section into a 24-hour chart, adds median KPIs alongside the
+existing means, fixes the per-day average of partial (started) months, shows the
+running Android version in the PDF footer, makes the light-mode "caution" colour
+clearly yellow, and adds a build-time guard that every PDF template placeholder is
+initialised. The PDF layout/design in `assets/report_template.html` was also
+updated (visual styling), independently of the structural edits listed here.
+
+### Added
+
+- **`ui/component/ChartComponents.kt` – `ValueBarChart`.** A small, reusable
+  vertical bar chart (no time axis, no limit line, no abstinence ticks) used by the
+  Statistics screen for the new hour-of-day and weekday charts. A bar of value ≤ 0
+  is drawn as an empty slot, which is how "no data for this slot" is shown.
+- **Statistics screen: hour-of-day and weekday charts.** Above the category donut
+  the screen now shows, in order, a **24-hour** chart (grams per clock hour) and a
+  **weekday** chart (average grams per weekday, rotated to the locale's first
+  weekday). Each card is hidden when it has no data.
+  - `ui/screen/StatsViewModel.kt`: `StatsUiState` gains `hourlyGrams` (24 buckets),
+    `weekdayOrder` (ISO 1..7, rotated) and `weekdayAverages` (null = weekday never a
+    drink day); all computed in the existing `combine`.
+  - `ui/screen/StatsScreen.kt`: renders the two new cards; weekday labels use the
+    locale's short `DayOfWeek` names.
+- **PDF report: median KPIs.** Beside the mean tiles the report now prints
+  **Median per Day**, **Median per Drinking Day**, **Ø Drinking Days/Month** and
+  **Median Drinking Days/Month**. Medians are robust to the occasional very heavy
+  day that can inflate a plain average.
+  - `util/PdfReportData.kt`: adds `medianPerDay`, `medianPerDrinkDay`,
+    `avgDrinkDaysPerMonth`, `medianDrinkDaysPerMonth`, plus a private `median()`
+    helper (even count → mean of the two central values).
+  - `util/PdfReportBuilder.kt`: emits the four extra KPI tiles.
+  - `res/values*/strings.xml`: new keys `pdf_kpi_median_day`,
+    `pdf_kpi_median_drink_day`, `pdf_kpi_avg_drink_days_month`,
+    `pdf_kpi_median_drink_days_month` – translated into **all 21 locales**.
+- **PDF report: 24-hour time-of-day chart.** The former "Ø first/last drink" and
+  "share before/after 17:00" figures are replaced by a 24-bar chart of **grams of
+  pure alcohol per clock hour** (0..23), mirroring the on-screen chart.
+  - `util/PdfReportData.kt`: adds `hourlyGrams: List<Double>` (24 buckets).
+  - `util/PdfReportBuilder.kt`: fills the new `HOURS` repeat block (height = grams
+    relative to the busiest hour; axis thinned to every third hour plus hour 23).
+  - `assets/report_template.html`: new `.chart.hours` CSS variant and `HOURS`
+    repeat block; the old before/after meta table is removed.
+  - `res/values*/strings.xml`: new screen titles `stats_time_of_day`,
+    `stats_weekday` – translated into **all 21 locales**.
+- **`test/.../util/PdfTemplatePlaceholderTest.kt` (new).** A pure-JVM guard that
+  reads `report_template.html` and `PdfReportBuilder.kt` as source, then fails the
+  build if any `{{PLACEHOLDER}}` used in the template is never initialised in the
+  builder (which would otherwise print as a raw `{{…}}` in the PDF). Comments are
+  stripped before scanning, and a second test asserts a few structural placeholders
+  are seen so a broken scan cannot pass vacuously.
+
+### Changed
+
+- **Light-mode "caution" colour is now clearly yellow.** `ui/theme/Color.kt`: the
+  light-theme `warningColor()` changed from amber-700 `#B45309` to gold `#A67C00`.
+  The previous amber still read as orange-red on the small dot (its red channel
+  dominated its green), sitting too close to the danger red. `#A67C00` shifts the
+  hue towards gold while staying compliant: **3.35:1** vs the light background
+  (≥ 3:1 required for a non-text indicator; 3.82:1 vs a white card) and **2.38:1**
+  vs the danger red `#960018`. Dark mode (`#E8A020`) is unchanged.
+- **PDF footer 2 carries the running Android version.** `util/PdfReportBuilder.kt`:
+  the line now reads *"… on Android &lt;release&gt;, …"* using
+  `Build.VERSION.RELEASE` (falling back to the numeric API level when blank),
+  replacing the static *"for Android"*.
+- **`assets/report_template.html` – heavier documentation (teaching detail).**
+  Added a top-of-body **placeholder & block inventory** and richer per-section
+  comments. (Separately, the file's visual design was updated manually by the
+  author; see the note at the top of this entry.)
+
+### Fixed
+
+- **Partial-month g/day no longer diluted by not-yet-recorded days.**
+  `util/PdfReportData.kt`: the monthly **Ø g/day** now divides each month's grams by
+  the number of that month's calendar days that actually fall inside the report
+  period `[firstDate, lastDate]` (via `ChronoUnit.DAYS.between(…)`), not by the full
+  calendar-month length. Previously a started first/last month counted its
+  remaining, unrecorded days as abstinent and deflated the figure.
+
+### Localisation
+
+- **`res/values*/strings.xml`**: removed the four now-unused keys
+  `pdf_meta_first_drink`, `pdf_meta_last_drink`, `pdf_meta_before_18`,
+  `pdf_meta_after_18`; added the six new keys above, translated into every locale.
+  Net change is uniform across all 21 files (`168 → 172` strings), so
+  `LocaleSyncTest` stays green.
+
+### Tests
+
+- `test/.../util/PdfReportDataTest.kt`: removed the obsolete *"time-of-day
+  percentages are complementary"* test (the fields no longer exist); added tests
+  for the 24-bucket hourly histogram (sums to the total), the new medians/means,
+  and the partial-month g/day fix.
+- Added `PdfTemplatePlaceholderTest` (see *Added*).
+- `test/.../ui/screen/StatsViewModelTest.kt`: hardened the three data-bearing tests
+  (`single over-limit day`, `drink today extends the effective period`,
+  `categoryBreakdown sums grams`) against two pre-existing, time/scheduling-dependent
+  fragilities (no production behaviour changed):
+  - They dated their entry with `LocalDate.now()` (the real calendar date) while the
+    ViewModel derives its period from the LOGICAL day (shifted by `dayChangeHour`,
+    `4` in these tests). Run between midnight and 04:00 the entry fell one calendar
+    day outside the period, so the computed state had no data and the assertions saw
+    zeros. They now date the entry with `DayResolver.today(4, 0)`, matching the
+    period — which was the tests' own documented intent ("use today's date as the
+    logical date").
+  - They assumed the first Turbine emission is already the computed state rather than
+    the `stateIn(WhileSubscribed)` seed. A small `awaitComputed()` helper now skips
+    any leading seed emission.
+
+---
+
 ## v0.64.0
 
 Feature release. Reworks the consumption chart (Statistics screen **and** PDF

@@ -172,8 +172,8 @@ class AlcoholCalculatorTest {
 
     // ── Clinical constants ────────────────────────────────────────────────────
 
-    @Test fun `binge threshold is the conservative 48g`() {
-        assertEquals(48.0, AlcoholCalculator.BINGE_THRESHOLD, 0.0)
+    @Test fun `binge threshold is the conservative 60g`() {
+        assertEquals(60.0, AlcoholCalculator.BINGE_THRESHOLD, 0.0)
     }
 
     // ── trafficLight ──────────────────────────────────────────────────────────

@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Ημέρες κατανάλωσης</string>
     <string name="pdf_col_total_g">Σύνολο g</string>
     <string name="pdf_col_avg_g_day">Μέσος g/ημέρα</string>
-    <string name="pdf_meta_first_drink">Μέσο πρώτο ποτό</string>
-    <string name="pdf_meta_last_drink">Μέσο τελευταίο ποτό</string>
-    <string name="pdf_meta_before_18">Μερίδιο πριν 17:00</string>
-    <string name="pdf_meta_after_18">Μερίδιο από 17:00</string>
     <string name="pdf_meta_binge_days">Ημέρες binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Μεγαλύτερη περίοδος αποχής</string>
     <string name="pdf_meta_current_abstinence">Τρέχουσα αποχή</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Μενού</string>
     <string name="help">Βοήθεια</string>
     <string name="license">Άδεια</string>
+    <string name="stats_time_of_day">Ώρα ημέρας</string>
+    <string name="stats_weekday">Ημέρα εβδομάδας</string>
+    <string name="pdf_kpi_median_day">Διάμεσος ανά ημέρα</string>
+    <string name="pdf_kpi_median_drink_day">Διάμεσος ανά ημέρα κατανάλωσης</string>
+    <string name="pdf_kpi_avg_drink_days_month">Μέσος ημέρες κατανάλωσης/μήνα</string>
+    <string name="pdf_kpi_median_drink_days_month">Διάμεσος ημέρες κατανάλωσης/μήνα</string>
 </resources>

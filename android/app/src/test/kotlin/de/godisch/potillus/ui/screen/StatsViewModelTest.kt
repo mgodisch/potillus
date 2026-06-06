@@ -41,7 +41,9 @@ package de.godisch.potillus.ui.screen
 //   reflects the fully-computed state.
 // =============================================================================
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -115,6 +117,26 @@ class StatsViewModelTest {
         timestampMillis = dateToMillis(date),
         logicalDate     = date
     )
+
+    /**
+     * Returns the first *computed* [StatsUiState], skipping the seed.
+     *
+     * `uiState` is a `stateIn(..., SharingStarted.WhileSubscribed, StatsUiState())`,
+     * so a fresh collector is first handed the default `StatsUiState()` seed and only
+     * afterwards the value the upstream `combine` computes. Depending on coroutine
+     * scheduling, Turbine may observe that seed as a distinct first item. Tests that
+     * assert on *computed* values must therefore skip any leading seed emission rather
+     * than trust that the very first item is already the computed one. This helper
+     * loops until it sees a state that differs from the default seed.
+     *
+     * It is safe for the data-bearing tests here because their computed state always
+     * differs from the default (e.g. non-zero `totalGrams`), so the loop terminates.
+     */
+    private suspend fun ReceiveTurbine<StatsUiState>.awaitComputed(): StatsUiState {
+        var state = awaitItem()
+        while (state == StatsUiState()) state = awaitItem()
+        return state
+    }
 
     @Before fun setUp() {
         Dispatchers.setMain(dispatcher)
@@ -195,12 +217,21 @@ class StatsViewModelTest {
      */
     @Test fun `single over-limit day is counted correctly`() = runTest {
         // Use today's date as the logical date so it falls in the current WEEK period.
-        val today = java.time.LocalDate.now().toString()
+        // Date the entry with the LOGICAL today — the same day-change-shifted date the
+        // ViewModel derives its period from (see DayResolver.resolve). Using
+        // LocalDate.now() instead puts the entry one calendar day outside the period
+        // whenever the build runs between midnight and dayChangeHour (04:00 here), so
+        // `current` would be empty and totalGrams 0. The args must match setUp()'s
+        // AppSettings(dayChangeHour = 4, dayChangeMinute = 0).
+        val today = DayResolver.today(4, 0)
         entryRepo.add(entry(id = 1, date = today, grams = 25.0))
 
         val vm = makeVm()
         vm.uiState.test {
-            val state = awaitItem()
+            // Read the settled state, not the seed: stateIn(WhileSubscribed) seeds
+            // collectors with the default StatsUiState() before the upstream produces
+            // the computed value. awaitComputed() skips any leading seed emission(s).
+            val state = awaitComputed()
             assertEquals(25.0, state.totalGrams, 0.001)
             assertEquals(1, state.daysOverDailyLimit)
             cancelAndIgnoreRemainingEvents()
@@ -219,12 +250,14 @@ class StatsViewModelTest {
      * value, so it holds whatever weekday the test runs on.
      */
     @Test fun `drink today extends the effective period for avgPerDay`() = runTest {
-        val today = java.time.LocalDate.now().toString()
+        // Logical today, not LocalDate.now() (see the over-limit-day test for why).
+        val today = DayResolver.today(4, 0)
         entryRepo.add(entry(id = 1, date = today, grams = 24.0))
 
         val vm = makeVm()
         vm.uiState.test {
-            val state = awaitItem()
+            // Settled state, not the seed (see note in the over-limit-day test).
+            val state = awaitComputed()
             assertEquals(1, state.dataPoints.size)            // today counted as a drink day
             // drinkDays == 1, so the effective period is abstinentDays + 1 (today).
             val effectivePeriodDays = state.abstinentDays + 1
@@ -248,13 +281,15 @@ class StatsViewModelTest {
         val wine = DrinkDefinition(id = 2, name = "Wein", volumeMl = 150, alcoholPercent = 13.0, category = DrinkCategory.WINE)
         drinkRepo = FakeDrinkRepository(listOf(beer, wine))
 
-        val today = java.time.LocalDate.now().toString()
+        // Logical today, not LocalDate.now() (see the over-limit-day test for why).
+        val today = DayResolver.today(4, 0)
         entryRepo.add(entry(id = 1, date = today, grams = 19.73, drinkId = 1, category = DrinkCategory.BEER))
         entryRepo.add(entry(id = 2, date = today, grams = 15.41, drinkId = 2, category = DrinkCategory.WINE))
 
         val vm = makeVm()
         vm.uiState.test {
-            val state = awaitItem()
+            // Settled state, not the seed (see note in the over-limit-day test).
+            val state = awaitComputed()
             // Each category must appear with its correct total
             assertEquals(19.73, state.categoryBreakdown[DrinkCategory.BEER] ?: 0.0, 0.01)
             assertEquals(15.41, state.categoryBreakdown[DrinkCategory.WINE] ?: 0.0, 0.01)

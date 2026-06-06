@@ -111,10 +111,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Дні вживання</string>
     <string name="pdf_col_total_g">Всього г</string>
     <string name="pdf_col_avg_g_day">Сер. г/день</string>
-    <string name="pdf_meta_first_drink">Перший напій (сер.)</string>
-    <string name="pdf_meta_last_drink">Останній напій (сер.)</string>
-    <string name="pdf_meta_before_18">Частка до 17:00</string>
-    <string name="pdf_meta_after_18">Частка від 17:00</string>
     <string name="pdf_meta_binge_days">Дні надмірного вживання (>%1$s г)</string>
     <string name="pdf_meta_longest_abstinence">Найдовше утримання</string>
     <string name="pdf_meta_current_abstinence">Поточне утримання</string>
@@ -234,4 +230,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Меню</string>
     <string name="help">Довідка</string>
     <string name="license">Ліцензія</string>
+    <string name="stats_time_of_day">Час доби</string>
+    <string name="stats_weekday">День тижня</string>
+    <string name="pdf_kpi_median_day">Медіана за день</string>
+    <string name="pdf_kpi_median_drink_day">Медіана за день вживання</string>
+    <string name="pdf_kpi_avg_drink_days_month">Сер. дні вживання/міс.</string>
+    <string name="pdf_kpi_median_drink_days_month">Медіана дні вживання/міс.</string>
 </resources>

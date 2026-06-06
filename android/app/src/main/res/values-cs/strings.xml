@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Dny pití</string>
     <string name="pdf_col_total_g">Celkem g</string>
     <string name="pdf_col_avg_g_day">Prům. g/den</string>
-    <string name="pdf_meta_first_drink">Prům. první nápoj</string>
-    <string name="pdf_meta_last_drink">Prům. poslední nápoj</string>
-    <string name="pdf_meta_before_18">Podíl před 17:00</string>
-    <string name="pdf_meta_after_18">Podíl od 17:00</string>
     <string name="pdf_meta_binge_days">Dny binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Nejdelší abstinence</string>
     <string name="pdf_meta_current_abstinence">Současná abstinence</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Nabídka</string>
     <string name="help">Nápověda</string>
     <string name="license">Licence</string>
+    <string name="stats_time_of_day">Denní doba</string>
+    <string name="stats_weekday">Den v týdnu</string>
+    <string name="pdf_kpi_median_day">Medián za den</string>
+    <string name="pdf_kpi_median_drink_day">Medián za den pití</string>
+    <string name="pdf_kpi_avg_drink_days_month">Prům. dny pití/měs.</string>
+    <string name="pdf_kpi_median_drink_days_month">Medián dny pití/měs.</string>
 </resources>

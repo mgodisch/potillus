@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Dias de consumo</string>
     <string name="pdf_col_total_g">Total g</string>
     <string name="pdf_col_avg_g_day">Média g/dia</string>
-    <string name="pdf_meta_first_drink">Primeira bebida média</string>
-    <string name="pdf_meta_last_drink">Última bebida média</string>
-    <string name="pdf_meta_before_18">Proporção antes das 17:00</string>
-    <string name="pdf_meta_after_18">Proporção a partir das 17:00</string>
     <string name="pdf_meta_binge_days">Dias de binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Maior período de abstinência</string>
     <string name="pdf_meta_current_abstinence">Abstinência atual</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Menu</string>
     <string name="help">Ajuda</string>
     <string name="license">Licença</string>
+    <string name="stats_time_of_day">Hora do dia</string>
+    <string name="stats_weekday">Dia da semana</string>
+    <string name="pdf_kpi_median_day">Mediana por dia</string>
+    <string name="pdf_kpi_median_drink_day">Mediana por dia de consumo</string>
+    <string name="pdf_kpi_avg_drink_days_month">Média dias de consumo/mês</string>
+    <string name="pdf_kpi_median_drink_days_month">Mediana dias de consumo/mês</string>
 </resources>

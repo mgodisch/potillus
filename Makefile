@@ -24,7 +24,11 @@
 VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 
 default:
-	@echo make default does nothing
+	adb devices | grep -q 'device$$'
+	$(MAKE) -C android clean
+	$(MAKE) -C android debug 2>&1 | tee ../build.log
+	$(MAKE) -C android test  2>&1 | tee ../test.log
+	$(MAKE) install
 
 install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk
 
@@ -34,14 +38,14 @@ install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(V
 tgz: distclean potillus-$(VERSION).tar.gz
 
 potillus-$(VERSION).tar.gz: CHANGELOG.md
-	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .git --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build --exclude TODO.md potillus
+	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .git --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build --exclude short --exclude TODO.md potillus
 
 push:
 	git push && git push --tags
 
 clean:
 	$(MAKE) -C android $@
-	rm -f *.patch *.orig
+	rm -f *.patch *.log *.orig
 
 distclean:
 	$(MAKE) -C android $@

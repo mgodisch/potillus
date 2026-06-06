@@ -92,9 +92,9 @@ class PdfReportDataTest {
         assertEquals(1, build().violations.daysOverDailyLimit)
     }
 
-    @Test fun `no binge days below the 48 g threshold`() {
+    @Test fun `no binge days below the 60 g threshold`() {
         assertEquals(0, build().bingeDays)
-        assertEquals(48.0, PdfReportData.bingeThreshold, 0.0)
+        assertEquals(60.0, PdfReportData.bingeThreshold, 0.0)
     }
 
     @Test fun `weekday order starts on the locale first weekday and rotates through all seven`() {
@@ -110,8 +110,39 @@ class PdfReportDataTest {
         assertEquals(7, d.weekdayAverages.size)
     }
 
-    @Test fun `time-of-day percentages are complementary`() {
+    @Test fun `hourly histogram has 24 buckets summing to the total grams`() {
         val d = build()
-        assertEquals(100, d.percentBefore17 + d.percentAfter17)
+        assertEquals(24, d.hourlyGrams.size)
+        // The buckets partition the consumption, so they must add up to the total.
+        assertEquals(d.totalGrams, d.hourlyGrams.sum(), 0.001)
+        // All fixture entries share timestamp 0L (the same clock hour), so exactly
+        // one bucket carries the whole total and the rest are empty.
+        assertEquals(1, d.hourlyGrams.count { it > 0.0 })
+    }
+
+    @Test fun `medians complement the mean KPIs`() {
+        val d = build()
+        // Per-drink-day totals: 10.0, 19.3, 25.0 → median 19.3.
+        assertEquals(19.3, d.medianPerDrinkDay, 0.001)
+        // Per-calendar-day median spans all 27 days in [01-10 … 02-05]; with only
+        // three drink days the middle value is an abstinent (0 g) day.
+        assertEquals(0.0, d.medianPerDay, 0.001)
+        // Drink days per month: Jan 2, Feb 1 → mean 1.5, median 1.5.
+        assertEquals(1.5, d.avgDrinkDaysPerMonth, 0.001)
+        assertEquals(1.5, d.medianDrinkDaysPerMonth, 0.001)
+    }
+
+    @Test fun `partial first and last months divide grams by in-period days only`() {
+        // Regression test for the partial-month bug: the g/day of a started month
+        // must use only the days that lie inside the report period, never the full
+        // calendar-month length (which would dilute the figure with not-yet-recorded
+        // "abstinent" days).
+        val months = build().months
+        // January is entered on the 10th → 22 in-period days (10 Jan … 31 Jan):
+        //   (19.3 + 25.0) / 22 ≈ 2.0136 g/day  (NOT / 31).
+        assertEquals(2.0136, months[0].avgPerCalendarDay, 0.001)
+        // February ends on the 5th → 5 in-period days (1 Feb … 5 Feb):
+        //   10.0 / 5 = 2.0 g/day  (NOT / 28).
+        assertEquals(2.0, months[1].avgPerCalendarDay, 0.001)
     }
 }

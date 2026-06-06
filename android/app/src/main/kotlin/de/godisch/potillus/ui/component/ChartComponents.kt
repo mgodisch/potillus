@@ -231,6 +231,90 @@ fun AlcoholBarChart(
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// SIMPLE VALUE BAR CHART  (weekday profile · hour-of-day profile)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * A lightweight vertical bar chart for a fixed list of [values] with optional
+ * per-bar labels. Used on the Statistics screen for the hour-of-day profile
+ * (24 bars) and the weekday profile (7 bars), mirroring the same two charts in
+ * the PDF report.
+ *
+ * Unlike [AlcoholBarChart] this chart has NO time axis, NO daily-limit line and
+ * NO abstinence ticks. It simply maps each value to a bar whose height is
+ * proportional to the largest value in the list. A value ≤ 0 draws NO bar, which
+ * is how an empty slot is shown — an hour with no consumption, or a weekday that
+ * never occurred as a drink day.
+ *
+ * Theme colours are captured before the [Canvas] block, because the Canvas lambda
+ * is a DrawScope (not a composable scope) and cannot call @Composable helpers
+ * (see this file's header note).
+ *
+ * @param values   One value per bar, in display order. ≤ 0 ⇒ empty slot (no bar).
+ * @param labelFor Axis label for a bar index, or "" to leave it blank — used to
+ *                 thin the dense 24-hour axis down to every few hours.
+ * @param modifier Optional layout modifier.
+ */
+@Composable
+fun ValueBarChart(
+    values: List<Double>,
+    labelFor: (Int) -> String,
+    modifier: Modifier = Modifier
+) {
+    if (values.isEmpty() || values.all { it <= 0.0 }) {
+        Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {
+            Text(stringResource(R.string.no_data),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        return
+    }
+
+    // coerceAtLeast(0.001): avoids division by zero in the height calculation.
+    val maxVal   = (values.maxOrNull() ?: 0.0).coerceAtLeast(0.001)
+    val barColor = MaterialTheme.colorScheme.primary
+
+    Canvas(modifier = modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp, bottom = 4.dp)) {
+        val chartH  = size.height
+        val chartW  = size.width
+        val spacing = chartW / values.size
+        // 70% of a slice as bar width works for both the 7-bar weekday chart and
+        // the 24-bar hour chart; coerceAtLeast(2f) keeps thin hour bars visible.
+        val barW    = (spacing * 0.7f).coerceAtLeast(2f)
+
+        values.forEachIndexed { i, v ->
+            if (v <= 0.0) return@forEachIndexed
+            // barH proportional to the tallest bar; coerceAtLeast(2f) keeps a tiny
+            // but non-zero value visible.
+            val barH    = (v / maxVal * chartH).toFloat().coerceAtLeast(2f)
+            val centerX = i * spacing + spacing / 2f
+            drawRoundRect(
+                color        = barColor,
+                topLeft      = Offset(centerX - barW / 2f, chartH - barH),
+                size         = Size(barW, barH),
+                cornerRadius = CornerRadius(3.dp.toPx())
+            )
+        }
+    }
+
+    // Axis labels, one weighted cell per column; labelFor returns "" for the
+    // thinned-out slots so dense (hourly) axes stay readable.
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+        values.indices.forEach { i ->
+            Text(
+                text      = labelFor(i),
+                style     = MaterialTheme.typography.labelSmall,
+                color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                maxLines  = 1,
+                overflow  = TextOverflow.Ellipsis,
+                modifier  = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // CATEGORY DONUT CHART
 // ════════════════════════════════════════════════════════════════════════════
 

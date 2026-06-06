@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Drinkdagen</string>
     <string name="pdf_col_total_g">Totaal g</string>
     <string name="pdf_col_avg_g_day">Gem. g/dag</string>
-    <string name="pdf_meta_first_drink">Gem. eerste drank</string>
-    <string name="pdf_meta_last_drink">Gem. laatste drank</string>
-    <string name="pdf_meta_before_18">Aandeel vóór 17:00</string>
-    <string name="pdf_meta_after_18">Aandeel vanaf 17:00</string>
     <string name="pdf_meta_binge_days">Bingedagen (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Langste onthouding</string>
     <string name="pdf_meta_current_abstinence">Huidige onthouding</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Menu</string>
     <string name="help">Help</string>
     <string name="license">Licentie</string>
+    <string name="stats_time_of_day">Tijdstip</string>
+    <string name="stats_weekday">Weekdag</string>
+    <string name="pdf_kpi_median_day">Mediaan per dag</string>
+    <string name="pdf_kpi_median_drink_day">Mediaan per drinkdag</string>
+    <string name="pdf_kpi_avg_drink_days_month">Gem. drinkdagen/maand</string>
+    <string name="pdf_kpi_median_drink_days_month">Mediaan drinkdagen/maand</string>
 </resources>

@@ -22,6 +22,7 @@
 package de.godisch.potillus.util
 
 import android.content.Context
+import android.os.Build
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
@@ -67,7 +68,7 @@ object PdfReportBuilder {
     private const val TEMPLATE_ASSET = "report_template.html"
 
     // Formatters use the default locale so dates/months match the rest of the app.
-    private val DATE_FMT     = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault())
+    private val DATE_FMT     = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.getDefault())
     private val MONTH_FMT    = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
     private val JOBNAME_FMT  = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
 
@@ -116,7 +117,12 @@ object PdfReportBuilder {
         // MAJOR.MINOR.PATCH — the debug build's "-debug" suffix is stripped — so the
         // printed line reads cleanly regardless of build type.
         val appVersion = BuildConfig.VERSION_NAME.substringBefore("-")
-        scalars["FOOTER2"]    = "Created with Libellus Potionis v$appVersion, " +
+        // Build.VERSION.RELEASE is the user-facing Android version string (e.g. "14").
+        // On the rare device where it is null/blank we fall back to the numeric API
+        // level so the footer never shows an empty version.
+        val androidVersion = Build.VERSION.RELEASE?.takeIf { it.isNotBlank() }
+            ?: Build.VERSION.SDK_INT.toString()
+        scalars["FOOTER2"]    = "Created with Libellus Potionis v$appVersion on Android $androidVersion, " +
             "free software under the GNU GPL v3, WITHOUT ANY WARRANTY."
 
         // ── Section titles ─────────────────────────────────────────────────────
@@ -137,28 +143,38 @@ object PdfReportBuilder {
         scalars["META_PERIOD_VALUE"] =
             "${LocalDate.parse(d.firstDate).format(DATE_FMT)} – ${LocalDate.parse(d.lastDate).format(DATE_FMT)}"
         scalars["META_LIMIT_LABEL"]  = context.getString(R.string.pdf_meta_limit)
-        scalars["META_LIMIT_VALUE"]  =
-            "${d.limitInfo.limitGrams.fmt1()} $perDay · ${d.limitInfo.weeklyLimitGrams.fmt1()} $perWeek · " +
-            "${d.limitInfo.maxDrinkDaysPerWeek} ${context.getString(R.string.pdf_meta_drink_days_suffix)}"
+        scalars["META_LIMIT_VALUE_DAY"]   = "${d.limitInfo.limitGrams.fmt1()} $perDay"
+        scalars["META_LIMIT_VALUE_7DAYS"] = "${d.limitInfo.weeklyLimitGrams.fmt1()} $perWeek"
+        scalars["META_LIMIT_VALUE_DDAYS"] = "${d.limitInfo.maxDrinkDaysPerWeek} ${context.getString(R.string.pdf_meta_drink_days_suffix)}"
         scalars["META_WEIGHT_LABEL"] = context.getString(R.string.pdf_meta_weight)
         scalars["META_WEIGHT_VALUE"] = if (d.weightKg > 0) "${d.weightKg.fmt1()} kg" else "–"
 
         // ── KPI tiles ────────────────────────────────────────────────────────────
         // Order and warn flags reproduce the original report exactly.
         repeats["KPIS"] = listOf(
-            kpi(context.getString(R.string.pdf_kpi_total),         "${d.totalGrams.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_day),       "${d.avgPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_drink_days),    "${d.drinkDays}"),
             kpi(context.getString(R.string.pdf_kpi_abstinent_days),"${d.abstinentDays}"),
+            kpi(context.getString(R.string.pdf_kpi_drink_days),    "${d.drinkDays}"),
+            kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
+                "${d.bingeDays}", d.bingeDays > 0),
+
+            kpi(context.getString(R.string.pdf_kpi_total),         "${d.totalGrams.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_day),       "${d.avgPerDay.fmt1()} g"),
+
+            // Medians beside their matching means (g per drink day, g per day) plus the
+            // monthly drink-days mean & median. Medians are robust to the occasional very
+            // heavy day that can inflate a plain average.
+            kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
+            kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
+
             kpi(context.getString(R.string.pdf_kpi_over_daily, d.limitInfo.limitGrams.fmt0()),
                 "${d.violations.daysOverDailyLimit}", d.violations.daysOverDailyLimit > 0),
             kpi(context.getString(R.string.pdf_kpi_over_weekly, d.limitInfo.weeklyLimitGrams.fmt0()),
                 "${d.violations.daysOverWeeklyLimit}", d.violations.daysOverWeeklyLimit > 0),
             kpi(context.getString(R.string.pdf_kpi_over_drink_days, d.limitInfo.maxDrinkDaysPerWeek),
-                "${d.violations.daysOverDrinkDayLimit}", d.violations.daysOverDrinkDayLimit > 0),
-            kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
-                "${d.bingeDays}", d.bingeDays > 0)
+                "${d.violations.daysOverDrinkDayLimit}", d.violations.daysOverDrinkDayLimit > 0)
         )
 
         // ── Monthly table ──────────────────────────────────────────────────────
@@ -217,15 +233,26 @@ object PdfReportBuilder {
             )
         }
 
-        // ── Time-of-day pattern ────────────────────────────────────────────────
-        scalars["DT_FIRST_LABEL"]  = context.getString(R.string.pdf_meta_first_drink)
-        scalars["DT_FIRST_VALUE"]  = hourToStr(d.avgFirstDrinkHour)
-        scalars["DT_LAST_LABEL"]   = context.getString(R.string.pdf_meta_last_drink)
-        scalars["DT_LAST_VALUE"]   = hourToStr(d.avgLastDrinkHour)
-        scalars["DT_BEFORE_LABEL"] = context.getString(R.string.pdf_meta_before_18)
-        scalars["DT_BEFORE_VALUE"] = "${d.percentBefore17} %"
-        scalars["DT_AFTER_LABEL"]  = context.getString(R.string.pdf_meta_after_18)
-        scalars["DT_AFTER_VALUE"]  = "${d.percentAfter17} %"
+        // ── Time-of-day pattern: 24-bar hour-of-day chart (replaces the former
+        //    "share before / after 17:00" two-number split). Each bar's height is
+        //    that hour's grams relative to the busiest hour; the dedicated CSS class
+        //    `.chart.hours` widens the chart to fit 24 thin columns. Axis labels are
+        //    thinned to every third hour (0, 3, 6 … 21) plus the final hour (23) so
+        //    the 7pt labels stay legible. The section title (SECTION_DAYTIME) is set
+        //    above with the other section headings.
+        run {
+            val maxHour = d.hourlyGrams.maxOrNull() ?: 0.0
+            repeats["HOURS"] = d.hourlyGrams.mapIndexed { hour, grams ->
+                val labelled = hour % 3 == 0 || hour == 23
+                mapOf(
+                    // 0 grams → no bar (height 0); otherwise at least a 2% sliver so a
+                    // small-but-nonzero hour stays visible.
+                    "H_HEIGHT_PCT" to (if (grams <= 0.0) "0"
+                                       else pct(grams, maxHour).coerceAtLeast(2.0).fmt0()),
+                    "H_LABEL"      to (if (labelled) "$hour" else "")
+                )
+            }
+        }
 
         // ── Weekday profile ────────────────────────────────────────────────────
         repeats["WEEKDAY_HEAD"] = d.weekdayOrder.map { iso ->
@@ -298,13 +325,6 @@ object PdfReportBuilder {
             ChartGranularity.DAILY, ChartGranularity.WEEKLY -> "${ld.dayOfMonth}.${ld.monthValue}."
             ChartGranularity.MONTHLY                        -> ld.format(MONTH_FMT)
         }
-    }
-
-    /** Formats fractional hours as "HH:MM" (14.5 → "14:30"). */
-    private fun hourToStr(h: Double): String {
-        val hh = h.toInt()
-        val mm = Math.round((h - hh) * 60).toInt()
-        return "%02d:%02d".format(hh, mm)
     }
 
     /** One-decimal display formatting (default locale, matching the rest of the app). */

@@ -69,6 +69,7 @@ export ANDROID_SDK_ROOT := $(ANDROID_HOME)
 export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform-tools:$(PATH)
 # Compose builds need a larger heap than a default Gradle invocation.
 GRADLE_OPTS ?= -Xmx2g -Xms512m
+#GRADLE_OPTS += --no-daemon
 export GRADLE_OPTS
 
 prereq: version-check java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/license.md guides
@@ -133,18 +134,18 @@ version-check:
 debug: app/build/outputs/apk/debug/app-debug.apk
 
 app/build/outputs/apk/debug/app-debug.apk: prereq
-	./gradlew assembleDebug --no-daemon
+	./gradlew assembleDebug
 
 release: app/build/outputs/apk/release/app-release-unsigned.apk
 
 app/build/outputs/apk/release/app-release-unsigned.apk: prereq
-	./gradlew assembleRelease --no-daemon
+	./gradlew assembleRelease
 
 test: unit-test test-device
 
 unit-test: prereq
 	REPORT="app/build/reports/tests/testDebugUnitTest/index.html"
-	./gradlew testDebugUnitTest --no-daemon
+	./gradlew testDebugUnitTest
 
 test-device: prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
@@ -158,7 +159,7 @@ test-device: prereq
 	adb shell input keyevent KEYCODE_WAKEUP
 	adb shell wm dismiss-keyguard
 	REPORT="app/build/reports/androidTests/connected/index.html"
-	./gradlew connectedDebugAndroidTest --no-daemon
+	./gradlew connectedDebugAndroidTest
 
 install: install-debug
 
@@ -168,7 +169,7 @@ install-debug: app/build/outputs/apk/debug/app-debug.apk
 	adb install -r $<
 
 clean: prereq
-	./gradlew clean --no-daemon
+	./gradlew clean
 
 distclean: clean
 	rm app/src/main/res/raw*/license.md

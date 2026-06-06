@@ -118,10 +118,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">음주일 수</string>
     <string name="pdf_col_total_g">합계 g</string>
     <string name="pdf_col_avg_g_day">평균 g/일</string>
-    <string name="pdf_meta_first_drink">첫 음주 (평균)</string>
-    <string name="pdf_meta_last_drink">마지막 음주 (평균)</string>
-    <string name="pdf_meta_before_18">17:00 이전 비율</string>
-    <string name="pdf_meta_after_18">17:00 이후 비율</string>
     <string name="pdf_meta_binge_days">과음일 (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">최장 금주 기간</string>
     <string name="pdf_meta_current_abstinence">현재 금주 기간</string>
@@ -241,4 +237,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">메뉴</string>
     <string name="help">도움말</string>
     <string name="license">라이선스</string>
+    <string name="stats_time_of_day">시간대</string>
+    <string name="stats_weekday">요일</string>
+    <string name="pdf_kpi_median_day">일 중앙값</string>
+    <string name="pdf_kpi_median_drink_day">음주일 중앙값</string>
+    <string name="pdf_kpi_avg_drink_days_month">평균 음주일 수/월</string>
+    <string name="pdf_kpi_median_drink_days_month">중앙값 음주일 수/월</string>
 </resources>

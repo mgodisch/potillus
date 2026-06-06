@@ -80,17 +80,17 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Alcohol Consumption Report</string>
     <string name="pdf_section_kpis">Key Figures</string>
     <string name="pdf_section_months">Monthly Overview</string>
-    <string name="pdf_section_trend">Long-term Trend (Ø g/month)</string>
+    <string name="pdf_section_trend">Long-term Trend (Ø Grams/Month)</string>
     <string name="pdf_section_categories">Drink Categories</string>
     <string name="pdf_section_daytime">Consumption Pattern: Time of Day</string>
-    <string name="pdf_section_weekday">Weekday Profile (Ø g Alcohol)</string>
+    <string name="pdf_section_weekday">Weekday Profile (Ø Gram Alcohol)</string>
     <string name="pdf_section_risk">Risk Consumption &amp; Abstinence</string>
     <string name="pdf_footer1">Estimated values - not a medical diagnosis. Not for driving eligibility or diagnostic purposes.</string>
 
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Export Date</string>
     <string name="pdf_meta_period">Period</string>
-    <string name="pdf_meta_limit">Limit</string>
+    <string name="pdf_meta_limit">Limits</string>
     <string name="pdf_meta_weight">Body Weight</string>
     <string name="pdf_kpi_total">Total Alcohol</string>
     <string name="pdf_kpi_avg_day">Ø per Day</string>
@@ -102,10 +102,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Drinking Days</string>
     <string name="pdf_col_total_g">Total g</string>
     <string name="pdf_col_avg_g_day">Ø g/Day</string>
-    <string name="pdf_meta_first_drink">Ø First Drink</string>
-    <string name="pdf_meta_last_drink">Ø Last Drink</string>
-    <string name="pdf_meta_before_18">Share Before 17:00</string>
-    <string name="pdf_meta_after_18">Share From 17:00</string>
     <string name="pdf_meta_binge_days">Binge Drinking Days (&gt; %1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Longest Abstinence Phase</string>
     <string name="pdf_meta_current_abstinence">Current Abstinence</string>
@@ -218,11 +214,17 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="days_over_drink_day_limit">Days Over Drinking Days Limit</string>
     <string name="pdf_unit_g_per_week">g/7 Days</string>
     <string name="pdf_meta_drink_days_suffix">Drinking Days/7 Days</string>
-    <string name="pdf_kpi_over_daily">Days &gt; Day (%1$s g)</string>
-    <string name="pdf_kpi_over_weekly">Days &gt; 7 Days (%1$s g)</string>
-    <string name="pdf_kpi_over_drink_days">Days &gt; %1$d Drinking Days</string>
+    <string name="pdf_kpi_over_daily">days &gt; %1$s g/day</string>
+    <string name="pdf_kpi_over_weekly">days &gt; %1$s g/7 days</string>
+    <string name="pdf_kpi_over_drink_days">days &gt; %1$d/7 drinking days</string>
     <string name="pdf_col_over_daily">&gt; Day</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>
     <string name="license">License</string>
+    <string name="stats_time_of_day">Time of Day</string>
+    <string name="stats_weekday">Weekday</string>
+    <string name="pdf_kpi_median_day">Median per Day</string>
+    <string name="pdf_kpi_median_drink_day">Median per Drinking Day</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø Drinking Days/Month</string>
+    <string name="pdf_kpi_median_drink_days_month">Median Drinking Days/Month</string>
 </resources>

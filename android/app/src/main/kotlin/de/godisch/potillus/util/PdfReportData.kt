@@ -36,6 +36,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 // =============================================================================
 // PdfReportData – the report's numbers, computed with NO Android dependencies
@@ -111,6 +112,16 @@ data class PdfReportData(
     val violations: LimitViolations,
     val bingeDays: Int,
 
+    // ── Medians (robust companions to the headline mean KPIs) ───────────────────
+    /** Median of the per-calendar-day grams over the whole period (abstinent days count as 0 g). */
+    val medianPerDay: Double,
+    /** Median of the per-drink-day grams over the drink days only. */
+    val medianPerDrinkDay: Double,
+    /** Mean number of drink days per calendar month across [months]. */
+    val avgDrinkDaysPerMonth: Double,
+    /** Median number of drink days per calendar month across [months]. */
+    val medianDrinkDaysPerMonth: Double,
+
     // ── Monthly breakdown & trend ──────────────────────────────────────────────
     /** Ascending by [MonthStat.monthKey]. The trend chart is shown only when ≥ 2. */
     val months: List<MonthStat>,
@@ -130,10 +141,13 @@ data class PdfReportData(
     val categories: List<CategoryStat>,
 
     // ── Time-of-day pattern ─────────────────────────────────────────────────────
-    val avgFirstDrinkHour: Double,
-    val avgLastDrinkHour: Double,
-    val percentBefore17: Int,
-    val percentAfter17: Int,
+    /**
+     * Pure-alcohol grams consumed in each hour-of-day bucket, indexed 0..23
+     * (the list always has exactly 24 entries). This drives the report's 24-bar
+     * time-of-day chart, which replaced the former "share before / after 17:00"
+     * two-number split. Hours with no consumption are 0.0.
+     */
+    val hourlyGrams: List<Double>,
 
     // ── Weekday profile ────────────────────────────────────────────────────────
     /**
@@ -208,19 +222,34 @@ data class PdfReportData(
             // ── Monthly aggregates (ascending). Unlike the old canvas exporter we do
             //    NOT truncate to a row budget here: the HTML report paginates
             //    automatically, so all months are emitted and flow across pages.
+            //
+            //    Period bounds as LocalDate, reused to clip partial first/last months.
+            val periodStartDate    = LocalDate.parse(firstDate)
+            val periodEndExclusive = LocalDate.parse(lastDate).plusDays(1)
             val months = byDate.entries
                 .groupBy { it.key.substring(0, 7) }   // "YYYY-MM"
                 .toSortedMap()
                 .map { (monthKey, days) ->
-                    val mDate  = LocalDate.parse("$monthKey-01")
-                    val mDays  = mDate.lengthOfMonth()
+                    val monthStart        = LocalDate.parse("$monthKey-01")
+                    val monthEndExclusive = monthStart.plusMonths(1)
+                    // Number of THIS month's calendar days that actually fall inside the
+                    // reporting period [firstDate, lastDate]. For a partial first or last
+                    // month (a "started" month) this is fewer than lengthOfMonth(); for a
+                    // fully contained month it equals lengthOfMonth(). Dividing by this —
+                    // rather than by the full calendar-month length — stops the not-yet-
+                    // recorded tail of a started month from being silently treated as
+                    // abstinent, which previously deflated the g/day figure.
+                    val effStart        = maxOf(monthStart, periodStartDate)
+                    val effEndExclusive = minOf(monthEndExclusive, periodEndExclusive)
+                    val effDays         = ChronoUnit.DAYS.between(effStart, effEndExclusive)
+                        .toInt().coerceAtLeast(1)
                     val mGrams = days.sumOf { it.value.sumOf { e -> e.gramsAlcohol } }
                     val mOver  = days.count { it.value.sumOf { e -> e.gramsAlcohol } > limitInfo.limitGrams }
                     MonthStat(
                         monthKey            = monthKey,
                         drinkDays           = days.size,
                         totalGrams          = mGrams,
-                        avgPerCalendarDay   = mGrams / mDays,
+                        avgPerCalendarDay   = mGrams / effDays,
                         daysOverDailyLimit  = mOver
                     )
                 }
@@ -239,18 +268,36 @@ data class PdfReportData(
                     CategoryStat(name, g, Math.round(g / totalForPct * 100).toInt())
                 }
 
-            // ── Time-of-day pattern.
-            val times = entries.map { e ->
-                val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(e.timestampMillis), ZoneId.systemDefault())
-                ldt.hour + ldt.minute / 60.0
+            // ── Time-of-day pattern: grams of pure alcohol per hour-of-day bucket.
+            //    24 fixed buckets (0..23). Each entry's full gram amount is attributed
+            //    to the local clock hour at which it was logged. This drives the report's
+            //    24-bar chart, which replaced the older "share before / after 17:00" split.
+            val hourlyGrams = DoubleArray(24)
+            entries.forEach { e ->
+                val hour = LocalDateTime
+                    .ofInstant(Instant.ofEpochMilli(e.timestampMillis), ZoneId.systemDefault())
+                    .hour
+                hourlyGrams[hour] += e.gramsAlcohol
             }
-            val firstTs = byDate.mapValues { (_, es) -> es.minOf { it.timestampMillis } }
-            val lastTs  = byDate.mapValues { (_, es) -> es.maxOf { it.timestampMillis } }
-            val avgFirst = if (firstTs.isNotEmpty()) firstTs.values.map(::tsToHour).average() else 0.0
-            val avgLast  = if (lastTs.isNotEmpty())  lastTs.values.map(::tsToHour).average()  else 0.0
-            val pctBefore17 = if (times.isNotEmpty())
-                Math.round(times.count { it < 17.0 }.toDouble() / times.size * 100).toInt() else 0
-            val pctAfter17 = 100 - pctBefore17
+
+            // ── Medians (robust companions to the mean KPIs).
+            //    medianPerDay spans EVERY calendar day in the period (abstinent days
+            //    contribute 0 g), mirroring avgPerDay's denominator; medianPerDrinkDay
+            //    spans only the days that had entries, mirroring avgPerDrinkDay.
+            val perDayTotals = buildList {
+                var day = periodStartDate
+                while (day.isBefore(periodEndExclusive)) {
+                    add(byDate[day.toString()]?.sumOf { it.gramsAlcohol } ?: 0.0)
+                    day = day.plusDays(1)
+                }
+            }
+            val perDrinkDayTotals       = byDate.values.map { es -> es.sumOf { it.gramsAlcohol } }
+            val medianPerDay            = median(perDayTotals)
+            val medianPerDrinkDay       = median(perDrinkDayTotals)
+            // Drink-days-per-month distribution across the calendar months in the period.
+            val drinkDaysPerMonth       = months.map { it.drinkDays.toDouble() }
+            val avgDrinkDaysPerMonth    = if (drinkDaysPerMonth.isNotEmpty()) drinkDaysPerMonth.average() else 0.0
+            val medianDrinkDaysPerMonth = median(drinkDaysPerMonth)
 
             // ── Weekday profile, rotated to start at the locale's first weekday.
             //    The app no longer has a configurable week start, so the column order
@@ -290,14 +337,15 @@ data class PdfReportData(
                 abstinentDays     = abstinentDays,
                 violations        = violations,
                 bingeDays         = bingeDays,
+                medianPerDay            = medianPerDay,
+                medianPerDrinkDay       = medianPerDrinkDay,
+                avgDrinkDaysPerMonth    = avgDrinkDaysPerMonth,
+                medianDrinkDaysPerMonth = medianDrinkDaysPerMonth,
                 months            = months,
                 chartBuckets      = chartBuckets,
                 chartGranularity  = chartGranularity,
                 categories        = categories,
-                avgFirstDrinkHour = avgFirst,
-                avgLastDrinkHour  = avgLast,
-                percentBefore17   = pctBefore17,
-                percentAfter17    = pctAfter17,
+                hourlyGrams       = hourlyGrams.toList(),
                 weekdayOrder      = weekdayOrder,
                 weekdayAverages   = weekdayAverages,
                 longestAbstinence = longest,
@@ -305,10 +353,17 @@ data class PdfReportData(
             )
         }
 
-        /** Converts a Unix-ms timestamp to fractional local hours (14:30 → 14.5). */
-        private fun tsToHour(ts: Long): Double {
-            val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneId.systemDefault())
-            return ldt.hour + ldt.minute / 60.0
+        /**
+         * Median (50th percentile) of [values]; 0.0 for an empty list. For an even
+         * count it is the mean of the two central values. The input list is copied
+         * and sorted, so the caller's list is left untouched.
+         */
+        private fun median(values: List<Double>): Double {
+            if (values.isEmpty()) return 0.0
+            val sorted = values.sorted()
+            val mid = sorted.size / 2
+            return if (sorted.size % 2 == 1) sorted[mid]
+                   else (sorted[mid - 1] + sorted[mid]) / 2.0
         }
     }
 }

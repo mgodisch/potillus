@@ -1,4 +1,5 @@
 .*.swp
+*.log
 *.orig
 
 /TODO.md
@@ -7,3 +8,4 @@
 /android/app/build
 /android/app/src/main/res/raw*/license.md
 /android/app/src/main/res/raw*/usersguide.md
+/short

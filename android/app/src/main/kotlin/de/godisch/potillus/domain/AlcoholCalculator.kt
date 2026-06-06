@@ -71,11 +71,11 @@ object AlcoholCalculator {
     /**
      * Binge-drinking threshold in grams of pure alcohol per occasion.
      *
-     * Fixed at 48 g, the WHO/NIAAA threshold historically used for women. As the
+     * Fixed at 60 g, the WHO/NIAAA threshold historically used for women. As the
      * app no longer stores the user's sex, the lower (stricter) of the two
      * thresholds is used so the PDF report flags binge days conservatively.
      */
-    const val BINGE_THRESHOLD = 48.0
+    const val BINGE_THRESHOLD = 60.0
 
     // ── Widmark parameters ────────────────────────────────────────────────────
 
@@ -250,7 +250,7 @@ object AlcoholCalculator {
     }
 
     // bingeThreshold(gender) has been removed: the binge threshold is now the
-    // sex-independent constant [BINGE_THRESHOLD] (48 g). Callers reference the
+    // sex-independent constant [BINGE_THRESHOLD] (60 g). Callers reference the
     // constant directly.
 
     /**

@@ -120,10 +120,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Zile de băut</string>
     <string name="pdf_col_total_g">Total g</string>
     <string name="pdf_col_avg_g_day">Medie g/zi</string>
-    <string name="pdf_meta_first_drink">Medie primul pahar</string>
-    <string name="pdf_meta_last_drink">Medie ultimul pahar</string>
-    <string name="pdf_meta_before_18">Pondere înainte de 17:00</string>
-    <string name="pdf_meta_after_18">Pondere după 17:00</string>
     <string name="pdf_meta_binge_days">Zile binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Cea mai lungă perioadă de abstinență</string>
     <string name="pdf_meta_current_abstinence">Abstinență curentă</string>
@@ -245,4 +241,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Meniu</string>
     <string name="help">Ajutor</string>
     <string name="license">Licență</string>
+    <string name="stats_time_of_day">Ora zilei</string>
+    <string name="stats_weekday">Ziua săptămânii</string>
+    <string name="pdf_kpi_median_day">Mediană pe zi</string>
+    <string name="pdf_kpi_median_drink_day">Mediană pe zi de băut</string>
+    <string name="pdf_kpi_avg_drink_days_month">Medie zile de băut/lună</string>
+    <string name="pdf_kpi_median_drink_days_month">Mediană zile de băut/lună</string>
 </resources>

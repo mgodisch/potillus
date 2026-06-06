@@ -101,10 +101,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">饮酒天数</string>
     <string name="pdf_col_total_g">总克数</string>
     <string name="pdf_col_avg_g_day">平均克/天</string>
-    <string name="pdf_meta_first_drink">平均首次饮酒</string>
-    <string name="pdf_meta_last_drink">平均末次饮酒</string>
-    <string name="pdf_meta_before_18">17:00 前比例</string>
-    <string name="pdf_meta_after_18">17:00 后比例</string>
     <string name="pdf_meta_binge_days">暴饮天数（>%1$s 克）</string>
     <string name="pdf_meta_longest_abstinence">最长戒酒期</string>
     <string name="pdf_meta_current_abstinence">当前戒酒期</string>
@@ -224,4 +220,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">菜单</string>
     <string name="help">帮助</string>
     <string name="license">许可证</string>
+    <string name="stats_time_of_day">一天中的时间</string>
+    <string name="stats_weekday">星期</string>
+    <string name="pdf_kpi_median_day">每日中位数</string>
+    <string name="pdf_kpi_median_drink_day">每饮酒日中位数</string>
+    <string name="pdf_kpi_avg_drink_days_month">平均饮酒天数/月</string>
+    <string name="pdf_kpi_median_drink_days_month">中位数饮酒天数/月</string>
 </resources>

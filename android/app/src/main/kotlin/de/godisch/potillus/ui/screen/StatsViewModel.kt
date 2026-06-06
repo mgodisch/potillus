@@ -56,6 +56,8 @@ import de.godisch.potillus.util.CsvExporter
 import de.godisch.potillus.util.ExportResult
 import de.godisch.potillus.util.PdfReportBuilder
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -93,6 +95,12 @@ data class StatsUiState(
     val limitInfo: LimitInfo                      = LimitInfo(20.0, 100.0, 5),
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
+    /** Pure-alcohol grams per hour-of-day bucket (index 0..23) for the time-of-day chart. */
+    val hourlyGrams: List<Double>                 = List(24) { 0.0 },
+    /** ISO weekday numbers (1=Mon..7=Sun) in display order (locale's first weekday first). */
+    val weekdayOrder: List<Int>                   = emptyList(),
+    /** Average grams per weekday in [weekdayOrder] order; null = weekday never a drink day. */
+    val weekdayAverages: List<Double?>            = emptyList(),
     // Defaults for the export date-range dialog (CSV/PDF export lives on this
     // screen). `today` is the logical current day; `statsFromDate`
     // is the configured statistics-start floor (empty when unset).
@@ -332,6 +340,29 @@ class StatsViewModel(
                 .mapValues { (_, es) -> es.sumOf { it.gramsAlcohol } }
                 .filter { it.value > 0.0 }
 
+            // Hour-of-day histogram: grams of pure alcohol per clock hour (0..23),
+            // built from the period's individual entries. Drives the Statistics
+            // screen's 24-bar time-of-day chart (the same series the PDF uses).
+            val hourlyGrams = DoubleArray(24)
+            periodEntries.forEach { e ->
+                val hour = LocalDateTime
+                    .ofInstant(Instant.ofEpochMilli(e.timestampMillis), ZoneId.systemDefault())
+                    .hour
+                hourlyGrams[hour] += e.gramsAlcohol
+            }
+
+            // Weekday profile: average grams on each weekday, rotated so the first
+            // column is the locale's first weekday. Computed from the daily summaries
+            // (one total per day), mirroring PdfReportData so screen and PDF agree.
+            val weekStartIso = DayResolver.firstDayOfWeekIso()
+            val weekdayOrder = (0..6).map { i -> (weekStartIso - 1 + i) % 7 + 1 }   // ISO 1..7
+            val weekdayTotals = Array(7) { mutableListOf<Double>() }
+            current.forEach { s ->
+                val col = (LocalDate.parse(s.date, fmt).dayOfWeek.value - weekStartIso + 7) % 7
+                weekdayTotals[col].add(s.totalGrams)
+            }
+            val weekdayAverages = weekdayTotals.map { if (it.isEmpty()) null else it.average() }
+
             // All three limits are evaluated together over the period's days.
             // Daily is a per-day check; the gram and drink-day limits use a gliding
             // 7-day window (see AlcoholCalculator.countLimitViolations).
@@ -370,6 +401,9 @@ class StatsViewModel(
                 trendPercent      = computeTrend(totalGrams, previous.sumOf { it.totalGrams }),
                 limitInfo         = limitInfo,
                 categoryBreakdown = categoryBreakdown,
+                hourlyGrams       = hourlyGrams.toList(),
+                weekdayOrder      = weekdayOrder,
+                weekdayAverages   = weekdayAverages,
                 today             = today,
                 statsFromDate     = statsFloor
             )

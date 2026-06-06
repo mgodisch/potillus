@@ -86,10 +86,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_drink_days">Дней с алкоголем</string>
     <string name="pdf_col_total_g">Всего г</string>
     <string name="pdf_col_avg_g_day">Ср. г/день</string>
-    <string name="pdf_meta_first_drink">Ср. первый напиток</string>
-    <string name="pdf_meta_last_drink">Ср. последний напиток</string>
-    <string name="pdf_meta_before_18">Доля до 17:00</string>
-    <string name="pdf_meta_after_18">Доля с 17:00</string>
     <string name="pdf_meta_binge_days">Дней бинджа (>%1$s г)</string>
     <string name="pdf_meta_longest_abstinence">Наибольший период воздержания</string>
     <string name="pdf_meta_current_abstinence">Текущее воздержание</string>
@@ -194,4 +190,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="menu">Меню</string>
     <string name="help">Справка</string>
     <string name="license">Лицензия</string>
+    <string name="stats_time_of_day">Время суток</string>
+    <string name="stats_weekday">День недели</string>
+    <string name="pdf_kpi_median_day">Медиана в день</string>
+    <string name="pdf_kpi_median_drink_day">Медиана в день потребления</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ср. дней с алкоголем/мес.</string>
+    <string name="pdf_kpi_median_drink_days_month">Медиана дней с алкоголем/мес.</string>
 </resources>

@@ -1,11 +1,27 @@
 <!DOCTYPE html>
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=============================================================================
+-->
 <!--
   ===========================================================================
-  Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
-  Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
-  Licensed under the GNU General Public License v3 or later. See LICENSE.md.
-  ===========================================================================
-
   PDF REPORT TEMPLATE  —  THIS FILE DEFINES HOW THE REPORT LOOKS.
   ===========================================================================
   You can edit the LAYOUT of the PDF report here, by hand, WITHOUT touching any
@@ -89,13 +105,13 @@
     /* ---- Two-column key/value metadata block ------------------------------ */
     .meta { width: 100%; border-collapse: collapse; }
     .meta td { padding: 1.5pt 0; vertical-align: top; }
-    .meta .k { color: #646464; width: 22%; }
-    .meta .v { color: #141414; font-weight: bold; width: 28%; }
+    .meta .k { color: #646464; width: 20%; }
+    .meta .v { color: #141414; font-weight: bold; width: 30%; }
 
-    /* ---- KPI grid (4 tiles per row) --------------------------------------- */
+    /* ---- KPI grid (3 tiles per row) --------------------------------------- */
     .kpis { display: flex; flex-wrap: wrap; gap: 4pt; }
     .kpi {
-        flex: 1 1 22%; min-width: 22%;
+        flex: 1 1 29%; min-width: 29%;
         background: #f5f7fc; border: .5px solid #dcdcdc;
         padding: 5pt 6pt; border-radius: 1pt;
     }
@@ -118,7 +134,14 @@
     table.data th:not(:first-child),
     table.data td:not(:first-child) { text-align: right; }
 
-    /* ---- Trend bar chart (pure CSS; no image) ----------------------------- */
+    /* ---- Bar charts (pure CSS; no images) --------------------------------- */
+    /* Two different charts share this same flex-column-of-bars layout:
+         1. the consumption-over-time "trend" chart (repeat block BARS), and
+         2. the 24-hour time-of-day chart (selector .chart.hours, block HOURS).
+       A chart is a horizontal flex row whose children (.col) are equal-width
+       columns. Each column anchors its .bar to the bottom (align-items:flex-end);
+       the bar's inline `height:NN%` (filled per row by the builder) sets its size
+       relative to the chart's own fixed height (60pt = the 100% reference). */
     .chart {
         position: relative; height: 60pt; margin-top: 4pt;
         display: flex; align-items: flex-end; gap: 3pt;
@@ -127,16 +150,23 @@
     .chart .col { flex: 1; display: flex; flex-direction: column;
                   justify-content: flex-end; align-items: center; height: 100%; }
     .chart .bar { width: 60%; background: #1e50a0; border-radius: 1pt 1pt 0 0; }
-    .chart .bar.over { background: #c83232; }
+    .chart .bar.over { background: #c83232; }          /* day over the daily limit */
     .chart .lab { font-size: 7pt; color: #646464; margin-top: 2pt; }
     /* Green tick marking an abstinent (zero-consumption) bucket, drawn at the
-       baseline in place of a bar. */
+       baseline in place of a bar (trend chart only). */
     .chart .tick { color: #2e7d32; font-size: 8pt; line-height: 1; }
-    /* Dashed reference line marking the daily limit; LIMIT_LINE_PCT is its height. */
+    /* Dashed reference line marking the daily limit; its inline `bottom:NN%`
+       comes from the LIMIT_LINE_PCT placeholder (trend chart only). */
     .chart .limit {
         position: absolute; left: 0; right: 0;
         border-top: 1px dashed #dc7832;
     }
+    /* 24-hour variant: 24 thin columns need a smaller gap and a wider bar so the
+       bars stay visible. This chart has no limit line and no abstinence ticks —
+       an hour with no consumption is simply an empty column. */
+    .chart.hours { gap: 1pt; }
+    .chart.hours .bar { width: 84%; }
+    .chart.hours .lab { font-size: 6.5pt; }
 
     /* ---- Footers ---------------------------------------------------------- */
     /* Page-specific disclaimer. Inside a .sheet it is pushed to the page bottom
@@ -164,6 +194,45 @@
 </head>
 <body>
 
+<!--
+  ===========================================================================
+  PLACEHOLDER & BLOCK INVENTORY  (quick map; the full contract is in the header)
+  ===========================================================================
+  Names are written here WITHOUT braces on purpose, so this reference can never
+  be mistaken for a live placeholder. In the markup below they appear as the
+  usual double-brace tokens. A repeat block is a comment-marker pair whose inner
+  row markup is emitted once per data row.
+
+  PAGE 1
+    Header ............ TITLE
+    Metadata .......... META_EXPORT_LABEL/VALUE, META_PERIOD_LABEL/VALUE,
+                        META_WEIGHT_LABEL/VALUE, META_LIMIT_LABEL,
+                        META_LIMIT_VALUE_DAY / _7DAYS / _DDAYS
+    KPI grid .......... SECTION_KPIS + block KPIS (row: KPI_CLASS, KPI_VALUE, KPI_LABEL)
+    Monthly table ..... SECTION_MONTHS, COL_MONTH/DRINK_DAYS/TOTAL_G/AVG_G_DAY/OVER_DAILY
+                        + block MONTHS (row: M_ROW_CLASS, M_MONTH, M_DRINK_DAYS,
+                        M_TOTAL, M_AVG, M_OVER)
+    Trend chart ....... SECTION_TREND, TREND_DISPLAY, LIMIT_LINE_PCT
+                        + block BARS (row: BAR_CLASS, BAR_HEIGHT_PCT,
+                        BAR_TICK_DISPLAY, BAR_LABEL)
+    Footer ............ FOOTER1
+
+  PAGE 2
+    Category table .... SECTION_CATEGORIES, CAT_HEAD_NAME/G/PCT
+                        + block CATEGORIES (row: C_NAME, C_G, C_PCT)
+    Time-of-day chart . SECTION_DAYTIME + block HOURS (row: H_HEIGHT_PCT, H_LABEL)
+    Weekday table ..... SECTION_WEEKDAY + block WEEKDAY_HEAD (row: WD_NAME)
+                        and block WEEKDAY_VAL (row: WD_VALUE)
+    Risk block ........ SECTION_RISK, RISK_BINGE_LABEL/VALUE,
+                        RISK_LONGEST_LABEL/VALUE, RISK_CURRENT_LABEL/VALUE
+    Footer ............ FOOTER2  (English-only; carries the running Android version)
+
+  A unit test (PdfTemplatePlaceholderTest) fails the build if any token used
+  below is not initialised in PdfReportBuilder.kt — so renaming on one side
+  without the other is caught automatically.
+  ===========================================================================
+-->
+
 <!-- ===================== PAGE 1 ===================== -->
 <div class="sheet">
 
@@ -176,11 +245,15 @@
 <table class="meta">
     <tr>
         <td class="k">{{META_EXPORT_LABEL}}</td><td class="v">{{META_EXPORT_VALUE}}</td>
-        <td class="k">{{META_PERIOD_LABEL}}</td><td class="v">{{META_PERIOD_VALUE}}</td>
+        <td class="k">{{META_LIMIT_LABEL}}</td><td class="v">{{META_LIMIT_VALUE_DAY}}</td>
     </tr>
     <tr>
-        <td class="k">{{META_LIMIT_LABEL}}</td><td class="v">{{META_LIMIT_VALUE}}</td>
+        <td class="k">{{META_PERIOD_LABEL}}</td><td class="v">{{META_PERIOD_VALUE}}</td>
+        <td class="k"></td><td class="v">{{META_LIMIT_VALUE_7DAYS}}</td>
+    </tr>
+    <tr>
         <td class="k">{{META_WEIGHT_LABEL}}</td><td class="v">{{META_WEIGHT_VALUE}}</td>
+        <td class="k"></td><td class="v">{{META_LIMIT_VALUE_DDAYS}}</td>
     </tr>
 </table>
 
@@ -261,18 +334,20 @@
     <!-- end:CATEGORIES -->
 </table>
 
-<!-- Time-of-day pattern -->
+<!-- Time-of-day pattern: a 24-bar chart, one bar per clock hour 0..23. This
+     replaced the former "first/last drink" times and the "share before/after
+     17:00" split. Each bar's inline height (H_HEIGHT_PCT) is that hour's grams
+     of pure alcohol relative to the busiest hour; H_LABEL is the hour number on
+     a thinned axis (empty string for the unlabelled hours in between). -->
 <div class="section">{{SECTION_DAYTIME}}</div>
-<table class="meta">
-    <tr>
-        <td class="k">{{DT_FIRST_LABEL}}</td><td class="v">{{DT_FIRST_VALUE}}</td>
-        <td class="k">{{DT_LAST_LABEL}}</td><td class="v">{{DT_LAST_VALUE}}</td>
-    </tr>
-    <tr>
-        <td class="k">{{DT_BEFORE_LABEL}}</td><td class="v">{{DT_BEFORE_VALUE}}</td>
-        <td class="k">{{DT_AFTER_LABEL}}</td><td class="v">{{DT_AFTER_VALUE}}</td>
-    </tr>
-</table>
+<div class="chart hours">
+    <!-- repeat:HOURS -->
+    <div class="col">
+        <div class="bar" style="height:{{H_HEIGHT_PCT}}%"></div>
+        <div class="lab">{{H_LABEL}}</div>
+    </div>
+    <!-- end:HOURS -->
+</div>
 
 <!-- Weekday profile -->
 <div class="section">{{SECTION_WEEKDAY}}</div>
