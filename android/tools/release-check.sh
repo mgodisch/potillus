@@ -275,7 +275,10 @@ extract_db_version() {
 #     (titles and descriptions deliberately omit the version to avoid churn), so
 #     it must track versionCode. Every locale present in the tree must ship the
 #     note for the current versionCode, or the store would advertise stale or
-#     missing release notes for the APK actually being shipped.
+#     missing release notes for the APK actually being shipped. In addition, all
+#     locale directories must carry the SAME set of <versionCode>.txt notes
+#     (locale parity), so a note added to one language but forgotten in another
+#     is caught before release.
 # =============================================================================
 check_version_consistency() {
     section "1 / 8 — VERSION CONSISTENCY"
@@ -355,10 +358,33 @@ check_version_consistency() {
                 missing=$((missing + 1))
             fi
         done
+
+        # Cross-check 2: LOCALE PARITY. Every locale's changelogs/ directory must
+        # carry the SAME set of <versionCode>.txt notes. The check above only
+        # inspects the current versionCode; this catches a note that was added to
+        # one locale but forgotten in another (or left behind in only one). The
+        # reference is the union of all locales' changelog file names; any locale
+        # missing one of them is a desync.
+        local all_files f desync=0
+        all_files=$(for locale_dir in "$FASTLANE_DIR"/*/; do
+            [[ -d "${locale_dir}changelogs" ]] || continue
+            ls "${locale_dir}changelogs" 2>/dev/null | grep -E '^[0-9]+\.txt$' || true
+        done | sort -u)
+        for locale_dir in "$FASTLANE_DIR"/*/; do
+            [[ -d "$locale_dir" ]] || continue
+            locale=$(basename "$locale_dir")
+            for f in $all_files; do
+                if [[ ! -f "${locale_dir}changelogs/${f}" ]]; then
+                    fail "fastlane: locale '$locale' is missing changelog $f that another locale has (changelogs out of sync)"
+                    desync=1
+                fi
+            done
+        done
+
         if [[ "$checked" -eq 0 ]]; then
             warn "fastlane tree present but contains no locale directories"
-        elif [[ "$missing" -eq 0 ]]; then
-            pass "fastlane changelogs present for versionCode $vcode in all $checked locale(s)"
+        elif [[ "$missing" -eq 0 && "$desync" -eq 0 ]]; then
+            pass "fastlane changelogs present for versionCode $vcode and in sync across all $checked locale(s)"
         fi
     fi
 }

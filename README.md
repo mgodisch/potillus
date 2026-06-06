@@ -22,7 +22,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
 
-## About the App (v0.67.0)
+## About the App (v0.67.1)
 
 **Libellus Potionis** ("Potillus") is a privacy-first, free, open-source, and
 ad-free alcohol consumption tracker designed to help users monitor, pace, and

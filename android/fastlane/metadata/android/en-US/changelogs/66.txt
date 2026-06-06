@@ -1,0 +1,3 @@
+Bugfix: the in-app document viewer now displays special characters written as
+HTML entities (for example "&copy;" now shows as ©) instead of the raw entity
+text.

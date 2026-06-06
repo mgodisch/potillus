@@ -1,0 +1,3 @@
+Fehlerbehebung: Die In-App-Dokumentanzeige stellt Sonderzeichen, die als
+HTML-Entity geschrieben sind, nun korrekt dar (z. B. erscheint „&copy;" jetzt als
+©) statt des rohen Entity-Texts.

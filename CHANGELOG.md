@@ -23,6 +23,38 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 # Libellus Potionis (Potillus) – Changelog
 
 <!-- Add new entries on top! -->
+<!-- RELEASE REMINDER: on every version bump, also add a localized store note
+     android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
+     EVERY locale, keeping the set identical across locales. release-check.sh §1
+     enforces both that the current versionCode's note exists in each locale and
+     that all locales carry the same set of changelog files. -->
+
+---
+
+## v0.67.1
+
+Bugfix: the in-app Markdown viewer (Copyright and Help) now resolves HTML/Markdown
+character entities such as `&copy;`, which were previously shown verbatim.
+
+### Fixed
+
+- **`MarkdownText` resolves character entities.** The viewer now decodes
+  HTML/Markdown character entities — named (`&copy;` → `©`, `&amp;`, `&mdash;`,
+  …) and numeric (`&#169;`, `&#xA9;`) — in headings and visible text, never in
+  URLs. Unknown names and out-of-range numeric values are left verbatim. Stray
+  ampersands without a trailing `;` (e.g. "AT&T") are untouched.
+
+### Changed
+
+- **Fastlane changelog sync check.** `release-check.sh` §1 now additionally
+  verifies LOCALE PARITY: all `fastlane/metadata/android/<locale>/changelogs/`
+  directories must carry the same set of `<versionCode>.txt` notes, so a release
+  note added to one language but forgotten in another is caught before release
+  (previously only the current versionCode's presence per locale was checked). A
+  maintainer reminder was added at the top of this CHANGELOG.
+- **Version bump** to `0.67.1` / `versionCode 66` across `build.gradle.kts`,
+  `proguard-rules.pro`, the `README.md` title and this CHANGELOG, with new
+  fastlane `changelogs/66.txt` notes for `en-US` and `de-DE`.
 
 ---
 
