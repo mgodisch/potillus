@@ -189,7 +189,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> giorno</string>
     <string name="menu">Menu</string>
     <string name="help">Aiuto</string>
-    <string name="license">Licenza</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Orario</string>
     <string name="stats_weekday">Giorno della settimana</string>
     <string name="pdf_kpi_median_day">Mediana al giorno</string>

@@ -99,8 +99,13 @@ sealed interface Screen {
     @Serializable data object Settings : Screen
     /** In-app user guide ("Help"), pushed on top of [Home] from the overflow menu. */
     @Serializable data object Help     : Screen
-    /** LICENSE viewer ("License"), pushed on top of [Home] from the overflow menu. */
-    @Serializable data object License  : Screen
+    /**
+     * Copyright viewer ("Copyright"), pushed on top of [Home] from the overflow
+     * menu. Displays the build-time concatenation of `COPYING.md` (the project's
+     * short copyright/licence notice) and the full GPL text from `LICENSE.md`,
+     * bundled as the single raw resource `R.raw.copyright`.
+     */
+    @Serializable data object Copyright  : Screen
 }
 
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
@@ -160,7 +165,7 @@ fun AppNavigation(
                 // opened from.
                 onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
                 onOpenHelp     = { navController.navigate(Screen.Help)     { launchSingleTop = true } },
-                onOpenLicense  = { navController.navigate(Screen.License)  { launchSingleTop = true } }
+                onOpenCopyright  = { navController.navigate(Screen.Copyright)  { launchSingleTop = true } }
             )
         }
         composable<Screen.Settings> {
@@ -175,11 +180,16 @@ fun AppNavigation(
                 onBack           = { navController.navigateUp() }
             )
         }
-        composable<Screen.License> {
-            // LICENSE is plain text and always the (English) default raw/license.md.
+        composable<Screen.Copyright> {
+            // The copyright document (COPYING.md + LICENSE.md, joined at build
+            // time into raw/copyright.md) is intentionally NOT locale-qualified:
+            // it always uses the default raw/ copy, so the legal text is shown
+            // verbatim in English regardless of the in-app language. It is
+            // rendered as Markdown because COPYING.md uses Markdown headings and
+            // links; the GPL body below it degrades gracefully as plain prose.
             DocumentViewerScreen(
-                titleRes         = R.string.license,
-                rawRes           = R.raw.license,
+                titleRes         = R.string.copyright,
+                rawRes           = R.raw.copyright,
                 renderAsMarkdown = true,
                 onBack           = { navController.navigateUp() }
             )
@@ -210,7 +220,7 @@ private fun MainPagerHost(
     drinksVm: DrinksViewModel,
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
-    onOpenLicense: () -> Unit
+    onOpenCopyright: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { mainPages.size })
     val scope      = rememberCoroutineScope()
@@ -243,10 +253,10 @@ private fun MainPagerHost(
             modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) { page ->
             when (page) {
-                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
-                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
-                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
-                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenLicense = onOpenLicense)
+                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
+                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
+                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
+                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
             }
         }
     }

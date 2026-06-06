@@ -81,11 +81,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_kpis">Kerndaten</string>
     <string name="pdf_section_months">Monatsübersicht</string>
     <string name="pdf_section_trend">Langfristiger Trend (Ø Gramm/Monat)</string>
-    <string name="pdf_section_categories">Getränkekategorien</string>
-    <string name="pdf_section_daytime">Konsummuster: Tageszeit</string>
-    <string name="pdf_section_weekday">Wochentag-Profil (Ø Gramm Alkohol)</string>
+    <string name="pdf_section_categories">Konsummuster: Getränkekategorien</string>
+    <string name="pdf_section_daytime">Konsummuster: Tageszeit (Ø Gramm Alkohol)</string>
+    <string name="pdf_section_weekday">Konsummuster: Wochentag (Ø Gramm Alkohol)</string>
     <string name="pdf_section_risk">Risikokonsum &amp; Abstinenz</string>
-    <string name="pdf_footer1">Schätzwerte – keine ärztliche Diagnose. Nicht für Fahreignungsbewertung und Diagnosezwecke.</string>
+    <string name="pdf_footer1">Eigenprotokollierte Schätzwerte – keine ärztliche Diagnose! Nicht für Fahreignungsbewertung und Diagnosezwecke!</string>
 
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Exportdatum</string>
@@ -220,7 +220,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">&gt; Tag</string>
     <string name="menu">Menü</string>
     <string name="help">Hilfe</string>
-    <string name="license">Lizenz</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Tageszeit</string>
     <string name="stats_weekday">Wochentag</string>
     <string name="pdf_kpi_median_day">Median pro Tag</string>

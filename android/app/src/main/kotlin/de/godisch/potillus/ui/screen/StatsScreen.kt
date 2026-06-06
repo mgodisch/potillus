@@ -64,7 +64,7 @@ fun StatsScreen(
     vm: StatsViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenLicense: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {}
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
     val exportStatus by vm.exportStatus.collectAsStateWithLifecycle()
@@ -125,7 +125,7 @@ fun StatsScreen(
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
-                        onOpenLicense  = onOpenLicense,
+                        onOpenCopyright  = onOpenCopyright,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

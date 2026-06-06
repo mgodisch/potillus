@@ -26,6 +26,83 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.67.0
+
+Renamed the overflow-menu **License** entry to **Copyright** and broadened the
+document it shows: the viewer now displays the project's `COPYING.md` notice and
+the full `LICENSE.md` GPL text, joined at build time and separated by a single
+blank line, still untranslated. Added a README section describing the project's
+textbook-grade source documentation, introduced a fastlane store-metadata tree
+for Google Play and F-Droid (English and German), and hardened the build: the
+release gate now runs on every build and its fastlane release notes are tied to
+the `versionCode`.
+
+### Added
+
+- **Fastlane store metadata.** New `android/fastlane/metadata/android/` tree with
+  `en-US` and `de-DE` listings, each providing `title.txt` (≤30 chars),
+  `short_description.txt` (≤80), `full_description.txt` (≤4000) and a
+  `changelogs/<versionCode>.txt` release note (≤500, F-Droid's limit). Texts are
+  derived from `README.md`; titles and descriptions deliberately omit the version
+  to avoid churn. An `images/` folder per locale carries the launcher icon and
+  documented placeholders for the feature graphic and screenshots (the binary
+  assets must be supplied before publishing). Layout follows the conventions both
+  `fastlane supply` and F-Droid consume.
+- **README documentation section.** New *Source Code Documentation* subsection
+  under *Technical Aspects*, explaining the literate, KDoc-everywhere style, how
+  `release-check.sh` enforces it, and the benefits for newcomers, reviewers and
+  long-term maintenance.
+
+### Changed
+
+- **"License" → "Copyright" in the overflow menu.** The string key `license` was
+  renamed to `copyright` in all 21 locales with the (intentionally untranslated)
+  value `Copyright`. The navigation route `Screen.License`, the callback
+  `onOpenLicense`, and the raw resource `R.raw.license` were renamed to
+  `Screen.Copyright`, `onOpenCopyright` and `R.raw.copyright` so no identifier
+  still calls the feature "license". KDoc/comments in `AppNav.kt`,
+  `AppOverflowMenu.kt` and `DocumentViewerScreen.kt` were updated to describe the
+  combined document accurately (and to correct a stale note that claimed the text
+  was rendered as plain, non-Markdown monospace).
+- **Build-time copyright document.** The Makefile rule that copied
+  `../LICENSE.md` to `raw/license.md` now concatenates `../COPYING.md`, a blank
+  line, and `../LICENSE.md` into `raw/copyright.md`. `check-guides`, `.gitignore`,
+  `distclean` and the `prereq` prerequisite list were updated accordingly.
+- **`MarkdownText` h1 top spacing.** Level-1 (`#`) headings gained a top inset
+  (20.dp, larger than the `##` heading's 16.dp). Previously an h1 had no top
+  inset, so the `# GNU GENERAL PUBLIC LICENSE` heading at the COPYING/LICENSE
+  seam sat closer to the text above it than the `## Preamble` heading below —
+  now its gap is at least as large.
+- **`release-check.sh` moved to `android/tools/`** and re-anchored to `android/`
+  (one line: `cd "$SCRIPT_DIR/.."`); all other relative paths are unchanged. A
+  new Makefile `release-check` target runs it, and it was added to `prereq`, so
+  the full read-only release gate now runs on **every** build and aborts on any
+  hard failure.
+- **`release-check.sh --Werror`.** New switch that treats warnings as errors
+  (non-zero exit on any warning). The Makefile `release-check` target passes it,
+  so warnings can no longer slip silently into a build. Without the flag warnings
+  remain advisory (exit 0); an invalid option exits 2; `--help` is supported.
+- **Sharper §5 documentation heuristic.** The KDoc look-behind now skips
+  multi-line annotation arguments (e.g. `@Query("""…""")`) so KDoc placed above
+  the annotation is found, and it excludes local (nested) functions the same way
+  it already excludes private ones. This removes two false positives
+  (`EntryDao.getDailySummaries`, `PdfReportBuilder`'s local `svg`) so the gate is
+  clean under `--Werror`.
+- **Version coupling for fastlane.** `release-check.sh` §1 verifies that every
+  fastlane locale directory ships a `changelogs/<versionCode>.txt` note matching
+  the current `versionCode`, alongside the existing version-string consistency
+  check across `build.gradle.kts`, the CHANGELOG, `README.md` and
+  `proguard-rules.pro`.
+- **Removed the Makefile `version-check` target.** Its checks are fully covered
+  by `release-check.sh` §1, which already runs in `prereq`; keeping a separate
+  Make target would only duplicate that logic. The target and its entry in
+  `prereq`/`.PHONY` were dropped, and the documentation that pointed at it now
+  points at the script.
+- **Version bump** to `0.67.0` / `versionCode 65` across `build.gradle.kts`,
+  `proguard-rules.pro`, the `README.md` title and this CHANGELOG.
+
+---
+
 ## v0.66.0
 
 PDF-report improvements: the time-of-day chart now labels every hour beneath the

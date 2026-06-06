@@ -189,7 +189,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> dag</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>
-    <string name="license">Licentie</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Tijdstip</string>
     <string name="stats_weekday">Weekdag</string>
     <string name="pdf_kpi_median_day">Mediaan per dag</string>

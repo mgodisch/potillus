@@ -53,12 +53,14 @@ import de.godisch.potillus.ui.component.MarkdownText
  * A read-only viewer for a bundled text document held in `res/raw`.
  *
  * It backs both overflow-menu entries added alongside Settings:
- *   - **Help**    → the localized user guide `R.raw.usersguide`, rendered as
- *                   Markdown ([renderAsMarkdown] = true).
- *   - **License** → `R.raw.license` (a verbatim copy of the project's
- *                   `LICENSE.md`), shown as plain monospaced text
- *                   ([renderAsMarkdown] = false) because the GPL text is not
- *                   Markdown and must be displayed exactly as written.
+ *   - **Help**      → the localized user guide `R.raw.usersguide`, rendered as
+ *                     Markdown ([renderAsMarkdown] = true).
+ *   - **Copyright** → `R.raw.copyright`, the build-time concatenation of
+ *                     `COPYING.md` (the short copyright/licence notice) and
+ *                     `LICENSE.md` (the full GPL text), separated by a blank
+ *                     line. It is also rendered with [renderAsMarkdown] = true
+ *                     so COPYING.md's headings and links display nicely; the
+ *                     GPL body is plain prose and renders unchanged.
  *
  * LOCALE RESOLUTION
  *   The text is read from [LocalContext]'s resources. Because the app selects a
@@ -66,8 +68,8 @@ import de.godisch.potillus.ui.component.MarkdownText
  *   already reflects the chosen language, so `openRawResource(R.raw.usersguide)`
  *   returns the matching `raw-<locale>` variant automatically — and falls back
  *   to the default `raw/` (English) for languages without a translated guide.
- *   The license has only the default `raw/license.md`, so it is always shown in
- *   its original (English) form, as intended.
+ *   The copyright document exists only as the default `raw/copyright.md`, so it
+ *   is always shown in its original (English) form, as intended.
  *
  * The content is read once and cached with [remember]; the raw resources are a
  * few kilobytes, so a single synchronous read on first composition is fine and
@@ -75,8 +77,9 @@ import de.godisch.potillus.ui.component.MarkdownText
  *
  * @param titleRes        String resource for the top-bar title.
  * @param rawRes          Raw resource holding the document text.
- * @param renderAsMarkdown Whether to render via [MarkdownText] (guide) or as
- *                        plain monospaced text (license).
+ * @param renderAsMarkdown Whether to render via [MarkdownText] (true for both
+ *                        the guide and the copyright document) or as plain
+ *                        monospaced text.
  * @param onBack          Invoked when the Up arrow is tapped.
  */
 @OptIn(ExperimentalMaterial3Api::class)

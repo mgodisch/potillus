@@ -1,0 +1,4 @@
+Der Menüeintrag „Lizenz“ heißt jetzt „Copyright“ und zeigt sowohl den
+Copyright-Hinweis als auch den vollständigen Lizenztext. Englische und deutsche
+Store-Einträge hinzugefügt. Diverse interne Build- und Release-Check-
+Verbesserungen.

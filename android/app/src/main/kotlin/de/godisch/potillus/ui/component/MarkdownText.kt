@@ -92,7 +92,16 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                 firstLine.startsWith("# ") -> Text(
                     text = firstLine.removePrefix("# ").trim(),
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    // A top inset larger than the `## ` heading's (16.dp). An h1
+                    // is the most prominent heading, so it deserves the largest
+                    // gap above it; without a top inset an h1 that appears in the
+                    // MIDDLE of a document — e.g. "# GNU GENERAL PUBLIC LICENSE"
+                    // at the seam where COPYING.md and LICENSE.md are joined —
+                    // would sit closer to the preceding paragraph than the lower
+                    // "## Preamble" heading below it, which looks wrong. The
+                    // leading h1 of a document gains a little top space too,
+                    // which reads fine inside the scrolling, padded viewer.
+                    modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
                 )
                 else -> Text(
                     // Reflow: collapse the hard-wrapped source lines of this

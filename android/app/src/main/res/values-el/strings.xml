@@ -189,7 +189,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> ημέρα</string>
     <string name="menu">Μενού</string>
     <string name="help">Βοήθεια</string>
-    <string name="license">Άδεια</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Ώρα ημέρας</string>
     <string name="stats_weekday">Ημέρα εβδομάδας</string>
     <string name="pdf_kpi_median_day">Διάμεσος ανά ημέρα</string>

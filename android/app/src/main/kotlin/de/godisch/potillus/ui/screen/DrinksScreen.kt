@@ -59,7 +59,7 @@ fun DrinksScreen(
     todayVm: TodayViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenLicense: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {}
 ) {
     val state        by vm.uiState.collectAsStateWithLifecycle()
     val todayState   by todayVm.uiState.collectAsStateWithLifecycle()
@@ -153,7 +153,7 @@ fun DrinksScreen(
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
-                        onOpenLicense  = onOpenLicense,
+                        onOpenCopyright  = onOpenCopyright,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

@@ -205,7 +205,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> jour</string>
     <string name="menu">Menu</string>
     <string name="help">Aide</string>
-    <string name="license">Licence</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Heure de la journée</string>
     <string name="stats_weekday">Jour de la semaine</string>
     <string name="pdf_kpi_median_day">Médiane par jour</string>

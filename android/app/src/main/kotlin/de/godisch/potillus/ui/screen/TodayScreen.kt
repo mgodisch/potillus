@@ -57,7 +57,7 @@ fun TodayScreen(
     vm: TodayViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenLicense: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {}
 ) {
     val state  by vm.uiState.collectAsStateWithLifecycle()
     val drinks by vm.drinks.collectAsStateWithLifecycle()
@@ -96,7 +96,7 @@ fun TodayScreen(
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
-                        onOpenLicense  = onOpenLicense,
+                        onOpenCopyright  = onOpenCopyright,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

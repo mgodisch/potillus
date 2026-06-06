@@ -28,6 +28,8 @@ help:
 	@echo "  make release        build release APK (unsigned)"
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
 	@echo "  make guides         regenerate the localized user guides"
+	@echo "  make check-guides   verify guides and raw/copyright.md are in sync"
+	@echo "  make release-check  run the read-only release-readiness gate"
 	@echo "  make test-device    run instrumented tests (device/emulator needed)"
 	@echo "  make test           run all tests (device needed)"
 	@echo "  make install-debug  install debug APK on device (device needed)"
@@ -72,7 +74,7 @@ GRADLE_OPTS ?= -Xmx2g -Xms512m
 #GRADLE_OPTS += --no-daemon
 export GRADLE_OPTS
 
-prereq: version-check java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/license.md guides
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md guides release-check
 
 java:
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
@@ -84,12 +86,23 @@ android: \
 	${ANDROID_HOME}/platforms/android-35 \
 	${ANDROID_HOME}/platforms/android-36
 
-# LICENSE.md is shown verbatim by the in-app "License" viewer. It is NOT
-# translated and NOT locale-qualified: always the project-root LICENSE.md,
-# copied to the default raw/ so R.raw.license resolves to it for every locale.
-app/src/main/res/raw/license.md: ../LICENSE.md
+# The in-app "Copyright" viewer shows a single bundled document that is the
+# concatenation of two project-root files:
+#
+#     COPYING.md   – the short copyright/licence notice (Markdown)
+#     <blank line>
+#     LICENSE.md   – the full, verbatim GNU GPL text
+#
+# The result is written to the DEFAULT raw/ (not locale-qualified) so that
+# R.raw.copyright resolves to the same English legal text for every locale: the
+# copyright/licence text is deliberately NOT translated.
+#
+# The `echo` between the two `cat`s emits the single separating blank line. This
+# assumes COPYING.md ends with exactly one trailing newline (the repository
+# convention); if it did not, the separation would be off by a line.
+app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md
 	mkdir -p app/src/main/res/raw
-	cp -a $< $@
+	{ cat ../COPYING.md; echo; cat ../LICENSE.md; } > $@
 
 # Regenerate the localized user guides from their templates in docs/guide/.
 # Resolves the {{screen-name}} tokens against the matching strings.xml so the
@@ -102,34 +115,30 @@ guides:
 	python3 tools/render-guide.py
 
 # CI helper: fail if the committed guides are not in sync with the templates
-# and strings.xml (does not write anything).
+# and strings.xml (does not write anything). Also verifies that the generated
+# raw/copyright.md matches the current COPYING.md + blank line + LICENSE.md, by
+# rebuilding the concatenation into a temporary file and comparing byte-for-byte.
 check-guides:
 	python3 tools/render-guide.py --check
-	cmp -s ../LICENSE.md app/src/main/res/raw/license.md
+	tmp=$$(mktemp); { cat ../COPYING.md; echo; cat ../LICENSE.md; } > "$$tmp"; \
+	    cmp -s "$$tmp" app/src/main/res/raw/copyright.md; rc=$$?; rm -f "$$tmp"; \
+	    test $$rc -eq 0 || { echo "check-guides: raw/copyright.md is stale — run 'make app/src/main/res/raw/copyright.md'"; exit 1; }
 
-# Version consistency. The app version is written in several places that must
-# all match the top-most "## vX.Y.Z" entry in ../CHANGELOG.md (the single source of
-# truth): build.gradle.kts versionName, the app/proguard-rules.pro header, and
-# the ../README.md title. This guards against the drift that previously left
-# build.gradle.kts on a stale versionName. Runs on every build via `prereq`.
-# (release-check.sh §1 performs the same comparison for the release gate; this is
-# the fast local pre-build equivalent.)
-version-check:
-	@ref=$$(grep -m1 '^## v' ../CHANGELOG.md | sed 's/^## v//; s/[[:space:]]*$$//')
-	if [ -z "$$ref" ]; then echo "version-check: no '## vX.Y.Z' entry found in ../CHANGELOG.md"; exit 1; fi
-	gradle=$$(grep 'versionName' app/build.gradle.kts | grep -v 'Suffix' | grep -oE '"[^"]+"' | head -1 | tr -d '"')
-	proguard=$$(grep -E '^# Version:' app/proguard-rules.pro | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-	readme=$$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' ../README.md | head -1 | tr -d 'v')
-	fail=0
-	for entry in "build.gradle.kts versionName:$$gradle" "app/proguard-rules.pro header:$$proguard" "../README.md title:$$readme"; do
-	    where=$${entry%%:*}; got=$${entry##*:}
-	    if [ "$$got" != "$$ref" ]; then
-	        echo "version-check: MISMATCH in $$where — found '$$got', expected '$$ref' (top of ../CHANGELOG.md)"
-	        fail=1
-	    fi
-	done
-	if [ "$$fail" -ne 0 ]; then echo "version-check: bring every location in sync with the ../CHANGELOG, then rebuild."; exit 1; fi
-	echo "version-check: all version strings consistent at $$ref"
+# Release gate (moved from android/release-check.sh to tools/release-check.sh).
+# It is a pure read-only check of all release invariants (version consistency,
+# changelog body, Room migrations, locale three-way sync, source documentation,
+# guarded Log calls, no German in source, backup format version, and the
+# fastlane changelog coupling). Per project decision it now runs on EVERY build
+# as part of `prereq`: any hard FAIL aborts the build (the script exits non-zero
+# and `set -e`-style make semantics propagate it). It is invoked with --Werror
+# so that warnings are treated as errors too and cannot slip into a build. The
+# script self-anchors to the android/ directory, so it can be invoked from here
+# regardless of cwd. This single gate also subsumes the former `version-check`
+# target: §1 of the script already performs the full version-string consistency
+# and fastlane-changelog coupling check, so a separate Make target would only
+# duplicate it.
+release-check:
+	bash tools/release-check.sh --Werror
 
 debug: app/build/outputs/apk/debug/app-debug.apk
 
@@ -172,7 +181,7 @@ clean: prereq
 	./gradlew clean
 
 distclean: clean
-	rm app/src/main/res/raw*/license.md
+	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq version-check java android guides check-guides debug release test unit-test test-device install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release test unit-test test-device install install-debug clean distclean

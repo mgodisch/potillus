@@ -219,7 +219,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> 日</string>
     <string name="menu">菜单</string>
     <string name="help">帮助</string>
-    <string name="license">许可证</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">一天中的时间</string>
     <string name="stats_weekday">星期</string>
     <string name="pdf_kpi_median_day">每日中位数</string>

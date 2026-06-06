@@ -53,7 +53,7 @@ import de.godisch.potillus.R
  * BEHAVIOUR
  *   The button shows a "burger" icon ([Icons.Default.Menu]). Tapping it opens a
  *   [DropdownMenu] (an Android "overflow menu") anchored to the button, with
- *   three entries: Settings, Help and License. Selecting an entry closes the
+ *   three entries: Settings, Help and Copyright. Selecting an entry closes the
  *   menu and invokes the matching callback; the actual navigation is the
  *   caller's responsibility (see [de.godisch.potillus.ui.nav.AppNavigation]),
  *   which keeps this component free of any navigation dependency.
@@ -61,8 +61,8 @@ import de.godisch.potillus.R
  * @param onOpenSettings Invoked when the "Settings" entry is chosen.
  * @param onOpenHelp     Invoked when the "Help" entry is chosen (opens the
  *                       in-app user guide viewer).
- * @param onOpenLicense  Invoked when the "License" entry is chosen (opens the
- *                       LICENSE viewer).
+ * @param onOpenCopyright Invoked when the "Copyright" entry is chosen (opens the
+ *                       Copyright viewer: the combined COPYING.md + LICENSE.md).
  * @param tint           Colour for the burger icon. Defaults to the ambient
  *                       content colour; the main screens pass their top-bar
  *                       `onPrimary` colour so the icon matches the former gear.
@@ -71,7 +71,7 @@ import de.godisch.potillus.R
 fun AppOverflowMenu(
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
-    onOpenLicense: () -> Unit,
+    onOpenCopyright: () -> Unit,
     tint: Color = LocalContentColor.current
 ) {
     // `expanded` is the only piece of state this component owns: whether the
@@ -115,14 +115,14 @@ fun AppOverflowMenu(
             }
         )
         DropdownMenuItem(
-            text = { Text(stringResource(R.string.license)) },
-            // The license entry now carries the open-book glyph (formerly used by
-            // the help entry); a book reads more naturally as "read the licence
-            // text" than the previous gavel.
+            text = { Text(stringResource(R.string.copyright)) },
+            // The copyright entry carries the open-book glyph (formerly used by
+            // the help entry); a book reads more naturally as "read the
+            // copyright and licence text" than the previous gavel.
             leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
             onClick = {
                 expanded = false
-                onOpenLicense()
+                onOpenCopyright()
             }
         )
     }

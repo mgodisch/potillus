@@ -153,23 +153,8 @@ object PdfReportBuilder {
         // ── KPI tiles ────────────────────────────────────────────────────────────
         // Order and warn flags reproduce the original report exactly.
         repeats["KPIS"] = listOf(
-            kpi(context.getString(R.string.pdf_kpi_abstinent_days),"${d.abstinentDays}"),
-            kpi(context.getString(R.string.pdf_kpi_drink_days),    "${d.drinkDays}"),
-            kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
-                "${d.bingeDays}", d.bingeDays > 0),
-
-            kpi(context.getString(R.string.pdf_kpi_total),         "${d.totalGrams.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_day),       "${d.avgPerDay.fmt1()} g"),
-
-            // Medians beside their matching means (g per drink day, g per day) plus the
-            // monthly drink-days mean & median. Medians are robust to the occasional very
-            // heavy day that can inflate a plain average.
-            kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
-            // Peaks: worst single day and worst rolling 7-day window.
-            kpi(context.getString(R.string.pdf_kpi_max_day),   "${d.maxPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_abstinent_days),          "${d.abstinentDays}"),
+            kpi(context.getString(R.string.pdf_kpi_drink_days),              "${d.drinkDays}"),
             kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
             kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
 
@@ -178,7 +163,24 @@ object PdfReportBuilder {
             kpi(context.getString(R.string.pdf_kpi_over_weekly, d.limitInfo.weeklyLimitGrams.fmt0()),
                 "${d.violations.daysOverWeeklyLimit}", d.violations.daysOverWeeklyLimit > 0),
             kpi(context.getString(R.string.pdf_kpi_over_drink_days, d.limitInfo.maxDrinkDaysPerWeek),
-                "${d.violations.daysOverDrinkDayLimit}", d.violations.daysOverDrinkDayLimit > 0)
+                "${d.violations.daysOverDrinkDayLimit}", d.violations.daysOverDrinkDayLimit > 0),
+            kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
+                "${d.bingeDays}", d.bingeDays > 0),
+
+
+            kpi(context.getString(R.string.pdf_kpi_total),         "${d.totalGrams.fmt1()} g"),
+            // Peaks: worst single day and worst rolling 7-day window.
+            kpi(context.getString(R.string.pdf_kpi_max_day),       "${d.maxPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_day),       "${d.avgPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
+
+            kpi("", ""),
+            kpi(context.getString(R.string.pdf_kpi_max_7days),        "${d.maxPer7Days.fmt1()} g"),
+            // Medians beside their matching means (g per drink day, g per day) plus the
+            // monthly drink-days mean & median. Medians are robust to the occasional very
+            // heavy day that can inflate a plain average.
+            kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g")
         )
 
         // ── Monthly table ──────────────────────────────────────────────────────

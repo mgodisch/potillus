@@ -78,14 +78,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- PDF-Export -->
     <string name="pdf_title">Alcohol Consumption Report</string>
-    <string name="pdf_section_kpis">Key Figures</string>
+    <string name="pdf_section_kpis">Key Indicators</string>
     <string name="pdf_section_months">Monthly Overview</string>
     <string name="pdf_section_trend">Long-term Trend (Ø Grams/Month)</string>
-    <string name="pdf_section_categories">Drink Categories</string>
-    <string name="pdf_section_daytime">Consumption Pattern: Time of Day</string>
-    <string name="pdf_section_weekday">Weekday Profile (Ø Gram Alcohol)</string>
+    <string name="pdf_section_categories">Consumption Pattern: Drink Categories</string>
+    <string name="pdf_section_daytime">Consumption Pattern: Time of Day (Ø Gram Alcohol)</string>
+    <string name="pdf_section_weekday">Consumption Pattern: Weekday (Ø Gram Alcohol)</string>
     <string name="pdf_section_risk">Risk Consumption &amp; Abstinence</string>
-    <string name="pdf_footer1">Estimated values - not a medical diagnosis. Not for driving eligibility or diagnostic purposes.</string>
+    <string name="pdf_footer1">Self-logged estimates – not a medical diagnosis! Not intended for driving ability evaluation or diagnostic purposes!</string>
 
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Export Date</string>
@@ -220,7 +220,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">&gt; Day</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>
-    <string name="license">License</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Time of Day</string>
     <string name="stats_weekday">Weekday</string>
     <string name="pdf_kpi_median_day">Median per Day</string>

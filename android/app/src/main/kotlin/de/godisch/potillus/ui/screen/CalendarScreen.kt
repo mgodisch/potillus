@@ -70,7 +70,7 @@ fun CalendarScreen(
     vm: CalendarViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenLicense: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {}
 ) {
     val state   by vm.uiState.collectAsStateWithLifecycle()
     val drinks  by vm.drinks.collectAsStateWithLifecycle()
@@ -105,7 +105,7 @@ fun CalendarScreen(
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
-                        onOpenLicense  = onOpenLicense,
+                        onOpenCopyright  = onOpenCopyright,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

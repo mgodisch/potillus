@@ -108,10 +108,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     .meta .k { color: #646464; width: 20%; }
     .meta .v { color: #141414; font-weight: bold; width: 30%; }
 
-    /* ---- KPI grid (3 tiles per row) --------------------------------------- */
+    /* ---- KPI grid (4 tiles per row) --------------------------------------- */
     .kpis { display: flex; flex-wrap: wrap; gap: 4pt; }
     .kpi {
-        flex: 1 1 29%; min-width: 29%;
+        flex: 1 1 22%; min-width: 22%;
         background: #f5f7fc; border: .5px solid #dcdcdc;
         padding: 5pt 6pt; border-radius: 1pt;
     }
@@ -296,6 +296,22 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- end:KPIS -->
 </div>
 
+<!-- Consumption time-axis chart (always shown; TREND_DISPLAY is always "block").
+     One bar per bucket; abstinent buckets render a green tick at the baseline. -->
+<div style="display:{{TREND_DISPLAY}}">
+    <div class="section">{{SECTION_TREND}}</div>
+    <div class="chart">
+        <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
+        <!-- repeat:BARS -->
+        <div class="col">
+            <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
+            <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
+            <div class="lab">{{BAR_LABEL}}</div>
+        </div>
+        <!-- end:BARS -->
+    </div>
+</div>
+
 <!-- Monthly table -->
 <div class="section">{{SECTION_MONTHS}}</div>
 <table class="data">
@@ -316,22 +332,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     </tr>
     <!-- end:MONTHS -->
 </table>
-
-<!-- Consumption time-axis chart (always shown; TREND_DISPLAY is always "block").
-     One bar per bucket; abstinent buckets render a green tick at the baseline. -->
-<div style="display:{{TREND_DISPLAY}}">
-    <div class="section">{{SECTION_TREND}}</div>
-    <div class="chart">
-        <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
-        <!-- repeat:BARS -->
-        <div class="col">
-            <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
-            <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
-            <div class="lab">{{BAR_LABEL}}</div>
-        </div>
-        <!-- end:BARS -->
-    </div>
-</div>
 
 <div class="disclaimer">{{FOOTER1}}</div>
 

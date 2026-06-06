@@ -31,12 +31,25 @@
 #   file.
 #
 # USAGE
-#   chmod +x release-check.sh   # once
-#   ./release-check.sh          # run from the repo root
+#   chmod +x tools/release-check.sh      # once
+#   tools/release-check.sh               # run from the android/ directory
+#   tools/release-check.sh --Werror      # treat warnings as errors
+#
+#   The script self-anchors to android/ (it lives in android/tools/), so it can
+#   also be invoked from anywhere, e.g. `bash android/tools/release-check.sh`.
+#   It additionally runs automatically on every build: the android/Makefile
+#   `prereq` target invokes it (with --Werror) via the `release-check` target,
+#   so a failing invariant — or, under --Werror, any warning — aborts the build.
+#
+# OPTIONS
+#   --Werror   Treat warnings as errors: exit non-zero if any warning is
+#              emitted, even when no hard FAIL occurred.
 #
 # EXIT CODES
-#   0  All checks passed (or all failures are warnings only).
-#   1  At least one FAIL check did not pass; the release is NOT safe to tag.
+#   0  All checks passed (warnings allowed unless --Werror is given).
+#   1  At least one FAIL (or, under --Werror, at least one warning); NOT safe to
+#      tag.
+#   2  Invalid command-line option.
 #
 # CHECKS PERFORMED
 #   The script is organised into eight sections that mirror the project's
@@ -122,6 +135,28 @@ FAILS=0
 WARNS=0
 PASSES=0
 
+# ── Options ───────────────────────────────────────────────────────────────────
+# --Werror : treat warnings as errors. Without it, warnings are advisory and the
+#            script exits 0 as long as there are no hard failures. With it, ANY
+#            warning flips the final exit code to non-zero, so a warning can never
+#            slip silently into a build. The Makefile `release-check` target
+#            passes --Werror, making the on-every-build gate reject warnings too.
+WERROR=0
+for arg in "$@"; do
+    case "$arg" in
+        --Werror|-Werror|--werror) WERROR=1 ;;
+        -h|--help)
+            echo "Usage: tools/release-check.sh [--Werror]"
+            echo "  --Werror   treat warnings as errors (non-zero exit on any warning)"
+            exit 0
+            ;;
+        *)
+            echo "release-check.sh: unknown option '$arg' (try --help)" >&2
+            exit 2
+            ;;
+    esac
+done
+
 # Output helpers – each increments the relevant counter and prints a
 # coloured, prefixed message.
 pass() { echo -e "  ${GREEN}✓${NC} $*";          PASSES=$(( PASSES + 1 )); }
@@ -138,8 +173,12 @@ section() {
 # ── Locate the repo root ──────────────────────────────────────────────────────
 # $BASH_SOURCE[0] is the path to this script.
 # cd + pwd -P resolves symlinks to give the canonical physical path.
+# The script now lives in android/tools/, so anchor ONE level up to android/
+# (SCRIPT_DIR/..). Every path below stays relative to android/ exactly as
+# before the move (app/... for build files, ../ for repo-root files), so the
+# relocation needs no other path edits.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR/.."
 
 # ── File paths (all relative to repo root) ────────────────────────────────────
 BUILD_GRADLE="app/build.gradle.kts"
@@ -157,6 +196,10 @@ LOCALE_CONFIG_XML="app/src/main/res/xml/locale_config.xml"
 BASE_STRINGS_XML="app/src/main/res/values/strings.xml"
 SOURCE_ROOT="app/src/main/kotlin"
 SCHEMAS_DIR="app/schemas/de.godisch.potillus.data.db.AppDatabase"
+# Fastlane store-metadata tree (used by both F-Droid and `fastlane supply`).
+# Per-locale release notes are named after the integer versionCode, e.g.
+# fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
+FASTLANE_DIR="fastlane/metadata/android"
 
 # ── Pre-flight: verify all required files exist ───────────────────────────────
 # Without these files the rest of the checks cannot run.
@@ -165,7 +208,7 @@ for f in "$BUILD_GRADLE" "$CHANGELOG" "$README" "$PROGUARD" \
           "$LOCALE_CONFIG_XML" "$BASE_STRINGS_XML"; do
     if [[ ! -f "$f" ]]; then
         echo -e "${RED}FATAL: Required file not found: $f${NC}"
-        echo "Make sure you run this script from the repository root."
+        echo "The script self-anchors to android/; ensure the tree is intact."
         exit 1
     fi
 done
@@ -223,6 +266,16 @@ extract_db_version() {
 #   versionCode must be a plain integer ≥ 1.  It is checked separately from
 #   versionName because it obeys different rules (monotonically increasing
 #   integer vs. human-readable string).
+#
+#   FASTLANE COUPLING:
+#     The store listings (F-Droid and Google Play via `fastlane supply`) carry
+#     a per-locale "what's new" note named after the integer versionCode, i.e.
+#     fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. That file
+#     name is the ONLY place a version number is embedded in the fastlane tree
+#     (titles and descriptions deliberately omit the version to avoid churn), so
+#     it must track versionCode. Every locale present in the tree must ship the
+#     note for the current versionCode, or the store would advertise stale or
+#     missing release notes for the APK actually being shipped.
 # =============================================================================
 check_version_consistency() {
     section "1 / 8 — VERSION CONSISTENCY"
@@ -280,6 +333,33 @@ check_version_consistency() {
         fail "versionName '$vname' ≠ proguard-rules.pro header version '$proguard_version'"
     else
         pass "versionName matches proguard-rules.pro header (v$vname)"
+    fi
+
+    # Cross-check: fastlane release notes are coupled to versionCode by filename.
+    # If no fastlane tree exists yet this is only advisory (the project may not
+    # publish to a store); once a locale directory exists it MUST carry the note
+    # for the current versionCode.
+    if [[ ! -d "$FASTLANE_DIR" ]]; then
+        warn "No fastlane metadata tree at $FASTLANE_DIR — skipping store-changelog check"
+    elif [[ -z "$vcode" ]]; then
+        warn "versionCode unknown — skipping fastlane changelog check"
+    else
+        local locale_dir locale changelog_file missing=0 checked=0
+        for locale_dir in "$FASTLANE_DIR"/*/; do
+            [[ -d "$locale_dir" ]] || continue
+            locale=$(basename "$locale_dir")
+            changelog_file="${locale_dir}changelogs/${vcode}.txt"
+            checked=$((checked + 1))
+            if [[ ! -f "$changelog_file" ]]; then
+                fail "fastlane: missing $changelog_file for versionCode $vcode (locale '$locale')"
+                missing=$((missing + 1))
+            fi
+        done
+        if [[ "$checked" -eq 0 ]]; then
+            warn "fastlane tree present but contains no locale directories"
+        elif [[ "$missing" -eq 0 ]]; then
+            pass "fastlane changelogs present for versionCode $vcode in all $checked locale(s)"
+        fi
     fi
 }
 
@@ -527,12 +607,14 @@ check_locale_consistency() {
 #   robust against minor formatting variations.
 #
 # 5b. FUNCTION KDOC (heuristic)
-#   We scan for public/internal function declarations that are NOT preceded by
-#   a KDoc block ("*/") within the preceding two lines.  This is a heuristic:
-#   it will flag functions whose KDoc is separated by blank lines or annotations
-#   but will not produce false negatives for functions with KDoc directly above.
-#   Private functions are excluded because the project documents them with
-#   inline comments, not KDoc.
+#   We scan for public/internal/top-level function declarations and verify each
+#   is preceded by a KDoc block (a line ending in "*/"). The look-behind skips
+#   blank lines, single-line annotations, AND multi-line annotation arguments
+#   such as @Query("""…""") so that KDoc placed above the annotation is still
+#   found. Excluded from the requirement (documented with inline comments, not
+#   KDoc): private functions, trivial set/clear/dismiss one-liners, and LOCAL
+#   (nested) functions — detected as declarations indented more than 8 spaces,
+#   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
     section "5 / 8 — SOURCE CODE DOCUMENTATION"
@@ -606,11 +688,44 @@ for dirpath, _, filenames in os.walk(source_root):
             if is_one_liner:
                 continue
 
-            # Walk upwards over blank lines and annotation lines to find
-            # the most recent non-trivial preceding line.
+            # Skip LOCAL (nested) functions. Like private functions, local
+            # helpers declared inside another function's body are documented
+            # with inline comments, not KDoc. Under the project's 4-space
+            # indentation, every API-level function is a top-level (0 spaces),
+            # class-member (4) or companion/object-member (8) declaration, so a
+            # leading indent of MORE than 8 spaces reliably marks a local helper
+            # (e.g. `fun svg(...)` defined inside a `run { … }` block).
+            indent = len(line) - len(line.lstrip(' '))
+            if indent > 8:
+                continue
+
+            # Walk upwards over blank lines and annotation lines to find the most
+            # recent non-trivial preceding line.
             j = i - 1
-            while j >= 0 and (lines[j].strip() == '' or anno_re.match(lines[j])):
-                j -= 1
+            while j >= 0:
+                prev = lines[j]
+                if prev.strip() == '' or anno_re.match(prev):
+                    j -= 1
+                    continue
+                # A MULTI-LINE annotation argument — e.g.
+                #     @Query("""
+                #         SELECT …
+                #     """)
+                # — ends on a line such as `    """)` or `    )`. Those body
+                # lines are neither blank nor start with '@', so without this
+                # they would stop the look-behind before reaching the KDoc that
+                # sits above the annotation, producing a false positive (e.g.
+                # EntryDao.getDailySummaries). When the preceding line closes
+                # such an argument, rewind past the matching `@Name(` opener
+                # (bounded to 30 lines) and keep scanning above it.
+                if prev.rstrip().endswith(')'):
+                    k, limit = j, max(0, j - 30)
+                    while k >= limit and not re.match(r'^\s*@\w+\s*\(', lines[k]):
+                        k -= 1
+                    if k >= limit and re.match(r'^\s*@\w+\s*\(', lines[k]):
+                        j = k - 1
+                        continue
+                break
 
             if j < 0 or not kdoc_re.search(lines[j]):
                 # No KDoc found above this function.
@@ -831,6 +946,12 @@ main() {
         echo ""
         exit 1
     elif [[ "$WARNS" -gt 0 ]]; then
+        if [[ "$WERROR" -eq 1 ]]; then
+            echo -e "${RED}${BOLD}  ✗ Release NOT ready — $WARNS warning(s) treated as errors (--Werror).${NC}"
+            echo -e "  Resolve the warnings above, or invoke without --Werror to treat them as advisory."
+            echo ""
+            exit 1
+        fi
         echo -e "${YELLOW}${BOLD}  ⚠ Release CONDITIONALLY ready — $WARNS warning(s).${NC}"
         echo -e "  Review the warnings above. Warnings are advisory;"
         echo -e "  they do not block the release but should be resolved."

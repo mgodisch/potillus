@@ -6,6 +6,6 @@
 /android/.gradle
 /android/.kotlin
 /android/app/build
-/android/app/src/main/res/raw*/license.md
+/android/app/src/main/res/raw*/copyright.md
 /android/app/src/main/res/raw*/usersguide.md
 /short

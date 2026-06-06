@@ -236,7 +236,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_col_over_daily">> 일</string>
     <string name="menu">메뉴</string>
     <string name="help">도움말</string>
-    <string name="license">라이선스</string>
+    <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">시간대</string>
     <string name="stats_weekday">요일</string>
     <string name="pdf_kpi_median_day">일 중앙값</string>
