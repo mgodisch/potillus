@@ -30,6 +30,7 @@ import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
+import de.godisch.potillus.l10n.formattingLocale
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -37,7 +38,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
-import java.util.Locale
 import kotlin.math.roundToInt
 
 // =============================================================================
@@ -68,9 +68,15 @@ object PdfReportBuilder {
     /** Asset path of the editable report layout (see that file's header for the contract). */
     private const val TEMPLATE_ASSET = "report_template.html"
 
-    // Formatters use the default locale so dates/months match the rest of the app.
-    private val DATE_FMT     = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.getDefault())
-    private val MONTH_FMT    = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
+    // Formatters that produce user-visible, locale-sensitive text (long dates,
+    // "MMM yyyy" month labels) must follow the PER-APP locale, not the system
+    // locale. They are therefore NOT created here as object-level fields: an
+    // object field is initialised once at class load and would freeze whatever
+    // locale happened to be active then — and it could only ever capture
+    // Locale.getDefault() (the system locale) anyway. Instead buildHtml() derives
+    // the locale from its Context (see formattingLocale()) and builds these
+    // formatters per call. Only the locale-INDEPENDENT job-name formatter (a
+    // purely numeric timestamp pattern) is safe to keep as a shared constant.
     private val JOBNAME_FMT  = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
 
     /**
@@ -106,6 +112,15 @@ object PdfReportBuilder {
     ): String {
         val d = PdfReportData.from(entries, drinks, settings)
 
+        // Locale for all value formatting in this report. We take it from the
+        // Context (which already reflects the per-app language, exactly like the
+        // string resources resolved below) rather than from Locale.getDefault(),
+        // so the formatted dates/months agree with their localized labels. The
+        // two locale-sensitive formatters are built here, once per report.
+        val locale   = context.formattingLocale()
+        val dateFmt  = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
+        val monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", locale)
+
         val scalars = HashMap<String, String>()
         val repeats = HashMap<String, List<Map<String, String>>>()
 
@@ -139,10 +154,10 @@ object PdfReportBuilder {
         val perDay  = context.getString(R.string.pdf_unit_g_per_day)
         val perWeek = context.getString(R.string.pdf_unit_g_per_week)
         scalars["META_EXPORT_LABEL"] = context.getString(R.string.pdf_meta_export_date)
-        scalars["META_EXPORT_VALUE"] = LocalDate.now().format(DATE_FMT)
+        scalars["META_EXPORT_VALUE"] = LocalDate.now().format(dateFmt)
         scalars["META_PERIOD_LABEL"] = context.getString(R.string.pdf_meta_period)
         scalars["META_PERIOD_VALUE"] =
-            "${LocalDate.parse(d.firstDate).format(DATE_FMT)} – ${LocalDate.parse(d.lastDate).format(DATE_FMT)}"
+            "${LocalDate.parse(d.firstDate).format(dateFmt)} – ${LocalDate.parse(d.lastDate).format(dateFmt)}"
         scalars["META_LIMIT_LABEL"]  = context.getString(R.string.pdf_meta_limit)
         scalars["META_LIMIT_VALUE_DAY"]   = "${d.limitInfo.limitGrams.fmt1()} $perDay"
         scalars["META_LIMIT_VALUE_7DAYS"] = "${d.limitInfo.weeklyLimitGrams.fmt1()} $perWeek"
@@ -191,7 +206,7 @@ object PdfReportBuilder {
         scalars["COL_OVER_DAILY"] = context.getString(R.string.pdf_col_over_daily)
         repeats["MONTHS"] = d.months.map { m ->
             mapOf(
-                "M_MONTH"      to LocalDate.parse("${m.monthKey}-01").format(MONTH_FMT),
+                "M_MONTH"      to LocalDate.parse("${m.monthKey}-01").format(monthFmt),
                 "M_DRINK_DAYS" to "${m.drinkDays}",
                 "M_TOTAL"      to m.totalGrams.fmt1(),
                 "M_AVG"        to m.avgPerCalendarDay.fmt1(),
@@ -217,7 +232,7 @@ object PdfReportBuilder {
             val labelIdx = chartLabelIndices(d.chartBuckets.size)
             repeats["BARS"] = d.chartBuckets.mapIndexed { i, b ->
                 mapOf(
-                    "BAR_LABEL"        to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b) else "",
+                    "BAR_LABEL"        to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b, monthFmt) else "",
                     "BAR_HEIGHT_PCT"   to if (b.isAbstinent) "0"
                                           else pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0(),
                     "BAR_CLASS"        to if (b.avgPerDay > limit) "bar over" else "bar",
@@ -307,7 +322,7 @@ object PdfReportBuilder {
             }
             repeats["WDLABELS"] = d.weekdayOrder.map { iso ->
                 mapOf("WD_NAME" to DayOfWeek.of(iso)
-                    .getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2))
+                    .getDisplayName(TextStyle.SHORT, locale).take(2))
             }
         }
 
@@ -381,12 +396,20 @@ object PdfReportBuilder {
      * Formats one bucket's first day into a short axis label, chosen by
      * granularity: day-and-month for daily/weekly buckets ("5.6."), month-and-year
      * for monthly buckets ("Jun 2026").
+     *
+     * @param monthFmt The per-app-locale "MMM yyyy" formatter built in [buildHtml];
+     *                 passed in (rather than held as a shared field) so the month
+     *                 name follows the in-app language, not the system locale.
      */
-    private fun chartBucketLabel(granularity: ChartGranularity, b: ChartBucket): String {
+    private fun chartBucketLabel(
+        granularity: ChartGranularity,
+        b: ChartBucket,
+        monthFmt: DateTimeFormatter
+    ): String {
         val ld = LocalDate.parse(b.labelDate)
         return when (granularity) {
             ChartGranularity.DAILY, ChartGranularity.WEEKLY -> "${ld.dayOfMonth}.${ld.monthValue}."
-            ChartGranularity.MONTHLY                        -> ld.format(MONTH_FMT)
+            ChartGranularity.MONTHLY                        -> ld.format(monthFmt)
         }
     }
 

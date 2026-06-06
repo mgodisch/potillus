@@ -40,6 +40,7 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.errorColor
@@ -49,7 +50,6 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * Statistics tab: KPIs (totals, averages, binge/over-limit days, trends) and
@@ -71,6 +71,9 @@ fun StatsScreen(
     val shareTarget  by vm.shareTarget.collectAsStateWithLifecycle()
     val printRequest by vm.printRequest.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    // Per-app locale for chart axis labels (weekday / month names). Derived from
+    // the context so it follows the in-app language, not Locale.getDefault().
+    val locale = context.formattingLocale()
 
     // Export date-range dialogs (CSV/PDF export lives on the Statistics screen).
     // rememberSaveable so an open dialog survives a configuration change
@@ -163,11 +166,11 @@ fun StatsScreen(
                         val labelFn: (ChartBucket) -> String = { b ->
                             val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
                             when (state.period) {
-                                StatsPeriod.WEEK  -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                StatsPeriod.WEEK  -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
                                 StatsPeriod.MONTH -> b.labelDate.substring(8)   // day-of-month
                                 // YEAR uses weekly buckets; label the week by its month
                                 // so the thinned axis reads as a month scale.
-                                StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                                StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, locale)
                             }
                         }
                         AlcoholBarChart(
@@ -297,7 +300,7 @@ fun StatsScreen(
                             // order as the values (locale's first weekday first).
                             val weekdayLabels = state.weekdayOrder.map { iso ->
                                 DayOfWeek.of(iso)
-                                    .getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2)
+                                    .getDisplayName(TextStyle.SHORT, locale).take(2)
                             }
                             ValueBarChart(
                                 // null (weekday never a drink day) → 0.0 ⇒ empty slot.

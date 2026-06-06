@@ -26,7 +26,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -53,6 +52,7 @@ import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import kotlinx.coroutines.delay
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.l10n.SupportedLocales
 
 /**
@@ -465,9 +465,11 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
  */
 @Composable
 private fun formatStatsDate(dateStr: String): String {
+    // Per-app locale (not Locale.getDefault()) so the month name matches the UI.
+    val locale = LocalContext.current.formattingLocale()
     return try {
         val ld = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        ld.format(DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.getDefault()))
+        ld.format(DateTimeFormatter.ofPattern("d. MMMM yyyy", locale))
     } catch (e: Exception) { dateStr }
 }
 

@@ -31,6 +31,48 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.67.2
+
+Bugfix: locale-sensitive text (month names, weekday names, long dates) now follows
+the in-app language instead of the system language. Previously, with the app set
+to English, the PDF report still printed German month names next to its English
+"Export Date" and "Period" labels.
+
+### Fixed
+
+- **PDF report dates follow the in-app language.** `PdfReportBuilder` formatted
+  dates and month labels with `Locale.getDefault()`, which reflects the *system*
+  locale and is unaffected by the in-app language picker
+  (`AppCompatDelegate.setApplicationLocales` only re-configures the Context, not
+  the JVM default). Labels (drawn from string resources via the Context) were
+  therefore localized while the adjacent month names were not. The two
+  locale-sensitive formatters are now built per report from the Context's locale,
+  and the weekday/month axis labels use the same locale. The formatters were also
+  `object`-level `val`s frozen at class-load time, so this additionally removes a
+  stale-locale hazard.
+- **Calendar and statistics screens follow the in-app language.** The same
+  `Locale.getDefault()` mismatch was present on screen: `CalendarScreen` (long
+  dates, the "MMMM yyyy" month header and weekday header), `StatsScreen` (the
+  week/year chart axis and the weekday-chart labels) and `SettingsScreen` (the
+  statistics from/to date). All now format with the per-app locale, taken from the
+  Compose `LocalContext`.
+
+### Added
+
+- **`Context.formattingLocale()` helper** (`l10n/LocaleSupport.kt`) — a single,
+  documented source for "the locale to format user-visible values in", resolved
+  from the Context configuration so it always agrees with the localized string
+  resources. All formatting code now goes through it instead of
+  `Locale.getDefault()`.
+
+### Changed
+
+- **Version bump** to `0.67.2` / `versionCode 67` across `build.gradle.kts`,
+  `README.md` and `proguard-rules.pro`, with matching localized store changelog
+  notes (`fastlane/.../changelogs/67.txt`) for de-DE and en-US.
+
+---
+
 ## v0.67.1
 
 Bugfix: the in-app Markdown viewer (Copyright and Help) now resolves HTML/Markdown

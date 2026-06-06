@@ -1,0 +1,4 @@
+Bugfix: when the app language is set to English, the PDF report's "Export Date"
+and "Period" now show English month names instead of the system language's. The
+same fix applies to dates and weekday/month labels shown on the calendar and
+statistics screens.

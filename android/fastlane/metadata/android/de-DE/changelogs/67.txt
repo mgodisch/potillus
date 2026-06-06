@@ -1,0 +1,4 @@
+Fehlerbehebung: Wenn die App-Sprache auf Englisch steht, zeigt der PDF-Bericht
+bei „Export Date“ und „Period“ jetzt englische Monatsnamen statt der
+Systemsprache. Dieselbe Korrektur gilt für Datums- sowie Wochentags- und
+Monatsnamen im Kalender- und Statistikbildschirm.

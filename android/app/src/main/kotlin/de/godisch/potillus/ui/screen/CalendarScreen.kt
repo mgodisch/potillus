@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +48,7 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import java.time.DayOfWeek
@@ -55,7 +57,6 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * Calendar tab: a month or year grid colour-coded by daily alcohol intake,
@@ -312,10 +313,15 @@ fun CalendarScreen(
 /** Converts a "YYYY-MM-DD" logical date string to a localised, human-readable format. */
 @Composable
 private fun formatLogicalDate(dateStr: String): String {
-    return remember(dateStr) {
+    // Use the per-app locale (not Locale.getDefault(), which stays on the system
+    // locale) so the formatted month name matches the rest of the localized UI.
+    // The locale is a remember key so the date re-formats when the user switches
+    // the in-app language.
+    val locale = LocalContext.current.formattingLocale()
+    return remember(dateStr, locale) {
         try {
             LocalDate.parse(dateStr, DayResolver.DATE_FORMATTER)
-                .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.getDefault()))
+                .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
         } catch (e: Exception) {
             dateStr // fallback to raw ISO on parse error
         }
@@ -345,6 +351,8 @@ private fun MonthCalendar(
     onPrevMonth: () -> Unit,
     onNextMonth: () -> Unit
 ) {
+    // Per-app locale for the month header and weekday names (see formattingLocale).
+    val locale = LocalContext.current.formattingLocale()
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp)) {
             Row(
@@ -356,7 +364,7 @@ private fun MonthCalendar(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
                 Text(
-                    currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                    currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)),
                     style = MaterialTheme.typography.titleMedium
                 )
                 IconButton(onClick = onNextMonth) {
@@ -369,7 +377,7 @@ private fun MonthCalendar(
                 // the seven weekdays in display order.
                 (0..6).map { i ->
                     DayOfWeek.of((weekStart - 1 + i) % 7 + 1)
-                        .getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2)
+                        .getDisplayName(TextStyle.SHORT, locale).take(2)
                 }.forEach { label ->
                     Text(
                         label,

@@ -1,1 +1,1 @@
-Privacy-first, offline alcohol tracker: limits, BAC estimate and PDF reports.
+Privacy-friendly alcohol tracker: limits, BAC estimate, PDF reports.
