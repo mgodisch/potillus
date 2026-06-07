@@ -53,11 +53,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">Оцінка рівня алкоголю в крові</string>
     <string name="bac_disclaimer">Оцінка · не для рішень щодо водіння</string>
-    <string name="stats_from_section">Період статистики</string>
     <string name="stats_from_label">Статистика від</string>
     <string name="stats_from_desc">Записи до цієї дати виключаються з усієї статистики.</string>
-    <string name="bac_section">Оцінювач рівня алкоголю (Widmark)</string>
-    <string name="bac_desc">Для оцінки потрібна вага тіла. Це математичне наближення, а не вимірювання.</string>
     <string name="body_weight">Вага тіла</string>
     <string name="not_set">не встановлено</string>
 
@@ -149,7 +146,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Час зміни дня</string>
     <string name="day_starts_at">Новий день починається о</string>
     <string name="weekly_limit_grams">Ліміт за 7 днів у грамах</string>
-    <string name="biometric">Блокування доступу</string>
     <string name="biometric_lock">Біометричне блокування</string>
     <string name="biometric_desc">Блокувати додаток відбитком пальця або розпізнаванням обличчя</string>
     <string name="language">Мова</string>
@@ -172,7 +168,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">Будь ласка, пройдіть автентифікацію</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">Показано %1$d з %2$d місяців – старіші дані доступні в CSV/резервній копії</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">немає запису</string>

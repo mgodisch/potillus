@@ -43,11 +43,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC / Promille-Schätzer -->
     <string name="bac_estimate">BAC Estimate</string>
     <string name="bac_disclaimer">Estimated value · not suitable for driving decisions</string>
-    <string name="stats_from_section">Statistics Period</string>
     <string name="stats_from_label">Statistics From</string>
     <string name="stats_from_desc">Entries before this date are ignored in all statistics.</string>
-    <string name="bac_section">BAC Estimator (Widmark)</string>
-    <string name="bac_desc">Body weight is required for the estimate. This value is a mathematical approximation and not a measurement result.</string>
     <string name="body_weight">Body Weight</string>
     <string name="not_set">Not Set</string>
 
@@ -140,7 +137,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Day Change Time</string>
     <string name="day_starts_at">New Day Starts At</string>
     <string name="weekly_limit_grams">7-Day Limit in Grams</string>
-    <string name="biometric">Access Lock</string>
     <string name="biometric_lock">Biometric Lock</string>
     <string name="biometric_desc">Lock the app upon opening via fingerprint or facial recognition</string>
     <string name="language">Language</string>
@@ -163,7 +159,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">Please authenticate</string>
 
     <!-- Export-Hinweis -->
-    <string name="pdf_months_truncated">Showing %1$d of the last %2$d months – older data is available in the CSV export/backup</string>
 
     <!-- Jahreskalender-Legende -->
     <string name="year_calendar_no_entry">no entry</string>

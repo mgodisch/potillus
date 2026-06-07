@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Snelle selectie favorieten</string>
     <string name="bac_estimate">Promille-schatting</string>
     <string name="bac_disclaimer">Schatting · niet voor rijden</string>
-    <string name="stats_from_section">Statistiekperiode</string>
     <string name="stats_from_label">Statistieken vanaf</string>
     <string name="stats_from_desc">Invoer vóór deze datum wordt uitgesloten van alle statistieken.</string>
-    <string name="bac_section">Promillecalculator (Widmark)</string>
-    <string name="bac_desc">Lichaamsgewicht is vereist voor de schatting. Dit is een wiskundige benadering, geen meting.</string>
     <string name="body_weight">Lichaamsgewicht</string>
     <string name="not_set">niet ingesteld</string>
     <string name="add_entry">Invoer toevoegen</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Dagwisseltijd</string>
     <string name="day_starts_at">Nieuwe dag begint om</string>
     <string name="weekly_limit_grams">Limiet voor 7 dagen in gram</string>
-    <string name="biometric">Toegangsslot</string>
     <string name="biometric_lock">Biometrisch slot</string>
     <string name="biometric_desc">App vergrendelen met vingerafdruk of gezichtsherkenning</string>
     <string name="language">Taal</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Toevoegen</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Verificeer uw identiteit</string>
-    <string name="pdf_months_truncated">Toont %1$d van %2$d maanden – oudere gegevens in CSV/back-up</string>
     <string name="year_calendar_no_entry">geen invoer</string>
     <string name="year_calendar_under_limit">onder limiet</string>
     <string name="year_calendar_over_limit">boven limiet</string>

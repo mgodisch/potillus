@@ -40,14 +40,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.ui.component.MarkdownText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * A read-only viewer for a bundled text document held in `res/raw`.
@@ -63,17 +66,19 @@ import de.godisch.potillus.ui.component.MarkdownText
  *                     GPL body is plain prose and renders unchanged.
  *
  * LOCALE RESOLUTION
- *   The text is read from [LocalContext]'s resources. Because the app selects a
- *   per-app locale via `AppCompatDelegate.setApplicationLocales`, that context
+ *   The text is read from [LocalResources]. Because the app selects a
+ *   per-app locale via `AppCompatDelegate.setApplicationLocales`, that resources
+ *   instance
  *   already reflects the chosen language, so `openRawResource(R.raw.usersguide)`
  *   returns the matching `raw-<locale>` variant automatically — and falls back
  *   to the default `raw/` (English) for languages without a translated guide.
  *   The copyright document exists only as the default `raw/copyright.md`, so it
  *   is always shown in its original (English) form, as intended.
  *
- * The content is read once and cached with [remember]; the raw resources are a
- * few kilobytes, so a single synchronous read on first composition is fine and
- * avoids the complexity of a background load.
+ * The content is read with [produceState] on [Dispatchers.IO] and cached for the
+ * lifetime of the composition (re-read only when `rawRes` changes). The raw
+ * resources are a few kilobytes, but keeping even this small decode off the main
+ * thread avoids any disk I/O during composition.
  *
  * @param titleRes        String resource for the top-bar title.
  * @param rawRes          Raw resource holding the document text.
@@ -90,13 +95,25 @@ fun DocumentViewerScreen(
     renderAsMarkdown: Boolean,
     onBack: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val text = remember(rawRes) {
-        runCatching {
-            context.resources.openRawResource(rawRes)
-                .bufferedReader()
-                .use { it.readText() }
-        }.getOrDefault("")
+    val resources = LocalResources.current
+    // Read the bundled raw resource OFF the main thread. Although the asset ships
+    // inside the APK and is small, reading it inside a remember{} block runs the
+    // decode on the main thread during composition. produceState performs the read
+    // on Dispatchers.IO and seeds the UI with an empty string until it completes,
+    // re-running whenever rawRes changes. The brief empty state is invisible in
+    // practice (the read is sub-millisecond) but keeps all I/O off the UI thread.
+    //
+    // LocalResources.current (not LocalContext.current.resources) is used so the
+    // read is re-invalidated on a Configuration change — the per-app locale switch
+    // therefore re-reads the correct raw-<locale> variant.
+    val text by produceState(initialValue = "", rawRes) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                resources.openRawResource(rawRes)
+                    .bufferedReader()
+                    .use { it.readText() }
+            }.getOrDefault("")
+        }
     }
 
     Scaffold(

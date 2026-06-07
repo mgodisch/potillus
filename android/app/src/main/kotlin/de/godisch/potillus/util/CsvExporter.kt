@@ -33,6 +33,7 @@ import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 // =============================================================================
 // CsvExporter.kt – Export consumption history as a CSV file
@@ -87,12 +88,11 @@ object CsvExporter {
     ): ExportResult? {
         val fileName = "potillus_export_${FILE_FMT.format(Instant.now())}.csv"
 
-        // Build a map from drink ID → definition for O(1) category lookups.
-        // A plain Map lookup is faster than searching the list for every entry.
-        val drinkMap = drinks.associateBy { it.id }
-
-        // Column headers from string resources (locale-aware)
-        val header = listOf(
+        // Resolve the localised column headers from string resources here (the
+        // only step that needs a Context), then delegate the Android-free CSV
+        // assembly to buildCsv so it can be unit-tested under any locale without a
+        // Context (see CsvExporterBuildTest).
+        val headerCells = listOf(
             context.getString(R.string.csv_col_date),
             context.getString(R.string.csv_col_time),
             context.getString(R.string.csv_col_drink),
@@ -101,30 +101,9 @@ object CsvExporter {
             context.getString(R.string.csv_col_alcohol_pct),
             context.getString(R.string.csv_col_grams),
             context.getString(R.string.csv_col_note)
-        ).joinToString(",")
+        )
 
-        val timeFmt = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
-
-        val rows = entries.map { e ->
-            val instant  = Instant.ofEpochMilli(e.timestampMillis)
-            // Category falls back to "OTHER" for entries whose drink was edited
-            // or if a future backup format includes an unknown category.
-            val category = drinkMap[e.drinkId]?.category?.name ?: "OTHER"
-            listOf(
-                e.logicalDate,
-                timeFmt.format(instant),
-                escapeField(e.drinkName),
-                category,
-                e.volumeMl.toString(),
-                e.alcoholPercent.toString(),
-                "%.2f".format(e.gramsAlcohol),
-                escapeField(e.note)
-            ).joinToString(",")
-        }
-
-        // RFC 4180: lines are separated by CRLF; every record including the last
-        // one MUST be terminated by CRLF (postfix = "\r\n")
-        val csv = (listOf(header) + rows).joinToString("\r\n", postfix = "\r\n")
+        val csv = buildCsv(headerCells, entries, drinks)
 
         val contentValues = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, fileName)
@@ -150,7 +129,76 @@ object CsvExporter {
     }
 
     /**
-     * Escapes a free-text field for safe inclusion in a CSV file.
+     * Assembles the full CSV document (header row + one row per entry) from
+     * already-resolved [headerCells].
+     *
+     * This is the Android-free core of [export]: it takes the localised column
+     * headers as plain strings instead of reading them from a [Context], so the
+     * entire row-assembly and number-formatting logic can be unit-tested on the
+     * JVM under any [Locale] (see `CsvExporterBuildTest`). [export] resolves the
+     * headers from string resources and then calls this.
+     *
+     * Two correctness details are enforced here:
+     *
+     * 1. **Locale-independent decimals.** The grams field is formatted with
+     *    [Locale.ROOT] (`String.format(Locale.ROOT, "%.2f", …)`). `"%.2f".format`
+     *    would otherwise honour [Locale.getDefault], so on a comma-decimal locale
+     *    (de, fr, es, it, …) `19.6` becomes `"19,60"`; that comma is unquoted
+     *    inside a comma-separated row and would split the value across two columns,
+     *    silently corrupting the export. CSV is a machine-readable interchange
+     *    format, so a `.` decimal separator is the correct, portable choice.
+     *
+     * 2. **Escaped headers.** The column captions are translator-supplied free
+     *    text and are therefore passed through [escapeField] just like the data
+     *    cells: a comma inside a localised header would otherwise add a spurious
+     *    column and misalign every row.
+     *
+     * `internal` + [VisibleForTesting] so the test source set can call it directly.
+     *
+     * @param headerCells The localised column captions, in column order.
+     * @param entries     The consumption entries to serialise (one row each).
+     * @param drinks      The drink catalogue, used to resolve each entry's category.
+     * @return            The complete CSV text, CRLF-terminated per RFC 4180.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun buildCsv(
+        headerCells: List<String>,
+        entries: List<ConsumptionEntry>,
+        drinks: List<DrinkDefinition>
+    ): String {
+        // Build a map from drink ID → definition for O(1) category lookups.
+        val drinkMap = drinks.associateBy { it.id }
+        val timeFmt  = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+
+        // Headers are escaped too (see step 2 in the KDoc above).
+        val header = headerCells.joinToString(",") { escapeField(it) }
+
+        val rows = entries.map { e ->
+            val instant  = Instant.ofEpochMilli(e.timestampMillis)
+            // Category falls back to "OTHER" for entries whose drink was edited
+            // or if a future backup format includes an unknown category.
+            val category = drinkMap[e.drinkId]?.category?.name ?: "OTHER"
+            listOf(
+                e.logicalDate,
+                timeFmt.format(instant),
+                escapeField(e.drinkName),
+                category,
+                e.volumeMl.toString(),
+                // Double.toString() is already locale-independent (always '.'),
+                // so the ABV column needs no special handling.
+                e.alcoholPercent.toString(),
+                // Locale.ROOT forces a '.' decimal separator (see step 1 above).
+                String.format(Locale.ROOT, "%.2f", e.gramsAlcohol),
+                escapeField(e.note)
+            ).joinToString(",")
+        }
+
+        // RFC 4180: lines are separated by CRLF; every record including the last
+        // one MUST be terminated by CRLF (postfix = "\r\n").
+        return (listOf(header) + rows).joinToString("\r\n", postfix = "\r\n")
+    }
+
+    /**
      *
      * This performs TWO independent jobs, in order:
      *

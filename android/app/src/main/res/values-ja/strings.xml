@@ -60,11 +60,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">血中アルコール濃度の推定</string>
     <string name="bac_disclaimer">推定値 · 運転判断には使用しないでください</string>
-    <string name="stats_from_section">統計期間</string>
     <string name="stats_from_label">統計開始日</string>
     <string name="stats_from_desc">この日付より前の記録はすべての統計から除外されます。</string>
-    <string name="bac_section">血中アルコール濃度推定（Widmark法）</string>
-    <string name="bac_desc">推定には体重が必要です。この値は数学的な近似値であり、測定値ではありません。</string>
     <string name="body_weight">体重</string>
     <string name="not_set">未設定</string>
 
@@ -156,7 +153,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">日付切り替え時刻</string>
     <string name="day_starts_at">新しい日の開始時刻</string>
     <string name="weekly_limit_grams">7日間の上限（グラム）</string>
-    <string name="biometric">アクセスロック</string>
     <string name="biometric_lock">生体認証ロック</string>
     <string name="biometric_desc">指紋または顔認証でアプリをロックする</string>
     <string name="language">言語</string>
@@ -179,7 +175,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">認証してください</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">%2$d か月中 %1$d か月を表示 — 古いデータは CSV／バックアップで確認できます</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">記録なし</string>

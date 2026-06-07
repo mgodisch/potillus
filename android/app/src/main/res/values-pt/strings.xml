@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Seleção rápida de favoritos</string>
     <string name="bac_estimate">Estimativa de teor alcoólico</string>
     <string name="bac_disclaimer">Estimativa · não para conduzir</string>
-    <string name="stats_from_section">Período de estatísticas</string>
     <string name="stats_from_label">Estatísticas desde</string>
     <string name="stats_from_desc">Os registos anteriores a esta data são excluídos de todas as estatísticas.</string>
-    <string name="bac_section">Calculadora de teor alcoólico (Widmark)</string>
-    <string name="bac_desc">É necessário o peso corporal para a estimativa. É uma aproximação matemática, não uma medição.</string>
     <string name="body_weight">Peso corporal</string>
     <string name="not_set">não definido</string>
     <string name="add_entry">Adicionar registo</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Hora de mudança de dia</string>
     <string name="day_starts_at">Novo dia começa às</string>
     <string name="weekly_limit_grams">Limite de 7 dias em gramas</string>
-    <string name="biometric">Bloqueio de acesso</string>
     <string name="biometric_lock">Bloqueio biométrico</string>
     <string name="biometric_desc">Bloquear a app com impressão digital ou reconhecimento facial</string>
     <string name="language">Idioma</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Adicionar</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Por favor autentique-se</string>
-    <string name="pdf_months_truncated">A mostrar %1$d de %2$d meses – dados mais antigos em CSV/cópia de segurança</string>
     <string name="year_calendar_no_entry">sem registo</string>
     <string name="year_calendar_under_limit">abaixo do limite</string>
     <string name="year_calendar_over_limit">acima do limite</string>

@@ -23,11 +23,126 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 # Libellus Potionis (Potillus) – Changelog
 
 <!-- Add new entries on top! -->
+<!-- HEADING CONVENTION: directly below each "## vX.Y.Z" header, write a one-line
+     summary formatted as a git commit subject — imperative mood, capitalized, no
+     trailing period, at most 50 characters. Leave a blank line, then the detailed
+     notes. This makes the entry's first line directly reusable as the subject of
+     the release commit/tag (git's recommended ≤50-char subject limit). -->
 <!-- RELEASE REMINDER: on every version bump, also add a localized store note
      android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
      EVERY locale, keeping the set identical across locales. release-check.sh §1
      enforces both that the current versionCode's note exists in each locale and
      that all locales carry the same set of changelog files. -->
+
+---
+
+## v0.68.0
+
+Add biometric toggle auth; fix bugs and lint
+
+Quality-assurance release plus one small feature: two functional bugfixes, a
+security-feature responsiveness fix, biometric authorisation for the lock toggle,
+resource-handling hardening, additional tests, and documentation corrections. No
+schema change, no UI redesign.
+
+Added:
+- Toggling the biometric app lock now requires biometric (or device-credential)
+  authorisation in BOTH directions: enabling AND disabling the lock prompts, and
+  the switch only changes when authentication succeeds. Cancelling leaves the
+  setting unchanged (the switch is bound to the stored value and snaps back).
+  MainActivity exposes a dedicated `authenticateForToggle()` that — unlike the
+  app-start gate — never finishes the Activity on cancel; the capability is threaded
+  through AppNavigation to the Settings switch. It reuses the existing biometric
+  prompt strings, so no new translations are needed. If no authenticator is
+  enrolled, the toggle is left unchanged (the lock could not be satisfied anyway).
+
+Fixed (functional):
+- CSV export now formats the grams column with a locale-independent dot decimal
+  separator (Locale.ROOT). Previously the default-locale formatter produced a
+  comma on comma-decimal locales (e.g. de, fr, es), and that unquoted comma split
+  the grams value across two columns, misaligning every following column in the
+  exported file. The localised column headers are now also escaped, so a comma in
+  a translated caption can no longer add a stray column.
+- Importing a JSON backup now runs the file read and JSON parse on Dispatchers.IO
+  instead of the main thread, removing an ANR risk on large backups. This matches
+  the export path, which already moved its I/O off the main thread.
+
+Fixed (security / behaviour):
+- The biometric app lock now reflects the live preference: enabling it during a
+  running session arms the inactivity re-authentication immediately, rather than
+  only after the next cold start. MainActivity keeps its cached flag in sync via a
+  repeatOnLifecycle collector.
+
+Hardened:
+- WebViewPdfPrinter now creates its off-screen WebView from the application
+  context (not the Activity context) and abandons any still-pending previous
+  WebView before starting a new print job, preventing an Activity context leak if
+  the page-finished callback never fires.
+- DocumentViewerScreen reads its bundled raw resource on Dispatchers.IO via
+  produceState instead of synchronously during composition, keeping all disk I/O
+  off the UI thread.
+
+Tests:
+- Added ChartBucketingTest (JVM) for gap filling, per-day averaging, period
+  clamping and calendar-month snapping.
+- Added CsvExporterBuildTest (JVM, run under Locale.GERMANY) covering the new
+  Locale.ROOT grams formatting, the eight-column invariant and header escaping.
+  CsvExporter's CSV assembly was extracted into an internal, Context-free
+  buildCsv() to make this testable without an Android Context.
+- Added LimitBarUiTest (instrumented Compose UI) and LocaleFormattingInstrumented-
+  Test (instrumented) for Context.formattingLocale().
+
+Fixed (lint / backup-rule correctness):
+- `res/xml/data_extraction_rules.xml` used `domain="datastore"`, which is not a
+  valid data-extraction domain. Android Lint rejected it as a `FullBackupContent`
+  error (build-blocking once Lint runs), and the rule would have silently matched
+  nothing if `android:allowBackup` were ever turned on, defeating the intended
+  exclusion of the encrypted preferences file from cloud backup and its inclusion
+  in a device transfer. Both rules now use `domain="file"` with the real on-disk
+  path `datastore/potillus_settings.preferences_pb` (the `file` domain is rooted
+  at `getFilesDir()`, where DataStore stores its file). No runtime behaviour
+  changes while `allowBackup` stays `false`.
+
+Lint cleanup (warnings driven to zero):
+- Fixed in the sources: launcher/limit/chart composables now declare `modifier`
+  as the first optional parameter (ModifierParameter); DocumentViewerScreen reads
+  the user guide via `LocalResources.current` so a configuration change
+  re-invalidates it (LocalContextResourcesRead); the passphrase write uses the KTX
+  `SharedPreferences.edit(commit = true) { … }` form, keeping the deliberate
+  synchronous commit (UseKtx, ApplySharedPref); the adaptive-icon XMLs moved from
+  `mipmap-anydpi-v26` to `mipmap-anydpi` since minSdk 30 makes the `-v26` qualifier
+  redundant (ObsoleteSdkInt), and the legacy pre-API-26 density launcher bitmaps
+  (`mipmap-*dpi/ic_launcher*.png`) were deleted — at minSdk 30 the adaptive icon is
+  always used, so they were dead fallbacks whose continued presence alongside the
+  unqualified `mipmap-anydpi` XML triggered an IconXmlAndPng error; the
+  `localeConfig` attribute is annotated
+  `tools:targetApi="33"` and the backup-rules advisory is suppressed with
+  `tools:ignore="DataExtractionRules"` (allowBackup is off, so a legacy
+  full-backup-content file would be dead config); the WebViewPdfPrinter singleton
+  carries a documented `@SuppressLint("StaticFieldLeak")` on its object declaration
+  (it holds only the application context and is cleared after use — see its KDoc); and
+  five genuinely unused strings (`stats_from_section`, `bac_section`, `bac_desc`,
+  `biometric`, `pdf_months_truncated`) were removed from all 21 locales
+  (UnusedResources), lowering the per-locale key count from 177 to 172.
+- Opted out by explicit policy in a documented `lint { }` block (NOT a baseline):
+  the dependency/AGP/Gradle/targetSdk version-update nags (GradleDependency,
+  NewerVersionAvailable, AndroidGradlePluginVersion, OldTargetApi), the launcher-
+  icon design hints (IconLauncherShape, IconDuplicates), and PluralsCandidate.
+  Each carries a rationale in build.gradle.kts; dependency upgrades and a proper
+  plural conversion across 21 locales are tracked as separate, tested changes.
+- Made the lint check a strict gate: `lint { warningsAsErrors = true }` (with the
+  default `abortOnError = true`) so `./gradlew lintDebug` now fails on warnings,
+  not just errors. The disabled checks above never report, so only genuinely new
+  warnings can break the build.
+
+Documentation:
+- Corrected the stale "181 string keys" comment to 177 in AndroidManifest.xml and
+  app/build.gradle.kts (LocaleSyncTest remains the authoritative source).
+- Corrected the "minSdk 35" remark in the AndroidManifest biometric comment to the
+  actual minSdk 30.
+- Translated the remaining German inline comments in AndroidManifest.xml and
+  app/build.gradle.kts to English, matching the project's English-documentation
+  convention.
 
 ---
 

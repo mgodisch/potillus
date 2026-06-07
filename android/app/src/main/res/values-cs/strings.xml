@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Rychlý výběr oblíbených</string>
     <string name="bac_estimate">Odhad promile</string>
     <string name="bac_disclaimer">Odhad · není pro řízení</string>
-    <string name="stats_from_section">Období statistik</string>
     <string name="stats_from_label">Statistiky od</string>
     <string name="stats_from_desc">Záznamy před tímto datem jsou vyloučeny ze všech statistik.</string>
-    <string name="bac_section">Kalkulátor promile (Widmark)</string>
-    <string name="bac_desc">Pro odhad je nutná tělesná hmotnost. Jde o matematický odhad, nikoli měření.</string>
     <string name="body_weight">Tělesná hmotnost</string>
     <string name="not_set">nenastaveno</string>
     <string name="add_entry">Přidat záznam</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Čas změny dne</string>
     <string name="day_starts_at">Nový den začíná v</string>
     <string name="weekly_limit_grams">Limit na 7 dní v gramech</string>
-    <string name="biometric">Zamčení přístupu</string>
     <string name="biometric_lock">Biometrický zámek</string>
     <string name="biometric_desc">Zamknout aplikaci otiskem prstu nebo obličejem</string>
     <string name="language">Jazyk</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Přidat</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Prosím ověřte svou identitu</string>
-    <string name="pdf_months_truncated">Zobrazeno %1$d z %2$d měsíců – starší data v CSV/záloze</string>
     <string name="year_calendar_no_entry">žádný záznam</string>
     <string name="year_calendar_under_limit">pod limitem</string>
     <string name="year_calendar_over_limit">nad limitem</string>

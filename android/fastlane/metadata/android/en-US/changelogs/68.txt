@@ -1,0 +1,4 @@
+Bugfix: CSV export now always uses a dot as the decimal separator, so opening the
+file on a device that uses a comma decimal no longer splits the grams column.
+Importing a large backup no longer briefly freezes the app, and a biometric lock
+you have just switched on now takes effect immediately.

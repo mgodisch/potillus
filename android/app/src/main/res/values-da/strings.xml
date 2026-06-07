@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Hurtigvalg af favoritter</string>
     <string name="bac_estimate">Promille-estimat</string>
     <string name="bac_disclaimer">Estimat · ikke til kørsel</string>
-    <string name="stats_from_section">Statistikperiode</string>
     <string name="stats_from_label">Statistik fra</string>
     <string name="stats_from_desc">Poster før denne dato udelades fra al statistik.</string>
-    <string name="bac_section">Promillekalkulator (Widmark)</string>
-    <string name="bac_desc">Legemsvægt er nødvendig for estimatet. Det er en matematisk tilnærmelse, ikke en måling.</string>
     <string name="body_weight">Legemsvægt</string>
     <string name="not_set">ikke angivet</string>
     <string name="add_entry">Tilføj post</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Dagsskiftetidspunkt</string>
     <string name="day_starts_at">Ny dag starter kl.</string>
     <string name="weekly_limit_grams">7-dages grænse i gram</string>
-    <string name="biometric">Adgangslås</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeraftryk eller ansigtsgenkendelse</string>
     <string name="language">Sprog</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Tilføj</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Bekræft venligst din identitet</string>
-    <string name="pdf_months_truncated">Viser %1$d af %2$d måneder – ældre data i CSV/sikkerhedskopi</string>
     <string name="year_calendar_no_entry">ingen post</string>
     <string name="year_calendar_under_limit">under grænsen</string>
     <string name="year_calendar_over_limit">over grænsen</string>

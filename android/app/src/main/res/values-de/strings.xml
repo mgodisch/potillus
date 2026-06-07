@@ -43,11 +43,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC / Promille-Schätzer -->
     <string name="bac_estimate">Promille-Schätzung</string>
     <string name="bac_disclaimer">Schätzwert · nicht zur Einschätzung der Fahreignung geeignet</string>
-    <string name="stats_from_section">Statistikzeitraum</string>
     <string name="stats_from_label">Statistik ab</string>
     <string name="stats_from_desc">Einträge vor diesem Datum werden in allen Statistiken ignoriert.</string>
-    <string name="bac_section">Promille-Schätzer (Widmark)</string>
-    <string name="bac_desc">Für die Schätzung wird das Körpergewicht benötigt. Der Wert ist eine mathematische Annäherung und kein Messergebnis.</string>
     <string name="body_weight">Körpergewicht</string>
     <string name="not_set">Nicht eingestellt</string>
 
@@ -140,7 +137,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Tageswechsel-Uhrzeit</string>
     <string name="day_starts_at">Neuer Tag beginnt um</string>
     <string name="weekly_limit_grams">7-Tage-Limit in Gramm</string>
-    <string name="biometric">Zugangssperre</string>
     <string name="biometric_lock">Biometrische Sperre</string>
     <string name="biometric_desc">App beim Öffnen per Fingerabdruck oder Gesichtserkennung sperren</string>
     <string name="language">Sprache</string>
@@ -163,7 +159,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">Bitte authentifizieren</string>
 
     <!-- Export-Hinweis -->
-    <string name="pdf_months_truncated">Zeige %1$d der letzten %2$d Monate – ältere Daten sind im CSV-Export/Backup verfügbar</string>
 
     <!-- Jahreskalender-Legende -->
     <string name="year_calendar_no_entry">kein Eintrag</string>

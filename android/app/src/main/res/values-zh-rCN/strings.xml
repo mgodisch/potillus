@@ -43,11 +43,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">血液酒精浓度估算</string>
     <string name="bac_disclaimer">估算值 · 不用于驾驶判断</string>
-    <string name="stats_from_section">统计时间段</string>
     <string name="stats_from_label">统计起始</string>
     <string name="stats_from_desc">此日期之前的记录将从所有统计中排除。</string>
-    <string name="bac_section">血液酒精浓度估算（Widmark）</string>
-    <string name="bac_desc">估算需要体重数据。此值为数学近似，非实际测量结果。</string>
     <string name="body_weight">体重</string>
     <string name="not_set">未设置</string>
 
@@ -139,7 +136,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">换日时间</string>
     <string name="day_starts_at">新的一天开始于</string>
     <string name="weekly_limit_grams">7天限量（克）</string>
-    <string name="biometric">访问锁定</string>
     <string name="biometric_lock">生物识别锁定</string>
     <string name="biometric_desc">通过指纹或面部识别锁定应用</string>
     <string name="language">语言</string>
@@ -162,7 +158,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">请进行身份验证</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">显示 %2$d 个月中的 %1$d 个——较旧数据可在 CSV/备份中获取</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">无记录</string>

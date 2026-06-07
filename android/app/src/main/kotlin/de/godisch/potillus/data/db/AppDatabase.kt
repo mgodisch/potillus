@@ -22,6 +22,7 @@
 package de.godisch.potillus.data.db
 
 import android.content.Context
+import androidx.core.content.edit
 import android.util.Base64
 import androidx.room.*
 import androidx.room.migration.Migration
@@ -226,9 +227,14 @@ abstract class AppDatabase : RoomDatabase() {
             //
             // Performance: commit() runs at most once per install (key creation); every
             // later call takes the early-return path above with no synchronous write.
-            prefs.edit()
-                .putString(PASSPHRASE_KEY, Base64.encodeToString(sealed, Base64.NO_WRAP))
-                .commit()  // synchronous – see above
+            // edit(commit = true) is the KTX form of a SYNCHRONOUS commit (see the
+            // race rationale above): the block runs and the write is flushed under a
+            // file lock before returning. Using it resolves the UseKtx and
+            // ApplySharedPref lint hints without weakening the required blocking write
+            // (apply() would be asynchronous and reintroduce the race).
+            prefs.edit(commit = true) {
+                putString(PASSPHRASE_KEY, Base64.encodeToString(sealed, Base64.NO_WRAP))
+            }
 
             return passphrase
         }

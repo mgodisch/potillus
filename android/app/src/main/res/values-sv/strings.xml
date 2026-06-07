@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Snabbval av favoriter</string>
     <string name="bac_estimate">Promilleuppskattning</string>
     <string name="bac_disclaimer">Uppskattning · ej för körning</string>
-    <string name="stats_from_section">Statistikperiod</string>
     <string name="stats_from_label">Statistik från</string>
     <string name="stats_from_desc">Poster före detta datum utesluts från all statistik.</string>
-    <string name="bac_section">Promillekalkylator (Widmark)</string>
-    <string name="bac_desc">Kroppsvikt krävs för uppskattningen. Det är en matematisk approximation, inte en mätning.</string>
     <string name="body_weight">Kroppsvikt</string>
     <string name="not_set">ej inställt</string>
     <string name="add_entry">Lägg till post</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Dagsskiftetid</string>
     <string name="day_starts_at">Ny dag börjar kl.</string>
     <string name="weekly_limit_grams">7-dagarsgräns i gram</string>
-    <string name="biometric">Åtkomstlås</string>
     <string name="biometric_lock">Biometriskt lås</string>
     <string name="biometric_desc">Lås appen med fingeravtryck eller ansiktsigenkänning</string>
     <string name="language">Språk</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Lägg till</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Verifiera din identitet</string>
-    <string name="pdf_months_truncated">Visar %1$d av %2$d månader – äldre data finns i CSV/säkerhetskopia</string>
     <string name="year_calendar_no_entry">ingen post</string>
     <string name="year_calendar_under_limit">under gränsen</string>
     <string name="year_calendar_over_limit">över gränsen</string>

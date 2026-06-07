@@ -146,7 +146,13 @@ fun AppNavigation(
     calendarVm: CalendarViewModel,
     statsVm:    StatsViewModel,
     drinksVm:   DrinksViewModel,
-    settingsVm: SettingsViewModel
+    settingsVm: SettingsViewModel,
+    /**
+     * Runs a biometric prompt to authorise a sensitive toggle and calls back with
+     * the result. Threaded through from [MainActivity] to [SettingsScreen], where
+     * it guards the biometric-lock switch.
+     */
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -169,7 +175,11 @@ fun AppNavigation(
             )
         }
         composable<Screen.Settings> {
-            SettingsScreen(settingsVm, onBack = { navController.navigateUp() })
+            SettingsScreen(
+                settingsVm,
+                onBack = { navController.navigateUp() },
+                onAuthenticate = onAuthenticate
+            )
         }
         composable<Screen.Help> {
             // The user guide is Markdown and locale-resolved (raw/raw-xx).

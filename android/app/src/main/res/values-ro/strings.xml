@@ -61,11 +61,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">Estimare BAC</string>
     <string name="bac_disclaimer">Estimare · nu pentru decizii de condus</string>
-    <string name="stats_from_section">Perioadă statistici</string>
     <string name="stats_from_label">Statistici de la</string>
     <string name="stats_from_desc">Înregistrările dinaintea acestei date sunt excluse din toate statisticile.</string>
-    <string name="bac_section">Estimator BAC (Widmark)</string>
-    <string name="bac_desc">Greutatea corporală este necesară pentru estimare. Aceasta este o aproximare matematică, nu o măsurătoare.</string>
     <string name="body_weight">Greutate corporală</string>
     <string name="not_set">nesetat</string>
 
@@ -158,7 +155,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Ora schimbării zilei</string>
     <string name="day_starts_at">Ziua nouă începe la</string>
     <string name="weekly_limit_grams">Limită pe 7 zile în grame</string>
-    <string name="biometric">Blocare</string>
     <string name="biometric_lock">Blocare biometrică</string>
     <string name="biometric_desc">Blochează aplicația cu amprentă sau față</string>
     <string name="language">Limbă</string>
@@ -182,7 +178,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Medical guidelines -->
     <!-- Miscellaneous -->
-    <string name="pdf_months_truncated">Se afișează %1$d din %2$d luni – datele mai vechi sunt în CSV/copie de rezervă</string>
     <string name="year_calendar_no_entry">fără înregistrare</string>
     <string name="year_calendar_under_limit">sub limită</string>
     <string name="year_calendar_over_limit">peste limită</string>

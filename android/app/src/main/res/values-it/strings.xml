@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Selezione rapida preferiti</string>
     <string name="bac_estimate">Stima tasso alcolemico</string>
     <string name="bac_disclaimer">Stima · non per guidare</string>
-    <string name="stats_from_section">Periodo statistiche</string>
     <string name="stats_from_label">Statistiche dal</string>
     <string name="stats_from_desc">Le registrazioni prima di questa data sono escluse da tutte le statistiche.</string>
-    <string name="bac_section">Calcolatore tasso alcolemico (Widmark)</string>
-    <string name="bac_desc">È necessario il peso corporeo per la stima. È un\'approssimazione matematica, non una misurazione.</string>
     <string name="body_weight">Peso corporeo</string>
     <string name="not_set">non impostato</string>
     <string name="add_entry">Aggiungi registrazione</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Orario cambio giorno</string>
     <string name="day_starts_at">Il nuovo giorno inizia alle</string>
     <string name="weekly_limit_grams">Limite su 7 giorni in grammi</string>
-    <string name="biometric">Blocco accesso</string>
     <string name="biometric_lock">Blocco biometrico</string>
     <string name="biometric_desc">Blocca l\'app con impronta digitale o riconoscimento facciale</string>
     <string name="language">Lingua</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Aggiungi</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Si prega di autenticarsi</string>
-    <string name="pdf_months_truncated">Visualizzazione di %1$d su %2$d mesi – dati più vecchi in CSV/backup</string>
     <string name="year_calendar_no_entry">nessuna registrazione</string>
     <string name="year_calendar_under_limit">sotto il limite</string>
     <string name="year_calendar_over_limit">oltre il limite</string>

@@ -96,7 +96,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.ui.nav.AppNavigation
 import de.godisch.potillus.ui.screen.*
@@ -167,8 +169,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Cached after the initial DataStore read so [onStart] can decide whether
-     * to trigger re-auth without another async read (which would be too slow).
+     * Whether the biometric app lock is currently enabled.
+     *
+     * Seeded from the initial DataStore read in [onCreate] and then kept in sync
+     * with the live preference by a [repeatOnLifecycle] collector (also in
+     * [onCreate]). [onStart] reads this synchronously to decide whether to trigger
+     * inactivity re-auth without an async read (which would be too slow before the
+     * first frame). Keeping it reactive — rather than a one-shot cache — means a
+     * lock the user switches ON during the same session arms the re-auth path
+     * immediately, not only after the next cold start.
      */
     private var biometricEnabled = false
 
@@ -234,6 +243,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Keep [biometricEnabled] in sync with the live preference for as long as
+        // the Activity is at least STARTED. Without this, the flag would only ever
+        // reflect the single value read above in onCreate, so a lock the user
+        // switches ON during the same session would not arm the onStart inactivity
+        // re-auth until the next cold start. repeatOnLifecycle cancels the
+        // collection when the Activity stops and restarts it on the next start, so
+        // it never collects while the app is in the background.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                app.appPreferences.settingsFlow.collect {
+                    biometricEnabled = it.biometricEnabled
+                }
+            }
+        }
+
         setContent {
             val gate by uiGate.collectAsStateWithLifecycle()
 
@@ -278,7 +302,7 @@ class MainActivity : AppCompatActivity() {
                             }
                         )
                     }
-                    MainContent(app)
+                    MainContent(app) { onResult -> authenticateForToggle(onResult) }
                 }
             }
         }
@@ -358,6 +382,62 @@ class MainActivity : AppCompatActivity() {
         prompt.authenticate(promptInfo)
     }
 
+    /**
+     * Runs a [BiometricPrompt] to authorise a sensitive in-app action — currently
+     * toggling the biometric app lock on or off — and reports the outcome via
+     * [onResult].
+     *
+     * WHY A SEPARATE METHOD FROM [showBiometricPrompt]?
+     *   [showBiometricPrompt] gates app start: on cancel/error it finishes the
+     *   Activity, because no data may be shown without authentication. A settings
+     *   toggle is different — cancelling must simply leave the setting unchanged and
+     *   keep the user in the app. This variant therefore NEVER finishes the
+     *   Activity; it only reports the result.
+     *
+     * If neither a biometric nor a device credential is enrolled, authentication is
+     * impossible, so [onResult] is invoked with `false` immediately and the caller
+     * leaves the toggle unchanged. (Without an authenticator the lock could not be
+     * satisfied at app start anyway, so refusing to arm it is the correct outcome.)
+     *
+     * A successful authentication also marks the session authenticated, mirroring
+     * the unlock path, so the inactivity gate does not immediately re-prompt.
+     *
+     * @param onResult Invoked on the main thread with `true` on success, or `false`
+     *                 on cancel / error / no authenticator available.
+     */
+    fun authenticateForToggle(onResult: (Boolean) -> Unit) {
+        if (!isBiometricAvailable()) {
+            onResult(false)
+            return
+        }
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.biometric_title))
+            .setSubtitle(getString(R.string.biometric_subtitle))
+            .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+            .build()
+
+        val prompt = BiometricPrompt(
+            this,
+            ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                /** Authorised → mark the session authenticated and report success. */
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    isAuthenticatedThisSession = true
+                    onResult(true)
+                }
+                /** Terminal error or user cancellation → report failure, but stay in the app. */
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    if (BuildConfig.DEBUG) Log.w(TAG, "Toggle auth error $errorCode: $errString")
+                    onResult(false)
+                }
+                /** A single non-terminal mismatch; the prompt stays open for a retry. */
+                override fun onAuthenticationFailed() { /* user can retry */ }
+            }
+        )
+        prompt.authenticate(promptInfo)
+    }
+
     // ── Inactivity re-authentication ─────────────────────────────────────────
 
     /**
@@ -405,7 +485,15 @@ class MainActivity : AppCompatActivity() {
  * @param app The [PotillusApp] singleton that owns all shared dependencies.
  */
 @Composable
-private fun MainContent(app: PotillusApp) {
+private fun MainContent(
+    app: PotillusApp,
+    /**
+     * Runs a biometric prompt to authorise a sensitive toggle and calls back with
+     * the result. Supplied by [MainActivity] (which owns the [BiometricPrompt]) and
+     * forwarded down to [SettingsScreen] for the biometric-lock switch.
+     */
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit
+) {
     // The ViewModelProvider.Factory is a named class (AppViewModelFactory)
     // rather than an anonymous object defined here. Benefits:
     //   - The dependency graph is centralised in AppViewModelFactory.kt and easy to find.
@@ -423,7 +511,8 @@ private fun MainContent(app: PotillusApp) {
             calendarVm = viewModel(factory = factory),
             statsVm    = viewModel(factory = factory),
             drinksVm   = viewModel(factory = factory),
-            settingsVm = settingsVm
+            settingsVm = settingsVm,
+            onAuthenticate = onAuthenticate
         )
     }
 }

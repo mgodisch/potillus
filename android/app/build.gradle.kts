@@ -136,16 +136,16 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 67
+        versionCode = 68
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.67.2"
+        versionName = "0.68.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
         // ─────────────────────────────────────────────────────────────────────
         // Step 1: Create app/src/main/res/values-<bcp47>/strings.xml
-        //         Translate all 181 keys. Source of truth: values-de/strings.xml.
+        //         Translate all 172 keys. Source of truth: values-de/strings.xml.
         //         (The exact count is verified by LocaleSyncTest — treat that test,
         //          not this comment, as the authoritative source if they ever differ.)
         //         Qualifier syntax:  values-fr/  values-pt-rBR/  values-zh-rCN/
@@ -200,7 +200,7 @@ android {
 
         // Debug build: for development and ADB installation
         debug {
-            isMinifyEnabled   = false   // kein R8 → schnellerer Build
+            isMinifyEnabled   = false   // no R8 → faster builds
 
             // Suffix prevents conflicts: debug and release APK
             // can be installed side-by-side on the same device.
@@ -282,6 +282,61 @@ android {
         }
     }
 
+    // =========================================================================
+    // LINT CONFIGURATION
+    // =========================================================================
+    //   The build runs `./gradlew lintDebug` as a quality gate. Lint aborts the
+    //   build on ERRORS only (warnings are advisory). All genuine code/resource
+    //   findings are fixed in the sources; the checks disabled below are advisory
+    //   ones the project deliberately does NOT enforce. This is an explicit,
+    //   reviewable POLICY — not a lint-baseline. A baseline silently records the
+    //   current set of violations and lets new ones of the same kind slip in
+    //   later; disabling a check states plainly that the project opts out of that
+    //   category, with the reason documented right here.
+    lint {
+        // STRICT GATE: fail the build on any reported issue, warnings included.
+        //   abortOnError (default true) stops the build on ERROR-severity issues.
+        //   warningsAsErrors promotes every reported WARNING to error severity, so
+        //   `./gradlew lintDebug` also fails on warnings — the project treats a
+        //   clean lint report as a release invariant.
+        //   The checks in `disable` below never report at all, so they can never
+        //   trip this gate; only genuinely new warnings will. Note the trade-off:
+        //   a future AGP/Lint upgrade or an updated dependency can introduce new
+        //   warnings that then break the build until they are fixed or, if truly
+        //   advisory, added to `disable` with a documented rationale.
+        abortOnError     = true
+        warningsAsErrors = true
+        // Each id below is opted out for the stated reason; re-enable any of them
+        // if the project's policy changes.
+        disable += setOf(
+            // ── Dependency / toolchain version nags ──────────────────────────
+            // These only report that a newer version exists. Upgrading a
+            // dependency, the Android Gradle Plugin, the Gradle wrapper or the
+            // compile/target SDK is a deliberate, separately-tested change, never
+            // an automatic lint fix. NewerVersionAvailable additionally hits the
+            // network on every run. Updates are tracked out-of-band.
+            "GradleDependency",
+            "NewerVersionAvailable",
+            "AndroidGradlePluginVersion",
+            // targetSdk is pinned to a level the app has actually been tested
+            // against; bumping it pulls in behavioural changes and is a conscious,
+            // tested step rather than a lint cleanup.
+            "OldTargetApi",
+            // ── Launcher-icon design hints ───────────────────────────────────
+            // The launcher icon is a deliberate, simple mark; "fills the square"
+            // and "round icon equals the square icon" are intentional design
+            // choices, not accidental duplicates.
+            "IconLauncherShape",
+            "IconDuplicates",
+            // ── Plurals hint ─────────────────────────────────────────────────
+            // A handful of "%d <noun>" strings are flagged as plural candidates.
+            // Converting them to <plurals> correctly across all 21 shipped
+            // locales (each with its own CLDR plural categories) is a substantial,
+            // separate localisation task, not part of this lint pass.
+            "PluralsCandidate"
+        )
+    }
+
     // UNIT-TEST JVM ENVIRONMENT:
     //   Local unit tests run against a stubbed android.jar in which every method
     //   throws "Method ... not mocked" by default. isReturnDefaultValues makes
@@ -357,12 +412,12 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
 
     // ── Jetpack Compose ───────────────────────────────────────────────────────
-    // BOM zuerst einbinden – legt Versionen aller compose-* Module fest
+    // Add the BOM first – it pins the versions of all compose-* modules
     implementation(platform(libs.compose.bom))
 
-    // Danach einzelne Module ohne Versionsangabe (BOM bestimmt sie):
-    implementation(libs.compose.ui)             // Kern-UI-Primitiven
-    implementation(libs.compose.ui.graphics)    // Canvas, Farben, Grafik
+    // Then the individual modules without an explicit version (the BOM sets them):
+    implementation(libs.compose.ui)             // Core UI primitives
+    implementation(libs.compose.ui.graphics)    // Canvas, colours, graphics
     implementation(libs.compose.ui.tooling.preview)  // @Preview
     implementation(libs.compose.material3)      // Material Design 3 Widgets
     implementation(libs.compose.material.icons) // Icons.Default.*

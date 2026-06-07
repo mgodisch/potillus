@@ -229,7 +229,15 @@ class SettingsViewModel(
      */
     fun importBackup(uri: Uri, mode: ImportMode) {
         viewModelScope.launch {
-            val result = BackupManager.importFromJson(appContext, uri)
+            // Reading the file (ContentResolver query + up to MAX_BACKUP_BYTES of
+            // stream I/O) and parsing the JSON are blocking, potentially heavy
+            // operations. viewModelScope dispatches on Dispatchers.Main.immediate,
+            // so they MUST be moved off the main thread to avoid an ANR on large
+            // backups — mirroring exportBackup() above, which already wraps its
+            // I/O in withContext(Dispatchers.IO).
+            val result = withContext(Dispatchers.IO) {
+                BackupManager.importFromJson(appContext, uri)
+            }
             if (result.error != null) {
                 _exportStatus.value = ExportStatus.Err(localiseImportError(result.error))
                 return@launch

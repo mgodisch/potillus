@@ -60,11 +60,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">혈중 알코올 농도 추정</string>
     <string name="bac_disclaimer">추정값 · 운전 판단에 사용하지 마세요</string>
-    <string name="stats_from_section">통계 기간</string>
     <string name="stats_from_label">통계 시작일</string>
     <string name="stats_from_desc">이 날짜 이전의 기록은 모든 통계에서 제외됩니다.</string>
-    <string name="bac_section">혈중 알코올 농도 추정 (Widmark)</string>
-    <string name="bac_desc">추정에는 체중이 필요합니다. 이 값은 수학적 근사치이며 측정값이 아닙니다.</string>
     <string name="body_weight">체중</string>
     <string name="not_set">설정 안 됨</string>
 
@@ -156,7 +153,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">날짜 변경 시간</string>
     <string name="day_starts_at">새 날 시작 시간</string>
     <string name="weekly_limit_grams">7일 한도 (그램)</string>
-    <string name="biometric">액세스 잠금</string>
     <string name="biometric_lock">생체 인증 잠금</string>
     <string name="biometric_desc">지문 또는 얼굴 인식으로 앱 잠금</string>
     <string name="language">언어</string>
@@ -179,7 +175,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">인증하세요</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">%2$d개월 중 %1$d개월 표시 – 오래된 데이터는 CSV/백업에서 확인 가능</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">기록 없음</string>

@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Быстрый выбор избранного</string>
     <string name="bac_estimate">Оценка промилле</string>
     <string name="bac_disclaimer">Оценка · не для вождения</string>
-    <string name="stats_from_section">Период статистики</string>
     <string name="stats_from_label">Статистика с</string>
     <string name="stats_from_desc">Записи до этой даты исключаются из всей статистики.</string>
-    <string name="bac_section">Оценщик промилле (Видмарк)</string>
-    <string name="bac_desc">Для оценки необходима масса тела. Это математическое приближение, не измерение.</string>
     <string name="body_weight">Масса тела</string>
     <string name="not_set">не задано</string>
     <string name="add_entry">Добавить запись</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Время смены дня</string>
     <string name="day_starts_at">Новый день начинается в</string>
     <string name="weekly_limit_grams">Лимит за 7 дней в граммах</string>
-    <string name="biometric">Блокировка доступа</string>
     <string name="biometric_lock">Биометрическая блокировка</string>
     <string name="biometric_desc">Блокировать приложение отпечатком пальца или лицом</string>
     <string name="language">Язык</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Добавить</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Пожалуйста, пройдите аутентификацию</string>
-    <string name="pdf_months_truncated">Показано %1$d из %2$d месяцев – более ранние данные в CSV/резервной копии</string>
     <string name="year_calendar_no_entry">нет записи</string>
     <string name="year_calendar_under_limit">ниже лимита</string>
     <string name="year_calendar_over_limit">выше лимита</string>

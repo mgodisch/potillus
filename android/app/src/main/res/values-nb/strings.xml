@@ -55,11 +55,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">BAC-estimat</string>
     <string name="bac_disclaimer">Estimat · ikke for kjørebeslutninger</string>
-    <string name="stats_from_section">Statistikkperiode</string>
     <string name="stats_from_label">Statistikk fra</string>
     <string name="stats_from_desc">Registreringer før denne datoen utelates fra all statistikk.</string>
-    <string name="bac_section">BAC-kalkulator (Widmark)</string>
-    <string name="bac_desc">Kroppsvekt er nødvendig for estimatet. Dette er en matematisk tilnærming, ikke en måling.</string>
     <string name="body_weight">Kroppsvekt</string>
     <string name="not_set">ikke angitt</string>
 
@@ -151,7 +148,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Tidspunkt for dagsskifte</string>
     <string name="day_starts_at">Ny dag starter klokken</string>
     <string name="weekly_limit_grams">7-dagers grense i gram</string>
-    <string name="biometric">Tilgangslås</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeravtrykk eller ansiktsgjenkjenning</string>
     <string name="language">Språk</string>
@@ -174,7 +170,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">Vennligst autentiser</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">Viser %1$d av %2$d måneder – eldre data tilgjengelig i CSV/sikkerhetskopi</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">ingen registrering</string>

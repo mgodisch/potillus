@@ -98,8 +98,8 @@ fun YearCalendarView(
     limitGrams: Double,
     today: LocalDate,
     onDayClick: (String) -> Unit,
-    weekStart: Int = 1,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    weekStart: Int = 1
 ) {
     val monthFmt    = DateTimeFormatter.ofPattern("MMM")
     val months      = (1..12).map { YearMonth.of(year, it) }

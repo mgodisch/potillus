@@ -51,8 +51,7 @@ help:
 #    Release: app/build/outputs/apk/release/app-release-unsigned.apk
 # =============================================================================
 
-# Run each recipe in ONE bash process with strict error handling, mirroring the
-# former build.sh "set -euo pipefail".
+# Run each recipe in ONE bash process with strict error handling
 SHELL         := /bin/bash
 .SHELLFLAGS   := -eu -o pipefail -c
 .ONESHELL:
@@ -150,11 +149,14 @@ release: app/build/outputs/apk/release/app-release-unsigned.apk
 app/build/outputs/apk/release/app-release-unsigned.apk: prereq
 	./gradlew assembleRelease
 
-test: unit-test test-device
+test: unit-test lint test-device
 
 unit-test: prereq
 	REPORT="app/build/reports/tests/testDebugUnitTest/index.html"
 	./gradlew testDebugUnitTest
+
+lint: prereq
+	./gradlew lintDebug
 
 test-device: prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
@@ -184,4 +186,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release test unit-test test-device install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release test unit-test lint test-device install install-debug clean distclean

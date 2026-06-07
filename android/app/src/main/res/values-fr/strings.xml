@@ -39,11 +39,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <string name="bac_estimate">Estimation d\'alcoolémie</string>
     <string name="bac_disclaimer">Estimation · non valable pour conduire</string>
-    <string name="stats_from_section">Période des statistiques</string>
     <string name="stats_from_label">Statistiques à partir de</string>
     <string name="stats_from_desc">Les entrées avant cette date sont exclues de toutes les statistiques.</string>
-    <string name="bac_section">Estimateur d\'alcoolémie (Widmark)</string>
-    <string name="bac_desc">Le poids corporel est nécessaire pour l\'estimation. Il s\'agit d\'une approximation mathématique, pas d\'une mesure.</string>
     <string name="body_weight">Poids corporel</string>
     <string name="not_set">non défini</string>
 
@@ -130,7 +127,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Heure de changement de jour</string>
     <string name="day_starts_at">Nouveau jour à partir de</string>
     <string name="weekly_limit_grams">Limite sur 7 jours en grammes</string>
-    <string name="biometric">Verrouillage</string>
     <string name="biometric_lock">Verrouillage biométrique</string>
     <string name="biometric_desc">Verrouiller l\'application à l\'ouverture</string>
     <string name="language">Langue</string>
@@ -147,7 +143,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Ajouter</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Veuillez vous authentifier</string>
-    <string name="pdf_months_truncated">Affichage de %1$d sur %2$d mois – données plus anciennes disponibles dans le CSV/backup</string>
 
     <!-- Légende calendrier annuel -->
     <string name="year_calendar_no_entry">aucune entrée</string>

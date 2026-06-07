@@ -35,11 +35,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="favorites_quick">Γρήγορη επιλογή αγαπημένων</string>
     <string name="bac_estimate">Εκτίμηση αλκοολαιμίας</string>
     <string name="bac_disclaimer">Εκτίμηση · όχι για οδήγηση</string>
-    <string name="stats_from_section">Περίοδος στατιστικών</string>
     <string name="stats_from_label">Στατιστικά από</string>
     <string name="stats_from_desc">Εγγραφές πριν από αυτή την ημερομηνία εξαιρούνται από όλα τα στατιστικά.</string>
-    <string name="bac_section">Υπολογιστής αλκοολαιμίας (Widmark)</string>
-    <string name="bac_desc">Απαιτείται σωματικό βάρος για την εκτίμηση. Είναι μαθηματική προσέγγιση, όχι μέτρηση.</string>
     <string name="body_weight">Σωματικό βάρος</string>
     <string name="not_set">μη ορισμένο</string>
     <string name="add_entry">Προσθήκη εγγραφής</string>
@@ -118,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">Ώρα αλλαγής ημέρας</string>
     <string name="day_starts_at">Νέα ημέρα ξεκινά στις</string>
     <string name="weekly_limit_grams">Όριο 7 ημερών σε γραμμάρια</string>
-    <string name="biometric">Κλείδωμα πρόσβασης</string>
     <string name="biometric_lock">Βιομετρικό κλείδωμα</string>
     <string name="biometric_desc">Κλείδωμα εφαρμογής με δακτυλικό αποτύπωμα ή αναγνώριση προσώπου</string>
     <string name="language">Γλώσσα</string>
@@ -135,7 +131,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_merge">Προσθήκη</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Παρακαλώ επαληθεύστε την ταυτότητά σας</string>
-    <string name="pdf_months_truncated">Εμφανίζονται %1$d από %2$d μήνες – παλαιότερα δεδομένα στο CSV/αντίγραφο ασφαλείας</string>
     <string name="year_calendar_no_entry">καμία εγγραφή</string>
     <string name="year_calendar_under_limit">κάτω από το όριο</string>
     <string name="year_calendar_over_limit">πάνω από το όριο</string>

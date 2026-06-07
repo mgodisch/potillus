@@ -23,6 +23,12 @@
 
 VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 
+# Run each recipe in ONE bash process with strict error handling
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+.ONESHELL:
+.DEFAULT_GOAL := default
+
 default:
 	adb devices | grep -q 'device$$'
 	$(MAKE) -C android clean

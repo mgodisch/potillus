@@ -21,6 +21,7 @@
  */
 package de.godisch.potillus.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.print.PrintAttributes
 import android.print.PrintManager
@@ -58,6 +59,15 @@ import androidx.annotation.MainThread
 //   (a LaunchedEffect in StatsScreen does exactly this).
 // =============================================================================
 
+// StaticFieldLeak: WebViewPdfPrinter is a singleton (object), so its `retained`
+// WebView field is effectively a static reference to a View — which lint flags as a
+// context leak, anchored on the object declaration. It is safe here and deliberately
+// suppressed: the WebView is created from the APPLICATION context (see [print]),
+// never an Activity, and is cleared as soon as the print adapter is handed over (any
+// stale instance is destroyed on re-entry), so no Activity / short-lived context can
+// be retained. The annotation sits on the object because lint reports the finding at
+// the object declaration; that scope also covers the `retained` field below.
+@SuppressLint("StaticFieldLeak")
 object WebViewPdfPrinter {
 
     /**
@@ -66,6 +76,13 @@ object WebViewPdfPrinter {
      * taken its adapter can abort the print job, so we keep a strong reference for
      * the brief window between [WebView.loadDataWithBaseURL] and the page-finished
      * callback. It is cleared again as soon as the job is submitted.
+     *
+     * The retained WebView is created from the APPLICATION context (see [print]),
+     * never an Activity context: if the page-finished callback never fires (e.g. a
+     * load failure) this field would otherwise pin the whole Activity for the
+     * process lifetime. [print] also abandons any still-pending previous WebView
+     * before starting a new job, so a rapid second call cannot silently drop a live
+     * reference.
      */
     private var retained: WebView? = null
 
@@ -82,7 +99,21 @@ object WebViewPdfPrinter {
      */
     @MainThread
     fun print(context: Context, html: String, jobName: String) {
-        val webView = WebView(context)
+        // Re-entrancy guard: if a previous job's WebView is still awaiting its
+        // page-finished callback, abandon it (destroy + release) before starting a
+        // new one, so the static field never silently drops a live reference.
+        retained?.destroy()
+        retained = null
+
+        // Create the off-screen WebView from the APPLICATION context, not the
+        // passed Activity context. The WebView is parked in the static [retained]
+        // field for the async load → page-finished round-trip; parking an
+        // Activity-scoped WebView there would leak the entire Activity if the
+        // callback never fires. The application context lives for the process
+        // lifetime, so retaining it is harmless. The system PrintManager is still
+        // obtained from the Activity [context] below, because the print dialog is
+        // Activity-scoped UI.
+        val webView = WebView(context.applicationContext)
 
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String?) {

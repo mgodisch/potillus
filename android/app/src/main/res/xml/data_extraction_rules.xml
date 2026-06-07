@@ -2,13 +2,16 @@
 <data-extraction-rules>
     <!--
         Cloud backup (Android 12+, relevant if allowBackup is ever set to true):
-        Exclude the database and DataStore file – both contain personal health data.
-        NOTE: domain="datastore" (not "sharedpref") – this app uses Jetpack DataStore,
-        whose backing file sits in the datastore/ subdirectory, not shared_prefs/.
+        Exclude the database and the DataStore file – both contain personal health data.
+        NOTE: DataStore has NO dedicated extraction domain. Its backing file lives at
+        getFilesDir()/datastore/<name>.preferences_pb, so it belongs to the "file"
+        domain (rooted at getFilesDir()) addressed with the "datastore/" path prefix —
+        NOT a (non-existent) "datastore" domain, which Android Lint rejects as a
+        FullBackupContent error.
     -->
     <cloud-backup>
-        <exclude domain="database"  path="potillus.db"/>
-        <exclude domain="datastore" path="potillus_settings.preferences_pb"/>
+        <exclude domain="database" path="potillus.db"/>
+        <exclude domain="file"     path="datastore/potillus_settings.preferences_pb"/>
     </cloud-backup>
     <!--
         Device-to-device transfer:
@@ -22,7 +25,8 @@
                                        AES-256-GCM envelope (IV || ciphertext+tag),
                                        Base64-encoded. Without this file the database
                                        cannot be decrypted on the target device.
-          potillus_settings…(datastore)  – encrypted DataStore (user preferences).
+          datastore/potillus_settings.preferences_pb (file)
+                                       – encrypted DataStore (user preferences).
 
         PREREQUISITE: Android's D2D transfer must also migrate the Keystore entries:
           potillus_db_passphrase_key     (AES-256-GCM key that seals the DB passphrase)
@@ -38,6 +42,6 @@
     <device-transfer>
         <include domain="database"   path="potillus.db"/>
         <include domain="sharedpref" path="potillus_db_key"/>
-        <include domain="datastore"  path="potillus_settings.preferences_pb"/>
+        <include domain="file"       path="datastore/potillus_settings.preferences_pb"/>
     </device-transfer>
 </data-extraction-rules>

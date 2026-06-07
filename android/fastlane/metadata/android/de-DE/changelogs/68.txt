@@ -1,0 +1,5 @@
+Fehlerbehebung: Der CSV-Export verwendet jetzt immer einen Punkt als
+Dezimaltrennzeichen, sodass das Öffnen der Datei auf Geräten mit Komma-Dezimal die
+Gramm-Spalte nicht mehr zerreißt. Das Importieren eines großen Backups blockiert
+die App nicht mehr kurzzeitig, und eine gerade aktivierte biometrische Sperre wirkt
+nun sofort.

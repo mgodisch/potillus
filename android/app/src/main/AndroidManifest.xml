@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        BERECHTIGUNGEN – minimales Profil:
-        - Keine Netzwerk-Permission
-        - Keine Kamera, kein Mikrofon, kein Standort
-        - Keine Telefon-Permissions
+        PERMISSIONS – minimal profile:
+        - No network permission
+        - No camera, microphone or location
+        - No telephony permissions
     -->
 
     <!--
-        Biometrie: USE_FINGERPRINT war seit API 28 deprecated und ist bei
-        minSdk 35 vollständig obsolet. Nur USE_BIOMETRIC wird benötigt.
+        Biometrics: USE_FINGERPRINT has been deprecated since API 28 and is fully
+        obsolete at minSdk 30. Only USE_BIOMETRIC is required.
     -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
@@ -23,7 +24,7 @@
 
         Step 1 – String resources
           Create app/src/main/res/values-<bcp47>/strings.xml and translate all
-          181 string keys.  Use values-de/strings.xml as the source of truth.
+          172 string keys.  Use values-de/strings.xml as the source of truth.
           (The exact count is asserted by LocaleSyncTest; if this comment and the
            test ever disagree, the test wins.)
           BCP-47 resource qualifier examples:
@@ -59,9 +60,20 @@
         harmless — android:allowBackup="false" disables cloud/device-transfer
         backup outright on EVERY supported version, so no personal health data can
         leave the device regardless of API level.
+
+        LINT SUPPRESSIONS on <application>:
+        - tools:targetApi="33" — android:localeConfig is an API-33+ attribute,
+          knowingly ignored on API 30–32 (the system language picker simply does
+          not appear there). This documents that intent (silences UnusedAttribute).
+        - tools:ignore="DataExtractionRules" — lint suggests also adding a legacy
+          android:fullBackupContent for API < 31. Because allowBackup="false"
+          disables ALL backup on every API, such a file would never be consulted,
+          so adding one would be dead configuration.
     -->
     <application
         android:name=".PotillusApp"
+        tools:targetApi="33"
+        tools:ignore="DataExtractionRules"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
@@ -81,8 +93,8 @@
         </activity>
 
         <!--
-            Für AppCompat-Lokalisierungssystem (Sprachumschaltung zur Laufzeit).
-            autoStoreLocales=true: Android speichert die Wahl automatisch.
+            For the AppCompat localisation system (runtime language switching).
+            autoStoreLocales=true: Android persists the choice automatically.
         -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

@@ -72,7 +72,17 @@ import de.godisch.potillus.l10n.SupportedLocales
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {}) {
+fun SettingsScreen(
+    vm: SettingsViewModel = viewModel(),
+    onBack: () -> Unit = {},
+    /**
+     * Runs a biometric prompt to authorise toggling the biometric lock and calls
+     * back with the result (`true` = authorised). Supplied by [MainActivity] via
+     * the navigation graph. The default `{ it(true) }` auto-authorises so that
+     * `@Preview` and other default callers render without a real prompt.
+     */
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit = { it(true) }
+) {
     val state    by vm.uiState.collectAsStateWithLifecycle()
     val context  = LocalContext.current
     val settings = state.settings
@@ -330,7 +340,21 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel(), onBack: () -> Unit = {})
                             Text(stringResource(R.string.biometric_desc), style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Switch(checked = settings.biometricEnabled, onCheckedChange = { vm.setBiometric(it) })
+                        Switch(
+                            checked = settings.biometricEnabled,
+                            // Toggling the lock — ON or OFF — must be biometrically
+                            // authorised. The Switch is a controlled component bound to
+                            // settings.biometricEnabled, so when authentication is
+                            // cancelled we simply do not persist the change and the
+                            // switch snaps back to its previous state on the next
+                            // recompose; no manual revert is needed. The new value is
+                            // only written via vm.setBiometric on a successful prompt.
+                            onCheckedChange = { desired ->
+                                onAuthenticate { authorised ->
+                                    if (authorised) vm.setBiometric(desired)
+                                }
+                            }
+                        )
                     }
                 }
             }

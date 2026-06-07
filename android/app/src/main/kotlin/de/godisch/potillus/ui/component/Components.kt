@@ -309,8 +309,8 @@ fun LimitBar(
     totalGrams: Double,
     limitGrams: Double,
     caption: String,
-    leftSuffix: String = "",
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    leftSuffix: String = ""
 ) {
     // coerceAtLeast(1.0): guard against limitGrams = 0 (not configured).
     // A limit of 0 would produce NaN; show 0 % fill visually instead.
@@ -439,8 +439,8 @@ fun TrafficLightDot(
 fun DrinkDaysBar(
     drinkDays: Int,
     maxDrinkDays: Int,
-    weekLabel: String    = "",
-    modifier: Modifier   = Modifier
+    modifier: Modifier   = Modifier,
+    weekLabel: String    = ""
 ) {
     val fraction = (drinkDays.toFloat() / maxDrinkDays.toFloat().coerceAtLeast(1f))
         .coerceAtLeast(0f)

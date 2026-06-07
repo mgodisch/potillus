@@ -266,8 +266,8 @@ fun AlcoholBarChart(
 fun ValueBarChart(
     values: List<Double>,
     labelFor: (Int) -> String,
-    showValues: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showValues: Boolean = false
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
         Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {

@@ -62,11 +62,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- BAC estimate -->
     <string name="bac_estimate">BAC 估算</string>
     <string name="bac_disclaimer">估算值・不適用於駕駛判斷</string>
-    <string name="stats_from_section">統計期間</string>
     <string name="stats_from_label">統計起始日</string>
     <string name="stats_from_desc">此日期之前的記錄將從所有統計中排除。</string>
-    <string name="bac_section">BAC 估算器（Widmark）</string>
-    <string name="bac_desc">估算需要體重數值。此為數學近似值，並非實際測量結果。</string>
     <string name="body_weight">體重</string>
     <string name="not_set">未設定</string>
 
@@ -158,7 +155,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="day_change_time">換日時間</string>
     <string name="day_starts_at">新一天從以下時間開始</string>
     <string name="weekly_limit_grams">7天限制（公克）</string>
-    <string name="biometric">存取鎖定</string>
     <string name="biometric_lock">生物辨識鎖定</string>
     <string name="biometric_desc">以指紋或臉部辨識鎖定應用程式</string>
     <string name="language">語言</string>
@@ -181,7 +177,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="biometric_subtitle">請進行身份驗證</string>
 
     <!-- WHO note -->
-    <string name="pdf_months_truncated">顯示 %2$d 個月中的 %1$d 個──較舊的資料可在 CSV／備份中取得</string>
 
     <!-- Year calendar legend -->
     <string name="year_calendar_no_entry">無記錄</string>
