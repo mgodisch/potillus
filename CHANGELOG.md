@@ -36,6 +36,36 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.68.1
+
+Fix lock bypass on warm start; add manual lock
+
+Fixed (security):
+- The biometric app lock could be bypassed after a "warm start". When Android
+  destroyed the Activity but kept the process cached (common after the phone has
+  been locked or used for other things for hours), reopening the app sometimes
+  revealed it WITHOUT a prompt. Cause: the inactivity timestamp `backgroundedAt`
+  was a per-Activity-instance field (reset to 0 on the recreated Activity), while
+  `isAuthenticatedThisSession` is process-global (still true) — so onCreate's gate,
+  which only checked the boolean, skipped the prompt, and onStart saw `backgroundedAt
+  == 0` and also skipped. `backgroundedAt` is now process-global (companion object)
+  and the staleness check runs in onCreate as well as onStart, so re-authentication
+  is required once the threshold has elapsed regardless of whether the Activity was
+  recreated. The timestamp is consumed on a valid foreground return, so a later
+  configuration change (which skips onStop) cannot re-prompt spuriously.
+  Reproducible deterministically with Developer Options → "Don't keep activities".
+
+Added:
+- "Lock app" entry in the shared overflow menu, for locking the app on demand. It
+  clears the authenticated state and shows the prompt immediately. Variant A: it
+  works regardless of the auto-lock setting, as long as a biometric or device
+  credential is available; the entry is hidden when no authenticator is enrolled,
+  so it can never strand the user. MainActivity exposes `lockNow()`, threaded
+  through AppNavigation to the four main screens' `AppOverflowMenu`. New string
+  `lock_app` added to all 21 locales (per-locale key count 172 → 173).
+
+---
+
 ## v0.68.0
 
 Add biometric toggle auth; fix bugs and lint

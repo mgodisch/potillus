@@ -136,16 +136,16 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 68
+        versionCode = 69
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.68.0"
+        versionName = "0.68.1"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
         // ─────────────────────────────────────────────────────────────────────
         // Step 1: Create app/src/main/res/values-<bcp47>/strings.xml
-        //         Translate all 172 keys. Source of truth: values-de/strings.xml.
+        //         Translate all 173 keys. Source of truth: values-de/strings.xml.
         //         (The exact count is verified by LocaleSyncTest — treat that test,
         //          not this comment, as the authoritative source if they ever differ.)
         //         Qualifier syntax:  values-fr/  values-pt-rBR/  values-zh-rCN/

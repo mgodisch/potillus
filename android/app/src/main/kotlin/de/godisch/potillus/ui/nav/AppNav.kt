@@ -152,7 +152,12 @@ fun AppNavigation(
      * the result. Threaded through from [MainActivity] to [SettingsScreen], where
      * it guards the biometric-lock switch.
      */
-    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit,
+    /**
+     * Locks the app immediately (overflow-menu "Lock app"). Forwarded to the four
+     * main screens, which pass it to their shared [AppOverflowMenu].
+     */
+    onLockApp: () -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -171,7 +176,8 @@ fun AppNavigation(
                 // opened from.
                 onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
                 onOpenHelp     = { navController.navigate(Screen.Help)     { launchSingleTop = true } },
-                onOpenCopyright  = { navController.navigate(Screen.Copyright)  { launchSingleTop = true } }
+                onOpenCopyright  = { navController.navigate(Screen.Copyright)  { launchSingleTop = true } },
+                onLockApp        = onLockApp
             )
         }
         composable<Screen.Settings> {
@@ -230,7 +236,9 @@ private fun MainPagerHost(
     drinksVm: DrinksViewModel,
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
-    onOpenCopyright: () -> Unit
+    onOpenCopyright: () -> Unit,
+    /** Forwarded to each page's [AppOverflowMenu] for the "Lock app" entry. */
+    onLockApp: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { mainPages.size })
     val scope      = rememberCoroutineScope()
@@ -263,10 +271,10 @@ private fun MainPagerHost(
             modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) { page ->
             when (page) {
-                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
-                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
-                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
-                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright)
+                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
+                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
+                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
+                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
             }
         }
     }

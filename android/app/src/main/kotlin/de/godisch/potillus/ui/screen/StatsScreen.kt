@@ -64,7 +64,9 @@ fun StatsScreen(
     vm: StatsViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenCopyright: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {},
+    /** Locks the app immediately (overflow-menu "Lock app"). */
+    onLockApp: () -> Unit = {}
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
     val exportStatus by vm.exportStatus.collectAsStateWithLifecycle()
@@ -129,6 +131,7 @@ fun StatsScreen(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
                         onOpenCopyright  = onOpenCopyright,
+                        onLockApp      = onLockApp,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

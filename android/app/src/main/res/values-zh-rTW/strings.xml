@@ -245,4 +245,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">你喜歡這個應用程式嗎？</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">確定</string>
+    <string name="lock_app">鎖定應用程式</string>
 </resources>

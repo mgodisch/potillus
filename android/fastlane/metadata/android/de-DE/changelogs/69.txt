@@ -1,0 +1,4 @@
+Fehlerbehebung: Die App-Sperre fragt jetzt zuverlässig nach Fingerabdruck (oder
+Geräte-PIN), wenn du die App nach längerer Zeit im Hintergrund wieder öffnest –
+auch dann, wenn das System die App aus dem Speicher entfernt hatte. Neuer Eintrag
+„App sperren" im Menü zum manuellen Sperren.

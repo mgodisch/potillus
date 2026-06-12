@@ -1,0 +1,4 @@
+Bugfix: the app lock now reliably asks for your fingerprint (or device PIN) when
+you reopen the app after it has been in the background for a while — including the
+case where the system had cleared the app from memory. New "Lock app" entry in the
+menu lets you lock the app on demand.

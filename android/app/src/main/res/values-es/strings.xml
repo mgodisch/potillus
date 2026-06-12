@@ -212,4 +212,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">¿Te gusta esta aplicación?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">Aceptar</string>
+    <string name="lock_app">Bloquear la aplicación</string>
 </resources>

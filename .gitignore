@@ -2,6 +2,7 @@
 *.log
 *.orig
 
+/*.pdf
 /TODO.md
 /android/.gradle
 /android/.kotlin

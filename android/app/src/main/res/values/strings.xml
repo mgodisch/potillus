@@ -227,4 +227,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">Do you like this App?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
+    <string name="lock_app">Lock app</string>
 </resources>

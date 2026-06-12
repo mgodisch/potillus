@@ -24,7 +24,7 @@
 
         Step 1 – String resources
           Create app/src/main/res/values-<bcp47>/strings.xml and translate all
-          172 string keys.  Use values-de/strings.xml as the source of truth.
+          173 string keys.  Use values-de/strings.xml as the source of truth.
           (The exact count is asserted by LocaleSyncTest; if this comment and the
            test ever disagree, the test wins.)
           BCP-47 resource qualifier examples:

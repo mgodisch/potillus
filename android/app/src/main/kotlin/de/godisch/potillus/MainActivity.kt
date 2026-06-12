@@ -159,6 +159,25 @@ class MainActivity : AppCompatActivity() {
         private var isAuthenticatedThisSession = false
 
         /**
+         * Monotonic timestamp (from [SystemClock.elapsedRealtime]) recorded in
+         * [onStop] when the app is backgrounded; `0` means "not backgrounded /
+         * already consumed". elapsedRealtime (not wall clock) is used because it
+         * keeps counting during deep sleep and is immune to clock adjustments, so
+         * the inactivity threshold holds across an overnight lock.
+         *
+         * CRITICAL — this lives in the companion object (process-global), NOT as an
+         * Activity instance field. Android frequently destroys the Activity while
+         * keeping the process cached for hours. With a per-instance timestamp, a
+         * recreated Activity would start with `backgroundedAt == 0` while the static
+         * [isAuthenticatedThisSession] was still `true`, so [onCreate] re-revealed
+         * the app WITHOUT a prompt no matter how long it had been backgrounded.
+         * Keeping the timestamp process-global lets the staleness check in
+         * [onCreate] and [onStart] work even across Activity recreation.
+         */
+        @Volatile
+        private var backgroundedAt = 0L
+
+        /**
          * Minimum background duration after which re-authentication is required.
          * 30 seconds is a common default for health and finance apps; long enough
          * to survive a brief pocket-lock but short enough to deter casual snooping.
@@ -180,14 +199,6 @@ class MainActivity : AppCompatActivity() {
      * immediately, not only after the next cold start.
      */
     private var biometricEnabled = false
-
-    /**
-     * Monotonic timestamp (from [SystemClock.elapsedRealtime]) recorded in
-     * [onStop]. Reset to `0` after a re-auth check in [onStart].
-     * Using elapsedRealtime (not wall clock) avoids clock adjustments
-     * interfering with the threshold comparison.
-     */
-    private var backgroundedAt = 0L
 
     /**
      * Sets up window security, edge-to-edge rendering, the biometric gate and
@@ -233,12 +244,23 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             biometricEnabled = app.appPreferences.settingsFlow.first().biometricEnabled
 
-            if (biometricEnabled && isBiometricAvailable() && !isAuthenticatedThisSession) {
+            // Require authentication when the lock is on AND either we have never
+            // authenticated in this process OR the app has been backgrounded longer
+            // than the inactivity threshold. The staleness term is what closes the
+            // warm-start hole: a recreated Activity whose process kept the static
+            // isAuthenticatedThisSession == true must still re-prompt once enough
+            // time has passed (backgroundedAt is process-global — see its KDoc).
+            if (biometricEnabled && isBiometricAvailable() &&
+                (!isAuthenticatedThisSession || isReauthDueToInactivity())) {
+                isAuthenticatedThisSession = false
+                backgroundedAt = 0L
                 _uiGate.value = UiGate.BIOMETRIC
                 showBiometricPrompt(app)
             } else {
-                // Either biometric is off, hardware is unavailable, or the user
-                // already authenticated earlier in this session (rotation case).
+                // Lock off / unavailable, or already authenticated and still fresh.
+                // Consume any pending background timestamp so a later configuration
+                // change (which skips onStop) cannot read it as stale and re-prompt.
+                backgroundedAt = 0L
                 _uiGate.value = UiGate.READY
             }
         }
@@ -302,7 +324,11 @@ class MainActivity : AppCompatActivity() {
                             }
                         )
                     }
-                    MainContent(app) { onResult -> authenticateForToggle(onResult) }
+                    MainContent(
+                        app,
+                        onAuthenticate = { onResult -> authenticateForToggle(onResult) },
+                        onLockApp = { lockNow() }
+                    )
                 }
             }
         }
@@ -441,6 +467,35 @@ class MainActivity : AppCompatActivity() {
     // ── Inactivity re-authentication ─────────────────────────────────────────
 
     /**
+     * True when the lock should re-engage because the app has been backgrounded
+     * for longer than [REAUTH_THRESHOLD_MS]. Reads the process-global
+     * [backgroundedAt]; `backgroundedAt == 0` (not backgrounded / already consumed)
+     * is never stale.
+     */
+    private fun isReauthDueToInactivity(): Boolean =
+        backgroundedAt > 0L &&
+        SystemClock.elapsedRealtime() - backgroundedAt > REAUTH_THRESHOLD_MS
+
+    /**
+     * Manually locks the app — the overflow-menu "Lock app" action (Variant A).
+     *
+     * It clears the authenticated state and shows the prompt immediately,
+     * INDEPENDENTLY of the auto-lock setting ([biometricEnabled]), because the user
+     * has explicitly asked to lock. It only proceeds when an authenticator
+     * (biometric or device credential) is available — otherwise locking would strand
+     * the user with no way back in, so the call is a no-op (and the menu entry is
+     * hidden in that case; see AppOverflowMenu). On a cancelled prompt the gate's
+     * usual policy applies (the Activity finishes), consistent with start-up.
+     */
+    fun lockNow() {
+        if (!isBiometricAvailable()) return
+        isAuthenticatedThisSession = false
+        backgroundedAt = 0L
+        _uiGate.value = UiGate.BIOMETRIC
+        showBiometricPrompt(application as PotillusApp)
+    }
+
+    /**
      * Records the time at which the Activity became invisible.
      *
      * [isChangingConfigurations] is `true` during a rotation or other config
@@ -460,17 +515,26 @@ class MainActivity : AppCompatActivity() {
      *
      * Called before [onResume], so the gate is set before the first frame is
      * drawn – the user never sees app content before the prompt appears.
+     *
+     * Only acts once [biometricEnabled] is known (it is `false` on the very first
+     * onStart of a freshly created Activity, before the onCreate coroutine has read
+     * it; that path is handled by onCreate's staleness check instead). When the app
+     * returns within the threshold, the pending [backgroundedAt] is consumed so a
+     * subsequent configuration change — which skips onStop — cannot read it as
+     * stale and re-prompt spuriously.
      */
     override fun onStart() {
         super.onStart()
-        val elapsed = SystemClock.elapsedRealtime() - backgroundedAt
-        if (backgroundedAt > 0L && elapsed > REAUTH_THRESHOLD_MS && biometricEnabled) {
+        if (!biometricEnabled || backgroundedAt == 0L) return
+        if (isReauthDueToInactivity()) {
             isAuthenticatedThisSession = false
             backgroundedAt = 0L
             if (isBiometricAvailable()) {
                 _uiGate.value = UiGate.BIOMETRIC
                 showBiometricPrompt(application as PotillusApp)
             }
+        } else {
+            backgroundedAt = 0L
         }
     }
 }
@@ -492,7 +556,12 @@ private fun MainContent(
      * the result. Supplied by [MainActivity] (which owns the [BiometricPrompt]) and
      * forwarded down to [SettingsScreen] for the biometric-lock switch.
      */
-    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit,
+    /**
+     * Locks the app immediately (the overflow-menu "Lock app" action). Supplied by
+     * [MainActivity.lockNow] and forwarded to the four main screens' overflow menu.
+     */
+    onLockApp: () -> Unit
 ) {
     // The ViewModelProvider.Factory is a named class (AppViewModelFactory)
     // rather than an anonymous object defined here. Benefits:
@@ -512,7 +581,8 @@ private fun MainContent(
             statsVm    = viewModel(factory = factory),
             drinksVm   = viewModel(factory = factory),
             settingsVm = settingsVm,
-            onAuthenticate = onAuthenticate
+            onAuthenticate = onAuthenticate,
+            onLockApp = onLockApp
         )
     }
 }

@@ -59,7 +59,9 @@ fun DrinksScreen(
     todayVm: TodayViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenCopyright: () -> Unit = {}
+    onOpenCopyright: () -> Unit = {},
+    /** Locks the app immediately (overflow-menu "Lock app"). */
+    onLockApp: () -> Unit = {}
 ) {
     val state        by vm.uiState.collectAsStateWithLifecycle()
     val todayState   by todayVm.uiState.collectAsStateWithLifecycle()
@@ -154,6 +156,7 @@ fun DrinksScreen(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp     = onOpenHelp,
                         onOpenCopyright  = onOpenCopyright,
+                        onLockApp      = onLockApp,
                         tint           = MaterialTheme.colorScheme.onPrimary
                     )
                 }

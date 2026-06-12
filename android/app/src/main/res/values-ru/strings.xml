@@ -196,4 +196,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">Вам нравится это приложение?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">ОК</string>
+    <string name="lock_app">Заблокировать приложение</string>
 </resources>

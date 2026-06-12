@@ -20,9 +20,13 @@
 
 package de.godisch.potillus.ui.component
 
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
@@ -37,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import de.godisch.potillus.R
 
@@ -63,6 +68,10 @@ import de.godisch.potillus.R
  *                       in-app user guide viewer).
  * @param onOpenCopyright Invoked when the "Copyright" entry is chosen (opens the
  *                       Copyright viewer: the combined COPYING.md + LICENSE.md).
+ * @param onLockApp      Invoked when the "Lock app" entry is chosen (manually locks
+ *                       the app). The entry is only shown when an authenticator
+ *                       (biometric or device credential) is available — otherwise
+ *                       locking would strand the user (Variant A).
  * @param tint           Colour for the burger icon. Defaults to the ambient
  *                       content colour; the main screens pass their top-bar
  *                       `onPrimary` colour so the icon matches the former gear.
@@ -72,6 +81,7 @@ fun AppOverflowMenu(
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
     onOpenCopyright: () -> Unit,
+    onLockApp: () -> Unit,
     tint: Color = LocalContentColor.current
 ) {
     // `expanded` is the only piece of state this component owns: whether the
@@ -79,6 +89,17 @@ fun AppOverflowMenu(
     // it intentionally does NOT survive process death, which is correct for a
     // transient menu.
     var expanded by remember { mutableStateOf(false) }
+
+    // Variant A: the "Lock app" entry is shown only when the device can actually
+    // authenticate (strong biometric OR device credential). Without an
+    // authenticator, manually locking would leave no way back in, so the entry is
+    // hidden. Computed once per composition instance (cheap binder call, cached).
+    val context = LocalContext.current
+    val canLock = remember {
+        BiometricManager.from(context)
+            .canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) ==
+            BiometricManager.BIOMETRIC_SUCCESS
+    }
 
     IconButton(onClick = { expanded = true }) {
         Icon(
@@ -125,5 +146,17 @@ fun AppOverflowMenu(
                 onOpenCopyright()
             }
         )
+        // "Lock app" — manual lock (Variant A). Only present when an authenticator
+        // is available, so it never leaves the user unable to get back in.
+        if (canLock) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.lock_app)) },
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                onClick = {
+                    expanded = false
+                    onLockApp()
+                }
+            )
+        }
     }
 }

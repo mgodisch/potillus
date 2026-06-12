@@ -236,4 +236,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">Вам подобається цей застосунок?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">Гаразд</string>
+    <string name="lock_app">Заблокувати застосунок</string>
 </resources>

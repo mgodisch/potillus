@@ -243,4 +243,5 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_title">이 앱이 마음에 드시나요?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">확인</string>
+    <string name="lock_app">앱 잠금</string>
 </resources>
