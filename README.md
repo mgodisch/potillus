@@ -1,6 +1,6 @@
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -20,15 +20,15 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-# Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 
-## About the App (v0.68.1)
+## About the App (v0.68.2)
 
-**Libellus Potionis** ("Potillus") is a privacy-first, free, open-source, and
-ad-free alcohol consumption tracker designed to help users monitor, pace, and
-manage their drinking habits entirely offline. It requires absolutely no
-invasive device permissions—no camera, microphone, or location access—and
-completely operates without network connectivity.
+**Libellus Potionis** is a privacy-first, free, open-source, and ad-free
+alcohol consumption tracker designed to help users monitor, pace, and manage
+their drinking habits entirely offline. It requires absolutely no invasive
+device permissions—no camera, microphone, or location access—and completely
+operates without network connectivity.
 
 ### Key Features
 
@@ -142,7 +142,7 @@ Changes are documented in
 
 ## License
 
-Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker, Copyright
+Libellus Potionis -- Privacy-Friendly Alcohol Tracker, Copyright
 &copy; 2026 Martin A. Godisch <[android@godisch.de](mailto:android@godisch.de)>
 
 The source code can be found at the [canonical repository at

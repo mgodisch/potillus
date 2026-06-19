@@ -1,9 +1,9 @@
 Fastlane store metadata
 =======================
 
-This tree holds the store-listing metadata for Libellus Potionis ("Potillus").
-It follows the layout that both `fastlane supply` (Google Play) and F-Droid read
-from a `fastlane/metadata/android/<locale>/` directory:
+This tree holds the store-listing metadata for Libellus Potionis. It follows
+the layout that both `fastlane supply` (Google Play) and F-Droid read from a
+`fastlane/metadata/android/<locale>/` directory:
 
     metadata/android/
         en-US/                       English (United States) listing

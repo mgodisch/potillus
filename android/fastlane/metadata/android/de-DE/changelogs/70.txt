@@ -1,0 +1,3 @@
+Die App heißt jetzt schlicht „Libellus Potionis" (der Beiname „Potillus"
+entfällt). In der Jahresansicht der Statistik zeigt das Diagramm jetzt einen
+Balken pro Monat statt einen pro Woche.

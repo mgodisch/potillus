@@ -1,6 +1,6 @@
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-# Libellus Potionis (Potillus) – Changelog
+# Libellus Potionis – Changelog
 
 <!-- Add new entries on top! -->
 <!-- HEADING CONVENTION: directly below each "## vX.Y.Z" header, write a one-line
@@ -33,6 +33,64 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
      EVERY locale, keeping the set identical across locales. release-check.sh §1
      enforces both that the current versionCode's note exists in each locale and
      that all locales carry the same set of changelog files. -->
+
+---
+
+## v0.68.2
+
+Rename app, fix year chart, add SBOM tooling
+
+Fixed:
+- Statistics screen, YEAR view: the consumption chart aggregated by ISO week
+  (~52 bars) while labelling each weekly bar with its month name, so a single
+  month could appear as several identically-named bars (e.g. three "Jun" bars
+  for entries spread across June). The on-screen YEAR view now aggregates by
+  calendar month (≤ 12 bars, exactly one bar per month). Implemented by
+  selecting `ChartGranularity.MONTHLY` instead of `WEEKLY` for the YEAR period
+  in StatsViewModel; the existing month-name axis label is the natural label for
+  a monthly bucket. The PDF export is deliberately unchanged — it derives its
+  granularity from the chosen span via `ChartBucketing.granularityForSpan()`, so
+  a one-year report still shows ~52 weekly bars.
+
+Changed:
+- The user-visible application name is now simply "Libellus Potionis"; the
+  informal "Potillus" nickname has been dropped. This affects the `app_name`
+  string in the base locale and every translated `values-<code>/strings.xml`,
+  the README/CONTRIBUTING/COPYING/CHANGELOG titles, all source- and build-file
+  header comments, `GplNotice.HEADER_LINES` (the header reproduced in exported
+  reports and JSON backups), the rendered User's Guide titles, and the Fastlane
+  store descriptions (de-DE, en-US).
+- Technical identifiers are intentionally left unchanged: the application id and
+  Kotlin package (`de.godisch.potillus`), the canonical repository URL
+  (`codeberg.org/godisch/potillus`) and the source tarball name stay "potillus",
+  so the update channel, signing identity and existing installations are
+  unaffected.
+
+Added:
+- Standardized SBOM generation. The CycloneDX Gradle plugin (org.cyclonedx.bom
+  3.2.4, the Gradle-9-compatible line) is wired into the build to emit a
+  CycloneDX 1.6 JSON Software Bill of Materials for the release runtime
+  classpath, i.e. exactly the third-party components packaged in app-release.
+  No SBOM file is committed to source; the SBOM is generated on demand via the
+  new `make sbom` target and is also produced as part of `make release`,
+  landing next to the APK at app/build/outputs/sbom/. The plugin is build-time
+  only, so the APK and versionCode are unchanged.
+  - Android scoping: generation is pinned to the resolved `releaseRuntimeClasspath`
+    configuration, which avoids the well-known "cannot choose between the
+    following variants of project :app" resolution error.
+  - Reproducible builds: the random serial number is disabled
+    (`includeBomSerialNumber = false`) and the volatile `metadata.timestamp` is
+    normalized by the new tools/sbom-normalize.py post-step (honoring
+    SOURCE\_DATE\_EPOCH when set, otherwise dropping the timestamp), so the SBOM
+    is byte-stable across identical builds. python3 was already a build
+    prerequisite, so no new tooling dependency is introduced.
+
+Release housekeeping:
+- versionName 0.68.1 → 0.68.2, versionCode 69 → 70.
+- Kept the version string in `proguard-rules.pro` and the README title line in
+  sync (release-check.sh §1).
+- Added Fastlane store notes `70.txt` for de-DE and en-US (release-check.sh §1
+  requires the changelog-file set to be identical across all locales).
 
 ---
 

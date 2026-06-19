@@ -1,6 +1,6 @@
 // vim: set et ts=4:
 // =============================================================================
-// Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+// Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 // Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 // =============================================================================
 //
@@ -74,4 +74,10 @@ plugins {
 
     // KSP – Kotlin Symbol Processor (für Room-Code-Generierung)
     alias(libs.plugins.ksp)                 apply false
+
+    // CycloneDX – generates a standardized SBOM for the release APK. Registered
+    // here with "apply false" (consistent with the other plugins) and actually
+    // applied in app/build.gradle.kts, where it is scoped to the release
+    // runtime classpath.
+    alias(libs.plugins.cyclonedx)           apply false
 }

@@ -1,6 +1,6 @@
 // vim: set et ts=4 sw=4:
 // =============================================================================
-// Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+// Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 // Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 // =============================================================================
 //
@@ -51,7 +51,7 @@ object GplNotice {
      * the canonical header.
      */
     val HEADER_LINES: List<String> = listOf(
-        "Libellus Potionis \"Potillus\" -- Privacy-Friendly Alcohol Tracker",
+        "Libellus Potionis -- Privacy-Friendly Alcohol Tracker",
         "Copyright (c) 2026 Martin A. Godisch <android@godisch.de>",
         "",
         "This program is free software: you can redistribute it and/or modify it",

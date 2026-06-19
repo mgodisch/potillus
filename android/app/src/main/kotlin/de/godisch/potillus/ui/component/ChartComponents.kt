@@ -1,6 +1,6 @@
 /* vim: set et ts=4:
  * =============================================================================
- * Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+ * Libellus Potionis -- Privacy-Friendly Alcohol Tracker
  * Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
  * =============================================================================
  *
@@ -80,8 +80,10 @@ import de.godisch.potillus.ui.theme.successColor
  * Draws a vertical bar chart of consumption over a real time axis, with a dashed
  * daily-limit line and explicit markers for abstinent buckets.
  *
- * Each bar is one [ChartBucket]: a day (WEEK / MONTH periods) or a whole week
- * (YEAR period, ≈ 52 bars). Because the series is gap-free (every day in the
+ * Each bar is one [ChartBucket]: a day, a calendar week, or a calendar month,
+ * depending on the caller's chosen granularity (e.g. the on-screen YEAR view
+ * uses one bar per month, ≤ 12 bars; the PDF export of a year-long span uses
+ * one bar per week, ~52 bars). Because the series is gap-free (every day in the
  * period is represented, even those with no entries), the x-axis is a proper
  * time axis rather than a list of drink days.
  *

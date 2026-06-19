@@ -1,0 +1,3 @@
+The app is now simply called "Libellus Potionis" (the "Potillus" nickname has
+been dropped). In the yearly statistics view, the consumption chart now shows
+one bar per month instead of one per week.

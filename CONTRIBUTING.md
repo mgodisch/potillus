@@ -1,6 +1,6 @@
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -20,11 +20,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-# Contributing to Libellus Potionis (Potillus)
+# Contributing to Libellus Potionis
 
-Potillus is a personal Android alcohol tracker and a **teaching project**. The goal of every
-change is to keep the code readable, well-tested, and well-documented for developers
-learning Android development.
+Libellus Potionis is a personal Android alcohol tracker and a **teaching
+project**. The goal of every change is to keep the code readable, well-tested,
+and well-documented for developers learning Android development.
 
 ---
 
@@ -109,7 +109,7 @@ util/          ← Export helpers (CSV, PDF, JSON backup)
 
 ## 5. Translation workflow
 
-Potillus supports locales. All string resources live in
+Libellus Potionis supports locales. All string resources live in
 `app/src/main/res/values-<code>/strings.xml`.
 
 **Rules:**

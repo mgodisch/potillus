@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis "Potillus" - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -21,7 +21,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 <resources>
-    <string name="app_name">Potillus</string>
+    <string name="app_name">Libellus Potionis</string>
 
     <string name="today">Hoy</string>
     <string name="calendar">Calendario</string>

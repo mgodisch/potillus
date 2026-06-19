@@ -170,6 +170,15 @@ espresso-core           = "3.6.1"     # androidTest Espresso core
 # is satisfied with a wide margin). Keep this on the latest 2.x patch.
 desugar-jdk-libs        = "2.1.5"     # core library desugaring (java.time backport)
 
+# CycloneDX Gradle plugin – generates a standardized Software Bill of Materials
+# (SBOM) describing exactly the third-party components that ship in the release
+# APK. 3.x is the line that is fully compatible with Gradle 9 (each project is
+# evaluated/resolved independently); 3.2.4 is the current release. The plugin is
+# build-time only — it adds nothing to the APK — so it does not affect the
+# versionCode. Applied in app/build.gradle.kts; see the cyclonedxDirectBom
+# configuration there for the Android-specific configuration scoping.
+cyclonedx               = "3.2.4"     # org.cyclonedx.bom (SBOM generation)
+
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────
 # core-ktx: Kotlin extension functions for Android APIs
@@ -316,3 +325,8 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 # KSP plugin – fast annotation processor, required by Room
 ksp                 = { id = "com.google.devtools.ksp",             version.ref = "ksp" }
+
+# CycloneDX plugin – generates the SBOM (see the `cyclonedx` version above).
+# Applied only in the :app module; registered with `apply false` in the root
+# build.gradle.kts to match the project's plugin-declaration pattern.
+cyclonedx           = { id = "org.cyclonedx.bom",                   version.ref = "cyclonedx" }

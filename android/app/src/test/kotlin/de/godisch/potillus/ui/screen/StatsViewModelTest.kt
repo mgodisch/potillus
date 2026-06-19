@@ -1,6 +1,6 @@
 /* vim: set et ts=4:
  * =============================================================================
- * Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+ * Libellus Potionis -- Privacy-Friendly Alcohol Tracker
  * Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
  * =============================================================================
  *
@@ -43,6 +43,7 @@ package de.godisch.potillus.ui.screen
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
+import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -194,6 +195,31 @@ class StatsViewModelTest {
 
             vm.setPeriod(StatsPeriod.YEAR)
             assertEquals(StatsPeriod.YEAR, awaitItem().period)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * The on-screen chart granularity is derived from the active period:
+     * WEEK and MONTH render one bar per day (DAILY), while YEAR aggregates into
+     * one bar per calendar month (MONTHLY, i.e. at most 12 bars).
+     *
+     * This pins the on-screen behaviour only. The PDF export selects its own
+     * granularity from the chosen span via ChartBucketing.granularityForSpan()
+     * and is intentionally not coupled to this mapping (a one-year report stays
+     * weekly), so a future change to one must not silently change the other.
+     */
+    @Test fun `chart granularity is DAILY for week and month, MONTHLY for year`() = runTest {
+        val vm = makeVm()
+        vm.uiState.test {
+            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)   // initial WEEK
+
+            vm.setPeriod(StatsPeriod.MONTH)
+            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)
+
+            vm.setPeriod(StatsPeriod.YEAR)
+            assertEquals(ChartGranularity.MONTHLY, awaitItem().chartGranularity)
 
             cancelAndIgnoreRemainingEvents()
         }

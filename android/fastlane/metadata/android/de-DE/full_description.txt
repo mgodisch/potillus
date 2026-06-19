@@ -1,8 +1,8 @@
-Libellus Potionis („Potillus“) ist ein datenschutzfreundlicher, kostenloser,
-quelloffener und werbefreier Alkohol-Tracker. Er hilft dir, deinen Konsum
-vollständig offline zu beobachten, zu dosieren und zu steuern. Er benötigt keine
-invasiven Berechtigungen – weder Kamera, Mikrofon noch Standort – und arbeitet
-komplett ohne Netzwerkzugriff.
+Libellus Potionis ist ein datenschutzfreundlicher, kostenloser, quelloffener
+und werbefreier Alkohol-Tracker. Er hilft dir, deinen Konsum vollständig
+offline zu beobachten, zu dosieren und zu steuern. Er benötigt keine invasiven
+Berechtigungen – weder Kamera, Mikrofon noch Standort – und arbeitet komplett
+ohne Netzwerkzugriff.
 
 FUNKTIONEN
 
@@ -29,13 +29,13 @@ Eine ausführliche Anleitung ist direkt in der App verfügbar.
 
 DATENSCHUTZ & SICHERHEIT
 
-Potillus ist auf absolute Datenhoheit und strikte Datensparsamkeit ausgelegt. Er
-läuft mit einem minimalen Berechtigungsprofil ganz ohne Netzwerkzugriff, sodass
-deine persönlichen Daten das Gerät nie verlassen. Die Daten werden vollständig
-verschlüsselt mit hardwaregestützter Kryptografie gespeichert, optional ergänzt
-durch eine biometrische Fingerabdrucksperre gegen unbefugten physischen Zugriff.
-Dieser Offline-Ansatz verhindert Tracking, Cloud-Synchronisation und den Abfluss
-von Daten.
+Libellus Potionis ist auf absolute Datenhoheit und strikte Datensparsamkeit
+ausgelegt. Er läuft mit einem minimalen Berechtigungsprofil ganz ohne
+Netzwerkzugriff, sodass deine persönlichen Daten das Gerät nie verlassen. Die
+Daten werden vollständig verschlüsselt mit hardwaregestützter Kryptografie
+gespeichert, optional ergänzt durch eine biometrische Fingerabdrucksperre gegen
+unbefugten physischen Zugriff. Dieser Offline-Ansatz verhindert Tracking,
+Cloud-Synchronisation und den Abfluss von Daten.
 
 KOMPATIBILITÄT
 
@@ -45,7 +45,6 @@ systemweiten App-Sprachauswahl.
 
 OPEN SOURCE
 
-Potillus ist freie Software unter der GNU General Public License v3 (oder
-später). Der Quellcode ist lehrbuchmäßig dokumentiert und im kanonischen
-Repository verfügbar:
-https://codeberg.org/godisch/potillus/
+Libellus Potionis ist freie Software unter der GNU General Public License v3
+(oder später). Der Quellcode ist lehrbuchmäßig dokumentiert und im kanonischen
+Repository verfügbar: https://codeberg.org/godisch/potillus/

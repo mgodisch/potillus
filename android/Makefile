@@ -1,6 +1,6 @@
 # vim: set noet ts=4 sw=4:
 # =============================================================================
-# Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 # Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 # =============================================================================
 #
@@ -18,7 +18,7 @@
 # this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # =============================================================================
-#  Makefile -- Potillus build tooling for Debian GNU/Linux stable
+#  Makefile -- Libellus Potionis build tooling for Debian GNU/Linux stable
 # =============================================================================
 #
 help:
@@ -26,6 +26,7 @@ help:
 	@echo "  make                build debug APK (default)"
 	@echo "  make debug          build debug APK"
 	@echo "  make release        build release APK (unsigned)"
+	@echo "  make sbom           generate the CycloneDX SBOM (reproducible JSON)"
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
 	@echo "  make guides         regenerate the localized user guides"
 	@echo "  make check-guides   verify guides and raw/copyright.md are in sync"
@@ -72,6 +73,11 @@ export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform
 GRADLE_OPTS ?= -Xmx2g -Xms512m
 #GRADLE_OPTS += --no-daemon
 export GRADLE_OPTS
+
+# Output path of the generated CycloneDX SBOM (see the `sbom` target and the
+# cyclonedxDirectBom block in app/build.gradle.kts). Kept under app/build/outputs/
+# alongside the APK so a release ships its bill of materials next to the binary.
+SBOM := app/build/outputs/sbom/libellus-potionis-sbom.json
 
 prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md guides release-check
 
@@ -144,10 +150,25 @@ debug: app/build/outputs/apk/debug/app-debug.apk
 app/build/outputs/apk/debug/app-debug.apk: prereq
 	./gradlew assembleDebug
 
-release: app/build/outputs/apk/release/app-release-unsigned.apk
+release: app/build/outputs/apk/release/app-release-unsigned.apk $(SBOM)
 
 app/build/outputs/apk/release/app-release-unsigned.apk: prereq
 	./gradlew assembleRelease
+
+# Generate a standardized CycloneDX 1.6 JSON SBOM for the release runtime
+# classpath (configuration lives in app/build.gradle.kts). Two steps:
+#   1. cyclonedxDirectBom writes the SBOM with includeBomSerialNumber=false.
+#   2. A post-step removes the volatile metadata.timestamp so the file is
+#      byte-stable across identical builds (the Gradle CycloneDX plugin has no
+#      reproducible-timestamp option, unlike the Maven plugin). metadata and all
+#      of its fields are optional in CycloneDX, so dropping the timestamp leaves
+#      a valid BOM. python3 is already a build prerequisite (see `guides`), so
+#      this adds no new tooling dependency.
+sbom: $(SBOM)
+
+$(SBOM): prereq
+	./gradlew :app:cyclonedxDirectBom
+	python3 tools/sbom-normalize.py "$(SBOM)"
 
 test: unit-test lint test-device
 
@@ -186,4 +207,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release test unit-test lint test-device install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release sbom test unit-test lint test-device install install-debug clean distclean

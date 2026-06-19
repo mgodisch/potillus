@@ -1,6 +1,6 @@
 /* vim: set et ts=4:
  * =============================================================================
- * Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+ * Libellus Potionis -- Privacy-Friendly Alcohol Tracker
  * Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
  * =============================================================================
  *
@@ -171,8 +171,9 @@ fun StatsScreen(
                             when (state.period) {
                                 StatsPeriod.WEEK  -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
                                 StatsPeriod.MONTH -> b.labelDate.substring(8)   // day-of-month
-                                // YEAR uses weekly buckets; label the week by its month
-                                // so the thinned axis reads as a month scale.
+                                // YEAR uses one bucket per calendar month, so the
+                                // month name of the bucket's first day is the bar's
+                                // natural label (one label per month).
                                 StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, locale)
                             }
                         }

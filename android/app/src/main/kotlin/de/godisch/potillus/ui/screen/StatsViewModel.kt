@@ -1,6 +1,6 @@
 /* vim: set et ts=4:
  * =============================================================================
- * Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+ * Libellus Potionis -- Privacy-Friendly Alcohol Tracker
  * Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
  * =============================================================================
  *
@@ -77,7 +77,7 @@ data class StatsUiState(
     val dataPoints: List<DaySummary>              = emptyList(),
     /** Gap-free, time-axis bucket series for the consumption chart (incl. abstinent buckets). */
     val chartBuckets: List<ChartBucket>           = emptyList(),
-    /** Bucket width of [chartBuckets]: DAILY for WEEK/MONTH, WEEKLY for YEAR. */
+    /** Bucket width of [chartBuckets]: DAILY for WEEK/MONTH, MONTHLY for YEAR. */
     val chartGranularity: ChartGranularity        = ChartGranularity.DAILY,
     val totalGrams: Double                        = 0.0,
     val avgPerDay: Double                         = 0.0,
@@ -385,11 +385,17 @@ class StatsViewModel(
             )
 
             // Consumption-over-time chart series. WEEK/MONTH show one bar per day;
-            // YEAR aggregates into weekly buckets (≈ 52 bars). The series spans the
-            // full period [effectiveFrom, to], so abstinent days appear as zero
-            // buckets (rendered as a green tick) on a real time axis.
+            // YEAR aggregates into monthly buckets (≤ 12 bars), so a year reads as
+            // one bar per calendar month rather than ~52 weekly bars. The series
+            // spans the full period [effectiveFrom, to], so abstinent days appear as
+            // zero buckets (rendered as a green tick) on a real time axis.
+            //
+            // NOTE: this is the ON-SCREEN granularity only. The PDF export picks its
+            // own granularity from the chosen span via
+            // ChartBucketing.granularityForSpan() (a one-year span there stays
+            // WEEKLY, i.e. ~52 bars); the two are intentionally independent.
             val chartGranularity =
-                if (period == StatsPeriod.YEAR) ChartGranularity.WEEKLY else ChartGranularity.DAILY
+                if (period == StatsPeriod.YEAR) ChartGranularity.MONTHLY else ChartGranularity.DAILY
             val chartBuckets =
                 ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity)
 

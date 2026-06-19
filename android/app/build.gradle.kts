@@ -1,6 +1,6 @@
 // vim: set et ts=4:
 // =============================================================================
-// Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+// Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 // Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 // =============================================================================
 //
@@ -42,6 +42,15 @@
 // statements must appear before the `plugins { }` block.
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+// CycloneDX model types used by the cyclonedxDirectBom configuration at the end
+// of this file: Version pins the SBOM to CycloneDX 1.6, and Component.Type tags
+// the SBOM subject as an application. Like the JvmTarget import above, these
+// must appear before the `plugins { }` block. The classes are on the
+// build-script classpath because the org.cyclonedx.bom plugin is applied in the
+// plugins block below.
+import org.cyclonedx.Version
+import org.cyclonedx.model.Component
+
 // ── 1. Plugins ────────────────────────────────────────────────────────────────
 // Plugins are Gradle extensions that add new build capabilities.
 // "alias(libs.plugins.xxx)" refers to an entry in gradle/libs.versions.toml.
@@ -68,6 +77,12 @@ plugins {
     // and generates the SQLite implementation at build time.
     // Advantage over kapt: ~2× faster, incremental.
     alias(libs.plugins.ksp)
+
+    // CycloneDX SBOM generator:
+    // Adds the cyclonedxDirectBom task that writes a CycloneDX 1.6 JSON SBOM for
+    // the release runtime classpath. Configured in the cyclonedxDirectBom block
+    // at the end of this file. Build-time only; nothing is added to the APK.
+    alias(libs.plugins.cyclonedx)
 }
 
 // ── 2. Android Configuration ──────────────────────────────────────────────────
@@ -136,10 +151,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 69
+        versionCode = 70
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.68.1"
+        versionName = "0.68.2"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -527,4 +542,55 @@ dependencies {
     // because it has to be merged into the debug app manifest the tests run against.
     debugImplementation(libs.compose.ui.test.manifest)
 
+}
+
+// ── 4. Software Bill of Materials (SBOM) ──────────────────────────────────────
+// Generates a standardized CycloneDX 1.6 JSON SBOM that lists exactly the
+// third-party components which end up in the RELEASE APK. Produce it via
+// `make sbom` (or as part of `make release`); that target also strips the
+// volatile metadata timestamp for reproducible output (see android/Makefile).
+//
+// WHY cyclonedxDirectBom (not cyclonedxBom): this is a single-module build, so
+// the per-project task is the correct one. cyclonedxBom is the multi-project
+// AGGREGATOR and would only wrap this one module in an empty aggregation layer.
+//
+// ANDROID SCOPING (important): left to discover configurations on its own, the
+// plugin fails on Android projects with "cannot choose between the following
+// variants of project :app" — Android exposes many build-type/test variants and
+// the resolver cannot pick one. Naming a single, already-resolved configuration
+// (releaseRuntimeClasspath) removes the ambiguity and yields precisely the
+// components shipped in the release build.
+tasks.cyclonedxDirectBom {
+    // metadata.component — the application this SBOM describes.
+    projectType      = Component.Type.APPLICATION
+    componentName    = "Libellus Potionis"
+    // Keep the SBOM component version in lock-step with the app's versionName
+    // (single source of truth: the android { } block above) rather than
+    // repeating the literal here.
+    componentVersion = android.defaultConfig.versionName ?: project.version.toString()
+
+    // Pin to CycloneDX 1.6 (the latest stable schema version).
+    schemaVersion    = Version.VERSION_16
+
+    // Resolve ONLY the release runtime classpath (see ANDROID SCOPING above) so
+    // the SBOM mirrors what is actually packaged in app-release. Because this is
+    // a single concrete, resolvable configuration, no skipConfigs filtering of
+    // the debug/test classpaths is needed.
+    includeConfigs   = listOf("releaseRuntimeClasspath")
+
+    // ── Reproducible builds ───────────────────────────────────────────────────
+    // The random urn:uuid serial number is the main run-to-run churn; disable
+    // it. The metadata timestamp is the other volatile field, and the Gradle
+    // plugin (unlike the Maven one) exposes no outputTimestamp option, so the
+    // `make sbom` target strips metadata.timestamp after generation. Together
+    // these make the SBOM byte-stable across identical builds.
+    includeBomSerialNumber = false
+
+    // JSON only: CycloneDX JSON is the de-facto interchange format. The plugin
+    // emits both JSON and XML by default; unsetting the XML output's convention
+    // suppresses the XML file entirely.
+    xmlOutput.unsetConvention()
+    jsonOutput.set(
+        layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json")
+    )
 }

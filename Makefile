@@ -1,6 +1,6 @@
 # vim: set noet ts=4 sw=4:
 # =============================================================================
-# Libellus Potionis "Potillus" -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
 # Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 # =============================================================================
 #
@@ -18,7 +18,7 @@
 # this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # =============================================================================
-#  Makefile -- Potillus build tooling for Debian GNU/Linux stable
+#  Makefile -- Libellus Potionis build tooling for Debian GNU/Linux stable
 # =============================================================================
 
 VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
