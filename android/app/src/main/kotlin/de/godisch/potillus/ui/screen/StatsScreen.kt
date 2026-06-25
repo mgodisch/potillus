@@ -177,10 +177,19 @@ fun StatsScreen(
                                 StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, locale)
                             }
                         }
+                        val isYear = state.period == StatsPeriod.YEAR
                         AlcoholBarChart(
                             buckets    = state.chartBuckets,
                             limitGrams = state.limitInfo.limitGrams,
-                            labelFn    = labelFn
+                            labelFn    = labelFn,
+                            // No daily-limit line in the YEAR view: its monthly
+                            // per-day averages are not compared against a daily limit.
+                            showLimitLine = !isYear,
+                            // Print the per-day average above every bar on the sparse
+                            // axes the user asked for: WEEK (the day's grams) and YEAR
+                            // (the month's grams-per-day). The dense ~30-bar MONTH
+                            // view stays unlabelled to avoid clutter.
+                            showBarValues = state.period == StatsPeriod.WEEK || isYear
                         )
                     }
                 }

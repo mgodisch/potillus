@@ -1,0 +1,5 @@
+Das Statistikdiagramm zeigt jetzt über jedem Balken eine gerundete Zahl: Gramm
+Alkohol pro Tag in der 7-Tage-Ansicht und die Gramm pro Tag des Monats in der
+Jahresansicht, in der die Limit-Linie entfällt (ein Tagesdurchschnitt wird nicht
+mit einem Tageslimit verglichen). Der Heute-Screen zeigt neben dem Tagestotal
+nun den Tagesdurchschnitt des laufenden Monats.

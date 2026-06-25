@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Drikkevarer</string>
     <string name="settings">Indstillinger</string>
     <string name="total_today">Samlet i dag</string>
-    <string name="grams_alcohol">g alkohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alkohol</string>
+    <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Poster i dag</string>
     <string name="no_entries_today">Ingen poster endnu.\nTryk på + for at tilføje.</string>
     <string name="no_entries_day">Ingen poster for denne dag.</string>

@@ -127,27 +127,59 @@ fun TodayScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(Modifier.padding(16.dp)) {
-                        Text(
-                            stringResource(R.string.total_today),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Row(verticalAlignment = Alignment.Bottom) {
+                        // Row 1: captions — "Today's total" (left) vs "Ø <month>"
+                        // (right, the current month's per-day average), mirrored
+                        // across the card width.
+                        Row(
+                            modifier              = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text(
-                                "${"%.1f".format(state.totalGrams)}",
-                                style = MaterialTheme.typography.headlineLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                stringResource(R.string.total_today),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(Modifier.width(4.dp))
                             Text(
-                                stringResource(R.string.grams_alcohol),
+                                stringResource(R.string.avg_of_month, state.currentMonthLabel),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        // Row 2: left is just the word "Alcohol" — today's own gram
+                        // figure is intentionally omitted here because it already
+                        // appears on the daily-limit bar below, so it is not shown
+                        // twice. The card's headline figure is the month's per-day
+                        // average on the right ("<x> g/day").
+                        Row(
+                            modifier              = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment     = Alignment.Bottom
+                        ) {
+                            Text(
+                                stringResource(R.string.alcohol),
                                 style    = MaterialTheme.typography.bodyMedium,
                                 color    = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(bottom = 4.dp)
                             )
+                            Row(verticalAlignment = Alignment.Bottom) {
+                                Text(
+                                    "%.1f".format(state.monthlyAvgPerDay),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    stringResource(R.string.grams_per_day),
+                                    style    = MaterialTheme.typography.bodyMedium,
+                                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                            }
                         }
-                        Spacer(Modifier.height(8.dp))
+                        // A little extra breathing room (~half a line) between the
+                        // headline figures and the limit bars below.
+                        Spacer(Modifier.height(16.dp))
                         // Three progress bars, one per active limit:
                         //   1. Daily gram limit   – today's grams vs. daily limit.
                         //   2. Weekly gram limit  – this week's grams vs. weekly limit.

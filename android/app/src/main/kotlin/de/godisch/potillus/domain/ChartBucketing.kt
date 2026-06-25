@@ -101,17 +101,29 @@ object ChartBucketing {
      * be shorter than a full week/month and its average is computed over the
      * days that actually fall inside the period.
      *
-     * @param summaries   Daily totals for days that have entries ("YYYY-MM-DD").
-     * @param from        Inclusive period start ("YYYY-MM-DD").
-     * @param to          Inclusive period end   ("YYYY-MM-DD").
-     * @param granularity Bucket width (see [granularityForSpan]).
-     * @return            Buckets in chronological order, or empty when from > to.
+     * IN-PROGRESS DAY ("today in superposition"): when [inProgressDay] is given
+     * (the current logical day, which on-screen equals [to]), the bucket that
+     * contains it applies the app's per-day rule — the unfinished day is left out
+     * of the average's denominator UNLESS a drink has already been logged that day.
+     * This keeps each bucket's average in step with the Statistics summary and the
+     * Today card (see [DayResolver.effectivePeriodDays]). The PDF export passes
+     * null, so historical reports count every calendar day as before.
+     *
+     * @param summaries     Daily totals for days that have entries ("YYYY-MM-DD").
+     * @param from          Inclusive period start ("YYYY-MM-DD").
+     * @param to            Inclusive period end   ("YYYY-MM-DD").
+     * @param granularity   Bucket width (see [granularityForSpan]).
+     * @param inProgressDay Optional current logical day; the bucket containing it
+     *                      excludes it from its day count when it is not yet a
+     *                      drink day. Null (default) counts every day.
+     * @return              Buckets in chronological order, or empty when from > to.
      */
     fun bucketize(
         summaries: List<DaySummary>,
         from: String,
         to: String,
-        granularity: ChartGranularity
+        granularity: ChartGranularity,
+        inProgressDay: String? = null
     ): List<ChartBucket> {
         val start = LocalDate.parse(from, DayResolver.DATE_FORMATTER)
         val end   = LocalDate.parse(to, DayResolver.DATE_FORMATTER)
@@ -145,6 +157,19 @@ object ChartBucketing {
                 sum += gramsByDate[DayResolver.formatDate(day)] ?: 0.0
                 dayCount++
                 day = day.plusDays(1)
+            }
+
+            // In-progress-day rule: if the current logical day falls in this bucket
+            // and is not yet a drink day, drop it from the day count so the average
+            // is taken over completed days only. This mirrors the per-day rule used
+            // by the Statistics summary and the Today card (see
+            // DayResolver.effectivePeriodDays); the bucket's `sum` already excludes
+            // the empty day, so only the divisor changes.
+            if (inProgressDay != null) {
+                val ip           = LocalDate.parse(inProgressDay, DayResolver.DATE_FORMATTER)
+                val ipInBucket   = !ip.isBefore(bucketStart) && ip.isBefore(cappedEndExclusive)
+                val ipIsDrinkDay = (gramsByDate[inProgressDay] ?: 0.0) > 0.0
+                if (ipInBucket && !ipIsDrinkDay && dayCount > 0) dayCount--
             }
 
             buckets.add(

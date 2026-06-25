@@ -1,0 +1,5 @@
+The statistics chart now prints a rounded number above each bar: grams of
+alcohol per day in the 7-day view, and the month's grams per day in the year
+view, where the daily-limit line is no longer shown (a per-day average is not
+compared to a daily limit). The Today screen now shows this month's average
+per day next to today's total.

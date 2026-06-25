@@ -30,7 +30,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Configuración</string>
 
     <string name="total_today">Total de hoy</string>
-    <string name="grams_alcohol">g de alcohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alcohol</string>
+    <string name="grams_per_day">g/día</string>
     <string name="entries_today">Entradas de hoy</string>
     <string name="no_entries_today">Aún no hay entradas hoy.\nToca + para añadir una entrada.</string>
     <string name="no_entries_day">No hay entradas para este día.</string>

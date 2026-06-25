@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Dranken</string>
     <string name="settings">Instellingen</string>
     <string name="total_today">Totaal vandaag</string>
-    <string name="grams_alcohol">g alcohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alcohol</string>
+    <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Invoer vandaag</string>
     <string name="no_entries_today">Nog geen invoer vandaag.\nTik op + om een invoer toe te voegen.</string>
     <string name="no_entries_day">Geen invoer voor deze dag.</string>

@@ -36,6 +36,54 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.69.0
+
+Label chart bars; add monthly per-day average
+
+Added:
+- Statistics chart, per-bar value labels. On the two sparse axes each bar is now
+  annotated with its grams of alcohol per day, commercially rounded to a whole
+  number and printed without a unit to stay compact: the 7-day view labels each
+  daily bar with that day's grams, and the year view labels each monthly bar
+  with the month's grams averaged over its calendar days. The dense ~30-bar
+  month view is left unlabelled to avoid clutter.
+- Today screen, monthly per-day average. The summary card's right-hand column
+  now shows the current month's average grams per day: a caption "Ø <month>"
+  (the full localized month name) above the figure "<x> g/day". The left column
+  keeps the "Today's Total" caption but no longer repeats today's gram figure —
+  that number already appears on the daily-limit bar just below, so the card
+  shows only the label "Alcohol" there. The per-day average uses the same rule
+  as the chart and the statistics summary (see Fixed). Backed by new
+  monthlyAvgPerDay and currentMonthLabel fields on TodayUiState.
+- New/renamed string resources, translated into all 20 locales: avg_of_month
+  ("Ø %1$s" format), alcohol and grams_per_day; the now-unused grams_alcohol was
+  removed.
+
+Changed:
+- Statistics chart, year view: the dashed daily-limit line and the over-limit
+  red colouring are no longer drawn, because a month's per-day average is not
+  compared against a daily limit. Bar heights remain the per-day average (the
+  same scale as the 7-day and month views), so a bar's height matches its label.
+  The 7-day and month views keep the daily-limit line unchanged.
+
+Fixed:
+- Per-day averages now agree across the app. The Today card's monthly average,
+  the Statistics summary's "average per day" and the year-view chart bar for the
+  current month previously used different denominators (the chart and Today
+  counted the in-progress day; the summary did not), so the same month could
+  read as e.g. 18.8 vs 19.6. They now share one rule, centralised in
+  DayResolver.effectivePeriodDays: the current day counts only once a drink has
+  been logged on it (otherwise the unfinished day is left out of the average).
+  bucketize gained an optional inProgressDay parameter for this; the PDF export
+  passes none and is unchanged.
+
+Release housekeeping:
+- versionName 0.68.2 → 0.69.0 (minor bump), versionCode 70 → 71.
+- Synced proguard-rules.pro and the README title line; added Fastlane store
+  notes 71.txt for de-DE and en-US.
+
+---
+
 ## v0.68.2
 
 Rename app, fix year chart, add SBOM tooling

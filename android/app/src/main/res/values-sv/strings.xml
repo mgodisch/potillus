@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Drycker</string>
     <string name="settings">Inställningar</string>
     <string name="total_today">Totalt idag</string>
-    <string name="grams_alcohol">g alkohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alkohol</string>
+    <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Poster idag</string>
     <string name="no_entries_today">Inga poster ännu.\nTryck på + för att lägga till.</string>
     <string name="no_entries_day">Inga poster för den här dagen.</string>

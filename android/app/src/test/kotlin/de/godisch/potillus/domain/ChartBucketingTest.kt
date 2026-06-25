@@ -124,4 +124,46 @@ class ChartBucketingTest {
         assertEquals(28.0 / 28.0, result[1].avgPerDay, 1e-9)
         assertTrue(result[2].isAbstinent)
     }
+
+    // ── bucketize: in-progress day (today in superposition) ───────────────────
+
+    @Test fun `in-progress empty today is excluded from its bucket's day count`() {
+        // June 1..24, drinks logged on three earlier days (total 460.0 g). Today
+        // (the 24th) has no entry yet. The June bucket therefore spans 24 calendar
+        // days, but the unfinished, empty today must NOT dilute the average:
+        // 460 / 23 completed days, not 460 / 24.
+        val summaries = listOf(
+            DaySummary("2026-06-05", 200.0, 1),
+            DaySummary("2026-06-12", 150.0, 1),
+            DaySummary("2026-06-20", 110.0, 1)
+        )
+        val result = ChartBucketing.bucketize(
+            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24"
+        )
+
+        assertEquals(1, result.size)
+        assertEquals(460.0 / 23.0, result[0].avgPerDay, 1e-9)
+        // Without the in-progress hint the same data divides by all 24 days.
+        val naive = ChartBucketing.bucketize(
+            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY
+        )
+        assertEquals(460.0 / 24.0, naive[0].avgPerDay, 1e-9)
+    }
+
+    @Test fun `in-progress today counts when it is already a drink day`() {
+        // Same window, but a drink was logged today (the 24th): today resolves to
+        // a drink day and joins the period, so the divisor is the full 24 days.
+        val summaries = listOf(
+            DaySummary("2026-06-05", 200.0, 1),
+            DaySummary("2026-06-12", 150.0, 1),
+            DaySummary("2026-06-24", 110.0, 1)
+        )
+        val result = ChartBucketing.bucketize(
+            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24"
+        )
+
+        assertEquals(460.0 / 24.0, result[0].avgPerDay, 1e-9)
+    }
 }

@@ -254,4 +254,24 @@ class DayResolverTest {
         val futureDrink = "2025-06-02"
         assertEquals(0, DayResolver.computeCurrentAbstinence(listOf(futureDrink), today))
     }
+
+    // ── effectivePeriodDays ───────────────────────────────────────────────────
+
+    @Test fun `effectivePeriodDays excludes the in-progress day unless it is a drink day`() {
+        // 1 June … 24 June. 23 days are completed (1st..23rd); today is the 24th.
+        assertEquals(23, DayResolver.effectivePeriodDays("2026-06-01", "2026-06-24", todayIsDrinkDay = false))
+        // A drink logged today resolves it to a drink day, so it joins the period.
+        assertEquals(24, DayResolver.effectivePeriodDays("2026-06-01", "2026-06-24", todayIsDrinkDay = true))
+    }
+
+    @Test fun `effectivePeriodDays on the first day is 0 dry or 1 after a drink`() {
+        // from == today: no completed days yet, so the period is empty until the
+        // first drink resolves today into the period.
+        assertEquals(0, DayResolver.effectivePeriodDays("2026-06-01", "2026-06-01", todayIsDrinkDay = false))
+        assertEquals(1, DayResolver.effectivePeriodDays("2026-06-01", "2026-06-01", todayIsDrinkDay = true))
+    }
+
+    @Test fun `effectivePeriodDays returns 0 for an inverted range`() {
+        assertEquals(0, DayResolver.effectivePeriodDays("2026-06-10", "2026-06-01", todayIsDrinkDay = true))
+    }
 }

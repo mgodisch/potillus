@@ -302,17 +302,6 @@ class StatsViewModel(
         ) { current, previous, periodEntries, drinks ->
             val drinkMap = drinks.associateBy { it.id }
 
-            // Guard: effectiveFrom > to when the user has set statsFromDate to a
-            // future date. datesUntil() throws IllegalArgumentException when start > end,
-            // so we clamp totalDays to 0 and skip the calculation.
-            //
-            // `totalDays` is the number of COMPLETED logical days in the period: the
-            // half-open interval [effectiveFrom, today) deliberately excludes the
-            // in-progress current day (datesUntil's end is exclusive).
-            val totalDays = if (effectiveFrom <= to)
-                DayResolver.parseDate(effectiveFrom).datesUntil(DayResolver.parseDate(to)).count().toInt()
-            else 0
-
             val totalGrams = current.sumOf { it.totalGrams }
             // Drink days in the period, INCLUDING today if a drink was logged today
             // (the daily-summary query is inclusive of `to`, which equals today).
@@ -322,19 +311,18 @@ class StatsViewModel(
             //
             // Today is in superposition until it resolves: logging a drink today makes
             // it a confirmed DRINK day, so it joins the period immediately (with the
-            // amount consumed so far) and the observable period grows by one day. With
-            // no drink yet, today is undetermined — it may still become a drink day or
-            // an abstinent day — so it stays out entirely until it finishes. Hence the
-            // period is exactly the completed days, plus today iff today is a drink day:
+            // amount consumed so far). With no drink yet, today stays out until it
+            // finishes. This is the app-wide per-day rule, centralised in
+            // DayResolver.effectivePeriodDays and shared with the Today card and the
+            // chart's current bucket so all three agree. It also returns 0 for an
+            // empty/inverted range (effectiveFrom > to), avoiding a divide-by-zero.
             //
-            //   effectivePeriodDays = totalDays + (today is a drink day ? 1 : 0)
-            //
-            // Everything derived from it is then consistent: `totalGrams` (which
-            // includes today's drinks) is divided by a period that includes today
-            // exactly when those drinks exist, and `abstinentDays` never counts the
-            // unfinished day (effectivePeriodDays − drinkDays = completed dry days).
+            // Everything derived from it is consistent: `totalGrams` (which includes
+            // today's drinks) is divided by a period that includes today exactly when
+            // those drinks exist, and `abstinentDays` never counts the unfinished day
+            // (effectivePeriodDays − drinkDays = completed dry days).
             val todayIsDrinkDay     = current.any { it.date == to }
-            val effectivePeriodDays = totalDays + if (todayIsDrinkDay) 1 else 0
+            val effectivePeriodDays = DayResolver.effectivePeriodDays(effectiveFrom, to, todayIsDrinkDay)
 
             val categoryBreakdown = periodEntries
                 .groupBy { e -> drinkMap[e.drinkId]?.category ?: DrinkCategory.OTHER }
@@ -397,7 +385,7 @@ class StatsViewModel(
             val chartGranularity =
                 if (period == StatsPeriod.YEAR) ChartGranularity.MONTHLY else ChartGranularity.DAILY
             val chartBuckets =
-                ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity)
+                ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity, inProgressDay = to)
 
             StatsUiState(
                 period            = period,

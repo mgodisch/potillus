@@ -32,7 +32,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today Screen -->
     <string name="total_today">Heute gesamt</string>
-    <string name="grams_alcohol">g Alkohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alkohol</string>
+    <string name="grams_per_day">g/Tag</string>
     <string name="entries_today">Einträge heute</string>
     <string name="no_entries_today">Noch keine Einträge heute.\nTippe auf „+“, um einen Eintrag hinzuzufügen.</string>
     <string name="no_entries_day">Keine Einträge für diesen Tag.</string>

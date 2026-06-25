@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Nápoje</string>
     <string name="settings">Nastavení</string>
     <string name="total_today">Celkem dnes</string>
-    <string name="grams_alcohol">g alkoholu</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alkohol</string>
+    <string name="grams_per_day">g/den</string>
     <string name="entries_today">Záznamy dnes</string>
     <string name="no_entries_today">Zatím žádné záznamy.\nKlepněte na + pro přidání záznamu.</string>
     <string name="no_entries_day">Žádné záznamy pro tento den.</string>

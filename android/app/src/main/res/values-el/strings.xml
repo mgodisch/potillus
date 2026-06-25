@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Ποτά</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="total_today">Σύνολο σήμερα</string>
-    <string name="grams_alcohol">γρ. αλκοόλης</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Αλκοόλ</string>
+    <string name="grams_per_day">γρ./ημέρα</string>
     <string name="entries_today">Εγγραφές σήμερα</string>
     <string name="no_entries_today">Δεν υπάρχουν εγγραφές ακόμα.\nΠατήστε + για προσθήκη.</string>
     <string name="no_entries_day">Δεν υπάρχουν εγγραφές για αυτή την ημέρα.</string>

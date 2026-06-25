@@ -32,7 +32,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today Screen -->
     <string name="total_today">今日合计</string>
-    <string name="grams_alcohol">克酒精</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">酒精</string>
+    <string name="grams_per_day">克/天</string>
     <string name="entries_today">今日记录</string>
     <string name="no_entries_today">今天还没有记录。\n点击 + 添加记录。</string>
     <string name="no_entries_day">该日没有记录。</string>

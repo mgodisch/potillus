@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Напитки</string>
     <string name="settings">Настройки</string>
     <string name="total_today">Итого сегодня</string>
-    <string name="grams_alcohol">г алкоголя</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Алкоголь</string>
+    <string name="grams_per_day">г/день</string>
     <string name="entries_today">Записи за сегодня</string>
     <string name="no_entries_today">Записей пока нет.\nНажмите + для добавления.</string>
     <string name="no_entries_day">Нет записей за этот день.</string>

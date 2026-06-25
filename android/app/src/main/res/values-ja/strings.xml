@@ -49,7 +49,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today Screen -->
     <string name="total_today">本日合計</string>
-    <string name="grams_alcohol">g アルコール</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">アルコール</string>
+    <string name="grams_per_day">g/日</string>
     <string name="entries_today">本日の記録</string>
     <string name="no_entries_today">本日の記録はまだありません。\n＋ をタップして記録を追加してください。</string>
     <string name="no_entries_day">この日の記録はありません。</string>

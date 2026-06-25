@@ -28,7 +28,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="drinks">Bevande</string>
     <string name="settings">Impostazioni</string>
     <string name="total_today">Totale oggi</string>
-    <string name="grams_alcohol">g di alcol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alcol</string>
+    <string name="grams_per_day">g/giorno</string>
     <string name="entries_today">Registrazioni oggi</string>
     <string name="no_entries_today">Nessuna registrazione oggi.\nTocca + per aggiungere.</string>
     <string name="no_entries_day">Nessuna registrazione per questo giorno.</string>

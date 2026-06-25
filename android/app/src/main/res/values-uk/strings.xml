@@ -42,7 +42,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today Screen -->
     <string name="total_today">Разом сьогодні</string>
-    <string name="grams_alcohol">г алкоголю</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Алкоголь</string>
+    <string name="grams_per_day">г/день</string>
     <string name="entries_today">Записи сьогодні</string>
     <string name="no_entries_today">Сьогодні ще немає записів.\nНатисніть + щоб додати запис.</string>
     <string name="no_entries_day">Немає записів за цей день.</string>

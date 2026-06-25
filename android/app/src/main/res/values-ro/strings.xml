@@ -50,7 +50,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today screen -->
     <string name="total_today">Total azi</string>
-    <string name="grams_alcohol">g alcool</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alcool</string>
+    <string name="grams_per_day">g/zi</string>
     <string name="entries_today">Înregistrări azi</string>
     <string name="no_entries_today">Nicio înregistrare azi.\nAtingeți + pentru a adăuga.</string>
     <string name="no_entries_day">Nicio înregistrare pentru această zi.</string>

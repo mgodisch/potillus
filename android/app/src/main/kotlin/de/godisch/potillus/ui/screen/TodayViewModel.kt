@@ -53,6 +53,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 // ════════════════════════════════════════════════════════════════════════════
 // TODAY
@@ -72,6 +74,14 @@ data class TodayUiState(
     val drinkDaysThisWeek: Int           = 0,
     val weeklyTotalGrams: Double         = 0.0,
     val weeklyRangeLabel: String         = "",
+    /**
+     * Average grams per day for the current calendar month so far: the month's
+     * cumulated grams divided by the number of days elapsed (1st of month …
+     * today, inclusive). Matches the current month's bar in the year-view chart.
+     */
+    val monthlyAvgPerDay: Double         = 0.0,
+    /** Localized standalone name of the current month (e.g. "June" / "Juni"). */
+    val currentMonthLabel: String        = "",
     val bacPermille: Double?             = null,
     val favorites: List<DrinkDefinition> = emptyList(),
     val settings: AppSettings            = AppSettings()
@@ -179,6 +189,15 @@ class TodayViewModel(
         // trailing-7-day figures.
         val windowEnd   = DayResolver.parseDate(today)
         val windowStart = windowEnd.minusDays(6)
+        // First day of the calendar month that contains "today"; used for the
+        // "month total" figure shown next to today's total on the summary card.
+        val monthStart  = windowEnd.withDayOfMonth(1)
+        // Localized, standalone month name for the card caption ("Ø <month>").
+        // Standalone form is the grammatically correct one for a bare label in
+        // languages with cases (e.g. ru/cs/pl/el). Derived from the logical
+        // "today" (via monthStart), not LocalDate.now(), so the day-change hour is
+        // respected around month boundaries.
+        val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
         val fmt       = DateTimeFormatter.ofPattern("d.M.")
         val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 
@@ -186,8 +205,9 @@ class TodayViewModel(
             entryRepo.getEntriesForDate(today),
             drinkRepo.drinks,
             entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
+            entryRepo.getDailySummaries(DayResolver.formatDate(monthStart), DayResolver.formatDate(windowEnd)),
             ticker
-        ) { entries, drinks, weeklySummaries, _ ->
+        ) { entries, drinks, weeklySummaries, monthlySummaries, _ ->
             val totalGrams = entries.sumOf { it.gramsAlcohol }
 
             // BAC calculation: only use entries with actual alcohol (> 0 %) so that
@@ -208,6 +228,20 @@ class TodayViewModel(
                 drinkDaysThisWeek = weeklySummaries.count { it.totalGrams > 0.0 },
                 weeklyTotalGrams  = weeklySummaries.sumOf { it.totalGrams },
                 weeklyRangeLabel  = weekLabel,
+                // Per-day average for the current month, using the app-wide rule
+                // (DayResolver.effectivePeriodDays): completed days this month plus
+                // today iff a drink was already logged today. todayIsDrinkDay is
+                // "today has a daily summary", mirroring StatsViewModel so the Today
+                // card, the Statistics summary and the year-view bar all match.
+                monthlyAvgPerDay  = run {
+                    val days = DayResolver.effectivePeriodDays(
+                        from            = DayResolver.formatDate(monthStart),
+                        today           = today,
+                        todayIsDrinkDay = monthlySummaries.any { it.date == today }
+                    )
+                    if (days > 0) monthlySummaries.sumOf { it.totalGrams } / days else 0.0
+                },
+                currentMonthLabel = monthLabel,
                 bacPermille       = bac,
                 favorites         = drinks.filter { it.isFavorite },
                 settings          = settings

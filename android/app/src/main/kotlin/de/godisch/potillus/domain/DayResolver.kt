@@ -93,6 +93,38 @@ object DayResolver {
         date.format(DATE_FORMATTER)
 
     /**
+     * Number of *effective* days in the inclusive range [[from], [today]] for the
+     * app's per-day averages, applying the "today counts only once it is a drink
+     * day" rule.
+     *
+     * The in-progress current day is in superposition: until a drink is logged it
+     * may still become either a drink day or an abstinent day, so it is kept out
+     * of the denominator; logging a drink resolves it to a drink day and it joins
+     * the period immediately. Hence:
+     *
+     *     effectivePeriodDays = completedDays(from … the day before today)
+     *                           + (todayIsDrinkDay ? 1 : 0)
+     *
+     * `datesUntil`'s end is exclusive, so `from.datesUntil(today)` is exactly the
+     * completed days. Returns 0 when [from] is after [today] (empty/invalid range);
+     * callers guard against dividing by zero.
+     *
+     * This is the single definition shared by the Statistics summary, the Today
+     * card's monthly average and the chart's current bucket, so all three agree.
+     *
+     * @param from            Inclusive period start ("yyyy-MM-dd").
+     * @param today           The in-progress current logical day ("yyyy-MM-dd").
+     * @param todayIsDrinkDay Whether a drink has already been logged today.
+     */
+    fun effectivePeriodDays(from: String, today: String, todayIsDrinkDay: Boolean): Int {
+        val f = parseDate(from)
+        val t = parseDate(today)
+        if (f.isAfter(t)) return 0
+        val completedDays = f.datesUntil(t).count().toInt()   // [from, today) — excludes today
+        return completedDays + if (todayIsDrinkDay) 1 else 0
+    }
+
+    /**
      * The first weekday of the calendar week for the given [locale], as an ISO-8601
      * weekday number (1 = Monday … 7 = Sunday).
      *

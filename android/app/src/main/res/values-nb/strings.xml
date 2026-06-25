@@ -44,7 +44,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Today Screen -->
     <string name="total_today">Dagens total</string>
-    <string name="grams_alcohol">g alkohol</string>
+    <string name="avg_of_month">Ø %1$s</string>
+    <string name="alcohol">Alkohol</string>
+    <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Dagens registreringer</string>
     <string name="no_entries_today">Ingen registreringer i dag ennå.\nTrykk på + for å legge til en registrering.</string>
     <string name="no_entries_day">Ingen registreringer for denne dagen.</string>

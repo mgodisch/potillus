@@ -77,8 +77,9 @@ import de.godisch.potillus.ui.theme.successColor
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * Draws a vertical bar chart of consumption over a real time axis, with a dashed
- * daily-limit line and explicit markers for abstinent buckets.
+ * Draws a vertical bar chart of consumption over a real time axis, with an
+ * optional dashed daily-limit line, optional per-bar value labels, and explicit
+ * markers for abstinent buckets.
  *
  * Each bar is one [ChartBucket]: a day, a calendar week, or a calendar month,
  * depending on the caller's chosen granularity (e.g. the on-screen YEAR view
@@ -88,19 +89,31 @@ import de.godisch.potillus.ui.theme.successColor
  * time axis rather than a list of drink days.
  *
  * Layout:
- * - A bar's height is proportional to [ChartBucket.avgPerDay] relative to [maxVal].
+ * - A bar's height is proportional to [ChartBucket.avgPerDay] (the per-day
+ *   average) relative to the chart's [maxVal]. For DAILY buckets (WEEK / MONTH
+ *   views) this is the day's grams; for MONTHLY buckets (YEAR view) it is the
+ *   month's grams averaged over its calendar days, keeping every view on the
+ *   same "grams per day" scale.
  * - Abstinent buckets ([ChartBucket.isAbstinent], i.e. 0 g) carry NO bar; instead
  *   a small green tick is drawn at the baseline so "recorded, nothing consumed"
  *   is visually distinct from a near-zero bar or from missing data.
- * - A horizontal dashed line marks the daily [limitGrams] threshold. Since bars
- *   are a per-day average, the line stays comparable for weekly buckets too.
+ * - When [showLimitLine] is true, a horizontal dashed line marks the daily
+ *   [limitGrams] threshold and bars whose value exceeds it are coloured red.
+ *   The YEAR view sets this false: its monthly per-day averages are not compared
+ *   against a daily limit, so no line is drawn and no bar is reddened.
+ * - When [showBarValues] is true, each non-abstinent bar's per-day average is
+ *   printed just above it, commercially rounded to a whole number (no unit, to
+ *   save horizontal space). Bar heights then reserve extra headroom so the
+ *   topmost label is not clipped. Intended for sparse axes only (WEEK = 7 bars,
+ *   YEAR ≤ 12 bars); the ~30-bar MONTH view leaves it off to avoid clutter.
  * - Axis labels are THINNED for dense charts (see below); [labelFn] formats one
  *   bucket into a short, locale-specific label.
  *
  * Colour coding:
  * - avg ≤ limit → [MaterialTheme.colorScheme.primary] (app's accent colour)
- * - avg > limit → [dangerRedColor] (the saturated red shared with delete icons
- *   and traffic-light bullets, so all "danger" reds match)
+ * - avg > limit → [dangerRedColor] (only when [showLimitLine]; the saturated
+ *   red shared with delete icons and traffic-light bullets, so all "danger"
+ *   reds match)
  * - Limit line  → [dangerRedColor] (red dashed)
  * - Abstinent tick → [successColor] (green)
  *
@@ -110,22 +123,28 @@ import de.godisch.potillus.ui.theme.successColor
  *   spaced subset is shown (axis context rather than per-bar precision).
  *
  * SCALE:
- *   `maxVal = max(highestBucketAvg, limitGrams) × 1.15` — 15 % headroom so
- *   neither the tallest bar nor the limit line touches the top edge.
+ *   `maxVal = max(highestBarAvg, limitGrams?) × headroom` — the limit is only
+ *   folded in when [showLimitLine]; headroom is 15 % normally and 30 % when
+ *   [showBarValues] so a value label above the tallest bar stays in view.
  *
- * @param buckets     Continuous, chronological bucket series (see [ChartBucketing]).
- * @param limitGrams  Daily limit threshold for the dashed line and bar colouring.
- * @param labelFn     Formats one [ChartBucket] into a short axis label, e.g. "Mo",
- *                    "1." or "Jan". Provided by the screen so the chart stays
- *                    locale-agnostic.
- * @param modifier    Optional layout modifier.
+ * @param buckets       Continuous, chronological bucket series (see [ChartBucketing]).
+ * @param limitGrams    Daily limit threshold for the dashed line and bar colouring.
+ * @param labelFn       Formats one [ChartBucket] into a short axis label, e.g. "Mo",
+ *                      "1." or "Jan". Provided by the screen so the chart stays
+ *                      locale-agnostic.
+ * @param modifier      Optional layout modifier.
+ * @param showLimitLine Draw the daily-limit line and redden over-limit bars.
+ * @param showBarValues Print each non-abstinent bar's per-day average (rounded
+ *                      to a whole number) above it.
  */
 @Composable
 fun AlcoholBarChart(
     buckets: List<ChartBucket>,
     limitGrams: Double,
     labelFn: (ChartBucket) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showLimitLine: Boolean = true,
+    showBarValues: Boolean = false
 ) {
     if (buckets.isEmpty()) {
         Box(modifier.height(180.dp), contentAlignment = Alignment.Center) {
@@ -136,8 +155,14 @@ fun AlcoholBarChart(
         return
     }
 
-    // Capture theme colors before entering Canvas (see file header note)
-    val maxVal     = maxOf(buckets.maxOf { it.avgPerDay }, limitGrams) * 1.15
+    // Capture theme colors before entering Canvas (see file header note).
+    // Bar height/colour are driven by the per-day average. The limit only enters
+    // the scale when it is actually drawn; showBarValues adds headroom so the
+    // value labels above the tallest bars are not clipped.
+    val headroom   = if (showBarValues) 1.30 else 1.15
+    val maxBar     = buckets.maxOf { it.avgPerDay }
+    val maxVal     = (if (showLimitLine) maxOf(maxBar, limitGrams) else maxBar)
+        .times(headroom).coerceAtLeast(0.001)
     val barColor   = MaterialTheme.colorScheme.primary
     // Daily-limit line in the saturated danger red (was amber) so it reads as a
     // "do not cross" threshold and matches the over-limit bar colour.
@@ -147,6 +172,8 @@ fun AlcoholBarChart(
     // every "over limit" cue in the app shares one consistent red.
     val overColor  = dangerRedColor()
     val tickColor  = successColor()
+    // Resolved here (not inside the Canvas DrawScope, which cannot read theme).
+    val valueArgb  = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
 
     Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
         val chartH  = size.height
@@ -157,17 +184,28 @@ fun AlcoholBarChart(
         val spacing = chartW / buckets.size
         val barW    = (spacing * 0.6f).coerceAtLeast(2f)
 
-        // Limit line Y coordinate: distance from the bottom = (limitGrams / maxVal) * chartH
-        val limitY  = chartH - (limitGrams / maxVal * chartH).toFloat()
+        // Paint for the per-bar value labels (grams), centred above each bar.
+        // Null when labels are disabled, so the loop below skips drawing them.
+        val valuePaint = if (showBarValues) android.graphics.Paint().apply {
+            isAntiAlias = true
+            color       = valueArgb
+            textAlign   = android.graphics.Paint.Align.CENTER
+            textSize    = 9.sp.toPx()
+        } else null
 
-        // Draw dashed horizontal limit line
-        drawLine(
-            color       = limitColor,
-            start       = Offset(0f, limitY),
-            end         = Offset(chartW, limitY),
-            strokeWidth = 2.dp.toPx(),
-            pathEffect  = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
-        )
+        // Dashed horizontal daily-limit line — only when meaningful. The YEAR
+        // view shows monthly totals with no daily-limit reference, so it passes
+        // showLimitLine = false and no line is drawn.
+        if (showLimitLine) {
+            val limitY = chartH - (limitGrams / maxVal * chartH).toFloat()
+            drawLine(
+                color       = limitColor,
+                start       = Offset(0f, limitY),
+                end         = Offset(chartW, limitY),
+                strokeWidth = 2.dp.toPx(),
+                pathEffect  = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
+            )
+        }
 
         buckets.forEachIndexed { i, bucket ->
             val centerX = i * spacing + spacing / 2f
@@ -184,16 +222,28 @@ fun AlcoholBarChart(
                     Offset(centerX - s * 0.25f, baseY),
                     Offset(centerX + s, baseY - s), strokeWidth = w)
             } else {
+                // Bar value: the bucket's per-day average (day grams for DAILY
+                // buckets, the month's grams-per-day for the YEAR view).
+                val value = bucket.avgPerDay
                 // barH: height in pixels; coerceAtLeast(2f) makes even 0.x-gram bars visible
-                val barH = (bucket.avgPerDay / maxVal * chartH).toFloat().coerceAtLeast(2f)
+                val barH = (value / maxVal * chartH).toFloat().coerceAtLeast(2f)
                 val left = centerX - barW / 2f
-                val color = if (bucket.avgPerDay > limitGrams) overColor else barColor
+                // Over-limit red only applies when a daily-limit line is shown.
+                val color = if (showLimitLine && value > limitGrams) overColor else barColor
                 drawRoundRect(
                     color        = color,
                     topLeft      = Offset(left, chartH - barH),
                     size         = Size(barW, barH),
                     cornerRadius = CornerRadius(3.dp.toPx())
                 )
+                // Value label just above the bar: per-day average, commercially
+                // rounded to a whole number (HALF_UP via %.0f; values are ≥ 0) and
+                // printed without a unit to keep it narrow.
+                valuePaint?.let { p ->
+                    drawContext.canvas.nativeCanvas.drawText(
+                        "%.0f".format(value), centerX, chartH - barH - 2.dp.toPx(), p
+                    )
+                }
             }
         }
     }
