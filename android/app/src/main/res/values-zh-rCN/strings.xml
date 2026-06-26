@@ -103,7 +103,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">暴饮天数（>%1$s 克）</string>
     <string name="pdf_meta_longest_abstinence">最长戒酒期</string>
     <string name="pdf_meta_current_abstinence">当前戒酒期</string>
-    <string name="pdf_days_suffix">天</string>
 
     <!-- Actions -->
     <string name="save">保存</string>
@@ -126,7 +125,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">戒断 &amp; 趋势</string>
     <string name="current_streak">当前戒酒</string>
     <string name="longest_streak">最长戒酒</string>
-    <string name="days_count">%1$d 天</string>
     <string name="trend_vs_prev">与上一周期对比趋势</string>
 
     <!-- Settings -->
@@ -229,4 +227,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">确定</string>
     <string name="lock_app">锁定应用</string>
+    <plurals name="days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
 </resources>

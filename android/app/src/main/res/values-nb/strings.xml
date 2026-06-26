@@ -115,7 +115,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Episodisk stordrikking-dager (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Lengste avholdsperiode</string>
     <string name="pdf_meta_current_abstinence">Nåværende avholdenhet</string>
-    <string name="pdf_days_suffix">dager</string>
 
     <!-- Actions -->
     <string name="save">Lagre</string>
@@ -138,7 +137,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Avholdenhet &amp; Trend</string>
     <string name="current_streak">Nåværende avholdenhet</string>
     <string name="longest_streak">Lengste avholdenhet</string>
-    <string name="days_count">%1$d dager</string>
     <string name="trend_vs_prev">Trend sammenlignet med forrige periode</string>
 
     <!-- Settings -->
@@ -241,4 +239,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Lås appen</string>
+    <plurals name="days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dager</item>
+    </plurals>
 </resources>

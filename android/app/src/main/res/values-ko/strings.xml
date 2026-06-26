@@ -120,7 +120,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">과음일 (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">최장 금주 기간</string>
     <string name="pdf_meta_current_abstinence">현재 금주 기간</string>
-    <string name="pdf_days_suffix">일</string>
 
     <!-- Actions -->
     <string name="save">저장</string>
@@ -143,7 +142,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">금주 &amp; 추세</string>
     <string name="current_streak">현재 금주</string>
     <string name="longest_streak">최장 금주</string>
-    <string name="days_count">%1$d 일</string>
     <string name="trend_vs_prev">이전 기간 대비 추세</string>
 
     <!-- Settings -->
@@ -246,4 +244,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">확인</string>
     <string name="lock_app">앱 잠금</string>
+    <plurals name="days">
+        <item quantity="other">%1$d일</item>
+    </plurals>
 </resources>

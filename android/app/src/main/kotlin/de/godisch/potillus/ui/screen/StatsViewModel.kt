@@ -51,6 +51,7 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartBucketing
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.util.CsvExporter
 import de.godisch.potillus.util.ExportResult
@@ -92,6 +93,12 @@ data class StatsUiState(
     val currentStreak: Int                        = 0,
     val longestStreak: Int                        = 0,
     val trendPercent: Double                      = 0.0,
+    /**
+     * Direction of [avgPerDay] versus the previous period's per-day average
+     * (FLAT when equal at 0.1 g or there is no previous value). Drives the trend
+     * arrow/colour; see [Trend].
+     */
+    val trend: Trend                              = Trend.FLAT,
     val limitInfo: LimitInfo                      = LimitInfo(20.0, 100.0, 5),
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
@@ -387,13 +394,26 @@ class StatsViewModel(
             val chartBuckets =
                 ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity, inProgressDay = to)
 
+            // Trend vs the previous period, on a PER-DAY-AVERAGE basis (never totals)
+            // so an in-progress period compares fairly against a full previous one.
+            // The current average already uses the superposition rule (effective
+            // days); the previous period is complete, so it is divided by its full
+            // day count [prevFrom, prevTo]. A non-positive previous average means
+            // "no comparable previous value" → Trend.FLAT (shown as "–").
+            val avgPerDay     = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0
+            val prevSum       = previous.sumOf { it.totalGrams }
+            val prevDays      = (DayResolver.parseDate(prevTo).toEpochDay() -
+                                 DayResolver.parseDate(prevFrom).toEpochDay() + 1).toInt()
+            val prevAvgPerDay = if (prevDays > 0) prevSum / prevDays else 0.0
+            val trend         = Trend.of(avgPerDay, prevAvgPerDay)
+
             StatsUiState(
                 period            = period,
                 dataPoints        = current,
                 chartBuckets      = chartBuckets,
                 chartGranularity  = chartGranularity,
                 totalGrams        = totalGrams,
-                avgPerDay         = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0,
+                avgPerDay         = avgPerDay,
                 avgPerDrinkDay    = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
                 daysOverDailyLimit    = violations.daysOverDailyLimit,
                 daysOverWeeklyLimit   = violations.daysOverWeeklyLimit,
@@ -403,7 +423,8 @@ class StatsViewModel(
                 // when there are no drink entries yet (implicit abstinence assumption).
                 currentStreak     = DayResolver.computeCurrentAbstinence(streakDates, today, statsFloor),
                 longestStreak     = DayResolver.computeLongestAbstinence(streakDates, today, statsFloor),
-                trendPercent      = computeTrend(totalGrams, previous.sumOf { it.totalGrams }),
+                trendPercent      = computeTrend(avgPerDay, prevAvgPerDay),
+                trend             = trend,
                 limitInfo         = limitInfo,
                 categoryBreakdown = categoryBreakdown,
                 hourBucketAverages = hourBucketAverages,

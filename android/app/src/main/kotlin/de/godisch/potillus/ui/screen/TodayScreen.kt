@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
@@ -175,6 +176,20 @@ fun TodayScreen(
                                     color    = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 4.dp)
                                 )
+                                // Trend vs. last month: ↓ green = fewer grams/day,
+                                // ↑ red = more. Nothing when equal (at 0.1 g) or when
+                                // there is no previous-month value (Trend.FLAT). Same
+                                // convention as the Statistics screen's month trend.
+                                if (state.monthTrend != Trend.FLAT) {
+                                    Spacer(Modifier.width(4.dp))
+                                    Text(
+                                        if (state.monthTrend == Trend.DOWN) "↓" else "↑",
+                                        style    = MaterialTheme.typography.titleMedium,
+                                        color    = if (state.monthTrend == Trend.DOWN) successColor()
+                                                   else dangerRedColor(),
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                    )
+                                }
                             }
                         }
                         // A little extra breathing room (~half a line) between the

@@ -113,7 +113,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Дні надмірного вживання (>%1$s г)</string>
     <string name="pdf_meta_longest_abstinence">Найдовше утримання</string>
     <string name="pdf_meta_current_abstinence">Поточне утримання</string>
-    <string name="pdf_days_suffix">днів</string>
 
     <!-- Actions -->
     <string name="save">Зберегти</string>
@@ -136,7 +135,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Утримання &amp; Тренд</string>
     <string name="current_streak">Поточне утримання</string>
     <string name="longest_streak">Найдовше утримання</string>
-    <string name="days_count">%1$d днів</string>
     <string name="trend_vs_prev">Тренд порівняно з попереднім періодом</string>
 
     <!-- Settings -->
@@ -239,4 +237,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">Гаразд</string>
     <string name="lock_app">Заблокувати застосунок</string>
+    <plurals name="days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дні</item>
+        <item quantity="many">%1$d днів</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
 </resources>

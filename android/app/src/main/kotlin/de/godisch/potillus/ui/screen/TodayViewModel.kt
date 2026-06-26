@@ -46,6 +46,7 @@ import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -80,6 +81,12 @@ data class TodayUiState(
      * today, inclusive). Matches the current month's bar in the year-view chart.
      */
     val monthlyAvgPerDay: Double         = 0.0,
+    /**
+     * Trend of [monthlyAvgPerDay] vs. the per-day average over the whole period
+     * from the configured statistics start date up to the day before this month
+     * (FLAT when there is no such baseline or the two are equal at 0.1 g).
+     */
+    val monthTrend: Trend                = Trend.FLAT,
     /** Localized standalone name of the current month (e.g. "June" / "Juni"). */
     val currentMonthLabel: String        = "",
     val bacPermille: Double?             = null,
@@ -192,6 +199,17 @@ class TodayViewModel(
         // First day of the calendar month that contains "today"; used for the
         // "month total" figure shown next to today's total on the summary card.
         val monthStart  = windowEnd.withDayOfMonth(1)
+        // Reference window for the Today trend arrow: the per-day average over the
+        // whole time from the configured statistics start date up to the day before
+        // this month. The daily-summary query below is widened to start there.
+        val monthStr     = DayResolver.formatDate(monthStart)
+        val prevEnd      = monthStart.minusDays(1)         // last day before this month
+        val statsFloor   = settings.statsFromDate          // "" = not configured
+        // A baseline only exists when the statistics start lies before this month.
+        val hasBaseline  = statsFloor.isNotEmpty() && statsFloor < monthStr
+        val historyFrom  = if (hasBaseline) statsFloor else monthStr
+        val baselineDays = if (hasBaseline)
+            (prevEnd.toEpochDay() - DayResolver.parseDate(statsFloor).toEpochDay() + 1).toInt() else 0
         // Localized, standalone month name for the card caption ("Ø <month>").
         // Standalone form is the grammatically correct one for a bare label in
         // languages with cases (e.g. ru/cs/pl/el). Derived from the logical
@@ -205,9 +223,9 @@ class TodayViewModel(
             entryRepo.getEntriesForDate(today),
             drinkRepo.drinks,
             entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
-            entryRepo.getDailySummaries(DayResolver.formatDate(monthStart), DayResolver.formatDate(windowEnd)),
+            entryRepo.getDailySummaries(historyFrom, DayResolver.formatDate(windowEnd)),
             ticker
-        ) { entries, drinks, weeklySummaries, monthlySummaries, _ ->
+        ) { entries, drinks, weeklySummaries, historySummaries, _ ->
             val totalGrams = entries.sumOf { it.gramsAlcohol }
 
             // BAC calculation: only use entries with actual alcohol (> 0 %) so that
@@ -221,6 +239,23 @@ class TodayViewModel(
                 AlcoholCalculator.calculateBAC(totalGrams, settings.weightKg, hoursElapsed)
             } else null
 
+            // Split the widened query into this month and everything before it
+            // (within the baseline window). The current month uses the superposition
+            // rule; the baseline is its summed grams over the full day count from the
+            // statistics start to the day before this month. Trend.of yields FLAT
+            // when there is no baseline or the two are equal at 0.1 g.
+            val curMonth     = historySummaries.filter { it.date >= monthStr }
+            val curMonthAvg  = run {
+                val days = DayResolver.effectivePeriodDays(
+                    from            = monthStr,
+                    today           = today,
+                    todayIsDrinkDay = curMonth.any { it.date == today }
+                )
+                if (days > 0) curMonth.sumOf { it.totalGrams } / days else 0.0
+            }
+            val baselineSum  = historySummaries.filter { it.date < monthStr }.sumOf { it.totalGrams }
+            val baselineAvg  = if (baselineDays > 0) baselineSum / baselineDays else 0.0
+
             TodayUiState(
                 entries           = entries,
                 totalGrams        = totalGrams,
@@ -228,19 +263,10 @@ class TodayViewModel(
                 drinkDaysThisWeek = weeklySummaries.count { it.totalGrams > 0.0 },
                 weeklyTotalGrams  = weeklySummaries.sumOf { it.totalGrams },
                 weeklyRangeLabel  = weekLabel,
-                // Per-day average for the current month, using the app-wide rule
-                // (DayResolver.effectivePeriodDays): completed days this month plus
-                // today iff a drink was already logged today. todayIsDrinkDay is
-                // "today has a daily summary", mirroring StatsViewModel so the Today
-                // card, the Statistics summary and the year-view bar all match.
-                monthlyAvgPerDay  = run {
-                    val days = DayResolver.effectivePeriodDays(
-                        from            = DayResolver.formatDate(monthStart),
-                        today           = today,
-                        todayIsDrinkDay = monthlySummaries.any { it.date == today }
-                    )
-                    if (days > 0) monthlySummaries.sumOf { it.totalGrams } / days else 0.0
-                },
+                // Per-day average for the current month (app-wide superposition rule),
+                // plus its trend versus the all-time-before-this-month baseline.
+                monthlyAvgPerDay  = curMonthAvg,
+                monthTrend        = Trend.of(curMonthAvg, baselineAvg),
                 currentMonthLabel = monthLabel,
                 bacPermille       = bac,
                 favorites         = drinks.filter { it.isFavorite },

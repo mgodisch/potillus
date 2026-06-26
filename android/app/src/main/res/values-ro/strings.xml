@@ -122,7 +122,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Zile binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Cea mai lungă perioadă de abstinență</string>
     <string name="pdf_meta_current_abstinence">Abstinență curentă</string>
-    <string name="pdf_days_suffix">zile</string>
 
     <!-- Actions -->
     <string name="save">Salvează</string>
@@ -145,7 +144,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Abstinență și tendință</string>
     <string name="current_streak">Abstinență curentă</string>
     <string name="longest_streak">Cea mai lungă abstinență</string>
-    <string name="days_count">%1$d zile</string>
     <string name="trend_vs_prev">Tendință față de perioada anterioară</string>
 
     <!-- Settings -->
@@ -250,4 +248,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Blochează aplicația</string>
+    <plurals name="days">
+        <item quantity="one">%1$d zi</item>
+        <item quantity="few">%1$d zile</item>
+        <item quantity="other">%1$d de zile</item>
+    </plurals>
 </resources>

@@ -135,29 +135,22 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     table.data td:not(:first-child) { text-align: right; }
 
     /* ---- Bar charts (pure CSS; no images) --------------------------------- */
-    /* The consumption-over-time "trend" chart (repeat block BARS) uses this
-       flex-column-of-bars layout: a horizontal flex row whose children (.col) are
-       equal-width columns, each anchoring its .bar to the bottom; the bar's inline
-       `height:NN%` sets its size relative to the chart's fixed height (60pt). */
-    .chart {
-        position: relative; height: 60pt; margin-top: 4pt;
-        display: flex; align-items: flex-end; gap: 3pt;
-        border-bottom: .5px solid #dcdcdc;
-    }
-    .chart .col { flex: 1; display: flex; flex-direction: column;
-                  justify-content: flex-end; align-items: center; height: 100%; }
-    .chart .bar { width: 60%; background: #1e50a0; border-radius: 1pt 1pt 0 0; }
-    .chart .bar.over { background: #c83232; }          /* day over the daily limit */
-    .chart .lab { font-size: 7pt; color: #646464; margin-top: 2pt; }
-    /* Green tick marking an abstinent (zero-consumption) bucket, drawn at the
-       baseline in place of a bar (trend chart only). */
-    .chart .tick { color: #2e7d32; font-size: 8pt; line-height: 1; }
-    /* Dashed reference line marking the daily limit; its inline `bottom:NN%`
-       comes from the LIMIT_LINE_PCT placeholder (trend chart only). */
-    .chart .limit {
+    /* The consumption-over-time "trend" chart (page 1) reuses the .barchart layout
+       below (separate .bars plot area + .axis label row BELOW the baseline, so the
+       x-axis labels match the page-2 hour/weekday charts), with these extras:
+       wider bars, a dashed daily-limit line and green abstinence ticks. */
+    .barchart.trend .bars { gap: 3pt; }
+    .barchart.trend .bars .bar { width: 60%; }
+    .barchart.trend .bars .bar.over { background: #c83232; }   /* over the daily limit */
+    /* Green tick marking an abstinent (zero-consumption) bucket at the baseline. */
+    .barchart.trend .bars .tick { color: #2e7d32; font-size: 8pt; line-height: 1; }
+    /* Dashed daily-limit reference line; its inline `bottom:NN%` comes from the
+       LIMIT_LINE_PCT placeholder. */
+    .barchart.trend .bars .limit {
         position: absolute; left: 0; right: 0;
         border-top: 1px dashed #c83232;   /* red — same hue as over-limit cues */
     }
+    .barchart.trend .axis .cell { font-size: 7pt; }
 
     /* Bar chart with the axis labels in a SEPARATE row BELOW the baseline, so a
        label is never overlapped by its bar (used by the hour-of-day and weekday
@@ -238,8 +231,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
                         + block MONTHS (row: M_ROW_CLASS, M_MONTH, M_DRINK_DAYS,
                         M_TOTAL, M_AVG, M_OVER)
     Trend chart ....... SECTION_TREND, TREND_DISPLAY, LIMIT_LINE_PCT
-                        + block BARS (row: BAR_CLASS, BAR_HEIGHT_PCT,
-                        BAR_TICK_DISPLAY, BAR_LABEL)
+                        + bars block BARS (BAR_CLASS, BAR_HEIGHT_PCT,
+                        BAR_TICK_DISPLAY) and axis block BARSLABELS (BAR_LABEL)
     Footer ............ FOOTER1
 
   PAGE 2
@@ -300,15 +293,21 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
      One bar per bucket; abstinent buckets render a green tick at the baseline. -->
 <div style="display:{{TREND_DISPLAY}}">
     <div class="section">{{SECTION_TREND}}</div>
-    <div class="chart">
-        <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
-        <!-- repeat:BARS -->
-        <div class="col">
-            <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
-            <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
-            <div class="lab">{{BAR_LABEL}}</div>
+    <div class="barchart trend">
+        <div class="bars">
+            <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
+            <!-- repeat:BARS -->
+            <div class="col">
+                <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
+                <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
+            </div>
+            <!-- end:BARS -->
         </div>
-        <!-- end:BARS -->
+        <div class="axis">
+            <!-- repeat:BARSLABELS -->
+            <div class="cell">{{BAR_LABEL}}</div>
+            <!-- end:BARSLABELS -->
+        </div>
     </div>
 </div>
 

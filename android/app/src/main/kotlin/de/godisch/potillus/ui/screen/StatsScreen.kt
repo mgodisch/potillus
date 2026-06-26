@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
@@ -246,26 +248,26 @@ fun StatsScreen(
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.current_streak),
-                            stringResource(R.string.days_count, state.currentStreak),
+                            pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
                             valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface
                         )
                         HorizontalDivider()
-                        StatRow(stringResource(R.string.longest_streak), stringResource(R.string.days_count, state.longestStreak))
+                        StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
                         HorizontalDivider()
-                        val trendText = when {
-                            state.trendPercent > 0 -> "+${"%.0f".format(state.trendPercent)} % ↑"
-                            state.trendPercent < 0 -> "${"%.0f".format(state.trendPercent)} % ↓"
-                            else                   -> "–"
+                        val trendText = when (state.trend) {
+                            Trend.UP   -> "+${"%.0f".format(state.trendPercent)} % ↑"
+                            Trend.DOWN -> "${"%.0f".format(state.trendPercent)} % ↓"
+                            Trend.FLAT -> "–"
                         }
                         StatRow(
                             stringResource(R.string.trend_vs_prev),
                             trendText,
-                            valueColor = when {
-                                // A rising trend is a "bad" signal, shown in the same
-                                // saturated danger red as the over-limit statistics.
-                                state.trendPercent > 0 -> dangerRedColor()
-                                state.trendPercent < 0 -> successColor()
-                                else                   -> MaterialTheme.colorScheme.onSurface
+                            valueColor = when (state.trend) {
+                                // A rising per-day average is a "bad" signal, shown in
+                                // the same saturated danger red as the over-limit stats.
+                                Trend.UP   -> dangerRedColor()
+                                Trend.DOWN -> successColor()
+                                Trend.FLAT -> MaterialTheme.colorScheme.onSurface
                             }
                         )
                     }

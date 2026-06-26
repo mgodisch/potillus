@@ -88,7 +88,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Bingedagen (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Langste onthouding</string>
     <string name="pdf_meta_current_abstinence">Huidige onthouding</string>
-    <string name="pdf_days_suffix">dagen</string>
     <string name="save">Opslaan</string>
     <string name="cancel">Annuleren</string>
     <string name="back">Terug</string>
@@ -107,7 +106,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Onthouding &amp; Trend</string>
     <string name="current_streak">Huidige onthouding</string>
     <string name="longest_streak">Langste onthouding</string>
-    <string name="days_count">%1$d dagen</string>
     <string name="trend_vs_prev">Trend t.o.v. vorige periode</string>
     <string name="appearance">Weergave</string>
     <string name="theme_mode">Kleurenschema</string>
@@ -199,4 +197,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">App vergrendelen</string>
+    <plurals name="days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagen</item>
+    </plurals>
 </resources>

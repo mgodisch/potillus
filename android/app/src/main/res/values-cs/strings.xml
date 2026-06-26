@@ -88,7 +88,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Dny binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Nejdelší abstinence</string>
     <string name="pdf_meta_current_abstinence">Současná abstinence</string>
-    <string name="pdf_days_suffix">dní</string>
     <string name="save">Uložit</string>
     <string name="cancel">Zrušit</string>
     <string name="back">Zpět</string>
@@ -107,7 +106,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Abstinence &amp; Trend</string>
     <string name="current_streak">Současná abstinence</string>
     <string name="longest_streak">Nejdelší abstinence</string>
-    <string name="days_count">%1$d dní</string>
     <string name="trend_vs_prev">Trend vůči předchozímu období</string>
     <string name="appearance">Vzhled</string>
     <string name="theme_mode">Barevné schéma</string>
@@ -199,4 +197,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Zamknout aplikaci</string>
+    <plurals name="days">
+        <item quantity="one">%1$d den</item>
+        <item quantity="few">%1$d dny</item>
+        <item quantity="many">%1$d dne</item>
+        <item quantity="other">%1$d dní</item>
+    </plurals>
 </resources>

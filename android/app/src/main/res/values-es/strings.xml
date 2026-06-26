@@ -97,7 +97,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Días binge (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Mayor abstinencia</string>
     <string name="pdf_meta_current_abstinence">Abstinencia actual</string>
-    <string name="pdf_days_suffix">días</string>
 
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
@@ -118,7 +117,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Abstinencia y tendencia</string>
     <string name="current_streak">Abstinencia actual</string>
     <string name="longest_streak">Abstinencia más larga</string>
-    <string name="days_count">%1$d días</string>
     <string name="trend_vs_prev">Tendencia vs período anterior</string>
 
     <string name="appearance">Apariencia</string>
@@ -215,4 +213,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">Aceptar</string>
     <string name="lock_app">Bloquear la aplicación</string>
+    <plurals name="days">
+        <item quantity="one">%1$d día</item>
+        <item quantity="many">%1$d días</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
 </resources>

@@ -36,6 +36,75 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.70.0
+
+Add monthly trend arrow; fair per-day trend
+
+Added:
+- Today screen, monthly trend arrow. Next to the month's per-day average a small
+  arrow now shows how it compares with the baseline period — the per-day average
+  over the whole time from the configured statistics start date up to the day
+  before this month: a green ↓ when this month is averaging fewer grams of
+  alcohol per day than that baseline, a red ↑ when it is more, and nothing (no
+  arrow, no extra space) when the two are equal at 0.1 g precision or there is no
+  baseline yet (statistics started this month). Backed by a new shared domain
+  type Trend (Trend.of(currentAvg, prevAvg)) and a monthTrend field on
+  TodayUiState; the baseline is read by widening the monthly daily-summary query
+  to start at the statistics start date.
+- Release gate now checks Markdown syntax. A new check (`release-check.sh`
+  section 9, backed by `tools/md-syntax.py`, standard library only) verifies that
+  `CHANGELOG.md`, `README.md`, `CONTRIBUTING.md` and the per-language guides
+  rendered from `*.md.in` are well formed: inline-code backticks and `*` emphasis
+  balanced, and code-looking tokens (`snake_case`, glob `*`) wrapped in backticks
+  so a stray marker cannot turn into accidental emphasis in the in-app renderer.
+  `CHANGELOG.md` headings must additionally read `## vMAJOR.MINOR.PATCH` in
+  descending order. The verbatim GPL texts (`LICENSE.md`, `COPYING.md`,
+  `copyright.md`) are excluded.
+
+Changed:
+- Statistics trend is now computed on a per-day-AVERAGE basis instead of period
+  totals, and its arrow uses the same shared Trend rule as the Today card. This
+  makes an in-progress period compare fairly with the previous one: the current
+  period is divided by its effective days (today counts only once it is a drink
+  day) and the previous, complete period by its full day count. As a result a
+  part-month no longer looks artificially lower than a full previous month, and
+  the two screens always agree. The "trend vs. previous" percentage is now the
+  change in the per-day averages; equal-at-0.1 g shows "–" (no arrow). The 7-day
+  view is unaffected in practice (two equal-length windows).
+
+Fixed:
+- PDF report, page-1 trend chart: the x-axis labels are now drawn in a separate
+  row BELOW the baseline, matching the page-2 hour/weekday charts (previously they
+  sat above the axis, inside the plot area). The trend chart was switched to the
+  same .barchart layout (a .bars plot area plus a .axis label row), so a label is
+  never overlapped by its bar and both pages are laid out consistently.
+- English PDF report capitalization. Report labels now use sentence case
+  (lowercase except the first word and proper nouns) instead of Title Case —
+  e.g. "Total alcohol", "Ø per day", "Longest abstinence phase", "Binge days",
+  "Drinking days" — and units after a slash are lowercase ("g/day", "g/7 days",
+  "Ø g/day", "… days/month"). Document title and section headings keep their
+  Title-Case / all-caps styling. Only the report-only (`pdf_*`) English strings
+  were touched; localized values are unchanged (e.g. German "g/Tag" stays
+  capitalized, since "Tag" is a noun).
+- Day counts are now correctly pluralized. The abstinence values in the PDF
+  report (e.g. "Longest abstinence: 1 day", "Current: 0 days") and the streak
+  values on the Statistics screen previously always used the plural form ("1
+  Days"). They now use a shared `days` plural resource with the correct forms for
+  every locale (including the multi-form Slavic plurals: cs/pl/ru/uk and ro).
+  The now-unused `pdf_days_suffix` and `days_count` strings were removed.
+- CHANGELOG escaping. Several code identifiers in recent entries were written
+  without backticks; their `_` and `*` characters could render as unintended
+  emphasis in a Markdown viewer. They are now wrapped in backticks (along with a
+  stray `2.2.*` version glob), matching the file's convention. The new section-9
+  check above guards against regressions.
+
+Release housekeeping:
+- versionName 0.69.0 → 0.70.0 (minor bump), versionCode 71 → 72.
+- Synced proguard-rules.pro and the README title line; added Fastlane store
+  notes 72.txt for de-DE and en-US.
+
+---
+
 ## v0.69.0
 
 Label chart bars; add monthly per-day average
@@ -55,8 +124,8 @@ Added:
   shows only the label "Alcohol" there. The per-day average uses the same rule
   as the chart and the statistics summary (see Fixed). Backed by new
   monthlyAvgPerDay and currentMonthLabel fields on TodayUiState.
-- New/renamed string resources, translated into all 20 locales: avg_of_month
-  ("Ø %1$s" format), alcohol and grams_per_day; the now-unused grams_alcohol was
+- New/renamed string resources, translated into all 20 locales: `avg_of_month`
+  ("Ø %1$s" format), `alcohol` and `grams_per_day`; the now-unused `grams_alcohol` was
   removed.
 
 Changed:
@@ -1323,7 +1392,7 @@ build-on-each-other steps under one version:
   same catalog key, this also moves the Compose compiler to 2.3.21, which is the
   compiler that pairs with the Compose 1.11 runtime (see below).
 - **KSP 2.0.21-1.0.28 → 2.3.7.** Adopts KSP's new, Kotlin-decoupled version
-  scheme (since KSP 2.3.0 a single release supports Kotlin 2.2.* and newer), so
+  scheme (since KSP 2.3.0 a single release supports Kotlin `2.2.*` and newer), so
   the version no longer mirrors the compiler version.
 - **Compose BOM 2025.05.01 → 2026.04.01.** Pins the core Compose modules to
   1.11.0.

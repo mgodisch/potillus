@@ -88,7 +88,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Bingedagar (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Längsta nykterhet</string>
     <string name="pdf_meta_current_abstinence">Aktuell nykterhet</string>
-    <string name="pdf_days_suffix">dagar</string>
     <string name="save">Spara</string>
     <string name="cancel">Avbryt</string>
     <string name="back">Tillbaka</string>
@@ -107,7 +106,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Nykterhet &amp; Trend</string>
     <string name="current_streak">Aktuell nykterhet</string>
     <string name="longest_streak">Längsta nykterhet</string>
-    <string name="days_count">%1$d dagar</string>
     <string name="trend_vs_prev">Trend jämfört med föregående period</string>
     <string name="appearance">Utseende</string>
     <string name="theme_mode">Färgschema</string>
@@ -199,4 +197,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Lås appen</string>
+    <plurals name="days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagar</item>
+    </plurals>
 </resources>

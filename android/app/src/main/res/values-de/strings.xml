@@ -104,7 +104,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Rauschtage (&gt; %1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Längste Abstinenzphase</string>
     <string name="pdf_meta_current_abstinence">Aktuelle Abstinenz</string>
-    <string name="pdf_days_suffix">Tage</string>
 
     <!-- Actions -->
     <string name="save">Speichern</string>
@@ -127,7 +126,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Abstinenz &amp; Trend</string>
     <string name="current_streak">Aktuelle Abstinenz</string>
     <string name="longest_streak">Längste Abstinenz</string>
-    <string name="days_count">%1$d Tage</string>
     <string name="trend_vs_prev">Trend ggü. Vorperiode</string>
 
     <!-- Settings -->
@@ -230,4 +228,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">App sperren</string>
+    <plurals name="days">
+        <item quantity="one">%1$d Tag</item>
+        <item quantity="other">%1$d Tage</item>
+    </plurals>
 </resources>

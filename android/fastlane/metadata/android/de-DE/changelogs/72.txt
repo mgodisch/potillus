@@ -1,0 +1,5 @@
+Der Heute-Screen zeigt neben dem Monatsdurchschnitt jetzt einen Trendpfeil: ein
+grüner Pfeil nach unten, wenn du weniger Gramm pro Tag als im Vormonat trinkst,
+ein roter nach oben bei mehr, keiner bei Gleichstand oder fehlendem Vormonat. Der
+Statistik-Trend vergleicht nun ebenfalls Tagesdurchschnitte, sodass ein
+angefangener Monat fair mit einem vollen Vormonat verglichen wird.

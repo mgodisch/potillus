@@ -87,24 +87,23 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Self-logged estimates – not a medical diagnosis! Not intended for driving ability evaluation or diagnostic purposes!</string>
 
     <!-- PDF Metadaten / KPI Labels -->
-    <string name="pdf_meta_export_date">Export Date</string>
+    <string name="pdf_meta_export_date">Export date</string>
     <string name="pdf_meta_period">Period</string>
     <string name="pdf_meta_limit">Limits</string>
-    <string name="pdf_meta_weight">Body Weight</string>
-    <string name="pdf_kpi_total">Total Alcohol</string>
-    <string name="pdf_kpi_avg_day">Ø per Day</string>
-    <string name="pdf_kpi_avg_drink_day">Ø per Drinking Day</string>
-    <string name="pdf_kpi_drink_days">Drinking Days</string>
-    <string name="pdf_kpi_abstinent_days">Abstinent Days</string>
-    <string name="pdf_kpi_binge">Binge Days (&gt; %1$s g)</string>
+    <string name="pdf_meta_weight">Body weight</string>
+    <string name="pdf_kpi_total">Total alcohol</string>
+    <string name="pdf_kpi_avg_day">Ø per day</string>
+    <string name="pdf_kpi_avg_drink_day">Ø per drinking day</string>
+    <string name="pdf_kpi_drink_days">Drinking days</string>
+    <string name="pdf_kpi_abstinent_days">Abstinent days</string>
+    <string name="pdf_kpi_binge">Binge days (&gt; %1$s g)</string>
     <string name="pdf_col_month">Month</string>
-    <string name="pdf_col_drink_days">Drinking Days</string>
+    <string name="pdf_col_drink_days">Drinking days</string>
     <string name="pdf_col_total_g">Total g</string>
-    <string name="pdf_col_avg_g_day">Ø g/Day</string>
-    <string name="pdf_meta_binge_days">Binge Drinking Days (&gt; %1$s g)</string>
-    <string name="pdf_meta_longest_abstinence">Longest Abstinence Phase</string>
-    <string name="pdf_meta_current_abstinence">Current Abstinence</string>
-    <string name="pdf_days_suffix">Days</string>
+    <string name="pdf_col_avg_g_day">Ø g/day</string>
+    <string name="pdf_meta_binge_days">Binge drinking days (&gt; %1$s g)</string>
+    <string name="pdf_meta_longest_abstinence">Longest abstinence phase</string>
+    <string name="pdf_meta_current_abstinence">Current abstinence</string>
 
     <!-- Actions -->
     <string name="save">Save</string>
@@ -127,7 +126,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Abstinence &amp; Trend</string>
     <string name="current_streak">Current Abstinence</string>
     <string name="longest_streak">Longest Abstinence</string>
-    <string name="days_count">%1$d Days</string>
     <string name="trend_vs_prev">Trend vs. Previous Period</string>
 
     <!-- Settings -->
@@ -195,7 +193,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_alcohol_pct">Alcohol_Percent</string>
     <string name="csv_col_grams">Grams_Alcohol</string>
     <string name="csv_col_note">Note</string>
-    <string name="pdf_unit_g_per_day">g/Day</string>
+    <string name="pdf_unit_g_per_day">g/day</string>
     <string name="drink_days_label">Drinking Days (last 7 days)</string>
     <string name="drink_days_setting">Max. Drinking Days/7 Days</string>
     <!-- Device-transfer warning (translate title and body) -->
@@ -204,30 +202,34 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="personal_data">Personal Data</string>
     <string name="limits">Limits</string>
     <string name="daily_limit_grams">Daily Limit in Grams</string>
-    <string name="limit_caption_day">%1$s g/Day</string>
-    <string name="limit_caption_week">%1$s g/7 Days</string>
+    <string name="limit_caption_day">%1$s g/day</string>
+    <string name="limit_caption_week">%1$s g/7 days</string>
     <string name="days_over_daily_limit">Days Over Daily Limit</string>
     <string name="days_over_weekly_limit">Days Over 7-Day Limit</string>
     <string name="days_over_drink_day_limit">Days Over Drinking Days Limit</string>
-    <string name="pdf_unit_g_per_week">g/7 Days</string>
-    <string name="pdf_meta_drink_days_suffix">Drinking Days/7 Days</string>
+    <string name="pdf_unit_g_per_week">g/7 days</string>
+    <string name="pdf_meta_drink_days_suffix">Drinking days/7 days</string>
     <string name="pdf_kpi_over_daily">days &gt; %1$s g/day</string>
     <string name="pdf_kpi_over_weekly">days &gt; %1$s g/7 days</string>
     <string name="pdf_kpi_over_drink_days">days &gt; %1$d/7 drinking days</string>
-    <string name="pdf_col_over_daily">&gt; Day</string>
+    <string name="pdf_col_over_daily">&gt; day</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>
     <string name="copyright">Copyright</string>
     <string name="stats_time_of_day">Time of Day</string>
     <string name="stats_weekday">Weekday</string>
-    <string name="pdf_kpi_median_day">Median per Day</string>
-    <string name="pdf_kpi_median_drink_day">Median per Drinking Day</string>
-    <string name="pdf_kpi_avg_drink_days_month">Ø Drinking Days/Month</string>
-    <string name="pdf_kpi_median_drink_days_month">Median Drinking Days/Month</string>
-    <string name="pdf_kpi_max_day">Max per Day</string>
-    <string name="pdf_kpi_max_7days">Max per 7 Days</string>
+    <string name="pdf_kpi_median_day">Median per day</string>
+    <string name="pdf_kpi_median_drink_day">Median per drinking day</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø drinking days/month</string>
+    <string name="pdf_kpi_median_drink_days_month">Median drinking days/month</string>
+    <string name="pdf_kpi_max_day">Max per day</string>
+    <string name="pdf_kpi_max_7days">Max per 7 days</string>
     <string name="info_dialog_title">Do you like this App?</string>
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Lock app</string>
+    <plurals name="days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
 </resources>

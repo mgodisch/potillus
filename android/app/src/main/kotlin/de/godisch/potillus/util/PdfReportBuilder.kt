@@ -230,15 +230,20 @@ object PdfReportBuilder {
             scalars["LIMIT_LINE_PCT"] = pct(limit, maxVal).fmt0()
 
             val labelIdx = chartLabelIndices(d.chartBuckets.size)
-            repeats["BARS"] = d.chartBuckets.mapIndexed { i, b ->
+            repeats["BARS"] = d.chartBuckets.map { b ->
                 mapOf(
-                    "BAR_LABEL"        to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b, monthFmt) else "",
                     "BAR_HEIGHT_PCT"   to if (b.isAbstinent) "0"
                                           else pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0(),
                     "BAR_CLASS"        to if (b.avgPerDay > limit) "bar over" else "bar",
                     // Green abstinence tick shown only for zero-consumption buckets.
                     "BAR_TICK_DISPLAY" to if (b.isAbstinent) "block" else "none"
                 )
+            }
+            // X-axis labels live in their OWN row BELOW the baseline (like the
+            // hour/weekday charts), so a label is never overlapped by its bar and
+            // the trend chart is laid out consistently with the page-2 charts.
+            repeats["BARSLABELS"] = d.chartBuckets.mapIndexed { i, b ->
+                mapOf("BAR_LABEL" to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b, monthFmt) else "")
             }
         }
 
@@ -327,13 +332,17 @@ object PdfReportBuilder {
         }
 
         // ── Binge & abstinence streaks ───────────────────────────────────────────
-        val daysSuffix = context.getString(R.string.pdf_days_suffix)
         scalars["RISK_BINGE_LABEL"]   = context.getString(R.string.pdf_meta_binge_days, PdfReportData.bingeThreshold.fmt0())
         scalars["RISK_BINGE_VALUE"]   = "${d.bingeDays}"
         scalars["RISK_LONGEST_LABEL"] = context.getString(R.string.pdf_meta_longest_abstinence)
-        scalars["RISK_LONGEST_VALUE"] = "${d.longestAbstinence} $daysSuffix"
+        // Properly pluralized "N day(s)" via the shared `days` plural resource, so
+        // the English report no longer prints "1 Days" (and every locale uses its
+        // own plural rules).
+        scalars["RISK_LONGEST_VALUE"] = context.resources.getQuantityString(
+            R.plurals.days, d.longestAbstinence, d.longestAbstinence)
         scalars["RISK_CURRENT_LABEL"] = context.getString(R.string.pdf_meta_current_abstinence)
-        scalars["RISK_CURRENT_VALUE"] = "${d.currentAbstinence} $daysSuffix"
+        scalars["RISK_CURRENT_VALUE"] = context.resources.getQuantityString(
+            R.plurals.days, d.currentAbstinence, d.currentAbstinence)
 
         val template = context.assets.open(TEMPLATE_ASSET).bufferedReader().use { it.readText() }
         return SimpleTemplate.render(template, scalars, repeats)

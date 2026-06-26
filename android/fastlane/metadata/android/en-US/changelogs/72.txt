@@ -1,0 +1,5 @@
+The Today screen now shows a trend arrow next to the month's average: a green
+down arrow when you are drinking fewer grams per day than last month, a red up
+arrow when it is more, and none when it is equal or there is no previous month
+yet. The statistics trend now compares per-day averages too, so a part-month
+compares fairly with a full previous month.

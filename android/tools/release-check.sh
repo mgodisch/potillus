@@ -106,6 +106,16 @@
 #      This check is heuristic: it verifies that the version constant matches
 #      the highest version number mentioned in the adjacent KDoc block.
 #
+#   9. MARKDOWN SYNTAX
+#      The authored Markdown docs (CHANGELOG.md, README.md, CONTRIBUTING.md) and
+#      the per-language guides rendered from *.md.in into res/raw*/ must be well
+#      formed: inline-code backticks and '*' emphasis balanced, and code-looking
+#      tokens (snake_case, glob '*') wrapped in backticks so a stray marker does
+#      not turn into accidental emphasis in the in-app renderer.  CHANGELOG.md
+#      headings must additionally read "## vMAJOR.MINOR.PATCH" in descending
+#      order.  The check lives in tools/md-syntax.py.  The verbatim GPL texts
+#      (LICENSE.md, COPYING.md, generated copyright.md) are excluded.
+#
 # HOW TO ADD A NEW CHECK
 #   1. Write a bash function named check_<topic>().
 #   2. Call fail "description" for hard failures (blocks the release).
@@ -188,6 +198,7 @@ BUILD_GRADLE="app/build.gradle.kts"
 # remain relative to android/ (i.e. under app/).
 CHANGELOG="../CHANGELOG.md"
 README="../README.md"
+CONTRIBUTING="../CONTRIBUTING.md"
 PROGUARD="app/proguard-rules.pro"
 APPDB_KT="app/src/main/kotlin/de/godisch/potillus/data/db/AppDatabase.kt"
 BACKUP_MANAGER_KT="app/src/main/kotlin/de/godisch/potillus/util/BackupManager.kt"
@@ -281,7 +292,7 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 8 — VERSION CONSISTENCY"
+    section "1 / 9 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version proguard_version
 
@@ -400,7 +411,7 @@ check_version_consistency() {
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 8 — CHANGELOG ENTRY"
+    section "2 / 9 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -443,7 +454,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 8 — ROOM DATABASE MIGRATIONS"
+    section "3 / 9 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -514,7 +525,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 8 — LOCALE CONSISTENCY"
+    section "4 / 9 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -643,7 +654,7 @@ check_locale_consistency() {
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 8 — SOURCE CODE DOCUMENTATION"
+    section "5 / 9 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -787,7 +798,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 8 — LOG CALL GUARDS"
+    section "6 / 9 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -839,7 +850,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 8 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 9 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -901,7 +912,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 8 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 9 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -937,6 +948,53 @@ check_backup_version() {
 }
 
 # =============================================================================
+# SECTION 9 – MARKDOWN SYNTAX
+#
+# WHY THIS MATTERS:
+#   The in-app guide/licence viewer renders Markdown with a small, permissive
+#   in-house renderer.  A stray emphasis marker — an asterisk or underscore
+#   meant literally but left outside an inline-code span — silently becomes
+#   italics/bold there.  Generic Markdown tools do not catch this (renderers
+#   just convert; style linters check layout), so we run a tiny standard-library
+#   checker, tools/md-syntax.py, over the authored docs and the rendered guides.
+#
+#   Excluded on purpose: the verbatim GPL texts LICENSE.md, COPYING.md and the
+#   generated copyright.md (their GNU `quoted' style uses single backticks that
+#   no balance check can satisfy, and they are never reformatted anyway).
+# =============================================================================
+check_markdown_syntax() {
+    section "9 / 9 — MARKDOWN SYNTAX"
+
+    # python3 is already a prerequisite (see §5); reuse it here.
+    if ! command -v python3 >/dev/null 2>&1; then
+        warn "python3 not found — skipping markdown syntax check"
+        return
+    fi
+
+    # Authored docs (repo root) + the per-language guides rendered from *.md.in
+    # into res/raw*/ earlier in the build. Guides are added only if present, so
+    # a standalone run before `make guides` simply checks the authored docs.
+    local files=("$CHANGELOG" "$README" "$CONTRIBUTING")
+    local g
+    for g in app/src/main/res/raw*/usersguide.md; do
+        [[ -f "$g" ]] && files+=("$g")
+    done
+
+    local output rc
+    output=$(python3 tools/md-syntax.py "${files[@]}" 2>/dev/null)
+    rc=$?
+
+    if [[ $rc -eq 0 ]]; then
+        pass "Markdown syntax OK in ${#files[@]} file(s) (docs + rendered guides)"
+    else
+        # md-syntax.py prints one "path:line: message" per problem on stdout.
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && fail "$line"
+        done <<< "$output"
+    fi
+}
+
+# =============================================================================
 # MAIN
 # =============================================================================
 main() {
@@ -956,6 +1014,7 @@ main() {
     check_log_guards
     check_no_german_comments
     check_backup_version
+    check_markdown_syntax
 
     # ── Final summary ─────────────────────────────────────────────────────────
     echo ""

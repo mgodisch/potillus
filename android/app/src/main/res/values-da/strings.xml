@@ -88,7 +88,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Binge-dage (>%1$s g)</string>
     <string name="pdf_meta_longest_abstinence">Længste afholdenhed</string>
     <string name="pdf_meta_current_abstinence">Aktuel afholdenhed</string>
-    <string name="pdf_days_suffix">dage</string>
     <string name="save">Gem</string>
     <string name="cancel">Annuller</string>
     <string name="back">Tilbage</string>
@@ -107,7 +106,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Afholdenhed &amp; Tendens</string>
     <string name="current_streak">Aktuel afholdenhed</string>
     <string name="longest_streak">Længste afholdenhed</string>
-    <string name="days_count">%1$d dage</string>
     <string name="trend_vs_prev">Tendens ift. forrige periode</string>
     <string name="appearance">Udseende</string>
     <string name="theme_mode">Farvetema</string>
@@ -199,4 +197,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Lås appen</string>
+    <plurals name="days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dage</item>
+    </plurals>
 </resources>

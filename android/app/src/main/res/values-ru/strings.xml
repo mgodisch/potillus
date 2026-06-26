@@ -88,7 +88,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_binge_days">Дней бинджа (>%1$s г)</string>
     <string name="pdf_meta_longest_abstinence">Наибольший период воздержания</string>
     <string name="pdf_meta_current_abstinence">Текущее воздержание</string>
-    <string name="pdf_days_suffix">дней</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
     <string name="back">Назад</string>
@@ -107,7 +106,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="streak_trend">Воздержание &amp; Тренд</string>
     <string name="current_streak">Текущее воздержание</string>
     <string name="longest_streak">Наибольшее воздержание</string>
-    <string name="days_count">%1$d дней</string>
     <string name="trend_vs_prev">Тренд к предыдущему периоду</string>
     <string name="appearance">Внешний вид</string>
     <string name="theme_mode">Цветовая схема</string>
@@ -199,4 +197,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="info_dialog_body">(Placeholder — text to follow.)</string>
     <string name="info_dialog_ok">ОК</string>
     <string name="lock_app">Заблокировать приложение</string>
+    <plurals name="days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
 </resources>
