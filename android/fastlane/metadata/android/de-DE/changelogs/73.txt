@@ -1,0 +1,6 @@
+Der Statistik-Screen öffnet jetzt standardmäßig die Monatsansicht. Ein neuer
+Bereich „Sicherheit" in den Einstellungen erlaubt Screenshots, die zum Schutz
+deiner Daten standardmäßig blockiert sind. Der Heute-Screen zeigt neben dem
+Monatsdurchschnitt jetzt die heutige Summe in Gramm, der Trendpfeil ist fett.
+Der PDF-Bericht ergänzt deine längste Abstinenzphase, hebt die Höchstwerte rot
+hervor, wenn sie über dem Limit liegen, und beschriftet jeden Trendbalken.

@@ -1,0 +1,3 @@
+Dieses Update behebt einen kleinen Darstellungsfehler im Heute-Screen: Der
+Trendpfeil neben dem Tagesdurchschnitt sitzt jetzt korrekt auf derselben
+Grundlinie wie die Beschriftung „g/Tag" daneben.

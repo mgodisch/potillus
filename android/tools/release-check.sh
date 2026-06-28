@@ -211,6 +211,9 @@ SCHEMAS_DIR="app/schemas/de.godisch.potillus.data.db.AppDatabase"
 # Per-locale release notes are named after the integer versionCode, e.g.
 # fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
 FASTLANE_DIR="fastlane/metadata/android"
+# Baseline coupling versionName ↔ versionCode for the one-increment-per-release
+# rule. See the file's own header and SECTION 1 for the derivation.
+ANCHOR_FILE="version-anchor"
 
 # ── Pre-flight: verify all required files exist ───────────────────────────────
 # Without these files the rest of the checks cannot run.
@@ -329,6 +332,64 @@ check_version_consistency() {
         fail "versionName '$vname' ≠ top CHANGELOG entry 'v$changelog_top' — update one or the other"
     else
         pass "versionName matches top CHANGELOG entry (v$vname)"
+    fi
+
+    # ── Cross-check: ONE versionCode INCREMENT PER RELEASE ────────────────────
+    # RULE (since the anchor below): every "## vX.Y.Z" heading added to
+    # CHANGELOG.md must be accompanied by EXACTLY ONE increment of versionCode.
+    # Equivalently, with the anchor as a fixed reference point:
+    #
+    #     expected versionCode = ANCHOR_VERSION_CODE
+    #                          + (count of "## vX.Y.Z" entries strictly ABOVE
+    #                             the anchored version in CHANGELOG.md)
+    #
+    # The anchor (android/version-anchor) freezes the pre-rule history, during
+    # which some doc-only releases deliberately shared a versionCode. Only
+    # entries above the anchored version are subject to the strict 1:1 rule.
+    #
+    # WHEN YOU ADD A NEW "## vX.Y.Z" TO CHANGELOG.md:
+    #   1. bump versionCode in build.gradle.kts by exactly 1, AND
+    #   2. add fastlane/metadata/android/<locale>/changelogs/<newCode>.txt
+    #      for every locale (enforced by the fastlane check further below).
+    if [[ ! -f "$ANCHOR_FILE" ]]; then
+        warn "No $ANCHOR_FILE — skipping one-increment-per-release check"
+    elif [[ -z "$vcode" || ! "$vcode" =~ ^[0-9]+$ ]]; then
+        warn "versionCode unusable — skipping one-increment-per-release check"
+    else
+        local anchor_name anchor_code
+        anchor_name=$(grep -E '^ANCHOR_VERSION_NAME=' "$ANCHOR_FILE" | head -1 | cut -d= -f2 | tr -d '[:space:]')
+        anchor_code=$(grep -E '^ANCHOR_VERSION_CODE=' "$ANCHOR_FILE" | head -1 | cut -d= -f2 | tr -d '[:space:]')
+
+        if [[ -z "$anchor_name" || -z "$anchor_code" || ! "$anchor_code" =~ ^[0-9]+$ ]]; then
+            fail "$ANCHOR_FILE is malformed (need ANCHOR_VERSION_NAME and integer ANCHOR_VERSION_CODE)"
+        else
+            # Ordered list of all release headings, top (newest) first.
+            local headings releases_above anchor_seen=0 line v
+            mapfile -t headings < <(grep -E '^## v[0-9]+\.[0-9]+\.[0-9]+' "$CHANGELOG" | sed 's/^## v//')
+
+            # Confirm the anchor version actually appears, and count entries above it.
+            releases_above=0
+            for v in "${headings[@]}"; do
+                if [[ "$v" == "$anchor_name" ]]; then
+                    anchor_seen=1
+                    break                 # everything before this was "above" (newer)
+                fi
+                releases_above=$((releases_above + 1))
+            done
+
+            if [[ "$anchor_seen" -ne 1 ]]; then
+                fail "anchor version 'v$anchor_name' from $ANCHOR_FILE not found in $CHANGELOG — re-anchor or fix the changelog"
+            else
+                local expected_code=$((anchor_code + releases_above))
+                if [[ "$vcode" -ne "$expected_code" ]]; then
+                    fail "versionCode $vcode ≠ expected $expected_code \
+(anchor v$anchor_name=$anchor_code + $releases_above release(s) since): each new \
+CHANGELOG version must bump versionCode by exactly 1"
+                else
+                    pass "versionCode $vcode matches one-increment-per-release rule (anchor v$anchor_name=$anchor_code + $releases_above)"
+                fi
+            fi
+        fi
     fi
 
     # Cross-check: versionName must match README title

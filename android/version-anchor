@@ -1,0 +1,37 @@
+# =============================================================================
+# version-anchor – baseline for the "one versionCode per release" rule
+# =============================================================================
+#
+# WHAT THIS IS
+#   A single fixed reference point that couples a known versionName to its
+#   versionCode. Everything after it is derived, not stored: release-check.sh
+#   counts the "## vX.Y.Z" entries in CHANGELOG.md from this anchor up to the
+#   top, and requires
+#
+#       versionCode == ANCHOR_VERSION_CODE + (number of releases after the anchor)
+#
+#   i.e. EVERY new "## vX.Y.Z" heading in CHANGELOG.md must be accompanied by
+#   EXACTLY ONE increment of versionCode in build.gradle.kts. See SECTION 1 of
+#   release-check.sh for the enforcing logic.
+#
+# WHY AN ANCHOR INSTEAD OF COUNTING FROM THE FIRST EVER RELEASE
+#   Before this rule existed, some releases deliberately shared a versionCode
+#   (documentation-only changes that produced no new APK). Counting from the
+#   project's very first entry would therefore not line up with the real
+#   versionCode. The anchor freezes that messy history: the strict
+#   one-increment-per-release rule applies ONLY to entries ABOVE the anchored
+#   version. The anchor line itself is the last release under the old regime.
+#
+# HOW TO MOVE THE ANCHOR (rarely needed)
+#   You normally never touch this file again. Only move it if you ever want to
+#   re-baseline (e.g. after squashing changelog history). Set both values to a
+#   versionName that appears in CHANGELOG.md and its true versionCode, then make
+#   sure the arithmetic above still holds for the current build.
+#
+# FORMAT
+#   Two KEY=VALUE lines, no spaces around '='. Lines starting with '#' and blank
+#   lines are ignored by the parser.
+# =============================================================================
+
+ANCHOR_VERSION_NAME=0.70.0
+ANCHOR_VERSION_CODE=72

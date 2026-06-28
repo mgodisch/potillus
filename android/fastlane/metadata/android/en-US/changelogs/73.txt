@@ -1,0 +1,7 @@
+The statistics screen now opens on the monthly view by default. A new Security
+section in Settings lets you allow screenshots and screen recordings, which are
+blocked by default to protect your data. The Today screen now shows today's
+total in grams next to the month's average, with the trend arrow in bold. The
+PDF report adds your longest abstinence streak, highlights the max-per-day and
+max-per-7-days figures in red when over the limit, and labels each trend bar
+with its value.

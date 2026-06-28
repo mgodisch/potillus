@@ -191,7 +191,12 @@ fun TodayScreen(
                                     Spacer(Modifier.width(4.dp))
                                     Text(
                                         if (state.monthTrend == Trend.DOWN) "↓" else "↑",
-                                        style      = MaterialTheme.typography.titleMedium,
+                                        // Same text style as the "g/day" label beside it
+                                        // (bodyMedium) so the arrow shares its baseline and
+                                        // size; only the weight differs. Using a larger style
+                                        // here (e.g. titleMedium) misaligns the glyph because
+                                        // Alignment.Bottom aligns bounding boxes, not baselines.
+                                        style      = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold,
                                         color      = if (state.monthTrend == Trend.DOWN) successColor()
                                                      else dangerRedColor(),

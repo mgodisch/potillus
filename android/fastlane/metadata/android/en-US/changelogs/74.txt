@@ -1,0 +1,3 @@
+This release fixes a small visual glitch on the Today screen: the month-trend
+arrow next to the per-day average now sits correctly on the same baseline as the
+"g/day" label beside it.

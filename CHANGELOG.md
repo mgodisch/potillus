@@ -36,6 +36,30 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.71.1
+
+Fix Today-screen trend-arrow baseline
+
+Fixed:
+- Today screen, second row: the month-trend arrow (↑/↓) next to the per-day
+  average was rendered in `titleMedium` while the adjacent "g/day" label uses
+  `bodyMedium`. Because `Alignment.Bottom` aligns text bounding boxes rather
+  than baselines, the larger style left the arrow sitting off the "g/day"
+  baseline. The arrow now uses `bodyMedium` (bold), so it shares the label's
+  baseline and size.
+
+Release process:
+- New rule, enforced by `release-check.sh` (SECTION 1): every `## vX.Y.Z`
+  heading added to this changelog must be accompanied by exactly one increment
+  of `versionCode`. The check derives the expected `versionCode` from a fixed
+  reference point in `android/version-anchor` (anchored at v0.70.0 = 72) plus
+  the number of changelog entries above it. versionName 0.71.0 → 0.71.1,
+  versionCode 72 → 74 (0.71.0 = 73, 0.71.1 = 74).
+- Added fastlane store notes for the new versionCodes in both locales:
+  `changelogs/73.txt` (covers 0.71.0) and `changelogs/74.txt` (covers 0.71.1).
+
+---
+
 ## v0.71.0
 
 Reorder PDF KPIs; show longest abstinence streak
