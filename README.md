@@ -1,6 +1,6 @@
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis -- Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
 ## About the App (v0.71.1)
 
@@ -142,7 +142,7 @@ Changes are documented in
 
 ## License
 
-Libellus Potionis -- Privacy-Friendly Alcohol Tracker, Copyright
+Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright
 &copy; 2026 Martin A. Godisch <[android@godisch.de](mailto:android@godisch.de)>
 
 The source code can be found at the [canonical repository at

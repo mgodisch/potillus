@@ -1,6 +1,6 @@
 # vim: set noet ts=4 sw=4:
 # =============================================================================
-# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
 # Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 # =============================================================================
 #

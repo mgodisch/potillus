@@ -1,6 +1,6 @@
 # COPYRIGHT
 
-## Libellus Potionis -- Privacy-Friendly Alcohol Tracker
+## Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
 Copyright &copy; 2026 Martin A. Godisch
 <[android@godisch.de](mailto:android@godisch.de)>

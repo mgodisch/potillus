@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # vim: set et ts=4:
 # =============================================================================
-# Libellus Potionis -- Privacy-Friendly Alcohol Tracker
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
 # Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 # =============================================================================
 #
