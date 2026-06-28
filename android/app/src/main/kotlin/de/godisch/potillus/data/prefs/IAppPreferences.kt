@@ -50,6 +50,8 @@ interface IAppPreferences {
     suspend fun setMaxDrinkDaysPerWeek(days: Int)
     /** Enables/disables the biometric app lock. */
     suspend fun setBiometric(v: Boolean)
+    /** Clears or re-sets [WindowManager.LayoutParams.FLAG_SECURE] for the app window. */
+    suspend fun setAllowScreenshots(v: Boolean)
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
     suspend fun setLanguage(lang: String)
     /** Persists the body weight [kg] (implementation clamps the range). */

@@ -160,16 +160,16 @@ class StatsViewModelTest {
 
     /**
      * With no entries in the repository the ViewModel emits an all-zero state
-     * and the default WEEK period.
+     * and the default MONTH period.
      *
      * This verifies that the flatMapLatest pipeline does not crash on an empty
      * data set and that initial values are sane defaults (not NaN / infinity).
      */
-    @Test fun `initial state is all zeros with WEEK period`() = runTest {
+    @Test fun `initial state is all zeros with MONTH period`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
             val state = awaitItem()
-            assertEquals(StatsPeriod.WEEK, state.period)
+            assertEquals(StatsPeriod.MONTH, state.period)
             assertEquals(0.0, state.totalGrams, 0.001)
             assertEquals(0.0, state.avgPerDay, 0.001)
             assertEquals(0, state.daysOverDailyLimit)
@@ -188,10 +188,10 @@ class StatsViewModelTest {
     @Test fun `setPeriod switches the active period`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
-            awaitItem()   // initial WEEK
+            awaitItem()   // initial MONTH
 
-            vm.setPeriod(StatsPeriod.MONTH)
-            assertEquals(StatsPeriod.MONTH, awaitItem().period)
+            vm.setPeriod(StatsPeriod.WEEK)
+            assertEquals(StatsPeriod.WEEK, awaitItem().period)
 
             vm.setPeriod(StatsPeriod.YEAR)
             assertEquals(StatsPeriod.YEAR, awaitItem().period)
@@ -213,9 +213,9 @@ class StatsViewModelTest {
     @Test fun `chart granularity is DAILY for week and month, MONTHLY for year`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
-            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)   // initial WEEK
+            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)   // initial MONTH
 
-            vm.setPeriod(StatsPeriod.MONTH)
+            vm.setPeriod(StatsPeriod.WEEK)
             assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)
 
             vm.setPeriod(StatsPeriod.YEAR)

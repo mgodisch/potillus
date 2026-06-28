@@ -248,6 +248,14 @@ data class AppSettings(
     val statsFromDate: String       = "",
     val biometricEnabled: Boolean   = false,
     /**
+     * When `true`, [WindowManager.LayoutParams.FLAG_SECURE] is cleared so the
+     * OS permits screenshots and screen recordings of the app window.
+     *
+     * Default is `false` (flag active, screenshots blocked) to protect
+     * health-sensitive data. The user must consciously opt in via Settings.
+     */
+    val allowScreenshots: Boolean   = false,
+    /**
      * Selected UI language as a BCP-47 tag, or `""` when the user has not chosen
      * one yet.
      *

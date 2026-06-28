@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Instellingen</string>
     <string name="total_today">Totaal vandaag</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alcohol</string>
     <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Invoer vandaag</string>
     <string name="no_entries_today">Nog geen invoer vandaag.\nTik op + om een invoer toe te voegen.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Alcohol-overzicht</string>
     <string name="pdf_section_kpis">Kerncijfers</string>
     <string name="pdf_section_months">Maandoverzicht</string>
-    <string name="pdf_section_trend">Langetermijntrend (gem. g/maand)</string>
+    <string name="pdf_section_trend">Langetermijntrend (gem. g/dag)</string>
     <string name="pdf_section_categories">Drankcategorieën</string>
     <string name="pdf_section_daytime">Consumptiepatroon: tijdstip</string>
     <string name="pdf_section_weekday">Weekdagprofiel (gem. g alcohol)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Huidige onthouding</string>
     <string name="longest_streak">Langste onthouding</string>
     <string name="trend_vs_prev">Trend t.o.v. vorige periode</string>
+    <string name="security">Beveiliging</string>
     <string name="appearance">Weergave</string>
     <string name="theme_mode">Kleurenschema</string>
     <string name="theme_system">Systeem</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Limiet voor 7 dagen in gram</string>
     <string name="biometric_lock">Biometrisch slot</string>
     <string name="biometric_desc">App vergrendelen met vingerafdruk of gezichtsherkenning</string>
+    <string name="allow_screenshots">Schermafbeeldingen toestaan</string>
+    <string name="allow_screenshots_desc">Schermafbeeldingen en schermopnamen van het app-venster toestaan</string>
     <string name="language">Taal</string>
     <string name="export">Gegevensexport</string>
     <string name="export_desc">Invoer exporteren naar de map Downloads</string>

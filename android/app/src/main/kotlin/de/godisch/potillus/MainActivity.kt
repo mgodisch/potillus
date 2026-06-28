@@ -272,10 +272,21 @@ class MainActivity : AppCompatActivity() {
         // re-auth until the next cold start. repeatOnLifecycle cancels the
         // collection when the Activity stops and restarts it on the next start, so
         // it never collects while the app is in the background.
+        //
+        // FLAG_SECURE is also updated here: when the user enables "allow screenshots"
+        // in Settings the flag is cleared immediately without requiring a restart.
+        // The cold-start default (FLAG_SECURE set unconditionally in onCreate above)
+        // stays in place until this collector fires for the first time, so there is
+        // never an un-secured frame even during first launch.
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 app.appPreferences.settingsFlow.collect {
                     biometricEnabled = it.biometricEnabled
+                    if (it.allowScreenshots) {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    } else {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
                 }
             }
         }

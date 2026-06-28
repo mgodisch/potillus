@@ -56,12 +56,13 @@ import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.l10n.SupportedLocales
 
 /**
- * Settings tab, organised into five sections:
+ * Settings tab, organised into six sections:
  *   1. Personal data    – body weight (used by the BAC estimate)
  *   2. Limits           – daily / weekly gram limits and max drink-days per week
  *   3. Statistics       – day-change time, week start, statistics-start date
  *   4. Backup           – JSON import / export
- *   5. Appearance       – biometric access lock, theme, language
+ *   5. Security         – biometric access lock, screenshot permission
+ *   6. Appearance       – theme, language
  *
  * CSV/PDF data export lives on the Statistics screen; only the JSON
  * backup import/export lives here now.
@@ -330,8 +331,8 @@ fun SettingsScreen(
                 }
             }
 
-            // ── 5. Appearance (access lock + theme + language) ──────
-            item { SettingsSectionHeader(stringResource(R.string.appearance)) }
+            // ── 5. Security (access lock + screenshots) ──────
+            item { SettingsSectionHeader(stringResource(R.string.security)) }
             item {
                 SettingsCard {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -358,6 +359,23 @@ fun SettingsScreen(
                     }
                 }
             }
+            item {
+                SettingsCard {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.allow_screenshots), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.allow_screenshots_desc), style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Switch(
+                            checked = settings.allowScreenshots,
+                            onCheckedChange = { vm.setAllowScreenshots(it) }
+                        )
+                    }
+                }
+            }
+            // ── 6. Appearance (theme + language) ──────
+            item { SettingsSectionHeader(stringResource(R.string.appearance)) }
             item {
                 SettingsCard {
                     Text(stringResource(R.string.theme_mode), style = MaterialTheme.typography.bodyMedium)

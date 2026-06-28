@@ -232,7 +232,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
                         M_TOTAL, M_AVG, M_OVER)
     Trend chart ....... SECTION_TREND, TREND_DISPLAY, LIMIT_LINE_PCT
                         + bars block BARS (BAR_CLASS, BAR_HEIGHT_PCT,
-                        BAR_TICK_DISPLAY) and axis block BARSLABELS (BAR_LABEL)
+                        BAR_VALUE, BAR_TICK_DISPLAY) and axis block BARSLABELS (BAR_LABEL)
     Footer ............ FOOTER1
 
   PAGE 2
@@ -298,6 +298,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
             <div class="limit" style="bottom:{{LIMIT_LINE_PCT}}%"></div>
             <!-- repeat:BARS -->
             <div class="col">
+                <div class="v">{{BAR_VALUE}}</div>
                 <div class="{{BAR_CLASS}}" style="height:{{BAR_HEIGHT_PCT}}%"></div>
                 <span class="tick" style="display:{{BAR_TICK_DISPLAY}}">&#10003;</span>
             </div>

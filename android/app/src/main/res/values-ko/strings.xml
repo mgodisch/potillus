@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -50,7 +50,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">오늘 합계</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">알코올</string>
     <string name="grams_per_day">g/일</string>
     <string name="entries_today">오늘의 기록</string>
     <string name="no_entries_today">오늘 기록이 없습니다.\n+ 를 탭하여 기록을 추가하세요.</string>
@@ -96,7 +95,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">알코올 요약</string>
     <string name="pdf_section_kpis">핵심 데이터</string>
     <string name="pdf_section_months">월별 개요</string>
-    <string name="pdf_section_trend">장기 추세 (평균 g/월)</string>
+    <string name="pdf_section_trend">장기 추세 (평균 g/일)</string>
     <string name="pdf_section_categories">음료 카테고리</string>
     <string name="pdf_section_daytime">소비 패턴: 시간대</string>
     <string name="pdf_section_weekday">요일별 프로필 (평균 g 알코올)</string>
@@ -145,6 +144,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">이전 기간 대비 추세</string>
 
     <!-- Settings -->
+    <string name="security">보안</string>
     <string name="appearance">외관</string>
     <string name="theme_mode">색상 구성</string>
     <string name="theme_system">시스템</string>
@@ -155,6 +155,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7일 한도 (그램)</string>
     <string name="biometric_lock">생체 인증 잠금</string>
     <string name="biometric_desc">지문 또는 얼굴 인식으로 앱 잠금</string>
+    <string name="allow_screenshots">스크린샷 허용</string>
+    <string name="allow_screenshots_desc">앱 창의 스크린샷 및 화면 녹화 허용</string>
     <string name="language">언어</string>
     <string name="export">데이터 내보내기</string>
     <string name="export_desc">기록을 다운로드 폴더로 내보내기</string>

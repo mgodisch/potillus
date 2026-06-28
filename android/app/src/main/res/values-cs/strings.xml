@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Nastavení</string>
     <string name="total_today">Celkem dnes</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/den</string>
     <string name="entries_today">Záznamy dnes</string>
     <string name="no_entries_today">Zatím žádné záznamy.\nKlepněte na + pro přidání záznamu.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Přehled alkoholu</string>
     <string name="pdf_section_kpis">Klíčové údaje</string>
     <string name="pdf_section_months">Měsíční přehled</string>
-    <string name="pdf_section_trend">Dlouhodobý trend (prům. g/měs.)</string>
+    <string name="pdf_section_trend">Dlouhodobý trend (prům. g/den)</string>
     <string name="pdf_section_categories">Kategorie nápojů</string>
     <string name="pdf_section_daytime">Vzorec konzumace: denní doba</string>
     <string name="pdf_section_weekday">Profil dne v týdnu (prům. g alkoholu)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Současná abstinence</string>
     <string name="longest_streak">Nejdelší abstinence</string>
     <string name="trend_vs_prev">Trend vůči předchozímu období</string>
+    <string name="security">Zabezpečení</string>
     <string name="appearance">Vzhled</string>
     <string name="theme_mode">Barevné schéma</string>
     <string name="theme_system">Systémové</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Limit na 7 dní v gramech</string>
     <string name="biometric_lock">Biometrický zámek</string>
     <string name="biometric_desc">Zamknout aplikaci otiskem prstu nebo obličejem</string>
+    <string name="allow_screenshots">Povolit snímky obrazovky</string>
+    <string name="allow_screenshots_desc">Povolit snímky a nahrávání obrazovky okna aplikace</string>
     <string name="language">Jazyk</string>
     <string name="export">Export dat</string>
     <string name="export_desc">Exportovat záznamy do složky Stažené</string>

@@ -179,6 +179,8 @@ class SettingsViewModel(
     fun setMaxDrinkDaysPerWeek(days: Int) = viewModelScope.launch { prefs.setMaxDrinkDaysPerWeek(days) }
     /** Enables/disables the biometric app lock. */
     fun setBiometric(v: Boolean)          = viewModelScope.launch { prefs.setBiometric(v) }
+    /** Clears or re-sets FLAG_SECURE to allow/block screenshots and screen recordings. */
+    fun setAllowScreenshots(v: Boolean)   = viewModelScope.launch { prefs.setAllowScreenshots(v) }
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
     fun setLanguage(lang: String)         = viewModelScope.launch { prefs.setLanguage(lang) }
     /** Persists the user's body weight in kilograms [kg] (clamped in AppPreferences). */

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Ustawienia</string>
     <string name="total_today">Łącznie dzisiaj</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/dzień</string>
     <string name="entries_today">Wpisy dzisiaj</string>
     <string name="no_entries_today">Brak wpisów dzisiaj.\nDotknij +, aby dodać wpis.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Podsumowanie alkoholu</string>
     <string name="pdf_section_kpis">Kluczowe dane</string>
     <string name="pdf_section_months">Przegląd miesięczny</string>
-    <string name="pdf_section_trend">Długoterminowy trend (śr. g/mies.)</string>
+    <string name="pdf_section_trend">Długoterminowy trend (śr. g/dzień)</string>
     <string name="pdf_section_categories">Kategorie napojów</string>
     <string name="pdf_section_daytime">Wzorzec spożycia: pora dnia</string>
     <string name="pdf_section_weekday">Profil dnia tygodnia (śr. g alkoholu)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Bieżąca abstynencja</string>
     <string name="longest_streak">Najdłuższa abstynencja</string>
     <string name="trend_vs_prev">Trend wobec poprzedniego okresu</string>
+    <string name="security">Bezpieczeństwo</string>
     <string name="appearance">Wygląd</string>
     <string name="theme_mode">Schemat kolorów</string>
     <string name="theme_system">Systemowy</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Limit na 7 dni w gramach</string>
     <string name="biometric_lock">Blokada biometryczna</string>
     <string name="biometric_desc">Zablokuj aplikację odciskiem palca lub rozpoznawaniem twarzy</string>
+    <string name="allow_screenshots">Zezwól na zrzuty ekranu</string>
+    <string name="allow_screenshots_desc">Zezwól na zrzuty ekranu i nagrania okna aplikacji</string>
     <string name="language">Język</string>
     <string name="export">Eksport danych</string>
     <string name="export_desc">Eksportuj wpisy do folderu Pobrane</string>

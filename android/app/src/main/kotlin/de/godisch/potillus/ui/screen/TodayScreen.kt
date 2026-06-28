@@ -31,6 +31,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -147,22 +148,28 @@ fun TodayScreen(
                             )
                         }
                         Spacer(Modifier.height(4.dp))
-                        // Row 2: left is just the word "Alcohol" — today's own gram
-                        // figure is intentionally omitted here because it already
-                        // appears on the daily-limit bar below, so it is not shown
-                        // twice. The card's headline figure is the month's per-day
-                        // average on the right ("<x> g/day").
+                        // Row 2: left shows today's own total in grams, right shows
+                        // the month's per-day average. Both use the same headline
+                        // figure + unit styling so the two values read as a pair.
                         Row(
                             modifier              = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment     = Alignment.Bottom
                         ) {
-                            Text(
-                                stringResource(R.string.alcohol),
-                                style    = MaterialTheme.typography.bodyMedium,
-                                color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
+                            Row(verticalAlignment = Alignment.Bottom) {
+                                Text(
+                                    "%.1f".format(state.totalGrams),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    "g",
+                                    style    = MaterialTheme.typography.bodyMedium,
+                                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                            }
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
                                     "%.1f".format(state.monthlyAvgPerDay),
@@ -184,10 +191,11 @@ fun TodayScreen(
                                     Spacer(Modifier.width(4.dp))
                                     Text(
                                         if (state.monthTrend == Trend.DOWN) "↓" else "↑",
-                                        style    = MaterialTheme.typography.titleMedium,
-                                        color    = if (state.monthTrend == Trend.DOWN) successColor()
-                                                   else dangerRedColor(),
-                                        modifier = Modifier.padding(bottom = 4.dp)
+                                        style      = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color      = if (state.monthTrend == Trend.DOWN) successColor()
+                                                     else dangerRedColor(),
+                                        modifier   = Modifier.padding(bottom = 4.dp)
                                     )
                                 }
                             }

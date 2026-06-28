@@ -168,10 +168,10 @@ object PdfReportBuilder {
         // ── KPI tiles ────────────────────────────────────────────────────────────
         // Order and warn flags reproduce the original report exactly.
         repeats["KPIS"] = listOf(
-            kpi(context.getString(R.string.pdf_kpi_abstinent_days),          "${d.abstinentDays}"),
-            kpi(context.getString(R.string.pdf_kpi_drink_days),              "${d.drinkDays}"),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
-            kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
+            kpi(context.getString(R.string.pdf_kpi_abstinent_days), "${d.abstinentDays}"),
+            kpi(context.getString(R.string.pdf_meta_longest_abstinence), "${d.longestAbstinence}"),
+            kpi(context.getString(R.string.pdf_kpi_drink_days),     "${d.drinkDays}"),
+            kpi(context.getString(R.string.pdf_kpi_total),          "${d.totalGrams.fmt1()} g"),
 
             kpi(context.getString(R.string.pdf_kpi_over_daily, d.limitInfo.limitGrams.fmt0()),
                 "${d.violations.daysOverDailyLimit}", d.violations.daysOverDailyLimit > 0),
@@ -182,19 +182,14 @@ object PdfReportBuilder {
             kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
                 "${d.bingeDays}", d.bingeDays > 0),
 
+            kpi(context.getString(R.string.pdf_kpi_max_day),   "${d.maxPerDay.fmt1()} g",   d.maxPerDay   > d.limitInfo.limitGrams),
+            kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g", d.maxPer7Days > d.limitInfo.weeklyLimitGrams),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
+            kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
 
-            kpi(context.getString(R.string.pdf_kpi_total),         "${d.totalGrams.fmt1()} g"),
-            // Peaks: worst single day and worst rolling 7-day window.
-            kpi(context.getString(R.string.pdf_kpi_max_day),       "${d.maxPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_day),       "${d.avgPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
-
-            kpi("", ""),
-            kpi(context.getString(R.string.pdf_kpi_max_7days),        "${d.maxPer7Days.fmt1()} g"),
-            // Medians beside their matching means (g per drink day, g per day) plus the
-            // monthly drink-days mean & median. Medians are robust to the occasional very
-            // heavy day that can inflate a plain average.
+            kpi(context.getString(R.string.pdf_kpi_avg_day),          "${d.avgPerDay.fmt1()} g"),
             kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_day),    "${d.avgPerDrinkDay.fmt1()} g"),
             kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g")
         )
 
@@ -235,6 +230,10 @@ object PdfReportBuilder {
                     "BAR_HEIGHT_PCT"   to if (b.isAbstinent) "0"
                                           else pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0(),
                     "BAR_CLASS"        to if (b.avgPerDay > limit) "bar over" else "bar",
+                    // On-top value, same convention as the page-2 hour/weekday charts:
+                    // the bucket's per-day average (one decimal), blank for abstinent
+                    // (zero-consumption) buckets so the green tick stands alone.
+                    "BAR_VALUE"        to if (b.isAbstinent) "" else b.avgPerDay.fmt1(),
                     // Green abstinence tick shown only for zero-consumption buckets.
                     "BAR_TICK_DISPLAY" to if (b.isAbstinent) "block" else "none"
                 )

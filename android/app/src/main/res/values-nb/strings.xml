@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -45,7 +45,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">Dagens total</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Dagens registreringer</string>
     <string name="no_entries_today">Ingen registreringer i dag ennå.\nTrykk på + for å legge til en registrering.</string>
@@ -91,7 +90,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Alkoholsammendrag</string>
     <string name="pdf_section_kpis">Nøkkeltall</string>
     <string name="pdf_section_months">Månedlig oversikt</string>
-    <string name="pdf_section_trend">Langsiktig trend (gj.snitt g/mnd)</string>
+    <string name="pdf_section_trend">Langsiktig trend (gj.snitt g/dag)</string>
     <string name="pdf_section_categories">Drikkekategorier</string>
     <string name="pdf_section_daytime">Konsummønster: Tid på dagen</string>
     <string name="pdf_section_weekday">Ukedagsprofil (gj.snitt g alkohol)</string>
@@ -140,6 +139,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">Trend sammenlignet med forrige periode</string>
 
     <!-- Settings -->
+    <string name="security">Sikkerhet</string>
     <string name="appearance">Utseende</string>
     <string name="theme_mode">Fargevalg</string>
     <string name="theme_system">System</string>
@@ -150,6 +150,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7-dagers grense i gram</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeravtrykk eller ansiktsgjenkjenning</string>
+    <string name="allow_screenshots">Tillat skjermbilder</string>
+    <string name="allow_screenshots_desc">Tillat skjermbilder og skjermopptak av appvinduet</string>
     <string name="language">Språk</string>
     <string name="export">Dataeksport</string>
     <string name="export_desc">Eksporter registreringer til Nedlastinger-mappen</string>

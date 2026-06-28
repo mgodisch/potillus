@@ -141,7 +141,10 @@ class StatsViewModel(
     private val getString: StringProvider
 ) : ViewModel() {
 
-    private val _period = MutableStateFlow(StatsPeriod.WEEK)
+    // MONTH is the default: on first open it gives a meaningful overview without
+    // the user having to switch away from a too-narrow week view. WEEK and YEAR
+    // remain available via the period selector in the statistics screen.
+    private val _period = MutableStateFlow(StatsPeriod.MONTH)
 
     // ── Export (CSV / PDF) ────────────────────────────────────────────────
     // Data export belongs with the

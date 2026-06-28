@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -50,7 +50,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">本日合計</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">アルコール</string>
     <string name="grams_per_day">g/日</string>
     <string name="entries_today">本日の記録</string>
     <string name="no_entries_today">本日の記録はまだありません。\n＋ をタップして記録を追加してください。</string>
@@ -96,7 +95,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">アルコール摂取まとめ</string>
     <string name="pdf_section_kpis">主要データ</string>
     <string name="pdf_section_months">月別概要</string>
-    <string name="pdf_section_trend">長期トレンド（平均 g／月）</string>
+    <string name="pdf_section_trend">長期トレンド（平均 g／日）</string>
     <string name="pdf_section_categories">飲み物カテゴリ</string>
     <string name="pdf_section_daytime">摂取パターン：時間帯</string>
     <string name="pdf_section_weekday">曜日別プロフィール（平均 g アルコール）</string>
@@ -145,6 +144,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">前期比トレンド</string>
 
     <!-- Settings -->
+    <string name="security">セキュリティ</string>
     <string name="appearance">外観</string>
     <string name="theme_mode">カラースキーム</string>
     <string name="theme_system">システム</string>
@@ -155,6 +155,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7日間の上限（グラム）</string>
     <string name="biometric_lock">生体認証ロック</string>
     <string name="biometric_desc">指紋または顔認証でアプリをロックする</string>
+    <string name="allow_screenshots">スクリーンショットを許可</string>
+    <string name="allow_screenshots_desc">アプリウィンドウのスクリーンショットと画面録画を許可する</string>
     <string name="language">言語</string>
     <string name="export">データエクスポート</string>
     <string name="export_desc">記録をダウンロードフォルダへエクスポート</string>

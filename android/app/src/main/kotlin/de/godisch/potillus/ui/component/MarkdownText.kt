@@ -118,23 +118,49 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
     }
 }
 
+// Maps the HTML character-entity references that appear in the bundled Markdown
+// documents to their Unicode equivalents. The set is intentionally small and
+// covers only entities present in the shipped files (COPYING.md / LICENSE.md /
+// usersguide.md). Numeric entities (&#NN; / &#xNN;) and the full HTML5 named
+// entity table are out of scope; adding them here would be premature, and a
+// real HTML parser would be the right tool if the documents ever needed them.
+private val HTML_ENTITIES = mapOf(
+    "&amp;"  to "&",
+    "&lt;"   to "<",
+    "&gt;"   to ">",
+    "&quot;" to "\"",
+    "&apos;" to "'",
+    "&nbsp;" to "\u00A0",
+    "&copy;" to "©",
+    "&reg;"  to "®",
+    "&trade;" to "™"
+)
+
+/** Replaces every key in [HTML_ENTITIES] with its Unicode equivalent. */
+private fun decodeHtmlEntities(text: String): String =
+    HTML_ENTITIES.entries.fold(text) { acc, (entity, ch) -> acc.replace(entity, ch) }
+
 // Matches a single Markdown inline link: [visible text](https://target).
 private val LINK_RE = Regex("""\[([^\]]+)\]\(([^)]+)\)""")
 
 /**
  * Converts a paragraph's plain text into an [AnnotatedString], turning every
  * `[text](url)` occurrence into a tappable link and leaving all other text
- * untouched.
+ * untouched. HTML character entities (e.g. `&copy;`) are decoded first so they
+ * appear as their Unicode glyphs rather than raw markup.
  */
 @Composable
 private fun renderInline(text: String): AnnotatedString {
     val linkColor = MaterialTheme.colorScheme.primary
+    // Decode HTML entities before scanning for Markdown links so that an entity
+    // inside a link label (e.g. `[&copy; Foo](https://…)`) is also handled.
+    val decoded = decodeHtmlEntities(text)
     return buildAnnotatedString {
         var cursor = 0
-        for (match in LINK_RE.findAll(text)) {
+        for (match in LINK_RE.findAll(decoded)) {
             // Emit any literal text before this link.
             if (match.range.first > cursor) {
-                append(text.substring(cursor, match.range.first))
+                append(decoded.substring(cursor, match.range.first))
             }
             val label = match.groupValues[1]
             val url = match.groupValues[2]
@@ -154,8 +180,8 @@ private fun renderInline(text: String): AnnotatedString {
             cursor = match.range.last + 1
         }
         // Emit any trailing literal text after the last link.
-        if (cursor < text.length) {
-            append(text.substring(cursor))
+        if (cursor < decoded.length) {
+            append(decoded.substring(cursor))
         }
     }
 }

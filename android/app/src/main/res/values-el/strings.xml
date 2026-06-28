@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Ρυθμίσεις</string>
     <string name="total_today">Σύνολο σήμερα</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Αλκοόλ</string>
     <string name="grams_per_day">γρ./ημέρα</string>
     <string name="entries_today">Εγγραφές σήμερα</string>
     <string name="no_entries_today">Δεν υπάρχουν εγγραφές ακόμα.\nΠατήστε + για προσθήκη.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Σύνοψη αλκοόλης</string>
     <string name="pdf_section_kpis">Βασικά στοιχεία</string>
     <string name="pdf_section_months">Μηνιαία επισκόπηση</string>
-    <string name="pdf_section_trend">Μακροπρόθεσμη τάση (μέσος g/μήνα)</string>
+    <string name="pdf_section_trend">Μακροπρόθεσμη τάση (μέσος g/ημέρα)</string>
     <string name="pdf_section_categories">Κατηγορίες ποτών</string>
     <string name="pdf_section_daytime">Πρότυπο κατανάλωσης: ώρα ημέρας</string>
     <string name="pdf_section_weekday">Προφίλ ημέρας εβδομάδας (μέσος g αλκοόλης)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Τρέχουσα αποχή</string>
     <string name="longest_streak">Μεγαλύτερη αποχή</string>
     <string name="trend_vs_prev">Τάση έναντι προηγούμενης περιόδου</string>
+    <string name="security">Ασφάλεια</string>
     <string name="appearance">Εμφάνιση</string>
     <string name="theme_mode">Χρωματικό σχήμα</string>
     <string name="theme_system">Σύστημα</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Όριο 7 ημερών σε γραμμάρια</string>
     <string name="biometric_lock">Βιομετρικό κλείδωμα</string>
     <string name="biometric_desc">Κλείδωμα εφαρμογής με δακτυλικό αποτύπωμα ή αναγνώριση προσώπου</string>
+    <string name="allow_screenshots">Επιτροπή στιγμιότυπων</string>
+    <string name="allow_screenshots_desc">Να επιτρέπονται στιγμιότυπα και εγγραφές οθόνης του παραθύρου της εφαρμογής</string>
     <string name="language">Γλώσσα</string>
     <string name="export">Εξαγωγή δεδομένων</string>
     <string name="export_desc">Εξαγωγή εγγραφών στο φάκελο Λήψεις</string>

@@ -36,6 +36,58 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.71.0
+
+Reorder PDF KPIs; show longest abstinence streak
+
+Changed:
+- PDF report, KPI section: reordered tiles so that `abstinent days` and
+  `longest abstinence phase` appear together in the first row, followed by
+  `drinking days` and `total alcohol`. The consumption-peak and average/median
+  rows are regrouped accordingly. (Patch `reorder.diff`.)
+
+Added:
+- PDF report, KPI section: the previously empty tile next to `abstinent days`
+  now shows the longest continuous abstinence streak (in days) within the
+  report period, using the already-computed `PdfReportData.longestAbstinence`
+  field and the existing `pdf_meta_longest_abstinence` string resource
+  (available in all 21 locales).
+- PDF report, KPI section: `max per day` and `max per 7 days` tiles are now
+  highlighted in red (warn flag) when their value exceeds the corresponding
+  configured limit (`LimitInfo.limitGrams` and `LimitInfo.weeklyLimitGrams`
+  respectively), consistent with the existing colouring of the
+  `days > g/day` and `days > g/7 days` violation tiles.
+- Statistics screen: initial period on first app start changed from `WEEK` to
+  `MONTH` (`StatsViewModel._period` default).
+- Document viewer: HTML character entities (`&copy;`, `&amp;`, `&lt;`,
+  `&gt;`, `&quot;`, `&apos;`, `&nbsp;`, `&reg;`, `&trade;`) are now decoded
+  to their Unicode equivalents before rendering, so e.g. `&copy;` in
+  `LICENSE.md` appears as `©` instead of literal markup
+  (`MarkdownText.decodeHtmlEntities`).
+- Settings screen, Appearance section: new "Allow Screenshots" toggle.
+  When off (default) `FLAG_SECURE` blocks screenshots and screen recordings
+  to protect health-sensitive data. When on, the flag is cleared reactively
+  via the `settingsFlow` collector in `MainActivity` without requiring a
+  restart (`AppSettings.allowScreenshots`, `KEY_ALLOW_SCREENSHOTS`,
+  `IAppPreferences.setAllowScreenshots`, `SettingsViewModel.setAllowScreenshots`).
+  String resources added in all 21 locales.
+- Today screen, second row: the left column now shows today's own total in
+  grams (e.g. `0.0 g`) styled like the right column's headline figure, instead
+  of the static word "Alcohol". The month-trend arrow (↑/↓) on the right is now
+  rendered in bold.
+- Settings screen: the access-lock and screenshot toggles moved out of the
+  "Appearance" section into a new "Security" section placed above it, so
+  "Appearance" now precedes the colour-scheme (theme) and language controls
+  only. New `security` string resource added in all 21 locales.
+- PDF report, page 1 long-term trend chart: corrected the section heading unit
+  from "Ø Grams/Month" to "Ø Grams/Day" in all 21 locales — the bars (and the
+  dashed reference line) have always been per-day averages against the daily
+  limit, independent of the span-derived bucket width. Each bar now also carries
+  its per-day average on top (one decimal, blank for abstinent buckets),
+  matching the page-2 hour/weekday charts (`BAR_VALUE`).
+
+---
+
 ## v0.70.0
 
 Add monthly trend arrow; fair per-day trend

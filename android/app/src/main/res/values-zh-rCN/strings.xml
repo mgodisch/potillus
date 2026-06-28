@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -33,7 +33,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">今日合计</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">酒精</string>
     <string name="grams_per_day">克/天</string>
     <string name="entries_today">今日记录</string>
     <string name="no_entries_today">今天还没有记录。\n点击 + 添加记录。</string>
@@ -79,7 +78,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">酒精摘要</string>
     <string name="pdf_section_kpis">核心数据</string>
     <string name="pdf_section_months">月度概览</string>
-    <string name="pdf_section_trend">长期趋势（平均克/月）</string>
+    <string name="pdf_section_trend">长期趋势（平均克/天）</string>
     <string name="pdf_section_categories">饮品类别</string>
     <string name="pdf_section_daytime">消费模式：一天中的时间</string>
     <string name="pdf_section_weekday">工作日分布（平均克酒精）</string>
@@ -128,6 +127,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">与上一周期对比趋势</string>
 
     <!-- Settings -->
+    <string name="security">安全</string>
     <string name="appearance">外观</string>
     <string name="theme_mode">配色方案</string>
     <string name="theme_system">系统</string>
@@ -138,6 +138,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7天限量（克）</string>
     <string name="biometric_lock">生物识别锁定</string>
     <string name="biometric_desc">通过指纹或面部识别锁定应用</string>
+    <string name="allow_screenshots">允许截图</string>
+    <string name="allow_screenshots_desc">允许对应用窗口进行截图和屏幕录制</string>
     <string name="language">语言</string>
     <string name="export">数据导出</string>
     <string name="export_desc">将记录导出到下载文件夹</string>

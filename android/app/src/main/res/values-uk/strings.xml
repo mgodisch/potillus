@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -43,7 +43,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">Разом сьогодні</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Алкоголь</string>
     <string name="grams_per_day">г/день</string>
     <string name="entries_today">Записи сьогодні</string>
     <string name="no_entries_today">Сьогодні ще немає записів.\nНатисніть + щоб додати запис.</string>
@@ -89,7 +88,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Підсумок алкоголю</string>
     <string name="pdf_section_kpis">Ключові показники</string>
     <string name="pdf_section_months">Місячний огляд</string>
-    <string name="pdf_section_trend">Довгостроковий тренд (сер. г/місяць)</string>
+    <string name="pdf_section_trend">Довгостроковий тренд (сер. г/день)</string>
     <string name="pdf_section_categories">Категорії напоїв</string>
     <string name="pdf_section_daytime">Модель споживання: час доби</string>
     <string name="pdf_section_weekday">Профіль за днями тижня (сер. г алкоголю)</string>
@@ -138,6 +137,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">Тренд порівняно з попереднім періодом</string>
 
     <!-- Settings -->
+    <string name="security">Безпека</string>
     <string name="appearance">Зовнішній вигляд</string>
     <string name="theme_mode">Колірна схема</string>
     <string name="theme_system">Система</string>
@@ -148,6 +148,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Ліміт за 7 днів у грамах</string>
     <string name="biometric_lock">Біометричне блокування</string>
     <string name="biometric_desc">Блокувати додаток відбитком пальця або розпізнаванням обличчя</string>
+    <string name="allow_screenshots">Дозволити знімки екрана</string>
+    <string name="allow_screenshots_desc">Дозволити знімки та записи екрана вікна програми</string>
     <string name="language">Мова</string>
     <string name="export">Експорт даних</string>
     <string name="export_desc">Експортувати записи до папки Завантаження</string>

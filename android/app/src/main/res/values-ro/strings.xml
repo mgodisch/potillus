@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -51,7 +51,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today screen -->
     <string name="total_today">Total azi</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alcool</string>
     <string name="grams_per_day">g/zi</string>
     <string name="entries_today">Înregistrări azi</string>
     <string name="no_entries_today">Nicio înregistrare azi.\nAtingeți + pentru a adăuga.</string>
@@ -97,7 +96,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Rezumat alcool</string>
     <string name="pdf_section_kpis">Cifre cheie</string>
     <string name="pdf_section_months">Prezentare lunară</string>
-    <string name="pdf_section_trend">Tendință pe termen lung (medie g/lună)</string>
+    <string name="pdf_section_trend">Tendință pe termen lung (medie g/zi)</string>
     <string name="pdf_section_categories">Categorii băuturi</string>
     <string name="pdf_section_daytime">Model de consum: ora zilei</string>
     <string name="pdf_section_weekday">Profil zile săptămână (medie g alcool)</string>
@@ -147,6 +146,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">Tendință față de perioada anterioară</string>
 
     <!-- Settings -->
+    <string name="security">Securitate</string>
     <string name="appearance">Aspect</string>
     <string name="theme_mode">Schemă de culori</string>
     <string name="theme_system">Sistem</string>
@@ -157,6 +157,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Limită pe 7 zile în grame</string>
     <string name="biometric_lock">Blocare biometrică</string>
     <string name="biometric_desc">Blochează aplicația cu amprentă sau față</string>
+    <string name="allow_screenshots">Permite capturi de ecran</string>
+    <string name="allow_screenshots_desc">Permite capturi de ecran și înregistrări ale ferestrei aplicației</string>
     <string name="language">Limbă</string>
     <string name="export">Export de date</string>
     <string name="export_desc">Exportă înregistrările în folderul Descărcări</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Indstillinger</string>
     <string name="total_today">Samlet i dag</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Poster i dag</string>
     <string name="no_entries_today">Ingen poster endnu.\nTryk på + for at tilføje.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Alkohol-oversigt</string>
     <string name="pdf_section_kpis">Nøgletal</string>
     <string name="pdf_section_months">Månedsoversigt</string>
-    <string name="pdf_section_trend">Langsigtet tendens (gns. g/md.)</string>
+    <string name="pdf_section_trend">Langsigtet tendens (gns. g/dag)</string>
     <string name="pdf_section_categories">Drikkekategorier</string>
     <string name="pdf_section_daytime">Forbrugsmønster: tidspunkt</string>
     <string name="pdf_section_weekday">Ugedagsprofil (gns. g alkohol)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Aktuel afholdenhed</string>
     <string name="longest_streak">Længste afholdenhed</string>
     <string name="trend_vs_prev">Tendens ift. forrige periode</string>
+    <string name="security">Sikkerhed</string>
     <string name="appearance">Udseende</string>
     <string name="theme_mode">Farvetema</string>
     <string name="theme_system">System</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7-dages grænse i gram</string>
     <string name="biometric_lock">Biometrisk lås</string>
     <string name="biometric_desc">Lås appen med fingeraftryk eller ansigtsgenkendelse</string>
+    <string name="allow_screenshots">Tillad skærmbilleder</string>
+    <string name="allow_screenshots_desc">Tillad skærmbilleder og skærmoptagelser af appvinduet</string>
     <string name="language">Sprog</string>
     <string name="export">Dataeksport</string>
     <string name="export_desc">Eksporter poster til mappen Overførsler</string>

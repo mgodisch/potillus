@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -31,7 +31,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <string name="total_today">Total du jour</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alcool</string>
     <string name="grams_per_day">g/jour</string>
     <string name="entries_today">Entrées du jour</string>
     <string name="no_entries_today">Aucune entrée aujourd\'hui.\nAppuyez sur + pour ajouter.</string>
@@ -73,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Résumé alcool</string>
     <string name="pdf_section_kpis">Chiffres clés</string>
     <string name="pdf_section_months">Aperçu mensuel</string>
-    <string name="pdf_section_trend">Tendance long terme (moy. g/mois)</string>
+    <string name="pdf_section_trend">Tendance long terme (moy. g/jour)</string>
     <string name="pdf_section_categories">Catégories de boissons</string>
     <string name="pdf_section_daytime">Profil horaire de consommation</string>
     <string name="pdf_section_weekday">Profil hebdomadaire (moy. g alcool)</string>
@@ -119,6 +118,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="longest_streak">Plus longue abstinence</string>
     <string name="trend_vs_prev">Tendance vs période précédente</string>
 
+    <string name="security">Sécurité</string>
     <string name="appearance">Apparence</string>
     <string name="theme_mode">Thème</string>
     <string name="theme_system">Système</string>
@@ -129,6 +129,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">Limite sur 7 jours en grammes</string>
     <string name="biometric_lock">Verrouillage biométrique</string>
     <string name="biometric_desc">Verrouiller l\'application à l\'ouverture</string>
+    <string name="allow_screenshots">Autoriser les captures d\'écran</string>
+    <string name="allow_screenshots_desc">Autoriser les captures et enregistrements d\'écran de la fenêtre de l\'application</string>
     <string name="language">Langue</string>
     <string name="export">Export des données</string>
     <string name="export_desc">Exporter les entrées dans le dossier Téléchargements</string>

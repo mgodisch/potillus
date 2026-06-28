@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -33,7 +33,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Today Screen -->
     <string name="total_today">Heute gesamt</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/Tag</string>
     <string name="entries_today">Einträge heute</string>
     <string name="no_entries_today">Noch keine Einträge heute.\nTippe auf „+“, um einen Eintrag hinzuzufügen.</string>
@@ -79,7 +78,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Konsumbericht Alkohol</string>
     <string name="pdf_section_kpis">Kerndaten</string>
     <string name="pdf_section_months">Monatsübersicht</string>
-    <string name="pdf_section_trend">Langfristiger Trend (Ø Gramm/Monat)</string>
+    <string name="pdf_section_trend">Langfristiger Trend (Ø Gramm/Tag)</string>
     <string name="pdf_section_categories">Konsummuster: Getränkekategorien</string>
     <string name="pdf_section_daytime">Konsummuster: Tageszeit (Ø Gramm Alkohol)</string>
     <string name="pdf_section_weekday">Konsummuster: Wochentag (Ø Gramm Alkohol)</string>
@@ -129,6 +128,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="trend_vs_prev">Trend ggü. Vorperiode</string>
 
     <!-- Settings -->
+    <string name="security">Sicherheit</string>
     <string name="appearance">Erscheinungsbild</string>
     <string name="theme_mode">Farbschema</string>
     <string name="theme_system">System</string>
@@ -139,6 +139,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7-Tage-Limit in Gramm</string>
     <string name="biometric_lock">Biometrische Sperre</string>
     <string name="biometric_desc">App beim Öffnen per Fingerabdruck oder Gesichtserkennung sperren</string>
+    <string name="allow_screenshots">Screenshots erlauben</string>
+    <string name="allow_screenshots_desc">Screenshots und Bildschirmaufnahmen des App-Fensters zulassen</string>
     <string name="language">Sprache</string>
     <string name="export">Datenexport</string>
     <string name="export_desc">Einträge exportieren</string>

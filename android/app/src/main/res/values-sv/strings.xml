@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- vim: set et ts=4:
 =============================================================================
-Libellus Potionis - - Privacy-Friendly Alcohol Tracker
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
 =============================================================================
 
@@ -29,7 +29,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="settings">Inställningar</string>
     <string name="total_today">Totalt idag</string>
     <string name="avg_of_month">Ø %1$s</string>
-    <string name="alcohol">Alkohol</string>
     <string name="grams_per_day">g/dag</string>
     <string name="entries_today">Poster idag</string>
     <string name="no_entries_today">Inga poster ännu.\nTryck på + för att lägga till.</string>
@@ -65,7 +64,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_title">Alkoholsammanfattning</string>
     <string name="pdf_section_kpis">Nyckeltal</string>
     <string name="pdf_section_months">Månadsöversikt</string>
-    <string name="pdf_section_trend">Långsiktig trend (snitt g/mån.)</string>
+    <string name="pdf_section_trend">Långsiktig trend (snitt g/dag)</string>
     <string name="pdf_section_categories">Dryckkategorier</string>
     <string name="pdf_section_daytime">Konsumtionsmönster: tid på dygnet</string>
     <string name="pdf_section_weekday">Veckodagsprofil (snitt g alkohol)</string>
@@ -107,6 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="current_streak">Aktuell nykterhet</string>
     <string name="longest_streak">Längsta nykterhet</string>
     <string name="trend_vs_prev">Trend jämfört med föregående period</string>
+    <string name="security">Säkerhet</string>
     <string name="appearance">Utseende</string>
     <string name="theme_mode">Färgschema</string>
     <string name="theme_system">System</string>
@@ -117,6 +117,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="weekly_limit_grams">7-dagarsgräns i gram</string>
     <string name="biometric_lock">Biometriskt lås</string>
     <string name="biometric_desc">Lås appen med fingeravtryck eller ansiktsigenkänning</string>
+    <string name="allow_screenshots">Tillåt skärmdumpar</string>
+    <string name="allow_screenshots_desc">Tillåt skärmdumpar och skärminspelningar av appfönstret</string>
     <string name="language">Språk</string>
     <string name="export">Dataexport</string>
     <string name="export_desc">Exportera poster till mappen Hämtningar</string>
