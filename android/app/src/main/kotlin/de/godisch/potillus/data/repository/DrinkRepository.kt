@@ -22,8 +22,6 @@
 package de.godisch.potillus.data.repository
 
 import de.godisch.potillus.data.db.dao.DrinkDao
-import de.godisch.potillus.data.db.entity.DrinkEntity
-import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -133,36 +131,10 @@ class DrinkRepository(private val dao: DrinkDao) : IDrinkRepository {
 }
 
 // ── Entity ↔ Domain conversion ───────────────────────────────────────────────
-
-/**
- * Converts a [DrinkEntity] to a [DrinkDefinition].
- *
- * The [category] string (stored as an enum name, e.g. "BEER") is parsed back
- * to a [DrinkCategory] enum. [runCatching] handles unknown or misspelled
- * category strings in old backups gracefully by defaulting to [DrinkCategory.OTHER].
- */
-private fun DrinkEntity.toDomain() = DrinkDefinition(
-    id             = id,
-    name           = name,
-    volumeMl       = volumeMl,
-    alcoholPercent = alcoholPercent,
-    isPreset       = isPreset,
-    isFavorite     = isFavorite,
-    category       = runCatching { DrinkCategory.valueOf(category) }.getOrDefault(DrinkCategory.OTHER)
-)
-
-/**
- * Converts a [DrinkDefinition] to a [DrinkEntity] for Room persistence.
- *
- * [category] is stored as the enum's [Enum.name] string so that reordering
- * the enum constants in a future version does not corrupt existing data.
- */
-private fun DrinkDefinition.toEntity() = DrinkEntity(
-    id             = id,
-    name           = name,
-    volumeMl       = volumeMl,
-    alcoholPercent = alcoholPercent,
-    isPreset       = isPreset,
-    isFavorite     = isFavorite,
-    category       = category.name
-)
+//
+// The conversion helpers (toDomain / toEntity) for both DrinkEntity and
+// EntryEntity are defined once in EntityMapping.kt as `internal` extension
+// functions, accessible to all files within this Gradle module. They were
+// previously declared as `private` here and duplicated in BackupRepository;
+// centralising them in one file removes that DRY violation. No callers in this
+// file need to change — Kotlin resolves the `internal` extensions in scope.

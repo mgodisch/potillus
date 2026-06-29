@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.l10n.SupportedLocales
 import java.time.LocalDate
 import java.util.Locale
@@ -202,14 +203,10 @@ class PotillusApp : Application() {
      *   no further change to this function.
      *
      * MATCHING STRATEGY:
-     *   1. Exact full-tag match on the IETF language tag returned by
-     *      [Locale.toLanguageTag] (e.g. "zh-CN", "pt-BR").
-     *      This picks the most specific variant when one exists.
-     *   2. Base-language match on [Locale.language] alone (e.g. "zh" → "zh-CN"
-     *      is NOT done here; a user running "zh-HK" would get English rather than
-     *      "zh-CN" unless their full tag matches).  The invariant is: only offer a
-     *      locale we explicitly ship, never a best-guess sibling.
-     *   3. Fall back to "en" (the base locale) if neither step matched.
+     *   Delegated to [de.godisch.potillus.domain.LocaleDetector.detect], which is a
+     *   pure, Android-free function and therefore unit-testable on the JVM without a
+     *   device (see [de.godisch.potillus.domain.LocaleDetectorTest]). The strategy
+     *   (full-tag → base-language → "en") is documented in LocaleDetector.kt.
      *
      * THREAD: called on Dispatchers.IO; [AppCompatDelegate.setApplicationLocales]
      * switches to Dispatchers.Main via [withContext] for the one UI call that
@@ -223,20 +220,9 @@ class PotillusApp : Application() {
         val stored = startupSettings.language
         if (stored.isNotEmpty()) return          // already set, nothing to do
 
-        val systemLocale = Locale.getDefault()
-        // IETF full tag, e.g. "zh-CN", "pt-BR", "de", "ar"
-        val systemFullTag = systemLocale.toLanguageTag()
-        // Base language only, e.g. "zh", "pt", "de", "ar"
-        val systemBaseLang = systemLocale.language
-
-        // Step 1: exact full-tag match (covers region variants like pt-BR, zh-CN, zh-TW).
-        // Step 2: base-language match (covers de, fr, es, id, ar, hi, …).
-        // Step 3: fall back to English.
-        val chosen = SupportedLocales.TAGS
-            .firstOrNull { it.equals(systemFullTag, ignoreCase = true) }
-            ?: SupportedLocales.TAGS
-                .firstOrNull { it.equals(systemBaseLang, ignoreCase = true) }
-            ?: "en"
+        // Delegate the pure locale-matching logic to LocaleDetector so it can be
+        // unit-tested independently of this Android Application subclass.
+        val chosen = LocaleDetector.detect(Locale.getDefault(), SupportedLocales.TAGS)
 
         appPreferences.setLanguage(chosen)
         // AppCompatDelegate.setApplicationLocales() internally calls

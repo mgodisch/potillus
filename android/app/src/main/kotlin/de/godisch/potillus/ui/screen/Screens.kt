@@ -19,8 +19,9 @@
  *
  * =============================================================================
  */
+package de.godisch.potillus.ui.screen
 
-// This file is intentionally empty.
+// This file is intentionally a documentation placeholder.
 // All screens have been split into their own files:
 //   TodayScreen.kt, CalendarScreen.kt, StatsScreen.kt, DrinksScreen.kt, SettingsScreen.kt
 // The Screen sealed class and navigation graph are in ui/nav/AppNav.kt.

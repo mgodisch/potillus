@@ -49,8 +49,11 @@ import de.godisch.potillus.ui.theme.warningColor
  * Today tab: the current logical day's entries, running gram total / limit
  * progress and estimated BAC, with quick add/edit/delete actions.
  *
- * @param vm The [TodayViewModel]; defaults to the Activity-scoped instance.
+ * @param vm             The [TodayViewModel]; defaults to the Activity-scoped instance.
  * @param onOpenSettings Invoked when the top-bar gear icon is tapped.
+ * @param onOpenHelp     Invoked when the overflow-menu Help item is tapped.
+ * @param onOpenCopyright Invoked when the overflow-menu Copyright item is tapped.
+ * @param onLockApp      Locks the app immediately (overflow-menu "Lock app").
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

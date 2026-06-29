@@ -36,6 +36,44 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.73.1
+
+Fix QA findings: locale, DRY mapping, docs, tests
+
+Changed:
+- `TodayViewModel`: replace `Locale.getDefault()` with a locale derived from
+  `AppSettings.language` (BCP-47 tag) for the monthly-average label on the Today
+  card. On devices where the system language differs from the in-app language the
+  month name now matches the rest of the UI rather than the OS locale (A-01).
+- `DrinkRepository`, `EntryRepository`, `BackupRepository`: the four entity ↔
+  domain conversion helpers (`toDomain` / `toEntity`) are now defined once as
+  `internal` extension functions in the new `EntityMapping.kt` file instead of
+  being duplicated across three files (C-01 DRY fix). The behaviour is unchanged.
+- `PotillusApp.applyLanguageOnFirstLaunch`: the pure locale-detection logic is
+  delegated to the new `LocaleDetector.detect()` function so it is unit-testable
+  without an Android runtime (T-03).
+- `DrinksScreen`, `TodayScreen`, `StatsScreen`, `CalendarScreen`: added missing
+  `@param` KDoc entries for `onOpenHelp`, `onOpenCopyright`, and `onLockApp` (D-02).
+- `Screens.kt`: added the missing `package de.godisch.potillus.ui.screen` declaration;
+  without it the file resided in the default package, inconsistent with every other
+  source file in the project (D-01 / S-01).
+
+Added:
+- `EntityMapping.kt` (`data/repository`): single source of truth for the four
+  entity ↔ domain conversion helpers, replacing the previously scattered private
+  and class-private copies (C-01).
+- `LocaleDetector.kt` (`domain`): pure, Android-free singleton that implements the
+  three-step BCP-47 matching strategy (full tag → base language → "en") extracted
+  from `PotillusApp` (T-03).
+- `LocaleDetectorTest.kt`: 10 JVM unit tests for `LocaleDetector.detect` covering
+  all three matching steps, region variants (zh-CN/zh-TW, pt-BR), unsupported
+  locales, empty sets, and case-insensitivity (T-03).
+- `AppViewModelFactoryTest.kt`: unit tests that verify each registered ViewModel
+  can be constructed with its injected dependency types, and that the factory's
+  `else` guard throws `IllegalArgumentException` for unregistered classes (T-02).
+
+---
+
 ## v0.73.0
 
 Remove SQLCipher; add signing and Play tooling

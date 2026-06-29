@@ -57,8 +57,11 @@ import java.time.format.TextStyle
  * Statistics tab: KPIs (totals, averages, binge/over-limit days, trends) and
  * charts for the selected [StatsPeriod].
  *
- * @param vm The [StatsViewModel]; defaults to the Activity-scoped instance.
+ * @param vm             The [StatsViewModel]; defaults to the Activity-scoped instance.
  * @param onOpenSettings Invoked when the top-bar gear icon is tapped.
+ * @param onOpenHelp     Invoked when the overflow-menu Help item is tapped.
+ * @param onOpenCopyright Invoked when the overflow-menu Copyright item is tapped.
+ * @param onLockApp      Locks the app immediately (overflow-menu "Lock app").
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

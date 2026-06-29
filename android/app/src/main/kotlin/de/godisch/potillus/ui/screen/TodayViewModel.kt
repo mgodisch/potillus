@@ -215,7 +215,19 @@ class TodayViewModel(
         // languages with cases (e.g. ru/cs/pl/el). Derived from the logical
         // "today" (via monthStart), not LocalDate.now(), so the day-change hour is
         // respected around month boundaries.
-        val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+        //
+        // WHY forLanguageTag(settings.language) instead of Locale.getDefault()?
+        //   AppCompatDelegate.setApplicationLocales() changes only the per-app
+        //   Context configuration, not the JVM-wide Locale.getDefault(). A user
+        //   who picks "Français" in Settings but has a German system locale would
+        //   see a German month name next to the French UI labels. Using the BCP-47
+        //   tag stored in [AppSettings.language] matches the same locale that the
+        //   string resources are resolved in, so labels and values agree. Falls
+        //   back to Locale.getDefault() when no language has been stored yet (empty
+        //   string sentinel on first launch before applyLanguageOnFirstLaunch runs).
+        val formattingLocale = if (settings.language.isNotEmpty())
+            Locale.forLanguageTag(settings.language) else Locale.getDefault()
+        val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, formattingLocale)
         val fmt       = DateTimeFormatter.ofPattern("d.M.")
         val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 

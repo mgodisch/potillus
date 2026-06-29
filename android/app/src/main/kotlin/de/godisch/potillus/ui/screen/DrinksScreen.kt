@@ -47,9 +47,12 @@ import de.godisch.potillus.ui.theme.warningColor
  * Drinks tab: the catalogue of preset and user-defined drinks, with add/edit/
  * delete and quick-log actions.
  *
- * @param vm      The [DrinksViewModel] (catalogue + validation).
- * @param todayVm The [TodayViewModel], used to quick-log a drink for today.
+ * @param vm             The [DrinksViewModel] (catalogue + validation).
+ * @param todayVm        The [TodayViewModel], used to quick-log a drink for today.
  * @param onOpenSettings Invoked when the top-bar gear icon is tapped.
+ * @param onOpenHelp     Invoked when the overflow-menu Help item is tapped.
+ * @param onOpenCopyright Invoked when the overflow-menu Copyright item is tapped.
+ * @param onLockApp      Locks the app immediately (overflow-menu "Lock app").
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

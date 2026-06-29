@@ -1,0 +1,1 @@
+Quality improvements: month names on the Today screen now follow the chosen in-app language instead of the system locale. Internal code clean-ups (shared mapping functions, extracted locale-detection logic) and additional unit tests improve maintainability. No functional changes for users.

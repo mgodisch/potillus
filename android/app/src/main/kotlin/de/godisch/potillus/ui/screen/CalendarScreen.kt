@@ -61,8 +61,11 @@ import java.time.format.TextStyle
  * Calendar tab: a month or year grid colour-coded by daily alcohol intake,
  * with a per-day detail/entry sheet.
  *
- * @param vm The [CalendarViewModel]; defaults to the Activity-scoped instance.
+ * @param vm             The [CalendarViewModel]; defaults to the Activity-scoped instance.
  * @param onOpenSettings Invoked when the top-bar gear icon is tapped.
+ * @param onOpenHelp     Invoked when the overflow-menu Help item is tapped.
+ * @param onOpenCopyright Invoked when the overflow-menu Copyright item is tapped.
+ * @param onLockApp      Locks the app immediately (overflow-menu "Lock app").
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

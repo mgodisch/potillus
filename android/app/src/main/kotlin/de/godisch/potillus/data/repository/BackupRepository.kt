@@ -55,8 +55,6 @@ import androidx.room.withTransaction
 import de.godisch.potillus.data.db.AppDatabase
 import de.godisch.potillus.data.db.dao.DrinkDao
 import de.godisch.potillus.data.db.dao.EntryDao
-import de.godisch.potillus.data.db.entity.DrinkEntity
-import de.godisch.potillus.data.db.entity.EntryEntity
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
 
@@ -173,36 +171,10 @@ class BackupRepository(
         return idMap
     }
 
-    // ── Local entity conversion helpers ──────────────────────────────────────
+    // ── Entity conversion ─────────────────────────────────────────────────────
     //
-    // WHY duplicated here instead of reusing the private funs in DrinkRepository
-    // / EntryRepository?
-    //   Those conversion functions are file-private (`private fun`). Making them
-    //   `internal` would expose them to the entire module. Re-declaring them as
-    //   private helpers in this file is the least-invasive solution and keeps
-    //   BackupRepository self-contained.
-
-    /** Maps a domain [DrinkDefinition] to its Room [DrinkEntity] (category stored as enum name). */
-    private fun DrinkDefinition.toEntity() = DrinkEntity(
-        id             = id,
-        name           = name,
-        volumeMl       = volumeMl,
-        alcoholPercent = alcoholPercent,
-        isPreset       = isPreset,
-        isFavorite     = isFavorite,
-        category       = category.name
-    )
-
-    /** Maps a domain [ConsumptionEntry] to its Room [EntryEntity]. */
-    private fun ConsumptionEntry.toEntity() = EntryEntity(
-        id              = id,
-        drinkId         = drinkId,
-        drinkName       = drinkName,
-        volumeMl        = volumeMl,
-        alcoholPercent  = alcoholPercent,
-        gramsAlcohol    = gramsAlcohol,
-        timestampMillis = timestampMillis,
-        logicalDate     = logicalDate,
-        note            = note
-    )
+    // DrinkDefinition.toEntity() and ConsumptionEntry.toEntity() are defined
+    // as `internal` extension functions in EntityMapping.kt and are therefore
+    // in scope here without any further declaration. The former private copies
+    // in this class have been removed as part of the C-01 DRY fix.
 }

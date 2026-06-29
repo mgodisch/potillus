@@ -1,0 +1,1 @@
+Qualitätsverbesserungen: Monatsnamen auf dem Heute-Bildschirm folgen jetzt der gewählten App-Sprache statt der Systemsprache. Interne Code-Bereinigungen (gemeinsame Mapping-Funktionen, extrahierte Spracherkennungslogik) und zusätzliche Unit-Tests verbessern die Wartbarkeit. Keine funktionalen Änderungen für Benutzer.

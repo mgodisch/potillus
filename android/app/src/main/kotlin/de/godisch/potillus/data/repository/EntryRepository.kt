@@ -264,29 +264,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
 }
 
 // ── Entity ↔ Domain conversion ───────────────────────────────────────────────
-
-/** Converts [EntryEntity] to [ConsumptionEntry]. All fields are mapped 1-to-1. */
-private fun EntryEntity.toDomain() = ConsumptionEntry(
-    id              = id,
-    drinkId         = drinkId,
-    drinkName       = drinkName,
-    volumeMl        = volumeMl,
-    alcoholPercent  = alcoholPercent,
-    gramsAlcohol    = gramsAlcohol,
-    timestampMillis = timestampMillis,
-    logicalDate     = logicalDate,
-    note            = note
-)
-
-/** Converts [ConsumptionEntry] to [EntryEntity] for Room persistence. All fields mapped 1-to-1. */
-private fun ConsumptionEntry.toEntity() = EntryEntity(
-    id              = id,
-    drinkId         = drinkId,
-    drinkName       = drinkName,
-    volumeMl        = volumeMl,
-    alcoholPercent  = alcoholPercent,
-    gramsAlcohol    = gramsAlcohol,
-    timestampMillis = timestampMillis,
-    logicalDate     = logicalDate,
-    note            = note
-)
+//
+// The conversion helpers (toDomain / toEntity) for EntryEntity and
+// ConsumptionEntry are defined once in EntityMapping.kt as `internal`
+// extension functions. See EntityMapping.kt for the full rationale.
