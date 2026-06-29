@@ -39,6 +39,17 @@ F-Droid pick up new releases automatically from **v-prefixed semver tags**
 the matching `vX.Y.Z` tag, and F-Droid opens a merge request that adds the new
 build block. Keep this reference copy and the fdroiddata file in sync.
 
+## Store listing metadata (auto-discovered)
+
+The fastlane store metadata (summaries, full descriptions, per-version
+changelogs and screenshots) lives at the **repository root** in
+`fastlane/metadata/android/<locale>/`. F-Droid auto-discovers fastlane metadata
+at the repo root, so the listing, the `<versionCode>.txt` changelogs and the
+screenshots are pulled into the F-Droid client automatically — no need to
+duplicate them in the fdroiddata merge request. (F-Droid does not find fastlane
+metadata placed inside the Gradle module tree, which is why it is kept at the
+root rather than under `android/`.)
+
 ## Caveats to verify on first submission
 
 - **`subdir` / wrapper discovery.** Because the Gradle wrapper is under `android/`

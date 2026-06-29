@@ -1,0 +1,1 @@
+Wartungsrelease: interne Projektstruktur angepasst – die Store-Metadaten (Beschreibungen, Änderungsprotokolle, Screenshots) liegen nun im Wurzelverzeichnis des Repositorys, damit F-Droid sie automatisch erkennt. Keine funktionalen Änderungen für Benutzer.

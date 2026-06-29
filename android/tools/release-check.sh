@@ -209,8 +209,8 @@ SOURCE_ROOT="app/src/main/kotlin"
 SCHEMAS_DIR="app/schemas/de.godisch.potillus.data.db.AppDatabase"
 # Fastlane store-metadata tree (used by both F-Droid and `fastlane supply`).
 # Per-locale release notes are named after the integer versionCode, e.g.
-# fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
-FASTLANE_DIR="fastlane/metadata/android"
+# ../fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
+FASTLANE_DIR="../fastlane/metadata/android"
 # Baseline coupling versionName ↔ versionCode for the one-increment-per-release
 # rule. See the file's own header and SECTION 1 for the derivation.
 ANCHOR_FILE="version-anchor"
@@ -284,7 +284,7 @@ extract_db_version() {
 #   FASTLANE COUPLING:
 #     The store listings (F-Droid and Google Play via `fastlane supply`) carry
 #     a per-locale "what's new" note named after the integer versionCode, i.e.
-#     fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. That file
+#     ../fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. That file
 #     name is the ONLY place a version number is embedded in the fastlane tree
 #     (titles and descriptions deliberately omit the version to avoid churn), so
 #     it must track versionCode. Every locale present in the tree must ship the
@@ -349,7 +349,7 @@ check_version_consistency() {
     #
     # WHEN YOU ADD A NEW "## vX.Y.Z" TO CHANGELOG.md:
     #   1. bump versionCode in build.gradle.kts by exactly 1, AND
-    #   2. add fastlane/metadata/android/<locale>/changelogs/<newCode>.txt
+    #   2. add ../fastlane/metadata/android/<locale>/changelogs/<newCode>.txt
     #      for every locale (enforced by the fastlane check further below).
     if [[ ! -f "$ANCHOR_FILE" ]]; then
         warn "No $ANCHOR_FILE — skipping one-increment-per-release check"

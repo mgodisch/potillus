@@ -6,8 +6,8 @@
 /TODO.md
 /android/.gradle
 /android/.kotlin
-/android/fastlane/.bundle
-/android/fastlane/.vendor
+/fastlane/.bundle
+/fastlane/.vendor
 
 /android/app/build
 /android/app/src/main/res/raw*/copyright.md
@@ -17,6 +17,6 @@
 
 # Release signing material and Play upload credentials — SECRET, never commit.
 # The committed templates are android/keystore.properties.example and the
-# SUPPLY_JSON_KEY note in android/fastlane/Appfile.
+# SUPPLY_JSON_KEY note in fastlane/Appfile.
 /android/keystore.properties
-/android/fastlane/play-store-credentials.json
+/fastlane/play-store-credentials.json

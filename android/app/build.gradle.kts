@@ -159,10 +159,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 77
+        versionCode = 78
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.73.1"
+        versionName = "0.73.2"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -392,7 +392,7 @@ android {
 
             // SCREENSHOT DEMO-DATA FIXTURE (single source of truth):
             //   ScreenshotTest seeds the app database from the Play-Store demo
-            //   data in fastlane/demo-backup.json. That file is the canonical
+            //   data in ../fastlane/demo-backup.json. That file is the canonical
             //   fixture (it lives next to the report PDFs and the store metadata),
             //   so instead of duplicating it under app/src/androidTest/assets we
             //   COPY it into a generated androidTest assets directory at build
@@ -502,21 +502,23 @@ kotlin {
 // ── 2c. Screenshot demo-data fixture wiring ───────────────────────────────────
 // The screenshot suite (app/src/androidTest/.../screenshot/ScreenshotTest.kt)
 // seeds the app database from the canonical Play-Store demo data file
-// fastlane/demo-backup.json. To avoid keeping a second copy of that JSON under
+// ../fastlane/demo-backup.json. To avoid keeping a second copy of that JSON under
 // the androidTest source set, this task copies the single source-of-truth file
 // into a generated androidTest assets directory that is registered on the
 // androidTest source set in the `sourceSets { }` block above.
 //
-// `rootProject.file(...)`: this is a single-module Gradle build whose root
-// project IS the android/ directory (see settings.gradle.kts), so the path
-// resolves to android/fastlane/demo-backup.json.
+// `rootProject.file("../fastlane/...")`: this is a single-module Gradle build
+// whose root project IS the android/ directory (see settings.gradle.kts). The
+// fastlane tree now lives at the repository root (a sibling of android/, so that
+// F-Droid auto-discovers the store metadata), hence the `../fastlane` prefix —
+// the path resolves to <repo>/fastlane/demo-backup.json.
 //
 // The copy is made a dependency of the androidTest asset-merge task so it always
 // runs before the test APK is packaged. `configureEach` covers whatever the
 // concrete merge task is named for the test build type (mergeDebugAndroidTestAssets).
 val copyDemoBackupFixture = tasks.register<Copy>("copyDemoBackupFixture") {
-    description = "Copy fastlane/demo-backup.json into the androidTest assets for the screenshot suite."
-    from(rootProject.file("fastlane/demo-backup.json"))
+    description = "Copy ../fastlane/demo-backup.json into the androidTest assets for the screenshot suite."
+    from(rootProject.file("../fastlane/demo-backup.json"))
     into(layout.buildDirectory.dir("generated/screenshotAssets"))
 }
 tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
@@ -724,7 +726,7 @@ dependencies {
     androidTestImplementation(libs.androidx.uiautomator)
     // screengrab: Screengrab.screenshot(name), UiAutomatorScreenshotStrategy and
     // LocaleTestRule. Used only by the screenshot suite; the `fastlane screengrab`
-    // CLI (see fastlane/Screengrabfile) drives the per-locale run and pulls the
+    // CLI (see ../fastlane/Screengrabfile) drives the per-locale run and pulls the
     // images into the fastlane metadata tree.
     androidTestImplementation(libs.screengrab)
 

@@ -286,7 +286,7 @@ androidx-uiautomator        = { group = "androidx.test.uiautomator", name = "uia
 # screengrab: fastlane's on-device capture helper (Screengrab.screenshot(...),
 # UiAutomatorScreenshotStrategy, LocaleTestRule). The `fastlane screengrab` CLI
 # installs the app + test APKs, switches locale and pulls the captured PNGs into
-# fastlane/metadata/android/<locale>/images/phoneScreenshots/.
+# ../fastlane/metadata/android/<locale>/images/phoneScreenshots/.
 screengrab                  = { group = "tools.fastlane",         name = "screengrab",                  version.ref = "screengrab" }
 
 # ── Core library desugaring ───────────────────────────────────────────────────

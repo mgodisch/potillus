@@ -24,7 +24,7 @@
 # Installs fastlane (which provides the `screengrab` / `capture_android_
 # screenshots` action used by `make screenshots`). Run once on a fresh checkout:
 #
-#     cd android/fastlane && bundle install
+#     cd fastlane && bundle install
 #
 # The Makefile invokes fastlane via `bundle exec` so the pinned version here is
 # always the one that runs, independent of any globally installed fastlane.

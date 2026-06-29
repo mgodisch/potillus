@@ -36,6 +36,25 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.73.2
+
+Move fastlane metadata to repo root for F-Droid
+
+Changed (project layout):
+- Moved the fastlane tree from `android/fastlane/` to the repository root
+  (`fastlane/`, a sibling of `android/`) so F-Droid auto-discovers the store
+  listing, per-version changelogs and screenshots from the source repo (F-Droid
+  does not look inside the Gradle module tree). The directory move itself is a
+  `git mv`; this entry accompanies the path updates that follow from it. fastlane
+  re-anchors to the new parent (the repo root), so paths into the Gradle build
+  outputs in `Fastfile`/`Screengrabfile` gain an `android/` prefix, while the
+  metadata output stays under `fastlane/`. The `android/`-side references
+  (`Makefile`, `app/build.gradle.kts`, `tools/release-check.sh`,
+  `tools/crop-screenshots.py`, `libs.versions.toml`, the screenshot test and
+  `.gitignore`) now point at `../fastlane/`. No functional change to the app.
+
+---
+
 ## v0.73.1
 
 Fix QA findings: locale, DRY mapping, docs, tests

@@ -87,9 +87,9 @@ export GRADLE_OPTS
 SBOM := app/build/outputs/sbom/libellus-potionis-sbom.json
 
 # ── Play-Store screenshot pipeline (see the `screenshots` target) ─────────────
-# Locales captured; MUST match fastlane/Screengrabfile and the metadata tree.
+# Locales captured; MUST match ../fastlane/Screengrabfile and the metadata tree.
 SCREENSHOT_LOCALES := de-DE en-US
-# The demo fixture (fastlane/demo-backup.json) covers 2026-01-01..2026-06-30, so
+# The demo fixture (../fastlane/demo-backup.json) covers 2026-01-01..2026-06-30, so
 # the device clock is pinned to the last day of that range to give the
 # date-relative "Today" screen meaningful content. (Setting the date needs an
 # emulator / rooted userdebug build; on a locked device the step is skipped.)
@@ -100,7 +100,7 @@ SCREENSHOT_CLOCK := 1000
 # Play's 320..3840 px / max-2:1 limits (verified by tools/validate-screenshots.py).
 SCREENSHOT_PDF_DPI := 200
 # Root of the fastlane store-metadata tree (shared by Play `supply` and F-Droid).
-META := fastlane/metadata/android
+META := ../fastlane/metadata/android
 
 # Optional opt-out of the screenshot suite during a normal instrumented-test run.
 # `make test-device EXCLUDE_SCREENSHOTS=1` skips every @ScreenshotOnly test.
@@ -203,14 +203,14 @@ bundle: prereq $(SBOM)
 	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"
 
 # Upload the signed AAB and the store metadata to Google Play via the fastlane
-# `deploy` lane (see fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
+# `deploy` lane (see ../fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
 # Requires: a configured signing key (keystore.properties / env), the bundled
-# fastlane (`cd fastlane && bundle install`), and a Play service-account key
-# (fastlane/play-store-credentials.json or $SUPPLY_JSON_KEY — see fastlane/Appfile).
-# Runs fastlane in a SUBSHELL so the `cd fastlane` does not leak into make state.
+# fastlane (`cd ../fastlane && bundle install`), and a Play service-account key
+# (../fastlane/play-store-credentials.json or $SUPPLY_JSON_KEY — see ../fastlane/Appfile).
+# Runs fastlane in a SUBSHELL so the `cd ../fastlane` does not leak into make state.
 # Override the track/status, e.g.:  make deploy DEPLOY_ARGS="track:internal status:completed"
 deploy: bundle
-	( cd fastlane && bundle exec fastlane deploy $(DEPLOY_ARGS) )
+	( cd ../fastlane && bundle exec fastlane deploy $(DEPLOY_ARGS) )
 
 # Generate a standardized CycloneDX 1.6 JSON SBOM for the release runtime
 # classpath (configuration lives in app/build.gradle.kts). Two steps:
@@ -271,10 +271,10 @@ install-debug: app/build/outputs/apk/debug/app-debug.apk
 #   (clock 10:00, 100 % battery, full Wi-Fi, no notifications). Demo Mode is
 #   ALWAYS switched off again at the end, even on failure, via a bash EXIT trap.
 #
-#   Prerequisites on the build host (see fastlane/Gemfile and the project README):
+#   Prerequisites on the build host (see ../fastlane/Gemfile and the project README):
 #     * a connected device/emulator with an aspect ratio <= 2:1
 #       (e.g. 1080x2160) so the captures satisfy Play's max-2:1 rule;
-#     * Ruby + bundler with fastlane installed: `cd fastlane && bundle install`;
+#     * Ruby + bundler with fastlane installed: `cd ../fastlane && bundle install`;
 #     * poppler-utils (`pdftoppm`) for rendering the PDF report pages.
 #     * Pillow (`python3-pil`) for bottom-cropping the in-app shots to <= 2:1.
 #
@@ -308,12 +308,12 @@ screenshots: prereq
 	adb shell am broadcast -a com.android.systemui.demo -e command network      -e mobile hide
 	adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
 	# 5) Capture the six in-app screenshots in both locales (de-DE, en-US).
-	#    The BUNDLED fastlane is mandatory (reproducible, pinned in fastlane/
-	#    Gemfile) — install it once with `cd fastlane && bundle install`. It runs
-	#    in a SUBSHELL so the `cd fastlane` does not leak into the following steps
+	#    The BUNDLED fastlane is mandatory (reproducible, pinned in ../fastlane/
+	#    Gemfile) — install it once with `cd ../fastlane && bundle install`. It runs
+	#    in a SUBSHELL so the `cd ../fastlane` does not leak into the following steps
 	#    or the EXIT trap (which must run from the android/ dir, otherwise
 	#    `$(MAKE) screenshots-demo-off` finds no such target).
-	( cd fastlane && bundle exec fastlane screenshots )
+	( cd ../fastlane && bundle exec fastlane screenshots )
 	# 6) Bottom-crop the six in-app screenshots to <= 2:1 (removes the Android
 	#    navigation bar at the bottom and satisfies Google Play's max-2:1 rule on
 	#    tall phones/emulators). The PDF report pages are added in the next step
@@ -337,10 +337,10 @@ screenshots-crop:
 # so these survive. `-singlefile` makes pdftoppm write exactly <root>.png.
 screenshots-pdf:
 	command -v pdftoppm >/dev/null || { echo "screenshots-pdf: 'pdftoppm' not found — install poppler-utils"; exit 1; }
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/07_report_page_1
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/08_report_page_2
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/07_report_page_1
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/08_report_page_2
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 ../fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/07_report_page_1
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 ../fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/08_report_page_2
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 ../fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/07_report_page_1
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 ../fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/08_report_page_2
 
 # Leave Android Demo Mode and restore the normal device state. Each step is
 # tolerant (|| true) so tear-down never fails the build; invoked from the

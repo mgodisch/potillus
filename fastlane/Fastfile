@@ -60,7 +60,7 @@ platform :android do
     # F-Droid reads, so the two stores never diverge.
     upload_to_play_store(
       # AAB (not APK): Google Play requires the App Bundle format for new apps.
-      aab: 'app/build/outputs/bundle/release/app-release.aab',
+      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
 
       # Default to the production track but allow an override for staged rollouts
       # (e.g. `track:internal`). `release_status: draft` is the SAFE default: the

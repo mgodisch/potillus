@@ -1,0 +1,1 @@
+Maintenance release: internal project layout adjusted – the store metadata (descriptions, changelogs, screenshots) now lives at the repository root so F-Droid auto-discovers it. No functional changes for users.

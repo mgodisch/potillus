@@ -27,9 +27,11 @@
 # Mode and the device date BEFORE calling fastlane and tears Demo Mode down
 # afterwards, then renders the two PDF report pages as screenshots 07/08.
 #
-# All relative paths below are resolved from the directory fastlane is run in,
-# which is the android/ project root (see the Makefile recipe: `cd fastlane &&
-# bundle exec fastlane screenshots`, and fastlane re-anchors to the project root).
+# All relative paths below are resolved from the directory fastlane re-anchors to,
+# which — now that this fastlane/ tree lives at the repository root — is the REPO
+# root (a sibling of android/), see the Makefile recipe: `cd ../fastlane &&
+# bundle exec fastlane screenshots`. Paths into the Gradle build outputs therefore
+# carry the `android/` prefix, while the metadata output stays under `fastlane/`.
 # =============================================================================
 
 # Application id of the build under test. The debug build appends ".debug"
@@ -40,8 +42,8 @@ tests_package_name('de.godisch.potillus.debug.test')
 
 # Pre-built APKs (the Makefile runs `assembleDebug assembleDebugAndroidTest`
 # first). Providing them lets screengrab (re)install before capturing.
-app_apk_path('app/build/outputs/apk/debug/app-debug.apk')
-tests_apk_path('app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk')
+app_apk_path('android/app/build/outputs/apk/debug/app-debug.apk')
+tests_apk_path('android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk')
 
 # Capture only the dedicated screenshot suite, not the whole instrumented test
 # set. This is also why the @ScreenshotOnly opt-out (used by `make test-device

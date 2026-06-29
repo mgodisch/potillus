@@ -35,7 +35,7 @@
 #   Path to the Google Play service-account key (a JSON file you download once
 #   from the Google Cloud console for a service account that has been granted
 #   access in the Play Console). It is a SECRET and is therefore git-ignored
-#   (.gitignore → /android/fastlane/play-store-credentials.json) and NOT shipped
+#   (.gitignore → /fastlane/play-store-credentials.json) and NOT shipped
 #   in the repository. The path can be overridden with the SUPPLY_JSON_KEY
 #   environment variable (useful in CI, where the key is injected as a secret).
 #   See: https://docs.fastlane.tools/actions/supply/#setup
@@ -43,4 +43,4 @@
 
 package_name("de.godisch.potillus")
 
-json_key_file(ENV["SUPPLY_JSON_KEY"] || "play-store-credentials.json")
+json_key_file(ENV["SUPPLY_JSON_KEY"] || "fastlane/play-store-credentials.json")

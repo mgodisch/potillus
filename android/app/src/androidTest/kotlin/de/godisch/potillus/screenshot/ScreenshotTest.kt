@@ -38,19 +38,19 @@ package de.godisch.potillus.screenshot
 //
 //   The remaining two assets (07/08) are the two pages of the localized PDF
 //   report; they are NOT screenshots and are rendered from the committed
-//   fastlane/potillus_report_<de|en>.pdf files by the `make screenshots`
+//   ../fastlane/potillus_report_<de|en>.pdf files by the `make screenshots`
 //   Makefile target AFTER this suite runs (see android/Makefile). The numeric
 //   filename prefixes guarantee the Play console lists all eight assets 1..8 in
 //   lexicographic order.
 //
 // HOW IT FITS THE FASTLANE SCREENGRAB FLOW
-//   `fastlane screengrab` (see fastlane/Screengrabfile + fastlane/Fastfile)
+//   `fastlane screengrab` (see ../fastlane/Screengrabfile + ../fastlane/Fastfile)
 //   installs the app + this test APK, then for EACH locale (de-DE, en-US):
 //     1. switches the device/app locale and re-runs this test,
 //     2. LocaleTestRule applies the locale inside the test process,
 //     3. Screengrab.screenshot(name) captures the current screen, and
 //     4. screengrab pulls the PNGs into
-//        fastlane/metadata/android/<locale>/images/phoneScreenshots/.
+//        ../fastlane/metadata/android/<locale>/images/phoneScreenshots/.
 //   screengrab CLEARS app data between locales, so this test re-seeds the
 //   database on every run (see [setUp]); it must never assume left-over state.
 //
@@ -157,7 +157,7 @@ class ScreenshotTest {
      * Prepares a clean, deterministic starting state for every run (screengrab
      * clears app data between locales, so this cannot assume anything survives):
      *
-     *  1. Seeds the database from the canonical demo fixture (fastlane/
+     *  1. Seeds the database from the canonical demo fixture (../fastlane/
      *     demo-backup.json), copied into the test APK assets at build time.
      *  2. Clears FLAG_SECURE for the run by enabling AppSettings.allowScreenshots,
      *     so the full-screen UiAutomator capture is not black.
