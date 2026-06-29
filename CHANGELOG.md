@@ -36,6 +36,71 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.72.0
+
+Automate Play-Store screenshots via screengrab
+
+Added:
+- Fully automated Play-Store screenshot pipeline, runnable as `make screenshots`
+  (root) which delegates to `make -C android screenshots`. It captures the six
+  in-app phone screenshots in both store locales (`de-DE`, `en-US`) via Fastlane
+  `screengrab` plus an Espresso/Compose UI test, then renders the two pages of
+  the localized PDF report as screenshots 7 and 8, placing all eight assets per
+  locale straight into `fastlane/metadata/android/<locale>/images/phoneScreenshots/`.
+- `app/src/androidTest/.../screenshot/ScreenshotTest.kt`: the capture suite. It
+  seeds the database from the canonical demo fixture (`fastlane/demo-backup.json`,
+  copied into the androidTest assets at build time by the new
+  `copyDemoBackupFixture` Gradle task), fixes the theme per phase (screenshots
+  1–3 in light mode, 4–6 in dark mode), and navigates Today → Calendar →
+  Statistics → Drinks → Add-drink dialog → Settings. It selects navigation
+  targets by their localized label text plus a click action (the production UI
+  has no test tags) so it works unchanged in both locales.
+- `app/src/androidTest/.../screenshot/ScreenshotOnly.kt`: a runtime annotation
+  tagging the suite so it can be excluded from an ordinary device-test run via
+  the documented switch `make test-device EXCLUDE_SCREENSHOTS=1`
+  (`-PexcludeScreenshotTests`). By default the suite still runs as part of
+  `connectedDebugAndroidTest`, so a broken capture flow is caught by the normal
+  gate.
+- `tools/validate-screenshots.py`: a pure-stdlib gate that fails the run unless
+  every captured asset meets Google Play's phone-screenshot requirements (PNG,
+  each side 320–3840 px, aspect ratio ≤ 2:1, exactly eight per locale).
+- Fastlane Ruby configuration: `fastlane/Fastfile` (lane `screenshots`),
+  `fastlane/Screengrabfile` (locales, packages, output dir), `fastlane/Gemfile`
+  (declares the fastlane gem) and the resolved `fastlane/Gemfile.lock` that pins
+  the exact gem versions for the mandatory `bundle exec` run.
+
+Changed:
+- Status-bar hygiene during capture uses the Android Demo Mode API, driven from
+  the `screenshots` Makefile target via adb: clock 10:00, 100 % battery, full
+  Wi-Fi and no notifications. A bash `EXIT` trap guarantees Demo Mode is disabled
+  again afterwards (`screenshots-demo-off`), even if the run fails. The device
+  date is pinned to 2026-06-30 so the date-relative Today screen shows the demo
+  period (best-effort; needs an emulator/rooted build).
+- `app/build.gradle.kts` / `gradle/libs.versions.toml`: added the
+  `tools.fastlane:screengrab` and `androidx.test.uiautomator` androidTest
+  dependencies. The UiAutomator full-screen capture strategy is required so the
+  cleaned Demo-Mode status bar is part of the saved image. `FLAG_SECURE` is cleared
+  for the run by enabling the existing `allowScreenshots` preference from the
+  test — no production code change.
+- Screenshot filenames are stable across runs: screengrab's timestamp suffix is
+  disabled (`use_timestamp_suffix(false)`), so capture overwrites
+  `01_today.png` … `06_settings.png` in place instead of emitting a new
+  timestamped file every run. The committed store screenshots can therefore be
+  re-generated and checked in without churn or duplicates.
+- The six in-app screenshots are bottom-cropped to at most a 2:1 aspect ratio
+  (`tools/crop-screenshots.py`, Make step `screenshots-crop`). This removes the
+  Android navigation bar at the bottom and satisfies Google Play's max-2:1 rule
+  even when captured on a tall phone/emulator (e.g. 19.5:9). The PDF report pages
+  (07/08) keep their A4 ratio and are never cropped.
+
+Release process:
+- versionName 0.71.1 → 0.72.0, versionCode 74 → 75 (anchor v0.70.0 = 72 plus
+  three releases since). README title and `proguard-rules.pro` header updated to
+  v0.72.0.
+- Added fastlane store notes `changelogs/75.txt` in both locales (covers 0.72.0).
+
+---
+
 ## v0.71.1
 
 Fix Today-screen trend-arrow baseline

@@ -33,12 +33,14 @@ help:
 	@echo "  make release-check  run the read-only release-readiness gate"
 	@echo "  make test-device    run instrumented tests (device/emulator needed)"
 	@echo "  make test           run all tests (device needed)"
+	@echo "  make screenshots    capture Play-Store screenshots (device + fastlane + poppler)"
 	@echo "  make install-debug  install debug APK on device (device needed)"
 	@echo "  make install        install debug APK on device (device needed)"
 	@echo "  make clean          clear the Gradle build cache"
 	@echo "  make dist-clean     clear all non-repo files"
 	@echo ""
 	@echo "Override the SDK path with:  make ANDROID_HOME=/path/to/android-sdk"
+	@echo "Skip the screenshot suite in a device-test run:  make test-device EXCLUDE_SCREENSHOTS=1"
 #
 #  Every build/test target first ensures Java 21, the Android SDK and the
 #  Gradle wrapper are present. Java 21 and Android SDK must be installed
@@ -78,6 +80,32 @@ export GRADLE_OPTS
 # cyclonedxDirectBom block in app/build.gradle.kts). Kept under app/build/outputs/
 # alongside the APK so a release ships its bill of materials next to the binary.
 SBOM := app/build/outputs/sbom/libellus-potionis-sbom.json
+
+# ── Play-Store screenshot pipeline (see the `screenshots` target) ─────────────
+# Locales captured; MUST match fastlane/Screengrabfile and the metadata tree.
+SCREENSHOT_LOCALES := de-DE en-US
+# The demo fixture (fastlane/demo-backup.json) covers 2026-01-01..2026-06-30, so
+# the device clock is pinned to the last day of that range to give the
+# date-relative "Today" screen meaningful content. (Setting the date needs an
+# emulator / rooted userdebug build; on a locked device the step is skipped.)
+SCREENSHOT_DATE  := 2026-06-30
+# Status-bar clock shown in every shot while Android Demo Mode is active (HHMM).
+SCREENSHOT_CLOCK := 1000
+# PDF report render resolution. 200 dpi on A4 -> ~1653x2337 px, inside Google
+# Play's 320..3840 px / max-2:1 limits (verified by tools/validate-screenshots.py).
+SCREENSHOT_PDF_DPI := 200
+# Root of the fastlane store-metadata tree (shared by Play `supply` and F-Droid).
+META := fastlane/metadata/android
+
+# Optional opt-out of the screenshot suite during a normal instrumented-test run.
+# `make test-device EXCLUDE_SCREENSHOTS=1` skips every @ScreenshotOnly test.
+# See app/build.gradle.kts (defaultConfig) and app/src/androidTest/.../
+# screenshot/ScreenshotOnly.kt for the underlying -PexcludeScreenshotTests switch.
+ifeq ($(EXCLUDE_SCREENSHOTS),1)
+SCREENSHOT_EXCLUDE_FLAG := -PexcludeScreenshotTests
+else
+SCREENSHOT_EXCLUDE_FLAG :=
+endif
 
 prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md guides release-check
 
@@ -191,7 +219,7 @@ test-device: prereq
 	adb shell input keyevent KEYCODE_WAKEUP
 	adb shell wm dismiss-keyguard
 	REPORT="app/build/reports/androidTests/connected/index.html"
-	./gradlew connectedDebugAndroidTest
+	./gradlew connectedDebugAndroidTest $(SCREENSHOT_EXCLUDE_FLAG)
 
 install: install-debug
 
@@ -200,6 +228,102 @@ install-debug: app/build/outputs/apk/debug/app-debug.apk
 	test "$${DEV_COUNT:-0}" -ne 0
 	adb install -r $<
 
+# =============================================================================
+# PLAY-STORE SCREENSHOTS
+# =============================================================================
+#   Fully automated capture of the eight Google-Play phone screenshots per
+#   locale (de-DE, en-US), placed straight into the fastlane metadata tree:
+#
+#     01_today  02_calendar  03_statistics   (LIGHT) ─┐ captured in-app by the
+#     04_drinks 05_add_drink 06_settings     (DARK)  ─┘ screengrab/Espresso suite
+#     07_report_page_1  08_report_page_2             ─ rendered from the PDF report
+#
+#   The status bar is cleaned for the in-app shots via the Android Demo Mode API
+#   (clock 10:00, 100 % battery, full Wi-Fi, no notifications). Demo Mode is
+#   ALWAYS switched off again at the end, even on failure, via a bash EXIT trap.
+#
+#   Prerequisites on the build host (see fastlane/Gemfile and the project README):
+#     * a connected device/emulator with an aspect ratio <= 2:1
+#       (e.g. 1080x2160) so the captures satisfy Play's max-2:1 rule;
+#     * Ruby + bundler with fastlane installed: `cd fastlane && bundle install`;
+#     * poppler-utils (`pdftoppm`) for rendering the PDF report pages.
+#     * Pillow (`python3-pil`) for bottom-cropping the in-app shots to <= 2:1.
+#
+#   Pinning the device date to $(SCREENSHOT_DATE) needs an emulator or a rooted
+#   userdebug build; on a locked production device that single step is skipped
+#   (|| true) and the "Today" screen simply reflects the real date.
+screenshots: prereq
+	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
+	test "$${DEV_COUNT:-0}" -ne 0
+	# 1) Build the app + instrumentation APKs that screengrab installs.
+	./gradlew assembleDebug assembleDebugAndroidTest
+	# 2) Demo Mode is torn down no matter how this recipe exits.
+	trap '$(MAKE) screenshots-demo-off' EXIT
+	# 3) Prepare the device: wake, disable animations, pin date/clock.
+	adb shell svc power stayon true
+	adb shell input keyevent KEYCODE_WAKEUP
+	adb shell wm dismiss-keyguard
+	adb shell settings put global window_animation_scale 0
+	adb shell settings put global transition_animation_scale 0
+	adb shell settings put global animator_duration_scale 0
+	adb shell settings put global auto_time 0 || true
+	adb root >/dev/null 2>&1 || true
+	adb shell "date $$(date -u -d '$(SCREENSHOT_DATE) 10:00:00' +%m%d%H%M%Y.%S)" || true
+	adb shell am broadcast -a android.intent.action.TIME_SET >/dev/null 2>&1 || true
+	# 4) Enter Android Demo Mode and clean the status bar.
+	adb shell settings put global sysui_demo_allowed 1
+	adb shell am broadcast -a com.android.systemui.demo -e command enter
+	adb shell am broadcast -a com.android.systemui.demo -e command clock        -e hhmm $(SCREENSHOT_CLOCK)
+	adb shell am broadcast -a com.android.systemui.demo -e command battery      -e plugged false -e level 100
+	adb shell am broadcast -a com.android.systemui.demo -e command network      -e wifi show -e level 4
+	adb shell am broadcast -a com.android.systemui.demo -e command network      -e mobile hide
+	adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
+	# 5) Capture the six in-app screenshots in both locales (de-DE, en-US).
+	#    The BUNDLED fastlane is mandatory (reproducible, pinned in fastlane/
+	#    Gemfile) — install it once with `cd fastlane && bundle install`. It runs
+	#    in a SUBSHELL so the `cd fastlane` does not leak into the following steps
+	#    or the EXIT trap (which must run from the android/ dir, otherwise
+	#    `$(MAKE) screenshots-demo-off` finds no such target).
+	( cd fastlane && bundle exec fastlane screenshots )
+	# 6) Bottom-crop the six in-app screenshots to <= 2:1 (removes the Android
+	#    navigation bar at the bottom and satisfies Google Play's max-2:1 rule on
+	#    tall phones/emulators). The PDF report pages are added in the next step
+	#    and are never cropped.
+	$(MAKE) screenshots-crop
+	# 7) Render the two PDF report pages per locale into the phoneScreenshots dirs.
+	$(MAKE) screenshots-pdf
+	# 8) Enforce the Google Play phone-screenshot requirements on all eight assets.
+	python3 tools/validate-screenshots.py $(SCREENSHOT_LOCALES)
+
+# Bottom-crop the in-app screenshots (01..06) to at most a 2:1 aspect ratio. Runs
+# AFTER capture and BEFORE the PDF pages are rendered, so it only ever sees the
+# in-app shots; the tool additionally skips any "report" page and any image that
+# is already <= 2:1, so re-runs and the PDF pages are safe.
+screenshots-crop:
+	python3 -c 'import PIL' 2>/dev/null || { echo "screenshots-crop: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
+	python3 tools/crop-screenshots.py $(SCREENSHOT_LOCALES)
+
+# Render report pages 1 & 2 of the localized PDF into screenshots 07/08. Runs
+# AFTER screengrab (whose clear_previous_screenshots wipes only the in-app PNGs),
+# so these survive. `-singlefile` makes pdftoppm write exactly <root>.png.
+screenshots-pdf:
+	command -v pdftoppm >/dev/null || { echo "screenshots-pdf: 'pdftoppm' not found — install poppler-utils"; exit 1; }
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/07_report_page_1
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/08_report_page_2
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/07_report_page_1
+	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/08_report_page_2
+
+# Leave Android Demo Mode and restore the normal device state. Each step is
+# tolerant (|| true) so tear-down never fails the build; invoked from the
+# `screenshots` EXIT trap.
+screenshots-demo-off:
+	-adb shell am broadcast -a com.android.systemui.demo -e command exit || true
+	-adb shell settings put global sysui_demo_allowed 0 || true
+	-adb shell settings put global auto_time 1 || true
+	-adb shell settings put global window_animation_scale 1 || true
+	-adb shell settings put global transition_animation_scale 1 || true
+	-adb shell settings put global animator_duration_scale 1 || true
+
 clean: prereq
 	./gradlew clean
 
@@ -207,4 +331,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release sbom test unit-test lint test-device install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf screenshots-demo-off install install-debug clean distclean

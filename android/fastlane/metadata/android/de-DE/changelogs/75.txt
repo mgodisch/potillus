@@ -1,0 +1,4 @@
+Nur Entwickler-Werkzeuge: Dieses Update fügt eine vollautomatische Erzeugung der
+Play-Store-Screenshots aus UI-Tests hinzu – mit bereinigter Statusleiste über die
+Android-Demo-Mode-API und den beiden Berichtsseiten aus dem PDF-Export. Für
+Nutzerinnen und Nutzer ändert sich an der App selbst nichts.

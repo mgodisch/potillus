@@ -1,0 +1,4 @@
+Developer tooling only: this release adds a fully automated pipeline that
+generates the Play-Store screenshots from UI tests, with a clean status bar via
+the Android Demo Mode API and the two report pages rendered from the PDF export.
+The app itself is unchanged for users.

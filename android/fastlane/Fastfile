@@ -1,0 +1,48 @@
+# vim: set et ts=2 sw=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# =============================================================================
+# Fastfile -- fastlane lanes for Libellus Potionis
+# =============================================================================
+#
+# Currently this defines a single lane, `screenshots`, that captures the six
+# in-app Play-Store screenshots through Fastlane screengrab (configuration in
+# Screengrabfile). It is intended to be invoked by the `make screenshots` target
+# (android/Makefile), which wraps it with Android Demo Mode set-up/tear-down,
+# device-date pinning and PDF-report rendering (screenshots 07/08).
+#
+# Running the lane on its own is possible (`bundle exec fastlane screenshots`),
+# but then the status bar is NOT cleaned and the PDF pages are NOT produced —
+# use `make screenshots` for the complete, Play-ready asset set.
+# =============================================================================
+
+default_platform(:android)
+
+platform :android do
+  desc 'Capture the in-app Play-Store screenshots (de-DE, en-US) via screengrab.'
+  desc 'Prefer `make screenshots`, which also cleans the status bar (Demo Mode)'
+  desc 'and renders the PDF report pages as screenshots 07/08.'
+  lane :screenshots do
+    # `capture_android_screenshots` is the modern alias of the `screengrab`
+    # action. It reads Screengrabfile, installs the APKs, and for each locale
+    # runs the screenshot suite and pulls the PNGs into the fastlane metadata
+    # tree. Demo Mode and PDF rendering are handled by the Makefile around this.
+    capture_android_screenshots
+  end
+end

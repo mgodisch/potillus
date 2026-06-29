@@ -151,10 +151,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 74
+        versionCode = 75
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.71.1"
+        versionName = "0.72.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -181,6 +181,34 @@ android {
         // Test runner for instrumented tests (run on device/emulator).
         // Not relevant for pure JVM unit tests.
         testInstrumentationRunner        = "androidx.test.runner.AndroidJUnitRunner"
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SCREENSHOT-TEST OPT-OUT SWITCH (documented; OFF by default)
+        // ─────────────────────────────────────────────────────────────────────
+        //   The Play-Store screenshot-capture suite (ScreenshotTest, tagged with
+        //   the @de.godisch.potillus.screenshot.ScreenshotOnly annotation) runs as
+        //   part of the ordinary `connectedDebugAndroidTest` / `make test-device`
+        //   run by DEFAULT — the project deliberately does NOT hide it, so a broken
+        //   capture flow is caught by the normal test gate.
+        //
+        //   To EXCLUDE it from a regular instrumented-test run, pass the Gradle
+        //   property `-PexcludeScreenshotTests` (or set it in gradle.properties):
+        //
+        //       ./gradlew connectedDebugAndroidTest -PexcludeScreenshotTests
+        //
+        //   The android/Makefile surfaces the same switch ergonomically as:
+        //
+        //       make test-device EXCLUDE_SCREENSHOTS=1
+        //
+        //   When the property is present, the JUnit `notAnnotation` instrumentation
+        //   argument is registered so AndroidX Test skips every test annotated with
+        //   @ScreenshotOnly. The `make screenshots` flow is unaffected: screengrab
+        //   targets the screenshot package directly (Screengrabfile
+        //   `use_tests_in_packages`) instead of relying on this annotation.
+        if (project.hasProperty("excludeScreenshotTests")) {
+            testInstrumentationRunnerArguments["notAnnotation"] =
+                "de.godisch.potillus.screenshot.ScreenshotOnly"
+        }
 
         // KSP argument for Room:
         // Room writes the database schema as JSON into this folder.
@@ -294,6 +322,19 @@ android {
             // resolved location is identical — app/schemas exposed as androidTest
             // assets — only the DSL changed.
             assets.directories += "$projectDir/schemas"
+
+            // SCREENSHOT DEMO-DATA FIXTURE (single source of truth):
+            //   ScreenshotTest seeds the app database from the Play-Store demo
+            //   data in fastlane/demo-backup.json. That file is the canonical
+            //   fixture (it lives next to the report PDFs and the store metadata),
+            //   so instead of duplicating it under app/src/androidTest/assets we
+            //   COPY it into a generated androidTest assets directory at build
+            //   time (see the `copyDemoBackupFixture` task below) and expose that
+            //   directory here. The test then opens "demo-backup.json" through the
+            //   instrumentation AssetManager while the repository keeps exactly one
+            //   copy of the data.
+            assets.directories +=
+                layout.buildDirectory.dir("generated/screenshotAssets").get().asFile.path
         }
     }
 
@@ -378,6 +419,30 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
     }
+}
+
+// ── 2c. Screenshot demo-data fixture wiring ───────────────────────────────────
+// The screenshot suite (app/src/androidTest/.../screenshot/ScreenshotTest.kt)
+// seeds the app database from the canonical Play-Store demo data file
+// fastlane/demo-backup.json. To avoid keeping a second copy of that JSON under
+// the androidTest source set, this task copies the single source-of-truth file
+// into a generated androidTest assets directory that is registered on the
+// androidTest source set in the `sourceSets { }` block above.
+//
+// `rootProject.file(...)`: this is a single-module Gradle build whose root
+// project IS the android/ directory (see settings.gradle.kts), so the path
+// resolves to android/fastlane/demo-backup.json.
+//
+// The copy is made a dependency of the androidTest asset-merge task so it always
+// runs before the test APK is packaged. `configureEach` covers whatever the
+// concrete merge task is named for the test build type (mergeDebugAndroidTestAssets).
+val copyDemoBackupFixture by tasks.registering(Copy::class) {
+    description = "Copy fastlane/demo-backup.json into the androidTest assets for the screenshot suite."
+    from(rootProject.file("fastlane/demo-backup.json"))
+    into(layout.buildDirectory.dir("generated/screenshotAssets"))
+}
+tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
+    dependsOn(copyDemoBackupFixture)
 }
 
 // ── 3. Dependencies ───────────────────────────────────────────────────────────
@@ -531,6 +596,19 @@ dependencies {
     // infrastructure is the supported configuration. androidTest-only.
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.espresso.core)
+
+    // ── Play-Store screenshot capture (androidTest) ────────────────────────────
+    // uiautomator: provides the full-screen capture used by ScreenshotTest via
+    // screengrab's UiAutomatorScreenshotStrategy, so the cleaned Android-Demo-Mode
+    // status bar (clock 10:00, full battery/Wi-Fi, no notifications) is part of the
+    // saved PNG. The Compose in-process DecorView strategy would crop the system
+    // bars out, so uiautomator is required, not optional.
+    androidTestImplementation(libs.androidx.uiautomator)
+    // screengrab: Screengrab.screenshot(name), UiAutomatorScreenshotStrategy and
+    // LocaleTestRule. Used only by the screenshot suite; the `fastlane screengrab`
+    // CLI (see fastlane/Screengrabfile) drives the per-locale run and pulls the
+    // images into the fastlane metadata tree.
+    androidTestImplementation(libs.screengrab)
 
     // room-testing: MigrationTestHelper validates each Room Migration against the
     // committed schema JSONs (app/schemas/), so a broken migration fails the test

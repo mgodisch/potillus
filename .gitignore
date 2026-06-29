@@ -6,6 +6,8 @@
 /TODO.md
 /android/.gradle
 /android/.kotlin
+/android/fastlane/.bundle
+/android/fastlane/.vendor
 /android/app/build
 /android/app/src/main/res/raw*/copyright.md
 /android/app/src/main/res/raw*/usersguide.md

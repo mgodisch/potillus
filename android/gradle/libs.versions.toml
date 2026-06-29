@@ -152,6 +152,8 @@ turbine                 = "1.2.0"     # Flow/StateFlow test assertions
 org-json                = "20240303"  # real org.json impl for JVM unit tests
 androidx-test-runner    = "1.6.2"     # androidTest runner
 espresso-core           = "3.6.1"     # androidTest Espresso core
+uiautomator             = "2.3.0"     # full-screen capture incl. demo-mode status bar
+screengrab              = "2.1.1"     # fastlane screengrab AAR (Screengrab + LocaleTestRule)
 
 # desugar_jdk_libs: the backported JDK class library used by CORE LIBRARY
 # DESUGARING. When isCoreLibraryDesugaringEnabled = true, D8/R8 rewrites calls to
@@ -298,6 +300,15 @@ turbine                     = { group = "app.cash.turbine",       name = "turbin
 org-json                    = { group = "org.json",               name = "json",                        version.ref = "org-json" }
 androidx-test-runner        = { group = "androidx.test",          name = "runner",                      version.ref = "androidx-test-runner" }
 espresso-core               = { group = "androidx.test.espresso", name = "espresso-core",               version.ref = "espresso-core" }
+# androidx-uiautomator: drives the full-screen screenshot strategy used by the
+# Play-Store capture suite. Unlike Compose's in-process DecorView capture, it
+# grabs the WHOLE screen (so the Android-Demo-Mode status bar is included).
+androidx-uiautomator        = { group = "androidx.test.uiautomator", name = "uiautomator",              version.ref = "uiautomator" }
+# screengrab: fastlane's on-device capture helper (Screengrab.screenshot(...),
+# UiAutomatorScreenshotStrategy, LocaleTestRule). The `fastlane screengrab` CLI
+# installs the app + test APKs, switches locale and pulls the captured PNGs into
+# fastlane/metadata/android/<locale>/images/phoneScreenshots/.
+screengrab                  = { group = "tools.fastlane",         name = "screengrab",                  version.ref = "screengrab" }
 
 # ── Core library desugaring ───────────────────────────────────────────────────
 # Consumed via the special `coreLibraryDesugaring(...)` configuration in

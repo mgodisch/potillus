@@ -1,0 +1,35 @@
+# vim: set et ts=2 sw=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# =============================================================================
+# Gemfile -- Ruby tooling for the fastlane screenshot pipeline
+# =============================================================================
+#
+# Installs fastlane (which provides the `screengrab` / `capture_android_
+# screenshots` action used by `make screenshots`). Run once on a fresh checkout:
+#
+#     cd android/fastlane && bundle install
+#
+# The Makefile invokes fastlane via `bundle exec` so the pinned version here is
+# always the one that runs, independent of any globally installed fastlane.
+# =============================================================================
+
+source 'https://rubygems.org'
+
+gem 'fastlane'

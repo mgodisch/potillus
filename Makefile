@@ -41,10 +41,26 @@ install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(V
 /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk: android/app/build/outputs/apk/debug/app-debug.apk
 	cp $< $@
 
+# Capture the eight Google-Play phone screenshots per locale. Delegates to the
+# android/ Makefile, which drives Android Demo Mode, Fastlane screengrab and the
+# PDF-report rendering. See `make -C android help` for prerequisites and the
+# EXCLUDE_SCREENSHOTS switch.
+screenshots:
+	$(MAKE) -C android screenshots
+
 tgz: distclean potillus-$(VERSION).tar.gz
 
 potillus-$(VERSION).tar.gz: CHANGELOG.md
-	tar czf ../potillus-$(VERSION).tar.gz -C .. --exclude .git --exclude .gradle --exclude .kotlin --exclude potillus/android/app/build --exclude short --exclude TODO.md potillus
+	tar czf ../potillus-$(VERSION).tar.gz -C .. \
+		--exclude .git \
+		--exclude .gradle \
+		--exclude .kotlin \
+		--exclude .bundle \
+		--exclude .vendor \
+		--exclude build \
+		--exclude short \
+		--exclude TODO.md \
+		potillus
 
 push:
 	git push && git push --tags
@@ -57,4 +73,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: default install tgz push clean distclean
+.PHONY: default install screenshots tgz push clean distclean
