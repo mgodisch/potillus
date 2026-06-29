@@ -192,9 +192,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_days_month">Median drickdagar/månad</string>
     <string name="pdf_kpi_max_day">Max per dag</string>
     <string name="pdf_kpi_max_7days">Max per 7 dagar</string>
-    <string name="info_dialog_title">Gillar du den här appen?</string>
-    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
-    <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Lås appen</string>
     <plurals name="days">
         <item quantity="one">%1$d dag</item>

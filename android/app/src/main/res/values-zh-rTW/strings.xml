@@ -241,9 +241,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_days_month">中位數飲酒日數/月</string>
     <string name="pdf_kpi_max_day">每日最大</string>
     <string name="pdf_kpi_max_7days">7天最大</string>
-    <string name="info_dialog_title">你喜歡這個應用程式嗎？</string>
-    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
-    <string name="info_dialog_ok">確定</string>
     <string name="lock_app">鎖定應用程式</string>
     <plurals name="days">
         <item quantity="other">%1$d天</item>

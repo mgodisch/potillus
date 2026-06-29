@@ -60,12 +60,4 @@ interface IAppPreferences {
     suspend fun setDayChangeTime(hour: Int, minute: Int)
     /** Persists the statistics start date [date] ("YYYY-MM-DD"). */
     suspend fun setStatsFromDate(date: String)
-
-    /**
-     * Year (e.g. 2026) in which the annual "Do you like this App?" info dialog was
-     * last shown; 0 means never. Used to show it at most once per calendar year.
-     */
-    val infoDialogShownYear: Flow<Int>
-    /** Records the [year] in which the annual info dialog was shown. */
-    suspend fun setInfoDialogShownYear(year: Int)
 }

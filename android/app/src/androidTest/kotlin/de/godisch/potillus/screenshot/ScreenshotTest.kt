@@ -76,9 +76,6 @@ package de.godisch.potillus.screenshot
 //   - Theme is fixed BEFORE each Activity launch (DAY for 01-03, NIGHT for
 //     04-06) using two separate ActivityScenario launches, so the theme is
 //     applied at first composition and there is no mid-run recomposition race.
-//   - The one-time annual info dialog is suppressed by marking it "already shown
-//     this year" in preferences, otherwise it would overlay the first screenshot
-//     on freshly cleared data.
 //   - Navigation never relies on test tags (the production UI has none): nav
 //     targets are selected by their localized label TEXT combined with a click
 //     action, which uniquely identifies the merged NavigationBarItem and never
@@ -118,7 +115,6 @@ import org.junit.runner.RunWith
 import tools.fastlane.screengrab.Screengrab
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy
 import tools.fastlane.screengrab.locale.LocaleTestRule
-import java.time.LocalDate
 import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
@@ -163,9 +159,7 @@ class ScreenshotTest {
      *     so the full-screen UiAutomator capture is not black.
      *  3. Resets the in-app language to "follow system" so LocaleTestRule fully
      *     controls the displayed language.
-     *  4. Marks the annual info dialog as already shown this year so it does not
-     *     overlay the first screenshot.
-     *  5. Installs the full-screen screenshot strategy (includes the demo-mode
+     *  4. Installs the full-screen screenshot strategy (includes the demo-mode
      *     status bar) and, defensively, applies the requested locale to the
      *     app resources used for label lookup.
      */
@@ -189,13 +183,12 @@ class ScreenshotTest {
         runBlocking {
             app.backupRepository.importReplace(parsed.drinks, parsed.entries)
 
-            // 2) + 3) + 4): make the run deterministic and capturable.
+            // 2) + 3): make the run deterministic and capturable.
             app.appPreferences.setAllowScreenshots(true)
             app.appPreferences.setLanguage("")
-            app.appPreferences.setInfoDialogShownYear(LocalDate.now().year)
         }
 
-        // 5) Full-screen capture so the cleaned demo-mode status bar is included.
+        // 4) Full-screen capture so the cleaned demo-mode status bar is included.
         Screengrab.setDefaultScreenshotStrategy(UiAutomatorScreenshotStrategy())
     }
 

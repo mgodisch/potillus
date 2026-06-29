@@ -159,16 +159,16 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 78
+        versionCode = 79
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.73.2"
+        versionName = "0.73.3"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
         // ─────────────────────────────────────────────────────────────────────
         // Step 1: Create app/src/main/res/values-<bcp47>/strings.xml
-        //         Translate all 173 keys. Source of truth: values-de/strings.xml.
+        //         Translate all 170 keys. Source of truth: values-de/strings.xml.
         //         (The exact count is verified by LocaleSyncTest — treat that test,
         //          not this comment, as the authoritative source if they ever differ.)
         //         Qualifier syntax:  values-fr/  values-pt-rBR/  values-zh-rCN/
@@ -372,6 +372,36 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+
+        // ── Native-library symbol stripping ───────────────────────────────────
+        //   AGP's `stripDebugDebugSymbols` task runs the NDK `strip` tool over the
+        //   bundled .so files to shrink them. When no NDK toolchain is present in
+        //   the build environment (the common case here, and in the F-Droid build
+        //   image — this app ships NO native code of its own, only a few transitive
+        //   prebuilt .so), `strip` cannot run and AGP prints, for every affected
+        //   library:
+        //       Unable to strip the following libraries, packaging them as they
+        //       are: libandroidx.graphics.path.so, libdatastore_shared_counter.so
+        //   The libraries are then packaged unstripped anyway, so the message is
+        //   purely cosmetic — but with `org.gradle.warning.mode=all` (set in
+        //   gradle.properties) it surfaces on every build.
+        //
+        //   Listing those libraries here marks them as "intentionally kept
+        //   unstripped", so AGP excludes them from the strip set and no longer
+        //   attempts (and fails) to strip them — the warning disappears. The
+        //   PACKAGED OUTPUT IS UNCHANGED: they were already shipped unstripped via
+        //   the "packaging them as they are" fallback, so there is no size or
+        //   behaviour difference, only a quieter, deterministic build. The two
+        //   names are listed explicitly (rather than a blanket `**/*.so`) so that
+        //   any NEW unstrippable library introduced by a future dependency update
+        //   re-surfaces the warning and prompts a conscious decision — matching the
+        //   project's "explicit policy, not blanket suppression" lint stance above.
+        jniLibs {
+            keepDebugSymbols += setOf(
+                "**/libandroidx.graphics.path.so",
+                "**/libdatastore_shared_counter.so"
+            )
         }
     }
 

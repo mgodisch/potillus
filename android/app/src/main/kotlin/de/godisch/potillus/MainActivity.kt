@@ -84,15 +84,11 @@ import androidx.biometric.BiometricManager.Authenticators.*
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.Lifecycle
@@ -304,19 +300,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 UiGate.READY -> {
-                    val showInfoDialog by app.infoDialog.collectAsStateWithLifecycle()
-                    if (showInfoDialog) {
-                        AlertDialog(
-                            onDismissRequest = { app.dismissInfoDialog() },
-                            title   = { Text(stringResource(R.string.info_dialog_title)) },
-                            text    = { Text(stringResource(R.string.info_dialog_body)) },
-                            confirmButton = {
-                                TextButton(onClick = { app.dismissInfoDialog() }) {
-                                    Text(stringResource(R.string.info_dialog_ok))
-                                }
-                            }
-                        )
-                    }
                     MainContent(
                         app,
                         onAuthenticate = { onResult -> authenticateForToggle(onResult) },

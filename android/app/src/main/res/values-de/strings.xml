@@ -223,9 +223,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_days_month">Median Trinktage/Monat</string>
     <string name="pdf_kpi_max_day">Max. pro Tag</string>
     <string name="pdf_kpi_max_7days">Max. pro 7 Tage</string>
-    <string name="info_dialog_title">Gefällt dir diese App?</string>
-    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
-    <string name="info_dialog_ok">OK</string>
     <string name="lock_app">App sperren</string>
     <plurals name="days">
         <item quantity="one">%1$d Tag</item>

@@ -49,7 +49,7 @@ import androidx.room.PrimaryKey
  *
  * Maps to the `drinks` table in the Room database.
  * Converted to/from [de.godisch.potillus.domain.model.DrinkDefinition] by the
- * extension functions in [de.godisch.potillus.data.repository.DrinkRepository].
+ * `internal` `toDomain` / `toEntity` extension functions in `EntityMapping.kt`.
  *
  * @param id             Auto-generated primary key (0 = unsaved).
  * @param name           Display name.

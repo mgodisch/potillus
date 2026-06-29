@@ -36,6 +36,109 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.73.3
+
+Fix QA findings: orphaned directory, German comments, docs, header style
+
+Changed:
+- `app/src/main/res/raw-la/` — removed the empty, orphaned directory left
+  behind when Latin (`la`) was dropped from the supported-locale set in
+  v0.63.0. The directory had no content and served no purpose, but its
+  presence could mislead `render-guide.py` if it ever changed to scan
+  output directories instead of template files (B-01).
+- `AndroidManifest.xml` — translated the only remaining German inline comment
+  (`<!-- CSV-Export in Downloads-Ordner … -->`) to English, consistent with
+  CONTRIBUTING.md §3 and `release-check.sh` §7 (D-01).
+- `ui/component/AppOverflowMenu.kt`, `ui/component/MarkdownText.kt` — unified
+  the vim modeline and file-header comment style with the rest of the codebase:
+  `// vim: set et ts=4 sw=4:` / `// =====` block replaced by the project-standard
+  `/* vim: set et ts=4: */` / `/* * ===== */` block (D-04).
+- `data/repository/EntryRepository.kt` — added the missing KDoc block to
+  `mostRecentEntry()`, making it consistent with the other `override` functions
+  in the same file that all carry explanatory KDoc (D-02).
+- `gradle.properties` — added `org.gradle.warning.mode=all` so that the
+  per-deprecation detail Gradle previously suppressed behind the summary line
+  *"Deprecated Gradle features were used … use `--warning-mode all`"* is
+  printed on every build run. The property is the canonical project-wide way
+  to set the flag (rather than a per-invocation CLI argument) and ensures the
+  warnings surface in CI, `make` runs, and Android Studio alike.
+- `gradle.properties` — translated the three remaining German inline comments
+  (`# AndroidX aktivieren …`, `# Gradle-Daemon und Parallelbuilds`,
+  `# Kotlin-Code-Style`) to English, consistent with CONTRIBUTING.md §3 (D-01).
+- `data/prefs/AppPreferences.kt` — made the encrypted DataStore flow resilient
+  to a transient read `IOException`. `settingsFlow` previously mapped
+  `dataStore.data` directly, so a plain `IOException` raised on
+  the read path (which the `ReplaceFileCorruptionHandler` does NOT cover — it
+  only handles `CorruptionException` from the serializer) would propagate to
+  every collector, including the start-up reads in `MainActivity.onCreate` and
+  `PotillusApp.onCreate`, and crash the app. It is now routed through a
+  new, unit-tested `recoverIoAsEmpty(...)` helper that emits `emptyPreferences()`
+  on an `IOException` (downstream `map` then falls back to the documented
+  defaults) and rethrows any non-IO error. This is the Jetpack DataStore
+  guidance and matches the app's existing "degrade, never crash" policy.
+  Covered by the new `AppPreferencesIoSafetyTest` (R-01).
+- `app/build.gradle.kts` — silenced the cosmetic `stripDebugDebugSymbols`
+  build warning *"Unable to strip the following libraries, packaging them as
+  they are: `libandroidx.graphics.path.so`, `libdatastore_shared_counter.so`"*.
+  The app ships no native code of its own; these two transitive prebuilt `.so`
+  files cannot be stripped when no NDK toolchain is present (as in the F-Droid
+  build image) and are then packaged unstripped anyway, so the message is purely
+  cosmetic — but it became visible on every build once
+  `org.gradle.warning.mode=all` was enabled in v0.73.3. They are now listed under
+  `packaging.jniLibs.keepDebugSymbols`, which removes them from the strip set so
+  AGP no longer attempts (and fails) to strip them. The packaged output is
+  unchanged. The two names are listed explicitly rather than a blanket `**/*.so`
+  so a future unstrippable library re-surfaces the warning for a conscious
+  decision (B-02).
+- `util/GplNotice.kt` — converted the file header from the `//` line-comment
+  form to the project-standard `/* … */` block header used by the other Kotlin
+  files, completing the header-style unification this release already applied to
+  `AppOverflowMenu.kt` and `MarkdownText.kt` (F2).
+- `ui/component/MarkdownText.kt` — promoted the pure helpers `decodeHtmlEntities`
+  and `parseOrderedList` (and the `ORDERED_ITEM_RE` pattern) from `private` to
+  `internal` + `@VisibleForTesting`, so the renderer's parsing logic is unit
+  testable on the JVM without a device. No behavioural change (F3).
+- Documentation accuracy: corrected five stale comments left by the earlier
+  C-01 refactor (which moved `toDomain`/`toEntity` to `EntityMapping.kt` as
+  `internal`). `BackupRepository.kt` and `DrinkRepository.kt` no longer claim the
+  mappers are file-private and re-declared per repository; `Models.kt`,
+  `DrinkEntity.kt` and `EntryEntity.kt` now point readers to the `internal`
+  extensions in `EntityMapping.kt` instead of the (no-longer-correct) repository
+  classes. Comments only — no code or behaviour change (G1).
+
+Added:
+- `app/src/test/kotlin/.../data/repository/EntityMappingTest.kt` — JVM unit
+  tests for the shared entity ↔ domain conversions: `toDomain`/`toEntity` round
+  trips and the unknown-category → `OTHER` fallback, the only non-trivial logic
+  in the otherwise pass-through repositories (F3).
+- `app/src/test/kotlin/.../ui/component/MarkdownTextTest.kt` — JVM unit tests for
+  the in-app Markdown renderer's pure helpers: HTML-entity decoding, the
+  ordered-item match boundary (a wrapped decimal is not a new item), and
+  continuation-line reflow (F3).
+
+Removed:
+- The annual info dialog (the one-shot dialog shown on December 27th) and every
+  artefact that existed only to support it (F1). Removed: `PotillusApp`'s
+  `infoDialog`/`_infoDialog` state, `dismissInfoDialog()` and
+  `checkAnnualInfoDialog()` (plus the now-unused `MutableStateFlow`/`StateFlow`/
+  `asStateFlow`/`LocalDate` imports); the `AlertDialog` block and its
+  `AlertDialog`/`Text`/`TextButton`/`stringResource` imports in `MainActivity`;
+  the `info_dialog_title` / `info_dialog_body` / `info_dialog_ok` strings in
+  `values/strings.xml` and all 20 `values-*/strings.xml` (per-locale key count
+  170, still in sync); the `infoDialogShownYear` / `setInfoDialogShownYear`
+  members of `IAppPreferences`, `AppPreferences` (`KEY_INFO_YEAR`,
+  `info_dialog_shown_year`) and `FakeAppPreferences`; and the now-obsolete
+  suppression call and notes in `ScreenshotTest`. A leftover
+  `info_dialog_shown_year` value in an existing DataStore file is simply ignored.
+  The two "translate all N keys" comments (`AndroidManifest.xml`,
+  `app/build.gradle.kts`) were updated 173 → 170.
+- `ui/screen/Screens.kt` — deleted the content-free documentation placeholder.
+  The `Screen` sealed interface and all navigation routes live in
+  `ui/nav/AppNav.kt`, which is already self-documenting. The placeholder added
+  no information and could confuse readers expecting a `Screens` class (D-03).
+
+---
+
 ## v0.73.2
 
 Move fastlane metadata to repo root for F-Droid

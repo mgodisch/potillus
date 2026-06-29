@@ -208,9 +208,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_days_month">Mediana días de consumo/mes</string>
     <string name="pdf_kpi_max_day">Máx. por día</string>
     <string name="pdf_kpi_max_7days">Máx. en 7 días</string>
-    <string name="info_dialog_title">¿Te gusta esta aplicación?</string>
-    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
-    <string name="info_dialog_ok">Aceptar</string>
     <string name="lock_app">Bloquear la aplicación</string>
     <plurals name="days">
         <item quantity="one">%1$d día</item>

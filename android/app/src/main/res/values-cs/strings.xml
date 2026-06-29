@@ -192,9 +192,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_kpi_median_drink_days_month">Medián dny pití/měs.</string>
     <string name="pdf_kpi_max_day">Max. za den</string>
     <string name="pdf_kpi_max_7days">Max. za 7 dní</string>
-    <string name="info_dialog_title">Líbí se vám tato aplikace?</string>
-    <string name="info_dialog_body">(Placeholder — text to follow.)</string>
-    <string name="info_dialog_ok">OK</string>
     <string name="lock_app">Zamknout aplikaci</string>
     <plurals name="days">
         <item quantity="one">%1$d den</item>

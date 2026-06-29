@@ -64,7 +64,7 @@ import androidx.room.PrimaryKey
  *
  * Maps to the `entries` table in the Room database.
  * Converted to/from [de.godisch.potillus.domain.model.ConsumptionEntry] by the
- * extension functions in [de.godisch.potillus.data.repository.EntryRepository].
+ * `internal` `toDomain` / `toEntity` extension functions in `EntityMapping.kt`.
  *
  * @param id              Auto-generated primary key (0 = unsaved).
  * @param drinkId         FK → [DrinkEntity.id], RESTRICT on delete.

@@ -1,0 +1,1 @@
+Code quality: remove orphaned directory, fix German comment, unify file headers, add missing KDoc, remove empty placeholder file.

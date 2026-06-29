@@ -53,8 +53,8 @@ enum class DrinkCategory { BEER, WINE, SPIRITS, LONGDRINK, LIQUEUR, OTHER }
  *
  * Immutable value type used throughout the domain and UI layers.
  * Persisted as [de.godisch.potillus.data.db.entity.DrinkEntity]; the repository
- * layer converts between the two representations via private extension
- * functions (`toDomain` / `toEntity`).
+ * layer converts between the two representations via the `internal` `toDomain` /
+ * `toEntity` extension functions defined in `EntityMapping.kt`.
  *
  * @param id             Database primary key (0 = not yet persisted).
  * @param name           User-visible display name.

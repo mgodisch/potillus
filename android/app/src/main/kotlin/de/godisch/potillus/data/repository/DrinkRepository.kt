@@ -40,10 +40,11 @@ import kotlinx.coroutines.flow.map
 //        knowing anything about the database schema.
 //
 // EXTENSION FUNCTIONS (toDomain / toEntity):
-//   Defined at file scope (top-level, private) rather than inside the
-//   repository class because they logically belong to the Entity/Domain
-//   types, not to the repository itself. Keeping them private limits their
-//   visibility to this file.
+//   Defined once in EntityMapping.kt as module-`internal` top-level extensions
+//   rather than inside the repository class, because they logically belong to
+//   the Entity/Domain types, not to the repository itself. `internal` keeps
+//   them visible to every repository in this module while hiding them from the
+//   domain and UI layers (see the detailed note lower in this file).
 // =============================================================================
 
 /**

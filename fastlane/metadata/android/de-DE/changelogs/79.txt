@@ -1,0 +1,1 @@
+Codequalität: verwaistes Verzeichnis entfernt, deutschen Kommentar übersetzt, Datei-Header vereinheitlicht, fehlende KDoc ergänzt, leere Placeholder-Datei entfernt.

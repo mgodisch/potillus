@@ -91,6 +91,15 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
     override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> =
         dao.getEntriesForPeriodFlow(from, to).map { list -> list.map { it.toDomain() } }
 
+    /**
+     * Reactive stream of the most recently logged entry (by timestamp), or
+     * `null` when no entries exist yet.
+     *
+     * Delegates to [EntryDao.getMostRecent], which uses `ORDER BY timestampMillis
+     * DESC LIMIT 1` in SQL so only one row is ever read from the database.
+     * Used by [de.godisch.potillus.ui.screen.TodayViewModel] to pre-select the
+     * last-used drink in the add-entry dialog.
+     */
     override fun mostRecentEntry(): Flow<ConsumptionEntry?> =
         dao.getMostRecent().map { it?.toDomain() }
 

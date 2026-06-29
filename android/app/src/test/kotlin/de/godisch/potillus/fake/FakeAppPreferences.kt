@@ -56,8 +56,4 @@ class FakeAppPreferences(
 
     override suspend fun setDayChangeTime(hour: Int, minute: Int) =
         _settings.update { it.copy(dayChangeHour = hour, dayChangeMinute = minute) }
-
-    private val _infoYear = MutableStateFlow(0)
-    override val infoDialogShownYear: Flow<Int> = _infoYear
-    override suspend fun setInfoDialogShownYear(year: Int) { _infoYear.value = year }
 }

@@ -1,25 +1,27 @@
-// vim: set et ts=4 sw=4:
-// =============================================================================
-// Libellus Potionis - Privacy-Friendly Alcohol Tracker
-// Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
-// =============================================================================
-//
-// This program is free software: you can redistribute it and/or modify it under
-// the terms of the GNU General Public License as published by the Free Software
-// Foundation, either version 3 of the License, or (at your option) any later
-// version.
-//
-// This program is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-// details.
-//
-// You should have received a copy of the GNU General Public License along with
-// this program.  If not, see <https://www.gnu.org/licenses/>.
-// =============================================================================
-
+/* vim: set et ts=4:
+ * =============================================================================
+ * Libellus Potionis - Privacy-Friendly Alcohol Tracker
+ * Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+ * =============================================================================
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * =============================================================================
+ */
 package de.godisch.potillus.ui.component
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -165,8 +167,15 @@ private val HTML_ENTITIES = mapOf(
     "&trade;" to "™"
 )
 
-/** Replaces every key in [HTML_ENTITIES] with its Unicode equivalent. */
-private fun decodeHtmlEntities(text: String): String =
+/**
+ * Replaces every key in [HTML_ENTITIES] with its Unicode equivalent.
+ *
+ * `internal` + [VisibleForTesting] so the entity-decoding table can be exercised
+ * directly on the JVM (no Compose/device) by `MarkdownTextTest`; it is otherwise
+ * an implementation detail of [renderInline].
+ */
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun decodeHtmlEntities(text: String): String =
     HTML_ENTITIES.entries.fold(text) { acc, (entity, ch) -> acc.replace(entity, ch) }
 
 // Matches the inline Markdown the documents use: a bold span **like this** OR a
@@ -233,15 +242,23 @@ private fun renderInline(text: String): AnnotatedString {
 // items. A line such as "3.5 grams" does NOT match (no whitespace after the
 // dot), so decimals that appear in a wrapped continuation line are kept as
 // continuation text rather than mistaken for a new item.
-private val ORDERED_ITEM_RE = Regex("""\s*(\d+)\.\s+(.*)""")
+// `internal` (not `private`) so `MarkdownTextTest` can pin down this exact
+// match/no-match boundary directly, without going through the composable.
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal val ORDERED_ITEM_RE = Regex("""\s*(\d+)\.\s+(.*)""")
 
 /**
  * Splits an ordered-list [block] into `(number, text)` pairs. Every source line
  * matching [ORDERED_ITEM_RE] starts a new item; any other non-blank line is a
  * continuation of the current item and is appended with a single space, since
  * the guide source hard-wraps long items across several lines.
+ *
+ * `internal` + [VisibleForTesting] so the item-splitting and continuation-reflow
+ * logic is unit-tested on the JVM by `MarkdownTextTest`; it is otherwise an
+ * implementation detail of [MarkdownText].
  */
-private fun parseOrderedList(block: String): List<Pair<String, String>> {
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun parseOrderedList(block: String): List<Pair<String, String>> {
     val items = mutableListOf<Pair<String, StringBuilder>>()
     for (rawLine in block.trim().lines()) {
         val line = rawLine.trim()

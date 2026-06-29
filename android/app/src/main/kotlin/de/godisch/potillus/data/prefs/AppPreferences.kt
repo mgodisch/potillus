@@ -22,6 +22,7 @@
 package de.godisch.potillus.data.prefs
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
@@ -40,6 +41,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import de.godisch.potillus.data.security.KeystoreSecretStore
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.GeneralSecurityException
@@ -47,6 +49,7 @@ import java.time.Instant
 import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okio.Buffer
@@ -195,6 +198,44 @@ private class EncryptedPreferencesSerializer(
 // AppPreferences using DataStoreFactory.create() + EncryptedPreferencesSerializer.
 
 /**
+ * Wraps a raw DataStore [Preferences] stream so a transient read [IOException]
+ * degrades to [emptyPreferences] instead of propagating to every collector.
+ *
+ * WHY THIS IS NEEDED (and why the corruption handler is not enough):
+ *   Two distinct failure modes can occur while reading the encrypted DataStore,
+ *   and they are recovered in two different places:
+ *     - A *decryption / parse* failure (e.g. the Keystore key vanished after a
+ *       factory reset) is raised by the serializer as a [CorruptionException] and
+ *       repaired by the [ReplaceFileCorruptionHandler] configured on the
+ *       DataStore, which resets the backing file to empty preferences.
+ *     - A *transient* read failure — a plain [IOException] surfaced on the
+ *       `dataStore.data` flow (e.g. a momentarily unreadable file) — is NOT a
+ *       corruption, so the corruption handler never sees it. Left unhandled it
+ *       would propagate to every collector, including the start-up reads in
+ *       `MainActivity.onCreate` and `PotillusApp.onCreate`, and crash the app.
+ *
+ *   The Jetpack DataStore guidance is to recover exactly this case with a
+ *   [kotlinx.coroutines.flow.catch] that emits [emptyPreferences] for an
+ *   [IOException] and rethrows everything else (a non-IO error is a genuine bug
+ *   and must stay loud). Emitting empty preferences lets the downstream [map]
+ *   fall back to the documented defaults — matching the app's "degrade, never
+ *   crash" policy already embodied by the corruption handler.
+ *
+ * Pure and Android-free: it only transforms a [Flow], so it is unit-testable on
+ * the JVM without a device or a [Context] (see `AppPreferencesIoSafetyTest`).
+ *
+ * `internal` + [VisibleForTesting] so the test source set can call it directly;
+ * within this file it is used by `settingsFlow`.
+ *
+ * @param source The raw `dataStore.data` stream (or any [Preferences] flow).
+ * @return       The same stream, but emitting [emptyPreferences] once in place
+ *               of a transient [IOException]; non-IO exceptions are rethrown.
+ */
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun recoverIoAsEmpty(source: Flow<Preferences>): Flow<Preferences> =
+    source.catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
+
+/**
  * Reads and writes all user preferences via an encrypted Jetpack DataStore.
  *
  * Exposes a single [settingsFlow] that combines all keys into an [AppSettings]
@@ -237,12 +278,14 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         internal val KEY_LANGUAGE       = stringPreferencesKey("language")
         internal val KEY_WEIGHT_KG      = doublePreferencesKey("weight_kg")
         internal val KEY_STATS_FROM     = stringPreferencesKey("stats_from_date")
-        internal val KEY_INFO_YEAR      = intPreferencesKey("info_dialog_shown_year")
         // Removed in the three-limit refactor: "gender", "limit_mode" and
         // "weekly_gram_mode". Removed in the rolling-window refactor (v0.62.0):
         // "week_start_day" — the app no longer has a configurable first weekday and
         // uses a gliding 7-day window for all metrics; the calendar grid and PDF
         // weekday profile derive their first column from the device locale instead.
+        // Removed in v0.73.3: "info_dialog_shown_year" — the annual info dialog
+        // (shown once on December 27th) was dropped, so its "shown year" marker is
+        // no longer written or read.
         // Any leftover values for those keys in an existing DataStore file are
         // simply ignored by settingsFlow below.
     }
@@ -314,8 +357,12 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      * [runCatching] is used for enum deserialization: if a future code change
      * removes an enum constant that was previously stored, parsing fails
      * silently and the default is used, rather than crashing the app.
+     *
+     * A transient read [IOException] is recovered to [emptyPreferences] by
+     * [recoverIoAsEmpty] (see its KDoc), so a momentary read fault degrades to
+     * the documented defaults instead of crashing every collector.
      */
-    override val settingsFlow: Flow<AppSettings> = dataStore.data.map { prefs ->
+    override val settingsFlow: Flow<AppSettings> = recoverIoAsEmpty(dataStore.data).map { prefs ->
         AppSettings(
             themeMode           = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
             dayChangeHour       = prefs[KEY_DAY_HOUR]        ?: 4,
@@ -330,10 +377,6 @@ class AppPreferences(private val context: Context) : IAppPreferences {
             statsFromDate       = prefs[KEY_STATS_FROM]      ?: installDate
         )
     }
-
-    /** Standalone (non-[AppSettings]) flow for the annual info-dialog year (0 = never). */
-    override val infoDialogShownYear: Flow<Int> =
-        dataStore.data.map { it[KEY_INFO_YEAR] ?: 0 }
 
     // ── Write functions ───────────────────────────────────────────────────────
     // Each function calls save{} which wraps DataStore's edit{} for a single key.
@@ -354,7 +397,6 @@ class AppPreferences(private val context: Context) : IAppPreferences {
     override suspend fun setLanguage(lang: String)      = save { it[KEY_LANGUAGE]       = lang }
     override suspend fun setWeightKg(kg: Double)        = save { it[KEY_WEIGHT_KG]      = kg.coerceIn(1.0, 500.0) }
     override suspend fun setMaxDrinkDaysPerWeek(days: Int) = save { it[KEY_MAX_DRINK_DAYS] = days.coerceIn(1, 7) }
-    override suspend fun setInfoDialogShownYear(year: Int)  = save { it[KEY_INFO_YEAR]      = year }
 
     /**
      * Writes day-change hour and minute in a single atomic transaction.
