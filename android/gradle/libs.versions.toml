@@ -21,7 +21,7 @@
 [versions]
 # Android Gradle Plugin – compiles Kotlin/Java → APK.
 # 9.2.x is a major step up from 8.x: it requires Gradle 9.x (lock-step major
-# upgrade — see gradle/wrapper/gradle-wrapper.properties, now 9.4.1), JDK 17+
+# upgrade — see gradle/wrapper/gradle-wrapper.properties, now 9.6.1), JDK 17+
 # (we use 21), and supports compileSdk up to API 36.1 (we use 36). AGP 9 also
 # ships "built-in Kotlin" (it compiles Kotlin itself), which is why the
 # org.jetbrains.kotlin.android plugin is removed in this version — see the
@@ -29,22 +29,22 @@
 agp                 = "9.2.0"
 
 # Kotlin compiler and standard library.
-# 2.3.21 is the current patch of the Kotlin 2.3 line (Dec 2025 feature release
-# 2.3.0, March 2026 tooling release 2.3.20, followed by the 2.3.21 bug-fix).
+# 2.4.0 is the current Kotlin language release (June 2026), one language
+# release ahead of the previous 2.3 line.
 # NOTE: this drives several other versions that MUST move together with the
 # compiler — see ksp, kotlinx-serialization-core, kotlinx-coroutines-test and
 # kotlin-test below. The Kotlin Compose compiler plugin (kotlin-compose) and the
 # serialization plugin (kotlin-serialization) are versioned via this same key,
-# so bumping Kotlin automatically bumps the Compose compiler to 2.3.21, which is
+# so bumping Kotlin automatically bumps the Compose compiler to 2.4.0, which is
 # the compiler that pairs with the Compose 1.11 runtime pulled in by the BOM.
 #
 # AGP 9 INTERACTION (built-in Kotlin): AGP 9 compiles Kotlin itself and bundles
-# KGP 2.2.10 as a floor. To make the built-in compiler use OUR version (2.3.21)
+# KGP 2.2.10 as a floor. To make the built-in compiler use OUR version (2.4.0)
 # instead of the bundled 2.2.10, the root build.gradle.kts pins the Kotlin
-# Gradle plugin on the buildscript classpath. That pin is a hard-coded "2.3.21"
+# Gradle plugin on the buildscript classpath. That pin is a hard-coded "2.4.0"
 # (a Gradle buildscript block cannot read this version catalog), so it MUST be
 # kept in sync with the value here whenever Kotlin is bumped.
-kotlin              = "2.3.21"
+kotlin              = "2.4.0"
 
 # KSP = Kotlin Symbol Processing
 # Replaces kapt (Annotation Processor); faster, less RAM usage.
@@ -54,26 +54,28 @@ kotlin              = "2.3.21"
 #   Up to and including the 2.0.21-1.0.28 series, KSP versions were written as
 #   "<kotlin-version>-<ksp-patch>" and had to match the Kotlin version exactly.
 #   Since KSP 2.3.0, KSP is decoupled from the Kotlin version: the plugin now
-#   carries a plain "<major>.<minor>.<patch>" version (e.g. 2.3.7) and a single
+#   carries a plain "<major>.<minor>.<patch>" version (e.g. 2.3.9) and a single
 #   release is compatible with Kotlin 2.2.* and newer. Therefore we no longer
-#   mirror the Kotlin version here; 2.3.7 is simply the latest KSP release and
-#   is compatible with the Kotlin 2.3.21 compiler selected above.
-ksp                 = "2.3.7"
+#   mirror the Kotlin version here; 2.3.9 is the latest KSP 2.3 release and is
+#   the version the Kotlin 2.4.0 release notes pair with (KSP runs standalone
+#   and is not rebuilt per compiler). If a build reports a KSP/Kotlin mismatch,
+#   move to the newest KSP release that targets Kotlin 2.4.0.
+ksp                 = "2.3.9"
 
 # Jetpack Compose BOM (Bill of Materials)
 # A BOM pins compatible versions for all Compose modules.
 # Individual Compose dependencies don't need their own version numbers –
 # the BOM determines them automatically.
-# 2026.04.01 maps the core Compose modules (ui, foundation, material3, runtime,
-# animation) to 1.11.0. Two consequences matter for this project:
+# 2026.06.00 maps the core Compose modules (ui, foundation, material3, runtime,
+# animation) to 1.11.3. Two consequences matter for this project:
 #   1. The Compose compiler that processes @Composable must be 1.11-compatible;
-#      it is, because it ships with the Kotlin 2.3.21 plugin selected above.
+#      it is, because it ships with the Kotlin 2.4.0 plugin selected above.
 #   2. The Compose UI-test framework switches its v2 test APIs ON BY DEFAULT.
 #      The default test dispatcher inside the Compose test rule changes from
 #      UnconfinedTestDispatcher (eager) to StandardTestDispatcher (queued), so
 #      instrumented UI tests must explicitly drain the queue before asserting on
 #      state mutated by an interaction. See EntryListItemUiTest for the pattern.
-compose-bom         = "2026.04.01"
+compose-bom         = "2026.06.00"
 
 # AndroidX core libraries
 core-ktx            = "1.18.0"   # Kotlin extensions for Android APIs (was 1.13.1)
@@ -96,12 +98,12 @@ navigation-compose  = "2.8.9"
 # Room: SQLite abstraction layer (ORM-like).
 # 2.8.4 is the latest Room 2.x (was 2.7.1). Room 2.x is in maintenance mode;
 # Room 3.0 is a separate package (androidx.room3) and is not adopted here. 2.8.x
-# keeps the SupportSQLite APIs, so the SQLCipher SupportOpenHelperFactory
-# integration in AppDatabase still works. NOTE: room-ktx was merged into
-# room-runtime as of 2.x's later releases (the artifact is now empty), so the
-# room-ktx library entry and dependency are removed — its coroutine/Flow APIs now
-# ship inside room-runtime. Paired here with androidx.sqlite 2.6.2 (see below),
-# which is the combination Google documents for Room 2.8.4.
+# keeps the SupportSQLite APIs the migration and pre-population callback use.
+# NOTE: room-ktx was merged into room-runtime as of 2.x's later releases (the
+# artifact is now empty), so the room-ktx library entry and dependency are
+# removed — its coroutine/Flow APIs now ship inside room-runtime. room-runtime
+# also brings in the small androidx.sqlite surface transitively, so it is no
+# longer pinned explicitly (the SQLCipher-era pin was dropped in v0.73.0).
 room                = "2.8.4"
 
 # DataStore: asynchronous key-value store (successor to SharedPreferences)
@@ -114,25 +116,11 @@ biometric           = "1.1.0"
 # deprecated it in April 2025 in favour of using the Android Keystore directly).
 # See KeystoreSecretStore for the replacement primitive.
 
-# SQLCipher: application-level AES-256 encryption for the Room database.
-# Distributed as a pre-built native library inside an AAR.
-#
-# ARTIFACT MIGRATION (was net.zetetic:android-database-sqlcipher 4.5.4):
-# The old "android-database-sqlcipher" library was deprecated in 2022, reached
-# end-of-life in 2023, and — crucially — its native .so libraries are NOT built
-# for 16 KB memory page sizes. Android 15+ devices can run with 16 KB pages, and
-# Google Play requires 16 KB support for apps targeting Android 15+; an unaligned
-# .so crashes at runtime on such devices. The maintained replacement is
-# net.zetetic:sqlcipher-android, which has shipped 16 KB-aligned native libraries
-# since 4.6.1. Pinned to 4.15.0, the current community release, paired with
-# androidx.sqlite 2.6.2 below (the combination documented in the sqlcipher-android
-# README). See the AppDatabase.kt code for the SupportOpenHelperFactory usage.
-sqlcipher           = "4.15.0"
-
-# androidx.sqlite: the SupportSQLiteOpenHelper adapter SQLCipher implements, and
-# the low-level SQLite API Room builds on. 2.6.2 is the version Google documents
-# alongside Room 2.8.4 and the sqlcipher-android README documents alongside 4.15.0.
-sqlite              = "2.6.2"
+# NOTE (SEC-05): SQLCipher (net.zetetic:sqlcipher-android) and the explicit
+# androidx.sqlite pin were removed in v0.73.0. The database is no longer encrypted
+# at the application level — it relies on Android's file-based storage encryption
+# and the per-app sandbox — and the small androidx.sqlite surface Room needs now
+# comes in transitively via room-runtime. See AppDatabase.kt and the CHANGELOG.
 
 # ── Instrumented (androidTest) test stack — TEST-01 ───────────────────────────
 # androidx.test.ext:junit provides AndroidJUnit4 + ext assertions. The Compose
@@ -237,9 +225,11 @@ navigation-compose          = { group = "androidx.navigation",    name = "naviga
 # (org.jetbrains.kotlin.plugin.serialization, versioned via the kotlin key) and
 # a runtime, and the two are bound by Kotlin's forward-compatibility rule: a
 # runtime built with Kotlin 2.Y works with 2.(Y+1) but not 2.(Y+2). The old
-# 1.7.3 runtime was built against Kotlin 2.0, so it is NOT valid under the
-# Kotlin 2.3.21 compiler. 1.11.0 is the current runtime, built against Kotlin
-# 2.2.x, and is therefore compatible with 2.3.21.
+# 1.7.3 runtime was built against Kotlin 2.0, so it was NOT valid under newer
+# compilers. 1.11.0 is the runtime in use; under this rule it must have been
+# built against Kotlin >= 2.3.x to stay valid with the 2.4.0 compiler. If the
+# build reports a kotlinx.serialization runtime/plugin mismatch, bump this to
+# the current kotlinx-serialization release.
 kotlinx-serialization-core  = { group = "org.jetbrains.kotlinx",  name = "kotlinx-serialization-core", version = "1.11.0" }
 
 # ── Room (SQLite database) ────────────────────────────────────────────────────
@@ -265,17 +255,6 @@ datastore-preferences       = { group = "androidx.datastore",     name = "datast
 # ── Biometrics ────────────────────────────────────────────────────────────────
 # BiometricPrompt API: fingerprint, face, PIN/pattern as fallback
 biometric                   = { group = "androidx.biometric",     name = "biometric",                   version.ref = "biometric" }
-
-# SQLCipher: transparent AES-256 page-level encryption for Room / SQLite.
-# Uses the maintained "sqlcipher-android" artifact (the deprecated, EOL
-# "android-database-sqlcipher" did not support 16 KB page sizes). The AAR ships
-# pre-built native libraries; if Gradle ever fails to resolve the native AAR,
-# append the explicit "@aar" artifact type to this coordinate.
-sqlcipher                   = { group = "net.zetetic",            name = "sqlcipher-android",           version.ref = "sqlcipher" }
-
-# androidx.sqlite: SupportSQLiteDatabase adapter needed by SQLCipher's
-# SupportFactory to integrate with Room's database helper infrastructure.
-sqlite                      = { group = "androidx.sqlite",        name = "sqlite",                      version.ref = "sqlite" }
 
 # ── Instrumented (androidTest) test stack — TEST-01 ───────────────────────────
 # androidx-test-ext-junit: AndroidJUnit4 runner glue + assertions.

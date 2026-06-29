@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <!--
-        Cloud backup (Android 12+, relevant if allowBackup is ever set to true):
-        Exclude the database and the DataStore file – both contain personal health data.
+        This app is fully offline and deliberately keeps all personal health data
+        on the device. android:allowBackup is "false", so these rules are not used
+        by the platform today; they are kept as a defensive, self-documenting
+        statement of intent in case backup is ever enabled.
+
+        Both transports below EXCLUDE the database and the preferences DataStore,
+        so personal data never leaves the device through an automatic mechanism.
+        The ONLY supported way to move data to another device is the user-initiated
+        JSON backup (Settings -> Backup -> Export / Import); see the user's guide.
+
         NOTE: DataStore has NO dedicated extraction domain. Its backing file lives at
         getFilesDir()/datastore/<name>.preferences_pb, so it belongs to the "file"
-        domain (rooted at getFilesDir()) addressed with the "datastore/" path prefix —
+        domain (rooted at getFilesDir()) addressed with the "datastore/" path prefix -
         NOT a (non-existent) "datastore" domain, which Android Lint rejects as a
         FullBackupContent error.
     -->
@@ -13,35 +21,8 @@
         <exclude domain="database" path="potillus.db"/>
         <exclude domain="file"     path="datastore/potillus_settings.preferences_pb"/>
     </cloud-backup>
-    <!--
-        Device-to-device transfer:
-        Include the database, its passphrase file, and the DataStore so that
-        a device migration is seamless.
-
-        WHY THREE FILES?
-          potillus.db                    – the SQLCipher-encrypted Room database.
-          potillus_db_key (sharedpref)   – plain SharedPreferences file that stores
-                                       the SQLCipher passphrase as a Keystore-sealed
-                                       AES-256-GCM envelope (IV || ciphertext+tag),
-                                       Base64-encoded. Without this file the database
-                                       cannot be decrypted on the target device.
-          datastore/potillus_settings.preferences_pb (file)
-                                       – encrypted DataStore (user preferences).
-
-        PREREQUISITE: Android's D2D transfer must also migrate the Keystore entries:
-          potillus_db_passphrase_key     (AES-256-GCM key that seals the DB passphrase)
-          potillus_prefs_key             (AES-256-GCM key for the DataStore serialiser)
-        Both keys are eligible for migration because neither is created with
-        setUserAuthenticationRequired(true). On Android 9+ devices this migration
-        typically happens automatically during a cable-based setup transfer.
-
-        FALLBACK: if Keystore migration is not supported by the target device OEM,
-        users should use Settings → Export Backup (JSON) and re-import on the new
-        device. The JSON backup path is always reliable and device-independent.
-    -->
     <device-transfer>
-        <include domain="database"   path="potillus.db"/>
-        <include domain="sharedpref" path="potillus_db_key"/>
-        <include domain="file"       path="datastore/potillus_settings.preferences_pb"/>
+        <exclude domain="database" path="potillus.db"/>
+        <exclude domain="file"     path="datastore/potillus_settings.preferences_pb"/>
     </device-transfer>
 </data-extraction-rules>

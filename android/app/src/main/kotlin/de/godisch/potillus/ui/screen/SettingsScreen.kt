@@ -46,7 +46,6 @@ import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
-import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor

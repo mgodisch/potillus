@@ -117,8 +117,7 @@ import okio.Buffer
  *   than crashing. The user loses their settings but the app stays functional.
  *
  * @param keyAlias  Keystore alias under which the AES-256-GCM key is stored.
- *                  A dedicated alias (separate from the DB passphrase key alias)
- *                  allows the two keys to be rotated independently.
+ *                  A stable, app-private alias dedicated to the preferences key.
  */
 private class EncryptedPreferencesSerializer(
     keyAlias: String,
@@ -210,8 +209,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
 
     companion object {
         // ── Android Keystore alias ────────────────────────────────────────────
-        // A dedicated alias (separate from the DB passphrase key alias used by
-        // AppDatabase) so this key can be rotated independently.
+        // The app-private Android Keystore alias for the preferences encryption key.
         private const val PREFS_KEY_ALIAS = "potillus_prefs_key"
 
         // ── Typed preference keys ─────────────────────────────────────────────

@@ -63,7 +63,6 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
-import de.godisch.potillus.ui.theme.errorColor
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

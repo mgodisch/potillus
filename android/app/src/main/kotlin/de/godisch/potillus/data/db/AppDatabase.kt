@@ -22,8 +22,6 @@
 package de.godisch.potillus.data.db
 
 import android.content.Context
-import androidx.core.content.edit
-import android.util.Base64
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -31,12 +29,11 @@ import de.godisch.potillus.data.db.dao.DrinkDao
 import de.godisch.potillus.data.db.dao.EntryDao
 import de.godisch.potillus.data.db.entity.DrinkEntity
 import de.godisch.potillus.data.db.entity.EntryEntity
-import de.godisch.potillus.data.security.KeystoreSecretStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.io.IOException
 import java.security.GeneralSecurityException
-import java.security.SecureRandom
+import java.security.KeyStore
 
 // =============================================================================
 // AppDatabase.kt – Room database definition and singleton
@@ -103,140 +100,64 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        /** File name of the SharedPreferences that stores the sealed DB passphrase. */
-        private const val PASSPHRASE_PREFS = "potillus_db_key"
+        /** File name of the Room database. */
+        private const val DATABASE_NAME = "potillus.db"
 
-        /** Key under which the Base64-encoded *sealed* passphrase blob is stored. */
-        private const val PASSPHRASE_KEY   = "passphrase"
-
-        /** Dedicated Android Keystore alias for the passphrase-sealing key. */
-        private const val PASSPHRASE_KEY_ALIAS = "potillus_db_passphrase_key"
-
-        /**
-         * Envelope-encryption helper for the DB passphrase.
-         *
-         * Replaces the former `MasterKey` + `EncryptedSharedPreferences` from the
-         * deprecated `androidx.security:security-crypto` library with the app's own
-         * Keystore-backed primitive. See [KeystoreSecretStore].
-         */
-        private val passphraseStore = KeystoreSecretStore(PASSPHRASE_KEY_ALIAS)
+        // ── Legacy SQLCipher artefacts (removed in v0.73.0) ───────────────────
+        //   Until v0.73.0 the database was encrypted with SQLCipher: a random
+        //   passphrase, sealed by a dedicated Android Keystore key and stored in a
+        //   private SharedPreferences file, was handed to a SupportOpenHelperFactory.
+        //   SQLCipher has been removed — the database now relies on Android's
+        //   file-based storage encryption and the per-app sandbox — so those two
+        //   artefacts are obsolete and are cleaned up once by
+        //   [purgeLegacyEncryptedDatabase].
+        private const val LEGACY_PASSPHRASE_PREFS     = "potillus_db_key"
+        private const val LEGACY_PASSPHRASE_PREFS_KEY = "passphrase"
+        private const val LEGACY_PASSPHRASE_KEY_ALIAS = "potillus_db_passphrase_key"
 
         /**
-         * Whether a sealed passphrase envelope is currently persisted.
+         * One-shot clean break from the former SQLCipher-encrypted database.
          *
-         * `false` means none has ever been written — i.e. a genuine first install
-         * (or freshly cleared data). `true` means a previous run, or an Android
-         * backup/device-transfer restore, left an envelope behind.
+         * A plaintext SQLite engine cannot open the old SQLCipher file — it would
+         * fail with "file is not a database" — and this release deliberately does
+         * NOT migrate the encrypted data (a conscious clean break). The legacy
+         * passphrase SharedPreferences file is the unambiguous marker of a
+         * pre-removal install: it existed ONLY while SQLCipher was in use. When it
+         * is present we delete the encrypted database (with its -wal/-shm/-journal
+         * side files), the passphrase file, and the now-unused Keystore key, then
+         * let Room create a fresh, empty plaintext database in its place.
          *
-         * Read-only: this never generates, seals, or persists anything.
+         * Idempotent and safe everywhere: removing the passphrase file clears the
+         * marker, so this never runs a second time; a clean install never has the
+         * marker at all, making the whole routine a no-op there. Every step is
+         * best-effort so a missing artefact or a Keystore hiccup can never block
+         * database creation.
          */
-        fun hasSealedPassphrase(context: Context): Boolean =
-            context.getSharedPreferences(PASSPHRASE_PREFS, Context.MODE_PRIVATE)
-                .getString(PASSPHRASE_KEY, null) != null
+        private fun purgeLegacyEncryptedDatabase(context: Context) {
+            val legacyPrefs =
+                context.getSharedPreferences(LEGACY_PASSPHRASE_PREFS, Context.MODE_PRIVATE)
+            // No sealed passphrase here means this is not a legacy install: nothing to do.
+            if (legacyPrefs.getString(LEGACY_PASSPHRASE_PREFS_KEY, null) == null) return
 
-        /**
-         * Whether the persisted passphrase envelope can actually be decrypted with
-         * this device's Keystore key.
-         *
-         * Returns `false` when there is no envelope (first install) OR when an
-         * envelope exists but cannot be opened. The latter is the signature of a
-         * device transfer where the hardware-bound Keystore key did not migrate:
-         * the SharedPreferences envelope was restored from backup, but the key to
-         * open it is gone, so [KeystoreSecretStore.open] throws.
-         *
-         * Combined with [hasSealedPassphrase], the caller can distinguish the two
-         * `false` cases — see [PotillusApp.shouldWarnDeviceTransfer].
-         *
-         * Read-only probe: the decrypted bytes are zeroed immediately and nothing
-         * is persisted. (Opening does lazily create the Keystore key if it is
-         * absent, exactly as the normal open path does; this has no observable
-         * effect on the stored envelope.)
-         */
-        fun canOpenSealedPassphrase(context: Context): Boolean {
-            val prefs = context.getSharedPreferences(PASSPHRASE_PREFS, Context.MODE_PRIVATE)
-            val storedB64 = prefs.getString(PASSPHRASE_KEY, null) ?: return false
-            return try {
-                passphraseStore.open(Base64.decode(storedB64, Base64.NO_WRAP)).fill(0)
-                true
+            // 1. Drop the encrypted database file and its journal/WAL side files.
+            context.deleteDatabase(DATABASE_NAME)
+
+            // 2. Delete the passphrase SharedPreferences file outright. This removes
+            //    the backing file together with its in-memory state (including the
+            //    marker), so this routine never runs again. No edit()/clear() is
+            //    needed — and an apply()/commit() would only race with the delete.
+            context.deleteSharedPreferences(LEGACY_PASSPHRASE_PREFS)
+
+            // 3. Delete the now-unused Android Keystore key that sealed the passphrase.
+            try {
+                KeyStore.getInstance("AndroidKeyStore")
+                    .apply { load(null) }
+                    .deleteEntry(LEGACY_PASSPHRASE_KEY_ALIAS)
             } catch (_: GeneralSecurityException) {
-                false   // envelope present but undecryptable → Keystore key did not migrate
-            } catch (_: IllegalArgumentException) {
-                false   // malformed/truncated envelope (e.g. a partial restore)
+                // Keystore unavailable or entry already gone — nothing to clean up.
+            } catch (_: IOException) {
+                // Keystore failed to load — non-fatal for database creation.
             }
-        }
-
-        /**
-         * Retrieves the database passphrase, generating and persisting a new
-         * 32-byte random value (sealed by the Android Keystore) if none exists.
-         *
-         * SECURITY MODEL:
-         *   The passphrase is a cryptographically random 32-byte value, Base64-encoded
-         *   to text. That text (its UTF-8 bytes) is what SQLCipher consumes as the key.
-         *   For storage, the passphrase bytes are SEALED via [KeystoreSecretStore]
-         *   (AES-256-GCM under a Keystore key that never leaves the secure hardware),
-         *   and the resulting `IV || ciphertext+tag` blob is itself Base64-encoded and
-         *   kept in a plain [android.content.SharedPreferences] file. The stored value
-         *   is therefore useless without the device's Keystore key.
-         *
-         * WHY DIRECT KEYSTORE (not EncryptedSharedPreferences)?
-         *   `androidx.security:security-crypto` was deprecated by Google in April 2025
-         *   in favour of using platform APIs / the Android Keystore directly. The app
-         *   already used the Keystore directly for its encrypted DataStore, so unifying
-         *   on one primitive ([KeystoreSecretStore]) removes the deprecated dependency
-         *   and leaves a single, auditable crypto path. The on-device protection is
-         *   equivalent: a Keystore-held AES-256-GCM key guards the secret either way.
-         *
-         * FAILURE MODE:
-         *   If the Keystore key is lost (e.g. a device-transfer that did not migrate
-         *   Keystore entries), [KeystoreSecretStore.open] throws and the
-         *   database cannot be opened. This matches the previous behaviour; recovery is
-         *   via Settings → Restore Backup (JSON), which is device-independent.
-         *
-         * MEMORY HYGIENE:
-         *   The returned [ByteArray] is zeroed by the caller immediately after
-         *   [SupportOpenHelperFactory] has consumed it, so the plaintext passphrase has the
-         *   shortest possible lifetime in the JVM heap.
-         */
-        private fun getOrCreatePassphrase(context: Context): ByteArray {
-            val prefs = context.getSharedPreferences(PASSPHRASE_PREFS, Context.MODE_PRIVATE)
-
-            val storedB64 = prefs.getString(PASSPHRASE_KEY, null)
-            if (storedB64 != null) {
-                // Decode the persisted envelope and ask the Keystore to open it.
-                val sealed = Base64.decode(storedB64, Base64.NO_WRAP)
-                return passphraseStore.open(sealed)   // == the passphrase bytes SQLCipher needs
-            }
-
-            // ── First run: generate, seal, persist ────────────────────────────
-            val raw        = ByteArray(32).also { SecureRandom().nextBytes(it) }
-            val passphrase = Base64.encodeToString(raw, Base64.NO_WRAP).toByteArray(Charsets.UTF_8)
-            raw.fill(0)    // zero the raw entropy immediately; we keep only the text form
-
-            val sealed = passphraseStore.seal(passphrase)
-
-            // Use commit() instead of apply() here.
-            //
-            // apply() schedules an asynchronous write and returns immediately. If two
-            // threads both reach this branch during cold start, the race looks like:
-            //   Thread A: getString → null → generates+seals key-A → apply() (scheduled)
-            //   Thread B: getString → null (apply not flushed) → generates+seals key-B → apply()
-            // Result: key-A was already used to open the database, but key-B overwrites
-            // it in prefs → the next open uses key-B → SQLCipher throws "file is not a
-            // database". commit() writes synchronously under a file lock, so the second
-            // thread blocks, then reads the persisted value and skips generation.
-            //
-            // Performance: commit() runs at most once per install (key creation); every
-            // later call takes the early-return path above with no synchronous write.
-            // edit(commit = true) is the KTX form of a SYNCHRONOUS commit (see the
-            // race rationale above): the block runs and the write is flushed under a
-            // file lock before returning. Using it resolves the UseKtx and
-            // ApplySharedPref lint hints without weakening the required blocking write
-            // (apply() would be asynchronous and reintroduce the race).
-            prefs.edit(commit = true) {
-                putString(PASSPHRASE_KEY, Base64.encodeToString(sealed, Base64.NO_WRAP))
-            }
-
-            return passphrase
         }
 
         /**
@@ -245,12 +166,13 @@ abstract class AppDatabase : RoomDatabase() {
          * Uses double-checked locking to avoid the cost of synchronization on
          * every call while remaining thread-safe on first creation.
          *
-         * ENCRYPTION:
-         *   A [SupportOpenHelperFactory] is constructed from the Keystore-backed passphrase
-         *   and passed to [Room.databaseBuilder]. Every read and write from that
-         *   point is transparently encrypted with SQLCipher (AES-256-CBC + HMAC-SHA1
-         *   page authentication). The passphrase byte array is zeroed immediately
-         *   after [SupportOpenHelperFactory] receives it.
+         * STORAGE SECURITY:
+         *   The database is a plain (unencrypted) SQLite file in the app's private
+         *   storage. At rest it is protected by Android's file-based storage
+         *   encryption and the per-app sandbox; there is no application-level
+         *   database encryption layer (SQLCipher was removed in v0.73.0). On the
+         *   first open after upgrading from an encrypted build, any leftover
+         *   SQLCipher artefacts are cleaned up by [purgeLegacyEncryptedDatabase].
          *
          * @param context          Application context – must be the application context
          *                         (not an Activity context) to avoid a memory leak.
@@ -259,21 +181,16 @@ abstract class AppDatabase : RoomDatabase() {
         fun getInstance(context: Context, applicationScope: CoroutineScope): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: run {
-                    val passphrase = getOrCreatePassphrase(context.applicationContext)
-                    // sqlcipher-android requires the native library to be loaded
-                    // explicitly before first use (the old android-database-sqlcipher
-                    // did this implicitly). System.loadLibrary is idempotent, and
-                    // getInstance's run{} block executes only once for the singleton.
-                    System.loadLibrary("sqlcipher")
-                    val factory    = SupportOpenHelperFactory(passphrase)
-                    passphrase.fill(0)   // zero our copy; the factory holds its own
+                    val appContext = context.applicationContext
+                    // One-shot clean break from the former SQLCipher database (a no-op
+                    // on clean installs and on every start after the first upgrade).
+                    purgeLegacyEncryptedDatabase(appContext)
 
                     Room.databaseBuilder(
-                        context.applicationContext,
+                        appContext,
                         AppDatabase::class.java,
-                        "potillus.db"
+                        DATABASE_NAME
                     )
-                        .openHelperFactory(factory)
                         .addMigrations(MIGRATION_1_2)
                         .addCallback(PrepopulateCallback(applicationScope))
                         .build()

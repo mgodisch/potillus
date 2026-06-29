@@ -51,7 +51,6 @@ import de.godisch.potillus.fake.FakeBackupRepository
 import de.godisch.potillus.util.BackupManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

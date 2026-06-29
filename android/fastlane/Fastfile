@@ -45,4 +45,41 @@ platform :android do
     # tree. Demo Mode and PDF rendering are handled by the Makefile around this.
     capture_android_screenshots
   end
+
+  desc 'Upload the SIGNED release App Bundle and the store metadata to Google Play.'
+  desc 'Build the bundle first with `make bundle` (needs a configured signing key,'
+  desc 'see android/keystore.properties.example). Options (all optional):'
+  desc '  track:<name>   Play track to publish to (default: production)'
+  desc '  status:<name>  release status: draft|completed|halted|inProgress (default: draft)'
+  desc 'Example:  bundle exec fastlane deploy track:internal status:completed'
+  lane :deploy do |options|
+    # `upload_to_play_store` is the modern alias of the `supply` action. It reads
+    # the package_name and the service-account key from the Appfile, uploads the
+    # AAB produced by `./gradlew bundleRelease`, and syncs the listing texts,
+    # changelogs and images from fastlane/metadata/android/ — the SAME tree that
+    # F-Droid reads, so the two stores never diverge.
+    upload_to_play_store(
+      # AAB (not APK): Google Play requires the App Bundle format for new apps.
+      aab: 'app/build/outputs/bundle/release/app-release.aab',
+
+      # Default to the production track but allow an override for staged rollouts
+      # (e.g. `track:internal`). `release_status: draft` is the SAFE default: the
+      # upload is staged in the Play Console for manual review/publish instead of
+      # going live automatically. Pass `status:completed` to publish immediately.
+      track: options[:track] || 'production',
+      release_status: options[:status] || 'draft',
+
+      # We upload a bundle, never a bare APK, so disable the APK upload paths.
+      skip_upload_apk: true,
+
+      # Sync the store listing from fastlane/metadata/android/. Images are pushed
+      # too; if you have not added the Play feature graphic yet (see
+      # metadata/android/en-US/images/PLACEHOLDERS.txt) set skip_upload_images
+      # and skip_upload_screenshots to true to upload texts/changelogs only.
+      skip_upload_metadata: false,
+      skip_upload_changelogs: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
 end

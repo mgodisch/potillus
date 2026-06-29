@@ -216,9 +216,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">公克／天</string>
     <string name="drink_days_label">飲酒日數（最近7天）</string>
     <string name="drink_days_setting">7天最多飲酒日數</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">設定未還原？</string>
-    <string name="device_transfer_warning_body">無法從上一部裝置完整還原設定與資料。當加密金鑰無法轉移時，可能會發生這種情況。\n\n如果這是全新安裝，可以忽略此訊息。否則，請透過 設定 → 還原備份 重新匯入備份。</string>
     <string name="personal_data">個人資料</string>
     <string name="limits">上限</string>
     <string name="daily_limit_grams">每日上限（公克）</string>

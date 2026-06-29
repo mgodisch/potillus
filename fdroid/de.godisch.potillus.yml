@@ -1,0 +1,32 @@
+# F-Droid build metadata for Libellus Potionis (de.godisch.potillus).
+#
+# This is the maintainer's REFERENCE COPY of the file that lives in the F-Droid
+# data repository as metadata/de.godisch.potillus.yml. F-Droid does NOT consume it
+# from here; it is submitted and maintained via a merge request against
+# https://gitlab.com/fdroid/fdroiddata. Keep this copy in sync whenever the
+# upstream recipe changes. See fdroid/README.md for the workflow and caveats.
+
+Categories:
+  - Sports & Health
+License: GPL-3.0-or-later
+AuthorName: Martin A. Godisch
+AuthorEmail: android@godisch.de
+SourceCode: https://codeberg.org/godisch/potillus
+IssueTracker: https://codeberg.org/godisch/potillus/issues
+Changelog: https://codeberg.org/godisch/potillus/src/branch/main/CHANGELOG.md
+
+RepoType: git
+Repo: https://codeberg.org/godisch/potillus.git
+
+Builds:
+  - versionName: 0.73.0
+    versionCode: 76
+    commit: v0.73.0
+    subdir: android/app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v([0-9]+\.){2}[0-9]+$
+CurrentVersion: 0.73.0
+CurrentVersionCode: 76

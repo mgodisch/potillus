@@ -218,9 +218,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/dia</string>
     <string name="drink_days_label">dias de consumo (últimos 7 dias)</string>
     <string name="drink_days_setting">Máx. dias de consumo/7 dias</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Configurações não restauradas?</string>
-    <string name="device_transfer_warning_body">As configurações e os dados não puderam ser totalmente restaurados do dispositivo anterior. Isso pode acontecer quando as chaves criptografadas não podem ser transferidas.\n\nSe esta for uma instalação nova, esta mensagem pode ser ignorada. Caso contrário, importe o backup novamente em Configurações → Restaurar backup.</string>
     <string name="personal_data">Dados pessoais</string>
     <string name="limits">Limites</string>
     <string name="daily_limit_grams">Limite diário em gramas</string>

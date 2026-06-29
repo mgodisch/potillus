@@ -197,9 +197,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">克/天</string>
     <string name="drink_days_label">饮酒天数（最近7天）</string>
     <string name="drink_days_setting">7天最多饮酒天数</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">设置未恢复？</string>
-    <string name="device_transfer_warning_body">无法从上一台设备完整恢复设置和数据。当加密密钥无法传输时，可能会发生这种情况。\n\n如果这是全新安装，可以忽略此消息。否则，请通过 设置 → 恢复备份 重新导入备份。</string>
     <string name="personal_data">个人数据</string>
     <string name="limits">限额</string>
     <string name="daily_limit_grams">每日限额（克）</string>

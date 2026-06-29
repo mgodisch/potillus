@@ -183,9 +183,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/jour</string>
     <string name="drink_days_label">jours de boisson (7 derniers jours)</string>
     <string name="drink_days_setting">Jours boisson max./7 j</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Paramètres non restaurés ?</string>
-    <string name="device_transfer_warning_body">Les paramètres et les données n\'ont pas pu être entièrement restaurés depuis l\'appareil précédent. Cela peut se produire lorsque les clés chiffrées ne peuvent pas être transférées.\n\nS\'il s\'agit d\'une nouvelle installation, ce message peut être ignoré. Sinon, réimporter la sauvegarde via Paramètres → Restaurer la sauvegarde.</string>
     <string name="personal_data">Données personnelles</string>
     <string name="limits">Limites</string>
     <string name="daily_limit_grams">Limite journalière en grammes</string>

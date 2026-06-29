@@ -218,9 +218,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Drinking-days and weekly gram mode -->
     <string name="drink_days_label">zile de băut (ultimele 7 zile)</string>
     <string name="drink_days_setting">Max. zile de băut/7 zile</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Setările nu au fost restaurate?</string>
-    <string name="device_transfer_warning_body">Setările și datele nu au putut fi restaurate complet de pe dispozitivul anterior. Acest lucru se poate întâmpla când cheile criptate nu pot fi transferate.\n\nDacă este o instalare nouă, acest mesaj poate fi ignorat. În caz contrar, reimportați copia de rezervă din Setări → Restaurează backupul.</string>
     <string name="personal_data">Date personale</string>
     <string name="limits">Limite</string>
     <string name="daily_limit_grams">Limită zilnică în grame</string>

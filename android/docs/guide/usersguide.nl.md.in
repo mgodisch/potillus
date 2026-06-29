@@ -107,7 +107,27 @@ vanaf welke datum de gegevens moeten worden geëvalueerd.
 
 ### {{backup_section}}
 
-Alle gegevens kunnen als JSON worden geëxporteerd en weer worden geïmporteerd.
+**Je gegevens verlaten dit apparaat nooit uit zichzelf.** Libellus Potionis
+bewaart alles in de privéopslag van de app en doet bewust **niet** mee aan
+automatische cloudback-ups en **niet** aan overdracht tussen apparaten. Als je
+van telefoon wisselt, de fabrieksinstellingen herstelt of de app opnieuw
+installeert, is **de enige manier om je gegevens te behouden ze zelf veilig te
+stellen** — er is geen andere manier van herstel, en gegevens die niet zijn
+geëxporteerd kunnen daarna niet worden teruggehaald.
+
+Een back-up is één JSON-bestand met al je drankjes en je volledige logboek. Zo
+verplaats je je gegevens naar een andere telefoon:
+
+1. Open op de **oude** telefoon **'{{settings}}' → {{backup_section}} →
+   {{backup_export}}** en sla het JSON-bestand op een veilige plek op — bijvoorbeeld
+   je eigen cloudopslag, een e-mail aan jezelf of een usb-overdracht.
+2. Installeer Libellus Potionis op de **nieuwe** telefoon.
+3. Open **'{{settings}}' → {{backup_section}} → {{backup_import}}** en selecteer
+   dat JSON-bestand. Kies **{{import_replace}}** om alles te overschrijven, of
+   **{{import_merge}}** om het samen te voegen met reeds aanwezige items.
+
+Exporteer regelmatig: een back-up beschermt alleen de gegevens die bestonden op
+het moment dat je hem maakte.
 
 ### {{appearance}}
 

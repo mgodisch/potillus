@@ -40,7 +40,6 @@ package de.godisch.potillus.ui.component
 //     - Drink-days progress bar    (TodayScreen)
 // =============================================================================
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -60,12 +59,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.model.ConsumptionEntry
-import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.domain.model.TrafficLight
 import de.godisch.potillus.ui.theme.dangerRedColor
-import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
 import java.time.Instant

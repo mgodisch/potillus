@@ -37,6 +37,14 @@
 //     3. dependencies { } – external libraries
 // =============================================================================
 
+// java.util.Properties reads the optional android/keystore.properties file in the
+// `signingConfigs` block below. It MUST be imported (and referenced as `Properties`,
+// not `java.util.Properties`): inside that block the bare identifier `java` resolves
+// to the Gradle Java-plugin extension accessor, so a fully-qualified `java.util.…`
+// fails to compile ("Unresolved reference 'util'"). Like the imports below, it has
+// to appear before the `plugins { }` block.
+import java.util.Properties
+
 // JvmTarget enum used by the Kotlin `compilerOptions` DSL (see the top-level
 // `kotlin { }` block further down). In a Gradle Kotlin DSL build script, import
 // statements must appear before the `plugins { }` block.
@@ -151,10 +159,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 75
+        versionCode = 76
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.72.0"
+        versionName = "0.73.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -218,6 +226,54 @@ android {
         }
     }
 
+    // ── Release signing (OPTIONAL — absent by default) ────────────────────────
+    //
+    // WHY THIS IS CONDITIONAL:
+    //   F-Droid builds the app from source and signs the resulting APK with ITS
+    //   OWN key, so the source tree must keep building an UNSIGNED artifact when
+    //   no developer key is configured. At the same time, a Google-Play release
+    //   needs a signed APK/AAB. This block satisfies both: it declares a
+    //   "release" signing config but only POPULATES it when key material is
+    //   actually available. If nothing is found, the config stays empty and the
+    //   release build below leaves `signingConfig` unset → `assembleRelease`
+    //   produces `app-release-unsigned.apk`, exactly as before this change.
+    //
+    // TWO EQUALLY SUPPORTED WAYS TO SUPPLY THE KEY (see keystore.properties.example):
+    //   (a) a local, git-ignored `android/keystore.properties` file, or
+    //   (b) environment variables (handy for CI), which OVERRIDE the file.
+    // Neither the keystore nor the passwords are ever committed: both the
+    // properties file and the Play service-account JSON are listed in .gitignore.
+    signingConfigs {
+        create("release") {
+            // rootProject is the `android/` directory (single-module build, see
+            // settings.gradle.kts), so this resolves to android/keystore.properties.
+            val keystorePropsFile = rootProject.file("keystore.properties")
+            val props = Properties().apply {
+                if (keystorePropsFile.exists()) {
+                    keystorePropsFile.inputStream().use { load(it) }
+                }
+            }
+            // Environment variable wins over the file entry; returns null if neither
+            // is set, which is the signal further down to stay unsigned.
+            fun value(propKey: String, envKey: String): String? =
+                System.getenv(envKey) ?: props.getProperty(propKey)
+
+            val storePath = value("storeFile", "POTILLUS_KEYSTORE_FILE")
+            val storePass = value("storePassword", "POTILLUS_KEYSTORE_PASSWORD")
+            val alias     = value("keyAlias", "POTILLUS_KEY_ALIAS")
+            val keyPass   = value("keyPassword", "POTILLUS_KEY_PASSWORD")
+
+            // Populate the config ONLY when all four values are present. A partial
+            // configuration would fail the build, so it is treated as "no key".
+            if (storePath != null && storePass != null && alias != null && keyPass != null) {
+                storeFile     = rootProject.file(storePath)
+                storePassword = storePass
+                keyAlias      = alias
+                keyPassword   = keyPass
+            }
+        }
+    }
+
     // Build types: "debug" and "release" are predefined.
     // More can be added here (e.g. "staging").
     buildTypes {
@@ -239,6 +295,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // Apply the release signing config ONLY if it was populated in the
+            // signingConfigs block above (i.e. key material was found). When it
+            // was not, `storeFile` is null and we leave `signingConfig` unset, so
+            // the build stays unsigned — the configuration F-Droid relies on. With
+            // a key configured, both `assembleRelease` (APK) and `bundleRelease`
+            // (AAB) are signed for Google Play.
+            val releaseSigningConfig = signingConfigs.getByName("release")
+            if (releaseSigningConfig.storeFile != null) {
+                signingConfig = releaseSigningConfig
+            }
         }
 
         // Debug build: for development and ADB installation
@@ -389,7 +456,18 @@ android {
             // Converting them to <plurals> correctly across all 21 shipped
             // locales (each with its own CLDR plural categories) is a substantial,
             // separate localisation task, not part of this lint pass.
-            "PluralsCandidate"
+            "PluralsCandidate",
+            // ── Navigation lint detector crash (tooling bug) ─────────────────
+            // navigation-compose 2.8.9 bundles a lint detector
+            // (BaseWrongStartDestinationTypeDetector) that crashes under the
+            // newer lint shipped with AGP 9.2: it throws
+            //   NoClassDefFoundError: androidx/navigation/lint/UtilKt
+            // while analysing AppNav.kt and aborts the whole lint task. Lint
+            // itself reports this as "a bug in lint or one of the libraries it
+            // depends on" and recommends disabling the check; it is not a real
+            // finding in our navigation graph. Re-enable once the navigation lint
+            // checks are compatible again (a future navigation release).
+            "WrongStartDestinationType"
         )
     }
 
@@ -436,13 +514,57 @@ kotlin {
 // The copy is made a dependency of the androidTest asset-merge task so it always
 // runs before the test APK is packaged. `configureEach` covers whatever the
 // concrete merge task is named for the test build type (mergeDebugAndroidTestAssets).
-val copyDemoBackupFixture by tasks.registering(Copy::class) {
+val copyDemoBackupFixture = tasks.register<Copy>("copyDemoBackupFixture") {
     description = "Copy fastlane/demo-backup.json into the androidTest assets for the screenshot suite."
     from(rootProject.file("fastlane/demo-backup.json"))
     into(layout.buildDirectory.dir("generated/screenshotAssets"))
 }
 tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
     dependsOn(copyDemoBackupFixture)
+}
+
+// ── Generated guide & copyright resources (build prerequisites) ────────────────
+//
+// The in-app documents under res/raw[-xx]/ are GENERATED, not committed (they are
+// listed in .gitignore). Historically only the Makefile produced them, so a bare
+// `./gradlew assembleRelease` — a fresh clone, CI, or an F-Droid build that does
+// not go through `make` — failed because R.raw.usersguide / R.raw.copyright had no
+// backing files. These two tasks reproduce the Makefile's generation inside Gradle
+// and are wired into `preBuild`, so EVERY Gradle build is self-contained.
+
+// Renders app/src/main/res/raw[-xx]/usersguide.md from the docs/guide templates.
+// render-guide.py is idempotent (it no-ops when the outputs are already current),
+// so re-running it on every build is cheap. Requires python3 on PATH — the same
+// prerequisite the Makefile already documents, and present in the F-Droid build
+// environment.
+val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
+    description = "Render the localized in-app user guides from docs/guide templates."
+    workingDir = rootProject.projectDir
+    commandLine("python3", "tools/render-guide.py")
+}
+
+// Concatenates COPYING.md + LICENSE.md (both at the repository root, one level
+// above this single-module Gradle root) into res/raw/copyright.md — the same
+// output the Makefile's `copyright.md` rule produces. Declares inputs/outputs so
+// Gradle can skip it when nothing changed.
+val generateCopyrightDocument = tasks.register("generateCopyrightDocument") {
+    description = "Concatenate COPYING.md + LICENSE.md into res/raw/copyright.md."
+    val copying = rootProject.projectDir.parentFile.resolve("COPYING.md")
+    val license = rootProject.projectDir.parentFile.resolve("LICENSE.md")
+    val output = layout.projectDirectory.file("src/main/res/raw/copyright.md")
+    inputs.files(copying, license)
+    outputs.file(output)
+    doLast {
+        val target = output.asFile
+        target.parentFile.mkdirs()
+        target.writeText(copying.readText() + "\n" + license.readText())
+    }
+}
+
+// preBuild is the earliest per-variant anchor; wiring the generators here makes
+// them run before resource merging and R-class generation for every variant.
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn(generateUserGuides, generateCopyrightDocument)
 }
 
 // ── 3. Dependencies ───────────────────────────────────────────────────────────
@@ -525,24 +647,20 @@ dependencies {
 
     // ── Security ──────────────────────────────────────────────────────────────
     //
-    // SQLCipher (net.zetetic:sqlcipher-android): application-level AES-256
-    //   encryption for the Room database. SupportOpenHelperFactory wraps Room's
-    //   SQLite helper so every read/write goes through the cipher transparently.
-    //   The passphrase is a 32-byte random value sealed by the Android Keystore
-    //   (KeystoreSecretStore) and stored as a Base64 envelope in a plain
-    //   SharedPreferences file (see AppDatabase.kt). The native library is loaded
-    //   explicitly via System.loadLibrary("sqlcipher") before the DB is opened.
-    implementation(libs.sqlcipher)
-    // androidx.sqlite provides the SupportSQLiteOpenHelper interfaces SQLCipher
-    // implements and the low-level SQLite API Room builds on.
-    implementation(libs.sqlite)
-
-    // NOTE: androidx.security:security-crypto is intentionally not used (Google deprecated it).
-    //   It was deprecated by Google in April 2025 in favour of using the Android
-    //   Keystore directly. Its only use (storing the SQLCipher passphrase via
-    //   EncryptedSharedPreferences in AppDatabase) was migrated to the app's own
-    //   KeystoreSecretStore (de.godisch.potillus.data.security), which is the same
-    //   primitive AppPreferences already used for the encrypted DataStore.
+    // The database is NOT encrypted at the application level: it is a plain Room/
+    // SQLite file protected at rest by Android's file-based storage encryption and
+    // the per-app sandbox. SQLCipher (net.zetetic:sqlcipher-android) was removed in
+    // v0.73.0 — see AppDatabase.kt for the one-shot clean-up of the former
+    // encrypted database, and the CHANGELOG for the rationale.
+    //
+    // androidx.sqlite is intentionally NOT declared explicitly: Room pulls in the
+    // small SDK surface it needs (SupportSQLiteDatabase, used by the migration and
+    // the pre-population callback) transitively via room-runtime.
+    //
+    // NOTE: androidx.security:security-crypto is intentionally not used (Google
+    //   deprecated it in April 2025 in favour of using the Android Keystore
+    //   directly). The app seals its remaining small secret — the user-preferences
+    //   DataStore — with its own KeystoreSecretStore (de.godisch.potillus.data.security).
 
     // ── Debug build only ──────────────────────────────────────────────────────
     // compose-ui-tooling: Layout Inspector, recomposition tracking

@@ -1,0 +1,46 @@
+# vim: set et ts=2 sw=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# =============================================================================
+# Appfile -- shared identity for fastlane's Google Play actions
+# =============================================================================
+#
+# WHAT THIS IS
+#   fastlane reads the Appfile automatically and uses it to identify the app and
+#   the credentials for the Google Play Developer API. It is consumed by the
+#   `deploy` lane in Fastfile (which calls `upload_to_play_store`/`supply`).
+#
+# package_name
+#   The applicationId of the RELEASE build (app/build.gradle.kts → applicationId).
+#   NOTE the debug build has a `.debug` suffix, but only the release artifact is
+#   ever uploaded to Play, so the un-suffixed id is correct here.
+#
+# json_key_file
+#   Path to the Google Play service-account key (a JSON file you download once
+#   from the Google Cloud console for a service account that has been granted
+#   access in the Play Console). It is a SECRET and is therefore git-ignored
+#   (.gitignore → /android/fastlane/play-store-credentials.json) and NOT shipped
+#   in the repository. The path can be overridden with the SUPPLY_JSON_KEY
+#   environment variable (useful in CI, where the key is injected as a secret).
+#   See: https://docs.fastlane.tools/actions/supply/#setup
+# =============================================================================
+
+package_name("de.godisch.potillus")
+
+json_key_file(ENV["SUPPLY_JSON_KEY"] || "play-store-credentials.json")

@@ -36,19 +36,20 @@ import javax.crypto.spec.GCMParameterSpec
  * ────────────────────────────────────────────────────────────────────────────
  * WHY THIS CLASS EXISTS
  * ────────────────────────────────────────────────────────────────────────────
- * The app needs to protect two small secrets at rest:
+ * The app needs to protect one small secret at rest:
  *
- *   1. the 32-byte SQLCipher passphrase            (see AppDatabase)
- *   2. the serialised user-preferences bytes       (see AppPreferences)
+ *   the serialised user-preferences bytes       (see AppPreferences)
  *
- * Historically (1) used the Jetpack `androidx.security:security-crypto`
- * library (`MasterKey` + `EncryptedSharedPreferences`). Google **deprecated**
- * that library in April 2025 (v1.1.0-alpha07) in favour of using the Android
- * Keystore directly. Meanwhile (2) already used the Keystore directly with its
- * own copy of the cipher logic. So the code base had two ways of doing the same
- * thing, one of them deprecated.
+ * It formerly also sealed the 32-byte SQLCipher database passphrase, but
+ * SQLCipher was removed in v0.73.0, so the preferences DataStore is now the sole
+ * user. The preferences path always used the Android Keystore directly; the
+ * earlier database-passphrase path had used the Jetpack
+ * `androidx.security:security-crypto` library (`MasterKey` +
+ * `EncryptedSharedPreferences`). Google **deprecated** that library in April 2025
+ * (v1.1.0-alpha07) in favour of using the Android Keystore directly. So the code
+ * base had two ways of doing the same thing, one of them deprecated.
  *
- * This class unifies both onto a single, auditable primitive built only on
+ * This class unifies everything onto a single, auditable primitive built only on
  * platform APIs, and the deprecated dependency is removed entirely.
  *
  * ────────────────────────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@
 
 # =============================================================================
 # proguard-rules.pro – R8 / ProGuard rules for Libellus Potionis
-# Version: v0.72.0  (keep in sync with build.gradle.kts versionName)
+# Version: v0.73.0  (keep in sync with build.gradle.kts versionName)
 # =============================================================================
 #
 # R8 is Android's code shrinker/obfuscator (successor to ProGuard).
@@ -95,13 +95,6 @@
 # Keep source file names and line numbers so that crash stack traces are readable
 # even in release builds (the mapping file maps obfuscated names back anyway).
 -keepattributes SourceFile,LineNumberTable
-
-# ── SQLCipher ─────────────────────────────────────────────────────────────────
-# SQLCipher ships native JNI code and reflectively loads its SQLite provider.
-# Without these rules R8 removes the Java bridge classes and the database
-# fails to open in release builds with a ClassNotFoundException.
--keep class net.sqlcipher.** { *; }
--keep class net.sqlcipher.database.** { *; }
 
 # ── Security Crypto (intentionally absent) ────────────────────────────────────
 # androidx.security:security-crypto is intentionally not a dependency (Google

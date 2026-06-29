@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/den</string>
     <string name="drink_days_label">dny s alkoholem (posledních 7 dní)</string>
     <string name="drink_days_setting">Max. dní/7 dní</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Nastavení nebylo obnoveno?</string>
-    <string name="device_transfer_warning_body">Nastavení a data se nepodařilo plně obnovit z předchozího zařízení. K tomu může dojít, když nelze přenést šifrované klíče.\n\nPokud jde o novou instalaci, lze tuto zprávu ignorovat. Jinak prosím znovu naimportujte zálohu přes Nastavení → Obnovit zálohu.</string>
     <string name="personal_data">Osobní údaje</string>
     <string name="limits">Limity</string>
     <string name="daily_limit_grams">Denní limit v gramech</string>

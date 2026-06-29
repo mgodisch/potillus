@@ -86,7 +86,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -305,23 +304,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 UiGate.READY -> {
-                    // Show a one-time, dismissible warning when a possible
-                    // device-transfer Keystore migration failure is detected.
-                    // The dialog appears on top of the normal app content so it is
-                    // never blocking; the user can dismiss it and continue normally.
-                    val showTransferWarning by app.deviceTransferWarning.collectAsStateWithLifecycle()
-                    if (showTransferWarning) {
-                        AlertDialog(
-                            onDismissRequest = { app.dismissDeviceTransferWarning() },
-                            title   = { Text(stringResource(R.string.device_transfer_warning_title)) },
-                            text    = { Text(stringResource(R.string.device_transfer_warning_body)) },
-                            confirmButton = {
-                                TextButton(onClick = { app.dismissDeviceTransferWarning() }) {
-                                    Text(stringResource(android.R.string.ok))
-                                }
-                            }
-                        )
-                    }
                     val showInfoDialog by app.infoDialog.collectAsStateWithLifecycle()
                     if (showInfoDialog) {
                         AlertDialog(

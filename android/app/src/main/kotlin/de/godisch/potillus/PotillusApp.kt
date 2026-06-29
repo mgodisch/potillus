@@ -42,7 +42,6 @@ package de.godisch.potillus
 // =============================================================================
 
 import android.app.Application
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import de.godisch.potillus.domain.model.AppSettings
@@ -132,43 +131,6 @@ class PotillusApp : Application() {
         BackupRepository(database.entryDao(), database.drinkDao(), database)
     }
 
-    // ── Device-transfer warning ──────────────────────────────────────
-    //
-    // PROBLEM:
-    //   data_extraction_rules.xml includes potillus_db_key (the Keystore-sealed
-    //   passphrase) and potillus_settings.preferences_pb in the
-    //   device-to-device transfer.
-    //   Both files are encrypted with Android Keystore keys. On many OEM devices
-    //   (non-Pixel especially) hardware-backed Keystore keys do NOT migrate during
-    //   a cable transfer. The result: the app opens with a blank database and factory-
-    //   default settings — all data is silently inaccessible, with no error message.
-    //
-    // DETECTION (authoritative, not a heuristic):
-    //   A failed transfer is detected directly: a sealed passphrase envelope is
-    //   present in storage (restored from backup) but cannot be decrypted with the
-    //   local Keystore key (AppDatabase.hasSealedPassphrase == true &&
-    //   canOpenSealedPassphrase == false). A genuine first install has no envelope
-    //   at all, so it never triggers the warning — this is what fixes the earlier
-    //   false positive that showed "Settings not restored?" on every fresh install.
-    //   The message is still worded to be reassuring and dismissible.
-    //
-    // HOW IT IS CONSUMED:
-    //   MainActivity observes deviceTransferWarning. When true, it shows a
-    //   one-time, dismissible dialog (device_transfer_warning_title/_body).
-    //   The flag is cleared on dismiss (dismissDeviceTransferWarning()).
-
-    private val _deviceTransferWarning = MutableStateFlow(false)
-
-    /**
-     * Emits `true` when a possible device-transfer Keystore migration failure
-     * is detected. Observed by `MainActivity` to show a one-time, dismissible
-     * info message. Call [dismissDeviceTransferWarning] after the user has read it.
-     */
-    val deviceTransferWarning: StateFlow<Boolean> = _deviceTransferWarning.asStateFlow()
-
-    /** Clears [deviceTransferWarning] after the user has dismissed the info message. */
-    fun dismissDeviceTransferWarning() { _deviceTransferWarning.value = false }
-
     // ── Annual info dialog ──────────────────────────────────────────────────────
     //   Shown at most once per calendar year, and ONLY when the app is opened on
     //   December 27th (device-local date). If the app is not opened that day, the
@@ -186,9 +148,9 @@ class PotillusApp : Application() {
     /**
      * Process entry point. Runs the one-shot startup tasks that must happen
      * before the first Activity reads settings: first-launch language detection
-     * and the device-transfer failure heuristic.
+     * and the annual info dialog.
      *
-     * Both run on [Dispatchers.IO] because they read DataStore; the few
+     * They run on [Dispatchers.IO] because they read DataStore; the few
      * UI-thread calls inside switch dispatcher explicitly via [withContext].
      */
     override fun onCreate() {
@@ -198,12 +160,8 @@ class PotillusApp : Application() {
         // every consumer must specify the dispatcher at the launch site.
         applicationScope.launch(Dispatchers.IO) {
             // applyLanguageOnFirstLaunch() needs the startup settings snapshot.
-            // checkForDeviceTransferFailure() is independent of settings — it probes
-            // the encrypted passphrase envelope directly — so ordering no longer
-            // matters between the two.
             val startupSettings = appPreferences.settingsFlow.first()
             applyLanguageOnFirstLaunch(startupSettings)
-            checkForDeviceTransferFailure()
             checkAnnualInfoDialog()
         }
     }
@@ -224,55 +182,6 @@ class PotillusApp : Application() {
                 _infoDialog.value = true
             }
         }
-    }
-
-    /**
-     * Detects a device transfer in which the Android Keystore key did not migrate,
-     * and surfaces [deviceTransferWarning] if so.
-     *
-     * The signal is authoritative, not a heuristic: a sealed passphrase envelope
-     * is present in storage (restored from an Android backup) but cannot be
-     * decrypted with this device's Keystore key. A genuine first install has no
-     * envelope at all and therefore never triggers the warning — which fixes the
-     * earlier false positive where a fresh install showed "Settings not restored?".
-     *
-     * The pure decision lives in [shouldWarnDeviceTransfer] so it can be
-     * unit-tested without an Android runtime. Called once per app process start,
-     * on Dispatchers.IO.
-     */
-    private fun checkForDeviceTransferFailure() {
-        val present     = AppDatabase.hasSealedPassphrase(this)
-        val decryptable = AppDatabase.canOpenSealedPassphrase(this)
-        if (shouldWarnDeviceTransfer(present, decryptable)) {
-            _deviceTransferWarning.value = true
-        }
-    }
-
-    companion object {
-        /**
-         * Pure decision function for the device-transfer warning.
-         *
-         * Returns `true` only when a sealed passphrase envelope EXISTS but is NOT
-         * decryptable — the unambiguous signature of a backup/device transfer in
-         * which the hardware-bound Keystore key did not come along. The other two
-         * states are safe and stay silent:
-         *  - [sealedEnvelopePresent] == false: no envelope yet → a genuine first
-         *    install (the case that used to false-positive), and
-         *  - [passphraseDecryptable] == true: the envelope opens fine → normal run.
-         *
-         * Side-effect-free, so it runs in the fast JVM unit-test executor without an
-         * Android Context or Application instance — see `PotillusAppHeuristicTest`.
-         * The two inputs are produced by [AppDatabase.hasSealedPassphrase] and
-         * [AppDatabase.canOpenSealedPassphrase].
-         *
-         * @param sealedEnvelopePresent Whether a passphrase envelope is persisted.
-         * @param passphraseDecryptable Whether that envelope opens with the local key.
-         */
-        @VisibleForTesting
-        internal fun shouldWarnDeviceTransfer(
-            sealedEnvelopePresent: Boolean,
-            passphraseDecryptable: Boolean
-        ): Boolean = sealedEnvelopePresent && !passphraseDecryptable
     }
 
     /**

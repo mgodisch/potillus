@@ -103,7 +103,27 @@ skal begynne fra.
 
 ### {{backup_section}}
 
-Alle data kan eksporteres som JSON og importeres igjen.
+**Dataene dine forlater aldri denne enheten av seg selv.** Libellus Potionis
+lagrer alt i appens private lagring og deltar bevisst **ikke** i noen automatisk
+sikkerhetskopiering i skyen og **ikke** i noen overføring mellom enheter. Hvis du
+bytter telefon, utfører en fabrikktilbakestilling eller installerer appen på
+nytt, er **den eneste måten å beholde dataene dine på å sikkerhetskopiere dem
+selv** — det finnes ingen annen vei til gjenoppretting, og data som ikke ble
+eksportert, kan ikke hentes tilbake etterpå.
+
+En sikkerhetskopi er én enkelt JSON-fil som inneholder alle drikkene dine og hele
+loggen din. Slik flytter du dataene dine til en annen telefon:
+
+1. På den **gamle** telefonen åpner du **«{{settings}}» → {{backup_section}} →
+   {{backup_export}}** og lagrer JSON-filen på et trygt sted — for eksempel din
+   egen skylagring, en e-post til deg selv eller en USB-overføring.
+2. Installer Libellus Potionis på den **nye** telefonen.
+3. Åpne **«{{settings}}» → {{backup_section}} → {{backup_import}}** og velg den
+   JSON-filen. Velg **{{import_replace}}** for å overskrive alt, eller
+   **{{import_merge}}** for å kombinere den med oppføringer som allerede finnes.
+
+Eksportér regelmessig: en sikkerhetskopi beskytter bare dataene som fantes i det
+øyeblikket du opprettet den.
 
 ### {{appearance}}
 

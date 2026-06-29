@@ -101,7 +101,27 @@ vyhodnocovat.
 
 ### {{backup_section}}
 
-Všechna data lze exportovat jako JSON a znovu naimportovat.
+**Tvoje data nikdy neopustí toto zařízení sama od sebe.** Libellus Potionis
+uchovává vše v soukromém úložišti aplikace a záměrně se neúčastní **žádného**
+automatického zálohování do cloudu ani **žádného** přenosu mezi zařízeními. Pokud
+změníš telefon, provedeš obnovení do továrního nastavení nebo aplikaci
+přeinstaluješ, **jediným způsobem, jak si data zachovat, je sám si je zálohovat**
+— jiná cesta k obnovení neexistuje a data, která nebyla exportována, už později
+nelze získat zpět.
+
+Záloha je jediný soubor JSON obsahující všechny tvé nápoje a celý tvůj záznam.
+Přenos dat do jiného telefonu:
+
+1. Na **starém** telefonu otevři **„{{settings}}" → {{backup_section}} →
+   {{backup_export}}** a ulož soubor JSON na bezpečné místo — například do
+   vlastního cloudového úložiště, do e-mailu sobě samému nebo přes přenos USB.
+2. Nainstaluj Libellus Potionis na **nový** telefon.
+3. Otevři **„{{settings}}" → {{backup_section}} → {{backup_import}}** a vyber
+   tento soubor JSON. Zvol **{{import_replace}}** pro přepsání všeho, nebo
+   **{{import_merge}}** pro sloučení se záznamy, které už existují.
+
+Exportuj pravidelně: záloha chrání pouze data, která existovala v okamžiku jejího
+vytvoření.
 
 ### {{appearance}}
 

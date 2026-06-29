@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drinkdagar (senaste 7 dagarna)</string>
     <string name="drink_days_setting">Max. drinkdagar/7 dagar</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Inställningarna återställdes inte?</string>
-    <string name="device_transfer_warning_body">Inställningarna och data kunde inte återställas helt från den tidigare enheten. Det kan hända när krypterade nycklar inte kan överföras.\n\nOm detta är en nyinstallation kan meddelandet ignoreras. Importera annars säkerhetskopian igen via Inställningar → Återställ säkerhetskopia.</string>
     <string name="personal_data">Personliga uppgifter</string>
     <string name="limits">Gränser</string>
     <string name="daily_limit_grams">Daglig gräns i gram</string>

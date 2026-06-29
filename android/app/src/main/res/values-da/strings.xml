@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drikkedage (sidste 7 dage)</string>
     <string name="drink_days_setting">Maks. drikkedage/7 dage</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Indstillinger ikke gendannet?</string>
-    <string name="device_transfer_warning_body">Indstillingerne og dataene kunne ikke gendannes helt fra den forrige enhed. Det kan ske, når krypterede nøgler ikke kan overføres.\n\nHvis dette er en ny installation, kan meddelelsen ignoreres. Ellers skal sikkerhedskopien importeres igen via Indstillinger → Gendan sikkerhedskopi.</string>
     <string name="personal_data">Personlige data</string>
     <string name="limits">Grænser</string>
     <string name="daily_limit_grams">Daglig grænse i gram</string>

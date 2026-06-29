@@ -30,8 +30,8 @@ package de.godisch.potillus.data.repository
 //   during a REPLACE import. It can only surface against a real Room/SQLite
 //   engine that enforces foreign keys — the JVM `FakeBackupRepository` used by
 //   the pure-JVM BackupRepositoryTest has no FK enforcement and therefore cannot
-//   reproduce it. We use an in-memory Room database (no SQLCipher needed — the
-//   FK constraint is independent of page encryption), which keeps the test fast
+//   reproduce it. We use an in-memory Room database (no application-level encryption is
+//   involved — the FK constraint is independent of storage), which keeps the test fast
 //   and self-contained while still exercising the real DAO/transaction path.
 //
 // WHAT THIS GUARDS AGAINST
@@ -78,7 +78,7 @@ class BackupRepositoryInstrumentedTest {
     /**
      * Builds a fresh in-memory [AppDatabase] (schema v2, FK enforcement on) for
      * each test. We bypass [AppDatabase.getInstance] on purpose so the test uses a
-     * plain, unencrypted database without the SQLCipher passphrase machinery and
+     * plain database without the singleton/clean-up machinery and
      * without the preset pre-population callback — the test seeds its own rows.
      */
     @Before

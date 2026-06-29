@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drinkdagen (laatste 7 dagen)</string>
     <string name="drink_days_setting">Max. drinkdagen/7 dagen</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Instellingen niet hersteld?</string>
-    <string name="device_transfer_warning_body">De instellingen en gegevens konden niet volledig worden hersteld vanaf het vorige apparaat. Dit kan gebeuren wanneer versleutelde sleutels niet kunnen worden overgedragen.\n\nBij een nieuwe installatie kan dit bericht worden genegeerd. Importeer de back-up anders opnieuw via Instellingen → Back-up herstellen.</string>
     <string name="personal_data">Persoonlijke gegevens</string>
     <string name="limits">Limieten</string>
     <string name="daily_limit_grams">Daglimiet in gram</string>

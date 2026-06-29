@@ -21,6 +21,7 @@
 package de.godisch.potillus.ui.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +32,9 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 
@@ -39,19 +42,22 @@ import androidx.compose.ui.unit.dp
  * A deliberately tiny Markdown renderer for the in-app user guide.
  *
  * SCOPE — and why it is so small
- *   The bundled guides (`res/raw[-xx]/usersguide.md`) only ever use a fixed,
- *   known subset of Markdown:
+ *   The renderer implements exactly the Markdown subset the bundled documents
+ *   (`res/raw[-xx]/usersguide.md`, plus COPYING.md / LICENSE.md) rely on:
  *     * ATX headings  `#`, `##`, `###`
  *     * blank-line-separated paragraphs whose source is hard-wrapped at ~78
  *       columns
  *     * inline links  `[text](url)`
- *   Rendering exactly that subset needs no third-party Markdown library, which
- *   keeps the app dependency-light and matches its privacy-minimal philosophy.
- *   Constructs we do NOT use in the guides (bold, emphasis, lists, code blocks,
- *   images, tables, blockquotes) are intentionally not implemented; their
- *   source markers would simply be shown verbatim. This is documented so a
- *   future maintainer who adds such syntax to a guide knows to extend the
- *   renderer rather than expecting magic.
+ *     * inline bold  `**text**`
+ *     * ordered lists  `1.` `2.` … (one item per source line; continuation
+ *       lines are reflowed into their item)
+ *   That needs no third-party Markdown library, which keeps the app
+ *   dependency-light and matches its privacy-minimal philosophy. Other
+ *   constructs (italic emphasis, unordered/bulleted lists, code blocks, images,
+ *   tables, blockquotes) are intentionally not implemented; their markers are
+ *   rendered as literal text inside the reflowed paragraph. A future maintainer
+ *   who adds such syntax to a guide should extend the renderer rather than
+ *   expect magic.
  *
  * REFLOW
  *   Guide paragraphs are wrapped at a fixed column in the source file. If we
@@ -103,6 +109,29 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // which reads fine inside the scrolling, padded viewer.
                     modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
                 )
+                ORDERED_ITEM_RE.matches(firstLine.substringBefore('\n')) -> {
+                    // An ordered list: render one row per item — the item number
+                    // and its body, where the body still gets inline bold/link
+                    // handling. Source lines wrapped within an item are reflowed
+                    // back together by parseOrderedList(). The body Text wraps to
+                    // the screen width, so its second and later lines hang-indent
+                    // under the body rather than under the number.
+                    Column(modifier = Modifier.padding(bottom = 12.dp)) {
+                        for ((number, itemText) in parseOrderedList(block)) {
+                            Row(modifier = Modifier.padding(bottom = 4.dp)) {
+                                Text(
+                                    text = "$number.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text(
+                                    text = renderInline(itemText),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+                }
                 else -> Text(
                     // Reflow: collapse the hard-wrapped source lines of this
                     // paragraph into a single, screen-wrapped string.
@@ -140,48 +169,89 @@ private val HTML_ENTITIES = mapOf(
 private fun decodeHtmlEntities(text: String): String =
     HTML_ENTITIES.entries.fold(text) { acc, (entity, ch) -> acc.replace(entity, ch) }
 
-// Matches a single Markdown inline link: [visible text](https://target).
-private val LINK_RE = Regex("""\[([^\]]+)\]\(([^)]+)\)""")
+// Matches the inline Markdown the documents use: a bold span **like this** OR a
+// link [visible text](https://target), whichever comes next. Group 1 captures a
+// bold span's content; groups 2 and 3 capture a link's label and URL. The bold
+// pattern is non-greedy so adjacent **a** **b** spans match separately. Since
+// renderInline() receives an already-reflowed (single-line) paragraph, `.` never
+// has to cross a newline.
+private val INLINE_RE = Regex("""\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\)""")
 
 /**
  * Converts a paragraph's plain text into an [AnnotatedString], turning every
- * `[text](url)` occurrence into a tappable link and leaving all other text
- * untouched. HTML character entities (e.g. `&copy;`) are decoded first so they
- * appear as their Unicode glyphs rather than raw markup.
+ * `[text](url)` occurrence into a tappable link and every `**text**` span into
+ * bold, and leaving all other text untouched. HTML character entities (e.g.
+ * `&copy;`) are decoded first so they appear as their Unicode glyphs rather than
+ * raw markup.
  */
 @Composable
 private fun renderInline(text: String): AnnotatedString {
     val linkColor = MaterialTheme.colorScheme.primary
-    // Decode HTML entities before scanning for Markdown links so that an entity
-    // inside a link label (e.g. `[&copy; Foo](https://…)`) is also handled.
+    // Decode HTML entities before scanning so an entity inside a link label or a
+    // bold span (e.g. `[&copy; Foo](https://…)`) is also handled.
     val decoded = decodeHtmlEntities(text)
     return buildAnnotatedString {
         var cursor = 0
-        for (match in LINK_RE.findAll(decoded)) {
-            // Emit any literal text before this link.
+        for (match in INLINE_RE.findAll(decoded)) {
+            // Emit any literal text before this match.
             if (match.range.first > cursor) {
                 append(decoded.substring(cursor, match.range.first))
             }
-            val label = match.groupValues[1]
-            val url = match.groupValues[2]
-            withLink(
-                LinkAnnotation.Url(
-                    url = url,
-                    styles = TextLinkStyles(
-                        style = SpanStyle(
-                            color = linkColor,
-                            textDecoration = TextDecoration.Underline
+            val boldText = match.groupValues[1]
+            if (boldText.isNotEmpty()) {
+                // **bold** — group 1 is only non-empty on the bold alternative.
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(boldText)
+                }
+            } else {
+                // [label](url) — groups 2 and 3.
+                withLink(
+                    LinkAnnotation.Url(
+                        url = match.groupValues[3],
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = linkColor,
+                                textDecoration = TextDecoration.Underline
+                            )
                         )
                     )
-                )
-            ) {
-                append(label)
+                ) {
+                    append(match.groupValues[2])
+                }
             }
             cursor = match.range.last + 1
         }
-        // Emit any trailing literal text after the last link.
+        // Emit any trailing literal text after the last match.
         if (cursor < decoded.length) {
             append(decoded.substring(cursor))
         }
     }
+}
+
+// Matches a single ordered-list item line: an integer, a dot, whitespace, then
+// the item text. Used both to detect an ordered-list block and to split it into
+// items. A line such as "3.5 grams" does NOT match (no whitespace after the
+// dot), so decimals that appear in a wrapped continuation line are kept as
+// continuation text rather than mistaken for a new item.
+private val ORDERED_ITEM_RE = Regex("""\s*(\d+)\.\s+(.*)""")
+
+/**
+ * Splits an ordered-list [block] into `(number, text)` pairs. Every source line
+ * matching [ORDERED_ITEM_RE] starts a new item; any other non-blank line is a
+ * continuation of the current item and is appended with a single space, since
+ * the guide source hard-wraps long items across several lines.
+ */
+private fun parseOrderedList(block: String): List<Pair<String, String>> {
+    val items = mutableListOf<Pair<String, StringBuilder>>()
+    for (rawLine in block.trim().lines()) {
+        val line = rawLine.trim()
+        if (line.isEmpty()) continue
+        val match = ORDERED_ITEM_RE.matchEntire(line)
+        if (match != null) {
+            items += match.groupValues[1] to StringBuilder(match.groupValues[2])
+        } else if (items.isNotEmpty()) {
+            items.last().second.append(' ').append(line)
+        }
+    }
+    return items.map { it.first to it.second.toString() }
 }

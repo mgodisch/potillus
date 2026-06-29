@@ -31,7 +31,7 @@
  *   [EntryListItem] is a good first target because it is completely STATELESS:
  *   it takes a [ConsumptionEntry] plus two callbacks and renders them, holding
  *   no ViewModel, database, or DataStore. That makes it fast and deterministic
- *   to test in isolation — no SQLCipher, no Keystore, no coroutines.
+ *   to test in isolation — no database, no Keystore, no coroutines.
  *
  * HOW COMPOSE UI TESTS WORK (the three building blocks)
  *   1. [createAndroidComposeRule] — a JUnit @Rule that launches an empty test

@@ -60,7 +60,6 @@ package de.godisch.potillus
 //   ViewModel is created at most once per Activity lifecycle.
 // =============================================================================
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import de.godisch.potillus.ui.screen.*

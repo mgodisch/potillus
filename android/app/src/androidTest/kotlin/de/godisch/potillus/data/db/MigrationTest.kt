@@ -42,11 +42,6 @@
  *   2. Build once so Room exports app/schemas/.../3.json — commit it.
  *   3. Add a `migrate2To3_...()` test below following the same pattern.
  *
- * SQLCIPHER NOTE
- *   The production database is encrypted with SQLCipher, so the MigrationTestHelper
- *   is given a [SupportOpenHelperFactory] (with a throwaway test passphrase) as its
- *   open-helper factory; otherwise it could not open the encrypted test DB.
- *
  * RUNNING
  *   ./gradlew connectedDebugAndroidTest   (requires a device/emulator)
  */
@@ -56,7 +51,6 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -73,43 +67,19 @@ class MigrationTest {
 
     private companion object {
         const val TEST_DB = "migration-test.db"
-
-        /**
-         * Throwaway passphrase for the encrypted test database. This is NOT a
-         * real secret — it only lets SQLCipher's [SupportOpenHelperFactory] open
-         * the disposable migration-test DB created by the helper.
-         */
-        val TEST_PASSPHRASE: ByteArray = "migration-test-passphrase".toByteArray()
-
-        init {
-            // sqlcipher-android requires the native library to be loaded before
-            // the encrypted database is opened. Doing it in the companion init
-            // guarantees it runs before the @get:Rule helper field is initialised.
-            System.loadLibrary("sqlcipher")
-        }
     }
 
     /**
      * Creates/opens the historical schema versions from the exported JSONs.
-     * The [SupportOpenHelperFactory] makes the helper open the (encrypted) test
-     * DB the same way the production code does.
+     *
+     * The database is a plain (unencrypted) SQLite file since SQLCipher was
+     * removed in v0.73.0, so the helper uses Room's default framework open
+     * factory — no passphrase or native library is required.
      */
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        // sqlcipher-android's SupportOpenHelperFactory has no clearPassphrase
-        // toggle. The old SupportFactory zeroed the passphrase byte[] after the
-        // first open by default (so the single-arg form broke reuse, and the test
-        // had to pass clearPassphrase = false). The new library does not clear the
-        // passphrase, so the single-argument constructor is safe across the
-        // multiple opens this test performs: createDatabase() builds the DB at the
-        // old version and closes it, then runMigrationsAndValidate() reopens it.
-        // NOTE: the new 3-arg constructor's last Boolean is enableWriteAheadLogging,
-        // NOT clearPassphrase — do not reintroduce a `false` here expecting the old
-        // meaning.
-        SupportOpenHelperFactory(TEST_PASSPHRASE)
+        AppDatabase::class.java
     )
 
     /**

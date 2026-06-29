@@ -36,6 +36,181 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.73.0
+
+Remove SQLCipher; add signing and Play tooling
+
+Added:
+- Conditional release code-signing in `android/app/build.gradle.kts`. A new
+  `signingConfigs { create("release") }` block reads the key material either from
+  a git-ignored `android/keystore.properties` file or from environment variables
+  (the latter take precedence, which is convenient for CI). The release build
+  type applies the config ONLY when the material is present, so the default
+  source build — and F-Droid, which signs the APK itself — keeps producing the
+  unsigned `app-release-unsigned.apk` with no key configured.
+- `android/keystore.properties.example`: a documented template listing the four
+  keys (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) and their
+  environment-variable equivalents (`POTILLUS_KEYSTORE_FILE` etc.). The real
+  `keystore.properties` and the Play service-account JSON are now git-ignored.
+- `make bundle` (`android/Makefile`): builds the Android App Bundle
+  (`bundleRelease`) that Google Play requires for new apps, alongside the
+  existing `make release` APK target; both also generate the SBOM.
+- `make deploy` plus a fastlane `deploy` lane (`android/fastlane/Fastfile`) and
+  `android/fastlane/Appfile`: upload the signed AAB and the existing store
+  metadata to Google Play via `upload_to_play_store`. The Play track and release
+  status are overridable (defaults: `production` / `draft`, i.e. staged for
+  manual publish) and the service-account key path is read from the
+  `SUPPLY_JSON_KEY` environment variable (falling back to
+  `fastlane/play-store-credentials.json`).
+- Per-locale Play/F-Droid release notes `…/changelogs/76.txt` (de-DE, en-US) for
+  the new versionCode.
+
+Changed:
+- `make release` is now a phony target that always invokes `assembleRelease` and
+  prints the produced artifact path, instead of hard-coding the
+  `app-release-unsigned.apk` filename (which becomes `app-release.apk` once a
+  signing key is configured).
+- Bumped versionName 0.72.0 → 0.73.0 and versionCode 75 → 76, with the matching
+  README, `proguard-rules.pro` and fastlane changelog updates that
+  `tools/release-check.sh` couples to the version.
+
+Removed:
+- **SQLCipher** (`net.zetetic:sqlcipher-android`) and the explicit
+  `androidx.sqlite` pin are gone, together with all passphrase machinery
+  (`getOrCreatePassphrase` / `hasSealedPassphrase` / `canOpenSealedPassphrase`
+  and the `KeystoreSecretStore`-sealed passphrase in `AppDatabase.kt`), the
+  `-keep class net.sqlcipher.**` ProGuard rules, and the `SupportOpenHelperFactory`
+  usage in `MigrationTest`. The database is now a plain Room/SQLite file, relying
+  on Android's file-based storage encryption and the per-app sandbox at rest.
+- The **device-transfer "Settings not restored?" warning** (its detection,
+  `PotillusApp` state/flow, the `MainActivity` dialog, the
+  `device_transfer_warning_title`/`_body` strings in all 21 locales, and the
+  `PotillusAppHeuristicTest`). The warning existed only to diagnose a failed
+  SQLCipher-passphrase migration, which can no longer occur.
+
+Changed (data & security):
+- `data_extraction_rules.xml` now **excludes** the database and the preferences
+  DataStore from both cloud-backup and device-transfer (and no longer references
+  the obsolete passphrase file). With `allowBackup="false"` these rules stay
+  inert, but they now state the intent plainly: personal data never leaves the
+  device automatically. The **only** supported way to move data between devices
+  is the user-initiated JSON backup (Settings → Backup → Export / Import).
+- The user's guide **Backup** section was rewritten to explain, emphatically,
+  why export/import is the sole transfer path and how to perform it, and was
+  translated into all 21 supported languages.
+
+Security:
+- **Clean break, no data migration.** A plaintext SQLite engine cannot open the
+  former SQLCipher file, so on the first launch after upgrading, `AppDatabase`
+  runs a one-shot `purgeLegacyEncryptedDatabase()`: keyed on the legacy
+  passphrase SharedPreferences marker, it deletes the old encrypted database, the
+  passphrase file, and the now-unused Keystore key, then lets Room create a fresh,
+  empty database. The routine is idempotent and a no-op on clean installs. Users
+  upgrading from an encrypted build must re-import their JSON backup.
+
+Fixed:
+- The release `signingConfigs` block in `android/app/build.gradle.kts` failed to
+  compile, breaking every Gradle task at configuration time (`Unresolved reference
+  'util'`). Inside that block the bare identifier `java` resolves to Gradle's
+  Java-plugin extension accessor, so the fully-qualified `java.util.Properties()`
+  was misparsed. Added an explicit `import java.util.Properties` and now reference
+  it as `Properties()`.
+- Lint (run with `warningsAsErrors = true`) aborted the build on the legacy-database
+  cleanup in `AppDatabase.kt`: `legacyPrefs.edit().clear().commit()` tripped both
+  `ApplySharedPref` (prefer `apply()` over `commit()`) and `UseKtx` (prefer the
+  `SharedPreferences.edit` KTX extension). The call was redundant — the following
+  `deleteSharedPreferences()` already removes the file and its in-memory state — so
+  the line was dropped entirely.
+- The in-app guide viewer (`MarkdownText`) now renders `**bold**` inline spans.
+  The rewritten Backup section uses bold for emphasis; previously the renderer
+  handled only headings, paragraphs and `[text](url)` links, so the `**` markers
+  would have appeared literally. Bold is now parsed alongside links in
+  `renderInline` via a combined regex and a `FontWeight.Bold` span.
+- The guide viewer now also renders ordered lists (`1.`, `2.`, …) as separate,
+  hanging-indented items instead of collapsing them into a single paragraph, so
+  the rewritten Backup section's device-transfer steps display as a proper
+  numbered list with inline bold preserved per item.
+- Migrated the screenshot test off the deprecated `createEmptyComposeRule` (the
+  Compose UI-test rule) to its `…junit4.v2` replacement. The v2 rule uses a
+  StandardTestDispatcher; the test is unaffected because it already synchronizes
+  explicitly via `waitUntil`/`waitForIdle` and drives a real Activity rather than
+  relying on immediate composition.
+- Worked around a crash in the bundled navigation lint detector
+  (`WrongStartDestinationType` / `BaseWrongStartDestinationTypeDetector`), which
+  throws `NoClassDefFoundError: androidx/navigation/lint/UtilKt` under the lint
+  shipped with AGP 9.2 and aborts `lintAnalyzeDebug` (the project runs lint with
+  `abortOnError`/`warningsAsErrors`). The check is disabled in the `lint {}` block
+  with a documented rationale; it is a tooling bug, not a finding in the app's
+  navigation graph. The crash only surfaced once a source change invalidated the
+  previously cached lint result.
+- Migrated the three build-script tasks (`copyDemoBackupFixture`,
+  `generateUserGuides`, `generateCopyrightDocument`) off the `val name by
+  tasks.registering { }` Kotlin-DSL property-delegate syntax, which Gradle 9.6
+  deprecated (scheduled for removal in Gradle 10), to the equivalent
+  `tasks.register<Type>("name") { }` form. Task names and wiring are unchanged.
+  (One remaining Gradle 10 deprecation — "Using a Project object as a dependency
+  notation" — originates inside the Android Gradle Plugin, not this build script,
+  and will clear with a future AGP release.)
+
+Cleanup:
+- Removed 13 unused imports across the UI and test sources, and corrected two
+  stale KDoc/comment references in `AppPreferences.kt` that still mentioned the
+  former SQLCipher "DB passphrase key alias" (which no longer exists). The
+  preferences DataStore key is now the only persistent Keystore key the app uses.
+
+Changed (build and distribution):
+- **Guide and copyright resources are now generated by Gradle.** Two tasks
+  (`generateUserGuides`, `generateCopyrightDocument`) render
+  `res/raw[-xx]/usersguide.md` and `res/raw/copyright.md` and are wired into
+  `preBuild`, so a bare `./gradlew assembleRelease` (a fresh clone, CI, or an
+  F-Droid build that does not go through `make`) no longer fails on the missing,
+  git-ignored `R.raw.*` backing files — previously only the Makefile produced them.
+- **Added the F-Droid build recipe** at `fdroid/de.godisch.potillus.yml` (a
+  reference copy of the fdroiddata metadata) with `fdroid/README.md`. Because the
+  generation is wired into Gradle, the recipe is a plain `gradle: [yes]` build;
+  the release stays unsigned when no keystore is configured, so F-Droid signs it.
+  Auto-updates track v-prefixed semver tags.
+
+Changed (store metadata):
+- Corrected the store texts that the SQLCipher removal had made inaccurate. The
+  long description no longer claims data is "stored fully encrypted using
+  hardware-backed cryptography" (true only of the former SQLCipher layer); it now
+  describes the actual model — on-device private storage under Android's storage
+  encryption and the app sandbox, with the preferences additionally sealed by a
+  hardware-backed Keystore key. The versionCode 76 store note
+  (`changelogs/76.txt`, de + en), previously "developer tooling only", now states
+  the real user-facing change and warns that data from earlier versions is not
+  migrated automatically.
+
+Changed (dependencies):
+- Bumped the Jetpack Compose BOM from 2026.04.01 to 2026.06.00 (core Compose
+  modules 1.11.0 → 1.11.3, bug-fix only). The Compose compiler stays paired with
+  the Kotlin plugin, and the v2 UI-test rule adopted earlier is unaffected.
+- Bumped the Gradle wrapper from 9.4.1 to 9.6.1 (`gradle-wrapper.properties`).
+  9.6.1 is a patch release of the 9.6 line and stays well within AGP 9.2's Gradle
+  requirement. Only `distributionUrl` is changed; the bundled wrapper JAR boots
+  any 9.x distribution, so it needs no regeneration.
+- Bumped Kotlin from 2.3.21 to 2.4.0. Because AGP 9's built-in Kotlin is pinned on
+  the buildscript classpath, this touches two coupled spots that must stay in
+  sync: the `kotlin` catalog key and the hard-coded `kotlin-gradle-plugin`
+  classpath literal in the root `build.gradle.kts`. The Compose compiler and the
+  serialization compiler plugin follow the `kotlin` key automatically. KSP is
+  moved 2.3.7 → 2.3.9 (the release the Kotlin 2.4.0 notes pair with). The
+  kotlinx-serialization runtime stays at 1.11.0; it must satisfy the
+  forward-compatibility rule under the 2.4.0 compiler — if a build reports a
+  serialization version mismatch, that runtime needs bumping too.
+
+Note:
+- The Google Play *feature graphic* (1024×500 px) is a design asset and cannot
+  be generated here; the placeholder description in
+  `android/fastlane/metadata/android/en-US/images/PLACEHOLDERS.txt` still
+  applies. The F-Droid build-recipe metadata (for the fdroiddata repository) is
+  intentionally NOT included yet — it needs the agreed tag/versioning convention.
+  (With SQLCipher removed, the build no longer ships any prebuilt native binary,
+  so the earlier prebuilt-binary concern no longer applies.)
+
+---
+
 ## v0.72.0
 
 Automate Play-Store screenshots via screengrab

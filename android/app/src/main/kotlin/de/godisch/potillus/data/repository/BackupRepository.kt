@@ -58,7 +58,6 @@ import de.godisch.potillus.data.db.dao.EntryDao
 import de.godisch.potillus.data.db.entity.DrinkEntity
 import de.godisch.potillus.data.db.entity.EntryEntity
 import de.godisch.potillus.domain.model.ConsumptionEntry
-import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 
 class BackupRepository(

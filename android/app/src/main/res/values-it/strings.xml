@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/giorno</string>
     <string name="drink_days_label">giorni con alcol (ultimi 7 giorni)</string>
     <string name="drink_days_setting">Gg. max./7 giorni</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Impostazioni non ripristinate?</string>
-    <string name="device_transfer_warning_body">Le impostazioni e i dati non sono stati ripristinati completamente dal dispositivo precedente. Questo può accadere quando le chiavi cifrate non possono essere trasferite.\n\nSe si tratta di una nuova installazione, questo messaggio può essere ignorato. In caso contrario, reimportare il backup da Impostazioni → Ripristina backup.</string>
     <string name="personal_data">Dati personali</string>
     <string name="limits">Limiti</string>
     <string name="daily_limit_grams">Limite giornaliero in grammi</string>

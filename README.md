@@ -22,7 +22,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
-## About the App (v0.72.0)
+## About the App (v0.73.0)
 
 **Libellus Potionis** is a privacy-first, free, open-source, and ad-free
 alcohol consumption tracker designed to help users monitor, pace, and manage
@@ -98,12 +98,12 @@ Lifecycle 2.10.0.
 UI navigation is anchored on the type-safe Navigation Compose 2.8.9 stable
 release, and the runtime environment utilizes Kotlinx Serialization Core 1.11.0
 to eliminate compiler compatibility conflicts. On the data and security front,
-the app utilizes Room 2.8.4 paired with SQLite 2.6.2, and integrates the modern
-`net.zetetic:sqlcipher-android` 4.15.0 artifact to natively support 16 KB
-memory page sizes, ensuring full runtime stability on Android 15+ devices and
-meeting Google Play compliance. Modern security practices are enforced through
-direct, hardware-backed Android Keystore integration without deprecated crypto
-wrappers, while reliable backward compatibility for advanced Java time APIs is
+the app utilizes Room 2.8.4 over a plain SQLite database that is protected at
+rest by Android's file-based storage encryption and the per-app sandbox rather
+than by an application-level cipher; data leaves the device only through the
+user-initiated JSON backup export/import. Modern security practices are enforced
+through direct, hardware-backed Android Keystore integration without deprecated
+crypto wrappers, while reliable backward compatibility for advanced Java time APIs is
 guaranteed across all target devices through the inclusion of Desugar JDK Libs
 2.1.5 alongside a consolidated Jetpack and Turbine test stack.
 

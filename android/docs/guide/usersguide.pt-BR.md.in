@@ -104,7 +104,28 @@ anterior), o dia em que a semana deve começar e — para as resoluções de Ano
 
 ### {{backup_section}}
 
-Todos os dados podem ser exportados como JSON e importados novamente.
+**Seus dados nunca saem deste dispositivo por conta própria.** O Libellus
+Potionis mantém tudo no armazenamento privado do aplicativo e, deliberadamente,
+não participa de **nenhum** backup automático na nuvem nem de **nenhuma**
+transferência entre dispositivos. Se você trocar de celular, fizer uma
+restauração de fábrica ou reinstalar o aplicativo, **a única forma de manter seus
+dados é fazer o backup você mesmo** — não há outra via de recuperação, e os dados
+que não foram exportados não podem ser recuperados depois.
+
+Um backup é um único arquivo JSON que contém todas as suas bebidas e o seu
+registro completo. Para mover seus dados para outro celular:
+
+1. No celular **antigo**, abra **"{{settings}}" → {{backup_section}} →
+   {{backup_export}}** e salve o arquivo JSON em um lugar seguro — por exemplo,
+   seu próprio armazenamento na nuvem, um e-mail para você mesmo ou uma
+   transferência por USB.
+2. Instale o Libellus Potionis no celular **novo**.
+3. Abra **"{{settings}}" → {{backup_section}} → {{backup_import}}** e selecione
+   esse arquivo JSON. Escolha **{{import_replace}}** para substituir tudo ou
+   **{{import_merge}}** para combiná-lo com as entradas já existentes.
+
+Exporte regularmente: um backup só protege os dados que existiam no momento em
+que você o criou.
 
 ### {{appearance}}
 

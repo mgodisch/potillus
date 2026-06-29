@@ -25,7 +25,9 @@ help:
 	@echo "Libellus Potionis build targets:"
 	@echo "  make                build debug APK (default)"
 	@echo "  make debug          build debug APK"
-	@echo "  make release        build release APK (unsigned)"
+	@echo "  make release        build release APK (signed if a key is configured, else unsigned)"
+	@echo "  make bundle         build release App Bundle/AAB for Google Play (needs signing key)"
+	@echo "  make deploy         upload the signed AAB + metadata to Google Play (needs fastlane + key)"
 	@echo "  make sbom           generate the CycloneDX SBOM (reproducible JSON)"
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
 	@echo "  make guides         regenerate the localized user guides"
@@ -50,8 +52,11 @@ help:
 #    make ANDROID_HOME=/path/to/android-sdk
 #
 #  OUTPUT:
-#    Debug:   app/build/outputs/apk/debug/app-debug.apk
-#    Release: app/build/outputs/apk/release/app-release-unsigned.apk
+#    Debug:        app/build/outputs/apk/debug/app-debug.apk
+#    Release APK:  app/build/outputs/apk/release/app-release-unsigned.apk
+#                  (or app-release.apk once a release signing key is configured —
+#                   see android/keystore.properties.example)
+#    Release AAB:  app/build/outputs/bundle/release/app-release.aab  (`make bundle`)
 # =============================================================================
 
 # Run each recipe in ONE bash process with strict error handling
@@ -178,10 +183,34 @@ debug: app/build/outputs/apk/debug/app-debug.apk
 app/build/outputs/apk/debug/app-debug.apk: prereq
 	./gradlew assembleDebug
 
-release: app/build/outputs/apk/release/app-release-unsigned.apk $(SBOM)
-
-app/build/outputs/apk/release/app-release-unsigned.apk: prereq
+# Build the release APK plus its SBOM. This is a PHONY target (not a file target)
+# on purpose: once a release signing key is configured (see
+# android/keystore.properties.example) the Gradle output is renamed from
+# app-release-unsigned.apk to app-release.apk, so hard-coding either filename as
+# a Make target would break for the other case. Gradle is itself up-to-date
+# aware, so re-running assembleRelease when nothing changed is a cheap no-op.
+release: prereq $(SBOM)
 	./gradlew assembleRelease
+	@echo "Release APK: $$(find app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' | head -1)"
+
+# Build the release Android App Bundle (AAB). Google Play requires the AAB format
+# for new apps; F-Droid never uses it. Signed when a release key is configured,
+# unsigned otherwise (an unsigned AAB cannot be uploaded to Play, but building it
+# is still useful for inspection). The SBOM is generated alongside, mirroring the
+# `release` target.
+bundle: prereq $(SBOM)
+	./gradlew bundleRelease
+	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"
+
+# Upload the signed AAB and the store metadata to Google Play via the fastlane
+# `deploy` lane (see fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
+# Requires: a configured signing key (keystore.properties / env), the bundled
+# fastlane (`cd fastlane && bundle install`), and a Play service-account key
+# (fastlane/play-store-credentials.json or $SUPPLY_JSON_KEY — see fastlane/Appfile).
+# Runs fastlane in a SUBSHELL so the `cd fastlane` does not leak into make state.
+# Override the track/status, e.g.:  make deploy DEPLOY_ARGS="track:internal status:completed"
+deploy: bundle
+	( cd fastlane && bundle exec fastlane deploy $(DEPLOY_ARGS) )
 
 # Generate a standardized CycloneDX 1.6 JSON SBOM for the release runtime
 # classpath (configuration lives in app/build.gradle.kts). Two steps:
@@ -331,4 +360,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf screenshots-demo-off install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf screenshots-demo-off install install-debug clean distclean

@@ -210,6 +210,5 @@ The three surfaces and their rules:
 ### 7.4 Identifiers that must never change
 
 - `applicationId` / `namespace` (`de.godisch.potillus`).
-- Database file name (`potillus.db`) and passphrase storage
-  (`potillus_db_key` + Keystore alias `potillus_db_passphrase_key`).
+- Database file name (`potillus.db`).
 - DataStore file name and its Keystore alias (`potillus_prefs_key`).

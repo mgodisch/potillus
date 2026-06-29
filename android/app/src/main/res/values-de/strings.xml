@@ -198,9 +198,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">g/Tag</string>
     <string name="drink_days_label">Trinktage (letzte 7 Tage)</string>
     <string name="drink_days_setting">Max. Trinktage/7 Tage</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Einstellungen nicht wiederhergestellt?</string>
-    <string name="device_transfer_warning_body">Einstellungen und Daten konnten vom vorherigen Gerät nicht vollständig wiederhergestellt werden. Dies kann passieren, wenn kryptografische Schlüssel nicht übertragen werden können.\n\nBei einer Neuinstallation kann diese Meldung ignoriert werden. Andernfalls importiere das Backup bitte erneut über Einstellungen → Backup → Import.</string>
     <string name="personal_data">Persönliche Daten</string>
     <string name="limits">Limits</string>
     <string name="daily_limit_grams">Tageslimit in Gramm</string>

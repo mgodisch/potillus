@@ -31,10 +31,12 @@ DATENSCHUTZ & SICHERHEIT
 
 Libellus Potionis ist auf absolute Datenhoheit und strikte Datensparsamkeit
 ausgelegt. Er läuft mit einem minimalen Berechtigungsprofil ganz ohne
-Netzwerkzugriff, sodass deine persönlichen Daten das Gerät nie verlassen. Die
-Daten werden vollständig verschlüsselt mit hardwaregestützter Kryptografie
-gespeichert, optional ergänzt durch eine biometrische Fingerabdrucksperre gegen
-unbefugten physischen Zugriff. Dieser Offline-Ansatz verhindert Tracking,
+Netzwerkzugriff, sodass deine persönlichen Daten das Gerät nie verlassen. Deine
+Daten bleiben im privaten App-Speicher und sind im Ruhezustand durch Androids
+Geräteverschlüsselung und die App-Sandbox geschützt; die App-Einstellungen
+werden zusätzlich mit einem hardwaregestützten Android-Keystore-Schlüssel
+gesichert. Eine optionale biometrische Fingerabdrucksperre schützt vor
+unbefugtem physischem Zugriff. Dieser Offline-Ansatz verhindert Tracking,
 Cloud-Synchronisation und den Abfluss von Daten.
 
 KOMPATIBILITÄT

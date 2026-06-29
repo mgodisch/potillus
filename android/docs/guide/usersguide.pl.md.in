@@ -105,7 +105,27 @@ noworocznych postanowień — datę, od której ma się rozpoczynać analiza dan
 
 ### {{backup_section}}
 
-Wszystkie dane można wyeksportować jako JSON i ponownie zaimportować.
+**Twoje dane nigdy nie opuszczają tego urządzenia samoczynnie.** Libellus
+Potionis przechowuje wszystko w prywatnej pamięci aplikacji i celowo **nie**
+uczestniczy w żadnej automatycznej kopii zapasowej w chmurze ani w żadnym
+przesyłaniu między urządzeniami. Jeśli zmienisz telefon, przywrócisz ustawienia
+fabryczne lub ponownie zainstalujesz aplikację, **jedynym sposobem na zachowanie
+danych jest samodzielne wykonanie kopii zapasowej** — nie ma innej drogi
+odzyskania, a danych, których nie wyeksportowano, nie da się później odzyskać.
+
+Kopia zapasowa to pojedynczy plik JSON zawierający wszystkie Twoje napoje i pełny
+dziennik. Aby przenieść dane na inny telefon:
+
+1. Na **starym** telefonie otwórz **„{{settings}}" → {{backup_section}} →
+   {{backup_export}}** i zapisz plik JSON w bezpiecznym miejscu — na przykład we
+   własnej chmurze, w wiadomości e-mail do samego siebie lub przez transfer USB.
+2. Zainstaluj Libellus Potionis na **nowym** telefonie.
+3. Otwórz **„{{settings}}" → {{backup_section}} → {{backup_import}}** i wybierz
+   ten plik JSON. Wybierz **{{import_replace}}**, aby zastąpić wszystko, lub
+   **{{import_merge}}**, aby połączyć go z już istniejącymi wpisami.
+
+Eksportuj regularnie: kopia zapasowa chroni tylko dane, które istniały w chwili
+jej utworzenia.
 
 ### {{appearance}}
 

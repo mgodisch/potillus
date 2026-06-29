@@ -113,7 +113,30 @@ données doit débuter.
 
 ### {{backup_section}}
 
-Toutes les données peuvent être exportées au format JSON puis réimportées.
+**Vos données ne quittent jamais cet appareil d'elles-mêmes.** Libellus Potionis
+conserve tout dans le stockage privé de l'application et ne participe
+délibérément à **aucune** sauvegarde automatique dans le cloud ni à **aucun**
+transfert d'appareil à appareil. Si vous changez de téléphone, effectuez une
+réinitialisation d'usine ou réinstallez l'application, **le seul moyen de
+conserver vos données est de les sauvegarder vous-même** — il n'existe aucune
+autre voie de récupération, et les données non exportées ne peuvent pas être
+récupérées par la suite.
+
+Une sauvegarde est un unique fichier JSON contenant toutes vos boissons et la
+totalité de votre journal. Pour transférer vos données vers un autre téléphone :
+
+1. Sur l'**ancien** téléphone, ouvrez **« {{settings}} » → {{backup_section}} →
+   {{backup_export}}** et enregistrez le fichier JSON en lieu sûr — par exemple
+   votre propre espace cloud, un e-mail que vous vous envoyez ou un transfert
+   USB.
+2. Installez Libellus Potionis sur le **nouveau** téléphone.
+3. Ouvrez **« {{settings}} » → {{backup_section}} → {{backup_import}}** et
+   sélectionnez ce fichier JSON. Choisissez **{{import_replace}}** pour tout
+   remplacer, ou **{{import_merge}}** pour le combiner avec les entrées déjà
+   présentes.
+
+Exportez régulièrement : une sauvegarde ne protège que les données existant au
+moment de sa création.
 
 ### {{appearance}}
 

@@ -111,8 +111,28 @@ precedentă) și – de exemplu pentru un nou început de Anul Nou – de la ce 
 
 ### {{backup_section}}
 
-Toate datele pot fi exportate ca fișier JSON și, la nevoie, importate din nou,
-de exemplu pe un alt smartphone.
+**Datele tale nu părăsesc niciodată acest dispozitiv de la sine.** Libellus
+Potionis păstrează totul în stocarea privată a aplicației și, în mod deliberat,
+nu participă la **nicio** copie de rezervă automată în cloud și la **niciun**
+transfer între dispozitive. Dacă schimbi telefonul, faci o resetare din fabrică
+sau reinstalezi aplicația, **singura modalitate de a-ți păstra datele este să le
+salvezi singur** — nu există altă cale de recuperare, iar datele neexportate nu
+mai pot fi recuperate ulterior.
+
+O copie de rezervă este un singur fișier JSON care conține toate băuturile tale
+și întregul tău jurnal. Pentru a-ți muta datele pe alt telefon:
+
+1. Pe telefonul **vechi**, deschide **„{{settings}}" → {{backup_section}} →
+   {{backup_export}}** și salvează fișierul JSON într-un loc sigur — de exemplu,
+   propriul tău spațiu de stocare în cloud, un e-mail către tine însuți sau un
+   transfer prin USB.
+2. Instalează Libellus Potionis pe telefonul **nou**.
+3. Deschide **„{{settings}}" → {{backup_section}} → {{backup_import}}** și
+   selectează acel fișier JSON. Alege **{{import_replace}}** pentru a suprascrie
+   tot sau **{{import_merge}}** pentru a-l combina cu intrările deja existente.
+
+Exportă în mod regulat: o copie de rezervă protejează doar datele care existau în
+momentul în care ai creat-o.
 
 ### {{appearance}}
 

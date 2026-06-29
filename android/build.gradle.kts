@@ -44,20 +44,20 @@
 // a runtime dependency on the Kotlin Gradle plugin (KGP) and bundles 2.2.10 as
 // a floor; a lower KGP is silently upgraded to 2.2.10.
 //
-// This project wants Kotlin 2.3.21 (see `kotlin` in libs.versions.toml: the
+// This project wants Kotlin 2.4.0 (see `kotlin` in libs.versions.toml: the
 // Compose compiler, serialization plugin and several test libraries are aligned
 // to it). The officially documented way to make built-in Kotlin use a HIGHER
 // KGP than the bundled one is to put it on the buildscript classpath here:
 buildscript {
     dependencies {
-        // Forces AGP's built-in Kotlin to compile with 2.3.21 rather than the
+        // Forces AGP's built-in Kotlin to compile with 2.4.0 rather than the
         // bundled 2.2.10. Keep this in sync with `kotlin` in libs.versions.toml
         // (a buildscript block cannot read the version catalog, hence the
-        // literal). KSP (2.3.7) is applied normally via the plugins block in
-        // app/build.gradle.kts; because 2.3.7 is above AGP's KSP floor it is not
+        // literal). KSP (2.3.9) is applied normally via the plugins block in
+        // app/build.gradle.kts; because 2.3.9 is above AGP's KSP floor it is not
         // force-upgraded. If a future build reports a KGP/KSP mismatch, add:
-        //   classpath("com.google.devtools.ksp:symbol-processing-gradle-plugin:2.3.7")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21")
+        //   classpath("com.google.devtools.ksp:symbol-processing-gradle-plugin:2.3.9")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.0")
     }
 }
 

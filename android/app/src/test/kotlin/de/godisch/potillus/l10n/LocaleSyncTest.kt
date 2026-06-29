@@ -74,7 +74,6 @@ package de.godisch.potillus.l10n
 //   path of the app module directory, or adjust RES_DIR below.
 // =============================================================================
 
-import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 import java.io.File

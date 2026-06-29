@@ -42,7 +42,6 @@ import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
-import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
 

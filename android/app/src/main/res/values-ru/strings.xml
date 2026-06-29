@@ -167,9 +167,6 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_unit_g_per_day">г/день</string>
     <string name="drink_days_label">дней с алкоголем (последние 7 дней)</string>
     <string name="drink_days_setting">Макс. дней/7 дней</string>
-    <!-- Device-transfer warning (translate title and body) -->
-    <string name="device_transfer_warning_title">Настройки не восстановлены?</string>
-    <string name="device_transfer_warning_body">Настройки и данные не удалось полностью восстановить с предыдущего устройства. Это может произойти, если зашифрованные ключи не удаётся перенести.\n\nЕсли это новая установка, это сообщение можно проигнорировать. В противном случае повторно импортируйте резервную копию через Настройки → Восстановить из резервной копии.</string>
     <string name="personal_data">Личные данные</string>
     <string name="limits">Лимиты</string>
     <string name="daily_limit_grams">Дневной лимит в граммах</string>
