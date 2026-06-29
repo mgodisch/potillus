@@ -31,6 +31,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.warningColor
@@ -70,6 +73,9 @@ fun DrinksScreen(
     val todayDrinks  by todayVm.drinks.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
     val drinks       = state.drinks
+    // Per-app locale for the per-drink gram preview, so its decimal separator
+    // matches the in-app language rather than the system locale (l10n/NumberFormat.kt).
+    val locale       = LocalContext.current.formattingLocale()
     // `showAdd` is rememberSaveable so an open "add drink" dialog survives
     // a configuration change (its form has no pre-selected domain object). The
     // object-valued targets below hold domain models that are intentionally NOT
@@ -238,7 +244,7 @@ fun DrinksScreen(
                                     DrinkCategoryIcon(drink.category)
                                 }
                                 Text(
-                                    "${drink.volumeMl} ml · ${drink.alcoholPercent} % · ≈ ${"%.1f".format(AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent))} g",
+                                    "${drink.volumeMl} ml · ${drink.alcoholPercent} % · ≈ ${AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent).fmt1(locale)} g",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

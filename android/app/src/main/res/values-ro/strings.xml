@@ -211,7 +211,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">Băutură</string>
     <string name="csv_col_category">Categorie</string>
     <string name="csv_col_volume_ml">Cantitate_ml</string>
-    <string name="csv_col_alcohol_pct">Alcool_%</string>
+    <string name="csv_col_alcohol_pct">Alcool_procent</string>
     <string name="csv_col_grams">Grame_alcool</string>
     <string name="csv_col_note">Notă</string>
     <string name="pdf_unit_g_per_day">g/zi</string>

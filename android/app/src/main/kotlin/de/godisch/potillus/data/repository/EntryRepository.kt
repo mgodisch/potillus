@@ -136,7 +136,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param volumeMl         Actual volume consumed (may differ from the drink's default).
      * @param timestampMillis  Unix epoch milliseconds of the consumption event.
      * @param note             Optional free-text annotation.
-     * @param settings         Current user settings (needed for day-change time and gender).
+     * @param settings         Current user settings (needed for the day-change time).
      * @return                 Database ID of the new entry.
      */
     override suspend fun addFromDrink(
@@ -259,17 +259,6 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * so the database is never left in a partially-cleared state.
      */
     override suspend fun deleteAll() = dao.deleteAll()
-
-    /**
-     * Returns `true` if an entry with the same timestamp and drinkId already exists.
-     *
-     * Used during MERGE imports to detect and skip duplicate entries.
-     *
-     * @param timestampMillis  Unix epoch milliseconds of the candidate entry.
-     * @param drinkId          FK of the candidate entry's drink (after ID remapping).
-     */
-    override suspend fun isDuplicate(timestampMillis: Long, drinkId: Long): Boolean =
-        dao.countByTimestampAndDrink(timestampMillis, drinkId) > 0
 }
 
 // ── Entity ↔ Domain conversion ───────────────────────────────────────────────

@@ -47,6 +47,7 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
@@ -90,6 +91,10 @@ fun CalendarScreen(
     var deleteEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
 
     val isYear = state.viewMode == CalendarViewMode.YEAR
+
+    // Per-app locale for the daily-limit caption number, so its formatting matches
+    // the in-app language rather than the system locale (see l10n/NumberFormat.kt).
+    val locale = LocalContext.current.formattingLocale()
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -184,7 +189,7 @@ fun CalendarScreen(
                                     limitGrams = state.limitInfo.limitGrams,
                                     caption    = stringResource(
                                         R.string.limit_caption_day,
-                                        "%.0f".format(state.limitInfo.limitGrams)
+                                        state.limitInfo.limitGrams.fmt0(locale)
                                     )
                                 )
                             }
@@ -242,7 +247,7 @@ fun CalendarScreen(
                                     limitGrams = state.limitInfo.limitGrams,
                                     caption    = stringResource(
                                         R.string.limit_caption_day,
-                                        "%.0f".format(state.limitInfo.limitGrams)
+                                        state.limitInfo.limitGrams.fmt0(locale)
                                     )
                                 )
                             }

@@ -614,8 +614,19 @@ private fun GramsInputDialog(
 ) {
     // rememberSaveable so a half-typed value survives a configuration
     // change while the dialog is open (the dialog's visibility flag is also saved).
+    //
+    // The initial text is formatted with Locale.ROOT (a '.' decimal separator) ON
+    // PURPOSE — NOT the per-app locale. The field is parsed back with
+    // text.toDoubleOrNull(), which only accepts '.'; formatting the initial value
+    // with a comma-decimal locale (e.g. de-DE) would yield "19,6", which
+    // toDoubleOrNull() rejects, opening the dialog already in an error state with
+    // Save disabled. ROOT keeps the value round-trip-safe (see l10n/NumberFormat.kt
+    // for the read-only-display counterpart that DOES follow the per-app locale).
     var text by rememberSaveable {
-        mutableStateOf(if (allowDecimal) "%.1f".format(initial) else initial.toInt().toString())
+        mutableStateOf(
+            if (allowDecimal) String.format(java.util.Locale.ROOT, "%.1f", initial)
+            else initial.toInt().toString()
+        )
     }
     val parsed   = text.toDoubleOrNull()
     val inRange  = parsed != null && parsed in minValue..maxValue

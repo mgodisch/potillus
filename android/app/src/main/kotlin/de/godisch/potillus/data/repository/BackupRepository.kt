@@ -129,10 +129,17 @@ class BackupRepository(
         backupDrinks:  List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>
     ): ImportStats {
-        val existingByName = drinkDao.getAllOnce().associate { it.name to it.id }
-
         var imported = 0; var skipped = 0
         db.withTransaction {
+            // Build the name → id map INSIDE the transaction (mirroring
+            // importReplace), so this read is part of the same atomic unit as the
+            // inserts below rather than a read-outside-write (TOCTOU) gap. MERGE
+            // performs no deletes, so the precise timing matters less than it does
+            // in REPLACE, but reading inside the transaction keeps the two import
+            // paths consistent. getAllOnce() is a one-shot suspend query and is
+            // therefore transaction-safe (unlike collecting the getAll() Flow).
+            val existingByName = drinkDao.getAllOnce().associate { it.name to it.id }
+
             val idMap = buildIdMap(backupDrinks, existingByName)
 
             backupEntries.forEach { entry ->
@@ -158,6 +165,12 @@ class BackupRepository(
      *   - Otherwise, insert the backup drink (with id=0 so Room auto-generates
      *     a new primary key) and record the returned ID.
      *
+     * A freshly inserted drink's name is added to a local, growing index so that a
+     * SECOND backup drink sharing the same (not-yet-existing) name reuses the id
+     * just inserted for the first one, instead of inserting a duplicate row with
+     * the same name. Without this, a backup containing two identically named new
+     * drinks would create two local drinks with that name.
+     *
      * Must be called inside a `withTransaction` block.
      */
     private suspend fun buildIdMap(
@@ -165,9 +178,15 @@ class BackupRepository(
         existingByName: Map<String, Long>
     ): Map<Long, Long> {
         val idMap = mutableMapOf<Long, Long>()
+        // Mutable copy of the existing name → id snapshot, grown as new drinks are
+        // inserted so later same-named backup drinks reuse the fresh id (see KDoc).
+        val nameToId = existingByName.toMutableMap()
         backupDrinks.forEach { drink ->
-            idMap[drink.id] = existingByName[drink.name]
-                ?: drinkDao.insert(drink.copy(id = 0).toEntity())
+            val localId = nameToId[drink.name]
+                ?: drinkDao.insert(drink.copy(id = 0).toEntity()).also { newId ->
+                    nameToId[drink.name] = newId
+                }
+            idMap[drink.id] = localId
         }
         return idMap
     }

@@ -125,9 +125,11 @@ object AlcoholCalculator {
      *   the call site, avoids the magic literal `100.0`, and can be reused
      *   by any future calculation that needs the same rounding precision.
      *
-     * Rounding to 2 decimal places is applied to alcohol gram values so that
-     * aggregate `SUM()` queries in SQLite are numerically stable (floating-point
-     * drift is bounded at the storage step rather than accumulating over many rows).
+     * The sole caller is [calculateBAC]: the estimated blood-alcohol value in ‰
+     * is rounded to two decimal places, the precision the Today screen displays
+     * ("0.42 ‰"). Alcohol GRAM values are NOT rounded here — they use
+     * [roundTo1Decimal] (0.1 g) so the displayed and limit-compared gram figures
+     * agree; see [calculateGrams] and [roundTo1Decimal].
      */
     private fun Double.roundTo2Decimals(): Double = (this * 100.0).roundToLong() / 100.0
 

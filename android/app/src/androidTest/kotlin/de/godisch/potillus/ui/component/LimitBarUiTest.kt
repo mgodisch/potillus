@@ -38,8 +38,13 @@
  */
 package de.godisch.potillus.ui.component
 
+import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -61,16 +66,22 @@ class LimitBarUiTest {
     private lateinit var originalLocale: Locale
 
     /**
-     * Pin the default locale to US for the duration of each test.
+     * Pin the locale to US for each test — at TWO levels.
      *
-     * [LimitBar] formats the consumed-grams figure with `"%.1f".format(...)`, which
-     * honours [Locale.getDefault] — by design, so the on-screen number matches the
-     * user's locale (e.g. "20,0 g" on a German device). That is correct UI
-     * behaviour, but it makes a hard-coded expected string ("20.0 g") device-
-     * dependent: this test failed on a comma-decimal device until the locale was
-     * pinned. Fixing the locale here keeps the expected text deterministic while
-     * still exercising the real formatting path — the same approach
-     * `CsvExporterBuildTest` uses (it pins Locale.GERMANY instead).
+     * [LimitBar] now formats the consumed-grams figure for the *per-app* locale
+     * via `Context.formattingLocale()` (see l10n/NumberFormat.kt), so the on-screen
+     * number matches the language the user picked in-app (e.g. "20,0 g" on a German
+     * locale). That is correct UI behaviour, but it makes a hard-coded expected
+     * string ("20.0 g") device-dependent.
+     *
+     * Crucially, `formattingLocale()` reads the **Context configuration** locale,
+     * which `Locale.setDefault()` does NOT affect — so pinning the JVM default
+     * alone (as this test did before the per-app-locale change) is no longer
+     * sufficient and the test failed on a comma-decimal device. The decisive pin
+     * is therefore in [setThemedContent], which provides a US-configured Context
+     * through `LocalContext`. The `Locale.setDefault(US)` below is kept as a
+     * belt-and-suspenders measure for any remaining `getDefault()`-based
+     * formatting in the rendered tree.
      */
     @Before fun setUp() {
         originalLocale = Locale.getDefault()
@@ -81,9 +92,30 @@ class LimitBarUiTest {
         Locale.setDefault(originalLocale)
     }
 
-    /** Renders [content] wrapped in [PotillusTheme] so theme colours resolve. */
+    /**
+     * Renders [content] wrapped in [PotillusTheme], with `LocalContext` overridden
+     * by a US-configured Context so that `Context.formattingLocale()` — and hence
+     * every number `LimitBar` formats — is deterministically US ("20.0 g"),
+     * independent of the test device's locale.
+     */
     private fun setThemedContent(content: @Composable () -> Unit) {
-        composeTestRule.setContent { PotillusTheme { content() } }
+        composeTestRule.setContent {
+            val base = LocalContext.current
+            // Read the base Configuration via LocalConfiguration.current (the
+            // Compose-sanctioned API) rather than base.resources.configuration,
+            // which the LocalContextConfigurationRead lint rule forbids. Copying
+            // the base config preserves density/screen fields; only the locale is
+            // overridden, and createConfigurationContext (a method call on the
+            // Context, not a configuration read) builds the US-locale Context.
+            val baseConfig = LocalConfiguration.current
+            val usContext = remember(base, baseConfig) {
+                val cfg = Configuration(baseConfig).apply { setLocale(Locale.US) }
+                base.createConfigurationContext(cfg)
+            }
+            CompositionLocalProvider(LocalContext provides usContext) {
+                PotillusTheme { content() }
+            }
+        }
     }
 
     /** The consumed-grams label (one decimal) and the caption must both render. */

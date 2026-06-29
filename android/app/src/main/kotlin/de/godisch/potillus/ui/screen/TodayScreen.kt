@@ -30,6 +30,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +41,10 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.fmt0
+import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.fmt2
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.successColor
@@ -68,6 +73,11 @@ fun TodayScreen(
     val state  by vm.uiState.collectAsStateWithLifecycle()
     val drinks by vm.drinks.collectAsStateWithLifecycle()
     val lastUsedDrink by vm.lastUsedDrink.collectAsStateWithLifecycle()
+
+    // Per-app locale for number formatting (grams, BAC, limits), so the decimal
+    // separator matches the in-app language rather than the system locale — see
+    // l10n/NumberFormat.kt.
+    val locale = LocalContext.current.formattingLocale()
 
     // these stay plain `remember` on purpose. `showAdd` is coupled to
     // `preSelectedDrink` (a domain DrinkDefinition, intentionally NOT Parcelable),
@@ -160,7 +170,7 @@ fun TodayScreen(
                         ) {
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
-                                    "%.1f".format(state.totalGrams),
+                                    state.totalGrams.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -174,7 +184,7 @@ fun TodayScreen(
                             }
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
-                                    "%.1f".format(state.monthlyAvgPerDay),
+                                    state.monthlyAvgPerDay.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -219,7 +229,7 @@ fun TodayScreen(
                             limitGrams = state.limitInfo.limitGrams,
                             caption    = stringResource(
                                 R.string.limit_caption_day,
-                                "%.0f".format(state.limitInfo.limitGrams)
+                                state.limitInfo.limitGrams.fmt0(locale)
                             )
                         )
                         Spacer(Modifier.height(10.dp))
@@ -228,7 +238,7 @@ fun TodayScreen(
                             limitGrams = state.limitInfo.weeklyLimitGrams,
                             caption    = stringResource(
                                 R.string.limit_caption_week,
-                                "%.0f".format(state.limitInfo.weeklyLimitGrams)
+                                state.limitInfo.weeklyLimitGrams.fmt0(locale)
                             ),
                             leftSuffix = if (state.weeklyRangeLabel.isNotEmpty()) "(${state.weeklyRangeLabel})" else ""
                         )
@@ -252,7 +262,7 @@ fun TodayScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        "${"%.2f".format(bac)} ‰",
+                                        "${bac.fmt2(locale)} ‰",
                                         style = MaterialTheme.typography.titleLarge,
                                         color = when {
                                             bac >= 0.5 -> dangerRedColor()

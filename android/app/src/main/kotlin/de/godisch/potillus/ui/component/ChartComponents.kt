@@ -61,6 +61,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -69,6 +70,9 @@ import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.model.DrinkCategory
+import de.godisch.potillus.l10n.fmt0
+import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.successColor
 
@@ -174,6 +178,10 @@ fun AlcoholBarChart(
     val tickColor  = successColor()
     // Resolved here (not inside the Canvas DrawScope, which cannot read theme).
     val valueArgb  = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
+    // Per-app locale for the on-bar value labels, captured before the Canvas
+    // (a DrawScope cannot read Compose composition locals) so the decimal
+    // separator follows the in-app language, not the system locale.
+    val locale     = LocalContext.current.formattingLocale()
 
     Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
         val chartH  = size.height
@@ -241,7 +249,7 @@ fun AlcoholBarChart(
                 // printed without a unit to keep it narrow.
                 valuePaint?.let { p ->
                     drawContext.canvas.nativeCanvas.drawText(
-                        "%.0f".format(value), centerX, chartH - barH - 2.dp.toPx(), p
+                        value.fmt0(locale), centerX, chartH - barH - 2.dp.toPx(), p
                     )
                 }
             }
@@ -338,6 +346,9 @@ fun ValueBarChart(
     // With value labels, scale bars against a 25%-taller reference so the label
     // above the tallest bar stays inside the canvas.
     val heightRef = if (showValues) maxVal * 1.25 else maxVal
+    // Per-app locale for the on-bar value labels, captured before the Canvas (see
+    // AlcoholBarChart for the same DrawScope/composition-local rationale).
+    val locale    = LocalContext.current.formattingLocale()
 
     Canvas(modifier = modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp, bottom = 4.dp)) {
         val chartH  = size.height
@@ -370,7 +381,7 @@ fun ValueBarChart(
             // Value just above the bar (one decimal), if requested.
             valuePaint?.let { p ->
                 drawContext.canvas.nativeCanvas.drawText(
-                    "%.1f".format(v), centerX, barTop - 2.dp.toPx(), p
+                    v.fmt1(locale), centerX, barTop - 2.dp.toPx(), p
                 )
             }
         }
@@ -453,6 +464,8 @@ fun CategoryDonutChart(
     val total   = data.values.sum().coerceAtLeast(0.001)
     // Sort largest segment first so the most prominent category starts at the top
     val entries = data.entries.sortedByDescending { it.value }
+    // Per-app locale for the legend's gram/percent numbers (see l10n/NumberFormat.kt).
+    val locale  = LocalContext.current.formattingLocale()
 
     Canvas(
         modifier = modifier
@@ -516,7 +529,7 @@ fun CategoryDonutChart(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                "${"%.1f".format(grams)} g · ${"%.0f".format(grams / total * 100)} %",
+                                "${grams.fmt1(locale)} g · ${(grams / total * 100).fmt0(locale)} %",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

@@ -42,6 +42,8 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.fmt0
+import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
@@ -204,11 +206,11 @@ fun StatsScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        StatRow(stringResource(R.string.total_period), "${"%.1f".format(state.totalGrams)} g")
+                        StatRow(stringResource(R.string.total_period), "${state.totalGrams.fmt1(locale)} g")
                         HorizontalDivider()
-                        StatRow(stringResource(R.string.avg_per_day), "${"%.1f".format(state.avgPerDay)} g")
+                        StatRow(stringResource(R.string.avg_per_day), "${state.avgPerDay.fmt1(locale)} g")
                         HorizontalDivider()
-                        StatRow(stringResource(R.string.avg_per_drink_day), "${"%.1f".format(state.avgPerDrinkDay)} g")
+                        StatRow(stringResource(R.string.avg_per_drink_day), "${state.avgPerDrinkDay.fmt1(locale)} g")
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.days_over_daily_limit),
@@ -258,8 +260,8 @@ fun StatsScreen(
                         StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
                         HorizontalDivider()
                         val trendText = when (state.trend) {
-                            Trend.UP   -> "+${"%.0f".format(state.trendPercent)} % ↑"
-                            Trend.DOWN -> "${"%.0f".format(state.trendPercent)} % ↓"
+                            Trend.UP   -> "+${state.trendPercent.fmt0(locale)} % ↑"
+                            Trend.DOWN -> "${state.trendPercent.fmt0(locale)} % ↓"
                             Trend.FLAT -> "–"
                         }
                         StatRow(

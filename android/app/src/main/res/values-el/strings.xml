@@ -161,7 +161,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">Ποτό</string>
     <string name="csv_col_category">Κατηγορία</string>
     <string name="csv_col_volume_ml">Ποσότητα_ml</string>
-    <string name="csv_col_alcohol_pct">Αλκοόλη_%</string>
+    <string name="csv_col_alcohol_pct">Αλκοόλη_ποσοστό</string>
     <string name="csv_col_grams">Γρ_αλκοόλης</string>
     <string name="csv_col_note">Σημείωση</string>
     <string name="pdf_unit_g_per_day">g/ημέρα</string>

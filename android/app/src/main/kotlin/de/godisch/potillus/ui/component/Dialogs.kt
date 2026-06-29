@@ -52,6 +52,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -63,6 +64,8 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
+import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.formattingLocale
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -114,6 +117,8 @@ fun AddEditEntryDialog(
     val volume       = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0
     val canSave      = selectedDrink != null && (volumeText.toIntOrNull() ?: 0) in 1..5000
+    // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
+    val locale       = LocalContext.current.formattingLocale()
 
     // Traffic-light: recalculated on every recomposition caused by selectedDrink
     // or volumeText change (both are state variables → Compose recomposes automatically).
@@ -223,7 +228,7 @@ fun AddEditEntryDialog(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                "≈ ${"%.1f".format(previewGrams)} ${stringResource(R.string.pure_alcohol)}",
+                                "≈ ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}",
                                 style    = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )
@@ -363,6 +368,8 @@ fun AddEditDrinkDialog(
 
     val previewGrams = if (volume != null && percent != null && volumeValid && percentValid)
         AlcoholCalculator.calculateGrams(volume, percent) else null
+    // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
+    val locale = LocalContext.current.formattingLocale()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -409,7 +416,7 @@ fun AddEditDrinkDialog(
                 if (previewGrams != null) {
                     Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.small) {
                         Text(
-                            "≈ ${"%.1f".format(previewGrams)} ${stringResource(R.string.pure_alcohol)}",
+                            "≈ ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(12.dp, 8.dp)
                         )

@@ -158,7 +158,4 @@ class FakeEntryRepository : IEntryRepository {
     }
 
     override suspend fun deleteAll() { _entries.value = emptyList() }
-
-    override suspend fun isDuplicate(timestampMillis: Long, drinkId: Long): Boolean =
-        _entries.value.any { it.timestampMillis == timestampMillis && it.drinkId == drinkId }
 }

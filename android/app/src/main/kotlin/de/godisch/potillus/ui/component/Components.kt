@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,6 +63,8 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.domain.model.TrafficLight
+import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
@@ -225,6 +228,9 @@ fun FavoriteQuickBar(
  */
 @Composable
 fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> Unit) {
+    // Per-app locale for the gram value, so its decimal separator matches the
+    // in-app language rather than the system locale (see l10n/NumberFormat.kt).
+    val locale = LocalContext.current.formattingLocale()
     val time = remember(entry.timestampMillis) {
         val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.timestampMillis), ZoneId.systemDefault())
         "%02d:%02d".format(ldt.hour, ldt.minute)
@@ -247,7 +253,7 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
                     overflow   = TextOverflow.Ellipsis
                 )
                 Text(
-                    "$time · ${entry.volumeMl} ml · ${entry.alcoholPercent} % · ${"%.1f".format(entry.gramsAlcohol)} g",
+                    "$time · ${entry.volumeMl} ml · ${entry.alcoholPercent} % · ${entry.gramsAlcohol.fmt1(locale)} g",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -309,6 +315,8 @@ fun LimitBar(
     modifier: Modifier = Modifier,
     leftSuffix: String = ""
 ) {
+    // Per-app locale for the consumed-grams label (see l10n/NumberFormat.kt).
+    val locale = LocalContext.current.formattingLocale()
     // coerceAtLeast(1.0): guard against limitGrams = 0 (not configured).
     // A limit of 0 would produce NaN; show 0 % fill visually instead.
     val fraction = (totalGrams / limitGrams.coerceAtLeast(1.0)).toFloat().coerceAtLeast(0f)
@@ -326,9 +334,9 @@ fun LimitBar(
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             val leftText = if (leftSuffix.isNotEmpty())
-                "${"%.1f".format(totalGrams)} g $leftSuffix"
+                "${totalGrams.fmt1(locale)} g $leftSuffix"
             else
-                "${"%.1f".format(totalGrams)} g"
+                "${totalGrams.fmt1(locale)} g"
             Text(leftText, style = MaterialTheme.typography.bodySmall)
             Text(
                 caption,

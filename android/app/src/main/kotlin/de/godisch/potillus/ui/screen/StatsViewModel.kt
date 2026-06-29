@@ -437,7 +437,7 @@ class StatsViewModel(
                 statsFromDate     = statsFloor
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState(period = StatsPeriod.MONTH))
 
     /** Selects the statistics aggregation period [p] (week / month / year …). */
     fun setPeriod(p: StatsPeriod) { _period.value = p }

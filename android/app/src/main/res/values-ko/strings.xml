@@ -208,7 +208,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">음료</string>
     <string name="csv_col_category">카테고리</string>
     <string name="csv_col_volume_ml">양_ml</string>
-    <string name="csv_col_alcohol_pct">알코올_%</string>
+    <string name="csv_col_alcohol_pct">알코올_퍼센트</string>
     <string name="csv_col_grams">그램_알코올</string>
     <string name="csv_col_note">메모</string>
     <string name="pdf_unit_g_per_day">g/일</string>

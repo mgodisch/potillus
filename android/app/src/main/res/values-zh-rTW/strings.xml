@@ -210,7 +210,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">飲品</string>
     <string name="csv_col_category">類別</string>
     <string name="csv_col_volume_ml">份量_毫升</string>
-    <string name="csv_col_alcohol_pct">酒精_%</string>
+    <string name="csv_col_alcohol_pct">酒精_百分比</string>
     <string name="csv_col_grams">公克_酒精</string>
     <string name="csv_col_note">備注</string>
     <string name="pdf_unit_g_per_day">公克／天</string>

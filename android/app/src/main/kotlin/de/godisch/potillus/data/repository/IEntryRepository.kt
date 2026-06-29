@@ -114,7 +114,4 @@ interface IEntryRepository {
 
     /** Deletes every entry (used by backup REPLACE import). */
     suspend fun deleteAll()
-
-    /** Returns `true` if an entry with the same [timestampMillis] and [drinkId] already exists (MERGE de-dup). */
-    suspend fun isDuplicate(timestampMillis: Long, drinkId: Long): Boolean
 }

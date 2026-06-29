@@ -161,7 +161,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">Bebida</string>
     <string name="csv_col_category">Categoria</string>
     <string name="csv_col_volume_ml">Quantidade_ml</string>
-    <string name="csv_col_alcohol_pct">Álcool_%</string>
+    <string name="csv_col_alcohol_pct">Álcool_percentagem</string>
     <string name="csv_col_grams">Gramas_álcool</string>
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/dia</string>

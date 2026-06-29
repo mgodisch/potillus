@@ -178,7 +178,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_error_version_too_high">不支持备份版本 %1$d（最高支持 %2$d）。</string>
     <string name="import_error_file_too_large">备份文件过大（最大 %1$d MB）。</string>
     <string name="import_error_read">读取错误：%1$s</string>
-    <string name="drink_delete_blocked">"%{name}"有 {count} 条记录，无法删除。</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d有 {count} 条记录，无法删除。</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">饮品名称不能为空。</string>
     <string name="drink_validation_name_too_long">饮品名称过长（最多 100 个字符）。</string>
@@ -191,7 +191,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">饮品</string>
     <string name="csv_col_category">类别</string>
     <string name="csv_col_volume_ml">数量_ml</string>
-    <string name="csv_col_alcohol_pct">酒精_%</string>
+    <string name="csv_col_alcohol_pct">酒精_百分比</string>
     <string name="csv_col_grams">克_酒精</string>
     <string name="csv_col_note">备注</string>
     <string name="pdf_unit_g_per_day">克/天</string>

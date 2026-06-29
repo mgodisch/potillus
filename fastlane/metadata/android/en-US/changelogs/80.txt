@@ -1,0 +1,1 @@
+L10N and code quality: numbers (grams, BAC, percentages) now follow the in-app language instead of the system language (correct decimal separator). More robust backup import, corrected docs, dead code removed.

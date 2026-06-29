@@ -36,6 +36,75 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.73.4
+
+Fix QA findings: locale-aware numbers, backup robustness, docs
+
+Fixed:
+- L10N: user-visible numbers (grams, BAC, percentages, gram limits) were
+  formatted with `String.format` / `"%.1f".format`, which follow
+  `Locale.getDefault()` (the system locale) instead of the per-app locale set
+  via `AppCompatDelegate.setApplicationLocales`. On a device whose system
+  language differed from the in-app language this printed a wrong decimal
+  separator next to correctly localized month/weekday names (e.g. "Juni 2026"
+  beside "19.6 g"). A new `l10n/NumberFormat.kt` adds locale-aware `fmt0` /
+  `fmt1` / `fmt2` helpers, and every read-only display on the Today, Statistics,
+  Calendar and Drinks screens, the shared chart and list components, and the PDF
+  report now passes the per-app locale (`Context.formattingLocale()`). CSV
+  export and the round-trip-parsed numeric input field keep `Locale.ROOT` on
+  purpose (machine-readable / `String.toDouble()`-parseable); the latter also
+  fixes a latent bug where the grams input dialog opened in an error state on a
+  comma-decimal system locale (F-1).
+- Backup: `BackupRepository.importMerge` now reads the existing drink
+  name-to-id snapshot INSIDE its database transaction, mirroring
+  `importReplace`, closing a read-outside-write (TOCTOU) gap (F-5).
+- Backup: `buildIdMap` now indexes freshly inserted drinks by name within the
+  same import, so a backup containing two identically named new drinks no longer
+  creates duplicate drink rows (F-6).
+- `StatsViewModel.uiState` now seeds its initial value with the actual default
+  period (`MONTH`) instead of `WEEK`, so the period selector no longer flashes a
+  one-frame `WEEK` selection before the first emission (F-7).
+
+Changed:
+- Removed the unused `IEntryRepository.isDuplicate` and its `EntryRepository` /
+  `FakeEntryRepository` implementations: the only MERGE de-duplication path
+  calls `entryDao.countByTimestampAndDrink` directly, so the method was dead
+  code (F-2).
+
+Docs:
+- `AlcoholCalculator.roundTo2Decimals` KDoc corrected: it rounds the BAC value
+  to two decimals, not gram values (which use `roundTo1Decimal`) (F-4).
+- `EntryRepository.addFromDrink` KDoc no longer mentions the removed gender
+  setting (F-3).
+
+L10N (comprehensive translation QA against `en` + `de` as the authoritative
+sources; key parity, apostrophe escaping, format placeholders, plural CLDR
+categories, brand/URL invariants and newline parity all verified clean):
+- `values-zh-rCN`: `drink_delete_blocked` started with a stray `%` and wrapped
+  the drink name in ASCII straight quotes (`"…"`). Android treats `"` as a
+  verbatim delimiter and strips it, so the user saw `%<name>有 …` with the
+  quotes gone and a leftover percent sign. Replaced with the same
+  `\u201c…\u201d` curly quotes the `en` source uses, dropping the stray `%`
+  (L-1). The string is filled via `String.replace("{name}"/"{count}")`, not
+  `String.format`, so there was never a crash — only wrong on-screen text.
+- CSV header `csv_col_alcohol_pct` is now spelled out in every locale to match
+  the `en`/`de` `Word_Word` style (e.g. `Alcohol_Percent` / `Alkohol_Prozent`)
+  instead of a literal `%` (e.g. `Alcool_%` → `Alcool_pourcentage`,
+  `酒精_%` → `酒精_百分比`). Purely a header-naming consistency change; the value
+  carries no format arguments, so behaviour is unchanged.
+
+Tests:
+- Added `NumberFormatTest` (JVM) pinning the decimal separator to the passed
+  locale (en-US "." vs de-DE ",").
+- `LimitBarUiTest` now pins the Compose **Context configuration** locale to US
+  (via a `createConfigurationContext` Context provided through `LocalContext`),
+  not just `Locale.getDefault()`. Since `LimitBar` now formats grams for the
+  per-app locale through `Context.formattingLocale()` — which is decoupled from
+  the JVM default — the previous `Locale.setDefault(US)` alone no longer made the
+  expected "20.0 g" deterministic on a comma-decimal device.
+
+---
+
 ## v0.73.3
 
 Fix QA findings: orphaned directory, German comments, docs, header style

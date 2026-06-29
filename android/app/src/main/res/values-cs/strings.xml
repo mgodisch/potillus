@@ -161,7 +161,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_drink">Nápoj</string>
     <string name="csv_col_category">Kategorie</string>
     <string name="csv_col_volume_ml">Množství_ml</string>
-    <string name="csv_col_alcohol_pct">Alkohol_%</string>
+    <string name="csv_col_alcohol_pct">Alkohol_procento</string>
     <string name="csv_col_grams">Gramy_alkoholu</string>
     <string name="csv_col_note">Poznámka</string>
     <string name="pdf_unit_g_per_day">g/den</string>

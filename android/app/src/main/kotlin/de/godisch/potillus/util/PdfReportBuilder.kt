@@ -30,6 +30,8 @@ import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
+import de.godisch.potillus.l10n.fmt0
+import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import java.time.DayOfWeek
 import java.time.Instant
@@ -120,6 +122,20 @@ object PdfReportBuilder {
         val locale   = context.formattingLocale()
         val dateFmt  = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
         val monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", locale)
+
+        // Locale-bound number formatters for this report. Every formatted number
+        // below must use the SAME per-app `locale` as the dates/months above,
+        // otherwise the decimal separator would silently follow the *system*
+        // locale (see l10n/NumberFormat.kt for the pitfall). These zero-argument
+        // local shims capture `locale` and delegate to the shared l10n helpers
+        // (`Double.fmt1(Locale)` / `Double.fmt0(Locale)`), so the many call sites
+        // below stay terse — `x.fmt1()` — while remaining locale-correct. The
+        // arity differs from the shared helpers, so `this.fmt1(locale)` resolves
+        // unambiguously to the imported one (no recursion).
+        /** One-decimal display formatting in this report's per-app [locale]. */
+        fun Double.fmt1(): String = this.fmt1(locale)
+        /** Zero-decimal display formatting in this report's per-app [locale]. */
+        fun Double.fmt0(): String = this.fmt0(locale)
 
         val scalars = HashMap<String, String>()
         val repeats = HashMap<String, List<Map<String, String>>>()
@@ -420,10 +436,4 @@ object PdfReportBuilder {
             ChartGranularity.MONTHLY                        -> ld.format(monthFmt)
         }
     }
-
-    /** One-decimal display formatting (default locale, matching the rest of the app). */
-    private fun Double.fmt1() = "%.1f".format(this)
-
-    /** Zero-decimal display formatting. */
-    private fun Double.fmt0() = "%.0f".format(this)
 }

@@ -1,0 +1,1 @@
+L10N und Codequalität: Zahlen (Gramm, Promille, Prozente) folgen jetzt der in der App gewählten Sprache statt der Systemsprache (korrektes Dezimaltrennzeichen). Robusterer Backup-Import, korrigierte Doku, toter Code entfernt.
