@@ -167,10 +167,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 85
+        versionCode = 86
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.77.1"
+        versionName = "0.77.2"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -903,7 +903,11 @@ abstract class GenerateSbomAsset @Inject constructor(
 
 val generateSbomAsset = tasks.register<GenerateSbomAsset>("generateSbomAsset") {
     sbomJson.set(tasks.cyclonedxDirectBom.flatMap { it.jsonOutput })
-    normalizer.set(layout.projectDirectory.file("tools/sbom-normalize.py"))
+    // rootProject is the Gradle root (android/), so this resolves to
+    // android/tools/sbom-normalize.py. NOT layout.projectDirectory, which is the
+    // :app module (android/app/) and would point at a non-existent
+    // android/app/tools/ — a release-only path that fails the F-Droid build.
+    normalizer.set(rootProject.file("tools/sbom-normalize.py"))
 }
 
 androidComponents {

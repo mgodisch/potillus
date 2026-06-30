@@ -36,6 +36,29 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.77.2
+
+Fix SBOM normalizer path in release build
+
+Bug fix:
+- The `generateSbomAsset` task resolved its `sbom-normalize.py` helper with
+  `layout.projectDirectory.file("tools/sbom-normalize.py")`.
+  `layout.projectDirectory` is the `:app` module directory (`android/app/`), so
+  this pointed at a non-existent `android/app/tools/sbom-normalize.py`; the
+  script actually lives at the Gradle root, `android/tools/sbom-normalize.py`.
+  The path now resolves via `rootProject.file("tools/sbom-normalize.py")`,
+  matching the idiom already used elsewhere in this file. The full release
+  build, including SBOM generation, R8 and resource shrinking, now completes.
+
+Versioning:
+- `versionCode` 85 → 86 and `versionName` 0.77.1 → 0.77.2 across
+  `build.gradle.kts`, `proguard-rules.pro`, `README.md` and the F-Droid recipe
+  (`commit: v0.77.2`); localized store notes added as `changelogs/86.txt` for
+  all 21 locales (the listing-only locales drop the previous `85.txt`). No
+  functional change to the app.
+
+---
+
 ## v0.77.1
 
 Fix F-Droid release build signing config
