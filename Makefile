@@ -47,6 +47,7 @@ install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(V
 # EXCLUDE_SCREENSHOTS switch.
 screenshots:
 	$(MAKE) -C android screenshots
+	$(MAKE) -C android feature-graphics
 
 tgz: distclean potillus-$(VERSION).tar.gz
 

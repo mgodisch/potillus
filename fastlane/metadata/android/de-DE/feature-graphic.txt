@@ -8,6 +8,6 @@ title: LIBELLUS POTIONIS
 tagline: Dein diskreter und privater Alkoholkonsum-Tracker.
 tagline: Volle Kontrolle ohne Kompromisse.
 bullet: Grenzen setzen & einhalten
-bullet: 100 % Privatsphäre & Offline
+bullet: 100 % Privacy:\nApp-Sperre,\nkein Netzwerk
 bullet: CSV & PDF-Berichte
-bullet: Kostenlos & Werbefrei
+bullet: Kostenlos & Werbefrei &\nOpen Source
