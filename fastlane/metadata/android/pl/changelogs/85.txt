@@ -1,0 +1,1 @@
+Naprawia kompilację wydania dla F-Droida. Brak zmian funkcjonalnych w aplikacji.

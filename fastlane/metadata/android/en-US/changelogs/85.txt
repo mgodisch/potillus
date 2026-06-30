@@ -1,0 +1,1 @@
+Fixes the F-Droid release build. No functional changes to the app.

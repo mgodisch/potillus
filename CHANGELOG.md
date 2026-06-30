@@ -36,6 +36,31 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.77.1
+
+Fix F-Droid release build signing config
+
+Bug fix:
+- The `release` build type looked up its signing config with
+  `signingConfigs.getByName("release")`. Before building, F-Droid strips the
+  whole `signingConfigs { … }` block out of `build.gradle.kts` (it signs APKs
+  itself), after which the named config no longer exists and `getByName` aborts
+  the build with "SigningConfig with name 'release' not found". As a result the
+  F-Droid build of 0.77.0 failed at `assembleRelease`. The lookup now uses the
+  nullable `findByName("release")` with a null-safe check, so when the block has
+  been removed the release build simply stays unsigned and F-Droid signs it.
+  Local behaviour is unchanged: with a keystore the build is signed, without one
+  it stays unsigned, exactly as before.
+
+Versioning:
+- `versionCode` 84 → 85 and `versionName` 0.77.0 → 0.77.1 across
+  `build.gradle.kts`, `proguard-rules.pro`, `README.md` and the F-Droid recipe
+  (`commit: v0.77.1`); localized store notes added as `changelogs/85.txt` for
+  all 21 locales (the listing-only locales drop the previous `84.txt`). No
+  functional change to the app; this is the first version that builds on F-Droid.
+
+---
+
 ## v0.77.0
 
 Rework feature-graphic copy; drop fdroid README

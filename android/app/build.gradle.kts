@@ -167,10 +167,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 84
+        versionCode = 85
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.77.0"
+        versionName = "0.77.1"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -310,8 +310,17 @@ android {
             // the build stays unsigned — the configuration F-Droid relies on. With
             // a key configured, both `assembleRelease` (APK) and `bundleRelease`
             // (AAB) are signed for Google Play.
-            val releaseSigningConfig = signingConfigs.getByName("release")
-            if (releaseSigningConfig.storeFile != null) {
+            //
+            // Use findByName (nullable) rather than getByName (throws): F-Droid's
+            // build strips the whole `signingConfigs { release { … } }` block out
+            // of build.gradle.kts before building, because it signs APKs itself.
+            // After that removal the "release" config no longer exists, so
+            // getByName("release") would fail the build with
+            // "SigningConfig with name 'release' not found". findByName returns
+            // null in that case and the null-safe check below simply leaves the
+            // build unsigned — exactly what F-Droid expects.
+            val releaseSigningConfig = signingConfigs.findByName("release")
+            if (releaseSigningConfig?.storeFile != null) {
                 signingConfig = releaseSigningConfig
             }
         }

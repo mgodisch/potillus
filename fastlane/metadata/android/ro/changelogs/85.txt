@@ -1,0 +1,1 @@
+Repară compilarea de lansare pentru F-Droid. Fără modificări funcționale în aplicație.
