@@ -36,6 +36,39 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.77.0
+
+Rework feature-graphic copy; drop fdroid README
+
+Store assets:
+- Reworked the feature-graphic bullet copy in both locales. The privacy bullet
+  now spells out the concrete guarantees instead of a generic label — en-US
+  "100 % Privacy: App Lock & Offline-only", de-DE "100 % Privacy: App-Sperre,
+  kein Netzwerk" — the limits bullet is title-cased on en-US ("Set & Maintain
+  Limits"), and the final bullet now also advertises "Open Source". Both
+  `featureGraphic.png` were regenerated from the updated copy.
+- `README.md` now shows the en-US feature graphic at the top.
+
+Build wiring:
+- `Makefile`: `make screenshots` now also runs `make feature-graphics`, so the
+  store graphics are regenerated together with the screenshots instead of as a
+  separate manual step.
+
+F-Droid:
+- Removed the maintainer reference-copy comment header from
+  `fdroid/de.godisch.potillus.yml` (it is plain metadata now) and deleted
+  `fdroid/README.md`; the recipe no longer references it, and `release-check.sh`
+  still keeps the reference copy's version in sync with `build.gradle.kts`.
+
+Versioning:
+- `versionCode` 83 → 84 and `versionName` 0.76.0 → 0.77.0 across
+  `build.gradle.kts`, `proguard-rules.pro`, `README.md` and the F-Droid recipe;
+  localized store notes added as `changelogs/84.txt` for all 21 locales (the
+  listing-only locales drop the previous `83.txt`). Store-asset/tooling change
+  only — the APK is functionally identical to 0.76.0.
+
+---
+
 ## v0.76.0
 
 Add a deterministic feature-graphic generator

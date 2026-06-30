@@ -11,14 +11,14 @@ RepoType: git
 Repo: https://codeberg.org/godisch/potillus.git
 
 Builds:
-  - versionName: 0.76.0
-    versionCode: 83
-    commit: v0.76.0
+  - versionName: 0.77.0
+    versionCode: 84
+    commit: v0.77.0
     subdir: android/app
     gradle:
       - yes
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v([0-9]+\.){2}[0-9]+$
-CurrentVersion: 0.76.0
-CurrentVersionCode: 83
+CurrentVersion: 0.77.0
+CurrentVersionCode: 84
