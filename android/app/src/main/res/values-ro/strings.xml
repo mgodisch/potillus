@@ -188,8 +188,16 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Nu există înregistrări de exportat.</string>
     <string name="export_failed">Exportul a eșuat.</string>
     <string name="backup_failed">Copia de rezervă a eșuat.</string>
-    <string name="import_success_replace">%1$d înregistrări importate.</string>
-    <string name="import_success_merge">%1$d importate, %2$d omise.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d înregistrare importată.</item>
+        <item quantity="few">%1$d înregistrări importate.</item>
+        <item quantity="other">%1$d de înregistrări importate.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importată, %2$d omise.</item>
+        <item quantity="few">%1$d importate, %2$d omise.</item>
+        <item quantity="other">%1$d importate, %2$d omise.</item>
+    </plurals>
     <string name="import_error_could_not_read">Fișierul nu poate fi citit.</string>
     <string name="import_error_empty">Fișierul de copie de rezervă este gol.</string>
     <string name="import_error_invalid_json">Format JSON invalid.</string>

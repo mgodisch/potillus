@@ -1,0 +1,1 @@
+Wartungs-Release: F-Droid-Paketierung vorbereitet, Build-Konfiguration aufgeräumt und die Store-Beschreibung jetzt in 19 weiteren Sprachen verfügbar. Keine Änderungen an der App-Funktion.

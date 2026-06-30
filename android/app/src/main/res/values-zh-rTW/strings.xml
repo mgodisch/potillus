@@ -189,8 +189,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">沒有可匯出的記錄。</string>
     <string name="export_failed">匯出失敗。</string>
     <string name="backup_failed">備份失敗。</string>
-    <string name="import_success_replace">已匯入 %1$d 筆記錄。</string>
-    <string name="import_success_merge">已匯入 %1$d 筆，略過 %2$d 筆。</string>
+    <plurals name="import_success_replace">
+        <item quantity="other">已匯入 %1$d 筆記錄。</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="other">已匯入 %1$d 筆，略過 %2$d 筆。</item>
+    </plurals>
     <string name="import_error_could_not_read">無法讀取檔案。</string>
     <string name="import_error_empty">備份檔案為空。</string>
     <string name="import_error_invalid_json">無效的 JSON 格式。</string>

@@ -155,8 +155,16 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">No hay entradas que exportar.</string>
     <string name="export_failed">Error al exportar.</string>
     <string name="backup_failed">Error en la copia de seguridad.</string>
-    <string name="import_success_replace">%1$d entradas importadas.</string>
-    <string name="import_success_merge">%1$d importadas, %2$d omitidas.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d entrada importada.</item>
+        <item quantity="many">%1$d entradas importadas.</item>
+        <item quantity="other">%1$d entradas importadas.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importada, %2$d omitidas.</item>
+        <item quantity="many">%1$d importadas, %2$d omitidas.</item>
+        <item quantity="other">%1$d importadas, %2$d omitidas.</item>
+    </plurals>
     <string name="import_error_could_not_read">No se pudo leer el archivo.</string>
     <string name="import_error_empty">El archivo de copia de seguridad está vacío.</string>
     <string name="import_error_invalid_json">Formato JSON no válido.</string>

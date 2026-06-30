@@ -1,0 +1,53 @@
+Libellus Potionis is een privacyvriendelijke, gratis, opensource en
+advertentievrije alcoholtracker. De app helpt je je gebruik volledig offline te
+volgen, te doseren en te beheren. Hij vereist geen indringende rechten — geen
+camera, microfoon of locatie — en werkt volledig zonder netwerktoegang.
+
+BELANGRIJKSTE FUNCTIES
+
+* Slim registreren: maak je eigen dranken aan of kies uit internationaal
+  gangbare sjablonen. Registreer dranken meteen of achteraf met nauwkeurige
+  tijdcorrecties.
+* Meerdere limieten tegelijk: stel drie limieten parallel in — een daglimiet
+  (gram pure alcohol), een voortschrijdende weeklimiet over 7 dagen (gram) en een
+  maximaal aantal drinkdagen per week. Voortgangsbalken houden je in realtime op
+  de hoogte.
+* Promilleschatting (BAC): voer je lichaamsgewicht in voor een live benadering op
+  basis van de gevestigde Widmark-formule.
+* Rapporten voor begeleiding: genereer een helder, overzichtelijk PDF-rapport van
+  twee pagina's, bedoeld voor consulten en begeleidingsgesprekken, dat je
+  gewoonten statistisch samenvat.
+* Gegevensportabiliteit: exporteer je volledige gegevensverzameling als een
+  standaard CSV-bestand voor externe verwerking (bijvoorbeeld in LibreOffice
+  Calc), of maak veilige JSON-back-ups om gegevens tussen apparaten te
+  verplaatsen.
+* Fijne instellingen: pas je "dagbegin" aan zodat drankjes laat in de nacht bij
+  de juiste avond worden geteld, en stel eigen startdatums voor de evaluatie in
+  voor een schone herstart.
+
+Een uitgebreide handleiding is beschikbaar in de app.
+
+PRIVACY & BEVEILIGING
+
+Libellus Potionis is opgebouwd rond volledige gegevenssoevereiniteit en strikte
+gegevensminimalisatie. De app draait met een minimaal rechtenprofiel dat
+netwerktoegang volledig uitsluit, zodat je persoonlijke gegevens het apparaat
+nooit verlaten. Je gegevens blijven in de privéopslag van de app, in rust
+beschermd door de apparaatversleuteling van Android en de app-sandbox; de
+voorkeuren worden bovendien verzegeld met een hardwarematig ondersteunde Android
+Keystore-sleutel. Een optionele biometrische vingerafdrukvergrendeling beschermt
+tegen onbevoegde fysieke toegang. Deze offline-aanpak sluit tracking,
+cloudsynchronisatie en externe datalekken uit.
+
+COMPATIBILITEIT
+
+De app draait op Android 11 (API 30) en nieuwer. Een volledig onafhankelijke
+taalkiezer in de app werkt op alle ondersteunde versies, los van de taalkiezer
+per app van het systeem.
+
+OPEN SOURCE
+
+Libellus Potionis is vrije software, uitgebracht onder de GNU General Public
+License v3 (of later). De broncode is op leerboekniveau gedocumenteerd en
+beschikbaar in de canonieke repository:
+https://codeberg.org/godisch/potillus/

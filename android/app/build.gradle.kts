@@ -159,10 +159,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 80
+        versionCode = 81
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.73.4"
+        versionName = "0.74.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -480,24 +480,7 @@ android {
             // and "round icon equals the square icon" are intentional design
             // choices, not accidental duplicates.
             "IconLauncherShape",
-            "IconDuplicates",
-            // ── Plurals hint ─────────────────────────────────────────────────
-            // A handful of "%d <noun>" strings are flagged as plural candidates.
-            // Converting them to <plurals> correctly across all 21 shipped
-            // locales (each with its own CLDR plural categories) is a substantial,
-            // separate localisation task, not part of this lint pass.
-            "PluralsCandidate",
-            // ── Navigation lint detector crash (tooling bug) ─────────────────
-            // navigation-compose 2.8.9 bundles a lint detector
-            // (BaseWrongStartDestinationTypeDetector) that crashes under the
-            // newer lint shipped with AGP 9.2: it throws
-            //   NoClassDefFoundError: androidx/navigation/lint/UtilKt
-            // while analysing AppNav.kt and aborts the whole lint task. Lint
-            // itself reports this as "a bug in lint or one of the libraries it
-            // depends on" and recommends disabling the check; it is not a real
-            // finding in our navigation graph. Re-enable once the navigation lint
-            // checks are compatible again (a future navigation release).
-            "WrongStartDestinationType"
+            "IconDuplicates"
         )
     }
 
@@ -526,6 +509,23 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
+
+        // Treat every Kotlin compiler warning as a build-breaking error. The
+        // project keeps its sources warning-free (the QA passes documented in
+        // CHANGELOG.md and the checks in tools/release-check.sh assume this), so
+        // promoting warnings to errors makes any regression — an unused import or
+        // symbol, a deprecated API call, an always-true `is` check — fail the
+        // build immediately instead of silently accumulating.
+        //
+        // Scope: this affects the KOTLIN compiler only, across every Kotlin
+        // compilation (main, unit-test and androidTest source sets, all build
+        // types). It deliberately does NOT touch Gradle-level deprecation
+        // warnings — e.g. AGP's internal "Using a Project object as a dependency
+        // notation" notice emitted from VariantManager.createTestComponents while
+        // wiring the test variant — because those originate in Gradle's
+        // configuration phase, not in kotlinc, and are outside this build's
+        // control (they will be resolved by a future AGP release).
+        allWarningsAsErrors.set(true)
     }
 }
 

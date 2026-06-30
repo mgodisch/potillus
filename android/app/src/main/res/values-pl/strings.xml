@@ -139,8 +139,18 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Brak wpisów do eksportu.</string>
     <string name="export_failed">Eksport nie powiódł się.</string>
     <string name="backup_failed">Kopia zapasowa nie powiodła się.</string>
-    <string name="import_success_replace">Zaimportowano %1$d wpisów.</string>
-    <string name="import_success_merge">%1$d zaimportowano, %2$d pominięto.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">Zaimportowano %1$d wpis.</item>
+        <item quantity="few">Zaimportowano %1$d wpisy.</item>
+        <item quantity="many">Zaimportowano %1$d wpisów.</item>
+        <item quantity="other">Zaimportowano %1$d wpisu.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d zaimportowano, %2$d pominięto.</item>
+        <item quantity="few">%1$d zaimportowano, %2$d pominięto.</item>
+        <item quantity="many">%1$d zaimportowano, %2$d pominięto.</item>
+        <item quantity="other">%1$d zaimportowano, %2$d pominięto.</item>
+    </plurals>
     <string name="import_error_could_not_read">Nie można odczytać pliku.</string>
     <string name="import_error_empty">Plik kopii zapasowej jest pusty.</string>
     <string name="import_error_invalid_json">Nieprawidłowy format JSON.</string>

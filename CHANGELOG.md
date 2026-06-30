@@ -36,6 +36,138 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.74.0
+
+Prepare F-Droid packaging, localize store listing
+
+This is a packaging, tooling and store-metadata release. It contains **no
+changes to the app's runtime behaviour**: no source file under `src/main/kotlin`
+was touched, the database schema is unchanged, and the set of shipped UI string
+resources is identical to v0.73.4. The version is bumped purely so the new store
+listings ship under their own `versionCode`.
+
+Packaging (F-Droid):
+- `fdroid/de.godisch.potillus.yml`: the reference build recipe lagged the source
+  tree (it still pinned `versionName 0.73.0` / `versionCode 76`). Its single
+  `Builds:` block and the `CurrentVersion` / `CurrentVersionCode` fields are now
+  synced to the current release (`0.74.0` / `81`, `commit: v0.74.0`). A new
+  release-check invariant (see Tooling) keeps them in lock-step from now on, so
+  this class of drift cannot silently reappear.
+- `fdroid/README.md`: added a step-by-step **fdroiddata submission checklist**
+  (fork, copy recipe, local `fdroid lint` / `fdroid build -l`, open the merge
+  request, address CI) and recorded the project decision that the FIRST
+  F-Droid-published version will be cut as `1.0.0`. The reference recipe
+  deliberately tracks the latest real release until that `1.0.0` tag exists.
+
+Changed (build configuration):
+- `android/settings.gradle.kts`: removed the `foojay-resolver-convention`
+  plugin. It can fetch a JDK over the network when a Java toolchain is requested
+  that is not installed locally — undesirable in F-Droid's network-restricted
+  build. The project declares no `toolchain {}` / `jvmToolchain(...)`, so the
+  plugin was never actually triggered (Gradle uses the build environment's JDK
+  21); removing it deletes a latent network path and a future foot-gun with no
+  change to how any build resolves Java.
+- `android/app/build.gradle.kts`: enabled `allWarningsAsErrors` in the Kotlin
+  `compilerOptions` block. The sources are warning-free, so every future Kotlin
+  compiler warning (unused import/symbol, deprecated API, always-true `is`
+  check, …) now fails the build instead of accumulating silently. Scope is the
+  Kotlin compiler only (all source sets and build types); it does not affect
+  Gradle-level deprecation notices (see "Known upstream issue" below).
+- `gradle/libs.versions.toml` + `android/app/build.gradle.kts` (`lint { }`):
+  bumped `navigation-compose` 2.8.9 → 2.9.7 and re-enabled the three navigation
+  lint checks that had been disabled as tooling-bug workarounds
+  (`WrongStartDestinationType`, `ComposableDestinationInComposeScope`,
+  `ComposableNavGraphInComposeScope`). navigation-compose 2.8.9 shipped lint
+  detectors compiled against older Compose lint utilities, which under AGP 9.2 /
+  `compose-bom` 2026.06.00 threw `NoClassDefFoundError`
+  (`androidx/navigation/lint/UtilKt`, `androidx/compose/lint/PsiUtilsKt`) and
+  aborted the whole lint task while analysing `AppNav.kt`. 2.9.7 ships detectors
+  built against the current Compose lint API, so the checks run instead of
+  crashing — making the previous `disable` workarounds unnecessary. `AppNav.kt`
+  is a single flat `NavHost` with top-level type-safe `composable<…>`
+  destinations and a `@Serializable` start destination, so the re-enabled checks
+  report no findings, and the type-safe-route API is unchanged between 2.8 and
+  2.9 (no source edits required).
+
+Store metadata (L10N):
+- Added fastlane store listings (`title`, `short_description`, `full_description`
+  and the `versionCode 81` changelog note) for the **19 app languages that had
+  no store listing yet**: `cs`, `da`, `el`, `es`, `fr`, `it`, `ja`, `ko`, `nb`,
+  `nl`, `pl`, `pt`, `pt-BR`, `ro`, `ru`, `sv`, `uk`, `zh-CN`, `zh-TW`. The store
+  listing now covers all 21 shipped app languages (`en` and `de` already
+  existed). Screenshots are intentionally NOT duplicated per locale — F-Droid
+  falls back to the `en-US` images — so only text was added.
+- Added the `versionCode 81` changelog note (`changelogs/81.txt`) to the
+  existing `en-US` and `de-DE` listings as well, as required by the release
+  gate.
+
+Tooling (`android/tools/release-check.sh`):
+- SECTION 1 now cross-checks the F-Droid reference recipe: the recipe's
+  `CurrentVersion` / `CurrentVersionCode` and its latest `Builds:` block must
+  equal the `build.gradle.kts` `versionName` / `versionCode` (which SECTION 1
+  already ties to the top CHANGELOG entry). This is the enforcing half of the
+  recipe-sync fix above.
+- SECTION 1 fastlane **locale-parity** rule relaxed: full changelog *history*
+  parity is now required only among the history-bearing locales (`en-US`,
+  `de-DE`); every other listing locale must carry only the CURRENT
+  `versionCode` note. Without this, adding 19 listing locales would have
+  demanded ~320 back-dated changelog files for `versionCode`s those locales
+  never shipped under. The current-version coverage check (every locale must
+  have `<versionCode>.txt`) is unchanged.
+
+Tests (warning cleanup, required by `allWarningsAsErrors` above):
+- `AppViewModelFactoryTest`: removed five `assertTrue(vm is …)` assertions (and
+  the now-unused `assertTrue` import). Each `vm` is already statically typed by
+  its constructor's return type, so the runtime `is` check is always true and
+  the Kotlin compiler flagged it as "Check for instance is always 'true'". The
+  meaningful guarantee — that each ViewModel's constructor signature stays
+  callable with the injected types — is enforced at compile time (the test would
+  not compile otherwise) and the retained `assertNotNull(vm)` covers successful
+  construction.
+- `LocaleDetectorTest`: replaced the deprecated single-argument
+  `java.util.Locale("…")` constructor (deprecated since JDK 19) with the
+  equivalent `Locale.of("…")` at the three remaining call sites. Behaviour is
+  identical; the file already used `Locale.of` / `Locale.forLanguageTag`
+  elsewhere. (The many `Locale("xx", "Autonym")` calls in
+  `l10n/SupportedLocales.kt` are unaffected: they construct the app's own
+  `data class Locale(tag, autonym)`, not `java.util.Locale`.)
+
+Localization (plurals) and re-enabled lint check:
+- Converted `import_success_replace` ("%1$d entries imported.") and
+  `import_success_merge` ("%1$d entries imported, %2$d skipped.") from flat
+  `<string>`s into `<plurals>` across all 21 locales, and re-enabled the
+  `PluralsCandidate` lint check that previously masked them (removed from the
+  `lint { disable }` set). `SettingsViewModel` now resolves them via a new
+  `quantityStr` helper (`resources.getQuantityString`, selecting on the imported
+  count). Per-locale plural forms mirror the CLDR category set and morphology of
+  each locale's existing `<plurals name="days">` (the flat translation becomes the
+  high-count form; singular/few/many forms derived accordingly). The merge message
+  is pluralized on the FIRST count only — the second number's word is invariant in
+  the en/de sources (an invariant past participle), so a single `<plurals>` is
+  correct there; in several locales (e.g. `cs`, `pl`, `ru`, `uk`) both clauses are
+  impersonal and do not inflect, so their categories carry identical text.
+- The remaining `%d`-bearing strings are NOT pluralizable nouns —
+  `import_error_version_too_high` (a backup version number),
+  `import_error_file_too_large` (`%d MB`, an invariant unit) and
+  `pdf_kpi_over_drink_days` (`%d/7`, a ratio) — so each is annotated
+  `tools:ignore="PluralsCandidate"` (with `xmlns:tools` added to the base
+  `values/strings.xml`) rather than forced into a meaningless plural.
+
+Known upstream issue (documented, not fixed here):
+- The Android Gradle Plugin emits "Using a Project object as a dependency
+  notation has been deprecated" during configuration. A deprecation trace places
+  it inside AGP itself
+  (`com.android.build.gradle.internal.dependency.VariantDependenciesBuilder`,
+  reached from `VariantManager.createTestComponents`) while it wires the tested
+  project as a dependency of the test variant — not in this project's build
+  scripts, and not in any applied third-party plugin (CycloneDX 3.2.4, the
+  latest, was ruled out). It is harmless on the current Gradle 9.6.1 and will
+  only become an error on Gradle 10, so the fix must come from a future AGP
+  release. `allWarningsAsErrors` does not promote it, as it is a Gradle
+  configuration-phase notice rather than a Kotlin compiler warning.
+
+---
+
 ## v0.73.4
 
 Fix QA findings: locale-aware numbers, backup robustness, docs

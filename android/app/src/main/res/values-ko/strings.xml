@@ -187,8 +187,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">내보낼 기록이 없습니다.</string>
     <string name="export_failed">내보내기에 실패했습니다.</string>
     <string name="backup_failed">백업에 실패했습니다.</string>
-    <string name="import_success_replace">%1$d 개의 기록을 가져왔습니다.</string>
-    <string name="import_success_merge">%1$d 개 가져오기, %2$d 개 건너뜀.</string>
+    <plurals name="import_success_replace">
+        <item quantity="other">%1$d 개의 기록을 가져왔습니다.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="other">%1$d 개 가져오기, %2$d 개 건너뜀.</item>
+    </plurals>
     <string name="import_error_could_not_read">파일을 읽을 수 없습니다.</string>
     <string name="import_error_empty">백업 파일이 비어 있습니다.</string>
     <string name="import_error_invalid_json">잘못된 JSON 형식입니다.</string>

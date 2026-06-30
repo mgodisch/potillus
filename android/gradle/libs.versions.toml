@@ -91,9 +91,16 @@ activity-compose    = "1.12.3"   # Bridge between Activity and Compose (was 1.9.
 lifecycle           = "2.10.0"
 
 # Navigation: Compose-based screen navigation.
-# 2.8.0+ required for type-safe routes (@Serializable data objects). Kept at 2.8.9:
-# androidx.navigation 2.9.x is still in alpha, so 2.8.9 is the current stable.
-navigation-compose  = "2.8.9"
+# 2.8.0+ required for type-safe routes (@Serializable data objects). 2.9.7 is the
+# current stable. It is required here because navigation 2.8.9 bundled lint
+# detectors compiled against older Compose lint utilities; under AGP 9.2 /
+# compose-bom 2026.06.00 those detectors crash the lint task with a
+# NoClassDefFoundError (androidx/navigation/lint/UtilKt and
+# androidx/compose/lint/PsiUtilsKt). 2.9.x ships detectors built against the
+# current Compose lint API, so the navigation lint checks run instead of crashing
+# (they are re-enabled in app/build.gradle.kts). The type-safe-route API the app
+# uses is unchanged from 2.8, so no source edits are needed.
+navigation-compose  = "2.9.7"
 
 # Room: SQLite abstraction layer (ORM-like).
 # 2.8.4 is the latest Room 2.x (was 2.7.1). Room 2.x is in maintenance mode;

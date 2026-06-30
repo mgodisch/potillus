@@ -139,8 +139,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Inga poster att exportera.</string>
     <string name="export_failed">Export misslyckades.</string>
     <string name="backup_failed">Säkerhetskopian misslyckades.</string>
-    <string name="import_success_replace">%1$d poster importerade.</string>
-    <string name="import_success_merge">%1$d importerade, %2$d hoppade över.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d post importerad.</item>
+        <item quantity="other">%1$d poster importerade.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importerade, %2$d hoppade över.</item>
+        <item quantity="other">%1$d importerade, %2$d hoppade över.</item>
+    </plurals>
     <string name="import_error_could_not_read">Filen kunde inte läsas.</string>
     <string name="import_error_empty">Säkerhetskopiafilen är tom.</string>
     <string name="import_error_invalid_json">Ogiltigt JSON-format.</string>

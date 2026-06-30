@@ -180,8 +180,18 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Немає записів для експорту.</string>
     <string name="export_failed">Помилка експорту.</string>
     <string name="backup_failed">Помилка резервного копіювання.</string>
-    <string name="import_success_replace">%1$d записів імпортовано.</string>
-    <string name="import_success_merge">%1$d імпортовано, %2$d пропущено.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d запис імпортовано.</item>
+        <item quantity="few">%1$d записи імпортовано.</item>
+        <item quantity="many">%1$d записів імпортовано.</item>
+        <item quantity="other">%1$d запису імпортовано.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d імпортовано, %2$d пропущено.</item>
+        <item quantity="few">%1$d імпортовано, %2$d пропущено.</item>
+        <item quantity="many">%1$d імпортовано, %2$d пропущено.</item>
+        <item quantity="other">%1$d імпортовано, %2$d пропущено.</item>
+    </plurals>
     <string name="import_error_could_not_read">Не вдалося прочитати файл.</string>
     <string name="import_error_empty">Файл резервної копії порожній.</string>
     <string name="import_error_invalid_json">Невірний формат JSON.</string>

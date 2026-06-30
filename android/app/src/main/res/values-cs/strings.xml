@@ -139,8 +139,18 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Žádné záznamy k exportu.</string>
     <string name="export_failed">Export se nezdařil.</string>
     <string name="backup_failed">Záloha se nezdařila.</string>
-    <string name="import_success_replace">Importováno %1$d záznamů.</string>
-    <string name="import_success_merge">%1$d importováno, %2$d přeskočeno.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">Importováno %1$d záznam.</item>
+        <item quantity="few">Importováno %1$d záznamy.</item>
+        <item quantity="many">Importováno %1$d záznamu.</item>
+        <item quantity="other">Importováno %1$d záznamů.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importováno, %2$d přeskočeno.</item>
+        <item quantity="few">%1$d importováno, %2$d přeskočeno.</item>
+        <item quantity="many">%1$d importováno, %2$d přeskočeno.</item>
+        <item quantity="other">%1$d importováno, %2$d přeskočeno.</item>
+    </plurals>
     <string name="import_error_could_not_read">Soubor nelze přečíst.</string>
     <string name="import_error_empty">Záložní soubor je prázdný.</string>
     <string name="import_error_invalid_json">Neplatný formát JSON.</string>

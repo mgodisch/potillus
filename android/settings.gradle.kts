@@ -52,9 +52,17 @@ pluginManagement {
         gradlePluginPortal()  // for Kotlin plugins and KSP
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
-}
+
+// NOTE: the org.gradle.toolchains.foojay-resolver-convention plugin was
+// DELIBERATELY REMOVED (and must not be re-added). It auto-provisions a JDK by
+// downloading one over the network whenever a Java toolchain is requested that
+// is not already installed. F-Droid builds run network-restricted, so such a
+// download would fail, and an auto-fetched JDK would also undermine reproducible
+// builds. This project pins no Java/Kotlin toolchain (no `jvmToolchain(...)` /
+// `java { toolchain { ... } }` block — compileOptions/JvmTarget target JDK 21
+// against whatever JDK 21 the environment already provides), so the resolver was
+// never actually invoked. Removing it deletes a latent network path with zero
+// change to how any build selects its JDK.
 
 // dependencyResolutionManagement: for app libraries (Compose, Room etc.)
 dependencyResolutionManagement {

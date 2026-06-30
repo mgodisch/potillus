@@ -52,6 +52,7 @@ package de.godisch.potillus.ui.screen
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -254,9 +255,9 @@ class SettingsViewModel(
                 }
                 _exportStatus.value = ExportStatus.Done(
                     if (mode == ImportMode.REPLACE)
-                        str(R.string.import_success_replace, stats.imported)
+                        quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
                     else
-                        str(R.string.import_success_merge, stats.imported, stats.skipped)
+                        quantityStr(R.plurals.import_success_merge, stats.imported, stats.imported, stats.skipped)
                 )
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) Log.e(TAG, "importBackup: unexpected error", e)
@@ -267,6 +268,19 @@ class SettingsViewModel(
 
     /** Resolves string resource [id] formatted with [args] via the injected [StringProvider]. */
     private fun str(@StringRes id: Int, vararg args: Any): String = getString(id, *args)
+
+    /**
+     * Resolves plural resource [id] for [quantity], formatted with [args].
+     *
+     * Uses [appContext]'s resources (same resolution path as [getString] via
+     * `app::getString`, so it honours the per-app locale). [quantity] selects the
+     * CLDR plural form; pass the count(s) again in [args] to fill the `%d`
+     * placeholders. For messages with two numbers (e.g. import_success_merge) the
+     * plural form is chosen by the FIRST count, which is the only one that governs
+     * an inflected word in the en/de sources.
+     */
+    private fun quantityStr(@PluralsRes id: Int, quantity: Int, vararg args: Any): String =
+        appContext.resources.getQuantityString(id, quantity, *args)
 
     /** Maps a [BackupManager.ImportError] to a localised, user-facing message. */
     private fun localiseImportError(error: BackupManager.ImportError): String = when (error) {

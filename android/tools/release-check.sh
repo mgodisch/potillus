@@ -59,7 +59,13 @@
 #      The versionName in build.gradle.kts, the top CHANGELOG.md entry, the
 #      README.md title line, and the proguard-rules.pro header comment must
 #      all carry the same version string.  versionCode must be ≥ 1 and must
-#      be a plain integer (no alphabetic suffix).
+#      be a plain integer (no alphabetic suffix).  Additionally, the F-Droid
+#      reference recipe (fdroid/de.godisch.potillus.yml) must agree: its
+#      CurrentVersion/CurrentVersionCode and its latest Builds block must equal
+#      the app's versionName/versionCode.  Fastlane store changelogs are coupled
+#      to versionCode by filename; every listing locale must carry the CURRENT
+#      versionCode note, while the FULL per-versionCode history need only stay in
+#      sync across the history-bearing locales (HISTORY_LOCALES: en-US, de-DE).
 #
 #   2. CHANGELOG
 #      The top-most ## vX.Y.Z entry must match versionName and must have at
@@ -211,6 +217,15 @@ SCHEMAS_DIR="app/schemas/de.godisch.potillus.data.db.AppDatabase"
 # Per-locale release notes are named after the integer versionCode, e.g.
 # ../fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
 FASTLANE_DIR="../fastlane/metadata/android"
+# F-Droid reference build recipe (maintainer's copy of the fdroiddata file). Its
+# version fields are cross-checked against build.gradle.kts in SECTION 1 so the
+# recipe can never silently lag the source tree again.
+FDROID_RECIPE="../fdroid/de.godisch.potillus.yml"
+# Listing locales that maintain the FULL per-versionCode changelog history. All
+# OTHER fastlane locales are listing-only: they ship the current versionCode note
+# and reuse en-US screenshots, and are exempt from full-history parity. See the
+# locale-parity cross-check in SECTION 1.
+HISTORY_LOCALES="en-US de-DE"
 # Baseline coupling versionName ↔ versionCode for the one-increment-per-release
 # rule. See the file's own header and SECTION 1 for the derivation.
 ANCHOR_FILE="version-anchor"
@@ -410,6 +425,49 @@ CHANGELOG version must bump versionCode by exactly 1"
         pass "versionName matches proguard-rules.pro header (v$vname)"
     fi
 
+    # ── Cross-check: F-Droid reference recipe ↔ build.gradle.kts ──────────────
+    # The maintainer's recipe copy (fdroid/de.godisch.potillus.yml) must never
+    # lag the source tree. Its CurrentVersion / CurrentVersionCode AND its latest
+    # Builds block must equal the app's versionName / versionCode — which the
+    # checks above already tie to the top CHANGELOG entry, the README title and
+    # the proguard header. This is the enforcing half of the recipe-sync policy:
+    # once green here, recipe, build.gradle.kts and CHANGELOG are provably in
+    # lock-step, so a stale build block (the bug this check was added for) fails
+    # the release instead of shipping silently.
+    if [[ ! -f "$FDROID_RECIPE" ]]; then
+        warn "No F-Droid recipe at $FDROID_RECIPE — skipping recipe version cross-check"
+    else
+        local r_cur_name r_cur_code r_build_name r_build_code
+        # Top-level CurrentVersion / CurrentVersionCode (strip key, quotes, spaces).
+        r_cur_name=$(grep -E '^CurrentVersion:'     "$FDROID_RECIPE" | head -1 \
+            | sed -E 's/^CurrentVersion:[[:space:]]*//; s/["'"'"']//g; s/[[:space:]]*$//')
+        r_cur_code=$(grep -E '^CurrentVersionCode:' "$FDROID_RECIPE" | head -1 \
+            | sed -E 's/[^0-9]//g')
+        # Latest Builds: block entry (indented versionName/versionCode); take the
+        # last occurrence so the check still targets the newest block if more than
+        # one is ever present.
+        r_build_name=$(grep -E '^[[:space:]]+(- )?versionName:' "$FDROID_RECIPE" | tail -1 \
+            | sed -E 's/.*versionName:[[:space:]]*//; s/["'"'"']//g; s/[[:space:]]*$//')
+        r_build_code=$(grep -E '^[[:space:]]+(- )?versionCode:' "$FDROID_RECIPE" | tail -1 \
+            | sed -E 's/[^0-9]//g')
+
+        if [[ "$r_cur_name" != "$vname" ]]; then
+            fail "F-Droid recipe CurrentVersion '$r_cur_name' ≠ versionName '$vname' — sync $FDROID_RECIPE"
+        else
+            pass "F-Droid recipe CurrentVersion matches versionName (v$vname)"
+        fi
+        if [[ "$r_cur_code" != "$vcode" ]]; then
+            fail "F-Droid recipe CurrentVersionCode '$r_cur_code' ≠ versionCode '$vcode' — sync $FDROID_RECIPE"
+        else
+            pass "F-Droid recipe CurrentVersionCode matches versionCode ($vcode)"
+        fi
+        if [[ "$r_build_name" != "$vname" || "$r_build_code" != "$vcode" ]]; then
+            fail "F-Droid recipe latest Builds block ($r_build_name/$r_build_code) ≠ build.gradle.kts ($vname/$vcode) — sync $FDROID_RECIPE"
+        else
+            pass "F-Droid recipe latest Builds block matches build.gradle.kts ($vname/$vcode)"
+        fi
+    fi
+
     # Cross-check: fastlane release notes are coupled to versionCode by filename.
     # If no fastlane tree exists yet this is only advisory (the project may not
     # publish to a store); once a locale directory exists it MUST carry the note
@@ -431,23 +489,27 @@ CHANGELOG version must bump versionCode by exactly 1"
             fi
         done
 
-        # Cross-check 2: LOCALE PARITY. Every locale's changelogs/ directory must
-        # carry the SAME set of <versionCode>.txt notes. The check above only
-        # inspects the current versionCode; this catches a note that was added to
-        # one locale but forgotten in another (or left behind in only one). The
-        # reference is the union of all locales' changelog file names; any locale
-        # missing one of them is a desync.
-        local all_files f desync=0
-        all_files=$(for locale_dir in "$FASTLANE_DIR"/*/; do
-            [[ -d "${locale_dir}changelogs" ]] || continue
-            ls "${locale_dir}changelogs" 2>/dev/null | grep -E '^[0-9]+\.txt$' || true
+        # Cross-check 2: LOCALE PARITY (history locales only). The locales in
+        # HISTORY_LOCALES (en-US, de-DE) maintain the FULL per-versionCode
+        # changelog history, so they must all carry the SAME set of <code>.txt
+        # notes — this catches a note added to one but forgotten in the other.
+        # Every OTHER listing locale is intentionally listing-only: it ships just
+        # the CURRENT versionCode note (already required by cross-check 1 above)
+        # and reuses the en-US screenshots, so it is EXEMPT from full-history
+        # parity. Without this exemption, adding a new listing locale would demand
+        # a back-dated changelog file for every historical versionCode it never
+        # actually shipped under. The reference set is therefore the union over
+        # history locales only.
+        local all_files f desync=0 hl
+        all_files=$(for hl in $HISTORY_LOCALES; do
+            [[ -d "$FASTLANE_DIR/$hl/changelogs" ]] || continue
+            ls "$FASTLANE_DIR/$hl/changelogs" 2>/dev/null | grep -E '^[0-9]+\.txt$' || true
         done | sort -u)
-        for locale_dir in "$FASTLANE_DIR"/*/; do
-            [[ -d "$locale_dir" ]] || continue
-            locale=$(basename "$locale_dir")
+        for hl in $HISTORY_LOCALES; do
+            [[ -d "$FASTLANE_DIR/$hl" ]] || continue
             for f in $all_files; do
-                if [[ ! -f "${locale_dir}changelogs/${f}" ]]; then
-                    fail "fastlane: locale '$locale' is missing changelog $f that another locale has (changelogs out of sync)"
+                if [[ ! -f "$FASTLANE_DIR/$hl/changelogs/${f}" ]]; then
+                    fail "fastlane: history locale '$hl' is missing changelog $f that another history locale has (changelogs out of sync)"
                     desync=1
                 fi
             done
@@ -456,7 +518,7 @@ CHANGELOG version must bump versionCode by exactly 1"
         if [[ "$checked" -eq 0 ]]; then
             warn "fastlane tree present but contains no locale directories"
         elif [[ "$missing" -eq 0 && "$desync" -eq 0 ]]; then
-            pass "fastlane changelogs present for versionCode $vcode and in sync across all $checked locale(s)"
+            pass "fastlane: versionCode $vcode note present in all $checked locale(s); full history in sync across history locales ($HISTORY_LOCALES)"
         fi
     fi
 }

@@ -64,10 +64,10 @@ class LocaleDetectorTest {
     /**
      * A locale whose full IETF tag matches exactly (e.g. "de" system → "de").
      *
-     * Locale("de") produces toLanguageTag() = "de", which is in the supported set.
+     * Locale.of("de") produces toLanguageTag() = "de", which is in the supported set.
      */
     @Test fun `exact tag match returns the matching tag`() {
-        val result = LocaleDetector.detect(Locale("de"), supported)
+        val result = LocaleDetector.detect(Locale.of("de"), supported)
         assertEquals("de", result)
     }
 
@@ -170,8 +170,8 @@ class LocaleDetectorTest {
      */
     @Test fun `matching is case-insensitive`() {
         val mixedCaseSupported = setOf("EN", "DE", "PT-BR")
-        assertEquals("EN", LocaleDetector.detect(Locale("en"), mixedCaseSupported))
-        assertEquals("DE", LocaleDetector.detect(Locale("de"), mixedCaseSupported))
+        assertEquals("EN", LocaleDetector.detect(Locale.of("en"), mixedCaseSupported))
+        assertEquals("DE", LocaleDetector.detect(Locale.of("de"), mixedCaseSupported))
         assertEquals("PT-BR", LocaleDetector.detect(Locale.forLanguageTag("pt-BR"), mixedCaseSupported))
     }
 }

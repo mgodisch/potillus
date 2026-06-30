@@ -1,0 +1,1 @@
+Onderhoudsrelease: F-Droid-verpakking voorbereid, build-configuratie opgeschoond en de winkelvermelding nu beschikbaar in 19 extra talen. Geen wijzigingen in de functionaliteit van de app.

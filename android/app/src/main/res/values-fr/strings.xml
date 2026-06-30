@@ -155,8 +155,16 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Aucune entrée à exporter.</string>
     <string name="export_failed">Échec de l\'export.</string>
     <string name="backup_failed">Échec de la sauvegarde.</string>
-    <string name="import_success_replace">%1$d entrées importées.</string>
-    <string name="import_success_merge">%1$d importées, %2$d ignorées.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d entrée importée.</item>
+        <item quantity="many">%1$d entrées importées.</item>
+        <item quantity="other">%1$d entrées importées.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importée, %2$d ignorées.</item>
+        <item quantity="many">%1$d importées, %2$d ignorées.</item>
+        <item quantity="other">%1$d importées, %2$d ignorées.</item>
+    </plurals>
     <string name="import_error_could_not_read">Impossible de lire le fichier.</string>
     <string name="import_error_empty">Le fichier de sauvegarde est vide.</string>
     <string name="import_error_invalid_json">Format JSON invalide.</string>

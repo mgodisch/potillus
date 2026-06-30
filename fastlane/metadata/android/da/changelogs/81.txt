@@ -1,0 +1,1 @@
+Vedligeholdelsesudgivelse: F-Droid-pakning forberedt, build-konfiguration ryddet op, og butikslisten er nu tilgængelig på 19 yderligere sprog. Ingen ændringer i appens funktion.

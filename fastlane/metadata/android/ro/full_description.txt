@@ -1,0 +1,53 @@
+Libellus Potionis este un jurnal al consumului de alcool prietenos cu
+confidențialitatea, gratuit, open source și fără reclame. Te ajută să
+monitorizezi, să dozezi și să îți gestionezi consumul complet offline. Nu
+necesită permisiuni invazive — fără cameră, microfon sau locație — și
+funcționează în întregime fără acces la rețea.
+
+FUNCȚII PRINCIPALE
+
+* Înregistrare inteligentă: definește-ți propriile băuturi sau alege dintre
+  șabloane uzuale la nivel internațional. Înregistrează băuturile imediat sau
+  retroactiv, cu corecții precise de timp.
+* Mai multe limite simultan: stabilește trei limite în paralel — o limită zilnică
+  (grame de alcool pur), o limită săptămânală glisantă pe 7 zile (grame) și un
+  număr maxim de zile de consum pe săptămână. Barele de progres te țin informat în
+  timp real.
+* Estimarea alcoolemiei (BAC): introdu greutatea corporală pentru a obține o
+  aproximare în timp real, bazată pe consacrata formulă Widmark.
+* Rapoarte pentru consiliere: generează un raport PDF de două pagini, clar și bine
+  organizat, conceput pentru consultații și ședințe de consiliere, care îți
+  rezumă statistic obiceiurile.
+* Portabilitatea datelor: exportă întregul set de date ca fișier CSV standard
+  pentru prelucrare externă (de exemplu, în LibreOffice Calc) sau creează copii de
+  rezervă JSON sigure pentru a muta datele între dispozitive.
+* Ajustări fine: personalizează ora de "început al zilei", astfel încât băuturile
+  de noapte târziu să fie numărate în seara corectă, și stabilește date de început
+  al evaluării personalizate pentru reporniri curate.
+
+În aplicație este disponibil un ghid de utilizare cuprinzător.
+
+CONFIDENȚIALITATE ȘI SECURITATE
+
+Libellus Potionis este construit în jurul suveranității absolute a datelor și al
+unei minimizări stricte a datelor. Rulează cu un profil minim de permisiuni care
+exclude complet accesul la rețea, așa că datele tale personale nu părăsesc
+niciodată dispozitivul. Datele rămân în stocarea privată a aplicației, protejate
+în repaus de criptarea dispozitivului Android și de sandbox-ul aplicației; în
+plus, preferințele sunt sigilate cu o cheie Android Keystore susținută hardware.
+O blocare biometrică prin amprentă, opțională, protejează împotriva accesului
+fizic neautorizat. Această abordare offline elimină urmărirea, sincronizarea în
+cloud și scurgerile de date în exterior.
+
+COMPATIBILITATE
+
+Aplicația rulează pe Android 11 (API 30) și versiuni mai noi. Un selector de
+limbă propriu, complet independent, funcționează pe toate versiunile acceptate,
+indiferent de selectorul de limbă per aplicație al sistemului.
+
+SURSĂ DESCHISĂ
+
+Libellus Potionis este software liber, lansat sub licența GNU General Public
+License v3 (sau ulterioară). Codul sursă este documentat la nivel de manual și
+este disponibil în depozitul canonic:
+https://codeberg.org/godisch/potillus/

@@ -63,7 +63,6 @@ import de.godisch.potillus.fake.FakeDrinkRepository
 import de.godisch.potillus.fake.FakeEntryRepository
 import de.godisch.potillus.ui.screen.*
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -98,7 +97,6 @@ class AppViewModelFactoryTest {
     @Test fun `TodayViewModel can be constructed with its injected types`() {
         val vm = TodayViewModel(entryRepo = entryRepo, drinkRepo = drinkRepo, prefs = prefs)
         assertNotNull(vm)
-        assertTrue(vm is TodayViewModel)
         // Note: ViewModel.onCleared() is protected and cannot be called from test code.
         // The coroutine scope managed by viewModelScope is cancelled automatically when
         // the ViewModel is garbage-collected; no explicit teardown is needed in a
@@ -111,7 +109,6 @@ class AppViewModelFactoryTest {
     @Test fun `CalendarViewModel can be constructed with its injected types`() {
         val vm = CalendarViewModel(entryRepo = entryRepo, drinkRepo = drinkRepo, prefs = prefs)
         assertNotNull(vm)
-        assertTrue(vm is CalendarViewModel)
     }
 
     /**
@@ -128,7 +125,6 @@ class AppViewModelFactoryTest {
             getString  = strings
         )
         assertNotNull(vm)
-        assertTrue(vm is StatsViewModel)
     }
 
     /**
@@ -137,7 +133,6 @@ class AppViewModelFactoryTest {
     @Test fun `DrinksViewModel can be constructed with its injected types`() {
         val vm = DrinksViewModel(drinkRepo = drinkRepo)
         assertNotNull(vm)
-        assertTrue(vm is DrinksViewModel)
     }
 
     /**
@@ -153,7 +148,6 @@ class AppViewModelFactoryTest {
             backupRepo  = backupRepo
         )
         assertNotNull(vm)
-        assertTrue(vm is SettingsViewModel)
     }
 
     // ── Factory `else` guard ─────────────────────────────────────────────────

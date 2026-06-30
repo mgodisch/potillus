@@ -1,0 +1,1 @@
+Maintenance release: F-Droid packaging prepared, build configuration cleaned up, and the store listing is now available in 19 additional languages. No changes to app functionality.

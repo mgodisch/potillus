@@ -1,0 +1,1 @@
+Versão de manutenção: empacotamento para F-Droid preparado, configuração de compilação arrumada e a página da loja agora disponível em mais 19 idiomas. Sem alterações na funcionalidade da aplicação.

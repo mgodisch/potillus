@@ -50,11 +50,58 @@ duplicate them in the fdroiddata merge request. (F-Droid does not find fastlane
 metadata placed inside the Gradle module tree, which is why it is kept at the
 root rather than under `android/`.)
 
+The listing is translated into all 21 shipped app languages. Only `en-US` and
+`de-DE` carry the full per-`versionCode` changelog history; the other locales
+ship the listing text plus the CURRENT version's changelog note, and reuse the
+`en-US` screenshots via F-Droid's locale fallback. `release-check.sh` SECTION 1
+enforces exactly this policy (see "locale-parity" there).
+
 ## Caveats to verify on first submission
 
 - **`subdir` / wrapper discovery.** Because the Gradle wrapper is under `android/`
   (not the repository root), confirm fdroidserver locates it from
   `subdir: android/app`. If the fdroiddata CI cannot find `gradlew`, adjust the
   recipe (e.g. point `subdir` at the Gradle root) per the CI feedback.
-- **The `v0.73.0` tag must exist** in the source repository before F-Droid can
-  build it; F-Droid only builds tagged commits.
+- **The build-block tag must exist** in the source repository before F-Droid can
+  build it; F-Droid only builds tagged commits. The current reference recipe
+  points at `v0.74.0`, so that tag must be pushed (see the milestone note below
+  for how this relates to the planned `1.0.0` debut).
+
+## First-version milestone (`1.0.0`)
+
+Project decision: the FIRST version actually published on F-Droid will be cut as
+**`1.0.0`** (it does not exist yet). Until that tag is created, this reference
+recipe deliberately tracks the latest *real* release so that `release-check.sh`
+can keep the recipe, `build.gradle.kts` and the top `CHANGELOG.md` entry in
+lock-step (the check fails on any drift). When you are ready to debut on F-Droid,
+cut `1.0.0` the normal way (bump `versionName`/`versionCode`, add the CHANGELOG
+entry and the per-locale `changelogs/<versionCode>.txt`, push the GPG-signed
+`v1.0.0` tag); the same machinery then updates this recipe to `1.0.0`, and that
+becomes the first `Builds:` block submitted to fdroiddata.
+
+## Submission checklist (fdroiddata merge request)
+
+These steps run entirely on your side; none of them contacts F-Droid until you
+deliberately open the merge request in step 6.
+
+1. **Pre-conditions.** The source repo is public over `https://`, builds an
+   unsigned release with no developer keystore, and carries a FOSS license
+   (`GPL-3.0-or-later`). All already true for this project.
+2. **Tag the release.** Push the GPG-signed `vX.Y.Z` tag the recipe's
+   `Builds: … commit:` points at (e.g. `v0.74.0`, later `v1.0.0`).
+3. **Get fdroidserver.** Install it locally, e.g. `pipx install fdroidserver`
+   (Debian/Ubuntu: `apt install fdroidserver`). Linting the recipe needs only
+   fdroidserver + Python; a real test build additionally needs the Android SDK
+   or the `registry.gitlab.com/fdroid/fdroidserver:buildserver` container image.
+4. **Fork & place the recipe.** Fork <https://gitlab.com/fdroid/fdroiddata>,
+   then copy this file to `metadata/de.godisch.potillus.yml` in the fork.
+5. **Validate locally (offline).** From the fdroiddata checkout run
+   `fdroid readmeta` and `fdroid lint de.godisch.potillus`; optionally
+   `fdroid build -l de.godisch.potillus` for a full clean-room build test.
+   Fix anything they report.
+6. **Open the merge request** against fdroiddata. The F-Droid CI builds and
+   reviews it; address any CI feedback (the `subdir`/wrapper caveat above is the
+   most likely first hurdle).
+7. **After merge**, `AutoUpdateMode: Version` picks up later `vX.Y.Z` tags
+   automatically and opens follow-up merge requests adding each new build block.
+   Keep this reference copy in sync with the fdroiddata file on every release.

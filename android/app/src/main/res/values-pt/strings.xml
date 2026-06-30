@@ -139,8 +139,16 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Sem registos para exportar.</string>
     <string name="export_failed">A exportação falhou.</string>
     <string name="backup_failed">A cópia de segurança falhou.</string>
-    <string name="import_success_replace">%1$d registos importados.</string>
-    <string name="import_success_merge">%1$d importados, %2$d ignorados.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d registo importado.</item>
+        <item quantity="many">%1$d registos importados.</item>
+        <item quantity="other">%1$d registos importados.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importado, %2$d ignorados.</item>
+        <item quantity="many">%1$d importados, %2$d ignorados.</item>
+        <item quantity="other">%1$d importados, %2$d ignorados.</item>
+    </plurals>
     <string name="import_error_could_not_read">Não foi possível ler o ficheiro.</string>
     <string name="import_error_empty">O ficheiro de cópia de segurança está vazio.</string>
     <string name="import_error_invalid_json">Formato JSON inválido.</string>

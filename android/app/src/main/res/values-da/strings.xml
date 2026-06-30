@@ -139,8 +139,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Ingen poster at eksportere.</string>
     <string name="export_failed">Eksporten mislykkedes.</string>
     <string name="backup_failed">Sikkerhedskopien mislykkedes.</string>
-    <string name="import_success_replace">%1$d poster importeret.</string>
-    <string name="import_success_merge">%1$d importeret, %2$d sprunget over.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d post importeret.</item>
+        <item quantity="other">%1$d poster importeret.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importeret, %2$d sprunget over.</item>
+        <item quantity="other">%1$d importeret, %2$d sprunget over.</item>
+    </plurals>
     <string name="import_error_could_not_read">Filen kunne ikke læses.</string>
     <string name="import_error_empty">Sikkerhedskopifilen er tom.</string>
     <string name="import_error_invalid_json">Ugyldigt JSON-format.</string>

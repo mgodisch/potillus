@@ -171,8 +171,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Keine Einträge vorhanden.</string>
     <string name="export_failed">Export fehlgeschlagen.</string>
     <string name="backup_failed">Backup fehlgeschlagen.</string>
-    <string name="import_success_replace">%1$d Einträge importiert.</string>
-    <string name="import_success_merge">%1$d Einträge importiert, %2$d übersprungen.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d Eintrag importiert.</item>
+        <item quantity="other">%1$d Einträge importiert.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d Eintrag importiert, %2$d übersprungen.</item>
+        <item quantity="other">%1$d Einträge importiert, %2$d übersprungen.</item>
+    </plurals>
     <string name="import_error_could_not_read">Datei konnte nicht gelesen werden.</string>
     <string name="import_error_empty">Backup-Datei ist leer.</string>
     <string name="import_error_invalid_json">Ungültiges JSON-Format.</string>

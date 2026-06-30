@@ -1,0 +1,1 @@
+Wydanie konserwacyjne: przygotowano pakowanie dla F-Droid, uporządkowano konfigurację kompilacji, a wpis w sklepie jest teraz dostępny w 19 dodatkowych językach. Bez zmian w działaniu aplikacji.

@@ -139,8 +139,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Δεν υπάρχουν εγγραφές για εξαγωγή.</string>
     <string name="export_failed">Η εξαγωγή απέτυχε.</string>
     <string name="backup_failed">Το αντίγραφο ασφαλείας απέτυχε.</string>
-    <string name="import_success_replace">Εισήχθησαν %1$d εγγραφές.</string>
-    <string name="import_success_merge">%1$d εισήχθησαν, %2$d παραλείφθηκαν.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">Εισήχθη %1$d εγγραφή.</item>
+        <item quantity="other">Εισήχθησαν %1$d εγγραφές.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d εισήχθη, %2$d παραλείφθηκαν.</item>
+        <item quantity="other">%1$d εισήχθησαν, %2$d παραλείφθηκαν.</item>
+    </plurals>
     <string name="import_error_could_not_read">Δεν ήταν δυνατή η ανάγνωση του αρχείου.</string>
     <string name="import_error_empty">Το αρχείο αντιγράφου ασφαλείας είναι κενό.</string>
     <string name="import_error_invalid_json">Μη έγκυρη μορφή JSON.</string>

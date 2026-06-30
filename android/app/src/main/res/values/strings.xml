@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 =============================================================================
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Libellus Potionis</string>
 
     <!-- Navigation -->
@@ -171,13 +171,21 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">No entries available.</string>
     <string name="export_failed">Export failed.</string>
     <string name="backup_failed">Backup failed.</string>
-    <string name="import_success_replace">%1$d entries imported.</string>
-    <string name="import_success_merge">%1$d entries imported, %2$d skipped.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d entry imported.</item>
+        <item quantity="other">%1$d entries imported.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d entry imported, %2$d skipped.</item>
+        <item quantity="other">%1$d entries imported, %2$d skipped.</item>
+    </plurals>
     <string name="import_error_could_not_read">File could not be read.</string>
     <string name="import_error_empty">Backup file is empty.</string>
     <string name="import_error_invalid_json">Invalid JSON format.</string>
-    <string name="import_error_version_too_high">Backup version %1$d is not supported (max. %2$d).</string>
-    <string name="import_error_file_too_large">Backup file too large (max. %1$d MB).</string>
+    <!-- The %d values below are a version number and a megabyte size, not counts
+         of a pluralizable noun, so PluralsCandidate is a false positive here. -->
+    <string name="import_error_version_too_high" tools:ignore="PluralsCandidate">Backup version %1$d is not supported (max. %2$d).</string>
+    <string name="import_error_file_too_large" tools:ignore="PluralsCandidate">Backup file too large (max. %1$d MB).</string>
     <string name="import_error_read">Read error: %1$s</string>
     <string name="drink_delete_blocked">\u201c{name}\u201d has {count} entries and cannot be deleted.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
@@ -210,7 +218,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_meta_drink_days_suffix">Drinking days/7 days</string>
     <string name="pdf_kpi_over_daily">days &gt; %1$s g/day</string>
     <string name="pdf_kpi_over_weekly">days &gt; %1$s g/7 days</string>
-    <string name="pdf_kpi_over_drink_days">days &gt; %1$d/7 drinking days</string>
+    <!-- "%1$d/7" is a ratio (threshold out of 7 days), not a count of a noun;
+         PluralsCandidate is a false positive here. -->
+    <string name="pdf_kpi_over_drink_days" tools:ignore="PluralsCandidate">days &gt; %1$d/7 drinking days</string>
     <string name="pdf_col_over_daily">&gt; day</string>
     <string name="menu">Menu</string>
     <string name="help">Help</string>

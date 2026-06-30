@@ -182,8 +182,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Ingen registreringer å eksportere.</string>
     <string name="export_failed">Eksport mislyktes.</string>
     <string name="backup_failed">Sikkerhetskopiering mislyktes.</string>
-    <string name="import_success_replace">%1$d registreringer importert.</string>
-    <string name="import_success_merge">%1$d importert, %2$d hoppet over.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d registrering importert.</item>
+        <item quantity="other">%1$d registreringer importert.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d importert, %2$d hoppet over.</item>
+        <item quantity="other">%1$d importert, %2$d hoppet over.</item>
+    </plurals>
     <string name="import_error_could_not_read">Filen kunne ikke leses.</string>
     <string name="import_error_empty">Sikkerhetskopifilen er tom.</string>
     <string name="import_error_invalid_json">Ugyldig JSON-format.</string>

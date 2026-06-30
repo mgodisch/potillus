@@ -187,8 +187,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">エクスポートする記録がありません。</string>
     <string name="export_failed">エクスポートに失敗しました。</string>
     <string name="backup_failed">バックアップに失敗しました。</string>
-    <string name="import_success_replace">%1$d 件の記録をインポートしました。</string>
-    <string name="import_success_merge">%1$d 件インポート、%2$d 件スキップ。</string>
+    <plurals name="import_success_replace">
+        <item quantity="other">%1$d 件の記録をインポートしました。</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="other">%1$d 件インポート、%2$d 件スキップ。</item>
+    </plurals>
     <string name="import_error_could_not_read">ファイルを読み込めませんでした。</string>
     <string name="import_error_empty">バックアップファイルが空です。</string>
     <string name="import_error_invalid_json">無効な JSON 形式です。</string>

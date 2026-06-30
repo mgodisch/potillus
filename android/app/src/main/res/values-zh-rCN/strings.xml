@@ -170,8 +170,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">没有可导出的记录。</string>
     <string name="export_failed">导出失败。</string>
     <string name="backup_failed">备份失败。</string>
-    <string name="import_success_replace">已导入 %1$d 条记录。</string>
-    <string name="import_success_merge">已导入 %1$d 条，跳过 %2$d 条。</string>
+    <plurals name="import_success_replace">
+        <item quantity="other">已导入 %1$d 条记录。</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="other">已导入 %1$d 条，跳过 %2$d 条。</item>
+    </plurals>
     <string name="import_error_could_not_read">无法读取文件。</string>
     <string name="import_error_empty">备份文件为空。</string>
     <string name="import_error_invalid_json">无效的 JSON 格式。</string>

@@ -1,0 +1,1 @@
+Versiune de întreținere: împachetarea pentru F-Droid pregatită, configurația de compilare curățată, iar pagina din magazin este acum disponibilă în încă 19 limbi. Fără modificări ale funcționalității aplicației.

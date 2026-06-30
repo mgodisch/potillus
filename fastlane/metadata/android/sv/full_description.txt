@@ -1,0 +1,50 @@
+Libellus Potionis är en integritetsvänlig, gratis, öppen källkods- och
+reklamfri alkoholspårare. Den hjälper dig att övervaka, dosera och hantera din
+konsumtion helt offline. Den kräver inga närgångna behörigheter – varken kamera,
+mikrofon eller plats – och fungerar helt utan nätverksåtkomst.
+
+HUVUDFUNKTIONER
+
+* Smart registrering: skapa egna drycker eller välj bland internationellt
+  vanliga mallar. Registrera drycker direkt eller i efterhand med exakta
+  tidskorrigeringar.
+* Flera gränser samtidigt: ställ in tre gränser parallellt – en daglig gräns
+  (gram ren alkohol), en glidande veckogräns över 7 dagar (gram) och ett högsta
+  antal dryckesdagar per vecka. Förloppsindikatorer håller dig informerad i
+  realtid.
+* Promilleuppskattning (BAC): ange din kroppsvikt för att få en
+  realtidsuppskattning baserad på den vedertagna Widmark-formeln.
+* Rapporter för rådgivning: skapa en tydlig, välorganiserad PDF-rapport på två
+  sidor, avsedd för konsultationer och rådgivningsbesök, som sammanfattar dina
+  vanor statistiskt.
+* Dataportabilitet: exportera hela din datamängd som en standard-CSV-fil för
+  extern bearbetning (till exempel i LibreOffice Calc), eller skapa säkra
+  JSON-säkerhetskopior för att flytta data mellan enheter.
+* Finjusteringar: anpassa din "dagsstart" så att sena nattdrycker räknas till
+  rätt kväll, och ange egna startdatum för utvärdering för rena omstarter.
+
+En utförlig användarguide finns inne i appen.
+
+INTEGRITET & SÄKERHET
+
+Libellus Potionis är byggd kring fullständig datasuveränitet och strikt
+dataminimering. Den körs med en minimal behörighetsprofil som helt utesluter
+nätverksåtkomst, så dina personuppgifter lämnar aldrig enheten. Dina data stannar
+i appens privata lagring, skyddade i vila av Androids enhetskryptering och
+appens sandlåda; inställningarna förseglas dessutom med en hårdvarustödd Android
+Keystore-nyckel. Ett valfritt biometriskt fingeravtryckslås skyddar mot obehörig
+fysisk åtkomst. Detta offline-först-upplägg eliminerar spårning,
+molnsynkronisering och externa dataläckor.
+
+KOMPATIBILITET
+
+Appen körs på Android 11 (API 30) och senare. En helt fristående språkväljare i
+appen fungerar på alla versioner som stöds, oberoende av systemets språkväljare
+per app.
+
+ÖPPEN KÄLLKOD
+
+Libellus Potionis är fri programvara som ges ut under GNU General Public License
+v3 (eller senare). Källkoden är dokumenterad på lärobokssnivå och finns i det
+kanoniska kodförrådet:
+https://codeberg.org/godisch/potillus/

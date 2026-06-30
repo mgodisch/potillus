@@ -139,8 +139,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="export_no_entries">Geen invoer om te exporteren.</string>
     <string name="export_failed">Export mislukt.</string>
     <string name="backup_failed">Back-up mislukt.</string>
-    <string name="import_success_replace">%1$d invoer geïmporteerd.</string>
-    <string name="import_success_merge">%1$d geïmporteerd, %2$d overgeslagen.</string>
+    <plurals name="import_success_replace">
+        <item quantity="one">%1$d invoer geïmporteerd.</item>
+        <item quantity="other">%1$d invoer geïmporteerd.</item>
+    </plurals>
+    <plurals name="import_success_merge">
+        <item quantity="one">%1$d geïmporteerd, %2$d overgeslagen.</item>
+        <item quantity="other">%1$d geïmporteerd, %2$d overgeslagen.</item>
+    </plurals>
     <string name="import_error_could_not_read">Bestand kon niet worden gelezen.</string>
     <string name="import_error_empty">Het back-upbestand is leeg.</string>
     <string name="import_error_invalid_json">Ongeldig JSON-formaat.</string>
