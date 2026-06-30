@@ -1,1 +1,0 @@
-Version de maintenance : empaquetage F-Droid préparé, configuration de build nettoyée et fiche du magasin désormais disponible dans 19 langues supplémentaires. Aucune modification des fonctionnalités de l'application.

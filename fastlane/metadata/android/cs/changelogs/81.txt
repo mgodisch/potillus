@@ -1,1 +1,0 @@
-Údržbové vydání: připravena balíčkovací konfigurace pro F-Droid, vyčištěna konfigurace sestavení a popis v obchodě je nyní dostupný v 19 dalších jazycích. Bez změn ve funkčnosti aplikace.

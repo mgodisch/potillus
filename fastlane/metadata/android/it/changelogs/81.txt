@@ -1,1 +1,0 @@
-Versione di manutenzione: pacchettizzazione F-Droid predisposta, configurazione di build ripulita e scheda dello store ora disponibile in altre 19 lingue. Nessuna modifica alle funzionalità dell'app.

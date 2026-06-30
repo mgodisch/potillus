@@ -1,0 +1,1 @@
+Versão de privacidade e transparência: o bloco de metadados de dependências do Google incorporado foi removido do APK e o aplicativo agora inclui sua lista de materiais de software (SBOM) dentro do pacote. Sem alterações na funcionalidade do aplicativo.

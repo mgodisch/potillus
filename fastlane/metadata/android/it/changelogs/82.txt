@@ -1,0 +1,1 @@
+Versione su privacy e trasparenza: rimosso dall'APK il blocco di metadati delle dipendenze Google incorporato e l'app ora include la sua distinta base del software (SBOM) all'interno del pacchetto. Nessuna modifica alle funzionalità dell'app.

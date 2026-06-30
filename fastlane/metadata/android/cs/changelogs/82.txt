@@ -1,0 +1,1 @@
+Vydání zaměřené na soukromí a transparentnost: z APK byl odstraněn vložený blok metadat závislostí Google a aplikace nyní přibaluje svůj soupis softwarových komponent (SBOM) přímo do balíčku. Žádné změny ve funkcích aplikace.

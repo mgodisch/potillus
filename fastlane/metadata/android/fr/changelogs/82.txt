@@ -1,0 +1,1 @@
+Version axée sur la confidentialité et la transparence : le bloc de métadonnées de dépendances Google intégré a été retiré de l'APK, et l'application fournit désormais sa nomenclature logicielle (SBOM) à l'intérieur du paquet. Aucune modification des fonctionnalités de l'application.

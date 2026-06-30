@@ -1,0 +1,1 @@
+Privacy and transparency release: removed the embedded Google dependency-metadata block from the APK, and the app now ships its Software Bill of Materials (SBOM) inside the package. No changes to app functionality.

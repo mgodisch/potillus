@@ -1,1 +1,0 @@
-Vedlikeholdsutgivelse: F-Droid-pakking forberedt, byggkonfigurasjon ryddet opp, og butikkoppføringen er nå tilgjengelig på 19 flere språk. Ingen endringer i appens funksjonalitet.

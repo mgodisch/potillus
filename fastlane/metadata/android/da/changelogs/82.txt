@@ -1,0 +1,1 @@
+Privatlivs- og gennemsigtighedsudgivelse: den indlejrede Google-afhængighedsmetadatablok er fjernet fra APK'en, og appen leverer nu sin softwarestykliste (SBOM) inde i pakken. Ingen ændringer i appens funktionalitet.

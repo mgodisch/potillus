@@ -1,0 +1,1 @@
+Integritets- och transparensutgåva: det inbäddade Google-beroendemetadatablocket har tagits bort från APK:n, och appen levererar nu sin programvaruförteckning (SBOM) inuti paketet. Inga ändringar i appens funktionalitet.

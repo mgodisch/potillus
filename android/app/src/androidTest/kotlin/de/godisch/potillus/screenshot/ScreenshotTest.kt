@@ -91,11 +91,13 @@ package de.godisch.potillus.screenshot
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
 import androidx.compose.ui.test.performClick
+import androidx.core.os.LocaleListCompat
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -104,10 +106,15 @@ import androidx.test.uiautomator.UiDevice
 import de.godisch.potillus.MainActivity
 import de.godisch.potillus.PotillusApp
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.domain.model.ThemeMode
+import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.util.BackupManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -153,25 +160,33 @@ class ScreenshotTest {
      * Prepares a clean, deterministic starting state for every run (screengrab
      * clears app data between locales, so this cannot assume anything survives):
      *
-     *  1. Seeds the database from the canonical demo fixture (../fastlane/
-     *     demo-backup.json), copied into the test APK assets at build time.
+     *  1. Waits for the one-shot preset prepopulation to finish, THEN seeds the
+     *     database from the canonical demo fixture (../fastlane/demo-backup.json,
+     *     copied into the test APK assets at build time). Awaiting the presets first
+     *     stops the import from racing the async PrepopulateCallback and inserting a
+     *     duplicate copy of every preset drink.
      *  2. Clears FLAG_SECURE for the run by enabling AppSettings.allowScreenshots,
      *     so the full-screen UiAutomator capture is not black.
-     *  3. Resets the in-app language to "follow system" so LocaleTestRule fully
-     *     controls the displayed language.
-     *  4. Installs the full-screen screenshot strategy (includes the demo-mode
-     *     status bar) and, defensively, applies the requested locale to the
-     *     app resources used for label lookup.
+     *  3. Forces the displayed language to the one screengrab requested via the
+     *     `testlocale` argument, by setting BOTH the app's `language` preference and
+     *     its live per-app locale. This drives the same path as the in-app language
+     *     picker, so the rendered UI language is deterministic and does NOT depend on
+     *     the (here unreliable) system-locale switch — otherwise every locale run
+     *     comes out in the device language.
+     *  4. Clears the statistics start floor (AppSettings.statsFromDate) so the
+     *     Statistics period spans the whole demo history instead of being clamped to
+     *     the fresh-install default (the APK install date = the capture day).
+     *  5. Installs the full-screen screenshot strategy (includes the demo-mode
+     *     status bar).
      */
     @Before
     fun setUp() {
         app    = ApplicationProvider.getApplicationContext()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        // 1) Seed the demo data through the REAL repository path so the running
-        //    app (which reads the same encrypted Room database) shows it. The
-        //    fixture is opened from the TEST APK assets via the instrumentation
-        //    context (NOT the target context).
+        // 0) Load the demo fixture text from the TEST APK assets via the
+        //    instrumentation context (NOT the target context). It is seeded into the
+        //    real Room database in step 1b below, so the running app shows it.
         val json = InstrumentationRegistry.getInstrumentation()
             .context.assets.open(DEMO_BACKUP_ASSET)
             .bufferedReader()
@@ -181,14 +196,74 @@ class ScreenshotTest {
         check(parsed.error == null) { "Demo backup fixture failed to parse: ${parsed.error}" }
 
         runBlocking {
+            // 1a) DETERMINISTIC PRESET PREPOPULATION (fixes duplicate drink rows).
+            //     The built-in preset drinks are inserted by Room's PrepopulateCallback
+            //     in a coroutine launched on the application scope when the database
+            //     file is first created (see AppDatabase.PrepopulateCallback). In a
+            //     screenshot run the FIRST database access is the importReplace() below,
+            //     so that async seeding and the import race each other: if
+            //     importReplace() takes its name-deduplication snapshot before the
+            //     presets are in place, it re-inserts every preset under a fresh id AND
+            //     the seeding inserts them again → each preset appears twice on the
+            //     Drinks screen. Touching the drinks Flow here forces the database open
+            //     and suspends until the single preset set has fully landed, so
+            //     importReplace() reliably matches the presets by name and reuses their
+            //     ids instead of duplicating them.
+            //
+            //     The demo fixture intentionally mirrors the preset set, so the backup's
+            //     drink count equals the number of presets; we wait until at least that
+            //     many rows are present. withTimeout guards against a seeding stall.
+            withTimeout(readyTimeoutMs) {
+                app.drinkRepository.drinks.first { it.size >= parsed.drinks.size }
+            }
+
+            // 1b) Seed the demo data through the REAL repository path so the running app
+            //     (which reads the same Room database) shows it.
             app.backupRepository.importReplace(parsed.drinks, parsed.entries)
 
-            // 2) + 3): make the run deterministic and capturable.
+            // 2) Clear FLAG_SECURE for the run so the full-screen capture is not black.
             app.appPreferences.setAllowScreenshots(true)
-            app.appPreferences.setLanguage("")
+
+            // 3) RESET THE STATISTICS START FLOOR (fixes the one-bar statistics chart).
+            //    AppSettings.statsFromDate defaults to the APK's install date when unset
+            //    (AppPreferences.installDate). screengrab reinstalls the app per locale,
+            //    so that default is the capture day; the demo backup carries no settings,
+            //    so the floor stays there. StatsViewModel clamps the period start to this
+            //    floor, collapsing e.g. the "Month" window to the single capture day —
+            //    exactly the lone last-day bar seen on 03_statistics while the Calendar
+            //    (which does not clamp) still shows the whole month. Clearing the floor
+            //    lets the statistics period span the full demo history again.
+            app.appPreferences.setStatsFromDate("")
+
+            // 4) FORCE THE CAPTURE LANGUAGE (fixes English store shots rendered in German).
+            //    Potillus applies its UI language itself via a per-app locale
+            //    (AppCompatDelegate.setApplicationLocales), seeded from the stored
+            //    `language` preference and a first-launch detection from the SYSTEM
+            //    locale (see PotillusApp.applyLanguageOnFirstLaunch). Merely clearing the
+            //    preference and trusting screengrab's LocaleTestRule to flip the system
+            //    locale did NOT change the rendered language on the capture device, so
+            //    BOTH locale runs came out in the device language. Instead we drive the
+            //    exact path the in-app language picker uses: resolve screengrab's
+            //    requested `testlocale` to one of the app's supported language tags and
+            //    set BOTH the stored preference and the live per-app locale to it, making
+            //    the rendered language deterministic and independent of the device
+            //    locale.
+            //
+            //    This is intentionally the LAST step: applyLanguageOnFirstLaunch runs
+            //    asynchronously at process start and, on a fresh install, writes the
+            //    detected system language. Performing our write after the (slower)
+            //    seeding/import work above guarantees it lands last and wins. The app
+            //    context is reconfigured before MainActivity is launched in the test
+            //    body, so the first frame already renders in the right language;
+            //    setApplicationLocales must run on the main thread.
+            val lang = targetLanguageTag()
+            app.appPreferences.setLanguage(lang)
+            withContext(Dispatchers.Main) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang))
+            }
         }
 
-        // 4) Full-screen capture so the cleaned demo-mode status bar is included.
+        // 5) Full-screen capture so the cleaned demo-mode status bar is included.
         Screengrab.setDefaultScreenshotStrategy(UiAutomatorScreenshotStrategy())
     }
 
@@ -220,6 +295,7 @@ class ScreenshotTest {
             waitUntilReady()
 
             navigateToTab(R.string.drinks)
+            waitUntilDrinksLoaded()
             Screengrab.screenshot("04_drinks")
 
             openAddDrinkDialog()
@@ -268,6 +344,35 @@ class ScreenshotTest {
      */
     private fun navigateToTab(labelRes: Int) {
         composeRule.onNode(hasText(label(labelRes)) and hasClickAction()).performClick()
+        composeRule.waitForIdle()
+    }
+
+    /**
+     * Blocks until the Drinks list has actually rendered its rows, rather than only
+     * until Compose is idle.
+     *
+     * WHY THIS IS NEEDED
+     *   DrinksViewModel.uiState is a StateFlow seeded with an EMPTY DrinksUiState()
+     *   that is filled only once its backing Room Flow emits (it is built with
+     *   stateIn(..., DrinksUiState())). composeRule.waitForIdle() returns as soon as
+     *   Compose has no pending recomposition or animation work, which can happen
+     *   BEFORE that first database emission arrives — capturing then yields the
+     *   empty-state screen ("No drinks defined yet."), the cause of the
+     *   intermittently blank 04_drinks shot (empty in one locale run, populated in
+     *   the other — the signature of a race).
+     *
+     *   We wait until the empty-state label (R.string.no_drinks) is gone, i.e. the
+     *   real list has replaced it. This asserts only that loading finished, not how
+     *   many rows exist, so it stays correct if the demo fixture changes. The
+     *   preceding navigateToTab() already idles on the composed (still-empty) screen,
+     *   so the label is present when we start waiting and its disappearance is a
+     *   reliable "data has loaded" signal.
+     */
+    private fun waitUntilDrinksLoaded() {
+        val emptyLabel = label(R.string.no_drinks)
+        composeRule.waitUntil(uiTimeoutMs) {
+            composeRule.onAllNodes(hasText(emptyLabel)).fetchSemanticsNodes().isEmpty()
+        }
         composeRule.waitForIdle()
     }
 
@@ -335,6 +440,23 @@ class ScreenshotTest {
         val config = Configuration(base.resources.configuration)
         config.setLocale(Locale.forLanguageTag(tag))
         return base.createConfigurationContext(config)
+    }
+
+    /**
+     * Resolves screengrab's requested `testlocale` instrumentation argument to one of
+     * the app's supported language tags (e.g. "de-DE" → "de", "en-US" → "en").
+     *
+     * Reuses the production matching logic in [LocaleDetector.detect] against
+     * [SupportedLocales.TAGS] — the same single source of truth the in-app language
+     * picker uses — so the screenshot language can never drift from the set of
+     * languages the app actually ships. When no `testlocale` is supplied (a plain
+     * connectedDebugAndroidTest run), the device's default locale is used instead.
+     */
+    private fun targetLanguageTag(): String {
+        val raw = InstrumentationRegistry.getArguments().getString("testlocale")
+        val locale = if (raw != null) Locale.forLanguageTag(raw.replace('_', '-'))
+                     else Locale.getDefault()
+        return LocaleDetector.detect(locale, SupportedLocales.TAGS)
     }
 
     private companion object {

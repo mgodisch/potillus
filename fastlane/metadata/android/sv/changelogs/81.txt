@@ -1,1 +1,0 @@
-Underhållsversion: F-Droid-paketering förberedd, byggkonfiguration uppstädad och butiksbeskrivningen är nu tillgänglig på 19 ytterligare språk. Inga ändringar av appens funktion.

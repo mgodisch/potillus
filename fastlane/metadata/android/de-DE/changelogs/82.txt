@@ -1,0 +1,1 @@
+Datenschutz- und Transparenz-Release: der eingebettete Google-Abhängigkeits-Metadatenblock wurde aus dem APK entfernt, und die App liefert ihre Software-Stückliste (SBOM) jetzt im Paket mit. Keine Änderungen an der App-Funktion.

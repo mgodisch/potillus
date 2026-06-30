@@ -1,0 +1,1 @@
+Wydanie dotyczące prywatności i przejrzystości: usunięto z APK wbudowany blok metadanych zależności Google, a aplikacja dołącza teraz swoją listę komponentów oprogramowania (SBOM) wewnątrz pakietu. Bez zmian w działaniu aplikacji.

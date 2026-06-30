@@ -1,0 +1,1 @@
+Privacy- en transparantierelease: het ingebedde Google-afhankelijkheidsmetadatablok is uit de APK verwijderd, en de app levert nu zijn software-stuklijst (SBOM) mee in het pakket. Geen wijzigingen aan de app-functionaliteit.

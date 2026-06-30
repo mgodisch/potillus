@@ -284,6 +284,17 @@ install-debug: app/build/outputs/apk/debug/app-debug.apk
 screenshots: prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
 	test "$${DEV_COUNT:-0}" -ne 0
+	# 0) Pre-flight: the BUNDLED fastlane must be installed in ../fastlane before any
+	#    expensive work (the Gradle build and the device / Demo-Mode setup below).
+	#    The gems are vendored under fastlane/.vendor via `cd fastlane && bundle
+	#    install`; if that bundle is missing, the `bundle exec fastlane` capture in
+	#    step 5 aborts late with the cryptic "bundler: command not found: fastlane"
+	#    (Error 127) AFTER a full build and after toggling Demo Mode. Fail fast with
+	#    an actionable message instead — mirrors the Pillow / pdftoppm pre-flight
+	#    checks in screenshots-crop / screenshots-pdf. `bundle check` only verifies
+	#    the bundle is satisfied (it does not load fastlane), so it is cheap.
+	command -v bundle >/dev/null 2>&1 || { echo "screenshots: 'bundle' (Ruby Bundler) not found -- install Ruby + Bundler 4.0.15, then run 'cd fastlane && bundle install'."; exit 1; }
+	( cd ../fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots: fastlane gems are not installed in ../fastlane -- run 'cd fastlane && bundle install' (gems vendor into fastlane/.vendor; Bundler 4.0.15 is pinned in fastlane/Gemfile.lock)."; exit 1; }
 	# 1) Build the app + instrumentation APKs that screengrab installs.
 	./gradlew assembleDebug assembleDebugAndroidTest
 	# 2) Demo Mode is torn down no matter how this recipe exits.
@@ -299,6 +310,15 @@ screenshots: prereq
 	adb root >/dev/null 2>&1 || true
 	adb shell "date $$(date -u -d '$(SCREENSHOT_DATE) 10:00:00' +%m%d%H%M%Y.%S)" || true
 	adb shell am broadcast -a android.intent.action.TIME_SET >/dev/null 2>&1 || true
+	# Verify the date pin actually took. `date` is rejected on non-rooted physical
+	# devices (the `adb root` above then also fails), so the pin silently no-ops and
+	# the date-relative screens (Today / Calendar / Statistics) reflect the REAL
+	# device date instead of $(SCREENSHOT_DATE). Warn loudly rather than ship
+	# off-date screenshots unnoticed; run on an emulator or rooted device to pin it.
+	dev_date="$$(adb shell date +%Y-%m-%d 2>/dev/null | tr -d '\r' || true)"
+	if [ "$$dev_date" != "$(SCREENSHOT_DATE)" ]; then
+		echo "WARNING: device date is '$$dev_date', expected '$(SCREENSHOT_DATE)' -- the date pin did not take (non-rooted device?). Date-relative screenshots will use the real device date."
+	fi
 	# 4) Enter Android Demo Mode and clean the status bar.
 	adb shell settings put global sysui_demo_allowed 1
 	adb shell am broadcast -a com.android.systemui.demo -e command enter

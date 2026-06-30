@@ -36,6 +36,94 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.75.0
+
+Disable embedded Google dependency blob, ship SBOM inside the APK
+
+Privacy / transparency:
+- `android/app/build.gradle.kts` (`android { dependenciesInfo { } }`): disabled
+  the dependency-metadata block that the Android Gradle Plugin embeds by default
+  into the APK signing block (`includeInApk = false`) and the App Bundle
+  (`includeInBundle = false`). That block is encrypted with a Google public key
+  and readable only by Google Play; for an offline, network-free FOSS app it
+  serves no purpose and is opaque to users. Dropping it also removes one
+  non-transparent artefact from the output, which is friendlier to
+  reproducible-build verification.
+
+Reproducible builds / SBOM packaging:
+- `android/app/build.gradle.kts` (new section 5: `GenerateSbomAsset` +
+  `androidComponents`): the CycloneDX SBOM is now packaged INSIDE the release APK
+  under `assets/sbom/libellus-potionis-sbom.json`, so the bill of materials ships
+  with the artefact it describes. The standalone copy under `build/outputs/sbom/`
+  (used by `make sbom`) is unchanged.
+- The packaged copy is kept reproducible: the raw CycloneDX output carries a
+  wall-clock `metadata.timestamp`, so a generated-assets task normalises it with
+  the same `tools/sbom-normalize.py` used by `make sbom` (`SOURCE_DATE_EPOCH`-aware;
+  strips the timestamp otherwise) BEFORE the asset merge. The task is wired via
+  `addGeneratedSourceDirectory`, so it runs as part of `mergeReleaseAssets` with no
+  manual task dependencies. `python3` is already a build prerequisite (see the
+  `Makefile`), so no new toolchain requirement is introduced.
+
+Store screenshots (`make screenshots`):
+- Fixed four defects in the automated Play-Store screenshot capture
+  (`android/app/src/androidTest/kotlin/de/godisch/potillus/screenshot/ScreenshotTest.kt`)
+  plus two build-tooling diagnostics (`android/Makefile`). All app-facing fixes are
+  test-only; no production code changed.
+- `03_statistics` showed a single bar (the capture day) instead of the whole
+  month: `AppSettings.statsFromDate` falls back to the APK install date when unset
+  (`AppPreferences.installDate`); screengrab reinstalls the app per locale, so that
+  default is the capture day, and `StatsViewModel` clamps the period start to it —
+  collapsing the chart and the period totals to one day. The Calendar (which does
+  not clamp) still showed the full month, which is why the two screens disagreed.
+  `setUp()` now clears the floor (`setStatsFromDate("")`) so the statistics period
+  spans the full demo history again.
+- `04_drinks` was intermittently empty (blank in one locale run, populated in the
+  other — the signature of a race). `DrinksViewModel.uiState` starts from an empty
+  `DrinksUiState()` that is filled by a Room `Flow` via `stateIn(...)`; the bare
+  `composeRule.waitForIdle()` returns before that first database emission arrives.
+  A new `waitUntilDrinksLoaded()` gate waits until the empty-state label
+  (`R.string.no_drinks`) has disappeared before capturing.
+- The `en-US` screenshots rendered in German: the app drives its UI language via
+  its own per-app locale (`AppCompatDelegate.setApplicationLocales`), so relying on
+  screengrab's `LocaleTestRule` system-locale switch had no effect on the rendered
+  language and both locale runs came out in the device language. `setUp()` now
+  resolves the requested `testlocale` to a supported language tag (reusing the
+  production `LocaleDetector.detect` against `SupportedLocales.TAGS`) and sets BOTH
+  the `language` preference and the live per-app locale to it. This is the last
+  setup step, so it reliably wins over the asynchronous first-launch language
+  detection in `PotillusApp.applyLanguageOnFirstLaunch`.
+- Duplicate preset drinks appeared on the Drinks screen: the preset prepopulation
+  runs asynchronously (`AppDatabase.PrepopulateCallback` launches it on the
+  application scope when the database is first created), and the screenshot run's
+  first database access is the import itself, so seeding and import raced and both
+  inserted the presets. `setUp()` now awaits the presets (by collecting the drinks
+  `Flow` until they are present) before `importReplace`, so the import's name-based
+  deduplication matches and reuses them. (This race is effectively unreachable
+  through the normal UI, where an import happens seconds after first launch.)
+- `android/Makefile` (`screenshots`): the device date pin (`adb shell date`)
+  silently no-ops on non-rooted physical devices, leaving the date-relative screens
+  (Today / Calendar / Statistics) on the real device date instead of
+  `SCREENSHOT_DATE`. The recipe now reads the device date back and prints a
+  non-fatal WARNING when it differs from `SCREENSHOT_DATE`, so the condition is no
+  longer silent; run on an emulator or rooted device to pin the date.
+- `android/Makefile` (`screenshots`): added a fast-failing pre-flight check for the
+  bundled fastlane. The fastlane tree moved to the repository root, so a vendored
+  bundle installed under the old `android/fastlane/.vendor` no longer applies; the
+  capture step then failed late (after a full build and after toggling Demo Mode)
+  with the cryptic `bundler: command not found: fastlane` (Error 127). The recipe
+  now runs `bundle check` in `../fastlane` up front and, if the bundle is missing,
+  aborts immediately with an actionable message (`cd fastlane && bundle install`),
+  mirroring the existing Pillow / pdftoppm pre-flight checks.
+
+Version:
+- Bumped to `0.75.0` / versionCode `82` across `build.gradle.kts`,
+  `proguard-rules.pro`, the `README.md` title and the F-Droid recipe
+  (`fdroid/de.godisch.potillus.yml`: `Builds` seed entry and
+  `CurrentVersion`/`CurrentVersionCode`); added the per-locale fastlane `82.txt`
+  store-changelog notes.
+
+---
+
 ## v0.74.0
 
 Prepare F-Droid packaging, localize store listing
