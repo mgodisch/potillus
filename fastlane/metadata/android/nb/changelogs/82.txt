@@ -1,1 +1,0 @@
-Personvern- og åpenhetsutgivelse: den innebygde Google-avhengighetsmetadatablokken er fjernet fra APK-en, og appen leverer nå sin programvarefortegnelse (SBOM) inne i pakken. Ingen endringer i appens funksjonalitet.

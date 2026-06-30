@@ -110,10 +110,8 @@ import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.util.BackupManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.Before
 import org.junit.Rule
@@ -130,9 +128,9 @@ class ScreenshotTest {
 
     /**
      * Applies the locale that `fastlane screengrab` requests for this run (passed
-     * as the `testlocale` instrumentation argument) so the captured UI is rendered
+     * as the `testLocale` instrumentation argument) so the captured UI is rendered
      * in that language. When the suite is run WITHOUT screengrab (e.g. a plain
-     * `connectedDebugAndroidTest`), no `testlocale` is supplied and the rule is a
+     * `connectedDebugAndroidTest`), no `testLocale` is supplied and the rule is a
      * no-op, so capture simply happens in the device's current locale.
      */
     @get:Rule
@@ -168,7 +166,7 @@ class ScreenshotTest {
      *  2. Clears FLAG_SECURE for the run by enabling AppSettings.allowScreenshots,
      *     so the full-screen UiAutomator capture is not black.
      *  3. Forces the displayed language to the one screengrab requested via the
-     *     `testlocale` argument, by setting BOTH the app's `language` preference and
+     *     `testLocale` argument, by setting BOTH the app's `language` preference and
      *     its live per-app locale. This drives the same path as the in-app language
      *     picker, so the rendered UI language is deterministic and does NOT depend on
      *     the (here unreliable) system-locale switch — otherwise every locale run
@@ -235,32 +233,23 @@ class ScreenshotTest {
             //    lets the statistics period span the full demo history again.
             app.appPreferences.setStatsFromDate("")
 
-            // 4) FORCE THE CAPTURE LANGUAGE (fixes English store shots rendered in German).
-            //    Potillus applies its UI language itself via a per-app locale
-            //    (AppCompatDelegate.setApplicationLocales), seeded from the stored
-            //    `language` preference and a first-launch detection from the SYSTEM
-            //    locale (see PotillusApp.applyLanguageOnFirstLaunch). Merely clearing the
-            //    preference and trusting screengrab's LocaleTestRule to flip the system
-            //    locale did NOT change the rendered language on the capture device, so
-            //    BOTH locale runs came out in the device language. Instead we drive the
-            //    exact path the in-app language picker uses: resolve screengrab's
-            //    requested `testlocale` to one of the app's supported language tags and
-            //    set BOTH the stored preference and the live per-app locale to it, making
-            //    the rendered language deterministic and independent of the device
-            //    locale.
+            // 4) PIN THE STORED LANGUAGE PREFERENCE to the language screengrab asked
+            //    for. This also makes PotillusApp.applyLanguageOnFirstLaunch a no-op
+            //    (it only acts while the preference is empty), so the app's own
+            //    first-launch detection cannot race us and pick the device language.
             //
-            //    This is intentionally the LAST step: applyLanguageOnFirstLaunch runs
-            //    asynchronously at process start and, on a fresh install, writes the
-            //    detected system language. Performing our write after the (slower)
-            //    seeding/import work above guarantees it lands last and wins. The app
-            //    context is reconfigured before MainActivity is launched in the test
-            //    body, so the first frame already renders in the right language;
-            //    setApplicationLocales must run on the main thread.
-            val lang = targetLanguageTag()
-            app.appPreferences.setLanguage(lang)
-            withContext(Dispatchers.Main) {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang))
-            }
+            //    NOTE: the LIVE per-app locale is intentionally NOT applied here.
+            //    screengrab's LocaleTestRule only flips the SYSTEM locale (which did not
+            //    change the rendered language on the capture device), and on API 33+
+            //    AppCompatDelegate.setApplicationLocales() is applied ASYNCHRONOUSLY by
+            //    the framework — so applying it before the Activity exists did not affect
+            //    the freshly launched Activity's FIRST frame (it still drew in the device
+            //    language, and waitUntilReady then timed out waiting for the target-
+            //    language label). Instead the live locale is applied AFTER each Activity
+            //    launch, from waitUntilReady() -> applyCaptureLanguage(), with the Activity
+            //    already in the foreground — mirroring the in-app language picker, which
+            //    recreates the visible Activity into the requested language reliably.
+            app.appPreferences.setLanguage(targetLanguageTag())
         }
 
         // 5) Full-screen capture so the cleaned demo-mode status bar is included.
@@ -326,11 +315,31 @@ class ScreenshotTest {
      * gate resolves to READY without a prompt.
      */
     private fun waitUntilReady() {
+        applyCaptureLanguage()
         val todayLabel = label(R.string.today)
         composeRule.waitUntil(readyTimeoutMs) {
             composeRule.onAllNodes(hasText(todayLabel)).fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.waitForIdle()
+    }
+
+    /**
+     * Applies the run's target language to the LIVE per-app locale, with the
+     * Activity already in the foreground.
+     *
+     * This mirrors the in-app language picker (the one path known to switch the
+     * rendered language reliably on the capture device): with a visible Activity,
+     * AppCompatDelegate.setApplicationLocales() recreates it into the new language.
+     * It is called from waitUntilReady() right after each launch; the subsequent
+     * waitUntil() then absorbs the asynchronous recreate (API 33+ applies the locale
+     * off the calling thread). When the language already matches — the device locale,
+     * or a second launch in the same run — this is a harmless no-op.
+     */
+    private fun applyCaptureLanguage() {
+        val locales = LocaleListCompat.forLanguageTags(targetLanguageTag())
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            AppCompatDelegate.setApplicationLocales(locales)
+        }
     }
 
     /**
@@ -421,7 +430,7 @@ class ScreenshotTest {
      * Resolves a string resource in the locale requested for this run.
      *
      * Labels are looked up through a configuration-localized Context derived from
-     * the `testlocale` instrumentation argument (when present), so they always
+     * the `testLocale` instrumentation argument (when present), so they always
      * match the language screengrab is currently capturing — independent of the
      * process default locale.
      */
@@ -429,12 +438,11 @@ class ScreenshotTest {
 
     /**
      * Builds a Context whose resources resolve in the run's target locale, or the
-     * default app context when no `testlocale` was provided (non-screengrab runs).
+     * default app context when no `testLocale` was provided (non-screengrab runs).
      */
     private fun localizedContext(): Context {
         val base = ApplicationProvider.getApplicationContext<Context>()
-        val raw  = InstrumentationRegistry.getArguments().getString("testlocale")
-            ?: return base
+        val raw  = screengrabLocaleArg() ?: return base
         // screengrab passes locales as "en_US" or "en-US"; forLanguageTag wants '-'.
         val tag = raw.replace('_', '-')
         val config = Configuration(base.resources.configuration)
@@ -443,17 +451,34 @@ class ScreenshotTest {
     }
 
     /**
-     * Resolves screengrab's requested `testlocale` instrumentation argument to one of
+     * Reads the locale screengrab requested for this run from the instrumentation
+     * arguments, or null on a plain `connectedDebugAndroidTest` run.
+     *
+     * fastlane screengrab passes it as `-e testLocale <locale>` — camelCase, with a
+     * CAPITAL L (this is visible in the `am instrument` line screengrab logs).
+     * Instrumentation argument keys are CASE-SENSITIVE, so reading "testlocale"
+     * (lower-case) silently returned null and every locale run fell back to the
+     * device locale — making both stores' captures come out in the device language.
+     * We read the exact key screengrab sends and, defensively, also accept the
+     * lower-case spelling so a future screengrab casing change cannot re-break this.
+     */
+    private fun screengrabLocaleArg(): String? {
+        val args = InstrumentationRegistry.getArguments()
+        return args.getString("testLocale") ?: args.getString("testlocale")
+    }
+
+    /**
+     * Resolves screengrab's requested `testLocale` instrumentation argument to one of
      * the app's supported language tags (e.g. "de-DE" → "de", "en-US" → "en").
      *
      * Reuses the production matching logic in [LocaleDetector.detect] against
      * [SupportedLocales.TAGS] — the same single source of truth the in-app language
      * picker uses — so the screenshot language can never drift from the set of
-     * languages the app actually ships. When no `testlocale` is supplied (a plain
+     * languages the app actually ships. When no `testLocale` is supplied (a plain
      * connectedDebugAndroidTest run), the device's default locale is used instead.
      */
     private fun targetLanguageTag(): String {
-        val raw = InstrumentationRegistry.getArguments().getString("testlocale")
+        val raw = screengrabLocaleArg()
         val locale = if (raw != null) Locale.forLanguageTag(raw.replace('_', '-'))
                      else Locale.getDefault()
         return LocaleDetector.detect(locale, SupportedLocales.TAGS)

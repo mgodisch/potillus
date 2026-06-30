@@ -1,0 +1,13 @@
+# Marketing-Text fuer die Play-Store-Feature-Grafik (1024x500), gerendert von
+# android/tools/render-feature-graphic.py. Woerter frei aendern; Zeilenumbrueche
+# der Taglines entstehen automatisch. Schluessel:
+#   title    -- eine Zeile (App-Name, gross dargestellt)
+#   tagline  -- eine Zeile je Absatz (automatischer Umbruch in der Spalte)
+#   bullet   -- GENAU vier kurze Phrasen; harter Umbruch via literalem \n
+title: LIBELLUS POTIONIS
+tagline: Dein diskreter und privater Alkoholkonsum-Tracker.
+tagline: Volle Kontrolle ohne Kompromisse.
+bullet: Grenzen setzen & einhalten
+bullet: 100 % Privatsphäre & Offline
+bullet: CSV & PDF-Berichte
+bullet: Kostenlos & Werbefrei

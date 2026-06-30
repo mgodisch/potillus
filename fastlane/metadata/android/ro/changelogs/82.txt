@@ -1,1 +1,0 @@
-Versiune de confidențialitate și transparență: blocul încorporat de metadate ale dependențelor Google a fost eliminat din APK, iar aplicația include acum lista de materiale software (SBOM) în interiorul pachetului. Fără modificări ale funcționalității aplicației.

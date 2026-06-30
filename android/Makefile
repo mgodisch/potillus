@@ -36,6 +36,7 @@ help:
 	@echo "  make test-device    run instrumented tests (device/emulator needed)"
 	@echo "  make test           run all tests (device needed)"
 	@echo "  make screenshots    capture Play-Store screenshots (device + fastlane + poppler)"
+	@echo "  make feature-graphics  render the 1024x500 feature graphic (needs rsvg-convert; reuses screenshots)"
 	@echo "  make install-debug  install debug APK on device (device needed)"
 	@echo "  make install        install debug APK on device (device needed)"
 	@echo "  make clean          clear the Gradle build cache"
@@ -362,6 +363,26 @@ screenshots-pdf:
 	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 ../fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/07_report_page_1
 	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 ../fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/08_report_page_2
 
+# Render the Play-Store feature graphic (one 1024x500 PNG per locale) into the
+# fastlane metadata tree at $(META)/<locale>/images/featureGraphic.png.
+#
+#   It is fully deterministic: it composes the per-locale marketing copy
+#   ($(META)/<locale>/feature-graphic.txt), the REAL screenshots produced by
+#   `make screenshots` (01_today as the phone, 07_report_page_1 as the report
+#   page) and the app's launcher icon, then renders with rsvg-convert under a
+#   PINNED bundled font (tools/fonts/Inter) so the output never depends on the
+#   fonts installed on the build host.
+#
+#   Run it AFTER `make screenshots`, since it reuses those captures — it does NOT
+#   trigger a capture itself (that needs a device); the script fails with an
+#   actionable message if a required screenshot is missing. Re-run it whenever the
+#   screenshots or the copy change. The pre-flight check mirrors the pdftoppm /
+#   Pillow checks in screenshots-pdf / screenshots-crop.
+feature-graphics:
+	command -v rsvg-convert >/dev/null 2>&1 || { echo "feature-graphics: 'rsvg-convert' not found — install it (Debian: apt install librsvg2-bin)"; exit 1; }
+	python3 -c 'import PIL' 2>/dev/null || { echo "feature-graphics: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
+	python3 tools/render-feature-graphic.py $(SCREENSHOT_LOCALES)
+
 # Leave Android Demo Mode and restore the normal device state. Each step is
 # tolerant (|| true) so tear-down never fails the build; invoked from the
 # `screenshots` EXIT trap.
@@ -380,4 +401,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf screenshots-demo-off install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf feature-graphics screenshots-demo-off install install-debug clean distclean

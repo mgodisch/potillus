@@ -36,6 +36,89 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.76.0
+
+Add a deterministic feature-graphic generator
+
+Replace the two AI-generated Play-Store feature graphics with a deterministic,
+re-localizable generator. This is a store-listing change only: the APK is
+functionally identical to v0.75.0, and the versionCode is bumped purely so the
+refreshed listing ships under its own code (same approach as v0.74.0).
+
+Feature-graphic generator:
+- New `android/tools/render-feature-graphic.py` composes the 1024x500 graphic
+  (the exact Google Play feature-graphic size; the previous AI images were
+  1488x720) from inputs the project already controls, so the result is
+  reproducible and trivially re-localizable: per-locale marketing copy, the REAL
+  screenshots from `make screenshots` (`01_today` as the phone, `07_report_page_1`
+  as the report page) and the app's launcher icon. It emits SVG and renders with
+  `rsvg-convert`; the phone is built and perspective-warped with Pillow (turned
+  slightly about its vertical axis, left edge receding) and given a perspective
+  depth edge on its near side, since SVG's affine transforms cannot do perspective. The old
+  images baked in AI-hallucinated text (e.g. a garbled report page); the embedded
+  shots are now the genuine, localized captures.
+- Determinism: text is rendered with a PINNED bundled font (see below), selected
+  via a throwaway fontconfig that exposes only `android/tools/fonts/`, so output
+  never depends on the fonts installed on the build host. Repeated renders are
+  byte-identical.
+- Runtime dependencies are deliberately small: the python3 standard library,
+  `rsvg-convert` (Debian `librsvg2-bin`), Pillow (already a project prerequisite)
+  and the bundled fonts. Marketing copy
+  lives in `fastlane/metadata/android/<locale>/feature-graphic.txt`; tagline line
+  breaks are computed by the tool, so editors change words, not layout.
+
+Bundled font:
+- `android/tools/fonts/Inter/` adds static Inter instances (Regular/SemiBold/Bold,
+  SIL OFL 1.1) used ONLY by the generator. They are build tooling and are NOT
+  shipped in the APK. Credited in `COPYING.md`.
+
+GPLv3 logo:
+- `fastlane/gpl-v3-logo.svg` adds the GPLv3 "Free as in Freedom" logo, embedded
+  (recoloured white) as a small license badge in the bottom-left of the graphic. It
+  is one of the
+  official GNU license logos by José Obed and is in the public domain; sourced from
+  <https://www.gnu.org/graphics/license-logos> and credited in `COPYING.md`.
+
+Copy / design tweaks (both locales unless noted):
+- de-DE now addresses the reader informally ("Dein …" rather than "Ihr …").
+- "100 %" is written with a space (was "100%").
+- The "limits" bullet icon is a bar chart beneath a DOWNWARD trend arrow (the goal
+  of keeping limits is to bring consumption down).
+- The free/ad-free bullet leads with "free" (de "Kostenlos & Werbefrei",
+  en "Free & Ad-free").
+
+Build wiring:
+- `android/Makefile`: new `feature-graphics` target renders the graphic for the
+  screenshot locales, with an `rsvg-convert` pre-flight check mirroring the
+  pdftoppm / Pillow checks; added to `.PHONY` and `make help`. It reuses the
+  captures from `make screenshots` and does not capture anything itself.
+
+Versioning:
+- `versionCode` 82 → 83 and `versionName` 0.75.0 → 0.76.0 across
+  `build.gradle.kts`, `proguard-rules.pro`, `README.md` and the F-Droid recipe;
+  localized store notes added as `changelogs/83.txt` for all 21 locales.
+
+Also in this release (unrelated tooling fixes):
+- `android/tools/validate-screenshots.py` still pointed at the pre-move metadata
+  path (`fastlane/metadata/android`), so `make screenshots` failed its final
+  Google Play validation step even though capture, crop and PDF rendering had all
+  succeeded. It now uses `../fastlane/metadata/android`, matching
+  `crop-screenshots.py`.
+- `ScreenshotTest` read screengrab's locale from the `testlocale` instrumentation
+  argument, but screengrab passes it as `testLocale` (camelCase). Argument keys
+  are case-sensitive, so the lookup returned null and every locale run fell back
+  to the device language — both stores' captures came out identical (the device
+  language). It now reads `testLocale` (with a lowercase fallback), so each
+  locale renders in its own language again. Test-only; not in the release APK.
+- Follow-up to the above: on API 33+ the per-app locale
+  (`AppCompatDelegate.setApplicationLocales`) is applied ASYNCHRONOUSLY, so seeding
+  it before launching the Activity left the first captured frame in the device
+  language and the English run timed out. The locale is now applied AFTER each
+  Activity launch, with the Activity foregrounded (mirroring the in-app language
+  picker, the one path that switches reliably on the capture device). Test-only.
+
+---
+
 ## v0.75.0
 
 Disable embedded Google dependency blob, ship SBOM inside the APK
