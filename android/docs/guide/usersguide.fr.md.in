@@ -31,16 +31,17 @@ l'application.
 Libellus Potionis est open source. Le code source peut être consulté et vérifié
 par tout le monde. Libellus Potionis respecte la vie privée. Il ne requiert
 aucune autorisation, ni pour l'appareil photo ou le microphone, ni pour le GPS
-ou l'accès au réseau. Libellus Potionis est sûr : toutes les données sont
-stockées sous forme chiffrée, et l'accès à l'application peut être restreint à
+ou l'accès au réseau. Libellus Potionis est sûr : vos données restent dans le
+stockage privé de l'application sur votre appareil, protégées par le
+chiffrement de votre appareil, et l'accès à l'application peut être restreint à
 l'aide d'une empreinte digitale. Libellus Potionis vous aide à doser votre
-consommation jusqu'à votre limite en vous indiquant à tout moment si
-« la petite sœur » tient encore dans votre budget. Libellus Potionis vous
-accompagne dans votre suivi en addictologie en fournissant, sur demande, un
-rapport PDF complet de deux pages sur vos habitudes de consommation. Libellus
-Potionis est gratuit et sans publicité.
+consommation jusqu'à votre limite en vous indiquant à tout moment si « la
+petite sœur » tient encore dans votre budget. Libellus Potionis vous accompagne
+dans votre suivi en addictologie en fournissant, sur demande, un rapport PDF
+complet de deux pages sur vos habitudes de consommation. Libellus Potionis est
+gratuit et sans publicité.
 
-Libellus Potionis nécessite Android 15 ou une version ultérieure. Il est
+Libellus Potionis nécessite Android 11 ou une version ultérieure. Il est
 utilisé en continu par l'auteur sur un Google Pixel 10 Pro sous GrapheneOS et
 testé en complément sur un Fairphone 4.
 
@@ -107,9 +108,8 @@ vous inspirer des recommandations de différents pays sur Wikipédia.
 
 Les paramètres statistiques vous permettent de définir l'heure à laquelle
 commence un nouveau jour (afin qu'une boisson prise à 1 h du matin compte encore
-pour la veille, par exemple), le jour où la semaine doit commencer et — pour les
-bonnes résolutions du Nouvel An — la date à partir de laquelle l'analyse des
-données doit débuter.
+pour la veille, par exemple) et — pour les bonnes résolutions du Nouvel An —
+la date à partir de laquelle l'analyse des données doit débuter.
 
 ### {{backup_section}}
 

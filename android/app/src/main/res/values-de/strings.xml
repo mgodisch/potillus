@@ -88,7 +88,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF Metadaten / KPI Labels -->
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Zeitraum</string>
-    <string name="pdf_meta_limit">Grenzwerte</string>
+    <string name="pdf_meta_limit">Limits</string>
     <string name="pdf_meta_weight">Körpergewicht</string>
     <string name="pdf_kpi_total">Gesamtalkohol</string>
     <string name="pdf_kpi_avg_day">Ø pro Tag</string>

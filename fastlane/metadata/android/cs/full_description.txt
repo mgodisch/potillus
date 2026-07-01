@@ -30,8 +30,7 @@ Libellus Potionis je postaven na naprosté svrchovanosti nad daty a přísné
 minimalizaci dat. Běží s minimálním profilem oprávnění, který zcela vylučuje
 přístup k síti, takže vaše osobní data nikdy neopustí zařízení. Vaše data
 zůstávají v soukromém úložišti aplikace, v klidovém stavu chráněná šifrováním
-zařízení Android a sandboxem aplikace; předvolby jsou navíc zapečetěny klíčem
-Android Keystore s hardwarovou podporou. Volitelný biometrický zámek otiskem
+zařízení Android a sandboxem aplikace. Volitelný biometrický zámek otiskem
 prstu chrání před neoprávněným fyzickým přístupem. Tento offline přístup
 vylučuje sledování, synchronizaci s cloudem a únik dat ven.
 

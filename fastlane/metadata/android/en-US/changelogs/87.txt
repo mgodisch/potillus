@@ -1,0 +1,1 @@
+Localization and wording refinements across all languages. No functional changes.

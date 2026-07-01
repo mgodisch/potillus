@@ -30,13 +30,14 @@ Alkoholkonsums! Diese Seite beschreibt die Features und Funktionen der App.
 Libellus Potionis ist Open Source. Der Quellcode ist für jedermann einsehbar
 und überprüfbar. Libellus Potionis ist datenschutzfreundlich. Es benötigt keine
 Berechtigungen – weder für Kamera oder Mikrofon noch für GPS oder das Netzwerk.
-Libellus Potionis ist sicher: Alle Daten werden verschlüsselt abgelegt und der
-Zugriff auf die App kann mittels Fingerabdrucks eingeschränkt werden. Libellus
-Potionis unterstützt dich beim Rantrinken an deine Limits, indem es dir
-jederzeit verrät, ob „la petite sœur“ noch im Limit liegt. Zudem unterstützt
-dich die App bei Terminen mit einer Suchtberatungsstelle, indem sie auf Wunsch
-dein komplettes Trinkverhalten auf einem übersichtlichen, zweiseitigen
-PDF-Dokument darlegt. Libellus Potionis ist komplett kostenlos und werbefrei.
+Libellus Potionis ist sicher: deine Daten bleiben im privaten App-Speicher auf
+deinem Gerät, geschützt durch die Geräteverschlüsselung und der Zugriff auf die
+App kann mittels Fingerabdrucks eingeschränkt werden. Libellus Potionis
+unterstützt dich beim Rantrinken an deine Limits, indem es dir jederzeit
+verrät, ob „la petite sœur“ noch im Limit liegt. Zudem unterstützt dich die App
+bei Terminen mit einer Suchtberatungsstelle, indem sie auf Wunsch dein
+komplettes Trinkverhalten auf einem übersichtlichen, zweiseitigen PDF-Dokument
+darlegt. Libellus Potionis ist komplett kostenlos und werbefrei.
 
 Libellus Potionis setzt Android 11 oder höher voraus. Es wird vom Autor
 kontinuierlich auf einem Google Pixel 10 Pro unter GrapheneOS (Android 16)

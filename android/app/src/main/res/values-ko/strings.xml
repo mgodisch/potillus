@@ -126,7 +126,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">뒤로</string>
     <string name="delete">삭제</string>
     <string name="change">변경</string>
-    <string name="delete_confirm">"%1$s"을(를) 정말 삭제하시겠습니까?</string>
+    <string name="delete_confirm">\u201c%1$s\u201d을(를) 정말 삭제하시겠습니까?</string>
     <string name="no_data">이 기간의 데이터가 없습니다.</string>
 
     <!-- Stats -->
@@ -159,7 +159,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">앱 창의 스크린샷 및 화면 녹화 허용</string>
     <string name="language">언어</string>
     <string name="export">데이터 내보내기</string>
-    <string name="export_desc">기록을 다운로드 폴더로 내보내기</string>
+    <string name="export_desc">기록을 내보내기</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">백업</string>
@@ -170,7 +170,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">데이터를 어떻게 가져오시겠습니까?</string>
     <string name="import_replace">교체</string>
-    <string name="import_merge">추가</string>
+    <string name="import_merge">병합</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>
@@ -199,7 +199,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_error_version_too_high">백업 버전 %1$d는 지원되지 않습니다 (최대 %2$d).</string>
     <string name="import_error_file_too_large">백업 파일이 너무 큽니다 (최대 %1$d MB).</string>
     <string name="import_error_read">읽기 오류: %1$s</string>
-    <string name="drink_delete_blocked">"{name}"에 {count}개의 기록이 있어 삭제할 수 없습니다.</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d에 {count}개의 기록이 있어 삭제할 수 없습니다.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">음료 이름을 입력해 주세요.</string>
     <string name="drink_validation_name_too_long">음료 이름이 너무 깁니다 (최대 100자).</string>

@@ -30,14 +30,15 @@ Denne side beskriver appens egenskaber og funktioner.
 Libellus Potionis er open source. Kildekoden kan ses og verificeres af enhver.
 Libellus Potionis er privatlivsvenlig. Den kræver ingen tilladelser, hverken til
 kamera eller mikrofon eller til GPS eller netværksadgang. Libellus Potionis er
-sikker: alle data gemmes krypteret, og adgangen til appen kan begrænses med et
-fingeraftryk. Libellus Potionis hjælper dig med at dosere dig op til din grænse
-ved til enhver tid at fortælle dig, om "la petite sœur" stadig er inden for dit
-budget. Libellus Potionis støtter dig i din misbrugsbehandling ved på anmodning
-at levere en omfattende, tosidet PDF-rapport over dine drikkevaner. Libellus
+sikker: dine data forbliver i appens private lager på din enhed, beskyttet af
+din enheds kryptering, og adgangen til appen kan begrænses med et fingeraftryk.
+Libellus Potionis hjælper dig med at dosere dig op til din grænse ved til enhver
+tid at fortælle dig, om "la petite sœur" stadig er inden for dit budget.
+Libellus Potionis støtter dig i din misbrugsbehandling ved på anmodning at
+levere en omfattende, tosidet PDF-rapport over dine drikkevaner. Libellus
 Potionis er gratis og reklamefri.
 
-Libellus Potionis kræver Android 15 eller nyere. Den bruges løbende af
+Libellus Potionis kræver Android 11 eller nyere. Den bruges løbende af
 forfatteren på en Google Pixel 10 Pro med GrapheneOS og testes desuden på en
 Fairphone 4.
 
@@ -99,8 +100,8 @@ inspiration fra forskellige landes anbefalinger på Wikipedia.
 
 De statistiske indstillinger giver dig mulighed for at fastlægge tidspunktet, hvor
 en ny dag begynder (så f.eks. en drik kl. 01.00 om natten stadig tæller med til
-dagen før), den dag, ugen skal begynde på, og — til nytårsforsætter — datoen, fra
-hvilken dataanalysen skal begynde.
+dagen før) og — til nytårsforsætter — datoen, fra hvilken dataanalysen skal
+begynde.
 
 ### {{backup_section}}
 

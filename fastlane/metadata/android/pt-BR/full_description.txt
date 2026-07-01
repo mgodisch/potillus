@@ -33,10 +33,9 @@ Libellus Potionis é baseado na soberania absoluta dos dados e em uma rigorosa
 minimização de dados. Ele funciona com um perfil de permissões mínimo que exclui
 totalmente o acesso à rede, então seus dados pessoais nunca saem do dispositivo.
 Seus dados permanecem no armazenamento privado do aplicativo, protegidos em
-repouso pela criptografia do dispositivo Android e pela sandbox do app; as
-preferências são ainda seladas com uma chave do Android Keystore com suporte de
-hardware. Um bloqueio biométrico por impressão digital, opcional, protege contra
-o acesso físico não autorizado. Essa abordagem offline elimina o rastreamento, a
+repouso pela criptografia do dispositivo Android e pela sandbox do app. Um
+bloqueio biométrico por impressão digital, opcional, protege contra o acesso
+físico não autorizado. Essa abordagem offline elimina o rastreamento, a
 sincronização na nuvem e o vazamento de dados para fora.
 
 COMPATIBILIDADE

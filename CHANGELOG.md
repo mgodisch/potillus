@@ -36,6 +36,90 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.77.3
+
+Refine translations and data-security wording
+
+Localization QA:
+- A localization quality-assurance pass reviewed the in-app UI strings and
+  several user-guide translations for terminology, grammar and typography:
+  - `res/values/strings.xml` (base/English): added a structured translator and
+    reviewer context block plus a per-entry `<!-- … -->` note for every string —
+    where it appears in the UI, what each `%1$s`/`{name}` placeholder means, and
+    the typographic-quote convention. These comments are documentation-only and
+    do not affect the build. Stray German-style quote escapes in a couple of
+    English strings were normalized to standard curly quotes.
+  - In-app UI strings across the base locale and all 21 translations
+    (`res/values*/strings.xml`): terminology, grammar and quote-consistency
+    fixes (e.g. aligning the PDF-report field labels).
+  - 12 localized user-guide templates (cs, da, es, fr, it, nb, nl, pl, pt,
+    pt-BR, ru, sv): wording and grammar refinements.
+  - The Romanian store summary was shortened to 77 characters to meet the
+    80-character store limit: "Jurnal de alcool axat pe confidențialitate:
+    limite, alcoolemie, rapoarte PDF."
+  - Build fix: the Ukrainian `import_merge` value ("Об'єднати") introduced by
+    the pass had its apostrophe escaped (`\'`) so the Android resource compiler
+    (aapt2) accepts the string.
+
+Documentation accuracy (data-at-rest wording):
+- After the earlier removal of SQLCipher, the Room database is no longer
+  encrypted at the application level — it is protected at rest only by Android's
+  file-based storage encryption and the per-app sandbox. A few texts still
+  carried the old "everything is encrypted" claim and were corrected so the
+  project no longer overstates its guarantees:
+  - `README.md`: the "Privacy & Security Architecture" section no longer says
+    security is enforced "through fully encrypted data storage via hardware-backed
+    cryptography". It now states that data rests in the app's private, sandboxed
+    storage, protected at rest by Android's device storage encryption, with an
+    optional biometric fingerprint lock.
+  - In-app User's Guide (`docs/guide/usersguide.md.in` and all 21 localized
+    `usersguide.<locale>.md.in` templates): the clause "All data is stored in
+    encrypted form" was replaced by an accurate wording ("your data stays in the
+    app's private storage on your device, protected by your device's
+    encryption"), translated per locale.
+  - Fastlane full descriptions (all 21 locales): dropped the now-superfluous
+    half-sentence stating the preferences are "additionally sealed with a
+    hardware-backed Android Keystore key", leaving the accurate device-encryption
+    + sandbox statement.
+- No source-code comments needed changes: `AppPreferences.kt` still correctly
+  documents the app-encrypted preferences DataStore (AES-256-GCM, Keystore-backed
+  — unchanged and accurate), and `AppDatabase.kt` only references the *legacy*
+  SQLCipher artefacts that `purgeLegacyEncryptedDatabase()` deletes.
+
+Release-check tooling (`tools/release-check.sh`):
+- §1 (VERSION CONSISTENCY) no longer cross-checks a version comment in
+  `proguard-rules.pro`. That header line merely duplicated `versionName` for no
+  functional benefit — R8 ignores `#` comments — yet had to be re-synced on
+  every release. The `# Version:` line was removed from `proguard-rules.pro`,
+  and the corresponding check (together with the file's pre-flight existence
+  entry and the doc references) was dropped from the script, removing one manual
+  sync point per release. The README title version stays enforced because it is
+  user-facing.
+- §2 (CHANGELOG ENTRY) now also verifies the entry's first line — reused verbatim
+  as the git commit subject — is ≤ 50 characters (git's subject-length
+  convention).
+- New §10 (STORE METADATA LENGTH LIMITS) checks every locale's
+  `short_description.txt` (≤ 80), `full_description.txt` (≤ 4000) and
+  `changelogs/*.txt` (≤ 500), counted in CHARACTERS (not bytes) so Greek,
+  Cyrillic and CJK are measured the way the stores do. Existing sections were
+  renumbered from "/ 9" to "/ 10".
+
+F-Droid reproducible build:
+- The reference recipe (`fdroid/de.godisch.potillus.yml`) now declares `Binaries`
+  (the Codeberg release-asset URL, `de.godisch.potillus_%c.apk`) and
+  `AllowedAPKSigningKeys`, enabling F-Droid to verify its own from-source build
+  against the developer-signed APK published on Codeberg. The published release
+  asset must be named for its versionCode (`de.godisch.potillus_87.apk`).
+
+Versioning:
+- `versionCode` 86 → 87 and `versionName` 0.77.2 → 0.77.3 across
+  `build.gradle.kts`, `README.md` and the F-Droid recipe;
+  localized store notes added as `changelogs/87.txt` for all 21 locales (the
+  listing-only locales drop the previous `86.txt`). Documentation and metadata
+  only — the APK is functionally identical to 0.77.2.
+
+---
+
 ## v0.77.2
 
 Fix SBOM normalizer path in release build

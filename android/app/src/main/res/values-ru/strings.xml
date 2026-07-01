@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Оценочные значения — не медицинский диагноз. Не для оценки годности к вождению и не для диагностики.</string>
     <string name="pdf_meta_export_date">Дата экспорта</string>
     <string name="pdf_meta_period">Период</string>
-    <string name="pdf_meta_limit">Лимит</string>
+    <string name="pdf_meta_limit">Лимиты</string>
     <string name="pdf_meta_weight">Масса тела</string>
     <string name="pdf_kpi_total">Всего алкоголя</string>
     <string name="pdf_kpi_avg_day">Ср. в день</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Назад</string>
     <string name="delete">Удалить</string>
     <string name="change">Изменить</string>
-    <string name="delete_confirm">Удалить \"%1$s\"?</string>
+    <string name="delete_confirm">Удалить \u00ab%1$s\u00bb?</string>
     <string name="no_data">Нет данных за этот период.</string>
     <string name="week">7 дней</string>
     <string name="month">Месяц</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Разрешить снимки экрана и запись окна приложения</string>
     <string name="language">Язык</string>
     <string name="export">Экспорт данных</string>
-    <string name="export_desc">Экспорт записей в папку Загрузки</string>
+    <string name="export_desc">Экспорт записей</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Резервная копия</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Импортировать</string>
     <string name="import_mode_question">Как импортировать данные?</string>
     <string name="import_replace">Заменить</string>
-    <string name="import_merge">Добавить</string>
+    <string name="import_merge">Объединить</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Пожалуйста, пройдите аутентификацию</string>
     <string name="year_calendar_no_entry">нет записи</string>
@@ -158,7 +158,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Файл резервной копии слишком большой (макс. %1$d МБ).</string>
     <string name="import_error_read">Ошибка чтения: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c имеет {count} записей и не может быть удалён.</string>
+    <string name="drink_delete_blocked">\u00ab{name}\u00bb имеет {count} записей и не может быть удалён.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Название напитка не может быть пустым.</string>
     <string name="drink_validation_name_too_long">Название напитка слишком длинное (макс. 100 символов).</string>

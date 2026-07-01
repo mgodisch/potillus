@@ -24,7 +24,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
-## About the App (v0.77.2)
+## About the App (v0.77.3)
 
 **Libellus Potionis** is a privacy-first, free, open-source, and ad-free
 alcohol consumption tracker designed to help users monitor, pace, and manage
@@ -64,9 +64,9 @@ Built with an unwavering commitment to user privacy, Libellus Potionis
 prioritizes absolute data sovereignty through a strict data-minimization
 architecture. It operates under a minimal permission profile that completely
 excludes network access, ensuring that personal data never leaves the device.
-Security is strictly enforced locally through fully encrypted data storage via
-hardware-backed cryptography, combined with an optional biometric fingerprint
-lock to prevent unauthorized physical access. This offline-first approach
+Your data rests in the app's private, sandboxed storage, protected at rest by
+Android's device storage encryption. An optional biometric fingerprint lock
+guards against unauthorized physical access. This offline-first approach
 completely eliminates tracking, cloud synchronizations, and external data
 extraction leaks.
 

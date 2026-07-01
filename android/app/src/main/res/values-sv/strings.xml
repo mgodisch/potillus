@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Uppskattningar – inte en medicinsk diagnos. Inte för bedömning av körlämplighet eller diagnostik.</string>
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Period</string>
-    <string name="pdf_meta_limit">Gräns</string>
+    <string name="pdf_meta_limit">Gränser</string>
     <string name="pdf_meta_weight">Kroppsvikt</string>
     <string name="pdf_kpi_total">Total alkohol</string>
     <string name="pdf_kpi_avg_day">Snitt per dag</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Tillbaka</string>
     <string name="delete">Radera</string>
     <string name="change">Ändra</string>
-    <string name="delete_confirm">Radera \"%1$s\"?</string>
+    <string name="delete_confirm">Radera \u201d%1$s\u201d?</string>
     <string name="no_data">Ingen data för den här perioden.</string>
     <string name="week">7 dagar</string>
     <string name="month">Månad</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Tillåt skärmdumpar och skärminspelningar av appfönstret</string>
     <string name="language">Språk</string>
     <string name="export">Dataexport</string>
-    <string name="export_desc">Exportera poster till mappen Hämtningar</string>
+    <string name="export_desc">Exportera poster</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Säkerhetskopia</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importera</string>
     <string name="import_mode_question">Hur ska data importeras?</string>
     <string name="import_replace">Ersätt</string>
-    <string name="import_merge">Lägg till</string>
+    <string name="import_merge">Sammanfoga</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Verifiera din identitet</string>
     <string name="year_calendar_no_entry">ingen post</string>
@@ -154,7 +154,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Säkerhetskopians fil är för stor (max. %1$d MB).</string>
     <string name="import_error_read">Läsfel: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c har {count} poster och kan inte raderas.</string>
+    <string name="drink_delete_blocked">\u201d{name}\u201d har {count} poster och kan inte raderas.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Dryckens namn får inte vara tomt.</string>
     <string name="drink_validation_name_too_long">Dryckens namn är för långt (max. 100 tecken).</string>

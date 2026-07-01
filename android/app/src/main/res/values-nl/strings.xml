@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Schattingen – geen medische diagnose. Niet voor beoordeling van rijgeschiktheid of diagnostiek.</string>
     <string name="pdf_meta_export_date">Exportdatum</string>
     <string name="pdf_meta_period">Periode</string>
-    <string name="pdf_meta_limit">Grenswaarde</string>
+    <string name="pdf_meta_limit">Limieten</string>
     <string name="pdf_meta_weight">Lichaamsgewicht</string>
     <string name="pdf_kpi_total">Totaal alcohol</string>
     <string name="pdf_kpi_avg_day">Gem. per dag</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Terug</string>
     <string name="delete">Verwijderen</string>
     <string name="change">Wijzigen</string>
-    <string name="delete_confirm">\"%1$s\" echt verwijderen?</string>
+    <string name="delete_confirm">\u201c%1$s\u201d echt verwijderen?</string>
     <string name="no_data">Geen gegevens voor deze periode.</string>
     <string name="week">7 dagen</string>
     <string name="month">Maand</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Schermafbeeldingen en schermopnamen van het app-venster toestaan</string>
     <string name="language">Taal</string>
     <string name="export">Gegevensexport</string>
-    <string name="export_desc">Invoer exporteren naar de map Downloads</string>
+    <string name="export_desc">Invoer exporteren</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Back-up</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importeren</string>
     <string name="import_mode_question">Hoe moeten de gegevens worden geïmporteerd?</string>
     <string name="import_replace">Vervangen</string>
-    <string name="import_merge">Toevoegen</string>
+    <string name="import_merge">Samenvoegen</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Verificeer uw identiteit</string>
     <string name="year_calendar_no_entry">geen invoer</string>
@@ -154,7 +154,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Het back-upbestand is te groot (max. %1$d MB).</string>
     <string name="import_error_read">Leesfout: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c heeft {count} invoer en kan niet worden verwijderd.</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d heeft {count} invoer en kan niet worden verwijderd.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">De naam van het drankje mag niet leeg zijn.</string>
     <string name="drink_validation_name_too_long">De naam van het drankje is te lang (max. 100 tekens).</string>

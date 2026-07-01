@@ -87,7 +87,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">导出日期</string>
     <string name="pdf_meta_period">时间段</string>
-    <string name="pdf_meta_limit">限制</string>
+    <string name="pdf_meta_limit">限额</string>
     <string name="pdf_meta_weight">体重</string>
     <string name="pdf_kpi_total">总酒精量</string>
     <string name="pdf_kpi_avg_day">每日平均</string>
@@ -109,7 +109,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">返回</string>
     <string name="delete">删除</string>
     <string name="change">更改</string>
-    <string name="delete_confirm">确定删除"%1$s"？</string>
+    <string name="delete_confirm">确定删除\u201c%1$s\u201d？</string>
     <string name="no_data">该时间段没有数据。</string>
 
     <!-- Stats -->
@@ -142,7 +142,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">允许对应用窗口进行截图和屏幕录制</string>
     <string name="language">语言</string>
     <string name="export">数据导出</string>
-    <string name="export_desc">将记录导出到下载文件夹</string>
+    <string name="export_desc">将记录导出</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">备份</string>
@@ -153,7 +153,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">如何导入数据？</string>
     <string name="import_replace">替换</string>
-    <string name="import_merge">追加</string>
+    <string name="import_merge">合并</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>

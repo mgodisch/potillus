@@ -97,7 +97,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Дата експорту</string>
     <string name="pdf_meta_period">Період</string>
-    <string name="pdf_meta_limit">Ліміт</string>
+    <string name="pdf_meta_limit">Ліміти</string>
     <string name="pdf_meta_weight">Вага тіла</string>
     <string name="pdf_kpi_total">Загальний алкоголь</string>
     <string name="pdf_kpi_avg_day">Сер. за день</string>
@@ -152,7 +152,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Дозволити знімки та записи екрана вікна програми</string>
     <string name="language">Мова</string>
     <string name="export">Експорт даних</string>
-    <string name="export_desc">Експортувати записи до папки Завантаження</string>
+    <string name="export_desc">Експортувати записи</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Резервна копія</string>
@@ -163,7 +163,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">Як імпортувати дані?</string>
     <string name="import_replace">Замінити</string>
-    <string name="import_merge">Додати</string>
+    <string name="import_merge">Об\'єднати</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>

@@ -1,0 +1,1 @@
+Lokalisierungs- und Formulierungs-Verfeinerungen in allen Sprachen. Keine funktionalen Änderungen.

@@ -104,7 +104,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">エクスポート日</string>
     <string name="pdf_meta_period">期間</string>
-    <string name="pdf_meta_limit">上限値</string>
+    <string name="pdf_meta_limit">上限</string>
     <string name="pdf_meta_weight">体重</string>
     <string name="pdf_kpi_total">総アルコール量</string>
     <string name="pdf_kpi_avg_day">1日平均</string>
@@ -159,7 +159,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">アプリウィンドウのスクリーンショットと画面録画を許可する</string>
     <string name="language">言語</string>
     <string name="export">データエクスポート</string>
-    <string name="export_desc">記録をダウンロードフォルダへエクスポート</string>
+    <string name="export_desc">記録をエクスポート</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">バックアップ</string>
@@ -170,7 +170,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">データをどのようにインポートしますか？</string>
     <string name="import_replace">置き換え</string>
-    <string name="import_merge">追加</string>
+    <string name="import_merge">統合</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>

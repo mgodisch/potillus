@@ -30,13 +30,14 @@ Această pagină descrie caracteristicile și funcțiile aplicației.
 Libellus Potionis este open source. Codul sursă poate fi consultat și verificat
 de oricine. Libellus Potionis respectă confidențialitatea. Nu necesită nicio
 permisiune – nici pentru cameră sau microfon, nici pentru GPS sau rețea.
-Libellus Potionis este sigur: toate datele sunt stocate criptat, iar accesul la
-aplicație poate fi restricționat prin amprentă. Libellus Potionis te sprijină
-să te apropii cu măsură de limitele tale, spunându-ți în orice moment dacă
-„la petite sœur” se încadrează încă în bugetul tău. În plus, aplicația te ajută
-la întâlnirile cu un centru de consiliere în adicții, prezentând la cerere
-întregul tău comportament de consum într-un document PDF clar, de două pagini.
-Libellus Potionis este complet gratuit și fără reclame.
+Libellus Potionis este sigur: datele tale rămân în stocarea privată a
+aplicației pe dispozitivul tău, protejate de criptarea dispozitivului tău, iar
+accesul la aplicație poate fi restricționat prin amprentă. Libellus Potionis te
+sprijină să te apropii cu măsură de limitele tale, spunându-ți în orice moment
+dacă „la petite sœur” se încadrează încă în bugetul tău. În plus, aplicația te
+ajută la întâlnirile cu un centru de consiliere în adicții, prezentând la
+cerere întregul tău comportament de consum într-un document PDF clar, de două
+pagini. Libellus Potionis este complet gratuit și fără reclame.
 
 Libellus Potionis necesită Android 11 sau mai nou. Este folosit continuu de
 autor pe un Google Pixel 10 Pro cu GrapheneOS (Android 16) și este testat în

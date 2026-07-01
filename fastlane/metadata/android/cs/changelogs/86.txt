@@ -1,1 +1,0 @@
-Opravuje sestavení vydání pro F-Droid. Žádné funkční změny v aplikaci.

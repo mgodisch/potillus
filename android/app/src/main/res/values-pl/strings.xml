@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Szacunki – nie są diagnozą lekarską. Nie do oceny zdolności do prowadzenia pojazdów ani do celów diagnostycznych.</string>
     <string name="pdf_meta_export_date">Data eksportu</string>
     <string name="pdf_meta_period">Okres</string>
-    <string name="pdf_meta_limit">Limit</string>
+    <string name="pdf_meta_limit">Limity</string>
     <string name="pdf_meta_weight">Masa ciała</string>
     <string name="pdf_kpi_total">Łączny alkohol</string>
     <string name="pdf_kpi_avg_day">Śr. dziennie</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Wstecz</string>
     <string name="delete">Usuń</string>
     <string name="change">Zmień</string>
-    <string name="delete_confirm">Naprawdę usunąć \"%1$s\"?</string>
+    <string name="delete_confirm">Naprawdę usunąć \u201e%1$s\u201d?</string>
     <string name="no_data">Brak danych dla tego okresu.</string>
     <string name="week">7 dni</string>
     <string name="month">Miesiąc</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Zezwól na zrzuty ekranu i nagrania okna aplikacji</string>
     <string name="language">Język</string>
     <string name="export">Eksport danych</string>
-    <string name="export_desc">Eksportuj wpisy do folderu Pobrane</string>
+    <string name="export_desc">Eksportuj wpisy</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Kopia zapasowa</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importuj</string>
     <string name="import_mode_question">Jak zaimportować dane?</string>
     <string name="import_replace">Zastąp</string>
-    <string name="import_merge">Dodaj</string>
+    <string name="import_merge">Scal</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Proszę się uwierzytelnić</string>
     <string name="year_calendar_no_entry">brak wpisu</string>

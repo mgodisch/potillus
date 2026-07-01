@@ -33,11 +33,10 @@ Libellus Potionis is opgebouwd rond volledige gegevenssoevereiniteit en strikte
 gegevensminimalisatie. De app draait met een minimaal rechtenprofiel dat
 netwerktoegang volledig uitsluit, zodat je persoonlijke gegevens het apparaat
 nooit verlaten. Je gegevens blijven in de privéopslag van de app, in rust
-beschermd door de apparaatversleuteling van Android en de app-sandbox; de
-voorkeuren worden bovendien verzegeld met een hardwarematig ondersteunde Android
-Keystore-sleutel. Een optionele biometrische vingerafdrukvergrendeling beschermt
-tegen onbevoegde fysieke toegang. Deze offline-aanpak sluit tracking,
-cloudsynchronisatie en externe datalekken uit.
+beschermd door de apparaatversleuteling van Android en de app-sandbox. Een
+optionele biometrische vingerafdrukvergrendeling beschermt tegen onbevoegde
+fysieke toegang. Deze offline-aanpak sluit tracking, cloudsynchronisatie en
+externe datalekken uit.
 
 COMPATIBILITEIT
 

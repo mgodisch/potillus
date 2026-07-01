@@ -1,1 +1,0 @@
-Corregge la build di rilascio per F-Droid. Nessuna modifica funzionale all'app.

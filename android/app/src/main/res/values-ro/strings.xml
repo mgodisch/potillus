@@ -106,7 +106,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data export</string>
     <string name="pdf_meta_period">Perioadă</string>
-    <string name="pdf_meta_limit">Limită</string>
+    <string name="pdf_meta_limit">Limite</string>
     <string name="pdf_meta_weight">Greutate corporală</string>
     <string name="pdf_kpi_total">Alcool total</string>
     <string name="pdf_kpi_avg_day">Medie pe zi</string>
@@ -161,7 +161,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Permite capturi de ecran și înregistrări ale ferestrei aplicației</string>
     <string name="language">Limbă</string>
     <string name="export">Export de date</string>
-    <string name="export_desc">Exportă înregistrările în folderul Descărcări</string>
+    <string name="export_desc">Exportă înregistrările</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Copie de rezervă</string>
@@ -172,7 +172,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">Cum să fie importate datele?</string>
     <string name="import_replace">Înlocuiește</string>
-    <string name="import_merge">Adaugă</string>
+    <string name="import_merge">Combină</string>
 
     <!-- Biometric prompt -->
     <string name="biometric_title">Libellus Potionis</string>

@@ -1,1 +1,0 @@
-Åtgärdar F-Droid-utgåvebygget. Inga funktionella ändringar i appen.

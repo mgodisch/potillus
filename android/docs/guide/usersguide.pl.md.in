@@ -30,15 +30,15 @@ opisuje cechy i funkcje aplikacji.
 Libellus Potionis jest oprogramowaniem open source. Kod źródłowy może obejrzeć i
 zweryfikować każdy. Libellus Potionis dba o prywatność. Nie wymaga żadnych
 uprawnień: ani do aparatu czy mikrofonu, ani do GPS czy dostępu do sieci.
-Libellus Potionis jest bezpieczny: wszystkie dane są przechowywane w postaci
-zaszyfrowanej, a dostęp do aplikacji można ograniczyć odciskiem palca. Libellus
-Potionis pomaga dawkować spożycie aż do Twojego limitu, informując w każdej
-chwili, czy „la petite sœur" wciąż mieści się w Twoim budżecie. Libellus
-Potionis wspiera Cię podczas terapii uzależnień, dostarczając na życzenie pełny,
-dwustronicowy raport PDF o Twoich nawykach picia. Libellus Potionis jest
-bezpłatny i wolny od reklam.
+Libellus Potionis jest bezpieczny: Twoje dane pozostają w prywatnej pamięci
+aplikacji na Twoim urządzeniu, chronione szyfrowaniem Twojego urządzenia, a
+dostęp do aplikacji można ograniczyć odciskiem palca. Libellus Potionis pomaga
+dawkować spożycie aż do Twojego limitu, informując w każdej chwili, czy „la
+petite sœur" wciąż mieści się w Twoim budżecie. Libellus Potionis wspiera Cię
+podczas terapii uzależnień, dostarczając na życzenie pełny, dwustronicowy raport
+PDF o Twoich nawykach picia. Libellus Potionis jest bezpłatny i wolny od reklam.
 
-Libellus Potionis wymaga systemu Android 15 lub nowszego. Autor używa go na
+Libellus Potionis wymaga systemu Android 11 lub nowszego. Autor używa go na
 bieżąco na urządzeniu Google Pixel 10 Pro z GrapheneOS i dodatkowo testuje na
 Fairphone 4.
 
@@ -100,8 +100,8 @@ zainspirować się zaleceniami różnych krajów w Wikipedii.
 
 Ustawienia statystyczne pozwalają określić godzinę, o której rozpoczyna się nowy
 dzień (tak aby na przykład napój o 1:00 w nocy nadal liczył się do dnia
-poprzedniego), dzień, od którego ma się zaczynać tydzień, oraz — na potrzeby
-noworocznych postanowień — datę, od której ma się rozpoczynać analiza danych.
+poprzedniego) oraz — na potrzeby noworocznych postanowień — datę, od której ma
+się rozpoczynać analiza danych.
 
 ### {{backup_section}}
 

@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Stime – non una diagnosi medica. Non per la valutazione dell\'idoneità alla guida né per scopi diagnostici.</string>
     <string name="pdf_meta_export_date">Data esportazione</string>
     <string name="pdf_meta_period">Periodo</string>
-    <string name="pdf_meta_limit">Limite</string>
+    <string name="pdf_meta_limit">Limiti</string>
     <string name="pdf_meta_weight">Peso corporeo</string>
     <string name="pdf_kpi_total">Alcol totale</string>
     <string name="pdf_kpi_avg_day">Media al giorno</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Indietro</string>
     <string name="delete">Elimina</string>
     <string name="change">Modifica</string>
-    <string name="delete_confirm">Eliminare davvero \"%1$s\"?</string>
+    <string name="delete_confirm">Eliminare davvero \u00ab%1$s\u00bb?</string>
     <string name="no_data">Nessun dato per questo periodo.</string>
     <string name="week">7 giorni</string>
     <string name="month">Mese</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Consenti screenshot e registrazioni schermo della finestra dell\'app</string>
     <string name="language">Lingua</string>
     <string name="export">Esportazione dati</string>
-    <string name="export_desc">Esporta registrazioni nella cartella Download</string>
+    <string name="export_desc">Esporta registrazioni</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Backup</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importa</string>
     <string name="import_mode_question">Come importare i dati?</string>
     <string name="import_replace">Sostituisci</string>
-    <string name="import_merge">Aggiungi</string>
+    <string name="import_merge">Unisci</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Si prega di autenticarsi</string>
     <string name="year_calendar_no_entry">nessuna registrazione</string>
@@ -156,7 +156,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Il file di backup è troppo grande (max. %1$d MB).</string>
     <string name="import_error_read">Errore di lettura: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c ha {count} registrazioni e non può essere eliminato.</string>
+    <string name="drink_delete_blocked">\u00ab{name}\u00bb ha {count} registrazioni e non può essere eliminato.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Il nome della bevanda non può essere vuoto.</string>
     <string name="drink_validation_name_too_long">Il nome della bevanda è troppo lungo (max. 100 caratteri).</string>

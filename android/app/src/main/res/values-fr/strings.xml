@@ -81,7 +81,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Date d\'export</string>
     <string name="pdf_meta_period">Période</string>
-    <string name="pdf_meta_limit">Limite</string>
+    <string name="pdf_meta_limit">Limites</string>
     <string name="pdf_meta_weight">Poids corporel</string>
     <string name="pdf_kpi_total">Alcool total</string>
     <string name="pdf_kpi_avg_day">Moy. par jour</string>
@@ -102,7 +102,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Retour</string>
     <string name="delete">Supprimer</string>
     <string name="change">Modifier</string>
-    <string name="delete_confirm">Supprimer « %1$s » ?</string>
+    <string name="delete_confirm">Supprimer «\u00a0%1$s\u00a0»\u00a0?</string>
     <string name="no_data">Aucune donnée pour cette période.</string>
 
     <string name="week">7 jours</string>
@@ -133,7 +133,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Autoriser les captures et enregistrements d\'écran de la fenêtre de l\'application</string>
     <string name="language">Langue</string>
     <string name="export">Export des données</string>
-    <string name="export_desc">Exporter les entrées dans le dossier Téléchargements</string>
+    <string name="export_desc">Exporter les entrées</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sauvegarde</string>
@@ -142,7 +142,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importer</string>
     <string name="import_mode_question">Comment importer les données ?</string>
     <string name="import_replace">Remplacer</string>
-    <string name="import_merge">Ajouter</string>
+    <string name="import_merge">Fusionner</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Veuillez vous authentifier</string>
 
@@ -172,7 +172,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Le fichier de sauvegarde est trop volumineux (max. %1$d Mo).</string>
     <string name="import_error_read">Erreur de lecture : %1$s</string>
-    <string name="drink_delete_blocked">\u00ab{name}\u00bb a {count} entrées et ne peut pas être supprimé.</string>
+    <string name="drink_delete_blocked">\u00ab\u00a0{name}\u00a0\u00bb a {count} entrées et ne peut pas être supprimé.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Le nom de la boisson ne doit pas être vide.</string>
     <string name="drink_validation_name_too_long">Le nom de la boisson est trop long (max. 100 caractères).</string>

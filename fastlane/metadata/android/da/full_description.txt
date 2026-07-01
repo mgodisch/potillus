@@ -28,11 +28,10 @@ PRIVATLIV & SIKKERHED
 Libellus Potionis er bygget op om fuld datasuverænitet og streng dataminimering.
 Den kører med en minimal tilladelsesprofil helt uden netadgang, så dine
 personlige data aldrig forlader enheden. Dine data forbliver i appens private
-lager, beskyttet i hvile af Androids enhedskryptering og app-sandkassen;
-app-indstillingerne forsegles desuden med en hardwarebaseret Android
-Keystore-nøgle. En valgfri biometrisk fingeraftrykslås beskytter mod uautoriseret
-fysisk adgang. Denne offline-tilgang udelukker sporing, cloud-synkronisering og
-udsivning af data.
+lager, beskyttet i hvile af Androids enhedskryptering og app-sandkassen. En
+valgfri biometrisk fingeraftrykslås beskytter mod uautoriseret fysisk adgang.
+Denne offline-tilgang udelukker sporing, cloud-synkronisering og udsivning af
+data.
 
 KOMPATIBILITET
 

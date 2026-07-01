@@ -57,8 +57,8 @@
 #
 #   1. VERSION CONSISTENCY
 #      The versionName in build.gradle.kts, the top CHANGELOG.md entry, the
-#      README.md title line, and the proguard-rules.pro header comment must
-#      all carry the same version string.  versionCode must be ≥ 1 and must
+#      README.md title line must all carry the same version string.
+#      versionCode must be ≥ 1 and must
 #      be a plain integer (no alphabetic suffix).  Additionally, the F-Droid
 #      reference recipe (fdroid/de.godisch.potillus.yml) must agree: its
 #      CurrentVersion/CurrentVersionCode and its latest Builds block must equal
@@ -200,12 +200,11 @@ cd "$SCRIPT_DIR/.."
 BUILD_GRADLE="app/build.gradle.kts"
 # CHANGELOG.md and README.md live at the repository root, one level above this
 # script's directory (android/). The script cd's into its own dir (SCRIPT_DIR)
-# above, so reference them with `../`. build.gradle.kts and proguard-rules.pro
-# remain relative to android/ (i.e. under app/).
+# above, so reference them with `../`. build.gradle.kts remains relative to
+# android/ (i.e. under app/).
 CHANGELOG="../CHANGELOG.md"
 README="../README.md"
 CONTRIBUTING="../CONTRIBUTING.md"
-PROGUARD="app/proguard-rules.pro"
 APPDB_KT="app/src/main/kotlin/de/godisch/potillus/data/db/AppDatabase.kt"
 BACKUP_MANAGER_KT="app/src/main/kotlin/de/godisch/potillus/util/BackupManager.kt"
 SUPPORTED_LOCALES_KT="app/src/main/kotlin/de/godisch/potillus/l10n/SupportedLocales.kt"
@@ -232,7 +231,7 @@ ANCHOR_FILE="version-anchor"
 
 # ── Pre-flight: verify all required files exist ───────────────────────────────
 # Without these files the rest of the checks cannot run.
-for f in "$BUILD_GRADLE" "$CHANGELOG" "$README" "$PROGUARD" \
+for f in "$BUILD_GRADLE" "$CHANGELOG" "$README" \
           "$APPDB_KT" "$BACKUP_MANAGER_KT" "$SUPPORTED_LOCALES_KT" \
           "$LOCALE_CONFIG_XML" "$BASE_STRINGS_XML"; do
     if [[ ! -f "$f" ]]; then
@@ -283,14 +282,12 @@ extract_db_version() {
 # SECTION 1 – VERSION CONSISTENCY
 #
 # WHY THIS MATTERS:
-#   Four places must carry the same version string to avoid user confusion:
+#   Three places must carry the same version string to avoid user confusion:
 #     • versionName (shown in Android Settings → Apps)
 #     • CHANGELOG.md top entry (release documentation)
 #     • README.md title line (first thing visitors see)
-#     • proguard-rules.pro header comment (for APK archaeology)
 #   A mismatch here is a real hazard: an APK built with a versionName that
-#   disagrees with the CHANGELOG, README or proguard header misleads users and
-#   makes later APK archaeology impossible.
+#   disagrees with the CHANGELOG or README misleads users.
 #
 #   versionCode must be a plain integer ≥ 1.  It is checked separately from
 #   versionName because it obeys different rules (monotonically increasing
@@ -310,9 +307,9 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 9 — VERSION CONSISTENCY"
+    section "1 / 10 — VERSION CONSISTENCY"
 
-    local vname vcode changelog_top readme_version proguard_version
+    local vname vcode changelog_top readme_version
 
     # Extract values from each source
     vname=$(extract_version_name)
@@ -321,8 +318,6 @@ check_version_consistency() {
     changelog_top=$(grep '^## v' "$CHANGELOG" | head -1 | sed 's/^## v//')
     # "vX.Y" in the README title line
     readme_version=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' "$README" | head -1 | tr -d 'v')
-    # Version in proguard-rules.pro header comment
-    proguard_version=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' "$PROGUARD" | head -1 | tr -d 'v')
 
     # versionName: must be present and in "major.minor" format
     if [[ -z "$vname" ]]; then
@@ -416,21 +411,12 @@ CHANGELOG version must bump versionCode by exactly 1"
         pass "versionName matches README.md title (v$vname)"
     fi
 
-    # Cross-check: versionName must match proguard-rules.pro header
-    if [[ -z "$proguard_version" ]]; then
-        warn "Could not parse a version number from $PROGUARD header — add or update the version comment"
-    elif [[ "$vname" != "$proguard_version" ]]; then
-        fail "versionName '$vname' ≠ proguard-rules.pro header version '$proguard_version'"
-    else
-        pass "versionName matches proguard-rules.pro header (v$vname)"
-    fi
-
     # ── Cross-check: F-Droid reference recipe ↔ build.gradle.kts ──────────────
     # The maintainer's recipe copy (fdroid/de.godisch.potillus.yml) must never
     # lag the source tree. Its CurrentVersion / CurrentVersionCode AND its latest
     # Builds block must equal the app's versionName / versionCode — which the
-    # checks above already tie to the top CHANGELOG entry, the README title and
-    # the proguard header. This is the enforcing half of the recipe-sync policy:
+    # checks above already tie to the top CHANGELOG entry and the README title.
+    # This is the enforcing half of the recipe-sync policy:
     # once green here, recipe, build.gradle.kts and CHANGELOG are provably in
     # lock-step, so a stale build block (the bug this check was added for) fails
     # the release instead of shipping silently.
@@ -534,7 +520,7 @@ CHANGELOG version must bump versionCode by exactly 1"
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 9 — CHANGELOG ENTRY"
+    section "2 / 10 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -546,6 +532,20 @@ check_changelog() {
     if [[ "$vname" != "$top_entry" ]]; then
         fail "Top CHANGELOG entry is 'v$top_entry' but versionName is '$vname'"
         return
+    fi
+
+    # Rule 6: the first non-empty line of the top entry is the git subject line
+    # and must be ≤ 50 characters — git's own subject-length convention, so the
+    # CHANGELOG heading can be reused verbatim as the release commit subject.
+    # Subjects are ASCII English imperatives, so bash's byte-based ${#var} equals
+    # the character count here.
+    local subject subj_len
+    subject=$(awk '/^## v/{seen=1; next} seen && NF {print; exit}' "$CHANGELOG")
+    subj_len=${#subject}
+    if (( subj_len > 50 )); then
+        fail "CHANGELOG subject line is $subj_len chars (> 50): \"$subject\""
+    else
+        pass "CHANGELOG subject line ≤ 50 chars ($subj_len): \"$subject\""
     fi
 
     # Count non-empty, non-heading body lines between the top ## entry and the next ## entry.
@@ -577,7 +577,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 9 — ROOM DATABASE MIGRATIONS"
+    section "3 / 10 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -648,7 +648,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 9 — LOCALE CONSISTENCY"
+    section "4 / 10 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -777,7 +777,7 @@ check_locale_consistency() {
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 9 — SOURCE CODE DOCUMENTATION"
+    section "5 / 10 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -921,7 +921,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 9 — LOG CALL GUARDS"
+    section "6 / 10 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -973,7 +973,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 9 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 10 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -1035,7 +1035,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 9 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 10 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -1086,7 +1086,7 @@ check_backup_version() {
 #   no balance check can satisfy, and they are never reformatted anyway).
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 9 — MARKDOWN SYNTAX"
+    section "9 / 10 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then
@@ -1117,6 +1117,70 @@ check_markdown_syntax() {
     fi
 }
 
+# -----------------------------------------------------------------------------
+# SECTION 10 — STORE METADATA LENGTH LIMITS
+# -----------------------------------------------------------------------------
+# Google Play / F-Droid (Triple-T) cap the length of the store-listing texts.
+# Exceeding them is silently truncated on Play and flagged by the F-Droid MR
+# code-quality scan, so catch it here BEFORE tagging. Limits, counted in
+# CHARACTERS (not bytes) so multi-byte scripts — Greek, Cyrillic, CJK — are
+# measured the way the stores do:
+#   short_description.txt   ≤   80   (the listing summary)
+#   full_description.txt    ≤ 4000
+#   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
+check_metadata_lengths() {
+    section "10 / 10 — STORE METADATA LENGTH LIMITS"
+
+    # python3 is already a prerequisite (see §5); reuse it for correct,
+    # locale-independent character counting.
+    if ! command -v python3 >/dev/null 2>&1; then
+        warn "python3 not found — skipping metadata length check"
+        return
+    fi
+
+    local output rc
+    output=$(python3 - "$FASTLANE_DIR" <<'PYEOF'
+import sys, glob, os
+
+root = sys.argv[1]
+# (filename glob, character limit)
+FIXED = [("short_description.txt", 80), ("full_description.txt", 4000)]
+problems = []
+
+def length(path):
+    # Count characters, ignoring a single trailing newline, the way the stores
+    # measure the visible text.
+    with open(path, encoding="utf-8") as fh:
+        return len(fh.read().rstrip("\n"))
+
+for name, limit in FIXED:
+    for path in sorted(glob.glob(os.path.join(root, "*", name))):
+        n = length(path)
+        if n > limit:
+            problems.append(f"{path}: {n} chars > {limit}")
+
+for path in sorted(glob.glob(os.path.join(root, "*", "changelogs", "*.txt"))):
+    n = length(path)
+    if n > 500:
+        problems.append(f"{path}: {n} chars > 500")
+
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PYEOF
+)
+    rc=$?
+
+    if [[ $rc -eq 0 ]]; then
+        pass "Store metadata within length limits (summary ≤80, full ≤4000, changelog ≤500)"
+    else
+        # One "path: N chars > LIMIT" per offending file on stdout.
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && fail "$line"
+        done <<< "$output"
+    fi
+}
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -1138,6 +1202,7 @@ main() {
     check_no_german_comments
     check_backup_version
     check_markdown_syntax
+    check_metadata_lengths
 
     # ── Final summary ─────────────────────────────────────────────────────────
     echo ""

@@ -108,7 +108,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data de exportação</string>
     <string name="pdf_meta_period">Período</string>
-    <string name="pdf_meta_limit">Limite</string>
+    <string name="pdf_meta_limit">Limites</string>
     <string name="pdf_meta_weight">Peso corporal</string>
     <string name="pdf_kpi_total">Álcool total</string>
     <string name="pdf_kpi_avg_day">Média por dia</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Voltar</string>
     <string name="delete">Excluir</string>
     <string name="change">Alterar</string>
-    <string name="delete_confirm">Excluir "%1$s"?</string>
+    <string name="delete_confirm">Excluir \u201c%1$s\u201d?</string>
     <string name="no_data">Sem dados para este período.</string>
 
     <!-- Stats -->
@@ -163,7 +163,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Permitir capturas e gravações de tela da janela do app</string>
     <string name="language">Idioma</string>
     <string name="export">Exportação de dados</string>
-    <string name="export_desc">Exportar registros para a pasta Downloads</string>
+    <string name="export_desc">Exportar registros</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Backup</string>
@@ -174,7 +174,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">Como deseja importar os dados?</string>
     <string name="import_replace">Substituir</string>
-    <string name="import_merge">Adicionar</string>
+    <string name="import_merge">Mesclar</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>
@@ -207,7 +207,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_error_version_too_high">A versão do backup %1$d não é suportada (máx. %2$d).</string>
     <string name="import_error_file_too_large">O arquivo de backup é muito grande (máx. %1$d MB).</string>
     <string name="import_error_read">Erro de leitura: %1$s</string>
-    <string name="drink_delete_blocked">"{name}" tem {count} registros e não pode ser excluído.</string>
+    <string name="drink_delete_blocked">\u201c{name}\u201d tem {count} registros e não pode ser excluído.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">O nome da bebida não pode estar vazio.</string>
     <string name="drink_validation_name_too_long">O nome da bebida é muito longo (máx. 100 caracteres).</string>

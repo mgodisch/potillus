@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Εκτιμήσεις – όχι ιατρική διάγνωση. Όχι για αξιολόγηση ικανότητας οδήγησης ή διαγνωστικούς σκοπούς.</string>
     <string name="pdf_meta_export_date">Ημερομηνία εξαγωγής</string>
     <string name="pdf_meta_period">Περίοδος</string>
-    <string name="pdf_meta_limit">Όριο</string>
+    <string name="pdf_meta_limit">Όρια</string>
     <string name="pdf_meta_weight">Σωματικό βάρος</string>
     <string name="pdf_kpi_total">Συνολική αλκοόλη</string>
     <string name="pdf_kpi_avg_day">Μέσος ανά ημέρα</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Πίσω</string>
     <string name="delete">Διαγραφή</string>
     <string name="change">Αλλαγή</string>
-    <string name="delete_confirm">Διαγραφή \"%1$s\";</string>
+    <string name="delete_confirm">Διαγραφή «%1$s»;</string>
     <string name="no_data">Δεν υπάρχουν δεδομένα για αυτή την περίοδο.</string>
     <string name="week">7 ημέρες</string>
     <string name="month">Μήνας</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Να επιτρέπονται στιγμιότυπα και εγγραφές οθόνης του παραθύρου της εφαρμογής</string>
     <string name="language">Γλώσσα</string>
     <string name="export">Εξαγωγή δεδομένων</string>
-    <string name="export_desc">Εξαγωγή εγγραφών στο φάκελο Λήψεις</string>
+    <string name="export_desc">Εξαγωγή εγγραφών</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Αντίγραφο ασφαλείας</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Εισαγωγή</string>
     <string name="import_mode_question">Πώς να εισαχθούν τα δεδομένα;</string>
     <string name="import_replace">Αντικατάσταση</string>
-    <string name="import_merge">Προσθήκη</string>
+    <string name="import_merge">Συγχώνευση</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Παρακαλώ επαληθεύστε την ταυτότητά σας</string>
     <string name="year_calendar_no_entry">καμία εγγραφή</string>
@@ -154,7 +154,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Το αρχείο αντιγράφου ασφαλείας είναι πολύ μεγάλο (μέγ. %1$d MB).</string>
     <string name="import_error_read">Σφάλμα ανάγνωσης: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c έχει {count} εγγραφές και δεν μπορεί να διαγραφεί.</string>
+    <string name="drink_delete_blocked">«{name}» έχει {count} εγγραφές και δεν μπορεί να διαγραφεί.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Το όνομα του ποτού δεν μπορεί να είναι κενό.</string>
     <string name="drink_validation_name_too_long">Το όνομα του ποτού είναι πολύ μακρύ (μέγ. 100 χαρακτήρες).</string>

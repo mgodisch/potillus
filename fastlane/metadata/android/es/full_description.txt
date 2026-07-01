@@ -34,10 +34,9 @@ minimización de datos. Funciona con un perfil de permisos mínimo que excluye p
 completo el acceso a la red, por lo que tus datos personales nunca salen del
 dispositivo. Tus datos permanecen en el almacenamiento privado de la aplicación,
 protegidos en reposo por el cifrado del dispositivo de Android y el sandbox de la
-app; además, las preferencias se sellan con una clave del Android Keystore
-respaldada por hardware. Un bloqueo biométrico por huella dactilar, opcional,
-protege frente al acceso físico no autorizado. Este enfoque sin conexión elimina
-el rastreo, la sincronización en la nube y las fugas de datos externas.
+app. Un bloqueo biométrico por huella dactilar, opcional, protege frente al
+acceso físico no autorizado. Este enfoque sin conexión elimina el rastreo, la
+sincronización en la nube y las fugas de datos externas.
 
 COMPATIBILIDAD
 

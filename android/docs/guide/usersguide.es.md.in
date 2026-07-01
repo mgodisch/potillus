@@ -30,15 +30,16 @@ Esta página describe las características y funciones de la aplicación.
 Libellus Potionis es de código abierto. Cualquiera puede consultar y verificar
 el código fuente. Libellus Potionis respeta la privacidad. No requiere ningún
 permiso: ni para la cámara o el micrófono, ni para el GPS o el acceso a la red.
-Libellus Potionis es seguro: todos los datos se almacenan cifrados y el acceso a
-la aplicación puede restringirse mediante huella dactilar. Libellus Potionis te
-ayuda a dosificarte hasta tu límite indicándote en todo momento si
-«la petite sœur» todavía cabe en tu presupuesto. Libellus Potionis te apoya en
-tu terapia de adicciones proporcionando, si lo deseas, un informe PDF completo
-de dos páginas sobre tus hábitos de consumo. Libellus Potionis es gratuito y sin
-publicidad.
+Libellus Potionis es seguro: tus datos permanecen en el almacenamiento privado
+de la aplicación en tu dispositivo, protegidos por el cifrado de tu dispositivo
+y el acceso a la aplicación puede restringirse mediante huella dactilar.
+Libellus Potionis te ayuda a dosificarte hasta tu límite indicándote en todo
+momento si «la petite sœur» todavía cabe en tu presupuesto. Libellus Potionis te
+apoya en tu terapia de adicciones proporcionando, si lo deseas, un informe PDF
+completo de dos páginas sobre tus hábitos de consumo. Libellus Potionis es
+gratuito y sin publicidad.
 
-Libellus Potionis requiere Android 15 o superior. El autor lo utiliza de forma
+Libellus Potionis requiere Android 11 o superior. El autor lo utiliza de forma
 continua en un Google Pixel 10 Pro con GrapheneOS y, además, lo prueba en un
 Fairphone 4.
 
@@ -101,9 +102,8 @@ Wikipedia.
 
 Los ajustes estadísticos te permiten definir la hora a la que comienza un nuevo
 día (de modo que, por ejemplo, una bebida a la 1:00 de la madrugada siga
-contando para el día anterior), el día en que debe empezar la semana y —para los
-propósitos de Año Nuevo— la fecha a partir de la cual debe iniciarse el análisis
-de los datos.
+contando para el día anterior) y —para los propósitos de Año Nuevo— la fecha a
+partir de la cual debe iniciarse el análisis de los datos.
 
 ### {{backup_section}}
 

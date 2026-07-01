@@ -30,14 +30,15 @@ popisuje vlastnosti a funkce aplikace.
 Libellus Potionis je open source. Zdrojový kód si může prohlédnout a ověřit
 kdokoli. Libellus Potionis je šetrný k soukromí. Nevyžaduje žádná oprávnění, ani
 ke kameře či mikrofonu, ani k GPS nebo přístupu k síti. Libellus Potionis je
-bezpečný: všechna data se ukládají šifrovaně a přístup k aplikaci lze omezit
-otiskem prstu. Libellus Potionis vám pomáhá dávkovat se až k vašemu limitu tím,
-že vám kdykoli prozradí, zda se „la petite sœur" ještě vejde do vašeho rozpočtu.
+bezpečný: vaše data zůstávají v soukromém úložišti aplikace na vašem zařízení,
+chráněná šifrováním vašeho zařízení a přístup k aplikaci lze omezit otiskem
+prstu. Libellus Potionis vám pomáhá dávkovat se až k vašemu limitu tím, že vám
+kdykoli prozradí, zda se „la petite sœur" ještě vejde do vašeho rozpočtu.
 Libellus Potionis vás podporuje při léčbě závislosti tím, že na požádání poskytne
 podrobnou dvoustránkovou zprávu PDF o vašich pijáckých návycích. Libellus
 Potionis je zdarma a bez reklam.
 
-Libellus Potionis vyžaduje Android 15 nebo novější. Autor jej průběžně používá na
+Libellus Potionis vyžaduje Android 11 nebo novější. Autor jej průběžně používá na
 zařízení Google Pixel 10 Pro se systémem GrapheneOS a navíc jej testuje na
 Fairphone 4.
 
@@ -95,9 +96,8 @@ co zde nastavit, můžete se inspirovat doporučeními různých zemí na Wikipe
 ### {{statistics}}
 
 Statistická nastavení umožňují určit, v kolik hodin začíná nový den (aby se
-například nápoj v 1:00 ráno ještě počítal k předchozímu dni), den, kterým má
-začínat týden, a — pro novoroční předsevzetí — datum, od kterého se mají data
-vyhodnocovat.
+například nápoj v 1:00 ráno ještě počítal k předchozímu dni) a — pro novoroční
+předsevzetí — datum, od kterého se mají data vyhodnocovat.
 
 ### {{backup_section}}
 

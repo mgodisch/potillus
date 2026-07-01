@@ -72,7 +72,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_footer1">Odhady – nejde o lékařskou diagnózu. Nepoužívat k posouzení způsobilosti k řízení ani k diagnostice.</string>
     <string name="pdf_meta_export_date">Datum exportu</string>
     <string name="pdf_meta_period">Období</string>
-    <string name="pdf_meta_limit">Limit</string>
+    <string name="pdf_meta_limit">Limity</string>
     <string name="pdf_meta_weight">Tělesná hmotnost</string>
     <string name="pdf_kpi_total">Celkový alkohol</string>
     <string name="pdf_kpi_avg_day">Prům. za den</string>
@@ -92,7 +92,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Zpět</string>
     <string name="delete">Smazat</string>
     <string name="change">Změnit</string>
-    <string name="delete_confirm">Opravdu smazat \"%1$s\"?</string>
+    <string name="delete_confirm">Opravdu smazat \u201e%1$s\u201c?</string>
     <string name="no_data">Žádná data pro toto období.</string>
     <string name="week">7 dní</string>
     <string name="month">Měsíc</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Povolit snímky a nahrávání obrazovky okna aplikace</string>
     <string name="language">Jazyk</string>
     <string name="export">Export dat</string>
-    <string name="export_desc">Exportovat záznamy do složky Stažené</string>
+    <string name="export_desc">Exportovat záznamy</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Záloha</string>
@@ -130,7 +130,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importovat</string>
     <string name="import_mode_question">Jak importovat data?</string>
     <string name="import_replace">Nahradit</string>
-    <string name="import_merge">Přidat</string>
+    <string name="import_merge">Sloučit</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Prosím ověřte svou identitu</string>
     <string name="year_calendar_no_entry">žádný záznam</string>

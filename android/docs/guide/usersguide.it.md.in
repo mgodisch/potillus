@@ -30,15 +30,16 @@ Questa pagina descrive le caratteristiche e le funzioni dell'app.
 Libellus Potionis è open source. Il codice sorgente può essere consultato e
 verificato da chiunque. Libellus Potionis rispetta la privacy. Non richiede
 alcun permesso: né per la fotocamera o il microfono, né per il GPS o l'accesso
-alla rete. Libellus Potionis è sicuro: tutti i dati sono memorizzati in forma
-cifrata e l'accesso all'app può essere limitato tramite impronta digitale.
+alla rete. Libellus Potionis è sicuro: i tuoi dati restano nell'archivio
+privato dell'app sul tuo dispositivo, protetti dalla cifratura del tuo
+dispositivo e l'accesso all'app può essere limitato tramite impronta digitale.
 Libellus Potionis ti aiuta a dosarti fino al tuo limite indicandoti in ogni
 momento se «la petite sœur» rientra ancora nel tuo budget. Libellus Potionis ti
 sostiene nel percorso presso il servizio per le dipendenze fornendo, su
 richiesta, un report PDF completo di due pagine sulle tue abitudini di consumo.
 Libellus Potionis è gratuito e senza pubblicità.
 
-Libellus Potionis richiede Android 15 o versioni successive. L'autore lo utilizza
+Libellus Potionis richiede Android 11 o versioni successive. L'autore lo utilizza
 con continuità su un Google Pixel 10 Pro con GrapheneOS e lo collauda inoltre su
 un Fairphone 4.
 
@@ -102,9 +103,8 @@ Wikipedia.
 
 Le impostazioni statistiche ti permettono di definire l'ora in cui inizia un
 nuovo giorno (in modo che, ad esempio, una bevanda consumata all'1:00 di notte
-conti ancora per il giorno precedente), il giorno in cui deve iniziare la
-settimana e — per i buoni propositi di Capodanno — la data a partire dalla quale
-deve iniziare l'analisi dei dati.
+conti ancora per il giorno precedente) e — per i buoni propositi di Capodanno —
+la data a partire dalla quale deve iniziare l'analisi dei dati.
 
 ### {{backup_section}}
 

@@ -1,0 +1,1 @@
+Forbedringer af lokalisering og formuleringer på alle sprog. Ingen funktionelle ændringer.

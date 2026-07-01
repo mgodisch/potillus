@@ -26,12 +26,13 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## 主要特性
 
-Libellus Potionis 是開源軟體。任何人都可以檢視並驗證其原始碼。Libellus Potionis 重視
-隱私。它不需要任何權限——無論是相機、麥克風，還是 GPS 或網路。Libellus Potionis 很安
-全：所有資料都以加密形式儲存，並且可以用指紋來限制對應用程式的存取。Libellus Potionis
-透過隨時告訴你「la petite sœur」是否仍在你的額度之內，協助你有節制地接近自己的上限。此
-外，在與成癮諮詢機構會面時，應用程式還可以應你的要求，將你的全部飲酒情況整理成一份清晰
-的兩頁 PDF 文件。Libellus Potionis 完全免費且無廣告。
+Libellus Potionis 是開源軟體。任何人都可以檢視並驗證其原始碼。Libellus Potionis 重視隱
+私。它不需要任何權限——無論是相機、麥克風，還是 GPS 或網路。Libellus Potionis 很安全：
+你的資料保存在裝置上應用程式的私有儲存空間中，受裝置加密保護，並且可以用指紋來限制對應
+用程式的存取。Libellus Potionis 透過隨時告訴你「la petite sœur」是否仍在你的額度之內，
+協助你有節制地接近自己的上限。此外，在與成癮諮詢機構會面時，應用程式還可以應你的要求，
+將你的全部飲酒情況整理成一份清晰的兩頁 PDF 文件。Libellus Potionis 完全免費且無廣
+告。
 
 Libellus Potionis 需要 Android 11 或更新版本。作者在搭載 GrapheneOS（Android 16）的
 Google Pixel 10 Pro 上持續使用它，並另外在 Fairphone 4（Android 15）與虛擬 Pixel 4

@@ -35,10 +35,9 @@ d'une stricte minimisation des données. Il fonctionne avec un profil
 d'autorisations minimal qui exclut totalement l'accès au réseau : vos données
 personnelles ne quittent donc jamais l'appareil. Vos données restent dans le
 stockage privé de l'application, protégées au repos par le chiffrement de
-l'appareil Android et le bac à sable de l'application ; les préférences sont en
-outre scellées par une clé de l'Android Keystore adossée au matériel. Un
-verrouillage biométrique par empreinte digitale, facultatif, protège contre tout
-accès physique non autorisé. Cette approche hors ligne élimine le pistage, la
+l'appareil Android et le bac à sable de l'application. Un verrouillage
+biométrique par empreinte digitale, facultatif, protège contre tout accès
+physique non autorisé. Cette approche hors ligne élimine le pistage, la
 synchronisation dans le nuage et les fuites de données externes.
 
 COMPATIBILITÉ

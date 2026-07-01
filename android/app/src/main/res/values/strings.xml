@@ -21,52 +21,103 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- =====================================================================
+         TRANSLATOR / REVIEWER CONTEXT (added for localization QA)
+
+         Every <string>/<plurals> below is preceded by a note stating where it
+         appears in the UI (screen / dialog / PDF report / status message) and
+         what each placeholder means. Conventions:
+           * %1$s, %1$d, %2$d ...: Android positional format arguments filled
+             in at runtime. Keep the same number and type as the English; being
+             positional, they MAY be reordered within the sentence if the target
+             grammar needs it.
+           * {name}, {count}: custom SimpleTemplate placeholders (only in
+             drink_delete_blocked) — keep the braces and identifiers verbatim.
+           * Typographic quote escapes (\u201e \u201c \u201d …): use your locale's
+             quotation convention, consistently within the language.
+         Comments are documentation only and do not affect the build.
+    ===================================================================== -->
+    <!-- App name shown in the launcher (AndroidManifest android:label). Proper noun — keep untranslated. -->
     <string name="app_name">Libellus Potionis</string>
 
     <!-- Navigation -->
+    <!-- Bottom-nav tab and Today-screen title. -->
     <string name="today">Today</string>
+    <!-- Bottom-nav tab and Calendar-screen title. -->
     <string name="calendar">Calendar</string>
+    <!-- Bottom-nav tab, Statistics-screen title, and the Settings 'Statistics' section header. -->
     <string name="statistics">Statistics</string>
+    <!-- Bottom-nav tab and Drinks-screen title. -->
     <string name="drinks">Drinks</string>
+    <!-- Overflow-menu item and Settings-screen title. -->
     <string name="settings">Settings</string>
 
     <!-- Today Screen -->
+    <!-- Today screen: label above the day's total-alcohol figure. -->
     <string name="total_today">Today\'s Total</string>
+    <!-- Today screen: monthly-average badge. %1$s = current month label (e.g. 'July'). -->
     <string name="avg_of_month">Ø %1$s</string>
+    <!-- Today screen: unit suffix under the average ('g/day'). -->
     <string name="grams_per_day">g/day</string>
+    <!-- Today screen: header of today's entry list. -->
     <string name="entries_today">Today\'s Entries</string>
-    <string name="no_entries_today">No entries yet today.\nTap \u201e+\u201c to add an entry.</string>
+    <!-- Today screen empty state. Has a line break; the quoted '+' refers to the add button. -->
+    <string name="no_entries_today">No entries yet today.\nTap \u201c+\u201d to add an entry.</string>
+    <!-- Calendar day-detail empty state. -->
     <string name="no_entries_day">No entries for this day.</string>
 
     <!-- Favoriten -->
+    <!-- Title of the quick-select favourites bar (entry dialog / Today). -->
     <string name="favorites_quick">Quick Selection Favorites</string>
 
     <!-- BAC / Promille-Schätzer -->
+    <!-- Today screen: title of the blood-alcohol (BAC) estimate card. -->
     <string name="bac_estimate">BAC Estimate</string>
+    <!-- Today screen: disclaimer under the BAC card ('·' is a separator). -->
     <string name="bac_disclaimer">Estimated value · not suitable for driving decisions</string>
+    <!-- Settings > Statistics: label of the evaluation-start-date row. -->
     <string name="stats_from_label">Statistics From</string>
+    <!-- Settings > Statistics: description under 'Statistics From'. -->
     <string name="stats_from_desc">Entries before this date are ignored in all statistics.</string>
+    <!-- Settings > Personal Data: body-weight row label and its edit-dialog title (used for BAC). -->
     <string name="body_weight">Body Weight</string>
+    <!-- Placeholder when body weight is unset. -->
     <string name="not_set">Not Set</string>
 
     <!-- Entry Dialog -->
+    <!-- Entry dialog title (new) and Today/Calendar add-button description. -->
     <string name="add_entry">Add Entry</string>
+    <!-- Entry dialog title (edit) and edit-icon description in the entry list. -->
     <string name="edit_entry">Edit Entry</string>
+    <!-- Entry dialog: 'Drink' selector label. -->
     <string name="drink">Drink</string>
+    <!-- Entry dialog: placeholder in the drink dropdown when none is chosen. -->
     <string name="select_drink">Select a drink …</string>
+    <!-- Amount field label in the entry and drink dialogs (value in millilitres). -->
     <string name="volume_ml">Amount</string>
+    <!-- Entry dialog: 'Time' field label and the time-picker dialog title. -->
     <string name="time">Time</string>
+    <!-- Suffix after the computed grams preview ('g Pure Alcohol') in entry/drink dialogs. -->
     <string name="pure_alcohol">g Pure Alcohol</string>
+    <!-- Entry dialog: optional note field label. -->
     <string name="note">Note (optional)</string>
 
     <!-- Drink Dialog -->
+    <!-- Drink dialog title (new) and Drinks add-button description. -->
     <string name="add_drink">Add Drink</string>
+    <!-- Drink dialog title (edit) and edit-icon description. -->
     <string name="edit_drink">Edit Drink</string>
+    <!-- Drink dialog: name field label. -->
     <string name="drink_name">Name</string>
+    <!-- Drink dialog: alcohol-content field label (suffix 'Vol.-%'). -->
     <string name="alcohol_percent">Alcohol Content</string>
+    <!-- Drink dialog/list: favourite-toggle description. -->
     <string name="favorite">Favorite</string>
+    <!-- Drinks screen empty state. -->
     <string name="no_drinks">No drinks defined yet.</string>
+    <!-- Drink dialog: category selector label; also the PDF category-table head. -->
     <string name="category">Category</string>
+    <!-- Drink category (drink dialog dropdown, list, PDF breakdown). -->
     <string name="category_beer">Beer</string>
     <string name="category_wine">Wine / Sparkling Wine</string>
     <string name="category_spirits">Spirits</string>
@@ -75,7 +126,9 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="category_other">Other</string>
 
     <!-- PDF-Export -->
+    <!-- PDF report: main title. -->
     <string name="pdf_title">Alcohol Consumption Report</string>
+    <!-- PDF report: section heading. -->
     <string name="pdf_section_kpis">Key Indicators</string>
     <string name="pdf_section_months">Monthly Overview</string>
     <string name="pdf_section_trend">Long-term Trend (Ø Grams/Day)</string>
@@ -83,118 +136,199 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="pdf_section_daytime">Consumption Pattern: Time of Day (Ø Gram Alcohol)</string>
     <string name="pdf_section_weekday">Consumption Pattern: Weekday (Ø Gram Alcohol)</string>
     <string name="pdf_section_risk">Risk Consumption &amp; Abstinence</string>
+    <!-- PDF report: footer disclaimer. -->
     <string name="pdf_footer1">Self-logged estimates – not a medical diagnosis! Not intended for driving ability evaluation or diagnostic purposes!</string>
 
     <!-- PDF Metadaten / KPI Labels -->
+    <!-- PDF metadata label: export date. -->
     <string name="pdf_meta_export_date">Export date</string>
+    <!-- PDF metadata label: reporting period. -->
     <string name="pdf_meta_period">Period</string>
+    <!-- PDF metadata label for the limits block. Keep consistent with the app's 'Limits' term (see 'limits'). -->
     <string name="pdf_meta_limit">Limits</string>
+    <!-- PDF metadata label: body weight. -->
     <string name="pdf_meta_weight">Body weight</string>
+    <!-- PDF KPI: total alcohol. -->
     <string name="pdf_kpi_total">Total alcohol</string>
+    <!-- PDF KPI: average per day. -->
     <string name="pdf_kpi_avg_day">Ø per day</string>
+    <!-- PDF KPI: average per drinking day. -->
     <string name="pdf_kpi_avg_drink_day">Ø per drinking day</string>
+    <!-- PDF KPI: number of drinking days. -->
     <string name="pdf_kpi_drink_days">Drinking days</string>
+    <!-- PDF KPI: number of abstinent days. -->
     <string name="pdf_kpi_abstinent_days">Abstinent days</string>
+    <!-- PDF KPI: binge days. %1$s = binge threshold in grams. -->
     <string name="pdf_kpi_binge">Binge days (&gt; %1$s g)</string>
+    <!-- PDF monthly-table column: month. -->
     <string name="pdf_col_month">Month</string>
+    <!-- PDF monthly-table column: drinking days. -->
     <string name="pdf_col_drink_days">Drinking days</string>
+    <!-- PDF monthly-table column: total grams. -->
     <string name="pdf_col_total_g">Total g</string>
+    <!-- PDF monthly-table column: Ø g/day. -->
     <string name="pdf_col_avg_g_day">Ø g/day</string>
+    <!-- PDF risk-section label: binge days. %1$s = binge threshold in grams. -->
     <string name="pdf_meta_binge_days">Binge drinking days (&gt; %1$s g)</string>
+    <!-- PDF label: longest abstinence phase (KPI + risk section). -->
     <string name="pdf_meta_longest_abstinence">Longest abstinence phase</string>
+    <!-- PDF risk-section label: current abstinence. -->
     <string name="pdf_meta_current_abstinence">Current abstinence</string>
 
     <!-- Actions -->
+    <!-- Generic confirm ('Save') button in dialogs. -->
     <string name="save">Save</string>
+    <!-- Generic dismiss ('Cancel') button in dialogs. -->
     <string name="cancel">Cancel</string>
+    <!-- Back-arrow description (Settings, document viewer). -->
     <string name="back">Back</string>
+    <!-- Delete button, delete-confirm dialog title, and delete-icon description. -->
     <string name="delete">Delete</string>
+    <!-- Edit-pencil icon description on Settings rows. -->
     <string name="change">Change</string>
+    <!-- Delete-confirmation dialog body. %1$s = name of the drink/entry being deleted. -->
     <string name="delete_confirm">Really delete \u201c%1$s\u201d?</string>
+    <!-- Chart empty state when a period has no data (Statistics). -->
     <string name="no_data">No data for this period.</string>
 
     <!-- Stats -->
+    <!-- Statistics period selector: '7 Days' (rolling 7-day window). -->
     <string name="week">7 Days</string>
+    <!-- Statistics/Calendar 'Month' toggle. -->
     <string name="month">Month</string>
+    <!-- Statistics/Calendar 'Year' toggle. -->
     <string name="year">Year</string>
+    <!-- Statistics: total in the selected period. -->
     <string name="total_period">Total in Period</string>
+    <!-- Statistics: average per day. -->
     <string name="avg_per_day">Average per Day</string>
+    <!-- Statistics: average per drinking day. -->
     <string name="avg_per_drink_day">Average per Drinking Day</string>
+    <!-- Statistics: abstinent-days row. -->
     <string name="abstinent_days">Abstinent Days</string>
+    <!-- Statistics: title of the category-breakdown chart. -->
     <string name="stats_category_breakdown">Categories</string>
+    <!-- Statistics: title of the abstinence & trend block. -->
     <string name="streak_trend">Abstinence &amp; Trend</string>
+    <!-- Statistics: current abstinence streak label. -->
     <string name="current_streak">Current Abstinence</string>
+    <!-- Statistics: longest abstinence streak label. -->
     <string name="longest_streak">Longest Abstinence</string>
+    <!-- Statistics: trend-vs-previous-period label. -->
     <string name="trend_vs_prev">Trend vs. Previous Period</string>
 
     <!-- Settings -->
+    <!-- Settings section header: Security. -->
     <string name="security">Security</string>
+    <!-- Settings section header: Appearance. -->
     <string name="appearance">Appearance</string>
+    <!-- Settings: colour-scheme row label. -->
     <string name="theme_mode">Color Scheme</string>
+    <!-- Colour-scheme option (System / Light / Dark). -->
     <string name="theme_system">System</string>
     <string name="theme_day">Light</string>
     <string name="theme_night">Dark</string>
+    <!-- Time-picker dialog title for the day-change time. -->
     <string name="day_change_time">Day Change Time</string>
+    <!-- Settings > Statistics: 'New Day Starts At' row label. -->
     <string name="day_starts_at">New Day Starts At</string>
+    <!-- Settings > Limits: 7-day-limit row label and its edit-dialog title. -->
     <string name="weekly_limit_grams">7-Day Limit in Grams</string>
+    <!-- Settings > Security: biometric-lock toggle label. -->
     <string name="biometric_lock">Biometric Lock</string>
+    <!-- Settings > Security: description under the biometric-lock toggle. -->
     <string name="biometric_desc">Lock the app upon opening via fingerprint or facial recognition</string>
+    <!-- Settings > Security: allow-screenshots toggle label. -->
     <string name="allow_screenshots">Allow Screenshots</string>
+    <!-- Settings > Security: description under allow-screenshots. -->
     <string name="allow_screenshots_desc">Permit screenshots and screen recordings of the app window</string>
+    <!-- Settings: in-app language selector label. -->
     <string name="language">Language</string>
+    <!-- Statistics: 'Data Export' block label. -->
     <string name="export">Data Export</string>
+    <!-- Statistics export-block description. Keep terse, matching the English 'Export entries'. -->
     <string name="export_desc">Export entries</string>
+    <!-- Export button: CSV. -->
     <string name="export_csv">CSV</string>
+    <!-- Export button: PDF. -->
     <string name="export_pdf">PDF</string>
+    <!-- Settings section header: Backup. -->
     <string name="backup_section">Backup</string>
+    <!-- Settings > Backup: description of the full JSON backup. -->
     <string name="backup_desc">Full backup (drinks &amp; log) as a JSON file</string>
+    <!-- Settings > Backup: 'Export' button; also the export-range dialog confirm button. -->
     <string name="backup_export">Export</string>
+    <!-- Settings > Backup: 'Import' button and import-mode dialog title. -->
     <string name="backup_import">Import</string>
 
     <!-- Import-Modus -->
+    <!-- Import dialog body: asks how the data should be imported. -->
     <string name="import_mode_question">How should the data be imported?</string>
+    <!-- Import dialog: 'Replace' option (overwrites all data); shown in the destructive colour. -->
     <string name="import_replace">Replace</string>
+    <!-- Import dialog: 'Merge' option (combines with existing entries). Use the standard software term for 'merge'. -->
     <string name="import_merge">Merge</string>
 
     <!-- Biometric Prompt -->
+    <!-- System biometric-prompt title (the app name). Keep as the app name. -->
     <string name="biometric_title">Libellus Potionis</string>
+    <!-- System biometric-prompt subtitle ('Please authenticate'). -->
     <string name="biometric_subtitle">Please authenticate</string>
 
     <!-- Export-Hinweis -->
 
     <!-- Jahreskalender-Legende -->
+    <!-- Year heat-map legend: day with no entry. -->
     <string name="year_calendar_no_entry">no entry</string>
+    <!-- Year heat-map legend: day under the limit. -->
     <string name="year_calendar_under_limit">under limit</string>
+    <!-- Year heat-map legend: day over the limit. -->
     <string name="year_calendar_over_limit">over limit</string>
 
     <!-- Export and backup messages -->
+    <!-- Export status: nothing to export. -->
     <string name="export_no_entries">No entries available.</string>
+    <!-- Export status: export failed. -->
     <string name="export_failed">Export failed.</string>
+    <!-- Backup status: backup failed. -->
     <string name="backup_failed">Backup failed.</string>
+    <!-- Import success (replace mode). %1$d = number of imported entries. -->
     <plurals name="import_success_replace">
         <item quantity="one">%1$d entry imported.</item>
         <item quantity="other">%1$d entries imported.</item>
     </plurals>
+    <!-- Import success (merge mode). %1$d = imported, %2$d = skipped (duplicates). -->
     <plurals name="import_success_merge">
         <item quantity="one">%1$d entry imported, %2$d skipped.</item>
         <item quantity="other">%1$d entries imported, %2$d skipped.</item>
     </plurals>
+    <!-- Import error: file could not be read. -->
     <string name="import_error_could_not_read">File could not be read.</string>
+    <!-- Import error: backup file empty. -->
     <string name="import_error_empty">Backup file is empty.</string>
+    <!-- Import error: invalid JSON. -->
     <string name="import_error_invalid_json">Invalid JSON format.</string>
     <!-- The %d values below are a version number and a megabyte size, not counts
          of a pluralizable noun, so PluralsCandidate is a false positive here. -->
+    <!-- Import error. %1$d = backup version found, %2$d = highest supported version. -->
     <string name="import_error_version_too_high" tools:ignore="PluralsCandidate">Backup version %1$d is not supported (max. %2$d).</string>
+    <!-- Import error. %1$d = maximum size in MB. -->
     <string name="import_error_file_too_large" tools:ignore="PluralsCandidate">Backup file too large (max. %1$d MB).</string>
+    <!-- Import error with detail. %1$s = error-detail text. -->
     <string name="import_error_read">Read error: %1$s</string>
+    <!-- Shown when deleting a drink that still has entries. Uses the custom {name}/{count} template (NOT %-args): keep the literal braces. {name} = drink name, {count} = entry count. -->
     <string name="drink_delete_blocked">\u201c{name}\u201d has {count} entries and cannot be deleted.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
+    <!-- Add/Edit Drink form validation message. -->
     <string name="drink_validation_name_blank">The name of the drink must not be empty.</string>
     <string name="drink_validation_name_too_long">The drink name is too long (max. 100 characters).</string>
     <string name="drink_validation_volume_range">The amount must be between 1 ml and 10,000 ml.</string>
+    <!-- Add/Edit Drink validation. formatted="false" because it contains literal % signs. -->
     <string name="drink_validation_alcohol_range" formatted="false">The alcohol content must be between 0 % and 100 %.</string>
     <string name="drink_validation_alcohol_invalid">The alcohol content is not a valid number.</string>
+    <!-- Formatted clock time. %1$02d = hour, %2$02d = minute (zero-padded). Usually left as-is. -->
     <string name="day_change_time_value">%1$02d:%2$02d</string>
+    <!-- CSV export column header (first row of the exported CSV). -->
     <string name="csv_col_date">Date</string>
     <string name="csv_col_time">Time</string>
     <string name="csv_col_drink">Drink</string>
@@ -203,37 +337,67 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="csv_col_alcohol_pct">Alcohol_Percent</string>
     <string name="csv_col_grams">Grams_Alcohol</string>
     <string name="csv_col_note">Note</string>
+    <!-- Unit used inside the PDF ('g/day'). -->
     <string name="pdf_unit_g_per_day">g/day</string>
+    <!-- Today/Components: 'Drinking Days (last 7 days)' bar label. -->
     <string name="drink_days_label">Drinking Days (last 7 days)</string>
+    <!-- Settings > Limits: max-drinking-days row label and its edit-dialog title. -->
     <string name="drink_days_setting">Max. Drinking Days/7 Days</string>
+    <!-- Settings section header: Personal Data. -->
     <string name="personal_data">Personal Data</string>
+    <!-- Settings section header: Limits. Anchor term — pdf_meta_limit and days_over_* should use the same word. -->
     <string name="limits">Limits</string>
+    <!-- Settings > Limits: daily-limit row label and its edit-dialog title. -->
     <string name="daily_limit_grams">Daily Limit in Grams</string>
+    <!-- Limit progress-bar caption. %1$s = daily limit in grams ('g/day'). -->
     <string name="limit_caption_day">%1$s g/day</string>
+    <!-- Limit progress-bar caption. %1$s = 7-day limit in grams ('g/7 days'). -->
     <string name="limit_caption_week">%1$s g/7 days</string>
+    <!-- Statistics: count of days over the daily limit. -->
     <string name="days_over_daily_limit">Days Over Daily Limit</string>
+    <!-- Statistics: count of days over the 7-day limit. -->
     <string name="days_over_weekly_limit">Days Over 7-Day Limit</string>
+    <!-- Statistics: count of days over the drinking-days limit. -->
     <string name="days_over_drink_day_limit">Days Over Drinking Days Limit</string>
+    <!-- Unit used inside the PDF ('g/7 days'). -->
     <string name="pdf_unit_g_per_week">g/7 days</string>
+    <!-- PDF: suffix after the drinking-days limit value ('Drinking days/7 days'). -->
     <string name="pdf_meta_drink_days_suffix">Drinking days/7 days</string>
+    <!-- PDF KPI: days over daily limit. %1$s = daily limit in grams. -->
     <string name="pdf_kpi_over_daily">days &gt; %1$s g/day</string>
+    <!-- PDF KPI: days over 7-day limit. %1$s = 7-day limit in grams. -->
     <string name="pdf_kpi_over_weekly">days &gt; %1$s g/7 days</string>
     <!-- "%1$d/7" is a ratio (threshold out of 7 days), not a count of a noun;
          PluralsCandidate is a false positive here. -->
+    <!-- PDF KPI: days over drinking-days limit. %1$d = threshold out of 7 (a ratio, not a count). -->
     <string name="pdf_kpi_over_drink_days" tools:ignore="PluralsCandidate">days &gt; %1$d/7 drinking days</string>
+    <!-- PDF monthly-table column header: '> day' (days over daily limit). -->
     <string name="pdf_col_over_daily">&gt; day</string>
+    <!-- Overflow (three-dot) menu button description. -->
     <string name="menu">Menu</string>
+    <!-- Overflow-menu item: opens the user's guide; also its viewer title. -->
     <string name="help">Help</string>
+    <!-- Overflow-menu item: opens the GPL/copyright notice; also its title. -->
     <string name="copyright">Copyright</string>
+    <!-- Statistics: title of the time-of-day chart. -->
     <string name="stats_time_of_day">Time of Day</string>
+    <!-- Statistics: title of the weekday chart. -->
     <string name="stats_weekday">Weekday</string>
+    <!-- PDF KPI: median per day. -->
     <string name="pdf_kpi_median_day">Median per day</string>
+    <!-- PDF KPI: median per drinking day. -->
     <string name="pdf_kpi_median_drink_day">Median per drinking day</string>
+    <!-- PDF KPI: Ø drinking days per month. -->
     <string name="pdf_kpi_avg_drink_days_month">Ø drinking days/month</string>
+    <!-- PDF KPI: median drinking days per month. -->
     <string name="pdf_kpi_median_drink_days_month">Median drinking days/month</string>
+    <!-- PDF KPI: maximum in a single day. -->
     <string name="pdf_kpi_max_day">Max per day</string>
+    <!-- PDF KPI: maximum in any 7 days. -->
     <string name="pdf_kpi_max_7days">Max per 7 days</string>
+    <!-- Overflow-menu item: lock the app now (only when biometric lock is on). -->
     <string name="lock_app">Lock app</string>
+    <!-- Reusable 'N day(s)' phrase for abstinence streaks. %1$d = number of days. -->
     <plurals name="days">
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>

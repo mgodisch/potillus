@@ -99,7 +99,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Eksportdato</string>
     <string name="pdf_meta_period">Periode</string>
-    <string name="pdf_meta_limit">Grense</string>
+    <string name="pdf_meta_limit">Grenser</string>
     <string name="pdf_meta_weight">Kroppsvekt</string>
     <string name="pdf_kpi_total">Total alkohol</string>
     <string name="pdf_kpi_avg_day">Gj.snitt per dag</string>
@@ -121,7 +121,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Tilbake</string>
     <string name="delete">Slett</string>
     <string name="change">Endre</string>
-    <string name="delete_confirm">Slett virkelig \"%1$s\"?</string>
+    <string name="delete_confirm">Slett virkelig \u00ab%1$s\u00bb?</string>
     <string name="no_data">Ingen data for denne perioden.</string>
 
     <!-- Stats -->
@@ -154,7 +154,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Tillat skjermbilder og skjermopptak av appvinduet</string>
     <string name="language">Språk</string>
     <string name="export">Dataeksport</string>
-    <string name="export_desc">Eksporter registreringer til Nedlastinger-mappen</string>
+    <string name="export_desc">Eksporter registreringer</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sikkerhetskopiering</string>
@@ -165,7 +165,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Import mode -->
     <string name="import_mode_question">Hvordan skal dataene importeres?</string>
     <string name="import_replace">Erstatt</string>
-    <string name="import_merge">Legg til</string>
+    <string name="import_merge">Slå sammen</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>
@@ -196,7 +196,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="import_error_version_too_high">Sikkerhetskopiversjon %1$d støttes ikke (maks. %2$d).</string>
     <string name="import_error_file_too_large">Sikkerhetskopifilen er for stor (maks. %1$d MB).</string>
     <string name="import_error_read">Lesefeil: %1$s</string>
-    <string name="drink_delete_blocked">\u201e{name}\u201c har {count} registreringer og kan ikke slettes.</string>
+    <string name="drink_delete_blocked">\u00ab{name}\u00bb har {count} registreringer og kan ikke slettes.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Drikknavnet kan ikke være tomt.</string>
     <string name="drink_validation_name_too_long">Drikknavnet er for langt (maks. 100 tegn).</string>

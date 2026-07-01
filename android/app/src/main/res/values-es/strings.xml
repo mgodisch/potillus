@@ -81,7 +81,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Fecha exportación</string>
     <string name="pdf_meta_period">Período</string>
-    <string name="pdf_meta_limit">Límite</string>
+    <string name="pdf_meta_limit">Límites</string>
     <string name="pdf_meta_weight">Peso corporal</string>
     <string name="pdf_kpi_total">Alcohol total</string>
     <string name="pdf_kpi_avg_day">Prom. por día</string>
@@ -102,7 +102,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="back">Atrás</string>
     <string name="delete">Eliminar</string>
     <string name="change">Cambiar</string>
-    <string name="delete_confirm">¿Eliminar «%1$s»?</string>
+    <string name="delete_confirm">¿Eliminar \u00ab%1$s\u00bb?</string>
     <string name="no_data">No hay datos para este período.</string>
 
     <string name="week">7 días</string>
@@ -133,7 +133,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="allow_screenshots_desc">Permitir capturas y grabaciones de pantalla de la ventana de la app</string>
     <string name="language">Idioma</string>
     <string name="export">Exportar datos</string>
-    <string name="export_desc">Exportar entradas a la carpeta de Descargas</string>
+    <string name="export_desc">Exportar entradas</string>
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Copia de seguridad</string>
@@ -142,7 +142,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="backup_import">Importar</string>
     <string name="import_mode_question">¿Cómo importar los datos?</string>
     <string name="import_replace">Reemplazar</string>
-    <string name="import_merge">Añadir</string>
+    <string name="import_merge">Combinar</string>
     <string name="biometric_title">Libellus Potionis</string>
     <string name="biometric_subtitle">Por favor autentíquese</string>
 
