@@ -36,6 +36,49 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.77.4
+
+Drop in-APK SBOM for reproducible builds
+
+Reproducible builds:
+- The release APK no longer embeds the CycloneDX SBOM under `assets/sbom/`.
+  F-Droid's from-source rebuild of 0.77.3 verified the signature but failed the
+  byte-for-byte reproducibility comparison, and the *only* differences were in
+  the packaged SBOM. Its CycloneDX metadata captures the build environment and
+  therefore differs between the developer's machine and F-Droid's CI:
+  `metadata.timestamp` (dropped locally when `SOURCE_DATE_EPOCH` is unset, but
+  pinned to it in CI), an auto-injected `build-system` entry carrying the GitLab
+  CI job URL, and the VCS URL recorded as `ssh://…` locally vs `https://…` in
+  CI. None of these can be reconciled across environments, so the robust fix is
+  to stop shipping the SBOM *inside* the APK.
+- `build.gradle.kts`: removed section 5 (`GenerateSbomAsset` and its
+  `androidComponents` asset wiring) together with the imports it alone used
+  (`java.io.File`, `javax.inject.Inject`, `ExecOperations`). Section 4
+  (`cyclonedxDirectBom`) is unchanged, so `make sbom` / `make release` still
+  produce the standalone `build/outputs/sbom/libellus-potionis-sbom.json`, which
+  can be published as a separate release asset alongside the APK.
+- The in-APK SBOM was never read at runtime and is not checked by
+  `release-check.sh`, so nothing else depends on it; the APK is otherwise
+  byte-identical to 0.77.3.
+
+Release-check tooling (`tools/release-check.sh`):
+- New §11 (REPRODUCIBLE-BUILD HYGIENE) fails the release if `build.gradle.kts`
+  reintroduces an in-APK SBOM task (`GenerateSbomAsset`), so this regression
+  cannot silently return. Sections renumbered from "/ 10" to "/ 11".
+
+F-Droid recipe:
+- `AutoName: Libellus Potionis` added to the reference recipe so it stays in
+  sync with the fdroiddata copy (where `fdroid checkupdates` populates it) and
+  no longer disappears from the recipe diff.
+
+Versioning:
+- `versionCode` 87 → 88 and `versionName` 0.77.3 → 0.77.4 across
+  `build.gradle.kts`, `README.md` and the F-Droid recipe; localized store notes
+  added as `changelogs/88.txt` for all 21 locales. No user-facing or functional
+  change — this is a build-reproducibility fix.
+
+---
+
 ## v0.77.3
 
 Refine translations and data-security wording

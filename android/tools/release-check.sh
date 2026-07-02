@@ -307,7 +307,7 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 10 — VERSION CONSISTENCY"
+    section "1 / 11 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version
 
@@ -520,7 +520,7 @@ CHANGELOG version must bump versionCode by exactly 1"
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 10 — CHANGELOG ENTRY"
+    section "2 / 11 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -577,7 +577,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 10 — ROOM DATABASE MIGRATIONS"
+    section "3 / 11 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -648,7 +648,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 10 — LOCALE CONSISTENCY"
+    section "4 / 11 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -777,7 +777,7 @@ check_locale_consistency() {
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 10 — SOURCE CODE DOCUMENTATION"
+    section "5 / 11 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -921,7 +921,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 10 — LOG CALL GUARDS"
+    section "6 / 11 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -973,7 +973,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 10 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 11 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -1035,7 +1035,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 10 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 11 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -1086,7 +1086,7 @@ check_backup_version() {
 #   no balance check can satisfy, and they are never reformatted anyway).
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 10 — MARKDOWN SYNTAX"
+    section "9 / 11 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then
@@ -1129,7 +1129,7 @@ check_markdown_syntax() {
 #   full_description.txt    ≤ 4000
 #   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
 check_metadata_lengths() {
-    section "10 / 10 — STORE METADATA LENGTH LIMITS"
+    section "10 / 11 — STORE METADATA LENGTH LIMITS"
 
     # python3 is already a prerequisite (see §5); reuse it for correct,
     # locale-independent character counting.
@@ -1182,6 +1182,32 @@ PYEOF
 }
 
 # =============================================================================
+# SECTION 11: REPRODUCIBLE-BUILD HYGIENE
+# =============================================================================
+# WHY THIS MATTERS:
+#   The CycloneDX SBOM must NOT be packaged inside the release APK. Its metadata
+#   captures the build ENVIRONMENT (a wall-clock timestamp, the CI job URL, and
+#   the VCS remote URL as ssh:// vs https://), none of which can match between
+#   the developer's machine and F-Droid's CI. Embedding it therefore breaks the
+#   byte-for-byte reproducible-build comparison (it did, for 0.77.3). The SBOM
+#   still ships as a standalone file via `cyclonedxDirectBom` / `make sbom` and
+#   can be published alongside the APK. This check guards against a regression
+#   that re-adds the in-APK SBOM task.
+# =============================================================================
+check_reproducible_build_hygiene() {
+    section "11 / 11 — REPRODUCIBLE-BUILD HYGIENE"
+
+    # The in-APK SBOM was wired via a `GenerateSbomAsset` task; its absence is
+    # the signal that the SBOM stays out of the APK. (cyclonedxDirectBom, the
+    # standalone generator, is fine and intentionally NOT matched here.)
+    if grep -q "GenerateSbomAsset" "$BUILD_GRADLE"; then
+        fail "$BUILD_GRADLE embeds the SBOM in the APK (GenerateSbomAsset) — this breaks reproducible builds; keep the SBOM standalone (cyclonedxDirectBom / make sbom)"
+    else
+        pass "SBOM is not embedded in the APK (reproducible-build safe)"
+    fi
+}
+
+# =============================================================================
 # MAIN
 # =============================================================================
 main() {
@@ -1203,6 +1229,7 @@ main() {
     check_backup_version
     check_markdown_syntax
     check_metadata_lengths
+    check_reproducible_build_hygiene
 
     # ── Final summary ─────────────────────────────────────────────────────────
     echo ""

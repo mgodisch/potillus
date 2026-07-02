@@ -1,0 +1,1 @@
+Wewnętrzna poprawka dla powtarzalnych kompilacji. Brak widocznych zmian.

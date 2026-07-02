@@ -59,14 +59,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.cyclonedx.Version
 import org.cyclonedx.model.Component
 
-// Used by the GenerateSbomAsset task at the end of this file (section 5): @Inject
-// pulls in Gradle's ExecOperations service (config-cache-safe process launching),
-// and java.io.File is used for the copy/normalise step. These imports, like the
-// ones above, must precede the `plugins { }` block.
-import java.io.File
-import javax.inject.Inject
-import org.gradle.process.ExecOperations
-
 // ── 1. Plugins ────────────────────────────────────────────────────────────────
 // Plugins are Gradle extensions that add new build capabilities.
 // "alias(libs.plugins.xxx)" refers to an entry in gradle/libs.versions.toml.
@@ -167,10 +159,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 87
+        versionCode = 88
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.77.3"
+        versionName = "0.77.4"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -850,71 +842,4 @@ tasks.cyclonedxDirectBom {
     jsonOutput.set(
         layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json")
     )
-}
-
-// ── 5. SBOM packaged inside the APK ───────────────────────────────────────────
-// Best practice is to ship the Software Bill of Materials WITH the artifact it
-// describes, so a consumer can read it straight from the installed APK. The
-// cyclonedxDirectBom task (section 4) still writes the standalone SBOM under
-// build/outputs/sbom/ (for `make sbom` and shipping alongside the APK); here we
-// ADDITIONALLY package a copy into the release APK under assets/sbom/.
-//
-// REPRODUCIBLE BUILDS: the raw CycloneDX output carries a wall-clock
-// metadata.timestamp, which — once inside the APK — would make the APK
-// non-reproducible. We therefore normalise the packaged copy with the very same
-// tools/sbom-normalize.py used by `make sbom` (SOURCE_DATE_EPOCH-aware; strips the
-// timestamp otherwise) BEFORE it reaches the asset merge, so the in-APK SBOM is
-// byte-stable across identical builds. python3 is already a build prerequisite of
-// this project (see the Makefile), so this adds no new toolchain requirement.
-//
-// Wiring: androidComponents' addGeneratedSourceDirectory registers the task's
-// output directory as a generated *assets* source for the release variant. AGP
-// then runs the task as part of mergeReleaseAssets and packages its output — no
-// manual task dependencies needed. The dependency on cyclonedxDirectBom is
-// established implicitly by wiring sbomJson to that task's output provider.
-abstract class GenerateSbomAsset @Inject constructor(
-    private val execOps: ExecOperations,
-) : DefaultTask() {
-    /** Raw CycloneDX JSON produced by cyclonedxDirectBom. */
-    @get:InputFile
-    abstract val sbomJson: RegularFileProperty
-
-    /** tools/sbom-normalize.py — strips/pins metadata.timestamp deterministically. */
-    @get:InputFile
-    abstract val normalizer: RegularFileProperty
-
-    /** Generated assets root; the SBOM is written to <root>/sbom/. */
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
-
-    @TaskAction
-    fun generate() {
-        val destDir = outputDir.get().dir("sbom").asFile
-        destDir.deleteRecursively()
-        destDir.mkdirs()
-        val dest = File(destDir, sbomJson.get().asFile.name)
-        sbomJson.get().asFile.copyTo(dest, overwrite = true)
-        // Normalise in place so the packaged SBOM is deterministic.
-        execOps.exec {
-            commandLine("python3", normalizer.get().asFile.absolutePath, dest.absolutePath)
-        }
-    }
-}
-
-val generateSbomAsset = tasks.register<GenerateSbomAsset>("generateSbomAsset") {
-    sbomJson.set(tasks.cyclonedxDirectBom.flatMap { it.jsonOutput })
-    // rootProject is the Gradle root (android/), so this resolves to
-    // android/tools/sbom-normalize.py. NOT layout.projectDirectory, which is the
-    // :app module (android/app/) and would point at a non-existent
-    // android/app/tools/ — a release-only path that fails the F-Droid build.
-    normalizer.set(rootProject.file("tools/sbom-normalize.py"))
-}
-
-androidComponents {
-    onVariants(selector().withBuildType("release")) { variant ->
-        variant.sources.assets?.addGeneratedSourceDirectory(
-            generateSbomAsset,
-            GenerateSbomAsset::outputDir,
-        )
-    }
 }
