@@ -25,7 +25,7 @@ WHAT THIS IS
   The privacy policy required by the Google Play "App content" section (every
   Play listing must link to a publicly reachable privacy policy URL, regardless
   of whether the app collects data). It is written to be hosted verbatim as a
-  web page -- see docs/PLAY_STORE.md, section "Privacy policy hosting", for the
+  web page -- see `docs/PLAY_STORE.md`, section "Privacy policy hosting", for the
   two supported ways to turn this file into a public URL.
 
   Keep the "Last updated" line and the version/package facts below in sync with
@@ -38,10 +38,10 @@ WHAT THIS IS
 
 # Privacy Policy — Libellus Potionis
 
-**Last updated:** 2026-07-02
-**Application:** Libellus Potionis (package `de.godisch.potillus`)
-**Developer:** Martin A. Godisch — <android@godisch.de>
-**Source code:** <https://codeberg.org/godisch/potillus>
+- **Last updated:** 2026-07-02
+- **Application:** Libellus Potionis (package `de.godisch.potillus`)
+- **Developer:** Martin A. Godisch — <android@godisch.de>
+- **Source code:** <https://codeberg.org/godisch/potillus>
 
 ## Summary
 

@@ -31,11 +31,47 @@ domain.  See
 <[https://www.gnu.org/graphics/license-logos](https://www.gnu.org/graphics/license-logos)>
 for the originals and terms.
 
+### "Get it on F-Droid" badges
+
+`fdroid/get-it-on-de.svg` (German) and `fdroid/get-it-on-en.svg` (English) are
+the official "Get it on F-Droid" download badges, used to link to this app's
+listing in the F-Droid catalogue.  They come from the F-Droid artwork project
+(<[https://gitlab.com/fdroid/artwork](https://gitlab.com/fdroid/artwork)>) and
+are licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported
+license (CC BY-SA 3.0); see
+<[https://creativecommons.org/licenses/by-sa/3.0/](https://creativecommons.org/licenses/by-sa/3.0/)>
+for the terms.  (F-Droid licenses the badge-generation scripts separately under
+GPL-3.0-or-later; only the badge artwork is bundled here.)  These files are
+repository and store-listing assets and are **not** distributed inside the
+application package.
+
 ### Inter font (build tooling only)
 
-`android/tools/fonts/Inter/` bundles static instances of the Inter typeface,
-used solely by `android/tools/render-feature-graphic.py` to render the feature
+`tools/fonts/Inter/` bundles static instances of the Inter typeface,
+used solely by `tools/render-feature-graphic.py` to render the feature
 graphic deterministically (so the result does not depend on the fonts installed
 on the build host).  Inter is licensed under the SIL Open Font License 1.1 (see
 the accompanying `OFL.txt`).  These files are build-time tooling and are **not**
 distributed inside the application package.
+
+### DejaVu Sans (feature-graphic badge text)
+
+`tools/fonts/DejaVuSans/DejaVuSans.ttf` renders the small "GET IT ON"
+line of the "Get it on F-Droid" badge embedded in the feature graphic.  DejaVu
+Sans is published under the DejaVu Fonts license — a permissive free font license
+derived from the Bitstream Vera and Arev font licenses (see the accompanying
+`LICENSE`).  Like Inter, this file is build-time tooling for
+`render-feature-graphic.py` and is **not** distributed inside the application
+package.  See `tools/fonts/DejaVuSans/README.txt` for the exact source.
+
+### Rokkitt (feature-graphic badge text)
+
+The "F-Droid" wordmark of that badge is set in Rokkitt Bold.  Rokkitt is the work
+of Vernon Adams and is licensed under the SIL Open Font License 1.1.  The upstream
+*variable* font is checked in at
+`tools/fonts-src/Rokkitt/Rokkitt[wght].ttf` (with its `OFL.txt`); the
+static `tools/fonts/Rokkitt/Rokkitt-Bold.ttf` the renderer actually uses
+is instanced from it reproducibly via `make rokkitt-bold` (see
+`tools/fonts-src/Rokkitt/README.txt`).  Like the fonts above, these are
+build-time tooling for `render-feature-graphic.py` and are **not** distributed
+inside the application package.

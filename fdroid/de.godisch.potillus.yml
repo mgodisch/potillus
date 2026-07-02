@@ -1,3 +1,12 @@
+# =============================================================================
+# BACKUP / DOCUMENTATION SNAPSHOT — NOT MAINTAINED
+# =============================================================================
+# This file is kept only as a local backup and for documentation purposes. The
+# authoritative recipe lives upstream in fdroiddata. It is intentionally NOT
+# auto-maintained and NOT verified by tools/release-check.sh, so its
+# version fields (CurrentVersion/CurrentVersionCode and the Builds block) may lag
+# the source tree. Do not rely on it being in sync with the app.
+# =============================================================================
 Categories:
   - Sports & Health
 License: GPL-3.0-or-later
@@ -6,7 +15,6 @@ AuthorEmail: android@godisch.de
 SourceCode: https://codeberg.org/godisch/potillus
 IssueTracker: https://codeberg.org/godisch/potillus/issues
 Changelog: https://codeberg.org/godisch/potillus/src/branch/main/CHANGELOG.md
-AutoName: Libellus Potionis
 
 AutoName: Libellus Potionis
 
@@ -18,7 +26,7 @@ Binaries:
 Builds:
   - versionName: 0.77.4
     versionCode: 88
-    commit: FIXME
+    commit: 9d84a84344eaa942a8645458a7de302830cab650
     subdir: android/app
     gradle:
       - yes

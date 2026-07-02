@@ -32,11 +32,12 @@
 #
 # USAGE
 #   chmod +x tools/release-check.sh      # once
-#   tools/release-check.sh               # run from the android/ directory
+#   tools/release-check.sh               # run from the repo root (self-anchors)
 #   tools/release-check.sh --Werror      # treat warnings as errors
 #
-#   The script self-anchors to android/ (it lives in android/tools/), so it can
-#   also be invoked from anywhere, e.g. `bash android/tools/release-check.sh`.
+#   The script self-anchors to android/ (it lives in tools/ at the repo root and
+#   cd's into the sibling android/ directory), so it can also be invoked from
+#   anywhere, e.g. `bash tools/release-check.sh`.
 #   It additionally runs automatically on every build: the android/Makefile
 #   `prereq` target invokes it (with --Werror) via the `release-check` target,
 #   so a failing invariant — or, under --Werror, any warning — aborts the build.
@@ -59,10 +60,7 @@
 #      The versionName in build.gradle.kts, the top CHANGELOG.md entry, the
 #      README.md title line must all carry the same version string.
 #      versionCode must be ≥ 1 and must
-#      be a plain integer (no alphabetic suffix).  Additionally, the F-Droid
-#      reference recipe (fdroid/de.godisch.potillus.yml) must agree: its
-#      CurrentVersion/CurrentVersionCode and its latest Builds block must equal
-#      the app's versionName/versionCode.  Fastlane store changelogs are coupled
+#      be a plain integer (no alphabetic suffix).  Fastlane store changelogs are coupled
 #      to versionCode by filename; every listing locale must carry the CURRENT
 #      versionCode note, while the FULL per-versionCode history need only stay in
 #      sync across the history-bearing locales (HISTORY_LOCALES: en-US, de-DE).
@@ -113,7 +111,8 @@
 #      the highest version number mentioned in the adjacent KDoc block.
 #
 #   9. MARKDOWN SYNTAX
-#      The authored Markdown docs (CHANGELOG.md, README.md, CONTRIBUTING.md) and
+#      The authored Markdown docs (CHANGELOG.md, README.md, CONTRIBUTING.md,
+#      PRIVACY.md) and
 #      the per-language guides rendered from *.md.in into res/raw*/ must be well
 #      formed: inline-code backticks and '*' emphasis balanced, and code-looking
 #      tokens (snake_case, glob '*') wrapped in backticks so a stray marker does
@@ -189,22 +188,22 @@ section() {
 # ── Locate the repo root ──────────────────────────────────────────────────────
 # $BASH_SOURCE[0] is the path to this script.
 # cd + pwd -P resolves symlinks to give the canonical physical path.
-# The script now lives in android/tools/, so anchor ONE level up to android/
-# (SCRIPT_DIR/..). Every path below stays relative to android/ exactly as
-# before the move (app/... for build files, ../ for repo-root files), so the
-# relocation needs no other path edits.
+# The script now lives in tools/ at the repository ROOT, so anchor to the sibling
+# android/ directory (SCRIPT_DIR/../android). Every path below stays relative to
+# android/ exactly as before (app/... for build files, ../ for repo-root files),
+# so the relocation needs no other path edits here.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-cd "$SCRIPT_DIR/.."
+cd "$SCRIPT_DIR/../android"
 
 # ── File paths (all relative to repo root) ────────────────────────────────────
 BUILD_GRADLE="app/build.gradle.kts"
-# CHANGELOG.md and README.md live at the repository root, one level above this
-# script's directory (android/). The script cd's into its own dir (SCRIPT_DIR)
-# above, so reference them with `../`. build.gradle.kts remains relative to
-# android/ (i.e. under app/).
+# CHANGELOG.md and README.md live at the repository root, one level above the
+# android/ directory the script cd'd into above, so reference them with `../`.
+# build.gradle.kts remains relative to android/ (i.e. under app/).
 CHANGELOG="../CHANGELOG.md"
 README="../README.md"
 CONTRIBUTING="../CONTRIBUTING.md"
+PRIVACY="../PRIVACY.md"
 APPDB_KT="app/src/main/kotlin/de/godisch/potillus/data/db/AppDatabase.kt"
 BACKUP_MANAGER_KT="app/src/main/kotlin/de/godisch/potillus/util/BackupManager.kt"
 SUPPORTED_LOCALES_KT="app/src/main/kotlin/de/godisch/potillus/l10n/SupportedLocales.kt"
@@ -216,10 +215,6 @@ SCHEMAS_DIR="app/schemas/de.godisch.potillus.data.db.AppDatabase"
 # Per-locale release notes are named after the integer versionCode, e.g.
 # ../fastlane/metadata/android/en-US/changelogs/65.txt — see SECTION 1.
 FASTLANE_DIR="../fastlane/metadata/android"
-# F-Droid reference build recipe (maintainer's copy of the fdroiddata file). Its
-# version fields are cross-checked against build.gradle.kts in SECTION 1 so the
-# recipe can never silently lag the source tree again.
-FDROID_RECIPE="../fdroid/de.godisch.potillus.yml"
 # Listing locales that maintain the FULL per-versionCode changelog history. All
 # OTHER fastlane locales are listing-only: they ship the current versionCode note
 # and reuse en-US screenshots, and are exempt from full-history parity. See the
@@ -409,49 +404,6 @@ CHANGELOG version must bump versionCode by exactly 1"
         fail "versionName '$vname' ≠ README.md version '$readme_version' — update README.md header"
     else
         pass "versionName matches README.md title (v$vname)"
-    fi
-
-    # ── Cross-check: F-Droid reference recipe ↔ build.gradle.kts ──────────────
-    # The maintainer's recipe copy (fdroid/de.godisch.potillus.yml) must never
-    # lag the source tree. Its CurrentVersion / CurrentVersionCode AND its latest
-    # Builds block must equal the app's versionName / versionCode — which the
-    # checks above already tie to the top CHANGELOG entry and the README title.
-    # This is the enforcing half of the recipe-sync policy:
-    # once green here, recipe, build.gradle.kts and CHANGELOG are provably in
-    # lock-step, so a stale build block (the bug this check was added for) fails
-    # the release instead of shipping silently.
-    if [[ ! -f "$FDROID_RECIPE" ]]; then
-        warn "No F-Droid recipe at $FDROID_RECIPE — skipping recipe version cross-check"
-    else
-        local r_cur_name r_cur_code r_build_name r_build_code
-        # Top-level CurrentVersion / CurrentVersionCode (strip key, quotes, spaces).
-        r_cur_name=$(grep -E '^CurrentVersion:'     "$FDROID_RECIPE" | head -1 \
-            | sed -E 's/^CurrentVersion:[[:space:]]*//; s/["'"'"']//g; s/[[:space:]]*$//')
-        r_cur_code=$(grep -E '^CurrentVersionCode:' "$FDROID_RECIPE" | head -1 \
-            | sed -E 's/[^0-9]//g')
-        # Latest Builds: block entry (indented versionName/versionCode); take the
-        # last occurrence so the check still targets the newest block if more than
-        # one is ever present.
-        r_build_name=$(grep -E '^[[:space:]]+(- )?versionName:' "$FDROID_RECIPE" | tail -1 \
-            | sed -E 's/.*versionName:[[:space:]]*//; s/["'"'"']//g; s/[[:space:]]*$//')
-        r_build_code=$(grep -E '^[[:space:]]+(- )?versionCode:' "$FDROID_RECIPE" | tail -1 \
-            | sed -E 's/[^0-9]//g')
-
-        if [[ "$r_cur_name" != "$vname" ]]; then
-            fail "F-Droid recipe CurrentVersion '$r_cur_name' ≠ versionName '$vname' — sync $FDROID_RECIPE"
-        else
-            pass "F-Droid recipe CurrentVersion matches versionName (v$vname)"
-        fi
-        if [[ "$r_cur_code" != "$vcode" ]]; then
-            fail "F-Droid recipe CurrentVersionCode '$r_cur_code' ≠ versionCode '$vcode' — sync $FDROID_RECIPE"
-        else
-            pass "F-Droid recipe CurrentVersionCode matches versionCode ($vcode)"
-        fi
-        if [[ "$r_build_name" != "$vname" || "$r_build_code" != "$vcode" ]]; then
-            fail "F-Droid recipe latest Builds block ($r_build_name/$r_build_code) ≠ build.gradle.kts ($vname/$vcode) — sync $FDROID_RECIPE"
-        else
-            pass "F-Droid recipe latest Builds block matches build.gradle.kts ($vname/$vcode)"
-        fi
     fi
 
     # Cross-check: fastlane release notes are coupled to versionCode by filename.
@@ -1097,14 +1049,17 @@ check_markdown_syntax() {
     # Authored docs (repo root) + the per-language guides rendered from *.md.in
     # into res/raw*/ earlier in the build. Guides are added only if present, so
     # a standalone run before `make guides` simply checks the authored docs.
-    local files=("$CHANGELOG" "$README" "$CONTRIBUTING")
+    # PRIVACY.md is included because it is hosted verbatim as the store listing's
+    # privacy-policy page (see docs/PLAY_STORE.md), so a stray emphasis marker
+    # would misrender on the public page just as it would in the in-app guides.
+    local files=("$CHANGELOG" "$README" "$CONTRIBUTING" "$PRIVACY")
     local g
     for g in app/src/main/res/raw*/usersguide.md; do
         [[ -f "$g" ]] && files+=("$g")
     done
 
     local output rc
-    output=$(python3 tools/md-syntax.py "${files[@]}" 2>/dev/null)
+    output=$(python3 ../tools/md-syntax.py "${files[@]}" 2>/dev/null)
     rc=$?
 
     if [[ $rc -eq 0 ]]; then

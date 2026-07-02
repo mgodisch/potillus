@@ -1,5 +1,5 @@
 # Marketing-Text fuer die Play-Store-Feature-Grafik (1024x500), gerendert von
-# android/tools/render-feature-graphic.py. Woerter frei aendern; Zeilenumbrueche
+# tools/render-feature-graphic.py. Woerter frei aendern; Zeilenumbrueche
 # der Taglines entstehen automatisch. Schluessel:
 #   title    -- eine Zeile (App-Name, gross dargestellt)
 #   tagline  -- eine Zeile je Absatz (automatischer Umbruch in der Spalte)

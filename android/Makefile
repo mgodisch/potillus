@@ -37,6 +37,7 @@ help:
 	@echo "  make test           run all tests (device needed)"
 	@echo "  make screenshots    capture Play-Store screenshots (device + fastlane + poppler)"
 	@echo "  make feature-graphics  render the 1024x500 feature graphic (needs rsvg-convert; reuses screenshots)"
+	@echo "  make rokkitt-bold   instance the static Rokkitt Bold badge font from the variable source (needs fonttools)"
 	@echo "  make install-debug  install debug APK on device (device needed)"
 	@echo "  make install        install debug APK on device (device needed)"
 	@echo "  make clean          clear the Gradle build cache"
@@ -151,19 +152,19 @@ app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md
 # renderer rewrites an output only when its template or strings.xml is newer, so
 # it is a cheap no-op when nothing changed.
 guides:
-	python3 tools/render-guide.py
+	python3 ../tools/render-guide.py
 
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything). Also verifies that the generated
 # raw/copyright.md matches the current COPYING.md + blank line + LICENSE.md, by
 # rebuilding the concatenation into a temporary file and comparing byte-for-byte.
 check-guides:
-	python3 tools/render-guide.py --check
+	python3 ../tools/render-guide.py --check
 	tmp=$$(mktemp); { cat ../COPYING.md; echo; cat ../LICENSE.md; } > "$$tmp"; \
 	    cmp -s "$$tmp" app/src/main/res/raw/copyright.md; rc=$$?; rm -f "$$tmp"; \
 	    test $$rc -eq 0 || { echo "check-guides: raw/copyright.md is stale — run 'make app/src/main/res/raw/copyright.md'"; exit 1; }
 
-# Release gate (moved from android/release-check.sh to tools/release-check.sh).
+# Release gate (tools/release-check.sh, at the repository root; runs from android/).
 # It is a pure read-only check of all release invariants (version consistency,
 # changelog body, Room migrations, locale three-way sync, source documentation,
 # guarded Log calls, no German in source, backup format version, and the
@@ -177,7 +178,7 @@ check-guides:
 # and fastlane-changelog coupling check, so a separate Make target would only
 # duplicate it.
 release-check:
-	bash tools/release-check.sh --Werror
+	bash ../tools/release-check.sh --Werror
 
 debug: app/build/outputs/apk/debug/app-debug.apk
 
@@ -226,7 +227,7 @@ sbom: $(SBOM)
 
 $(SBOM): prereq
 	./gradlew :app:cyclonedxDirectBom
-	python3 tools/sbom-normalize.py "$(SBOM)"
+	python3 ../tools/sbom-normalize.py "$(SBOM)"
 
 test: unit-test lint test-device
 
@@ -343,7 +344,7 @@ screenshots: prereq
 	# 7) Render the two PDF report pages per locale into the phoneScreenshots dirs.
 	$(MAKE) screenshots-pdf
 	# 8) Enforce the Google Play phone-screenshot requirements on all eight assets.
-	python3 tools/validate-screenshots.py $(SCREENSHOT_LOCALES)
+	python3 ../tools/validate-screenshots.py $(SCREENSHOT_LOCALES)
 
 # Bottom-crop the in-app screenshots (01..06) to at most a 2:1 aspect ratio. Runs
 # AFTER capture and BEFORE the PDF pages are rendered, so it only ever sees the
@@ -351,7 +352,7 @@ screenshots: prereq
 # is already <= 2:1, so re-runs and the PDF pages are safe.
 screenshots-crop:
 	python3 -c 'import PIL' 2>/dev/null || { echo "screenshots-crop: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
-	python3 tools/crop-screenshots.py $(SCREENSHOT_LOCALES)
+	python3 ../tools/crop-screenshots.py $(SCREENSHOT_LOCALES)
 
 # Render report pages 1 & 2 of the localized PDF into screenshots 07/08. Runs
 # AFTER screengrab (whose clear_previous_screenshots wipes only the in-app PNGs),
@@ -381,7 +382,29 @@ screenshots-pdf:
 feature-graphics:
 	command -v rsvg-convert >/dev/null 2>&1 || { echo "feature-graphics: 'rsvg-convert' not found — install it (Debian: apt install librsvg2-bin)"; exit 1; }
 	python3 -c 'import PIL' 2>/dev/null || { echo "feature-graphics: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
-	python3 tools/render-feature-graphic.py $(SCREENSHOT_LOCALES)
+	python3 ../tools/render-feature-graphic.py $(SCREENSHOT_LOCALES)
+
+# Instantiate the STATIC Rokkitt Bold used for the "F-Droid" wordmark in the
+# feature-graphic badge, from the upstream VARIABLE font checked in under
+# tools/fonts-src/Rokkitt/. Rationale for this split:
+#   * The badge's <text> requests family "Rokkitt" at weight 700. The renderer
+#     pins fontconfig to tools/fonts/ ONLY (for reproducibility), so a resolvable
+#     STATIC Bold must live there.
+#   * A variable font would let freetype/fontconfig pick the 700 instance in a
+#     version-dependent way — not reproducible. So the variable source is kept
+#     OUTSIDE the scanned dir (tools/fonts-src/) and this target bakes a fixed
+#     static instance INTO tools/fonts/Rokkitt/, where the renderer finds it.
+# You run this ONCE and COMMIT the generated Rokkitt-Bold.ttf; everyone else then
+# renders byte-identically without needing fonttools installed.
+ROKKITT_VF  = ../tools/fonts-src/Rokkitt/Rokkitt[wght].ttf
+ROKKITT_OUT = ../tools/fonts/Rokkitt/Rokkitt-Bold.ttf
+rokkitt-bold:
+	python3 -c 'import fontTools' 2>/dev/null || { echo "rokkitt-bold: fonttools not found — install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
+	@test -f "$(ROKKITT_VF)" || { echo "rokkitt-bold: variable source missing: $(ROKKITT_VF) — download Rokkitt[wght].ttf (see tools/fonts-src/Rokkitt/README.txt / COPYING.md)"; exit 1; }
+	mkdir -p ../tools/fonts/Rokkitt
+	python3 -m fontTools.varLib.instancer "$(ROKKITT_VF)" wght=700 --update-name-table --output "$(ROKKITT_OUT)"
+	cp ../tools/fonts-src/Rokkitt/OFL.txt ../tools/fonts/Rokkitt/OFL.txt
+	@echo "rokkitt-bold: wrote $(ROKKITT_OUT) — COMMIT it so the feature-graphic build is deterministic for everyone."
 
 # Leave Android Demo Mode and restore the normal device state. Each step is
 # tolerant (|| true) so tear-down never fails the build; invoked from the
@@ -401,4 +424,4 @@ distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
 
-.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf feature-graphics screenshots-demo-off install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshots screenshots-crop screenshots-pdf feature-graphics rokkitt-bold screenshots-demo-off install install-debug clean distclean

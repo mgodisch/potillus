@@ -1,5 +1,5 @@
 # Marketing copy for the Play-Store feature graphic (1024x500), rendered by
-# android/tools/render-feature-graphic.py. Edit the words freely; line breaks in
+# tools/render-feature-graphic.py. Edit the words freely; line breaks in
 # the taglines are added automatically. Keys:
 #   title    -- one line (the app name, shown large)
 #   tagline  -- one line per paragraph (wrapped automatically to the column)

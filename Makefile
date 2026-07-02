@@ -49,7 +49,7 @@ screenshots:
 	$(MAKE) -C android screenshots
 	$(MAKE) -C android feature-graphics
 
-tgz: distclean potillus-$(VERSION).tar.gz
+tgz: potillus-$(VERSION).tar.gz
 
 potillus-$(VERSION).tar.gz: CHANGELOG.md
 	tar czf ../potillus-$(VERSION).tar.gz -C .. \
@@ -61,6 +61,8 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 		--exclude build \
 		--exclude short \
 		--exclude TODO.md \
+		--exclude keystore.properties \
+		--exclude play-store-credentials.json \
 		potillus
 
 push:

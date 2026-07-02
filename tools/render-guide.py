@@ -90,8 +90,11 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-# Repository root = parent of the directory holding this script (tools/).
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# This script renders into the android/ Gradle module (its app/src/main/res and
+# docs/guide). The script now lives in tools/ at the repository root, so that
+# module is the sibling android/ directory (one level up from tools/, then
+# "android"). ROOT therefore points at android/, not the repository root.
+ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "android")
 RES  = os.path.join(ROOT, "app", "src", "main", "res")
 TPL  = os.path.join(ROOT, "docs", "guide")
 

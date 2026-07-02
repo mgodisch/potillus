@@ -49,7 +49,8 @@ platform :android do
   desc 'Upload the SIGNED release App Bundle and the store metadata to Google Play.'
   desc 'Build the bundle first with `make bundle` (needs a configured signing key,'
   desc 'see android/keystore.properties.example). Options (all optional):'
-  desc '  track:<name>   Play track to publish to (default: production)'
+  desc '  track:<name>   Play track to publish to (default: internal). Publishing to'
+  desc '                 production requires passing track:production explicitly.'
   desc '  status:<name>  release status: draft|completed|halted|inProgress (default: draft)'
   desc 'Example:  bundle exec fastlane deploy track:internal status:completed'
   lane :deploy do |options|
@@ -62,20 +63,28 @@ platform :android do
       # AAB (not APK): Google Play requires the App Bundle format for new apps.
       aab: 'android/app/build/outputs/bundle/release/app-release.aab',
 
-      # Default to the production track but allow an override for staged rollouts
-      # (e.g. `track:internal`). `release_status: draft` is the SAFE default: the
-      # upload is staged in the Play Console for manual review/publish instead of
-      # going live automatically. Pass `status:completed` to publish immediately.
-      track: options[:track] || 'production',
+      # Default to the INTERNAL testing track: it is the safe, low-blast-radius
+      # target, and a new personal developer account cannot publish to production
+      # at all until the closed-testing gate is cleared (12 testers / 14 days —
+      # see docs/PLAY_STORE.md §5). Reaching production is therefore a deliberate,
+      # explicit act: pass `track:production`. Staged rollouts use the same
+      # override (e.g. `track:closed`).
+      #
+      # `release_status: draft` keeps a production upload staged in the Play
+      # Console for manual review/publish instead of going live automatically.
+      # NOTE: the testing tracks (internal/closed) expect a COMPLETED release, so
+      # pair them with `status:completed` (as the Example line above shows); the
+      # draft default is meaningful for the production track.
+      track: options[:track] || 'internal',
       release_status: options[:status] || 'draft',
 
       # We upload a bundle, never a bare APK, so disable the APK upload paths.
       skip_upload_apk: true,
 
-      # Sync the store listing from fastlane/metadata/android/. Images are pushed
-      # too; if you have not added the Play feature graphic yet (see
-      # metadata/android/en-US/images/PLACEHOLDERS.txt) set skip_upload_images
-      # and skip_upload_screenshots to true to upload texts/changelogs only.
+      # Sync the store listing from fastlane/metadata/android/. The full image set
+      # (icon, feature graphic and phone screenshots) is present, so images are
+      # pushed too. If you ever want to update only texts/changelogs, set
+      # skip_upload_images and skip_upload_screenshots to true.
       skip_upload_metadata: false,
       skip_upload_changelogs: false,
       skip_upload_images: false,

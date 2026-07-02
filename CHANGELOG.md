@@ -36,6 +36,83 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.78.0
+
+Add Play Store onboarding; move tooling to tools/
+
+Google Play onboarding, an F-Droid badge in the feature graphic, and a
+relocation of the build tooling. This release is documentation, store assets and
+build/release tooling only — no functional or user-facing app change.
+
+New documentation:
+- `PRIVACY.md`: the privacy policy required by the Play "App content" section,
+  linked from `README.md`. It states the app's actual behaviour — no data
+  collection, no network access, on-device storage protected at rest by device
+  encryption and the sandbox, and an optional biometric lock handled by Android —
+  using the corrected data-at-rest wording (no database-level-encryption
+  over-claim; the JSON backup is described plainly).
+- `docs/PLAY_STORE.md`: a repeatable runbook for publishing to Google Play
+  alongside F-Droid with a single signing identity (own app signing key via PEPK;
+  a separate upload key), package-name registration, Play App Signing enrolment,
+  the App-content declarations, the closed-testing gate, and versionCode
+  discipline.
+
+Feature graphic (`tools/render-feature-graphic.py`):
+- Embed the per-locale "Get it on F-Droid" badge (`fdroid/get-it-on-de.svg` and
+  `fdroid/get-it-on-en.svg`, both new in this release) in the bottom-LEFT corner
+  and the GPLv3 logo in the bottom-RIGHT, with mirrored 48 px margins, a shared
+  baseline and a shared visible height. The bottom-right logo is drawn after the
+  report "paper" so it sits in front of the tilted PDF screenshot.
+- Factored SVG parsing into `_svg_box_and_inner`; added a colour-preserving
+  `_badge_nested` (F-Droid brand colours are kept, unlike the recoloured logo)
+  and `_svg_ink_bbox`. The badge canvas carries a ~43 px transparent margin, so
+  the badge is cropped to its ink box before scaling — otherwise its visible
+  height would not match the logo. The shared mark size is kept reduced
+  (`logo_w` 96).
+
+Badge fonts (build tooling; not shipped in the app package):
+- Bundle the two fonts the badge text needs under `tools/fonts/`: DejaVu Sans
+  (DejaVu Fonts license) for "GET IT ON" and Rokkitt (SIL Open Font License 1.1)
+  for the "F-Droid" wordmark; both are documented in `COPYING.md`. The static
+  Rokkitt Bold is instanced from the checked-in upstream variable font via the
+  new `make rokkitt-bold`; the variable source lives outside the pinned font dir
+  (`tools/fonts-src/`) so it never competes with the static instance during the
+  deterministic render.
+
+Release-check tooling (`tools/release-check.sh`):
+- Section 9 (markdown syntax) now also validates `PRIVACY.md`.
+- Section 1 (version consistency) no longer verifies the F-Droid reference
+  recipe: the recipe cross-check and its path variable are removed, and the
+  recipe (`fdroid/de.godisch.potillus.yml`) is kept only as a static,
+  non-maintained backup (a banner in the file states this).
+
+Build tooling relocation:
+- Move the build/packaging tooling from `android/tools/` to a repo-root `tools/`
+  directory (a sibling of `android/`, `fastlane/`, `fdroid/`, `docs/`), since
+  these scripts serve the build/release process rather than the app. Re-anchor
+  `release-check.sh` (it now cd's to the sibling `android/`),
+  `render-feature-graphic.py` and `render-guide.py`, and update the invocations
+  in `android/Makefile` and `app/build.gradle.kts` to `../tools/...`. Historical
+  CHANGELOG entries are intentionally left referring to `android/tools/`.
+
+Release packaging (`Makefile`):
+- Exclude `keystore.properties` and `play-store-credentials.json` from the
+  release tarball, and drop the `distclean` dependency of the `tgz` target.
+
+Fastlane (`fastlane/Fastfile`):
+- The `deploy` lane now defaults to the `internal` track instead of `production`;
+  reaching production requires passing `track:production` explicitly. Removed a
+  stale reference to a no-longer-existing `PLACEHOLDERS.txt`.
+
+Versioning:
+- `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`
+  and the `README.md` title; localized store notes added as `changelogs/89.txt`
+  for all 21 listing locales (each reuses that locale's existing "no visible
+  changes" wording, since there is no user-facing change). The F-Droid recipe is
+  intentionally NOT updated — it is a static backup.
+
+---
+
 ## v0.77.4
 
 Drop in-APK SBOM for reproducible builds

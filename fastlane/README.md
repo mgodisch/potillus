@@ -39,7 +39,9 @@ Build the bundle first with `make bundle` (needs a configured signing key,
 
 see android/keystore.properties.example). Options (all optional):
 
-  track:<name>   Play track to publish to (default: production)
+  track:<name>   Play track to publish to (default: internal). Publishing to
+
+                 production requires passing track:production explicitly.
 
   status:<name>  release status: draft|completed|halted|inProgress (default: draft)
 

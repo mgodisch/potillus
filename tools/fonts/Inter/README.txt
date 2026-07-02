@@ -1,6 +1,6 @@
 Inter (static instances) — bundled build asset, NOT shipped in the APK.
 
-Used only by android/tools/render-feature-graphic.py to render the Play-Store
+Used only by tools/render-feature-graphic.py to render the Play-Store
 feature graphic deterministically (pinned font, so rsvg-convert output does not
 depend on whatever fonts happen to be installed on the build host).
 

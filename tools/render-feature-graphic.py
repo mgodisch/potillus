@@ -44,13 +44,13 @@
 #   screenshots), which is far more legible and tweakable as SVG than as Pillow
 #   pixel math. The one determinism caveat of librsvg -- that text rendering
 #   depends on whatever fonts the host happens to have -- is removed by pinning a
-#   bundled font: we point fontconfig at android/tools/fonts/ ONLY (see
+#   bundled font: we point fontconfig at tools/fonts/ ONLY (see
 #   _render_png), so the same Inter files are always used regardless of host.
 #
 # RUNTIME DEPENDENCIES (kept deliberately small)
 #   * python3 standard library only (no third-party Python packages),
 #   * rsvg-convert (Debian package `librsvg2-bin`),
-#   * the bundled fonts under android/tools/fonts/Inter/.
+#   * the bundled fonts under tools/fonts/Inter/.
 #   The static Inter instances were prepared once with fontTools; this script
 #   never needs fontTools itself.
 #
@@ -72,15 +72,16 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-# The script lives in android/tools/, so the repository root is two levels up.
+# The script now lives in tools/ at the repository root (a sibling of android/).
 TOOLS_DIR = Path(__file__).resolve().parent
-ANDROID_DIR = TOOLS_DIR.parent
-REPO_ROOT = ANDROID_DIR.parent
+REPO_ROOT = TOOLS_DIR.parent
+ANDROID_DIR = REPO_ROOT / "android"
 FONT_DIR = TOOLS_DIR / "fonts"
 META_DIR = REPO_ROOT / "fastlane" / "metadata" / "android"
 ICON_FG = (
@@ -93,6 +94,13 @@ ICON_BG = "#1A1E2B"
 # The GPLv3 "Free as in Freedom" license badge (red variant), inlined as a small
 # corner badge. Source/licence are credited in COPYING.md.
 GPL_LOGO = REPO_ROOT / "fastlane" / "gpl-v3-logo.svg"
+
+# The per-locale "Get it on F-Droid" badge (fdroid/get-it-on-<lang>.svg), placed
+# to the right of the GPL logo. Its lettering is LIVE <text> -- "GET IT ON" in
+# DejaVu Sans and "F-Droid" in Rokkitt Bold -- so those two families must be
+# resolvable by the pinned fontconfig; they are bundled under tools/fonts/
+# alongside Inter (see COPYING.md and `make rokkitt-bold`).
+BADGE_DIR = REPO_ROOT / "fdroid"
 
 # ── Canvas (Google Play feature-graphic spec) ────────────────────────────────
 W, H = 1024, 500
@@ -177,24 +185,22 @@ def _tspans(lines: list[str], x: float, y: float, line_height: float) -> str:
     return "".join(out)
 
 
-def _logo_nested(x: float, y: float, width: float, color: str = "#ffffff") -> str:
-    """Inline the GPLv3 logo (fastlane/gpl-v3-logo.svg) as a nested <svg>.
+def _svg_box_and_inner(path: Path) -> tuple[float, float, str]:
+    """Parse an SVG file into its coordinate box and inner markup.
 
-    The bundled file is the 'Free as in Freedom' GPLv3 badge on a transparent
-    background -- exactly one logo. Its artwork is a single solid colour
-    (#bd0000); we recolour it to `color` at embed time (white reads best on the
-    dark canvas) by substituting that fill, leaving the stored source untouched.
-    The drawing content is inlined inside a nested <svg> whose viewBox is the
-    logo's own coordinate box, so it stays crisp vector art rendered in the SAME
-    rsvg pass (no extra rasterisation) and scales to `width` keeping aspect ratio.
-
-    The logo's native box and inner content are parsed from the file so replacing
-    the asset (e.g. a differently sized export) needs no code change.
+    Returns ``(box_width, box_height, inner)`` where the box comes from the root
+    ``viewBox`` if present, else from the root ``width``/``height`` (the F-Droid
+    badge exports carry only width/height, no viewBox -- both paths are handled).
+    ``inner`` is everything between the root ``<svg …>`` tag and its closing
+    ``</svg>``. Callers re-wrap ``inner`` in a nested ``<svg>`` with their own
+    placement box, so the artwork keeps its aspect ratio and is drawn in the SAME
+    rsvg pass as the rest of the graphic (no extra rasterisation). Replacing an
+    asset with a differently sized export therefore needs no code change.
     """
-    raw = GPL_LOGO.read_text(encoding="utf-8")
+    raw = path.read_text(encoding="utf-8")
     root = re.search(r"<svg\b[^>]*>", raw)
     if root is None:
-        raise ValueError(f"{GPL_LOGO}: no <svg> root element")
+        raise ValueError(f"{path}: no <svg> root element")
     root_tag = root.group(0)
     vb = re.search(r'viewBox="\s*([\d.\s-]+)"', root_tag)
     if vb:
@@ -204,12 +210,131 @@ def _logo_nested(x: float, y: float, width: float, color: str = "#ffffff") -> st
         vb_w = float(re.search(r'\bwidth="([\d.]+)', root_tag).group(1))
         vb_h = float(re.search(r'\bheight="([\d.]+)', root_tag).group(1))
     inner = raw[root.end():raw.rindex("</svg>")]
+    return vb_w, vb_h, inner
+
+
+def _svg_ink_bbox(path: Path) -> tuple[float, float, float, float]:
+    """Return the VISIBLE ink bounding box (min_x, min_y, width, height) of an SVG.
+
+    The F-Droid badge exports sit on a 646x250 canvas with a wide TRANSPARENT
+    margin (~43 px per side); scaling by the canvas would therefore render the
+    visible badge much shorter than a logo scaled the same way. Cropping the
+    nested <svg>'s viewBox to this ink box lets the badge be matched to the GPL
+    logo by VISIBLE height instead of by canvas height.
+
+    The box is computed from the BACKGROUND shapes (<rect>/<circle>/<ellipse>)
+    with their nested transforms applied. That is exactly right for the badge: the
+    rounded-rectangle background bounds the whole button, and the wordmark (<text>)
+    and robot (<path>) sit inside it -- so paths and text are deliberately ignored,
+    which keeps this free of a fragile path-data parser. Only affine
+    translate/scale/matrix transforms occur in these assets, so no rotation
+    handling is needed. If an asset carries no such background shape, the function
+    falls back to the full canvas box.
+    """
+
+    def mul(m, n):
+        a, b, c, d, e, f = m
+        A, B, C, D, E, F = n
+        return (a * A + c * B, b * A + d * B, a * C + c * D, b * C + d * D,
+                a * E + c * F + e, b * E + d * F + f)
+
+    def parse(s):
+        m = (1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
+        for name, args in re.findall(r"(\w+)\s*\(([^)]*)\)", s or ""):
+            v = [float(t) for t in re.split(r"[\s,]+", args.strip()) if t]
+            if name == "translate":
+                m = mul(m, (1, 0, 0, 1, v[0], v[1] if len(v) > 1 else 0))
+            elif name == "scale":
+                m = mul(m, (v[0], 0, 0, v[1] if len(v) > 1 else v[0], 0, 0))
+            elif name == "matrix":
+                m = mul(m, tuple(v))
+        return m
+
+    box = [float("inf"), float("inf"), float("-inf"), float("-inf")]
+
+    def add(m, x, y):
+        a, b, c, d, e, f = m
+        px, py = a * x + c * y + e, b * x + d * y + f
+        box[0] = min(box[0], px); box[1] = min(box[1], py)
+        box[2] = max(box[2], px); box[3] = max(box[3], py)
+
+    def walk(el, m):
+        t = el.get("transform")
+        cur = mul(m, parse(t)) if t else m
+        tag = el.tag.split("}")[-1]
+        if tag == "rect":
+            x = float(el.get("x", 0)); y = float(el.get("y", 0))
+            w = float(el.get("width", 0)); h = float(el.get("height", 0))
+            add(cur, x, y); add(cur, x + w, y + h)
+        elif tag in ("circle", "ellipse"):
+            cx = float(el.get("cx", 0)); cy = float(el.get("cy", 0))
+            rx = float(el.get("r", el.get("rx", 0)))
+            ry = float(el.get("r", el.get("ry", 0)))
+            add(cur, cx - rx, cy - ry); add(cur, cx + rx, cy + ry)
+        for child in el:
+            walk(child, cur)
+
+    walk(ET.parse(path).getroot(), (1.0, 0.0, 0.0, 1.0, 0.0, 0.0))
+    if box[0] == float("inf"):          # no background shape found -> full canvas
+        vb_w, vb_h, _ = _svg_box_and_inner(path)
+        return 0.0, 0.0, vb_w, vb_h
+    return box[0], box[1], box[2] - box[0], box[3] - box[1]
+
+
+def _logo_nested(x: float, y: float, width: float, color: str = "#ffffff") -> str:
+    """Inline the GPLv3 logo (fastlane/gpl-v3-logo.svg) as a nested <svg>.
+
+    The bundled file is the 'Free as in Freedom' GPLv3 badge on a transparent
+    background -- exactly one logo. Its artwork is a single solid colour
+    (#bd0000); we recolour it to `color` at embed time (white reads best on the
+    dark canvas) by substituting that fill, leaving the stored source untouched.
+    Scales to `width` keeping aspect ratio (see _svg_box_and_inner).
+    """
+    vb_w, vb_h, inner = _svg_box_and_inner(GPL_LOGO)
     inner = re.sub(r"#bd0000", color, inner, flags=re.IGNORECASE)
     height = width * vb_h / vb_w
     return (
         f'<svg x="{x:.1f}" y="{y:.1f}" width="{width:.1f}" height="{height:.1f}" '
         f'viewBox="0 0 {vb_w:g} {vb_h:g}">{inner}</svg>'
     )
+
+
+def _badge_nested(path: Path, x: float, y: float, height: float) -> str:
+    """Inline a 'Get it on F-Droid' badge as a nested <svg>, scaled to `height`.
+
+    Unlike the GPL logo the badge is embedded with its ORIGINAL colours -- F-Droid
+    brand artwork must not be recoloured -- so `inner` is emitted verbatim.
+
+    `height` is the target VISIBLE height (so the badge matches the GPL logo, which
+    fills its own canvas). The badge canvas, by contrast, carries a wide
+    transparent margin, so we crop the nested viewBox to the badge's INK box
+    (_svg_ink_bbox) and scale THAT to `height`; the width then follows from the
+    ink aspect ratio. Cropping via the viewBox costs nothing -- the same rsvg pass
+    just maps the ink box, not the padded canvas, into the placement rectangle.
+
+    The badge's live <text> ("GET IT ON" in DejaVu Sans, "F-Droid" in Rokkitt
+    Bold) resolves against the pinned bundled fonts under tools/fonts/. Its
+    internal `xlink:href`/`id` references (a gradient `<defs>` entry) stay valid
+    because the outer document declares the xlink namespace and each graphic
+    embeds exactly one badge, so those ids cannot collide.
+    """
+    _, _, inner = _svg_box_and_inner(path)
+    vx, vy, vw, vh = _svg_ink_bbox(path)
+    width = height * vw / vh
+    return (
+        f'<svg x="{x:.1f}" y="{y:.1f}" width="{width:.1f}" height="{height:.1f}" '
+        f'viewBox="{vx:g} {vy:g} {vw:g} {vh:g}">{inner}</svg>'
+    )
+
+
+def _badge_for_locale(locale: str) -> Path:
+    """Return the 'Get it on F-Droid' badge SVG matching `locale`'s language.
+
+    Only the two feature-graphic locales exist (de-DE, en-US); anything else
+    falls back to the English badge.
+    """
+    lang = "de" if locale.lower().startswith("de") else "en"
+    return BADGE_DIR / f"get-it-on-{lang}.svg"
 
 
 # ── Locale copy ──────────────────────────────────────────────────────────────
@@ -390,7 +515,7 @@ def _render_phone_png(today_png: Path, w: int, h: int, r: int, bezel: int) -> by
     return buf.getvalue()
 
 
-def _build_svg(copy: Copy, today_png: Path, report_png: Path) -> str:
+def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -> str:
     """Assemble the full SVG document string for one locale."""
     report_uri = _data_uri(report_png)
     icon_uri = _data_uri(ICON_FG)
@@ -489,14 +614,35 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path) -> str:
         )
         y += tag_lh * len(lines) + 18  # paragraph gap
 
-    # License badge: the GPLv3 "Free as in Freedom" logo, recoloured WHITE and
-    # kept small. Placed in the bottom-left corner with EQUAL left and bottom
-    # margins (both 48 px) for a balanced corner.
+    # Bottom corners: the "Get it on F-Droid" badge (original colours) in the
+    # bottom-LEFT and the GPLv3 "Free as in Freedom" logo (recoloured WHITE) in
+    # the bottom-RIGHT, each inset by EQUAL bottom + side margins (48 px) so the
+    # two corners mirror one another. Both share the same bottom baseline and the
+    # same VISIBLE height.
+    #
+    # logo_w drives that shared height (the badge is matched to the logo's visible
+    # height). It is kept at 96 -- the reduced size introduced earlier -- so the
+    # pair renders a little smaller than the logo's native 112. NOTE: the original
+    # phone-clearance reason for the reduction no longer strictly applies now that
+    # the WIDE badge sits bottom-LEFT (clear of the phone) and the NARROW logo sits
+    # bottom-RIGHT (its left edge x≈880 clears the phone body + soft shadow ≈823 by
+    # ~57 px); the reduced size is retained by choice and may be raised to 112.
     margin = 48.0
-    logo_w = 112.0
+    logo_w = 96.0
     logo_h = logo_w * 358.0 / 720.0
-    parts.append(_logo_nested(margin, H - margin - logo_h, logo_w, color="#ffffff"))
+    baseline_y = H - margin - logo_h
+    # F-Droid badge, bottom-LEFT (x = margin): original brand colours, cropped to
+    # its ink box and scaled to the shared visible height (see _badge_nested). The
+    # bottom-left corner is clear of the phone and the PDF "paper", so it is drawn
+    # here in normal order.
+    # Commented out as long as merge req
+    # https://gitlab.com/fdroid/fdroiddata/-/merge_requests/41751 is not yet
+    # approved.
+    #parts.append(_badge_nested(badge_svg, margin, baseline_y, logo_h))
 
+    # The GPLv3 logo mirrors this into the bottom-RIGHT corner, but it is appended
+    # LATER -- after the report "paper" -- so it sits IN FRONT of the tilted PDF
+    # screenshot instead of behind it. See the report/phone block below.
     # ── Centre column: four feature bullets ──────────────────────────────────
     # The boxes are wide enough that their RIGHT edge (bx+bw) tucks behind the
     # phone (drawn afterwards), as in the reference; the label column is capped
@@ -556,6 +702,14 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path) -> str:
         f'</g>'
     )
 
+    # GPLv3 logo (bottom-right corner): drawn HERE, AFTER the report "paper", so it
+    # OVERLAPS/covers the tilted PDF screenshot instead of being hidden behind it.
+    # Recoloured WHITE and right-anchored at the mirrored 48 px margin, sharing the
+    # bottom baseline and visible height with the bottom-left badge. Its left edge
+    # (x≈880) clears the phone + soft shadow (≈823), so being placed before the
+    # phone below is fine — they do not overlap.
+    parts.append(_logo_nested(W - margin - logo_w, baseline_y, logo_w, color="#ffffff"))
+
     # Right-side depth edge: a thin perspective band along the phone's NEAR (right)
     # edge, giving it visible thickness (the front face is otherwise flat). It is
     # tapered (shorter at the back) and drawn just before the phone so the front
@@ -594,7 +748,7 @@ def _render_png(svg: str, out_png: Path) -> None:
 
     Determinism hinges on the font: librsvg resolves font families through
     fontconfig, so we generate a throwaway fontconfig that exposes ONLY
-    android/tools/fonts/ and point FONTCONFIG_FILE at it. The host's installed
+    tools/fonts/ and point FONTCONFIG_FILE at it. The host's installed
     fonts are therefore irrelevant -- the same Inter files are always used.
     """
     with tempfile.TemporaryDirectory() as td:
@@ -639,10 +793,11 @@ def render_locale(locale: str) -> Path:
     shots = loc_dir / "images" / "phoneScreenshots"
     today_png = shots / "01_today.png"
     report_png = shots / "07_report_page_1.png"
-    for p in (today_png, report_png, ICON_FG):
+    badge_svg = _badge_for_locale(locale)
+    for p in (today_png, report_png, ICON_FG, badge_svg):
         if not p.is_file():
             raise FileNotFoundError(f"required input missing: {p}")
-    svg = _build_svg(copy, today_png, report_png)
+    svg = _build_svg(copy, today_png, report_png, badge_svg)
     out_png = loc_dir / "images" / "featureGraphic.png"
     _render_png(svg, out_png)
     return out_png
@@ -689,7 +844,8 @@ def main(argv: list[str]) -> int:
         loc_dir = META_DIR / loc
         copy = Copy.load(loc_dir / "feature-graphic.txt")
         shots = loc_dir / "images" / "phoneScreenshots"
-        svg = _build_svg(copy, shots / "01_today.png", shots / "07_report_page_1.png")
+        svg = _build_svg(copy, shots / "01_today.png", shots / "07_report_page_1.png",
+                         _badge_for_locale(loc))
         Path(args.svg_only).write_text(svg, encoding="utf-8")
         print(f"wrote SVG for {loc} -> {args.svg_only}")
         return 0

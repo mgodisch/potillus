@@ -159,10 +159,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG, the README title and the
         // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 88
+        versionCode = 89
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.77.4"
+        versionName = "0.78.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
@@ -593,7 +593,9 @@ tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
 val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
     description = "Render the localized in-app user guides from docs/guide templates."
     workingDir = rootProject.projectDir
-    commandLine("python3", "tools/render-guide.py")
+    // workingDir is the android/ Gradle root; the tooling now lives in tools/ at
+    // the repository root, i.e. one level up.
+    commandLine("python3", "../tools/render-guide.py")
 }
 
 // Concatenates COPYING.md + LICENSE.md (both at the repository root, one level
