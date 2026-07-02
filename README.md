@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic.png)
+![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic-hq.png)
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 

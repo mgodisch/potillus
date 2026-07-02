@@ -1,1 +1,1 @@
-Geen zichtbare wijzigingen.
+Export now shows a notice when the selected date range has no entries.

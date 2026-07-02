@@ -76,10 +76,14 @@ except ImportError:
 # Google Play's hard cap: the long side may be at most twice the short side.
 MAX_RATIO = 2.0
 
-# Root of the fastlane metadata tree. The tree lives at the repository root
-# (a sibling of android/), and the Makefile invokes this script from the android/
-# project dir, so the path is `../fastlane/metadata/android`.
-META_ROOT = os.path.join("..", "fastlane", "metadata", "android")
+# Root of the fastlane metadata tree. It lives at the repository root (a sibling
+# of android/ and of this script's tools/ dir). Anchor to it from __file__ so the
+# script is cwd-independent (the parent of tools/ is the repository root); it no
+# longer relies on being invoked from the android/ project dir.
+META_ROOT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "fastlane", "metadata", "android",
+)
 
 # Filename marker for the PDF report pages (07/08) that must never be cropped.
 REPORT_MARKER = "report"

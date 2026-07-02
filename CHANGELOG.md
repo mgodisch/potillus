@@ -40,9 +40,16 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Add Play Store onboarding; move tooling to tools/
 
-Google Play onboarding, an F-Droid badge in the feature graphic, and a
-relocation of the build tooling. This release is documentation, store assets and
-build/release tooling only — no functional or user-facing app change.
+Google Play onboarding, an F-Droid badge in the feature graphic, a relocation of
+the build tooling, and one small user-facing export fix. Apart from that fix,
+this release is documentation, store assets and build/release tooling only.
+
+User-facing:
+- CSV/PDF export: when the chosen date range contains no entries, show a short,
+  self-dismissing Toast ("No entries available.") instead of doing nothing
+  visible. Previously this was only a faint inline notice inside the scrollable
+  statistics list, so it was easily missed. A successful export is still
+  signalled only by the share sheet (CSV) or the system print dialog (PDF).
 
 New documentation:
 - `PRIVACY.md`: the privacy policy required by the Play "App content" section,
@@ -69,6 +76,10 @@ Feature graphic (`tools/render-feature-graphic.py`):
   the badge is cropped to its ink box before scaling — otherwise its visible
   height would not match the logo. The shared mark size is kept reduced
   (`logo_w` 96).
+- Also render a 4x high-resolution companion (`featureGraphic-hq.png`,
+  4096x2000) next to each 1024x500 store graphic, for press/web/print; fastlane
+  supply does not upload it, and the `README.md` header embeds this high-res
+  version.
 
 Badge fonts (build tooling; not shipped in the app package):
 - Bundle the two fonts the badge text needs under `tools/fonts/`: DejaVu Sans
@@ -94,6 +105,12 @@ Build tooling relocation:
   `render-feature-graphic.py` and `render-guide.py`, and update the invocations
   in `android/Makefile` and `app/build.gradle.kts` to `../tools/...`. Historical
   CHANGELOG entries are intentionally left referring to `android/tools/`.
+- Move the `screenshots` and `feature-graphics` targets (with their screenshot
+  helper targets and variables) from `android/Makefile` to the root `Makefile`,
+  since they orchestrate repo-wide assets rather than the app build; the Gradle
+  build stays in android/ via a new `screenshot-apks` target invoked with
+  `$(MAKE) -C android`. `crop-screenshots.py` and `validate-screenshots.py` are
+  made cwd-independent (`__file__`-anchored) so they run from the repository root.
 
 Release packaging (`Makefile`):
 - Exclude `keystore.properties` and `play-store-credentials.json` from the
@@ -106,10 +123,10 @@ Fastlane (`fastlane/Fastfile`):
 
 Versioning:
 - `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`
-  and the `README.md` title; localized store notes added as `changelogs/89.txt`
-  for all 21 listing locales (each reuses that locale's existing "no visible
-  changes" wording, since there is no user-facing change). The F-Droid recipe is
-  intentionally NOT updated — it is a static backup.
+  and the `README.md` title; localized store notes in `changelogs/89.txt` for all
+  21 listing locales now describe the export fix above (en-US and de-DE are
+  localized; the remaining locales carry the English wording pending translation).
+  The F-Droid recipe is intentionally NOT updated — it is a static backup.
 
 ---
 

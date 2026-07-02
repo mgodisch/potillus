@@ -22,6 +22,7 @@
 package de.godisch.potillus.ui.screen
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -47,10 +48,8 @@ import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
-import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.util.WebViewPdfPrinter
-import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -91,11 +90,20 @@ fun StatsScreen(
     var showCsvRangeDialog by rememberSaveable { mutableStateOf(false) }
     var showPdfRangeDialog by rememberSaveable { mutableStateOf(false) }
 
-    // Auto-dismiss the export status banner after 3 seconds.
-    exportStatus?.let { status ->
-        LaunchedEffect(status) {
-            delay(3_000)
-            vm.clearExportStatus()
+    // An export that produces no file (e.g. no entries in the chosen range) is
+    // reported via [exportStatus]. Surface the ERROR as a short, self-dismissing
+    // Toast so it is noticed regardless of scroll position. The SUCCESS case is
+    // deliberately NOT surfaced here: a successful CSV export opens the share sheet
+    // and a PDF export opens the system print dialog, so the outcome is already
+    // obvious; we only consume the status to clear it.
+    LaunchedEffect(exportStatus) {
+        when (val status = exportStatus) {
+            is ExportStatus.Err  -> {
+                Toast.makeText(context, status.message, Toast.LENGTH_LONG).show()
+                vm.clearExportStatus()
+            }
+            is ExportStatus.Done -> vm.clearExportStatus()  // success shown by share/print dialog
+            null                 -> Unit
         }
     }
 
@@ -376,20 +384,6 @@ fun StatsScreen(
                             OutlinedButton(onClick = { showPdfRangeDialog = true }, modifier = Modifier.weight(1f)) {
                                 Text(stringResource(R.string.export_pdf))
                             }
-                        }
-                        exportStatus?.let { status ->
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                when (status) {
-                                    is ExportStatus.Done -> status.message
-                                    is ExportStatus.Err  -> status.message
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = when (status) {
-                                    is ExportStatus.Done -> successColor()
-                                    is ExportStatus.Err  -> errorColor()
-                                }
-                            )
                         }
                     }
                 }

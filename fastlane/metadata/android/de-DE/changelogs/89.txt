@@ -1,1 +1,1 @@
-Keine sichtbaren Änderungen.
+Export zeigt jetzt einen Hinweis, wenn im gewählten Zeitraum keine Einträge vorliegen.

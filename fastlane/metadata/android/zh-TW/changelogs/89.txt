@@ -1,1 +1,1 @@
-無可見變更。
+Export now shows a notice when the selected date range has no entries.

@@ -59,13 +59,15 @@ EXPECTED_COUNT = 8   # the task requires exactly eight assets per locale
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
-# Root of the fastlane metadata tree. The tree lives at the repository root
-# (../fastlane), one level above this android/ project dir from which the Makefile
-# invokes this script, so the path is `../fastlane/metadata/android` -- matching
-# crop-screenshots.py. (It previously omitted the `..`, so validation looked in a
-# non-existent android/fastlane/... and failed even when capture/crop/PDF had all
-# succeeded.)
-META_ROOT = os.path.join("..", "fastlane", "metadata", "android")
+# Root of the fastlane metadata tree. It lives at the repository root (a sibling
+# of android/ and of this script's tools/ dir). Anchor to it from __file__ so the
+# script is cwd-independent (the parent of tools/ is the repository root) --
+# matching crop-screenshots.py; it no longer relies on being invoked from the
+# android/ project dir.
+META_ROOT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "fastlane", "metadata", "android",
+)
 
 
 def png_dimensions(path):

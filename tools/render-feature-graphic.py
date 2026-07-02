@@ -104,6 +104,10 @@ BADGE_DIR = REPO_ROOT / "fdroid"
 
 # ── Canvas (Google Play feature-graphic spec) ────────────────────────────────
 W, H = 1024, 500
+# The store PNG must be exactly W x H. A high-resolution companion
+# (featureGraphic-hq.png) is additionally rendered at HQ_SCALE x that size for
+# press/web/print use; it is NOT uploaded to Play (see render_locale).
+HQ_SCALE = 4  # 4 x (1024 x 500) = 4096 x 2000
 
 # ── Palette ──────────────────────────────────────────────────────────────────
 BG_TOP = "#11192a"      # background gradient, top-left
@@ -742,9 +746,14 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -
 
 
 # ── Rendering ────────────────────────────────────────────────────────────────
-def _render_png(svg: str, out_png: Path) -> None:
-    """Render the SVG to a 1024x500 PNG with rsvg-convert using ONLY the bundled
-    fonts.
+def _render_png(svg: str, out_png: Path, scale: int = 1) -> None:
+    """Render the SVG to a PNG with rsvg-convert using ONLY the bundled fonts.
+
+    The output is `scale` x the Play feature-graphic size, i.e.
+    (1024*scale) x (500*scale) px. The viewBox is unchanged, so the whole graphic
+    is simply rasterised at a higher pixel density: vector elements (text, the
+    badge and its fonts, the logo, shapes) stay razor-sharp, and the embedded
+    screenshots -- heavily downscaled even at scale=4 -- stay crisp too.
 
     Determinism hinges on the font: librsvg resolves font families through
     fontconfig, so we generate a throwaway fontconfig that exposes ONLY
@@ -775,8 +784,8 @@ def _render_png(svg: str, out_png: Path) -> None:
         subprocess.run(
             [
                 "rsvg-convert",
-                "--width", str(W),
-                "--height", str(H),
+                "--width", str(W * scale),
+                "--height", str(H * scale),
                 "--format", "png",
                 "--output", str(out_png),
                 str(svg_path),
@@ -786,8 +795,12 @@ def _render_png(svg: str, out_png: Path) -> None:
         )
 
 
-def render_locale(locale: str) -> Path:
-    """Render the feature graphic for one locale and return the output path."""
+def render_locale(locale: str) -> tuple[Path, Path]:
+    """Render the feature graphic for one locale.
+
+    Returns ``(store_png, hq_png)``: the 1024x500 Play graphic and its
+    high-resolution companion.
+    """
     loc_dir = META_DIR / locale
     copy = Copy.load(loc_dir / "feature-graphic.txt")
     shots = loc_dir / "images" / "phoneScreenshots"
@@ -798,9 +811,15 @@ def render_locale(locale: str) -> Path:
         if not p.is_file():
             raise FileNotFoundError(f"required input missing: {p}")
     svg = _build_svg(copy, today_png, report_png, badge_svg)
-    out_png = loc_dir / "images" / "featureGraphic.png"
-    _render_png(svg, out_png)
-    return out_png
+    images = loc_dir / "images"
+    out_png = images / "featureGraphic.png"
+    _render_png(svg, out_png)                       # 1024x500, uploaded to Play
+    # High-resolution companion for press/web/print. fastlane supply only matches
+    # the exact name featureGraphic.png, so this file is never uploaded (and Play
+    # caps the store feature graphic at 1024x500 anyway).
+    hq_png = images / "featureGraphic-hq.png"
+    _render_png(svg, hq_png, scale=HQ_SCALE)
+    return out_png, hq_png
 
 
 def main(argv: list[str]) -> int:
@@ -851,8 +870,9 @@ def main(argv: list[str]) -> int:
         return 0
 
     for loc in locales:
-        out = render_locale(loc)
+        out, hq = render_locale(loc)
         print(f"feature graphic ({loc}) -> {out}")
+        print(f"  high-res     ({loc}) -> {hq}")
     return 0
 
 
