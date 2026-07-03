@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Snímky obrazovky a propagační grafika jsou nyní lokalizovány pro každý jazyk a zásady ochrany osobních údajů aplikace jsou nyní zveřejněny (v angličtině): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Export nyní zobrazí upozornění, když ve zvoleném období nejsou žádné záznamy. Dále rozsáhlá reorganizace a vyčištění kódu a sestavovací infrastruktury; žádné další funkční změny.

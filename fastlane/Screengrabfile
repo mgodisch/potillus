@@ -53,10 +53,21 @@ use_tests_in_packages(['de.godisch.potillus.screenshot'])
 # AndroidX test runner (matches testInstrumentationRunner in build.gradle.kts).
 test_instrumentation_runner('androidx.test.runner.AndroidJUnitRunner')
 
-# The two store locales. screengrab runs the suite once per locale and passes the
-# value to the test as the `testlocale` argument (read by ScreenshotTest and
-# LocaleTestRule).
-locales(['de-DE', 'en-US'])
+# The store locales to capture, discovered from the metadata tree instead of
+# being hard-coded: every fastlane/metadata/android/<locale>/ directory carries a
+# changelogs/ sub-dir, so this yields exactly the locale set (and skips the
+# non-locale screenshots.html). It is the SAME derivation the Makefile's
+# SCREENSHOT_LOCALES uses, so capture, cropping, validation and the feature
+# graphic all cover an identical set that grows automatically when a locale dir
+# is added. Paths are resolved from the repo root (see the header note).
+# en-US is captured first so the base locale is grabbed before the rest.
+# screengrab runs the suite once per locale and passes the value to the test as
+# the `testlocale` argument (read by ScreenshotTest and LocaleTestRule).
+locales(
+  Dir.glob('fastlane/metadata/android/*/changelogs')
+     .map { |p| File.basename(File.dirname(p)) }
+     .sort_by { |l| [l == 'en-US' ? 0 : 1, l] }
+)
 
 # Wipe the previous PNGs so a re-run cannot leave stale shots behind. The PDF
 # pages (07/08) are added by the Makefile AFTER screengrab finishes, so this

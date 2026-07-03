@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+截图和特征图形现已针对每种语言进行本地化，应用的隐私政策现已发布（英文）：https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md。现在，当所选日期范围内没有记录时，导出会显示提示。此外，还对代码和构建基础设施进行了大规模重组和清理；没有其他功能性更改。

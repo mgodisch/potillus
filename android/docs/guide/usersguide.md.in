@@ -58,6 +58,9 @@ alcohol consumption so far for today and the six preceding days (rolling
 seven-day window/rolling week) in relation to your limit (as a number and
 as a bar chart).
 
+In addition, a badge marked "Ø" shows your average consumption for the current
+month (average grams of pure alcohol per day).
+
 ## Screen "{{calendar}}"
 
 On this screen, you will find the calendar. Days on which alcohol was consumed
@@ -133,7 +136,15 @@ To move your data to another phone:
 Export regularly: a backup only protects the data that existed at the moment you
 created it.
 
+### {{security}}
+
+This category protects access to the app and controls its visibility. Enable
+{{biometric_lock}} to require a fingerprint or facial recognition each time the
+app is opened. The {{allow_screenshots}} switch controls whether screenshots and
+screen recordings of the app window are permitted; it is off by default, so the
+window is hidden from screenshots and from the recent-apps overview.
+
 ### {{appearance}}
 
-In this category, you can activate the biometric lock for the app, as well as
-set the color theme and the language independently of the system settings.
+In this category, you can set the color theme and the language independently of
+the system settings.

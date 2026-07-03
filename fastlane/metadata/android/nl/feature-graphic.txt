@@ -1,0 +1,13 @@
+# Marketing copy for the Play-Store feature graphic (1024x500), rendered by
+# tools/render-feature-graphic.py. Edit the words freely; line breaks in
+# the taglines are added automatically. Keys:
+#   title    -- one line (the app name, shown large)
+#   tagline  -- one line per paragraph (wrapped automatically to the column)
+#   bullet   -- EXACTLY four short phrases; force a break with a literal \n
+title: LIBELLUS POTIONIS
+tagline: Jouw discrete en privétracker voor alcoholgebruik.
+tagline: Volledige controle zonder compromissen.
+bullet: Grenzen stellen & naleven
+bullet: 100 % privacy:\napp-slot &\nalleen offline
+bullet: CSV- & PDF-rapporten
+bullet: Gratis, reclamevrij &\nOpen Source

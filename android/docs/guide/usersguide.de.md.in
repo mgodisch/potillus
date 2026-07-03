@@ -59,6 +59,9 @@ Tage mit Alkoholkonsum des heutigen und der sechs vorangehenden Tage
 (gleitendes Sieben-Tage-Fenster/gleitende Woche) bezogen auf dein Limit (als
 Zahl und als Balkendiagramm).
 
+Zusätzlich zeigt eine mit „Ø“ gekennzeichnete Markierung den durchschnittlichen
+Konsum im aktuellen Monat (durchschnittliche Gramm reinen Alkohols pro Tag).
+
 ## Screen "{{calendar}}"
 
 Auf diesem Screen findest du den Kalender. Tage, an denen Alkohol konsumiert
@@ -140,8 +143,16 @@ vollständigen Protokoll. So überträgst du deine Daten auf ein anderes Smartph
 Exportiere regelmäßig: Ein Backup schützt nur die Daten, die zum Zeitpunkt seiner
 Erstellung vorhanden waren.
 
+### {{security}}
+
+Diese Kategorie schützt den Zugang zur App und steuert ihre Sichtbarkeit.
+Aktiviere {{biometric_lock}}, um bei jedem Öffnen der App einen Fingerabdruck
+oder eine Gesichtserkennung zu verlangen. Der Schalter {{allow_screenshots}}
+legt fest, ob Screenshots und Bildschirmaufnahmen des App-Fensters erlaubt sind;
+er ist standardmäßig deaktiviert, sodass das Fenster in Screenshots und in der
+Übersicht der letzten Apps ausgeblendet wird.
+
 ### {{appearance}}
 
-In dieser Kategorie kann die biometrische Sperre für die App aktiviert sowie
-das Farbschema und die Sprache unabhängig von den Systemeinstellungen
-festgelegt werden.
+In dieser Kategorie können das Farbschema und die Sprache unabhängig von den
+Systemeinstellungen festgelegt werden.

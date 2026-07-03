@@ -56,6 +56,9 @@ dezelfde hoeveelheid ten opzichte van je dag- en weeklimiet (in gram en als
 voortgangsbalk) en het aantal dagen met alcoholgebruik tot nu toe deze week ten
 opzichte van je limiet (als getal en als voortgangsbalk).
 
+Daarnaast toont een label met „Ø“ je gemiddelde consumptie voor de huidige
+maand (gemiddeld aantal gram pure alcohol per dag).
+
 ## Scherm "{{calendar}}"
 
 Op dit scherm vind je de kalender. Dagen waarop alcohol is gebruikt, zijn
@@ -130,8 +133,16 @@ verplaats je je gegevens naar een andere telefoon:
 Exporteer regelmatig: een back-up beschermt alleen de gegevens die bestonden op
 het moment dat je hem maakte.
 
+### {{security}}
+
+Deze categorie beschermt de toegang tot de app en bepaalt de zichtbaarheid.
+Schakel {{biometric_lock}} in om bij elke keer dat de app wordt geopend een
+vingerafdruk of gezichtsherkenning te vereisen. De schakelaar
+{{allow_screenshots}} bepaalt of schermafbeeldingen en schermopnamen van het
+app-venster zijn toegestaan; deze staat standaard uit, zodat het venster
+verborgen blijft op schermafbeeldingen en in het overzicht van recente apps.
+
 ### {{appearance}}
 
-In deze categorie kun je de biometrische vergrendeling voor de app activeren.
-Daarnaast kun je het kleurenthema en de taal onafhankelijk van de
+In deze categorie kun je het kleurenthema en de taal onafhankelijk van de
 systeeminstellingen instellen.

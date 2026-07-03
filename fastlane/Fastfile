@@ -35,7 +35,7 @@
 default_platform(:android)
 
 platform :android do
-  desc 'Capture the in-app Play-Store screenshots (de-DE, en-US) via screengrab.'
+  desc 'Capture the in-app Play-Store screenshots (all store locales) via screengrab.'
   desc 'Prefer `make screenshots`, which also cleans the status bar (Demo Mode)'
   desc 'and renders the PDF report pages as screenshots 07/08.'
   lane :screenshots do

@@ -60,6 +60,9 @@ progression), et le nombre de jours de consommation d'alcool jusqu'à présent
 cette semaine par rapport à votre limite (sous forme de nombre et de barre de
 progression).
 
+De plus, un badge marqué « Ø » indique votre consommation moyenne pour le mois
+en cours (moyenne de grammes d’alcool pur par jour).
+
 ## Écran « {{calendar}} »
 
 Sur cet écran, vous trouverez le calendrier. Les jours où de l'alcool a été
@@ -138,8 +141,17 @@ totalité de votre journal. Pour transférer vos données vers un autre téléph
 Exportez régulièrement : une sauvegarde ne protège que les données existant au
 moment de sa création.
 
+### {{security}}
+
+Cette catégorie protège l’accès à l’application et contrôle sa visibilité.
+Activez {{biometric_lock}} pour exiger une empreinte digitale ou la
+reconnaissance faciale à chaque ouverture de l’application. L’interrupteur
+{{allow_screenshots}} détermine si les captures et les enregistrements d’écran
+de la fenêtre de l’application sont autorisés ; il est désactivé par défaut, de
+sorte que la fenêtre est masquée sur les captures d’écran et dans l’aperçu des
+applications récentes.
+
 ### {{appearance}}
 
-Dans cette catégorie, vous pouvez activer le verrouillage biométrique de
-l'application. Vous pouvez en outre définir le thème de couleurs et la langue
+Dans cette catégorie, vous pouvez définir le thème de couleurs et la langue
 indépendamment des paramètres du système.

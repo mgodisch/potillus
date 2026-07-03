@@ -55,6 +55,9 @@ cantidad en relación con tus límites diario y semanal (en gramos y como barra 
 progreso), y el número de días con consumo de alcohol en lo que va de semana en
 relación con tu límite (como número y como barra de progreso).
 
+Además, una insignia marcada con «Ø» muestra tu consumo medio del mes actual
+(media de gramos de alcohol puro al día).
+
 ## Pantalla "{{calendar}}"
 
 En esta pantalla encontrarás el calendario. Los días en los que se consumió
@@ -131,8 +134,17 @@ tu registro completo. Para mover tus datos a otro teléfono:
 Exporta con regularidad: una copia de seguridad solo protege los datos que
 existían en el momento en que la creaste.
 
+### {{security}}
+
+Esta categoría protege el acceso a la aplicación y controla su visibilidad.
+Activa {{biometric_lock}} para exigir una huella dactilar o el reconocimiento
+facial cada vez que se abre la aplicación. El interruptor {{allow_screenshots}}
+controla si se permiten capturas de pantalla y grabaciones de pantalla de la
+ventana de la aplicación; está desactivado de forma predeterminada, por lo que
+la ventana se oculta en las capturas de pantalla y en la vista de aplicaciones
+recientes.
+
 ### {{appearance}}
 
-En esta categoría puedes activar el bloqueo biométrico de la aplicación. Además,
-puedes establecer el tema de color y el idioma con independencia de los ajustes
-del sistema.
+En esta categoría puedes establecer el tema de color y el idioma con
+independencia de los ajustes del sistema.

@@ -38,7 +38,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## v0.78.0
 
-Add Play Store onboarding; move tooling to tools/
+Complete L10N for F-Droid; overhaul build tools
 
 Google Play onboarding, an F-Droid badge in the feature graphic, a relocation of
 the build tooling, and one small user-facing export fix. Apart from that fix,
@@ -76,10 +76,71 @@ Feature graphic (`tools/render-feature-graphic.py`):
   the badge is cropped to its ink box before scaling — otherwise its visible
   height would not match the logo. The shared mark size is kept reduced
   (`logo_w` 96).
-- Also render a 4x high-resolution companion (`featureGraphic-hq.png`,
+- Also render a 4x high-resolution companion (`featureGraphic-4K.png`,
   4096x2000) next to each 1024x500 store graphic, for press/web/print; fastlane
   supply does not upload it, and the `README.md` header embeds this high-res
-  version.
+  version. (Named `featureGraphic-4K.png`; an earlier draft in this cycle called
+  it `featureGraphic-hq.png` — the renderer, the `README.md` embed and the two
+  committed companion PNGs were renamed to match.)
+
+Feature-graphic localisation:
+- Add per-locale marketing copy
+  (`fastlane/metadata/android/<locale>/feature-graphic.txt`) for all 19 further
+  store locales (cs, da, el, es, fr, it, ja, ko, nb, nl, pl, pt, pt-BR, ro, ru,
+  sv, uk, zh-CN, zh-TW), so the deterministic renderer now produces a localized
+  feature graphic for every one of the 21 store locales.
+- CJK support: bundle Noto Sans CJK Regular (OFL 1.1) under
+  `tools/fonts/NotoSansCJK/` — Inter has no CJK/Hangul glyphs — and make the
+  renderer CJK-aware. `_char_width` now gives Han/kana/Hangul/fullwidth code
+  points a full-em advance, `_wrap` allows a line break between CJK characters
+  (they carry no spaces, so a CJK tagline was previously one unbreakable,
+  oversized line), and `_build_svg` appends the region-appropriate Noto family
+  (SC/TC/JP/KR) after Inter in the text `font-family` for `ja`/`ko`/`zh-CN`/
+  `zh-TW`. The CJK glyphs in those locales' F-Droid badges resolve via
+  fontconfig's per-glyph fallback to the same bundled font. Latin/Greek/Cyrillic
+  locales are unaffected (font-family stays `Inter`).
+- Quality pass on the supplied copy: fixed a German phrase that had leaked into
+  the Dutch tagline ("ohne kompromissen" → "zonder compromissen"); shortened two
+  bullets that overflowed the fixed 150 px label column (nl "app-vergrendeling"
+  → "app-slot"; ro reworded to a clean three-line form); and normalized the
+  privacy bullet to a spaced "100 %" across the Latin locales, matching
+  de-DE/en-US (CJK locales keep their locale-conventional spacing).
+- Data-security bullet height fix (el, fr, pl, ru, uk): the feature boxes all
+  share one height (the tallest bullet's line count), and in these five wordier
+  languages the privacy bullet wrapped to FIVE lines, pushing the four-box stack
+  to ~530 px — taller than the 500 px canvas, so it was clipped top and bottom.
+  Trimmed each to four lines while keeping the concrete features ("app lock",
+  "offline") intact: pl moves the "&" onto the offline line so the app-lock fits
+  one line (no word dropped); fr drops the redundant "uniquement"; el/ru/uk drop
+  the "100 %" emphasis (already echoed by their "full control" tagline). The
+  four-line stack is ~442 px and sits within the canvas (verified against the
+  renderer's own wrap and stack-height math).
+- Follow-up harmonization: el/ru/uk had dropped the "100 %" prefix above (their
+  app-lock term is inherently two lines, so "100 %" was the cheapest line to
+  cut). Restored it uniformly by shortening the privacy word so "100 %" fits one
+  line again while keeping the full app-lock term: el uses the noun "απόρρητο"
+  (confidentiality); ru/uk use "приватно". All 21 privacy bullets now carry
+  "100 %" and still render at four lines. NOTE: for ru/uk this shifts a noun to
+  an adverb ("приватно" = "privately"), which is fine in marketing register but
+  worth a native review; el stays a noun.
+- ja/ko feature-graphic polish: the width-based CJK wrap split words mid-run and
+  left tiny orphan tails on their own line (ja "プライバシー" → "…プライバシ"+"ー：",
+  "レポート" → "…レポ"+"ート"; ko lone "：", "보고서" → "…보고"+"서"). Added explicit
+  line breaks at word boundaries in the ja/ko copy (no renderer change) so each
+  line ends on a natural boundary and "100 %" sits on its own line, matching the
+  Latin locales. NOTE: the exact break points are a native-review detail.
+- Each new file carries the same English format-header comment as de-DE/en-US
+  (ignored by the renderer) so editors see the title/tagline/bullet contract.
+- Add the localized "Get it on F-Droid" badges (`fdroid/get-it-on-<lang>.svg`)
+  for every store language, and generalize `_badge_for_locale`: it now selects
+  the badge whose tag matches the locale (region kept and lower-cased, e.g.
+  `pt-BR` → `pt-br`), then falls back to the bare language and finally to the
+  English badge, so locales without their own badge (nb, uk) still render one.
+  de-DE/en-US keep resolving to the de/en badge, so the two already-published
+  graphics are unchanged. `COPYING.md` now attributes the whole localized badge
+  set (same F-Droid artwork source, CC BY-SA 3.0). The CJK badges (ja, ko,
+  zh-CN, zh-TW) render correctly via the bundled Noto Sans CJK font (see the
+  CJK note above).
 
 Badge fonts (build tooling; not shipped in the app package):
 - Bundle the two fonts the badge text needs under `tools/fonts/`: DejaVu Sans
@@ -92,10 +153,153 @@ Badge fonts (build tooling; not shipped in the app package):
 
 Release-check tooling (`tools/release-check.sh`):
 - Section 9 (markdown syntax) now also validates `PRIVACY.md`.
+- Section 9 no longer swallows its own findings: the checker was invoked as a
+  bare `output=$(md-syntax.py …)` assignment, and under the script's `set -e` a
+  non-zero exit from that substitution aborted the whole run AT that line —
+  before the captured `path:line: message` problems could be printed — so a
+  markdown error surfaced only as a bare "Error 1" naming no file. The call is
+  now `if`-guarded (a tested context, where `set -e` does not abort), so every
+  offending FILE and LINE is printed; an unexpected crash of `md-syntax.py` also
+  surfaces its stderr instead of failing silently.
 - Section 1 (version consistency) no longer verifies the F-Droid reference
   recipe: the recipe cross-check and its path variable are removed, and the
   recipe (`fdroid/de.godisch.potillus.yml`) is kept only as a static,
   non-maintained backup (a banner in the file states this).
+
+Screenshot pipeline (all store locales):
+- `make screenshots` now captures every store locale, not just de-DE/en-US.
+  `SCREENSHOT_LOCALES` (Makefile) and the screengrab `locales` (Screengrabfile)
+  are both DERIVED from the metadata tree — every
+  `fastlane/metadata/android/<locale>/` has a `changelogs/` sub-dir, so globbing
+  those yields exactly the locale set and skips the non-locale `screenshots.html`.
+  The two derivations match, so capture, cropping, validation and the feature
+  graphic always cover the same set, and adding a locale directory extends the
+  pipeline automatically. The screenshot instrumentation test already applies
+  whatever locale screengrab passes, so no test change was needed.
+- `screenshots-pdf` renders report pages 07/08 for every locale from a report PDF
+  named EXACTLY for that store locale,
+  `fastlane/report-pdf/potillus_report_<locale>.pdf` (`de-DE` uses
+  `potillus_report_de-DE.pdf`, `zh-CN` uses `potillus_report_zh-CN.pdf`). There is
+  deliberately NO base-language or English fallback: a `fr` graphic must use the
+  `fr` report, and `zh-CN`/`zh-TW` (or `pt`/`pt-BR`) must not collapse onto a
+  shared PDF -- so a missing per-locale PDF is a hard `make` error (run
+  `make report-pdfs`, which exports each PDF under that exact name). The two
+  committed reports were renamed from `potillus_report_de.pdf` /
+  `potillus_report_en.pdf` to `potillus_report_de-DE.pdf` /
+  `potillus_report_en-US.pdf` to match.
+- The report pages and feature graphics are proper make FILE targets wired into
+  a dependency graph, so `make screenshots-pdf` and `make feature-graphics`
+  regenerate only the locales whose inputs actually changed. Each
+  `featureGraphic.png` depends on its `feature-graphic.txt`, its `01_today.png`
+  capture and its `07_report_page_1.png`; that report page in turn depends on the
+  source report PDF, so dropping a newer PDF re-rasterizes the locale's report
+  page AND re-renders its feature graphic on the next `make` -- with no separate
+  `screenshots-pdf` step. A missing device screenshot now fails with an
+  actionable message rather than make's terse "No rule to make target".
+- The source report PDFs moved from `fastlane/` into `fastlane/report-pdf/` (the
+  `REPORT_PDF_DIR` variable); `make report-pdfs` pulls exports straight there.
+- Every feature graphic now tracks the WHOLE `tools/fonts/` tree, not only Inter
+  and NotoSansCJK: the badges draw live text in DejaVuSans ("GET IT ON") and
+  Rokkitt ("F-Droid"), so those font files are genuine inputs too. Changing any
+  bundled font -- or generating the Rokkitt bold via `make rokkitt-bold` --
+  rebuilds the affected graphics, closing a stale-asset gap in the earlier deps.
+- `featureGraphic-4K.png`, the high-resolution companion the README embeds, is now
+  a first-class output: it shares one grouped-target rule with `featureGraphic.png`
+  (GNU Make 4.3+), so a single renderer call produces both and `make` tracks both.
+
+Build dependencies -- localized user guides (android/):
+- The generated guides (`res/raw*/usersguide.md`) are no longer rebuilt by a
+  blanket phony `guides` target on every build. `render-guide.py --make-deps`
+  emits, from its single language discovery, one
+  `output: template strings.xml render-guide.py` rule per language into `guides.d`,
+  which `android/Makefile` auto-regenerates and `-include`s. `prereq` now depends
+  on the real `$(GUIDE_OUTPUTS)`, so `make` regenerates a guide only when its own
+  template or `strings.xml` changed -- specific per-target prerequisites instead of
+  one global catch-all. The shared recipe `touch`es its output because
+  `render-guide.py` writes content-based and the file would otherwise look
+  perpetually stale; `distclean` also removes `guides.d`.
+
+Report export (semi-automatic, human-in-the-loop):
+- New `make report-pdfs` drives the app's PDF report export once per locale so
+  producing the 21 source PDFs no longer means 21 fully manual exports. For each
+  locale an instrumented test (`ReportExportTest`) opens the system "Save as PDF"
+  dialog and then BLOCKS until the app is foreground again; the operator taps
+  Save (nothing else) and the run advances. Afterwards the saved files are pulled
+  into `fastlane/report-pdf/`, where `screenshots-pdf` already resolves them.
+- Why semi-automatic: the production export deliberately routes through the
+  platform print dialog (see util/WebViewPdfPrinter), and both fully-silent export
+  (needs a non-public print-framework API) and automating the localized dialog
+  itself are fragile. So the automation only triggers the export and waits for the
+  app to return to the foreground — it never has to read a localized button.
+- The dialog's file name is pre-filled as `potillus_report_<locale>.pdf`: the test
+  calls the print path directly with that job name. This lives ENTIRELY in the
+  androidTest source set; production keeps its timestamped name (unchanged).
+- `ReportExportTest` is inert in every other run: an Assume guard skips it unless
+  invoked with `-e reportExport true`, so `make test` and `make screenshots` never
+  open a dialog. It seeds the same `demo-backup.json` fixture and localizes the
+  report via a Context configured for the requested `testLocale`, so the output
+  matches the committed de/en reports.
+- NOTE: this instrumented test + Makefile target could not be compiled or run in
+  the authoring environment (no Android SDK/Gradle/device); it is written against
+  the existing ScreenshotTest/screengrab patterns and is to be validated on-device.
+- Install step hardened after a first on-device run: the APKs are now installed
+  with `adb install -t` (the instrumentation APK is testOnly and is rejected
+  without it), any previously installed copy is uninstalled first so a signature
+  or downgrade mismatch cannot block the install, and adb's own failure message
+  is printed instead of the bare, reason-less "Error 1" seen after "Performing
+  Streamed Install". The unused `-g` (no dangerous runtime permissions) was
+  dropped.
+
+Root `Makefile` convenience targets and readability:
+- Redesigned the everyday entry points into two convenience targets and made
+  `debug` the default goal (`.DEFAULT_GOAL`). `make debug` runs the maximal LOCAL
+  verification and then the debug APK: through `android/` it drives the
+  `release-check` gate (via `prereq`), Android `lint`, the JVM `unit-test`s, the
+  on-device instrumentation tests (`test-device`) and the `check-guides` doc-sync
+  check, then refreshes any feature graphics already on disk. It is incremental (no
+  `clean`) and needs a connected device, since the instrumentation tests do; it
+  fails if any code or documentation check requires a correction. The former
+  bespoke `default` target (clean + debug + test + copy-to-USB) is gone.
+- `make release` refreshes the store assets and then builds the signed artifact:
+  `screenshots` (recaptures every locale and rasterizes the report pages from the
+  PDFs you exported), `feature-graphics` (rebuilds each locale's graphic whose
+  inputs changed), and finally the `android` `release` target (signed release APK
+  plus its CycloneDX SBOM). You still supply the per-locale report PDFs yourself.
+- New `feature-graphics-existing` target refreshes ONLY the feature graphics that
+  already exist on disk (a `$(wildcard)` over the metadata tree). `debug` uses it so
+  a screenshot-less working copy never trips the `01_today.png` guard for the many
+  locales whose device screenshots are not committed; `release` keeps using the full
+  `feature-graphics`, since it captures screenshots for every locale first.
+- Removed duplication: the per-tool preflight checks are now single `require-device`,
+  `require-pdftoppm`, `require-rsvg`, `require-pillow` and `require-fonttools` helper
+  macros (called with the target name as the message prefix), replacing the roughly
+  six inline copies. The two report-page rules were folded into one parametrized
+  canned recipe (`report_page_rule`; page 1 renders `07_report_page_1.png`, page 2
+  renders `08_report_page_2.png`) and the feature-graphic rule into
+  `feature_graphic_rule`, both instantiated per locale by `potillus_pipeline_rules`.
+  Behaviour is unchanged, verified against the `make -p` database.
+- Reorganized the file into labelled sections (configuration, convenience/install,
+  screenshots, the report-page/feature-graphic pipeline, PDF export, fonts,
+  packaging/deploy, housekeeping) with a targets-at-a-glance index at the top; the
+  configuration variables are consolidated together and `screenshots-demo-off` now
+  sits beside `screenshots`.
+
+User's guide (all 21 locales):
+- Document the app-visibility/lock features and the monthly-average badge. A new
+  `### {{security}}` section (rendered from the `security` string) describes the
+  `{{biometric_lock}}` and `{{allow_screenshots}}` toggles — the latter is off by
+  default (`FLAG_SECURE`), so the window stays out of screenshots and the recent-
+  apps overview. It is placed before `### {{appearance}}`, matching the Settings
+  screen order (backup → security → appearance).
+- The `### {{appearance}}` section is trimmed to what it still covers (color
+  theme + language); its former biometric-lock sentence now lives under Security.
+- The "{{today}}" screen gains a sentence for the new "Ø" badge (average grams of
+  pure alcohol per day for the current month).
+- Applied to the English source template and translated into all 20 other
+  guide templates (`android/docs/guide/usersguide.<lang>.md.in`). UI labels stay
+  as `{{token}}` references so they track `strings.xml`; only the connective
+  prose is translated. All required string keys already exist in every locale, so
+  `render-guide.py` regenerates all 21 guides cleanly (verified).
 
 Build tooling relocation:
 - Move the build/packaging tooling from `android/tools/` to a repo-root `tools/`
@@ -115,6 +319,15 @@ Build tooling relocation:
 Release packaging (`Makefile`):
 - Exclude `keystore.properties` and `play-store-credentials.json` from the
   release tarball, and drop the `distclean` dependency of the `tgz` target.
+- Derive the `tar` exclude list for the `tgz` target DYNAMICALLY from
+  `.gitignore` instead of hard-coding a parallel copy, so the tarball can no
+  longer ship files the repository ignores. `.gitignore` patterns are mapped to
+  `tar` faithfully: comments/blank lines are dropped; a negation (`!`) aborts the
+  build (tar cannot express an un-exclude); root-anchored patterns (those with a
+  `/`) get the repo dir prepended and are matched `--anchored`, the rest
+  `--no-anchored`; and `--no-wildcards-match-slash` keeps `*` inside one path
+  segment (so `/*.pdf` excludes only root PDFs). `.git` is excluded explicitly
+  since git does not list it.
 
 Fastlane (`fastlane/Fastfile`):
 - The `deploy` lane now defaults to the `internal` track instead of `production`;
@@ -124,8 +337,8 @@ Fastlane (`fastlane/Fastfile`):
 Versioning:
 - `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`
   and the `README.md` title; localized store notes in `changelogs/89.txt` for all
-  21 listing locales now describe the export fix above (en-US and de-DE are
-  localized; the remaining locales carry the English wording pending translation).
+  21 listing locales now describe the export fix above (all 21 locales are now
+  localized; the previously English-only locales were translated).
   The F-Droid recipe is intentionally NOT updated — it is a static backup.
 
 ---

@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Le schermate e la grafica di presentazione ora sono localizzate per ogni lingua e l'informativa sulla privacy dell'app è ora pubblicata (in inglese): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. L'esportazione mostra ora un avviso quando l'intervallo di date selezionato non contiene voci. Inoltre, un'ampia riorganizzazione e pulizia del codice e dell'infrastruttura di build; nessun'altra modifica funzionale.

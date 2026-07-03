@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+스크린샷과 피처 그래픽이 이제 모든 언어로 현지화되었으며, 앱의 개인정보 처리방침이 공개되었습니다(영어): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. 선택한 기간에 항목이 없으면 이제 내보내기 시 알림이 표시됩니다. 또한 코드와 빌드 인프라를 폭넓게 재구성하고 정리했습니다. 그 외 기능 변경은 없습니다.

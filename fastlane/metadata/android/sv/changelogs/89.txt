@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Skärmbilder och feature-grafiken är nu lokaliserade för varje språk, och appens integritetspolicy är nu publicerad (på engelska): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Exporten visar nu ett meddelande när det valda datumintervallet saknar poster. Dessutom en omfattande omorganisation och uppstädning av kod och build-infrastruktur; inga andra funktionella ändringar.

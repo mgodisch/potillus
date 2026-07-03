@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic-hq.png)
+![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic-4K.png)
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
@@ -54,7 +54,8 @@ operates without network connectivity.
     late-night drinks count toward the correct evening) and define custom
     evaluation start dates for clean restarts.
 
-A comprehensive User's Guide is fully accessible in-app.
+A comprehensive User's Guide is fully accessible in-app. The app is available
+on [F-Droid](https://f-droid.org/packages/de.godisch.potillus).
 
 ## Technical Aspects
 

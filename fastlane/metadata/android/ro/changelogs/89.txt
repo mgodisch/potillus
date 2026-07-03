@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Capturile de ecran și grafica de prezentare sunt acum localizate pentru fiecare limbă, iar politica de confidențialitate a aplicației este acum publicată (în engleză): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Exportul afișează acum o notificare când intervalul de date selectat nu are înregistrări. De asemenea, o reorganizare și curățare amplă a codului și a infrastructurii de build; nicio altă modificare funcțională.

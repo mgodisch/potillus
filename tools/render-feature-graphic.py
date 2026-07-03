@@ -105,7 +105,7 @@ BADGE_DIR = REPO_ROOT / "fdroid"
 # ── Canvas (Google Play feature-graphic spec) ────────────────────────────────
 W, H = 1024, 500
 # The store PNG must be exactly W x H. A high-resolution companion
-# (featureGraphic-hq.png) is additionally rendered at HQ_SCALE x that size for
+# (featureGraphic-4K.png) is additionally rendered at HQ_SCALE x that size for
 # press/web/print use; it is NOT uploaded to Play (see render_locale).
 HQ_SCALE = 4  # 4 x (1024 x 500) = 4096 x 2000
 
@@ -126,9 +126,44 @@ PHONE_STROKE = "#27313f"
 # is accurate enough to wrap a handful of marketing lines without overflow; it
 # is deliberately a hair wide so wrapping errs toward breaking early. Values are
 # fractions of the font size in user units (px).
+#
+# CJK note: Han, kana, Hangul and fullwidth punctuation are (near) EM-square, so
+# they advance ~1.0 em -- roughly double the Latin average. Treating them with
+# the Latin classes below would under-measure a CJK line by ~2x and never wrap
+# it (there are no spaces to break at either), so it would shoot off the canvas.
+# _is_cjk flags these code points; _char_width gives them a full-em advance and
+# _wrap treats each as its own break opportunity.
+def _is_cjk(ch: str) -> bool:
+    """True for CJK ideographs, kana, Hangul and CJK/fullwidth punctuation.
+
+    These are the scripts that (a) render at ~1 em width and (b) allow a line
+    break between (almost) any two adjacent characters, unlike space-delimited
+    Latin. The ranges intentionally include the CJK punctuation block (、。，：)
+    and the Fullwidth Forms block (！：％) so those wrap and measure like the Han
+    text they sit in.
+    """
+    o = ord(ch)
+    return (
+        0x1100 <= o <= 0x11FF or    # Hangul Jamo
+        0x2E80 <= o <= 0x2EFF or    # CJK Radicals Supplement
+        0x3000 <= o <= 0x303F or    # CJK Symbols and Punctuation
+        0x3040 <= o <= 0x30FF or    # Hiragana + Katakana
+        0x3130 <= o <= 0x318F or    # Hangul Compatibility Jamo
+        0x3400 <= o <= 0x4DBF or    # CJK Unified Ideographs Extension A
+        0x4E00 <= o <= 0x9FFF or    # CJK Unified Ideographs
+        0xA960 <= o <= 0xA97F or    # Hangul Jamo Extended-A
+        0xAC00 <= o <= 0xD7A3 or    # Hangul Syllables
+        0xF900 <= o <= 0xFAFF or    # CJK Compatibility Ideographs
+        0xFF00 <= o <= 0xFF60 or    # Fullwidth Forms (！：％ …)
+        0xFFE0 <= o <= 0xFFE6       # Fullwidth signs (￥ …)
+    )
+
+
 _NARROW = set("iIl1.,;:'!|()[]{}/\\ ")
 _WIDE = set("mMwW@")
 def _char_width(ch: str, size: float) -> float:
+    if _is_cjk(ch):
+        return size * 1.0       # ~EM-square advance (Han, kana, Hangul, fullwidth)
     if ch == " ":
         return size * 0.27
     if ch in _NARROW:
@@ -148,20 +183,47 @@ def _text_width(text: str, size: float) -> float:
 
 
 def _wrap(text: str, size: float, max_width: float) -> list[str]:
-    """Greedy word wrap honouring explicit '\\n' breaks in the source text."""
+    """Greedy wrap honouring explicit '\\n' breaks, Latin words AND CJK runs.
+
+    Break opportunities are: at every space (which then renders as a single
+    space when both sides share a line) and between CJK characters (which carry
+    no spaces). Latin words -- maximal runs of non-space, non-CJK characters --
+    stay intact. This keeps the previous behaviour verbatim for space-delimited
+    Latin copy while letting CJK taglines wrap at all (they otherwise form one
+    unbreakable, oversized line).
+    """
     lines: list[str] = []
     for hard_line in text.split("\\n"):
-        words = hard_line.split()
-        if not words:
+        # Tokenise into units, remembering whether a space preceded each one.
+        units: list[tuple[str, bool]] = []
+        i, n, pending_space = 0, len(hard_line), False
+        while i < n:
+            c = hard_line[i]
+            if c == " ":
+                pending_space = True
+                i += 1
+            elif _is_cjk(c):
+                units.append((c, pending_space))
+                pending_space = False
+                i += 1
+            else:
+                j = i
+                while j < n and hard_line[j] != " " and not _is_cjk(hard_line[j]):
+                    j += 1
+                units.append((hard_line[i:j], pending_space))
+                pending_space = False
+                i = j
+        if not units:
             lines.append("")
             continue
-        cur = words[0]
-        for word in words[1:]:
-            if _text_width(cur + " " + word, size) <= max_width:
-                cur += " " + word
+        cur = units[0][0]                      # leading space (if any) dropped
+        for tok, space_before in units[1:]:
+            sep = " " if space_before else ""
+            if _text_width(cur + sep + tok, size) <= max_width:
+                cur += sep + tok
             else:
                 lines.append(cur)
-                cur = word
+                cur = tok
         lines.append(cur)
     return lines
 
@@ -334,11 +396,67 @@ def _badge_nested(path: Path, x: float, y: float, height: float) -> str:
 def _badge_for_locale(locale: str) -> Path:
     """Return the 'Get it on F-Droid' badge SVG matching `locale`'s language.
 
-    Only the two feature-graphic locales exist (de-DE, en-US); anything else
-    falls back to the English badge.
+    The badge files are named ``fdroid/get-it-on-<tag>.svg``, where ``<tag>`` is
+    the language subtag in lower case, keeping (and lower-casing) any region:
+    ``pt-BR`` -> ``pt-br``, ``zh-CN`` -> ``zh-cn``. To pick one, we try the most
+    specific name first and fall back to progressively broader ones, ending at
+    the English badge -- so a locale that ships no badge of its own (e.g. ``nb``,
+    ``uk``) still renders a valid, if English, badge instead of raising::
+
+        de-DE -> get-it-on-de-de.svg?  (no)  -> get-it-on-de.svg   (yes)
+        en-US -> get-it-on-en-us.svg?  (no)  -> get-it-on-en.svg   (yes)
+        pt-BR -> get-it-on-pt-br.svg   (yes)
+        zh-CN -> get-it-on-zh-cn.svg   (yes)
+        cs    -> get-it-on-cs.svg      (yes)
+        nb    -> get-it-on-nb.svg?     (no)  -> get-it-on-en.svg   (fallback)
+
+    Because ``de-DE``/``en-US`` still resolve to the ``de``/``en`` badge exactly
+    as before, the two previously published graphics are unaffected (no
+    regression); every other shipped locale now picks up its own localized badge.
     """
-    lang = "de" if locale.lower().startswith("de") else "en"
-    return BADGE_DIR / f"get-it-on-{lang}.svg"
+    tag = locale.lower()
+    candidates = [tag]                          # full tag, e.g. "pt-br", "de-de"
+    if "-" in tag:
+        candidates.append(tag.split("-", 1)[0])  # bare language, e.g. "de", "pt"
+    candidates.append("en")                     # ultimate fallback (always present)
+    for cand in candidates:
+        path = BADGE_DIR / f"get-it-on-{cand}.svg"
+        if path.is_file():
+            return path
+    # Unreachable in practice: the English badge is always bundled. Returning it
+    # explicitly keeps the function total (it never returns None).
+    return BADGE_DIR / "get-it-on-en.svg"
+
+
+# The Noto Sans CJK families (bundled under tools/fonts/NotoSansCJK/) used as the
+# fallback after Inter for the four CJK locales, keyed by fastlane locale dir.
+# Inter has no CJK/Hangul glyphs, so without this the CJK copy would render as
+# missing-glyph boxes. Region-specific families are chosen so each locale gets
+# its expected Han variants (SC vs TC) and JP/KR kana/Hangul shaping. Locales not
+# in this map (all the Latin/Greek/Cyrillic ones) get no CJK fallback and render
+# from Inter exactly as before.
+_CJK_FAMILY = {
+    "ja":    "Noto Sans CJK JP",
+    "ko":    "Noto Sans CJK KR",
+    "zh-CN": "Noto Sans CJK SC",
+    "zh-TW": "Noto Sans CJK TC",
+}
+
+
+def _cjk_family_for_locale(locale: str) -> str | None:
+    """Return the Noto Sans CJK family to append after Inter, or None."""
+    return _CJK_FAMILY.get(locale)
+
+
+def _font_family(cjk_family: str | None) -> str:
+    """Build the SVG font-family value: Inter first, then the CJK family if any.
+
+    fontconfig/pango fall back per glyph, so Latin/digits/punctuation keep coming
+    from Inter (weights 400/600/700) while Han/kana/Hangul resolve to the CJK
+    family. The value is emitted into a double-quoted SVG attribute, so the CJK
+    family name is wrapped in single quotes.
+    """
+    return "Inter" if not cjk_family else f"Inter, '{cjk_family}'"
 
 
 # ── Locale copy ──────────────────────────────────────────────────────────────
@@ -519,8 +637,14 @@ def _render_phone_png(today_png: Path, w: int, h: int, r: int, bezel: int) -> by
     return buf.getvalue()
 
 
-def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -> str:
-    """Assemble the full SVG document string for one locale."""
+def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path,
+               cjk_family: str | None = None) -> str:
+    """Assemble the full SVG document string for one locale.
+
+    `cjk_family` (see _cjk_family_for_locale) is appended after Inter in the
+    text font-family for CJK locales; None keeps the Latin-only Inter family.
+    """
+    font_family = _font_family(cjk_family)
     report_uri = _data_uri(report_png)
     icon_uri = _data_uri(ICON_FG)
 
@@ -600,7 +724,7 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -
 
     title_y = 196
     parts.append(
-        f'<text x="48" y="{title_y}" font-family="Inter" font-weight="700" '
+        f'<text x="48" y="{title_y}" font-family="{font_family}" font-weight="700" '
         f'font-size="30" letter-spacing="0.4" fill="{TEXT_PRIMARY}">'
         f'{_esc(copy.title)}</text>'
     )
@@ -612,7 +736,7 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -
     for para in copy.taglines:
         lines = _wrap(para, tag_size, max_width=320)
         parts.append(
-            f'<text x="48" y="{y:.1f}" font-family="Inter" font-weight="400" '
+            f'<text x="48" y="{y:.1f}" font-family="{font_family}" font-weight="400" '
             f'font-size="{tag_size}" fill="{TEXT_SECONDARY}">'
             f'{_tspans(lines, 48, y, tag_lh)}</text>'
         )
@@ -639,10 +763,7 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -
     # its ink box and scaled to the shared visible height (see _badge_nested). The
     # bottom-left corner is clear of the phone and the PDF "paper", so it is drawn
     # here in normal order.
-    # Commented out as long as merge req
-    # https://gitlab.com/fdroid/fdroiddata/-/merge_requests/41751 is not yet
-    # approved.
-    #parts.append(_badge_nested(badge_svg, margin, baseline_y, logo_h))
+    parts.append(_badge_nested(badge_svg, margin, baseline_y, logo_h))
 
     # The GPLv3 logo mirrors this into the bottom-RIGHT corner, but it is appended
     # LATER -- after the report "paper" -- so it sits IN FRONT of the tilted PDF
@@ -685,7 +806,7 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path) -
         # which is what previously pushed the text up and left a gap underneath).
         first_baseline = box_cy - (len(lines) - 1) * lab_lh / 2 + (cap_h - descent) / 2
         parts.append(
-            f'<text x="{bx + 60}" y="{first_baseline:.1f}" font-family="Inter" '
+            f'<text x="{bx + 60}" y="{first_baseline:.1f}" font-family="{font_family}" '
             f'font-weight="600" font-size="{lab_size}" fill="{TEXT_PRIMARY}">'
             f'{_tspans(lines, bx + 60, first_baseline, lab_lh)}</text>'
         )
@@ -807,17 +928,18 @@ def render_locale(locale: str) -> tuple[Path, Path]:
     today_png = shots / "01_today.png"
     report_png = shots / "07_report_page_1.png"
     badge_svg = _badge_for_locale(locale)
+    cjk_family = _cjk_family_for_locale(locale)
     for p in (today_png, report_png, ICON_FG, badge_svg):
         if not p.is_file():
             raise FileNotFoundError(f"required input missing: {p}")
-    svg = _build_svg(copy, today_png, report_png, badge_svg)
+    svg = _build_svg(copy, today_png, report_png, badge_svg, cjk_family)
     images = loc_dir / "images"
     out_png = images / "featureGraphic.png"
     _render_png(svg, out_png)                       # 1024x500, uploaded to Play
     # High-resolution companion for press/web/print. fastlane supply only matches
     # the exact name featureGraphic.png, so this file is never uploaded (and Play
     # caps the store feature graphic at 1024x500 anyway).
-    hq_png = images / "featureGraphic-hq.png"
+    hq_png = images / "featureGraphic-4K.png"
     _render_png(svg, hq_png, scale=HQ_SCALE)
     return out_png, hq_png
 
@@ -864,7 +986,7 @@ def main(argv: list[str]) -> int:
         copy = Copy.load(loc_dir / "feature-graphic.txt")
         shots = loc_dir / "images" / "phoneScreenshots"
         svg = _build_svg(copy, shots / "01_today.png", shots / "07_report_page_1.png",
-                         _badge_for_locale(loc))
+                         _badge_for_locale(loc), _cjk_family_for_locale(loc))
         Path(args.svg_only).write_text(svg, encoding="utf-8")
         print(f"wrote SVG for {loc} -> {args.svg_only}")
         return 0

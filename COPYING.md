@@ -33,10 +33,14 @@ for the originals and terms.
 
 ### "Get it on F-Droid" badges
 
-`fdroid/get-it-on-de.svg` (German) and `fdroid/get-it-on-en.svg` (English) are
-the official "Get it on F-Droid" download badges, used to link to this app's
-listing in the F-Droid catalogue.  They come from the F-Droid artwork project
-(<[https://gitlab.com/fdroid/artwork](https://gitlab.com/fdroid/artwork)>) and
+The `fdroid/get-it-on-<lang>.svg` files are the official "Get it on F-Droid"
+download badges (one per store-listing language — e.g. `get-it-on-en.svg`,
+`get-it-on-de.svg`, `get-it-on-pt-br.svg`, `get-it-on-zh-cn.svg`), used to link
+to this app's listing in the F-Droid catalogue.  They all come from the same
+source, the F-Droid artwork project
+(<[https://gitlab.com/fdroid/artwork](https://gitlab.com/fdroid/artwork)>, also
+mirrored at
+<[https://github.com/f-droid/artwork](https://github.com/f-droid/artwork)>), and
 are licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported
 license (CC BY-SA 3.0); see
 <[https://creativecommons.org/licenses/by-sa/3.0/](https://creativecommons.org/licenses/by-sa/3.0/)>
@@ -53,6 +57,20 @@ graphic deterministically (so the result does not depend on the fonts installed
 on the build host).  Inter is licensed under the SIL Open Font License 1.1 (see
 the accompanying `OFL.txt`).  These files are build-time tooling and are **not**
 distributed inside the application package.
+
+### Noto Sans CJK (feature-graphic CJK text)
+
+`tools/fonts/NotoSansCJK/NotoSansCJK-Regular.ttc` supplies the Japanese, Korean
+and Simplified/Traditional Chinese glyphs for the `ja`, `ko`, `zh-CN` and `zh-TW`
+feature-graphic copy (Inter has no CJK glyphs), and — through fontconfig's
+per-glyph fallback — the CJK text in the localized "Get it on F-Droid" badges.
+It is the Regular-weight OpenType Collection from the Noto CJK project
+(<[https://github.com/notofonts/noto-cjk](https://github.com/notofonts/noto-cjk)>,
+`Sans/OTC/NotoSansCJK-Regular.ttc`) and is licensed under the SIL Open Font
+License 1.1 (see the accompanying `LICENSE`; the source and version are recorded
+in `README.txt`).  Like the other bundled faces, this file is build-time tooling
+for `render-feature-graphic.py` and is **not** distributed inside the application
+package.
 
 ### DejaVu Sans (feature-graphic badge text)
 

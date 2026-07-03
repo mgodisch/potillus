@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+スクリーンショットとフィーチャーグラフィックが各言語にローカライズされ、アプリのプライバシーポリシーが公開されました（英語）：https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md。選択した期間にデータがない場合、エクスポート時に通知が表示されるようになりました。また、コードとビルド基盤の大規模な再編成とクリーンアップを行いました。その他の機能的な変更はありません。

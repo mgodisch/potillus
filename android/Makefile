@@ -96,7 +96,7 @@ else
 SCREENSHOT_EXCLUDE_FLAG :=
 endif
 
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md guides release-check
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md $(GUIDE_OUTPUTS) release-check
 
 java:
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
@@ -126,15 +126,40 @@ app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md
 	mkdir -p app/src/main/res/raw
 	{ cat ../COPYING.md; echo; cat ../LICENSE.md; } > $@
 
-# Regenerate the localized user guides from their templates in docs/guide/.
-# Resolves the {{screen-name}} tokens against the matching strings.xml so the
-# in-app res/raw[-xx]/usersguide.md copies can never drift from the labels the
-# app actually shows. The language set is discovered from the template files
-# (no hard-coded list). Runs on every build (a prerequisite of `prereq`); the
-# renderer rewrites an output only when its template or strings.xml is newer, so
-# it is a cheap no-op when nothing changed.
-guides:
+# Regenerate the localized user guides from their templates in docs/guide/,
+# resolving the {{screen-name}} tokens against the matching strings.xml so the
+# in-app res/raw[-xx]/usersguide.md copies can never drift from the labels the app
+# actually shows. The language set is discovered from the template files (no hard-
+# coded list).
+#
+# Each guide is a proper FILE target rather than one blanket phony: render-guide.py
+# --make-deps emits, from that same discovery, one `output: template strings.xml
+# render-guide.py` rule per language into guides.d. That fragment is auto-
+# regenerated whenever a template, a strings.xml or the renderer changes and pulled
+# in with `-include`, so make (not a phony that runs every build) decides which
+# guides are stale, and `prereq` depends on the real $(GUIDE_OUTPUTS). The shared
+# recipe renders on demand; render-guide.py rewrites only the outputs whose inputs
+# are newer, so a per-target re-invocation is a cheap near-no-op after the first.
+-include guides.d
+
+guides.d: $(wildcard docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/values*/strings.xml) ../tools/render-guide.py
+	python3 ../tools/render-guide.py --make-deps > $@
+
+# Shared recipe for every guide output (prerequisites come from guides.d above).
+# Guarded so the empty-goal parse BEFORE guides.d exists is harmless; make then
+# builds guides.d, restarts, and this rule is defined with the populated list.
+# render-guide.py writes content-based (it leaves a file untouched when its text
+# would not change), which would leave the mtime older than the inputs and make
+# the target look perpetually stale -- so `touch` the target to record that it is
+# now up to date. The outputs are gitignored, so the touch causes no VCS churn.
+ifneq ($(GUIDE_OUTPUTS),)
+$(GUIDE_OUTPUTS):
 	python3 ../tools/render-guide.py
+	touch $@
+endif
+
+# Convenience alias: `make guides` builds any stale guide (dependency-driven).
+guides: $(GUIDE_OUTPUTS)
 
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything). Also verifies that the generated
@@ -254,5 +279,6 @@ clean: prereq
 distclean: clean
 	rm app/src/main/res/raw*/copyright.md
 	rm app/src/main/res/raw*/usersguide.md
+	rm -f guides.d
 
 .PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshot-apks install install-debug clean distclean

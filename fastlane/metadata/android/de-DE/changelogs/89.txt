@@ -1,1 +1,1 @@
-Export zeigt jetzt einen Hinweis, wenn im gewählten Zeitraum keine Einträge vorliegen.
+Screenshots und das Feature-Graphic sind jetzt für jede Sprache lokalisiert, und die Datenschutzerklärung der App ist nun veröffentlicht (auf Englisch): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Export zeigt jetzt einen Hinweis, wenn im gewählten Zeitraum keine Einträge vorliegen. Außerdem eine umfassende Reorganisation und Bereinigung von Code und Build-Infrastruktur; keine weiteren funktionalen Änderungen.

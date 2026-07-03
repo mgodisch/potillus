@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane android screenshots
 ```
 
-Capture the in-app Play-Store screenshots (de-DE, en-US) via screengrab.
+Capture the in-app Play-Store screenshots (all store locales) via screengrab.
 
 Prefer `make screenshots`, which also cleans the status bar (Demo Mode)
 

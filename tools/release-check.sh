@@ -1058,18 +1058,30 @@ check_markdown_syntax() {
         [[ -f "$g" ]] && files+=("$g")
     done
 
-    local output rc
-    output=$(python3 ../tools/md-syntax.py "${files[@]}" 2>/dev/null)
-    rc=$?
-
-    if [[ $rc -eq 0 ]]; then
+    # Run the checker. This MUST be guarded by `if` rather than a bare
+    # `output=$(...)` assignment: under `set -e` a standalone assignment whose
+    # command substitution exits non-zero aborts the WHOLE script at this line —
+    # before the problems captured on stdout can be printed. That is why a
+    # markdown error used to surface only as a bare "Error 1" naming no file. The
+    # `if` puts the command in a tested context, so a non-zero exit is handled
+    # here instead of killing the run. Its stderr is captured so an unexpected
+    # crash of the checker itself is surfaced rather than failing silently.
+    local output err
+    err=$(mktemp)
+    if output=$(python3 ../tools/md-syntax.py "${files[@]}" 2>"$err"); then
         pass "Markdown syntax OK in ${#files[@]} file(s) (docs + rendered guides)"
-    else
-        # md-syntax.py prints one "path:line: message" per problem on stdout.
+    elif [[ -n "$output" ]]; then
+        # md-syntax.py prints one "path:line: message" per problem on stdout, so
+        # each FAIL below names the offending FILE and LINE.
         while IFS= read -r line; do
             [[ -n "$line" ]] && fail "$line"
         done <<< "$output"
+    else
+        # Non-zero exit with no per-problem output means the checker itself failed
+        # (e.g. crashed); surface its stderr so the failure is never silent.
+        fail "md-syntax.py did not run cleanly: $(tr '\n' ' ' <"$err")"
     fi
+    rm -f "$err"
 }
 
 # -----------------------------------------------------------------------------

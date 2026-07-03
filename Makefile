@@ -16,9 +16,35 @@
 #
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 # =============================================================================
 #  Makefile -- Libellus Potionis build tooling for Debian GNU/Linux stable
+# =============================================================================
+#
+#  TARGETS AT A GLANCE
+#    Convenience
+#      debug        (default) maximal on-device check + debug APK, then refresh
+#                   any feature graphics already on disk        [needs a device]
+#      release      fresh screenshots + feature graphics, then the signed APK
+#                   and its SBOM   [needs a device; supply report PDFs yourself]
+#      install      copy the freshly built debug APK to the local install path
+#    Store assets
+#      screenshots        capture all 8 phone screenshots per locale [device]
+#      screenshots-crop   ) sub-steps of `screenshots`, also runnable on their
+#      screenshots-pdf    )   own (crop in-app shots / rasterize report pages)
+#      feature-graphics           (re)build every locale's featureGraphic*.png
+#      feature-graphics-existing  refresh only the graphics already on disk
+#      report-pdfs        semi-automatic per-locale PDF report export  [device]
+#      rokkitt-bold       bake the static Rokkitt Bold used by the badges
+#    Packaging
+#      tgz          release source tarball (exclusions derived from .gitignore)
+#      push         git push + tags
+#    Housekeeping
+#      clean / distclean
+# =============================================================================
+
+# =============================================================================
+# CONFIGURATION
 # =============================================================================
 
 VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
@@ -27,23 +53,17 @@ VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
-.DEFAULT_GOAL := default
-
-default:
-	adb devices | grep -q 'device$$'
-	$(MAKE) -C android clean
-	$(MAKE) -C android debug 2>&1 | tee ../build.log
-	$(MAKE) -C android test  2>&1 | tee ../test.log
-	$(MAKE) install
-
-install: /home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk
-
-/home/godisch/FRITZ/USB-SanDisk3-2Gen1-01/Martin/Downloads/potillus-$(VERSION)-debug.apk: android/app/build/outputs/apk/debug/app-debug.apk
-	cp $< $@
+.DEFAULT_GOAL := debug
 
 # ── Play-Store screenshot pipeline (see the `screenshots` target) ─────────────
-# Locales captured; MUST match fastlane/Screengrabfile and the metadata tree.
-SCREENSHOT_LOCALES := de-DE en-US
+# Locales captured: EVERY store locale under the metadata tree. Each locale dir
+# carries a changelogs/ sub-dir, so globbing those and stripping the suffix
+# yields exactly the locale set (and skips the non-locale screenshots.html file,
+# which has no changelogs/). This is self-maintaining -- adding a
+# fastlane/metadata/android/<locale>/ directory extends capture automatically --
+# and fastlane/Screengrabfile derives the SAME set the same way, so the two can
+# never drift.
+SCREENSHOT_LOCALES := $(sort $(notdir $(patsubst %/changelogs,%,$(wildcard fastlane/metadata/android/*/changelogs))))
 # The demo fixture (fastlane/demo-backup.json) covers 2026-01-01..2026-06-30, so
 # the device clock is pinned to the last day of that range to give the
 # date-relative "Today" screen meaningful content. (Setting the date needs an
@@ -56,12 +76,58 @@ SCREENSHOT_CLOCK := 1000
 SCREENSHOT_PDF_DPI := 200
 # Root of the fastlane store-metadata tree (shared by Play `supply` and F-Droid).
 META := fastlane/metadata/android
+# Directory holding the per-locale source report PDFs (potillus_report_<locale>.pdf)
+# that screenshots-pdf rasterizes into the 07/08 report screenshots.
+REPORT_PDF_DIR := fastlane/report-pdf
+
+# ── Preflight helpers ── each expands to a one-line "fail fast with an install
+# hint if a tool is missing" guard. $(1) is the calling target's name, used as
+# the message prefix, so one definition serves every recipe that needs the tool.
+require-device    = adb devices 2>/dev/null | grep -q 'device$$' || { echo "$(1): no device/emulator connected (adb) -- connect one first."; exit 1; }
+require-pdftoppm  = command -v pdftoppm >/dev/null || { echo "$(1): 'pdftoppm' not found — install poppler-utils"; exit 1; }
+require-rsvg      = command -v rsvg-convert >/dev/null 2>&1 || { echo "$(1): 'rsvg-convert' not found — install librsvg2-bin"; exit 1; }
+require-pillow    = python3 -c 'import PIL' 2>/dev/null || { echo "$(1): Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
+require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): fonttools not found — install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
+
+# =============================================================================
+# CONVENIENCE & INSTALL
+# =============================================================================
+
+# ── debug ── the everyday build. Maximal LOCAL verification, then the debug APK.
+# Runs (via android/) the release-check gate, Android lint, the JVM unit tests,
+# the on-device instrumentation tests and the guide/copyright sync check, then
+# builds the debug APK and refreshes any feature graphics that already exist. It
+# is deliberately incremental (no `clean`) for fast iteration, and needs a device
+# because the instrumentation tests do. It FAILS if any code or documentation
+# check would require a correction.
+debug:
+	$(call require-device,debug)
+	$(MAKE) -C android debug test check-guides
+	$(MAKE) feature-graphics-existing
+	$(MAKE) install
+
+# ── release ── refresh the store assets, then build the signed APK + SBOM.
+# `screenshots` recaptures every locale and rasterizes the report pages from the
+# PDFs you exported (via `report-pdfs`); `feature-graphics` then rebuilds each
+# locale's graphic whose inputs changed; the android `release` target produces
+# the signed release APK together with its CycloneDX SBOM. Needs a device (for
+# the capture); you supply the per-locale report PDFs manually beforehand.
+release:
+	$(MAKE) screenshots
+	$(MAKE) feature-graphics
+	$(MAKE) -C android release
+
+install: ../downloads/potillus-$(VERSION)-debug.apk
+
+../downloads/potillus-$(VERSION)-debug.apk: android/app/build/outputs/apk/debug/app-debug.apk
+	cp $< $@
 
 # =============================================================================
 # PLAY-STORE SCREENSHOTS
 # =============================================================================
 #   Fully automated capture of the eight Google-Play phone screenshots per
-#   locale (de-DE, en-US), placed straight into the fastlane metadata tree:
+#   locale (every store locale under the metadata tree; see SCREENSHOT_LOCALES),
+#   placed straight into the fastlane metadata tree:
 #
 #     01_today  02_calendar  03_statistics   (LIGHT) ─┐ captured in-app by the
 #     04_drinks 05_add_drink 06_settings     (DARK)  ─┘ screengrab/Espresso suite
@@ -128,7 +194,8 @@ screenshots:
 	adb shell am broadcast -a com.android.systemui.demo -e command network      -e wifi show -e level 4
 	adb shell am broadcast -a com.android.systemui.demo -e command network      -e mobile hide
 	adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
-	# 5) Capture the six in-app screenshots in both locales (de-DE, en-US).
+	# 5) Capture the six in-app screenshots in every configured locale
+	#    (SCREENSHOT_LOCALES, derived from the metadata tree).
 	#    The BUNDLED fastlane is mandatory (reproducible, pinned in fastlane/
 	#    Gemfile) — install it once with `cd fastlane && bundle install`. It runs
 	#    in a SUBSHELL so the `cd fastlane` does not leak into the following steps
@@ -150,38 +217,203 @@ screenshots:
 # in-app shots; the tool additionally skips any "report" page and any image that
 # is already <= 2:1, so re-runs and the PDF pages are safe.
 screenshots-crop:
-	python3 -c 'import PIL' 2>/dev/null || { echo "screenshots-crop: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
+	$(call require-pillow,screenshots-crop)
 	python3 tools/crop-screenshots.py $(SCREENSHOT_LOCALES)
 
-# Render report pages 1 & 2 of the localized PDF into screenshots 07/08. Runs
-# AFTER screengrab (whose clear_previous_screenshots wipes only the in-app PNGs),
-# so these survive. `-singlefile` makes pdftoppm write exactly <root>.png.
-screenshots-pdf:
-	command -v pdftoppm >/dev/null || { echo "screenshots-pdf: 'pdftoppm' not found — install poppler-utils"; exit 1; }
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/07_report_page_1
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_de.pdf $(META)/de-DE/images/phoneScreenshots/08_report_page_2
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/07_report_page_1
-	pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 fastlane/potillus_report_en.pdf $(META)/en-US/images/phoneScreenshots/08_report_page_2
+# Leave Android Demo Mode and restore the normal device state. Each step is
+# tolerant (|| true) so tear-down never fails the build; invoked from the
+# `screenshots` EXIT trap.
+screenshots-demo-off:
+	-adb shell am broadcast -a com.android.systemui.demo -e command exit || true
+	-adb shell settings put global sysui_demo_allowed 0 || true
+	-adb shell settings put global auto_time 1 || true
+	-adb shell settings put global window_animation_scale 1 || true
+	-adb shell settings put global transition_animation_scale 1 || true
+	-adb shell settings put global animator_duration_scale 1 || true
 
-# Render the Play-Store feature graphic (one 1024x500 PNG per locale) into the
-# fastlane metadata tree at $(META)/<locale>/images/featureGraphic.png.
+# =============================================================================
+# REPORT PAGES & FEATURE GRAPHICS  (dependency pipeline)
+# =============================================================================
+
+# Render report pages 1 & 2 of the localized PDF into screenshots 07/08, for
+# EVERY locale in $(SCREENSHOT_LOCALES). Runs AFTER screengrab (whose
+# clear_previous_screenshots wipes only the in-app PNGs 01..06), so these survive.
 #
-#   It is fully deterministic: it composes the per-locale marketing copy
-#   ($(META)/<locale>/feature-graphic.txt), the REAL screenshots produced by
-#   `make screenshots` (01_today as the phone, 07_report_page_1 as the report
-#   page) and the app's launcher icon, then renders with rsvg-convert under a
-#   PINNED bundled font (tools/fonts/Inter) so the output never depends on the
-#   fonts installed on the build host.
+# Report source per locale: the report PDF is named EXACTLY for the store locale,
+# $(REPORT_PDF_DIR)/potillus_report_<locale>.pdf -- so `de-DE` uses
+# potillus_report_de-DE.pdf, `zh-CN` uses potillus_report_zh-CN.pdf, etc. There is
+# deliberately NO base-language/English fallback: a `fr` graphic MUST use the `fr`
+# report, and `zh-CN`/`zh-TW` must not collapse onto a shared `zh` PDF. If a
+# locale's own PDF is missing that is an error -- run `make report-pdfs` (which
+# exports each PDF under that exact name) first.
 #
-#   Run it AFTER `make screenshots`, since it reuses those captures — it does NOT
-#   trigger a capture itself (that needs a device); the script fails with an
-#   actionable message if a required screenshot is missing. Re-run it whenever the
-#   screenshots or the copy change. The pre-flight check mirrors the pdftoppm /
-#   Pillow checks in screenshots-pdf / screenshots-crop.
-feature-graphics:
-	command -v rsvg-convert >/dev/null 2>&1 || { echo "feature-graphics: 'rsvg-convert' not found — install it (Debian: apt install librsvg2-bin)"; exit 1; }
-	python3 -c 'import PIL' 2>/dev/null || { echo "feature-graphics: Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
-	python3 tools/render-feature-graphic.py $(SCREENSHOT_LOCALES)
+# `-singlefile` makes pdftoppm write exactly <root>.png (no page-number suffix).
+#
+# DEPENDENCY-DRIVEN PIPELINE: the report pages and feature graphics are proper
+# FILE targets, so `make screenshots-pdf` / `make feature-graphics` rebuild ONLY
+# the locales whose inputs actually changed:
+#
+#   $(REPORT_PDF_DIR)/potillus_report_<locale>.pdf (source PDF; named exactly)
+#        |  pdftoppm
+#        v
+#   $(META)/<loc>/images/phoneScreenshots/07_report_page_1.png   (and 08)
+#        |                                    +-- feature-graphic.txt
+#        |                                    +-- 01_today.png (from screengrab)
+#        v  render-feature-graphic.py         +-- $(FG_SHARED_DEPS)
+#   $(META)/<loc>/images/featureGraphic.png <-'
+#
+# So dropping a newer source PDF makes `make feature-graphics` re-rasterize that
+# locale's report page AND re-render its feature graphic, with no extra step.
+
+# Per-locale source PDF, named EXACTLY for the store locale. No fallback: 07/08
+# depend on this precise file, so a missing per-locale PDF is a hard make error.
+report_src = $(REPORT_PDF_DIR)/potillus_report_$(1).pdf
+
+# Shared inputs every feature graphic depends on. The whole tools/fonts/ tree is
+# pulled in because the renderer pins fontconfig to it and the badges draw live
+# text (DejaVuSans for "GET IT ON", Rokkitt for "F-Droid") -- so DejaVuSans and
+# Rokkitt are inputs too, not just Inter/NotoSansCJK. Over-approximated on
+# purpose: an unnecessary rebuild is cheap, a MISSED dependency ships a stale asset.
+FG_RENDERER    := tools/render-feature-graphic.py
+FG_SHARED_DEPS := $(FG_RENDERER) \
+                  android/app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground.png \
+                  fastlane/gpl-v3-logo.svg \
+                  $(wildcard fdroid/get-it-on-*.svg) \
+                  $(wildcard tools/fonts/*/*)
+
+REPORT_PAGE_PNGS     :=
+FEATURE_GRAPHIC_PNGS :=
+
+# ── Per-locale rules, generated for every store locale via $(eval). One canned
+# recipe per artifact kind. The two report pages differ only in the page number,
+# so a SINGLE parametrized recipe emits both (07 = page 1, 08 = page 2).
+
+# report_page_rule: $(1)=locale  $(2)=sequence (07|08)  $(3)=page number (1|2)
+define report_page_rule
+$(META)/$(1)/images/phoneScreenshots/$(2)_report_page_$(3).png: $(call report_src,$(1))
+	@$(call require-pdftoppm,screenshots-pdf)
+	@mkdir -p "$$(@D)"
+	@echo "screenshots-pdf: $(1) p$(3) <- $$(notdir $$<)"
+	@pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f $(3) -l $(3) "$$<" "$$(@:.png=)"
+endef
+
+# feature_graphic_rule: $(1)=locale. Grouped target (&:, GNU Make 4.3+) so the
+# single renderer call produces BOTH the 1024x500 PNG and its 4K companion.
+define feature_graphic_rule
+$(META)/$(1)/images/featureGraphic.png $(META)/$(1)/images/featureGraphic-4K.png &: $(META)/$(1)/feature-graphic.txt $(META)/$(1)/images/phoneScreenshots/01_today.png $(META)/$(1)/images/phoneScreenshots/07_report_page_1.png $(FG_SHARED_DEPS)
+	@$(call require-rsvg,feature-graphics)
+	@$(call require-pillow,feature-graphics)
+	@echo "feature-graphics: $(1)"
+	@python3 $(FG_RENDERER) $(1)
+endef
+
+# Instantiate all three rules per locale and collect the outputs.
+define potillus_pipeline_rules
+$(call report_page_rule,$(1),07,1)
+$(call report_page_rule,$(1),08,2)
+$(call feature_graphic_rule,$(1))
+REPORT_PAGE_PNGS     += $(META)/$(1)/images/phoneScreenshots/07_report_page_1.png $(META)/$(1)/images/phoneScreenshots/08_report_page_2.png
+FEATURE_GRAPHIC_PNGS += $(META)/$(1)/images/featureGraphic.png $(META)/$(1)/images/featureGraphic-4K.png
+endef
+$(foreach loc,$(SCREENSHOT_LOCALES),$(eval $(call potillus_pipeline_rules,$(loc))))
+
+# Device screenshots (01..06) come from `make screenshots` (screengrab on a
+# device) and have no build rule here. If one is missing when a feature graphic
+# needs it, fail with an actionable message instead of make's terse "No rule".
+$(META)/%/images/phoneScreenshots/01_today.png:
+	@echo "feature-graphics: missing device screenshot $@ — run 'make screenshots' first (needs a device)." >&2; exit 1
+
+# Aggregators: build every locale's outputs but ONLY the stale ones (real file
+# prerequisites -> timestamp-driven; an up-to-date tree is a no-op).
+screenshots-pdf: $(REPORT_PAGE_PNGS)
+feature-graphics: $(FEATURE_GRAPHIC_PNGS)
+# Refresh ONLY the feature graphics already on disk (used by the `debug` build,
+# which captures no screenshots): $(wildcard) never lists a locale without a
+# featureGraphic.png yet, so this can never trip the 01_today guard above.
+feature-graphics-existing: $(wildcard $(META)/*/images/featureGraphic.png)
+
+# =============================================================================
+# REPORT PDF EXPORT  (semi-automatic, human-in-the-loop)
+# =============================================================================
+
+# Semi-automatic per-locale PDF report export (feeds screenshots-pdf).
+#
+#   The 07/08 report pages are rasterized by `screenshots-pdf` from per-locale
+#   source PDFs `$(REPORT_PDF_DIR)/potillus_report_<locale>.pdf`. Exporting those
+#   for 21 locales is tedious, so this target drives the app's export ONCE per
+#   locale and leaves only the system "Save as PDF" dialog to you — with the file
+#   name PRE-FILLED as potillus_report_<locale>.pdf (see the androidTest class
+#   ReportExportTest; production keeps its timestamped name, unchanged).
+#
+#   FLOW: for each locale the instrumented ReportExportTest opens the print dialog
+#   and then BLOCKS until the app is foreground again. You tap "Save as PDF" ->
+#   Save (name is pre-filled) into the device Downloads folder; the automation
+#   then advances to the next locale. Afterwards the saved PDFs are pulled into
+#   $(REPORT_PDF_DIR)/, where the dependency graph picks them up automatically.
+#
+#   It is a HUMAN-IN-THE-LOOP target: the ReportExportTest is skipped in every
+#   other run (a `-e reportExport true` Assume guard), so ordinary `make test` and
+#   `make screenshots` never open a dialog. Run it explicitly, on a device/emulator
+#   whose print stack offers "Save as PDF".
+#
+#   INSTR is the instrumentation component: the debug applicationId
+#   (de.godisch.potillus + the `.debug` suffix from app/build.gradle.kts) plus the
+#   `.test` androidTest suffix, with the AndroidX JUnit runner.
+INSTR := de.godisch.potillus.debug.test/androidx.test.runner.AndroidJUnitRunner
+report-pdfs:
+	$(MAKE) -C android prereq
+	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
+	test "$${DEV_COUNT:-0}" -ne 0
+	# 1) Build, then (re)install the app + instrumentation APKs. Any prior copy is
+	#    removed first so a signature/downgrade mismatch cannot block the install
+	#    (that failure prints an empty reason after "Performing Streamed Install"),
+	#    and `-t` is required because the instrumentation APK is marked testOnly.
+	#    adb's own message is surfaced on failure instead of a bare "Error 1".
+	$(MAKE) -C android screenshot-apks
+	adb uninstall de.godisch.potillus.debug      >/dev/null 2>&1 || true
+	adb uninstall de.godisch.potillus.debug.test >/dev/null 2>&1 || true
+	for apk in android/app/build/outputs/apk/debug/app-debug.apk \
+	           android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk; do \
+	    echo "report-pdfs: installing $$(basename "$$apk")"; \
+	    out=$$(adb install -t -r "$$apk" 2>&1) || { \
+	        echo "report-pdfs: adb install failed for $$apk:"; \
+	        printf '%s\n' "$$out" | sed 's/^/    /'; \
+	        exit 1; \
+	    }; \
+	done
+	# 2) Keep the screen awake for the interactive run.
+	adb shell svc power stayon true
+	adb shell input keyevent KEYCODE_WAKEUP
+	adb shell wm dismiss-keyguard
+	echo
+	echo ">>> For EACH locale: tap 'Save as PDF' -> Save (name is pre-filled) into"
+	echo ">>> the Downloads folder. The run advances automatically after each save."
+	echo
+	# 3) Trigger the export once per locale (blocks until you finish the dialog).
+	@for loc in $(SCREENSHOT_LOCALES); do \
+	    echo "report-pdfs: === $$loc — waiting for your 'Save as PDF' ==="; \
+	    adb shell am instrument -w \
+	        -e class de.godisch.potillus.screenshot.ReportExportTest \
+	        -e reportExport true -e testLocale "$$loc" \
+	        $(INSTR) >/dev/null || true; \
+	done
+	# 4) Pull the saved PDFs from Downloads into $(REPORT_PDF_DIR) (best effort; a
+	#    missing file just means that locale was skipped/cancelled — re-run it).
+	@mkdir -p "$(REPORT_PDF_DIR)"
+	@for loc in $(SCREENSHOT_LOCALES); do \
+	    if adb pull "/sdcard/Download/potillus_report_$$loc.pdf" "$(REPORT_PDF_DIR)/potillus_report_$$loc.pdf" >/dev/null 2>&1; then \
+	        echo "report-pdfs: pulled potillus_report_$$loc.pdf"; \
+	    else \
+	        echo "report-pdfs: (no potillus_report_$$loc.pdf in Downloads — skipped?)"; \
+	    fi; \
+	done
+	adb shell svc power stayon false || true
+	echo "report-pdfs: done. Run 'make feature-graphics' (and/or 'make screenshots-pdf') — the"
+	echo "report-pdfs: dependency graph picks up the new PDFs and rebuilds only what changed."
+
+# =============================================================================
+# FONTS
+# =============================================================================
 
 # Instantiate the STATIC Rokkitt Bold used for the "F-Droid" wordmark in the
 # feature-graphic badge, from the upstream VARIABLE font checked in under
@@ -198,41 +430,60 @@ feature-graphics:
 ROKKITT_VF  = tools/fonts-src/Rokkitt/Rokkitt[wght].ttf
 ROKKITT_OUT = tools/fonts/Rokkitt/Rokkitt-Bold.ttf
 rokkitt-bold:
-	python3 -c 'import fontTools' 2>/dev/null || { echo "rokkitt-bold: fonttools not found — install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
+	$(call require-fonttools,rokkitt-bold)
 	@test -f "$(ROKKITT_VF)" || { echo "rokkitt-bold: variable source missing: $(ROKKITT_VF) — download Rokkitt[wght].ttf (see tools/fonts-src/Rokkitt/README.txt / COPYING.md)"; exit 1; }
 	mkdir -p tools/fonts/Rokkitt
 	python3 -m fontTools.varLib.instancer "$(ROKKITT_VF)" wght=700 --update-name-table --output "$(ROKKITT_OUT)"
 	cp tools/fonts-src/Rokkitt/OFL.txt tools/fonts/Rokkitt/OFL.txt
 	@echo "rokkitt-bold: wrote $(ROKKITT_OUT) — COMMIT it so the feature-graphic build is deterministic for everyone."
 
-# Leave Android Demo Mode and restore the normal device state. Each step is
-# tolerant (|| true) so tear-down never fails the build; invoked from the
-# `screenshots` EXIT trap.
-screenshots-demo-off:
-	-adb shell am broadcast -a com.android.systemui.demo -e command exit || true
-	-adb shell settings put global sysui_demo_allowed 0 || true
-	-adb shell settings put global auto_time 1 || true
-	-adb shell settings put global window_animation_scale 1 || true
-	-adb shell settings put global transition_animation_scale 1 || true
-	-adb shell settings put global animator_duration_scale 1 || true
+# =============================================================================
+# PACKAGING & DEPLOY
+# =============================================================================
+
 tgz: potillus-$(VERSION).tar.gz
 
+# Release tarball. The set of files to leave out is derived DYNAMICALLY from
+# .gitignore instead of being duplicated here, so the two can never drift.
+#
+# Mapping .gitignore patterns to tar --exclude patterns faithfully needs care:
+#   * Comments (# ...), trailing whitespace and blank lines are stripped.
+#   * A negation (!pattern) cannot be expressed with tar --exclude, so we abort
+#     rather than silently over-exclude. (There are none today.)
+#   * git treats a pattern that contains a '/' as anchored to the repo root and
+#     one without any '/' as matching at ANY depth. tar's default is the
+#     opposite (all patterns float), so we split the list: anchored patterns get
+#     the archive's top directory (this repo dir) prepended and are matched with
+#     --anchored; the rest are matched with --no-anchored.
+#   * tar lets '*' cross '/' by default, which would make e.g. '/*.pdf' (root
+#     PDFs only) also swallow nested PDFs; --no-wildcards-match-slash restores
+#     git's single-'*'-stays-in-one-segment semantics.
+#   * .git itself is not in .gitignore (git implies it), so it is excluded
+#     explicitly.
+# The two pattern files are written under a mktemp dir OUTSIDE the archived tree
+# so they never end up inside the tarball.
 potillus-$(VERSION).tar.gz: CHANGELOG.md
+	@if grep -q '^[[:space:]]*!' .gitignore; then \
+	    echo "tgz: .gitignore has a negation (!) that tar --exclude cannot express — aborting." >&2; \
+	    exit 1; \
+	fi
+	@top=`basename "$$PWD"`; td=`mktemp -d`; \
+	clean=`sed -e 's/#.*$$//' -e 's/[[:space:]]*$$//' -e '/^$$/d' .gitignore`; \
+	printf '%s\n' "$$clean" | grep '/'    | sed -e 's#^/##' -e "s#^#$$top/#" > "$$td/anchored"   || true; \
+	printf '%s\n' "$$clean" | grep -v '/'                                    > "$$td/unanchored" || true; \
 	tar czf ../potillus-$(VERSION).tar.gz -C .. \
-		--exclude .git \
-		--exclude .gradle \
-		--exclude .kotlin \
-		--exclude .bundle \
-		--exclude .vendor \
-		--exclude build \
-		--exclude short \
-		--exclude TODO.md \
-		--exclude keystore.properties \
-		--exclude play-store-credentials.json \
-		potillus
+		--no-wildcards-match-slash \
+		--anchored    --exclude="$$top/.git" --exclude-from="$$td/anchored" \
+		--no-anchored --exclude-from="$$td/unanchored" \
+		"$$top"; \
+	rm -rf "$$td"
 
 push:
 	git push && git push --tags
+
+# =============================================================================
+# HOUSEKEEPING
+# =============================================================================
 
 clean:
 	$(MAKE) -C android $@
@@ -242,4 +493,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: default install screenshots screenshots-crop screenshots-pdf screenshots-demo-off feature-graphics rokkitt-bold tgz push clean distclean
+.PHONY: debug release install screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing report-pdfs rokkitt-bold tgz push clean distclean

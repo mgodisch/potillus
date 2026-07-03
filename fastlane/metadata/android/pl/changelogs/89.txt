@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Zrzuty ekranu i grafika promocyjna są teraz zlokalizowane dla każdego języka, a polityka prywatności aplikacji została opublikowana (po angielsku): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Eksport pokazuje teraz powiadomienie, gdy wybrany zakres dat nie zawiera wpisów. Ponadto szeroka reorganizacja i uporządkowanie kodu oraz infrastruktury kompilacji; brak innych zmian funkcjonalnych.

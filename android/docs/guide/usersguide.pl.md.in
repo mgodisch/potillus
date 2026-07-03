@@ -54,6 +54,9 @@ odniesieniu do Twojego limitu dziennego i tygodniowego (w gramach i jako pasek
 postępu) oraz liczba dni ze spożyciem alkoholu w tym tygodniu w odniesieniu do
 Twojego limitu (jako liczba i jako pasek postępu).
 
+Dodatkowo odznaka oznaczona „Ø” pokazuje Twoje średnie spożycie w bieżącym
+miesiącu (średnia liczba gramów czystego alkoholu na dzień).
+
 ## Ekran „{{calendar}}"
 
 Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
@@ -127,7 +130,16 @@ dziennik. Aby przenieść dane na inny telefon:
 Eksportuj regularnie: kopia zapasowa chroni tylko dane, które istniały w chwili
 jej utworzenia.
 
+### {{security}}
+
+Ta kategoria chroni dostęp do aplikacji i steruje jej widocznością. Włącz
+{{biometric_lock}}, aby przy każdym otwarciu aplikacji wymagany był odcisk palca
+lub rozpoznawanie twarzy. Przełącznik {{allow_screenshots}} decyduje, czy
+dozwolone są zrzuty ekranu i nagrania ekranu okna aplikacji; domyślnie jest
+wyłączony, więc okno jest ukrywane na zrzutach ekranu oraz w widoku ostatnich
+aplikacji.
+
 ### {{appearance}}
 
-W tej kategorii możesz włączyć blokadę biometryczną aplikacji. Ponadto możesz
-ustawić motyw kolorystyczny i język niezależnie od ustawień systemowych.
+W tej kategorii możesz ustawić motyw kolorystyczny i język niezależnie od
+ustawień systemowych.

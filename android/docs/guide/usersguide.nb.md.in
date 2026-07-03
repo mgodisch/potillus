@@ -54,6 +54,9 @@ mengden i forhold til dags- og ukegrensene dine (i gram og som fremdriftslinje)
 samt antall dager med alkoholforbruk hittil denne uken i forhold til grensen din
 (som tall og som fremdriftslinje).
 
+I tillegg viser et merke med «Ø» ditt gjennomsnittlige forbruk for inneværende
+måned (gjennomsnittlig antall gram ren alkohol per dag).
+
 ## Skjerm "{{calendar}}"
 
 På denne skjermen finner du kalenderen. Dager da det ble inntatt alkohol, er
@@ -125,7 +128,15 @@ loggen din. Slik flytter du dataene dine til en annen telefon:
 Eksportér regelmessig: en sikkerhetskopi beskytter bare dataene som fantes i det
 øyeblikket du opprettet den.
 
+### {{security}}
+
+Denne kategorien beskytter tilgangen til appen og styrer synligheten. Aktiver
+{{biometric_lock}} for å kreve fingeravtrykk eller ansiktsgjenkjenning hver gang
+appen åpnes. Bryteren {{allow_screenshots}} styrer om skjermbilder og
+skjermopptak av appvinduet er tillatt; den er av som standard, slik at vinduet
+skjules på skjermbilder og i oversikten over nylige apper.
+
 ### {{appearance}}
 
-I denne kategorien kan du aktivere den biometriske låsen for appen. I tillegg kan
-du stille inn fargetema og språk uavhengig av systeminnstillingene.
+I denne kategorien kan du stille inn fargetema og språk uavhengig av
+systeminnstillingene.

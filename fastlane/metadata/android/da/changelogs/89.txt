@@ -1,1 +1,1 @@
-Export now shows a notice when the selected date range has no entries.
+Skærmbilleder og feature-grafikken er nu lokaliseret til hvert sprog, og appens privatlivspolitik er nu offentliggjort (på engelsk): https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md. Eksport viser nu en meddelelse, når den valgte periode ikke indeholder poster. Desuden en omfattende reorganisering og oprydning af kode og build-infrastruktur; ingen andre funktionelle ændringer.

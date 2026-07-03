@@ -56,6 +56,9 @@ come barra di avanzamento) e il numero di giorni con consumo di alcol finora
 questa settimana rispetto al tuo limite (come numero e come barra di
 avanzamento).
 
+Inoltre, un contrassegno con l’indicazione «Ø» mostra il tuo consumo medio del
+mese corrente (media dei grammi di alcol puro al giorno).
+
 ## Schermata "{{calendar}}"
 
 In questa schermata trovi il calendario. I giorni in cui è stato consumato alcol
@@ -130,8 +133,17 @@ registro. Per spostare i tuoi dati su un altro telefono:
 Esporta regolarmente: un backup protegge solo i dati che esistevano nel momento
 in cui lo hai creato.
 
+### {{security}}
+
+Questa categoria protegge l’accesso all’app e ne controlla la visibilità.
+Attiva {{biometric_lock}} per richiedere un’impronta digitale o il
+riconoscimento del volto a ogni apertura dell’app. L’interruttore
+{{allow_screenshots}} controlla se sono consentiti screenshot e registrazioni
+dello schermo della finestra dell’app; è disattivato per impostazione
+predefinita, quindi la finestra è nascosta negli screenshot e nella panoramica
+delle app recenti.
+
 ### {{appearance}}
 
-In questa categoria puoi attivare il blocco biometrico dell'app. Inoltre puoi
-impostare il tema dei colori e la lingua indipendentemente dalle impostazioni di
-sistema.
+In questa categoria puoi impostare il tema dei colori e la lingua
+indipendentemente dalle impostazioni di sistema.

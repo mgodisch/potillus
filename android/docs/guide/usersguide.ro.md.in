@@ -57,6 +57,9 @@ zilelor cu consum de alcool din ziua de astăzi și din cele șase zile anterioa
 (fereastră glisantă de șapte zile/săptămână glisantă) raportat la limita ta (ca
 număr și sub formă de diagramă cu bare).
 
+În plus, o insignă marcată cu „Ø” afișează consumul mediu din luna curentă
+(media gramelor de alcool pur pe zi).
+
 ## Ecranul „{{calendar}}”
 
 Pe acest ecran găsești calendarul. Zilele în care s-a consumat alcool sunt
@@ -135,7 +138,17 @@ O copie de rezervă este un singur fișier JSON care conține toate băuturile t
 Exportă în mod regulat: o copie de rezervă protejează doar datele care existau în
 momentul în care ai creat-o.
 
+### {{security}}
+
+Această categorie protejează accesul la aplicație și îi controlează
+vizibilitatea. Activează {{biometric_lock}} pentru a solicita o amprentă sau
+recunoașterea facială de fiecare dată când aplicația este deschisă. Comutatorul
+{{allow_screenshots}} stabilește dacă sunt permise capturi de ecran și
+înregistrări ale ecranului ferestrei aplicației; este dezactivat în mod
+implicit, astfel încât fereastra este ascunsă în capturile de ecran și în lista
+aplicațiilor recente.
+
 ### {{appearance}}
 
-În această categorie pot fi activate blocarea biometrică a aplicației, precum și
-stabilirea schemei de culori și a limbii independent de setările sistemului.
+În această categorie pot fi stabilite schema de culori și limba independent de
+setările sistemului.

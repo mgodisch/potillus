@@ -55,6 +55,9 @@ essa mesma quantidade em relação aos teus limites diário e semanal (em gramas
 como barra de progresso) e o número de dias com consumo de álcool até agora esta
 semana em relação ao teu limite (como número e como barra de progresso).
 
+Além disso, um emblema marcado com «Ø» mostra o teu consumo médio do mês atual
+(média de gramas de álcool puro por dia).
+
 ## Ecrã "{{calendar}}"
 
 Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
@@ -130,8 +133,16 @@ e o teu registo completo. Para mover os teus dados para outro telemóvel:
 Exporta regularmente: uma cópia de segurança só protege os dados que existiam no
 momento em que a criaste.
 
+### {{security}}
+
+Esta categoria protege o acesso à aplicação e controla a sua visibilidade.
+Ativa {{biometric_lock}} para exigir uma impressão digital ou o reconhecimento
+facial sempre que a aplicação é aberta. O interruptor {{allow_screenshots}}
+controla se são permitidas capturas de ecrã e gravações de ecrã da janela da
+aplicação; está desativado por predefinição, pelo que a janela fica oculta nas
+capturas de ecrã e na vista de aplicações recentes.
+
 ### {{appearance}}
 
-Nesta categoria podes ativar o bloqueio biométrico da aplicação. Além disso,
-podes definir o tema de cores e o idioma independentemente das definições do
-sistema.
+Nesta categoria podes definir o tema de cores e o idioma independentemente das
+definições do sistema.

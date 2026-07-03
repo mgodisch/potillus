@@ -38,14 +38,14 @@ package de.godisch.potillus.screenshot
 //
 //   The remaining two assets (07/08) are the two pages of the localized PDF
 //   report; they are NOT screenshots and are rendered from the committed
-//   ../fastlane/potillus_report_<de|en>.pdf files by the `make screenshots`
+//   ../fastlane/report-pdf/potillus_report_<de|en>.pdf files by the `make screenshots`
 //   Makefile target AFTER this suite runs (see android/Makefile). The numeric
 //   filename prefixes guarantee the Play console lists all eight assets 1..8 in
 //   lexicographic order.
 //
 // HOW IT FITS THE FASTLANE SCREENGRAB FLOW
 //   `fastlane screengrab` (see ../fastlane/Screengrabfile + ../fastlane/Fastfile)
-//   installs the app + this test APK, then for EACH locale (de-DE, en-US):
+//   installs the app + this test APK, then for EACH configured locale:
 //     1. switches the device/app locale and re-runs this test,
 //     2. LocaleTestRule applies the locale inside the test process,
 //     3. Screengrab.screenshot(name) captures the current screen, and
