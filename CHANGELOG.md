@@ -41,8 +41,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 Complete L10N for F-Droid; overhaul build tools
 
 Google Play onboarding, an F-Droid badge in the feature graphic, a relocation of
-the build tooling, and one small user-facing export fix. Apart from that fix,
-this release is documentation, store assets and build/release tooling only.
+the build tooling, and one small user-facing export fix. Apart from that fix the
+release makes no user-facing behavioural change; the rest is documentation, store
+assets, build/release tooling and internal QA hardening (see "Licensing, QA
+review & hardening" below).
 
 User-facing:
 - CSV/PDF export: when the chosen date range contains no entries, show a short,
@@ -333,6 +335,48 @@ Fastlane (`fastlane/Fastfile`):
 - The `deploy` lane now defaults to the `internal` track instead of `production`;
   reaching production requires passing `track:production` explicitly. Removed a
   stale reference to a no-longer-existing `PLACEHOLDERS.txt`.
+
+Licensing, QA review & hardening:
+- `COPYING.md`: added a "Third-Party Software (bundled in the release APK)"
+  section that records the copyright holders and licenses of the runtime
+  libraries actually shipped in the APK — the Apache-2.0 AndroidX / Jetpack /
+  Compose / Room / DataStore / biometric / tracing stack and the Kotlin +
+  kotlinx runtime, plus `desugar_jdk_libs` under GPL-2.0-with-Classpath-Exception
+  — and points to the CycloneDX SBOM as the authoritative machine-readable
+  inventory. Build- and test-time-only dependencies are listed separately as
+  non-redistributed. Previously only the build-time font/badge/logo assets were
+  documented; the APK-embedded dependencies were covered by the SBOM alone.
+  Documentation only — no code, resource or build change, so nothing user-facing
+  or functional is affected.
+- `WebViewPdfPrinter`: closed a latent Activity leak in the PDF-export path. The
+  off-screen `WebView` was already created from the application context, but the
+  `WebViewClient.onPageFinished` closure captured the Activity context strongly to
+  reach the `PrintManager`; while the `WebView` was parked in the static `retained`
+  field awaiting its page-finished callback, that chain pinned the whole Activity,
+  and if the callback never fired (e.g. a load failure) the Activity leaked until
+  the next export. The Activity context is now held through a `WeakReference` (the
+  print dialog is Activity-scoped UI, so a collected Activity simply means there is
+  nothing to print), and `retained` is released on every callback path. No change
+  to the successful-export flow (the system print dialog still opens exactly as
+  before); the fix only affects the error/never-fires path. The class KDoc and the
+  `StaticFieldLeak` suppression rationale were updated to match.
+- Backup MERGE: documented that merging also brings over the backup's drink
+  catalogue — a custom drink whose name is not present locally is inserted even
+  when it has no entries — and that this is intentional and idempotent (a later
+  merge re-matches the drink by name). Clarifies the previously entries-only
+  wording of the MERGE contract in `BackupManager`, `IBackupRepository` and
+  `BackupRepository.buildIdMap`. Documentation only — the import behaviour is
+  unchanged; REPLACE likewise restores the full catalogue.
+- `DrinkDao.insert`: changed the conflict strategy from `REPLACE` to `ABORT`,
+  mirroring `EntryDao.insert`, and corrected the KDoc. Every caller inserts with
+  `id = 0` (new-drink add, backup remap, preset pre-population), so Room always
+  auto-generates the primary key and no collision can occur — `ABORT` is thus
+  behaviourally identical here while making any future explicit-id collision fail
+  loudly instead of silently overwriting a row. The previous rationale ("re-insert
+  presets without failing on the unique constraint") was inaccurate: the `drinks`
+  table has no `UNIQUE` constraint on `name`, and backup de-duplication is done by
+  name in `BackupRepository`. No schema/migration impact (the conflict strategy
+  affects the generated INSERT statement, not the table definition).
 
 Versioning:
 - `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`

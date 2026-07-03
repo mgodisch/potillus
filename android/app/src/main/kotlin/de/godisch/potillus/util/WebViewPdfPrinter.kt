@@ -28,6 +28,7 @@ import android.print.PrintManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.MainThread
+import java.lang.ref.WeakReference
 
 // =============================================================================
 // WebViewPdfPrinter – renders report HTML to PDF via the system print dialog
@@ -64,9 +65,11 @@ import androidx.annotation.MainThread
 // context leak, anchored on the object declaration. It is safe here and deliberately
 // suppressed: the WebView is created from the APPLICATION context (see [print]),
 // never an Activity, and is cleared as soon as the print adapter is handed over (any
-// stale instance is destroyed on re-entry), so no Activity / short-lived context can
-// be retained. The annotation sits on the object because lint reports the finding at
-// the object declaration; that scope also covers the `retained` field below.
+// stale instance is destroyed on re-entry). The one remaining Activity reference —
+// the context the page-finished callback needs to reach the PrintManager — is held
+// only through a [WeakReference] (see [print]), so a never-firing callback cannot pin
+// the Activity either. The annotation sits on the object because lint reports the
+// finding at the object declaration; that scope also covers the `retained` field below.
 @SuppressLint("StaticFieldLeak")
 object WebViewPdfPrinter {
 
@@ -78,11 +81,13 @@ object WebViewPdfPrinter {
      * callback. It is cleared again as soon as the job is submitted.
      *
      * The retained WebView is created from the APPLICATION context (see [print]),
-     * never an Activity context: if the page-finished callback never fires (e.g. a
-     * load failure) this field would otherwise pin the whole Activity for the
-     * process lifetime. [print] also abandons any still-pending previous WebView
-     * before starting a new job, so a rapid second call cannot silently drop a live
-     * reference.
+     * never an Activity context, so the WebView itself holds no Activity. The only
+     * Activity reference in flight — the context the page-finished callback uses to
+     * obtain the [PrintManager] — is captured through a [WeakReference], so even if
+     * the callback never fires (e.g. a load failure) this field cannot pin the
+     * Activity for the process lifetime. [print] also abandons any still-pending
+     * previous WebView before starting a new job, so a rapid second call cannot
+     * silently drop a live reference.
      */
     private var retained: WebView? = null
 
@@ -110,19 +115,33 @@ object WebViewPdfPrinter {
         // field for the async load → page-finished round-trip; parking an
         // Activity-scoped WebView there would leak the entire Activity if the
         // callback never fires. The application context lives for the process
-        // lifetime, so retaining it is harmless. The system PrintManager is still
-        // obtained from the Activity [context] below, because the print dialog is
-        // Activity-scoped UI.
+        // lifetime, so retaining it is harmless.
         val webView = WebView(context.applicationContext)
+
+        // The print dialog is Activity-scoped UI, so the PrintManager must be
+        // obtained from the Activity [context] — but capturing that context STRONGLY
+        // in the WebViewClient closure below would tie the Activity's lifetime to the
+        // retained WebView, leaking it if onPageFinished never fires. Hold it weakly
+        // instead: when the callback fires normally the Activity is still alive and
+        // the reference resolves; if the Activity is already gone there is nothing to
+        // print anyway, so bailing out is correct.
+        val activityRef = WeakReference(context)
 
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String?) {
-                val printManager = context.getSystemService(Context.PRINT_SERVICE) as? PrintManager
-                if (printManager == null) {
-                    // No print service available; release the reference and bail out.
-                    retained = null
-                    return
-                }
+                // Release the retained WebView on EVERY path. `view` (the method
+                // parameter) keeps it strongly reachable for the duration of this
+                // callback, so the synchronous createPrintDocumentAdapter/print calls
+                // below still run against a live WebView even after this clear.
+                retained = null
+
+                // Activity gone (weak reference collected): nothing to print.
+                val activityContext = activityRef.get() ?: return
+                // No print service on this device: bail out (WebView already released).
+                val printManager =
+                    activityContext.getSystemService(Context.PRINT_SERVICE) as? PrintManager
+                        ?: return
+
                 val adapter = view.createPrintDocumentAdapter(jobName)
                 val attributes = PrintAttributes.Builder()
                     .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
@@ -132,8 +151,6 @@ object WebViewPdfPrinter {
                     .build()
 
                 printManager.print(jobName, adapter, attributes)
-                // The system now holds the adapter; we no longer need the WebView.
-                retained = null
             }
         }
 

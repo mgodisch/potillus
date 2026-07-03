@@ -76,6 +76,13 @@ interface IBackupRepository {
      * if a match is found the existing ID is used, otherwise a new drink is
      * inserted.
      *
+     * This drink-matching runs for EVERY backup drink, so a custom drink with no
+     * entries of its own is still added to the local catalogue when its name is not
+     * already present. Merging the drink catalogue alongside the entries is
+     * intentional (a merge should bring over the user's drink definitions too), and
+     * it is idempotent: a second merge re-matches the drink by name and inserts
+     * nothing further.
+     *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.
      * @return               [ImportStats] with both [ImportStats.imported] and

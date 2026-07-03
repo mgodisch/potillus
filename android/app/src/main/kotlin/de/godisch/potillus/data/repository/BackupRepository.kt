@@ -171,6 +171,13 @@ class BackupRepository(
      * the same name. Without this, a backup containing two identically named new
      * drinks would create two local drinks with that name.
      *
+     * NOTE (catalogue merge): this inserts a new-named drink even when no entry
+     * references it, so `importMerge` deliberately merges the backup's drink
+     * catalogue — including custom drinks that carry no entries — not only the
+     * consumption entries. That is the intended contract (see [IBackupRepository]);
+     * it is idempotent, because a later merge re-matches the same name. If MERGE is
+     * ever redefined as entries-only, insert lazily from the entry loop instead.
+     *
      * Must be called inside a `withTransaction` block.
      */
     private suspend fun buildIdMap(

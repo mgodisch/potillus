@@ -94,13 +94,35 @@ interface DrinkDao {
     suspend fun getById(id: Long): DrinkEntity?
 
     /**
-     * Inserts a new drink or replaces an existing one with the same primary key.
+     * Inserts a new drink and returns its auto-generated row ID.
      *
-     * [OnConflictStrategy.REPLACE] is used instead of IGNORE or ABORT so that
-     * the backup restore logic can re-insert preset drinks without failing on
-     * the unique constraint. Returns the row ID of the inserted/replaced row.
+     * WHY [OnConflictStrategy.ABORT] (mirroring [EntryDao.insert])?
+     *   Every caller inserts with `id = 0`, which Room treats as "unset" and
+     *   replaces with the next auto-incremented primary key, so a primary-key
+     *   collision cannot arise on the normal path:
+     *     - [de.godisch.potillus.data.repository.DrinkRepository.add] builds a
+     *       fresh [de.godisch.potillus.domain.model.DrinkDefinition] (its `id`
+     *       defaults to 0); editing an existing drink goes through [update], not here.
+     *     - [de.godisch.potillus.data.repository.BackupRepository] inserts backup
+     *       drinks with `id = 0` — it deliberately remaps them to fresh local ids
+     *       rather than preserving the backup's ids.
+     *     - the preset pre-population
+     *       ([de.godisch.potillus.data.db.AppDatabase]) inserts with `id = 0`.
+     *   ABORT therefore never triggers in practice; it is chosen so that any FUTURE
+     *   explicit-id insert that DID collide fails loudly instead of silently
+     *   overwriting an existing row (the behaviour of the previous
+     *   [OnConflictStrategy.REPLACE]).
+     *
+     *   NOTE: the `drinks` table has NO UNIQUE constraint on `name` (only the
+     *   primary key on `id`; see the exported schema in `app/schemas/`), so REPLACE
+     *   never served a name-uniqueness purpose — the earlier "re-insert presets
+     *   without failing on the unique constraint" rationale did not apply. Name-based
+     *   de-duplication for backup import is handled explicitly in
+     *   [de.godisch.potillus.data.repository.BackupRepository] (`buildIdMap`).
+     *
+     * @return  The auto-generated row ID of the inserted drink.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(drink: DrinkEntity): Long
 
     /** Updates all columns of an existing drink row. */

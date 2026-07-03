@@ -64,6 +64,12 @@ import java.time.format.DateTimeFormatter
 //   REPLACE – delete all local data, then import everything from the backup.
 //   MERGE   – keep local data, add backup entries that are not duplicates.
 //             Duplicates are detected by (timestampMillis, drinkId) pairs.
+//             MERGE also merges the backup's DRINK CATALOGUE: a backup drink whose
+//             name is not present locally is inserted, INCLUDING a custom drink
+//             that has no entries of its own. This is intentional — a merge brings
+//             over the user's drink definitions too, not only consumption events —
+//             and it is idempotent (a second merge re-matches the drink by name and
+//             inserts nothing further). REPLACE likewise restores the full catalogue.
 //
 // KOTLIN "sealed class":
 //   ImportError lists every possible failure as a distinct subtype.
