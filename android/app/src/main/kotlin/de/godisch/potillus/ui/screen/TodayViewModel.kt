@@ -48,6 +48,7 @@ import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.shortDayMonthPattern
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -228,7 +229,12 @@ class TodayViewModel(
         val formattingLocale = if (settings.language.isNotEmpty())
             Locale.forLanguageTag(settings.language) else Locale.getDefault()
         val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, formattingLocale)
-        val fmt       = DateTimeFormatter.ofPattern("d.M.")
+        // Weekly range label ("28.6–4.7" / "6/28–7/4"): the day/month ORDER and
+        // SEPARATOR follow the same per-app locale as the month name above.
+        // shortDayMonthPattern derives them from the locale's SHORT date pattern
+        // (see l10n/DatePatterns.kt) — the previously hard-coded "d.M." showed
+        // the European order for every language, including en-US/ja/zh.
+        val fmt       = DateTimeFormatter.ofPattern(shortDayMonthPattern(formattingLocale), formattingLocale)
         val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 
         combine(
@@ -309,16 +315,16 @@ class TodayViewModel(
             return
         }
         viewModelScope.launch {
-            // Read the current settings from the already-active StateFlow
-            // value instead of calling prefs.settingsFlow.first(). Both approaches
-            // are correct, but settingsFlow.first() triggers an additional collection
-            // on the DataStore flow even though uiState is already collecting it.
-            // uiState.value.settings is always up-to-date because uiState is a hot
-            // StateFlow backed by SharingStarted.WhileSubscribed – the same settings
-            // emission that TodayViewModel uses for BAC calculation is the one we read
-            // here. Skipping the extra first() call eliminates a redundant upstream
-            // subscription and a minor coroutine overhead on every button tap.
-            entryRepo.addFromDrink(drink, volumeMl, timestampMillis, note, uiState.value.settings)
+            // Read the settings from prefs.settingsFlow.first(), NOT from
+            // uiState.value.settings. uiState is a hot StateFlow, but its value
+            // only reflects real settings AFTER the first combine emission; before
+            // that (stateIn's initial value) it holds the AppSettings() DEFAULTS —
+            // notably a 04:00 day-change time. An entry added through that window
+            // would be filed under the wrong logical date. settingsFlow.first()
+            // costs one short extra DataStore collection per button tap and is
+            // always correct; CalendarViewModel.addEntry uses the same approach.
+            val settings = prefs.settingsFlow.first()
+            entryRepo.addFromDrink(drink, volumeMl, timestampMillis, note, settings)
         }
     }
 
@@ -327,8 +333,10 @@ class TodayViewModel(
      * current settings. @param entry The modified consumption entry.
      */
     fun updateEntry(entry: ConsumptionEntry) {
-        // Same rationale as addEntry – read from the hot StateFlow.
-        viewModelScope.launch { entryRepo.updateEntry(entry, uiState.value.settings) }
+        // Same rationale as addEntry – read the authoritative settings snapshot.
+        viewModelScope.launch {
+            entryRepo.updateEntry(entry, prefs.settingsFlow.first())
+        }
     }
 
     /** Deletes [entry] from the database. @param entry The entry to remove. */

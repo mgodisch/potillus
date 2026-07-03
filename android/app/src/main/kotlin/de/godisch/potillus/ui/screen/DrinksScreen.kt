@@ -195,7 +195,11 @@ fun DrinksScreen(
                     )
                 }
             } else {
-                items(drinks) { drink ->
+                // Stable Room id as key: drinks can be added, deleted, and — via
+                // the favourite toggle — REORDERED (favourites sort first); keyed
+                // items let Compose MOVE the affected card instead of rebinding
+                // every position in between.
+                items(drinks, key = { it.id }) { drink ->
                     // Tapping the card body opens the Add Entry dialog with this
                     // drink pre-selected (same behaviour as the quick-bar in TodayScreen).
                     // Tapping the star/edit/delete icon buttons works independently –

@@ -106,13 +106,9 @@ interface EntryDao {
 
     // ── Single-row queries ────────────────────────────────────────────────────
 
-    /**
-     * Looks up a single entry by its primary key.
-     *
-     * Returns `null` if the entry no longer exists (e.g. deleted concurrently).
-     */
-    @Query("SELECT * FROM entries WHERE id = :id")
-    suspend fun getById(id: Long): EntryEntity?
+    // getById(id) has been removed: no production code ever looked an entry up
+    // by primary key (dead API found in the v0.78.0 QA review). Edits flow
+    // through [update] with the already-loaded entity instead.
 
     // ── Write operations ──────────────────────────────────────────────────────
 

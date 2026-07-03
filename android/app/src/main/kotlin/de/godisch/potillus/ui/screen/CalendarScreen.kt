@@ -205,7 +205,10 @@ fun CalendarScreen(
                             )
                         }
                     } else {
-                        items(state.selectedEntries) { entry ->
+                        // Stable Room id as key: entries of the selected day can be
+                        // deleted in place; keyed items let Compose remove exactly the
+                        // affected row instead of rebinding all following positions.
+                        items(state.selectedEntries, key = { it.id }) { entry ->
                             EntryListItem(
                                 entry    = entry,
                                 onEdit   = { editEntry = entry },
@@ -263,7 +266,10 @@ fun CalendarScreen(
                             )
                         }
                     } else {
-                        items(state.selectedEntries) { entry ->
+                        // Stable Room id as key: entries of the selected day can be
+                        // deleted in place; keyed items let Compose remove exactly the
+                        // affected row instead of rebinding all following positions.
+                        items(state.selectedEntries, key = { it.id }) { entry ->
                             EntryListItem(
                                 entry    = entry,
                                 onEdit   = { editEntry = entry },

@@ -19,7 +19,8 @@
  *
  * =============================================================================
  *
- * INSTRUMENTED TEST — Context.formattingLocale()
+ * INSTRUMENTED TEST — Context.formattingLocale() / Context.localizedContextFor()
+ * (the transformation behind Context.perAppLocalizedContext())
  *
  * WHY THIS FILE EXISTS (teaching note)
  *   formattingLocale() reads the locale from a Context's *configuration* rather
@@ -37,9 +38,11 @@ package de.godisch.potillus.l10n
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import androidx.core.os.LocaleListCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
@@ -61,6 +64,41 @@ class LocaleFormattingInstrumentedTest {
         }
         val localized = base.createConfigurationContext(config)
 
+        assertEquals(Locale.FRENCH.language, localized.formattingLocale().language)
+    }
+
+    /**
+     * With an EMPTY locale list, [localizedContextFor] must be a strict no-op —
+     * the SAME context instance comes back, so callers pay nothing on the
+     * first-launch path before language detection has run. (The empty list is
+     * exactly what [perAppLocalizedContext] feeds it when nothing is stored.)
+     */
+    @Test
+    fun localizedContextFor_isNoOpForEmptyLocaleList() {
+        val app: Context = ApplicationProvider.getApplicationContext()
+        assertSame(app, app.localizedContextFor(LocaleListCompat.getEmptyLocaleList()))
+    }
+
+    /**
+     * With a non-empty locale list, [localizedContextFor] must yield a context
+     * whose [formattingLocale] IS that locale — the regression guard for the
+     * API 30–32 gap where the raw Application context keeps the SYSTEM locale.
+     *
+     * WHY THE TEST TARGETS [localizedContextFor] WITH AN EXPLICIT LIST rather
+     * than driving [perAppLocalizedContext] through
+     * `AppCompatDelegate.setApplicationLocales`: on API 33+ the delegate
+     * reaches the framework `LocaleManager` only through ACTIVE
+     * AppCompatDelegate instances — in an activity-less instrumented test the
+     * set call is a silent no-op and the get call returns the empty list, so
+     * that arrangement can never pass on modern devices (it failed with
+     * "expected fr, was <device language>" on an API 35 device). The explicit
+     * list exercises the actual transformation deterministically on every API
+     * level, without touching global or persisted device state.
+     */
+    @Test
+    fun localizedContextFor_carriesRequestedLocale() {
+        val app: Context = ApplicationProvider.getApplicationContext()
+        val localized = app.localizedContextFor(LocaleListCompat.forLanguageTags("fr"))
         assertEquals(Locale.FRENCH.language, localized.formattingLocale().language)
     }
 }

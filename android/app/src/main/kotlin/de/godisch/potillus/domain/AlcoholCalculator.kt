@@ -198,23 +198,10 @@ object AlcoholCalculator {
         return raw.coerceAtLeast(0.0).roundTo2Decimals()
     }
 
-    /**
-     * Returns the estimated epoch-millisecond timestamp at which BAC reaches zero.
-     *
-     * Derived from the Widmark formula solved for t:
-     *   t_sober = BAC / β
-     *
-     * @param bacPermille  Current BAC in ‰ (should be ≥ 0).
-     * @param nowMillis    Current time as Unix milliseconds (typically
-     *                     [System.currentTimeMillis]).
-     * @return             Epoch-ms when BAC is expected to reach 0.0.
-     *                     Returns [nowMillis] immediately if [bacPermille] ≤ 0.
-     */
-    fun soberByMillis(bacPermille: Double, nowMillis: Long): Long {
-        if (bacPermille <= 0.0) return nowMillis
-        val hoursUntilSober = bacPermille / BETA
-        return nowMillis + (hoursUntilSober * MILLIS_PER_HOUR).toLong()
-    }
+    // soberByMillis(bacPermille, nowMillis) has been removed: it was never
+    // wired into any screen (dead production code found in the v0.78.0 QA
+    // review). Should a "sober by" estimate ever ship, re-derive it from the
+    // Widmark decay used in [calculateBAC]: t_sober = BAC / β.
 
     /**
      * Returns the [LimitInfo] for the given [settings].
@@ -242,8 +229,15 @@ object AlcoholCalculator {
      * The result is clamped to a minimum of 0f so it can be passed directly
      * to a [androidx.compose.material3.LinearProgressIndicator].
      *
+     * This is the SINGLE source of the fill-fraction logic: the LimitBar
+     * composable (ui/component/Components.kt) calls it instead of duplicating
+     * the division inline, so the zero-limit guard below cannot drift from the
+     * one the UI shows.
+     *
      * @param totalGrams  Grams of alcohol consumed today.
-     * @param limitGrams  Active daily limit in grams (must be > 0).
+     * @param limitGrams  Active daily limit in grams. A non-positive value
+     *                    (limit not configured) yields 0f — an empty bar —
+     *                    instead of a NaN/Infinity fill.
      * @return            Fraction in range [0f, ∞), clamped to 0f from below.
      */
     fun limitPercent(totalGrams: Double, limitGrams: Double): Float {

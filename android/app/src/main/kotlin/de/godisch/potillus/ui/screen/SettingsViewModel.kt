@@ -60,6 +60,7 @@ import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
 import de.godisch.potillus.data.prefs.IAppPreferences
+import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
@@ -272,15 +273,20 @@ class SettingsViewModel(
     /**
      * Resolves plural resource [id] for [quantity], formatted with [args].
      *
-     * Uses [appContext]'s resources (same resolution path as [getString] via
-     * `app::getString`, so it honours the per-app locale). [quantity] selects the
-     * CLDR plural form; pass the count(s) again in [args] to fill the `%d`
-     * placeholders. For messages with two numbers (e.g. import_success_merge) the
-     * plural form is chosen by the FIRST count, which is the only one that governs
-     * an inflected word in the en/de sources.
+     * Resolves through [perAppLocalizedContext] rather than the raw
+     * [appContext]: on API 30–32 the Application context keeps the SYSTEM
+     * locale (AppCompat's per-app-language back-port only localizes Activity
+     * contexts), so a raw `appContext.resources` lookup would pick the wrong
+     * language — and, for languages with richer plural rules than the system
+     * one, potentially the wrong CLDR plural form. The wrapper is applied per
+     * call so a runtime language switch is always reflected. [quantity] selects
+     * the CLDR plural form; pass the count(s) again in [args] to fill the `%d`
+     * placeholders. For messages with two numbers (e.g. import_success_merge)
+     * the plural form is chosen by the FIRST count, which is the only one that
+     * governs an inflected word in the en/de sources.
      */
     private fun quantityStr(@PluralsRes id: Int, quantity: Int, vararg args: Any): String =
-        appContext.resources.getQuantityString(id, quantity, *args)
+        appContext.perAppLocalizedContext().resources.getQuantityString(id, quantity, *args)
 
     /** Maps a [BackupManager.ImportError] to a localised, user-facing message. */
     private fun localiseImportError(error: BackupManager.ImportError): String = when (error) {

@@ -62,6 +62,7 @@ package de.godisch.potillus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.ui.screen.*
 
 /**
@@ -111,8 +112,19 @@ class AppViewModelFactory(private val app: PotillusApp) : ViewModelProvider.Fact
                 // CSV/PDF export is owned by StatsViewModel; it needs
                 // the Application context for MediaStore I/O and a StringProvider
                 // for localised status messages (same pattern as SettingsViewModel).
+                //
+                // PER-APP LOCALE: the raw Application context resolves strings in
+                // the SYSTEM language on API 30–32 (AppCompat's back-port only
+                // localizes Activity contexts there). The StringProvider therefore
+                // wraps it with perAppLocalizedContext() ON EVERY CALL — resolving
+                // lazily also keeps the messages correct after a language switch,
+                // which a context snapshot captured here would not survive. The
+                // ViewModel applies the same wrapper before handing the context to
+                // CsvExporter/PdfReportBuilder (see StatsViewModel).
                 appContext = app.applicationContext,
-                getString  = StringProvider { id, args -> app.getString(id, *args) }
+                getString  = StringProvider { id, args ->
+                    app.perAppLocalizedContext().getString(id, *args)
+                }
             ) as T
 
         DrinksViewModel::class.java   ->
@@ -120,7 +132,11 @@ class AppViewModelFactory(private val app: PotillusApp) : ViewModelProvider.Fact
 
         SettingsViewModel::class.java ->
             SettingsViewModel(
-                getString  = StringProvider { id, args -> app.getString(id, *args) },
+                // PER-APP LOCALE: wrapped per call, same rationale as in the
+                // StatsViewModel branch above.
+                getString  = StringProvider { id, args ->
+                    app.perAppLocalizedContext().getString(id, *args)
+                },
                 // Pass applicationContext explicitly – see SettingsViewModel KDoc for
                 // the rationale why applicationContext is safe in a ViewModel.
                 appContext  = app.applicationContext,

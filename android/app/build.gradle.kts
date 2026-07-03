@@ -340,6 +340,36 @@ android {
         includeInBundle = false
     }
 
+    // App Bundle configuration (Google Play AAB only; F-Droid APKs are never
+    // split and are unaffected by this block):
+    //
+    // WHY LANGUAGE SPLITS MUST BE OFF:
+    //   By default Google Play splits an AAB by language and installs only the
+    //   device's languages. This app, however, offers an IN-APP language
+    //   switcher (SettingsScreen → AppCompatDelegate.setApplicationLocales,
+    //   plus perAppLocalizedContext() in l10n/LocaleSupport.kt for
+    //   Application-context lookups): the user can select any of the 21
+    //   supported languages at runtime, so ALL locale resources must already
+    //   be on the device — with the default splits, a switched-to language
+    //   would simply have no strings installed. The supported configurations
+    //   are either the Play Core on-demand language download (a Play-services
+    //   dependency this offline app deliberately avoids) or disabling the
+    //   language split, chosen here. Cost: the AAB carries all 21 locales'
+    //   STRING resources — negligible bytes for a text-only translation set.
+    //
+    // LINT: the AppBundleLocaleChanges check watches for dynamic locale calls
+    //   (it pattern-matches Configuration.setLocales in perAppLocalizedContext;
+    //   AppCompatDelegate alone never triggered it) and verifies exactly this
+    //   `language.enableSplit = false` setting — the latent mismatch existed
+    //   ever since the in-app switcher shipped, lint only gained a call site
+    //   it recognises. With warningsAsErrors this block is what keeps
+    //   `lintDebug` green.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     // Java compatibility:
     // sourceCompatibility/targetCompatibility = which Java version the *source*
     // uses and which JVM it is *compiled* for.
@@ -392,6 +422,17 @@ android {
     // with the same name under META-INF/.
     packaging {
         resources {
+            // Several artifacts on the runtime classpath (notably the
+            // kotlinx-coroutines JARs) each ship the SAME pair of licence-notice
+            // files, META-INF/AL2.0 and META-INF/LGPL2.1; merging them verbatim
+            // would fail with a duplicate-resource error, so the standard Compose
+            // template excludes them. LICENCE-COMPLIANCE NOTE: this removes only
+            // duplicated NOTICE-style text files, never code — no LGPL-licensed
+            // code is compiled into this app (the LGPL2.1 file accompanies
+            // coroutines' dual-licensed tooling heritage) — and the Apache-2.0
+            // licence text itself IS delivered to users through the in-app
+            // copyright document (res/raw/copyright.md, which bundles
+            // LICENSE.Apache-2.0.md; see generateCopyrightDocument below).
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
 
@@ -598,21 +639,27 @@ val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
     commandLine("python3", "../tools/render-guide.py")
 }
 
-// Concatenates COPYING.md + LICENSE.md (both at the repository root, one level
-// above this single-module Gradle root) into res/raw/copyright.md — the same
-// output the Makefile's `copyright.md` rule produces. Declares inputs/outputs so
-// Gradle can skip it when nothing changed.
+// Concatenates COPYING.md + LICENSE.md + LICENSE.Apache-2.0.md (all at the
+// repository root, one level above this single-module Gradle root) into
+// res/raw/copyright.md — the same output the Makefile's `copyright.md` rule
+// produces. The Apache-2.0 text ships in-app because Apache-2.0 §4(a) requires
+// giving recipients a copy of the licence for the Apache-licensed runtime
+// libraries compiled into the APK (see COPYING.md, "Third-Party Software").
+// Declares inputs/outputs so Gradle can skip it when nothing changed.
 val generateCopyrightDocument = tasks.register("generateCopyrightDocument") {
-    description = "Concatenate COPYING.md + LICENSE.md into res/raw/copyright.md."
+    description = "Concatenate COPYING.md + LICENSE.md + LICENSE.Apache-2.0.md into res/raw/copyright.md."
     val copying = rootProject.projectDir.parentFile.resolve("COPYING.md")
     val license = rootProject.projectDir.parentFile.resolve("LICENSE.md")
+    val apache  = rootProject.projectDir.parentFile.resolve("LICENSE.Apache-2.0.md")
     val output = layout.projectDirectory.file("src/main/res/raw/copyright.md")
-    inputs.files(copying, license)
+    inputs.files(copying, license, apache)
     outputs.file(output)
     doLast {
         val target = output.asFile
         target.parentFile.mkdirs()
-        target.writeText(copying.readText() + "\n" + license.readText())
+        target.writeText(
+            copying.readText() + "\n" + license.readText() + "\n" + apache.readText()
+        )
     }
 }
 

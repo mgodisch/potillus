@@ -38,9 +38,6 @@ interface IDrinkRepository {
     /** Reactive stream of all drinks: favourites first, then alphabetically. */
     val drinks: Flow<List<DrinkDefinition>>
 
-    /** Returns the drink with [id], or `null` if it does not exist. */
-    suspend fun getById(id: Long): DrinkDefinition?
-
     /** Inserts [drink] and returns its new database ID. */
     suspend fun add(drink: DrinkDefinition): Long
 

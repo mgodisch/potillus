@@ -83,9 +83,6 @@ class FakeEntryRepository : IEntryRepository {
 
     // ── One-shot reads ────────────────────────────────────────────────────────
 
-    override suspend fun getById(id: Long): ConsumptionEntry? =
-        _entries.value.find { it.id == id }
-
     override suspend fun getAll(): List<ConsumptionEntry> = _entries.value
 
     override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> =

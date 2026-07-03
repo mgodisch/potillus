@@ -103,16 +103,6 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
     override fun mostRecentEntry(): Flow<ConsumptionEntry?> =
         dao.getMostRecent().map { it?.toDomain() }
 
-    // ── One-shot reads ────────────────────────────────────────────────────────
-
-    /**
-     * Looks up a single entry by its primary key.
-     *
-     * @param id  Database primary key.
-     * @return    [ConsumptionEntry], or `null` if the entry no longer exists.
-     */
-    override suspend fun getById(id: Long): ConsumptionEntry? = dao.getById(id)?.toDomain()
-
     // ── Write operations ──────────────────────────────────────────────────────
 
     /**

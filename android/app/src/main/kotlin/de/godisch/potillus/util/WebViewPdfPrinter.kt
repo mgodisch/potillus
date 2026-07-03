@@ -23,7 +23,12 @@ package de.godisch.potillus.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
 import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -150,7 +155,15 @@ object WebViewPdfPrinter {
                     .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
                     .build()
 
-                printManager.print(jobName, adapter, attributes)
+                // Hand the framework a DELEGATING adapter whose only addition is
+                // deterministic cleanup: the WebView must stay alive while the
+                // print framework lays out and writes pages through the real
+                // adapter, so it cannot be destroyed here — but once the framework
+                // calls onFinish() (job printed, saved OR cancelled), nothing
+                // references the WebView any more and destroy() releases its
+                // native resources immediately instead of waiting for a GC of an
+                // unreachable, never-destroyed WebView.
+                printManager.print(jobName, DestroyOnFinishAdapter(adapter, view), attributes)
             }
         }
 
@@ -158,5 +171,47 @@ object WebViewPdfPrinter {
         retained = webView
         // baseUrl = null keeps rendering local and offline.
         webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+    }
+
+    /**
+     * A [PrintDocumentAdapter] that forwards every callback to [delegate] and,
+     * when the print framework signals the END of the job via [onFinish],
+     * additionally destroys the off-screen [webView] that backs the delegate.
+     *
+     * onFinish() is invoked exactly once per print job — after successful
+     * printing/saving as well as after cancellation — which makes it the one
+     * reliable hook for releasing the WebView's native resources (see the
+     * comment at the print() call above).
+     */
+    private class DestroyOnFinishAdapter(
+        private val delegate: PrintDocumentAdapter,
+        private val webView: WebView
+    ) : PrintDocumentAdapter() {
+
+        /** Forwards the job-start notification unchanged. */
+        override fun onStart() = delegate.onStart()
+
+        /** Forwards the layout pass unchanged. */
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes,
+            cancellationSignal: CancellationSignal?,
+            callback: LayoutResultCallback,
+            extras: Bundle?
+        ) = delegate.onLayout(oldAttributes, newAttributes, cancellationSignal, callback, extras)
+
+        /** Forwards the page-write pass unchanged. */
+        override fun onWrite(
+            pages: Array<out PageRange>,
+            destination: ParcelFileDescriptor,
+            cancellationSignal: CancellationSignal?,
+            callback: WriteResultCallback
+        ) = delegate.onWrite(pages, destination, cancellationSignal, callback)
+
+        /** Forwards the job-end notification, then releases the WebView. */
+        override fun onFinish() {
+            delegate.onFinish()
+            webView.destroy()
+        }
     }
 }

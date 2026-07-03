@@ -87,8 +87,14 @@ interface DrinkDao {
     /**
      * One-shot lookup of a single drink by its primary key.
      *
-     * Returns `null` if no drink with [id] exists (e.g. it was deleted
-     * between the list being displayed and the user tapping it).
+     * Returns `null` if no drink with [id] exists.
+     *
+     * NOTE: no production code calls this — its sole consumer is
+     * BackupRepositoryInstrumentedTest, which uses it to verify that imported
+     * entries were re-linked to the correct drink row. It is kept for that
+     * white-box assertion; the repository layer deliberately does NOT expose it
+     * (the former IDrinkRepository.getById was removed as dead API in the
+     * v0.78.0 QA review).
      */
     @Query("SELECT * FROM drinks WHERE id = :id")
     suspend fun getById(id: Long): DrinkEntity?

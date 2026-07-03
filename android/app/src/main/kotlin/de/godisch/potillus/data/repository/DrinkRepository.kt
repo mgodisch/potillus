@@ -72,14 +72,6 @@ class DrinkRepository(private val dao: DrinkDao) : IDrinkRepository {
     }
 
     /**
-     * One-shot lookup of a single drink by its primary key.
-     *
-     * @param id  Database primary key.
-     * @return    [DrinkDefinition], or `null` if not found.
-     */
-    override suspend fun getById(id: Long): DrinkDefinition? = dao.getById(id)?.toDomain()
-
-    /**
      * Inserts [drink] and returns its new database ID.
      *
      * Note: [drink.id] is ignored on insert (Room auto-generates the key).

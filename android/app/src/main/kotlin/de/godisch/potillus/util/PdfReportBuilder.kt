@@ -33,6 +33,7 @@ import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
+import de.godisch.potillus.l10n.shortDayMonthPattern
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
@@ -122,6 +123,11 @@ object PdfReportBuilder {
         val locale   = context.formattingLocale()
         val dateFmt  = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
         val monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", locale)
+        // Compact day+month formatter for the chart's x-axis tick labels. The
+        // pattern is DERIVED from the locale (day/month order and separator, see
+        // l10n/DatePatterns.kt) instead of the previously hard-coded European
+        // "d.M." — which showed "28.6" even in en-US/ja/zh reports.
+        val dayMonthFmt = DateTimeFormatter.ofPattern(shortDayMonthPattern(locale), locale)
 
         // Locale-bound number formatters for this report. Every formatted number
         // below must use the SAME per-app `locale` as the dates/months above,
@@ -154,6 +160,11 @@ object PdfReportBuilder {
         // level so the footer never shows an empty version.
         val androidVersion = Build.VERSION.RELEASE?.takeIf { it.isNotBlank() }
             ?: Build.VERSION.SDK_INT.toString()
+        // DELIBERATELY NOT LOCALIZED: this is the report's licence/warranty
+        // notice. Like the bundled COPYING/LICENSE documents (see the Makefile
+        // note on raw/copyright.md), legal boilerplate is kept in its original
+        // English so its meaning never depends on translation quality; the GPL's
+        // warranty disclaimer in particular is quoted, not paraphrased.
         scalars["FOOTER2"]    = "Created with Libellus Potionis v$appVersion on Android $androidVersion, " +
             "free software under the GNU GPL v3, WITHOUT ANY WARRANTY."
 
@@ -258,7 +269,7 @@ object PdfReportBuilder {
             // hour/weekday charts), so a label is never overlapped by its bar and
             // the trend chart is laid out consistently with the page-2 charts.
             repeats["BARSLABELS"] = d.chartBuckets.mapIndexed { i, b ->
-                mapOf("BAR_LABEL" to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b, monthFmt) else "")
+                mapOf("BAR_LABEL" to if (i in labelIdx) chartBucketLabel(d.chartGranularity, b, monthFmt, dayMonthFmt) else "")
             }
         }
 
@@ -418,21 +429,26 @@ object PdfReportBuilder {
 
     /**
      * Formats one bucket's first day into a short axis label, chosen by
-     * granularity: day-and-month for daily/weekly buckets ("5.6."), month-and-year
+     * granularity: locale-ordered day-and-month for daily/weekly buckets ("5.6" / "6/5"), month-and-year
      * for monthly buckets ("Jun 2026").
      *
      * @param monthFmt The per-app-locale "MMM yyyy" formatter built in [buildHtml];
      *                 passed in (rather than held as a shared field) so the month
      *                 name follows the in-app language, not the system locale.
+     * @param dayMonthFmt The per-app-locale compact day+month formatter built in
+     *                 [buildHtml] from [shortDayMonthPattern]; carries the
+     *                 locale's day/month ORDER ("28.6" vs "6/28") for the
+     *                 daily/weekly tick labels.
      */
     private fun chartBucketLabel(
         granularity: ChartGranularity,
         b: ChartBucket,
-        monthFmt: DateTimeFormatter
+        monthFmt: DateTimeFormatter,
+        dayMonthFmt: DateTimeFormatter
     ): String {
         val ld = LocalDate.parse(b.labelDate)
         return when (granularity) {
-            ChartGranularity.DAILY, ChartGranularity.WEEKLY -> "${ld.dayOfMonth}.${ld.monthValue}."
+            ChartGranularity.DAILY, ChartGranularity.WEEKLY -> ld.format(dayMonthFmt)
             ChartGranularity.MONTHLY                        -> ld.format(monthFmt)
         }
     }

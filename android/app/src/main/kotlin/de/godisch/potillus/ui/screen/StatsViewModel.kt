@@ -44,6 +44,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.R
 import de.godisch.potillus.data.prefs.IAppPreferences
+import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.AlcoholCalculator
@@ -74,7 +75,12 @@ enum class StatsPeriod { WEEK, MONTH, YEAR }
 
 @Immutable
 data class StatsUiState(
-    val period: StatsPeriod                       = StatsPeriod.WEEK,
+    // Default = MONTH: MUST match the ViewModel's initial `_period` value and
+    // the stateIn seed below, so that `StatsUiState()` IS the seed state. Tests
+    // (StatsViewModelTest.awaitComputed) rely on `state == StatsUiState()`
+    // identifying the not-yet-computed seed; a diverging default here would make
+    // the seed look like a computed value.
+    val period: StatsPeriod                       = StatsPeriod.MONTH,
     val dataPoints: List<DaySummary>              = emptyList(),
     /** Gap-free, time-axis bucket series for the consumption chart (incl. abstinent buckets). */
     val chartBuckets: List<ChartBucket>           = emptyList(),
@@ -194,10 +200,16 @@ class StatsViewModel(
                 return@launch
             }
             val drinks = drinkRepo.drinks.first()
+            // Wrap the Application context so the CSV column headers resolve in
+            // the per-app language on ALL supported API levels: on API 30–32 the
+            // raw appContext keeps the SYSTEM locale (see perAppLocalizedContext).
+            // Captured before withContext because AppCompatDelegate's stored
+            // locale list is conventionally accessed from the main thread.
+            val exportContext = appContext.perAppLocalizedContext()
             // CSV building + MediaStore writes are blocking I/O, so they
             // must not run on the Main dispatcher.
             val result = withContext(Dispatchers.IO) {
-                CsvExporter.export(appContext, entries, drinks)
+                CsvExporter.export(exportContext, entries, drinks)
             }
             _exportStatus.value = if (result != null) {
                 _shareTarget.value = result
@@ -226,9 +238,12 @@ class StatsViewModel(
             }
             val drinks  = drinkRepo.drinks.first()
             val jobName = PdfReportBuilder.jobName(Instant.now())
+            // Same per-app-locale wrapping as in exportCsv: every label, date and
+            // number format of the report is resolved from this context.
+            val reportContext = appContext.perAppLocalizedContext()
             // HTML assembly (template fill) is CPU work, not UI work → off the main thread.
             val html = withContext(Dispatchers.Default) {
-                runCatching { PdfReportBuilder.buildHtml(appContext, entries, drinks, settings) }
+                runCatching { PdfReportBuilder.buildHtml(reportContext, entries, drinks, settings) }
                     .getOrNull()
             }
             if (html != null) {
@@ -437,7 +452,7 @@ class StatsViewModel(
                 statsFromDate     = statsFloor
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState(period = StatsPeriod.MONTH))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
 
     /** Selects the statistics aggregation period [p] (week / month / year …). */
     fun setPeriod(p: StatsPeriod) { _period.value = p }

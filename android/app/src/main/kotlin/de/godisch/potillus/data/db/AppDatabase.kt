@@ -30,6 +30,7 @@ import de.godisch.potillus.data.db.dao.EntryDao
 import de.godisch.potillus.data.db.entity.DrinkEntity
 import de.godisch.potillus.data.db.entity.EntryEntity
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.security.GeneralSecurityException
@@ -224,7 +225,14 @@ abstract class AppDatabase : RoomDatabase() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
-                scope.launch {
+                // Dispatchers.IO explicitly: [PotillusApp.applicationScope]
+                // deliberately carries NO default dispatcher (every launch site
+                // must state its choice — see its KDoc). The preset insert is
+                // database I/O; the suspend DAO would hop to Room's own executor
+                // anyway, but stating IO here keeps this launch site consistent
+                // with the documented convention instead of silently falling
+                // back to Dispatchers.Default.
+                scope.launch(Dispatchers.IO) {
                     val dao = database.drinkDao()
                     if (dao.countPresets() == 0) {
                         PRESET_DRINKS.forEach { dao.insert(it) }

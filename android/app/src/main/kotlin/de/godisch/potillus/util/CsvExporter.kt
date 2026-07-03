@@ -115,7 +115,14 @@ object CsvExporter {
             ?: return null   // MediaStore declined to create the entry
 
         return try {
-            resolver.openOutputStream(uri)?.use { stream ->
+            // A null stream is a FAILURE, not a success with no content — see the
+            // matching guard in BackupManager.exportToJson. Without it, the app
+            // reported a successful export while an EMPTY .csv sat in Downloads.
+            val out = resolver.openOutputStream(uri) ?: run {
+                resolver.delete(uri, null, null)
+                return null
+            }
+            out.use { stream ->
                 // Prepend UTF-8 BOM so Excel detects the encoding automatically
                 stream.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
                 stream.write(csv.toByteArray(Charsets.UTF_8))

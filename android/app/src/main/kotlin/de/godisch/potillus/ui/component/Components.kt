@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
@@ -181,7 +182,10 @@ fun FavoriteQuickBar(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding        = PaddingValues(horizontal = 16.dp)
         ) {
-            items(favorites) { drink ->
+            // Stable key: favourites can be toggled on/off in the Drinks screen
+            // while this row is visible; keying by the Room id lets Compose move
+            // the surviving chips instead of rebinding every position.
+            items(favorites, key = { it.id }) { drink ->
                 SuggestionChip(
                     onClick = { onSelect(drink) },
                     label   = {
@@ -300,8 +304,9 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
  * exactly 1.0f still signals the violation.
  *
  * @param totalGrams  Grams consumed in the current period.
- * @param limitGrams  The threshold to compare against. Clamped to ≥ 1.0 internally
- *                    to prevent division-by-zero when the limit is not yet configured.
+ * @param limitGrams  The threshold to compare against. A non-positive value
+ *                    (limit not configured) shows an empty bar — the guard lives
+ *                    in [AlcoholCalculator.limitPercent].
  * @param caption     Right-hand caption shown above the bar (already formatted).
  * @param leftSuffix  Optional text appended to the consumed-grams label on the left,
  *                    e.g. a week range "(25.5.–31.5.)". Empty by default.
@@ -317,9 +322,12 @@ fun LimitBar(
 ) {
     // Per-app locale for the consumed-grams label (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
-    // coerceAtLeast(1.0): guard against limitGrams = 0 (not configured).
-    // A limit of 0 would produce NaN; show 0 % fill visually instead.
-    val fraction = (totalGrams / limitGrams.coerceAtLeast(1.0)).toFloat().coerceAtLeast(0f)
+    // Fill fraction from the domain layer's single source of truth. The guard
+    // for an unconfigured limit (≤ 0 → empty bar instead of NaN) lives THERE,
+    // not here — this composable used to duplicate the division with a subtly
+    // different guard (coerceAtLeast(1.0)), which the v0.78.0 QA review
+    // unified into AlcoholCalculator.limitPercent.
+    val fraction = AlcoholCalculator.limitPercent(totalGrams, limitGrams)
     // Red only when the limit is *exceeded* (strictly greater), matching
     // AlcoholCalculator.countLimitViolations and the calendar/chart over-limit
     // markers, which all use `totalGrams > limitGrams`. Reaching the limit exactly

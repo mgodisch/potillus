@@ -109,22 +109,28 @@ android: \
 	${ANDROID_HOME}/platforms/android-36
 
 # The in-app "Copyright" viewer shows a single bundled document that is the
-# concatenation of two project-root files:
+# concatenation of three project-root files:
 #
-#     COPYING.md   – the short copyright/licence notice (Markdown)
+#     COPYING.md            – the short copyright/licence notice (Markdown)
 #     <blank line>
-#     LICENSE.md   – the full, verbatim GNU GPL text
+#     LICENSE.md            – the full, verbatim GNU GPL text
+#     <blank line>
+#     LICENSE.Apache-2.0.md – the full, verbatim Apache-2.0 text; bundled
+#                             because Apache-2.0 §4(a) requires shipping a copy
+#                             of the licence alongside the Apache-licensed
+#                             runtime libraries compiled into the APK (see the
+#                             "Third-Party Software" section of COPYING.md)
 #
 # The result is written to the DEFAULT raw/ (not locale-qualified) so that
 # R.raw.copyright resolves to the same English legal text for every locale: the
 # copyright/licence text is deliberately NOT translated.
 #
-# The `echo` between the two `cat`s emits the single separating blank line. This
-# assumes COPYING.md ends with exactly one trailing newline (the repository
-# convention); if it did not, the separation would be off by a line.
-app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md
+# The `echo` between the `cat`s emits the single separating blank line. This
+# assumes each source file ends with exactly one trailing newline (the
+# repository convention); if it did not, the separation would be off by a line.
+app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md
 	mkdir -p app/src/main/res/raw
-	{ cat ../COPYING.md; echo; cat ../LICENSE.md; } > $@
+	{ cat ../COPYING.md; echo; cat ../LICENSE.md; echo; cat ../LICENSE.Apache-2.0.md; } > $@
 
 # Regenerate the localized user guides from their templates in docs/guide/,
 # resolving the {{screen-name}} tokens against the matching strings.xml so the
@@ -163,11 +169,12 @@ guides: $(GUIDE_OUTPUTS)
 
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything). Also verifies that the generated
-# raw/copyright.md matches the current COPYING.md + blank line + LICENSE.md, by
-# rebuilding the concatenation into a temporary file and comparing byte-for-byte.
+# raw/copyright.md matches the current COPYING.md + LICENSE.md +
+# LICENSE.Apache-2.0.md concatenation (blank-line separated), by rebuilding it
+# into a temporary file and comparing byte-for-byte.
 check-guides:
 	python3 ../tools/render-guide.py --check
-	tmp=$$(mktemp); { cat ../COPYING.md; echo; cat ../LICENSE.md; } > "$$tmp"; \
+	tmp=$$(mktemp); { cat ../COPYING.md; echo; cat ../LICENSE.md; echo; cat ../LICENSE.Apache-2.0.md; } > "$$tmp"; \
 	    cmp -s "$$tmp" app/src/main/res/raw/copyright.md; rc=$$?; rm -f "$$tmp"; \
 	    test $$rc -eq 0 || { echo "check-guides: raw/copyright.md is stale — run 'make app/src/main/res/raw/copyright.md'"; exit 1; }
 

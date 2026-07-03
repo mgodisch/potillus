@@ -51,8 +51,24 @@ under the Apache License, Version 2.0
   and `androidx.tracing:tracing`.
 - **Kotlin standard library and kotlinx libraries** &mdash; Copyright &copy;
   JetBrains s.r.o. and contributors: the Kotlin standard library,
-  `org.jetbrains.kotlinx:kotlinx-serialization-core` and the
-  `org.jetbrains.kotlinx:kotlinx-coroutines` runtime pulled in transitively.
+  `org.jetbrains.kotlinx:kotlinx-serialization-core`, the
+  `org.jetbrains.kotlinx:kotlinx-coroutines` runtime pulled in transitively,
+  and the `org.jetbrains:annotations` artifact.
+- **Okio** &mdash; Copyright &copy; Square, Inc.:
+  `com.squareup.okio:okio`, pulled in transitively by
+  `androidx.datastore:datastore-preferences`.
+- **Guava ListenableFuture** &mdash; Copyright &copy; The Guava Authors
+  (Google): `com.google.guava:listenablefuture`, pulled in transitively by
+  `androidx.concurrent:concurrent-futures`.
+- **JSpecify** &mdash; Copyright &copy; The JSpecify Authors:
+  `org.jspecify:jspecify` (runtime-retention nullness annotations), pulled in
+  transitively by the AndroidX lifecycle libraries.
+
+The full Apache-2.0 licence text is kept verbatim in the repository as
+`LICENSE.Apache-2.0.md` and is bundled into the in-app copyright document
+(`res/raw/copyright.md`, generated from COPYING.md + LICENSE.md +
+LICENSE.Apache-2.0.md), satisfying the licence's &sect;4(a) requirement to
+give recipients a copy of the licence.
 
 Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with
 a dependency.  The release process should confirm — from the resolved
@@ -162,3 +178,16 @@ from it reproducibly via `make rokkitt-bold` (see
 `tools/fonts-src/Rokkitt/README.txt`).  Like the fonts above, these are
 build-time tooling for `render-feature-graphic.py` and are **not** distributed
 inside the application package.
+
+### Device fonts embedded in the sample report PDFs
+
+The pre-rendered sample reports under `fastlane/report-pdf/` (one per
+store-listing language, produced on a real device by the `ReportExportTest`
+flow) embed subsets of the fonts the device's WebView used to render them:
+**Roboto** (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
+<[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>)
+in every file, plus **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
+SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
+licences explicitly permit embedding subsets in documents.  These PDFs are
+repository and store-listing assets and are **not** distributed inside the
+application package.

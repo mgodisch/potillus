@@ -97,33 +97,6 @@ class AlcoholCalculatorTest {
         assertEquals(0.0, AlcoholCalculator.calculateBAC(0.0, 80.0, 0.0), 0.0)
     }
 
-    // ── soberByMillis ──────────────────────────────────────────────────────────
-
-    @Test fun `soberByMillis zero or negative BAC returns nowMillis`() {
-        val now = 1_700_000_000_000L
-        assertEquals(now, AlcoholCalculator.soberByMillis(0.0,  now))
-        assertEquals(now, AlcoholCalculator.soberByMillis(-1.0, now))
-    }
-
-    @Test fun `soberByMillis 0_15 permille adds exactly 1 hour`() {
-        // 0.15 ‰ / 0.15 ‰h = 1 h = MILLIS_PER_HOUR ms
-        val now      = 1_700_000_000_000L
-        val expected = now + AlcoholCalculator.MILLIS_PER_HOUR.toLong()
-        assertEquals(expected, AlcoholCalculator.soberByMillis(0.15, now))
-    }
-
-    @Test fun `soberByMillis 0_5 permille adds 3h20m`() {
-        // 0.5 / 0.15 = 3.333... h = 12_000_000 ms
-        val now = 0L
-        val result = AlcoholCalculator.soberByMillis(0.5, now)
-        assertEquals(12_000_000.0, result.toDouble(), 1_000.0)  // 1 s tolerance for floating-point
-    }
-
-    @Test fun `soberByMillis result is always at least nowMillis`() {
-        val now = System.currentTimeMillis()
-        assertTrue("soberByMillis result must always be >= nowMillis", AlcoholCalculator.soberByMillis(1.5, now) >= now)
-    }
-
     // ── getLimitInfo ──────────────────────────────────────────────────────────
 
     @Test fun `getLimitInfo maps the three limits from settings`() {

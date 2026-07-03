@@ -65,9 +65,6 @@ interface IEntryRepository {
 
     // ── One-shot reads ────────────────────────────────────────────────────────
 
-    /** Returns the entry with [id], or `null` if it does not exist. */
-    suspend fun getById(id: Long): ConsumptionEntry?
-
     /** Returns every entry (used by full JSON backup export). */
     suspend fun getAll(): List<ConsumptionEntry>
 

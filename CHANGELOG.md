@@ -41,10 +41,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 Complete L10N for F-Droid; overhaul build tools
 
 Google Play onboarding, an F-Droid badge in the feature graphic, a relocation of
-the build tooling, and one small user-facing export fix. Apart from that fix the
-release makes no user-facing behavioural change; the rest is documentation, store
+the build tooling, and a handful of user-facing fixes. Beyond those the release
+makes no user-facing behavioural change; the rest is documentation, store
 assets, build/release tooling and internal QA hardening (see "Licensing, QA
-review & hardening" below).
+review & hardening" and "Second QA pass" below).
 
 User-facing:
 - CSV/PDF export: when the chosen date range contains no entries, show a short,
@@ -52,6 +52,23 @@ User-facing:
   visible. Previously this was only a faint inline notice inside the scrollable
   statistics list, so it was easily missed. A successful export is still
   signalled only by the share sheet (CSV) or the system print dialog (PDF).
+- In-app language on Android 11–12L (API 30–32): CSV column headers, the whole
+  PDF report (labels, date and number formats) and import/export status
+  messages now follow the language selected IN THE APP. They previously fell
+  back to the SYSTEM language on those API levels, because AppCompat's per-app
+  locale back-port localizes only Activity contexts, not the Application
+  context the exporters were handed (fixed via `perAppLocalizedContext()`, see
+  the second QA pass below). Android 13+ was never affected.
+- Locale-correct compact date labels: the Today screen's weekly range and the
+  PDF report chart's x-axis ticks now use the LOCALE's day/month order and
+  separator ("6/28" for en-US/ja/zh, "6. 28." for ko, "6-28" for sv) instead of
+  the hard-coded European "d.M." for every language. For unaffected locales the
+  only visible change is the dropped trailing dot ("28.6–4.7" instead of
+  "28.6.–4.7.").
+- CSV/JSON export reports FAILURE when the file cannot be written: if MediaStore
+  hands back no output stream, the app previously claimed success while leaving
+  an EMPTY file in Downloads — a silent data-loss trap for a health backup. The
+  orphaned file is now removed and the error message shown.
 
 New documentation:
 - `PRIVACY.md`: the privacy policy required by the Play "App content" section,
@@ -377,6 +394,105 @@ Licensing, QA review & hardening:
   table has no `UNIQUE` constraint on `name`, and backup de-duplication is done by
   name in `BackupRepository`. No schema/migration impact (the conflict strategy
   affects the generated INSERT statement, not the table definition).
+
+Second QA pass (full-scope re-audit of v0.78.0; folded into this release):
+- Per-app locale plumbing: new `Context.perAppLocalizedContext()`
+  (`l10n/LocaleSupport.kt`) derives a context carrying the locale list stored
+  via `AppCompatDelegate.getApplicationLocales()`. Used per call by the
+  `StringProvider`s in `AppViewModelFactory`, by `SettingsViewModel`'s plural
+  resolution, and by `StatsViewModel` before handing the context to
+  `CsvExporter`/`PdfReportBuilder` — fixing the API 30–32 system-language
+  fallback described under "User-facing". The `LocaleSupport.kt` documentation,
+  which incorrectly claimed the Application context carries the per-app locale,
+  was corrected. The transformation itself lives in an `internal`
+  `localizedContextFor(locales)` behind the one-line public facade, and two
+  instrumented regression tests (`LocaleFormattingInstrumentedTest`) cover its
+  no-op (empty list) and locale-carrying paths with EXPLICIT locale lists —
+  deliberately not arranged through `AppCompatDelegate.setApplicationLocales`,
+  which on API 33+ reaches the framework `LocaleManager` only via ACTIVE
+  AppCompatDelegate instances (verified in the AndroidX source) and is
+  therefore a silent no-op in an activity-less instrumented test; an earlier
+  test iteration failed on-device for exactly that reason. Production is
+  unaffected by that gate: on API 33+ the framework already localizes every
+  context, so the facade's empty-read fallback is already correct there.
+- New `l10n/DatePatterns.kt` (`shortDayMonthPattern(locale)`): derives the
+  compact day+month pattern from the locale's SHORT date pattern via pure
+  java.time (JVM-testable, unlike `DateFormat.getBestDateTimePattern`);
+  verified against all 21 shipped locales in the new `DatePatternsTest`. Used
+  by `TodayViewModel` (weekly range label) and `PdfReportBuilder` (chart tick
+  labels).
+- `TodayViewModel.addEntry`/`updateEntry` read the settings snapshot from
+  `prefs.settingsFlow.first()` instead of `uiState.value.settings`: before the
+  first combine emission the hot StateFlow still holds the `AppSettings()`
+  DEFAULTS (04:00 day change), so an entry added through that window could be
+  filed under the wrong logical date. Matches `CalendarViewModel.addEntry`; the
+  comment that argued the opposite was corrected.
+- `WebViewPdfPrinter`: the off-screen WebView is now destroyed deterministically
+  when the print job ends, via a delegating `PrintDocumentAdapter`
+  (`DestroyOnFinishAdapter`) whose `onFinish()` — fired once per job, after
+  printing/saving AND after cancellation — releases the native resources.
+  Previously the WebView was merely dereferenced and lingered until GC.
+- `AppDatabase.PrepopulateCallback` launches on an explicit `Dispatchers.IO`,
+  honouring the documented `applicationScope` convention that every launch site
+  states its dispatcher (it silently fell back to `Dispatchers.Default`).
+- `StatsUiState` default `period` unified to `MONTH`, matching the ViewModel's
+  actual initial state; the `stateIn` seed is now plain `StatsUiState()`. This
+  also makes `StatsViewModelTest.awaitComputed()`'s documented seed-detection
+  assumption (`state == StatsUiState()`) actually hold.
+- Compose list hygiene: all `LazyColumn`/`LazyRow` `items()` over entries and
+  drinks now pass the stable Room id as `key` (Today, Calendar ×2, Drinks,
+  favourites quick-bar), so deletions/reorderings move keyed rows instead of
+  rebinding every following position.
+- Removed all guarded `!!` not-null assertions from UI code (drink editor save,
+  export date-range confirm, import mode dialog) in favour of elvis-return /
+  `?.let` guards — crash-free even if the guarding `enabled` conditions are
+  ever refactored.
+- Dead API removed: `AlcoholCalculator.soberByMillis` (never wired into any
+  screen; its four unit tests removed with it) and the repository-level
+  `getById` lookups (`IEntryRepository`/`IDrinkRepository`, implementations,
+  fakes, `EntryDao.getById`). `DrinkDao.getById` is kept — its sole consumer is
+  a white-box assertion in `BackupRepositoryInstrumentedTest` — with a KDoc
+  note saying so. `LimitBar` now calls `AlcoholCalculator.limitPercent` instead
+  of duplicating the fill-fraction division inline with a subtly different
+  zero-limit guard; the domain function is the single source of truth.
+- Licensing (COPYING.md): the Apache-2.0 runtime inventory now also names the
+  copyright holders pulled in transitively — Square, Inc. (`okio`, via
+  DataStore), The Guava Authors (`listenablefuture`, via concurrent-futures),
+  The JSpecify Authors (`jspecify`) and `org.jetbrains:annotations` — and a new
+  "Third-Party Assets" paragraph records the Roboto (Apache-2.0) and Noto Sans
+  CJK (OFL-1.1) subsets embedded in the committed `fastlane/report-pdf/*.pdf`
+  samples (verified with pdffonts).
+- Licensing (Apache-2.0 §4(a)): the verbatim licence text is checked in as
+  `LICENSE.Apache-2.0.md` and bundled into the in-app copyright document —
+  `res/raw/copyright.md` is now the three-file concatenation COPYING.md +
+  LICENSE.md + LICENSE.Apache-2.0.md (android/Makefile rule, `check-guides`
+  comparison and the `generateCopyrightDocument` Gradle task updated in
+  lock-step). The `packaging { excludes }` block gained a licence-compliance
+  note explaining that the excluded META-INF/AL2.0 + LGPL2.1 entries are
+  duplicated notice FILES from the kotlinx-coroutines artifacts, not code, and
+  where the licence text is delivered instead.
+- Licensing (Apache-2.0 §4(d)): `tools/release-check.sh` gained SECTION 12,
+  "THIRD-PARTY NOTICE FILES" — an SBOM-gated scan that resolves every shipped
+  component to its Gradle-cache artifact and WARNs on any `META-INF/NOTICE*`
+  entry, automating the confirmation step COPYING.md previously prescribed as a
+  manual release-process note. Without the SBOM or cache the check reports
+  itself as skipped and passes, so the routine debug gate cannot false-fail.
+- App Bundle language splits disabled (`bundle { language { enableSplit =
+  false } }`): the in-app language switcher requires every locale's resources
+  on the device, which Play's default per-language AAB splits would strip — a
+  LATENT mismatch that existed ever since the switcher shipped. It surfaced as
+  the lint error `AppBundleLocaleChanges` once `perAppLocalizedContext()`
+  introduced a `Configuration.setLocales` call the detector recognises
+  (`AppCompatDelegate` alone never triggered it); with `warningsAsErrors` that
+  failed `lintDebug`/`make debug`. F-Droid APKs are unsplit and unaffected;
+  the AAB now carries all 21 locales' string resources (negligible size).
+- PDF report footer: the English licence/warranty line is documented as
+  DELIBERATELY not localized (legal boilerplate is quoted, not paraphrased).
+- Known upstream issue (documented, not fixable in-repo): the Gradle 9.6
+  configuration-phase deprecation "Using a Project object as a dependency
+  notation" originates in AGP 9.2's internal test-variant wiring — this build
+  declares no `project(...)` dependency — and will disappear with a future AGP
+  update; tracked at the `allWarningsAsErrors` note in `build.gradle.kts`.
 
 Versioning:
 - `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`

@@ -313,7 +313,9 @@ fun TodayScreen(
                     )
                 }
             } else {
-                items(state.entries) { entry ->
+                // Stable Room id as key — same rationale as the calendar's entry
+                // list: deletions remove one keyed row instead of rebinding all.
+                items(state.entries, key = { it.id }) { entry ->
                     EntryListItem(
                         entry    = entry,
                         onEdit   = { editEntry = entry },

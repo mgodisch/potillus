@@ -45,9 +45,6 @@ class FakeDrinkRepository(
 
     // ── IDrinkRepository ─────────────────────────────────────────────────────
 
-    override suspend fun getById(id: Long): DrinkDefinition? =
-        _drinks.value.find { it.id == id }
-
     override suspend fun add(drink: DrinkDefinition): Long {
         val id = nextId++
         _drinks.value = _drinks.value + drink.copy(id = id)

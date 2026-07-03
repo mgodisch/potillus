@@ -480,7 +480,11 @@ fun SettingsScreen(
             confirmButton  = {
                 // Primary action: safe merge (non-destructive)
                 TextButton(onClick = {
-                    vm.importBackup(pendingImportUri!!, ImportMode.MERGE)
+                    // No `!!`: the dialog is only composed while pendingImportUri
+                    // is non-null (see the enclosing `if`), but state can change
+                    // between recompositions — `?.let` makes the click a no-op
+                    // instead of a crash in that window.
+                    pendingImportUri?.let { vm.importBackup(it, ImportMode.MERGE) }
                     showImportMode = false; pendingImportUri = null
                 }) { Text(stringResource(R.string.import_merge)) }
             },
@@ -491,7 +495,8 @@ fun SettingsScreen(
                     }
                     // Destructive action: highlighted in red
                     TextButton(onClick = {
-                        vm.importBackup(pendingImportUri!!, ImportMode.REPLACE)
+                        // Same `?.let` guard as the merge button above.
+                        pendingImportUri?.let { vm.importBackup(it, ImportMode.REPLACE) }
                         showImportMode = false; pendingImportUri = null
                     }) { Text(stringResource(R.string.import_replace), color = errorColor()) }
                 }

@@ -425,7 +425,19 @@ fun AddEditDrinkDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(name.trim(), volume!!, percent!!, category) }, enabled = canSave) {
+            TextButton(
+                onClick = {
+                    // No `!!`: re-read the nullable parse results into locals and
+                    // bail out defensively. `enabled = canSave` already guarantees
+                    // they are non-null when this runs, but expressing the guard
+                    // in code (instead of a not-null assertion) keeps the button
+                    // crash-free even if the canSave condition is ever refactored.
+                    val v = volume  ?: return@TextButton
+                    val p = percent ?: return@TextButton
+                    onSave(name.trim(), v, p, category)
+                },
+                enabled = canSave
+            ) {
                 Text(stringResource(R.string.save))
             }
         },
@@ -524,9 +536,13 @@ fun ExportDateRangeDialog(
                     Spacer(Modifier.width(8.dp))
                     Button(
                         onClick  = {
-                            val from = pickerState.selectedStartDateMillis!!.toDateString()
-                            val to   = pickerState.selectedEndDateMillis!!.toDateString()
-                            onConfirm(from, to)
+                            // No `!!`: same defensive-guard pattern as the drink
+                            // editor's save button — `enabled = canConfirm` makes
+                            // the nulls unreachable, the elvis-return keeps that
+                            // true under future refactorings.
+                            val start = pickerState.selectedStartDateMillis ?: return@Button
+                            val end   = pickerState.selectedEndDateMillis   ?: return@Button
+                            onConfirm(start.toDateString(), end.toDateString())
                         },
                         enabled  = canConfirm
                     ) {

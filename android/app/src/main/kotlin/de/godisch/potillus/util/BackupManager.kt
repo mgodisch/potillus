@@ -189,7 +189,16 @@ object BackupManager {
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues) ?: return null
 
         return try {
-            resolver.openOutputStream(uri)?.use { it.write(root.toString(2).toByteArray(Charsets.UTF_8)) }
+            // A null stream is a FAILURE, not a success with no content: silently
+            // skipping the write used to leave an EMPTY .json in Downloads while
+            // the UI reported a successful backup — a data-loss trap for a health
+            // backup. Treat it exactly like an IOException: delete the orphaned
+            // MediaStore entry and report failure.
+            val stream = resolver.openOutputStream(uri) ?: run {
+                resolver.delete(uri, null, null)
+                return null
+            }
+            stream.use { it.write(root.toString(2).toByteArray(Charsets.UTF_8)) }
             ExportResult(fileName, uri, "application/json")
         } catch (e: IOException) {
             resolver.delete(uri, null, null)

@@ -22,7 +22,11 @@
 package de.godisch.potillus.l10n
 
 import android.content.Context
+import android.content.res.Configuration
+import android.os.LocaleList
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.ConfigurationCompat
+import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
 // =============================================================================
@@ -59,11 +63,15 @@ import java.util.Locale
 //   list, which does not occur on a normally configured device.
 //
 // HOW TO USE
-//   • From a plain Context / Application context / ViewModel:
-//         val locale = context.formattingLocale()
-//   • From Compose, obtain the Context first (it already reflects the per-app
-//     locale because AppCompat wraps the activity's base context):
+//   • From Compose or any Activity-derived Context (these DO carry the per-app
+//     locale, because AppCompat wraps the activity's base context):
 //         val locale = LocalContext.current.formattingLocale()
+//   • From a ViewModel or any other place that only holds the APPLICATION
+//     context: wrap it first —
+//         val ctx = appContext.perAppLocalizedContext()
+//         val locale = ctx.formattingLocale()
+//     See [perAppLocalizedContext] below for why the raw Application context is
+//     NOT sufficient on every supported API level.
 //
 //   Use the returned Locale for EVERY java.time formatter and every
 //   getDisplayName(...) call that produces user-visible text. Never pass
@@ -81,10 +89,90 @@ import java.util.Locale
  * surrounding localized labels.
  *
  * @receiver Any [Context] whose resources are configured for the desired
- *           language — the application context, an activity, or the Compose
- *           `LocalContext`. All of these carry the per-app locale.
+ *           language — an activity, the Compose `LocalContext`, or the result
+ *           of [perAppLocalizedContext]. The raw Application context is only
+ *           safe on API 33+; wrap it with [perAppLocalizedContext] first (see
+ *           that function for the API 30–32 caveat).
  * @return The configuration's primary locale, or [Locale.getDefault] as a
  *         last-resort fallback if the configuration somehow has no locale.
  */
 fun Context.formattingLocale(): Locale =
     ConfigurationCompat.getLocales(resources.configuration)[0] ?: Locale.getDefault()
+
+/**
+ * A [Context] whose resources are guaranteed to resolve in the app's per-app
+ * locale — safe to use for `getString(...)`, `getQuantityString(...)` and
+ * [formattingLocale] from code that only holds the APPLICATION context.
+ *
+ * WHY THIS EXISTS (API 30–32 caveat):
+ *   `AppCompatDelegate.setApplicationLocales(...)` behaves differently across
+ *   the supported API range:
+ *
+ *   - **API 33+**: the call delegates to the system `LocaleManager`; the
+ *     framework applies the per-app locale to EVERY context of the app,
+ *     including the Application context. No wrapping would be needed.
+ *   - **API 30–32** (minSdk is 30): the AppCompat back-port applies the locale
+ *     only by wrapping the base context of each `AppCompatActivity` as it is
+ *     created. The Application context keeps the SYSTEM configuration, so
+ *     `application.getString(...)` silently resolves in the system language —
+ *     wrong whenever the in-app language differs from it. The symptom was CSV
+ *     column headers, the whole PDF report and ViewModel status messages
+ *     appearing in the system language on Android 11–12L.
+ *
+ *   This helper closes the gap uniformly: it reads the per-app locale list
+ *   from [AppCompatDelegate.getApplicationLocales] and derives a context whose
+ *   configuration carries exactly those locales. On API 33+ it is a harmless
+ *   re-statement of what the framework already did; on API 30–32 it is the fix.
+ *
+ * API 33+ SUBTLETY (verified against the AndroidX source): on T+ the
+ * AppCompatDelegate get/set calls reach the framework `LocaleManager` through
+ * the list of ACTIVE AppCompatDelegate instances — with no live
+ * `AppCompatActivity`, `getApplicationLocales()` returns the EMPTY list even
+ * when a per-app locale is stored. That is harmless here: on those API levels
+ * the framework already localizes every context of the app (including the
+ * Application context), so the empty-list no-op path below returns a receiver
+ * that is ALREADY correct. On API 30–32 the lookup uses process-wide statics
+ * and needs no activity. It does mean, however, that this function cannot be
+ * exercised end-to-end from an activity-less instrumented test on modern
+ * devices — which is why the tests target [localizedContextFor] directly.
+ *
+ * THREADING: cheap and side-effect free; call it right where a localized
+ * string or [formattingLocale] is needed, so it always reflects the CURRENT
+ * language selection (never cache the result across a language switch).
+ *
+ * @receiver Typically the Application context held by a ViewModel.
+ * @return The receiver itself when no per-app locale is set (first launch
+ *         before detection, or tests), otherwise a configuration context
+ *         localized to the stored per-app locale list.
+ */
+fun Context.perAppLocalizedContext(): Context =
+    localizedContextFor(AppCompatDelegate.getApplicationLocales())
+
+/**
+ * The pure transformation behind [perAppLocalizedContext]: derives a context
+ * whose configuration carries exactly [locales].
+ *
+ * Split out (and `internal`) so instrumented tests can verify the actual
+ * configuration-context derivation with EXPLICIT locale lists — deterministic
+ * on every API level, no activity required, no global or persisted device
+ * state touched. Arranging the same coverage through
+ * [AppCompatDelegate.setApplicationLocales] is impossible on API 33+ without
+ * a live `AppCompatActivity` (see the API 33+ SUBTLETY note above).
+ *
+ * @param locales The locale list to impose; the empty list is the documented
+ *                "nothing stored" case and yields the receiver unchanged.
+ * @return The receiver itself for an empty [locales], otherwise a
+ *         configuration context localized to [locales].
+ */
+internal fun Context.localizedContextFor(locales: LocaleListCompat): Context {
+    val tags = locales.toLanguageTags()
+    if (tags.isEmpty()) return this
+    val config = Configuration(resources.configuration)
+    // Lint's AppBundleLocaleChanges check pattern-matches this setLocales call:
+    // dynamic locale changes require that every locale's resources are present
+    // at runtime. That is guaranteed by `bundle { language { enableSplit =
+    // false } }` in app/build.gradle.kts (see the rationale there) — Play never
+    // strips languages from this app's AAB, and F-Droid APKs are unsplit anyway.
+    config.setLocales(LocaleList.forLanguageTags(tags))
+    return createConfigurationContext(config)
+}
