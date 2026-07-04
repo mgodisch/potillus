@@ -1,0 +1,23 @@
+# EditorConfig — https://editorconfig.org
+#
+# Kotlin style settings consumed by ktlint (silver criterion
+# `coding_standards_enforced`). This block is scoped to Kotlin source and script
+# files so it does not impose settings on other file types; the per-file vim
+# modelines used elsewhere in the tree continue to govern those.
+#
+# `ktlint_code_style = intellij_idea` selects the official Kotlin coding
+# conventions (as enforced by IntelliJ IDEA), which is the style declared in
+# CONTRIBUTING.md §4.
+
+root = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+ktlint_code_style = intellij_idea
+
+# The existing sources use deliberate, occasionally long, hand-aligned lines.
+# The max-line-length rule cannot be auto-fixed by `ktlintFormat`, so it is left
+# off for now to avoid a wall of non-fixable failures on adoption; it can be
+# enabled later once the affected lines are reflowed.
+max_line_length = off

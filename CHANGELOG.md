@@ -528,7 +528,7 @@ Versioning:
   localized; the previously English-only locales were translated).
   The F-Droid recipe is intentionally NOT updated — it is a static backup.
 
-OpenSSF Best Practices (bestpractices.dev) passing-badge groundwork
+OpenSSF Best Practices (bestpractices.dev) passing- and silver-badge groundwork
 (documentation only; no code or user-facing behaviour change):
 - README: new "Feedback & Contributing" and "Security" sections. The former
   documents how to obtain the app, report bugs/enhancements (the Codeberg
@@ -550,6 +550,71 @@ OpenSSF Best Practices (bestpractices.dev) passing-badge groundwork
   vulnerability-reporting process — PGP-encrypted e-mail to android@godisch.de,
   the maintainer's key fetched from the official Debian keyserver
   (keyring.debian.org), and a 14-day acknowledgement commitment.
+- CONTRIBUTING.md: adopted the Developer Certificate of Origin (DCO) for
+  contributions (silver criterion `dco`). Section 2 now requires every commit to
+  be signed off (`git commit -s`, adding a `Signed-off-by` line) and links to
+  developercertificate.org, clarifying that sign-off is a plain-text DCO
+  agreement, not a cryptographic signature. It also notes the
+  `git config format.signOff true` convenience setting.
+- GOVERNANCE.md: new document defining the project's governance model (silver
+  criterion `governance`). It states the single-maintainer (benevolent-dictator)
+  model, how decisions are made (open discussion on Codeberg, maintainer
+  decides and is sole merger), and the key project roles; it is linked from
+  CONTRIBUTING.md.
+- `CODE_OF_CONDUCT.md`: adopted the Contributor Covenant v2.1 (silver criterion
+  `code_of_conduct`), reproduced verbatim under CC BY 4.0 with the enforcement
+  contact set to android@godisch.de; linked from CONTRIBUTING.md and recorded in
+  COPYING.md's third-party inventory.
+- ROADMAP.md: new documented roadmap (silver criterion `documentation_roadmap`)
+  describing the project's intended directions for roughly the next year and its
+  explicit non-goals; the specific items are listed in the file. Linked from the
+  README.
+- SECURITY.md: added a "Security model" section documenting the software's
+  security requirements (silver criterion `documentation_security`) — what users
+  can expect (no network/data transmission, least privilege, on-device encrypted
+  storage, optional biometric lock, no tracking) and cannot expect (no defence
+  on a compromised device, biometric lock is only an access gate, exported files
+  leave the app's control, BAC figures are informational).
+- README: added a "Quick start" section (silver criterion
+  `documentation_quick_start`) — a short numbered guide for new users to install
+  the app and log their first drink, see their status, and optionally set limits
+  or export data.
+- Build: adopted ktlint for automatic Kotlin style enforcement (silver criterion
+  `coding_standards_enforced`) via the org.jlleitschuh.gradle.ktlint plugin
+  (14.2.0), a repository-root .editorconfig selecting the official Kotlin
+  conventions, and a CONTRIBUTING.md §4 note. ktlintCheck runs under `check`
+  and is build-time only (not on the release-assembly path), so the APK and
+  reproducible builds are unaffected.
+- SECURITY.md / CONTRIBUTING.md: documented a periodic dependency
+  vulnerability-monitoring process (silver criterion `dependency_monitoring`) —
+  external dependencies are scanned with osv-scanner against the CycloneDX SBOM
+  before each release, with a matching item added to the §7 release checklist.
+- CONTRIBUTING.md: added a formal, mandatory test policy to §5 (silver criterion
+  `test_policy_mandated`) — as major new functionality is added, automated tests
+  covering it MUST be added in the same change, or it will not be merged.
+- CONTRIBUTING.md: made the add-tests policy explicit in the change-proposal
+  instructions in §2 (silver criterion `tests_documented_added`), stating that
+  major new functionality MUST include automated tests in the same change.
+- SECURITY.md: added a "Verifying releases" section (silver criterion
+  `signed_releases`) documenting that releases are signed with the maintainer's
+  own reproducible-build signing key (private key never on distribution sites)
+  and how users can verify a release — automatically via the F-Droid client, by
+  comparing the APK signing certificate SHA-256 fingerprint with the published
+  value, or by reproducing the build.
+- CONTRIBUTING.md / SECURITY.md: adopted GPG-signed release tags (silver
+  criterion `version_tags_signed`) — the §7 release checklist now creates a
+  signed annotated tag (`git tag -s`) with the maintainer's key, and "Verifying
+  releases" documents verification via `git tag -v`. It also notes the
+  `git config tag.gpgSign true` convenience setting.
+- ASSURANCE_CASE.md: new security assurance case (silver criterion
+  `assurance_case`) — states the threat model, identifies the trust boundaries,
+  argues that secure design principles were applied, and maps common
+  implementation weakness classes to the countermeasures in the app; linked from
+  SECURITY.md.
+- README: added the OpenSSF Best Practices badge (project 13480) under the title
+  (silver criterion `documentation_achievements`), so the project's badge status
+  is shown on the repository front page and updates automatically as the level
+  changes.
 
 ---
 

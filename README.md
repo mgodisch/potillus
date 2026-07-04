@@ -24,6 +24,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13480/badge)](https://www.bestpractices.dev/projects/13480)
+
 ## About the App (v0.78.0)
 
 **Libellus Potionis** is a privacy-first, free, open-source, and ad-free
@@ -56,6 +58,26 @@ operates without network connectivity.
 
 A comprehensive User's Guide is fully accessible in-app. The app is available
 on [F-Droid](https://f-droid.org/packages/de.godisch.potillus).
+
+## Quick start
+
+1. **Install** Libellus Potionis from
+   [F-Droid](https://f-droid.org/packages/de.godisch.potillus).
+2. **Log your first drink.** Open the app; on the **Today** screen, tap the
+   **plus** button and pick a common preset (or define your own beverage). It
+   is logged instantly — you can also correct the timestamp for a drink you had
+   earlier.
+3. **See where you stand.** The Today screen immediately shows the grams of
+   pure alcohol you have consumed today, your progress toward your daily and
+   rolling 7-day limits (as bars), and your drinking-days count for the week.
+4. **Optional — personalize.** In **Settings** you can set your daily, weekly,
+   and drinking-days limits, enter your body weight for a live blood-alcohol
+   (BAC) estimate, and enable the fingerprint lock.
+5. **Optional — export.** Generate a two-page **PDF report** for a counseling
+   appointment, export a **CSV** for a spreadsheet, or create a **JSON backup**
+   to move your data to another device.
+
+The in-app User's Guide explains every screen and feature in full.
 
 ## Feedback & Contributing
 
@@ -161,6 +183,11 @@ code reviews can focus on functional correctness rather than intent. For an
 offline, privacy-focused application that relies on transparency and
 auditability, this structured documentation is an essential component of
 verifying the application's integrity.
+
+## Roadmap
+
+The project's intended direction and its explicit non-goals are described in
+[ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/ROADMAP.md).
 
 ## Changes
 

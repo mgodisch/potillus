@@ -191,3 +191,20 @@ SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
 licences explicitly permit embedding subsets in documents.  These PDFs are
 repository and store-listing assets and are **not** distributed inside the
 application package.
+
+## Repository Documentation Under Other Licenses
+
+The following repository document is not part of the program and is **not**
+distributed inside the application package; it is reproduced from a third party
+under its own license and is listed here for completeness.
+
+### Contributor Covenant (Code of Conduct)
+
+`CODE_OF_CONDUCT.md` reproduces the **Contributor Covenant, version 2.1**
+(Copyright &copy; the Contributor Covenant authors), licensed under the
+**Creative Commons Attribution 4.0 International (CC BY 4.0)** license
+(<[https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/)>).
+Only the enforcement-contact placeholder has been filled in; the required
+attribution is retained in that file's own "Attribution" section.  The original
+is available at
+<[https://www.contributor-covenant.org/version/2/1/code_of_conduct.html](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html)>.

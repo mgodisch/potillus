@@ -80,4 +80,11 @@ plugins {
     // applied in app/build.gradle.kts, where it is scoped to the release
     // runtime classpath.
     alias(libs.plugins.cyclonedx)           apply false
+
+    // ktlint – enforces the Kotlin coding style automatically. Registered here
+    // with "apply false" (consistent with the other plugins) and actually
+    // applied in app/build.gradle.kts. Its ktlintCheck task is a build-time
+    // verification only; it is not part of the release-assembly path, so the
+    // APK output and reproducible builds are unaffected.
+    alias(libs.plugins.ktlint)              apply false
 }

@@ -91,6 +91,16 @@ plugins {
     // the release runtime classpath. Configured in the cyclonedxDirectBom block
     // at the end of this file. Build-time only; nothing is added to the APK.
     alias(libs.plugins.cyclonedx)
+
+    // ktlint (org.jlleitschuh.gradle.ktlint):
+    // Enforces the Kotlin coding style declared in CONTRIBUTING.md §4. It adds
+    // the ktlintCheck task (hooked into `check`) and the ktlintFormat task
+    // (auto-formats sources). Style settings are read from the repository-root
+    // .editorconfig. This is build-time verification only: ktlintCheck is not on
+    // the release-assembly path (assembleRelease), so it adds nothing to the APK
+    // and does not affect reproducible builds. ktlint is downloaded from the
+    // central repository already configured in settings.gradle.kts.
+    alias(libs.plugins.ktlint)
 }
 
 // ── 2. Android Configuration ──────────────────────────────────────────────────

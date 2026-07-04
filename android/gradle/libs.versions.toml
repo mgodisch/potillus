@@ -176,6 +176,14 @@ desugar-jdk-libs        = "2.1.5"     # core library desugaring (java.time backp
 # configuration there for the Android-specific configuration scoping.
 cyclonedx               = "3.2.4"     # org.cyclonedx.bom (SBOM generation)
 
+# ktlint-gradle: automatic enforcement of the Kotlin coding style (silver
+# criterion coding_standards_enforced). 14.x is the line that supports AGP 9
+# projects using built-in Kotlin (the "new DSL"), which is what this project
+# uses. Build-time verification only (the ktlintCheck task runs under `check`,
+# not in the release-assembly path), so it adds nothing to the APK and does not
+# affect reproducible builds. Applied in app/build.gradle.kts.
+ktlint                  = "14.2.0"    # org.jlleitschuh.gradle.ktlint
+
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────
 # core-ktx: Kotlin extension functions for Android APIs
@@ -327,3 +335,8 @@ ksp                 = { id = "com.google.devtools.ksp",             version.ref 
 # Applied only in the :app module; registered with `apply false` in the root
 # build.gradle.kts to match the project's plugin-declaration pattern.
 cyclonedx           = { id = "org.cyclonedx.bom",                   version.ref = "cyclonedx" }
+
+# ktlint plugin – runs ktlint to enforce the Kotlin coding style. Registered
+# with `apply false` in the root build.gradle.kts (matching the project's
+# plugin-declaration pattern) and applied in the :app module.
+ktlint              = { id = "org.jlleitschuh.gradle.ktlint",       version.ref = "ktlint" }
