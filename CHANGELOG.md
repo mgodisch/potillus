@@ -528,6 +528,29 @@ Versioning:
   localized; the previously English-only locales were translated).
   The F-Droid recipe is intentionally NOT updated — it is a static backup.
 
+OpenSSF Best Practices (bestpractices.dev) passing-badge groundwork
+(documentation only; no code or user-facing behaviour change):
+- README: new "Feedback & Contributing" and "Security" sections. The former
+  documents how to obtain the app, report bugs/enhancements (the Codeberg
+  issue tracker, or android@godisch.de), and contribute (CONTRIBUTING.md);
+  the latter points to the new SECURITY.md.
+- CONTRIBUTING.md: new "Submitting changes" section describing the
+  contribution process (open an issue first, submit a Codeberg pull request
+  or an e-mailed patch, meet the acceptance requirements, pass maintainer
+  review); later sections were renumbered and a stale table-of-contents
+  anchor was fixed. Accuracy pass to match the code: the architecture map
+  now lists the `l10n/` and `data/security/` packages; the `BINGE_THRESHOLD`
+  example was corrected from `48.0` g to `60.0` g; the testing-strategy table
+  was replaced with the real unit/instrumented test layout; and the
+  translation workflow was rewritten around `l10n/SupportedLocales.kt` as the
+  single source of truth, noting that only English and German are
+  hand-authored while all other locales are machine-generated (native-speaker
+  corrections welcome).
+- SECURITY.md: new security policy publishing the private
+  vulnerability-reporting process — PGP-encrypted e-mail to android@godisch.de,
+  the maintainer's key fetched from the official Debian keyserver
+  (keyring.debian.org), and a 14-day acknowledgement commitment.
+
 ---
 
 ## v0.77.4

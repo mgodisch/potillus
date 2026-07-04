@@ -57,6 +57,26 @@ operates without network connectivity.
 A comprehensive User's Guide is fully accessible in-app. The app is available
 on [F-Droid](https://f-droid.org/packages/de.godisch.potillus).
 
+## Feedback & Contributing
+
+Feedback, bug reports, and enhancement requests are welcome. The preferred
+channel is the issue tracker of the canonical repository at
+[Codeberg](https://codeberg.org/godisch/potillus/issues); if you would rather
+not use the tracker, you may instead write to
+[android@godisch.de](mailto:android@godisch.de).
+
+Code and documentation contributions are welcome too. The contribution
+process — how changes are proposed and reviewed, together with the
+architecture, coding, testing, and release conventions a change must follow —
+is documented in
+[CONTRIBUTING.md](https://codeberg.org/godisch/potillus/src/branch/main/CONTRIBUTING.md).
+
+## Security
+
+To report a security vulnerability, please do **not** open a public issue.
+Instead, follow the private, PGP-encrypted reporting process described in
+[SECURITY.md](https://codeberg.org/godisch/potillus/src/branch/main/SECURITY.md).
+
 ## Technical Aspects
 
 ### Privacy & Security Architecture

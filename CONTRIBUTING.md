@@ -31,12 +31,13 @@ and well-documented for developers learning Android development.
 ## Table of Contents
 
 1. [Project philosophy](#1-project-philosophy)
-2. [Architecture rules](#2-architecture-rules)
-3. [Coding conventions](#3-coding-conventions)
-4. [Testing strategy](#4-testing-strategy)
-5. [Translation workflow](#5-translation-workflow)
-6. [Release checklist](#6-release-checklist)
-7. [Data persistence — schema freeze rules](#7-data-persistence--schema-freeze-rules)
+2. [Submitting changes](#2-submitting-changes)
+3. [Architecture rules](#3-architecture-rules)
+4. [Coding conventions](#4-coding-conventions)
+5. [Testing strategy](#5-testing-strategy)
+6. [Translation workflow](#6-translation-workflow)
+7. [Versioning & release checklist](#7-versioning--release-checklist)
+8. [Data persistence — schema freeze rules](#8-data-persistence--schema-freeze-rules)
 
 ---
 
@@ -52,13 +53,48 @@ and well-documented for developers learning Android development.
 
 ---
 
-## 2. Architecture rules
+## 2. Submitting changes
+
+Libellus Potionis is a personal project maintained by a single author. Feedback
+is always welcome; external code contributions are considered on a case-by-case
+basis. The steps below describe how a change moves from idea to merge.
+
+1. **Open an issue first.** Before writing code, describe the bug or proposed
+   enhancement in the [Codeberg issue
+   tracker](https://codeberg.org/godisch/potillus/issues). This lets the
+   maintainer confirm the change fits the project's scope and privacy-first
+   philosophy (Section 1) before anyone invests effort. Small, obvious fixes
+   (typos, an off-by-one in a comment) may skip this step.
+2. **Submit the change as a pull request** against the `main` branch of the
+   [canonical repository](https://codeberg.org/godisch/potillus). If you cannot
+   use Codeberg, a plain patch or `git format-patch` series sent to
+   [android@godisch.de](mailto:android@godisch.de) is accepted as an
+   alternative.
+3. **Meet the acceptance requirements.** Every change must follow the
+   conventions in the rest of this document: the architecture rules
+   (Section 3), coding and KDoc conventions (Section 4), the testing strategy
+   (Section 5), and — for any user-facing string — the translation workflow
+   (Section 6). `./gradlew test` must pass and `tools/release-check.sh` must
+   stay green.
+4. **Review and merge.** The maintainer reviews every pull request and is the
+   sole merger. Expect review comments; a change is merged only once it builds,
+   its tests pass, and it upholds the documented conventions. There is no
+   separate CI service — the maintainer runs the build and the release gate
+   locally as part of the review.
+
+---
+
+## 3. Architecture rules
 
 ```
 data/          ← Room entities, DAOs, DataStore preferences, repositories
-domain/        ← Pure Kotlin: models, AlcoholCalculator, DayResolver
-ui/            ← Compose screens, ViewModels, navigation
-util/          ← Export helpers (CSV, PDF, JSON backup)
+data/security/ ← Android Keystore-backed secret store for the encrypted prefs
+domain/        ← Pure Kotlin: models, AlcoholCalculator, DayResolver, and other
+                 framework-free logic (ChartBucketing, LocaleDetector, Trend)
+l10n/          ← Locale registry (SupportedLocales), locale detection, and
+                 date/number formatting helpers
+ui/            ← Compose screens, ViewModels, navigation, theme, components
+util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
 ```
 
 - **No Android imports in `domain/`.**  
@@ -74,13 +110,13 @@ util/          ← Export helpers (CSV, PDF, JSON backup)
 
 ---
 
-## 3. Coding conventions
+## 4. Coding conventions
 
 - **Kotlin style guide:** follow the [official Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html).
 - **KDoc:** all public classes, functions, and properties must have a KDoc comment.
   Use `@param`, `@return`, and `@throws` where relevant.
 - **Constants:** domain constants (limit values, Widmark coefficients) belong in
-  `AlcoholCalculator` as `const val` with units in the name or KDoc (e.g. `BINGE_THRESHOLD = 48.0` g).
+  `AlcoholCalculator` as `const val` with units in the name or KDoc (e.g. `BINGE_THRESHOLD = 60.0` g).
 - **Default values:** default values in `AppSettings` and `AppPreferences` must match.
   When adding a new preference key, add the default in both places at the same time.
 - **Enum persistence:** enums stored in Room or DataStore must be stored by their
@@ -89,16 +125,30 @@ util/          ← Export helpers (CSV, PDF, JSON backup)
 
 ---
 
-## 4. Testing strategy
+## 5. Testing strategy
 
-| Layer | Tool | Where |
+The project ships two test source sets. Unit tests run on the JVM without an
+emulator; instrumented tests run on a device or emulator.
+
+| Layer | Kind | Where |
 |---|---|---|
-| Domain logic | JUnit 4, pure Kotlin | `app/src/test/` |
-| UI / ViewModel | (future: Compose testing) | — |
-| Database | (future: Room in-memory tests) | — |
+| Domain logic (`AlcoholCalculator`, `DayResolver`, `ChartBucketing`, `Trend`, `LocaleDetector`) | Unit, pure Kotlin | `app/src/test/` |
+| Data layer (repositories, `EntityMapping`, `AppPreferences` I/O, `KeystoreSecretStore`) | Unit, with in-memory fakes (`test/.../fake/`) | `app/src/test/` |
+| ViewModels | Unit, with fake repositories/prefs | `app/src/test/` |
+| l10n & util (number/date formatting, CSV/PDF/backup, templating) | Unit | `app/src/test/` |
+| Locale sync & completeness (`LocaleSyncTest`) | Unit | `app/src/test/` |
+| Room migrations (`MigrationTest`) | Instrumented (`Room.testing`) | `app/src/androidTest/` |
+| Compose UI components (`EntryListItemUiTest`, `LimitBarUiTest`) | Instrumented UI | `app/src/androidTest/` |
+| Locale formatting on real Android | Instrumented | `app/src/androidTest/` |
+| Screenshot capture (fastlane/screengrab) | Instrumented | `app/src/androidTest/screenshot/` |
 
-**Rules for unit tests:**
-- Every public function in `AlcoholCalculator` and `DayResolver` must have test coverage.
+Run the unit tests with `./gradlew :app:test` and the instrumented tests with
+`./gradlew :app:connectedAndroidTest` (device/emulator required).
+
+**Rules for tests:**
+- The domain layer is the coverage floor: every public function in
+  `AlcoholCalculator` and `DayResolver` must have unit tests, and new domain
+  logic ships with its own tests.
 - Test names use backtick strings describing the scenario, e.g.  
   `` `trafficLight RED when no serving fits` ``.
 - Test comments and `assertTrue` messages must be in **English**.
@@ -107,31 +157,56 @@ util/          ← Export helpers (CSV, PDF, JSON backup)
 
 ---
 
-## 5. Translation workflow
+## 6. Translation workflow
 
-Libellus Potionis supports locales. All string resources live in
-`app/src/main/res/values-<code>/strings.xml`.
+Libellus Potionis is fully localized. String resources live in
+`app/src/main/res/values-<qualifier>/strings.xml`, where `<qualifier>` is the
+Android resource qualifier (e.g. `values-fr/`, `values-pt-rBR/`,
+`values-zh-rCN/`). The base (English) strings live in `res/values/` — there is
+**no** `values-en/` directory; Android falls back to `res/values/` for English.
+
+**Single source of truth.** The authoritative list of supported languages is
+[`SupportedLocales`](app/src/main/kotlin/de/godisch/potillus/l10n/SupportedLocales.kt)
+(`SupportedLocales.ALL`). It is consumed by the in-app language selector
+(`LanguageDropdown` in `SettingsScreen`) and by
+`PotillusApp.applyLanguageOnFirstLaunch()`, which derives its candidate set from
+`SupportedLocales.TAGS` (never hard-coded). `res/xml/locale_config.xml` (the
+system per-app language picker) must mirror this list exactly. `LocaleSyncTest`
+enforces that `SupportedLocales.ALL`, `locale_config.xml`, and the set of
+`values-<qualifier>/` directories all agree, and that every `strings.xml` is
+complete.
+
+**Translation quality.** Only **English** (`res/values/`) and **German**
+(`res/values-de/`) are written and maintained by the author. **All other
+locales are machine-generated** and shipped as-is without native-speaker review.
+They are therefore likely to contain awkward or incorrect phrasing.
+Native-speaker corrections are very much appreciated — please open an issue or a
+pull request (see Section 2) with the language and the improved string(s).
 
 **Rules:**
-1. Add every new string key to **all locale files** at the same time.
-2. The English file (`values-en/strings.xml`) is the reference for meaning.
-   When in doubt, the English text takes precedence.
-3. Machine translation is acceptable as a first pass, but native-speaker review
-   is required before any public release.
-4. Do not use string formatting characters (`%1$s`, `%2$d`) unless the corresponding
-   Java format call exists in the Kotlin source.
-5. The `locale_config.xml` and the language list in `SettingsScreen.kt` must always
-   be kept in sync with the set of `values-<code>/` folders.
+1. Add every new string key to **all** locale files at the same time (the base
+   `res/values/strings.xml` plus every `values-<qualifier>/`). `LocaleSyncTest`
+   fails the build on any missing key.
+2. The base English text in `res/values/strings.xml` is the reference for
+   meaning; `res/values-de/strings.xml` is the hand-authored German reference.
+   When in doubt, English takes precedence.
+3. Do not use string formatting characters (`%1$s`, `%2$d`) unless the
+   corresponding Java format call exists in the Kotlin source.
 
 **Adding a new locale:**
-1. Create `app/src/main/res/values-<code>/strings.xml` with every string key translated.
-2. Add `<locale android:name="<code>"/>` to `locale_config.xml`.
-3. Add `"<code>" to "<Native name>"` to the `languages` list in `SettingsScreen.kt`.
-4. Add `"<code>"` to the `supported` set in `PotillusApp.applyLanguageOnFirstLaunch()`.
+1. Create `app/src/main/res/values-<qualifier>/strings.xml` with every key
+   translated (copy `res/values/` or `res/values-de/` as the starting point).
+2. Register the locale in `SupportedLocales.ALL` as a `Locale(tag, autonym)`
+   entry, where `tag` is a plain BCP-47 tag with **no** `r` region prefix
+   (`"pt-BR"`, `"zh-CN"`) and `autonym` is the language name in its own script.
+   Keep the list sorted alphabetically by autonym.
+3. Add `<locale android:name="<tag>"/>` to `res/xml/locale_config.xml`.
+4. Run `./gradlew :app:test` (`LocaleSyncTest`) to confirm all three artefacts
+   are in sync and the new `strings.xml` is complete.
 
 ---
 
-## 6. Versioning & release checklist
+## 7. Versioning & release checklist
 
 **Versioning.** The version string is three-part `MAJOR.MINOR.PATCH`. Routine
 changes (fixes, small improvements) bump the PATCH component; larger feature sets
@@ -161,7 +236,7 @@ Before tagging a new version:
 
 ---
 
-## 7. Data persistence — schema freeze rules
+## 8. Data persistence — schema freeze rules
 
 The three persistence surfaces are considered **frozen**: their
 on-disk/on-wire format is stable, and any change must be backward-compatible or
@@ -170,7 +245,7 @@ loses their configured drinks, logged entries, or settings across an update.
 
 The three surfaces and their rules:
 
-### 7.1 Room database (`drinks`, `entries`)
+### 8.1 Room database (`drinks`, `entries`)
 
 - **Never** edit a committed schema JSON in `app/schemas/`. Those files are the
   historical record migrations are validated against.
@@ -186,7 +261,7 @@ The three surfaces and their rules:
   gramsAlcohol) are intentional: historical records must not change when a drink
   definition is later edited. Do not "normalise them away".
 
-### 7.2 Preferences (encrypted DataStore, `AppPreferences`)
+### 8.2 Preferences (encrypted DataStore, `AppPreferences`)
 
 - **Never rename** an existing key string (e.g. `"theme_mode"`) and **never
   change its value type** (e.g. int → string) after release — either silently
@@ -197,7 +272,7 @@ The three surfaces and their rules:
   Keep that pattern: it means renaming/removing an enum constant degrades to the
   default instead of crashing. Avoid renaming persisted enum constants regardless.
 
-### 7.3 Backup / restore (JSON, `BackupManager`)
+### 8.3 Backup / restore (JSON, `BackupManager`)
 
 - The JSON root carries a `"version"` integer (`BACKUP_VERSION`). Bump it only
   for **additive** changes, and keep reading older files: required fields use
@@ -207,7 +282,7 @@ The three surfaces and their rules:
 - The exported field names mirror the entity columns; if you rename a column,
   keep reading the old JSON field name for backward compatibility.
 
-### 7.4 Identifiers that must never change
+### 8.4 Identifiers that must never change
 
 - `applicationId` / `namespace` (`de.godisch.potillus`).
 - Database file name (`potillus.db`).
