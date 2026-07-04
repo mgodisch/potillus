@@ -71,9 +71,10 @@ LICENSE.Apache-2.0.md), satisfying the licence's &sect;4(a) requirement to
 give recipients a copy of the licence.
 
 Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with
-a dependency.  The release process should confirm — from the resolved
-artifacts, or the SBOM — that any such `NOTICE` is preserved; whenever a newly
-added dependency carries `NOTICE` text, copy it into this section.
+a dependency.  This is verified automatically at release time by
+`tools/release-check.sh` **Section 12**, which resolves every component in the
+CycloneDX SBOM to its cached artifact and scans it for `META-INF/NOTICE*`
+entries; when it warns about one, copy that `NOTICE` text into this section.
 
 ### GPL-2.0 with the Classpath Exception
 

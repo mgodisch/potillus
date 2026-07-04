@@ -25,6 +25,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -134,6 +135,17 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                         }
                     }
                 }
+                THEMATIC_BREAK_RE.matches(block.trim()) -> HorizontalDivider(
+                    // A Markdown thematic break (`---`, `***`, `___`). The bundled
+                    // copyright document (res/raw/copyright.md) separates its three
+                    // concatenated parts — COPYING.md, the GPL text and the
+                    // Apache-2.0 text — with a `---` between blank lines (see
+                    // tools/render-copyright.py), so without this branch the seam
+                    // rendered as the literal characters "---". A standalone block
+                    // whose whole content is the break marker becomes a divider.
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
                 else -> Text(
                     // Reflow: collapse the hard-wrapped source lines of this
                     // paragraph into a single, screen-wrapped string.
@@ -164,7 +176,9 @@ private val HTML_ENTITIES = mapOf(
     "&nbsp;" to "\u00A0",
     "&copy;" to "©",
     "&reg;"  to "®",
-    "&trade;" to "™"
+    "&trade;" to "™",
+    "&mdash;" to "—",
+    "&sect;" to "§"
 )
 
 /**
@@ -236,6 +250,16 @@ private fun renderInline(text: String): AnnotatedString {
         }
     }
 }
+
+// Matches a Markdown thematic break: a block whose entire content is three or
+// more of the SAME marker character (`-`, `*` or `_`), optionally separated and
+// surrounded by spaces/tabs (so `---`, `***`, `___` and the spaced `- - -` all
+// match, while `--`, `-*-` or any line with other text do not). The renderer
+// draws these as a HorizontalDivider (see the `when` in MarkdownText). Exposed
+// `internal` + [VisibleForTesting] so `MarkdownTextTest` can pin the exact
+// match/no-match boundary without going through the composable.
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal val THEMATIC_BREAK_RE = Regex("""[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*""")
 
 // Matches a single ordered-list item line: an integer, a dot, whitespace, then
 // the item text. Used both to detect an ordered-list block and to split it into

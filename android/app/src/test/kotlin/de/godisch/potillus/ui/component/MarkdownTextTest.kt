@@ -56,6 +56,8 @@ class MarkdownTextTest {
         assertEquals("'", decodeHtmlEntities("&apos;"))
         assertEquals("©", decodeHtmlEntities("&copy;"))
         assertEquals("\u00A0", decodeHtmlEntities("&nbsp;"))
+        assertEquals("—", decodeHtmlEntities("&mdash;"))
+        assertEquals("§", decodeHtmlEntities("&sect;"))
     }
 
     /** Entities are decoded even when embedded in surrounding prose. */
@@ -89,6 +91,33 @@ class MarkdownTextTest {
      */
     @Test fun `ordered item regex rejects a decimal number`() {
         assertFalse(ORDERED_ITEM_RE.matches("3.5 grams"))
+    }
+
+    // ── THEMATIC_BREAK_RE ─────────────────────────────────────────────────────
+
+    /**
+     * Three or more of the same marker character form a thematic break (rendered
+     * as a divider); the spaced form and surrounding whitespace are tolerated.
+     */
+    @Test fun `thematic break regex matches horizontal rules`() {
+        assertTrue(THEMATIC_BREAK_RE.matches("---"))
+        assertTrue(THEMATIC_BREAK_RE.matches("***"))
+        assertTrue(THEMATIC_BREAK_RE.matches("___"))
+        assertTrue(THEMATIC_BREAK_RE.matches("----"))
+        assertTrue(THEMATIC_BREAK_RE.matches("- - -"))
+        assertTrue(THEMATIC_BREAK_RE.matches("  ---  "))
+    }
+
+    /**
+     * Fewer than three markers, mixed markers, or any line carrying other text
+     * must NOT be treated as a break — otherwise ordinary prose or a list marker
+     * would vanish into a divider.
+     */
+    @Test fun `thematic break regex rejects non-rules`() {
+        assertFalse(THEMATIC_BREAK_RE.matches("--"))
+        assertFalse(THEMATIC_BREAK_RE.matches("-*-"))
+        assertFalse(THEMATIC_BREAK_RE.matches("- item"))
+        assertFalse(THEMATIC_BREAK_RE.matches("text"))
     }
 
     // ── parseOrderedList ──────────────────────────────────────────────────────

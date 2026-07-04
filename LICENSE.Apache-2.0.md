@@ -1,26 +1,3 @@
-<!-- vim: set et ts=4:
-=============================================================================
-Libellus Potionis - Privacy-Friendly Alcohol Tracker
-=============================================================================
-
-Verbatim copy of the Apache License, Version 2.0, as published by the Apache
-Software Foundation at <https://www.apache.org/licenses/LICENSE-2.0.txt>.
-
-WHY THIS FILE IS IN THE REPOSITORY:
-  Several third-party runtime libraries compiled into the release APK (the
-  AndroidX / Jetpack stack, the Kotlin runtime, Okio, Guava's
-  ListenableFuture, JSpecify — see COPYING.md, "Third-Party Software") are
-  licensed under Apache-2.0. Its section 4(a) requires that redistribution
-  gives recipients "a copy of this License", so this verbatim text is
-  concatenated — together with COPYING.md and the GPL text in LICENSE.md —
-  into the in-app copyright document res/raw/copyright.md (see the
-  `copyright.md` rule in android/Makefile and the matching
-  `generateCopyrightDocument` Gradle task). Do not edit the licence text; it
-  is intentionally byte-identical to the upstream original below this
-  comment block.
-=============================================================================
--->
-
 
                                  Apache License
                            Version 2.0, January 2004

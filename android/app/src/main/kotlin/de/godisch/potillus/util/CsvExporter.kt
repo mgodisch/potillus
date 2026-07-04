@@ -44,8 +44,9 @@ import java.util.Locale
 //   RFC 4180 compliance:
 //     - Lines are separated by CRLF (\r\n), not just LF (\n).
 //       Many Windows applications (including older Excel versions) expect CRLF.
-//     - Fields that contain commas, double-quotes, or newlines are enclosed in
-//       double-quotes. Internal double-quotes are escaped by doubling them ("").
+//     - Fields that contain commas, double-quotes, or a line break (LF or CR)
+//       are enclosed in double-quotes. Internal double-quotes are escaped by
+//       doubling them ("").
 //
 //   UTF-8 BOM:
 //     The file starts with the byte sequence EF BB BF (UTF-8 Byte Order Mark).
@@ -226,8 +227,9 @@ object CsvExporter {
      *    a legitimate note like `-5 today` is exported as `'-5 today`.
      *
      * 2. **RFC 4180 quoting.** If the (already formula-guarded) value contains a
-     *    comma, double-quote, or newline, the whole field is wrapped in double
-     *    quotes and any embedded double-quote is doubled (`"` → `""`).
+     *    comma, double-quote, or a line break (LF or CR), the whole field is
+     *    wrapped in double quotes and any embedded double-quote is doubled
+     *    (`"` → `""`).
      *
      * The two steps compose correctly: the guard is applied to the raw value
      * first, then RFC 4180 quoting wraps the guarded value if structurally
@@ -260,10 +262,18 @@ object CsvExporter {
 
     /**
      * Applies RFC 4180 quoting to [value] if it contains a comma, double-quote,
-     * or newline; otherwise returns it unchanged.
+     * or a line break; otherwise returns it unchanged.
+     *
+     * RFC 4180 §2 requires quoting for a field that embeds CR **or** LF. Both are
+     * tested independently rather than only `\n`, so a lone CR — e.g. an old-Mac
+     * line ending pasted into a note, which never carries an accompanying `\n` —
+     * cannot slip through unquoted and split the record. (A leading CR is also a
+     * formula trigger and is guarded by [neutralizeFormula] first; this covers a
+     * CR anywhere in the field.)
      */
     private fun rfc4180Quote(value: String): String =
-        if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+        if (value.contains(',') || value.contains('"') ||
+            value.contains('\n') || value.contains('\r')) {
             "\"${value.replace("\"", "\"\"")}\""
         } else value
 }

@@ -533,7 +533,46 @@ Second QA pass (full-scope re-audit of v0.78.0; folded into this release):
   declares no `project(...)` dependency — and will disappear with a future AGP
   update; tracked at the `allWarningsAsErrors` note in `build.gradle.kts`.
 
-Versioning:
+Third QA pass (delta re-audit of v0.78.0; folded into this release):
+- CSV export: `CsvExporter.escapeField` now forces RFC 4180 quoting on a field
+  that embeds a lone carriage return, not only a line feed. RFC 4180 §2 mandates
+  quoting for CR *or* LF; the previous guard tested only `\n`, so an old-Mac
+  line ending (a bare `\r` with no accompanying `\n`) in the middle of a note
+  could split the record. A leading `\r` was already neutralised as a
+  formula-injection trigger; this closes the mid-field case. New unit cases in
+  `CsvExporterTest` (`carriageReturn_forcesQuoting`) cover both positions.
+- `TodayViewModel`: documentation only. Clarified that its Context-free
+  `Locale.forLanguageTag(settings.language)` derivation and the Context-based
+  `Context.formattingLocale()` used elsewhere are two views of the SAME per-app
+  locale (the language tag and `AppCompatDelegate`'s application locales are
+  always written together), so a future reader does not "reconcile" them by
+  injecting a Context into this deliberately Context-free, JVM-testable
+  ViewModel. A matching cross-reference was added to `LocaleSupport.kt`'s
+  "HOW TO USE" note. No behavioural change.
+- In-app document viewer (`MarkdownText`): render a Markdown thematic break
+  (`---`, `***`, `___`) as a `HorizontalDivider` instead of the literal marker
+  characters. The in-app licenses screen concatenates COPYING.md, the GPL text
+  and the Apache-2.0 text separated by `---` (see `tools/render-copyright.py`),
+  which previously showed as "---" between the sections. Detection is via the
+  new `THEMATIC_BREAK_RE`, unit-tested in `MarkdownTextTest`.
+- In-app document viewer: decode the `&mdash;` (—) and `&sect;` (§) HTML
+  entities, which COPYING.md uses (e.g. "&sect;4(a)") and which previously
+  rendered verbatim. Added to the existing `HTML_ENTITIES` table with matching
+  `MarkdownTextTest` cases.
+- `LICENSE.Apache-2.0.md`: dropped the leading `<!-- … -->` modeline/preamble
+  header so the file is now the pure, verbatim upstream Apache-2.0 text. That
+  header was concatenated into the in-app copyright document and rendered as a
+  literal HTML comment after the second `---` seam. The licence body is
+  unchanged (still byte-identical to the upstream original), so the &sect;4(a)
+  "copy of the licence" obligation is still satisfied — more cleanly than before.
+- Licensing (COPYING.md): the Apache-2.0 &sect;4(d) paragraph now points at the
+  automated `release-check.sh` Section 12 NOTICE scan instead of describing the
+  confirmation as a manual "the release process should confirm" step, which had
+  become stale once that gate was added earlier in this release. Documentation
+  only; the transitive runtime inventory was re-verified complete against the
+  resolved `releaseRuntimeClasspath` (no missing copyright holder).
+
+
 - `versionCode` 88 → 89 and `versionName` 0.77.4 → 0.78.0 in `build.gradle.kts`
   and the `README.md` title; localized store notes in `changelogs/89.txt` for all
   21 listing locales now describe the export fix above (all 21 locales are now

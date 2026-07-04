@@ -72,6 +72,12 @@ import java.util.Locale
 //         val locale = ctx.formattingLocale()
 //     See [perAppLocalizedContext] below for why the raw Application context is
 //     NOT sufficient on every supported API level.
+//   • From code that holds NO Context and must stay Context-free (e.g.
+//     TodayViewModel, kept JVM-testable): read the SAME per-app locale from its
+//     persisted source, `Locale.forLanguageTag(AppSettings.language)`. That tag
+//     and AppCompatDelegate's application locales are always written together
+//     (the Settings language picker and applyLanguageOnFirstLaunch set both), so
+//     this yields the same locale as [formattingLocale] without needing a Context.
 //
 //   Use the returned Locale for EVERY java.time formatter and every
 //   getDisplayName(...) call that produces user-visible text. Never pass

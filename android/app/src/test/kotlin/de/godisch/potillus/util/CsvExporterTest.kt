@@ -26,8 +26,8 @@
  *   1. Formula-injection neutralisation (OWASP "CSV Injection"): any field whose
  *      first character could trigger spreadsheet formula evaluation
  *      (= + - @ TAB CR) is prefixed with a single quote (').
- *   2. RFC 4180 quoting: commas, double-quotes and newlines force the field to
- *      be wrapped in double quotes, with embedded quotes doubled.
+ *   2. RFC 4180 quoting: commas, double-quotes and line breaks (LF or CR) force
+ *      the field to be wrapped in double quotes, with embedded quotes doubled.
  *
  * They run on the plain JVM (no Android Context) because escapeField is pure.
  */
@@ -59,13 +59,14 @@ class CsvExporterTest {
     /** Every documented trigger character must be neutralised. */
     @Test
     fun allTriggerCharacters_areNeutralised() {
-        // These contain no comma/quote/newline, so the ONLY change is the guard.
+        // These contain no comma/quote/line-break, so the ONLY change is the
+        // guard. (CR is also a trigger but additionally forces RFC 4180 quoting,
+        // so it is asserted in carriageReturn_forcesQuoting below, not here.)
         assertEquals("'=1+1", CsvExporter.escapeField("=1+1"))
         assertEquals("'+1",   CsvExporter.escapeField("+1"))
         assertEquals("'-1",   CsvExporter.escapeField("-1"))
         assertEquals("'@SUM", CsvExporter.escapeField("@SUM"))
         assertEquals("'\tx",  CsvExporter.escapeField("\tx"))
-        assertEquals("'\rx",  CsvExporter.escapeField("\rx"))
     }
 
     /** A trigger character that is NOT the first character must be left alone. */
@@ -105,6 +106,19 @@ class CsvExporterTest {
     @Test
     fun newline_isQuoted() {
         assertEquals("\"line1\nline2\"", CsvExporter.escapeField("line1\nline2"))
+    }
+
+    /**
+     * A carriage return forces RFC 4180 quoting even without an accompanying LF.
+     * A CR in the MIDDLE of a field (first char is ordinary, so no formula guard)
+     * would otherwise pass through unquoted and split the record; a LEADING CR is
+     * both a formula trigger and a line break, so it is guarded first and then
+     * wrapped.
+     */
+    @Test
+    fun carriageReturn_forcesQuoting() {
+        assertEquals("\"a\rb\"",  CsvExporter.escapeField("a\rb"))
+        assertEquals("\"'\rx\"", CsvExporter.escapeField("\rx"))
     }
 
     // ── Composition of both steps ─────────────────────────────────────────────

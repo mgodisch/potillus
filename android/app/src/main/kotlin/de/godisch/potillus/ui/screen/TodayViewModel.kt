@@ -226,6 +226,18 @@ class TodayViewModel(
         //   string resources are resolved in, so labels and values agree. Falls
         //   back to Locale.getDefault() when no language has been stored yet (empty
         //   string sentinel on first launch before applyLanguageOnFirstLaunch runs).
+        //
+        // RELATION TO Context.formattingLocale():
+        //   Elsewhere the per-app formatting locale is read from a Context's
+        //   configuration via [de.godisch.potillus.l10n.formattingLocale]. This
+        //   ViewModel deliberately holds NO Context (see the class header — it is
+        //   kept Context-free so it stays JVM-unit-testable), so it reads the same
+        //   per-app locale from its persisted SOURCE instead: [AppSettings.language]
+        //   and AppCompatDelegate's application locales are always written together
+        //   (SettingsScreen's language picker sets both; applyLanguageOnFirstLaunch
+        //   sets both), so the tag here and Context.formattingLocale() elsewhere
+        //   resolve to the same locale. They are two views of one value, not two
+        //   independent sources — do not "reconcile" them by injecting a Context.
         val formattingLocale = if (settings.language.isNotEmpty())
             Locale.forLanguageTag(settings.language) else Locale.getDefault()
         val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, formattingLocale)
