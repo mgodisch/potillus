@@ -45,7 +45,7 @@ additional long-term maintainers join; any such change will be recorded here.
   pull requests. Anyone may open an issue, comment, or propose a change.
 - **Decisions** are made by the maintainer. For contributions, the acceptance
   criteria and review process are documented in
-  [CONTRIBUTING.md](CONTRIBUTING.md) (Section 2, "Submitting changes"): the
+  [CONTRIBUTING.md](../CONTRIBUTING.md) (Section 2, "Submitting changes"): the
   maintainer reviews every pull request and is the sole merger.
 - **Disputes** are resolved by the maintainer. As with any free-software
   project, anyone who disagrees with the project's direction is free to fork it
@@ -57,7 +57,7 @@ At present the project has a single role:
 
 - **Maintainer / project lead** — Martin A. Godisch (`android@godisch.de`).
   Holds all responsibilities: triaging and answering issues, reviewing and
-  merging contributions, handling security reports (see [SECURITY.md](SECURITY.md)),
+  merging contributions, handling security reports (see [SECURITY.md](../SECURITY.md)),
   maintaining translations and documentation, and preparing and signing
   releases.
 

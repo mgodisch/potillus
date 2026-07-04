@@ -125,12 +125,11 @@ android: \
 # R.raw.copyright resolves to the same English legal text for every locale: the
 # copyright/licence text is deliberately NOT translated.
 #
-# The `echo` between the `cat`s emits the single separating blank line. This
-# assumes each source file ends with exactly one trailing newline (the
-# repository convention); if it did not, the separation would be off by a line.
-app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md
-	mkdir -p app/src/main/res/raw
-	{ cat ../COPYING.md; echo; cat ../LICENSE.md; echo; cat ../LICENSE.Apache-2.0.md; } > $@
+# The concatenation is delegated to tools/render-copyright.py so that this rule,
+# its check-guides verification, and the Gradle generateCopyrightDocument task
+# all share one generator (the blocks are joined by a Markdown horizontal rule).
+app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md ../tools/render-copyright.py
+	python3 ../tools/render-copyright.py $@ ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md
 
 # Regenerate the localized user guides from their templates in docs/guide/,
 # resolving the {{screen-name}} tokens against the matching strings.xml so the
@@ -170,11 +169,12 @@ guides: $(GUIDE_OUTPUTS)
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything). Also verifies that the generated
 # raw/copyright.md matches the current COPYING.md + LICENSE.md +
-# LICENSE.Apache-2.0.md concatenation (blank-line separated), by rebuilding it
-# into a temporary file and comparing byte-for-byte.
+# LICENSE.Apache-2.0.md concatenation (horizontal-rule separated, via
+# tools/render-copyright.py), by rebuilding it into a temporary file and
+# comparing byte-for-byte.
 check-guides:
 	python3 ../tools/render-guide.py --check
-	tmp=$$(mktemp); { cat ../COPYING.md; echo; cat ../LICENSE.md; echo; cat ../LICENSE.Apache-2.0.md; } > "$$tmp"; \
+	tmp=$$(mktemp); python3 ../tools/render-copyright.py "$$tmp" ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md; \
 	    cmp -s "$$tmp" app/src/main/res/raw/copyright.md; rc=$$?; rm -f "$$tmp"; \
 	    test $$rc -eq 0 || { echo "check-guides: raw/copyright.md is stale — run 'make app/src/main/res/raw/copyright.md'"; exit 1; }
 

@@ -20,7 +20,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 =============================================================================
 -->
 
-![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic-4K.png)
+[![Feature Image](fastlane/metadata/android/en-US/images/featureGraphic-4K.png)](https://f-droid.org/packages/de.godisch.potillus/)
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
@@ -187,7 +187,7 @@ verifying the application's integrity.
 ## Roadmap
 
 The project's intended direction and its explicit non-goals are described in
-[ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/ROADMAP.md).
+[ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/docs/ROADMAP.md).
 
 ## Changes
 

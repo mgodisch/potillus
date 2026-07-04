@@ -3,7 +3,6 @@
 *.orig
 
 /*.pdf
-/TODO.md
 /android/.gradle
 /android/.kotlin
 /fastlane/.bundle

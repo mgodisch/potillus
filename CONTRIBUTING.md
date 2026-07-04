@@ -84,7 +84,7 @@ participation in the project is expected to follow our
    its tests pass, and it upholds the documented conventions. There is no
    separate CI service — the maintainer runs the build and the release gate
    locally as part of the review. The project's decision-making model and roles
-   are described in [GOVERNANCE.md](GOVERNANCE.md).
+   are described in [GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ### Developer Certificate of Origin (DCO)
 

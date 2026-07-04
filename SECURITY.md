@@ -33,7 +33,7 @@ These are the security properties Libellus Potionis is designed to provide, and
 their limits. They describe what the software is intended to guarantee — not a
 promise that no defect will ever exist. A structured argument for why these
 requirements are met — including the threat model and trust boundaries — is in
-[ASSURANCE_CASE.md](ASSURANCE_CASE.md).
+[ASSURANCE_CASE.md](docs/ASSURANCE_CASE.md).
 
 **What users can expect:**
 

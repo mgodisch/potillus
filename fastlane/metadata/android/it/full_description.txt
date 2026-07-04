@@ -1,52 +1,24 @@
-Libellus Potionis è un tracker del consumo di alcol attento alla privacy,
-gratuito, open source e senza pubblicità. Ti aiuta a monitorare, dosare e gestire
-il tuo consumo completamente offline. Non richiede permessi invasivi — né
-fotocamera, né microfono, né posizione — e funziona del tutto senza accesso alla
-rete.
+Libellus Potionis è un tracker del consumo di alcol attento alla privacy, gratuito, open source e senza pubblicità. Ti aiuta a monitorare, dosare e gestire il tuo consumo completamente offline. Non richiede permessi invasivi — né fotocamera, né microfono, né posizione — e funziona del tutto senza accesso alla rete.
 
 FUNZIONI PRINCIPALI
 
-* Registrazione intelligente: crea le tue bevande o scegli tra modelli diffusi a
-  livello internazionale. Registra le consumazioni subito o in modo retroattivo
-  con correzioni precise dell'orario.
-* Più limiti contemporaneamente: imposta tre limiti in parallelo — un limite
-  giornaliero (grammi di alcol puro), un limite settimanale mobile su 7 giorni
-  (grammi) e un numero massimo di giorni di consumo a settimana. Le barre di
-  avanzamento ti tengono informato in tempo reale.
-* Stima del tasso alcolemico (BAC): inserisci il tuo peso corporeo per ottenere
-  un'approssimazione in tempo reale basata sulla consolidata formula di Widmark.
-* Report per la consulenza: genera un report PDF chiaro e ben organizzato di due
-  pagine, pensato per consulti e appuntamenti di counseling, che riassume le tue
-  abitudini in modo statistico.
-* Portabilità dei dati: esporta l'intero set di dati come file CSV standard per
-  l'elaborazione esterna (ad esempio in LibreOffice Calc) oppure crea backup JSON
-  sicuri per spostare i dati tra dispositivi.
-* Regolazioni fini: personalizza l'orario di "inizio giornata" così che le bevute
-  a tarda notte siano conteggiate nella sera corretta, e imposta date di inizio
-  valutazione personalizzate per ripartire da zero in modo pulito.
+• Registrazione intelligente: crea le tue bevande o scegli tra modelli diffusi a livello internazionale. Registra le consumazioni subito o in modo retroattivo con correzioni precise dell'orario.
+• Più limiti contemporaneamente: imposta tre limiti in parallelo — un limite giornaliero (grammi di alcol puro), un limite settimanale mobile su 7 giorni (grammi) e un numero massimo di giorni di consumo a settimana. Le barre di avanzamento ti tengono informato in tempo reale.
+• Stima del tasso alcolemico (BAC): inserisci il tuo peso corporeo per ottenere un'approssimazione in tempo reale basata sulla consolidata formula di Widmark.
+• Report per la consulenza: genera un report PDF chiaro e ben organizzato di due pagine, pensato per consulti e appuntamenti di counseling, che riassume le tue abitudini in modo statistico.
+• Portabilità dei dati: esporta l'intero set di dati come file CSV standard per l'elaborazione esterna (ad esempio in LibreOffice Calc) oppure crea backup JSON sicuri per spostare i dati tra dispositivi.
+• Regolazioni fini: personalizza l'orario di "inizio giornata" così che le bevute a tarda notte siano conteggiate nella sera corretta, e imposta date di inizio valutazione personalizzate per ripartire da zero in modo pulito.
 
 Una guida utente completa è disponibile all'interno dell'app.
 
 PRIVACY E SICUREZZA
 
-Libellus Potionis è costruito attorno alla piena sovranità sui dati e a una
-rigorosa minimizzazione dei dati. Funziona con un profilo di permessi minimo che
-esclude completamente l'accesso alla rete, perciò i tuoi dati personali non
-lasciano mai il dispositivo. I tuoi dati restano nell'archivio privato dell'app,
-protetti a riposo dalla cifratura del dispositivo Android e dal sandbox dell'app.
-Un blocco biometrico con impronta digitale, facoltativo, protegge da accessi
-fisici non autorizzati. Questo approccio offline elimina il tracciamento, la
-sincronizzazione nel cloud e le fughe di dati esterne.
+Libellus Potionis è costruito attorno alla piena sovranità sui dati e a una rigorosa minimizzazione dei dati. Funziona con un profilo di permessi minimo che esclude completamente l'accesso alla rete, perciò i tuoi dati personali non lasciano mai il dispositivo. I tuoi dati restano nell'archivio privato dell'app, protetti a riposo dalla cifratura del dispositivo Android e dal sandbox dell'app. Un blocco biometrico con impronta digitale, facoltativo, protegge da accessi fisici non autorizzati. Questo approccio offline elimina il tracciamento, la sincronizzazione nel cloud e le fughe di dati esterne.
 
 COMPATIBILITÀ
 
-L'app funziona su Android 11 (API 30) e versioni successive. Un selettore di
-lingua interno, del tutto indipendente, funziona su tutte le versioni supportate,
-a prescindere dal selettore di lingua per app del sistema.
+L'app funziona su Android 11 (API 30) e versioni successive. Un selettore di lingua interno, del tutto indipendente, funziona su tutte le versioni supportate, a prescindere dal selettore di lingua per app del sistema.
 
 OPEN SOURCE
 
-Libellus Potionis è software libero rilasciato sotto la GNU General Public
-License v3 (o successiva). Il codice sorgente è documentato a livello da manuale
-ed è disponibile nel repository canonico:
-https://codeberg.org/godisch/potillus/
+Libellus Potionis è software libero rilasciato sotto la GNU General Public License v3 (o successiva). Il codice sorgente è documentato a livello da manuale ed è disponibile nel repository canonico: https://codeberg.org/godisch/potillus/

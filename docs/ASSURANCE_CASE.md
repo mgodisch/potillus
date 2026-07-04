@@ -26,7 +26,7 @@ This document is a short, structured argument for why Libellus Potionis meets
 its security requirements. It states the threat model, identifies the trust
 boundaries, argues that secure design principles were applied, and argues that
 common implementation weaknesses have been countered. It complements the
-security requirements documented in [SECURITY.md](SECURITY.md) ("Security
+security requirements documented in [SECURITY.md](../SECURITY.md) ("Security
 model").
 
 ## Security requirements (what is claimed)
