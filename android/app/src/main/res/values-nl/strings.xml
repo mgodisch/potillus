@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Vandaag</string>
     <string name="calendar">Kalender</string>
     <string name="statistics">Statistieken</string>
+    <string name="nav_statistics">Statistieken</string>
     <string name="drinks">Dranken</string>
     <string name="settings">Instellingen</string>
     <string name="total_today">Totaal vandaag</string>

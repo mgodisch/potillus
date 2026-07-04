@@ -46,7 +46,15 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <!-- Bottom-nav tab and Calendar-screen title. -->
     <string name="calendar">Calendar</string>
     <!-- Bottom-nav tab, Statistics-screen title, and the Settings 'Statistics' section header. -->
+    <!-- Statistics-screen title and the Settings 'Statistics' section header. -->
     <string name="statistics">Statistics</string>
+    <!-- Bottom-nav tab label. A dedicated, deliberately short synonym of
+         "statistics": the tab is a narrow column under an icon, so a long
+         word (e.g. French "Statistiques") would wrap onto two lines. Most
+         locales repeat their full statistics word here; only those that
+         overflow shorten it (fr -> "Stats"). Keep in sync conceptually with
+         "statistics" above. -->
+    <string name="nav_statistics">Statistics</string>
     <!-- Bottom-nav tab and Drinks-screen title. -->
     <string name="drinks">Drinks</string>
     <!-- Overflow-menu item and Settings-screen title. -->

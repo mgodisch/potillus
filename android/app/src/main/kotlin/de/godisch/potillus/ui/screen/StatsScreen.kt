@@ -428,8 +428,31 @@ fun StatsScreen(
  */
 @Composable
 private fun StatRow(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = valueColor)
+    // Layout hardening (v0.78.0 QA): give the LABEL the flexible width and pin the
+    // VALUE to a single, unbroken line. Without a weight both Texts are measured at
+    // their intrinsic width; a long label (seen with some translations, e.g. the
+    // French "Moyenne par jour de consommation") then eats the row and squeezes the
+    // value into a sliver, where it wrapped character-by-character into a vertical
+    // stack. With the label weighted, the non-weighted value is measured first at
+    // its natural width and the label wraps into the space that remains — so the
+    // value can never stack, in any locale, whatever the label length. The start
+    // padding keeps a gap; the value stays right-aligned because the weighted label
+    // fills the rest of the row.
+    Row(Modifier.fillMaxWidth()) {
+        Text(
+            label,
+            style    = MaterialTheme.typography.bodyMedium,
+            color    = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            value,
+            style      = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color      = valueColor,
+            softWrap   = false,
+            maxLines   = 1,
+            modifier   = Modifier.padding(start = 12.dp)
+        )
     }
 }

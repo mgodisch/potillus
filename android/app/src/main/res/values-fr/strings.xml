@@ -26,6 +26,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Aujourd\'hui</string>
     <string name="calendar">Calendrier</string>
     <string name="statistics">Statistiques</string>
+    <string name="nav_statistics">Stats</string>
     <string name="drinks">Boissons</string>
     <string name="settings">Paramètres</string>
 
@@ -110,7 +111,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year">Année</string>
     <string name="total_period">Total de la période</string>
     <string name="avg_per_day">Moyenne par jour</string>
-    <string name="avg_per_drink_day">Moyenne par jour de consommation</string>
+    <string name="avg_per_drink_day">Moy. par jour de conso.</string>
     <string name="abstinent_days">Jours d\'abstinence</string>
     <string name="stats_category_breakdown">Catégories</string>
     <string name="streak_trend">Abstinence et tendance</string>

@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Dzisiaj</string>
     <string name="calendar">Kalendarz</string>
     <string name="statistics">Statystyki</string>
+    <string name="nav_statistics">Statystyki</string>
     <string name="drinks">Napoje</string>
     <string name="settings">Ustawienia</string>
     <string name="total_today">Łącznie dzisiaj</string>

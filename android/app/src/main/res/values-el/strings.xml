@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Σήμερα</string>
     <string name="calendar">Ημερολόγιο</string>
     <string name="statistics">Στατιστικά</string>
+    <string name="nav_statistics">Στατιστικά</string>
     <string name="drinks">Ποτά</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="total_today">Σύνολο σήμερα</string>

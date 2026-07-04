@@ -166,4 +166,78 @@ class ChartBucketingTest {
 
         assertEquals(460.0 / 24.0, result[0].avgPerDay, 1e-9)
     }
+
+    // ── bucketize: isAbstinent obeys the "completed period" rule ───────────────
+    //
+    // A green tick promises "this whole period was recorded alcohol-free". A period
+    // that still contains the in-progress current day is not finished, so it must
+    // NOT be flagged abstinent until the day-change time passes. These tests lock
+    // that in for every granularity, plus the historical (no in-progress) path.
+
+    @Test fun `in-progress empty today is NOT abstinent (daily bucket)`() {
+        // WEEK/MONTH views use DAILY buckets, so today is its own bucket. With no
+        // drink logged yet its grams are 0, but it is still open — no green tick.
+        val result = ChartBucketing.bucketize(
+            summaries     = emptyList(),
+            from          = "2026-06-24",
+            to            = "2026-06-24",
+            granularity   = ChartGranularity.DAILY,
+            inProgressDay = "2026-06-24"
+        )
+
+        assertEquals(1, result.size)
+        assertFalse("the open current day must not earn an abstinence tick", result[0].isAbstinent)
+        // It is also not a bar: no completed day, so the average is 0. The renderer
+        // draws this "not abstinent, zero average" bucket as an empty slot.
+        assertEquals(0.0, result[0].avgPerDay, 1e-9)
+    }
+
+    @Test fun `a past empty day IS abstinent (daily bucket)`() {
+        // Regression guard for the common case: a finished dry day keeps its tick.
+        // June 23 is empty and lies before the in-progress 24th, so it is a
+        // completed abstinent day.
+        val result = ChartBucketing.bucketize(
+            summaries     = emptyList(),
+            from          = "2026-06-23",
+            to            = "2026-06-24",
+            granularity   = ChartGranularity.DAILY,
+            inProgressDay = "2026-06-24"
+        )
+
+        assertEquals(2, result.size)
+        assertTrue("a finished dry day stays abstinent", result[0].isAbstinent)   // 23rd
+        assertFalse("the open current day is not abstinent", result[1].isAbstinent) // 24th
+    }
+
+    @Test fun `current month with only dry completed days is NOT abstinent (monthly bucket)`() {
+        // YEAR view uses MONTHLY buckets. The current month has several completed
+        // dry days (June 1..23) plus the still-open 24th and zero grams overall.
+        // Because the month still holds the open day it is not yet a completed
+        // period, so Variante B withholds the tick even though nothing was drunk.
+        val result = ChartBucketing.bucketize(
+            summaries     = emptyList(),
+            from          = "2026-06-01",
+            to            = "2026-06-24",
+            granularity   = ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24"
+        )
+
+        assertEquals(1, result.size)
+        assertFalse("a month still containing today is not a completed dry period", result[0].isAbstinent)
+    }
+
+    @Test fun `a fully past dry month IS abstinent (monthly bucket, historical)`() {
+        // The PDF export path (inProgressDay = null) and any month strictly in the
+        // past: an all-zero month is a finished abstinent period and keeps its tick.
+        val result = ChartBucketing.bucketize(
+            summaries   = emptyList(),
+            from        = "2026-05-01",
+            to          = "2026-05-31",
+            granularity = ChartGranularity.MONTHLY
+            // inProgressDay omitted → null → historical semantics
+        )
+
+        assertEquals(1, result.size)
+        assertTrue("a fully completed dry month is abstinent", result[0].isAbstinent)
+    }
 }

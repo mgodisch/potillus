@@ -69,6 +69,33 @@ User-facing:
   hands back no output stream, the app previously claimed success while leaving
   an EMPTY file in Downloads — a silent data-loss trap for a health backup. The
   orphaned file is now removed and the error message shown.
+- Statistics chart: the current day no longer shows a green "abstinent" tick
+  before it is over. The tick promises a completed, alcohol-free period, but an
+  in-progress day is in superposition — it may still become a drink day until the
+  configured day-change time. The chart now leaves the current day/period as an
+  empty slot until it resolves: a drink is logged (a bar appears) or the period
+  closes dry (the tick appears). The rule is enforced in the single shared series
+  builder (`ChartBucketing.bucketize`), so the on-screen chart and the PDF report
+  cannot drift apart; the PDF, whose range ends at the last recorded day, was not
+  visibly affected but now shares the same guarantee. WEEK/MONTH (daily bars) and
+  YEAR (monthly bars) are all covered.
+- French localization polish (cosmetic, fr only): the bottom-navigation
+  "Statistics" tab used the full screen title "Statistiques", which wrapped onto
+  two lines in the narrow tab. It now uses a dedicated short tab label ("Stats");
+  the screen title and the Settings section header keep the full "Statistiques".
+  A new `nav_statistics` string backs the tab in every locale (most repeat their
+  full word; only French shortens it). Also, the Statistics row label "Moyenne
+  par jour de consommation" was long enough to squeeze its value into a vertical,
+  character-by-character stack; it is shortened to "Moy. par jour de conso.",
+  matching the wording the PDF report already uses. Regenerated screenshots and
+  feature graphics.
+- Statistics rows are now hardened against that value-stacking regardless of
+  language: the label takes the flexible width (and wraps if long) while the
+  value is pinned to a single line. Previously a translation long enough to fill
+  the row could squeeze any statistic's value into a vertical, per-character
+  stack; this is now structurally impossible in every locale, whatever the label
+  length. The French shortening above is the cosmetic nicety on top of this
+  general safety net.
 
 New documentation:
 - `PRIVACY.md`: the privacy policy required by the Play "App content" section,

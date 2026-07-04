@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Idag</string>
     <string name="calendar">Kalender</string>
     <string name="statistics">Statistik</string>
+    <string name="nav_statistics">Statistik</string>
     <string name="drinks">Drycker</string>
     <string name="settings">Inställningar</string>
     <string name="total_today">Totalt idag</string>

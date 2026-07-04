@@ -39,6 +39,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">I dag</string>
     <string name="calendar">Kalender</string>
     <string name="statistics">Statistikk</string>
+    <string name="nav_statistics">Statistikk</string>
     <string name="drinks">Drikker</string>
     <string name="settings">Innstillinger</string>
 

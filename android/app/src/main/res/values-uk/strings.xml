@@ -37,6 +37,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Сьогодні</string>
     <string name="calendar">Календар</string>
     <string name="statistics">Статистика</string>
+    <string name="nav_statistics">Статистика</string>
     <string name="drinks">Напої</string>
     <string name="settings">Налаштування</string>
 

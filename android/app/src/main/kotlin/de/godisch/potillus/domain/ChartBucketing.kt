@@ -66,8 +66,12 @@ enum class ChartGranularity { DAILY, WEEKLY, MONTHLY }
  *                    locale-agnostic.
  * @param avgPerDay   Mean grams of pure alcohol per calendar day in the bucket
  *                    (see file header). Equals the day's total for DAILY buckets.
- * @param isAbstinent True when the whole bucket had zero consumption; rendered
- *                    as a green tick instead of a bar.
+ * @param isAbstinent True when the bucket was recorded fully alcohol-free (0 g)
+ *                    AND is a completed period, i.e. it does not contain the
+ *                    still-in-progress current day. Rendered as a green tick
+ *                    instead of a bar. A bucket that still holds today is never
+ *                    abstinent: "the whole period was dry" cannot be asserted
+ *                    until the day-change time has passed and the day is final.
  */
 data class ChartBucket(
     val labelDate: String,
@@ -103,11 +107,15 @@ object ChartBucketing {
      *
      * IN-PROGRESS DAY ("today in superposition"): when [inProgressDay] is given
      * (the current logical day, which on-screen equals [to]), the bucket that
-     * contains it applies the app's per-day rule — the unfinished day is left out
-     * of the average's denominator UNLESS a drink has already been logged that day.
-     * This keeps each bucket's average in step with the Statistics summary and the
-     * Today card (see [DayResolver.effectivePeriodDays]). The PDF export passes
-     * null, so historical reports count every calendar day as before.
+     * contains it applies the app's per-day rule in two ways. First, the unfinished
+     * day is left out of the average's denominator UNLESS a drink has already been
+     * logged that day, keeping each bucket's average in step with the Statistics
+     * summary and the Today card (see [DayResolver.effectivePeriodDays]). Second,
+     * that bucket is never marked [ChartBucket.isAbstinent]: a period that still
+     * contains the open day is not yet completed, so it cannot be declared "fully
+     * alcohol-free" (the green tick) before the day-change time. The PDF export
+     * passes null, so historical reports count every calendar day and every zero
+     * bucket is a finished, abstinent one.
      *
      * @param summaries     Daily totals for days that have entries ("YYYY-MM-DD").
      * @param from          Inclusive period start ("YYYY-MM-DD").
@@ -159,16 +167,31 @@ object ChartBucketing {
                 day = day.plusDays(1)
             }
 
-            // In-progress-day rule: if the current logical day falls in this bucket
-            // and is not yet a drink day, drop it from the day count so the average
-            // is taken over completed days only. This mirrors the per-day rule used
-            // by the Statistics summary and the Today card (see
-            // DayResolver.effectivePeriodDays); the bucket's `sum` already excludes
-            // the empty day, so only the divisor changes.
+            // In-progress-day rule (the "today in superposition" principle). The
+            // still-open current day is neither a drink day nor an abstinent day
+            // yet, which has TWO consequences for the bucket that contains it:
+            //
+            //   (1) AVERAGE — when it is not yet a drink day it is dropped from the
+            //       divisor, so the average is taken over completed days only. This
+            //       mirrors the per-day rule used by the Statistics summary and the
+            //       Today card (see DayResolver.effectivePeriodDays); the bucket's
+            //       `sum` already excludes the empty day, so only the divisor changes.
+            //
+            //   (2) ABSTINENCE — a bucket that still holds the open day is not a
+            //       *completed* period, so it must never be flagged abstinent. The
+            //       green tick promises "this whole period was recorded alcohol-free",
+            //       and that claim cannot be settled while today is still running: the
+            //       day could yet become a drink day before the day-change time. This
+            //       is tracked by `bucketHoldsInProgressDay` and applied below. (The
+            //       PDF export passes inProgressDay = null, so its historical buckets
+            //       are unaffected — every zero bucket there is a finished, abstinent
+            //       one.)
+            var bucketHoldsInProgressDay = false
             if (inProgressDay != null) {
                 val ip           = LocalDate.parse(inProgressDay, DayResolver.DATE_FORMATTER)
                 val ipInBucket   = !ip.isBefore(bucketStart) && ip.isBefore(cappedEndExclusive)
                 val ipIsDrinkDay = (gramsByDate[inProgressDay] ?: 0.0) > 0.0
+                bucketHoldsInProgressDay = ipInBucket
                 if (ipInBucket && !ipIsDrinkDay && dayCount > 0) dayCount--
             }
 
@@ -176,7 +199,10 @@ object ChartBucketing {
                 ChartBucket(
                     labelDate   = DayResolver.formatDate(bucketStart),
                     avgPerDay   = if (dayCount > 0) sum / dayCount else 0.0,
-                    isAbstinent = sum == 0.0
+                    // Abstinent = recorded fully alcohol-free AND a completed period.
+                    // The `!bucketHoldsInProgressDay` guard is consequence (2) above:
+                    // the current day/week/month never earns a tick until it closes.
+                    isAbstinent = sum == 0.0 && !bucketHoldsInProgressDay
                 )
             )
 

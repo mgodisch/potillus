@@ -98,9 +98,14 @@ import de.godisch.potillus.ui.theme.successColor
  *   views) this is the day's grams; for MONTHLY buckets (YEAR view) it is the
  *   month's grams averaged over its calendar days, keeping every view on the
  *   same "grams per day" scale.
- * - Abstinent buckets ([ChartBucket.isAbstinent], i.e. 0 g) carry NO bar; instead
- *   a small green tick is drawn at the baseline so "recorded, nothing consumed"
- *   is visually distinct from a near-zero bar or from missing data.
+ * - Abstinent buckets ([ChartBucket.isAbstinent], i.e. a completed 0 g period)
+ *   carry NO bar; instead a small green tick is drawn at the baseline so
+ *   "recorded, nothing consumed" is visually distinct from a near-zero bar or
+ *   from missing data.
+ * - The still-in-progress current day/period is a THIRD case: zero grams so far
+ *   but not yet a completed period, so it is neither abstinent nor a bar. It is
+ *   drawn as an empty slot (no tick, no bar) and only resolves to a bar (a drink
+ *   is logged) or a tick (the period closes dry) once the day-change time passes.
  * - When [showLimitLine] is true, a horizontal dashed line marks the daily
  *   [limitGrams] threshold and bars whose value exceeds it are coloured red.
  *   The YEAR view sets this false: its monthly per-day averages are not compared
@@ -229,7 +234,7 @@ fun AlcoholBarChart(
                 drawLine(tickColor,
                     Offset(centerX - s * 0.25f, baseY),
                     Offset(centerX + s, baseY - s), strokeWidth = w)
-            } else {
+            } else if (bucket.avgPerDay > 0.0) {
                 // Bar value: the bucket's per-day average (day grams for DAILY
                 // buckets, the month's grams-per-day for the YEAR view).
                 val value = bucket.avgPerDay
@@ -253,6 +258,13 @@ fun AlcoholBarChart(
                     )
                 }
             }
+            // else: a non-abstinent bucket with a zero average is the still-in-
+            // progress current day/period (superposition). It is neither a finished
+            // abstinent bucket (no tick) nor a real consumption bar (no bar), so it
+            // is left as an empty slot until it resolves — a drink is logged (bar)
+            // or the day-change time passes with the period dry (tick). This pairs
+            // with ChartBucketing.bucketize, which withholds isAbstinent from any
+            // bucket that still holds the open day.
         }
     }
 

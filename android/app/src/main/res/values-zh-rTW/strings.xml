@@ -46,6 +46,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">今天</string>
     <string name="calendar">行事曆</string>
     <string name="statistics">統計</string>
+    <string name="nav_statistics">統計</string>
     <string name="drinks">飲品</string>
     <string name="settings">設定</string>
 

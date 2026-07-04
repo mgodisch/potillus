@@ -127,10 +127,15 @@ private data class MainPage(val titleRes: Int, val icon: ImageVector)
 // here: it is opened via a gear action in each screen's top bar and pushed as a
 // separate destination (no bottom bar).
 private val mainPages = listOf(
-    MainPage(R.string.today,      Icons.Default.Today),
-    MainPage(R.string.calendar,   Icons.Default.CalendarMonth),
-    MainPage(R.string.statistics, Icons.Default.BarChart),
-    MainPage(R.string.drinks,     Icons.Default.LocalBar),
+    MainPage(R.string.today,          Icons.Default.Today),
+    MainPage(R.string.calendar,       Icons.Default.CalendarMonth),
+    // Statistics uses a dedicated, deliberately short label (`nav_statistics`)
+    // rather than the full screen title (`statistics`): the tab is a narrow
+    // column under an icon, and long translations (e.g. French "Statistiques")
+    // would otherwise wrap onto two lines. In most locales `nav_statistics`
+    // repeats the full word; only overflowing ones shorten it (fr -> "Stats").
+    MainPage(R.string.nav_statistics, Icons.Default.BarChart),
+    MainPage(R.string.drinks,         Icons.Default.LocalBar),
 )
 
 // ── Navigation composable ─────────────────────────────────────────────────────
@@ -252,8 +257,10 @@ private fun MainPagerHost(
                 mainPages.forEachIndexed { index, page ->
                     NavigationBarItem(
                         icon     = { Icon(page.icon, contentDescription = null) },
-                        // Android-standard bottom bar: label under the icon,
-                        // reusing the existing fully-translated screen names.
+                        // Android-standard bottom bar: label under the icon. Each
+                        // page carries its own fully-translated label string; the
+                        // Statistics tab uses a short synonym (see `mainPages`) so
+                        // long translations do not wrap.
                         label    = { Text(stringResource(page.titleRes)) },
                         // Highlight the tab for the page currently shown by the
                         // pager — this updates automatically when the user swipes.

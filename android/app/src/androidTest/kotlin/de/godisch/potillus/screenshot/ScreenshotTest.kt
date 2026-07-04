@@ -274,7 +274,10 @@ class ScreenshotTest {
             navigateToTab(R.string.calendar)
             Screengrab.screenshot("02_calendar")
 
-            navigateToTab(R.string.statistics)
+            // The Statistics tab renders `nav_statistics` (a short synonym of the
+            // screen title), so the tab must be located by that label — in some
+            // locales (e.g. fr: "Stats") it differs from `statistics`.
+            navigateToTab(R.string.nav_statistics)
             Screengrab.screenshot("03_statistics")
         }
 

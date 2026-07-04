@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Dnes</string>
     <string name="calendar">Kalendář</string>
     <string name="statistics">Statistiky</string>
+    <string name="nav_statistics">Statistiky</string>
     <string name="drinks">Nápoje</string>
     <string name="settings">Nastavení</string>
     <string name="total_today">Celkem dnes</string>

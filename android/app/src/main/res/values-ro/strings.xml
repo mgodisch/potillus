@@ -45,6 +45,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Azi</string>
     <string name="calendar">Calendar</string>
     <string name="statistics">Statistici</string>
+    <string name="nav_statistics">Statistici</string>
     <string name="drinks">Băuturi</string>
     <string name="settings">Setări</string>
 

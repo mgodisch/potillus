@@ -48,6 +48,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="today">Hoje</string>
     <string name="calendar">Calendário</string>
     <string name="statistics">Estatísticas</string>
+    <string name="nav_statistics">Estatísticas</string>
     <string name="drinks">Bebidas</string>
     <string name="settings">Configurações</string>
 
