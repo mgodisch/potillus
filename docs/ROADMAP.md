@@ -97,6 +97,14 @@ practice.
 - Keep the silver "Met URL" entries pointing at the moved docs: `governance` and
   `roles_responsibilities` -> `docs/GOVERNANCE.md`, `documentation_roadmap` ->
   `docs/ROADMAP.md`, `assurance_case` -> `docs/ASSURANCE_CASE.md`.
+- Keep every answered badge field — the metal series (passing, silver, gold) and
+  OSPS Baseline Level 1 — in `.bestpractices.json` (repository root) as the single
+  source of truth. To sync after editing it: commit and push the file, then on
+  bestpractices.dev open each affected level's edit form and click "Save (and
+  continue) 🤖", which re-reads the committed file and proposes the values for
+  review before saving. No credentials are used and the maintainer stays the final
+  arbiter. (Baseline Levels 2 and 3 have no answers yet; they populate the same way
+  once filled.) See the badge project's `docs/bestpractices-json.md`.
 
 ## Working toward the OpenSSF gold badge
 

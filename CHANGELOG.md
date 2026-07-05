@@ -100,6 +100,13 @@ listed below as they land.
   not `git commit`, so it does not sign off ordinary commits; use a `commit -s`
   alias or a `prepare-commit-msg` hook instead. Documentation only; no functional
   change.
+- Added `.bestpractices.json` (repository root) as the version-controlled source
+  of truth for the project's OpenSSF badge answers — the metal series (passing,
+  silver, gold) and OSPS Baseline Level 1, 151 criteria in total. Syncing it back
+  to bestpractices.dev uses the repository-file mechanism (commit, then "Save and
+  continue 🤖" per level so the badge re-reads the file), documented in
+  docs/ROADMAP.md; no credentials are used and the maintainer reviews every change
+  before saving. Metadata only; no functional change.
 
 ---
 

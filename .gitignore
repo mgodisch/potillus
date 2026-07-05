@@ -1,6 +1,8 @@
 .*.swp
 *.log
 *.orig
+*.pyc
+__pycache__/
 
 /*.pdf
 /android/.gradle
