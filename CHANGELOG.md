@@ -36,6 +36,46 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.79.0
+
+Work toward OpenSSF gold badge criteria
+
+Development toward the OpenSSF Best Practices gold level (project 13480). This
+release is groundwork only — project documentation and development-process
+improvements — with no functional changes to the app; individual changes are
+listed below as they land.
+
+- Per-file licensing: added the project's standard GPL copyright-and-licence
+  header to the remaining hand-authored source files that lacked it — eight XML
+  files (the manifest, the two adaptive-icon mipmaps, the colour and theme
+  resources, `data_extraction_rules.xml`, and `locale_config.xml`) and four
+  configuration files (`libs.versions.toml`, `gradle-daemon-jvm.properties`,
+  `.editorconfig`, and `version-anchor`). Every hand-authored source file now
+  carries both a copyright statement and a licence statement (gold criteria
+  `copyright_per_file` and `license_per_file`). No functional change.
+- Contributor onboarding: added a "Good first issues" subsection to
+  CONTRIBUTING.md that identifies small, self-contained tasks for new or casual
+  contributors (native-speaker translation review, documentation, and test
+  cases) and points to the tracker's `good first issue` label (gold criterion
+  `small_tasks`).
+- Security policy: docs/GOVERNANCE.md now documents that any account with write
+  access to the canonical repository must have cryptographic two-factor
+  authentication (a TOTP app or a hardware key, not SMS) enabled, since the forge
+  offers no per-project 2FA enforcement (gold criteria `require_2FA` and
+  `secure_2FA`).
+- Code review: added a "Code review requirements" subsection to CONTRIBUTING.md
+  documenting how review is conducted (single reviewer and merger; the reviewer
+  runs the build, tests, and release gate locally), an explicit checklist of what
+  is checked, and the acceptance criteria for merging (gold criterion
+  `code_review_standards`).
+- Security review: `docs/ASSURANCE_CASE.md` now records a dated security review
+  (2026) that takes into account the security requirements (SECURITY.md,
+  "Security model") and the security boundary (threat model and trust
+  boundaries), combining the assurance-case analysis with an Android-focused QA
+  pass over the security-relevant code (gold criterion `security_review`).
+
+---
+
 ## v0.78.0
 
 Complete L10N for F-Droid; overhaul build tools

@@ -64,3 +64,13 @@ At present the project has a single role:
 Because the project currently has one maintainer, that person holds every role.
 Detailed responsibilities are listed under "Key roles" above; contributors take
 on no formal ongoing role beyond the individual contributions they submit.
+
+## Repository access and account security
+
+Anyone granted write (push) access to the canonical repository — currently only
+the maintainer — MUST have two-factor authentication (2FA) enabled on their
+Codeberg account, using a cryptographic method (a TOTP authenticator app or a
+hardware security key), not SMS. The forge offers no per-project 2FA enforcement
+setting, so this is a documented project policy: write access will not be granted
+to, or retained by, an account without such 2FA. This protects the integrity of
+the central repository against account takeover.

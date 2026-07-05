@@ -138,3 +138,20 @@ to a local, offline Android app are countered. The residual risks (a compromised
 device, forensic access to an unlocked device, and exported files) are stated
 explicitly rather than claimed to be mitigated. On this basis, the security
 requirements in SECURITY.md are met for the app's intended threat model.
+
+## Security review record
+
+A security review of Libellus Potionis was performed in 2026 by the maintainer.
+It took into account the security requirements (SECURITY.md, "Security model")
+and the security boundary (the threat model and trust boundaries described above
+in this document). The review combined the assurance-case analysis with an
+Android-focused code and quality-assurance pass over the security-relevant areas:
+at-rest encryption (`KeystoreSecretStore`), input and backup/import validation,
+CSV-injection neutralization, the permission surface and exported components, and
+the `FLAG_SECURE` / `allowBackup="false"` / R8 hardening measures.
+
+Outcome: the countermeasures described above are in place; the residual risks (a
+compromised device, forensic access to an unlocked device, and exported files)
+are documented rather than claimed to be mitigated; and no unresolved
+high-severity issues are known. This record is updated whenever a further review
+is performed.

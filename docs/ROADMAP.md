@@ -50,14 +50,20 @@ attainable until each is resolved. They are the most critical open items.
   each push and reports success/failure. `./gradlew testDebugUnitTest` plus
   `lintDebug` and `ktlintCheck` is sufficient; instrumented tests need an
   emulator and are optional. Requires enabling Woodpecker for the repository.
-  Also satisfies passing `test_continuous_integration` and
-  `static_analysis_often`, and is the natural home for the periodic `osv-scanner`
-  run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
-- **Statement coverage >= 80%** (`test_statement_coverage80`). Integrate Kover,
+  Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
+  gold) and `static_analysis_often`, and is the natural home for the periodic
+  `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
+- **Statement coverage >= 80% (silver), >= 90% (gold)**
+  (`test_statement_coverage80`, `test_statement_coverage90`). Integrate Kover,
   measure statement coverage over the JVM-testable code, apply legitimate
   exclusions for generated/non-testable code (Room-generated classes,
-  `MainActivity`, pure Compose previews), and add tests to reach the threshold.
-  Also satisfies passing `test_most` and `dynamic_analysis`.
+  `MainActivity`, pure Compose previews), and add tests to reach the threshold —
+  80% clears silver, 90% clears the stricter gold criterion. Kover also measures
+  branch coverage, so the same integration must reach >= 80% branch coverage for
+  the gold `test_branch_coverage80` criterion. Reaching >= 80% branch coverage
+  also satisfies the gold `dynamic_analysis` criterion (an automated suite at that
+  coverage counts as dynamic analysis); the statement-coverage work also
+  satisfies passing `test_most`.
 
 ## Recommended, not blocking (SHOULD)
 
@@ -99,6 +105,53 @@ practice.
   `roles_responsibilities` -> `docs/GOVERNANCE.md`, `documentation_roadmap` ->
   `docs/ROADMAP.md`, `assurance_case` -> `docs/ASSURANCE_CASE.md`.
 
+## Working toward the OpenSSF gold badge
+
+Gold requires the silver badge first (every silver item above must be resolved).
+These are the additional gold-level criteria that are not yet met, recorded as
+they are assessed and ordered by criticality. Several are structural and need a
+second active participant in the project.
+
+- **Bus factor of 2 or more** (`bus_factor`, gold MUST). With a single maintainer
+  the bus factor is 1. This is the silver "Raise the bus factor" item above,
+  promoted to a hard requirement at gold: it needs a second, significantly
+  involved maintainer.
+- **Two unassociated significant contributors** (`contributors_unassociated`,
+  gold MUST). Requires at least two significant contributors who are not
+  associated with each other (e.g. not the same employer/organization). With a
+  single maintainer this is unmet; it is resolved by the same step as the bus
+  factor — a second, independent contributor.
+- **Two-person review of >= 50% of changes** (`two_person_review`, gold MUST).
+  Requires at least half of all proposed modifications to be reviewed before
+  release by someone other than their author. The review process itself is
+  documented (CONTRIBUTING.md, "Code review requirements"), but with a single
+  author-reviewer no change is reviewed by a second person. Resolved by the same
+  step as the two items above — a second, independent maintainer who can review.
+- **Hardened site headers** (`hardened_site`, gold MUST). The criterion requires
+  the repository and download sites to send all four key hardening headers:
+  Content-Security-Policy, HTTP Strict-Transport-Security, X-Content-Type-Options
+  (`nosniff`), and X-Frame-Options — with no exemption for static sites. The
+  download site (F-Droid) sends all four. The repository host (Codeberg) sends
+  strong HSTS and X-Frame-Options but not CSP or `nosniff`; those headers are
+  controlled by Codeberg, not the project, so they cannot be set from the
+  repository. Remediation options: ask Codeberg to emit the missing headers (at
+  least `X-Content-Type-Options: nosniff`), or host/mirror the repository on a
+  platform known to satisfy this criterion (GitHub and GitLab are listed as
+  compliant). Revisit once Codeberg's header set changes.
+- **More run-time assertions checked during testing**
+  (`dynamic_analysis_enable_assertions`, gold SHOULD; non-blocking). This
+  criterion targets fault detection during dynamic analysis (testing) before
+  deployment — explicitly not production. Today the code uses always-on Kotlin
+  preconditions (`require`, `check`, `error`) in a few critical places; these are
+  checked whenever the code runs, including under the test suite, but they are
+  not "many". Kotlin's compile-time null-safety and exhaustive typing already
+  enforce many invariants statically, reducing the need. To satisfy this SHOULD,
+  add invariant assertions in the JVM-testable domain and data layers using
+  Kotlin `assert()`: Gradle's unit-test task runs with assertions enabled
+  (`-ea`) by default, so they are verified during dynamic analysis, while ART
+  leaves them disabled in release builds — the "on for testing, off in
+  production" split the criterion recommends.
+
 ## Longer-term direction (~12 months)
 
 Lower-criticality, forward-looking directions, roughly in priority order:
@@ -111,8 +164,6 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   locales are machine-generated. Improve those locales as native-speaker
   corrections arrive (see the translation workflow in
   [../CONTRIBUTING.md](../CONTRIBUTING.md)) and keep every locale complete.
-- **Continue toward the OpenSSF gold badge.** After silver, adopt the further
-  documentation and process improvements the gold criteria encourage.
 - **Small, in-scope UX and feature refinements.** Incremental improvements to the
   existing screens and reports that stay within the app's purpose, without
   expanding its scope or permissions.

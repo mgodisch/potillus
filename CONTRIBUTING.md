@@ -86,6 +86,26 @@ participation in the project is expected to follow our
    locally as part of the review. The project's decision-making model and roles
    are described in [GOVERNANCE.md](docs/GOVERNANCE.md).
 
+### Good first issues
+
+New or casual contributors are welcome to start with small, self-contained tasks
+that need no deep familiarity with the codebase. Issues suitable for a first
+contribution are marked in the [issue
+tracker](https://codeberg.org/godisch/potillus/issues) with the `good first
+issue` label; filter by that label to find current ones. Small tasks that fit
+this project especially well include:
+
+- **Translation review.** English and German are hand-authored; the other
+  locales are machine-generated (see Section 6). Reviewing and correcting the
+  strings for a language you speak natively is a valuable, self-contained
+  contribution.
+- **Documentation.** Clarifying or correcting the README, this guide, or the
+  in-app user guide.
+- **Test cases.** Adding tests for existing behaviour that is not yet covered.
+
+If you spot a small improvement that is not yet tracked, feel free to open an
+issue describing it.
+
 ### Developer Certificate of Origin (DCO)
 
 All contributions to this project are made under the
@@ -118,6 +138,40 @@ Sign-off is a plain text line certifying agreement with the DCO; it is **not** a
 cryptographic signature and requires no key — only that your Git `user.name` and
 `user.email` are configured. Pull requests whose commits are not signed off may
 be asked to add the sign-off before they are merged.
+
+### Code review requirements
+
+Every change is reviewed before it is merged. Because the project currently has a
+single maintainer, the maintainer is the reviewer and the sole merger; external
+contributions are reviewed as pull requests (or emailed patch series). Until a
+continuous-integration service is in place, the reviewer runs the full build, the
+test suite, and the release gate locally as part of each review.
+
+A change is reviewed against this checklist — the same requirements a contributor
+is expected to have met (Section 2, step 3):
+
+- **Scope and philosophy.** The change fits the project's purpose and
+  privacy-first design, and adds no network access, accounts, tracking, or new
+  permissions (Section 1).
+- **Architecture.** It respects the architecture rules (Section 3).
+- **Code quality.** It follows the coding and KDoc conventions (Section 4) and
+  introduces no new compiler or lint warnings (the build treats warnings as
+  errors).
+- **Tests.** New major functionality is covered by automated tests in the same
+  change (the mandatory test policy, Section 5), and existing tests still pass.
+- **Localization.** Any new or changed user-facing string is complete across all
+  locales per the translation workflow (Section 6), so `LocaleSyncTest` passes.
+- **Licensing.** New source files carry the standard copyright-and-licence header,
+  and the change respects third-party licences (see COPYING.md).
+- **Provenance.** All commits are signed off under the DCO (see above).
+- **Data safety.** Any change touching persistence honours the schema-freeze
+  rules (Section 8).
+
+To be accepted (merged), a change MUST build cleanly, MUST have `./gradlew test`
+passing and `tools/release-check.sh` green, MUST uphold every item above, and
+MUST be judged a worthwhile improvement free of known defects that would argue
+against its inclusion. Changes that do not yet meet these requirements receive
+review comments and are merged only once resolved.
 
 ---
 

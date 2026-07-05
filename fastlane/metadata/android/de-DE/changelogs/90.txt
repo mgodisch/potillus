@@ -1,0 +1,1 @@
+Verbesserungen an Projektdokumentation und Entwicklungsprozess in Richtung der OpenSSF-Best-Practices-Gold-Kriterien. Keine funktionalen Änderungen an der App.
