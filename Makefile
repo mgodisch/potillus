@@ -39,6 +39,9 @@
 #    Packaging
 #      tgz          release source tarball (exclusions derived from .gitignore)
 #      push         git push + tags
+#    OpenSSF badge
+#      bestpractices-json  pull the badge answers from bestpractices.dev into
+#                          .bestpractices.json (site -> repo snapshot)
 #    Housekeeping
 #      clean / distclean
 # =============================================================================
@@ -482,6 +485,30 @@ push:
 	git push && git push --tags
 
 # =============================================================================
+# OPENSSF BEST PRACTICES BADGE
+# =============================================================================
+#
+# The project's badge answers live on bestpractices.dev. `.bestpractices.json`
+# in the repository root is a version-controlled SNAPSHOT of them, pulled from
+# the site's own JSON export (served by bestpractices.dev, so it is independent
+# of the code host). This is a one-way mirror site -> repo: answers are edited on
+# bestpractices.dev, and this target pulls them into version control. The reverse
+# (the badge ingesting a committed .bestpractices.json) is NOT available for
+# Codeberg-hosted repositories, and the URL-based proposal path is impractical
+# because the server rejects the long URLs the full answer set produces.
+BADGE_ID  := 13480
+BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
+
+# ── bestpractices-json ── MANUAL, network. Download the badge answers and keep
+# only the answered criteria (<name>_status in Met/Unmet/N/A plus the matching
+# _justification), sorted, so the committed snapshot diffs meaningfully. Review
+# `git diff .bestpractices.json` before committing.
+bestpractices-json:
+	@command -v curl >/dev/null || { echo "bestpractices-json: 'curl' not found — install it (Debian: apt install curl)"; exit 1; }
+	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 -c 'import json,sys; d=json.load(sys.stdin); a={k[:-7] for k,v in d.items() if k.endswith("_status") and str(v).strip() in {"Met","Unmet","N/A"}}; o={k:v for k,v in d.items() if (k.endswith("_status") and k[:-7] in a) or (k.endswith("_justification") and k[:-14] in a)}; json.dump(dict(sorted(o.items())), open(".bestpractices.json","w",encoding="utf-8"), indent=2, ensure_ascii=False); open(".bestpractices.json","a",encoding="utf-8").write(chr(10)); print("bestpractices-json: %d criteria written"%len(a), file=sys.stderr)'
+	@echo "bestpractices-json: review 'git diff .bestpractices.json' before committing."
+
+# =============================================================================
 # HOUSEKEEPING
 # =============================================================================
 
@@ -493,4 +520,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug release install screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing report-pdfs rokkitt-bold tgz push clean distclean
+.PHONY: debug release install screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing report-pdfs rokkitt-bold tgz push bestpractices-json clean distclean

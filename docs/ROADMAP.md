@@ -97,14 +97,16 @@ practice.
 - Keep the silver "Met URL" entries pointing at the moved docs: `governance` and
   `roles_responsibilities` -> `docs/GOVERNANCE.md`, `documentation_roadmap` ->
   `docs/ROADMAP.md`, `assurance_case` -> `docs/ASSURANCE_CASE.md`.
-- Keep every answered badge field — the metal series (passing, silver, gold) and
-  OSPS Baseline Level 1 — in `.bestpractices.json` (repository root) as the single
-  source of truth. To sync after editing it: commit and push the file, then on
-  bestpractices.dev open each affected level's edit form and click "Save (and
-  continue) 🤖", which re-reads the committed file and proposes the values for
-  review before saving. No credentials are used and the maintainer stays the final
-  arbiter. (Baseline Levels 2 and 3 have no answers yet; they populate the same way
-  once filled.) See the badge project's `docs/bestpractices-json.md`.
+- Keep a version-controlled snapshot of the badge answers (metal series passing,
+  silver, gold, plus OSPS Baseline Level 1) in `.bestpractices.json` (repository
+  root). This is a one-way mirror site -> repo: the maintainer edits answers on
+  bestpractices.dev, and `make bestpractices-json` pulls them back into the file
+  from the site's own JSON export (no credentials; review `git diff` before
+  committing). The reverse direction is unavailable here — bestpractices.dev's
+  automation does not ingest a `.bestpractices.json` committed to a Codeberg
+  repository (its repository analysis targets GitHub/GitLab), and the URL-based
+  automation-proposal path is impractical because the server rejects the long URLs
+  the full answer set produces. (Baseline Levels 2 and 3 are not yet answered.)
 
 ## Working toward the OpenSSF gold badge
 
