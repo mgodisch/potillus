@@ -59,6 +59,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.cyclonedx.Version
 import org.cyclonedx.model.Component
 
+// CoverageUnit selects LINE vs BRANCH for the Kover verification bounds in the
+// `kover { reports { verify { … } } }` block at the end of this file. Like the
+// imports above, it must appear before the `plugins { }` block.
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+
 // ── 1. Plugins ────────────────────────────────────────────────────────────────
 // Plugins are Gradle extensions that add new build capabilities.
 // "alias(libs.plugins.xxx)" refers to an entry in gradle/libs.versions.toml.
@@ -101,6 +106,16 @@ plugins {
     // and does not affect reproducible builds. ktlint is downloaded from the
     // central repository already configured in settings.gradle.kts.
     alias(libs.plugins.ktlint)
+
+    // Kover (org.jetbrains.kotlinx.kover):
+    // Measures statement and branch coverage from the JVM unit tests, toward the
+    // silver 80% and gold 90%/branch-80% coverage criteria. Coverage is measured
+    // over the unit-testable code; the Compose UI layer, the framework entry
+    // points, and generated code are excluded (see the kover { } block at the end
+    // of this file) because they are exercised by instrumented tests rather than
+    // JVM unit tests. Report tasks are build-time only and not on the
+    // release-assembly path, so they add nothing to the APK.
+    alias(libs.plugins.kover)
 }
 
 // ── 2. Android Configuration ──────────────────────────────────────────────────
@@ -906,4 +921,142 @@ tasks.cyclonedxDirectBom {
     jsonOutput.set(
         layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json")
     )
+}
+
+// ---------------------------------------------------------------------------
+// Kover — test coverage configuration
+// ---------------------------------------------------------------------------
+// Kover measures how much of the code is exercised by the JVM unit-test suite
+// (`./gradlew :app:test`). It reports two OpenSSF-relevant figures: statement
+// coverage (silver target 80%, gold target 90%) and branch coverage (gold
+// target 80%). Generate a report with, e.g.:
+//
+//     ./gradlew :app:koverHtmlReport   # HTML, under app/build/reports/kover
+//     ./gradlew :app:koverXmlReport    # machine-readable XML
+//     ./gradlew :app:koverLog          # prints total coverage to the console
+//
+// Scope / methodology: coverage is measured over the *unit-testable* code — the
+// domain, l10n, and repository layers, the pure util helpers, and the screen
+// ViewModels. Code that requires the Android runtime is excluded below, because
+// it is verified by the instrumented tests in src/androidTest (Room migrations,
+// Compose UI, on-device locale formatting, report export) rather than by JVM
+// unit tests, and Kover only observes the JVM test task: the Compose UI, the
+// Room database/DAO layer, the DataStore preferences, the Keystore access, and
+// the PDF/WebView renderers. The exclusions are limited to non-JVM-testable and
+// generated code so the reported figure honestly reflects coverage of the code
+// the unit tests are responsible for.
+//
+// This block configures reporting and filtering only. Build-breaking
+// verification thresholds (koverVerify) are deliberately NOT enabled yet; they
+// will be switched on once the measured coverage reaches the targets, so the
+// build is not broken in the meantime.
+kover {
+    reports {
+        filters {
+            excludes {
+                // Android-generated classes (R, BuildConfig, Manifest, ...).
+                androidGeneratedClasses()
+
+                // Compose UI that is not JVM-unit-testable: the theme, the
+                // reusable UI components, and the navigation graph together with
+                // its @Serializable routes. The screen ViewModels also live under
+                // ui (in ui.screen) but are deliberately NOT excluded — they are
+                // JVM-unit-tested; only the @Composable screen bodies are dropped,
+                // by the annotation filter below.
+                packages(
+                    "de.godisch.potillus.ui.theme",
+                    "de.godisch.potillus.ui.component",
+                    "de.godisch.potillus.ui.nav",
+                )
+
+                // All @Composable functions (screen bodies etc.): verified by the
+                // instrumented Compose UI tests, not by JVM unit tests.
+                annotatedBy("androidx.compose.runtime.Composable")
+
+                // Compose-generated lambda holders for @Composable functions
+                // (ComposableSingletons$...ScreenKt): generated code, not testable.
+                classes("*ComposableSingletons*")
+
+                // Framework entry points and the manual DI factory (which
+                // instantiates Android-scoped ViewModels from PotillusApp) — no
+                // JVM-unit-testable logic. The trailing "*" also drops their
+                // generated nested classes (lambdas, SAM conversions).
+                classes(
+                    "de.godisch.potillus.MainActivity*",
+                    "de.godisch.potillus.PotillusApp*",
+                    "de.godisch.potillus.AppViewModelFactory",
+                )
+
+                // Android-runtime-bound layers, verified by the instrumented
+                // tests (MigrationTest, BackupRepositoryInstrumentedTest,
+                // ReportExportTest) rather than by JVM unit tests. Note: the plain
+                // @Entity data classes in data.db.entity stay IN scope (they are
+                // JVM-unit-tested by EntityMappingTest); only the Room database,
+                // the DAOs, and the generated *_Impl classes are excluded.
+                packages(
+                    "de.godisch.potillus.data.db.dao",
+                    "de.godisch.potillus.data.prefs",
+                    "de.godisch.potillus.data.security",
+                )
+                classes(
+                    "de.godisch.potillus.data.db.AppDatabase*",
+                    "*_Impl*",
+                )
+
+                // Room-transaction-bound repository: BackupRepository uses
+                // db.withTransaction, which needs a real Room database, so it is
+                // verified by BackupRepositoryInstrumentedTest rather than by JVM
+                // unit tests. The other repositories only delegate to DAO methods
+                // and ARE JVM-unit-tested (with fake DAOs), so they stay in scope.
+                classes("de.godisch.potillus.data.repository.BackupRepository*")
+
+                // Android PDF / WebView renderers (android.print / android.graphics
+                // / WebView): exercised by the instrumented ReportExportTest. The
+                // trailing "*" also drops their generated nested classes.
+                classes(
+                    "de.godisch.potillus.util.PdfReportBuilder*",
+                    "de.godisch.potillus.util.WebViewPdfPrinter*",
+                )
+
+                // Android-runtime-bound declarations marked @AndroidIoBound
+                // (MediaStore export/import, print-request DTO): verified by the
+                // instrumented ReportExportTest, not by JVM unit tests.
+                annotatedBy("de.godisch.potillus.util.AndroidIoBound")
+
+                // Context-bound per-app locale helpers (top-level Context extensions).
+                classes("de.godisch.potillus.l10n.LocaleSupportKt")
+
+                // The coroutine bodies of the @AndroidIoBound ViewModel export/import
+                // actions compile to separate continuation classes that the
+                // annotation filter above does not reach, so they are excluded by
+                // name (they call the excluded MediaStore/PDF code).
+                classes(
+                    "de.godisch.potillus.ui.screen.SettingsViewModel\$exportBackup*",
+                    "de.godisch.potillus.ui.screen.SettingsViewModel\$importBackup*",
+                    "de.godisch.potillus.ui.screen.StatsViewModel\$exportCsv*",
+                    "de.godisch.potillus.ui.screen.StatsViewModel\$exportPdf*",
+                )
+            }
+        }
+
+        // ── Coverage verification (task: koverVerify) ──────────────────────
+        // Build-breaking regression floors over the JVM-unit-testable scope
+        // defined by the report filters above (verification shares them).
+        // These are guard rails, not the OpenSSF gold branch threshold
+        // (test_branch_coverage80, still a roadmap goal):
+        //   • LINE   >= 90  locks in the achieved gold statement coverage
+        //                   (test_statement_coverage90, and silver _80).
+        //   • BRANCH >= 75  guards the current branch coverage (~80%) against
+        //                   regression without demanding the gold 80% here.
+        // Enforced at release time by `tools/release-check.sh --coverage`
+        // (and, going forward, by the CI pipeline).
+        verify {
+            rule {
+                minBound(90, CoverageUnit.LINE)
+            }
+            rule {
+                minBound(75, CoverageUnit.BRANCH)
+            }
+        }
+    }
 }

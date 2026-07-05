@@ -131,6 +131,7 @@ object BackupManager {
      * @param entries  All consumption entries.
      * @return         [ExportResult] on success; `null` on I/O error.
      */
+    @AndroidIoBound
     fun exportToJson(
         context: Context,
         drinks: List<DrinkDefinition>,
@@ -286,6 +287,7 @@ object BackupManager {
      * @param uri      Content URI of the backup file (from the file picker).
      * @return         [ImportResult] – always non-null; check [ImportResult.error].
      */
+    @AndroidIoBound
     fun importFromJson(context: Context, uri: Uri): ImportResult {
         // ── Guard 1: file size ────────────────────────────────────────────────
         // Query the reported file size via ContentResolver before reading.

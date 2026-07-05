@@ -82,6 +82,7 @@ object CsvExporter {
      *                 `null` on any I/O error (the incomplete MediaStore entry is
      *                 deleted so no corrupt file remains in Downloads).
      */
+    @AndroidIoBound
     fun export(
         context: Context,
         entries: List<ConsumptionEntry>,

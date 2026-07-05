@@ -65,6 +65,7 @@ import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.util.AndroidIoBound
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.ExportResult
 import kotlinx.coroutines.Dispatchers
@@ -205,6 +206,7 @@ class SettingsViewModel(
      * on success, sets [shareTarget] so the screen can offer a share sheet.
      * Updates [exportStatus] with the result.
      */
+    @AndroidIoBound
     fun exportBackup() {
         viewModelScope.launch {
             val entries = entryRepo.getAll()
@@ -231,6 +233,7 @@ class SettingsViewModel(
      * @param uri  The content URI the user picked.
      * @param mode REPLACE (wipe then import) or MERGE (add, skipping duplicates).
      */
+    @AndroidIoBound
     fun importBackup(uri: Uri, mode: ImportMode) {
         viewModelScope.launch {
             // Reading the file (ContentResolver query + up to MAX_BACKUP_BYTES of

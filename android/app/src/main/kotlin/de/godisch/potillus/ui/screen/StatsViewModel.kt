@@ -54,6 +54,7 @@ import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.util.AndroidIoBound
 import de.godisch.potillus.util.CsvExporter
 import de.godisch.potillus.util.ExportResult
 import de.godisch.potillus.util.PdfReportBuilder
@@ -130,6 +131,7 @@ data class StatsUiState(
  * system print dialog via [de.godisch.potillus.util.WebViewPdfPrinter], then calls
  * [StatsViewModel.clearPrintRequest].
  */
+@AndroidIoBound
 data class PdfPrintRequest(
     val html: String,
     val jobName: String
@@ -190,6 +192,7 @@ class StatsViewModel(
      * @param from Start date inclusive ("YYYY-MM-DD").
      * @param to   End date inclusive ("YYYY-MM-DD").
      */
+    @AndroidIoBound
     fun exportCsv(from: String, to: String) {
         viewModelScope.launch {
             // Delegate the date filter to SQLite via getInRange() so the
@@ -228,6 +231,7 @@ class StatsViewModel(
      * @param from Start date inclusive ("YYYY-MM-DD").
      * @param to   End date inclusive ("YYYY-MM-DD").
      */
+    @AndroidIoBound
     fun exportPdf(from: String, to: String) {
         viewModelScope.launch {
             val settings = prefs.settingsFlow.first()

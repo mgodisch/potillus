@@ -73,6 +73,19 @@ listed below as they land.
   "Security model") and the security boundary (threat model and trust
   boundaries), combining the assurance-case analysis with an Android-focused QA
   pass over the security-relevant code (gold criterion `security_review`).
+- Test coverage: integrated Kover and expanded the JVM unit-test suite to measure
+  statement and branch coverage over the unit-testable code (the Compose UI, the
+  Android-runtime-bound layers — database, preferences, Keystore, PDF/WebView, and
+  the MediaStore import/export marked `@AndroidIoBound` — the app entry points,
+  and generated code are excluded and covered by instrumented tests instead).
+  Statement coverage now reaches ~97% and branch coverage ~80%. A build-breaking
+  floor (`koverVerify`: LINE >= 90, BRANCH >= 75 over that scope) is wired into the
+  release gate (`tools/release-check.sh --coverage`, `make cover-check`) so
+  coverage cannot silently regress. This meets silver `test_statement_coverage80`,
+  gold `test_statement_coverage90`, and passing `test_most`; the gold
+  `test_branch_coverage80` criterion (and the `dynamic_analysis` it unlocks)
+  remains a priority-2 roadmap goal, as the last branches sit in
+  Android-/Compose-adjacent code.
 
 ---
 

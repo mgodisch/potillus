@@ -27,13 +27,16 @@
 # PURPOSE
 #   Verifies all invariants that must hold before a new Potillus release is
 #   tagged. Run this script after completing all code changes and before
-#   calling `git tag`. It is a pure read-only check: it never modifies any
-#   file.
+#   calling `git tag`. The static checks are pure and read-only: they never
+#   modify any file. The opt-in coverage gate (--coverage) additionally runs
+#   `./gradlew :app:koverVerify`, which executes the unit-test suite and writes
+#   Gradle build outputs (never source files).
 #
 # USAGE
 #   chmod +x tools/release-check.sh      # once
 #   tools/release-check.sh               # run from the repo root (self-anchors)
 #   tools/release-check.sh --Werror      # treat warnings as errors
+#   tools/release-check.sh --coverage    # also enforce the Kover coverage floor
 #
 #   The script self-anchors to android/ (it lives in tools/ at the repo root and
 #   cd's into the sibling android/ directory), so it can also be invoked from
@@ -45,6 +48,11 @@
 # OPTIONS
 #   --Werror   Treat warnings as errors: exit non-zero if any warning is
 #              emitted, even when no hard FAIL occurred.
+#   --coverage Additionally run the Kover coverage gate (:app:koverVerify),
+#              which hard-fails if LINE < 90 or BRANCH < 75 over the
+#              JVM-unit-testable scope. Opt-in because it runs Gradle and the
+#              unit-test suite (slow); the on-every-build Makefile prereq path
+#              leaves it off, release/CI runs enable it.
 #
 # EXIT CODES
 #   0  All checks passed (warnings allowed unless --Werror is given).
@@ -157,12 +165,19 @@ PASSES=0
 #            slip silently into a build. The Makefile `release-check` target
 #            passes --Werror, making the on-every-build gate reject warnings too.
 WERROR=0
+# --coverage : additionally run the Kover coverage gate (./gradlew :app:koverVerify).
+#            Opt-in because it launches Gradle and runs the unit-test suite, which
+#            is far slower than the static checks; the on-every-build Makefile
+#            `prereq` path therefore leaves it OFF, while release/CI runs enable it.
+COVERAGE=0
 for arg in "$@"; do
     case "$arg" in
         --Werror|-Werror|--werror) WERROR=1 ;;
+        --coverage) COVERAGE=1 ;;
         -h|--help)
-            echo "Usage: tools/release-check.sh [--Werror]"
-            echo "  --Werror   treat warnings as errors (non-zero exit on any warning)"
+            echo "Usage: tools/release-check.sh [--Werror] [--coverage]"
+            echo "  --Werror     treat warnings as errors (non-zero exit on any warning)"
+            echo "  --coverage   also run the Kover coverage gate (:app:koverVerify)"
             exit 0
             ;;
         *)
@@ -1268,6 +1283,65 @@ PYEND
 }
 
 # =============================================================================
+#  OPT-IN — CODE COVERAGE (Kover)
+# =============================================================================
+#   Runs the build-breaking Kover verification (:app:koverVerify), whose bounds
+#   are declared in app/build.gradle.kts (LINE >= 90, BRANCH >= 75 over the
+#   JVM-unit-testable scope), and :app:koverXmlReport so the actual measured
+#   figures can be shown next to the enforced floors. Skipped unless --coverage
+#   is given, because it launches Gradle and executes the unit-test suite — far
+#   slower than the static checks above, so the on-every-build Makefile `prereq`
+#   path leaves it off. Release and CI runs pass --coverage to enforce the floor.
+check_coverage() {
+    section "COVERAGE — Kover verification (opt-in: --coverage)"
+
+    if [[ "$COVERAGE" -ne 1 ]]; then
+        info "Skipped (run with --coverage to enforce :app:koverVerify)"
+        return
+    fi
+
+    if [[ ! -x ./gradlew ]]; then
+        fail "gradlew not found or not executable in $(pwd) — cannot run the coverage gate"
+        return
+    fi
+
+    info "Running ./gradlew :app:koverXmlReport :app:koverVerify (this runs the unit-test suite)…"
+    if ./gradlew --console=plain --quiet :app:koverXmlReport :app:koverVerify; then
+        # Report the actual figures alongside the enforced floors. The values are
+        # read from the XML report koverXmlReport just produced; if it cannot be
+        # located or parsed, fall back to naming the floors only.
+        local report figures
+        report="$(find app/build/reports/kover -maxdepth 2 -name '*.xml' 2>/dev/null | head -1)"
+        figures=""
+        if [[ -n "$report" ]]; then
+            figures="$(python3 - "$report" <<'PYEND' 2>/dev/null
+import sys, xml.etree.ElementTree as ET
+try:
+    root = ET.parse(sys.argv[1]).getroot()
+except Exception:
+    sys.exit(0)
+def pct(unit):
+    for c in root.findall("counter"):
+        if c.get("type") == unit:
+            missed, covered = int(c.get("missed")), int(c.get("covered"))
+            total = missed + covered
+            return f"{100.0 * covered / total:.1f}%" if total else "n/a"
+    return "n/a"
+print(f"LINE = {pct('LINE')} >= 90, BRANCH = {pct('BRANCH')} >= 75")
+PYEND
+)"
+        fi
+        if [[ -n "$figures" ]]; then
+            pass "Coverage floors met ($figures; see app/build.gradle.kts)"
+        else
+            pass "Coverage floors met (LINE >= 90, BRANCH >= 75; see app/build.gradle.kts)"
+        fi
+    else
+        fail "koverVerify failed — coverage dropped below the enforced floor (LINE 90 / BRANCH 75)"
+    fi
+}
+
+# =============================================================================
 # MAIN
 # =============================================================================
 main() {
@@ -1291,6 +1365,7 @@ main() {
     check_metadata_lengths
     check_reproducible_build_hygiene
     check_third_party_notices
+    check_coverage
 
     # ── Final summary ─────────────────────────────────────────────────────────
     echo ""

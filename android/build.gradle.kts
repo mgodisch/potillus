@@ -87,4 +87,11 @@ plugins {
     // verification only; it is not part of the release-assembly path, so the
     // APK output and reproducible builds are unaffected.
     alias(libs.plugins.ktlint)              apply false
+
+    // Kover – measures Kotlin statement/branch test coverage. Registered here
+    // with "apply false" (consistent with the other plugins) and actually
+    // applied in app/build.gradle.kts. Its report tasks are build-time only and
+    // not part of the release-assembly path, so the APK output and reproducible
+    // builds are unaffected.
+    alias(libs.plugins.kover)               apply false
 }

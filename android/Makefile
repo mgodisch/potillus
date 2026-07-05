@@ -33,6 +33,7 @@ help:
 	@echo "  make guides         regenerate the localized user guides"
 	@echo "  make check-guides   verify guides and raw/copyright.md are in sync"
 	@echo "  make release-check  run the read-only release-readiness gate"
+	@echo "  make cover-check    release gate + enforce the Kover coverage floor"
 	@echo "  make test-device    run instrumented tests (device/emulator needed)"
 	@echo "  make test           run all tests (device needed)"
 	@echo "  make screenshot-apks  build the debug + androidTest APKs for screenshot capture"
@@ -193,6 +194,13 @@ check-guides:
 # duplicate it.
 release-check:
 	bash ../tools/release-check.sh --Werror
+
+# Release gate WITH the Kover coverage floor enforced (:app:koverVerify, LINE >= 90
+# / BRANCH >= 75). Kept separate from `release-check` (and thus from the
+# on-every-build `prereq` path) because it launches Gradle and runs the unit-test
+# suite; run it before tagging a release and in CI.
+cover-check:
+	bash ../tools/release-check.sh --Werror --coverage
 
 debug: app/build/outputs/apk/debug/app-debug.apk
 

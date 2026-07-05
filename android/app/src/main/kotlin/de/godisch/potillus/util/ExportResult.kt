@@ -60,6 +60,7 @@ import android.net.Uri
  * @param mimeType  MIME type string for the share intent
  *                  (e.g. "text/csv", "application/pdf", "application/json").
  */
+@AndroidIoBound
 data class ExportResult(
     val fileName: String,
     val uri: Uri,

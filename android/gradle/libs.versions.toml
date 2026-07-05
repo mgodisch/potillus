@@ -204,6 +204,16 @@ cyclonedx               = "3.2.4"     # org.cyclonedx.bom (SBOM generation)
 # affect reproducible builds. Applied in app/build.gradle.kts.
 ktlint                  = "14.2.0"    # org.jlleitschuh.gradle.ktlint
 
+# Kover: Kotlin code-coverage tool (JetBrains). Measures statement and branch
+# coverage from the JVM unit-test task, toward the silver 80% statement target
+# and the gold 90% statement / 80% branch targets. Build-time only — the report
+# tasks are never on the release-assembly path — so it adds nothing to the APK
+# and does not affect reproducible builds. 0.9.8 is required for AGP 9: earlier
+# 0.9.x releases produced an empty report on AGP 9 (the total report had no test
+# tasks / build variants attached — kotlinx-kover issue #785). Applied in
+# app/build.gradle.kts.
+kover                   = "0.9.8"     # org.jetbrains.kotlinx.kover
+
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────
 # core-ktx: Kotlin extension functions for Android APIs
@@ -360,3 +370,8 @@ cyclonedx           = { id = "org.cyclonedx.bom",                   version.ref 
 # with `apply false` in the root build.gradle.kts (matching the project's
 # plugin-declaration pattern) and applied in the :app module.
 ktlint              = { id = "org.jlleitschuh.gradle.ktlint",       version.ref = "ktlint" }
+
+# Kover plugin – measures Kotlin test coverage (see the `kover` version above).
+# Registered with `apply false` in the root build.gradle.kts (matching the
+# project's plugin-declaration pattern) and applied in the :app module.
+kover               = { id = "org.jetbrains.kotlinx.kover",         version.ref = "kover" }

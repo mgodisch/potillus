@@ -257,6 +257,35 @@ merged.
 - Cover all boundary conditions: zero inputs, negative inputs, exactly-at-limit,
   exactly-one-over-limit, future dates.
 
+**Coverage (Kover):**
+The project measures test coverage with Kover. Generate a report with:
+
+```
+./gradlew :app:koverHtmlReport   # HTML report under app/build/reports/kover
+./gradlew :app:koverXmlReport    # machine-readable XML
+./gradlew :app:koverLog          # prints total coverage to the console
+```
+
+Coverage is measured over the unit-testable code — the `domain`, `l10n`, and
+repository layers, the pure `util` helpers, and the screen ViewModels. Code that
+requires the Android runtime is excluded, because it is exercised by the
+instrumented tests in `src/androidTest` rather than by JVM unit tests: the
+Compose UI (`ui.theme`, `ui.component`, `ui.nav`, and all `@Composable`
+functions), the app entry points and manual DI factory (`MainActivity`,
+`PotillusApp`, `AppViewModelFactory`), the Room database/DAO layer
+(`data.db.dao`, `AppDatabase`, generated `*_Impl`), the DataStore preferences
+(`data.prefs`), the Keystore access (`data.security`), the Room-transaction
+repository (`BackupRepository`, which uses `db.withTransaction`), the PDF/WebView
+renderers (`PdfReportBuilder`, `WebViewPdfPrinter`), and generated code (`R`,
+`BuildConfig`, Compose `ComposableSingletons`). Individual Android-I/O methods
+inside otherwise-testable classes (the MediaStore export/import in `BackupManager`
+and `CsvExporter`, and the ViewModel export/import actions) are marked with the
+`@AndroidIoBound` annotation and excluded via `annotatedBy(...)`, so the reported
+figure reflects the JVM-unit-testable code. The plain `@Entity` data classes stay in scope. The
+targets are statement coverage >= 80% (silver) and >= 90% (gold), plus branch
+coverage >= 80% (gold); build-breaking enforcement is added once those targets
+are reached.
+
 ---
 
 ## 6. Translation workflow

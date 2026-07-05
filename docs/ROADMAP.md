@@ -53,17 +53,6 @@ attainable until each is resolved. They are the most critical open items.
   Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
   gold) and `static_analysis_often`, and is the natural home for the periodic
   `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
-- **Statement coverage >= 80% (silver), >= 90% (gold)**
-  (`test_statement_coverage80`, `test_statement_coverage90`). Integrate Kover,
-  measure statement coverage over the JVM-testable code, apply legitimate
-  exclusions for generated/non-testable code (Room-generated classes,
-  `MainActivity`, pure Compose previews), and add tests to reach the threshold —
-  80% clears silver, 90% clears the stricter gold criterion. Kover also measures
-  branch coverage, so the same integration must reach >= 80% branch coverage for
-  the gold `test_branch_coverage80` criterion. Reaching >= 80% branch coverage
-  also satisfies the gold `dynamic_analysis` criterion (an automated suite at that
-  coverage counts as dynamic analysis); the statement-coverage work also
-  satisfies passing `test_most`.
 
 ## Recommended, not blocking (SHOULD)
 
@@ -138,6 +127,19 @@ second active participant in the project.
   least `X-Content-Type-Options: nosniff`), or host/mirror the repository on a
   platform known to satisfy this criterion (GitHub and GitLab are listed as
   compliant). Revisit once Codeberg's header set changes.
+- **Branch coverage >= 80%** (`test_branch_coverage80`, gold MUST; also unlocks
+  `dynamic_analysis`). *Priority 2 — deliberately not forced.* Kover is fully
+  integrated and enforced: statement coverage is ~97% and branch coverage ~80%,
+  with a build-breaking floor (`koverVerify`: LINE >= 90 / BRANCH >= 75) wired
+  into the release gate (`make cover-check`). Reaching the gold threshold needs
+  branch coverage at or above 80%; the last few percent of branches sit in
+  Android-/Compose-adjacent code (ViewModel `StateFlow` assembly, resource-bound
+  error mapping) that is awkward to exercise from JVM unit tests. Closing the gap
+  — via targeted tests or a small refactor that makes that logic pure — also
+  satisfies the gold `dynamic_analysis` criterion (an automated suite at that
+  coverage counts as dynamic analysis). The related passing `test_most` and the
+  silver/gold statement-coverage criteria (`test_statement_coverage80`,
+  `test_statement_coverage90`) are already met.
 - **More run-time assertions checked during testing**
   (`dynamic_analysis_enable_assertions`, gold SHOULD; non-blocking). This
   criterion targets fault detection during dynamic analysis (testing) before
