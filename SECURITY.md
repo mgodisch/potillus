@@ -175,3 +175,8 @@ You can verify a downloaded or installed release in any of these ways:
   `1842 323B 4FCF 9B90 995F  A17F A350 B991 F05A 4857`, the same key used for
   security reports above; fetch it from `hkps://keyring.debian.org:443`). After
   importing the key you can verify a tag with `git tag -v vX.Y.Z`.
+
+- **By auditing commit signatures.** All commits are cryptographically signed —
+  branch protection rejects unsigned or unverifiable commits — so you can check
+  the authorship of the entire history with `git log --show-signature`. Codeberg
+  also marks each verified commit as *Verified* in its web interface.

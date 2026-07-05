@@ -92,6 +92,14 @@ listed below as they land.
   that refreshes the pin on a Gradle bump (CONTRIBUTING.md §7). This keeps the
   committed `gradle-wrapper.jar` a stock, verifiable wrapper (OSPS Baseline
   `OSPS-QA-05.02`). No functional change.
+- Documented the commit-signing and fast-forward-only merge workflow now enforced
+  by branch protection — signed commits required on every branch except `main`,
+  `main` merged fast-forward-only — in CONTRIBUTING.md §2, and noted commit-signature
+  verification (`git log --show-signature`) in SECURITY.md. Also corrected the DCO
+  auto-sign-off tip: `format.signOff` affects `git format-patch`/`git send-email`,
+  not `git commit`, so it does not sign off ordinary commits; use a `commit -s`
+  alias or a `prepare-commit-msg` hook instead. Documentation only; no functional
+  change.
 
 ---
 

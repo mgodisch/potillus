@@ -127,17 +127,60 @@ flag:
 git commit -s -m "Your commit message"
 ```
 
-To avoid having to remember `-s`, you can make Git add the sign-off line to
-every commit in this repository automatically:
+To avoid having to remember `-s`, add a repository alias — note that
+`format.signOff` affects only `git format-patch` / `git send-email`, not
+`git commit`, so it does **not** sign off ordinary commits:
 
 ```sh
-git config format.signOff true
+git config alias.cs 'commit -s'    # then commit with: git cs -m "…"
+```
+
+Alternatively, append the trailer automatically with a `prepare-commit-msg`
+hook (idempotent — it never adds a duplicate line):
+
+```sh
+cat > .git/hooks/prepare-commit-msg <<'EOF'
+#!/bin/sh
+git interpret-trailers --if-exists doNothing \
+    --trailer "Signed-off-by: $(git config user.name) <$(git config user.email)>" \
+    --in-place "$1"
+EOF
+chmod +x .git/hooks/prepare-commit-msg
 ```
 
 Sign-off is a plain text line certifying agreement with the DCO; it is **not** a
 cryptographic signature and requires no key — only that your Git `user.name` and
 `user.email` are configured. Pull requests whose commits are not signed off may
 be asked to add the sign-off before they are merged.
+
+### Commit signing and merge workflow
+
+Beyond the DCO sign-off (a plain-text line), the repository requires every commit
+to carry a **cryptographic signature**. Branch protection on Codeberg rejects
+pushes that contain unsigned or unverifiable commits on every branch except
+`main`; `main` itself is merged **fast-forward-only**, so the already-signed
+commits flow onto it unchanged (rather than the forge creating an unsigned merge
+commit). Enable signing locally and register the matching **public** key with
+your Codeberg account, so the forge can verify the signature:
+
+```sh
+git config commit.gpgSign true
+git config user.signingKey <your-key-id>
+```
+
+For SSH signing instead of GPG, set `git config gpg.format ssh` and point
+`user.signingKey` at your public-key file. If the public key is not on your
+Codeberg account, the commit counts as *unverifiable* and the push is rejected.
+
+Because merges are fast-forward-only, the branch must sit directly on top of the
+current `main`. Rebase before opening or updating a pull request; with
+`commit.gpgSign` set, the rebased commits are re-signed automatically:
+
+```sh
+git fetch origin
+git rebase origin/main          # to squash: git rebase -i --gpg-sign origin/main
+git push --force-with-lease
+```
 
 ### Code review requirements
 
