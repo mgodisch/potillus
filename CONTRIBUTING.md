@@ -413,6 +413,10 @@ Before tagging a new version:
       `git tag -s vX.Y.Z -m "vX.Y.Z"`, signed with the maintainer's key, and push
       it. Tags are verifiable with `git tag -v vX.Y.Z` (see SECURITY.md,
       "Verifying releases").
+- [ ] Publish the release on Codeberg from the signed tag and attach the CycloneDX
+      SBOM (`android/app/build/outputs/sbom/libellus-potionis-sbom.json`, built by
+      `make release`/`make bundle`) as a release asset, so every released version is
+      accompanied by its software bill of materials.
 
 To avoid forgetting the signature, configure Git to sign annotated tags
 automatically in this repository (this requires `user.signingkey` to be set):

@@ -116,6 +116,41 @@ listed below as they land.
   no functional change.
 - SECURITY.md: reworded the link to the assurance case to use human-readable link
   text (matching the rest of the docs), resolving a `tools/md-syntax.py` warning.
+- SECURITY.md: added a "Secrets and credentials" section defining the project's
+  policy for its secrets (release signing keystore, Google Play upload credentials,
+  and the maintainer's OpenPGP key) — how they are stored (never committed;
+  git-ignored with structure-only templates; environment-variable injection),
+  accessed (held solely by the maintainer on trusted machines), and rotated.
+  Satisfies OSPS Baseline Level 3 `OSPS-BR-07.02`. Documentation only; no functional
+  change.
+- SECURITY.md: added a "Support" section stating the project's support model — a
+  single-maintainer rolling release in which only the latest version is supported,
+  the scope (best-effort bug fixes and security updates shipped in new releases, no
+  back-porting) and duration of support, and when a version stops receiving security
+  updates. Satisfies OSPS Baseline Level 3 `OSPS-DO-04.01` and `OSPS-DO-05.01`.
+  Documentation only; no functional change.
+- docs/GOVERNANCE.md: extended "Repository access and account security" with a
+  policy that code collaborators are reviewed and approved before being granted
+  escalated permissions to sensitive resources (write/merge access, release
+  secrets), with least-privilege grants and identity vetting. Satisfies OSPS
+  Baseline Level 3 `OSPS-GV-04.01`. Documentation only; no functional change.
+- Release process: every published Codeberg release is accompanied by the build's
+  CycloneDX SBOM as a release asset. `android/Makefile` `release`/`bundle` (which
+  already build the SBOM alongside the artifact) now also print its path, and
+  CONTRIBUTING.md §7 adds attaching it as a release-checklist step. Every released
+  version is thus delivered with its software bill of materials, satisfying OSPS
+  Baseline Level 3 `OSPS-QA-02.02`. No change to the build artifacts themselves.
+- docs/ROADMAP.md: added a "Working toward OpenSSF Baseline Level 3" section
+  recording the remaining Level 3 gaps — the structural walls shared with the gold
+  tier and a future VEX feed for `OSPS-VM-04.02` — and marked Level 3 as in
+  progress. Documentation only; no functional change.
+- SECURITY.md ("Dependency monitoring"): documented that every dependency must be
+  under a license compatible with the project's GPL-3.0-or-later distribution and
+  that incompatible-license findings are remediated before release, defining the
+  project's SCA remediation threshold for both vulnerabilities and licenses (OSPS
+  Baseline Level 3 `OSPS-VM-05.01`). docs/ROADMAP.md: recorded the future
+  CI-based automated, blocking policy gates (`OSPS-VM-05.03`, strengthening
+  `OSPS-VM-06.02`). Documentation only; no functional change.
 
 ---
 

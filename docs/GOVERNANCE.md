@@ -74,3 +74,14 @@ hardware security key), not SMS. The forge offers no per-project 2FA enforcement
 setting, so this is a documented project policy: write access will not be granted
 to, or retained by, an account without such 2FA. This protects the integrity of
 the central repository against account takeover.
+
+Escalated permissions to sensitive resources — write/merge access to the
+canonical repository, and access to release secrets or credentials — are granted
+only after the maintainer has reviewed and approved the individual. Review
+considers the contributor's track record in the project (contributions accepted
+through the normal pull-request review process), a justifiable lineage of
+identity, and the 2FA requirement above. Permissions are granted at the lowest
+level needed for the person's role and escalated only as further need is
+demonstrated, and revoked when no longer needed. Until such a grant, all
+contributions are submitted as pull requests and merged only by the maintainer,
+so no contributor holds escalated permissions without this review.

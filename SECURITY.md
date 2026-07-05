@@ -134,6 +134,28 @@ Vulnerabilities in third-party dependencies should be reported to their
 respective projects; if a dependency issue affects Libellus Potionis, you are
 welcome to notify the maintainer as well so the dependency can be updated.
 
+## Support
+
+Libellus Potionis is maintained by a single volunteer maintainer and follows a
+rolling-release model: only the **latest released version** is supported.
+
+- **Scope.** Support consists of bug fixes and security updates, delivered in new
+  releases through [F-Droid](https://f-droid.org/packages/de.godisch.potillus/),
+  on a best-effort basis. There are no separate maintenance branches and fixes are
+  not back-ported to older versions; users receive fixes by updating to the newest
+  release.
+- **Duration.** Each release is supported until the next release supersedes it.
+  Security updates are provided for the current release for as long as the project
+  remains active.
+- **End of security updates.** A given version stops receiving security updates as
+  soon as a newer release supersedes it, because security fixes ship in the new
+  release rather than being back-ported. If the project is ever discontinued, that
+  will be announced in the repository (README), after which no further updates —
+  security or otherwise — will be provided.
+- **Obtaining support.** Bug reports and questions go to the
+  [Codeberg issue tracker](https://codeberg.org/godisch/potillus/issues); suspected
+  vulnerabilities follow the process in "Reporting a vulnerability" above.
+
 ## Dependency monitoring
 
 The project's external dependencies are checked periodically — at a minimum
@@ -147,6 +169,49 @@ app are recorded as such. Because the app performs no network communication and
 requests a minimal permission set, the exposure from dependency vulnerabilities
 is limited, but they are tracked and addressed regardless. This periodic check
 is part of the release checklist in CONTRIBUTING.md §7.
+
+The same discipline applies to dependency licenses: every third-party dependency
+must be under a license compatible with the project's GPL-3.0-or-later
+distribution — the licenses actually in use are recorded in COPYING.md — and any
+dependency whose license is not compatible is replaced or removed before a
+release. Together with the vulnerability triage above, this defines the project's
+remediation threshold for software-composition-analysis (SCA) findings.
+
+## Secrets and credentials
+
+The project uses a small, fixed set of secrets, none of which are ever committed
+to version control:
+
+- the **release code-signing keystore** (`android/keystore.properties` and the
+  keystore file it references), used only to sign Google Play artifacts;
+- the **Google Play upload credentials** (`fastlane/play-store-credentials.json`),
+  used only by the Fastlane `deploy` lane; and
+- the maintainer's **OpenPGP signing key**, used to sign release tags and commits.
+
+**Storing.** Secrets are never hard-coded in source and never stored in the
+repository. `android/keystore.properties` and
+`fastlane/play-store-credentials.json` are git-ignored; the committed templates
+(`android/keystore.properties.example` and `fastlane/Appfile`) document their
+structure without any secret values. On a build host the values are supplied
+through those local files or, equivalently, through environment variables
+(`POTILLUS_KEYSTORE_*`, `SUPPLY_JSON_KEY`), so a secret is injected at build time
+rather than persisted in the tree.
+
+**Accessing.** The project has a single maintainer, who is the only holder of
+these secrets and keeps them solely on trusted local machines; they are not
+shared. Any future collaborator granted release duties would receive only the
+specific credential their task requires.
+
+**Rotating.** The Google Play API credential and any injected tokens can be
+rotated at any time by revoking the old credential in the Google Play Console and
+replacing the file or variable, with no code change. The OpenPGP signing key is
+rotated by publishing a new key — updating the fingerprint recorded in this file —
+and re-signing subsequent releases. The Android application-signing key is
+deliberately long-lived, because update artifacts must be signed with the same
+key for install continuity, so it is rotated only in response to suspected
+compromise, following the key-rotation process of the distribution channel
+(F-Droid or Play App Signing). Any secret believed to be exposed is revoked and
+replaced before the next release.
 
 ## Verifying releases
 

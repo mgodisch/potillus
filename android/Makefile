@@ -223,6 +223,7 @@ screenshot-apks:
 release: prereq $(SBOM)
 	./gradlew assembleRelease
 	@echo "Release APK: $$(find app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' | head -1)"
+	@echo "SBOM:        $(SBOM)  (attach to the Codeberg release)"
 
 # Build the release Android App Bundle (AAB). Google Play requires the AAB format
 # for new apps; F-Droid never uses it. Signed when a release key is configured,
@@ -232,6 +233,7 @@ release: prereq $(SBOM)
 bundle: prereq $(SBOM)
 	./gradlew bundleRelease
 	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"
+	@echo "SBOM:        $(SBOM)  (attach to the Codeberg release)"
 
 # Upload the signed AAB and the store metadata to Google Play via the fastlane
 # `deploy` lane (see ../fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
