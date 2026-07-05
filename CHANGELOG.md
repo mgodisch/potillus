@@ -102,12 +102,20 @@ listed below as they land.
   change.
 - Added `.bestpractices.json` (repository root) as a version-controlled snapshot
   of the project's OpenSSF badge answers — the metal series (passing, silver, gold)
-  and OSPS Baseline Level 1, 153 criteria in total — together with a manual
+  and OSPS Baseline Levels 1 and 2 — together with a manual
   `make bestpractices-json` target that refreshes it from bestpractices.dev's own
   JSON export. This is a one-way site -> repo mirror: the badge automation does not
   ingest a `.bestpractices.json` from a Codeberg repository, and the URL-based
   proposal path is impractical because the server rejects the long URLs. No
   credentials are used. Metadata/tooling only; no functional change.
+- SECURITY.md: added a "Security advisories" section documenting that confirmed,
+  fixed vulnerabilities are published through predictable public channels — the
+  CHANGELOG release notes and the corresponding Codeberg release — stating the
+  affected version(s), how a user can determine whether they are affected, and the
+  remediation. Satisfies OSPS Baseline Level 2 `OSPS-VM-04.01`. Documentation only;
+  no functional change.
+- SECURITY.md: reworded the link to the assurance case to use human-readable link
+  text (matching the rest of the docs), resolving a `tools/md-syntax.py` warning.
 
 ---
 

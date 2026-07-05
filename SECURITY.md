@@ -33,7 +33,7 @@ These are the security properties Libellus Potionis is designed to provide, and
 their limits. They describe what the software is intended to guarantee — not a
 promise that no defect will ever exist. A structured argument for why these
 requirements are met — including the threat model and trust boundaries — is in
-[ASSURANCE_CASE.md](docs/ASSURANCE_CASE.md).
+[the assurance case](docs/ASSURANCE_CASE.md).
 
 **What users can expect:**
 
@@ -116,6 +116,16 @@ To help triage and reproduce the issue, please include where possible:
   reasonable opportunity to release a fix before disclosing the issue publicly.
   Unless you prefer to remain anonymous, your contribution will be credited in
   the release notes once a fix is published.
+
+## Security advisories
+
+When a vulnerability in Libellus Potionis is confirmed and fixed, the project
+publishes an advisory through predictable public channels: the security-relevant
+fix is recorded in the release notes (CHANGELOG.md) and in the corresponding
+Codeberg release. Each advisory states, to the extent possible, the affected
+version(s), how a user can determine whether they are affected, and the
+remediation — updating to the fixed version, which is distributed through
+F-Droid.
 
 ## Scope
 

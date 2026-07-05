@@ -53,10 +53,13 @@ attainable until each is resolved. They are the most critical open items.
   Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
   gold) and `static_analysis_often`, and is the natural home for the periodic
   `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
-  When added, the pipeline must also satisfy the CI-conditional OSPS Baseline L1
-  controls: sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
-  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
-  and run with least-privilege permissions (`OSPS-AC-04.01`, `OSPS-AC-05.01`).
+  When added, the pipeline should be configured to satisfy the CI-conditional OSPS
+  Baseline controls that are answered N/A today for want of any CI, across Level 1
+  and Level 2: sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
+  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`), run
+  with least-privilege default permissions (`OSPS-AC-04.01`), and run the test
+  suite and any status checks in the pipeline before merge (`OSPS-QA-06.01`,
+  `OSPS-QA-03.01`).
 
 ## Recommended, not blocking (SHOULD)
 
@@ -106,7 +109,8 @@ practice.
   automation does not ingest a `.bestpractices.json` committed to a Codeberg
   repository (its repository analysis targets GitHub/GitLab), and the URL-based
   automation-proposal path is impractical because the server rejects the long URLs
-  the full answer set produces. (Baseline Levels 2 and 3 are not yet answered.)
+  the full answer set produces. (Baseline Level 2 is complete; Level 3 is not yet
+  answered.)
 
 ## Working toward the OpenSSF gold badge
 
