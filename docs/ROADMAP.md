@@ -53,6 +53,10 @@ attainable until each is resolved. They are the most critical open items.
   Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
   gold) and `static_analysis_often`, and is the natural home for the periodic
   `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
+  When added, the pipeline must also satisfy the CI-conditional OSPS Baseline L1
+  controls: sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
+  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
+  and run with least-privilege permissions (`OSPS-AC-04.01`, `OSPS-AC-05.01`).
 
 ## Recommended, not blocking (SHOULD)
 

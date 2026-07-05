@@ -86,6 +86,12 @@ listed below as they land.
   `test_branch_coverage80` criterion (and the `dynamic_analysis` it unlocks)
   remains a priority-2 roadmap goal, as the last branches sit in
   Android-/Compose-adjacent code.
+- Supply-chain hardening: pinned the Gradle distribution by checksum
+  (`distributionSha256Sum` in `gradle-wrapper.properties`) so Gradle verifies every
+  download against a known-good hash, and documented the wrapper-regeneration step
+  that refreshes the pin on a Gradle bump (CONTRIBUTING.md §7). This keeps the
+  committed `gradle-wrapper.jar` a stock, verifiable wrapper (OSPS Baseline
+  `OSPS-QA-05.02`). No functional change.
 
 ---
 

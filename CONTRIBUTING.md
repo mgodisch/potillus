@@ -382,6 +382,24 @@ Note this applies to annotated tags (`git tag -a`/`-m`/`-s`); a lightweight
 `git tag vX.Y.Z` creates no tag object and is not signed, so always create the
 release tag as an annotated tag.
 
+### Updating the Gradle version
+
+The Gradle distribution is pinned by checksum in
+`android/gradle/wrapper/gradle-wrapper.properties` (`distributionSha256Sum`), so
+Gradle verifies every download against a known-good hash. This is supply-chain
+hardening and also underpins OSPS Baseline `OSPS-QA-05.02` (the committed
+`gradle-wrapper.jar` stays a stock, verifiable wrapper). The pin is
+version-specific, so when bumping Gradle, regenerate the wrapper rather than
+editing the version by hand — this refreshes both the URL and the checksum:
+
+```sh
+./gradlew wrapper --gradle-version <X.Y.Z> \
+    --gradle-distribution-sha256-sum <sha256-of-gradle-X.Y.Z-bin.zip>
+```
+
+The official `-bin.zip` checksum is published at
+<https://gradle.org/release-checksums/>.
+
 ---
 
 ## 8. Data persistence — schema freeze rules

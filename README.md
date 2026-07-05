@@ -25,6 +25,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13480/badge)](https://www.bestpractices.dev/projects/13480)
+[![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 
 ## About the App (v0.79.0)
 
