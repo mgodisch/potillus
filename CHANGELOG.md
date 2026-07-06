@@ -231,6 +231,7 @@ listed below as they land.
   `./gradlew ktlintCheck lintDebug`, so a style regression breaks the everyday
   build instead of surfacing only at release time. Style/build-tooling only; no
   functional change to the app.
+- Update fastlane v2.236.1 to v2.237.0.
 
 ---
 
