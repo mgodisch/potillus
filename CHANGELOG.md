@@ -45,6 +45,15 @@ release is groundwork only — project documentation and development-process
 improvements — with no functional changes to the app; individual changes are
 listed below as they land.
 
+- `.bestpractices.json`: reworded the four justifications that quoted a
+  concrete release ("currently 0.78.0" in `OSPS-BR-02.01`/`OSPS-BR-02.02`/
+  `version_unique`, "e.g. v0.78.0" in `version_tags`) to be release-agnostic
+  — the versionName/versionCode statements now point at their defining
+  location (`android/app/build.gradle.kts`) and the tag statement describes
+  the `v<versionName>` scheme. The self-assessment can no longer go stale on
+  version bumps; the substance of the answers is unchanged. (Found by the
+  claims-vs-tree consistency scan of the QA delta review; the file said
+  0.78.0 while the tree was 0.79.0.)
 - QA delta review (three verified findings against v0.79.0, independently
   reported by a skill-guided review run and confirmed at the source):
   - `KeystoreSecretStore.openWithKey` now throws `GeneralSecurityException`
