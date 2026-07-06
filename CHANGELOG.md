@@ -45,6 +45,29 @@ release is groundwork only — project documentation and development-process
 improvements — with no functional changes to the app; individual changes are
 listed below as they land.
 
+- QA delta review (three verified findings against v0.79.0, independently
+  reported by a skill-guided review run and confirmed at the source):
+  - `KeystoreSecretStore.openWithKey` now throws `GeneralSecurityException`
+    (instead of `require`'s `IllegalArgumentException`) for a blob too short to
+    contain an IV. `open()`'s public contract promises GSE for ANY malformed
+    blob and `AppPreferences` catches exactly that family to translate
+    decryption failures into a DataStore `CorruptionException` — so a truncated
+    (partially written) preferences file used to BYPASS the
+    `ReplaceFileCorruptionHandler` and crash the read instead of self-healing.
+    The unit test that had pinned the wrong exception type was corrected and a
+    boundary-case test (exactly IV-sized blob → authentication failure, not
+    length failure) added; both executed on the JVM.
+  - `YearCalendarView` builds its month-abbreviation formatter with the per-app
+    `formattingLocale()`; the pattern previously carried no locale, so the year
+    calendar's month labels followed the SYSTEM language on every API level —
+    against the project's own "never Locale.getDefault() for user-visible
+    text" rule.
+  - `formatStatsDate` (Settings/Stats date range) uses the locale's LONG date
+    style instead of the hardcoded `"d. MMMM yyyy"` pattern: passing a locale
+    to a hardcoded pattern localizes only the month NAME, while field order and
+    punctuation stayed German for every language ("28. June 2026" instead of
+    "June 28, 2026"). Minor visible change for German users: none (LONG for de
+    is "28. Juni 2026").
 - Per-file licensing: added the project's standard GPL copyright-and-licence
   header to the remaining hand-authored source files that lacked it — eight XML
   files (the manifest, the two adaptive-icon mipmaps, the colour and theme

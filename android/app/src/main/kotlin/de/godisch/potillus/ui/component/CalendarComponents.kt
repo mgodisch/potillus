@@ -53,10 +53,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.model.DaySummary
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
 import java.time.LocalDate
 import java.time.YearMonth
@@ -101,7 +103,13 @@ fun YearCalendarView(
     modifier: Modifier = Modifier,
     weekStart: Int = 1
 ) {
-    val monthFmt    = DateTimeFormatter.ofPattern("MMM")
+    // Per-app locale (LocaleSupport.kt rule: never Locale.getDefault() for
+    // user-visible text). Without the explicit locale this formatter followed
+    // the JVM default — i.e. the SYSTEM language — so the year calendar's
+    // month abbreviations ignored the in-app language on every API level
+    // (found in the v0.79.0 QA delta review).
+    val locale      = LocalContext.current.formattingLocale()
+    val monthFmt    = DateTimeFormatter.ofPattern("MMM", locale)
     val months      = (1..12).map { YearMonth.of(year, it) }
 
     // Capture theme colours before entering Box/Column lambdas (see file header note)

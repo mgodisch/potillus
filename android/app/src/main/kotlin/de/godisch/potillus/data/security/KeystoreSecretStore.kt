@@ -24,6 +24,7 @@ package de.godisch.potillus.data.security
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.VisibleForTesting
+import java.security.GeneralSecurityException
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -134,13 +135,24 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * Reverses [sealWithKey]: parses `IV || ciphertext+tag` and decrypts under
      * [key]. Used by [open]; exposed for testing.
      *
-     * @throws javax.crypto.AEADBadTagException (a GeneralSecurityException) if the
-     *         data was modified, or [IllegalArgumentException] if [blob] is too
-     *         short to contain an IV.
+     * @throws java.security.GeneralSecurityException if [blob] is too short to
+     *         contain an IV, or (as [javax.crypto.AEADBadTagException]) if the
+     *         data was modified. Truncation deliberately maps to
+     *         `GeneralSecurityException` rather than the `require`-style
+     *         `IllegalArgumentException`: [open]'s public contract promises GSE
+     *         for ANY malformed blob, and AppPreferences relies on that promise
+     *         to translate decryption failures into a DataStore
+     *         `CorruptionException` so the `ReplaceFileCorruptionHandler` can
+     *         reset the file. An `IllegalArgumentException` would bypass that
+     *         catch and crash the read instead of self-healing — a truncated
+     *         (partially written / corrupted) preferences file is exactly the
+     *         corruption case the handler exists for.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun openWithKey(key: SecretKey, blob: ByteArray): ByteArray {
-        require(blob.size >= GCM_IV_LEN) { "Sealed blob too short to contain an IV" }
+        if (blob.size < GCM_IV_LEN) {
+            throw GeneralSecurityException("Sealed blob too short to contain an IV")
+        }
         val iv         = blob.copyOfRange(0, GCM_IV_LEN)
         val ciphertext = blob.copyOfRange(GCM_IV_LEN, blob.size)
         val cipher = Cipher.getInstance(AES_GCM).apply {

@@ -26,6 +26,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -506,16 +507,24 @@ fun SettingsScreen(
 }
 
 /**
- * Formats an ISO-8601 "YYYY-MM-DD" [dateStr] as a localised long date
- * ("d. MMMM yyyy"). Falls back to the raw string if parsing fails.
+ * Formats an ISO-8601 "YYYY-MM-DD" [dateStr] as the locale's LONG date
+ * ("28. Juni 2026" / "June 28, 2026"). Falls back to the raw string if
+ * parsing fails.
  */
 @Composable
 private fun formatStatsDate(dateStr: String): String {
-    // Per-app locale (not Locale.getDefault()) so the month name matches the UI.
+    // Per-app locale (not Locale.getDefault()) so the date matches the UI.
     val locale = LocalContext.current.formattingLocale()
     return try {
         val ld = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        ld.format(DateTimeFormatter.ofPattern("d. MMMM yyyy", locale))
+        // ofLocalizedDate(LONG), not ofPattern("d. MMMM yyyy"): a hardcoded
+        // pattern with a locale localizes only the month NAME — the field
+        // ORDER and the ". " punctuation stayed German for every language
+        // ("28. June 2026" instead of "June 28, 2026"). The localized style
+        // takes order, separators AND names from CLDR, matching what
+        // PdfReportBuilder already does for its date lines (found in the
+        // v0.79.0 QA delta review).
+        ld.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
     } catch (e: Exception) { dateStr }
 }
 

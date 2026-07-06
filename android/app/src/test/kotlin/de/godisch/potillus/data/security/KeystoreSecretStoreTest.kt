@@ -115,10 +115,30 @@ class KeystoreSecretStoreTest {
     }
 
     /** A blob shorter than the IV length is rejected with IllegalArgumentException. */
+    /**
+     * A truncated blob must throw a [GeneralSecurityException] — the SAME
+     * exception family as tampering — because [KeystoreSecretStore.open]'s
+     * public contract promises GSE for any malformed blob, and AppPreferences'
+     * corruption handling catches exactly that family to reset the file. This
+     * test previously pinned an `IllegalArgumentException` here, i.e. it
+     * enshrined the contract violation: a truncated on-disk blob bypassed the
+     * `ReplaceFileCorruptionHandler` and crashed the preferences read instead
+     * of self-healing (found in the v0.79.0 QA delta review).
+     */
     @Test
-    fun blobTooShort_throws() {
-        assertThrows(IllegalArgumentException::class.java) {
+    fun blobTooShort_throwsGeneralSecurityException() {
+        assertThrows(GeneralSecurityException::class.java) {
             store.openWithKey(softwareKey(), ByteArray(5))
+        }
+    }
+
+    /** The boundary case: exactly IV-sized (12-byte) input is parsed (empty
+     *  ciphertext), and then fails as a normal GCM authentication error — not
+     *  as a length error. Documents where the length guard ends. */
+    @Test
+    fun blobExactlyIvSized_failsAuthenticationNotLengthCheck() {
+        assertThrows(GeneralSecurityException::class.java) {
+            store.openWithKey(softwareKey(), ByteArray(12))
         }
     }
 }
