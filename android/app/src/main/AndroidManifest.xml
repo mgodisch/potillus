@@ -40,7 +40,8 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!--
         ═══════════════════════════════════════════════════════════════════════
-        HOW TO ADD A NEW LANGUAGE — checklist (all three steps are required)
+        HOW TO ADD A NEW LANGUAGE — checklist (four steps; Step 3 applies to
+        RTL languages only)
         ═══════════════════════════════════════════════════════════════════════
 
         Step 1 – String resources

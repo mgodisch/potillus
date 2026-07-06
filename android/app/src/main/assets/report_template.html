@@ -59,7 +59,20 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     long tables; this template does not).
   ===========================================================================
 -->
-<html>
+<!--
+  DOCUMENT LANGUAGE — {{REPORT_LANG}} is the report's BCP-47 language tag
+  (e.g. "en-US", "de", "ja", "ko", "zh-CN", "zh-TW"), filled in by
+  PdfReportBuilder from the per-app locale. It is NOT cosmetic: the report is
+  rendered by a WebView (Blink), whose CJK font fallback selects the glyph
+  ORTHOGRAPHY — Simplified vs Traditional Han, Japanese kanji, Korean hanja —
+  from this document language. Han-unified code points are shared across
+  zh/ja/ko but prefer region-specific glyph shapes; with no lang hint Blink
+  defaults to Simplified-Chinese forms, so a Japanese, Korean or
+  Traditional-Chinese report would show Chinese-style glyphs for those shared
+  characters. Keep the lang attribute; treat {{REPORT_LANG}} like any other
+  placeholder (do not rename it).
+-->
+<html lang="{{REPORT_LANG}}">
 <head>
 <meta charset="utf-8">
 <style>

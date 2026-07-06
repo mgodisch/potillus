@@ -41,13 +41,50 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 Work toward OpenSSF gold badge criteria
 
 Development toward the OpenSSF Best Practices gold level (project 13480),
-plus the fixes from a full QA review of the whole tree (the fourth review
-round; the first covering every source, resource, tooling and store-metadata
-file at once). The OpenSSF work is documentation and process only; the QA
-fixes include user-visible corrections — Chinese language detection, the
-report's longest-abstinence figure, month/date label localization, the
-day rollover on the Today screen — each listed individually below.
+plus the fixes from full QA reviews of the whole tree (the fourth and fifth
+review rounds folded into this release; the fourth was the first covering
+every source, resource, tooling and store-metadata file at once, the fifth a
+follow-up full pass). The OpenSSF work is documentation and process only; the
+QA fixes include user-visible corrections — Chinese language detection, the
+report's longest-abstinence figure, month/date label localization, the day
+rollover on the Today screen, and the PDF report's CJK glyph orthography for
+Japanese/Korean/Traditional-Chinese — each listed individually below.
 
+- PDF report — CJK glyph orthography: the report template's root element now
+  carries a per-locale language hint (`<html lang="{{REPORT_LANG}}">`, filled
+  by `PdfReportBuilder` from the per-app locale via `Locale.toLanguageTag()`).
+  The report is rendered by a WebView (Blink), whose CJK font fallback selects
+  the glyph ORTHOGRAPHY — Simplified vs Traditional Han, Japanese kanji, Korean
+  hanja — from the document language. Han-unified code points are shared across
+  zh/ja/ko but prefer region-specific glyph shapes, so without a `lang` hint
+  Blink defaulted to Simplified-Chinese forms: Japanese, Korean and
+  Traditional-Chinese reports rendered Chinese-style glyphs for those shared
+  characters. Verified in the fifth QA round with `pdffonts` on the committed
+  sample reports, which embedded `NotoSansCJKSC` (Simplified) even for `ja`,
+  `ko` and `zh-TW`. `PdfReportBuilder` already formats every number/date/label
+  with the same per-app locale, so only the glyph orthography was off; the fix
+  makes it deterministic on every device. User-visible for Japanese, Korean and
+  Traditional-Chinese report exports; Latin locales are unaffected. A new
+  `PdfReportLangTest` pins both the template invariant and the substitution
+  behaviour (the placeholder⇄builder sync is already enforced by
+  `PdfTemplatePlaceholderTest`). NOTE: the pre-rendered sample PDFs under
+  `fastlane/report-pdf/` are regenerated on a device by the `ReportExportTest`
+  flow and are refreshed on the next screenshot/report run; they are repository
+  assets and are not shipped inside the APK.
+- `AndroidManifest.xml`: corrected the "HOW TO ADD A NEW LANGUAGE" checklist
+  header, which said "all three steps are required" while the checklist lists
+  four steps (Step 3 applies to RTL languages only). Comment only; no
+  functional change. (Fifth QA round.)
+- Build hygiene: investigated the Gradle 9.6.1 deprecation warning "Using a
+  Project object as a dependency notation" seen during `:app` configuration.
+  A `--warning-mode all --stacktrace` run attributes it to upstream plugins,
+  not this project's build scripts: one occurrence originates in Kover
+  (`PrepareKover.kt`) and two in the Android Gradle Plugin itself
+  (`VariantDependenciesBuilder` while wiring test components). No project build
+  script uses the deprecated notation, so there is nothing to fix in-repo;
+  recorded here so the warning is not re-investigated and is tracked for the
+  eventual Gradle 10 upgrade (to be resolved by future Kover/AGP releases). No
+  change. (Fifth QA round.)
 - `.bestpractices.json`: reworded the four justifications that quoted a
   concrete release ("currently 0.78.0" in `OSPS-BR-02.01`/`OSPS-BR-02.02`/
   `version_unique`, "e.g. v0.78.0" in `version_tags`) to be release-agnostic

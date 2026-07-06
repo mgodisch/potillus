@@ -152,6 +152,23 @@ object PdfReportBuilder {
         val scalars = HashMap<String, String>()
         val repeats = HashMap<String, List<Map<String, String>>>()
 
+        // ── Document language (CJK glyph-orthography hint) ────────────────────
+        // Fills the template's root <html lang="{{REPORT_LANG}}"> with this
+        // report's BCP-47 tag. WHY THIS MATTERS: the report is rendered by a
+        // WebView (Blink), whose CJK font fallback picks the glyph ORTHOGRAPHY
+        // (Simplified vs Traditional Han, Japanese kanji, Korean hanja) from the
+        // document language. Han-unified code points are shared across zh/ja/ko
+        // but prefer region-specific glyph shapes; with no lang hint Blink
+        // defaults to Simplified-Chinese forms, so a Japanese, Korean or
+        // Traditional-Chinese report would render Chinese-style glyphs for those
+        // shared characters. Emitting the per-app locale here pins the correct
+        // orthography deterministically, on every device. This uses the SAME
+        // per-app `locale` (never Locale.getDefault()) as every date/number/label
+        // formatter in this report, so the glyph forms agree with the text; Latin
+        // locales are unaffected. `toLanguageTag()` yields exactly the BCP-47
+        // form Blink expects (e.g. "zh-TW", "ja", "en-US").
+        scalars["REPORT_LANG"] = locale.toLanguageTag()
+
         // ── Header & footers ──────────────────────────────────────────────────
         scalars["TITLE"] = context.getString(R.string.pdf_title)
         scalars["FOOTER1"] = context.getString(R.string.pdf_footer1)
