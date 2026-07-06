@@ -83,7 +83,8 @@ interface EntryDao {
      *              String comparison works correctly because ISO-8601 sorts
      *              lexicographically in the same order as chronologically.
      */
-    @Query("""
+    @Query(
+        """
         SELECT logicalDate,
                SUM(gramsAlcohol) AS totalGrams,
                COUNT(*) AS entryCount
@@ -91,7 +92,8 @@ interface EntryDao {
         WHERE logicalDate >= :from AND logicalDate <= :to
         GROUP BY logicalDate
         ORDER BY logicalDate ASC
-    """)
+    """,
+    )
     fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>>
 
     /**
@@ -136,7 +138,7 @@ interface EntryDao {
      * caller has deliberately chosen a specific entry ID and accepts the risk
      * of overwriting a conflicting row. For all other inserts, use [insert].
      *
-     * @return  The row ID of the inserted or replaced entry.
+     * @return The row ID of the inserted or replaced entry.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplace(entry: EntryEntity): Long
@@ -260,5 +262,5 @@ interface EntryDao {
 data class DailySummaryRaw(
     val logicalDate: String,
     val totalGrams: Double,
-    val entryCount: Int
+    val entryCount: Int,
 )

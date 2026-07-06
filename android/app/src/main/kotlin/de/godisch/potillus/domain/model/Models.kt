@@ -69,9 +69,9 @@ data class DrinkDefinition(
     val name: String,
     val volumeMl: Int,
     val alcoholPercent: Double,
-    val isPreset: Boolean   = false,
+    val isPreset: Boolean = false,
     val isFavorite: Boolean = false,
-    val category: DrinkCategory = DrinkCategory.OTHER
+    val category: DrinkCategory = DrinkCategory.OTHER,
 )
 
 /**
@@ -111,7 +111,7 @@ data class ConsumptionEntry(
     val gramsAlcohol: Double,
     val timestampMillis: Long,
     val logicalDate: String,
-    val note: String = ""
+    val note: String = "",
 )
 
 /**
@@ -127,7 +127,7 @@ data class ConsumptionEntry(
 data class DaySummary(
     val date: String,
     val totalGrams: Double,
-    val entryCount: Int
+    val entryCount: Int,
 )
 
 /**
@@ -146,7 +146,7 @@ data class DaySummary(
 data class LimitViolations(
     val daysOverDailyLimit: Int,
     val daysOverWeeklyLimit: Int,
-    val daysOverDrinkDayLimit: Int
+    val daysOverDrinkDayLimit: Int,
 )
 
 /**
@@ -176,7 +176,7 @@ enum class ThemeMode { SYSTEM, DAY, NIGHT }
 data class LimitInfo(
     val limitGrams: Double,
     val weeklyLimitGrams: Double,
-    val maxDrinkDaysPerWeek: Int = 5
+    val maxDrinkDaysPerWeek: Int = 5,
 )
 
 /**
@@ -214,7 +214,7 @@ data class DrinkCapacity(
     val weeklyTotalGrams: Double,
     val weeklyLimitGrams: Double,
     val drinkDaysThisWeek: Int,
-    val maxDrinkDaysPerWeek: Int
+    val maxDrinkDaysPerWeek: Int,
 ) {
     /** True when today already has > 0 g of alcohol logged, i.e. it is already a drink day. */
     val todayIsDrinkDay: Boolean
@@ -239,14 +239,14 @@ data class DrinkCapacity(
  * @param maxDrinkDaysPerWeek Maximum number of drink days within any 7-day window (1–7).
  */
 data class AppSettings(
-    val themeMode: ThemeMode        = ThemeMode.SYSTEM,
-    val dayChangeHour: Int          = 4,
-    val dayChangeMinute: Int        = 0,
-    val dailyLimitGrams: Double     = 20.0,
-    val weeklyLimitGrams: Double    = 100.0,
-    val maxDrinkDaysPerWeek: Int    = 5,
-    val statsFromDate: String       = "",
-    val biometricEnabled: Boolean   = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val dayChangeHour: Int = 4,
+    val dayChangeMinute: Int = 0,
+    val dailyLimitGrams: Double = 20.0,
+    val weeklyLimitGrams: Double = 100.0,
+    val maxDrinkDaysPerWeek: Int = 5,
+    val statsFromDate: String = "",
+    val biometricEnabled: Boolean = false,
     /**
      * When `true`, [WindowManager.LayoutParams.FLAG_SECURE] is cleared so the
      * OS permits screenshots and screen recordings of the app window.
@@ -254,7 +254,7 @@ data class AppSettings(
      * Default is `false` (flag active, screenshots blocked) to protect
      * health-sensitive data. The user must consciously opt in via Settings.
      */
-    val allowScreenshots: Boolean   = false,
+    val allowScreenshots: Boolean = false,
     /**
      * Selected UI language as a BCP-47 tag, or `""` when the user has not chosen
      * one yet.
@@ -265,6 +265,6 @@ data class AppSettings(
      * the device-transfer heuristic test against. A non-empty default such as
      * `"en"` would contradict the flow fallback and those checks, so it stays empty.
      */
-    val language: String            = "",
-    val weightKg: Double            = 0.0
+    val language: String = "",
+    val weightKg: Double = 0.0,
 )

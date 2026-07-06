@@ -135,8 +135,8 @@ class LimitBarUiTest {
             LimitBar(
                 totalGrams = 12.5,
                 limitGrams = 100.0,
-                caption    = "weekly",
-                leftSuffix = "(week)"
+                caption = "weekly",
+                leftSuffix = "(week)",
             )
         }
         composeTestRule.onNodeWithText("12.5 g (week)").assertIsDisplayed()

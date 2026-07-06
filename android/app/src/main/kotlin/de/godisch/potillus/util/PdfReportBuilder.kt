@@ -81,7 +81,7 @@ object PdfReportBuilder {
     // the locale from its Context (see formattingLocale()) and builds these
     // formatters per call. Only the locale-INDEPENDENT job-name formatter (a
     // purely numeric timestamp pattern) is safe to keep as a shared constant.
-    private val JOBNAME_FMT  = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
+    private val JOBNAME_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
 
     /**
      * Builds a job/file name for the report, e.g. `potillus_report_20260603_1430.pdf`.
@@ -96,8 +96,7 @@ object PdfReportBuilder {
      *   looked unfinished and hid the file type from the user. Appending `.pdf`
      *   makes the dialog pre-fill a complete, recognisable file name.
      */
-    fun jobName(now: Instant = Instant.now()): String =
-        "potillus_report_${JOBNAME_FMT.format(now)}.pdf"
+    fun jobName(now: Instant = Instant.now()): String = "potillus_report_${JOBNAME_FMT.format(now)}.pdf"
 
     /**
      * Renders the full two-page report as a self-contained HTML string.
@@ -112,7 +111,7 @@ object PdfReportBuilder {
         context: Context,
         entries: List<ConsumptionEntry>,
         drinks: List<DrinkDefinition>,
-        settings: AppSettings
+        settings: AppSettings,
     ): String {
         val d = PdfReportData.from(entries, drinks, settings)
 
@@ -121,8 +120,8 @@ object PdfReportBuilder {
         // string resources resolved below) rather than from Locale.getDefault(),
         // so the formatted dates/months agree with their localized labels. The
         // two locale-sensitive formatters are built here, once per report.
-        val locale   = context.formattingLocale()
-        val dateFmt  = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
+        val locale = context.formattingLocale()
+        val dateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
         val monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", locale)
         // Compact day+month formatter for the chart's x-axis tick labels. The
         // pattern is DERIVED from the locale (day/month order and separator, see
@@ -141,6 +140,7 @@ object PdfReportBuilder {
         // unambiguously to the imported one (no recursion).
         /** One-decimal display formatting in this report's per-app [locale]. */
         fun Double.fmt1(): String = this.fmt1(locale)
+
         /** Zero-decimal display formatting in this report's per-app [locale]. */
         fun Double.fmt0(): String = this.fmt0(locale)
 
@@ -148,8 +148,8 @@ object PdfReportBuilder {
         val repeats = HashMap<String, List<Map<String, String>>>()
 
         // ── Header & footers ──────────────────────────────────────────────────
-        scalars["TITLE"]      = context.getString(R.string.pdf_title)
-        scalars["FOOTER1"]    = context.getString(R.string.pdf_footer1)
+        scalars["TITLE"] = context.getString(R.string.pdf_title)
+        scalars["FOOTER1"] = context.getString(R.string.pdf_footer1)
         // Footer 2 is intentionally English-only (never localised) and now also
         // carries the GPL / no-warranty notice that used to be a separate running
         // footer (GPL_FOOTER), which has been removed. The version is shortened to
@@ -166,20 +166,20 @@ object PdfReportBuilder {
         // note on raw/copyright.md), legal boilerplate is kept in its original
         // English so its meaning never depends on translation quality; the GPL's
         // warranty disclaimer in particular is quoted, not paraphrased.
-        scalars["FOOTER2"]    = "Created with Libellus Potionis v$appVersion on Android $androidVersion, " +
+        scalars["FOOTER2"] = "Created with Libellus Potionis v$appVersion on Android $androidVersion, " +
             "free software under the GNU GPL v3, WITHOUT ANY WARRANTY."
 
         // ── Section titles ─────────────────────────────────────────────────────
-        scalars["SECTION_KPIS"]       = context.getString(R.string.pdf_section_kpis)
-        scalars["SECTION_MONTHS"]     = context.getString(R.string.pdf_section_months)
-        scalars["SECTION_TREND"]      = context.getString(R.string.pdf_section_trend)
+        scalars["SECTION_KPIS"] = context.getString(R.string.pdf_section_kpis)
+        scalars["SECTION_MONTHS"] = context.getString(R.string.pdf_section_months)
+        scalars["SECTION_TREND"] = context.getString(R.string.pdf_section_trend)
         scalars["SECTION_CATEGORIES"] = context.getString(R.string.pdf_section_categories)
-        scalars["SECTION_DAYTIME"]    = context.getString(R.string.pdf_section_daytime)
-        scalars["SECTION_WEEKDAY"]    = context.getString(R.string.pdf_section_weekday)
-        scalars["SECTION_RISK"]       = context.getString(R.string.pdf_section_risk)
+        scalars["SECTION_DAYTIME"] = context.getString(R.string.pdf_section_daytime)
+        scalars["SECTION_WEEKDAY"] = context.getString(R.string.pdf_section_weekday)
+        scalars["SECTION_RISK"] = context.getString(R.string.pdf_section_risk)
 
         // ── Metadata block (page 1) ─────────────────────────────────────────────
-        val perDay  = context.getString(R.string.pdf_unit_g_per_day)
+        val perDay = context.getString(R.string.pdf_unit_g_per_day)
         val perWeek = context.getString(R.string.pdf_unit_g_per_week)
         scalars["META_EXPORT_LABEL"] = context.getString(R.string.pdf_meta_export_date)
         // Read through DayResolver.clock() so the report's "export date" is pinned
@@ -189,8 +189,8 @@ object PdfReportBuilder {
         scalars["META_PERIOD_LABEL"] = context.getString(R.string.pdf_meta_period)
         scalars["META_PERIOD_VALUE"] =
             "${LocalDate.parse(d.firstDate).format(dateFmt)} – ${LocalDate.parse(d.lastDate).format(dateFmt)}"
-        scalars["META_LIMIT_LABEL"]  = context.getString(R.string.pdf_meta_limit)
-        scalars["META_LIMIT_VALUE_DAY"]   = "${d.limitInfo.limitGrams.fmt1()} $perDay"
+        scalars["META_LIMIT_LABEL"] = context.getString(R.string.pdf_meta_limit)
+        scalars["META_LIMIT_VALUE_DAY"] = "${d.limitInfo.limitGrams.fmt1()} $perDay"
         scalars["META_LIMIT_VALUE_7DAYS"] = "${d.limitInfo.weeklyLimitGrams.fmt1()} $perWeek"
         scalars["META_LIMIT_VALUE_DDAYS"] = "${d.limitInfo.maxDrinkDaysPerWeek} ${context.getString(R.string.pdf_meta_drink_days_suffix)}"
         scalars["META_WEIGHT_LABEL"] = context.getString(R.string.pdf_meta_weight)
@@ -201,43 +201,55 @@ object PdfReportBuilder {
         repeats["KPIS"] = listOf(
             kpi(context.getString(R.string.pdf_kpi_abstinent_days), "${d.abstinentDays}"),
             kpi(context.getString(R.string.pdf_meta_longest_abstinence), "${d.longestAbstinence}"),
-            kpi(context.getString(R.string.pdf_kpi_drink_days),     "${d.drinkDays}"),
-            kpi(context.getString(R.string.pdf_kpi_total),          "${d.totalGrams.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_drink_days), "${d.drinkDays}"),
+            kpi(context.getString(R.string.pdf_kpi_total), "${d.totalGrams.fmt1()} g"),
 
-            kpi(context.getString(R.string.pdf_kpi_over_daily, d.limitInfo.limitGrams.fmt0()),
-                "${d.violations.daysOverDailyLimit}", d.violations.daysOverDailyLimit > 0),
-            kpi(context.getString(R.string.pdf_kpi_over_weekly, d.limitInfo.weeklyLimitGrams.fmt0()),
-                "${d.violations.daysOverWeeklyLimit}", d.violations.daysOverWeeklyLimit > 0),
-            kpi(context.getString(R.string.pdf_kpi_over_drink_days, d.limitInfo.maxDrinkDaysPerWeek),
-                "${d.violations.daysOverDrinkDayLimit}", d.violations.daysOverDrinkDayLimit > 0),
-            kpi(context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
-                "${d.bingeDays}", d.bingeDays > 0),
+            kpi(
+                context.getString(R.string.pdf_kpi_over_daily, d.limitInfo.limitGrams.fmt0()),
+                "${d.violations.daysOverDailyLimit}",
+                d.violations.daysOverDailyLimit > 0,
+            ),
+            kpi(
+                context.getString(R.string.pdf_kpi_over_weekly, d.limitInfo.weeklyLimitGrams.fmt0()),
+                "${d.violations.daysOverWeeklyLimit}",
+                d.violations.daysOverWeeklyLimit > 0,
+            ),
+            kpi(
+                context.getString(R.string.pdf_kpi_over_drink_days, d.limitInfo.maxDrinkDaysPerWeek),
+                "${d.violations.daysOverDrinkDayLimit}",
+                d.violations.daysOverDrinkDayLimit > 0,
+            ),
+            kpi(
+                context.getString(R.string.pdf_kpi_binge, PdfReportData.bingeThreshold.fmt0()),
+                "${d.bingeDays}",
+                d.bingeDays > 0,
+            ),
 
-            kpi(context.getString(R.string.pdf_kpi_max_day),   "${d.maxPerDay.fmt1()} g",   d.maxPerDay   > d.limitInfo.limitGrams),
+            kpi(context.getString(R.string.pdf_kpi_max_day), "${d.maxPerDay.fmt1()} g", d.maxPerDay > d.limitInfo.limitGrams),
             kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g", d.maxPer7Days > d.limitInfo.weeklyLimitGrams),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month),    d.avgDrinkDaysPerMonth.fmt1()),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month), d.avgDrinkDaysPerMonth.fmt1()),
             kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
 
-            kpi(context.getString(R.string.pdf_kpi_avg_day),          "${d.avgPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_median_day),       "${d.medianPerDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_avg_drink_day),    "${d.avgPerDrinkDay.fmt1()} g"),
-            kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g")
+            kpi(context.getString(R.string.pdf_kpi_avg_day), "${d.avgPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_median_day), "${d.medianPerDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_avg_drink_day), "${d.avgPerDrinkDay.fmt1()} g"),
+            kpi(context.getString(R.string.pdf_kpi_median_drink_day), "${d.medianPerDrinkDay.fmt1()} g"),
         )
 
         // ── Monthly table ──────────────────────────────────────────────────────
-        scalars["COL_MONTH"]      = context.getString(R.string.pdf_col_month)
+        scalars["COL_MONTH"] = context.getString(R.string.pdf_col_month)
         scalars["COL_DRINK_DAYS"] = context.getString(R.string.pdf_col_drink_days)
-        scalars["COL_TOTAL_G"]    = context.getString(R.string.pdf_col_total_g)
-        scalars["COL_AVG_G_DAY"]  = context.getString(R.string.pdf_col_avg_g_day)
+        scalars["COL_TOTAL_G"] = context.getString(R.string.pdf_col_total_g)
+        scalars["COL_AVG_G_DAY"] = context.getString(R.string.pdf_col_avg_g_day)
         scalars["COL_OVER_DAILY"] = context.getString(R.string.pdf_col_over_daily)
         repeats["MONTHS"] = d.months.map { m ->
             mapOf(
-                "M_MONTH"      to LocalDate.parse("${m.monthKey}-01").format(monthFmt),
+                "M_MONTH" to LocalDate.parse("${m.monthKey}-01").format(monthFmt),
                 "M_DRINK_DAYS" to "${m.drinkDays}",
-                "M_TOTAL"      to m.totalGrams.fmt1(),
-                "M_AVG"        to m.avgPerCalendarDay.fmt1(),
-                "M_OVER"       to if (m.daysOverDailyLimit > 0) "${m.daysOverDailyLimit}" else "–",
-                "M_ROW_CLASS"  to if (m.daysOverDailyLimit > 0) "warn" else ""
+                "M_TOTAL" to m.totalGrams.fmt1(),
+                "M_AVG" to m.avgPerCalendarDay.fmt1(),
+                "M_OVER" to if (m.daysOverDailyLimit > 0) "${m.daysOverDailyLimit}" else "–",
+                "M_ROW_CLASS" to if (m.daysOverDailyLimit > 0) "warn" else "",
             )
         }
 
@@ -249,7 +261,7 @@ object PdfReportBuilder {
         // the daily limit. Labels are thinned for dense series (see chartLabelIndices).
         scalars["TREND_DISPLAY"] = "block"
         run {
-            val limit  = d.limitInfo.limitGrams
+            val limit = d.limitInfo.limitGrams
             val maxAvg = d.chartBuckets.maxOfOrNull { it.avgPerDay } ?: 0.0
             // Headroom of 10% so the tallest bar / limit line never touches the top.
             val maxVal = maxOf(maxAvg, limit) * 1.1
@@ -258,15 +270,18 @@ object PdfReportBuilder {
             val labelIdx = chartLabelIndices(d.chartBuckets.size)
             repeats["BARS"] = d.chartBuckets.map { b ->
                 mapOf(
-                    "BAR_HEIGHT_PCT"   to if (b.isAbstinent) "0"
-                                          else pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0(),
-                    "BAR_CLASS"        to if (b.avgPerDay > limit) "bar over" else "bar",
+                    "BAR_HEIGHT_PCT" to if (b.isAbstinent) {
+                        "0"
+                    } else {
+                        pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0()
+                    },
+                    "BAR_CLASS" to if (b.avgPerDay > limit) "bar over" else "bar",
                     // On-top value, same convention as the page-2 hour/weekday charts:
                     // the bucket's per-day average (one decimal), blank for abstinent
                     // (zero-consumption) buckets so the green tick stands alone.
-                    "BAR_VALUE"        to if (b.isAbstinent) "" else b.avgPerDay.fmt1(),
+                    "BAR_VALUE" to if (b.isAbstinent) "" else b.avgPerDay.fmt1(),
                     // Green abstinence tick shown only for zero-consumption buckets.
-                    "BAR_TICK_DISPLAY" to if (b.isAbstinent) "block" else "none"
+                    "BAR_TICK_DISPLAY" to if (b.isAbstinent) "block" else "none",
                 )
             }
             // X-axis labels live in their OWN row BELOW the baseline (like the
@@ -279,14 +294,14 @@ object PdfReportBuilder {
 
         // ── Category table + donut ───────────────────────────────────────────────
         scalars["CAT_HEAD_NAME"] = context.getString(R.string.category)
-        scalars["CAT_HEAD_G"]    = "g"
-        scalars["CAT_HEAD_PCT"]  = "%"
+        scalars["CAT_HEAD_G"] = "g"
+        scalars["CAT_HEAD_PCT"] = "%"
         repeats["CATEGORIES"] = d.categories.map { c ->
             mapOf(
-                "C_NAME"  to categoryLabel(context, c.categoryName),
-                "C_COLOR" to categoryColor(c.categoryName),   // swatch = donut colour
-                "C_G"     to c.grams.fmt1(),
-                "C_PCT"   to "${c.percent} %"
+                "C_NAME" to categoryLabel(context, c.categoryName),
+                "C_COLOR" to categoryColor(c.categoryName), // swatch = donut colour
+                "C_G" to c.grams.fmt1(),
+                "C_PCT" to "${c.percent} %",
             )
         }
         // Donut slices (same data, rendered as an SVG ring beside the table). We use
@@ -298,6 +313,7 @@ object PdfReportBuilder {
         run {
             val totalCat = d.categories.sumOf { it.grams }
             var cumulative = 0.0
+
             // SVG attributes must use a '.' decimal separator regardless of the device
             // locale. String.format()/Double.format() honour the *default* locale, so a
             // German device would emit "40,00" — and SVG treats both ',' and ' ' as list
@@ -307,10 +323,10 @@ object PdfReportBuilder {
             repeats["PIE_SLICES"] = d.categories.map { c ->
                 val fraction = if (totalCat > 0) c.grams / totalCat * 100.0 else 0.0
                 val slice = mapOf(
-                    "PIE_FILL"   to categoryColor(c.categoryName),
-                    "PIE_DASH"   to svg(fraction),
-                    "PIE_GAP"    to svg(100.0 - fraction),
-                    "PIE_OFFSET" to svg(25.0 - cumulative)
+                    "PIE_FILL" to categoryColor(c.categoryName),
+                    "PIE_DASH" to svg(fraction),
+                    "PIE_GAP" to svg(100.0 - fraction),
+                    "PIE_OFFSET" to svg(25.0 - cumulative),
                 )
                 cumulative += fraction
                 slice
@@ -325,16 +341,21 @@ object PdfReportBuilder {
             val maxHour = d.hourlyGrams.maxOrNull() ?: 0.0
             // 15 % headroom so the value printed above the tallest bar still fits.
             val ceiling = maxHour * 1.15
-            val days    = d.totalDays.coerceAtLeast(1)
+            val days = d.totalDays.coerceAtLeast(1)
             repeats["HBARS"] = d.hourlyGrams.map { grams ->
                 mapOf(
                     // 0 grams → no bar; otherwise at least a 2% sliver so a small-but-
                     // nonzero hour stays visible.
-                    "H_HEIGHT_PCT" to (if (grams <= 0.0) "0"
-                                       else pct(grams, ceiling).coerceAtLeast(2.0).fmt0()),
+                    "H_HEIGHT_PCT" to (
+                        if (grams <= 0.0) {
+                            "0"
+                        } else {
+                            pct(grams, ceiling).coerceAtLeast(2.0).fmt0()
+                        }
+                        ),
                     // Average grams per calendar day in this clock hour (blank for an
                     // hour that never saw any drinking).
-                    "H_VALUE"      to (if (grams <= 0.0) "" else (grams / days).fmt1())
+                    "H_VALUE" to (if (grams <= 0.0) "" else (grams / days).fmt1()),
                 )
             }
             repeats["HLABELS"] = (0..23).map { hour -> mapOf("H_LABEL" to "$hour") }
@@ -346,33 +367,46 @@ object PdfReportBuilder {
         //    value label above the tallest bar still fits inside the plot height.
         run {
             val maxWeekday = d.weekdayAverages.filterNotNull().maxOrNull() ?: 0.0
-            val ceiling    = maxWeekday * 1.15
+            val ceiling = maxWeekday * 1.15
             repeats["WDBARS"] = d.weekdayAverages.map { avg ->
                 mapOf(
-                    "WD_HEIGHT_PCT" to (if (avg == null || avg <= 0.0) "0"
-                                        else pct(avg, ceiling).coerceAtLeast(2.0).fmt0()),
+                    "WD_HEIGHT_PCT" to (
+                        if (avg == null || avg <= 0.0) {
+                            "0"
+                        } else {
+                            pct(avg, ceiling).coerceAtLeast(2.0).fmt0()
+                        }
+                        ),
                     // Value above the bar; blank for a weekday that was never a drink day.
-                    "WD_VALUE"      to (avg?.fmt1() ?: "")
+                    "WD_VALUE" to (avg?.fmt1() ?: ""),
                 )
             }
             repeats["WDLABELS"] = d.weekdayOrder.map { iso ->
-                mapOf("WD_NAME" to DayOfWeek.of(iso)
-                    .getDisplayName(TextStyle.SHORT, locale).take(2))
+                mapOf(
+                    "WD_NAME" to DayOfWeek.of(iso)
+                        .getDisplayName(TextStyle.SHORT, locale).take(2),
+                )
             }
         }
 
         // ── Binge & abstinence streaks ───────────────────────────────────────────
-        scalars["RISK_BINGE_LABEL"]   = context.getString(R.string.pdf_meta_binge_days, PdfReportData.bingeThreshold.fmt0())
-        scalars["RISK_BINGE_VALUE"]   = "${d.bingeDays}"
+        scalars["RISK_BINGE_LABEL"] = context.getString(R.string.pdf_meta_binge_days, PdfReportData.bingeThreshold.fmt0())
+        scalars["RISK_BINGE_VALUE"] = "${d.bingeDays}"
         scalars["RISK_LONGEST_LABEL"] = context.getString(R.string.pdf_meta_longest_abstinence)
         // Properly pluralized "N day(s)" via the shared `days` plural resource, so
         // the English report no longer prints "1 Days" (and every locale uses its
         // own plural rules).
         scalars["RISK_LONGEST_VALUE"] = context.resources.getQuantityString(
-            R.plurals.days, d.longestAbstinence, d.longestAbstinence)
+            R.plurals.days,
+            d.longestAbstinence,
+            d.longestAbstinence,
+        )
         scalars["RISK_CURRENT_LABEL"] = context.getString(R.string.pdf_meta_current_abstinence)
         scalars["RISK_CURRENT_VALUE"] = context.resources.getQuantityString(
-            R.plurals.days, d.currentAbstinence, d.currentAbstinence)
+            R.plurals.days,
+            d.currentAbstinence,
+            d.currentAbstinence,
+        )
 
         val template = context.assets.open(TEMPLATE_ASSET).bufferedReader().use { it.readText() }
         return SimpleTemplate.render(template, scalars, repeats)
@@ -381,19 +415,18 @@ object PdfReportBuilder {
     // ── small presentation helpers ───────────────────────────────────────────────
 
     /** Builds one KPI tile row for the KPIS repeat block. */
-    private fun kpi(label: String, value: String, warn: Boolean = false): Map<String, String> =
-        mapOf("KPI_LABEL" to label, "KPI_VALUE" to value, "KPI_CLASS" to if (warn) "kpi warn" else "kpi")
+    private fun kpi(label: String, value: String, warn: Boolean = false): Map<String, String> = mapOf("KPI_LABEL" to label, "KPI_VALUE" to value, "KPI_CLASS" to if (warn) "kpi warn" else "kpi")
 
     /** Maps a [de.godisch.potillus.domain.model.DrinkCategory] enum name to its localised label. */
     private fun categoryLabel(context: Context, name: String): String = context.getString(
         when (name) {
-            "BEER"      -> R.string.category_beer
-            "WINE"      -> R.string.category_wine
-            "SPIRITS"   -> R.string.category_spirits
+            "BEER" -> R.string.category_beer
+            "WINE" -> R.string.category_wine
+            "SPIRITS" -> R.string.category_spirits
             "LONGDRINK" -> R.string.category_longdrink
-            "LIQUEUR"   -> R.string.category_liqueur
-            else        -> R.string.category_other
-        }
+            "LIQUEUR" -> R.string.category_liqueur
+            else -> R.string.category_other
+        },
     )
 
     /**
@@ -403,12 +436,12 @@ object PdfReportBuilder {
      * SimpleTemplate into an SVG `stroke`/CSS `background`.
      */
     private fun categoryColor(name: String): String = when (name) {
-        "BEER"      -> "#F59E0B"   // amber-500
-        "WINE"      -> "#9333EA"   // purple-600
-        "SPIRITS"   -> "#EF4444"   // red-500
-        "LONGDRINK" -> "#3B82F6"   // blue-500
-        "LIQUEUR"   -> "#10B981"   // emerald-500
-        else        -> "#6B7280"   // gray-500 (OTHER)
+        "BEER" -> "#F59E0B" // amber-500
+        "WINE" -> "#9333EA" // purple-600
+        "SPIRITS" -> "#EF4444" // red-500
+        "LONGDRINK" -> "#3B82F6" // blue-500
+        "LIQUEUR" -> "#10B981" // emerald-500
+        else -> "#6B7280" // gray-500 (OTHER)
     }
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
@@ -424,7 +457,7 @@ object PdfReportBuilder {
         if (n <= 0) return emptySet()
         if (n <= 12) return (0 until n).toSet()
         val target = 8
-        val step   = ((n - 1).toFloat() / (target - 1)).coerceAtLeast(1f)
+        val step = ((n - 1).toFloat() / (target - 1)).coerceAtLeast(1f)
         return (0 until target)
             .map { (it * step).toInt().coerceAtMost(n - 1) }
             .toSortedSet()
@@ -448,12 +481,12 @@ object PdfReportBuilder {
         granularity: ChartGranularity,
         b: ChartBucket,
         monthFmt: DateTimeFormatter,
-        dayMonthFmt: DateTimeFormatter
+        dayMonthFmt: DateTimeFormatter,
     ): String {
         val ld = LocalDate.parse(b.labelDate)
         return when (granularity) {
             ChartGranularity.DAILY, ChartGranularity.WEEKLY -> ld.format(dayMonthFmt)
-            ChartGranularity.MONTHLY                        -> ld.format(monthFmt)
+            ChartGranularity.MONTHLY -> ld.format(monthFmt)
         }
     }
 }

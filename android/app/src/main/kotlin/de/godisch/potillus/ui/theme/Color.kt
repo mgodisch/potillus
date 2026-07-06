@@ -60,37 +60,39 @@ import androidx.compose.ui.graphics.luminance
 // ── Shared foundation colour ──────────────────────────────────────────────────
 
 /** RAL 5004 Schwarzblau – the core brand colour used as the base for both themes. */
-val Schwarzblau       = Color(0xFF1A1E2B)
+val Schwarzblau = Color(0xFF1A1E2B)
+
 /** Slightly lighter variant used for elevated surfaces in the Nacht theme. */
-val SchwarzblauHell   = Color(0xFF2D3448)
+val SchwarzblauHell = Color(0xFF2D3448)
+
 /** Darker variant used as the Nacht theme's canvas background. */
 val SchwarzblauDunkel = Color(0xFF0D1018)
 
 // ── THEME "NACHT" (Dark) ──────────────────────────────────────────────────────
 
-val NachtBackground         = Color(0xFF0D1018)   // near-black canvas
-val NachtSurface            = Color(0xFF1E2538)   // card / sheet surface
-val NachtSurfaceVariant     = Color(0xFF252D45)   // progress track, chip background
-val NachtOutline            = Color(0xFF2A3050)   // dividers, borders
-val NachtOnSurface          = Color(0xFFE4E8F0)   // primary text
-val NachtOnSurfaceVariant   = Color(0xFF8896B3)   // secondary text, captions
-val NachtPrimary            = Color(0xFF5B8DD9)   // steel-blue accent
-val NachtOnPrimary          = Color(0xFF0D1018)   // text on primary (dark bg)
-val NachtPrimaryContainer   = Color(0xFF1E2A40)   // card accent surface
-val NachtOnPrimaryContainer = Color(0xFFB8D0F5)   // text on primaryContainer
+val NachtBackground = Color(0xFF0D1018) // near-black canvas
+val NachtSurface = Color(0xFF1E2538) // card / sheet surface
+val NachtSurfaceVariant = Color(0xFF252D45) // progress track, chip background
+val NachtOutline = Color(0xFF2A3050) // dividers, borders
+val NachtOnSurface = Color(0xFFE4E8F0) // primary text
+val NachtOnSurfaceVariant = Color(0xFF8896B3) // secondary text, captions
+val NachtPrimary = Color(0xFF5B8DD9) // steel-blue accent
+val NachtOnPrimary = Color(0xFF0D1018) // text on primary (dark bg)
+val NachtPrimaryContainer = Color(0xFF1E2A40) // card accent surface
+val NachtOnPrimaryContainer = Color(0xFFB8D0F5) // text on primaryContainer
 
 // ── THEME "SCHIEFER" (Light) ──────────────────────────────────────────────────
 
-val SchieferBackground         = Color(0xFFEDF0F8)   // slate-white canvas
-val SchieferSurface            = Color(0xFFFFFFFF)   // pure white cards
-val SchieferSurfaceVariant     = Color(0xFFDDE3F0)   // light bluish-grey
-val SchieferOutline            = Color(0xFFC8D0E4)   // soft blue-grey borders
-val SchieferOnSurface          = Color(0xFF1C2745)   // deep navy text
-val SchieferOnSurfaceVariant   = Color(0xFF6878A0)   // medium navy-grey captions
-val SchieferPrimary            = Color(0xFF2F3F6E)   // navy accent
-val SchieferOnPrimary          = Color(0xFFFFFFFF)   // white text on primary
-val SchieferPrimaryContainer   = Color(0xFFD8E0F5)   // light blue card accent
-val SchieferOnPrimaryContainer = Color(0xFF1C2745)   // text on primaryContainer
+val SchieferBackground = Color(0xFFEDF0F8) // slate-white canvas
+val SchieferSurface = Color(0xFFFFFFFF) // pure white cards
+val SchieferSurfaceVariant = Color(0xFFDDE3F0) // light bluish-grey
+val SchieferOutline = Color(0xFFC8D0E4) // soft blue-grey borders
+val SchieferOnSurface = Color(0xFF1C2745) // deep navy text
+val SchieferOnSurfaceVariant = Color(0xFF6878A0) // medium navy-grey captions
+val SchieferPrimary = Color(0xFF2F3F6E) // navy accent
+val SchieferOnPrimary = Color(0xFFFFFFFF) // white text on primary
+val SchieferPrimaryContainer = Color(0xFFD8E0F5) // light blue card accent
+val SchieferOnPrimaryContainer = Color(0xFF1C2745) // text on primaryContainer
 
 // ── Raw semantic colours (used only in Theme.kt) ──────────────────────────────
 //
@@ -102,7 +104,7 @@ val SchieferOnPrimaryContainer = Color(0xFF1C2745)   // text on primaryContainer
 internal val ErrorColorLight = Color(0xFFB3261E)
 
 /** Error red for the dark ("Nacht") theme. Lightened for WCAG AA: 5.28:1 on NachtBackground. */
-internal val ErrorColorDark  = Color(0xFFCF6679)
+internal val ErrorColorDark = Color(0xFFCF6679)
 
 // ── Semantic colour helpers ───────────────────────────────────────────────────
 //
@@ -116,7 +118,7 @@ internal val ErrorColorDark  = Color(0xFFCF6679)
 //   warningColor – Slate 4.40:1 ✓ / Night 8.58:1 ✓ (dot needs ≥ 3:1 per WCAG 1.4.11)
 
 /** Returns the theme's error red (set per theme in [de.godisch.potillus.ui.theme.Theme]). */
-@Composable fun errorColor()   = MaterialTheme.colorScheme.error
+@Composable fun errorColor() = MaterialTheme.colorScheme.error
 
 /**
  * Returns `true` when the currently active Material theme is dark.
@@ -143,12 +145,10 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
  * Slightly darker, fully saturated red used for traffic-light bullets,
  * calendar over-limit dots, and delete-action icons.
  */
-@Composable fun dangerRedColor() =
-    if (isDarkTheme()) Color(0xFFDD2C2C) else Color(0xFF960018)
+@Composable fun dangerRedColor() = if (isDarkTheme()) Color(0xFFDD2C2C) else Color(0xFF960018)
 
 /** Returns a green that passes WCAG AA against the current theme's background. */
-@Composable fun successColor() =
-    if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)
+@Composable fun successColor() = if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)
 
 /**
  * Returns an amber/gold that passes WCAG AA against the current theme's background.
@@ -172,5 +172,4 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
  * DARK value = #E8A020 (unchanged): on the near-black Nacht canvas a bright amber
  * already has ample contrast and an unmistakably yellow hue.
  */
-@Composable fun warningColor() =
-    if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFFA67C00)
+@Composable fun warningColor() = if (isDarkTheme()) Color(0xFFE8A020) else Color(0xFFA67C00)

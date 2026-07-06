@@ -79,7 +79,7 @@ class MigrationTest {
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java
+        AppDatabase::class.java,
     )
 
     /**
@@ -95,12 +95,12 @@ class MigrationTest {
         helper.createDatabase(TEST_DB, 1).apply {
             execSQL(
                 "INSERT INTO drinks (id, name, volumeMl, alcoholPercent, isPreset, isFavorite, category) " +
-                    "VALUES (1, 'Test Lager', 500, 5.0, 0, 0, 'BEER')"
+                    "VALUES (1, 'Test Lager', 500, 5.0, 0, 0, 'BEER')",
             )
             execSQL(
                 "INSERT INTO entries " +
                     "(id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol, timestampMillis, logicalDate, note) " +
-                    "VALUES (1, 1, 'Test Lager', 500, 5.0, 19.7, 1700000000000, '2026-05-30', '')"
+                    "VALUES (1, 1, 'Test Lager', 500, 5.0, 19.7, 1700000000000, '2026-05-30', '')",
             )
             close()
         }
@@ -112,7 +112,7 @@ class MigrationTest {
         // ── Assert: the index now exists … ────────────────────────────────────
         assertTrue(
             "v1→v2 should create index_entries_logicalDate",
-            hasIndex(db, "entries", "index_entries_logicalDate")
+            hasIndex(db, "entries", "index_entries_logicalDate"),
         )
 
         // ── … and the seeded row is unchanged ─────────────────────────────────
@@ -124,13 +124,15 @@ class MigrationTest {
     }
 
     /** Returns true if [table] has an index named [index] (via `PRAGMA index_list`). */
-    private fun hasIndex(db: SupportSQLiteDatabase, table: String, index: String): Boolean =
-        db.query("PRAGMA index_list($table)").use { c ->
-            val nameCol = c.getColumnIndex("name")
-            var found = false
-            while (c.moveToNext()) {
-                if (c.getString(nameCol) == index) { found = true; break }
+    private fun hasIndex(db: SupportSQLiteDatabase, table: String, index: String): Boolean = db.query("PRAGMA index_list($table)").use { c ->
+        val nameCol = c.getColumnIndex("name")
+        var found = false
+        while (c.moveToNext()) {
+            if (c.getString(nameCol) == index) {
+                found = true
+                break
             }
-            found
         }
+        found
+    }
 }

@@ -60,11 +60,11 @@ import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
 import de.godisch.potillus.data.prefs.IAppPreferences
-import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.util.AndroidIoBound
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.ExportResult
@@ -91,7 +91,7 @@ fun interface StringProvider {
      *
      * @param id   Android string resource id.
      * @param args Optional format arguments for `%s` / `%d` placeholders.
-     * @return     The resolved (and formatted) localised string.
+     * @return The resolved (and formatted) localised string.
      */
     operator fun invoke(@StringRes id: Int, vararg args: Any): String
 }
@@ -111,19 +111,19 @@ enum class ImportMode { REPLACE, MERGE }
  */
 sealed class ExportStatus {
     data class Done(val message: String) : ExportStatus()
-    data class Err(val message: String)  : ExportStatus()
+    data class Err(val message: String) : ExportStatus()
 }
 
 @Immutable
 data class SettingsUiState(
-    val settings: AppSettings      = AppSettings(),
+    val settings: AppSettings = AppSettings(),
     val exportStatus: ExportStatus? = null,
     /** Non-null when an export has succeeded and the file should be shared immediately. */
-    val shareTarget: ExportResult?  = null
+    val shareTarget: ExportResult? = null,
 )
 
 class SettingsViewModel(
-    private val getString:  StringProvider,
+    private val getString: StringProvider,
     /**
      * Application context, used solely for MediaStore and ContentResolver access
      * during CSV, PDF, and backup export/import operations.
@@ -144,10 +144,10 @@ class SettingsViewModel(
      *   than buried inside the ViewModel.
      */
     private val appContext: Context,
-    private val prefs:      IAppPreferences,
-    private val entryRepo:  IEntryRepository,
-    private val drinkRepo:  IDrinkRepository,
-    private val backupRepo: IBackupRepository
+    private val prefs: IAppPreferences,
+    private val entryRepo: IEntryRepository,
+    private val drinkRepo: IDrinkRepository,
+    private val backupRepo: IBackupRepository,
 ) : ViewModel() {
 
     companion object {
@@ -155,10 +155,12 @@ class SettingsViewModel(
     }
 
     private val _exportStatus = MutableStateFlow<ExportStatus?>(null)
-    private val _shareTarget  = MutableStateFlow<ExportResult?>(null)
+    private val _shareTarget = MutableStateFlow<ExportResult?>(null)
 
     val uiState: StateFlow<SettingsUiState> = combine(
-        prefs.settingsFlow, _exportStatus, _shareTarget
+        prefs.settingsFlow,
+        _exportStatus,
+        _shareTarget,
     ) { settings, status, share ->
         SettingsUiState(settings, status, share)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
@@ -171,30 +173,44 @@ class SettingsViewModel(
     // (UI, tests, future callers) shares the same validation.
 
     /** Persists the selected [ThemeMode] (light / dark / follow system). */
-    fun setThemeMode(m: ThemeMode)        = viewModelScope.launch { prefs.setTheme(m) }
+    fun setThemeMode(m: ThemeMode) = viewModelScope.launch { prefs.setTheme(m) }
+
     /** Persists the day-change time (hour [h], minute [m]) atomically. */
-    fun setDayChangeTime(h: Int, m: Int)  = viewModelScope.launch { prefs.setDayChangeTime(h, m) }
+    fun setDayChangeTime(h: Int, m: Int) = viewModelScope.launch { prefs.setDayChangeTime(h, m) }
+
     /** Persists the daily pure-alcohol limit in grams [g] (clamped in AppPreferences). */
-    fun setDailyLimit(g: Double)          = viewModelScope.launch { prefs.setDailyLimit(g) }
+    fun setDailyLimit(g: Double) = viewModelScope.launch { prefs.setDailyLimit(g) }
+
     /** Persists the weekly pure-alcohol limit in grams [g] (clamped in AppPreferences). */
-    fun setWeeklyLimit(g: Double)         = viewModelScope.launch { prefs.setWeeklyLimit(g) }
+    fun setWeeklyLimit(g: Double) = viewModelScope.launch { prefs.setWeeklyLimit(g) }
+
     /** Persists the maximum number of drink days per week [days] (1–7). */
     fun setMaxDrinkDaysPerWeek(days: Int) = viewModelScope.launch { prefs.setMaxDrinkDaysPerWeek(days) }
+
     /** Enables/disables the biometric app lock. */
-    fun setBiometric(v: Boolean)          = viewModelScope.launch { prefs.setBiometric(v) }
+    fun setBiometric(v: Boolean) = viewModelScope.launch { prefs.setBiometric(v) }
+
     /** Clears or re-sets FLAG_SECURE to allow/block screenshots and screen recordings. */
-    fun setAllowScreenshots(v: Boolean)   = viewModelScope.launch { prefs.setAllowScreenshots(v) }
+    fun setAllowScreenshots(v: Boolean) = viewModelScope.launch { prefs.setAllowScreenshots(v) }
+
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
-    fun setLanguage(lang: String)         = viewModelScope.launch { prefs.setLanguage(lang) }
+    fun setLanguage(lang: String) = viewModelScope.launch { prefs.setLanguage(lang) }
+
     /** Persists the user's body weight in kilograms [kg] (clamped in AppPreferences). */
-    fun setWeightKg(kg: Double)           = viewModelScope.launch { prefs.setWeightKg(kg) }
+    fun setWeightKg(kg: Double) = viewModelScope.launch { prefs.setWeightKg(kg) }
+
     /** Persists the statistics start date [date] ("YYYY-MM-DD"). */
-    fun setStatsFromDate(date: String)    = viewModelScope.launch { prefs.setStatsFromDate(date) }
+    fun setStatsFromDate(date: String) = viewModelScope.launch { prefs.setStatsFromDate(date) }
 
     /** Dismisses the export/import status banner. */
-    fun clearExportStatus() { _exportStatus.value = null }
+    fun clearExportStatus() {
+        _exportStatus.value = null
+    }
+
     /** Clears the pending share target after the share sheet has been launched. */
-    fun clearShareTarget()  { _shareTarget.value  = null }
+    fun clearShareTarget() {
+        _shareTarget.value = null
+    }
 
     // NOTE: CSV and PDF export live in StatsViewModel — data export now
     // lives on the Statistics screen, next to the statistics it exports. The JSON
@@ -210,8 +226,8 @@ class SettingsViewModel(
     fun exportBackup() {
         viewModelScope.launch {
             val entries = entryRepo.getAll()
-            val drinks  = drinkRepo.drinks.first()
-            val result  = withContext(Dispatchers.IO) {
+            val drinks = drinkRepo.drinks.first()
+            val result = withContext(Dispatchers.IO) {
                 BackupManager.exportToJson(appContext, drinks, entries)
             }
             _exportStatus.value = if (result != null) {
@@ -255,13 +271,14 @@ class SettingsViewModel(
             try {
                 val stats = when (mode) {
                     ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries)
-                    ImportMode.MERGE   -> backupRepo.importMerge(result.drinks, result.entries)
+                    ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries)
                 }
                 _exportStatus.value = ExportStatus.Done(
-                    if (mode == ImportMode.REPLACE)
+                    if (mode == ImportMode.REPLACE) {
                         quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
-                    else
+                    } else {
                         quantityStr(R.plurals.import_success_merge, stats.imported, stats.imported, stats.skipped)
+                    },
                 )
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) Log.e(TAG, "importBackup: unexpected error", e)
@@ -288,16 +305,15 @@ class SettingsViewModel(
      * the plural form is chosen by the FIRST count, which is the only one that
      * governs an inflected word in the en/de sources.
      */
-    private fun quantityStr(@PluralsRes id: Int, quantity: Int, vararg args: Any): String =
-        appContext.perAppLocalizedContext().resources.getQuantityString(id, quantity, *args)
+    private fun quantityStr(@PluralsRes id: Int, quantity: Int, vararg args: Any): String = appContext.perAppLocalizedContext().resources.getQuantityString(id, quantity, *args)
 
     /** Maps a [BackupManager.ImportError] to a localised, user-facing message. */
     private fun localiseImportError(error: BackupManager.ImportError): String = when (error) {
-        is BackupManager.ImportError.CouldNotRead   -> str(R.string.import_error_could_not_read)
-        is BackupManager.ImportError.FileEmpty      -> str(R.string.import_error_empty)
-        is BackupManager.ImportError.InvalidJson    -> str(R.string.import_error_invalid_json)
-        is BackupManager.ImportError.FileTooLarge   -> str(R.string.import_error_file_too_large, error.maxBytes / 1_024 / 1_024)
+        is BackupManager.ImportError.CouldNotRead -> str(R.string.import_error_could_not_read)
+        is BackupManager.ImportError.FileEmpty -> str(R.string.import_error_empty)
+        is BackupManager.ImportError.InvalidJson -> str(R.string.import_error_invalid_json)
+        is BackupManager.ImportError.FileTooLarge -> str(R.string.import_error_file_too_large, error.maxBytes / 1_024 / 1_024)
         is BackupManager.ImportError.VersionTooHigh -> str(R.string.import_error_version_too_high, error.found, error.max)
-        is BackupManager.ImportError.ReadError      -> str(R.string.import_error_read, error.detail ?: "")
+        is BackupManager.ImportError.ReadError -> str(R.string.import_error_read, error.detail ?: "")
     }
 }

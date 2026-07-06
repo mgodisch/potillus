@@ -93,8 +93,11 @@ class LocaleSyncTest {
          */
         private val RES_DIR: File = run {
             val override = System.getProperty("potillus.project.dir")
-            if (override != null) File(override, "src/main/res")
-            else File("src/main/res")
+            if (override != null) {
+                File(override, "src/main/res")
+            } else {
+                File("src/main/res")
+            }
         }
 
         /** The German base strings.xml — source of truth for key count. */
@@ -111,8 +114,11 @@ class LocaleSyncTest {
          */
         private val GUIDE_DIR: File = run {
             val override = System.getProperty("potillus.project.dir")
-            if (override != null) File(override, "../docs/guide")
-            else File("../docs/guide")
+            if (override != null) {
+                File(override, "../docs/guide")
+            } else {
+                File("../docs/guide")
+            }
         }
 
         /**
@@ -123,8 +129,7 @@ class LocaleSyncTest {
          *   values-zh-rCN  →  "zh-CN"
          *   values-de      →  "de"
          */
-        private fun qualifierToBcp47(qualifier: String): String =
-            qualifier.replace(Regex("-r([A-Z])"), "-$1")
+        private fun qualifierToBcp47(qualifier: String): String = qualifier.replace(Regex("-r([A-Z])"), "-$1")
 
         /**
          * Counts <string name="…"> elements in an XML file.
@@ -198,10 +203,10 @@ class LocaleSyncTest {
     private fun localeTagsFromDirs(): Set<String> {
         val dirs = RES_DIR.listFiles { f ->
             f.isDirectory &&
-            f.name.startsWith("values-") &&
-            f.name != "values-night" &&
-            !f.name.matches(Regex("values-v\\d+")) &&
-            File(f, "strings.xml").exists()
+                f.name.startsWith("values-") &&
+                f.name != "values-night" &&
+                !f.name.matches(Regex("values-v\\d+")) &&
+                File(f, "strings.xml").exists()
         } ?: emptyArray()
 
         return dirs.map { qualifierToBcp47(it.name.removePrefix("values-")) }.toSet() + "en"
@@ -224,7 +229,7 @@ class LocaleSyncTest {
         val fromRegistry = SupportedLocales.TAGS
 
         val missingFromRegistry = fromDirs - fromRegistry
-        val missingDirectory    = fromRegistry - fromDirs - setOf("en") // en has no dir
+        val missingDirectory = fromRegistry - fromDirs - setOf("en") // en has no dir
 
         val errors = buildString {
             if (missingFromRegistry.isNotEmpty()) {
@@ -254,11 +259,11 @@ class LocaleSyncTest {
      */
     @Test
     fun `locale_config xml mirrors SupportedLocales exactly`() {
-        val fromConfig   = parseAndroidNames(LOCALE_CONFIG)
+        val fromConfig = parseAndroidNames(LOCALE_CONFIG)
         val fromRegistry = SupportedLocales.TAGS
 
-        val missingFromConfig   = fromRegistry - fromConfig
-        val extraInConfig       = fromConfig   - fromRegistry
+        val missingFromConfig = fromRegistry - fromConfig
+        val extraInConfig = fromConfig - fromRegistry
 
         val errors = buildString {
             if (missingFromConfig.isNotEmpty()) {
@@ -303,13 +308,14 @@ class LocaleSyncTest {
 
         RES_DIR.listFiles { f ->
             f.isDirectory &&
-            f.name.startsWith("values-") &&
-            f.name != "values-de" &&        // exclude the base itself
-            f.name != "values-night" &&
-            !f.name.matches(Regex("values-v\\d+"))
+                f.name.startsWith("values-") &&
+                f.name != "values-de" &&
+                // exclude the base itself
+                f.name != "values-night" &&
+                !f.name.matches(Regex("values-v\\d+"))
         }?.sorted()?.forEach { dir ->
             val stringsFile = File(dir, "strings.xml")
-            if (!stringsFile.exists()) return@forEach  // no strings.xml → covered by Test 1
+            if (!stringsFile.exists()) return@forEach // no strings.xml → covered by Test 1
 
             val actualCount = countStrings(stringsFile)
             if (actualCount != expectedCount) {
@@ -320,8 +326,8 @@ class LocaleSyncTest {
         if (offenders.isNotEmpty()) {
             fail(
                 "String count mismatch in ${offenders.size} locale(s):\n" +
-                offenders.joinToString("\n") { "  ✗  $it" } + "\n" +
-                "  → Translate all missing keys, or remove obsolete ones."
+                    offenders.joinToString("\n") { "  ✗  $it" } + "\n" +
+                    "  → Translate all missing keys, or remove obsolete ones.",
             )
         }
     }
@@ -351,17 +357,18 @@ class LocaleSyncTest {
 
         RES_DIR.listFiles { f ->
             f.isDirectory &&
-            f.name.startsWith("values-") &&
-            f.name != "values-de" &&        // exclude the base itself
-            f.name != "values-night" &&
-            !f.name.matches(Regex("values-v\\d+"))
+                f.name.startsWith("values-") &&
+                f.name != "values-de" &&
+                // exclude the base itself
+                f.name != "values-night" &&
+                !f.name.matches(Regex("values-v\\d+"))
         }?.sorted()?.forEach { dir ->
             val stringsFile = File(dir, "strings.xml")
-            if (!stringsFile.exists()) return@forEach  // no strings.xml → covered by Test 1
+            if (!stringsFile.exists()) return@forEach // no strings.xml → covered by Test 1
 
-            val keys    = parseStringNames(stringsFile)
+            val keys = parseStringNames(stringsFile)
             val missing = baseKeys - keys
-            val extra   = keys - baseKeys
+            val extra = keys - baseKeys
             if (missing.isNotEmpty() || extra.isNotEmpty()) {
                 val parts = buildString {
                     if (missing.isNotEmpty()) append("missing ${missing.sorted()}")
@@ -377,8 +384,8 @@ class LocaleSyncTest {
         if (offenders.isNotEmpty()) {
             fail(
                 "String key-set mismatch in ${offenders.size} locale(s):\n" +
-                offenders.joinToString("\n") { "  ✗  $it" } + "\n" +
-                "  → Add missing keys (translate from values-de/) or remove stray ones."
+                    offenders.joinToString("\n") { "  ✗  $it" } + "\n" +
+                    "  → Add missing keys (translate from values-de/) or remove stray ones.",
             )
         }
     }
@@ -398,7 +405,7 @@ class LocaleSyncTest {
         if (duplicates.isNotEmpty()) {
             fail(
                 "Duplicate tags in SupportedLocales.ALL:\n" +
-                duplicates.sorted().joinToString("\n") { "  ✗  $it" }
+                    duplicates.sorted().joinToString("\n") { "  ✗  $it" },
             )
         }
     }
@@ -418,7 +425,7 @@ class LocaleSyncTest {
         if (duplicates.isNotEmpty()) {
             fail(
                 "Duplicate autonyms in SupportedLocales.ALL:\n" +
-                duplicates.sorted().joinToString("\n") { "  ✗  $it" }
+                    duplicates.sorted().joinToString("\n") { "  ✗  $it" },
             )
         }
     }
@@ -485,8 +492,8 @@ class LocaleSyncTest {
         }
         val stringTags = localeTagsFromDirs()
 
-        val missingGuide   = (stringTags - guideTags).sorted()  // strings, no guide
-        val missingStrings = (guideTags - stringTags).sorted()  // guide, no strings
+        val missingGuide = (stringTags - guideTags).sorted() // strings, no guide
+        val missingStrings = (guideTags - stringTags).sorted() // guide, no strings
 
         if (missingGuide.isNotEmpty() || missingStrings.isNotEmpty()) {
             val msg = buildString {

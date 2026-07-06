@@ -93,12 +93,12 @@ private data class CategoryIconSpec(val vector: ImageVector, val size: Dp)
  * makes the same icon/size choice. @param category The category to map.
  */
 private fun categoryIconSpec(category: DrinkCategory): CategoryIconSpec = when (category) {
-    DrinkCategory.BEER      -> CategoryIconSpec(Icons.Default.SportsBar,  18.dp)
-    DrinkCategory.WINE      -> CategoryIconSpec(Icons.Default.WineBar,    18.dp)
-    DrinkCategory.SPIRITS   -> CategoryIconSpec(Icons.Default.Liquor,     18.dp)
+    DrinkCategory.BEER -> CategoryIconSpec(Icons.Default.SportsBar, 18.dp)
+    DrinkCategory.WINE -> CategoryIconSpec(Icons.Default.WineBar, 18.dp)
+    DrinkCategory.SPIRITS -> CategoryIconSpec(Icons.Default.Liquor, 18.dp)
     DrinkCategory.LONGDRINK -> CategoryIconSpec(Icons.Default.LocalDrink, 18.dp)
-    DrinkCategory.LIQUEUR   -> CategoryIconSpec(Icons.Default.LocalBar,   14.dp)
-    DrinkCategory.OTHER     -> CategoryIconSpec(Icons.Default.Blender,    18.dp)
+    DrinkCategory.LIQUEUR -> CategoryIconSpec(Icons.Default.LocalBar, 14.dp)
+    DrinkCategory.OTHER -> CategoryIconSpec(Icons.Default.Blender, 18.dp)
 }
 
 /**
@@ -116,14 +116,14 @@ private fun categoryIconSpec(category: DrinkCategory): CategoryIconSpec = when (
 fun DrinkCategoryIcon(
     category: DrinkCategory,
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     val spec = categoryIconSpec(category)
     Icon(
-        imageVector        = spec.vector,
+        imageVector = spec.vector,
         contentDescription = category.name,
-        modifier           = modifier.size(spec.size),
-        tint               = tint
+        modifier = modifier.size(spec.size),
+        tint = tint,
     )
 }
 
@@ -136,12 +136,12 @@ fun DrinkCategoryIcon(
  */
 @Composable
 fun DrinkCategory.displayLabel(): String = when (this) {
-    DrinkCategory.BEER      -> stringResource(R.string.category_beer)
-    DrinkCategory.WINE      -> stringResource(R.string.category_wine)
-    DrinkCategory.SPIRITS   -> stringResource(R.string.category_spirits)
+    DrinkCategory.BEER -> stringResource(R.string.category_beer)
+    DrinkCategory.WINE -> stringResource(R.string.category_wine)
+    DrinkCategory.SPIRITS -> stringResource(R.string.category_spirits)
     DrinkCategory.LONGDRINK -> stringResource(R.string.category_longdrink)
-    DrinkCategory.LIQUEUR   -> stringResource(R.string.category_liqueur)
-    DrinkCategory.OTHER     -> stringResource(R.string.category_other)
+    DrinkCategory.LIQUEUR -> stringResource(R.string.category_liqueur)
+    DrinkCategory.OTHER -> stringResource(R.string.category_other)
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -167,20 +167,20 @@ fun DrinkCategory.displayLabel(): String = when (this) {
 fun FavoriteQuickBar(
     favorites: List<DrinkDefinition>,
     onSelect: (DrinkDefinition) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (favorites.isEmpty()) return
     Column(modifier = modifier) {
         Text(
-            text     = stringResource(R.string.favorites_quick),
-            style    = MaterialTheme.typography.labelSmall,
-            color    = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            text = stringResource(R.string.favorites_quick),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
         Spacer(Modifier.height(4.dp))
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding        = PaddingValues(horizontal = 16.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
             // Stable key: favourites can be toggled on/off in the Drinks screen
             // while this row is visible; keying by the Room id lets Compose move
@@ -188,10 +188,10 @@ fun FavoriteQuickBar(
             items(favorites, key = { it.id }) { drink ->
                 SuggestionChip(
                     onClick = { onSelect(drink) },
-                    label   = {
+                    label = {
                         Row(
-                            verticalAlignment     = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             DrinkCategoryIcon(category = drink.category, modifier = Modifier.size(14.dp))
                             Column {
@@ -199,11 +199,11 @@ fun FavoriteQuickBar(
                                 Text(
                                     "${drink.volumeMl} ml · ${drink.alcoholPercent} %",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
-                    }
+                    },
                 )
             }
         }
@@ -240,34 +240,34 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
         "%02d:%02d".format(ldt.hour, ldt.minute)
     }
     Card(
-        modifier  = Modifier.fillMaxWidth(),
-        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
-            modifier          = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     entry.drinkName,
-                    style      = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    maxLines   = 1,
-                    overflow   = TextOverflow.Ellipsis
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     "$time · ${entry.volumeMl} ml · ${entry.alcoholPercent} % · ${entry.gramsAlcohol.fmt1(locale)} g",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (entry.note.isNotBlank()) {
                     Text(
                         entry.note,
-                        style    = MaterialTheme.typography.bodySmall,
-                        color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -318,7 +318,7 @@ fun LimitBar(
     limitGrams: Double,
     caption: String,
     modifier: Modifier = Modifier,
-    leftSuffix: String = ""
+    leftSuffix: String = "",
 ) {
     // Per-app locale for the consumed-grams label (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
@@ -336,30 +336,31 @@ fun LimitBar(
     // the boundary.
     val barColor = when {
         totalGrams > limitGrams -> dangerRedColor()
-        fraction < 0.75f        -> MaterialTheme.colorScheme.primary
-        else                    -> warningColor()
+        fraction < 0.75f -> MaterialTheme.colorScheme.primary
+        else -> warningColor()
     }
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            val leftText = if (leftSuffix.isNotEmpty())
+            val leftText = if (leftSuffix.isNotEmpty()) {
                 "${totalGrams.fmt1(locale)} g $leftSuffix"
-            else
+            } else {
                 "${totalGrams.fmt1(locale)} g"
+            }
             Text(leftText, style = MaterialTheme.typography.bodySmall)
             Text(
                 caption,
-                style    = MaterialTheme.typography.bodySmall,
-                color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 // Guaranteed minimum visual gap from the left text so the two
                 // values never visually merge in SpaceBetween layout.
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = 8.dp),
             )
         }
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
-            progress   = { fraction.coerceIn(0f, 1f) },
-            modifier   = Modifier.fillMaxWidth().height(8.dp),
-            color      = barColor,
+            progress = { fraction.coerceIn(0f, 1f) },
+            modifier = Modifier.fillMaxWidth().height(8.dp),
+            color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
     }
@@ -396,32 +397,35 @@ fun LimitBar(
 @Composable
 fun TrafficLightDot(
     light: TrafficLight,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val baseColor = when (light) {
-        TrafficLight.GREEN  -> successColor()
+        TrafficLight.GREEN -> successColor()
         TrafficLight.YELLOW -> warningColor()
-        TrafficLight.RED    -> dangerRedColor()
+        TrafficLight.RED -> dangerRedColor()
     }
     // Capture color BEFORE entering the Canvas lambda (DrawScope is not Composable)
     val highlight = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.52f)
 
     androidx.compose.foundation.Canvas(modifier = modifier.size(12.dp)) {
-        val r  = size.minDimension / 2f
-        val cx = size.width  / 2f
+        val r = size.minDimension / 2f
+        val cx = size.width / 2f
         val cy = size.height / 2f
 
         // 1. Filled base circle
-        drawCircle(color = baseColor, radius = r,
-            center = androidx.compose.ui.geometry.Offset(cx, cy))
+        drawCircle(
+            color = baseColor,
+            radius = r,
+            center = androidx.compose.ui.geometry.Offset(cx, cy),
+        )
 
         // 2. Specular highlight – smaller circle offset to upper-left.
         //    Radius = 35 % of sphere radius; offset = 28 % in each axis.
         //    Creates the illusion of a convex surface lit from the top-left.
         drawCircle(
-            color  = highlight,
+            color = highlight,
             radius = r * 0.35f,
-            center = androidx.compose.ui.geometry.Offset(cx - r * 0.28f, cy - r * 0.28f)
+            center = androidx.compose.ui.geometry.Offset(cx - r * 0.28f, cy - r * 0.28f),
         )
     }
 }
@@ -452,8 +456,8 @@ fun TrafficLightDot(
 fun DrinkDaysBar(
     drinkDays: Int,
     maxDrinkDays: Int,
-    modifier: Modifier   = Modifier,
-    weekLabel: String    = ""
+    modifier: Modifier = Modifier,
+    weekLabel: String = "",
 ) {
     val fraction = (drinkDays.toFloat() / maxDrinkDays.toFloat().coerceAtLeast(1f))
         .coerceAtLeast(0f)
@@ -463,25 +467,28 @@ fun DrinkDaysBar(
     // limit and stays amber ("at cap, none left"); the next drink day is over.
     val barColor = when {
         drinkDays > maxDrinkDays -> dangerRedColor()
-        fraction < 0.75f         -> MaterialTheme.colorScheme.primary
-        else                     -> warningColor()
+        fraction < 0.75f -> MaterialTheme.colorScheme.primary
+        else -> warningColor()
     }
     Column(modifier = modifier) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 "$drinkDays / $maxDrinkDays ${stringResource(R.string.drink_days_label)}",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
             if (weekLabel.isNotEmpty()) {
-                Text(weekLabel, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    weekLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
-            progress   = { fraction.coerceIn(0f, 1f) },
-            modifier   = Modifier.fillMaxWidth().height(8.dp),
-            color      = barColor,
+            progress = { fraction.coerceIn(0f, 1f) },
+            modifier = Modifier.fillMaxWidth().height(8.dp),
+            color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
     }

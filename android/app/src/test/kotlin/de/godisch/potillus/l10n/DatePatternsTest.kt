@@ -56,7 +56,7 @@ class DatePatternsTest {
     private val appLocales = listOf(
         "cs", "da", "de", "el", "en", "es", "fr", "it", "ja", "ko",
         "nb", "nl", "pl", "pt", "pt-BR", "ro", "ru", "sv", "uk",
-        "zh-CN", "zh-TW"
+        "zh-CN", "zh-TW",
     ).map(Locale::forLanguageTag)
 
     @Test fun `german pattern is unpadded day-dot-month`() {
@@ -72,7 +72,7 @@ class DatePatternsTest {
             val pattern = shortDayMonthPattern(locale)
             assertFalse(
                 "pattern for $locale must not contain a year field: $pattern",
-                pattern.contains('y') || pattern.contains('u')
+                pattern.contains('y') || pattern.contains('u'),
             )
         }
     }
@@ -95,7 +95,7 @@ class DatePatternsTest {
             val pattern = shortDayMonthPattern(Locale.forLanguageTag(tag))
             assertTrue(
                 "month must precede day for $tag: $pattern",
-                pattern.indexOf('M') < pattern.indexOf('d')
+                pattern.indexOf('M') < pattern.indexOf('d'),
             )
         }
     }
@@ -105,7 +105,7 @@ class DatePatternsTest {
             val pattern = shortDayMonthPattern(Locale.forLanguageTag(tag))
             assertTrue(
                 "day must precede month for $tag: $pattern",
-                pattern.indexOf('d') < pattern.indexOf('M')
+                pattern.indexOf('d') < pattern.indexOf('M'),
             )
         }
     }

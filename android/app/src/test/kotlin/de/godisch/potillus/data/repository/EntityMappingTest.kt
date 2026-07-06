@@ -51,13 +51,13 @@ class EntityMappingTest {
      */
     @Test fun `drink round-trips domain to entity to domain`() {
         val original = DrinkDefinition(
-            id             = 7,
-            name           = "Lager (Pint)",
-            volumeMl       = 568,
+            id = 7,
+            name = "Lager (Pint)",
+            volumeMl = 568,
             alcoholPercent = 4.5,
-            isPreset       = true,
-            isFavorite     = true,
-            category       = DrinkCategory.BEER
+            isPreset = true,
+            isFavorite = true,
+            category = DrinkCategory.BEER,
         )
         assertEquals(original, original.toEntity().toDomain())
     }
@@ -65,8 +65,11 @@ class EntityMappingTest {
     /** [DrinkDefinition.toEntity] stores the category as its [Enum.name] string. */
     @Test fun `drink toEntity stores category as enum name`() {
         val entity = DrinkDefinition(
-            id = 1, name = "Red Wine", volumeMl = 150, alcoholPercent = 13.5,
-            category = DrinkCategory.WINE
+            id = 1,
+            name = "Red Wine",
+            volumeMl = 150,
+            alcoholPercent = 13.5,
+            category = DrinkCategory.WINE,
         ).toEntity()
         assertEquals("WINE", entity.category)
     }
@@ -74,8 +77,11 @@ class EntityMappingTest {
     /** A known category string decodes back to the matching enum constant. */
     @Test fun `drink toDomain decodes a known category string`() {
         val domain = DrinkEntity(
-            id = 1, name = "Vodka Shot", volumeMl = 40, alcoholPercent = 40.0,
-            category = "SPIRITS"
+            id = 1,
+            name = "Vodka Shot",
+            volumeMl = 40,
+            alcoholPercent = 40.0,
+            category = "SPIRITS",
         ).toDomain()
         assertEquals(DrinkCategory.SPIRITS, domain.category)
     }
@@ -87,8 +93,11 @@ class EntityMappingTest {
      */
     @Test fun `drink toDomain falls back to OTHER for an unknown category`() {
         val domain = DrinkEntity(
-            id = 1, name = "Mystery", volumeMl = 100, alcoholPercent = 5.0,
-            category = "NOT_A_REAL_CATEGORY"
+            id = 1,
+            name = "Mystery",
+            volumeMl = 100,
+            alcoholPercent = 5.0,
+            category = "NOT_A_REAL_CATEGORY",
         ).toDomain()
         assertEquals(DrinkCategory.OTHER, domain.category)
     }
@@ -102,15 +111,15 @@ class EntityMappingTest {
      */
     @Test fun `entry round-trips domain to entity to domain`() {
         val original = ConsumptionEntry(
-            id              = 42,
-            drinkId         = 7,
-            drinkName       = "Lager (Pint)",
-            volumeMl        = 568,
-            alcoholPercent  = 4.5,
-            gramsAlcohol    = 20.2,
+            id = 42,
+            drinkId = 7,
+            drinkName = "Lager (Pint)",
+            volumeMl = 568,
+            alcoholPercent = 4.5,
+            gramsAlcohol = 20.2,
             timestampMillis = 1_700_000_000_000L,
-            logicalDate     = "2025-05-26",
-            note            = "after work"
+            logicalDate = "2025-05-26",
+            note = "after work",
         )
         assertEquals(original, original.toEntity().toDomain())
     }
@@ -118,15 +127,15 @@ class EntityMappingTest {
     /** The reverse direction (entity → domain → entity) is equally lossless. */
     @Test fun `entry round-trips entity to domain to entity`() {
         val entity = EntryEntity(
-            id              = 3,
-            drinkId         = 1,
-            drinkName       = "Red Wine",
-            volumeMl        = 150,
-            alcoholPercent  = 13.5,
-            gramsAlcohol    = 16.0,
+            id = 3,
+            drinkId = 1,
+            drinkName = "Red Wine",
+            volumeMl = 150,
+            alcoholPercent = 13.5,
+            gramsAlcohol = 16.0,
             timestampMillis = 1_700_000_500_000L,
-            logicalDate     = "2025-05-27",
-            note            = ""
+            logicalDate = "2025-05-27",
+            note = "",
         )
         assertEquals(entity, entity.toDomain().toEntity())
     }

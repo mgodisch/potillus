@@ -49,8 +49,7 @@ class KeystoreSecretStoreTest {
     private val store = KeystoreSecretStore(keyAlias = "test-alias")
 
     /** A fresh software AES-256 key (no Android Keystore involved). */
-    private fun softwareKey(): SecretKey =
-        KeyGenerator.getInstance("AES").apply { init(256) }.generateKey()
+    private fun softwareKey(): SecretKey = KeyGenerator.getInstance("AES").apply { init(256) }.generateKey()
 
     /** seal → open returns the original plaintext. */
     @Test
@@ -97,7 +96,7 @@ class KeystoreSecretStoreTest {
     fun tamperedCiphertext_throws() {
         val key = softwareKey()
         val sealed = store.sealWithKey(key, "payload".toByteArray())
-        sealed[sealed.size - 1] = (sealed[sealed.size - 1] + 1).toByte()  // corrupt the tag
+        sealed[sealed.size - 1] = (sealed[sealed.size - 1] + 1).toByte() // corrupt the tag
 
         assertThrows(GeneralSecurityException::class.java) {
             store.openWithKey(key, sealed)
@@ -110,7 +109,7 @@ class KeystoreSecretStoreTest {
         val sealed = store.sealWithKey(softwareKey(), "payload".toByteArray())
 
         assertThrows(GeneralSecurityException::class.java) {
-            store.openWithKey(softwareKey(), sealed)  // different key
+            store.openWithKey(softwareKey(), sealed) // different key
         }
     }
 

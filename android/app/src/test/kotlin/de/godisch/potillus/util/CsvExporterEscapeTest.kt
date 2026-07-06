@@ -38,7 +38,7 @@ class CsvExporterEscapeTest {
         for (payload in listOf("=SUM(A1)", "+1", "-1", "@cmd", "\tx", "\rx")) {
             assertTrue(
                 "payload '$payload' must be neutralised",
-                CsvExporter.escapeField(payload).contains("'")
+                CsvExporter.escapeField(payload).contains("'"),
             )
         }
     }
@@ -72,7 +72,7 @@ class CsvExporterEscapeTest {
             gramsAlcohol = 12.6,
             timestampMillis = 1_700_000_000_000L,
             logicalDate = "2026-01-01",
-            note = "=danger"
+            note = "=danger",
         )
         val header = listOf("d", "t", "drink", "cat", "v", "a", "g", "n")
         val csv = CsvExporter.buildCsv(header, listOf(entry), emptyList())

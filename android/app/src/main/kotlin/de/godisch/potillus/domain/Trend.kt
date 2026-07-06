@@ -41,7 +41,10 @@ package de.godisch.potillus.domain
  *          (previous average ≤ 0): no arrow is shown.
  */
 enum class Trend {
-    UP, DOWN, FLAT;
+    UP,
+    DOWN,
+    FLAT,
+    ;
 
     companion object {
         /**
@@ -64,7 +67,7 @@ enum class Trend {
             return when {
                 c > p -> UP
                 c < p -> DOWN
-                else  -> FLAT
+                else -> FLAT
             }
         }
     }

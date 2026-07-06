@@ -52,7 +52,7 @@ class CsvExporterTest {
     fun equalsPrefixHyperlink_isNeutralisedAndQuoted() {
         assertEquals(
             "\"'=HYPERLINK(\"\"x\"\")\"",
-            CsvExporter.escapeField("=HYPERLINK(\"x\")")
+            CsvExporter.escapeField("=HYPERLINK(\"x\")"),
         )
     }
 
@@ -63,10 +63,10 @@ class CsvExporterTest {
         // guard. (CR is also a trigger but additionally forces RFC 4180 quoting,
         // so it is asserted in carriageReturn_forcesQuoting below, not here.)
         assertEquals("'=1+1", CsvExporter.escapeField("=1+1"))
-        assertEquals("'+1",   CsvExporter.escapeField("+1"))
-        assertEquals("'-1",   CsvExporter.escapeField("-1"))
+        assertEquals("'+1", CsvExporter.escapeField("+1"))
+        assertEquals("'-1", CsvExporter.escapeField("-1"))
         assertEquals("'@SUM", CsvExporter.escapeField("@SUM"))
-        assertEquals("'\tx",  CsvExporter.escapeField("\tx"))
+        assertEquals("'\tx", CsvExporter.escapeField("\tx"))
     }
 
     /** A trigger character that is NOT the first character must be left alone. */
@@ -117,7 +117,7 @@ class CsvExporterTest {
      */
     @Test
     fun carriageReturn_forcesQuoting() {
-        assertEquals("\"a\rb\"",  CsvExporter.escapeField("a\rb"))
+        assertEquals("\"a\rb\"", CsvExporter.escapeField("a\rb"))
         assertEquals("\"'\rx\"", CsvExporter.escapeField("\rx"))
     }
 

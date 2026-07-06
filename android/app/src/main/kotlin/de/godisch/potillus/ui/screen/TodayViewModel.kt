@@ -53,7 +53,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -69,37 +68,37 @@ import java.util.Locale
 // classes in this file follow the same contract.
 @Immutable
 data class TodayUiState(
-    val entries: List<ConsumptionEntry>  = emptyList(),
-    val totalGrams: Double               = 0.0,
-    val limitInfo: LimitInfo             = LimitInfo(20.0, 100.0, 5),
+    val entries: List<ConsumptionEntry> = emptyList(),
+    val totalGrams: Double = 0.0,
+    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
     /** Number of distinct days in the trailing 7-day window with ≥1 entry (today included if applicable). */
-    val drinkDaysThisWeek: Int           = 0,
-    val weeklyTotalGrams: Double         = 0.0,
-    val weeklyRangeLabel: String         = "",
+    val drinkDaysThisWeek: Int = 0,
+    val weeklyTotalGrams: Double = 0.0,
+    val weeklyRangeLabel: String = "",
     /**
      * Average grams per day for the current calendar month so far: the month's
      * cumulated grams divided by the number of days elapsed (1st of month …
      * today, inclusive). Matches the current month's bar in the year-view chart.
      */
-    val monthlyAvgPerDay: Double         = 0.0,
+    val monthlyAvgPerDay: Double = 0.0,
     /**
      * Trend of [monthlyAvgPerDay] vs. the per-day average over the whole period
      * from the configured statistics start date up to the day before this month
      * (FLAT when there is no such baseline or the two are equal at 0.1 g).
      */
-    val monthTrend: Trend                = Trend.FLAT,
+    val monthTrend: Trend = Trend.FLAT,
     /** Localized standalone name of the current month (e.g. "June" / "Juni"). */
-    val currentMonthLabel: String        = "",
-    val bacPermille: Double?             = null,
+    val currentMonthLabel: String = "",
+    val bacPermille: Double? = null,
     val favorites: List<DrinkDefinition> = emptyList(),
-    val settings: AppSettings            = AppSettings()
+    val settings: AppSettings = AppSettings(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TodayViewModel(
     private val entryRepo: IEntryRepository,
     private val drinkRepo: IDrinkRepository,
-    private val prefs: IAppPreferences
+    private val prefs: IAppPreferences,
 ) : ViewModel() {
 
     /**
@@ -175,7 +174,7 @@ class TodayViewModel(
      */
     val lastUsedDrink: StateFlow<DrinkDefinition?> = combine(
         entryRepo.mostRecentEntry(),
-        drinkRepo.drinks
+        drinkRepo.drinks,
     ) { recent, drinks ->
         drinks.firstOrNull { it.id == recent?.drinkId } ?: drinks.firstOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -188,29 +187,32 @@ class TodayViewModel(
      * when settings change.
      */
     val uiState: StateFlow<TodayUiState> = prefs.settingsFlow.flatMapLatest { settings ->
-        val today     = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+        val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         // Rolling 7-day window: today plus the previous six calendar days (inclusive).
         // This replaces the former fixed calendar week so the "weekly" gram total and
         // drink-day count never reset on a weekday boundary. The field names below
         // keep the historical "weekly*" spelling to avoid churn; they now denote the
         // trailing-7-day figures.
-        val windowEnd   = DayResolver.parseDate(today)
+        val windowEnd = DayResolver.parseDate(today)
         val windowStart = windowEnd.minusDays(6)
         // First day of the calendar month that contains "today"; used for the
         // "month total" figure shown next to today's total on the summary card.
-        val monthStart  = windowEnd.withDayOfMonth(1)
+        val monthStart = windowEnd.withDayOfMonth(1)
         // Reference window for the Today trend arrow: the per-day average over the
         // whole time from the configured statistics start date up to the day before
         // this month. The daily-summary query below is widened to start there.
-        val monthStr     = DayResolver.formatDate(monthStart)
-        val prevEnd      = monthStart.minusDays(1)         // last day before this month
-        val statsFloor   = settings.statsFromDate          // "" = not configured
+        val monthStr = DayResolver.formatDate(monthStart)
+        val prevEnd = monthStart.minusDays(1) // last day before this month
+        val statsFloor = settings.statsFromDate // "" = not configured
         // A baseline only exists when the statistics start lies before this month.
-        val hasBaseline  = statsFloor.isNotEmpty() && statsFloor < monthStr
-        val historyFrom  = if (hasBaseline) statsFloor else monthStr
-        val baselineDays = if (hasBaseline)
-            (prevEnd.toEpochDay() - DayResolver.parseDate(statsFloor).toEpochDay() + 1).toInt() else 0
+        val hasBaseline = statsFloor.isNotEmpty() && statsFloor < monthStr
+        val historyFrom = if (hasBaseline) statsFloor else monthStr
+        val baselineDays = if (hasBaseline) {
+            (prevEnd.toEpochDay() - DayResolver.parseDate(statsFloor).toEpochDay() + 1).toInt()
+        } else {
+            0
+        }
         // Localized, standalone month name for the card caption ("Ø <month>").
         // Standalone form is the grammatically correct one for a bare label in
         // languages with cases (e.g. ru/cs/pl/el). Derived from the logical
@@ -238,15 +240,18 @@ class TodayViewModel(
         //   sets both), so the tag here and Context.formattingLocale() elsewhere
         //   resolve to the same locale. They are two views of one value, not two
         //   independent sources — do not "reconcile" them by injecting a Context.
-        val formattingLocale = if (settings.language.isNotEmpty())
-            Locale.forLanguageTag(settings.language) else Locale.getDefault()
-        val monthLabel  = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, formattingLocale)
+        val formattingLocale = if (settings.language.isNotEmpty()) {
+            Locale.forLanguageTag(settings.language)
+        } else {
+            Locale.getDefault()
+        }
+        val monthLabel = monthStart.month.getDisplayName(TextStyle.FULL_STANDALONE, formattingLocale)
         // Weekly range label ("28.6–4.7" / "6/28–7/4"): the day/month ORDER and
         // SEPARATOR follow the same per-app locale as the month name above.
         // shortDayMonthPattern derives them from the locale's SHORT date pattern
         // (see l10n/DatePatterns.kt) — the previously hard-coded "d.M." showed
         // the European order for every language, including en-US/ja/zh.
-        val fmt       = DateTimeFormatter.ofPattern(shortDayMonthPattern(formattingLocale), formattingLocale)
+        val fmt = DateTimeFormatter.ofPattern(shortDayMonthPattern(formattingLocale), formattingLocale)
         val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 
         combine(
@@ -254,7 +259,7 @@ class TodayViewModel(
             drinkRepo.drinks,
             entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
             entryRepo.getDailySummaries(historyFrom, DayResolver.formatDate(windowEnd)),
-            ticker
+            ticker,
         ) { entries, drinks, weeklySummaries, historySummaries, _ ->
             val totalGrams = entries.sumOf { it.gramsAlcohol }
 
@@ -262,45 +267,47 @@ class TodayViewModel(
             // alcohol-free entries don't push the "first drink" timestamp earlier than
             // the real drinking episode started.
             val alcoholEntries = entries.filter { it.alcoholPercent > 0.0 }
-            val nowMillis      = System.currentTimeMillis()
+            val nowMillis = System.currentTimeMillis()
             val bac: Double? = if (settings.weightKg > 0 && alcoholEntries.isNotEmpty()) {
-                val firstTs      = alcoholEntries.minOf { it.timestampMillis }
+                val firstTs = alcoholEntries.minOf { it.timestampMillis }
                 val hoursElapsed = (nowMillis - firstTs) / AlcoholCalculator.MILLIS_PER_HOUR
                 AlcoholCalculator.calculateBAC(totalGrams, settings.weightKg, hoursElapsed)
-            } else null
+            } else {
+                null
+            }
 
             // Split the widened query into this month and everything before it
             // (within the baseline window). The current month uses the superposition
             // rule; the baseline is its summed grams over the full day count from the
             // statistics start to the day before this month. Trend.of yields FLAT
             // when there is no baseline or the two are equal at 0.1 g.
-            val curMonth     = historySummaries.filter { it.date >= monthStr }
-            val curMonthAvg  = run {
+            val curMonth = historySummaries.filter { it.date >= monthStr }
+            val curMonthAvg = run {
                 val days = DayResolver.effectivePeriodDays(
-                    from            = monthStr,
-                    today           = today,
-                    todayIsDrinkDay = curMonth.any { it.date == today }
+                    from = monthStr,
+                    today = today,
+                    todayIsDrinkDay = curMonth.any { it.date == today },
                 )
                 if (days > 0) curMonth.sumOf { it.totalGrams } / days else 0.0
             }
-            val baselineSum  = historySummaries.filter { it.date < monthStr }.sumOf { it.totalGrams }
-            val baselineAvg  = if (baselineDays > 0) baselineSum / baselineDays else 0.0
+            val baselineSum = historySummaries.filter { it.date < monthStr }.sumOf { it.totalGrams }
+            val baselineAvg = if (baselineDays > 0) baselineSum / baselineDays else 0.0
 
             TodayUiState(
-                entries           = entries,
-                totalGrams        = totalGrams,
-                limitInfo         = limitInfo,
+                entries = entries,
+                totalGrams = totalGrams,
+                limitInfo = limitInfo,
                 drinkDaysThisWeek = weeklySummaries.count { it.totalGrams > 0.0 },
-                weeklyTotalGrams  = weeklySummaries.sumOf { it.totalGrams },
-                weeklyRangeLabel  = weekLabel,
+                weeklyTotalGrams = weeklySummaries.sumOf { it.totalGrams },
+                weeklyRangeLabel = weekLabel,
                 // Per-day average for the current month (app-wide superposition rule),
                 // plus its trend versus the all-time-before-this-month baseline.
-                monthlyAvgPerDay  = curMonthAvg,
-                monthTrend        = Trend.of(curMonthAvg, baselineAvg),
+                monthlyAvgPerDay = curMonthAvg,
+                monthTrend = Trend.of(curMonthAvg, baselineAvg),
                 currentMonthLabel = monthLabel,
-                bacPermille       = bac,
-                favorites         = drinks.filter { it.isFavorite },
-                settings          = settings
+                bacPermille = bac,
+                favorites = drinks.filter { it.isFavorite },
+                settings = settings,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())

@@ -89,7 +89,7 @@ sealed class DrinksEvent {
      */
     data class ValidationError(val field: FieldId, val reason: Reason) : DrinksEvent() {
         enum class FieldId { NAME, VOLUME_ML, ALCOHOL_PERCENT }
-        enum class Reason  { BLANK, TOO_LONG, OUT_OF_RANGE, NOT_FINITE }
+        enum class Reason { BLANK, TOO_LONG, OUT_OF_RANGE, NOT_FINITE }
     }
 }
 
@@ -97,11 +97,13 @@ sealed class DrinksEvent {
 data class DrinksUiState(val drinks: List<DrinkDefinition> = emptyList())
 
 /** Maximum length of a user-defined drink name. */
-private const val MAX_DRINK_NAME_LEN   = 100
+private const val MAX_DRINK_NAME_LEN = 100
+
 /** Accepted volume range in ml (1 ml … 10 l). */
-private val VALID_VOLUME_ML_RANGE      = 1..10_000
+private val VALID_VOLUME_ML_RANGE = 1..10_000
+
 /** Accepted alcohol-by-volume range (0 % … 100 %). */
-private val VALID_ALCOHOL_PCT_RANGE    = 0.0..100.0
+private val VALID_ALCOHOL_PCT_RANGE = 0.0..100.0
 
 class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
 
@@ -137,60 +139,72 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
         if (name.isBlank()) {
             if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – name blank")
             viewModelScope.launch {
-                _events.emit(DrinksEvent.ValidationError(
-                    DrinksEvent.ValidationError.FieldId.NAME,
-                    DrinksEvent.ValidationError.Reason.BLANK
-                ))
+                _events.emit(
+                    DrinksEvent.ValidationError(
+                        DrinksEvent.ValidationError.FieldId.NAME,
+                        DrinksEvent.ValidationError.Reason.BLANK,
+                    ),
+                )
             }
             return
         }
         if (name.length > MAX_DRINK_NAME_LEN) {
             if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – name too long (${name.length})")
             viewModelScope.launch {
-                _events.emit(DrinksEvent.ValidationError(
-                    DrinksEvent.ValidationError.FieldId.NAME,
-                    DrinksEvent.ValidationError.Reason.TOO_LONG
-                ))
+                _events.emit(
+                    DrinksEvent.ValidationError(
+                        DrinksEvent.ValidationError.FieldId.NAME,
+                        DrinksEvent.ValidationError.Reason.TOO_LONG,
+                    ),
+                )
             }
             return
         }
         if (volumeMl !in VALID_VOLUME_ML_RANGE) {
             if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – volumeMl=$volumeMl out of range")
             viewModelScope.launch {
-                _events.emit(DrinksEvent.ValidationError(
-                    DrinksEvent.ValidationError.FieldId.VOLUME_ML,
-                    DrinksEvent.ValidationError.Reason.OUT_OF_RANGE
-                ))
+                _events.emit(
+                    DrinksEvent.ValidationError(
+                        DrinksEvent.ValidationError.FieldId.VOLUME_ML,
+                        DrinksEvent.ValidationError.Reason.OUT_OF_RANGE,
+                    ),
+                )
             }
             return
         }
         if (!alcoholPercent.isFinite()) {
             if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – alcoholPercent=$alcoholPercent not finite")
             viewModelScope.launch {
-                _events.emit(DrinksEvent.ValidationError(
-                    DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
-                    DrinksEvent.ValidationError.Reason.NOT_FINITE
-                ))
+                _events.emit(
+                    DrinksEvent.ValidationError(
+                        DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
+                        DrinksEvent.ValidationError.Reason.NOT_FINITE,
+                    ),
+                )
             }
             return
         }
         if (alcoholPercent !in VALID_ALCOHOL_PCT_RANGE) {
             if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – alcoholPercent=$alcoholPercent out of range")
             viewModelScope.launch {
-                _events.emit(DrinksEvent.ValidationError(
-                    DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
-                    DrinksEvent.ValidationError.Reason.OUT_OF_RANGE
-                ))
+                _events.emit(
+                    DrinksEvent.ValidationError(
+                        DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
+                        DrinksEvent.ValidationError.Reason.OUT_OF_RANGE,
+                    ),
+                )
             }
             return
         }
         viewModelScope.launch {
-            drinkRepo.add(DrinkDefinition(
-                name           = name.trim(),
-                volumeMl       = volumeMl,
-                alcoholPercent = alcoholPercent,
-                category       = category
-            ))
+            drinkRepo.add(
+                DrinkDefinition(
+                    name = name.trim(),
+                    volumeMl = volumeMl,
+                    alcoholPercent = alcoholPercent,
+                    category = category,
+                ),
+            )
         }
     }
 
@@ -200,7 +214,9 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
      * @param drink The modified drink definition (validation is the caller's
      *              responsibility; the edit dialog reuses the same field checks).
      */
-    fun updateDrink(drink: DrinkDefinition) { viewModelScope.launch { drinkRepo.update(drink) } }
+    fun updateDrink(drink: DrinkDefinition) {
+        viewModelScope.launch { drinkRepo.update(drink) }
+    }
 
     /**
      * Deletes [drink] if no entries reference it.

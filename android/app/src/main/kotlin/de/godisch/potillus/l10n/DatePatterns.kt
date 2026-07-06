@@ -85,7 +85,10 @@ private val REPEATED_PATTERN_LETTER = Regex("([A-Za-z])\\1+")
  */
 fun shortDayMonthPattern(locale: Locale): String {
     val full = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-        FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        locale,
     )
     val stripped = full
         .replace(YEAR_WITH_SEPARATORS, "")

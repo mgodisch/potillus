@@ -88,11 +88,10 @@ object SimpleTemplate {
      * lets the body span multiple lines; the lazy `(.*?)` stops at the first
      * matching `end` marker so adjacent blocks do not bleed into one another.
      */
-    private fun repeatBlock(name: String): Regex =
-        Regex(
-            """<!--\s*repeat:${Regex.escape(name)}\s*-->(.*?)<!--\s*end:${Regex.escape(name)}\s*-->""",
-            RegexOption.DOT_MATCHES_ALL
-        )
+    private fun repeatBlock(name: String): Regex = Regex(
+        """<!--\s*repeat:${Regex.escape(name)}\s*-->(.*?)<!--\s*end:${Regex.escape(name)}\s*-->""",
+        RegexOption.DOT_MATCHES_ALL,
+    )
 
     /**
      * Renders [template] by expanding every repeat block in [repeats] and then
@@ -113,7 +112,7 @@ object SimpleTemplate {
     fun render(
         template: String,
         scalars: Map<String, String>,
-        repeats: Map<String, List<Map<String, String>>> = emptyMap()
+        repeats: Map<String, List<Map<String, String>>> = emptyMap(),
     ): String {
         var out = template
 
@@ -131,22 +130,23 @@ object SimpleTemplate {
     }
 
     /** Replaces every `{{KEY}}` in [text] with the escaped value from [values]. */
-    private fun substitute(text: String, values: Map<String, String>): String =
-        PLACEHOLDER.replace(text) { match ->
-            val key = match.groupValues[1]
-            // Leave unknown placeholders verbatim (match.value) to surface typos.
-            values[key]?.let(::escapeHtml) ?: match.value
-        }
+    private fun substitute(text: String, values: Map<String, String>): String = PLACEHOLDER.replace(text) { match ->
+        val key = match.groupValues[1]
+        // Leave unknown placeholders verbatim (match.value) to surface typos.
+        values[key]?.let(::escapeHtml) ?: match.value
+    }
 
     /** Escapes the five characters that are significant in HTML text/attributes. */
     private fun escapeHtml(s: String): String = buildString(s.length) {
-        for (c in s) when (c) {
-            '&'  -> append("&amp;")
-            '<'  -> append("&lt;")
-            '>'  -> append("&gt;")
-            '"'  -> append("&quot;")
-            '\'' -> append("&#39;")
-            else -> append(c)
+        for (c in s) {
+            when (c) {
+                '&' -> append("&amp;")
+                '<' -> append("&lt;")
+                '>' -> append("&gt;")
+                '"' -> append("&quot;")
+                '\'' -> append("&#39;")
+                else -> append(c)
+            }
         }
     }
 }

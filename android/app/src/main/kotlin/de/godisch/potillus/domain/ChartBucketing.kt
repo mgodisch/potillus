@@ -76,7 +76,7 @@ enum class ChartGranularity { DAILY, WEEKLY, MONTHLY }
 data class ChartBucket(
     val labelDate: String,
     val avgPerDay: Double,
-    val isAbstinent: Boolean
+    val isAbstinent: Boolean,
 )
 
 object ChartBucketing {
@@ -91,9 +91,9 @@ object ChartBucketing {
      * @param days Number of calendar days in the (inclusive) span.
      */
     fun granularityForSpan(days: Int): ChartGranularity = when {
-        days <= 35  -> ChartGranularity.DAILY
+        days <= 35 -> ChartGranularity.DAILY
         days <= 366 -> ChartGranularity.WEEKLY
-        else        -> ChartGranularity.MONTHLY
+        else -> ChartGranularity.MONTHLY
     }
 
     /**
@@ -124,17 +124,17 @@ object ChartBucketing {
      * @param inProgressDay Optional current logical day; the bucket containing it
      *                      excludes it from its day count when it is not yet a
      *                      drink day. Null (default) counts every day.
-     * @return              Buckets in chronological order, or empty when from > to.
+     * @return Buckets in chronological order, or empty when from > to.
      */
     fun bucketize(
         summaries: List<DaySummary>,
         from: String,
         to: String,
         granularity: ChartGranularity,
-        inProgressDay: String? = null
+        inProgressDay: String? = null,
     ): List<ChartBucket> {
         val start = LocalDate.parse(from, DayResolver.DATE_FORMATTER)
-        val end   = LocalDate.parse(to, DayResolver.DATE_FORMATTER)
+        val end = LocalDate.parse(to, DayResolver.DATE_FORMATTER)
         if (start.isAfter(end)) return emptyList()
 
         // O(1) lookup of a day's total; days not present here are abstinent (0 g).
@@ -147,16 +147,19 @@ object ChartBucketing {
         while (!bucketStart.isAfter(end)) {
             // Natural (un-clamped) end of this bucket, exclusive.
             val naturalEndExclusive: LocalDate = when (granularity) {
-                ChartGranularity.DAILY   -> bucketStart.plusDays(1)
-                ChartGranularity.WEEKLY  -> bucketStart.plusWeeks(1)
+                ChartGranularity.DAILY -> bucketStart.plusDays(1)
+                ChartGranularity.WEEKLY -> bucketStart.plusWeeks(1)
                 // Month buckets snap to the 1st of the next month so successive
                 // buckets align to calendar months even if the first one starts
                 // mid-month.
                 ChartGranularity.MONTHLY -> bucketStart.withDayOfMonth(1).plusMonths(1)
             }
             // Never let a bucket run past the period.
-            val cappedEndExclusive = if (naturalEndExclusive.isAfter(endExclusive))
-                endExclusive else naturalEndExclusive
+            val cappedEndExclusive = if (naturalEndExclusive.isAfter(endExclusive)) {
+                endExclusive
+            } else {
+                naturalEndExclusive
+            }
 
             var sum = 0.0
             var dayCount = 0
@@ -188,8 +191,8 @@ object ChartBucketing {
             //       one.)
             var bucketHoldsInProgressDay = false
             if (inProgressDay != null) {
-                val ip           = LocalDate.parse(inProgressDay, DayResolver.DATE_FORMATTER)
-                val ipInBucket   = !ip.isBefore(bucketStart) && ip.isBefore(cappedEndExclusive)
+                val ip = LocalDate.parse(inProgressDay, DayResolver.DATE_FORMATTER)
+                val ipInBucket = !ip.isBefore(bucketStart) && ip.isBefore(cappedEndExclusive)
                 val ipIsDrinkDay = (gramsByDate[inProgressDay] ?: 0.0) > 0.0
                 bucketHoldsInProgressDay = ipInBucket
                 if (ipInBucket && !ipIsDrinkDay && dayCount > 0) dayCount--
@@ -197,13 +200,13 @@ object ChartBucketing {
 
             buckets.add(
                 ChartBucket(
-                    labelDate   = DayResolver.formatDate(bucketStart),
-                    avgPerDay   = if (dayCount > 0) sum / dayCount else 0.0,
+                    labelDate = DayResolver.formatDate(bucketStart),
+                    avgPerDay = if (dayCount > 0) sum / dayCount else 0.0,
                     // Abstinent = recorded fully alcohol-free AND a completed period.
                     // The `!bucketHoldsInProgressDay` guard is consequence (2) above:
                     // the current day/week/month never earns a tick until it closes.
-                    isAbstinent = sum == 0.0 && !bucketHoldsInProgressDay
-                )
+                    isAbstinent = sum == 0.0 && !bucketHoldsInProgressDay,
+                ),
             )
 
             bucketStart = cappedEndExclusive

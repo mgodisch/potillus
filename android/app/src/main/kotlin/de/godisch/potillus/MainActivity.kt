@@ -90,20 +90,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.ui.nav.AppNavigation
 import de.godisch.potillus.ui.screen.*
 import de.godisch.potillus.ui.theme.PotillusTheme
-import de.godisch.potillus.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import androidx.core.view.WindowCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity() {
         // Recents during cold start.
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
+            WindowManager.LayoutParams.FLAG_SECURE,
         )
 
         // Opt into edge-to-edge rendering (mandatory on Android 15+ / API 35+).
@@ -245,8 +245,10 @@ class MainActivity : AppCompatActivity() {
             // warm-start hole: a recreated Activity whose process kept the static
             // isAuthenticatedThisSession == true must still re-prompt once enough
             // time has passed (backgroundedAt is process-global — see its KDoc).
-            if (biometricEnabled && isBiometricAvailable() &&
-                (!isAuthenticatedThisSession || isReauthDueToInactivity())) {
+            if (biometricEnabled &&
+                isBiometricAvailable() &&
+                (!isAuthenticatedThisSession || isReauthDueToInactivity())
+            ) {
                 isAuthenticatedThisSession = false
                 backgroundedAt = 0L
                 _uiGate.value = UiGate.BIOMETRIC
@@ -303,7 +305,7 @@ class MainActivity : AppCompatActivity() {
                     MainContent(
                         app,
                         onAuthenticate = { onResult -> authenticateForToggle(onResult) },
-                        onLockApp = { lockNow() }
+                        onLockApp = { lockNow() },
                     )
                 }
             }
@@ -321,7 +323,7 @@ class MainActivity : AppCompatActivity() {
     private fun isBiometricAvailable(): Boolean {
         val mgr = BiometricManager.from(this)
         return mgr.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) ==
-               BiometricManager.BIOMETRIC_SUCCESS
+            BiometricManager.BIOMETRIC_SUCCESS
     }
 
     /**
@@ -348,6 +350,7 @@ class MainActivity : AppCompatActivity() {
                     isAuthenticatedThisSession = true
                     _uiGate.value = UiGate.READY
                 }
+
                 /**
                  * A terminal authentication error or user cancellation occurred.
                  * In every case the Activity is finished so no data is shown. The
@@ -373,13 +376,14 @@ class MainActivity : AppCompatActivity() {
                     }
                     finish()
                 }
+
                 /**
                  * A single attempt was not recognised (e.g. wrong fingerprint).
                  * This is NOT a terminal error — the system prompt stays open and
                  * the user can retry — so we intentionally do nothing here.
                  */
                 override fun onAuthenticationFailed() { /* user can retry */ }
-            }
+            },
         )
         prompt.authenticate(promptInfo)
     }
@@ -428,14 +432,16 @@ class MainActivity : AppCompatActivity() {
                     isAuthenticatedThisSession = true
                     onResult(true)
                 }
+
                 /** Terminal error or user cancellation → report failure, but stay in the app. */
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     if (BuildConfig.DEBUG) Log.w(TAG, "Toggle auth error $errorCode: $errString")
                     onResult(false)
                 }
+
                 /** A single non-terminal mismatch; the prompt stays open for a retry. */
                 override fun onAuthenticationFailed() { /* user can retry */ }
-            }
+            },
         )
         prompt.authenticate(promptInfo)
     }
@@ -448,8 +454,7 @@ class MainActivity : AppCompatActivity() {
      * [backgroundedAt]; `backgroundedAt == 0` (not backgrounded / already consumed)
      * is never stale.
      */
-    private fun isReauthDueToInactivity(): Boolean =
-        backgroundedAt > 0L &&
+    private fun isReauthDueToInactivity(): Boolean = backgroundedAt > 0L &&
         SystemClock.elapsedRealtime() - backgroundedAt > REAUTH_THRESHOLD_MS
 
     /**
@@ -537,7 +542,7 @@ private fun MainContent(
      * Locks the app immediately (the overflow-menu "Lock app" action). Supplied by
      * [MainActivity.lockNow] and forwarded to the four main screens' overflow menu.
      */
-    onLockApp: () -> Unit
+    onLockApp: () -> Unit,
 ) {
     // The ViewModelProvider.Factory is a named class (AppViewModelFactory)
     // rather than an anonymous object defined here. Benefits:
@@ -547,18 +552,18 @@ private fun MainContent(
     //     lifecycle and is not re-instantiated on recomposition.
     val factory = remember { AppViewModelFactory(app) }
 
-    val settingsVm      = viewModel<SettingsViewModel>(factory = factory)
+    val settingsVm = viewModel<SettingsViewModel>(factory = factory)
     val settingsUiState by settingsVm.uiState.collectAsStateWithLifecycle()
 
     PotillusTheme(themeMode = settingsUiState.settings.themeMode) {
         AppNavigation(
-            todayVm    = viewModel(factory = factory),
+            todayVm = viewModel(factory = factory),
             calendarVm = viewModel(factory = factory),
-            statsVm    = viewModel(factory = factory),
-            drinksVm   = viewModel(factory = factory),
+            statsVm = viewModel(factory = factory),
+            drinksVm = viewModel(factory = factory),
             settingsVm = settingsVm,
             onAuthenticate = onAuthenticate,
-            onLockApp = onLockApp
+            onLockApp = onLockApp,
         )
     }
 }

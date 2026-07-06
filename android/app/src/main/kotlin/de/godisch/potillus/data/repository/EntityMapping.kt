@@ -67,13 +67,13 @@ import de.godisch.potillus.domain.model.DrinkDefinition
  * [DrinkCategory.OTHER].
  */
 internal fun DrinkEntity.toDomain() = DrinkDefinition(
-    id             = id,
-    name           = name,
-    volumeMl       = volumeMl,
+    id = id,
+    name = name,
+    volumeMl = volumeMl,
     alcoholPercent = alcoholPercent,
-    isPreset       = isPreset,
-    isFavorite     = isFavorite,
-    category       = runCatching { DrinkCategory.valueOf(category) }.getOrDefault(DrinkCategory.OTHER)
+    isPreset = isPreset,
+    isFavorite = isFavorite,
+    category = runCatching { DrinkCategory.valueOf(category) }.getOrDefault(DrinkCategory.OTHER),
 )
 
 /**
@@ -84,13 +84,13 @@ internal fun DrinkEntity.toDomain() = DrinkDefinition(
  * existing data.
  */
 internal fun DrinkDefinition.toEntity() = DrinkEntity(
-    id             = id,
-    name           = name,
-    volumeMl       = volumeMl,
+    id = id,
+    name = name,
+    volumeMl = volumeMl,
     alcoholPercent = alcoholPercent,
-    isPreset       = isPreset,
-    isFavorite     = isFavorite,
-    category       = category.name
+    isPreset = isPreset,
+    isFavorite = isFavorite,
+    category = category.name,
 )
 
 // ── Entry conversions ────────────────────────────────────────────────────────
@@ -99,15 +99,15 @@ internal fun DrinkDefinition.toEntity() = DrinkEntity(
  * Converts an [EntryEntity] to a [ConsumptionEntry]. All fields are mapped 1-to-1.
  */
 internal fun EntryEntity.toDomain() = ConsumptionEntry(
-    id              = id,
-    drinkId         = drinkId,
-    drinkName       = drinkName,
-    volumeMl        = volumeMl,
-    alcoholPercent  = alcoholPercent,
-    gramsAlcohol    = gramsAlcohol,
+    id = id,
+    drinkId = drinkId,
+    drinkName = drinkName,
+    volumeMl = volumeMl,
+    alcoholPercent = alcoholPercent,
+    gramsAlcohol = gramsAlcohol,
     timestampMillis = timestampMillis,
-    logicalDate     = logicalDate,
-    note            = note
+    logicalDate = logicalDate,
+    note = note,
 )
 
 /**
@@ -115,13 +115,13 @@ internal fun EntryEntity.toDomain() = ConsumptionEntry(
  * All fields are mapped 1-to-1.
  */
 internal fun ConsumptionEntry.toEntity() = EntryEntity(
-    id              = id,
-    drinkId         = drinkId,
-    drinkName       = drinkName,
-    volumeMl        = volumeMl,
-    alcoholPercent  = alcoholPercent,
-    gramsAlcohol    = gramsAlcohol,
+    id = id,
+    drinkId = drinkId,
+    drinkName = drinkName,
+    volumeMl = volumeMl,
+    alcoholPercent = alcoholPercent,
+    gramsAlcohol = gramsAlcohol,
     timestampMillis = timestampMillis,
-    logicalDate     = logicalDate,
-    note            = note
+    logicalDate = logicalDate,
+    note = note,
 )

@@ -105,10 +105,9 @@ class DrinkRepository(private val dao: DrinkDao) : IDrinkRepository {
      * a raw SQLite constraint violation.
      *
      * @param drinkId  Primary key of the drink to check.
-     * @return         Number of entries referencing the drink (0 = safe to delete).
+     * @return Number of entries referencing the drink (0 = safe to delete).
      */
-    override suspend fun countEntriesForDrink(drinkId: Long): Int =
-        dao.countEntriesByDrinkId(drinkId)
+    override suspend fun countEntriesForDrink(drinkId: Long): Int = dao.countEntriesByDrinkId(drinkId)
 
     /**
      * Deletes all user-created (non-preset) drinks.

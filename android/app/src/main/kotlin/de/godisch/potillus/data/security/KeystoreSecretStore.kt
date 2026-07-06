@@ -95,7 +95,7 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * Encrypts [plaintext] and returns the self-describing blob `IV || ciphertext+tag`.
      *
      * @param plaintext The secret bytes to protect.
-     * @return          A byte array safe to persist anywhere (it reveals nothing
+     * @return A byte array safe to persist anywhere (it reveals nothing
      *                  without the Keystore key).
      */
     fun seal(plaintext: ByteArray): ByteArray = sealWithKey(getOrCreateKey(), plaintext)
@@ -104,7 +104,7 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * Decrypts a blob previously produced by [seal].
      *
      * @param blob The `IV || ciphertext+tag` byte array.
-     * @return     The original plaintext.
+     * @return The original plaintext.
      * @throws java.security.GeneralSecurityException if [blob] is malformed, was
      *         tampered with (GCM tag mismatch), or the Keystore key is missing
      *         (e.g. after a factory reset). Callers decide how to react — e.g.
@@ -126,9 +126,9 @@ class KeystoreSecretStore(private val keyAlias: String) {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun sealWithKey(key: SecretKey, plaintext: ByteArray): ByteArray {
         val cipher = Cipher.getInstance(AES_GCM).apply { init(Cipher.ENCRYPT_MODE, key) }
-        val iv         = cipher.iv                       // 12-byte IV chosen by the provider
+        val iv = cipher.iv // 12-byte IV chosen by the provider
         val ciphertext = cipher.doFinal(plaintext)
-        return iv + ciphertext                           // IV || ciphertext+tag
+        return iv + ciphertext // IV || ciphertext+tag
     }
 
     /**
@@ -153,7 +153,7 @@ class KeystoreSecretStore(private val keyAlias: String) {
         if (blob.size < GCM_IV_LEN) {
             throw GeneralSecurityException("Sealed blob too short to contain an IV")
         }
-        val iv         = blob.copyOfRange(0, GCM_IV_LEN)
+        val iv = blob.copyOfRange(0, GCM_IV_LEN)
         val ciphertext = blob.copyOfRange(GCM_IV_LEN, blob.size)
         val cipher = Cipher.getInstance(AES_GCM).apply {
             init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(GCM_TAG_BITS, iv))
@@ -178,13 +178,13 @@ class KeystoreSecretStore(private val keyAlias: String) {
                 init(
                     KeyGenParameterSpec.Builder(
                         keyAlias,
-                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT,
                     )
                         .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                         .setKeySize(256)
-                        .setRandomizedEncryptionRequired(true)   // forces a fresh IV per encryption
-                        .build()
+                        .setRandomizedEncryptionRequired(true) // forces a fresh IV per encryption
+                        .build(),
                 )
             }.generateKey()
         }
@@ -196,10 +196,10 @@ class KeystoreSecretStore(private val keyAlias: String) {
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
 
         /** AES in Galois/Counter Mode; GCM provides confidentiality + integrity (AEAD). */
-        private const val AES_GCM      = "AES/GCM/NoPadding"
+        private const val AES_GCM = "AES/GCM/NoPadding"
 
         /** 96-bit IV — the size recommended by NIST SP 800-38D for GCM. */
-        private const val GCM_IV_LEN   = 12
+        private const val GCM_IV_LEN = 12
 
         /** 128-bit authentication tag — the maximum (and strongest) GCM tag length. */
         private const val GCM_TAG_BITS = 128

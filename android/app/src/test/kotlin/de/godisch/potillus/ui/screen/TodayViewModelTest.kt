@@ -66,13 +66,13 @@ class TodayViewModelTest {
     // Test helpers – recreated per test for isolation.
     private lateinit var entryRepo: FakeEntryRepository
     private lateinit var drinkRepo: FakeDrinkRepository
-    private lateinit var prefs:     FakeAppPreferences
+    private lateinit var prefs: FakeAppPreferences
 
     @Before fun setUp() {
         Dispatchers.setMain(dispatcher)
         entryRepo = FakeEntryRepository()
         drinkRepo = FakeDrinkRepository()
-        prefs     = FakeAppPreferences(AppSettings(dayChangeHour = 4, dayChangeMinute = 0))
+        prefs = FakeAppPreferences(AppSettings(dayChangeHour = 4, dayChangeMinute = 0))
     }
 
     @After fun tearDown() = Dispatchers.resetMain()
@@ -91,12 +91,12 @@ class TodayViewModelTest {
     }
 
     @Test fun `uiState totalGrams reflects added entries`() = runTest(dispatcher) {
-        val beer  = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val now   = System.currentTimeMillis()
-        val vm    = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
+        val now = System.currentTimeMillis()
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.uiState.test {
-            awaitItem()                          // initial empty state
+            awaitItem() // initial empty state
             vm.addEntry(beer, 500, now, "")
             val state = awaitItem()
             // 500 ml × 5 % × 0.789 g/ml ≈ 19.73 g
@@ -109,15 +109,17 @@ class TodayViewModelTest {
     @Test fun `uiState BAC is non-null when weight is set and entry exists`() = runTest(dispatcher) {
         prefs = FakeAppPreferences(AppSettings(weightKg = 75.0, dayChangeHour = 4))
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val now  = System.currentTimeMillis()
-        val vm   = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val now = System.currentTimeMillis()
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.uiState.test {
             awaitItem()
             vm.addEntry(beer, 500, now, "")
             val state = awaitItem()
-            assertTrue("BAC should be non-null when weight is set and entry exists",
-                state.bacPermille != null)
+            assertTrue(
+                "BAC should be non-null when weight is set and entry exists",
+                state.bacPermille != null,
+            )
             assertTrue("BAC should be positive", state.bacPermille!! > 0.0)
             cancelAndIgnoreRemainingEvents()
         }
@@ -127,8 +129,8 @@ class TodayViewModelTest {
 
     @Test fun `addEntry with valid data persists entry in repository`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val now  = System.currentTimeMillis()
-        val vm   = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val now = System.currentTimeMillis()
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.addEntry(beer, 500, now, "after work")
 
@@ -139,7 +141,7 @@ class TodayViewModelTest {
 
     @Test fun `addEntry with volumeMl=0 is rejected by guard`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val vm   = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.addEntry(beer, 0, System.currentTimeMillis(), "")
 
@@ -148,7 +150,7 @@ class TodayViewModelTest {
 
     @Test fun `addEntry with timestampMillis=0 is rejected by guard`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val vm   = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.addEntry(beer, 500, 0L, "")
 
@@ -159,8 +161,8 @@ class TodayViewModelTest {
 
     @Test fun `deleteEntry removes entry from repository`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
-        val now  = System.currentTimeMillis()
-        val vm   = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val now = System.currentTimeMillis()
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
 
         vm.addEntry(beer, 500, now, "")
         assertEquals(1, entryRepo.allEntries.size)

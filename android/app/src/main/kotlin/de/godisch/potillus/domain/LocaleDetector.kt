@@ -74,11 +74,11 @@ object LocaleDetector {
      * @param systemLocale  The JVM locale to match (typically [Locale.getDefault]).
      * @param supportedTags The set of BCP-47 tags the app ships translations for,
      *                      e.g. [de.godisch.potillus.l10n.SupportedLocales.TAGS].
-     * @return              A tag from [supportedTags], or `"en"` if none matched.
+     * @return A tag from [supportedTags], or `"en"` if none matched.
      */
     fun detect(systemLocale: Locale, supportedTags: Set<String>): String {
-        val fullTag  = systemLocale.toLanguageTag()  // e.g. "zh-CN", "pt-BR", "de"
-        val baseLang = systemLocale.language          // e.g. "zh",    "pt",    "de"
+        val fullTag = systemLocale.toLanguageTag() // e.g. "zh-CN", "pt-BR", "de"
+        val baseLang = systemLocale.language // e.g. "zh",    "pt",    "de"
 
         // Step 1: exact full-tag match (covers region-specific translations).
         supportedTags.firstOrNull { it.equals(fullTag, ignoreCase = true) }

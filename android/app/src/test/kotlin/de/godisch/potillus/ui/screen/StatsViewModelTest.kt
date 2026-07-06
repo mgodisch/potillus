@@ -73,7 +73,7 @@ class StatsViewModelTest {
 
     private lateinit var entryRepo: FakeEntryRepository
     private lateinit var drinkRepo: FakeDrinkRepository
-    private lateinit var prefs:     FakeAppPreferences
+    private lateinit var prefs: FakeAppPreferences
 
     // StringProvider stub: returns the resource ID as a decimal string. The export
     // status messages are not asserted by value, only that they are set/cleared.
@@ -81,25 +81,24 @@ class StatsViewModelTest {
 
     /** Creates a new ViewModel wired to the current fake dependencies. */
     private fun makeVm() = StatsViewModel(
-        entryRepo  = entryRepo,
-        drinkRepo  = drinkRepo,
-        prefs      = prefs,
+        entryRepo = entryRepo,
+        drinkRepo = drinkRepo,
+        prefs = prefs,
         // CSV/PDF export lives in StatsViewModel. A dummy Application
         // context is fine here: the tested paths (empty-range guard) never touch
         // MediaStore. getString only localises status messages.
         appContext = android.app.Application(),
-        getString  = testStrings
+        getString = testStrings,
     )
 
     /**
      * Converts an ISO-8601 date string to a Unix timestamp at midnight local time.
      * Used to create ConsumptionEntry values with a deterministic timestampMillis.
      */
-    private fun dateToMillis(date: String): Long =
-        LocalDate.parse(date)
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
+    private fun dateToMillis(date: String): Long = LocalDate.parse(date)
+        .atStartOfDay(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli()
 
     /** Convenience function: creates a minimal ConsumptionEntry for a given date and grams. */
     private fun entry(
@@ -107,16 +106,16 @@ class StatsViewModelTest {
         date: String,
         grams: Double,
         drinkId: Long = 1L,
-        category: DrinkCategory = DrinkCategory.BEER
+        category: DrinkCategory = DrinkCategory.BEER,
     ) = ConsumptionEntry(
-        id              = id,
-        drinkId         = drinkId,
-        drinkName       = "TestDrink",
-        volumeMl        = 500,
-        alcoholPercent  = 5.0,
-        gramsAlcohol    = grams,
+        id = id,
+        drinkId = drinkId,
+        drinkName = "TestDrink",
+        volumeMl = 500,
+        alcoholPercent = 5.0,
+        gramsAlcohol = grams,
         timestampMillis = dateToMillis(date),
-        logicalDate     = date
+        logicalDate = date,
     )
 
     /**
@@ -149,8 +148,8 @@ class StatsViewModelTest {
             AppSettings(
                 dayChangeHour = 4,
                 dayChangeMinute = 0,
-                statsFromDate = "2026-01-01"
-            )
+                statsFromDate = "2026-01-01",
+            ),
         )
     }
 
@@ -188,7 +187,7 @@ class StatsViewModelTest {
     @Test fun `setPeriod switches the active period`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
-            awaitItem()   // initial MONTH
+            awaitItem() // initial MONTH
 
             vm.setPeriod(StatsPeriod.WEEK)
             assertEquals(StatsPeriod.WEEK, awaitItem().period)
@@ -213,7 +212,7 @@ class StatsViewModelTest {
     @Test fun `chart granularity is DAILY for week and month, MONTHLY for year`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
-            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)   // initial MONTH
+            assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity) // initial MONTH
 
             vm.setPeriod(StatsPeriod.WEEK)
             assertEquals(ChartGranularity.DAILY, awaitItem().chartGranularity)
@@ -284,7 +283,7 @@ class StatsViewModelTest {
         vm.uiState.test {
             // Settled state, not the seed (see note in the over-limit-day test).
             val state = awaitComputed()
-            assertEquals(1, state.dataPoints.size)            // today counted as a drink day
+            assertEquals(1, state.dataPoints.size) // today counted as a drink day
             // drinkDays == 1, so the effective period is abstinentDays + 1 (today).
             val effectivePeriodDays = state.abstinentDays + 1
             assertEquals(24.0 / effectivePeriodDays, state.avgPerDay, 0.001)
@@ -352,7 +351,7 @@ class StatsViewModelTest {
         val vm = makeVm()
         vm.exportStatus.test {
             assertEquals("initial export status is null", null, awaitItem())
-            vm.exportCsv("2024-01-01", "2024-01-01")   // no entries → ExportStatus.Err
+            vm.exportCsv("2024-01-01", "2024-01-01") // no entries → ExportStatus.Err
             assertTrue("empty-range export sets an error status", awaitItem() is ExportStatus.Err)
             vm.clearExportStatus()
             assertEquals("clearExportStatus resets to null", null, awaitItem())

@@ -126,7 +126,7 @@ interface DrinkDao {
      *   de-duplication for backup import is handled explicitly in
      *   [de.godisch.potillus.data.repository.BackupRepository] (`buildIdMap`).
      *
-     * @return  The auto-generated row ID of the inserted drink.
+     * @return The auto-generated row ID of the inserted drink.
      */
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(drink: DrinkEntity): Long
@@ -164,7 +164,7 @@ interface DrinkDao {
      * FK RESTRICT constraint surface as an uncaught exception.
      *
      * @param drinkId  Primary key of the drink to check.
-     * @return         Number of entries that would be orphaned by a deletion.
+     * @return Number of entries that would be orphaned by a deletion.
      */
     @Query("SELECT COUNT(*) FROM entries WHERE drinkId = :drinkId")
     suspend fun countEntriesByDrinkId(drinkId: Long): Int

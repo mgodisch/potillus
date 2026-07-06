@@ -41,6 +41,6 @@ package de.godisch.potillus.util
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY,
-    AnnotationTarget.CLASS
+    AnnotationTarget.CLASS,
 )
 annotation class AndroidIoBound

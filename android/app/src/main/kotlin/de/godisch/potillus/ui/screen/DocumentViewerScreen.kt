@@ -93,7 +93,7 @@ fun DocumentViewerScreen(
     @StringRes titleRes: Int,
     @RawRes rawRes: Int,
     renderAsMarkdown: Boolean,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
 ) {
     val resources = LocalResources.current
     // Read the bundled raw resource OFF the main thread. Although the asset ships
@@ -126,16 +126,16 @@ fun DocumentViewerScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             )
-        }
+        },
     ) { paddingValues ->
         // No bottom navigation bar on this screen, so the scrolling content adds
         // the system navigation-bar inset itself (mirrors SettingsScreen) to keep
@@ -159,7 +159,7 @@ fun DocumentViewerScreen(
                 text = text,
                 style = MaterialTheme.typography.bodySmall,
                 fontFamily = FontFamily.Monospace,
-                modifier = contentModifier
+                modifier = contentModifier,
             )
         }
     }

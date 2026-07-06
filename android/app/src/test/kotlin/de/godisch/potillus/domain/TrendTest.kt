@@ -44,12 +44,12 @@ class TrendTest {
 
     @Test fun `a 0_1 g difference is enough to show a trend`() {
         assertEquals(Trend.DOWN, Trend.of(currentAvg = 19.9, prevAvg = 20.0))
-        assertEquals(Trend.UP,   Trend.of(currentAvg = 20.1, prevAvg = 20.0))
+        assertEquals(Trend.UP, Trend.of(currentAvg = 20.1, prevAvg = 20.0))
     }
 
     @Test fun `no previous value is FLAT`() {
         // prevAvg <= 0 means "no comparable previous month" → no arrow.
         assertEquals(Trend.FLAT, Trend.of(currentAvg = 18.8, prevAvg = 0.0))
-        assertEquals(Trend.FLAT, Trend.of(currentAvg = 0.0,  prevAvg = 0.0))
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 0.0, prevAvg = 0.0))
     }
 }

@@ -32,18 +32,18 @@ class FakeBackupRepository : IBackupRepository {
 
     // Recorded call arguments – useful for verifying which mode was used.
     var lastReplaceCall: Pair<List<DrinkDefinition>, List<ConsumptionEntry>>? = null
-    var lastMergeCall:   Pair<List<DrinkDefinition>, List<ConsumptionEntry>>? = null
+    var lastMergeCall: Pair<List<DrinkDefinition>, List<ConsumptionEntry>>? = null
 
     // Configurable return values for tests.
     var replaceResult: ImportStats = ImportStats(imported = 0, skipped = 0)
-    var mergeResult:   ImportStats = ImportStats(imported = 0, skipped = 0)
+    var mergeResult: ImportStats = ImportStats(imported = 0, skipped = 0)
 
     // Set to non-null to simulate a failure (throws this exception).
     var throwOnImport: Exception? = null
 
     override suspend fun importReplace(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats {
         throwOnImport?.let { throw it }
         lastReplaceCall = backupDrinks to backupEntries
@@ -51,8 +51,8 @@ class FakeBackupRepository : IBackupRepository {
     }
 
     override suspend fun importMerge(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats {
         throwOnImport?.let { throw it }
         lastMergeCall = backupDrinks to backupEntries

@@ -34,7 +34,7 @@ class DayResolverAbstinenceEdgeTest {
     @Test fun `empty history with statsFrom on or after today is zero`() {
         assertEquals(
             0,
-            DayResolver.computeLongestAbstinence(emptyList(), today = "2026-01-01", statsFrom = "2026-01-05")
+            DayResolver.computeLongestAbstinence(emptyList(), today = "2026-01-01", statsFrom = "2026-01-05"),
         )
     }
 
@@ -42,7 +42,7 @@ class DayResolverAbstinenceEdgeTest {
         // Gaps: 01-01 -> 01-10 is 8 abstinent days; 01-10 -> 01-12 is 1. Longest = 8.
         assertEquals(
             8,
-            DayResolver.computeLongestAbstinence(listOf("2026-01-01", "2026-01-10", "2026-01-12"))
+            DayResolver.computeLongestAbstinence(listOf("2026-01-01", "2026-01-10", "2026-01-12")),
         )
     }
 }

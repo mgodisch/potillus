@@ -41,3 +41,32 @@ ktlint_code_style = intellij_idea
 # off for now to avoid a wall of non-fixable failures on adoption; it can be
 # enabled later once the affected lines are reflowed.
 max_line_length = off
+
+# ── Deliberately disabled standard rules ─────────────────────────────────────
+# These rules conflict with intentional, project-wide idioms rather than catching
+# real defects, so they are turned off instead of churning the whole tree to
+# satisfy them. (ktlintFormat cannot auto-correct any of them.)
+
+# Jetpack Compose @Composable functions are PascalCase by convention (that IS the
+# Compose naming rule). Exempt them from the lowercase function-naming rule rather
+# than renaming — renaming would break the Compose idiom. Non-Composable functions
+# are still checked.
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+# Compose UI code idiomatically imports whole packages (e.g.
+# androidx.compose.material3.*, foundation.layout.*). Expanding ~60 wildcards to
+# explicit imports adds churn without benefit, so the rule is disabled project-wide.
+ktlint_standard_no-wildcard-imports = disabled
+
+# The ViewModels expose their state through a combined public `uiState` flow, so
+# the private `_x = MutableStateFlow(...)` fields legitimately have no matching
+# public `x`. That is a deliberate backing-state convention, not a naming defect;
+# the backing-property-naming rule (which assumes _x ⇒ public x) does not fit it.
+ktlint_standard_backing-property-naming = disabled
+
+# ── File 'ViewModels.kt' should not be empty ─────────────────────────────────
+# ui/screen/ViewModels.kt is an intentional package-overview documentation file
+# (GPL header + package KDoc, no declarations). Keep the documentation and exempt
+# only this one file from the no-empty-file rule instead of deleting it.
+[**/ui/screen/ViewModels.kt]
+ktlint_standard_no-empty-file = disabled

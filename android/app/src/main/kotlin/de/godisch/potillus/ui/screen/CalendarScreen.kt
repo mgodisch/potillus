@@ -76,18 +76,18 @@ fun CalendarScreen(
     onOpenHelp: () -> Unit = {},
     onOpenCopyright: () -> Unit = {},
     /** Locks the app immediately (overflow-menu "Lock app"). */
-    onLockApp: () -> Unit = {}
+    onLockApp: () -> Unit = {},
 ) {
-    val state   by vm.uiState.collectAsStateWithLifecycle()
-    val drinks  by vm.drinks.collectAsStateWithLifecycle()
+    val state by vm.uiState.collectAsStateWithLifecycle()
+    val drinks by vm.drinks.collectAsStateWithLifecycle()
     // `showAdd` is rememberSaveable so an open add-entry dialog survives
     // a configuration change; it targets the ViewModel's selectedDate (which also
     // survives), so no extra state is needed. `editEntry`/`deleteEntry` hold domain
     // objects (ConsumptionEntry) that are intentionally NOT Parcelable (the domain
     // layer is Android-free), so they stay plain `remember`: on recreation the
     // edit/delete dialog closes cleanly rather than reopening with a lost target.
-    var showAdd     by rememberSaveable { mutableStateOf(false) }
-    var editEntry   by remember { mutableStateOf<ConsumptionEntry?>(null) }
+    var showAdd by rememberSaveable { mutableStateOf(false) }
+    var editEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
     var deleteEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
 
     val isYear = state.viewMode == CalendarViewMode.YEAR
@@ -100,44 +100,44 @@ fun CalendarScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title  = { Text(stringResource(R.string.calendar)) },
+                title = { Text(stringResource(R.string.calendar)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 actions = {
                     TextButton(onClick = { vm.toggleViewMode() }) {
                         Text(
                             if (isYear) stringResource(R.string.month) else stringResource(R.string.year),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
-                        onOpenHelp     = onOpenHelp,
-                        onOpenCopyright  = onOpenCopyright,
-                        onLockApp      = onLockApp,
-                        tint           = MaterialTheme.colorScheme.onPrimary
+                        onOpenHelp = onOpenHelp,
+                        onOpenCopyright = onOpenCopyright,
+                        onLockApp = onLockApp,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
-                }
+                },
             )
         },
         floatingActionButton = {
             if (state.selectedDate != null) {
                 FloatingActionButton(
-                    onClick        = { showAdd = true },
+                    onClick = { showAdd = true },
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor   = MaterialTheme.colorScheme.onPrimary
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_entry))
                 }
             }
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
-            contentPadding      = PaddingValues(16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier            = Modifier.fillMaxSize().padding(paddingValues)
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {
             if (isYear) {
                 // ── Year view ─────────────────────────────────────────────────
@@ -147,7 +147,7 @@ fun CalendarScreen(
                             Row(
                                 Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment     = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 IconButton(onClick = { vm.prevPeriod() }) {
                                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -159,12 +159,12 @@ fun CalendarScreen(
                             }
                             Spacer(Modifier.height(8.dp))
                             YearCalendarView(
-                                year       = state.currentYear,
-                                summaries  = state.daySummaries,
+                                year = state.currentYear,
+                                summaries = state.daySummaries,
                                 limitGrams = state.limitInfo.limitGrams,
-                                today      = state.today,
+                                today = state.today,
                                 onDayClick = { date -> vm.selectDate(date) },
-                                weekStart  = state.weekStartDay
+                                weekStart = state.weekStartDay,
                             )
                         }
                     }
@@ -172,14 +172,14 @@ fun CalendarScreen(
                 state.selectedDate?.let { date ->
                     item {
                         Card(
-                            colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            modifier = Modifier.fillMaxWidth()
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Column(Modifier.padding(16.dp)) {
                                 // Show localised date instead of raw ISO string
                                 Text(
                                     formatLogicalDate(date),
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
@@ -187,10 +187,10 @@ fun CalendarScreen(
                                     // daily gram limit is meaningful here.
                                     totalGrams = state.totalGramsSelected,
                                     limitGrams = state.limitInfo.limitGrams,
-                                    caption    = stringResource(
+                                    caption = stringResource(
                                         R.string.limit_caption_day,
-                                        state.limitInfo.limitGrams.fmt0(locale)
-                                    )
+                                        state.limitInfo.limitGrams.fmt0(locale),
+                                    ),
                                 )
                             }
                         }
@@ -199,9 +199,9 @@ fun CalendarScreen(
                         item {
                             Text(
                                 stringResource(R.string.no_entries_day),
-                                style    = MaterialTheme.typography.bodyMedium,
-                                color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(vertical = 8.dp)
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
                             )
                         }
                     } else {
@@ -210,9 +210,9 @@ fun CalendarScreen(
                         // affected row instead of rebinding all following positions.
                         items(state.selectedEntries, key = { it.id }) { entry ->
                             EntryListItem(
-                                entry    = entry,
-                                onEdit   = { editEntry = entry },
-                                onDelete = { deleteEntry = entry }
+                                entry = entry,
+                                onEdit = { editEntry = entry },
+                                onDelete = { deleteEntry = entry },
                             )
                         }
                     }
@@ -223,24 +223,24 @@ fun CalendarScreen(
                     MonthCalendar(
                         currentMonth = state.currentMonth,
                         daySummaries = state.daySummaries,
-                        limitGrams   = state.limitInfo.limitGrams,
+                        limitGrams = state.limitInfo.limitGrams,
                         selectedDate = state.selectedDate,
-                        weekStart    = state.weekStartDay,
+                        weekStart = state.weekStartDay,
                         onSelectDate = { vm.selectDate(it) },
-                        onPrevMonth  = { vm.prevPeriod() },
-                        onNextMonth  = { vm.nextPeriod() }
+                        onPrevMonth = { vm.prevPeriod() },
+                        onNextMonth = { vm.nextPeriod() },
                     )
                 }
                 state.selectedDate?.let { date ->
                     item {
                         Card(
-                            colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                            modifier = Modifier.fillMaxWidth()
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Column(Modifier.padding(16.dp)) {
                                 Text(
                                     formatLogicalDate(date),
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
@@ -248,10 +248,10 @@ fun CalendarScreen(
                                     // daily gram limit is meaningful here.
                                     totalGrams = state.totalGramsSelected,
                                     limitGrams = state.limitInfo.limitGrams,
-                                    caption    = stringResource(
+                                    caption = stringResource(
                                         R.string.limit_caption_day,
-                                        state.limitInfo.limitGrams.fmt0(locale)
-                                    )
+                                        state.limitInfo.limitGrams.fmt0(locale),
+                                    ),
                                 )
                             }
                         }
@@ -260,9 +260,9 @@ fun CalendarScreen(
                         item {
                             Text(
                                 stringResource(R.string.no_entries_day),
-                                style    = MaterialTheme.typography.bodyMedium,
-                                color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(vertical = 8.dp)
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
                             )
                         }
                     } else {
@@ -271,9 +271,9 @@ fun CalendarScreen(
                         // affected row instead of rebinding all following positions.
                         items(state.selectedEntries, key = { it.id }) { entry ->
                             EntryListItem(
-                                entry    = entry,
-                                onEdit   = { editEntry = entry },
-                                onDelete = { deleteEntry = entry }
+                                entry = entry,
+                                onEdit = { editEntry = entry },
+                                onDelete = { deleteEntry = entry },
                             )
                         }
                     }
@@ -284,44 +284,52 @@ fun CalendarScreen(
 
     if (showAdd) {
         AddEditEntryDialog(
-            entry     = null,
-            drinks    = drinks,
-            onSave    = { drink, vol, ts, note -> vm.addEntry(drink, vol, ts, note); showAdd = false },
-            onDismiss = { showAdd = false }
+            entry = null,
+            drinks = drinks,
+            onSave = { drink, vol, ts, note ->
+                vm.addEntry(drink, vol, ts, note)
+                showAdd = false
+            },
+            onDismiss = { showAdd = false },
         )
     }
     editEntry?.let { entry ->
         AddEditEntryDialog(
-            entry     = entry,
-            drinks    = drinks,
-            onSave    = { drink, vol, ts, note ->
-                vm.updateEntry(entry.copy(
-                    drinkId         = drink.id,
-                    drinkName       = drink.name,
-                    volumeMl        = vol,
-                    alcoholPercent  = drink.alcoholPercent,
-                    gramsAlcohol    = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
-                    timestampMillis = ts,
-                    note            = note
-                ))
+            entry = entry,
+            drinks = drinks,
+            onSave = { drink, vol, ts, note ->
+                vm.updateEntry(
+                    entry.copy(
+                        drinkId = drink.id,
+                        drinkName = drink.name,
+                        volumeMl = vol,
+                        alcoholPercent = drink.alcoholPercent,
+                        gramsAlcohol = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
+                        timestampMillis = ts,
+                        note = note,
+                    ),
+                )
                 editEntry = null
             },
-            onDismiss = { editEntry = null }
+            onDismiss = { editEntry = null },
         )
     }
     deleteEntry?.let { entry ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },
-            title  = { Text(stringResource(R.string.delete)) },
-            text   = { Text(stringResource(R.string.delete_confirm, entry.drinkName)) },
-            confirmButton  = {
-                TextButton(onClick = { vm.deleteEntry(entry); deleteEntry = null }) {
+            title = { Text(stringResource(R.string.delete)) },
+            text = { Text(stringResource(R.string.delete_confirm, entry.drinkName)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.deleteEntry(entry)
+                    deleteEntry = null
+                }) {
                     Text(stringResource(R.string.delete), color = errorColor())
                 }
             },
-            dismissButton  = {
+            dismissButton = {
                 TextButton(onClick = { deleteEntry = null }) { Text(stringResource(R.string.cancel)) }
-            }
+            },
         )
     }
 }
@@ -365,7 +373,7 @@ private fun MonthCalendar(
     weekStart: Int,
     onSelectDate: (String) -> Unit,
     onPrevMonth: () -> Unit,
-    onNextMonth: () -> Unit
+    onNextMonth: () -> Unit,
 ) {
     // Per-app locale for the month header and weekday names (see formattingLocale).
     val locale = LocalContext.current.formattingLocale()
@@ -374,14 +382,14 @@ private fun MonthCalendar(
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onPrevMonth) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
                 Text(
                     currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 IconButton(onClick = onNextMonth) {
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
@@ -400,14 +408,14 @@ private fun MonthCalendar(
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
-            val firstDay    = currentMonth.atDay(1)
-            val totalDays   = currentMonth.lengthOfMonth()
+            val firstDay = currentMonth.atDay(1)
+            val totalDays = currentMonth.lengthOfMonth()
             val startOffset = (firstDay.dayOfWeek.value - weekStart + 7) % 7
-            val rows        = (startOffset + totalDays + 6) / 7
+            val rows = (startOffset + totalDays + 6) / 7
 
             // Capture composable color before the loop
             val overLimitColor = errorColor()
@@ -417,8 +425,8 @@ private fun MonthCalendar(
                     repeat(7) { col ->
                         val day = row * 7 + col - startOffset + 1
                         if (day in 1..totalDays) {
-                            val date       = DayResolver.formatDate(currentMonth.atDay(day))
-                            val summary    = daySummaries[date]
+                            val date = DayResolver.formatDate(currentMonth.atDay(day))
+                            val summary = daySummaries[date]
                             val isSelected = date == selectedDate
                             Box(
                                 modifier = Modifier
@@ -426,22 +434,25 @@ private fun MonthCalendar(
                                     .clip(MaterialTheme.shapes.small)
                                     .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
                                     .clickable { onSelectDate(date) },
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         day.toString(),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                     )
                                     if (summary != null) {
                                         Box(
                                             Modifier.size(5.dp)
                                                 .clip(MaterialTheme.shapes.extraSmall)
                                                 .background(
-                                                    if (summary.totalGrams > limitGrams) overLimitColor
-                                                    else MaterialTheme.colorScheme.primary
-                                                )
+                                                    if (summary.totalGrams > limitGrams) {
+                                                        overLimitColor
+                                                    } else {
+                                                        MaterialTheme.colorScheme.primary
+                                                    },
+                                                ),
                                         )
                                     }
                                 }

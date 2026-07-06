@@ -83,7 +83,7 @@ fun AppOverflowMenu(
     onOpenHelp: () -> Unit,
     onOpenCopyright: () -> Unit,
     onLockApp: () -> Unit,
-    tint: Color = LocalContentColor.current
+    tint: Color = LocalContentColor.current,
 ) {
     // `expanded` is the only piece of state this component owns: whether the
     // dropdown is currently shown. `remember` keeps it across recompositions;
@@ -106,13 +106,13 @@ fun AppOverflowMenu(
         Icon(
             imageVector = Icons.Default.Menu,
             contentDescription = stringResource(R.string.menu),
-            tint = tint
+            tint = tint,
         )
     }
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { expanded = false }
+        onDismissRequest = { expanded = false },
     ) {
         // Each item closes the menu BEFORE invoking its callback so the dropdown
         // is already dismissed by the time the destination is pushed.
@@ -122,7 +122,7 @@ fun AppOverflowMenu(
             onClick = {
                 expanded = false
                 onOpenSettings()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.help)) },
@@ -134,7 +134,7 @@ fun AppOverflowMenu(
             onClick = {
                 expanded = false
                 onOpenHelp()
-            }
+            },
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.copyright)) },
@@ -145,7 +145,7 @@ fun AppOverflowMenu(
             onClick = {
                 expanded = false
                 onOpenCopyright()
-            }
+            },
         )
         // "Lock app" — manual lock (Variant A). Only present when an authenticator
         // is available, so it never leaves the user unable to get back in.
@@ -156,7 +156,7 @@ fun AppOverflowMenu(
                 onClick = {
                     expanded = false
                     onLockApp()
-                }
+                },
             )
         }
     }

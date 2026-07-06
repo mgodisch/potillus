@@ -27,13 +27,13 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.annotation.VisibleForTesting
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.annotation.VisibleForTesting
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -103,7 +103,7 @@ object BackupManager {
      *   10 MB is far larger than any legitimate backup (a year of daily entries
      *   produces roughly 500 KB) and serves as a hard safety cap.
      */
-    private const val MAX_BACKUP_BYTES = 10L * 1_024 * 1_024   // 10 MB
+    private const val MAX_BACKUP_BYTES = 10L * 1_024 * 1_024 // 10 MB
 
     /** Timestamp format for the backup file name. */
     private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
@@ -129,18 +129,18 @@ object BackupManager {
      * @param context  Context for ContentResolver access.
      * @param drinks   Current drink catalogue (including presets).
      * @param entries  All consumption entries.
-     * @return         [ExportResult] on success; `null` on I/O error.
+     * @return [ExportResult] on success; `null` on I/O error.
      */
     @AndroidIoBound
     fun exportToJson(
         context: Context,
         drinks: List<DrinkDefinition>,
-        entries: List<ConsumptionEntry>
+        entries: List<ConsumptionEntry>,
     ): ExportResult? {
         // Capture Instant.now() once so the file name and the
         // "exportedAt" field in the JSON root are guaranteed to match exactly,
         // even on devices where the clock is adjusted between two calls.
-        val now      = Instant.now()
+        val now = Instant.now()
         val fileName = "potillus_backup_${FILE_FMT.format(now)}.json"
 
         val root = JSONObject().apply {
@@ -151,34 +151,44 @@ object BackupManager {
             put("_comment", JSONArray(GplNotice.HEADER_LINES))
             put("version", BACKUP_VERSION)
             put("exportedAt", now.toString())
-            put("drinks", JSONArray().also { arr ->
-                drinks.forEach { d ->
-                    arr.put(JSONObject().apply {
-                        put("id", d.id)
-                        put("name", d.name)
-                        put("volumeMl", d.volumeMl)
-                        put("alcoholPercent", d.alcoholPercent)
-                        put("isPreset", d.isPreset)
-                        put("isFavorite", d.isFavorite)
-                        put("category", d.category.name)
-                    })
-                }
-            })
-            put("entries", JSONArray().also { arr ->
-                entries.forEach { e ->
-                    arr.put(JSONObject().apply {
-                        put("id", e.id)
-                        put("drinkId", e.drinkId)
-                        put("drinkName", e.drinkName)
-                        put("volumeMl", e.volumeMl)
-                        put("alcoholPercent", e.alcoholPercent)
-                        put("gramsAlcohol", e.gramsAlcohol)
-                        put("timestampMillis", e.timestampMillis)
-                        put("logicalDate", e.logicalDate)
-                        put("note", e.note)
-                    })
-                }
-            })
+            put(
+                "drinks",
+                JSONArray().also { arr ->
+                    drinks.forEach { d ->
+                        arr.put(
+                            JSONObject().apply {
+                                put("id", d.id)
+                                put("name", d.name)
+                                put("volumeMl", d.volumeMl)
+                                put("alcoholPercent", d.alcoholPercent)
+                                put("isPreset", d.isPreset)
+                                put("isFavorite", d.isFavorite)
+                                put("category", d.category.name)
+                            },
+                        )
+                    }
+                },
+            )
+            put(
+                "entries",
+                JSONArray().also { arr ->
+                    entries.forEach { e ->
+                        arr.put(
+                            JSONObject().apply {
+                                put("id", e.id)
+                                put("drinkId", e.drinkId)
+                                put("drinkName", e.drinkName)
+                                put("volumeMl", e.volumeMl)
+                                put("alcoholPercent", e.alcoholPercent)
+                                put("gramsAlcohol", e.gramsAlcohol)
+                                put("timestampMillis", e.timestampMillis)
+                                put("logicalDate", e.logicalDate)
+                                put("note", e.note)
+                            },
+                        )
+                    }
+                },
+            )
         }
 
         val contentValues = ContentValues().apply {
@@ -224,10 +234,13 @@ object BackupManager {
     sealed class ImportError {
         /** The content resolver returned null or threw on openInputStream. */
         object CouldNotRead : ImportError()
+
         /** The file exists but contains only whitespace. */
-        object FileEmpty    : ImportError()
+        object FileEmpty : ImportError()
+
         /** The file content is not valid JSON. */
-        object InvalidJson  : ImportError()
+        object InvalidJson : ImportError()
+
         /**
          * The backup file exceeds [MAX_BACKUP_BYTES].
          * [foundBytes] is the reported file size; [maxBytes] is the limit.
@@ -235,12 +248,14 @@ object BackupManager {
          * actionable message ("file too large") rather than a generic read error.
          */
         data class FileTooLarge(val foundBytes: Long, val maxBytes: Long) : ImportError()
+
         /**
          * The backup was created by a newer app version and may contain fields
          * this version cannot handle. [found] is the version in the file;
          * [max] is [BACKUP_VERSION].
          */
         data class VersionTooHigh(val found: Int, val max: Int) : ImportError()
+
         /** Parsing succeeded but a required field value was unexpected. [detail] carries the exception message. */
         data class ReadError(val detail: String?) : ImportError()
     }
@@ -265,7 +280,7 @@ object BackupManager {
         val drinks: List<DrinkDefinition> = emptyList(),
         val entries: List<ConsumptionEntry> = emptyList(),
         val sourceVersion: Int = 1,
-        val error: ImportError? = null
+        val error: ImportError? = null,
     )
 
     /**
@@ -285,7 +300,7 @@ object BackupManager {
      *
      * @param context  Context for ContentResolver (to open the file URI).
      * @param uri      Content URI of the backup file (from the file picker).
-     * @return         [ImportResult] – always non-null; check [ImportResult.error].
+     * @return [ImportResult] – always non-null; check [ImportResult.error].
      */
     @AndroidIoBound
     fun importFromJson(context: Context, uri: Uri): ImportResult {
@@ -332,18 +347,18 @@ object BackupManager {
      *
      * @param input    The stream to drain (the caller is responsible for closing it).
      * @param maxBytes The inclusive maximum number of bytes to accept.
-     * @return         The bytes read (size ≤ [maxBytes]), or `null` on overflow.
+     * @return The bytes read (size ≤ [maxBytes]), or `null` on overflow.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun readAllUpTo(input: InputStream, maxBytes: Long): ByteArray? {
         val buffer = ByteArrayOutputStream()
-        val chunk  = ByteArray(8 * 1024)
-        var total  = 0L
+        val chunk = ByteArray(8 * 1024)
+        var total = 0L
         while (true) {
             val read = input.read(chunk)
             if (read == -1) break
             total += read
-            if (total > maxBytes) return null   // exceeded the cap → reject
+            if (total > maxBytes) return null // exceeded the cap → reject
             buffer.write(chunk, 0, read)
         }
         return buffer.toByteArray()
@@ -367,8 +382,11 @@ object BackupManager {
     internal fun parseBackupJson(text: String): ImportResult {
         if (text.isBlank()) return ImportResult(error = ImportError.FileEmpty)
 
-        val root = try { JSONObject(text) }
-        catch (e: Exception) { return ImportResult(error = ImportError.InvalidJson) }
+        val root = try {
+            JSONObject(text)
+        } catch (e: Exception) {
+            return ImportResult(error = ImportError.InvalidJson)
+        }
 
         val version = root.optInt("version", 1)
         if (version > BACKUP_VERSION) {
@@ -384,19 +402,21 @@ object BackupManager {
                 // ── Guard 2: drink value ranges ───────────────────────────────
                 // Reject physically impossible values that could corrupt BAC
                 // calculations (e.g. NaN / Infinity propagates through SUM()).
-                val volumeMl       = obj.getInt("volumeMl")
+                val volumeMl = obj.getInt("volumeMl")
                     .also { require(it in 1..10_000) { "volumeMl out of range: $it" } }
                 val alcoholPercent = obj.getDouble("alcoholPercent")
                     .also { require(it.isFinite() && it in 0.0..100.0) { "alcoholPercent invalid: $it" } }
-                drinks.add(DrinkDefinition(
-                    id             = obj.optLong("id", 0),
-                    name           = obj.getString("name"),
-                    volumeMl       = volumeMl,
-                    alcoholPercent = alcoholPercent,
-                    isPreset       = obj.optBoolean("isPreset", false),
-                    isFavorite     = obj.optBoolean("isFavorite", false),
-                    category       = runCatching { DrinkCategory.valueOf(catName) }.getOrDefault(DrinkCategory.OTHER)
-                ))
+                drinks.add(
+                    DrinkDefinition(
+                        id = obj.optLong("id", 0),
+                        name = obj.getString("name"),
+                        volumeMl = volumeMl,
+                        alcoholPercent = alcoholPercent,
+                        isPreset = obj.optBoolean("isPreset", false),
+                        isFavorite = obj.optBoolean("isFavorite", false),
+                        category = runCatching { DrinkCategory.valueOf(catName) }.getOrDefault(DrinkCategory.OTHER),
+                    ),
+                )
             }
 
             val entries = mutableListOf<ConsumptionEntry>()
@@ -407,13 +427,13 @@ object BackupManager {
                 // gramsAlcohol is the primary input to all BAC and statistics
                 // calculations; a NaN or negative value would silently corrupt
                 // every aggregate query that touches this entry.
-                val entryVolumeMl       = obj.getInt("volumeMl")
+                val entryVolumeMl = obj.getInt("volumeMl")
                     .also { require(it in 1..10_000) { "entry volumeMl out of range: $it" } }
                 val entryAlcoholPercent = obj.getDouble("alcoholPercent")
                     .also { require(it.isFinite() && it in 0.0..100.0) { "entry alcoholPercent invalid: $it" } }
-                val gramsAlcohol        = obj.getDouble("gramsAlcohol")
+                val gramsAlcohol = obj.getDouble("gramsAlcohol")
                     .also { require(it.isFinite() && it >= 0.0) { "gramsAlcohol invalid: $it" } }
-                val timestampMillis     = obj.getLong("timestampMillis")
+                val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
                 // ── Guard 4: logicalDate – full calendar-semantic validation ─────
                 // logicalDate is used in all SQL WHERE and ORDER BY clauses as a
@@ -433,24 +453,27 @@ object BackupManager {
                 val logicalDate = obj.getString("logicalDate").also { raw ->
                     val parsed = runCatching { DayResolver.parseDate(raw) }.getOrElse { ex ->
                         throw IllegalArgumentException(
-                            "logicalDate is not a valid calendar date: $raw", ex
+                            "logicalDate is not a valid calendar date: $raw",
+                            ex,
                         )
                     }
                     require(DayResolver.formatDate(parsed) == raw) {
                         "logicalDate is not a valid calendar date: $raw"
                     }
                 }
-                entries.add(ConsumptionEntry(
-                    id              = obj.optLong("id", 0),
-                    drinkId         = obj.optLong("drinkId", 0),
-                    drinkName       = obj.getString("drinkName"),
-                    volumeMl        = entryVolumeMl,
-                    alcoholPercent  = entryAlcoholPercent,
-                    gramsAlcohol    = gramsAlcohol,
-                    timestampMillis = timestampMillis,
-                    logicalDate     = logicalDate,
-                    note            = obj.optString("note", "")
-                ))
+                entries.add(
+                    ConsumptionEntry(
+                        id = obj.optLong("id", 0),
+                        drinkId = obj.optLong("drinkId", 0),
+                        drinkName = obj.getString("drinkName"),
+                        volumeMl = entryVolumeMl,
+                        alcoholPercent = entryAlcoholPercent,
+                        gramsAlcohol = gramsAlcohol,
+                        timestampMillis = timestampMillis,
+                        logicalDate = logicalDate,
+                        note = obj.optString("note", ""),
+                    ),
+                )
             }
 
             ImportResult(drinks, entries, sourceVersion = version)

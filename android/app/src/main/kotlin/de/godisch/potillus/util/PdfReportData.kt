@@ -71,7 +71,7 @@ data class MonthStat(
     val drinkDays: Int,
     val totalGrams: Double,
     val avgPerCalendarDay: Double,
-    val daysOverDailyLimit: Int
+    val daysOverDailyLimit: Int,
 )
 
 /**
@@ -85,7 +85,7 @@ data class MonthStat(
 data class CategoryStat(
     val categoryName: String,
     val grams: Double,
-    val percent: Int
+    val percent: Int,
 )
 
 /**
@@ -169,7 +169,7 @@ data class PdfReportData(
 
     // ── Abstinence streaks ──────────────────────────────────────────────────────
     val longestAbstinence: Int,
-    val currentAbstinence: Int
+    val currentAbstinence: Int,
 ) {
     companion object {
 
@@ -188,7 +188,7 @@ data class PdfReportData(
         fun from(
             entries: List<ConsumptionEntry>,
             drinks: List<DrinkDefinition>,
-            settings: AppSettings
+            settings: AppSettings,
         ): PdfReportData {
             val drinkMap = drinks.associateBy { it.id }
 
@@ -196,7 +196,7 @@ data class PdfReportData(
             val byDate = entries.groupBy { it.logicalDate }
 
             val firstDate = entries.minOf { it.logicalDate }
-            val lastDate  = entries.maxOf { it.logicalDate }
+            val lastDate = entries.maxOf { it.logicalDate }
             val limitInfo = AlcoholCalculator.getLimitInfo(settings)
 
             // Calendar span of the period (inclusive), used for averages and abstinent days.
@@ -204,23 +204,23 @@ data class PdfReportData(
                 .datesUntil(LocalDate.parse(lastDate).plusDays(1))
                 .count().toInt()
 
-            val drinkDays     = byDate.size
+            val drinkDays = byDate.size
             val abstinentDays = (totalDays - drinkDays).coerceAtLeast(0)
-            val totalGrams    = entries.sumOf { it.gramsAlcohol }
-            val avgPerDay     = if (totalDays > 0) totalGrams / totalDays else 0.0
-            val avgPerDrink   = if (drinkDays > 0) totalGrams / drinkDays else 0.0
+            val totalGrams = entries.sumOf { it.gramsAlcohol }
+            val avgPerDay = if (totalDays > 0) totalGrams / totalDays else 0.0
+            val avgPerDrink = if (drinkDays > 0) totalGrams / drinkDays else 0.0
 
             // Shared limit-violation counter → identical figures to the Statistics screen.
             val daySummaries = byDate.map { (date, es) ->
                 DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size)
             }
             val violations = AlcoholCalculator.countLimitViolations(
-                summaries           = daySummaries,
-                dailyLimitGrams     = limitInfo.limitGrams,
-                weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
-                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek
+                summaries = daySummaries,
+                dailyLimitGrams = limitInfo.limitGrams,
+                weeklyLimitGrams = limitInfo.weeklyLimitGrams,
+                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
             )
-            val binge     = AlcoholCalculator.BINGE_THRESHOLD
+            val binge = AlcoholCalculator.BINGE_THRESHOLD
             val bingeDays = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > binge }
 
             // ── Monthly aggregates (ascending). Unlike the old canvas exporter we do
@@ -228,13 +228,13 @@ data class PdfReportData(
             //    automatically, so all months are emitted and flow across pages.
             //
             //    Period bounds as LocalDate, reused to clip partial first/last months.
-            val periodStartDate    = LocalDate.parse(firstDate)
+            val periodStartDate = LocalDate.parse(firstDate)
             val periodEndExclusive = LocalDate.parse(lastDate).plusDays(1)
             val months = byDate.entries
-                .groupBy { it.key.substring(0, 7) }   // "YYYY-MM"
+                .groupBy { it.key.substring(0, 7) } // "YYYY-MM"
                 .toSortedMap()
                 .map { (monthKey, days) ->
-                    val monthStart        = LocalDate.parse("$monthKey-01")
+                    val monthStart = LocalDate.parse("$monthKey-01")
                     val monthEndExclusive = monthStart.plusMonths(1)
                     // Number of THIS month's calendar days that actually fall inside the
                     // reporting period [firstDate, lastDate]. For a partial first or last
@@ -243,18 +243,18 @@ data class PdfReportData(
                     // rather than by the full calendar-month length — stops the not-yet-
                     // recorded tail of a started month from being silently treated as
                     // abstinent, which previously deflated the g/day figure.
-                    val effStart        = maxOf(monthStart, periodStartDate)
+                    val effStart = maxOf(monthStart, periodStartDate)
                     val effEndExclusive = minOf(monthEndExclusive, periodEndExclusive)
-                    val effDays         = ChronoUnit.DAYS.between(effStart, effEndExclusive)
+                    val effDays = ChronoUnit.DAYS.between(effStart, effEndExclusive)
                         .toInt().coerceAtLeast(1)
                     val mGrams = days.sumOf { it.value.sumOf { e -> e.gramsAlcohol } }
-                    val mOver  = days.count { it.value.sumOf { e -> e.gramsAlcohol } > limitInfo.limitGrams }
+                    val mOver = days.count { it.value.sumOf { e -> e.gramsAlcohol } > limitInfo.limitGrams }
                     MonthStat(
-                        monthKey            = monthKey,
-                        drinkDays           = days.size,
-                        totalGrams          = mGrams,
-                        avgPerCalendarDay   = mGrams / effDays,
-                        daysOverDailyLimit  = mOver
+                        monthKey = monthKey,
+                        drinkDays = days.size,
+                        totalGrams = mGrams,
+                        avgPerCalendarDay = mGrams / effDays,
+                        daysOverDailyLimit = mOver,
                     )
                 }
 
@@ -295,12 +295,12 @@ data class PdfReportData(
                     day = day.plusDays(1)
                 }
             }
-            val perDrinkDayTotals       = byDate.values.map { es -> es.sumOf { it.gramsAlcohol } }
-            val medianPerDay            = median(perDayTotals)
-            val medianPerDrinkDay       = median(perDrinkDayTotals)
+            val perDrinkDayTotals = byDate.values.map { es -> es.sumOf { it.gramsAlcohol } }
+            val medianPerDay = median(perDayTotals)
+            val medianPerDrinkDay = median(perDrinkDayTotals)
             // Drink-days-per-month distribution across the calendar months in the period.
-            val drinkDaysPerMonth       = months.map { it.drinkDays.toDouble() }
-            val avgDrinkDaysPerMonth    = if (drinkDaysPerMonth.isNotEmpty()) drinkDaysPerMonth.average() else 0.0
+            val drinkDaysPerMonth = months.map { it.drinkDays.toDouble() }
+            val avgDrinkDaysPerMonth = if (drinkDaysPerMonth.isNotEmpty()) drinkDaysPerMonth.average() else 0.0
             val medianDrinkDaysPerMonth = median(drinkDaysPerMonth)
 
             // Peaks. maxPerDay is the single worst day; maxPer7Days is the worst
@@ -309,11 +309,14 @@ data class PdfReportData(
             // window, so the whole-period total is used.
             val maxPerDay = perDayTotals.maxOrNull() ?: 0.0
             val maxPer7Days =
-                if (perDayTotals.size <= 7) perDayTotals.sum()
-                else (0..perDayTotals.size - 7).maxOf { start ->
-                    var sum = 0.0
-                    for (i in start until start + 7) sum += perDayTotals[i]
-                    sum
+                if (perDayTotals.size <= 7) {
+                    perDayTotals.sum()
+                } else {
+                    (0..perDayTotals.size - 7).maxOf { start ->
+                        var sum = 0.0
+                        for (i in start until start + 7) sum += perDayTotals[i]
+                        sum
+                    }
                 }
 
             // ── Weekday profile, rotated to start at the locale's first weekday.
@@ -321,54 +324,54 @@ data class PdfReportData(
             //    follows the device locale (Mon-first in most of Europe, Sun-first in
             //    the US, etc.) via DayResolver.firstDayOfWeekIso().
             val ws = DayResolver.firstDayOfWeekIso()
-            val weekdayOrder = (0..6).map { i -> (ws - 1 + i) % 7 + 1 }   // ISO 1..7
+            val weekdayOrder = (0..6).map { i -> (ws - 1 + i) % 7 + 1 } // ISO 1..7
             val dayTotals = Array(7) { mutableListOf<Double>() }
             byDate.forEach { (dateStr, es) ->
-                val col = (LocalDate.parse(dateStr).dayOfWeek.value - ws + 7) % 7  // 0 = week-start
+                val col = (LocalDate.parse(dateStr).dayOfWeek.value - ws + 7) % 7 // 0 = week-start
                 dayTotals[col].add(es.sumOf { it.gramsAlcohol })
             }
             val weekdayAverages = dayTotals.map { list -> if (list.isEmpty()) null else list.average() }
 
             // ── Abstinence streaks (shared DayResolver logic).
             val allDates = byDate.keys.sorted()
-            val today    = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
-            val longest  = DayResolver.computeLongestAbstinence(allDates)
-            val current  = DayResolver.computeCurrentAbstinence(allDates, today)
+            val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+            val longest = DayResolver.computeLongestAbstinence(allDates)
+            val current = DayResolver.computeCurrentAbstinence(allDates, today)
 
             // Time-axis consumption series for the report chart. The span is the
             // recorded range [firstDate, lastDate]; granularity scales with its
             // length (daily → weekly → monthly) so the bar count stays readable.
             val chartGranularity = ChartBucketing.granularityForSpan(totalDays)
-            val chartBuckets     = ChartBucketing.bucketize(daySummaries, firstDate, lastDate, chartGranularity)
+            val chartBuckets = ChartBucketing.bucketize(daySummaries, firstDate, lastDate, chartGranularity)
 
             return PdfReportData(
-                firstDate         = firstDate,
-                lastDate          = lastDate,
-                totalDays         = totalDays,
-                limitInfo         = limitInfo,
-                weightKg          = settings.weightKg,
-                totalGrams        = totalGrams,
-                avgPerDay         = avgPerDay,
-                avgPerDrinkDay    = avgPerDrink,
-                drinkDays         = drinkDays,
-                abstinentDays     = abstinentDays,
-                violations        = violations,
-                bingeDays         = bingeDays,
-                medianPerDay            = medianPerDay,
-                medianPerDrinkDay       = medianPerDrinkDay,
-                avgDrinkDaysPerMonth    = avgDrinkDaysPerMonth,
+                firstDate = firstDate,
+                lastDate = lastDate,
+                totalDays = totalDays,
+                limitInfo = limitInfo,
+                weightKg = settings.weightKg,
+                totalGrams = totalGrams,
+                avgPerDay = avgPerDay,
+                avgPerDrinkDay = avgPerDrink,
+                drinkDays = drinkDays,
+                abstinentDays = abstinentDays,
+                violations = violations,
+                bingeDays = bingeDays,
+                medianPerDay = medianPerDay,
+                medianPerDrinkDay = medianPerDrinkDay,
+                avgDrinkDaysPerMonth = avgDrinkDaysPerMonth,
                 medianDrinkDaysPerMonth = medianDrinkDaysPerMonth,
-                maxPerDay               = maxPerDay,
-                maxPer7Days             = maxPer7Days,
-                months            = months,
-                chartBuckets      = chartBuckets,
-                chartGranularity  = chartGranularity,
-                categories        = categories,
-                hourlyGrams       = hourlyGrams.toList(),
-                weekdayOrder      = weekdayOrder,
-                weekdayAverages   = weekdayAverages,
+                maxPerDay = maxPerDay,
+                maxPer7Days = maxPer7Days,
+                months = months,
+                chartBuckets = chartBuckets,
+                chartGranularity = chartGranularity,
+                categories = categories,
+                hourlyGrams = hourlyGrams.toList(),
+                weekdayOrder = weekdayOrder,
+                weekdayAverages = weekdayAverages,
                 longestAbstinence = longest,
-                currentAbstinence = current
+                currentAbstinence = current,
             )
         }
 
@@ -381,8 +384,11 @@ data class PdfReportData(
             if (values.isEmpty()) return 0.0
             val sorted = values.sorted()
             val mid = sorted.size / 2
-            return if (sorted.size % 2 == 1) sorted[mid]
-                   else (sorted[mid - 1] + sorted[mid]) / 2.0
+            return if (sorted.size % 2 == 1) {
+                sorted[mid]
+            } else {
+                (sorted[mid - 1] + sorted[mid]) / 2.0
+            }
         }
     }
 }

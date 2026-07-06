@@ -185,7 +185,7 @@ object WebViewPdfPrinter {
      */
     private class DestroyOnFinishAdapter(
         private val delegate: PrintDocumentAdapter,
-        private val webView: WebView
+        private val webView: WebView,
     ) : PrintDocumentAdapter() {
 
         /** Forwards the job-start notification unchanged. */
@@ -197,7 +197,7 @@ object WebViewPdfPrinter {
             newAttributes: PrintAttributes,
             cancellationSignal: CancellationSignal?,
             callback: LayoutResultCallback,
-            extras: Bundle?
+            extras: Bundle?,
         ) = delegate.onLayout(oldAttributes, newAttributes, cancellationSignal, callback, extras)
 
         /** Forwards the page-write pass unchanged. */
@@ -205,7 +205,7 @@ object WebViewPdfPrinter {
             pages: Array<out PageRange>,
             destination: ParcelFileDescriptor,
             cancellationSignal: CancellationSignal?,
-            callback: WriteResultCallback
+            callback: WriteResultCallback,
         ) = delegate.onWrite(pages, destination, cancellationSignal, callback)
 
         /** Forwards the job-end notification, then releases the WebView. */

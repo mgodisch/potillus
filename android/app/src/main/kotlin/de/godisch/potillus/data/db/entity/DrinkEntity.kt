@@ -75,7 +75,8 @@ data class DrinkEntity(
     val name: String,
     val volumeMl: Int,
     val alcoholPercent: Double,
-    val isPreset: Boolean   = false,
+    val isPreset: Boolean = false,
     val isFavorite: Boolean = false,
-    val category: String    = "OTHER"   // DrinkCategory.name()
+    // DrinkCategory.name()
+    val category: String = "OTHER",
 )

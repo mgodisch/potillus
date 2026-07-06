@@ -38,24 +38,40 @@ import org.junit.Test
  */
 class PdfReportDataTest {
 
-    private val beer = DrinkDefinition(id = 1, name = "Beer", volumeMl = 500,
-        alcoholPercent = 5.0, category = DrinkCategory.BEER)
-    private val wine = DrinkDefinition(id = 2, name = "Wine", volumeMl = 200,
-        alcoholPercent = 13.0, category = DrinkCategory.WINE)
+    private val beer = DrinkDefinition(
+        id = 1,
+        name = "Beer",
+        volumeMl = 500,
+        alcoholPercent = 5.0,
+        category = DrinkCategory.BEER,
+    )
+    private val wine = DrinkDefinition(
+        id = 2,
+        name = "Wine",
+        volumeMl = 200,
+        alcoholPercent = 13.0,
+        category = DrinkCategory.WINE,
+    )
 
     private fun entry(date: String, drinkId: Long, grams: Double) = ConsumptionEntry(
-        id = 0, drinkId = drinkId, drinkName = "x", volumeMl = 0, alcoholPercent = 0.0,
-        gramsAlcohol = grams, timestampMillis = 0L, logicalDate = date
+        id = 0,
+        drinkId = drinkId,
+        drinkName = "x",
+        volumeMl = 0,
+        alcoholPercent = 0.0,
+        gramsAlcohol = grams,
+        timestampMillis = 0L,
+        logicalDate = date,
     )
 
     /** Two months of data: one over-limit day (25 g > 20 g) in January, one quiet day in February. */
     private val entries = listOf(
         entry("2026-01-10", 1, 19.3),
-        entry("2026-01-20", 2, 25.0),   // over the 20 g daily limit
-        entry("2026-02-05", 1, 10.0)
+        entry("2026-01-20", 2, 25.0), // over the 20 g daily limit
+        entry("2026-02-05", 1, 10.0),
     )
     private val drinks = listOf(beer, wine)
-    private val settings = AppSettings()   // dailyLimit 20 g, weight 0 (no week-start setting any more)
+    private val settings = AppSettings() // dailyLimit 20 g, weight 0 (no week-start setting any more)
 
     private fun build() = PdfReportData.from(entries, drinks, settings)
 
@@ -73,14 +89,14 @@ class PdfReportDataTest {
         assertEquals(2, months.size)
         assertEquals("2026-01", months[0].monthKey)
         assertEquals(2, months[0].drinkDays)
-        assertEquals(1, months[0].daysOverDailyLimit)   // the 25 g day
+        assertEquals(1, months[0].daysOverDailyLimit) // the 25 g day
         assertEquals("2026-02", months[1].monthKey)
         assertEquals(0, months[1].daysOverDailyLimit)
     }
 
     @Test fun `categories are sorted by grams with whole-percent shares summing to 100`() {
         val cats = build().categories
-        assertEquals("BEER", cats[0].categoryName)          // 29.3 g > 25.0 g
+        assertEquals("BEER", cats[0].categoryName) // 29.3 g > 25.0 g
         assertEquals(29.3, cats[0].grams, 0.001)
         assertEquals("WINE", cats[1].categoryName)
         assertEquals(54, cats[0].percent)

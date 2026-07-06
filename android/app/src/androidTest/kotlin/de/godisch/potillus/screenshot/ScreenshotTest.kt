@@ -153,7 +153,7 @@ class ScreenshotTest {
 
     // ── Capture timing constants ──────────────────────────────────────────────
     private val readyTimeoutMs = 15_000L
-    private val uiTimeoutMs     = 8_000L
+    private val uiTimeoutMs = 8_000L
 
     /**
      * Prepares a clean, deterministic starting state for every run (screengrab
@@ -187,7 +187,7 @@ class ScreenshotTest {
         // builds. Cleared again in tearDown(). See ScreenshotClock.
         ScreenshotClock.pin()
 
-        app    = ApplicationProvider.getApplicationContext()
+        app = ApplicationProvider.getApplicationContext()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         // 0) Load the demo fixture text from the TEST APK assets via the
@@ -463,7 +463,7 @@ class ScreenshotTest {
      */
     private fun localizedContext(): Context {
         val base = ApplicationProvider.getApplicationContext<Context>()
-        val raw  = screengrabLocaleArg() ?: return base
+        val raw = screengrabLocaleArg() ?: return base
         // screengrab passes locales as "en_US" or "en-US"; forLanguageTag wants '-'.
         val tag = raw.replace('_', '-')
         val config = Configuration(base.resources.configuration)
@@ -500,8 +500,11 @@ class ScreenshotTest {
      */
     private fun targetLanguageTag(): String {
         val raw = screengrabLocaleArg()
-        val locale = if (raw != null) Locale.forLanguageTag(raw.replace('_', '-'))
-                     else Locale.getDefault()
+        val locale = if (raw != null) {
+            Locale.forLanguageTag(raw.replace('_', '-'))
+        } else {
+            Locale.getDefault()
+        }
         return LocaleDetector.detect(locale, SupportedLocales.TAGS)
     }
 

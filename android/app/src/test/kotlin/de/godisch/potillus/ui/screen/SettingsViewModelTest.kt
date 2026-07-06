@@ -56,7 +56,6 @@ import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeBackupRepository
 import de.godisch.potillus.fake.FakeDrinkRepository
 import de.godisch.potillus.fake.FakeEntryRepository
-import de.godisch.potillus.util.BackupManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -74,9 +73,9 @@ class SettingsViewModelTest {
     private val dispatcher = UnconfinedTestDispatcher()
 
     // Fakes – recreated for each test to ensure isolation.
-    private lateinit var prefs:      FakeAppPreferences
-    private lateinit var entryRepo:  FakeEntryRepository
-    private lateinit var drinkRepo:  FakeDrinkRepository
+    private lateinit var prefs: FakeAppPreferences
+    private lateinit var entryRepo: FakeEntryRepository
+    private lateinit var drinkRepo: FakeDrinkRepository
     private lateinit var backupRepo: FakeBackupRepository
 
     /**
@@ -96,19 +95,19 @@ class SettingsViewModelTest {
 
     /** Builds a SettingsViewModel wired to the current fake instances. */
     private fun buildVm() = SettingsViewModel(
-        getString  = testStrings,
+        getString = testStrings,
         appContext = android.app.Application(), // not used in the tested paths
-        prefs      = prefs,
-        entryRepo  = entryRepo,
-        drinkRepo  = drinkRepo,
-        backupRepo = backupRepo
+        prefs = prefs,
+        entryRepo = entryRepo,
+        drinkRepo = drinkRepo,
+        backupRepo = backupRepo,
     )
 
     @Before fun setUp() {
         Dispatchers.setMain(dispatcher)
-        prefs      = FakeAppPreferences(AppSettings())
-        entryRepo  = FakeEntryRepository()
-        drinkRepo  = FakeDrinkRepository()
+        prefs = FakeAppPreferences(AppSettings())
+        entryRepo = FakeEntryRepository()
+        drinkRepo = FakeDrinkRepository()
         backupRepo = FakeBackupRepository()
     }
 
@@ -138,7 +137,7 @@ class SettingsViewModelTest {
         val vm = buildVm()
         vm.setMaxDrinkDaysPerWeek(4)
         assertEquals(4, prefs.currentSettings.maxDrinkDaysPerWeek)
-        vm.setMaxDrinkDaysPerWeek(9)               // out of range → clamped to 7
+        vm.setMaxDrinkDaysPerWeek(9) // out of range → clamped to 7
         assertEquals(7, prefs.currentSettings.maxDrinkDaysPerWeek)
     }
 
@@ -152,7 +151,7 @@ class SettingsViewModelTest {
         val vm = buildVm()
         vm.setDayChangeTime(3, 30)
         val s = prefs.currentSettings
-        assertEquals(3,  s.dayChangeHour)
+        assertEquals(3, s.dayChangeHour)
         assertEquals(30, s.dayChangeMinute)
     }
 
@@ -229,8 +228,9 @@ class SettingsViewModelTest {
         vm.uiState.test {
             awaitItem()
             // Trigger directly – simulates the repository failure path
-            try { backupRepo.importReplace(emptyList(), emptyList()) }
-            catch (_: RuntimeException) { /* expected */ }
+            try {
+                backupRepo.importReplace(emptyList(), emptyList())
+            } catch (_: RuntimeException) { /* expected */ }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -255,7 +255,7 @@ class SettingsViewModelTest {
     @Test fun `uiState emits updated settings when prefs change`() = runTest(dispatcher) {
         val vm = buildVm()
         vm.uiState.test {
-            awaitItem()  // initial
+            awaitItem() // initial
             vm.setDailyLimit(33.0)
             val state = awaitItem()
             assertEquals(33.0, state.settings.dailyLimitGrams, 0.001)

@@ -46,7 +46,14 @@ class CsvExporterBuildTest {
 
     /** The eight column captions, in the order [CsvExporter.buildCsv] emits them. */
     private val header = listOf(
-        "date", "time", "drink", "category", "ml", "abv", "grams", "note"
+        "date",
+        "time",
+        "drink",
+        "category",
+        "ml",
+        "abv",
+        "grams",
+        "note",
     )
 
     private lateinit var originalLocale: Locale
@@ -66,28 +73,31 @@ class CsvExporterBuildTest {
     }
 
     private fun sampleDrink(id: Long) = DrinkDefinition(
-        id = id, name = "Pilsner", volumeMl = 500, alcoholPercent = 4.9,
-        category = DrinkCategory.BEER
+        id = id,
+        name = "Pilsner",
+        volumeMl = 500,
+        alcoholPercent = 4.9,
+        category = DrinkCategory.BEER,
     )
 
     private fun sampleEntry(drinkId: Long) = ConsumptionEntry(
         id = 1L, drinkId = drinkId, drinkName = "Pilsner", volumeMl = 500,
         alcoholPercent = 4.9, gramsAlcohol = 19.6,
-        timestampMillis = 1_700_000_000_000L, logicalDate = "2026-05-29", note = ""
+        timestampMillis = 1_700_000_000_000L, logicalDate = "2026-05-29", note = "",
     )
 
     /** Non-empty lines (the CRLF terminator leaves a trailing empty element). */
     private fun lines(csv: String) = csv.split("\r\n").filter { it.isNotEmpty() }
 
     @Test fun `grams use a dot decimal separator regardless of locale`() {
-        val csv  = CsvExporter.buildCsv(header, listOf(sampleEntry(10L)), listOf(sampleDrink(10L)))
+        val csv = CsvExporter.buildCsv(header, listOf(sampleEntry(10L)), listOf(sampleDrink(10L)))
         val cols = lines(csv)[1].split(",")
         // Column index 6 is "grams" (date,time,drink,category,ml,abv,grams,note).
         assertEquals("19.60", cols[6])
     }
 
     @Test fun `a data row has exactly eight columns under a comma-decimal locale`() {
-        val csv  = CsvExporter.buildCsv(header, listOf(sampleEntry(10L)), listOf(sampleDrink(10L)))
+        val csv = CsvExporter.buildCsv(header, listOf(sampleEntry(10L)), listOf(sampleDrink(10L)))
         val cols = lines(csv)[1].split(",")
         // Would be 9 if the grams field were rendered as "19,60".
         assertEquals(8, cols.size)

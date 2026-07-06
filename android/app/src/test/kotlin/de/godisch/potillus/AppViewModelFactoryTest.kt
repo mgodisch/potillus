@@ -75,11 +75,11 @@ import org.junit.Test
 class AppViewModelFactoryTest {
 
     // Shared Fake dependencies (stateless for these constructor tests).
-    private val entryRepo  = FakeEntryRepository()
-    private val drinkRepo  = FakeDrinkRepository()
-    private val prefs      = FakeAppPreferences()
+    private val entryRepo = FakeEntryRepository()
+    private val drinkRepo = FakeDrinkRepository()
+    private val prefs = FakeAppPreferences()
     private val backupRepo = FakeBackupRepository()
-    private val strings    = StringProvider { id, args ->
+    private val strings = StringProvider { id, args ->
         if (args.isEmpty()) id.toString() else "$id(${args.joinToString()})"
     }
 
@@ -118,11 +118,11 @@ class AppViewModelFactoryTest {
      */
     @Test fun `StatsViewModel can be constructed with its injected types`() {
         val vm = StatsViewModel(
-            entryRepo  = entryRepo,
-            drinkRepo  = drinkRepo,
-            prefs      = prefs,
+            entryRepo = entryRepo,
+            drinkRepo = drinkRepo,
+            prefs = prefs,
             appContext = android.app.Application(),
-            getString  = strings
+            getString = strings,
         )
         assertNotNull(vm)
     }
@@ -140,12 +140,12 @@ class AppViewModelFactoryTest {
      */
     @Test fun `SettingsViewModel can be constructed with its injected types`() {
         val vm = SettingsViewModel(
-            getString   = strings,
-            appContext  = android.app.Application(),
-            prefs       = prefs,
-            entryRepo   = entryRepo,
-            drinkRepo   = drinkRepo,
-            backupRepo  = backupRepo
+            getString = strings,
+            appContext = android.app.Application(),
+            prefs = prefs,
+            entryRepo = entryRepo,
+            drinkRepo = drinkRepo,
+            backupRepo = backupRepo,
         )
         assertNotNull(vm)
     }
@@ -172,7 +172,7 @@ class AppViewModelFactoryTest {
                 // No known branches: every class hits the else-guard.
                 else -> throw IllegalArgumentException(
                     "Unknown ViewModel class: ${modelClass.name}. " +
-                    "Register it in AppViewModelFactory."
+                        "Register it in AppViewModelFactory.",
                 )
             }
         }

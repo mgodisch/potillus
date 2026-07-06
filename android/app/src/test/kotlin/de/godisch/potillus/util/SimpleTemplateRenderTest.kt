@@ -33,11 +33,11 @@ class SimpleTemplateRenderTest {
     @Test fun `present placeholders are HTML-escaped and unknown ones are left intact`() {
         val out = SimpleTemplate.render(
             template = "{{name}} and {{missing}}",
-            scalars = mapOf("name" to "a&b<c>d\"e'f")
+            scalars = mapOf("name" to "a&b<c>d\"e'f"),
         )
         assertTrue(
             "all HTML metacharacters must be escaped",
-            out.contains("a&amp;b&lt;c&gt;d&quot;e&#39;f")
+            out.contains("a&amp;b&lt;c&gt;d&quot;e&#39;f"),
         )
         assertTrue("an unknown placeholder must be left untouched", out.contains("{{missing}}"))
     }

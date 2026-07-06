@@ -102,8 +102,7 @@ import java.util.Locale
  * @return The configuration's primary locale, or [Locale.getDefault] as a
  *         last-resort fallback if the configuration somehow has no locale.
  */
-fun Context.formattingLocale(): Locale =
-    ConfigurationCompat.getLocales(resources.configuration)[0] ?: Locale.getDefault()
+fun Context.formattingLocale(): Locale = ConfigurationCompat.getLocales(resources.configuration)[0] ?: Locale.getDefault()
 
 /**
  * A [Context] whose resources are guaranteed to resolve in the app's per-app
@@ -151,8 +150,7 @@ fun Context.formattingLocale(): Locale =
  *         before detection, or tests), otherwise a configuration context
  *         localized to the stored per-app locale list.
  */
-fun Context.perAppLocalizedContext(): Context =
-    localizedContextFor(AppCompatDelegate.getApplicationLocales())
+fun Context.perAppLocalizedContext(): Context = localizedContextFor(AppCompatDelegate.getApplicationLocales())
 
 /**
  * The pure transformation behind [perAppLocalizedContext]: derives a context

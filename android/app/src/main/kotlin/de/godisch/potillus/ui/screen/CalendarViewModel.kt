@@ -72,27 +72,27 @@ enum class CalendarViewMode { MONTH, YEAR }
  */
 @Immutable
 data class CalendarUiState(
-    val viewMode: CalendarViewMode              = CalendarViewMode.MONTH,
+    val viewMode: CalendarViewMode = CalendarViewMode.MONTH,
     // These now()-defaults form the stateIn seed shown for the first frame (before
     // the combine emits). They read through DayResolver.clock() so that seed frame
     // is pinned in screenshot runs too; in production the clock is the real system
     // clock, so they equal YearMonth.now()/LocalDate.now() as before.
-    val currentMonth: YearMonth                 = YearMonth.now(DayResolver.clock()),
-    val currentYear: Int                        = LocalDate.now(DayResolver.clock()).year,
+    val currentMonth: YearMonth = YearMonth.now(DayResolver.clock()),
+    val currentYear: Int = LocalDate.now(DayResolver.clock()).year,
     /** Logical today as a LocalDate, respecting the configured day-change time. */
-    val today: LocalDate                        = LocalDate.now(DayResolver.clock()),
-    val daySummaries: Map<String, DaySummary>   = emptyMap(),
-    val selectedDate: String?                   = null,
+    val today: LocalDate = LocalDate.now(DayResolver.clock()),
+    val daySummaries: Map<String, DaySummary> = emptyMap(),
+    val selectedDate: String? = null,
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
-    val totalGramsSelected: Double              = 0.0,
-    val limitInfo: LimitInfo                    = LimitInfo(20.0, 100.0, 5),
+    val totalGramsSelected: Double = 0.0,
+    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
     /**
      * First weekday for month-grid alignment (ISO 1 = Monday … 7 = Sunday).
      * Derived from the device locale via [DayResolver.firstDayOfWeekIso] — the app
      * no longer exposes a user setting for this. Affects only the visual column
      * order of the calendar, not any consumption metric.
      */
-    val weekStartDay: Int                       = 1
+    val weekStartDay: Int = 1,
 )
 
 /**
@@ -124,21 +124,22 @@ private data class CalendarParams(
     val limitInfo: LimitInfo,
     val from: String,
     val to: String,
-    val weekStart: Int
+    val weekStart: Int,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CalendarViewModel(
     private val entryRepo: IEntryRepository,
     private val drinkRepo: IDrinkRepository,
-    private val prefs: IAppPreferences
+    private val prefs: IAppPreferences,
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "CalendarViewModel"
     }
 
-    private val _viewMode     = MutableStateFlow(CalendarViewMode.MONTH)
+    private val _viewMode = MutableStateFlow(CalendarViewMode.MONTH)
+
     // Note: _month is seeded with the current CALENDAR month for initial
     // navigation. It is intentionally NOT derived from the logical "today"
     // ([DayResolver.today]), because the user always wants to start navigating
@@ -157,7 +158,7 @@ class CalendarViewModel(
     // YEAR mode again, _month and _year could disagree if prevPeriod/nextPeriod
     // had advanced one but not the other. Deriving currentYear = _month.value.year
     // makes the two values structurally consistent with zero extra state.
-    private val _month        = MutableStateFlow(YearMonth.now(DayResolver.clock()))
+    private val _month = MutableStateFlow(YearMonth.now(DayResolver.clock()))
     private val _selectedDate = MutableStateFlow<String?>(null)
 
     init {
@@ -179,73 +180,76 @@ class CalendarViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val uiState: StateFlow<CalendarUiState> = combine(
-        _viewMode, _month, _selectedDate, prefs.settingsFlow
+        _viewMode,
+        _month,
+        _selectedDate,
+        prefs.settingsFlow,
     ) { mode, month, selDate, settings ->
-        val todayStr  = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+        val todayStr = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val todayDate = DayResolver.parseDate(todayStr)
         // year is always derived from the current _month value so both
         // are structurally consistent without a separate StateFlow.
         val year = month.year
         val (from, to) = when (mode) {
             CalendarViewMode.MONTH -> DayResolver.formatDate(month.atDay(1)) to DayResolver.formatDate(month.atEndOfMonth())
-            CalendarViewMode.YEAR  -> "$year-01-01" to "$year-12-31"
+            CalendarViewMode.YEAR -> "$year-01-01" to "$year-12-31"
         }
         CalendarParams(mode, month, year, todayDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
     }
-    // ── Stage 1: load day summaries for the visible period ────────────────
-    // flatMapLatest cancels the previous inner Flow and starts a new one every
-    // time CalendarParams emits. This ensures that navigating to a different
-    // month/year immediately re-queries the database for the new date range,
-    // and the old query's results are discarded.
-    .flatMapLatest { p ->
-        entryRepo.getDailySummaries(p.from, p.to).map { summaries ->
-            CalendarUiState(
-                viewMode     = p.mode,
-                currentMonth = p.month,
-                currentYear  = p.year,
-                today        = p.today,
-                daySummaries = summaries.associateBy { it.date },
-                selectedDate = p.selDate,
-                limitInfo    = p.limitInfo,
-                weekStartDay = p.weekStart
-            )
-        }
-    }
-    // ── Stage 2: if a date is selected, load its individual entries ───────
-    // A second flatMapLatest is chained on top of Stage 1.
-    // It receives a CalendarUiState (= "base") and:
-    //   - If a date is selected: returns a new Flow that re-emits whenever
-    //     entries for that date change (user adds/edits/deletes from here).
-    //     base.copy(…) merges the entry list into the existing state without
-    //     re-triggering Stage 1.
-    //   - If no date is selected: wraps base in flowOf(base) – a Flow that
-    //     emits exactly once and completes, effectively a no-op pass-through.
-    // WHY two chained flatMapLatest?
-    //   The two database queries (summaries and entries) have different
-    //   triggering conditions: summaries reload when the date range changes;
-    //   entries reload when the selected date changes OR when a new entry
-    //   is added. Keeping them in separate stages avoids re-querying summaries
-    //   just because the user tapped a day.
-    .flatMapLatest { base ->
-        val date = base.selectedDate
-        if (date != null) {
-            entryRepo.getEntriesForDate(date).map { entries ->
-                base.copy(
-                    selectedEntries    = entries,
-                    totalGramsSelected = entries.sumOf { it.gramsAlcohol }
+        // ── Stage 1: load day summaries for the visible period ────────────────
+        // flatMapLatest cancels the previous inner Flow and starts a new one every
+        // time CalendarParams emits. This ensures that navigating to a different
+        // month/year immediately re-queries the database for the new date range,
+        // and the old query's results are discarded.
+        .flatMapLatest { p ->
+            entryRepo.getDailySummaries(p.from, p.to).map { summaries ->
+                CalendarUiState(
+                    viewMode = p.mode,
+                    currentMonth = p.month,
+                    currentYear = p.year,
+                    today = p.today,
+                    daySummaries = summaries.associateBy { it.date },
+                    selectedDate = p.selDate,
+                    limitInfo = p.limitInfo,
+                    weekStartDay = p.weekStart,
                 )
             }
-        } else {
-            flowOf(base)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
+        // ── Stage 2: if a date is selected, load its individual entries ───────
+        // A second flatMapLatest is chained on top of Stage 1.
+        // It receives a CalendarUiState (= "base") and:
+        //   - If a date is selected: returns a new Flow that re-emits whenever
+        //     entries for that date change (user adds/edits/deletes from here).
+        //     base.copy(…) merges the entry list into the existing state without
+        //     re-triggering Stage 1.
+        //   - If no date is selected: wraps base in flowOf(base) – a Flow that
+        //     emits exactly once and completes, effectively a no-op pass-through.
+        // WHY two chained flatMapLatest?
+        //   The two database queries (summaries and entries) have different
+        //   triggering conditions: summaries reload when the date range changes;
+        //   entries reload when the selected date changes OR when a new entry
+        //   is added. Keeping them in separate stages avoids re-querying summaries
+        //   just because the user tapped a day.
+        .flatMapLatest { base ->
+            val date = base.selectedDate
+            if (date != null) {
+                entryRepo.getEntriesForDate(date).map { entries ->
+                    base.copy(
+                        selectedEntries = entries,
+                        totalGramsSelected = entries.sumOf { it.gramsAlcohol },
+                    )
+                }
+            } else {
+                flowOf(base)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
 
     /**
      * Toggles between MONTH and YEAR calendar views and clears the current day
      * selection (a selection from one view is meaningless in the other).
      */
     fun toggleViewMode() {
-        _viewMode.value     = if (_viewMode.value == CalendarViewMode.MONTH) CalendarViewMode.YEAR else CalendarViewMode.MONTH
+        _viewMode.value = if (_viewMode.value == CalendarViewMode.MONTH) CalendarViewMode.YEAR else CalendarViewMode.MONTH
         _selectedDate.value = null
     }
 
@@ -255,18 +259,26 @@ class CalendarViewModel(
         // (which drives CalendarParams.year) updates atomically with the navigation.
         // Previously a separate _year StateFlow was decremented here; removing it
         // eliminates the gap where _month and _year could momentarily disagree.
-        if (_viewMode.value == CalendarViewMode.MONTH) _month.value = _month.value.minusMonths(1)
-        else _month.value = _month.value.minusYears(1)
+        if (_viewMode.value == CalendarViewMode.MONTH) {
+            _month.value = _month.value.minusMonths(1)
+        } else {
+            _month.value = _month.value.minusYears(1)
+        }
     }
 
     /** Navigate to the next month (MONTH mode) or next year (YEAR mode). */
     fun nextPeriod() {
-        if (_viewMode.value == CalendarViewMode.MONTH) _month.value = _month.value.plusMonths(1)
-        else _month.value = _month.value.plusYears(1)
+        if (_viewMode.value == CalendarViewMode.MONTH) {
+            _month.value = _month.value.plusMonths(1)
+        } else {
+            _month.value = _month.value.plusYears(1)
+        }
     }
 
     /** Selects (or, with `null`, clears) the calendar day [date] ("YYYY-MM-DD"). */
-    fun selectDate(date: String?) { _selectedDate.value = date }
+    fun selectDate(date: String?) {
+        _selectedDate.value = date
+    }
 
     /**
      * Logs a new entry on the currently selected calendar day.
@@ -288,7 +300,7 @@ class CalendarViewModel(
             return
         }
         viewModelScope.launch {
-            val settings    = prefs.settingsFlow.first()
+            val settings = prefs.settingsFlow.first()
             // Log a warning when no date is selected and we fall back to
             // "today". On the Calendar screen this should not normally happen because
             // the UI only shows the Add-entry dialog when a day is selected. If it
@@ -314,7 +326,7 @@ class CalendarViewModel(
      * date that may differ from the wall-clock date of the timestamp.
      */
     fun updateEntry(entry: ConsumptionEntry) {
-        viewModelScope.launch { entryRepo.update(entry) }  // preserves logicalDate
+        viewModelScope.launch { entryRepo.update(entry) } // preserves logicalDate
     }
 
     /** Deletes [entry] from the database. @param entry The entry to remove. */

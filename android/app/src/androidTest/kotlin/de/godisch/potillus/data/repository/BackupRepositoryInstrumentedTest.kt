@@ -108,32 +108,42 @@ class BackupRepositoryInstrumentedTest {
         // ── Local state: one preset + one user-created drink with the SAME name
         //    that the backup will also contain ("Mojito"). ─────────────────────
         drinkDao.insert(
-            DrinkEntity(name = "Lager", volumeMl = 500, alcoholPercent = 5.0, isPreset = true, category = "BEER")
+            DrinkEntity(name = "Lager", volumeMl = 500, alcoholPercent = 5.0, isPreset = true, category = "BEER"),
         )
         val localMojitoId = drinkDao.insert(
-            DrinkEntity(name = "Mojito", volumeMl = 200, alcoholPercent = 10.0, isPreset = false, category = "LONGDRINK")
+            DrinkEntity(name = "Mojito", volumeMl = 200, alcoholPercent = 10.0, isPreset = false, category = "LONGDRINK"),
         )
         // A pre-existing local entry (will be wiped by the REPLACE import).
         entryDao.insert(
             EntryEntity(
-                drinkId = localMojitoId, drinkName = "Mojito", volumeMl = 200, alcoholPercent = 10.0,
-                gramsAlcohol = 15.78, timestampMillis = 500L, logicalDate = "2024-12-31", note = ""
-            )
+                drinkId = localMojitoId,
+                drinkName = "Mojito",
+                volumeMl = 200,
+                alcoholPercent = 10.0,
+                gramsAlcohol = 15.78,
+                timestampMillis = 500L,
+                logicalDate = "2024-12-31",
+                note = "",
+            ),
         )
 
         // ── Backup payload: the same "Mojito" drink (its backup id is irrelevant
         //    once remapped) plus one entry that references it. ──────────────────
         val backupDrinks = listOf(
             DrinkDefinition(
-                id = 99, name = "Mojito", volumeMl = 200, alcoholPercent = 10.0,
-                isPreset = false, category = DrinkCategory.LONGDRINK
-            )
+                id = 99,
+                name = "Mojito",
+                volumeMl = 200,
+                alcoholPercent = 10.0,
+                isPreset = false,
+                category = DrinkCategory.LONGDRINK,
+            ),
         )
         val backupEntries = listOf(
             ConsumptionEntry(
                 id = 0, drinkId = 99, drinkName = "Mojito", volumeMl = 200, alcoholPercent = 10.0,
-                gramsAlcohol = 15.78, timestampMillis = 1_000L, logicalDate = "2025-01-01", note = ""
-            )
+                gramsAlcohol = 15.78, timestampMillis = 1_000L, logicalDate = "2025-01-01", note = "",
+            ),
         )
 
         // ── Act: this must NOT throw an FK constraint exception. ───────────────

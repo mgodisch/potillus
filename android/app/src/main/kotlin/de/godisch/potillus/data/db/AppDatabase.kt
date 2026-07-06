@@ -48,10 +48,10 @@ import java.security.KeyStore
 // SINGLETON PATTERN (double-checked locking):
 //   Only one database connection is needed for the whole app lifetime.
 //   The getInstance() method uses the classic "double-checked locking" idiom:
-//     1. Fast path (no lock): if INSTANCE is non-null, return it immediately.
+//     1. Fast path (no lock): if instance is non-null, return it immediately.
 //     2. Slow path (with lock): enter a synchronized block, check again, and
 //        create the instance if it is still null.
-//   @Volatile ensures that writes to INSTANCE are immediately visible to all
+//   @Volatile ensures that writes to instance are immediately visible to all
 //   threads, preventing a stale cached value from being read in step 1.
 //
 // SCHEMA EXPORT (exportSchema = true):
@@ -78,9 +78,9 @@ import java.security.KeyStore
 // add a case to MigrationTest. See CONTRIBUTING.md §7.1. Never use
 // fallbackToDestructiveMigration — it would wipe user data.
 @Database(
-    entities     = [DrinkEntity::class, EntryEntity::class],
-    version      = 2,
-    exportSchema = true
+    entities = [DrinkEntity::class, EntryEntity::class],
+    version = 2,
+    exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -99,7 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
          * the CPU from caching a stale reference in a thread-local register.
          */
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var instance: AppDatabase? = null
 
         /** File name of the Room database. */
         private const val DATABASE_NAME = "potillus.db"
@@ -112,7 +112,7 @@ abstract class AppDatabase : RoomDatabase() {
         //   file-based storage encryption and the per-app sandbox — so those two
         //   artefacts are obsolete and are cleaned up once by
         //   [purgeLegacyEncryptedDatabase].
-        private const val LEGACY_PASSPHRASE_PREFS     = "potillus_db_key"
+        private const val LEGACY_PASSPHRASE_PREFS = "potillus_db_key"
         private const val LEGACY_PASSPHRASE_PREFS_KEY = "passphrase"
         private const val LEGACY_PASSPHRASE_KEY_ALIAS = "potillus_db_passphrase_key"
 
@@ -179,24 +179,22 @@ abstract class AppDatabase : RoomDatabase() {
          *                         (not an Activity context) to avoid a memory leak.
          * @param applicationScope Long-lived [CoroutineScope] from [de.godisch.potillus.PotillusApp].
          */
-        fun getInstance(context: Context, applicationScope: CoroutineScope): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: run {
-                    val appContext = context.applicationContext
-                    // One-shot clean break from the former SQLCipher database (a no-op
-                    // on clean installs and on every start after the first upgrade).
-                    purgeLegacyEncryptedDatabase(appContext)
+        fun getInstance(context: Context, applicationScope: CoroutineScope): AppDatabase = instance ?: synchronized(this) {
+            instance ?: run {
+                val appContext = context.applicationContext
+                // One-shot clean break from the former SQLCipher database (a no-op
+                // on clean installs and on every start after the first upgrade).
+                purgeLegacyEncryptedDatabase(appContext)
 
-                    Room.databaseBuilder(
-                        appContext,
-                        AppDatabase::class.java,
-                        DATABASE_NAME
-                    )
-                        .addMigrations(MIGRATION_1_2)
-                        .addCallback(PrepopulateCallback(applicationScope))
-                        .build()
-                        .also { INSTANCE = it }
-                }
+                Room.databaseBuilder(
+                    appContext,
+                    AppDatabase::class.java,
+                    DATABASE_NAME,
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .addCallback(PrepopulateCallback(applicationScope))
+                    .build()
+                    .also { instance = it }
             }
         }
     }
@@ -207,7 +205,7 @@ abstract class AppDatabase : RoomDatabase() {
      * Inserts the built-in preset drinks the first time the database is created.
      *
      * Room calls [onCreate] once, immediately after the database file is first
-     * opened and the schema has been created. At this point [INSTANCE] is
+     * opened and the schema has been created. At this point [instance] is
      * already set (see [getInstance]), so we can safely access the DAO.
      *
      * WHY [applicationScope] instead of `GlobalScope.launch`?
@@ -224,7 +222,7 @@ abstract class AppDatabase : RoomDatabase() {
     private class PrepopulateCallback(private val scope: CoroutineScope) : Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            INSTANCE?.let { database ->
+            instance?.let { database ->
                 // Dispatchers.IO explicitly: [PotillusApp.applicationScope]
                 // deliberately carries NO default dispatcher (every launch site
                 // must state its choice — see its KDoc). The preset insert is
@@ -273,7 +271,7 @@ abstract class AppDatabase : RoomDatabase() {
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
-            "CREATE INDEX IF NOT EXISTS index_entries_logicalDate ON entries (logicalDate)"
+            "CREATE INDEX IF NOT EXISTS index_entries_logicalDate ON entries (logicalDate)",
         )
     }
 }
@@ -291,19 +289,19 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
 /** Preset drinks inserted on first install. Users can add their own; these cannot be deleted. */
 private val PRESET_DRINKS = listOf(
-    DrinkEntity(name = "Lager (Pint)",               volumeMl = 568, alcoholPercent =  4.5, isPreset = true, category = "BEER"),
-    DrinkEntity(name = "Lager (Standard)",           volumeMl = 500, alcoholPercent =  5.0, isPreset = true, category = "BEER"),
-    DrinkEntity(name = "Lager (Small)",              volumeMl = 330, alcoholPercent =  5.0, isPreset = true, category = "BEER"),
-    DrinkEntity(name = "Shandy / Radler",            volumeMl = 500, alcoholPercent =  2.5, isPreset = true, category = "BEER"),
-    DrinkEntity(name = "White Wine (Small)",         volumeMl = 125, alcoholPercent = 12.5, isPreset = true, category = "WINE"),
-    DrinkEntity(name = "White Wine (Regular)",       volumeMl = 150, alcoholPercent = 13.0, isPreset = true, category = "WINE"),
-    DrinkEntity(name = "Red Wine (Regular)",         volumeMl = 150, alcoholPercent = 13.5, isPreset = true, category = "WINE"),
-    DrinkEntity(name = "Sparkling Wine / Prosecco",  volumeMl = 125, alcoholPercent = 11.5, isPreset = true, category = "WINE"),
-    DrinkEntity(name = "Gin & Tonic",                volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
-    DrinkEntity(name = "Cuba Libre",                 volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
-    DrinkEntity(name = "Vodka Soda",                 volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
-    DrinkEntity(name = "Vodka Shot",                 volumeMl =  40, alcoholPercent = 40.0, isPreset = true, category = "SPIRITS"),
-    DrinkEntity(name = "Vodka Shot (International)", volumeMl =  45, alcoholPercent = 40.0, isPreset = true, category = "SPIRITS"),
-    DrinkEntity(name = "Whiskey (Neat/Rocks)",       volumeMl =  45, alcoholPercent = 43.0, isPreset = true, category = "SPIRITS"),
-    DrinkEntity(name = "Liqueur Shot",               volumeMl =  40, alcoholPercent = 35.0, isPreset = true, category = "LIQUEUR"),
+    DrinkEntity(name = "Lager (Pint)", volumeMl = 568, alcoholPercent = 4.5, isPreset = true, category = "BEER"),
+    DrinkEntity(name = "Lager (Standard)", volumeMl = 500, alcoholPercent = 5.0, isPreset = true, category = "BEER"),
+    DrinkEntity(name = "Lager (Small)", volumeMl = 330, alcoholPercent = 5.0, isPreset = true, category = "BEER"),
+    DrinkEntity(name = "Shandy / Radler", volumeMl = 500, alcoholPercent = 2.5, isPreset = true, category = "BEER"),
+    DrinkEntity(name = "White Wine (Small)", volumeMl = 125, alcoholPercent = 12.5, isPreset = true, category = "WINE"),
+    DrinkEntity(name = "White Wine (Regular)", volumeMl = 150, alcoholPercent = 13.0, isPreset = true, category = "WINE"),
+    DrinkEntity(name = "Red Wine (Regular)", volumeMl = 150, alcoholPercent = 13.5, isPreset = true, category = "WINE"),
+    DrinkEntity(name = "Sparkling Wine / Prosecco", volumeMl = 125, alcoholPercent = 11.5, isPreset = true, category = "WINE"),
+    DrinkEntity(name = "Gin & Tonic", volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
+    DrinkEntity(name = "Cuba Libre", volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
+    DrinkEntity(name = "Vodka Soda", volumeMl = 200, alcoholPercent = 10.0, isPreset = true, category = "LONGDRINK"),
+    DrinkEntity(name = "Vodka Shot", volumeMl = 40, alcoholPercent = 40.0, isPreset = true, category = "SPIRITS"),
+    DrinkEntity(name = "Vodka Shot (International)", volumeMl = 45, alcoholPercent = 40.0, isPreset = true, category = "SPIRITS"),
+    DrinkEntity(name = "Whiskey (Neat/Rocks)", volumeMl = 45, alcoholPercent = 43.0, isPreset = true, category = "SPIRITS"),
+    DrinkEntity(name = "Liqueur Shot", volumeMl = 40, alcoholPercent = 35.0, isPreset = true, category = "LIQUEUR"),
 )

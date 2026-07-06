@@ -72,11 +72,11 @@ fun StatsScreen(
     onOpenHelp: () -> Unit = {},
     onOpenCopyright: () -> Unit = {},
     /** Locks the app immediately (overflow-menu "Lock app"). */
-    onLockApp: () -> Unit = {}
+    onLockApp: () -> Unit = {},
 ) {
     val state by vm.uiState.collectAsStateWithLifecycle()
     val exportStatus by vm.exportStatus.collectAsStateWithLifecycle()
-    val shareTarget  by vm.shareTarget.collectAsStateWithLifecycle()
+    val shareTarget by vm.shareTarget.collectAsStateWithLifecycle()
     val printRequest by vm.printRequest.collectAsStateWithLifecycle()
     val context = LocalContext.current
     // Per-app locale for chart axis labels (weekday / month names). Derived from
@@ -98,12 +98,12 @@ fun StatsScreen(
     // obvious; we only consume the status to clear it.
     LaunchedEffect(exportStatus) {
         when (val status = exportStatus) {
-            is ExportStatus.Err  -> {
+            is ExportStatus.Err -> {
                 Toast.makeText(context, status.message, Toast.LENGTH_LONG).show()
                 vm.clearExportStatus()
             }
-            is ExportStatus.Done -> vm.clearExportStatus()  // success shown by share/print dialog
-            null                 -> Unit
+            is ExportStatus.Done -> vm.clearExportStatus() // success shown by share/print dialog
+            null -> Unit
         }
     }
 
@@ -136,42 +136,42 @@ fun StatsScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title  = { Text(stringResource(R.string.statistics)) },
+                title = { Text(stringResource(R.string.statistics)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 actions = {
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
-                        onOpenHelp     = onOpenHelp,
-                        onOpenCopyright  = onOpenCopyright,
-                        onLockApp      = onLockApp,
-                        tint           = MaterialTheme.colorScheme.onPrimary
+                        onOpenHelp = onOpenHelp,
+                        onOpenCopyright = onOpenCopyright,
+                        onLockApp = onLockApp,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
-            contentPadding      = PaddingValues(16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier            = Modifier.fillMaxSize().padding(paddingValues)
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {
             // ── Period selector ───────────────────────────────────────────
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatsPeriod.entries.forEach { p ->
                         val labelRes = when (p) {
-                            StatsPeriod.WEEK  -> R.string.week
+                            StatsPeriod.WEEK -> R.string.week
                             StatsPeriod.MONTH -> R.string.month
-                            StatsPeriod.YEAR  -> R.string.year
+                            StatsPeriod.YEAR -> R.string.year
                         }
                         FilterChip(
                             selected = state.period == p,
-                            onClick  = { vm.setPeriod(p) },
-                            label    = { Text(stringResource(labelRes)) },
-                            modifier = Modifier.weight(1f)
+                            onClick = { vm.setPeriod(p) },
+                            label = { Text(stringResource(labelRes)) },
+                            modifier = Modifier.weight(1f),
                         )
                     }
                 }
@@ -184,19 +184,19 @@ fun StatsScreen(
                         val labelFn: (ChartBucket) -> String = { b ->
                             val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
                             when (state.period) {
-                                StatsPeriod.WEEK  -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
-                                StatsPeriod.MONTH -> b.labelDate.substring(8)   // day-of-month
+                                StatsPeriod.WEEK -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
+                                StatsPeriod.MONTH -> b.labelDate.substring(8) // day-of-month
                                 // YEAR uses one bucket per calendar month, so the
                                 // month name of the bucket's first day is the bar's
                                 // natural label (one label per month).
-                                StatsPeriod.YEAR  -> d.month.getDisplayName(TextStyle.SHORT, locale)
+                                StatsPeriod.YEAR -> d.month.getDisplayName(TextStyle.SHORT, locale)
                             }
                         }
                         val isYear = state.period == StatsPeriod.YEAR
                         AlcoholBarChart(
-                            buckets    = state.chartBuckets,
+                            buckets = state.chartBuckets,
                             limitGrams = state.limitInfo.limitGrams,
-                            labelFn    = labelFn,
+                            labelFn = labelFn,
                             // No daily-limit line in the YEAR view: its monthly
                             // per-day averages are not compared against a daily limit.
                             showLimitLine = !isYear,
@@ -204,7 +204,7 @@ fun StatsScreen(
                             // axes the user asked for: WEEK (the day's grams) and YEAR
                             // (the month's grams-per-day). The dense ~30-bar MONTH
                             // view stays unlabelled to avoid clutter.
-                            showBarValues = state.period == StatsPeriod.WEEK || isYear
+                            showBarValues = state.period == StatsPeriod.WEEK || isYear,
                         )
                     }
                 }
@@ -227,25 +227,25 @@ fun StatsScreen(
                             // used by delete icons and traffic-light bullets, instead
                             // of the softer Material `error` colour, so every "over
                             // limit" cue in the app looks identical.
-                            valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor()
+                            valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor(),
                         )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.days_over_weekly_limit),
                             state.daysOverWeeklyLimit.toString(),
-                            valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor()
+                            valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor(),
                         )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.days_over_drink_day_limit),
                             state.daysOverDrinkDayLimit.toString(),
-                            valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor()
+                            valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor(),
                         )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.abstinent_days),
                             state.abstinentDays.toString(),
-                            valueColor = if (state.abstinentDays > 0) successColor() else MaterialTheme.colorScheme.onSurface
+                            valueColor = if (state.abstinentDays > 0) successColor() else MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -255,20 +255,22 @@ fun StatsScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(stringResource(R.string.streak_trend),
+                        Text(
+                            stringResource(R.string.streak_trend),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary)
+                            color = MaterialTheme.colorScheme.primary,
+                        )
                         HorizontalDivider()
                         StatRow(
                             stringResource(R.string.current_streak),
                             pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
-                            valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface
+                            valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
                         )
                         HorizontalDivider()
                         StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
                         HorizontalDivider()
                         val trendText = when (state.trend) {
-                            Trend.UP   -> "+${state.trendPercent.fmt0(locale)} % ↑"
+                            Trend.UP -> "+${state.trendPercent.fmt0(locale)} % ↑"
                             Trend.DOWN -> "${state.trendPercent.fmt0(locale)} % ↓"
                             Trend.FLAT -> "–"
                         }
@@ -278,10 +280,10 @@ fun StatsScreen(
                             valueColor = when (state.trend) {
                                 // A rising per-day average is a "bad" signal, shown in
                                 // the same saturated danger red as the over-limit stats.
-                                Trend.UP   -> dangerRedColor()
+                                Trend.UP -> dangerRedColor()
                                 Trend.DOWN -> successColor()
                                 Trend.FLAT -> MaterialTheme.colorScheme.onSurface
-                            }
+                            },
                         )
                     }
                 }
@@ -297,14 +299,14 @@ fun StatsScreen(
                             Text(
                                 stringResource(R.string.stats_time_of_day),
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                             Spacer(Modifier.height(12.dp))
                             ValueBarChart(
                                 // Eight 3-hour buckets; average grams/day printed above.
-                                values     = state.hourBucketAverages,
-                                labelFor   = { b -> "${b * 3}\u2013${b * 3 + 3}" },
-                                showValues = true
+                                values = state.hourBucketAverages,
+                                labelFor = { b -> "${b * 3}\u2013${b * 3 + 3}" },
+                                showValues = true,
                             )
                         }
                     }
@@ -321,7 +323,7 @@ fun StatsScreen(
                             Text(
                                 stringResource(R.string.stats_weekday),
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                             Spacer(Modifier.height(12.dp))
                             // Short weekday names for the axis, in the same rotated
@@ -332,9 +334,9 @@ fun StatsScreen(
                             }
                             ValueBarChart(
                                 // null (weekday never a drink day) → 0.0 ⇒ empty slot.
-                                values     = state.weekdayAverages.map { it ?: 0.0 },
-                                labelFor   = { i -> weekdayLabels.getOrElse(i) { "" } },
-                                showValues = true
+                                values = state.weekdayAverages.map { it ?: 0.0 },
+                                labelFor = { i -> weekdayLabels.getOrElse(i) { "" } },
+                                showValues = true,
                             )
                         }
                     }
@@ -349,7 +351,7 @@ fun StatsScreen(
                             Text(
                                 stringResource(R.string.stats_category_breakdown),
                                 style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                             Spacer(Modifier.height(12.dp))
                             CategoryDonutChart(data = state.categoryBreakdown)
@@ -368,13 +370,13 @@ fun StatsScreen(
                         Text(
                             stringResource(R.string.export),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             stringResource(R.string.export_desc),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.height(8.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -398,23 +400,23 @@ fun StatsScreen(
     if (showCsvRangeDialog) {
         ExportDateRangeDialog(
             initialFrom = state.statsFromDate.ifEmpty { exportToday },
-            initialTo   = exportToday,
-            onConfirm   = { from, to ->
+            initialTo = exportToday,
+            onConfirm = { from, to ->
                 vm.exportCsv(from, to)
                 showCsvRangeDialog = false
             },
-            onDismiss   = { showCsvRangeDialog = false }
+            onDismiss = { showCsvRangeDialog = false },
         )
     }
     if (showPdfRangeDialog) {
         ExportDateRangeDialog(
             initialFrom = state.statsFromDate.ifEmpty { exportToday },
-            initialTo   = exportToday,
-            onConfirm   = { from, to ->
+            initialTo = exportToday,
+            onConfirm = { from, to ->
                 vm.exportPdf(from, to)
                 showPdfRangeDialog = false
             },
-            onDismiss   = { showPdfRangeDialog = false }
+            onDismiss = { showPdfRangeDialog = false },
         )
     }
 }
@@ -441,18 +443,18 @@ private fun StatRow(label: String, value: String, valueColor: Color = MaterialTh
     Row(Modifier.fillMaxWidth()) {
         Text(
             label,
-            style    = MaterialTheme.typography.bodyMedium,
-            color    = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
         )
         Text(
             value,
-            style      = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
-            color      = valueColor,
-            softWrap   = false,
-            maxLines   = 1,
-            modifier   = Modifier.padding(start = 12.dp)
+            color = valueColor,
+            softWrap = false,
+            maxLines = 1,
+            modifier = Modifier.padding(start = 12.dp),
         )
     }
 }

@@ -42,22 +42,31 @@ interface IAppPreferences {
 
     /** Persists the UI [mode] (light / dark / follow system). */
     suspend fun setTheme(mode: ThemeMode)
+
     /** Persists the daily pure-alcohol limit [g] in grams (implementation clamps the range). */
     suspend fun setDailyLimit(g: Double)
+
     /** Persists the weekly pure-alcohol limit [g] in grams (implementation clamps the range). */
     suspend fun setWeeklyLimit(g: Double)
+
     /** Persists the maximum number of drink days per week [days] (clamped to 1–7). */
     suspend fun setMaxDrinkDaysPerWeek(days: Int)
+
     /** Enables/disables the biometric app lock. */
     suspend fun setBiometric(v: Boolean)
+
     /** Clears or re-sets [WindowManager.LayoutParams.FLAG_SECURE] for the app window. */
     suspend fun setAllowScreenshots(v: Boolean)
+
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
     suspend fun setLanguage(lang: String)
+
     /** Persists the body weight [kg] (implementation clamps the range). */
     suspend fun setWeightKg(kg: Double)
+
     /** Persists the day-change [hour]/[minute] atomically (single transaction). */
     suspend fun setDayChangeTime(hour: Int, minute: Int)
+
     /** Persists the statistics start date [date] ("YYYY-MM-DD"). */
     suspend fun setStatsFromDate(date: String)
 }

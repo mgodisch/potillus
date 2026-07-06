@@ -131,7 +131,7 @@ class ReportExportTest {
         // GUARD: only the explicit `make report-pdfs` invocation sets this.
         assumeTrue(
             "ReportExportTest runs only when invoked with -e reportExport true",
-            InstrumentationRegistry.getArguments().getString("reportExport")?.toBoolean() == true
+            InstrumentationRegistry.getArguments().getString("reportExport")?.toBoolean() == true,
         )
 
         // Pin the report's logical "today" to the demo fixture's last day so the
@@ -140,7 +140,7 @@ class ReportExportTest {
         // tearDown(). See ScreenshotClock.
         ScreenshotClock.pin()
 
-        app    = ApplicationProvider.getApplicationContext()
+        app = ApplicationProvider.getApplicationContext()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val json = InstrumentationRegistry.getInstrumentation()
@@ -191,9 +191,9 @@ class ReportExportTest {
         // number/date formatting are deterministic.
         val html = runBlocking {
             val settings = app.appPreferences.settingsFlow.first()
-            val entries  = app.entryRepository.getInRange(RANGE_FROM, RANGE_TO)
+            val entries = app.entryRepository.getInRange(RANGE_FROM, RANGE_TO)
             check(entries.isNotEmpty()) { "Demo fixture produced no entries for '$loc'." }
-            val drinks   = app.drinkRepository.drinks.first()
+            val drinks = app.drinkRepository.drinks.first()
             PdfReportBuilder.buildHtml(ctx, entries, drinks, settings)
         }
 
@@ -255,7 +255,7 @@ class ReportExportTest {
      * runtime). Mirrors ScreenshotTest.localizedContext.
      */
     private fun localizedContext(): Context {
-        val base   = ApplicationProvider.getApplicationContext<Context>()
+        val base = ApplicationProvider.getApplicationContext<Context>()
         val config = Configuration(base.resources.configuration)
         config.setLocale(Locale.forLanguageTag(reportLocaleTag()))
         return base.createConfigurationContext(config)
@@ -267,13 +267,15 @@ class ReportExportTest {
 
         /** Wide date window so getInRange returns the ENTIRE demo history. */
         const val RANGE_FROM = "0001-01-01"
-        const val RANGE_TO   = "9999-12-31"
+        const val RANGE_TO = "9999-12-31"
 
         // ── Timing constants ──────────────────────────────────────────────────
         /** Preset-prepopulation await guard (matches ScreenshotTest). */
         const val READY_TIMEOUT_MS = 15_000L
+
         /** How long to wait for the print dialog to take over the screen. */
         const val DIALOG_APPEAR_TIMEOUT_MS = 20_000L
+
         /** How long the human may take per locale in the dialog (no time pressure). */
         const val HUMAN_TIMEOUT_MS = 300_000L
     }

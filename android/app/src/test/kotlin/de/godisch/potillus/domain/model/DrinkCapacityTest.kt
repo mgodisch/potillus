@@ -38,7 +38,7 @@ class DrinkCapacityTest {
         weeklyTotalGrams = 50.0,
         weeklyLimitGrams = 100.0,
         drinkDaysThisWeek = 2,
-        maxDrinkDaysPerWeek = 5
+        maxDrinkDaysPerWeek = 5,
     )
 
     @Test fun `todayIsDrinkDay is true when grams above zero`() {

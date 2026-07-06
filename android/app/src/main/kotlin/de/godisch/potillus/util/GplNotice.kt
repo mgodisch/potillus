@@ -66,11 +66,11 @@ object GplNotice {
         "Public License for more details.",
         "",
         "You should have received a copy of the GNU General Public License along",
-        "with this program. If not, see <https://www.gnu.org/licenses/>."
+        "with this program. If not, see <https://www.gnu.org/licenses/>.",
     )
 
     /** One-line condensed notice for the PDF report footer. */
     const val PDF_FOOTER: String =
         "Libellus Potionis \u00A9 2026 Martin A. Godisch \u00B7 free software under the " +
-        "GNU GPL v3, WITHOUT ANY WARRANTY \u00B7 https://www.gnu.org/licenses/"
+            "GNU GPL v3, WITHOUT ANY WARRANTY \u00B7 https://www.gnu.org/licenses/"
 }

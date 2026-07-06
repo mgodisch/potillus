@@ -78,7 +78,7 @@ object CsvExporter {
      * @param entries  All consumption entries in chronological order.
      * @param drinks   Full drink catalogue (used to look up the category name
      *                 for each entry's [ConsumptionEntry.drinkId]).
-     * @return         [ExportResult] with filename and MediaStore URI on success,
+     * @return [ExportResult] with filename and MediaStore URI on success,
      *                 `null` on any I/O error (the incomplete MediaStore entry is
      *                 deleted so no corrupt file remains in Downloads).
      */
@@ -86,7 +86,7 @@ object CsvExporter {
     fun export(
         context: Context,
         entries: List<ConsumptionEntry>,
-        drinks: List<DrinkDefinition>
+        drinks: List<DrinkDefinition>,
     ): ExportResult? {
         val fileName = "potillus_export_${FILE_FMT.format(Instant.now())}.csv"
 
@@ -102,7 +102,7 @@ object CsvExporter {
             context.getString(R.string.csv_col_volume_ml),
             context.getString(R.string.csv_col_alcohol_pct),
             context.getString(R.string.csv_col_grams),
-            context.getString(R.string.csv_col_note)
+            context.getString(R.string.csv_col_note),
         )
 
         val csv = buildCsv(headerCells, entries, drinks)
@@ -114,7 +114,7 @@ object CsvExporter {
         }
         val resolver = context.contentResolver
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-            ?: return null   // MediaStore declined to create the entry
+            ?: return null // MediaStore declined to create the entry
 
         return try {
             // A null stream is a FAILURE, not a success with no content — see the
@@ -167,23 +167,23 @@ object CsvExporter {
      * @param headerCells The localised column captions, in column order.
      * @param entries     The consumption entries to serialise (one row each).
      * @param drinks      The drink catalogue, used to resolve each entry's category.
-     * @return            The complete CSV text, CRLF-terminated per RFC 4180.
+     * @return The complete CSV text, CRLF-terminated per RFC 4180.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun buildCsv(
         headerCells: List<String>,
         entries: List<ConsumptionEntry>,
-        drinks: List<DrinkDefinition>
+        drinks: List<DrinkDefinition>,
     ): String {
         // Build a map from drink ID → definition for O(1) category lookups.
         val drinkMap = drinks.associateBy { it.id }
-        val timeFmt  = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+        val timeFmt = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
 
         // Headers are escaped too (see step 2 in the KDoc above).
         val header = headerCells.joinToString(",") { escapeField(it) }
 
         val rows = entries.map { e ->
-            val instant  = Instant.ofEpochMilli(e.timestampMillis)
+            val instant = Instant.ofEpochMilli(e.timestampMillis)
             // Category falls back to "OTHER" for entries whose drink was edited
             // or if a future backup format includes an unknown category.
             val category = drinkMap[e.drinkId]?.category?.name ?: "OTHER"
@@ -198,7 +198,7 @@ object CsvExporter {
                 e.alcoholPercent.toString(),
                 // Locale.ROOT forces a '.' decimal separator (see step 1 above).
                 String.format(Locale.ROOT, "%.2f", e.gramsAlcohol),
-                escapeField(e.note)
+                escapeField(e.note),
             ).joinToString(",")
         }
 
@@ -241,7 +241,7 @@ object CsvExporter {
      * can verify the sanitisation directly without an Android [Context].
      *
      * @param raw  The unsanitised field value (e.g. a drink name or note).
-     * @return     A CSV-safe representation of [raw].
+     * @return A CSV-safe representation of [raw].
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun escapeField(raw: String): String = rfc4180Quote(neutralizeFormula(raw))
@@ -258,8 +258,7 @@ object CsvExporter {
      * Prepends a single quote to [raw] iff its first character could trigger
      * formula evaluation. Empty strings are returned unchanged (no first char).
      */
-    private fun neutralizeFormula(raw: String): String =
-        if (raw.isNotEmpty() && raw[0] in FORMULA_TRIGGERS) "'$raw" else raw
+    private fun neutralizeFormula(raw: String): String = if (raw.isNotEmpty() && raw[0] in FORMULA_TRIGGERS) "'$raw" else raw
 
     /**
      * Applies RFC 4180 quoting to [value] if it contains a comma, double-quote,
@@ -272,9 +271,13 @@ object CsvExporter {
      * formula trigger and is guarded by [neutralizeFormula] first; this covers a
      * CR anywhere in the field.)
      */
-    private fun rfc4180Quote(value: String): String =
-        if (value.contains(',') || value.contains('"') ||
-            value.contains('\n') || value.contains('\r')) {
-            "\"${value.replace("\"", "\"\"")}\""
-        } else value
+    private fun rfc4180Quote(value: String): String = if (value.contains(',') ||
+        value.contains('"') ||
+        value.contains('\n') ||
+        value.contains('\r')
+    ) {
+        "\"${value.replace("\"", "\"\"")}\""
+    } else {
+        value
+    }
 }

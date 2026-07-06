@@ -42,8 +42,8 @@ package de.godisch.potillus.ui.screen
 // =============================================================================
 
 import app.cash.turbine.test
-import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeDrinkRepository
@@ -60,7 +60,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.time.YearMonth
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CalendarViewModelTest {
@@ -69,7 +68,7 @@ class CalendarViewModelTest {
 
     private lateinit var entryRepo: FakeEntryRepository
     private lateinit var drinkRepo: FakeDrinkRepository
-    private lateinit var prefs:     FakeAppPreferences
+    private lateinit var prefs: FakeAppPreferences
 
     /** Creates a new ViewModel wired to the current fake dependencies. */
     private fun makeVm() = CalendarViewModel(entryRepo, drinkRepo, prefs)
@@ -78,7 +77,7 @@ class CalendarViewModelTest {
         Dispatchers.setMain(dispatcher)
         entryRepo = FakeEntryRepository()
         drinkRepo = FakeDrinkRepository()
-        prefs     = FakeAppPreferences(AppSettings(dayChangeHour = 4, dayChangeMinute = 0))
+        prefs = FakeAppPreferences(AppSettings(dayChangeHour = 4, dayChangeMinute = 0))
     }
 
     @After fun tearDown() = Dispatchers.resetMain()
@@ -96,7 +95,7 @@ class CalendarViewModelTest {
      */
     @Test fun `initial state pre-selects logical today with empty entries`() = runTest {
         val vm = makeVm()
-        val today = DayResolver.today(4, 0)   // matches the day-change time in setUp
+        val today = DayResolver.today(4, 0) // matches the day-change time in setUp
         vm.uiState.test {
             var state = awaitItem()
             while (state.selectedDate == null) state = awaitItem()
@@ -120,14 +119,14 @@ class CalendarViewModelTest {
         vm.uiState.test {
             assertEquals(CalendarViewMode.MONTH, awaitItem().viewMode)
 
-            vm.toggleViewMode()   // MONTH -> YEAR
+            vm.toggleViewMode() // MONTH -> YEAR
             // The async "today" pre-selection can interleave an extra MONTH
             // emission here, so drain until the view mode actually flips.
             var s = awaitItem()
             while (s.viewMode != CalendarViewMode.YEAR) s = awaitItem()
             assertEquals(CalendarViewMode.YEAR, s.viewMode)
 
-            vm.toggleViewMode()   // YEAR -> MONTH
+            vm.toggleViewMode() // YEAR -> MONTH
             s = awaitItem()
             while (s.viewMode != CalendarViewMode.MONTH) s = awaitItem()
             assertEquals(CalendarViewMode.MONTH, s.viewMode)
@@ -180,7 +179,7 @@ class CalendarViewModelTest {
      */
     @Test fun `nextPeriod in YEAR mode advances by one year`() = runTest {
         val vm = makeVm()
-        vm.toggleViewMode()   // MONTH -> YEAR (applied before collection)
+        vm.toggleViewMode() // MONTH -> YEAR (applied before collection)
         vm.uiState.test {
             // uiState is a conflated StateFlow; currentYear is identical in every
             // pre-navigation emission (it defaults to the real current year), so
@@ -211,7 +210,7 @@ class CalendarViewModelTest {
     @Test fun `selectDate updates selectedDate in uiState`() = runTest {
         val vm = makeVm()
         vm.uiState.test {
-            awaitItem()   // initial (selectedDate = null)
+            awaitItem() // initial (selectedDate = null)
 
             vm.selectDate("2026-03-15")
             assertEquals("2026-03-15", awaitItem().selectedDate)
@@ -239,11 +238,11 @@ class CalendarViewModelTest {
     @Test fun `addEntry with selected date stores entry on correct logical date`() = runTest {
         val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
         drinkRepo = FakeDrinkRepository(listOf(drink))
-        val vm    = makeVm()
+        val vm = makeVm()
 
         vm.selectDate("2026-01-10")
         vm.uiState.test {
-            awaitItem()   // initial state with selected date
+            awaitItem() // initial state with selected date
 
             val ts = System.currentTimeMillis()
             vm.addEntry(drink, 500, ts, note = "")
@@ -262,7 +261,7 @@ class CalendarViewModelTest {
     @Test fun `addEntry with invalid volumeMl is rejected`() = runTest {
         val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
         drinkRepo = FakeDrinkRepository(listOf(drink))
-        val vm    = makeVm()
+        val vm = makeVm()
 
         vm.selectDate("2026-01-10")
         vm.addEntry(drink, volumeMl = 0, timestampMillis = System.currentTimeMillis(), note = "")
@@ -277,7 +276,7 @@ class CalendarViewModelTest {
     @Test fun `deleteEntry removes entry from repository`() = runTest {
         val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
         drinkRepo = FakeDrinkRepository(listOf(drink))
-        val vm    = makeVm()
+        val vm = makeVm()
 
         vm.selectDate("2026-01-10")
         val ts = System.currentTimeMillis()

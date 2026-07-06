@@ -62,7 +62,7 @@ import de.godisch.potillus.domain.model.DrinkDefinition
 class BackupRepository(
     private val entryDao: EntryDao,
     private val drinkDao: DrinkDao,
-    private val db:       AppDatabase
+    private val db: AppDatabase,
 ) : IBackupRepository {
 
     /**
@@ -72,11 +72,11 @@ class BackupRepository(
      *
      * @param backupDrinks  Drinks from the backup file.
      * @param backupEntries Entries from the backup file.
-     * @return              [ImportStats] with the number of imported entries (skipped = 0).
+     * @return [ImportStats] with the number of imported entries (skipped = 0).
      */
     override suspend fun importReplace(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats {
         var imported = 0
         db.withTransaction {
@@ -123,13 +123,14 @@ class BackupRepository(
      *
      * @param backupDrinks  Drinks from the backup file.
      * @param backupEntries Entries from the backup file.
-     * @return              [ImportStats] with the imported and skipped counts.
+     * @return [ImportStats] with the imported and skipped counts.
      */
     override suspend fun importMerge(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats {
-        var imported = 0; var skipped = 0
+        var imported = 0
+        var skipped = 0
         db.withTransaction {
             // Build the name → id map INSIDE the transaction (mirroring
             // importReplace), so this read is part of the same atomic unit as the
@@ -181,8 +182,8 @@ class BackupRepository(
      * Must be called inside a `withTransaction` block.
      */
     private suspend fun buildIdMap(
-        backupDrinks:  List<DrinkDefinition>,
-        existingByName: Map<String, Long>
+        backupDrinks: List<DrinkDefinition>,
+        existingByName: Map<String, Long>,
     ): Map<Long, Long> {
         val idMap = mutableMapOf<Long, Long>()
         // Mutable copy of the existing name → id snapshot, grown as new drinks are

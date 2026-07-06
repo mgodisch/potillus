@@ -60,7 +60,7 @@ class ChartBucketingTest {
     @Test fun `daily fills gaps with abstinent zero buckets`() {
         val summaries = listOf(
             DaySummary("2026-01-01", 10.0, 1),
-            DaySummary("2026-01-03", 30.0, 2)
+            DaySummary("2026-01-03", 30.0, 2),
         )
         val result = ChartBucketing.bucketize(summaries, "2026-01-01", "2026-01-03", ChartGranularity.DAILY)
 
@@ -103,7 +103,7 @@ class ChartBucketingTest {
         val result = ChartBucketing.bucketize(summaries, "2026-01-01", "2026-01-03", ChartGranularity.WEEKLY)
 
         assertEquals(1, result.size)
-        assertEquals(10.0, result[0].avgPerDay, 1e-9)   // 30 g / 3 days
+        assertEquals(10.0, result[0].avgPerDay, 1e-9) // 30 g / 3 days
     }
 
     // ── bucketize: MONTHLY ────────────────────────────────────────────────────
@@ -135,18 +135,24 @@ class ChartBucketingTest {
         val summaries = listOf(
             DaySummary("2026-06-05", 200.0, 1),
             DaySummary("2026-06-12", 150.0, 1),
-            DaySummary("2026-06-20", 110.0, 1)
+            DaySummary("2026-06-20", 110.0, 1),
         )
         val result = ChartBucketing.bucketize(
-            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY,
-            inProgressDay = "2026-06-24"
+            summaries,
+            "2026-06-01",
+            "2026-06-24",
+            ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24",
         )
 
         assertEquals(1, result.size)
         assertEquals(460.0 / 23.0, result[0].avgPerDay, 1e-9)
         // Without the in-progress hint the same data divides by all 24 days.
         val naive = ChartBucketing.bucketize(
-            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY
+            summaries,
+            "2026-06-01",
+            "2026-06-24",
+            ChartGranularity.MONTHLY,
         )
         assertEquals(460.0 / 24.0, naive[0].avgPerDay, 1e-9)
     }
@@ -157,11 +163,14 @@ class ChartBucketingTest {
         val summaries = listOf(
             DaySummary("2026-06-05", 200.0, 1),
             DaySummary("2026-06-12", 150.0, 1),
-            DaySummary("2026-06-24", 110.0, 1)
+            DaySummary("2026-06-24", 110.0, 1),
         )
         val result = ChartBucketing.bucketize(
-            summaries, "2026-06-01", "2026-06-24", ChartGranularity.MONTHLY,
-            inProgressDay = "2026-06-24"
+            summaries,
+            "2026-06-01",
+            "2026-06-24",
+            ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24",
         )
 
         assertEquals(460.0 / 24.0, result[0].avgPerDay, 1e-9)
@@ -178,11 +187,11 @@ class ChartBucketingTest {
         // WEEK/MONTH views use DAILY buckets, so today is its own bucket. With no
         // drink logged yet its grams are 0, but it is still open — no green tick.
         val result = ChartBucketing.bucketize(
-            summaries     = emptyList(),
-            from          = "2026-06-24",
-            to            = "2026-06-24",
-            granularity   = ChartGranularity.DAILY,
-            inProgressDay = "2026-06-24"
+            summaries = emptyList(),
+            from = "2026-06-24",
+            to = "2026-06-24",
+            granularity = ChartGranularity.DAILY,
+            inProgressDay = "2026-06-24",
         )
 
         assertEquals(1, result.size)
@@ -197,15 +206,15 @@ class ChartBucketingTest {
         // June 23 is empty and lies before the in-progress 24th, so it is a
         // completed abstinent day.
         val result = ChartBucketing.bucketize(
-            summaries     = emptyList(),
-            from          = "2026-06-23",
-            to            = "2026-06-24",
-            granularity   = ChartGranularity.DAILY,
-            inProgressDay = "2026-06-24"
+            summaries = emptyList(),
+            from = "2026-06-23",
+            to = "2026-06-24",
+            granularity = ChartGranularity.DAILY,
+            inProgressDay = "2026-06-24",
         )
 
         assertEquals(2, result.size)
-        assertTrue("a finished dry day stays abstinent", result[0].isAbstinent)   // 23rd
+        assertTrue("a finished dry day stays abstinent", result[0].isAbstinent) // 23rd
         assertFalse("the open current day is not abstinent", result[1].isAbstinent) // 24th
     }
 
@@ -215,11 +224,11 @@ class ChartBucketingTest {
         // Because the month still holds the open day it is not yet a completed
         // period, so Variante B withholds the tick even though nothing was drunk.
         val result = ChartBucketing.bucketize(
-            summaries     = emptyList(),
-            from          = "2026-06-01",
-            to            = "2026-06-24",
-            granularity   = ChartGranularity.MONTHLY,
-            inProgressDay = "2026-06-24"
+            summaries = emptyList(),
+            from = "2026-06-01",
+            to = "2026-06-24",
+            granularity = ChartGranularity.MONTHLY,
+            inProgressDay = "2026-06-24",
         )
 
         assertEquals(1, result.size)
@@ -230,10 +239,10 @@ class ChartBucketingTest {
         // The PDF export path (inProgressDay = null) and any month strictly in the
         // past: an all-zero month is a finished abstinent period and keeps its tick.
         val result = ChartBucketing.bucketize(
-            summaries   = emptyList(),
-            from        = "2026-05-01",
-            to          = "2026-05-31",
-            granularity = ChartGranularity.MONTHLY
+            summaries = emptyList(),
+            from = "2026-05-01",
+            to = "2026-05-31",
+            granularity = ChartGranularity.MONTHLY,
             // inProgressDay omitted → null → historical semantics
         )
 

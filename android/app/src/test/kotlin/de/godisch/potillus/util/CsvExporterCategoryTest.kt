@@ -21,8 +21,8 @@
  */
 package de.godisch.potillus.util
 
-import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.ConsumptionEntry
+import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -40,7 +40,7 @@ class CsvExporterCategoryTest {
             name = "Lager",
             volumeMl = 500,
             alcoholPercent = 5.0,
-            category = DrinkCategory.BEER
+            category = DrinkCategory.BEER,
         )
         val entry = ConsumptionEntry(
             drinkId = 7,
@@ -49,12 +49,12 @@ class CsvExporterCategoryTest {
             alcoholPercent = 5.0,
             gramsAlcohol = 20.0,
             timestampMillis = 1_700_000_000_000L,
-            logicalDate = "2026-01-01"
+            logicalDate = "2026-01-01",
         )
         val csv = CsvExporter.buildCsv(
             listOf("d", "t", "drink", "cat", "v", "a", "g", "n"),
             listOf(entry),
-            listOf(drink)
+            listOf(drink),
         )
         assertTrue("matching drink category BEER must appear", csv.contains("BEER"))
     }

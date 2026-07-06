@@ -37,21 +37,21 @@ class DayResolverAbstinenceTest {
     @Test fun `no history counts the statsFrom to today span`() {
         assertEquals(
             4,
-            DayResolver.computeLongestAbstinence(emptyList(), today = "2026-01-05", statsFrom = "2026-01-01")
+            DayResolver.computeLongestAbstinence(emptyList(), today = "2026-01-05", statsFrom = "2026-01-01"),
         )
     }
 
     @Test fun `initial gap before the first drink is counted`() {
         assertEquals(
             9,
-            DayResolver.computeLongestAbstinence(listOf("2026-01-10"), statsFrom = "2026-01-01")
+            DayResolver.computeLongestAbstinence(listOf("2026-01-10"), statsFrom = "2026-01-01"),
         )
     }
 
     @Test fun `tail gap after the last drink up to today is counted`() {
         assertEquals(
             4,
-            DayResolver.computeLongestAbstinence(listOf("2026-01-10"), today = "2026-01-15")
+            DayResolver.computeLongestAbstinence(listOf("2026-01-10"), today = "2026-01-15"),
         )
     }
 }

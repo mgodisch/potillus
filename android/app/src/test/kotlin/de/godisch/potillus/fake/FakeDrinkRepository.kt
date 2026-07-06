@@ -29,13 +29,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 // See FakeEntryRepository.kt for the rationale behind Fake vs Mock.
 
 class FakeDrinkRepository(
-    initialDrinks: List<DrinkDefinition> = emptyList()
+    initialDrinks: List<DrinkDefinition> = emptyList(),
 ) : IDrinkRepository {
 
     private val _drinks = MutableStateFlow(initialDrinks)
     override val drinks: Flow<List<DrinkDefinition>> = _drinks
 
-    private var nextId    = (initialDrinks.maxOfOrNull { it.id } ?: 0L) + 1
+    private var nextId = (initialDrinks.maxOfOrNull { it.id } ?: 0L) + 1
 
     /**
      * Configures how many consumption entries each drink ID has.
@@ -59,8 +59,7 @@ class FakeDrinkRepository(
         _drinks.value = _drinks.value.filter { it.id != drink.id }
     }
 
-    override suspend fun countEntriesForDrink(drinkId: Long): Int =
-        entryCounts[drinkId] ?: 0
+    override suspend fun countEntriesForDrink(drinkId: Long): Int = entryCounts[drinkId] ?: 0
 
     override suspend fun deleteUserCreatedDrinks() {
         _drinks.value = _drinks.value.filter { it.isPreset }

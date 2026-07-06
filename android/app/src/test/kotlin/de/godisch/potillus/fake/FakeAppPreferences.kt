@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.update
 // See FakeEntryRepository.kt for the rationale behind Fake vs Mock.
 
 class FakeAppPreferences(
-    initial: AppSettings = AppSettings()
+    initial: AppSettings = AppSettings(),
 ) : IAppPreferences {
 
     private val _settings = MutableStateFlow(initial)
@@ -42,18 +42,17 @@ class FakeAppPreferences(
 
     // ── IAppPreferences ──────────────────────────────────────────────────────
 
-    override suspend fun setTheme(mode: ThemeMode)   = _settings.update { it.copy(themeMode = mode) }
-    override suspend fun setBiometric(v: Boolean)     = _settings.update { it.copy(biometricEnabled = v) }
+    override suspend fun setTheme(mode: ThemeMode) = _settings.update { it.copy(themeMode = mode) }
+    override suspend fun setBiometric(v: Boolean) = _settings.update { it.copy(biometricEnabled = v) }
     override suspend fun setAllowScreenshots(v: Boolean) = _settings.update { it.copy(allowScreenshots = v) }
-    override suspend fun setLanguage(lang: String)    = _settings.update { it.copy(language = lang) }
+    override suspend fun setLanguage(lang: String) = _settings.update { it.copy(language = lang) }
     override suspend fun setStatsFromDate(date: String) = _settings.update { it.copy(statsFromDate = date) }
 
     // Mirror the coerceIn guards from AppPreferences so behaviour is consistent.
-    override suspend fun setDailyLimit(g: Double)          = _settings.update { it.copy(dailyLimitGrams = g.coerceIn(1.0, 500.0)) }
-    override suspend fun setWeeklyLimit(g: Double)         = _settings.update { it.copy(weeklyLimitGrams = g.coerceIn(1.0, 3500.0)) }
-    override suspend fun setWeightKg(kg: Double)           = _settings.update { it.copy(weightKg = kg.coerceIn(1.0, 500.0)) }
+    override suspend fun setDailyLimit(g: Double) = _settings.update { it.copy(dailyLimitGrams = g.coerceIn(1.0, 500.0)) }
+    override suspend fun setWeeklyLimit(g: Double) = _settings.update { it.copy(weeklyLimitGrams = g.coerceIn(1.0, 3500.0)) }
+    override suspend fun setWeightKg(kg: Double) = _settings.update { it.copy(weightKg = kg.coerceIn(1.0, 500.0)) }
     override suspend fun setMaxDrinkDaysPerWeek(days: Int) = _settings.update { it.copy(maxDrinkDaysPerWeek = days.coerceIn(1, 7)) }
 
-    override suspend fun setDayChangeTime(hour: Int, minute: Int) =
-        _settings.update { it.copy(dayChangeHour = hour, dayChangeMinute = minute) }
+    override suspend fun setDayChangeTime(hour: Int, minute: Int) = _settings.update { it.copy(dayChangeHour = hour, dayChangeMinute = minute) }
 }

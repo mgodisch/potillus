@@ -117,15 +117,15 @@ class EntryListItemUiTest {
 
     /** A representative entry reused across the test cases. */
     private val sampleEntry = ConsumptionEntry(
-        id              = 1L,
-        drinkId         = 10L,
-        drinkName       = "Pilsner",
-        volumeMl        = 500,
-        alcoholPercent  = 4.9,
-        gramsAlcohol    = 19.3,
+        id = 1L,
+        drinkId = 10L,
+        drinkName = "Pilsner",
+        volumeMl = 500,
+        alcoholPercent = 4.9,
+        gramsAlcohol = 19.3,
         timestampMillis = 1_700_000_000_000L,
-        logicalDate     = "2026-05-29",
-        note            = "after work"
+        logicalDate = "2026-05-29",
+        note = "after work",
     )
 
     /**

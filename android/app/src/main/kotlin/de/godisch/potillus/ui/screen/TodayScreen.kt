@@ -68,9 +68,9 @@ fun TodayScreen(
     onOpenHelp: () -> Unit = {},
     onOpenCopyright: () -> Unit = {},
     /** Locks the app immediately (overflow-menu "Lock app"). */
-    onLockApp: () -> Unit = {}
+    onLockApp: () -> Unit = {},
 ) {
-    val state  by vm.uiState.collectAsStateWithLifecycle()
+    val state by vm.uiState.collectAsStateWithLifecycle()
     val drinks by vm.drinks.collectAsStateWithLifecycle()
     val lastUsedDrink by vm.lastUsedDrink.collectAsStateWithLifecycle()
 
@@ -84,79 +84,82 @@ fun TodayScreen(
     // so saving `showAdd` alone would reopen the add dialog after a configuration
     // change with a lost pre-selection. Keeping all four un-saved means they reset
     // together — the dialog simply closes on recreation, with no inconsistent state.
-    var showAdd          by remember { mutableStateOf(false) }
+    var showAdd by remember { mutableStateOf(false) }
     var preSelectedDrink by remember { mutableStateOf<DrinkDefinition?>(null) }
-    var editEntry        by remember { mutableStateOf<ConsumptionEntry?>(null) }
-    var deleteEntry      by remember { mutableStateOf<ConsumptionEntry?>(null) }
+    var editEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
+    var deleteEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
 
     // Capacity snapshot for traffic-light indicators in AddEditEntryDialog
     val capacity = DrinkCapacity(
-        todayGrams          = state.totalGrams,
-        dailyLimitGrams     = state.limitInfo.limitGrams,
-        weeklyTotalGrams    = state.weeklyTotalGrams,
-        weeklyLimitGrams    = state.limitInfo.weeklyLimitGrams,
-        drinkDaysThisWeek   = state.drinkDaysThisWeek,
-        maxDrinkDaysPerWeek = state.limitInfo.maxDrinkDaysPerWeek
+        todayGrams = state.totalGrams,
+        dailyLimitGrams = state.limitInfo.limitGrams,
+        weeklyTotalGrams = state.weeklyTotalGrams,
+        weeklyLimitGrams = state.limitInfo.weeklyLimitGrams,
+        drinkDaysThisWeek = state.drinkDaysThisWeek,
+        maxDrinkDaysPerWeek = state.limitInfo.maxDrinkDaysPerWeek,
     )
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title  = { Text(stringResource(R.string.today)) },
+                title = { Text(stringResource(R.string.today)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 actions = {
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
-                        onOpenHelp     = onOpenHelp,
-                        onOpenCopyright  = onOpenCopyright,
-                        onLockApp      = onLockApp,
-                        tint           = MaterialTheme.colorScheme.onPrimary
+                        onOpenHelp = onOpenHelp,
+                        onOpenCopyright = onOpenCopyright,
+                        onLockApp = onLockApp,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
-                }
+                },
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick        = { preSelectedDrink = lastUsedDrink; showAdd = true },
+                onClick = {
+                    preSelectedDrink = lastUsedDrink
+                    showAdd = true
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor   = MaterialTheme.colorScheme.onPrimary
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_entry))
             }
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
-            contentPadding      = PaddingValues(16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier            = Modifier.fillMaxSize().padding(paddingValues)
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {
             // ── Daily summary card ────────────────────────────────────────────
             item {
                 Card(
-                    colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         // Row 1: captions — "Today's total" (left) vs "Ø <month>"
                         // (right, the current month's per-day average), mirrored
                         // across the card width.
                         Row(
-                            modifier              = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
                                 stringResource(R.string.total_today),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 stringResource(R.string.avg_of_month, state.currentMonthLabel),
                                 style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         Spacer(Modifier.height(4.dp))
@@ -164,36 +167,36 @@ fun TodayScreen(
                         // the month's per-day average. Both use the same headline
                         // figure + unit styling so the two values read as a pair.
                         Row(
-                            modifier              = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment     = Alignment.Bottom
+                            verticalAlignment = Alignment.Bottom,
                         ) {
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
                                     state.totalGrams.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     "g",
-                                    style    = MaterialTheme.typography.bodyMedium,
-                                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 4.dp)
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 4.dp),
                                 )
                             }
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
                                     state.monthlyAvgPerDay.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     stringResource(R.string.grams_per_day),
-                                    style    = MaterialTheme.typography.bodyMedium,
-                                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 4.dp)
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 4.dp),
                                 )
                                 // Trend vs. last month: ↓ green = fewer grams/day,
                                 // ↑ red = more. Nothing when equal (at 0.1 g) or when
@@ -208,11 +211,14 @@ fun TodayScreen(
                                         // size; only the weight differs. Using a larger style
                                         // here (e.g. titleMedium) misaligns the glyph because
                                         // Alignment.Bottom aligns bounding boxes, not baselines.
-                                        style      = MaterialTheme.typography.bodyMedium,
+                                        style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color      = if (state.monthTrend == Trend.DOWN) successColor()
-                                                     else dangerRedColor(),
-                                        modifier   = Modifier.padding(bottom = 4.dp)
+                                        color = if (state.monthTrend == Trend.DOWN) {
+                                            successColor()
+                                        } else {
+                                            dangerRedColor()
+                                        },
+                                        modifier = Modifier.padding(bottom = 4.dp),
                                     )
                                 }
                             }
@@ -227,27 +233,27 @@ fun TodayScreen(
                         LimitBar(
                             totalGrams = state.totalGrams,
                             limitGrams = state.limitInfo.limitGrams,
-                            caption    = stringResource(
+                            caption = stringResource(
                                 R.string.limit_caption_day,
-                                state.limitInfo.limitGrams.fmt0(locale)
-                            )
+                                state.limitInfo.limitGrams.fmt0(locale),
+                            ),
                         )
                         Spacer(Modifier.height(10.dp))
                         LimitBar(
                             totalGrams = state.weeklyTotalGrams,
                             limitGrams = state.limitInfo.weeklyLimitGrams,
-                            caption    = stringResource(
+                            caption = stringResource(
                                 R.string.limit_caption_week,
-                                state.limitInfo.weeklyLimitGrams.fmt0(locale)
+                                state.limitInfo.weeklyLimitGrams.fmt0(locale),
                             ),
-                            leftSuffix = if (state.weeklyRangeLabel.isNotEmpty()) "(${state.weeklyRangeLabel})" else ""
+                            leftSuffix = if (state.weeklyRangeLabel.isNotEmpty()) "(${state.weeklyRangeLabel})" else "",
                         )
                         // Drink-days bar: distinct drink days this week vs. the max.
                         Spacer(Modifier.height(10.dp))
                         DrinkDaysBar(
-                            drinkDays    = state.drinkDaysThisWeek,
+                            drinkDays = state.drinkDaysThisWeek,
                             maxDrinkDays = state.limitInfo.maxDrinkDaysPerWeek,
-                            weekLabel    = state.weeklyRangeLabel
+                            weekLabel = state.weeklyRangeLabel,
                         )
                         // BAC estimate (Widmark formula) – only shown when weight is configured
                         state.bacPermille?.let { bac ->
@@ -259,7 +265,7 @@ fun TodayScreen(
                                     Text(
                                         stringResource(R.string.bac_estimate),
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                     Text(
                                         "${bac.fmt2(locale)} ‰",
@@ -267,16 +273,16 @@ fun TodayScreen(
                                         color = when {
                                             bac >= 0.5 -> dangerRedColor()
                                             bac >= 0.3 -> warningColor()
-                                            else       -> successColor()
-                                        }
+                                            else -> successColor()
+                                        },
                                     )
                                 }
                                 Text(
                                     stringResource(R.string.bac_disclaimer),
-                                    style     = MaterialTheme.typography.labelSmall,
-                                    color     = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier  = Modifier.weight(1f),
-                                    textAlign = TextAlign.End
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.End,
                                 )
                             }
                         }
@@ -289,7 +295,10 @@ fun TodayScreen(
                 item {
                     FavoriteQuickBar(
                         favorites = state.favorites,
-                        onSelect  = { drink -> preSelectedDrink = drink; showAdd = true }
+                        onSelect = { drink ->
+                            preSelectedDrink = drink
+                            showAdd = true
+                        },
                     )
                 }
             }
@@ -298,7 +307,7 @@ fun TodayScreen(
                 Text(
                     stringResource(R.string.entries_today),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
@@ -306,10 +315,10 @@ fun TodayScreen(
                 item {
                     Text(
                         stringResource(R.string.no_entries_today),
-                        style     = MaterialTheme.typography.bodyMedium,
-                        color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
-                        modifier  = Modifier.fillMaxWidth().padding(vertical = 24.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     )
                 }
             } else {
@@ -317,9 +326,9 @@ fun TodayScreen(
                 // list: deletions remove one keyed row instead of rebinding all.
                 items(state.entries, key = { it.id }) { entry ->
                     EntryListItem(
-                        entry    = entry,
-                        onEdit   = { editEntry = entry },
-                        onDelete = { deleteEntry = entry }
+                        entry = entry,
+                        onEdit = { editEntry = entry },
+                        onDelete = { deleteEntry = entry },
                     )
                 }
             }
@@ -328,50 +337,59 @@ fun TodayScreen(
 
     if (showAdd) {
         AddEditEntryDialog(
-            entry            = null,
-            drinks           = drinks,
+            entry = null,
+            drinks = drinks,
             preSelectedDrink = preSelectedDrink,
-            capacity         = capacity,
-            onSave           = { drink, vol, ts, note ->
+            capacity = capacity,
+            onSave = { drink, vol, ts, note ->
                 vm.addEntry(drink, vol, ts, note)
-                showAdd = false; preSelectedDrink = null
+                showAdd = false
+                preSelectedDrink = null
             },
-            onDismiss = { showAdd = false; preSelectedDrink = null }
+            onDismiss = {
+                showAdd = false
+                preSelectedDrink = null
+            },
         )
     }
     editEntry?.let { entry ->
         AddEditEntryDialog(
-            entry    = entry,
-            drinks   = drinks,
+            entry = entry,
+            drinks = drinks,
             capacity = capacity,
-            onSave   = { drink, vol, ts, note ->
-                vm.updateEntry(entry.copy(
-                    drinkId         = drink.id,
-                    drinkName       = drink.name,
-                    volumeMl        = vol,
-                    alcoholPercent  = drink.alcoholPercent,
-                    gramsAlcohol    = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
-                    timestampMillis = ts,
-                    note            = note
-                ))
+            onSave = { drink, vol, ts, note ->
+                vm.updateEntry(
+                    entry.copy(
+                        drinkId = drink.id,
+                        drinkName = drink.name,
+                        volumeMl = vol,
+                        alcoholPercent = drink.alcoholPercent,
+                        gramsAlcohol = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
+                        timestampMillis = ts,
+                        note = note,
+                    ),
+                )
                 editEntry = null
             },
-            onDismiss = { editEntry = null }
+            onDismiss = { editEntry = null },
         )
     }
     deleteEntry?.let { entry ->
         AlertDialog(
             onDismissRequest = { deleteEntry = null },
-            title  = { Text(stringResource(R.string.delete)) },
-            text   = { Text(stringResource(R.string.delete_confirm, entry.drinkName)) },
+            title = { Text(stringResource(R.string.delete)) },
+            text = { Text(stringResource(R.string.delete_confirm, entry.drinkName)) },
             confirmButton = {
-                TextButton(onClick = { vm.deleteEntry(entry); deleteEntry = null }) {
+                TextButton(onClick = {
+                    vm.deleteEntry(entry)
+                    deleteEntry = null
+                }) {
                     Text(stringResource(R.string.delete), color = dangerRedColor())
                 }
             },
             dismissButton = {
                 TextButton(onClick = { deleteEntry = null }) { Text(stringResource(R.string.cancel)) }
-            }
+            },
         )
     }
 }

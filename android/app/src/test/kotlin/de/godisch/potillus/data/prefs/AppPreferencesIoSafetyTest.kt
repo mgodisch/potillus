@@ -24,15 +24,15 @@ package de.godisch.potillus.data.prefs
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.mutablePreferencesOf
-import java.io.IOException
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Test
+import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
-import org.junit.Test
 
 // =============================================================================
 // AppPreferencesIoSafetyTest – unit tests for recoverIoAsEmpty(...)
@@ -79,7 +79,7 @@ class AppPreferencesIoSafetyTest {
             flow {
                 emit(good)
                 throw IOException("read fault after first value")
-            }
+            },
         ).toList()
 
         assertEquals(2, emissions.size)

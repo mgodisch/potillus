@@ -49,9 +49,9 @@ class BackupManagerParseDefaultsTest {
         assertNull(result.error)
         assertEquals(1, result.drinks.size)
         val drink = result.drinks.first()
-        assertEquals(0L, drink.id)                        // id absent -> 0
-        assertFalse(drink.isPreset)                       // isPreset absent -> false
-        assertFalse(drink.isFavorite)                     // isFavorite absent -> false
+        assertEquals(0L, drink.id) // id absent -> 0
+        assertFalse(drink.isPreset) // isPreset absent -> false
+        assertFalse(drink.isFavorite) // isFavorite absent -> false
         assertEquals(DrinkCategory.OTHER, drink.category) // category absent -> OTHER
     }
 }

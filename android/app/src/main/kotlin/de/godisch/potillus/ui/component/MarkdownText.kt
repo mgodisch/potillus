@@ -36,9 +36,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 
 /**
@@ -91,12 +91,12 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                 firstLine.startsWith("### ") -> Text(
                     text = firstLine.removePrefix("### ").trim(),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                 )
                 firstLine.startsWith("## ") -> Text(
                     text = firstLine.removePrefix("## ").trim(),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
                 )
                 firstLine.startsWith("# ") -> Text(
                     text = firstLine.removePrefix("# ").trim(),
@@ -110,7 +110,7 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // "## Preamble" heading below it, which looks wrong. The
                     // leading h1 of a document gains a little top space too,
                     // which reads fine inside the scrolling, padded viewer.
-                    modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(top = 20.dp, bottom = 8.dp),
                 )
                 ORDERED_ITEM_RE.matches(firstLine.substringBefore('\n')) -> {
                     // An ordered list: render one row per item — the item number
@@ -125,11 +125,11 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                                 Text(
                                     text = "$number.",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(end = 8.dp)
+                                    modifier = Modifier.padding(end = 8.dp),
                                 )
                                 Text(
                                     text = renderInline(itemText),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
                                 )
                             }
                         }
@@ -144,7 +144,7 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // rendered as the literal characters "---". A standalone block
                     // whose whole content is the break marker becomes a divider.
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 )
                 else -> Text(
                     // Reflow: collapse the hard-wrapped source lines of this
@@ -154,7 +154,7 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // 12.dp leaves a clear blank-line gap between paragraphs (the
                     // source separates them with a blank line); a touch more than
                     // the previous 8.dp without being a full empty text line.
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 12.dp),
                 )
             }
         }
@@ -168,17 +168,17 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
 // entity table are out of scope; adding them here would be premature, and a
 // real HTML parser would be the right tool if the documents ever needed them.
 private val HTML_ENTITIES = mapOf(
-    "&amp;"  to "&",
-    "&lt;"   to "<",
-    "&gt;"   to ">",
+    "&amp;" to "&",
+    "&lt;" to "<",
+    "&gt;" to ">",
     "&quot;" to "\"",
     "&apos;" to "'",
     "&nbsp;" to "\u00A0",
     "&copy;" to "©",
-    "&reg;"  to "®",
+    "&reg;" to "®",
     "&trade;" to "™",
     "&mdash;" to "—",
-    "&sect;" to "§"
+    "&sect;" to "§",
 )
 
 /**
@@ -189,8 +189,7 @@ private val HTML_ENTITIES = mapOf(
  * an implementation detail of [renderInline].
  */
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal fun decodeHtmlEntities(text: String): String =
-    HTML_ENTITIES.entries.fold(text) { acc, (entity, ch) -> acc.replace(entity, ch) }
+internal fun decodeHtmlEntities(text: String): String = HTML_ENTITIES.entries.fold(text) { acc, (entity, ch) -> acc.replace(entity, ch) }
 
 // Matches the inline Markdown the documents use: a bold span **like this** OR a
 // link [visible text](https://target), whichever comes next. Group 1 captures a
@@ -234,10 +233,10 @@ private fun renderInline(text: String): AnnotatedString {
                         styles = TextLinkStyles(
                             style = SpanStyle(
                                 color = linkColor,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        )
-                    )
+                                textDecoration = TextDecoration.Underline,
+                            ),
+                        ),
+                    ),
                 ) {
                     append(match.groupValues[2])
                 }

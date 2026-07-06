@@ -266,8 +266,13 @@ unit-test: prereq
 	REPORT="app/build/reports/tests/testDebugUnitTest/index.html"
 	./gradlew testDebugUnitTest
 
+# Static analysis run as part of the default `debug` path (debug -> test -> lint):
+# ktlintCheck enforces the Kotlin coding style (it is otherwise only wired into
+# Gradle's `check`), and lintDebug runs Android lint. Both are build-breaking here,
+# so a style or lint regression fails the everyday build instead of slipping
+# through to release time.
 lint: prereq
-	./gradlew lintDebug
+	./gradlew ktlintCheck lintDebug
 
 test-device: prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)

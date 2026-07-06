@@ -85,7 +85,7 @@ interface IEntryRepository {
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        settings: AppSettings
+        settings: AppSettings,
     ): Long
 
     /**
@@ -97,7 +97,7 @@ interface IEntryRepository {
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        logicalDate: String
+        logicalDate: String,
     ): Long
 
     /** Updates [entry], recomputing derived values (grams, logicalDate) from [settings]. */

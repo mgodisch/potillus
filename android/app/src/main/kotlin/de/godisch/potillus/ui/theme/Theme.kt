@@ -55,22 +55,22 @@ import de.godisch.potillus.domain.model.ThemeMode
  * Roles not listed here fall back to Material 3's default dark-theme values.
  */
 private val NachtColors = darkColorScheme(
-    primary              = NachtPrimary,
-    onPrimary            = NachtOnPrimary,
-    primaryContainer     = NachtPrimaryContainer,
-    onPrimaryContainer   = NachtOnPrimaryContainer,
-    secondary            = NachtOnSurfaceVariant,
-    onSecondary          = NachtOnPrimary,
-    secondaryContainer   = NachtSurfaceVariant,
+    primary = NachtPrimary,
+    onPrimary = NachtOnPrimary,
+    primaryContainer = NachtPrimaryContainer,
+    onPrimaryContainer = NachtOnPrimaryContainer,
+    secondary = NachtOnSurfaceVariant,
+    onSecondary = NachtOnPrimary,
+    secondaryContainer = NachtSurfaceVariant,
     onSecondaryContainer = NachtOnSurface,
-    surface              = NachtSurface,
-    onSurface            = NachtOnSurface,
-    surfaceVariant       = NachtSurfaceVariant,
-    onSurfaceVariant     = NachtOnSurfaceVariant,
-    background           = NachtBackground,
-    onBackground         = NachtOnSurface,
-    outline              = NachtOutline,
-    error                = ErrorColorDark,   // lightened red passes WCAG AA on dark bg
+    surface = NachtSurface,
+    onSurface = NachtOnSurface,
+    surfaceVariant = NachtSurfaceVariant,
+    onSurfaceVariant = NachtOnSurfaceVariant,
+    background = NachtBackground,
+    onBackground = NachtOnSurface,
+    outline = NachtOutline,
+    error = ErrorColorDark, // lightened red passes WCAG AA on dark bg
 )
 
 /**
@@ -79,22 +79,22 @@ private val NachtColors = darkColorScheme(
  * Named after the slate-blue (Schieferblau) tint of the background.
  */
 private val SchieferColors = lightColorScheme(
-    primary              = SchieferPrimary,
-    onPrimary            = SchieferOnPrimary,
-    primaryContainer     = SchieferPrimaryContainer,
-    onPrimaryContainer   = SchieferOnPrimaryContainer,
-    secondary            = SchieferOnSurfaceVariant,
-    onSecondary          = SchieferOnPrimary,
-    secondaryContainer   = SchieferSurfaceVariant,
+    primary = SchieferPrimary,
+    onPrimary = SchieferOnPrimary,
+    primaryContainer = SchieferPrimaryContainer,
+    onPrimaryContainer = SchieferOnPrimaryContainer,
+    secondary = SchieferOnSurfaceVariant,
+    onSecondary = SchieferOnPrimary,
+    secondaryContainer = SchieferSurfaceVariant,
     onSecondaryContainer = SchieferOnSurface,
-    surface              = SchieferSurface,
-    onSurface            = SchieferOnSurface,
-    surfaceVariant       = SchieferSurfaceVariant,
-    onSurfaceVariant     = SchieferOnSurfaceVariant,
-    background           = SchieferBackground,
-    onBackground         = SchieferOnSurface,
-    outline              = SchieferOutline,
-    error                = ErrorColorLight,
+    surface = SchieferSurface,
+    onSurface = SchieferOnSurface,
+    surfaceVariant = SchieferSurfaceVariant,
+    onSurfaceVariant = SchieferOnSurfaceVariant,
+    background = SchieferBackground,
+    onBackground = SchieferOnSurface,
+    outline = SchieferOutline,
+    error = ErrorColorLight,
 )
 
 /**
@@ -114,18 +114,18 @@ private val SchieferColors = lightColorScheme(
 @Composable
 fun PotillusTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themeMode) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        ThemeMode.DAY    -> false
-        ThemeMode.NIGHT  -> true
+        ThemeMode.DAY -> false
+        ThemeMode.NIGHT -> true
     }
     val colorScheme = if (darkTheme) NachtColors else SchieferColors
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography  = AppTypography,
-        content     = content
+        typography = AppTypography,
+        content = content,
     )
 }

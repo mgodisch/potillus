@@ -69,7 +69,7 @@ class BackupRepositoryTest {
         val fake = FakeBackupRepository().also {
             it.replaceResult = ImportStats(imported = 3, skipped = 0)
         }
-        val drinks  = listOf(drink(1))
+        val drinks = listOf(drink(1))
         val entries = listOf(entry(1), entry(2), entry(3))
 
         val stats = fake.importReplace(drinks, entries)
@@ -86,7 +86,7 @@ class BackupRepositoryTest {
         val fake = FakeBackupRepository().also {
             it.mergeResult = ImportStats(imported = 2, skipped = 1)
         }
-        val drinks  = listOf(drink(1))
+        val drinks = listOf(drink(1))
         val entries = listOf(entry(1), entry(2), entry(3))
 
         val stats = fake.importMerge(drinks, entries)
@@ -218,7 +218,7 @@ class BackupRepositoryTest {
         val result = BackupManager.parseBackupJson(json)
         assertTrue(
             "Expected ReadError for impossible date 2024-02-31, got: ${result.error}",
-            result.error is BackupManager.ImportError.ReadError
+            result.error is BackupManager.ImportError.ReadError,
         )
     }
 
@@ -241,7 +241,7 @@ class BackupRepositoryTest {
         val result = BackupManager.parseBackupJson(json)
         assertTrue(
             "Expected ReadError for date 9999-99-99, got: ${result.error}",
-            result.error is BackupManager.ImportError.ReadError
+            result.error is BackupManager.ImportError.ReadError,
         )
     }
 
@@ -268,20 +268,20 @@ class BackupRepositoryTest {
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private fun drink(id: Long) = DrinkDefinition(
-        id             = id,
-        name           = "Drink$id",
-        volumeMl       = 500,
-        alcoholPercent = 5.0
+        id = id,
+        name = "Drink$id",
+        volumeMl = 500,
+        alcoholPercent = 5.0,
     )
 
     private fun entry(id: Long) = ConsumptionEntry(
-        id              = id,
-        drinkId         = 1,
-        drinkName       = "Drink1",
-        volumeMl        = 500,
-        alcoholPercent  = 5.0,
-        gramsAlcohol    = 19.73,
+        id = id,
+        drinkId = 1,
+        drinkName = "Drink1",
+        volumeMl = 500,
+        alcoholPercent = 5.0,
+        gramsAlcohol = 19.73,
         timestampMillis = 1_736_935_200_000L,
-        logicalDate     = "2026-01-15"
+        logicalDate = "2026-01-15",
     )
 }

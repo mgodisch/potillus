@@ -53,8 +53,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      *
      * @param date  Logical date as "YYYY-MM-DD".
      */
-    override fun getEntriesForDate(date: String): Flow<List<ConsumptionEntry>> =
-        dao.getByDate(date).map { list -> list.map { it.toDomain() } }
+    override fun getEntriesForDate(date: String): Flow<List<ConsumptionEntry>> = dao.getByDate(date).map { list -> list.map { it.toDomain() } }
 
     /**
      * Reactive stream of per-day totals for a date range.
@@ -65,10 +64,9 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param from  Start date inclusive.
      * @param to    End date inclusive.
      */
-    override fun getDailySummaries(from: String, to: String): Flow<List<DaySummary>> =
-        dao.getDailySummaries(from, to).map { list ->
-            list.map { raw -> DaySummary(date = raw.logicalDate, totalGrams = raw.totalGrams, entryCount = raw.entryCount) }
-        }
+    override fun getDailySummaries(from: String, to: String): Flow<List<DaySummary>> = dao.getDailySummaries(from, to).map { list ->
+        list.map { raw -> DaySummary(date = raw.logicalDate, totalGrams = raw.totalGrams, entryCount = raw.entryCount) }
+    }
 
     /**
      * Reactive stream of all distinct dates that have at least one entry.
@@ -88,8 +86,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param from  Start date inclusive.
      * @param to    End date inclusive.
      */
-    override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> =
-        dao.getEntriesForPeriodFlow(from, to).map { list -> list.map { it.toDomain() } }
+    override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> = dao.getEntriesForPeriodFlow(from, to).map { list -> list.map { it.toDomain() } }
 
     /**
      * Reactive stream of the most recently logged entry (by timestamp), or
@@ -100,8 +97,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * Used by [de.godisch.potillus.ui.screen.TodayViewModel] to pre-select the
      * last-used drink in the add-entry dialog.
      */
-    override fun mostRecentEntry(): Flow<ConsumptionEntry?> =
-        dao.getMostRecent().map { it?.toDomain() }
+    override fun mostRecentEntry(): Flow<ConsumptionEntry?> = dao.getMostRecent().map { it?.toDomain() }
 
     // ── Write operations ──────────────────────────────────────────────────────
 
@@ -127,26 +123,28 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param timestampMillis  Unix epoch milliseconds of the consumption event.
      * @param note             Optional free-text annotation.
      * @param settings         Current user settings (needed for the day-change time).
-     * @return                 Database ID of the new entry.
+     * @return Database ID of the new entry.
      */
     override suspend fun addFromDrink(
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        settings: AppSettings
+        settings: AppSettings,
     ): Long {
         val logical = DayResolver.resolve(timestampMillis, settings.dayChangeHour, settings.dayChangeMinute)
-        return add(ConsumptionEntry(
-            drinkId         = drink.id,
-            drinkName       = drink.name,
-            volumeMl        = volumeMl,
-            alcoholPercent  = drink.alcoholPercent,
-            gramsAlcohol    = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
-            timestampMillis = timestampMillis,
-            logicalDate     = logical,
-            note            = note
-        ))
+        return add(
+            ConsumptionEntry(
+                drinkId = drink.id,
+                drinkName = drink.name,
+                volumeMl = volumeMl,
+                alcoholPercent = drink.alcoholPercent,
+                gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
+                timestampMillis = timestampMillis,
+                logicalDate = logical,
+                note = note,
+            ),
+        )
     }
 
     /**
@@ -163,24 +161,26 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param timestampMillis  Wall-clock time of the consumption (for display).
      * @param note             Optional annotation.
      * @param logicalDate      The date to assign the entry to ("YYYY-MM-DD").
-     * @return                 Database ID of the new entry.
+     * @return Database ID of the new entry.
      */
     override suspend fun addFromDrinkWithDate(
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        logicalDate: String
-    ): Long = add(ConsumptionEntry(
-        drinkId         = drink.id,
-        drinkName       = drink.name,
-        volumeMl        = volumeMl,
-        alcoholPercent  = drink.alcoholPercent,
-        gramsAlcohol    = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
-        timestampMillis = timestampMillis,
-        logicalDate     = logicalDate,
-        note            = note
-    ))
+        logicalDate: String,
+    ): Long = add(
+        ConsumptionEntry(
+            drinkId = drink.id,
+            drinkName = drink.name,
+            volumeMl = volumeMl,
+            alcoholPercent = drink.alcoholPercent,
+            gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
+            timestampMillis = timestampMillis,
+            logicalDate = logicalDate,
+            note = note,
+        ),
+    )
 
     /**
      * Updates an entry and **recalculates** [ConsumptionEntry.logicalDate] from the
@@ -200,7 +200,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
         val newLogicalDate = DayResolver.resolve(
             entry.timestampMillis,
             settings.dayChangeHour,
-            settings.dayChangeMinute
+            settings.dayChangeMinute,
         )
         dao.update(entry.copy(logicalDate = newLogicalDate).toEntity())
     }
@@ -238,8 +238,7 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * @param from  Start date inclusive ("YYYY-MM-DD").
      * @param to    End date inclusive ("YYYY-MM-DD").
      */
-    override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> =
-        dao.getInRange(from, to).map { it.toDomain() }
+    override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> = dao.getInRange(from, to).map { it.toDomain() }
 
     /**
      * Deletes all entries. Called at the start of a REPLACE backup import.

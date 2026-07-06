@@ -127,7 +127,7 @@ class MarkdownTextTest {
         val items = parseOrderedList("1. Alpha\n2. Beta\n3. Gamma")
         assertEquals(
             listOf("1" to "Alpha", "2" to "Beta", "3" to "Gamma"),
-            items
+            items,
         )
     }
 
@@ -140,7 +140,7 @@ class MarkdownTextTest {
         val items = parseOrderedList("1. Pour about\n3.5 grams of sugar\n2. Stir well")
         assertEquals(
             listOf("1" to "Pour about 3.5 grams of sugar", "2" to "Stir well"),
-            items
+            items,
         )
     }
 

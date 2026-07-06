@@ -84,7 +84,7 @@ private class FakeDrinkDao : DrinkDao {
 
     private val samples = listOf(
         DrinkEntity(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0, category = "BEER"),
-        DrinkEntity(id = 2, name = "Mystery", volumeMl = 40, alcoholPercent = 40.0, category = "BOGUS")
+        DrinkEntity(id = 2, name = "Mystery", volumeMl = 40, alcoholPercent = 40.0, category = "BOGUS"),
     )
 
     override fun getAll(): Flow<List<DrinkEntity>> = flowOf(samples)

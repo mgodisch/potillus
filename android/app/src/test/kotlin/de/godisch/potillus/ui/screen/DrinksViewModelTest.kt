@@ -69,7 +69,7 @@ class DrinksViewModelTest {
         val vm = DrinksViewModel(drinkRepo)
 
         vm.uiState.test {
-            awaitItem()   // initial empty state
+            awaitItem() // initial empty state
             vm.addDrink("Wine", 150, 13.0, DrinkCategory.WINE)
             val state = awaitItem()
             assertEquals(1, state.drinks.size)
@@ -162,7 +162,7 @@ class DrinksViewModelTest {
     }
 
     @Test fun `addDrink with name exceeding max length is rejected`() = runTest(dispatcher) {
-        val vm   = DrinksViewModel(drinkRepo)
+        val vm = DrinksViewModel(drinkRepo)
         val long = "A".repeat(101)
         vm.addDrink(long, 500, 5.0, DrinkCategory.BEER)
 
@@ -183,8 +183,10 @@ class DrinksViewModelTest {
         vm.deleteDrink(beer)
 
         vm.uiState.test {
-            assertTrue("Drink should be deleted when it has no entries",
-                awaitItem().drinks.isEmpty())
+            assertTrue(
+                "Drink should be deleted when it has no entries",
+                awaitItem().drinks.isEmpty(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -198,8 +200,10 @@ class DrinksViewModelTest {
         vm.events.test {
             vm.deleteDrink(beer)
             val event = awaitItem()
-            assertTrue("Should emit DeleteBlocked when drink has entries",
-                event is DrinksEvent.DeleteBlocked)
+            assertTrue(
+                "Should emit DeleteBlocked when drink has entries",
+                event is DrinksEvent.DeleteBlocked,
+            )
             val blocked = event as DrinksEvent.DeleteBlocked
             assertEquals("Lager", blocked.drinkName)
             assertEquals(3, blocked.entryCount)

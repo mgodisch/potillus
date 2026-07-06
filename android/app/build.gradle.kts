@@ -37,32 +37,27 @@
 //     3. dependencies { } – external libraries
 // =============================================================================
 
-// java.util.Properties reads the optional android/keystore.properties file in the
-// `signingConfigs` block below. It MUST be imported (and referenced as `Properties`,
-// not `java.util.Properties`): inside that block the bare identifier `java` resolves
-// to the Gradle Java-plugin extension accessor, so a fully-qualified `java.util.…`
-// fails to compile ("Unresolved reference 'util'"). Like the imports below, it has
-// to appear before the `plugins { }` block.
-import java.util.Properties
-
-// JvmTarget enum used by the Kotlin `compilerOptions` DSL (see the top-level
-// `kotlin { }` block further down). In a Gradle Kotlin DSL build script, import
-// statements must appear before the `plugins { }` block.
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
-// CycloneDX model types used by the cyclonedxDirectBom configuration at the end
-// of this file: Version pins the SBOM to CycloneDX 1.6, and Component.Type tags
-// the SBOM subject as an application. Like the JvmTarget import above, these
-// must appear before the `plugins { }` block. The classes are on the
-// build-script classpath because the org.cyclonedx.bom plugin is applied in the
-// plugins block below.
+// Script-level imports. In a Gradle Kotlin DSL build script every `import` must
+// appear BEFORE the `plugins { }` block, and ktlint requires them contiguous, in
+// lexicographic order, with no comments or blank lines between them (java/javax/
+// kotlin sort last). Per-import notes therefore live here, above the block:
+//   - kotlinx…CoverageUnit: selects LINE vs BRANCH for the Kover verification
+//     bounds in the `kover { reports { verify { … } } }` block below.
+//   - org.cyclonedx.Version / model.Component: pin the SBOM to CycloneDX 1.6 and
+//     tag its subject as an application, for the cyclonedxDirectBom config below;
+//     on the build-script classpath via the org.cyclonedx.bom plugin.
+//   - org.jetbrains.kotlin.gradle.dsl.JvmTarget: used by the Kotlin
+//     `compilerOptions` DSL in the top-level `kotlin { }` block below.
+//   - java.util.Properties: reads the optional android/keystore.properties file in
+//     the `signingConfigs` block below. It MUST be referenced as the bare
+//     `Properties` (not `java.util.Properties`): inside that block the identifier
+//     `java` resolves to the Gradle Java-plugin extension accessor, so a
+//     fully-qualified `java.util.…` fails to compile ("Unresolved reference 'util'").
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.cyclonedx.Version
 import org.cyclonedx.model.Component
-
-// CoverageUnit selects LINE vs BRANCH for the Kover verification bounds in the
-// `kover { reports { verify { … } } }` block at the end of this file. Like the
-// imports above, it must appear before the `plugins { }` block.
-import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 // ── 1. Plugins ────────────────────────────────────────────────────────────────
 // Plugins are Gradle extensions that add new build capabilities.
@@ -126,18 +121,18 @@ android {
     // (if ever published there), and during ADB installation.
     // WARNING: Never change after the first installation –
     //          it would be treated as a new app and all user data would be lost.
-    namespace         = "de.godisch.potillus"
+    namespace = "de.godisch.potillus"
 
     // compileSdk: the Android API level to *compile* against.
     // This is the SDK version installed on the developer machine.
     // May be higher than targetSdk and minSdk.
     // 36 = Android 16 (latest API at development time)
-    compileSdk        = 36
+    compileSdk = 36
 
     defaultConfig {
         // applicationId: normally matches namespace but can differ.
         // For simple projects it is identical to namespace.
-        applicationId                    = "de.godisch.potillus"
+        applicationId = "de.godisch.potillus"
 
         // minSdk: minimum Android version the APK supports.
         // Devices running an older version cannot install the app.
@@ -171,13 +166,13 @@ android {
         // June 2025; Jetpack Compose since inception), so 30 sits comfortably above
         // it. Reachable devices roughly double versus API 35 (~41% → ~87% of the
         // worldwide install base, per apilevels.com / Statcounter, April 2026).
-        minSdk                           = 30
+        minSdk = 30
 
         // targetSdk: the Android version the app is OPTIMISED for.
         // Android uses this to decide whether to activate compatibility modes.
         // targetSdk = 36 means: the app expects full Android 16 behaviour
         // (no compatibility shims).
-        targetSdk                        = 36
+        targetSdk = 36
 
         // versionCode: opaque monotonic integer, bumped by at least 1 for every
         // published APK. Android uses it (not versionName) to order updates.
@@ -213,7 +208,7 @@ android {
 
         // Test runner for instrumented tests (run on device/emulator).
         // Not relevant for pure JVM unit tests.
-        testInstrumentationRunner        = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // ─────────────────────────────────────────────────────────────────────
         // SCREENSHOT-TEST OPT-OUT SWITCH (documented; OFF by default)
@@ -278,23 +273,23 @@ android {
                     keystorePropsFile.inputStream().use { load(it) }
                 }
             }
+
             // Environment variable wins over the file entry; returns null if neither
             // is set, which is the signal further down to stay unsigned.
-            fun value(propKey: String, envKey: String): String? =
-                System.getenv(envKey) ?: props.getProperty(propKey)
+            fun value(propKey: String, envKey: String): String? = System.getenv(envKey) ?: props.getProperty(propKey)
 
             val storePath = value("storeFile", "POTILLUS_KEYSTORE_FILE")
             val storePass = value("storePassword", "POTILLUS_KEYSTORE_PASSWORD")
-            val alias     = value("keyAlias", "POTILLUS_KEY_ALIAS")
-            val keyPass   = value("keyPassword", "POTILLUS_KEY_PASSWORD")
+            val alias = value("keyAlias", "POTILLUS_KEY_ALIAS")
+            val keyPass = value("keyPassword", "POTILLUS_KEY_PASSWORD")
 
             // Populate the config ONLY when all four values are present. A partial
             // configuration would fail the build, so it is treated as "no key".
             if (storePath != null && storePass != null && alias != null && keyPass != null) {
-                storeFile     = rootProject.file(storePath)
+                storeFile = rootProject.file(storePath)
                 storePassword = storePass
-                keyAlias      = alias
-                keyPassword   = keyPass
+                keyAlias = alias
+                keyPassword = keyPass
             }
         }
     }
@@ -308,7 +303,7 @@ android {
             // isMinifyEnabled: enables R8 (code shrinking + obfuscation)
             // R8 removes unused code and shortens class names.
             // Result: smaller APK, harder to reverse-engineer.
-            isMinifyEnabled  = true
+            isMinifyEnabled = true
 
             // isShrinkResources: removes unused resources (images, strings).
             // Only works when isMinifyEnabled = true.
@@ -318,7 +313,7 @@ android {
             // Important for reflection-based libraries such as Room and Biometric.
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
 
             // Apply the release signing config ONLY if it was populated in the
@@ -344,12 +339,12 @@ android {
 
         // Debug build: for development and ADB installation
         debug {
-            isMinifyEnabled   = false   // no R8 → faster builds
+            isMinifyEnabled = false // no R8 → faster builds
 
             // Suffix prevents conflicts: debug and release APK
             // can be installed side-by-side on the same device.
             applicationIdSuffix = ".debug"
-            versionNameSuffix   = "-debug"
+            versionNameSuffix = "-debug"
         }
     }
 
@@ -361,7 +356,7 @@ android {
     // Disabling it also removes one non-transparent, non-deterministic-leaning
     // artefact from the output, which helps reproducible-build verification.
     dependenciesInfo {
-        includeInApk    = false
+        includeInApk = false
         includeInBundle = false
     }
 
@@ -487,7 +482,7 @@ android {
         jniLibs {
             keepDebugSymbols += setOf(
                 "**/libandroidx.graphics.path.so",
-                "**/libdatastore_shared_counter.so"
+                "**/libdatastore_shared_counter.so",
             )
         }
     }
@@ -544,7 +539,7 @@ android {
         //   a future AGP/Lint upgrade or an updated dependency can introduce new
         //   warnings that then break the build until they are fixed or, if truly
         //   advisory, added to `disable` with a documented rationale.
-        abortOnError     = true
+        abortOnError = true
         warningsAsErrors = true
         // Each id below is opted out for the stated reason; re-enable any of them
         // if the project's policy changes.
@@ -567,7 +562,7 @@ android {
             // and "round icon equals the square icon" are intentional design
             // choices, not accidental duplicates.
             "IconLauncherShape",
-            "IconDuplicates"
+            "IconDuplicates",
         )
     }
 
@@ -687,9 +682,12 @@ val generateCopyrightDocument = tasks.register<Exec>("generateCopyrightDocument"
     )
     outputs.file(output)
     commandLine(
-        "python3", "../tools/render-copyright.py",
+        "python3",
+        "../tools/render-copyright.py",
         output.asFile.absolutePath,
-        "../COPYING.md", "../LICENSE.md", "../LICENSE.Apache-2.0.md",
+        "../COPYING.md",
+        "../LICENSE.md",
+        "../LICENSE.Apache-2.0.md",
     )
 }
 
@@ -750,10 +748,10 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     // Then the individual modules without an explicit version (the BOM sets them):
-    implementation(libs.compose.ui)             // Core UI primitives
-    implementation(libs.compose.ui.graphics)    // Canvas, colours, graphics
-    implementation(libs.compose.ui.tooling.preview)  // @Preview
-    implementation(libs.compose.material3)      // Material Design 3 Widgets
+    implementation(libs.compose.ui) // Core UI primitives
+    implementation(libs.compose.ui.graphics) // Canvas, colours, graphics
+    implementation(libs.compose.ui.tooling.preview) // @Preview
+    implementation(libs.compose.material3) // Material Design 3 Widgets
     implementation(libs.compose.material.icons) // Icons.Default.*
 
     // ── Navigation ────────────────────────────────────────────────────────────
@@ -833,8 +831,8 @@ dependencies {
     // androidTest classpath) pins ui-test-junit4 to the same Compose version as
     // the app, so the test artifacts and the UI under test never diverge.
     androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.androidx.test.ext.junit)   // AndroidJUnit4
-    androidTestImplementation(libs.compose.ui.test.junit4)    // createComposeRule, finders, actions
+    androidTestImplementation(libs.androidx.test.ext.junit) // AndroidJUnit4
+    androidTestImplementation(libs.compose.ui.test.junit4) // createComposeRule, finders, actions
 
     // androidx.test runner + espresso, pinned to current versions. Compose 1.8's
     // ui-test integrates with the Espresso / instrumentation-runner machinery to
@@ -869,7 +867,6 @@ dependencies {
     // launches. It MUST be a debugImplementation (not androidTestImplementation)
     // because it has to be merged into the debug app manifest the tests run against.
     debugImplementation(libs.compose.ui.test.manifest)
-
 }
 
 // ── 4. Software Bill of Materials (SBOM) ──────────────────────────────────────
@@ -890,21 +887,21 @@ dependencies {
 // components shipped in the release build.
 tasks.cyclonedxDirectBom {
     // metadata.component — the application this SBOM describes.
-    projectType      = Component.Type.APPLICATION
-    componentName    = "Libellus Potionis"
+    projectType = Component.Type.APPLICATION
+    componentName = "Libellus Potionis"
     // Keep the SBOM component version in lock-step with the app's versionName
     // (single source of truth: the android { } block above) rather than
     // repeating the literal here.
     componentVersion = android.defaultConfig.versionName ?: project.version.toString()
 
     // Pin to CycloneDX 1.6 (the latest stable schema version).
-    schemaVersion    = Version.VERSION_16
+    schemaVersion = Version.VERSION_16
 
     // Resolve ONLY the release runtime classpath (see ANDROID SCOPING above) so
     // the SBOM mirrors what is actually packaged in app-release. Because this is
     // a single concrete, resolvable configuration, no skipConfigs filtering of
     // the debug/test classpaths is needed.
-    includeConfigs   = listOf("releaseRuntimeClasspath")
+    includeConfigs = listOf("releaseRuntimeClasspath")
 
     // ── Reproducible builds ───────────────────────────────────────────────────
     // The random urn:uuid serial number is the main run-to-run churn; disable
@@ -919,7 +916,7 @@ tasks.cyclonedxDirectBom {
     // suppresses the XML file entirely.
     xmlOutput.unsetConvention()
     jsonOutput.set(
-        layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json")
+        layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json"),
     )
 }
 

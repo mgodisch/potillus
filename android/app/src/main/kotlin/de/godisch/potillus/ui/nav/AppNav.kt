@@ -94,18 +94,21 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Screen {
     /** The four swipeable top-level screens, hosted together in a HorizontalPager. */
-    @Serializable data object Home     : Screen
+    @Serializable data object Home : Screen
+
     /** Settings, opened via the overflow menu and pushed on top of [Home]. */
     @Serializable data object Settings : Screen
+
     /** In-app user guide ("Help"), pushed on top of [Home] from the overflow menu. */
-    @Serializable data object Help     : Screen
+    @Serializable data object Help : Screen
+
     /**
      * Copyright viewer ("Copyright"), pushed on top of [Home] from the overflow
      * menu. Displays the build-time concatenation of `COPYING.md` (the project's
      * short copyright/licence notice) and the full GPL text from `LICENSE.md`,
      * bundled as the single raw resource `R.raw.copyright`.
      */
-    @Serializable data object Copyright  : Screen
+    @Serializable data object Copyright : Screen
 }
 
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
@@ -127,15 +130,15 @@ private data class MainPage(val titleRes: Int, val icon: ImageVector)
 // here: it is opened via a gear action in each screen's top bar and pushed as a
 // separate destination (no bottom bar).
 private val mainPages = listOf(
-    MainPage(R.string.today,          Icons.Default.Today),
-    MainPage(R.string.calendar,       Icons.Default.CalendarMonth),
+    MainPage(R.string.today, Icons.Default.Today),
+    MainPage(R.string.calendar, Icons.Default.CalendarMonth),
     // Statistics uses a dedicated, deliberately short label (`nav_statistics`)
     // rather than the full screen title (`statistics`): the tab is a narrow
     // column under an icon, and long translations (e.g. French "Statistiques")
     // would otherwise wrap onto two lines. In most locales `nav_statistics`
     // repeats the full word; only overflowing ones shorten it (fr -> "Stats").
     MainPage(R.string.nav_statistics, Icons.Default.BarChart),
-    MainPage(R.string.drinks,         Icons.Default.LocalBar),
+    MainPage(R.string.drinks, Icons.Default.LocalBar),
 )
 
 // ── Navigation composable ─────────────────────────────────────────────────────
@@ -147,10 +150,10 @@ private val mainPages = listOf(
  */
 @Composable
 fun AppNavigation(
-    todayVm:    TodayViewModel,
+    todayVm: TodayViewModel,
     calendarVm: CalendarViewModel,
-    statsVm:    StatsViewModel,
-    drinksVm:   DrinksViewModel,
+    statsVm: StatsViewModel,
+    drinksVm: DrinksViewModel,
     settingsVm: SettingsViewModel,
     /**
      * Runs a biometric prompt to authorise a sensitive toggle and calls back with
@@ -162,43 +165,43 @@ fun AppNavigation(
      * Locks the app immediately (overflow-menu "Lock app"). Forwarded to the four
      * main screens, which pass it to their shared [AppOverflowMenu].
      */
-    onLockApp: () -> Unit
+    onLockApp: () -> Unit,
 ) {
     val navController = rememberNavController()
 
     NavHost(
-        navController    = navController,
-        startDestination = Screen.Home
+        navController = navController,
+        startDestination = Screen.Home,
     ) {
         composable<Screen.Home> {
             MainPagerHost(
-                todayVm        = todayVm,
-                calendarVm     = calendarVm,
-                statsVm        = statsVm,
-                drinksVm       = drinksVm,
+                todayVm = todayVm,
+                calendarVm = calendarVm,
+                statsVm = statsVm,
+                drinksVm = drinksVm,
                 // Push each overflow-menu destination on top so the system Back
                 // button / Up arrow returns to Home on whichever page it was
                 // opened from.
                 onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
-                onOpenHelp     = { navController.navigate(Screen.Help)     { launchSingleTop = true } },
-                onOpenCopyright  = { navController.navigate(Screen.Copyright)  { launchSingleTop = true } },
-                onLockApp        = onLockApp
+                onOpenHelp = { navController.navigate(Screen.Help) { launchSingleTop = true } },
+                onOpenCopyright = { navController.navigate(Screen.Copyright) { launchSingleTop = true } },
+                onLockApp = onLockApp,
             )
         }
         composable<Screen.Settings> {
             SettingsScreen(
                 settingsVm,
                 onBack = { navController.navigateUp() },
-                onAuthenticate = onAuthenticate
+                onAuthenticate = onAuthenticate,
             )
         }
         composable<Screen.Help> {
             // The user guide is Markdown and locale-resolved (raw/raw-xx).
             DocumentViewerScreen(
-                titleRes         = R.string.help,
-                rawRes           = R.raw.usersguide,
+                titleRes = R.string.help,
+                rawRes = R.raw.usersguide,
                 renderAsMarkdown = true,
-                onBack           = { navController.navigateUp() }
+                onBack = { navController.navigateUp() },
             )
         }
         composable<Screen.Copyright> {
@@ -209,10 +212,10 @@ fun AppNavigation(
             // rendered as Markdown because COPYING.md uses Markdown headings and
             // links; the GPL body below it degrades gracefully as plain prose.
             DocumentViewerScreen(
-                titleRes         = R.string.copyright,
-                rawRes           = R.raw.copyright,
+                titleRes = R.string.copyright,
+                rawRes = R.raw.copyright,
                 renderAsMarkdown = true,
-                onBack           = { navController.navigateUp() }
+                onBack = { navController.navigateUp() },
             )
         }
     }
@@ -243,10 +246,10 @@ private fun MainPagerHost(
     onOpenHelp: () -> Unit,
     onOpenCopyright: () -> Unit,
     /** Forwarded to each page's [AppOverflowMenu] for the "Lock app" entry. */
-    onLockApp: () -> Unit
+    onLockApp: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { mainPages.size })
-    val scope      = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         // Each page's own Scaffold handles the top inset; this one only owns the
@@ -256,26 +259,26 @@ private fun MainPagerHost(
             NavigationBar {
                 mainPages.forEachIndexed { index, page ->
                     NavigationBarItem(
-                        icon     = { Icon(page.icon, contentDescription = null) },
+                        icon = { Icon(page.icon, contentDescription = null) },
                         // Android-standard bottom bar: label under the icon. Each
                         // page carries its own fully-translated label string; the
                         // Statistics tab uses a short synonym (see `mainPages`) so
                         // long translations do not wrap.
-                        label    = { Text(stringResource(page.titleRes)) },
+                        label = { Text(stringResource(page.titleRes)) },
                         // Highlight the tab for the page currently shown by the
                         // pager — this updates automatically when the user swipes.
                         selected = pagerState.currentPage == index,
                         // animateScrollToPage runs in a coroutine; the pager
                         // enforces the bounds (no wrap-around).
-                        onClick  = { scope.launch { pagerState.animateScrollToPage(index) } }
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                     )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         HorizontalPager(
-            state    = pagerState,
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
+            state = pagerState,
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) { page ->
             when (page) {
                 0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)

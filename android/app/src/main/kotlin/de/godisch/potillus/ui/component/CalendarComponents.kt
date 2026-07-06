@@ -101,40 +101,40 @@ fun YearCalendarView(
     today: LocalDate,
     onDayClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    weekStart: Int = 1
+    weekStart: Int = 1,
 ) {
     // Per-app locale (LocaleSupport.kt rule: never Locale.getDefault() for
     // user-visible text). Without the explicit locale this formatter followed
     // the JVM default — i.e. the SYSTEM language — so the year calendar's
     // month abbreviations ignored the in-app language on every API level
     // (found in the v0.79.0 QA delta review).
-    val locale      = LocalContext.current.formattingLocale()
-    val monthFmt    = DateTimeFormatter.ofPattern("MMM", locale)
-    val months      = (1..12).map { YearMonth.of(year, it) }
+    val locale = LocalContext.current.formattingLocale()
+    val monthFmt = DateTimeFormatter.ofPattern("MMM", locale)
+    val months = (1..12).map { YearMonth.of(year, it) }
 
     // Capture theme colours before entering Box/Column lambdas (see file header note)
-    val green       = MaterialTheme.colorScheme.primary
-    val red         = dangerRedColor()
-    val empty       = MaterialTheme.colorScheme.surfaceVariant
+    val green = MaterialTheme.colorScheme.primary
+    val red = dangerRedColor()
+    val empty = MaterialTheme.colorScheme.surfaceVariant
     val todayBorder = MaterialTheme.colorScheme.outline
-    val cellSize    = 10.dp
-    val cellGap     = 2.dp
+    val cellSize = 10.dp
+    val cellGap = 2.dp
 
     Column(modifier = modifier.padding(horizontal = 8.dp)) {
         // Rows of 3 months
         months.chunked(3).forEach { rowMonths ->
             Row(
-                modifier              = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 rowMonths.forEach { ym ->
                     Column(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
                         // Month abbreviation header (e.g. "Jan", "Feb")
                         Text(
                             ym.format(monthFmt),
-                            style    = MaterialTheme.typography.labelSmall,
-                            color    = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 2.dp)
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 2.dp),
                         )
 
                         // Week alignment: day 1 of the month may not fall on the
@@ -152,12 +152,12 @@ fun YearCalendarView(
                                         // Empty placeholder to preserve grid alignment
                                         Box(Modifier.size(cellSize).padding(cellGap / 2))
                                     } else {
-                                        val date    = ym.atDay(dayNum).toString()   // "YYYY-MM-DD"
+                                        val date = ym.atDay(dayNum).toString() // "YYYY-MM-DD"
                                         val summary = summaries[date]
-                                        val color   = when {
+                                        val color = when {
                                             summary == null || summary.totalGrams == 0.0 -> empty
-                                            summary.totalGrams > limitGrams              -> red
-                                            else                                         -> green
+                                            summary.totalGrams > limitGrams -> red
+                                            else -> green
                                         }
                                         val isToday = ym.atDay(dayNum) == today
                                         Box(
@@ -166,10 +166,13 @@ fun YearCalendarView(
                                                 .padding(cellGap / 2)
                                                 .background(color, RoundedCornerShape(1.dp))
                                                 .then(
-                                                    if (isToday) Modifier.border(1.dp, todayBorder, RoundedCornerShape(1.dp))
-                                                    else Modifier
+                                                    if (isToday) {
+                                                        Modifier.border(1.dp, todayBorder, RoundedCornerShape(1.dp))
+                                                    } else {
+                                                        Modifier
+                                                    },
                                                 )
-                                                .clickable(enabled = summary != null) { onDayClick(date) }
+                                                .clickable(enabled = summary != null) { onDayClick(date) },
                                         )
                                     }
                                 }
@@ -186,18 +189,27 @@ fun YearCalendarView(
 
         // Colour legend at the bottom
         Row(
-            modifier              = Modifier.fillMaxWidth().padding(top = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             horizontalArrangement = Arrangement.End,
-            verticalAlignment     = androidx.compose.ui.Alignment.CenterVertically
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         ) {
-            Text(stringResource(R.string.year_calendar_no_entry), style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.year_calendar_no_entry),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Box(Modifier.padding(horizontal = 4.dp).size(10.dp).background(empty, RoundedCornerShape(1.dp)))
-            Text(stringResource(R.string.year_calendar_under_limit), style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.year_calendar_under_limit),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Box(Modifier.padding(horizontal = 4.dp).size(10.dp).background(green, RoundedCornerShape(1.dp)))
-            Text(stringResource(R.string.year_calendar_over_limit), style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                stringResource(R.string.year_calendar_over_limit),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Box(Modifier.padding(start = 4.dp).size(10.dp).background(red, RoundedCornerShape(1.dp)))
         }
     }

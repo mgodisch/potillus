@@ -54,39 +54,33 @@ class FakeEntryRepository : IEntryRepository {
 
     // Central in-memory store; tests can inspect this directly.
     private val _entries = MutableStateFlow<List<ConsumptionEntry>>(emptyList())
-    private var nextId   = 1L
+    private var nextId = 1L
 
     // Convenience property for assertions in tests.
     val allEntries: List<ConsumptionEntry> get() = _entries.value
 
     // ── Reactive queries ──────────────────────────────────────────────────────
 
-    override fun getEntriesForDate(date: String): Flow<List<ConsumptionEntry>> =
-        _entries.map { it.filter { e -> e.logicalDate == date } }
+    override fun getEntriesForDate(date: String): Flow<List<ConsumptionEntry>> = _entries.map { it.filter { e -> e.logicalDate == date } }
 
-    override fun getDailySummaries(from: String, to: String): Flow<List<DaySummary>> =
-        _entries.map { list ->
-            list.filter { it.logicalDate in from..to }
-                .groupBy { it.logicalDate }
-                .map { (date, es) -> DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size) }
-                .sortedBy { it.date }
-        }
+    override fun getDailySummaries(from: String, to: String): Flow<List<DaySummary>> = _entries.map { list ->
+        list.filter { it.logicalDate in from..to }
+            .groupBy { it.logicalDate }
+            .map { (date, es) -> DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size) }
+            .sortedBy { it.date }
+    }
 
-    override fun getAllDatesFlow(): Flow<List<String>> =
-        _entries.map { it.map { e -> e.logicalDate }.distinct().sorted() }
+    override fun getAllDatesFlow(): Flow<List<String>> = _entries.map { it.map { e -> e.logicalDate }.distinct().sorted() }
 
-    override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> =
-        _entries.map { it.filter { e -> e.logicalDate in from..to } }
+    override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> = _entries.map { it.filter { e -> e.logicalDate in from..to } }
 
-    override fun mostRecentEntry(): Flow<ConsumptionEntry?> =
-        _entries.map { list -> list.maxByOrNull { it.timestampMillis } }
+    override fun mostRecentEntry(): Flow<ConsumptionEntry?> = _entries.map { list -> list.maxByOrNull { it.timestampMillis } }
 
     // ── One-shot reads ────────────────────────────────────────────────────────
 
     override suspend fun getAll(): List<ConsumptionEntry> = _entries.value
 
-    override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> =
-        _entries.value.filter { it.logicalDate in from..to }
+    override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> = _entries.value.filter { it.logicalDate in from..to }
 
     // ── Write operations ──────────────────────────────────────────────────────
 
@@ -101,23 +95,25 @@ class FakeEntryRepository : IEntryRepository {
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        settings: AppSettings
+        settings: AppSettings,
     ): Long {
         val logical = DayResolver.resolve(
             timestampMillis,
             settings.dayChangeHour,
-            settings.dayChangeMinute
+            settings.dayChangeMinute,
         )
-        return add(ConsumptionEntry(
-            drinkId         = drink.id,
-            drinkName       = drink.name,
-            volumeMl        = volumeMl,
-            alcoholPercent  = drink.alcoholPercent,
-            gramsAlcohol    = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
-            timestampMillis = timestampMillis,
-            logicalDate     = logical,
-            note            = note
-        ))
+        return add(
+            ConsumptionEntry(
+                drinkId = drink.id,
+                drinkName = drink.name,
+                volumeMl = volumeMl,
+                alcoholPercent = drink.alcoholPercent,
+                gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
+                timestampMillis = timestampMillis,
+                logicalDate = logical,
+                note = note,
+            ),
+        )
     }
 
     override suspend fun addFromDrinkWithDate(
@@ -125,23 +121,25 @@ class FakeEntryRepository : IEntryRepository {
         volumeMl: Int,
         timestampMillis: Long,
         note: String,
-        logicalDate: String
-    ): Long = add(ConsumptionEntry(
-        drinkId         = drink.id,
-        drinkName       = drink.name,
-        volumeMl        = volumeMl,
-        alcoholPercent  = drink.alcoholPercent,
-        gramsAlcohol    = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
-        timestampMillis = timestampMillis,
-        logicalDate     = logicalDate,
-        note            = note
-    ))
+        logicalDate: String,
+    ): Long = add(
+        ConsumptionEntry(
+            drinkId = drink.id,
+            drinkName = drink.name,
+            volumeMl = volumeMl,
+            alcoholPercent = drink.alcoholPercent,
+            gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
+            timestampMillis = timestampMillis,
+            logicalDate = logicalDate,
+            note = note,
+        ),
+    )
 
     override suspend fun updateEntry(entry: ConsumptionEntry, settings: AppSettings) {
         val newDate = DayResolver.resolve(
             entry.timestampMillis,
             settings.dayChangeHour,
-            settings.dayChangeMinute
+            settings.dayChangeMinute,
         )
         update(entry.copy(logicalDate = newDate))
     }
@@ -154,5 +152,7 @@ class FakeEntryRepository : IEntryRepository {
         _entries.value = _entries.value.filter { it.id != entry.id }
     }
 
-    override suspend fun deleteAll() { _entries.value = emptyList() }
+    override suspend fun deleteAll() {
+        _entries.value = emptyList()
+    }
 }

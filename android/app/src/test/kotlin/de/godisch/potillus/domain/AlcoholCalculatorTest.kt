@@ -102,16 +102,16 @@ class AlcoholCalculatorTest {
     @Test fun `getLimitInfo maps the three limits from settings`() {
         val settings = AppSettings(dailyLimitGrams = 25.0, weeklyLimitGrams = 120.0, maxDrinkDaysPerWeek = 4)
         val info = AlcoholCalculator.getLimitInfo(settings)
-        assertEquals(25.0,  info.limitGrams,        0.0)
-        assertEquals(120.0, info.weeklyLimitGrams,  0.0)
-        assertEquals(4,     info.maxDrinkDaysPerWeek)
+        assertEquals(25.0, info.limitGrams, 0.0)
+        assertEquals(120.0, info.weeklyLimitGrams, 0.0)
+        assertEquals(4, info.maxDrinkDaysPerWeek)
     }
 
     @Test fun `getLimitInfo defaults are 20-100-5`() {
         val info = AlcoholCalculator.getLimitInfo(AppSettings())
-        assertEquals(20.0,  info.limitGrams,       0.0)
+        assertEquals(20.0, info.limitGrams, 0.0)
         assertEquals(100.0, info.weeklyLimitGrams, 0.0)
-        assertEquals(5,     info.maxDrinkDaysPerWeek)
+        assertEquals(5, info.maxDrinkDaysPerWeek)
     }
 
     @Test fun `getLimitInfo clamps maxDrinkDaysPerWeek into 1 to 7`() {
@@ -158,20 +158,20 @@ class AlcoholCalculatorTest {
      */
     private fun light(
         gramsPerDrink: Double,
-        todayGrams: Double         = 0.0,
-        dailyLimitGrams: Double    = 20.0,
-        weeklyTotalGrams: Double   = 0.0,
-        weeklyLimitGrams: Double   = 1000.0,
-        drinkDaysThisWeek: Int     = 0,
-        maxDrinkDaysPerWeek: Int   = 5
+        todayGrams: Double = 0.0,
+        dailyLimitGrams: Double = 20.0,
+        weeklyTotalGrams: Double = 0.0,
+        weeklyLimitGrams: Double = 1000.0,
+        drinkDaysThisWeek: Int = 0,
+        maxDrinkDaysPerWeek: Int = 5,
     ) = AlcoholCalculator.trafficLight(
-        gramsPerDrink       = gramsPerDrink,
-        todayGrams          = todayGrams,
-        dailyLimitGrams     = dailyLimitGrams,
-        weeklyTotalGrams    = weeklyTotalGrams,
-        weeklyLimitGrams    = weeklyLimitGrams,
-        drinkDaysThisWeek   = drinkDaysThisWeek,
-        maxDrinkDaysPerWeek = maxDrinkDaysPerWeek
+        gramsPerDrink = gramsPerDrink,
+        todayGrams = todayGrams,
+        dailyLimitGrams = dailyLimitGrams,
+        weeklyTotalGrams = weeklyTotalGrams,
+        weeklyLimitGrams = weeklyLimitGrams,
+        drinkDaysThisWeek = drinkDaysThisWeek,
+        maxDrinkDaysPerWeek = maxDrinkDaysPerWeek,
     )
 
     @Test fun `trafficLight alcohol-free drink is always GREEN`() {
@@ -200,14 +200,14 @@ class AlcoholCalculatorTest {
         // daily allows 4 (today 0 of 20), but weekly leaves only 5 g (95 of 100) → min = 1 → YELLOW
         assertEquals(
             TrafficLight.YELLOW,
-            light(gramsPerDrink = 5.0, todayGrams = 0.0, weeklyTotalGrams = 95.0, weeklyLimitGrams = 100.0)
+            light(gramsPerDrink = 5.0, todayGrams = 0.0, weeklyTotalGrams = 95.0, weeklyLimitGrams = 100.0),
         )
     }
 
     @Test fun `trafficLight RED when weekly budget exhausted`() {
         assertEquals(
             TrafficLight.RED,
-            light(gramsPerDrink = 5.0, weeklyTotalGrams = 100.0, weeklyLimitGrams = 100.0)
+            light(gramsPerDrink = 5.0, weeklyTotalGrams = 100.0, weeklyLimitGrams = 100.0),
         )
     }
 
@@ -215,8 +215,13 @@ class AlcoholCalculatorTest {
         // today 0 g (not a drink day), 5 past drink days, max 5 → starting a 6th day is RED
         assertEquals(
             TrafficLight.RED,
-            light(gramsPerDrink = 5.0, todayGrams = 0.0, dailyLimitGrams = 100.0,
-                  drinkDaysThisWeek = 5, maxDrinkDaysPerWeek = 5)
+            light(
+                gramsPerDrink = 5.0,
+                todayGrams = 0.0,
+                dailyLimitGrams = 100.0,
+                drinkDaysThisWeek = 5,
+                maxDrinkDaysPerWeek = 5,
+            ),
         )
     }
 
@@ -225,8 +230,13 @@ class AlcoholCalculatorTest {
         // → pastDrinkDays = 6 - 1 = 5 >= 5 → RED (per spec, the 6th drink day itself is over budget)
         assertEquals(
             TrafficLight.RED,
-            light(gramsPerDrink = 5.0, todayGrams = 5.0, dailyLimitGrams = 100.0,
-                  drinkDaysThisWeek = 6, maxDrinkDaysPerWeek = 5)
+            light(
+                gramsPerDrink = 5.0,
+                todayGrams = 5.0,
+                dailyLimitGrams = 100.0,
+                drinkDaysThisWeek = 6,
+                maxDrinkDaysPerWeek = 5,
+            ),
         )
     }
 
@@ -235,8 +245,13 @@ class AlcoholCalculatorTest {
         // → pastDrinkDays = 4 < 5 → gate does not fire; daily gram check decides → GREEN
         assertEquals(
             TrafficLight.GREEN,
-            light(gramsPerDrink = 5.0, todayGrams = 5.0, dailyLimitGrams = 20.0,
-                  drinkDaysThisWeek = 5, maxDrinkDaysPerWeek = 5)
+            light(
+                gramsPerDrink = 5.0,
+                todayGrams = 5.0,
+                dailyLimitGrams = 20.0,
+                drinkDaysThisWeek = 5,
+                maxDrinkDaysPerWeek = 5,
+            ),
         )
     }
 
@@ -253,7 +268,9 @@ class AlcoholCalculatorTest {
         // is a plain per-day comparison, unaffected by the rolling window.
         val v = AlcoholCalculator.countLimitViolations(
             summaries = listOf(ds("2026-01-05", 25.0), ds("2026-01-06", 10.0)),
-            dailyLimitGrams = 20.0, weeklyLimitGrams = 1000.0, maxDrinkDaysPerWeek = 7
+            dailyLimitGrams = 20.0,
+            weeklyLimitGrams = 1000.0,
+            maxDrinkDaysPerWeek = 7,
         )
         assertEquals(1, v.daysOverDailyLimit)
     }
@@ -263,11 +280,17 @@ class AlcoholCalculatorTest {
         // single 7-day window, so the trailing total per day is 10,20,30,40,50.
         // > 25 from the 3rd day (30) onward → days 3,4,5 = 3.
         val days = listOf(
-            ds("2026-01-05", 10.0), ds("2026-01-06", 10.0), ds("2026-01-07", 10.0),
-            ds("2026-01-08", 10.0), ds("2026-01-09", 10.0)
+            ds("2026-01-05", 10.0),
+            ds("2026-01-06", 10.0),
+            ds("2026-01-07", 10.0),
+            ds("2026-01-08", 10.0),
+            ds("2026-01-09", 10.0),
         )
         val v = AlcoholCalculator.countLimitViolations(
-            summaries = days, dailyLimitGrams = 1000.0, weeklyLimitGrams = 25.0, maxDrinkDaysPerWeek = 7
+            summaries = days,
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 25.0,
+            maxDrinkDaysPerWeek = 7,
         )
         assertEquals(3, v.daysOverWeeklyLimit)
     }
@@ -278,7 +301,9 @@ class AlcoholCalculatorTest {
         // calendar week with a Monday reset might or might not have produced).
         val v = AlcoholCalculator.countLimitViolations(
             summaries = listOf(ds("2026-01-01", 30.0), ds("2026-01-09", 30.0)),
-            dailyLimitGrams = 1000.0, weeklyLimitGrams = 25.0, maxDrinkDaysPerWeek = 7
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 25.0,
+            maxDrinkDaysPerWeek = 7,
         )
         assertEquals(2, v.daysOverWeeklyLimit)
     }
@@ -289,7 +314,9 @@ class AlcoholCalculatorTest {
         // → 20 + 20 = 40 > 30 → one over (01-01 alone is 20, not over).
         val withinWindow = AlcoholCalculator.countLimitViolations(
             summaries = listOf(ds("2026-01-01", 20.0), ds("2026-01-07", 20.0)),
-            dailyLimitGrams = 1000.0, weeklyLimitGrams = 30.0, maxDrinkDaysPerWeek = 7
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 30.0,
+            maxDrinkDaysPerWeek = 7,
         )
         assertEquals(1, withinWindow.daysOverWeeklyLimit)
 
@@ -297,16 +324,21 @@ class AlcoholCalculatorTest {
         // 01-01 → only 20 g → nothing over.
         val outsideWindow = AlcoholCalculator.countLimitViolations(
             summaries = listOf(ds("2026-01-01", 20.0), ds("2026-01-08", 20.0)),
-            dailyLimitGrams = 1000.0, weeklyLimitGrams = 30.0, maxDrinkDaysPerWeek = 7
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 30.0,
+            maxDrinkDaysPerWeek = 7,
         )
         assertEquals(0, outsideWindow.daysOverWeeklyLimit)
     }
 
     @Test fun `countLimitViolations counts drink days beyond the limit within a 7-day window`() {
         // 7 consumption days inside one window, max 5 → the 6th and 7th day count → 2.
-        val days = (5..11).map { ds("2026-01-%02d".format(it), 5.0) }  // 05 .. 11
+        val days = (5..11).map { ds("2026-01-%02d".format(it), 5.0) } // 05 .. 11
         val v = AlcoholCalculator.countLimitViolations(
-            summaries = days, dailyLimitGrams = 1000.0, weeklyLimitGrams = 1000.0, maxDrinkDaysPerWeek = 5
+            summaries = days,
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 1000.0,
+            maxDrinkDaysPerWeek = 5,
         )
         assertEquals(2, v.daysOverDrinkDayLimit)
     }
@@ -316,9 +348,12 @@ class AlcoholCalculatorTest {
         // max 5. Trailing drink-day counts: 1,2,3,4,5,6,7,7 → days 10,11,12 are over.
         // A calendar week with a Monday reset would have made 12 the "1st" day again;
         // the rolling window keeps counting → 3 violations, proving no weekly reset.
-        val days = (5..12).map { ds("2026-01-%02d".format(it), 5.0) }  // Mon 05 .. Mon 12
+        val days = (5..12).map { ds("2026-01-%02d".format(it), 5.0) } // Mon 05 .. Mon 12
         val v = AlcoholCalculator.countLimitViolations(
-            summaries = days, dailyLimitGrams = 1000.0, weeklyLimitGrams = 1000.0, maxDrinkDaysPerWeek = 5
+            summaries = days,
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 1000.0,
+            maxDrinkDaysPerWeek = 5,
         )
         assertEquals(3, v.daysOverDrinkDayLimit)
     }
@@ -327,7 +362,10 @@ class AlcoholCalculatorTest {
         // A 0 g day is not a drink day and never enters the window.
         val days = listOf(ds("2026-01-05", 0.0), ds("2026-01-06", 30.0))
         val v = AlcoholCalculator.countLimitViolations(
-            summaries = days, dailyLimitGrams = 1000.0, weeklyLimitGrams = 25.0, maxDrinkDaysPerWeek = 1
+            summaries = days,
+            dailyLimitGrams = 1000.0,
+            weeklyLimitGrams = 25.0,
+            maxDrinkDaysPerWeek = 1,
         )
         // Only the 30 g day is a consumption day: it is the 1st drink day in its window
         // (not over the max of 1) but exceeds the 25 g window limit → weekly 1, drink-day 0.

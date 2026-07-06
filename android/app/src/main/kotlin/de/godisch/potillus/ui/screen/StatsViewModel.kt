@@ -44,7 +44,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.R
 import de.godisch.potillus.data.prefs.IAppPreferences
-import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
 import de.godisch.potillus.domain.AlcoholCalculator
@@ -54,19 +53,20 @@ import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.util.AndroidIoBound
 import de.godisch.potillus.util.CsvExporter
 import de.godisch.potillus.util.ExportResult
 import de.godisch.potillus.util.PdfReportBuilder
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 // ════════════════════════════════════════════════════════════════════════════
 // STATS
@@ -81,46 +81,46 @@ data class StatsUiState(
     // (StatsViewModelTest.awaitComputed) rely on `state == StatsUiState()`
     // identifying the not-yet-computed seed; a diverging default here would make
     // the seed look like a computed value.
-    val period: StatsPeriod                       = StatsPeriod.MONTH,
-    val dataPoints: List<DaySummary>              = emptyList(),
+    val period: StatsPeriod = StatsPeriod.MONTH,
+    val dataPoints: List<DaySummary> = emptyList(),
     /** Gap-free, time-axis bucket series for the consumption chart (incl. abstinent buckets). */
-    val chartBuckets: List<ChartBucket>           = emptyList(),
+    val chartBuckets: List<ChartBucket> = emptyList(),
     /** Bucket width of [chartBuckets]: DAILY for WEEK/MONTH, MONTHLY for YEAR. */
-    val chartGranularity: ChartGranularity        = ChartGranularity.DAILY,
-    val totalGrams: Double                        = 0.0,
-    val avgPerDay: Double                         = 0.0,
-    val avgPerDrinkDay: Double                    = 0.0,
+    val chartGranularity: ChartGranularity = ChartGranularity.DAILY,
+    val totalGrams: Double = 0.0,
+    val avgPerDay: Double = 0.0,
+    val avgPerDrinkDay: Double = 0.0,
     /** Days whose own total exceeds the daily gram limit. */
-    val daysOverDailyLimit: Int                   = 0,
+    val daysOverDailyLimit: Int = 0,
     /** Consumption days whose trailing-7-day gram total exceeded the limit. */
-    val daysOverWeeklyLimit: Int                  = 0,
+    val daysOverWeeklyLimit: Int = 0,
     /** Consumption days exceeding the allowed drink days within their trailing 7-day window. */
-    val daysOverDrinkDayLimit: Int                = 0,
-    val abstinentDays: Int                        = 0,
-    val currentStreak: Int                        = 0,
-    val longestStreak: Int                        = 0,
-    val trendPercent: Double                      = 0.0,
+    val daysOverDrinkDayLimit: Int = 0,
+    val abstinentDays: Int = 0,
+    val currentStreak: Int = 0,
+    val longestStreak: Int = 0,
+    val trendPercent: Double = 0.0,
     /**
      * Direction of [avgPerDay] versus the previous period's per-day average
      * (FLAT when equal at 0.1 g or there is no previous value). Drives the trend
      * arrow/colour; see [Trend].
      */
-    val trend: Trend                              = Trend.FLAT,
-    val limitInfo: LimitInfo                      = LimitInfo(20.0, 100.0, 5),
+    val trend: Trend = Trend.FLAT,
+    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
     /** Pure-alcohol grams per hour-of-day bucket (index 0..23) for the time-of-day chart. */
     /** Average grams per day in each of eight 3-hour buckets (0–3, 3–6 … 21–24). */
-    val hourBucketAverages: List<Double>          = List(8) { 0.0 },
+    val hourBucketAverages: List<Double> = List(8) { 0.0 },
     /** ISO weekday numbers (1=Mon..7=Sun) in display order (locale's first weekday first). */
-    val weekdayOrder: List<Int>                   = emptyList(),
+    val weekdayOrder: List<Int> = emptyList(),
     /** Average grams per weekday in [weekdayOrder] order; null = weekday never a drink day. */
-    val weekdayAverages: List<Double?>            = emptyList(),
+    val weekdayAverages: List<Double?> = emptyList(),
     // Defaults for the export date-range dialog (CSV/PDF export lives on this
     // screen). `today` is the logical current day; `statsFromDate`
     // is the configured statistics-start floor (empty when unset).
-    val today: String                             = "",
-    val statsFromDate: String                     = ""
+    val today: String = "",
+    val statsFromDate: String = "",
 )
 
 /**
@@ -134,7 +134,7 @@ data class StatsUiState(
 @AndroidIoBound
 data class PdfPrintRequest(
     val html: String,
-    val jobName: String
+    val jobName: String,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -146,7 +146,7 @@ class StatsViewModel(
     // appContext is the Application context (safe to hold in a ViewModel — see the
     // SettingsViewModel KDoc); getString localises export status messages.
     private val appContext: Context,
-    private val getString: StringProvider
+    private val getString: StringProvider,
 ) : ViewModel() {
 
     // MONTH is the default: on first open it gives a meaningful overview without
@@ -167,10 +167,14 @@ class StatsViewModel(
     val shareTarget: StateFlow<ExportResult?> = _shareTarget.asStateFlow()
 
     /** Clears the transient status banner (called after its auto-dismiss delay). */
-    fun clearExportStatus() { _exportStatus.value = null }
+    fun clearExportStatus() {
+        _exportStatus.value = null
+    }
 
     /** Clears the pending share target after the chooser has been shown. */
-    fun clearShareTarget() { _shareTarget.value = null }
+    fun clearShareTarget() {
+        _shareTarget.value = null
+    }
 
     // ── PDF print request (one-shot) ──────────────────────────────────────
     // The PDF report is rendered to HTML here and then handed to the screen,
@@ -181,7 +185,9 @@ class StatsViewModel(
     val printRequest: StateFlow<PdfPrintRequest?> = _printRequest.asStateFlow()
 
     /** Clears the pending print request after the screen has opened the print dialog. */
-    fun clearPrintRequest() { _printRequest.value = null }
+    fun clearPrintRequest() {
+        _printRequest.value = null
+    }
 
     /**
      * Exports entries within the given inclusive date range as a CSV file in
@@ -235,12 +241,12 @@ class StatsViewModel(
     fun exportPdf(from: String, to: String) {
         viewModelScope.launch {
             val settings = prefs.settingsFlow.first()
-            val entries  = entryRepo.getInRange(from, to)
+            val entries = entryRepo.getInRange(from, to)
             if (entries.isEmpty()) {
                 _exportStatus.value = ExportStatus.Err(str(R.string.export_no_entries))
                 return@launch
             }
-            val drinks  = drinkRepo.drinks.first()
+            val drinks = drinkRepo.drinks.first()
             val jobName = PdfReportBuilder.jobName(Instant.now())
             // Same per-app-locale wrapping as in exportCsv: every label, date and
             // number format of the report is resolved from this context.
@@ -261,7 +267,6 @@ class StatsViewModel(
     /** Localises a string resource via the injected [StringProvider]. */
     private fun str(@StringRes id: Int, vararg args: Any): String = getString(id, *args)
 
-
     /**
      * Intermediate value that bridges the outer `combine` and the downstream `flatMapLatest`
      * in [uiState].
@@ -278,24 +283,24 @@ class StatsViewModel(
      *   outside it. Nesting it keeps the declaration close to the only site that uses it.
      */
     private data class StatsParams(
-        val period:   StatsPeriod,
+        val period: StatsPeriod,
         val settings: AppSettings,
-        val allDates: List<String>
+        val allDates: List<String>,
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<StatsUiState> = combine(
         _period,
         prefs.settingsFlow,
-        entryRepo.getAllDatesFlow()
+        entryRepo.getAllDatesFlow(),
     ) { period, settings, allDates ->
         StatsParams(period, settings, allDates)
     }.flatMapLatest { params ->
         val (period, settings, allDates) = params
-        val today     = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+        val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val todayDate = DayResolver.parseDate(today)
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
-        val fmt       = DayResolver.DATE_FORMATTER
+        val fmt = DayResolver.DATE_FORMATTER
 
         val (from, to, prevFrom, prevTo) = when (period) {
             StatsPeriod.WEEK -> {
@@ -303,38 +308,38 @@ class StatsViewModel(
                 // The previous window is the seven days immediately before it, so the
                 // trend percentage compares two adjacent, equal-length 7-day spans.
                 val from = todayDate.minusDays(6)
-                val pf   = from.minusDays(7)
+                val pf = from.minusDays(7)
                 arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
             }
             StatsPeriod.MONTH -> {
                 val from = todayDate.withDayOfMonth(1)
-                val pf   = from.minusMonths(1)
+                val pf = from.minusMonths(1)
                 arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
             }
             StatsPeriod.YEAR -> {
                 val from = todayDate.withDayOfYear(1)
-                val pf   = from.minusYears(1)
+                val pf = from.minusYears(1)
                 arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
             }
         }
 
         // Apply the global statistics start date as a lower bound.
-        val statsFloor    = settings.statsFromDate
+        val statsFloor = settings.statsFromDate
         val effectiveFrom = if (statsFloor.isNotEmpty() && statsFloor > from) statsFloor else from
-        val streakDates   = if (statsFloor.isNotEmpty()) allDates.filter { it >= statsFloor } else allDates
+        val streakDates = if (statsFloor.isNotEmpty()) allDates.filter { it >= statsFloor } else allDates
 
         combine(
             entryRepo.getDailySummaries(effectiveFrom, to),
             entryRepo.getDailySummaries(prevFrom, prevTo),
             entryRepo.getEntriesForPeriod(effectiveFrom, to),
-            drinkRepo.drinks
+            drinkRepo.drinks,
         ) { current, previous, periodEntries, drinks ->
             val drinkMap = drinks.associateBy { it.id }
 
             val totalGrams = current.sumOf { it.totalGrams }
             // Drink days in the period, INCLUDING today if a drink was logged today
             // (the daily-summary query is inclusive of `to`, which equals today).
-            val drinkDays  = current.size
+            val drinkDays = current.size
 
             // Effective period length for the per-day rate and the abstinent-day count.
             //
@@ -350,7 +355,7 @@ class StatsViewModel(
             // today's drinks) is divided by a period that includes today exactly when
             // those drinks exist, and `abstinentDays` never counts the unfinished day
             // (effectivePeriodDays − drinkDays = completed dry days).
-            val todayIsDrinkDay     = current.any { it.date == to }
+            val todayIsDrinkDay = current.any { it.date == to }
             val effectivePeriodDays = DayResolver.effectivePeriodDays(effectiveFrom, to, todayIsDrinkDay)
 
             val categoryBreakdown = periodEntries
@@ -383,7 +388,7 @@ class StatsViewModel(
             // column is the locale's first weekday. Computed from the daily summaries
             // (one total per day), mirroring PdfReportData so screen and PDF agree.
             val weekStartIso = DayResolver.firstDayOfWeekIso()
-            val weekdayOrder = (0..6).map { i -> (weekStartIso - 1 + i) % 7 + 1 }   // ISO 1..7
+            val weekdayOrder = (0..6).map { i -> (weekStartIso - 1 + i) % 7 + 1 } // ISO 1..7
             val weekdayTotals = Array(7) { mutableListOf<Double>() }
             current.forEach { s ->
                 val col = (LocalDate.parse(s.date, fmt).dayOfWeek.value - weekStartIso + 7) % 7
@@ -395,10 +400,10 @@ class StatsViewModel(
             // Daily is a per-day check; the gram and drink-day limits use a gliding
             // 7-day window (see AlcoholCalculator.countLimitViolations).
             val violations = AlcoholCalculator.countLimitViolations(
-                summaries           = current,
-                dailyLimitGrams     = limitInfo.limitGrams,
-                weeklyLimitGrams    = limitInfo.weeklyLimitGrams,
-                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek
+                summaries = current,
+                dailyLimitGrams = limitInfo.limitGrams,
+                weeklyLimitGrams = limitInfo.weeklyLimitGrams,
+                maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
             )
 
             // Consumption-over-time chart series. WEEK/MONTH show one bar per day;
@@ -422,44 +427,48 @@ class StatsViewModel(
             // days); the previous period is complete, so it is divided by its full
             // day count [prevFrom, prevTo]. A non-positive previous average means
             // "no comparable previous value" → Trend.FLAT (shown as "–").
-            val avgPerDay     = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0
-            val prevSum       = previous.sumOf { it.totalGrams }
-            val prevDays      = (DayResolver.parseDate(prevTo).toEpochDay() -
-                                 DayResolver.parseDate(prevFrom).toEpochDay() + 1).toInt()
+            val avgPerDay = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0
+            val prevSum = previous.sumOf { it.totalGrams }
+            val prevDays = (
+                DayResolver.parseDate(prevTo).toEpochDay() -
+                    DayResolver.parseDate(prevFrom).toEpochDay() + 1
+                ).toInt()
             val prevAvgPerDay = if (prevDays > 0) prevSum / prevDays else 0.0
-            val trend         = Trend.of(avgPerDay, prevAvgPerDay)
+            val trend = Trend.of(avgPerDay, prevAvgPerDay)
 
             StatsUiState(
-                period            = period,
-                dataPoints        = current,
-                chartBuckets      = chartBuckets,
-                chartGranularity  = chartGranularity,
-                totalGrams        = totalGrams,
-                avgPerDay         = avgPerDay,
-                avgPerDrinkDay    = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
-                daysOverDailyLimit    = violations.daysOverDailyLimit,
-                daysOverWeeklyLimit   = violations.daysOverWeeklyLimit,
+                period = period,
+                dataPoints = current,
+                chartBuckets = chartBuckets,
+                chartGranularity = chartGranularity,
+                totalGrams = totalGrams,
+                avgPerDay = avgPerDay,
+                avgPerDrinkDay = if (drinkDays > 0) totalGrams / drinkDays else 0.0,
+                daysOverDailyLimit = violations.daysOverDailyLimit,
+                daysOverWeeklyLimit = violations.daysOverWeeklyLimit,
                 daysOverDrinkDayLimit = violations.daysOverDrinkDayLimit,
-                abstinentDays     = (effectivePeriodDays - drinkDays).coerceAtLeast(0),
+                abstinentDays = (effectivePeriodDays - drinkDays).coerceAtLeast(0),
                 // Pass statsFloor so the streak starts at the recording-start date
                 // when there are no drink entries yet (implicit abstinence assumption).
-                currentStreak     = DayResolver.computeCurrentAbstinence(streakDates, today, statsFloor),
-                longestStreak     = DayResolver.computeLongestAbstinence(streakDates, today, statsFloor),
-                trendPercent      = computeTrend(avgPerDay, prevAvgPerDay),
-                trend             = trend,
-                limitInfo         = limitInfo,
+                currentStreak = DayResolver.computeCurrentAbstinence(streakDates, today, statsFloor),
+                longestStreak = DayResolver.computeLongestAbstinence(streakDates, today, statsFloor),
+                trendPercent = computeTrend(avgPerDay, prevAvgPerDay),
+                trend = trend,
+                limitInfo = limitInfo,
                 categoryBreakdown = categoryBreakdown,
                 hourBucketAverages = hourBucketAverages,
-                weekdayOrder      = weekdayOrder,
-                weekdayAverages   = weekdayAverages,
-                today             = today,
-                statsFromDate     = statsFloor
+                weekdayOrder = weekdayOrder,
+                weekdayAverages = weekdayAverages,
+                today = today,
+                statsFromDate = statsFloor,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
 
     /** Selects the statistics aggregation period [p] (week / month / year …). */
-    fun setPeriod(p: StatsPeriod) { _period.value = p }
+    fun setPeriod(p: StatsPeriod) {
+        _period.value = p
+    }
 
     /**
      * Returns the percentage change from [previous] to [current].
@@ -469,7 +478,7 @@ class StatsViewModel(
      *
      * @param current  The current period's value.
      * @param previous The preceding period's value (the baseline).
-     * @return         Signed percentage change, or 0.0 when no baseline exists.
+     * @return Signed percentage change, or 0.0 when no baseline exists.
      */
     private fun computeTrend(current: Double, previous: Double): Double {
         if (previous <= 0) return 0.0

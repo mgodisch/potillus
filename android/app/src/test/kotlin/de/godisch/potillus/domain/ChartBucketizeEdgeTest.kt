@@ -37,7 +37,7 @@ class ChartBucketizeEdgeTest {
             summaries = emptyList(),
             from = "2026-02-01",
             to = "2026-01-01",
-            granularity = ChartGranularity.DAILY
+            granularity = ChartGranularity.DAILY,
         )
         assertTrue(result.isEmpty())
     }
@@ -45,13 +45,13 @@ class ChartBucketizeEdgeTest {
     @Test fun `monthly granularity snaps buckets to calendar months`() {
         val summaries = listOf(
             DaySummary("2026-01-15", 20.0, 1),
-            DaySummary("2026-02-03", 10.0, 1)
+            DaySummary("2026-02-03", 10.0, 1),
         )
         val result = ChartBucketing.bucketize(
             summaries = summaries,
             from = "2026-01-15",
             to = "2026-02-10",
-            granularity = ChartGranularity.MONTHLY
+            granularity = ChartGranularity.MONTHLY,
         )
         // The range touches two calendar months, so it yields two month buckets.
         assertEquals(2, result.size)

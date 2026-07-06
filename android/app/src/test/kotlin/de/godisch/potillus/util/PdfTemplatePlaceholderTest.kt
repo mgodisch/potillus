@@ -70,14 +70,17 @@ class PdfTemplatePlaceholderTest {
             if (override != null) File(override) else File(".")
         }
         private val TEMPLATE: File = File(MODULE_DIR, "src/main/assets/report_template.html")
-        private val BUILDER:  File = File(MODULE_DIR, "src/main/kotlin/de/godisch/potillus/util/PdfReportBuilder.kt")
+        private val BUILDER: File = File(MODULE_DIR, "src/main/kotlin/de/godisch/potillus/util/PdfReportBuilder.kt")
 
         /** A {{NAME}} placeholder token (NAME = upper-case letters, digits, underscore). */
         private val TOKEN = Regex("""\{\{([A-Z][A-Z0-9_]*)\}\}""")
+
         /** HTML comment, including multi-line ones, removed before token extraction. */
         private val HTML_COMMENT = Regex("""<!--.*?-->""", RegexOption.DOT_MATCHES_ALL)
+
         /** A document-level scalar assignment: scalars["NAME"]. */
         private val SCALAR_KEY = Regex("""scalars\["([A-Z][A-Z0-9_]*)"\]""")
+
         /** A map-entry key, e.g. "M_MONTH" to … — covers all repeat-row and KPI keys. */
         private val MAP_KEY = Regex(""""([A-Z][A-Z0-9_]*)"\s+to\b""")
     }
@@ -100,15 +103,15 @@ class PdfTemplatePlaceholderTest {
 
     @Test
     fun `every template placeholder is initialised by the builder`() {
-        val used        = templateTokens()
+        val used = templateTokens()
         val initialised = initialisedKeys()
-        val missing     = (used - initialised).sorted()
+        val missing = (used - initialised).sorted()
 
         assertTrue(
             "These placeholders appear in report_template.html but are never " +
                 "initialised in PdfReportBuilder.kt (they would print as raw " +
                 "{{...}} in the PDF): $missing",
-            missing.isEmpty()
+            missing.isEmpty(),
         )
     }
 

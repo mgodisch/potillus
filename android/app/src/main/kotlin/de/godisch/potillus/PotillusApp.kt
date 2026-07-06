@@ -44,7 +44,6 @@ package de.godisch.potillus
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.data.db.AppDatabase
 import de.godisch.potillus.data.prefs.AppPreferences
 import de.godisch.potillus.data.prefs.IAppPreferences
@@ -54,14 +53,15 @@ import de.godisch.potillus.data.repository.EntryRepository
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
+import de.godisch.potillus.domain.LocaleDetector
+import de.godisch.potillus.domain.model.AppSettings
+import de.godisch.potillus.l10n.SupportedLocales
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import de.godisch.potillus.domain.LocaleDetector
-import de.godisch.potillus.l10n.SupportedLocales
 import java.util.Locale
 
 /**
@@ -180,7 +180,7 @@ class PotillusApp : Application() {
      */
     private suspend fun applyLanguageOnFirstLaunch(startupSettings: AppSettings) {
         val stored = startupSettings.language
-        if (stored.isNotEmpty()) return          // already set, nothing to do
+        if (stored.isNotEmpty()) return // already set, nothing to do
 
         // Delegate the pure locale-matching logic to LocaleDetector so it can be
         // unit-tested independently of this Android Application subclass.

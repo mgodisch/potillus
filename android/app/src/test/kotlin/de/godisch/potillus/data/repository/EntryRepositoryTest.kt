@@ -52,14 +52,14 @@ class EntryRepositoryTest {
         alcoholPercent = 5.0,
         gramsAlcohol = 20.0,
         timestampMillis = 1L,
-        logicalDate = "2026-01-01"
+        logicalDate = "2026-01-01",
     )
 
     private fun sampleDrink() = DrinkDefinition(
         id = 2,
         name = "Lager",
         volumeMl = 500,
-        alcoholPercent = 5.0
+        alcoholPercent = 5.0,
     )
 
     @Test fun `flow reads map entities to domain models`() = runTest {
@@ -122,13 +122,12 @@ private class FakeEntryDao : EntryDao {
         gramsAlcohol = 20.0,
         timestampMillis = 1_700_000_000_000L,
         logicalDate = "2026-01-01",
-        note = "n"
+        note = "n",
     )
 
     override fun getByDate(date: String): Flow<List<EntryEntity>> = flowOf(listOf(sample))
 
-    override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> =
-        flowOf(listOf(DailySummaryRaw(logicalDate = "2026-01-01", totalGrams = 20.0, entryCount = 1)))
+    override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> = flowOf(listOf(DailySummaryRaw(logicalDate = "2026-01-01", totalGrams = 20.0, entryCount = 1)))
 
     override fun getAllDatesFlow(): Flow<List<String>> = flowOf(listOf("2026-01-01"))
 
@@ -162,6 +161,5 @@ private class FakeEntryDao : EntryDao {
 
     override suspend fun countByTimestampAndDrink(ts: Long, drinkId: Long): Int = 0
 
-    override fun getEntriesForPeriodFlow(from: String, to: String): Flow<List<EntryEntity>> =
-        flowOf(listOf(sample))
+    override fun getEntriesForPeriodFlow(from: String, to: String): Flow<List<EntryEntity>> = flowOf(listOf(sample))
 }

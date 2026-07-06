@@ -22,11 +22,6 @@
 package de.godisch.potillus.ui.screen
 
 import android.content.Intent
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -48,12 +43,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.model.*
+import de.godisch.potillus.l10n.SupportedLocales
+import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
 import kotlinx.coroutines.delay
-import de.godisch.potillus.l10n.formattingLocale
-import de.godisch.potillus.l10n.SupportedLocales
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Settings tab, organised into six sections:
@@ -82,10 +82,10 @@ fun SettingsScreen(
      * the navigation graph. The default `{ it(true) }` auto-authorises so that
      * `@Preview` and other default callers render without a real prompt.
      */
-    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit = { it(true) }
+    onAuthenticate: (onResult: (Boolean) -> Unit) -> Unit = { it(true) },
 ) {
-    val state    by vm.uiState.collectAsStateWithLifecycle()
-    val context  = LocalContext.current
+    val state by vm.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val settings = state.settings
 
     // rememberSaveable so open dialogs and — most importantly — the
@@ -95,17 +95,20 @@ fun SettingsScreen(
     // silently abort the import. `android.net.Uri` is Parcelable, so the default
     // saver handles it. (The two dropdown-`expanded` flags further below stay plain
     // `remember`: a collapsed menu on recreation is trivially re-openable.)
-    var showTimePicker      by rememberSaveable { mutableStateOf(false) }
-    var showDailyLimit      by rememberSaveable { mutableStateOf(false) }
-    var showWeeklyLimit     by rememberSaveable { mutableStateOf(false) }
-    var showMaxDrinkDays    by rememberSaveable { mutableStateOf(false) }
-    var showWeightInput     by rememberSaveable { mutableStateOf(false) }
-    var showImportMode      by rememberSaveable { mutableStateOf(false) }
-    var showStatDatePicker  by rememberSaveable { mutableStateOf(false) }
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
+    var showDailyLimit by rememberSaveable { mutableStateOf(false) }
+    var showWeeklyLimit by rememberSaveable { mutableStateOf(false) }
+    var showMaxDrinkDays by rememberSaveable { mutableStateOf(false) }
+    var showWeightInput by rememberSaveable { mutableStateOf(false) }
+    var showImportMode by rememberSaveable { mutableStateOf(false) }
+    var showStatDatePicker by rememberSaveable { mutableStateOf(false) }
     var pendingImportUri by rememberSaveable { mutableStateOf<android.net.Uri?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) { pendingImportUri = uri; showImportMode = true }
+        if (uri != null) {
+            pendingImportUri = uri
+            showImportMode = true
+        }
     }
 
     // Auto-dismiss the export status banner after 3 seconds
@@ -149,7 +152,7 @@ fun SettingsScreen(
                     setDataAndType(shareTarget.uri, shareTarget.mimeType)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 },
-                shareTarget.fileName
+                shareTarget.fileName,
             ).apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(sendIntent))
             }
@@ -171,20 +174,22 @@ fun SettingsScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title  = { Text(stringResource(R.string.settings)) },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack,
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = MaterialTheme.colorScheme.onPrimary)
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             )
-        }
+        },
     ) { paddingValues ->
         LazyColumn(
             // The Settings screen has no bottom navigation bar (unlike the four
@@ -192,14 +197,14 @@ fun SettingsScreen(
             // system navigation bar. Add that inset to the bottom padding so the
             // last item (and its spacing) stays fully visible above the gesture/
             // button bar.
-            contentPadding      = PaddingValues(
-                start  = 16.dp,
-                top    = 16.dp,
-                end    = 16.dp,
-                bottom = 16.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier            = Modifier.fillMaxSize().padding(paddingValues)
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {
             // ── 1. Personal data (body weight) ──────────────────────
             item { SettingsSectionHeader(stringResource(R.string.personal_data)) }
@@ -208,10 +213,10 @@ fun SettingsScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.body_weight) + ": " +
-                            if (settings.weightKg > 0) "${settings.weightKg.toInt()} kg" else stringResource(R.string.not_set),
-                            style = MaterialTheme.typography.bodyMedium
+                                if (settings.weightKg > 0) "${settings.weightKg.toInt()} kg" else stringResource(R.string.not_set),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
-                        IconButton(onClick = {showWeightInput = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
+                        IconButton(onClick = { showWeightInput = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                 }
             }
@@ -224,22 +229,28 @@ fun SettingsScreen(
                 SettingsCard {
                     // Daily gram limit
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.daily_limit_grams) + ": ${settings.dailyLimitGrams.toInt()} g",
-                            style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            stringResource(R.string.daily_limit_grams) + ": ${settings.dailyLimitGrams.toInt()} g",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                         IconButton(onClick = { showDailyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                     Spacer(Modifier.height(4.dp))
                     // Weekly gram limit
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.weekly_limit_grams) + ": ${settings.weeklyLimitGrams.toInt()} g",
-                            style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            stringResource(R.string.weekly_limit_grams) + ": ${settings.weeklyLimitGrams.toInt()} g",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                         IconButton(onClick = { showWeeklyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                     Spacer(Modifier.height(4.dp))
                     // Max drink days per week
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.drink_days_setting) + ": ${settings.maxDrinkDaysPerWeek}",
-                            style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            stringResource(R.string.drink_days_setting) + ": ${settings.maxDrinkDaysPerWeek}",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                         IconButton(onClick = { showMaxDrinkDays = true }) {
                             Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary)
                         }
@@ -257,10 +268,10 @@ fun SettingsScreen(
                             Text(
                                 stringResource(R.string.day_change_time_value, settings.dayChangeHour, settings.dayChangeMinute),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        IconButton(onClick = {showTimePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
+                        IconButton(onClick = { showTimePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                 }
             }
@@ -269,28 +280,28 @@ fun SettingsScreen(
                     Text(
                         stringResource(R.string.stats_from_desc),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column {
                             Text(
                                 stringResource(R.string.stats_from_label),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                             if (settings.statsFromDate.isNotEmpty()) {
                                 Text(
                                     formatStatsDate(settings.statsFromDate),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             }
                         }
-                        IconButton(onClick = {showStatDatePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
+                        IconButton(onClick = { showStatDatePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                 }
             }
@@ -299,8 +310,11 @@ fun SettingsScreen(
             item { SettingsSectionHeader(stringResource(R.string.backup_section)) }
             item {
                 SettingsCard {
-                    Text(stringResource(R.string.backup_desc), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        stringResource(R.string.backup_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = { vm.exportBackup() }, modifier = Modifier.weight(1f)) {
@@ -319,13 +333,13 @@ fun SettingsScreen(
                         Text(
                             when (status) {
                                 is ExportStatus.Done -> status.message
-                                is ExportStatus.Err  -> status.message
+                                is ExportStatus.Err -> status.message
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = when (status) {
                                 is ExportStatus.Done -> successColor()
-                                is ExportStatus.Err  -> errorColor()
-                            }
+                                is ExportStatus.Err -> errorColor()
+                            },
                         )
                     }
                 }
@@ -338,8 +352,11 @@ fun SettingsScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.biometric_lock), style = MaterialTheme.typography.bodyMedium)
-                            Text(stringResource(R.string.biometric_desc), style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(R.string.biometric_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         Switch(
                             checked = settings.biometricEnabled,
@@ -354,7 +371,7 @@ fun SettingsScreen(
                                 onAuthenticate { authorised ->
                                     if (authorised) vm.setBiometric(desired)
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -364,12 +381,15 @@ fun SettingsScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.allow_screenshots), style = MaterialTheme.typography.bodyMedium)
-                            Text(stringResource(R.string.allow_screenshots_desc), style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(R.string.allow_screenshots_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                         Switch(
                             checked = settings.allowScreenshots,
-                            onCheckedChange = { vm.setAllowScreenshots(it) }
+                            onCheckedChange = { vm.setAllowScreenshots(it) },
                         )
                     }
                 }
@@ -384,14 +404,14 @@ fun SettingsScreen(
                         ThemeMode.entries.forEach { mode ->
                             val labelRes = when (mode) {
                                 ThemeMode.SYSTEM -> R.string.theme_system
-                                ThemeMode.DAY    -> R.string.theme_day
-                                ThemeMode.NIGHT  -> R.string.theme_night
+                                ThemeMode.DAY -> R.string.theme_day
+                                ThemeMode.NIGHT -> R.string.theme_night
                             }
                             FilterChip(
                                 selected = settings.themeMode == mode,
-                                onClick  = { vm.setThemeMode(mode) },
-                                label    = { Text(stringResource(labelRes)) },
-                                modifier = Modifier.weight(1f)
+                                onClick = { vm.setThemeMode(mode) },
+                                label = { Text(stringResource(labelRes)) },
+                                modifier = Modifier.weight(1f),
                             )
                         }
                     }
@@ -406,9 +426,9 @@ fun SettingsScreen(
                         onSelect = { code ->
                             vm.setLanguage(code)
                             androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                                androidx.core.os.LocaleListCompat.forLanguageTags(code)
+                                androidx.core.os.LocaleListCompat.forLanguageTags(code),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -419,28 +439,37 @@ fun SettingsScreen(
 
     if (showTimePicker) {
         TimePickerDialog(
-            title         = stringResource(R.string.day_change_time),
-            initialHour   = settings.dayChangeHour,
+            title = stringResource(R.string.day_change_time),
+            initialHour = settings.dayChangeHour,
             initialMinute = settings.dayChangeMinute,
-            onConfirm     = { h, m -> vm.setDayChangeTime(h, m); showTimePicker = false },
-            onDismiss     = { showTimePicker = false }
+            onConfirm = { h, m ->
+                vm.setDayChangeTime(h, m)
+                showTimePicker = false
+            },
+            onDismiss = { showTimePicker = false },
         )
     }
     if (showDailyLimit) {
         GramsInputDialog(
-            title     = stringResource(R.string.daily_limit_grams),
-            initial   = settings.dailyLimitGrams,
-            onConfirm = { v -> vm.setDailyLimit(v); showDailyLimit = false },
-            onDismiss = { showDailyLimit = false }
+            title = stringResource(R.string.daily_limit_grams),
+            initial = settings.dailyLimitGrams,
+            onConfirm = { v ->
+                vm.setDailyLimit(v)
+                showDailyLimit = false
+            },
+            onDismiss = { showDailyLimit = false },
         )
     }
     if (showWeeklyLimit) {
         GramsInputDialog(
-            title     = stringResource(R.string.weekly_limit_grams),
-            initial   = settings.weeklyLimitGrams,
-            maxValue  = 3500.0,
-            onConfirm = { v -> vm.setWeeklyLimit(v); showWeeklyLimit = false },
-            onDismiss = { showWeeklyLimit = false }
+            title = stringResource(R.string.weekly_limit_grams),
+            initial = settings.weeklyLimitGrams,
+            maxValue = 3500.0,
+            onConfirm = { v ->
+                vm.setWeeklyLimit(v)
+                showWeeklyLimit = false
+            },
+            onDismiss = { showWeeklyLimit = false },
         )
     }
     if (showMaxDrinkDays) {
@@ -448,37 +477,49 @@ fun SettingsScreen(
         // The value is stored as an integer but GramsInputDialog takes/returns Double –
         // we round to Int on confirm.
         GramsInputDialog(
-            title     = stringResource(R.string.drink_days_setting),
-            initial   = settings.maxDrinkDaysPerWeek.toDouble(),
-            suffix    = "",
-            onConfirm = { v -> vm.setMaxDrinkDaysPerWeek(v.toInt().coerceIn(1, 7)); showMaxDrinkDays = false },
-            onDismiss = { showMaxDrinkDays = false }
+            title = stringResource(R.string.drink_days_setting),
+            initial = settings.maxDrinkDaysPerWeek.toDouble(),
+            suffix = "",
+            onConfirm = { v ->
+                vm.setMaxDrinkDaysPerWeek(v.toInt().coerceIn(1, 7))
+                showMaxDrinkDays = false
+            },
+            onDismiss = { showMaxDrinkDays = false },
         )
     }
     if (showWeightInput) {
         GramsInputDialog(
-            title        = stringResource(R.string.body_weight),
-            initial      = settings.weightKg,
-            suffix       = "kg",
+            title = stringResource(R.string.body_weight),
+            initial = settings.weightKg,
+            suffix = "kg",
             allowDecimal = false,
-            onConfirm    = { v -> vm.setWeightKg(v); showWeightInput = false },
-            onDismiss    = { showWeightInput = false }
+            onConfirm = { v ->
+                vm.setWeightKg(v)
+                showWeightInput = false
+            },
+            onDismiss = { showWeightInput = false },
         )
     }
     if (showStatDatePicker) {
         StatsFromDatePickerDialog(
             initialDateStr = settings.statsFromDate,
-            onConfirm = { date -> vm.setStatsFromDate(date); showStatDatePicker = false },
-            onDismiss = { showStatDatePicker = false }
+            onConfirm = { date ->
+                vm.setStatsFromDate(date)
+                showStatDatePicker = false
+            },
+            onDismiss = { showStatDatePicker = false },
         )
     }
 
     if (showImportMode && pendingImportUri != null) {
         AlertDialog(
-            onDismissRequest = { showImportMode = false; pendingImportUri = null },
-            title  = { Text(stringResource(R.string.backup_import)) },
-            text   = { Text(stringResource(R.string.import_mode_question)) },
-            confirmButton  = {
+            onDismissRequest = {
+                showImportMode = false
+                pendingImportUri = null
+            },
+            title = { Text(stringResource(R.string.backup_import)) },
+            text = { Text(stringResource(R.string.import_mode_question)) },
+            confirmButton = {
                 // Primary action: safe merge (non-destructive)
                 TextButton(onClick = {
                     // No `!!`: the dialog is only composed while pendingImportUri
@@ -486,22 +527,27 @@ fun SettingsScreen(
                     // between recompositions — `?.let` makes the click a no-op
                     // instead of a crash in that window.
                     pendingImportUri?.let { vm.importBackup(it, ImportMode.MERGE) }
-                    showImportMode = false; pendingImportUri = null
+                    showImportMode = false
+                    pendingImportUri = null
                 }) { Text(stringResource(R.string.import_merge)) }
             },
-            dismissButton  = {
+            dismissButton = {
                 Row {
-                    TextButton(onClick = { showImportMode = false; pendingImportUri = null }) {
+                    TextButton(onClick = {
+                        showImportMode = false
+                        pendingImportUri = null
+                    }) {
                         Text(stringResource(R.string.cancel))
                     }
                     // Destructive action: highlighted in red
                     TextButton(onClick = {
                         // Same `?.let` guard as the merge button above.
                         pendingImportUri?.let { vm.importBackup(it, ImportMode.REPLACE) }
-                        showImportMode = false; pendingImportUri = null
+                        showImportMode = false
+                        pendingImportUri = null
                     }) { Text(stringResource(R.string.import_replace), color = errorColor()) }
                 }
-            }
+            },
         )
     }
 }
@@ -525,7 +571,9 @@ private fun formatStatsDate(dateStr: String): String {
         // PdfReportBuilder already does for its date lines (found in the
         // v0.79.0 QA delta review).
         ld.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
-    } catch (e: Exception) { dateStr }
+    } catch (e: Exception) {
+        dateStr
+    }
 }
 
 /**
@@ -540,13 +588,15 @@ private fun formatStatsDate(dateStr: String): String {
 private fun StatsFromDatePickerDialog(
     initialDateStr: String,
     onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val initialMillis = remember(initialDateStr) {
         try {
             LocalDate.parse(initialDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-        } catch (e: Exception) { System.currentTimeMillis() }
+        } catch (e: Exception) {
+            System.currentTimeMillis()
+        }
     }
     // Prevent selecting a future date: the "Statistik ab" date must be today or earlier.
     // SelectableDates is a Material 3 API for constraining the calendar.
@@ -563,12 +613,12 @@ private fun StatsFromDatePickerDialog(
         selectableDates = object : androidx.compose.material3.SelectableDates {
             /** Allows only days up to and including today (no future dates). */
             override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= today
-        }
+        },
     )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
-        confirmButton    = {
+        confirmButton = {
             TextButton(onClick = {
                 pickerState.selectedDateMillis?.let { ms ->
                     val date = Instant.ofEpochMilli(ms)
@@ -579,7 +629,7 @@ private fun StatsFromDatePickerDialog(
                 }
             }) { Text(stringResource(R.string.save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     ) {
         DatePicker(state = pickerState)
     }
@@ -588,15 +638,21 @@ private fun StatsFromDatePickerDialog(
 /** Renders a small primary-coloured section title in the settings list. @param title Section label. */
 @Composable
 private fun SettingsSectionHeader(title: String) {
-    Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(vertical = 4.dp))
+    Text(
+        title,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(vertical = 4.dp),
+    )
 }
 
 /** Surface-coloured card wrapper that groups related settings rows. @param content The card body. */
 @Composable
 private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
         Column(Modifier.padding(16.dp), content = content)
     }
 }
@@ -624,7 +680,7 @@ private fun GramsInputDialog(
     minValue: Double = 1.0,
     maxValue: Double = 500.0,
     onConfirm: (Double) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     // rememberSaveable so a half-typed value survives a configuration
     // change while the dialog is open (the dialog's visibility flag is also saved).
@@ -638,38 +694,41 @@ private fun GramsInputDialog(
     // for the read-only-display counterpart that DOES follow the per-app locale).
     var text by rememberSaveable {
         mutableStateOf(
-            if (allowDecimal) String.format(java.util.Locale.ROOT, "%.1f", initial)
-            else initial.toInt().toString()
+            if (allowDecimal) {
+                String.format(java.util.Locale.ROOT, "%.1f", initial)
+            } else {
+                initial.toInt().toString()
+            },
         )
     }
-    val parsed   = text.toDoubleOrNull()
-    val inRange  = parsed != null && parsed in minValue..maxValue
+    val parsed = text.toDoubleOrNull()
+    val inRange = parsed != null && parsed in minValue..maxValue
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
-        text  = {
+        text = {
             OutlinedTextField(
-                value           = text,
-                onValueChange   = {
+                value = text,
+                onValueChange = {
                     text = if (allowDecimal) {
                         it.filter { c -> c.isDigit() || c == '.' || c == ',' }.replace(',', '.')
                     } else {
                         it.filter { c -> c.isDigit() }
                     }
                 },
-                suffix          = { Text(suffix) },
-                isError         = text.isNotEmpty() && !inRange,
+                suffix = { Text(suffix) },
+                isError = text.isNotEmpty() && !inRange,
                 keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                singleLine      = true
+                singleLine = true,
             )
         },
-        confirmButton  = {
+        confirmButton = {
             TextButton(
-                onClick  = { parsed?.let { onConfirm(it) } },
-                enabled  = inRange
+                onClick = { parsed?.let { onConfirm(it) } },
+                enabled = inRange,
             ) { Text(stringResource(R.string.save)) }
         },
-        dismissButton  = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -691,25 +750,34 @@ private fun LanguageDropdown(selected: String, onSelect: (String) -> Unit) {
 
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         OutlinedTextField(
-            value         = currentLabel,
+            value = currentLabel,
             onValueChange = {},
-            readOnly      = true,
-            trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier      = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             languages.forEach { (code, label) ->
                 DropdownMenuItem(
                     text = { Text(label) },
-                    onClick = { onSelect(code); expanded = false },
-                    trailingIcon = if (code == selected) ({
-                        Icon(
-                            imageVector        = Icons.Default.Check,
-                            contentDescription = null,
-                            tint               = MaterialTheme.colorScheme.primary,
-                            modifier           = Modifier.size(16.dp)
-                        )
-                    }) else null
+                    onClick = {
+                        onSelect(code)
+                        expanded = false
+                    },
+                    trailingIcon = if (code == selected) {
+                        (
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
+                            )
+                    } else {
+                        null
+                    },
                 )
             }
         }

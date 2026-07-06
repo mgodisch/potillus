@@ -57,21 +57,21 @@ object DayResolver {
      * @param changeHour       Hour of the day-change boundary (0–23).
      * @param changeMinute     Minute of the day-change boundary (0–59).
      * @param zoneId           Timezone for conversion. Defaults to system timezone.
-     * @return                 Logical date as "YYYY-MM-DD".
+     * @return Logical date as "YYYY-MM-DD".
      */
     fun resolve(
         timestampMillis: Long,
         changeHour: Int,
         changeMinute: Int,
-        zoneId: ZoneId = ZoneId.systemDefault()
+        zoneId: ZoneId = ZoneId.systemDefault(),
     ): String {
         val localDateTime = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(timestampMillis),
-            zoneId
+            zoneId,
         )
         val isBeforeChangeTime =
             localDateTime.hour < changeHour ||
-            (localDateTime.hour == changeHour && localDateTime.minute < changeMinute)
+                (localDateTime.hour == changeHour && localDateTime.minute < changeMinute)
 
         val logicalDate: LocalDate = if (isBeforeChangeTime) {
             localDateTime.toLocalDate().minusDays(1)
@@ -124,16 +124,13 @@ object DayResolver {
      * otherwise the real device clock); the resulting instant is then run through
      * [resolve] so the configured day-change boundary is honoured either way.
      */
-    fun today(changeHour: Int, changeMinute: Int): String =
-        resolve(clock().millis(), changeHour, changeMinute)
+    fun today(changeHour: Int, changeMinute: Int): String = resolve(clock().millis(), changeHour, changeMinute)
 
     /** Parses a "YYYY-MM-DD" string into a [LocalDate]. */
-    fun parseDate(dateStr: String): LocalDate =
-        LocalDate.parse(dateStr, DATE_FORMATTER)
+    fun parseDate(dateStr: String): LocalDate = LocalDate.parse(dateStr, DATE_FORMATTER)
 
     /** Formats a [LocalDate] as "YYYY-MM-DD". */
-    fun formatDate(date: LocalDate): String =
-        date.format(DATE_FORMATTER)
+    fun formatDate(date: LocalDate): String = date.format(DATE_FORMATTER)
 
     /**
      * Number of *effective* days in the inclusive range [[from], [today]] for the
@@ -163,7 +160,7 @@ object DayResolver {
         val f = parseDate(from)
         val t = parseDate(today)
         if (f.isAfter(t)) return 0
-        val completedDays = f.datesUntil(t).count().toInt()   // [from, today) — excludes today
+        val completedDays = f.datesUntil(t).count().toInt() // [from, today) — excludes today
         return completedDays + if (todayIsDrinkDay) 1 else 0
     }
 
@@ -191,8 +188,7 @@ object DayResolver {
      *               device default locale.
      * @return ISO-8601 weekday number of the locale's first weekday (1..7).
      */
-    fun firstDayOfWeekIso(locale: Locale = Locale.getDefault()): Int =
-        WeekFields.of(locale).firstDayOfWeek.value
+    fun firstDayOfWeekIso(locale: Locale = Locale.getDefault()): Int = WeekFields.of(locale).firstDayOfWeek.value
 
     /**
      * Number of completed, alcohol-free days since the most recent drink (or since
@@ -217,12 +213,12 @@ object DayResolver {
      * @param today        Logical today from [DayResolver.today].
      * @param statsFrom    Optional statistics start date ("YYYY-MM-DD"). When set,
      *                     used as the streak origin when [sortedDates] is empty.
-     * @return             Current abstinence streak in days (≥ 0).
+     * @return Current abstinence streak in days (≥ 0).
      */
     fun computeCurrentAbstinence(
         sortedDates: List<String>,
         today: String,
-        statsFrom: String = ""
+        statsFrom: String = "",
     ): Int {
         if (sortedDates.isEmpty()) {
             // No drink history: streak runs from statsFrom to today (exclusive)
@@ -268,12 +264,12 @@ object DayResolver {
      *                     Defaults to "" (tail gap ignored; the conservative behaviour
      *                     for backward-compatible callers).
      * @param statsFrom    Optional statistics start date. Enables the initial gap.
-     * @return             Longest abstinence run in days (≥ 0).
+     * @return Longest abstinence run in days (≥ 0).
      */
     fun computeLongestAbstinence(
         sortedDates: List<String>,
         today: String = "",
-        statsFrom: String = ""
+        statsFrom: String = "",
     ): Int {
         // No drink history at all: longest = same as current streak
         if (sortedDates.isEmpty()) {

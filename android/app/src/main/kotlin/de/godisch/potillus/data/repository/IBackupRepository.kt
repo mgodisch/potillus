@@ -61,11 +61,11 @@ interface IBackupRepository {
      *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.
-     * @return               [ImportStats] with [ImportStats.imported] = total entries inserted.
+     * @return [ImportStats] with [ImportStats.imported] = total entries inserted.
      */
     suspend fun importReplace(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats
 
     /**
@@ -85,11 +85,11 @@ interface IBackupRepository {
      *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.
-     * @return               [ImportStats] with both [ImportStats.imported] and
+     * @return [ImportStats] with both [ImportStats.imported] and
      *                       [ImportStats.skipped] populated.
      */
     suspend fun importMerge(
-        backupDrinks:  List<DrinkDefinition>,
-        backupEntries: List<ConsumptionEntry>
+        backupDrinks: List<DrinkDefinition>,
+        backupEntries: List<ConsumptionEntry>,
     ): ImportStats
 }

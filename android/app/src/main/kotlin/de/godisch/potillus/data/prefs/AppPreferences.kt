@@ -41,18 +41,18 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import de.godisch.potillus.data.security.KeystoreSecretStore
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.security.GeneralSecurityException
-import java.time.Instant
-import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okio.Buffer
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.security.GeneralSecurityException
+import java.time.Instant
+import java.time.ZoneId
 
 // =============================================================================
 // AppPreferences.kt – Persistent user settings via encrypted Jetpack DataStore
@@ -124,7 +124,7 @@ import okio.Buffer
  */
 private class EncryptedPreferencesSerializer(
     keyAlias: String,
-    override val defaultValue: Preferences = emptyPreferences()
+    override val defaultValue: Preferences = emptyPreferences(),
 ) : Serializer<Preferences> {
 
     /**
@@ -151,7 +151,7 @@ private class EncryptedPreferencesSerializer(
      * reset the file instead of crashing the app.
      *
      * @param input The encrypted backing-file stream.
-     * @return      The decrypted preferences snapshot.
+     * @return The decrypted preferences snapshot.
      */
     override suspend fun readFrom(input: InputStream): Preferences {
         val bytes = withContext(Dispatchers.IO) { input.readBytes() }
@@ -228,12 +228,11 @@ private class EncryptedPreferencesSerializer(
  * within this file it is used by `settingsFlow`.
  *
  * @param source The raw `dataStore.data` stream (or any [Preferences] flow).
- * @return       The same stream, but emitting [emptyPreferences] once in place
+ * @return The same stream, but emitting [emptyPreferences] once in place
  *               of a transient [IOException]; non-IO exceptions are rethrown.
  */
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal fun recoverIoAsEmpty(source: Flow<Preferences>): Flow<Preferences> =
-    source.catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
+internal fun recoverIoAsEmpty(source: Flow<Preferences>): Flow<Preferences> = source.catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
 
 /**
  * Reads and writes all user preferences via an encrypted Jetpack DataStore.
@@ -263,21 +262,23 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         //   set of the same Gradle module, so unit tests can verify that the
         //   correct key name is used. They are NOT part of the IAppPreferences
         //   interface; callers always go through the typed set*/get* functions.
-        internal val KEY_THEME          = stringPreferencesKey("theme_mode")
-        internal val KEY_DAY_HOUR       = intPreferencesKey("day_change_hour")
-        internal val KEY_DAY_MINUTE     = intPreferencesKey("day_change_minute")
+        internal val KEY_THEME = stringPreferencesKey("theme_mode")
+        internal val KEY_DAY_HOUR = intPreferencesKey("day_change_hour")
+        internal val KEY_DAY_MINUTE = intPreferencesKey("day_change_minute")
+
         // KEY_DAILY_LIMIT keeps the historical key name "custom_limit_grams" so
         // that a user's previously configured daily limit survives the upgrade to
         // the always-on three-limit model.
-        internal val KEY_DAILY_LIMIT    = doublePreferencesKey("custom_limit_grams")
-        internal val KEY_WEEKLY_LIMIT   = doublePreferencesKey("weekly_limit_grams")
+        internal val KEY_DAILY_LIMIT = doublePreferencesKey("custom_limit_grams")
+        internal val KEY_WEEKLY_LIMIT = doublePreferencesKey("weekly_limit_grams")
+
         // KEY_MAX_DRINK_DAYS keeps the historical key name "custom_max_drink_days".
         internal val KEY_MAX_DRINK_DAYS = intPreferencesKey("custom_max_drink_days")
-        internal val KEY_BIOMETRIC      = booleanPreferencesKey("biometric_lock")
+        internal val KEY_BIOMETRIC = booleanPreferencesKey("biometric_lock")
         internal val KEY_ALLOW_SCREENSHOTS = booleanPreferencesKey("allow_screenshots")
-        internal val KEY_LANGUAGE       = stringPreferencesKey("language")
-        internal val KEY_WEIGHT_KG      = doublePreferencesKey("weight_kg")
-        internal val KEY_STATS_FROM     = stringPreferencesKey("stats_from_date")
+        internal val KEY_LANGUAGE = stringPreferencesKey("language")
+        internal val KEY_WEIGHT_KG = doublePreferencesKey("weight_kg")
+        internal val KEY_STATS_FROM = stringPreferencesKey("stats_from_date")
         // Removed in the three-limit refactor: "gender", "limit_mode" and
         // "weekly_gram_mode". Removed in the rolling-window refactor (v0.62.0):
         // "week_start_day" — the app no longer has a configurable first weekday and
@@ -309,9 +310,9 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      *   to a plain DataStore (if encryption is ever removed) is trivial.
      */
     private val dataStore: DataStore<Preferences> = DataStoreFactory.create(
-        serializer        = EncryptedPreferencesSerializer(keyAlias = PREFS_KEY_ALIAS),
+        serializer = EncryptedPreferencesSerializer(keyAlias = PREFS_KEY_ALIAS),
         corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
-        produceFile       = { context.preferencesDataStoreFile("potillus_settings") }
+        produceFile = { context.preferencesDataStoreFile("potillus_settings") },
     )
 
     /**
@@ -364,17 +365,17 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      */
     override val settingsFlow: Flow<AppSettings> = recoverIoAsEmpty(dataStore.data).map { prefs ->
         AppSettings(
-            themeMode           = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
-            dayChangeHour       = prefs[KEY_DAY_HOUR]        ?: 4,
-            dayChangeMinute     = prefs[KEY_DAY_MINUTE]      ?: 0,
-            dailyLimitGrams     = prefs[KEY_DAILY_LIMIT]     ?: 20.0,
-            weeklyLimitGrams    = prefs[KEY_WEEKLY_LIMIT]    ?: 100.0,
-            maxDrinkDaysPerWeek = prefs[KEY_MAX_DRINK_DAYS]  ?: 5,
-            biometricEnabled    = prefs[KEY_BIOMETRIC]           ?: false,
-            allowScreenshots    = prefs[KEY_ALLOW_SCREENSHOTS]   ?: false,
-            language            = prefs[KEY_LANGUAGE]        ?: "",
-            weightKg            = prefs[KEY_WEIGHT_KG]       ?: 0.0,
-            statsFromDate       = prefs[KEY_STATS_FROM]      ?: installDate
+            themeMode = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
+            dayChangeHour = prefs[KEY_DAY_HOUR] ?: 4,
+            dayChangeMinute = prefs[KEY_DAY_MINUTE] ?: 0,
+            dailyLimitGrams = prefs[KEY_DAILY_LIMIT] ?: 20.0,
+            weeklyLimitGrams = prefs[KEY_WEEKLY_LIMIT] ?: 100.0,
+            maxDrinkDaysPerWeek = prefs[KEY_MAX_DRINK_DAYS] ?: 5,
+            biometricEnabled = prefs[KEY_BIOMETRIC] ?: false,
+            allowScreenshots = prefs[KEY_ALLOW_SCREENSHOTS] ?: false,
+            language = prefs[KEY_LANGUAGE] ?: "",
+            weightKg = prefs[KEY_WEIGHT_KG] ?: 0.0,
+            statsFromDate = prefs[KEY_STATS_FROM] ?: installDate,
         )
     }
 
@@ -389,13 +390,13 @@ class AppPreferences(private val context: Context) : IAppPreferences {
     // behaviour added here over the contract is range clamping, which is shown
     // inline via coerceIn(...) so the valid bounds are visible at a glance.
 
-    override suspend fun setTheme(mode: ThemeMode)      = save { it[KEY_THEME]          = mode.name }
-    override suspend fun setDailyLimit(g: Double)       = save { it[KEY_DAILY_LIMIT]    = g.coerceIn(1.0, 500.0) }
-    override suspend fun setWeeklyLimit(g: Double)      = save { it[KEY_WEEKLY_LIMIT]   = g.coerceIn(1.0, 3500.0) }
-    override suspend fun setBiometric(v: Boolean)          = save { it[KEY_BIOMETRIC]          = v }
-    override suspend fun setAllowScreenshots(v: Boolean)   = save { it[KEY_ALLOW_SCREENSHOTS]  = v }
-    override suspend fun setLanguage(lang: String)      = save { it[KEY_LANGUAGE]       = lang }
-    override suspend fun setWeightKg(kg: Double)        = save { it[KEY_WEIGHT_KG]      = kg.coerceIn(1.0, 500.0) }
+    override suspend fun setTheme(mode: ThemeMode) = save { it[KEY_THEME] = mode.name }
+    override suspend fun setDailyLimit(g: Double) = save { it[KEY_DAILY_LIMIT] = g.coerceIn(1.0, 500.0) }
+    override suspend fun setWeeklyLimit(g: Double) = save { it[KEY_WEEKLY_LIMIT] = g.coerceIn(1.0, 3500.0) }
+    override suspend fun setBiometric(v: Boolean) = save { it[KEY_BIOMETRIC] = v }
+    override suspend fun setAllowScreenshots(v: Boolean) = save { it[KEY_ALLOW_SCREENSHOTS] = v }
+    override suspend fun setLanguage(lang: String) = save { it[KEY_LANGUAGE] = lang }
+    override suspend fun setWeightKg(kg: Double) = save { it[KEY_WEIGHT_KG] = kg.coerceIn(1.0, 500.0) }
     override suspend fun setMaxDrinkDaysPerWeek(days: Int) = save { it[KEY_MAX_DRINK_DAYS] = days.coerceIn(1, 7) }
 
     /**
@@ -410,7 +411,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      * @param minute  New day-change minute (0–59).
      */
     override suspend fun setDayChangeTime(hour: Int, minute: Int) = save {
-        it[KEY_DAY_HOUR]   = hour
+        it[KEY_DAY_HOUR] = hour
         it[KEY_DAY_MINUTE] = minute
     }
 

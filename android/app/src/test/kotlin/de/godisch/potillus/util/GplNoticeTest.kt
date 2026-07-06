@@ -37,11 +37,11 @@ class GplNoticeTest {
         assertTrue("header must not be empty", lines.isNotEmpty())
         assertEquals(
             "Libellus Potionis - Privacy-Friendly Alcohol Tracker",
-            lines.first()
+            lines.first(),
         )
         assertTrue(
             "header must mention the licence",
-            lines.any { it.contains("GNU General Public License") }
+            lines.any { it.contains("GNU General Public License") },
         )
     }
 

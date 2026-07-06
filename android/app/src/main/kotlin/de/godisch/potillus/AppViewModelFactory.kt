@@ -90,25 +90,25 @@ class AppViewModelFactory(private val app: PotillusApp) : ViewModelProvider.Fact
      */
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when (modelClass) {
-        TodayViewModel::class.java    ->
+        TodayViewModel::class.java ->
             TodayViewModel(
-                entryRepo  = app.entryRepository,
-                drinkRepo  = app.drinkRepository,
-                prefs      = app.appPreferences
+                entryRepo = app.entryRepository,
+                drinkRepo = app.drinkRepository,
+                prefs = app.appPreferences,
             ) as T
 
         CalendarViewModel::class.java ->
             CalendarViewModel(
-                entryRepo  = app.entryRepository,
-                drinkRepo  = app.drinkRepository,
-                prefs      = app.appPreferences
+                entryRepo = app.entryRepository,
+                drinkRepo = app.drinkRepository,
+                prefs = app.appPreferences,
             ) as T
 
-        StatsViewModel::class.java    ->
+        StatsViewModel::class.java ->
             StatsViewModel(
-                entryRepo  = app.entryRepository,
-                drinkRepo  = app.drinkRepository,
-                prefs      = app.appPreferences,
+                entryRepo = app.entryRepository,
+                drinkRepo = app.drinkRepository,
+                prefs = app.appPreferences,
                 // CSV/PDF export is owned by StatsViewModel; it needs
                 // the Application context for MediaStore I/O and a StringProvider
                 // for localised status messages (same pattern as SettingsViewModel).
@@ -122,33 +122,33 @@ class AppViewModelFactory(private val app: PotillusApp) : ViewModelProvider.Fact
                 // ViewModel applies the same wrapper before handing the context to
                 // CsvExporter/PdfReportBuilder (see StatsViewModel).
                 appContext = app.applicationContext,
-                getString  = StringProvider { id, args ->
+                getString = StringProvider { id, args ->
                     app.perAppLocalizedContext().getString(id, *args)
-                }
+                },
             ) as T
 
-        DrinksViewModel::class.java   ->
+        DrinksViewModel::class.java ->
             DrinksViewModel(drinkRepo = app.drinkRepository) as T
 
         SettingsViewModel::class.java ->
             SettingsViewModel(
                 // PER-APP LOCALE: wrapped per call, same rationale as in the
                 // StatsViewModel branch above.
-                getString  = StringProvider { id, args ->
+                getString = StringProvider { id, args ->
                     app.perAppLocalizedContext().getString(id, *args)
                 },
                 // Pass applicationContext explicitly – see SettingsViewModel KDoc for
                 // the rationale why applicationContext is safe in a ViewModel.
-                appContext  = app.applicationContext,
-                prefs      = app.appPreferences,
-                entryRepo  = app.entryRepository,
-                drinkRepo  = app.drinkRepository,
-                backupRepo = app.backupRepository
+                appContext = app.applicationContext,
+                prefs = app.appPreferences,
+                entryRepo = app.entryRepository,
+                drinkRepo = app.drinkRepository,
+                backupRepo = app.backupRepository,
             ) as T
 
         else -> throw IllegalArgumentException(
             "Unknown ViewModel class: ${modelClass.name}. " +
-            "Register it in AppViewModelFactory."
+                "Register it in AppViewModelFactory.",
         )
     }
 }

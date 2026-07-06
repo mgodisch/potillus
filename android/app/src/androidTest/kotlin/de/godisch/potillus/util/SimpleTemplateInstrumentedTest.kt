@@ -59,7 +59,7 @@ class SimpleTemplateInstrumentedTest {
         val out = SimpleTemplate.render(
             "<ul><!-- repeat:ITEMS --><li>{{NAME}}</li><!-- end:ITEMS --></ul>",
             scalars = emptyMap(),
-            repeats = mapOf("ITEMS" to listOf(mapOf("NAME" to "a"), mapOf("NAME" to "b")))
+            repeats = mapOf("ITEMS" to listOf(mapOf("NAME" to "a"), mapOf("NAME" to "b"))),
         )
         assertEquals("<ul><li>a</li><li>b</li></ul>", out)
     }

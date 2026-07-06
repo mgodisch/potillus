@@ -52,21 +52,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -153,13 +153,15 @@ fun AlcoholBarChart(
     labelFn: (ChartBucket) -> String,
     modifier: Modifier = Modifier,
     showLimitLine: Boolean = true,
-    showBarValues: Boolean = false
+    showBarValues: Boolean = false,
 ) {
     if (buckets.isEmpty()) {
         Box(modifier.height(180.dp), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.no_data),
+            Text(
+                stringResource(R.string.no_data),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         return
     }
@@ -168,43 +170,47 @@ fun AlcoholBarChart(
     // Bar height/colour are driven by the per-day average. The limit only enters
     // the scale when it is actually drawn; showBarValues adds headroom so the
     // value labels above the tallest bars are not clipped.
-    val headroom   = if (showBarValues) 1.30 else 1.15
-    val maxBar     = buckets.maxOf { it.avgPerDay }
-    val maxVal     = (if (showLimitLine) maxOf(maxBar, limitGrams) else maxBar)
+    val headroom = if (showBarValues) 1.30 else 1.15
+    val maxBar = buckets.maxOf { it.avgPerDay }
+    val maxVal = (if (showLimitLine) maxOf(maxBar, limitGrams) else maxBar)
         .times(headroom).coerceAtLeast(0.001)
-    val barColor   = MaterialTheme.colorScheme.primary
+    val barColor = MaterialTheme.colorScheme.primary
     // Daily-limit line in the saturated danger red (was amber) so it reads as a
     // "do not cross" threshold and matches the over-limit bar colour.
     val limitColor = dangerRedColor()
     // Over-limit bars use the saturated danger red (same hue as delete icons /
     // traffic-light bullets) rather than the softer Material `error` colour, so
     // every "over limit" cue in the app shares one consistent red.
-    val overColor  = dangerRedColor()
-    val tickColor  = successColor()
+    val overColor = dangerRedColor()
+    val tickColor = successColor()
     // Resolved here (not inside the Canvas DrawScope, which cannot read theme).
-    val valueArgb  = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
+    val valueArgb = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
     // Per-app locale for the on-bar value labels, captured before the Canvas
     // (a DrawScope cannot read Compose composition locals) so the decimal
     // separator follows the in-app language, not the system locale.
-    val locale     = LocalContext.current.formattingLocale()
+    val locale = LocalContext.current.formattingLocale()
 
     Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
-        val chartH  = size.height
-        val chartW  = size.width
+        val chartH = size.height
+        val chartW = size.width
         // Each bar occupies an equal horizontal slice (spacing = chartW / numBars).
         // The actual bar width is 60 % of the slice to leave gaps between bars.
         // coerceAtLeast(2f) keeps a hairline bar visible even with ~53 weekly bars.
         val spacing = chartW / buckets.size
-        val barW    = (spacing * 0.6f).coerceAtLeast(2f)
+        val barW = (spacing * 0.6f).coerceAtLeast(2f)
 
         // Paint for the per-bar value labels (grams), centred above each bar.
         // Null when labels are disabled, so the loop below skips drawing them.
-        val valuePaint = if (showBarValues) android.graphics.Paint().apply {
-            isAntiAlias = true
-            color       = valueArgb
-            textAlign   = android.graphics.Paint.Align.CENTER
-            textSize    = 9.sp.toPx()
-        } else null
+        val valuePaint = if (showBarValues) {
+            android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = valueArgb
+                textAlign = android.graphics.Paint.Align.CENTER
+                textSize = 9.sp.toPx()
+            }
+        } else {
+            null
+        }
 
         // Dashed horizontal daily-limit line — only when meaningful. The YEAR
         // view shows monthly totals with no daily-limit reference, so it passes
@@ -212,11 +218,11 @@ fun AlcoholBarChart(
         if (showLimitLine) {
             val limitY = chartH - (limitGrams / maxVal * chartH).toFloat()
             drawLine(
-                color       = limitColor,
-                start       = Offset(0f, limitY),
-                end         = Offset(chartW, limitY),
+                color = limitColor,
+                start = Offset(0f, limitY),
+                end = Offset(chartW, limitY),
                 strokeWidth = 2.dp.toPx(),
-                pathEffect  = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f)),
             )
         }
 
@@ -225,15 +231,21 @@ fun AlcoholBarChart(
             if (bucket.isAbstinent) {
                 // Green tick at the baseline: two short strokes forming a check.
                 // Sized to the slice so it stays visible but never overlaps neighbours.
-                val s     = (spacing * 0.30f).coerceIn(2.dp.toPx(), 5.dp.toPx())
+                val s = (spacing * 0.30f).coerceIn(2.dp.toPx(), 5.dp.toPx())
                 val baseY = chartH - 1.dp.toPx()
-                val w     = 1.5.dp.toPx()
-                drawLine(tickColor,
+                val w = 1.5.dp.toPx()
+                drawLine(
+                    tickColor,
                     Offset(centerX - s, baseY - s * 0.5f),
-                    Offset(centerX - s * 0.25f, baseY), strokeWidth = w)
-                drawLine(tickColor,
                     Offset(centerX - s * 0.25f, baseY),
-                    Offset(centerX + s, baseY - s), strokeWidth = w)
+                    strokeWidth = w,
+                )
+                drawLine(
+                    tickColor,
+                    Offset(centerX - s * 0.25f, baseY),
+                    Offset(centerX + s, baseY - s),
+                    strokeWidth = w,
+                )
             } else if (bucket.avgPerDay > 0.0) {
                 // Bar value: the bucket's per-day average (day grams for DAILY
                 // buckets, the month's grams-per-day for the YEAR view).
@@ -244,17 +256,20 @@ fun AlcoholBarChart(
                 // Over-limit red only applies when a daily-limit line is shown.
                 val color = if (showLimitLine && value > limitGrams) overColor else barColor
                 drawRoundRect(
-                    color        = color,
-                    topLeft      = Offset(left, chartH - barH),
-                    size         = Size(barW, barH),
-                    cornerRadius = CornerRadius(3.dp.toPx())
+                    color = color,
+                    topLeft = Offset(left, chartH - barH),
+                    size = Size(barW, barH),
+                    cornerRadius = CornerRadius(3.dp.toPx()),
                 )
                 // Value label just above the bar: per-day average, commercially
                 // rounded to a whole number (HALF_UP via %.0f; values are ≥ 0) and
                 // printed without a unit to keep it narrow.
                 valuePaint?.let { p ->
                     drawContext.canvas.nativeCanvas.drawText(
-                        value.fmt0(locale), centerX, chartH - barH - 2.dp.toPx(), p
+                        value.fmt0(locale),
+                        centerX,
+                        chartH - barH - 2.dp.toPx(),
+                        p,
                     )
                 }
             }
@@ -274,13 +289,13 @@ fun AlcoholBarChart(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             buckets.forEach { bucket ->
                 Text(
-                    text      = labelFn(bucket),
-                    style     = MaterialTheme.typography.labelSmall,
-                    color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = labelFn(bucket),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    maxLines  = 1,
-                    overflow  = TextOverflow.Ellipsis,
-                    modifier  = Modifier.weight(1f)
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -295,11 +310,11 @@ fun AlcoholBarChart(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             sampled.forEach { bucket ->
                 Text(
-                    text     = labelFn(bucket),
-                    style    = MaterialTheme.typography.labelSmall,
-                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = labelFn(bucket),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -339,19 +354,21 @@ fun ValueBarChart(
     values: List<Double>,
     labelFor: (Int) -> String,
     modifier: Modifier = Modifier,
-    showValues: Boolean = false
+    showValues: Boolean = false,
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
         Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.no_data),
+            Text(
+                stringResource(R.string.no_data),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         return
     }
 
     // coerceAtLeast(0.001): avoids division by zero in the height calculation.
-    val maxVal   = (values.maxOrNull() ?: 0.0).coerceAtLeast(0.001)
+    val maxVal = (values.maxOrNull() ?: 0.0).coerceAtLeast(0.001)
     val barColor = MaterialTheme.colorScheme.primary
     // Resolved here (not inside the Canvas DrawScope, which cannot read theme).
     val valueArgb = MaterialTheme.colorScheme.onSurfaceVariant.toArgb()
@@ -360,40 +377,47 @@ fun ValueBarChart(
     val heightRef = if (showValues) maxVal * 1.25 else maxVal
     // Per-app locale for the on-bar value labels, captured before the Canvas (see
     // AlcoholBarChart for the same DrawScope/composition-local rationale).
-    val locale    = LocalContext.current.formattingLocale()
+    val locale = LocalContext.current.formattingLocale()
 
     Canvas(modifier = modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp, bottom = 4.dp)) {
-        val chartH  = size.height
-        val chartW  = size.width
+        val chartH = size.height
+        val chartW = size.width
         val spacing = chartW / values.size
         // 70% of a slice as bar width works for both the 7-bar weekday chart and
         // the 24-bar hour chart; coerceAtLeast(2f) keeps thin hour bars visible.
-        val barW    = (spacing * 0.7f).coerceAtLeast(2f)
+        val barW = (spacing * 0.7f).coerceAtLeast(2f)
 
-        val valuePaint = if (showValues) android.graphics.Paint().apply {
-            isAntiAlias = true
-            color       = valueArgb
-            textAlign   = android.graphics.Paint.Align.CENTER
-            textSize    = 10.sp.toPx()
-        } else null
+        val valuePaint = if (showValues) {
+            android.graphics.Paint().apply {
+                isAntiAlias = true
+                color = valueArgb
+                textAlign = android.graphics.Paint.Align.CENTER
+                textSize = 10.sp.toPx()
+            }
+        } else {
+            null
+        }
 
         values.forEachIndexed { i, v ->
             if (v <= 0.0) return@forEachIndexed
             // barH proportional to the tallest bar; coerceAtLeast(2f) keeps a tiny
             // but non-zero value visible.
-            val barH    = (v / heightRef * chartH).toFloat().coerceAtLeast(2f)
+            val barH = (v / heightRef * chartH).toFloat().coerceAtLeast(2f)
             val centerX = i * spacing + spacing / 2f
-            val barTop  = chartH - barH
+            val barTop = chartH - barH
             drawRoundRect(
-                color        = barColor,
-                topLeft      = Offset(centerX - barW / 2f, barTop),
-                size         = Size(barW, barH),
-                cornerRadius = CornerRadius(3.dp.toPx())
+                color = barColor,
+                topLeft = Offset(centerX - barW / 2f, barTop),
+                size = Size(barW, barH),
+                cornerRadius = CornerRadius(3.dp.toPx()),
             )
             // Value just above the bar (one decimal), if requested.
             valuePaint?.let { p ->
                 drawContext.canvas.nativeCanvas.drawText(
-                    v.fmt1(locale), centerX, barTop - 2.dp.toPx(), p
+                    v.fmt1(locale),
+                    centerX,
+                    barTop - 2.dp.toPx(),
+                    p,
                 )
             }
         }
@@ -404,13 +428,13 @@ fun ValueBarChart(
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         values.indices.forEach { i ->
             Text(
-                text      = labelFor(i),
-                style     = MaterialTheme.typography.labelSmall,
-                color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = labelFor(i),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                maxLines  = 1,
-                overflow  = TextOverflow.Ellipsis,
-                modifier  = Modifier.weight(1f)
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -429,12 +453,12 @@ fun ValueBarChart(
  * good contrast against both light and dark backgrounds.
  */
 private val CATEGORY_COLORS = mapOf(
-    DrinkCategory.BEER      to Color(0xFFF59E0B),   // amber-500
-    DrinkCategory.WINE      to Color(0xFF9333EA),   // purple-600
-    DrinkCategory.SPIRITS   to Color(0xFFEF4444),   // red-500
-    DrinkCategory.LONGDRINK to Color(0xFF3B82F6),   // blue-500
-    DrinkCategory.LIQUEUR   to Color(0xFF10B981),   // emerald-500
-    DrinkCategory.OTHER     to Color(0xFF6B7280)    // gray-500
+    DrinkCategory.BEER to Color(0xFFF59E0B), // amber-500
+    DrinkCategory.WINE to Color(0xFF9333EA), // purple-600
+    DrinkCategory.SPIRITS to Color(0xFFEF4444), // red-500
+    DrinkCategory.LONGDRINK to Color(0xFF3B82F6), // blue-500
+    DrinkCategory.LIQUEUR to Color(0xFF10B981), // emerald-500
+    DrinkCategory.OTHER to Color(0xFF6B7280), // gray-500
 )
 
 /**
@@ -460,54 +484,56 @@ private val CATEGORY_COLORS = mapOf(
 @Composable
 fun CategoryDonutChart(
     data: Map<DrinkCategory, Double>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (data.isEmpty()) {
         Box(modifier.height(120.dp), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.no_data),
+            Text(
+                stringResource(R.string.no_data),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         return
     }
 
     // coerceAtLeast(0.001): prevents division by zero in the percentage calculation
     // when only zero-gram entries are present (edge case).
-    val total   = data.values.sum().coerceAtLeast(0.001)
+    val total = data.values.sum().coerceAtLeast(0.001)
     // Sort largest segment first so the most prominent category starts at the top
     val entries = data.entries.sortedByDescending { it.value }
     // Per-app locale for the legend's gram/percent numbers (see l10n/NumberFormat.kt).
-    val locale  = LocalContext.current.formattingLocale()
+    val locale = LocalContext.current.formattingLocale()
 
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .height(160.dp),
     ) {
         // Donut geometry: radius fills 88 % of the smaller canvas dimension;
         // stroke width is 38 % of the radius, giving the "ring" appearance.
-        val radius      = minOf(size.width, size.height) / 2f * 0.88f
+        val radius = minOf(size.width, size.height) / 2f * 0.88f
         val strokeWidth = radius * 0.38f
-        val cx          = size.width / 2f
-        val cy          = size.height / 2f
-        val arcBounds   = androidx.compose.ui.geometry.Rect(
-            left   = cx - radius,
-            top    = cy - radius,
-            right  = cx + radius,
-            bottom = cy + radius
+        val cx = size.width / 2f
+        val cy = size.height / 2f
+        val arcBounds = androidx.compose.ui.geometry.Rect(
+            left = cx - radius,
+            top = cy - radius,
+            right = cx + radius,
+            bottom = cy + radius,
         )
 
-        var startAngle = -90f   // start at 12 o'clock
+        var startAngle = -90f // start at 12 o'clock
         entries.forEach { (category, grams) ->
             val sweepAngle = (grams / total * 360f).toFloat()
             drawArc(
-                color       = CATEGORY_COLORS[category] ?: Color.Gray,
-                startAngle  = startAngle,
-                sweepAngle  = sweepAngle - 1f,   // 1° visual gap between segments
-                useCenter   = false,             // false = arc only (no pie wedge lines)
-                topLeft     = arcBounds.topLeft,
-                size        = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
-                style       = Stroke(width = strokeWidth)
+                color = CATEGORY_COLORS[category] ?: Color.Gray,
+                startAngle = startAngle,
+                sweepAngle = sweepAngle - 1f, // 1° visual gap between segments
+                useCenter = false, // false = arc only (no pie wedge lines)
+                topLeft = arcBounds.topLeft,
+                size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
+                style = Stroke(width = strokeWidth),
             )
             startAngle += sweepAngle
         }
@@ -519,8 +545,8 @@ fun CategoryDonutChart(
             Row(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
                 row.forEach { (category, grams) ->
                     Row(
-                        modifier          = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Colour swatch drawn via drawBehind to avoid an extra composable
                         Box(
@@ -529,21 +555,21 @@ fun CategoryDonutChart(
                                 .then(
                                     Modifier.drawBehind {
                                         drawCircle(color = CATEGORY_COLORS[category] ?: Color.Gray)
-                                    }
-                                )
+                                    },
+                                ),
                         )
                         Spacer(Modifier.width(6.dp))
                         Column {
                             Text(
                                 category.displayLabel(),
-                                style    = MaterialTheme.typography.labelSmall,
+                                style = MaterialTheme.typography.labelSmall,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
                             )
                             Text(
                                 "${grams.fmt1(locale)} g · ${(grams / total * 100).fmt0(locale)} %",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }

@@ -32,26 +32,24 @@ class DayResolverTest {
     private val zone = ZoneId.of("Europe/Berlin")
 
     // Hilfsmethode: LocalDateTime → Unix-Millisekunden in einer fixen Zeitzone
-    private fun toMillis(ldt: LocalDateTime): Long =
-        ldt.atZone(zone).toInstant().toEpochMilli()
+    private fun toMillis(ldt: LocalDateTime): Long = ldt.atZone(zone).toInstant().toEpochMilli()
 
     // ── Basisfall: nach Tageswechsel ──────────────────────────────────────────
 
     @Test fun `resolve 04h01 stays same day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 4, 1))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 4, 1))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-24", day)
     }
 
     @Test fun `resolve 12h00 stays same day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 12, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 12, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-24", day)
-
     }
 
     @Test fun `resolve 23h59 stays same day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 23, 59))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 23, 59))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-24", day)
     }
@@ -59,19 +57,19 @@ class DayResolverTest {
     // ── Vor Tageswechsel → Vortag ─────────────────────────────────────────────
 
     @Test fun `resolve 03h59 maps to previous day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 3, 59))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 3, 59))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve 02h30 maps to previous day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 2, 30))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 2, 30))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve 00h00 (midnight) maps to previous day`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 0, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 0, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-23", day)
     }
@@ -80,7 +78,7 @@ class DayResolverTest {
 
     @Test fun `resolve exactly at change time stays same day`() {
         // 04:00 ist NICHT vor 04:00, also gleicher Tag
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 4, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 4, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-05-24", day)
     }
@@ -88,13 +86,13 @@ class DayResolverTest {
     // ── Benutzerdefinierter Tageswechsel ──────────────────────────────────────
 
     @Test fun `resolve custom change time 06h00`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 5, 59))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 5, 59))
         val day = DayResolver.resolve(ts, 6, 0, zone)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve custom change time 06h00 after`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 5, 24, 6, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 5, 24, 6, 0))
         val day = DayResolver.resolve(ts, 6, 0, zone)
         assertEquals("2025-05-24", day)
     }
@@ -102,27 +100,27 @@ class DayResolverTest {
     @Test fun `resolve change time with minutes`() {
         // Tageswechsel um 04:30 → 04:29 ist Vortag, 04:30 ist heute
         val tsBefore = toMillis(LocalDateTime.of(2025, 5, 24, 4, 29))
-        val tsAt     = toMillis(LocalDateTime.of(2025, 5, 24, 4, 30))
+        val tsAt = toMillis(LocalDateTime.of(2025, 5, 24, 4, 30))
         assertEquals("2025-05-23", DayResolver.resolve(tsBefore, 4, 30, zone))
-        assertEquals("2025-05-24", DayResolver.resolve(tsAt,     4, 30, zone))
+        assertEquals("2025-05-24", DayResolver.resolve(tsAt, 4, 30, zone))
     }
 
     // ── Monatsgrenzen ──────────────────────────────────────────────────────────
 
     @Test fun `resolve maps midnight Jan 1 to Dec 31`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 1, 1, 0, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 1, 1, 0, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2024-12-31", day)
     }
 
     @Test fun `resolve maps midnight March 1 to Feb 28 in non-leap year`() {
-        val ts  = toMillis(LocalDateTime.of(2025, 3, 1, 0, 0))
+        val ts = toMillis(LocalDateTime.of(2025, 3, 1, 0, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2025-02-28", day)
     }
 
     @Test fun `resolve maps midnight March 1 to Feb 29 in leap year`() {
-        val ts  = toMillis(LocalDateTime.of(2024, 3, 1, 0, 0))
+        val ts = toMillis(LocalDateTime.of(2024, 3, 1, 0, 0))
         val day = DayResolver.resolve(ts, 4, 0, zone)
         assertEquals("2024-02-29", day)
     }
@@ -131,14 +129,14 @@ class DayResolverTest {
 
     @Test fun `parseDate round trips formatDate`() {
         val original = LocalDate.of(2025, 5, 24)
-        val str      = DayResolver.formatDate(original)
-        val parsed   = DayResolver.parseDate(str)
+        val str = DayResolver.formatDate(original)
+        val parsed = DayResolver.parseDate(str)
         assertEquals(original, parsed)
     }
 
     @Test fun `parseDate format is ISO`() {
         val str = DayResolver.formatDate(LocalDate.of(2025, 5, 7))
-        assertEquals("2025-05-07", str)  // No single-digit months/days without a leading zero
+        assertEquals("2025-05-07", str) // No single-digit months/days without a leading zero
     }
 
     // ── computeCurrentAbstinence ────────────────────────────────────────────

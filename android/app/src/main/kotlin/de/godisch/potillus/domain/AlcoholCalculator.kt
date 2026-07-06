@@ -160,7 +160,7 @@ object AlcoholCalculator {
      *
      * @param volumeMl       Volume of the drink in millilitres.
      * @param alcoholPercent Alcohol by volume (ABV) as a percentage, e.g. 4.9.
-     * @return               Grams of pure alcohol, rounded to one decimal place (0.1 g).
+     * @return Grams of pure alcohol, rounded to one decimal place (0.1 g).
      */
     fun calculateGrams(volumeMl: Int, alcoholPercent: Double): Double {
         val rawGrams = volumeMl.toDouble() * (alcoholPercent / 100.0) * ETHANOL_DENSITY
@@ -185,13 +185,13 @@ object AlcoholCalculator {
      * @param weightKg      Body weight in kilograms (must be > 0).
      * @param hoursElapsed  Hours since the first alcoholic drink of the episode.
      *                      Negative values are treated as 0 (coerced).
-     * @return              Estimated BAC in ‰, always ≥ 0.0.
+     * @return Estimated BAC in ‰, always ≥ 0.0.
      *                      Returns 0.0 for invalid inputs (weight ≤ 0 or no alcohol).
      */
     fun calculateBAC(
         totalGrams: Double,
         weightKg: Double,
-        hoursElapsed: Double
+        hoursElapsed: Double,
     ): Double {
         if (weightKg <= 0 || totalGrams <= 0) return 0.0
         val raw = (totalGrams / (weightKg * R_CONSERVATIVE)) - (BETA * hoursElapsed.coerceAtLeast(0.0))
@@ -214,12 +214,12 @@ object AlcoholCalculator {
      * valid 1–7 range defensively (the preference layer already clamps on write).
      *
      * @param settings  Current user preferences.
-     * @return          [LimitInfo] with the daily, weekly and drink-day thresholds.
+     * @return [LimitInfo] with the daily, weekly and drink-day thresholds.
      */
     fun getLimitInfo(settings: AppSettings): LimitInfo = LimitInfo(
-        limitGrams          = settings.dailyLimitGrams,
-        weeklyLimitGrams    = settings.weeklyLimitGrams,
-        maxDrinkDaysPerWeek = settings.maxDrinkDaysPerWeek.coerceIn(1, 7)
+        limitGrams = settings.dailyLimitGrams,
+        weeklyLimitGrams = settings.weeklyLimitGrams,
+        maxDrinkDaysPerWeek = settings.maxDrinkDaysPerWeek.coerceIn(1, 7),
     )
 
     /**
@@ -238,7 +238,7 @@ object AlcoholCalculator {
      * @param limitGrams  Active daily limit in grams. A non-positive value
      *                    (limit not configured) yields 0f — an empty bar —
      *                    instead of a NaN/Infinity fill.
-     * @return            Fraction in range [0f, ∞), clamped to 0f from below.
+     * @return Fraction in range [0f, ∞), clamped to 0f from below.
      */
     fun limitPercent(totalGrams: Double, limitGrams: Double): Float {
         if (limitGrams <= 0.0) return 0f
@@ -287,7 +287,7 @@ object AlcoholCalculator {
      * @param drinkDaysThisWeek   Distinct drink days in the trailing 7-day window
      *                            (today included when today already has alcohol).
      * @param maxDrinkDaysPerWeek Maximum allowed drink days within the 7-day window.
-     * @return                    [TrafficLight] status.
+     * @return [TrafficLight] status.
      */
     fun trafficLight(
         gramsPerDrink: Double,
@@ -296,24 +296,24 @@ object AlcoholCalculator {
         weeklyTotalGrams: Double,
         weeklyLimitGrams: Double,
         drinkDaysThisWeek: Int,
-        maxDrinkDaysPerWeek: Int
+        maxDrinkDaysPerWeek: Int,
     ): TrafficLight {
         if (gramsPerDrink <= 0.0) return TrafficLight.GREEN
 
         // Drink-day gate: count drink days strictly before today.
         val todayIsDrinkDay = todayGrams > 0.0
-        val pastDrinkDays   = drinkDaysThisWeek - (if (todayIsDrinkDay) 1 else 0)
+        val pastDrinkDays = drinkDaysThisWeek - (if (todayIsDrinkDay) 1 else 0)
         if (pastDrinkDays >= maxDrinkDaysPerWeek) return TrafficLight.RED
 
         // Gram checks: whole servings that fit into the remaining daily / weekly budget.
-        val dailyCount  = servingsFitting(dailyLimitGrams  - todayGrams,        gramsPerDrink)
-        val weeklyCount = servingsFitting(weeklyLimitGrams - weeklyTotalGrams,  gramsPerDrink)
-        val count       = minOf(dailyCount, weeklyCount)
+        val dailyCount = servingsFitting(dailyLimitGrams - todayGrams, gramsPerDrink)
+        val weeklyCount = servingsFitting(weeklyLimitGrams - weeklyTotalGrams, gramsPerDrink)
+        val count = minOf(dailyCount, weeklyCount)
 
         return when {
             count <= 0 -> TrafficLight.RED
             count == 1 -> TrafficLight.YELLOW
-            else       -> TrafficLight.GREEN
+            else -> TrafficLight.GREEN
         }
     }
 
@@ -378,13 +378,13 @@ object AlcoholCalculator {
      * @param dailyLimitGrams     Daily gram limit.
      * @param weeklyLimitGrams    Gram limit for the trailing 7-day window.
      * @param maxDrinkDaysPerWeek Maximum allowed drink days within any 7-day window.
-     * @return                    The three violation counts.
+     * @return The three violation counts.
      */
     fun countLimitViolations(
         summaries: List<DaySummary>,
         dailyLimitGrams: Double,
         weeklyLimitGrams: Double,
-        maxDrinkDaysPerWeek: Int
+        maxDrinkDaysPerWeek: Int,
     ): LimitViolations {
         val daysOverDaily = summaries.count { it.totalGrams > dailyLimitGrams }
 
@@ -395,7 +395,7 @@ object AlcoholCalculator {
             .map { LocalDate.parse(it.date) to it.totalGrams }
             .sortedBy { it.first }
 
-        var daysOverWeekly   = 0
+        var daysOverWeekly = 0
         var daysOverDrinkDay = 0
 
         // Two-pointer window: [left, right] holds every consumption day whose date is
@@ -415,7 +415,7 @@ object AlcoholCalculator {
             }
 
             val windowDrinkDays = right - left + 1
-            if (windowGrams > weeklyLimitGrams)        daysOverWeekly++
+            if (windowGrams > weeklyLimitGrams) daysOverWeekly++
             if (windowDrinkDays > maxDrinkDaysPerWeek) daysOverDrinkDay++
         }
 

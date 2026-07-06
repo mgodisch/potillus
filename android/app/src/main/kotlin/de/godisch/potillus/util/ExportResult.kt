@@ -64,5 +64,5 @@ import android.net.Uri
 data class ExportResult(
     val fileName: String,
     val uri: Uri,
-    val mimeType: String
+    val mimeType: String,
 )

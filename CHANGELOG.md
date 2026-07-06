@@ -213,6 +213,24 @@ listed below as they land.
     unpinned). The add-drink dialog's default time-of-day and a non-visible
     export-range fallback were deliberately left as-is (time-of-day, governed by
     Demo Mode; not the date perspective).
+- Enforce the ktlint Kotlin-style gate tree-wide and wire it into the default
+  build. `./gradlew ktlintFormat` reformatted the whole codebase to the pinned
+  ktlint ruleset (long-whitespace, trailing commas, argument wrapping, newline and
+  indentation rules). The non-auto-correctable findings were resolved WITHOUT
+  churning idiomatic code, via `.editorconfig`: Jetpack Compose `@Composable`
+  functions are exempted from the lowercase function-naming rule (PascalCase is the
+  Compose convention), and `no-wildcard-imports` (Compose imports whole packages)
+  and `backing-property-naming` (the ViewModels expose state through a combined
+  `uiState`, so their private `_x` MutableStateFlows have no public `x`) are
+  disabled; the intentional package-overview file `ui/screen/ViewModels.kt` is
+  exempted from `no-empty-file`. Genuine code fixes: `app/build.gradle.kts` script
+  imports made contiguous and comment-free so ktlint can order them; an inline
+  value-parameter comment in `DrinkEntity` moved above the parameter; the singleton
+  holder `AppDatabase.INSTANCE` renamed to `instance`. Finally `android/Makefile`'s
+  `lint` target — on the default `debug` path via `test` — now runs
+  `./gradlew ktlintCheck lintDebug`, so a style regression breaks the everyday
+  build instead of surfacing only at release time. Style/build-tooling only; no
+  functional change to the app.
 
 ---
 

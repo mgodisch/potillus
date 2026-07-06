@@ -98,49 +98,49 @@ object SupportedLocales {
     val ALL: List<Locale> = listOf(
         // ── Latin-script autonyms (alphabetical) ─────────────────────────────
         // ── Danish ───────────────────────────────────────────────────────────
-        Locale("da",    "Dansk"),
+        Locale("da", "Dansk"),
         // ── German (primary development language / string source of truth) ───
-        Locale("de",    "Deutsch"),
+        Locale("de", "Deutsch"),
         // ── English (base locale — no values-en/ dir, falls back to values/) ─
-        Locale("en",    "English"),
+        Locale("en", "English"),
         // ── Spanish ──────────────────────────────────────────────────────────
-        Locale("es",    "Español"),
+        Locale("es", "Español"),
         // ── French ───────────────────────────────────────────────────────────
-        Locale("fr",    "Français"),
+        Locale("fr", "Français"),
         // ── Italian ──────────────────────────────────────────────────────────
-        Locale("it",    "Italiano"),
+        Locale("it", "Italiano"),
         // ── Dutch ────────────────────────────────────────────────────────────
-        Locale("nl",    "Nederlands"),
+        Locale("nl", "Nederlands"),
         // ── Norwegian Bokmål ─────────────────────────────────────────────────
-        Locale("nb",    "Norsk bokmål"),
+        Locale("nb", "Norsk bokmål"),
         // ── Polish ───────────────────────────────────────────────────────────
-        Locale("pl",    "Polski"),
+        Locale("pl", "Polski"),
         // ── Portuguese (European) ────────────────────────────────────────────
-        Locale("pt",    "Português"),
+        Locale("pt", "Português"),
         // ── Portuguese (Brazilian) ───────────────────────────────────────────
         Locale("pt-BR", "Português (Brasil)"),
         // ── Romanian ─────────────────────────────────────────────────────────
-        Locale("ro",    "Română"),
+        Locale("ro", "Română"),
         // ── Swedish ──────────────────────────────────────────────────────────
-        Locale("sv",    "Svenska"),
+        Locale("sv", "Svenska"),
         // ── Czech (Č sorts after the plain-Latin block) ──────────────────────
-        Locale("cs",    "Čeština"),
+        Locale("cs", "Čeština"),
         // ── Greek ────────────────────────────────────────────────────────────
-        Locale("el",    "Ελληνικά"),
+        Locale("el", "Ελληνικά"),
         // ── Cyrillic ─────────────────────────────────────────────────────────
         // ── Russian ──────────────────────────────────────────────────────────
-        Locale("ru",    "Русский"),
+        Locale("ru", "Русский"),
         // ── Ukrainian (Cyrillic — same font stack as Russian) ─────────────────
-        Locale("uk",    "Українська"),
+        Locale("uk", "Українська"),
         // ── CJK ──────────────────────────────────────────────────────────────
         // ── Chinese, Simplified (Mainland China / Singapore) ─────────────────
         Locale("zh-CN", "中文（简体）"),
         // ── Chinese, Traditional (Taiwan / Hong Kong / Macau) ────────────────
         Locale("zh-TW", "中文（繁體）"),
         // ── Japanese (Kanji/Hiragana/Katakana) ───────────────────────────────
-        Locale("ja",    "日本語"),
+        Locale("ja", "日本語"),
         // ── Korean (Hangul — rendered via Noto Sans KR, API 21+) ─────────────
-        Locale("ko",    "한국어")
+        Locale("ko", "한국어"),
     )
 
     /**

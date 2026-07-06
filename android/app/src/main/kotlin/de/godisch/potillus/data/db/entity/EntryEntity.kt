@@ -79,13 +79,15 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = "entries",
-    foreignKeys = [ForeignKey(
-        entity        = DrinkEntity::class,
-        parentColumns = ["id"],
-        childColumns  = ["drinkId"],
-        onDelete      = ForeignKey.RESTRICT
-    )],
-    indices = [Index(value = ["drinkId"]), Index(value = ["logicalDate"])]
+    foreignKeys = [
+        ForeignKey(
+            entity = DrinkEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["drinkId"],
+            onDelete = ForeignKey.RESTRICT,
+        ),
+    ],
+    indices = [Index(value = ["drinkId"]), Index(value = ["logicalDate"])],
 )
 data class EntryEntity(
     @PrimaryKey(autoGenerate = true)
@@ -97,5 +99,5 @@ data class EntryEntity(
     val gramsAlcohol: Double,
     val timestampMillis: Long,
     val logicalDate: String,
-    val note: String = ""
+    val note: String = "",
 )

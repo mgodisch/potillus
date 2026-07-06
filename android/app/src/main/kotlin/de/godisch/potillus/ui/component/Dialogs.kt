@@ -93,47 +93,49 @@ fun AddEditEntryDialog(
     entry: ConsumptionEntry?,
     drinks: List<DrinkDefinition>,
     preSelectedDrink: DrinkDefinition? = null,
-    capacity: DrinkCapacity?           = null,
+    capacity: DrinkCapacity? = null,
     onSave: (DrinkDefinition, Int, Long, String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
-    val isEdit    = entry != null
+    val isEdit = entry != null
     val initDrink = preSelectedDrink
         ?: drinks.firstOrNull { it.id == entry?.drinkId }
         ?: drinks.firstOrNull()
 
-    var selectedDrink     by remember { mutableStateOf(initDrink) }
-    var volumeText        by remember { mutableStateOf(entry?.volumeMl?.toString() ?: initDrink?.volumeMl?.toString() ?: "") }
-    var noteText          by remember { mutableStateOf(entry?.note ?: "") }
+    var selectedDrink by remember { mutableStateOf(initDrink) }
+    var volumeText by remember { mutableStateOf(entry?.volumeMl?.toString() ?: initDrink?.volumeMl?.toString() ?: "") }
+    var noteText by remember { mutableStateOf(entry?.note ?: "") }
     var drinkDropdownOpen by remember { mutableStateOf(false) }
 
     val initDt = entry?.timestampMillis?.let {
         LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
     } ?: LocalDateTime.now()
-    var hour   by remember { mutableIntStateOf(initDt.hour) }
+    var hour by remember { mutableIntStateOf(initDt.hour) }
     var minute by remember { mutableIntStateOf(initDt.minute) }
     var showTimePicker by remember { mutableStateOf(false) }
 
-    val volume       = volumeText.toIntOrNull() ?: 0
+    val volume = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0
-    val canSave      = selectedDrink != null && (volumeText.toIntOrNull() ?: 0) in 1..5000
+    val canSave = selectedDrink != null && (volumeText.toIntOrNull() ?: 0) in 1..5000
     // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
-    val locale       = LocalContext.current.formattingLocale()
+    val locale = LocalContext.current.formattingLocale()
 
     // Traffic-light: recalculated on every recomposition caused by selectedDrink
     // or volumeText change (both are state variables → Compose recomposes automatically).
     // Shown only when capacity is provided AND a drink is selected.
     val trafficLight = if (capacity != null && selectedDrink != null && volume > 0) {
         AlcoholCalculator.trafficLight(
-            gramsPerDrink       = previewGrams,
-            todayGrams          = capacity.todayGrams,
-            dailyLimitGrams     = capacity.dailyLimitGrams,
-            weeklyTotalGrams    = capacity.weeklyTotalGrams,
-            weeklyLimitGrams    = capacity.weeklyLimitGrams,
-            drinkDaysThisWeek   = capacity.drinkDaysThisWeek,
-            maxDrinkDaysPerWeek = capacity.maxDrinkDaysPerWeek
+            gramsPerDrink = previewGrams,
+            todayGrams = capacity.todayGrams,
+            dailyLimitGrams = capacity.dailyLimitGrams,
+            weeklyTotalGrams = capacity.weeklyTotalGrams,
+            weeklyLimitGrams = capacity.weeklyLimitGrams,
+            drinkDaysThisWeek = capacity.drinkDaysThisWeek,
+            maxDrinkDaysPerWeek = capacity.maxDrinkDaysPerWeek,
         )
-    } else null
+    } else {
+        null
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -142,21 +144,21 @@ fun AddEditEntryDialog(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // ── Drink picker ──────────────────────────────────────────────
                 ExposedDropdownMenuBox(
-                    expanded         = drinkDropdownOpen,
-                    onExpandedChange = { drinkDropdownOpen = it }
+                    expanded = drinkDropdownOpen,
+                    onExpandedChange = { drinkDropdownOpen = it },
                 ) {
                     OutlinedTextField(
-                        value         = selectedDrink?.name ?: stringResource(R.string.select_drink),
+                        value = selectedDrink?.name ?: stringResource(R.string.select_drink),
                         onValueChange = {},
-                        readOnly      = true,
-                        label         = { Text(stringResource(R.string.drink)) },
-                        leadingIcon   = selectedDrink?.let { { DrinkCategoryIcon(it.category) } },
-                        trailingIcon  = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = drinkDropdownOpen) },
-                        modifier      = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.drink)) },
+                        leadingIcon = selectedDrink?.let { { DrinkCategoryIcon(it.category) } },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = drinkDropdownOpen) },
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                     )
                     ExposedDropdownMenu(
-                        expanded         = drinkDropdownOpen,
-                        onDismissRequest = { drinkDropdownOpen = false }
+                        expanded = drinkDropdownOpen,
+                        onDismissRequest = { drinkDropdownOpen = false },
                     ) {
                         drinks.forEach { drink ->
                             DropdownMenuItem(
@@ -167,15 +169,15 @@ fun AddEditEntryDialog(
                                         Text(
                                             "${drink.volumeMl} ml · ${drink.alcoholPercent} %",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
                                 },
                                 onClick = {
-                                    selectedDrink     = drink
-                                    volumeText        = drink.volumeMl.toString()
+                                    selectedDrink = drink
+                                    volumeText = drink.volumeMl.toString()
                                     drinkDropdownOpen = false
-                                }
+                                },
                             )
                         }
                     }
@@ -183,13 +185,13 @@ fun AddEditEntryDialog(
 
                 // ── Volume ────────────────────────────────────────────────────
                 OutlinedTextField(
-                    value           = volumeText,
-                    onValueChange   = { volumeText = it.filter { c -> c.isDigit() } },
-                    label           = { Text(stringResource(R.string.volume_ml)) },
-                    suffix          = { Text("ml") },
+                    value = volumeText,
+                    onValueChange = { volumeText = it.filter { c -> c.isDigit() } },
+                    label = { Text(stringResource(R.string.volume_ml)) },
+                    suffix = { Text("ml") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError         = volumeText.isNotEmpty() && (volumeText.toIntOrNull() ?: 0) !in 1..5000,
-                    modifier        = Modifier.fillMaxWidth()
+                    isError = volumeText.isNotEmpty() && (volumeText.toIntOrNull() ?: 0) !in 1..5000,
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // ── Time picker ───────────────────────────────────────────────
@@ -206,11 +208,11 @@ fun AddEditEntryDialog(
 
                 // ── Note ──────────────────────────────────────────────────────
                 OutlinedTextField(
-                    value         = noteText,
+                    value = noteText,
                     onValueChange = { noteText = it },
-                    label         = { Text(stringResource(R.string.note)) },
-                    maxLines      = 2,
-                    modifier      = Modifier.fillMaxWidth()
+                    label = { Text(stringResource(R.string.note)) },
+                    maxLines = 2,
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // ── Grams preview + traffic-light dot ─────────────────────────
@@ -218,27 +220,27 @@ fun AddEditEntryDialog(
                 if (selectedDrink != null && volume > 0) {
                     Surface(
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.small
+                        shape = MaterialTheme.shapes.small,
                     ) {
                         Row(
-                            modifier          = Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
                                 "≈ ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}",
-                                style    = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f),
                             )
                             // Traffic-light dot: appears once a drink is selected and
                             // capacity data is available. Updates on every recomposition
                             // (i.e. whenever selectedDrink or volumeText changes).
                             if (trafficLight != null) {
                                 TrafficLightDot(
-                                    light    = trafficLight,
-                                    modifier = Modifier.padding(start = 4.dp)
+                                    light = trafficLight,
+                                    modifier = Modifier.padding(start = 4.dp),
                                 )
                             }
                         }
@@ -250,7 +252,7 @@ fun AddEditEntryDialog(
             TextButton(
                 onClick = {
                     val drink = selectedDrink ?: return@TextButton
-                    val vol   = volumeText.toIntOrNull()?.takeIf { it > 0 } ?: return@TextButton
+                    val vol = volumeText.toIntOrNull()?.takeIf { it > 0 } ?: return@TextButton
                     // Build timestamp from today's calendar date + the user-selected time.
                     // (CalendarScreen overrides logicalDate in the ViewModel; the date component
                     //  of this timestamp is only relevant for TodayScreen and DrinksScreen.)
@@ -259,20 +261,24 @@ fun AddEditEntryDialog(
                         .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                     onSave(drink, vol, ts, noteText.trim())
                 },
-                enabled = canSave
+                enabled = canSave,
             ) { Text(stringResource(R.string.save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 
     // Clock-style time picker, opened by tapping the HH:MM field above.
     if (showTimePicker) {
         TimePickerDialog(
-            title         = stringResource(R.string.time),
-            initialHour   = hour,
+            title = stringResource(R.string.time),
+            initialHour = hour,
             initialMinute = minute,
-            onConfirm     = { h, m -> hour = h; minute = m; showTimePicker = false },
-            onDismiss     = { showTimePicker = false }
+            onConfirm = { h, m ->
+                hour = h
+                minute = m
+                showTimePicker = false
+            },
+            onDismiss = { showTimePicker = false },
         )
     }
 }
@@ -310,15 +316,15 @@ fun TimePickerDialog(
     initialHour: Int,
     initialMinute: Int,
     onConfirm: (Int, Int) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val state = rememberTimePickerState(initialHour, initialMinute, is24Hour = true)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title         = { Text(title) },
-        text          = { TimePicker(state = state) },
+        title = { Text(title) },
+        text = { TimePicker(state = state) },
         confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text(stringResource(R.string.save)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -351,23 +357,26 @@ fun TimePickerDialog(
 fun AddEditDrinkDialog(
     drink: DrinkDefinition?,
     onSave: (name: String, volumeMl: Int, alcoholPercent: Double, category: DrinkCategory) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
-    var name        by remember { mutableStateOf(drink?.name ?: "") }
-    var volText     by remember { mutableStateOf(drink?.volumeMl?.toString() ?: "") }
-    var pctText     by remember { mutableStateOf(drink?.alcoholPercent?.toString() ?: "") }
-    var category    by remember { mutableStateOf(drink?.category ?: DrinkCategory.OTHER) }
+    var name by remember { mutableStateOf(drink?.name ?: "") }
+    var volText by remember { mutableStateOf(drink?.volumeMl?.toString() ?: "") }
+    var pctText by remember { mutableStateOf(drink?.alcoholPercent?.toString() ?: "") }
+    var category by remember { mutableStateOf(drink?.category ?: DrinkCategory.OTHER) }
     var catExpanded by remember { mutableStateOf(false) }
 
-    val volume  = volText.toIntOrNull()
+    val volume = volText.toIntOrNull()
     val percent = pctText.toDoubleOrNull()
 
-    val volumeValid  = volume != null && volume in 1..5000  // 5000 ml = 5 litres max
+    val volumeValid = volume != null && volume in 1..5000 // 5000 ml = 5 litres max
     val percentValid = percent != null && percent in 0.0..100.0
-    val canSave      = name.isNotBlank() && volumeValid && percentValid
+    val canSave = name.isNotBlank() && volumeValid && percentValid
 
-    val previewGrams = if (volume != null && percent != null && volumeValid && percentValid)
-        AlcoholCalculator.calculateGrams(volume, percent) else null
+    val previewGrams = if (volume != null && percent != null && volumeValid && percentValid) {
+        AlcoholCalculator.calculateGrams(volume, percent)
+    } else {
+        null
+    }
     // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
 
@@ -377,38 +386,49 @@ fun AddEditDrinkDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
-                    value = name, onValueChange = { name = it },
+                    value = name,
+                    onValueChange = { name = it },
                     label = { Text(stringResource(R.string.drink_name)) },
-                    modifier = Modifier.fillMaxWidth(), singleLine = true
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                 )
                 OutlinedTextField(
-                    value = volText, onValueChange = { volText = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.volume_ml)) }, suffix = { Text("ml") },
+                    value = volText,
+                    onValueChange = { volText = it.filter { c -> c.isDigit() } },
+                    label = { Text(stringResource(R.string.volume_ml)) },
+                    suffix = { Text("ml") },
                     isError = volText.isNotEmpty() && !volumeValid,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 OutlinedTextField(
-                    value = pctText, onValueChange = { pctText = it.replace(',', '.') },
-                    label = { Text(stringResource(R.string.alcohol_percent)) }, suffix = { Text("Vol.-%") },
+                    value = pctText,
+                    onValueChange = { pctText = it.replace(',', '.') },
+                    label = { Text(stringResource(R.string.alcohol_percent)) },
+                    suffix = { Text("Vol.-%") },
                     isError = pctText.isNotEmpty() && !percentValid,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 ExposedDropdownMenuBox(expanded = catExpanded, onExpandedChange = { catExpanded = it }) {
                     OutlinedTextField(
-                        value = category.displayLabel(), onValueChange = {}, readOnly = true,
+                        value = category.displayLabel(),
+                        onValueChange = {},
+                        readOnly = true,
                         label = { Text(stringResource(R.string.category)) },
                         leadingIcon = { DrinkCategoryIcon(category) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catExpanded) },
-                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                     )
                     ExposedDropdownMenu(expanded = catExpanded, onDismissRequest = { catExpanded = false }) {
                         DrinkCategory.entries.forEach { cat ->
                             DropdownMenuItem(
                                 leadingIcon = { DrinkCategoryIcon(cat) },
                                 text = { Text(cat.displayLabel()) },
-                                onClick = { category = cat; catExpanded = false }
+                                onClick = {
+                                    category = cat
+                                    catExpanded = false
+                                },
                             )
                         }
                     }
@@ -418,7 +438,7 @@ fun AddEditDrinkDialog(
                         Text(
                             "≈ ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(12.dp, 8.dp)
+                            modifier = Modifier.padding(12.dp, 8.dp),
                         )
                     }
                 }
@@ -432,16 +452,16 @@ fun AddEditDrinkDialog(
                     // they are non-null when this runs, but expressing the guard
                     // in code (instead of a not-null assertion) keeps the button
                     // crash-free even if the canSave condition is ever refactored.
-                    val v = volume  ?: return@TextButton
+                    val v = volume ?: return@TextButton
                     val p = percent ?: return@TextButton
                     onSave(name.trim(), v, p, category)
                 },
-                enabled = canSave
+                enabled = canSave,
             ) {
                 Text(stringResource(R.string.save))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -472,7 +492,7 @@ fun ExportDateRangeDialog(
     initialFrom: String,
     initialTo: String,
     onConfirm: (from: String, to: String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     // Convert ISO-8601 strings to UTC epoch-ms for the picker state.
     // The DateRangePicker operates in UTC, so we parse at UTC midnight.
@@ -483,68 +503,67 @@ fun ExportDateRangeDialog(
     }.getOrNull()
 
     /** Formats a UTC epoch-ms value back to an ISO-8601 "YYYY-MM-DD" string. */
-    fun Long.toDateString(): String =
-        java.time.Instant.ofEpochMilli(this)
-            .atZone(ZoneOffset.UTC)
-            .toLocalDate()
-            .toString()   // ISO-8601 "YYYY-MM-DD"
+    fun Long.toDateString(): String = java.time.Instant.ofEpochMilli(this)
+        .atZone(ZoneOffset.UTC)
+        .toLocalDate()
+        .toString() // ISO-8601 "YYYY-MM-DD"
 
     val todayMillis = initialTo.toUtcMillis() ?: System.currentTimeMillis()
 
     val pickerState = rememberDateRangePickerState(
         initialSelectedStartDateMillis = initialFrom.toUtcMillis(),
-        initialSelectedEndDateMillis   = initialTo.toUtcMillis(),
+        initialSelectedEndDateMillis = initialTo.toUtcMillis(),
         // Prevent selecting future dates: any day after today is greyed out
         selectableDates = object : SelectableDates {
             /** Allows only days up to and including today (no future dates). */
             override fun isSelectableDate(utcTimeMillis: Long) = utcTimeMillis <= todayMillis
-        }
+        },
     )
 
     val canConfirm = pickerState.selectedStartDateMillis != null &&
-                     pickerState.selectedEndDateMillis   != null
+        pickerState.selectedEndDateMillis != null
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties       = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color    = MaterialTheme.colorScheme.surface,
-            shape    = MaterialTheme.shapes.extraLarge
+            color = MaterialTheme.colorScheme.surface,
+            shape = MaterialTheme.shapes.extraLarge,
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // The DateRangePicker takes all available height via weight(1f),
                 // with the button row pinned to the bottom.
                 DateRangePicker(
-                    state    = pickerState,
-                    modifier = Modifier.weight(1f)
+                    state = pickerState,
+                    modifier = Modifier.weight(1f),
                 )
 
                 HorizontalDivider()
 
                 Row(
-                    modifier              = Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.End,
-                    verticalAlignment     = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(stringResource(R.string.cancel))
                     }
                     Spacer(Modifier.width(8.dp))
                     Button(
-                        onClick  = {
+                        onClick = {
                             // No `!!`: same defensive-guard pattern as the drink
                             // editor's save button — `enabled = canConfirm` makes
                             // the nulls unreachable, the elvis-return keeps that
                             // true under future refactorings.
                             val start = pickerState.selectedStartDateMillis ?: return@Button
-                            val end   = pickerState.selectedEndDateMillis   ?: return@Button
+                            val end = pickerState.selectedEndDateMillis ?: return@Button
                             onConfirm(start.toDateString(), end.toDateString())
                         },
-                        enabled  = canConfirm
+                        enabled = canConfirm,
                     ) {
                         Text(stringResource(R.string.backup_export))
                     }

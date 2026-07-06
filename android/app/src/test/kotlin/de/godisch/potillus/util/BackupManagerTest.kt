@@ -77,9 +77,17 @@ class BackupManagerTest {
     }
 
     @Test fun `valid backup with one drink parses correctly`() {
-        val json = buildBackupJson(drinks = listOf(drinkJson(
-            id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0, category = "BEER"
-        )))
+        val json = buildBackupJson(
+            drinks = listOf(
+                drinkJson(
+                    id = 1,
+                    name = "Lager",
+                    volumeMl = 500,
+                    alcoholPercent = 5.0,
+                    category = "BEER",
+                ),
+            ),
+        )
         val result = BackupManager.parseBackupJson(json)
         assertNull(result.error)
         assertEquals(1, result.drinks.size)
@@ -92,13 +100,19 @@ class BackupManagerTest {
 
     @Test fun `valid backup with one entry parses correctly`() {
         val json = buildBackupJson(
-            drinks  = listOf(drinkJson(id = 1, name = "Wine", volumeMl = 150, alcoholPercent = 13.0)),
-            entries = listOf(entryJson(
-                id = 1, drinkId = 1, drinkName = "Wine",
-                volumeMl = 150, alcoholPercent = 13.0,
-                gramsAlcohol = 15.4, timestampMillis = 1_700_000_000_000L,
-                logicalDate = "2023-11-14"
-            ))
+            drinks = listOf(drinkJson(id = 1, name = "Wine", volumeMl = 150, alcoholPercent = 13.0)),
+            entries = listOf(
+                entryJson(
+                    id = 1,
+                    drinkId = 1,
+                    drinkName = "Wine",
+                    volumeMl = 150,
+                    alcoholPercent = 13.0,
+                    gramsAlcohol = 15.4,
+                    timestampMillis = 1_700_000_000_000L,
+                    logicalDate = "2023-11-14",
+                ),
+            ),
         )
         val result = BackupManager.parseBackupJson(json)
         assertNull(result.error)
@@ -190,13 +204,15 @@ class BackupManagerTest {
     @Test fun `round-trip export then parse preserves drink and entry data`() {
         // Build a valid backup and verify all fields survive the parse.
         val json = buildBackupJson(
-            drinks  = listOf(drinkJson(id = 7, name = "Gin & Tonic", volumeMl = 200, alcoholPercent = 10.0, category = "LONGDRINK")),
-            entries = listOf(entryJson(
-                id = 3, drinkId = 7, drinkName = "Gin & Tonic",
-                volumeMl = 200, alcoholPercent = 10.0,
-                gramsAlcohol = 15.78, timestampMillis = 1_700_100_000_000L,
-                logicalDate = "2023-11-15", note = "birthday"
-            ))
+            drinks = listOf(drinkJson(id = 7, name = "Gin & Tonic", volumeMl = 200, alcoholPercent = 10.0, category = "LONGDRINK")),
+            entries = listOf(
+                entryJson(
+                    id = 3, drinkId = 7, drinkName = "Gin & Tonic",
+                    volumeMl = 200, alcoholPercent = 10.0,
+                    gramsAlcohol = 15.78, timestampMillis = 1_700_100_000_000L,
+                    logicalDate = "2023-11-15", note = "birthday",
+                ),
+            ),
         )
         val result = BackupManager.parseBackupJson(json)
         assertNull(result.error)
@@ -211,39 +227,39 @@ class BackupManagerTest {
         assertNotNull("Expected an error", result.error)
         assertTrue(
             "Expected ReadError but got ${result.error}",
-            result.error is ImportError.ReadError
+            result.error is ImportError.ReadError,
         )
     }
 
     private fun buildBackupJson(
-        version: Int         = 2,
-        drinks:  List<String> = emptyList(),
-        entries: List<String> = emptyList()
+        version: Int = 2,
+        drinks: List<String> = emptyList(),
+        entries: List<String> = emptyList(),
     ): String {
-        val drinksArr  = drinks.joinToString(",", "[", "]")
+        val drinksArr = drinks.joinToString(",", "[", "]")
         val entriesArr = entries.joinToString(",", "[", "]")
         return """{"version":$version,"drinks":$drinksArr,"entries":$entriesArr}"""
     }
 
     private fun drinkJson(
-        id:             Long   = 1,
-        name:           String = "Beer",
-        volumeMl:       Int    = 500,
+        id: Long = 1,
+        name: String = "Beer",
+        volumeMl: Int = 500,
         alcoholPercent: Double = 5.0,
-        isPreset:       Boolean = false,
-        isFavorite:     Boolean = false,
-        category:       String = "BEER"
+        isPreset: Boolean = false,
+        isFavorite: Boolean = false,
+        category: String = "BEER",
     ) = """{"id":$id,"name":"$name","volumeMl":$volumeMl,"alcoholPercent":$alcoholPercent,"isPreset":$isPreset,"isFavorite":$isFavorite,"category":"$category"}"""
 
     private fun entryJson(
-        id:              Long   = 1,
-        drinkId:         Long   = 1,
-        drinkName:       String = "Beer",
-        volumeMl:        Int    = 500,
-        alcoholPercent:  Double = 5.0,
-        gramsAlcohol:    Double = 19.73,
-        timestampMillis: Long   = 1_700_000_000_000L,
-        logicalDate:     String = "2023-11-14",
-        note:            String = ""
+        id: Long = 1,
+        drinkId: Long = 1,
+        drinkName: String = "Beer",
+        volumeMl: Int = 500,
+        alcoholPercent: Double = 5.0,
+        gramsAlcohol: Double = 19.73,
+        timestampMillis: Long = 1_700_000_000_000L,
+        logicalDate: String = "2023-11-14",
+        note: String = "",
     ) = """{"id":$id,"drinkId":$drinkId,"drinkName":"$drinkName","volumeMl":$volumeMl,"alcoholPercent":$alcoholPercent,"gramsAlcohol":$gramsAlcohol,"timestampMillis":$timestampMillis,"logicalDate":"$logicalDate","note":"$note"}"""
 }

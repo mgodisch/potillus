@@ -55,8 +55,7 @@ class EntryRepositoryEmptyTest {
  */
 private class EmptyEntryDao : EntryDao {
     override fun getByDate(date: String): Flow<List<EntryEntity>> = flowOf(emptyList())
-    override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> =
-        flowOf(emptyList())
+    override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> = flowOf(emptyList())
     override fun getAllDatesFlow(): Flow<List<String>> = flowOf(emptyList())
     override suspend fun insert(entry: EntryEntity): Long = 0L
     override suspend fun insertOrReplace(entry: EntryEntity): Long = 0L
@@ -67,6 +66,5 @@ private class EmptyEntryDao : EntryDao {
     override suspend fun getInRange(from: String, to: String): List<EntryEntity> = emptyList()
     override suspend fun deleteAll() {}
     override suspend fun countByTimestampAndDrink(ts: Long, drinkId: Long): Int = 0
-    override fun getEntriesForPeriodFlow(from: String, to: String): Flow<List<EntryEntity>> =
-        flowOf(emptyList())
+    override fun getEntriesForPeriodFlow(from: String, to: String): Flow<List<EntryEntity>> = flowOf(emptyList())
 }

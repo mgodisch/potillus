@@ -50,7 +50,7 @@ class SimpleTemplateTest {
         val out = SimpleTemplate.render(
             template,
             scalars = emptyMap(),
-            repeats = mapOf("ITEMS" to listOf(mapOf("NAME" to "a"), mapOf("NAME" to "b")))
+            repeats = mapOf("ITEMS" to listOf(mapOf("NAME" to "a"), mapOf("NAME" to "b"))),
         )
         assertEquals("<ul><li>a</li><li>b</li></ul>", out)
     }
@@ -66,7 +66,7 @@ class SimpleTemplateTest {
         val out = SimpleTemplate.render(
             template,
             scalars = mapOf("FOOT" to "end"),
-            repeats = mapOf("R" to listOf(mapOf("V" to "1"), mapOf("V" to "2")))
+            repeats = mapOf("R" to listOf(mapOf("V" to "1"), mapOf("V" to "2"))),
         )
         assertEquals("<td>1</td><td>2</td>end", out)
     }
@@ -74,8 +74,9 @@ class SimpleTemplateTest {
     @Test fun `multiline repeat body is supported`() {
         val template = "<!-- repeat:R -->\n  <tr>{{V}}</tr>\n<!-- end:R -->"
         val out = SimpleTemplate.render(
-            template, emptyMap(),
-            mapOf("R" to listOf(mapOf("V" to "x")))
+            template,
+            emptyMap(),
+            mapOf("R" to listOf(mapOf("V" to "x"))),
         )
         assertEquals("\n  <tr>x</tr>\n", out)
     }
