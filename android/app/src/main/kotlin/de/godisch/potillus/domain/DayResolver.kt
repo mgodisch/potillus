@@ -21,6 +21,7 @@
  */
 package de.godisch.potillus.domain
 
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -80,9 +81,51 @@ object DayResolver {
         return logicalDate.format(DATE_FORMATTER)
     }
 
-    /** Returns today's logical date from the current system clock. */
+    /**
+     * Test-only override for the wall clock that [today] reads.
+     *
+     * PRODUCTION (the default, `null`): [today] reads the real device clock, so
+     * behaviour is identical to a direct `System.currentTimeMillis()` call — this
+     * seam changes nothing for shipped builds.
+     *
+     * INSTRUMENTATION / SCREENSHOTS ONLY: a test may pin a fixed [Clock] here so
+     * that every date-relative surface renders from one reproducible logical day.
+     * Because Today, Calendar, Statistics and the PDF report all derive "today"
+     * exclusively through [today], pinning this single field pins the perspective
+     * of the whole app at once. That is what lets `make screenshots` capture from
+     * a fixed date on ANY device — including a locked production phone, where the
+     * Makefile's `adb shell date` pin is silently rejected and the device keeps
+     * its real date. The capture suite sets it in its `@Before` and clears it in
+     * its `@After` (see `ScreenshotClock`, `ScreenshotTest`, `ReportExportTest`).
+     *
+     * Marked `@Volatile` because it is written from the instrumentation thread and
+     * read from the UI / flow-collector threads that evaluate [today].
+     */
+    @Volatile
+    var clockOverride: Clock? = null
+
+    /**
+     * The effective wall clock: the pinned test clock when [clockOverride] is set,
+     * otherwise the real system clock ([Clock.systemDefaultZone]).
+     *
+     * Prefer this over calling `LocalDate.now()`, `YearMonth.now()` or
+     * `System.currentTimeMillis()` directly for anything that determines
+     * date-relative UI: passing this clock (e.g. `YearMonth.now(DayResolver.clock())`)
+     * makes that surface honour the screenshot pin too, instead of silently reading
+     * the real device clock. In production (override `null`) it is exactly the
+     * system clock, so behaviour is unchanged.
+     */
+    fun clock(): Clock = clockOverride ?: Clock.systemDefaultZone()
+
+    /**
+     * Returns today's logical date.
+     *
+     * The wall-clock reading comes from [clock] (the pinned test clock when set,
+     * otherwise the real device clock); the resulting instant is then run through
+     * [resolve] so the configured day-change boundary is honoured either way.
+     */
     fun today(changeHour: Int, changeMinute: Int): String =
-        resolve(System.currentTimeMillis(), changeHour, changeMinute)
+        resolve(clock().millis(), changeHour, changeMinute)
 
     /** Parses a "YYYY-MM-DD" string into a [LocalDate]. */
     fun parseDate(dateStr: String): LocalDate =

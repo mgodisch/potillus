@@ -183,6 +183,36 @@ listed below as they land.
   Baseline Level 3 `OSPS-VM-05.01`). docs/ROADMAP.md: recorded the future
   CI-based automated, blocking policy gates (`OSPS-VM-05.03`, strengthening
   `OSPS-VM-06.02`). Documentation only; no functional change.
+- Screenshots: pin the capture date in-app so `make screenshots` no longer
+  depends on the device date. Every date-relative surface derives "today" from
+  `DayResolver.today()`, which read the raw device clock; the `screenshots`
+  target tried to pin that clock via `adb shell date`, but that only works on an
+  emulator or a rooted userdebug build and silently no-ops on a locked
+  production phone — so captures used the REAL date instead of the intended
+  perspective (2026-06-30, the last day of the demo period). Fix: `DayResolver`
+  gains a test-only `clockOverride` (null in production, so shipped behaviour is
+  unchanged); a new androidTest helper `ScreenshotClock` pins it to 2026-06-30,
+  and both capture tests (`ScreenshotTest`, `ReportExportTest`) set it in
+  `@Before` and clear it in `@After`. The perspective is now correct on ANY
+  device. The Makefile's device-date pin is demoted to best-effort cosmetics
+  (its former "will use the real date" WARNING was made accurate — screenshots
+  are unaffected), and a cheap `screenshots` preflight now enforces that the
+  Makefile `SCREENSHOT_DATE` and `ScreenshotClock.SCREENSHOT_DATE` agree and
+  that the pinned day is not before the fixture's last logged day (2026-06-29,
+  so 2026-06-30 is a deliberately dry "today"), preventing the sources from
+  drifting apart unnoticed. Test-tooling only; no change to the shipped APK.
+  - Follow-up: the in-app pin initially covered only `DayResolver.today()`, but a
+    few date-relative surfaces read the wall clock directly and so still showed
+    the real date — most visibly the Calendar header/grid (seeded from
+    `YearMonth.now()`), which displayed the real month while the day cells showed
+    the pinned day, plus the PDF report's "export date" (`LocalDate.now()`).
+    `DayResolver` now exposes the effective clock via `clock()` (the pinned test
+    clock when set, else the real system clock), and these call sites read
+    `YearMonth.now(DayResolver.clock())` / `LocalDate.now(DayResolver.clock())`.
+    Production behaviour is unchanged (the clock is the real system clock when
+    unpinned). The add-drink dialog's default time-of-day and a non-visible
+    export-range fallback were deliberately left as-is (time-of-day, governed by
+    Demo Mode; not the date perspective).
 
 ---
 

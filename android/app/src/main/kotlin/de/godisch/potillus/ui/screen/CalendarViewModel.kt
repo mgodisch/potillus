@@ -73,10 +73,14 @@ enum class CalendarViewMode { MONTH, YEAR }
 @Immutable
 data class CalendarUiState(
     val viewMode: CalendarViewMode              = CalendarViewMode.MONTH,
-    val currentMonth: YearMonth                 = YearMonth.now(),
-    val currentYear: Int                        = LocalDate.now().year,
+    // These now()-defaults form the stateIn seed shown for the first frame (before
+    // the combine emits). They read through DayResolver.clock() so that seed frame
+    // is pinned in screenshot runs too; in production the clock is the real system
+    // clock, so they equal YearMonth.now()/LocalDate.now() as before.
+    val currentMonth: YearMonth                 = YearMonth.now(DayResolver.clock()),
+    val currentYear: Int                        = LocalDate.now(DayResolver.clock()).year,
     /** Logical today as a LocalDate, respecting the configured day-change time. */
-    val today: LocalDate                        = LocalDate.now(),
+    val today: LocalDate                        = LocalDate.now(DayResolver.clock()),
     val daySummaries: Map<String, DaySummary>   = emptyMap(),
     val selectedDate: String?                   = null,
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
@@ -135,10 +139,17 @@ class CalendarViewModel(
     }
 
     private val _viewMode     = MutableStateFlow(CalendarViewMode.MONTH)
-    // Note: _month uses the current calendar date for initial navigation.
-    // It is intentionally NOT derived from DayResolver, because the user always
-    // wants to start navigating from the current calendar month/year, regardless of
-    // whether the logical "today" has crossed midnight yet.
+    // Note: _month is seeded with the current CALENDAR month for initial
+    // navigation. It is intentionally NOT derived from the logical "today"
+    // ([DayResolver.today]), because the user always wants to start navigating
+    // from the current calendar month/year, regardless of whether the logical
+    // "today" has crossed midnight yet.
+    //
+    // It IS read through [DayResolver.clock] rather than a bare YearMonth.now(),
+    // so that a screenshot run can pin the month alongside the logical "today"
+    // (otherwise the calendar header would show the real device month while the
+    // day cells show the pinned date). In production the clock is the real system
+    // clock, so this is behaviourally identical to YearMonth.now().
     //
     // The year is derived from _month rather than stored as a separate
     // MutableStateFlow. Keeping a separate _year caused a synchronisation gap:
@@ -146,7 +157,7 @@ class CalendarViewModel(
     // YEAR mode again, _month and _year could disagree if prevPeriod/nextPeriod
     // had advanced one but not the other. Deriving currentYear = _month.value.year
     // makes the two values structurally consistent with zero extra state.
-    private val _month        = MutableStateFlow(YearMonth.now())
+    private val _month        = MutableStateFlow(YearMonth.now(DayResolver.clock()))
     private val _selectedDate = MutableStateFlow<String?>(null)
 
     init {

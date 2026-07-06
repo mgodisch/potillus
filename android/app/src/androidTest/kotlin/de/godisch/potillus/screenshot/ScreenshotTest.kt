@@ -113,6 +113,7 @@ import de.godisch.potillus.util.BackupManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -179,6 +180,13 @@ class ScreenshotTest {
      */
     @Before
     fun setUp() {
+        // Pin the app's logical "today" to the demo fixture's last day BEFORE any
+        // Activity is launched, so every date-relative screen (Today / Calendar /
+        // Statistics) is captured from that fixed perspective — independent of the
+        // physical device date, which the Makefile can only pin on emulator/rooted
+        // builds. Cleared again in tearDown(). See ScreenshotClock.
+        ScreenshotClock.pin()
+
         app    = ApplicationProvider.getApplicationContext()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
@@ -254,6 +262,16 @@ class ScreenshotTest {
 
         // 5) Full-screen capture so the cleaned demo-mode status bar is included.
         Screengrab.setDefaultScreenshotStrategy(UiAutomatorScreenshotStrategy())
+    }
+
+    /**
+     * Clears the pinned capture clock so the fixed "today" cannot leak into other
+     * instrumented tests that share this process (the pin lives in the shared
+     * [de.godisch.potillus.domain.DayResolver] singleton).
+     */
+    @After
+    fun tearDown() {
+        ScreenshotClock.unpin()
     }
 
     /**

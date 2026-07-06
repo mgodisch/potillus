@@ -68,10 +68,22 @@ SHELL := /bin/bash
 # never drift.
 SCREENSHOT_LOCALES := $(sort $(notdir $(patsubst %/changelogs,%,$(wildcard fastlane/metadata/android/*/changelogs))))
 # The demo fixture (fastlane/demo-backup.json) covers 2026-01-01..2026-06-30, so
-# the device clock is pinned to the last day of that range to give the
-# date-relative "Today" screen meaningful content. (Setting the date needs an
-# emulator / rooted userdebug build; on a locked device the step is skipped.)
+# the screenshots are captured from the perspective of the last day of that range
+# to give the date-relative "Today" screen meaningful content.
+#
+# AUTHORITATIVE PIN: the capture suite pins this perspective IN-APP
+# (DayResolver.clockOverride, set by ScreenshotClock.pin()), so it holds on ANY
+# device — including a locked production phone where the `adb shell date` pin in
+# the `screenshots` recipe is silently rejected. This SCREENSHOT_DATE must stay
+# equal to ScreenshotClock.SCREENSHOT_DATE and must not fall before the fixture's
+# last logged day (2026-06-30 is a deliberately dry "today", one day after the
+# last 2026-06-29 entry); the `screenshots` preflight guard enforces both.
 SCREENSHOT_DATE  := 2026-06-30
+# Inputs the drift guard cross-checks against SCREENSHOT_DATE (see the guard in
+# the `screenshots` recipe): the in-app capture-date pin and the demo fixture
+# whose last logged day the "Today" screenshot must land on.
+SCREENSHOT_PIN_KT := android/app/src/androidTest/kotlin/de/godisch/potillus/screenshot/ScreenshotClock.kt
+DEMO_BACKUP_JSON  := fastlane/demo-backup.json
 # Status-bar clock shown in every shot while Android Demo Mode is active (HHMM).
 SCREENSHOT_CLOCK := 1000
 # PDF report render resolution. 200 dpi on A4 -> ~1653x2337 px, inside Google
@@ -147,9 +159,13 @@ install: ../downloads/potillus-$(VERSION)-debug.apk
 #     * poppler-utils (`pdftoppm`) for rendering the PDF report pages.
 #     * Pillow (`python3-pil`) for bottom-cropping the in-app shots to <= 2:1.
 #
-#   Pinning the device date to $(SCREENSHOT_DATE) needs an emulator or a rooted
-#   userdebug build; on a locked production device that single step is skipped
-#   (|| true) and the "Today" screen simply reflects the real date.
+#   The capture perspective (logical "today") is pinned IN-APP by the capture
+#   suite (ScreenshotClock.pin() → DayResolver.clockOverride = $(SCREENSHOT_DATE)),
+#   so the date-relative screens are correct on ANY device. The extra
+#   `adb shell date` pin below is only best-effort cosmetics for anything that
+#   might read the raw device clock; it needs an emulator or a rooted userdebug
+#   build and is skipped (|| true) on a locked production device WITHOUT affecting
+#   the captured screenshots.
 screenshots:
 	$(MAKE) -C android prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
@@ -165,11 +181,33 @@ screenshots:
 	#    the bundle is satisfied (it does not load fastlane), so it is cheap.
 	command -v bundle >/dev/null 2>&1 || { echo "screenshots: 'bundle' (Ruby Bundler) not found -- install Ruby + Bundler 4.0.15, then run 'cd fastlane && bundle install'."; exit 1; }
 	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots: fastlane gems are not installed in fastlane -- run 'cd fastlane && bundle install' (gems vendor into fastlane/.vendor; Bundler 4.0.15 is pinned in fastlane/Gemfile.lock)."; exit 1; }
+	# 0b) Perspective-pin consistency guard (cheap; runs before the expensive build).
+	#     The captured perspective is pinned IN-APP (ScreenshotClock.pin() sets
+	#     DayResolver.clockOverride), so it no longer depends on the device date.
+	#     Two invariants must hold or the capture is subtly wrong:
+	#       (1) the two pins agree: Makefile SCREENSHOT_DATE == ScreenshotClock's;
+	#       (2) the pinned day is NOT BEFORE the demo fixture's last logged day,
+	#           so no seeded entry falls on a 'future' day the pinned Today cannot
+	#           show. (The pinned day MAY be later than the last entry on purpose:
+	#           2026-06-30 is a deliberately dry 'today' one day after the last
+	#           2026-06-29 drink.) Enforced here so the sources cannot drift.
+	pin_kt="$$(sed -n 's/.*SCREENSHOT_DATE[^"]*"\([0-9-]*\)".*/\1/p' "$(SCREENSHOT_PIN_KT)" | head -n1)"
+	last_entry="$$(grep -oE '"logicalDate"[[:space:]]*:[[:space:]]*"[0-9]{4}-[0-9]{2}-[0-9]{2}"' "$(DEMO_BACKUP_JSON)" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | sort | tail -n1)"
+	newest="$$(printf '%s\n%s\n' "$$last_entry" "$(SCREENSHOT_DATE)" | sort | tail -n1)"
+	if [ "$$pin_kt" != "$(SCREENSHOT_DATE)" ]; then
+		echo "screenshots: capture-date pins disagree -- Makefile SCREENSHOT_DATE='$(SCREENSHOT_DATE)' vs ScreenshotClock.SCREENSHOT_DATE='$$pin_kt'. Align the two and re-run."
+		exit 1
+	fi
+	if [ "$$newest" != "$(SCREENSHOT_DATE)" ]; then
+		echo "screenshots: capture date '$(SCREENSHOT_DATE)' is BEFORE the demo fixture's last logged day '$$last_entry' -- seeded entries would fall on a future day the pinned Today cannot show. Move SCREENSHOT_DATE to on/after '$$last_entry'."
+		exit 1
+	fi
 	# 1) Build the app + instrumentation APKs that screengrab installs.
 	$(MAKE) -C android screenshot-apks
 	# 2) Demo Mode is torn down no matter how this recipe exits.
 	trap '$(MAKE) screenshots-demo-off' EXIT
-	# 3) Prepare the device: wake, disable animations, pin date/clock.
+	# 3) Prepare the device: wake, disable animations, pin clock (and, best-effort,
+	#    the device date — the capture PERSPECTIVE itself is already pinned in-app).
 	adb shell svc power stayon true
 	adb shell input keyevent KEYCODE_WAKEUP
 	adb shell wm dismiss-keyguard
@@ -180,14 +218,15 @@ screenshots:
 	adb root >/dev/null 2>&1 || true
 	adb shell "date $$(date -u -d '$(SCREENSHOT_DATE) 10:00:00' +%m%d%H%M%Y.%S)" || true
 	adb shell am broadcast -a android.intent.action.TIME_SET >/dev/null 2>&1 || true
-	# Verify the date pin actually took. `date` is rejected on non-rooted physical
-	# devices (the `adb root` above then also fails), so the pin silently no-ops and
-	# the date-relative screens (Today / Calendar / Statistics) reflect the REAL
-	# device date instead of $(SCREENSHOT_DATE). Warn loudly rather than ship
-	# off-date screenshots unnoticed; run on an emulator or rooted device to pin it.
+	# Report whether the (best-effort) device-date pin took. `date` is rejected on
+	# non-rooted physical devices (the `adb root` above then also fails), so the pin
+	# silently no-ops there. This NO LONGER affects the screenshots: the capture
+	# perspective is pinned in-app (see ScreenshotClock / DayResolver.clockOverride),
+	# so the date-relative screens still render from $(SCREENSHOT_DATE) regardless.
+	# The line below is therefore informational only — it never fails the build.
 	dev_date="$$(adb shell date +%Y-%m-%d 2>/dev/null | tr -d '\r' || true)"
 	if [ "$$dev_date" != "$(SCREENSHOT_DATE)" ]; then
-		echo "WARNING: device date is '$$dev_date', expected '$(SCREENSHOT_DATE)' -- the date pin did not take (non-rooted device?). Date-relative screenshots will use the real device date."
+		echo "note: device date is '$$dev_date' (not $(SCREENSHOT_DATE)); the device-date pin needs an emulator/rooted build. Screenshots are unaffected — their date is pinned in-app to $(SCREENSHOT_DATE)."
 	fi
 	# 4) Enter Android Demo Mode and clean the status bar.
 	adb shell settings put global sysui_demo_allowed 1

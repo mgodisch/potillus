@@ -27,6 +27,7 @@ import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartGranularity
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
@@ -181,7 +182,10 @@ object PdfReportBuilder {
         val perDay  = context.getString(R.string.pdf_unit_g_per_day)
         val perWeek = context.getString(R.string.pdf_unit_g_per_week)
         scalars["META_EXPORT_LABEL"] = context.getString(R.string.pdf_meta_export_date)
-        scalars["META_EXPORT_VALUE"] = LocalDate.now().format(dateFmt)
+        // Read through DayResolver.clock() so the report's "export date" is pinned
+        // in screenshot runs (report pages 07/08) instead of showing the real date;
+        // in production the clock is the real system clock, so this is unchanged.
+        scalars["META_EXPORT_VALUE"] = LocalDate.now(DayResolver.clock()).format(dateFmt)
         scalars["META_PERIOD_LABEL"] = context.getString(R.string.pdf_meta_period)
         scalars["META_PERIOD_VALUE"] =
             "${LocalDate.parse(d.firstDate).format(dateFmt)} – ${LocalDate.parse(d.lastDate).format(dateFmt)}"

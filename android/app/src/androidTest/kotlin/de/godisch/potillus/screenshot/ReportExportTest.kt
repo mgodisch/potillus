@@ -96,6 +96,7 @@ import de.godisch.potillus.util.WebViewPdfPrinter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import org.junit.After
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
@@ -133,6 +134,12 @@ class ReportExportTest {
             InstrumentationRegistry.getArguments().getString("reportExport")?.toBoolean() == true
         )
 
+        // Pin the report's logical "today" to the demo fixture's last day so the
+        // date-relative report content (e.g. the current-abstinence streak) is
+        // reproducible regardless of the physical device date. Cleared in
+        // tearDown(). See ScreenshotClock.
+        ScreenshotClock.pin()
+
         app    = ApplicationProvider.getApplicationContext()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
@@ -153,6 +160,16 @@ class ReportExportTest {
             app.backupRepository.importReplace(parsed.drinks, parsed.entries)
             app.appPreferences.setAllowScreenshots(true)
         }
+    }
+
+    /**
+     * Clears the pinned capture clock so the fixed "today" cannot leak into other
+     * instrumented tests sharing this process. Runs even when the `@Before` guard
+     * skipped the test, which is harmless (it just re-nulls an already-null field).
+     */
+    @After
+    fun tearDown() {
+        ScreenshotClock.unpin()
     }
 
     /**
