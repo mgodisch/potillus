@@ -124,6 +124,50 @@ class BackupManagerTest {
         }
     }
 
+    // ── Guard 5: referential integrity (v0.79.0 QA) ───────────────────────────
+
+    /**
+     * An entry whose drinkId points at no drink IN THE BACKUP must be rejected
+     * at parse time. Before this guard, the dangling id slipped through to the
+     * repository, where the REPLACE import's remap fallback kept the raw value:
+     * colliding with a local preset id silently attached the entry to the wrong
+     * drink; otherwise the FK aborted the whole transaction with only a generic
+     * error.
+     */
+    @Test fun `entry referencing a drink absent from the backup is rejected as ReadError`() {
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1, name = "Wine", volumeMl = 150, alcoholPercent = 13.0)),
+            entries = listOf(entryJson(id = 1, drinkId = 42, drinkName = "Wine")),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertReadError(result)
+        // One explicit cast into a local; a second `as` after the smart cast
+        // would draw kotlinc's "no cast needed" warning, which -Werror promotes
+        // to a build failure.
+        val error = result.error as ImportError.ReadError
+        assertTrue(
+            "detail should name the dangling id, got: ${error.detail}",
+            error.detail?.contains("42") == true,
+        )
+    }
+
+    /** The guard must not reject a valid multi-drink backup (ids matched as a set). */
+    @Test fun `entries referencing any backup drink pass the referential guard`() {
+        val json = buildBackupJson(
+            drinks = listOf(
+                drinkJson(id = 7, name = "Wine", volumeMl = 150, alcoholPercent = 13.0),
+                drinkJson(id = 3, name = "Lager", volumeMl = 500, alcoholPercent = 5.0),
+            ),
+            entries = listOf(
+                entryJson(id = 1, drinkId = 3, drinkName = "Lager"),
+                entryJson(id = 2, drinkId = 7, drinkName = "Wine", timestampMillis = 1_700_000_100_000L),
+            ),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull("valid references must not trip Guard 5", result.error)
+        assertEquals(2, result.entries.size)
+    }
+
     @Test fun `version 1 backup without category field uses OTHER as default`() {
         val json = """{"version":1,"drinks":[{"id":1,"name":"Old","volumeMl":500,"alcoholPercent":5.0}],"entries":[]}"""
         val result = BackupManager.parseBackupJson(json)
@@ -193,7 +237,12 @@ class BackupManagerTest {
     }
 
     @Test fun `entry with valid logicalDate YYYY-MM-DD is accepted`() {
-        val json = buildBackupJson(entries = listOf(entryJson(logicalDate = "2023-11-14")))
+        // The matching drink keeps the fixture referentially valid (Guard 5): this
+        // test's subject is the DATE guard, which must be the only one exercised.
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)),
+            entries = listOf(entryJson(logicalDate = "2023-11-14")),
+        )
         val result = BackupManager.parseBackupJson(json)
         assertNull("Valid YYYY-MM-DD should not produce an error", result.error)
         assertEquals("2023-11-14", result.entries.first().logicalDate)

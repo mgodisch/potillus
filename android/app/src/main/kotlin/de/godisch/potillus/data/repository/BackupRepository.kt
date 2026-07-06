@@ -109,7 +109,7 @@ class BackupRepository(
                 // auto-generate a fresh primary key anyway. REPLACE is semantically
                 // correct for the restore scenario and is kept here for clarity; the
                 // normal insert path uses ABORT to catch unintended collisions.
-                val remapped = entry.copy(id = 0, drinkId = idMap[entry.drinkId] ?: entry.drinkId)
+                val remapped = entry.copy(id = 0, drinkId = requireMapped(idMap, entry.drinkId))
                 entryDao.insertOrReplace(remapped.toEntity())
                 imported++
             }
@@ -144,7 +144,7 @@ class BackupRepository(
             val idMap = buildIdMap(backupDrinks, existingByName)
 
             backupEntries.forEach { entry ->
-                val remapped = entry.copy(id = 0, drinkId = idMap[entry.drinkId] ?: entry.drinkId)
+                val remapped = entry.copy(id = 0, drinkId = requireMapped(idMap, entry.drinkId))
                 if (entryDao.countByTimestampAndDrink(remapped.timestampMillis, remapped.drinkId) > 0) {
                     skipped++
                 } else {
@@ -197,6 +197,23 @@ class BackupRepository(
             idMap[drink.id] = localId
         }
         return idMap
+    }
+
+    /**
+     * The local drink id [backupDrinkId] was remapped to — a STRICT lookup.
+     *
+     * Every entry that reaches the repository through [BackupManager.parseBackupJson]
+     * is guaranteed to reference a drink from the same backup (its Guard 5), and
+     * [buildIdMap] maps every backup drink, so this cannot fail on the production
+     * path. The former silent fallback (`idMap[…] ?: entry.drinkId`) is exactly
+     * what this replaces: for a caller that bypasses the parser, a dangling raw
+     * backup id either collided with a local preset id — silently attaching the
+     * entry to the WRONG drink — or tripped the entries→drinks FK deep inside the
+     * transaction. Failing loudly here names the actual problem instead, and the
+     * surrounding `withTransaction` still rolls everything back (v0.79.0 QA fix).
+     */
+    private fun requireMapped(idMap: Map<Long, Long>, backupDrinkId: Long): Long = requireNotNull(idMap[backupDrinkId]) {
+        "backup entry references drinkId $backupDrinkId, which is not in the backup's drinks list"
     }
 
     // ── Entity conversion ─────────────────────────────────────────────────────

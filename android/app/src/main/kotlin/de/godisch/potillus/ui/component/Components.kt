@@ -328,14 +328,15 @@ fun LimitBar(
     // different guard (coerceAtLeast(1.0)), which the v0.78.0 QA review
     // unified into AlcoholCalculator.limitPercent.
     val fraction = AlcoholCalculator.limitPercent(totalGrams, limitGrams)
-    // Red only when the limit is *exceeded* (strictly greater), matching
-    // AlcoholCalculator.countLimitViolations and the calendar/chart over-limit
-    // markers, which all use `totalGrams > limitGrams`. Reaching the limit exactly
-    // is allowed (the limit is what you may consume), so it stays amber. Using the
-    // gram comparison rather than `fraction >= 1f` also avoids float-rounding at
-    // the boundary.
+    // Red only when the limit is *exceeded*, decided by the domain layer's ONE
+    // definition of "over the limit" (AlcoholCalculator.isOverLimit) — the same
+    // check countLimitViolations, the calendar/chart over-limit markers and the
+    // PDF report use. Reaching the limit exactly is allowed (the limit is what
+    // you may consume), so it stays amber; the helper's epsilon keeps a total
+    // that DISPLAYS as exactly the limit from flipping red through binary
+    // floating-point drift (see isOverLimit's KDoc).
     val barColor = when {
-        totalGrams > limitGrams -> dangerRedColor()
+        AlcoholCalculator.isOverLimit(totalGrams, limitGrams) -> dangerRedColor()
         fraction < 0.75f -> MaterialTheme.colorScheme.primary
         else -> warningColor()
     }

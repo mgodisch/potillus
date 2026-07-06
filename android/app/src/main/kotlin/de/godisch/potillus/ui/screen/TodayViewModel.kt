@@ -111,18 +111,24 @@ class TodayViewModel(
      *   would be frozen at the value captured during the last emission, so the
      *   displayed BAC would not change even as hours passed.
      *
-     * WHY combined INSIDE flatMapLatest (not outside)?
-     *   If the ticker were placed outside the flatMapLatest, each tick would
-     *   restart the whole flatMapLatest lambda: all upstream DB queries would
-     *   be cancelled and re-subscribed every minute, causing a visible flicker.
-     *   Placing it inside means only the combine recalculates; the DB Flows
-     *   remain active and undisturbed.
+     * WHERE it is used (twice, with different jobs):
+     *   1. OUTSIDE the flatMapLatest, combined with the settings, it re-derives
+     *      the logical day once per minute so the whole pipeline rolls over at
+     *      the configured day-change time even while the screen stays open.
+     *      `distinctUntilChanged` swallows the tick unless the day (or the
+     *      settings) actually changed, so this does NOT restart the DB queries
+     *      every minute — only at the boundary (see [uiState]).
+     *   2. INSIDE the flatMapLatest's combine it recalculates the BAC snapshot
+     *      each minute. Placing this role inside means only the combine lambda
+     *      re-runs; the DB Flows remain active and undisturbed, avoiding the
+     *      visible flicker a full restart would cause.
      *
      * WHY 60 seconds?
      *   BAC changes roughly 0.15 ‰/h = 0.0025 ‰/min. A one-minute resolution
      *   is imperceptible for the user but keeps battery impact negligible
      *   (one wakeup per minute vs continuous). Shorter intervals would not add
-     *   meaningful accuracy.
+     *   meaningful accuracy. It also bounds the day-rollover latency to one
+     *   minute, matching the resolution of the day-change setting itself.
      */
     private val ticker: Flow<Unit> = flow {
         while (true) {
@@ -182,12 +188,28 @@ class TodayViewModel(
     /**
      * UI state flow.
      *
-     * Derived entirely from [prefs.settingsFlow] as the outer stream so that "today"
-     * (which depends on the day-change time stored in settings) is always recalculated
-     * when settings change.
+     * The OUTER stream pairs [prefs.settingsFlow] with the [ticker] and derives
+     * the logical day from both, so "today" is recalculated when the settings
+     * change (the day-change time lives there) AND once per minute while the
+     * screen is subscribed. `distinctUntilChanged` then swallows every tick on
+     * which neither the settings nor the resulting day string actually changed,
+     * so the flatMapLatest below — and with it all DB queries — restarts exactly
+     * twice a day at most (day rollover) plus on real settings edits.
+     *
+     * WHY the day must be an INPUT of flatMapLatest (v0.79.0 QA fix):
+     *   "today" used to be computed once inside the flatMapLatest lambda, which
+     *   was keyed on settings alone. With the screen continuously subscribed
+     *   across the configured day boundary (the 04:00 default exists precisely
+     *   for late evenings), every date-scoped query — today's entries, the
+     *   7-day window, the month total — stayed pinned to the PREVIOUS day:
+     *   a drink logged after the boundary was correctly stored under the new
+     *   logical date and therefore invisible on the Today screen until the
+     *   subscriber count dropped to zero for > 5 s (WhileSubscribed) or the
+     *   settings changed.
      */
-    val uiState: StateFlow<TodayUiState> = prefs.settingsFlow.flatMapLatest { settings ->
-        val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+    val uiState: StateFlow<TodayUiState> = combine(prefs.settingsFlow, ticker) { settings, _ ->
+        settings to DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+    }.distinctUntilChanged().flatMapLatest { (settings, today) ->
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         // Rolling 7-day window: today plus the previous six calendar days (inclusive).
         // This replaces the former fixed calendar week so the "weekly" gram total and

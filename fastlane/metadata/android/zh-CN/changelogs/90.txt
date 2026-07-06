@@ -1,1 +1,1 @@
-Project documentation and development-process improvements toward the OpenSSF Best Practices gold criteria. No functional changes to the app.
+来自全面代码审查的修复:繁体和简体中文在首次启动时可被正确识别;PDF 报告中的最长戒酒时长现已包含正在进行的戒酒期;月份和日期标签遵循各语言的书写习惯;“今天”界面在应用打开时也会在设定时间切换到新的一天;恰好等于限制值的数值不再计为超限。此外还包含面向 OpenSSF 金牌标准的文档与流程改进。

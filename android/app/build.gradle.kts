@@ -188,9 +188,9 @@ android {
         // LOCALISATION — how to add a new language (all steps are required)
         // ─────────────────────────────────────────────────────────────────────
         // Step 1: Create app/src/main/res/values-<bcp47>/strings.xml
-        //         Translate all 170 keys. Source of truth: values-de/strings.xml.
-        //         (The exact count is verified by LocaleSyncTest — treat that test,
-        //          not this comment, as the authoritative source if they ever differ.)
+        //         Translate ALL keys — LocaleSyncTest pins the exact set, so the
+        //         authoritative count lives in that test, never in a comment.
+        //         Source of truth: values-de/strings.xml.
         //         Qualifier syntax:  values-fr/  values-pt-rBR/  values-zh-rCN/
         //
         // Step 2: Register the locale in app/src/main/res/xml/locale_config.xml
@@ -203,7 +203,11 @@ android {
         // Step 3 (RTL only): android:supportsRtl="true" is already set in
         //         AndroidManifest.xml — no further action needed.
         //
-        // See also: AndroidManifest.xml for the full three-step checklist.
+        // See also: AndroidManifest.xml for the full checklist, including
+        //         Step 4 (the Google Play store-locale directory under
+        //         fastlane/metadata/android/ — its code usually differs from the
+        //         resource tag, e.g. values-ja/ → ja-JP/; release-check §4 Check D
+        //         enforces the mapping).
         // ─────────────────────────────────────────────────────────────────────
 
         // Test runner for instrumented tests (run on device/emulator).
@@ -943,10 +947,13 @@ tasks.cyclonedxDirectBom {
 // generated code so the reported figure honestly reflects coverage of the code
 // the unit tests are responsible for.
 //
-// This block configures reporting and filtering only. Build-breaking
-// verification thresholds (koverVerify) are deliberately NOT enabled yet; they
-// will be switched on once the measured coverage reaches the targets, so the
-// build is not broken in the meantime.
+// This block configures reporting, filtering AND the build-breaking
+// verification thresholds: the `verify { }` rules below enforce ≥ 90 % LINE and
+// ≥ 75 % BRANCH coverage of the filtered class set whenever `:app:koverVerify`
+// runs — locally, via `make cover-check`, and in the release gate's opt-in
+// coverage mode (`tools/release-check.sh --coverage`). The thresholds are a
+// ratchet against regressions, not a target to chase: raise them as real
+// coverage grows (see docs/ROADMAP.md for the branch-coverage goal).
 kover {
     reports {
         filters {

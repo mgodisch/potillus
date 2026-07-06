@@ -40,10 +40,13 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 Work toward OpenSSF gold badge criteria
 
-Development toward the OpenSSF Best Practices gold level (project 13480). This
-release is groundwork only — project documentation and development-process
-improvements — with no functional changes to the app; individual changes are
-listed below as they land.
+Development toward the OpenSSF Best Practices gold level (project 13480),
+plus the fixes from a full QA review of the whole tree (the fourth review
+round; the first covering every source, resource, tooling and store-metadata
+file at once). The OpenSSF work is documentation and process only; the QA
+fixes include user-visible corrections — Chinese language detection, the
+report's longest-abstinence figure, month/date label localization, the
+day rollover on the Today screen — each listed individually below.
 
 - `.bestpractices.json`: reworded the four justifications that quoted a
   concrete release ("currently 0.78.0" in `OSPS-BR-02.01`/`OSPS-BR-02.02`/
@@ -232,6 +235,119 @@ listed below as they land.
   build instead of surfacing only at release time. Style/build-tooling only; no
   functional change to the app.
 - Update fastlane v2.236.1 to v2.237.0.
+- QA: the PDF report's "longest abstinence" now includes the ongoing dry
+  streak, exactly like the Statistics screen. The report called the legacy
+  no-`today` overload of `DayResolver.computeLongestAbstinence`, which ignores
+  the tail gap after the last drink — so a report could show a *current*
+  abstinence larger than the *longest* one (impossible by definition) whenever
+  the ongoing run was the user's best. `PdfReportDataTest` pins the tail
+  inclusion and the `longest >= current` invariant with a pinned clock.
+- QA: first-launch language detection now understands script subtags. Modern
+  Android reports Chinese as `zh-Hant-TW` / `zh-Hans-CN`, which the full-tag /
+  base-language matcher could not map to the shipped `zh-TW` / `zh-CN` — so
+  Chinese users were silently forced to English, persistently (the detected
+  tag overrides Android's own resource fallback). `LocaleDetector.detect` now
+  matches language+region with the script dropped, disambiguates the remaining
+  `zh` variants by script/region (`Hant`/TW/HK/MO → `zh-TW`, otherwise
+  `zh-CN`), and folds the Norwegian macrolanguage alias `no` onto `nb`; seven
+  new unit tests cover the added steps.
+- QA: the Today screen now rolls over to the new logical day while it stays
+  open. "Today" was computed once per settings emission, so with the app open
+  across the configured day-change time (04:00 by default — late evenings are
+  the point of that setting) every date-scoped query stayed pinned to the
+  previous day and a drink logged after the boundary was invisible. The
+  minute ticker now re-derives the day *outside* the `flatMapLatest` (behind
+  `distinctUntilChanged`, so DB queries restart only at the boundary), and the
+  Statistics period bounds and the Calendar's today marker follow the same
+  pattern. A new `TodayViewModelTest` drives a pinned mutable clock across the
+  boundary on virtual time to pin the rollover.
+- QA: totals that are exactly AT a limit no longer count as exceeded. Gram
+  amounts are stored on a 0.1 g grid, but day/window totals are binary-double
+  sums (the 7-day window even incrementally maintained), so an
+  exactly-at-limit total could drift to e.g. 100.000000000000014 and a strict
+  `>` flagged an exceedance the user cannot see — against the app's "displayed
+  number == compared number" principle. The new
+  `AlcoholCalculator.isOverLimit` (epsilon 1e-6, three orders below the data
+  grid) is now the single definition of "over the limit", used by the
+  violation counters, the report's over-limit months / binge days / peak-KPI
+  warnings / chart bars, and the on-screen limit bar, calendar and chart
+  markers. A regression test replays a provably drifting sequence.
+- QA: month+year labels (Calendar header, the PDF's monthly table and chart)
+  are now built from the CLDR skeletons `yMMMM`/`yMMM` via the new
+  `monthYearFormatter` (l10n/LocaleSupport.kt) instead of a literal
+  `"MMMM yyyy"` — which showed the wrong field order for Chinese, Japanese
+  and Korean ("6月 2026" instead of "2026年6月") and the wrong grammatical
+  form for the inflected languages (genitive "czerwca 2026" instead of the
+  standalone "czerwiec 2026"). The year view's bare month abbreviations
+  switched from `MMM` to the standalone `LLL` for the same reason. Asserted
+  on-device by three new `LocaleFormattingInstrumentedTest` cases.
+- QA: Swedish compact day+month labels (Today's week range, chart ticks) now
+  render day-first ("28/6") as Swedish convention demands. Deriving the label
+  from the SHORT date pattern kept sv's ISO-like year-first order, yielding
+  "6-28" — and the test suite even pinned that wrong order as expected. The
+  derivation now aligns the day/month order with the locale's MEDIUM pattern
+  (quoted-literal-safe); a new property test asserts that alignment for every
+  shipped locale, so future locales cannot re-enter through the same gap.
+- QA: backup import now validates referential integrity at parse time
+  (`BackupManager` Guard 5): every entry must reference a drink contained in
+  the backup. Previously a dangling `drinkId` (hand-edited or truncated file)
+  reached the repository, where the REPLACE path's remap fallback kept the raw
+  id — silently attaching the entry to the wrong drink when the number
+  happened to match a local preset, or aborting the whole transaction with
+  only a generic error otherwise. The repository's fallback is replaced by a
+  strict lookup that names the dangling id; two new parser tests cover the
+  reject and accept paths.
+- QA: store-locale directories renamed to Google Play's store-listing codes.
+  The `deploy` lane pushes `fastlane/metadata/android/` to Play, which accepts
+  only its fixed language list — 14 of the 21 directories carried bare codes
+  Play rejects (`cs`→`cs-CZ`, `da`→`da-DK`, `el`→`el-GR`, `es`→`es-ES`,
+  `fr`→`fr-FR`, `it`→`it-IT`, `ja`→`ja-JP`, `ko`→`ko-KR`, `nb`→`no-NO`,
+  `nl`→`nl-NL`, `pl`→`pl-PL`, `pt`→`pt-PT`, `ru`→`ru-RU`, `sv`→`sv-SE`);
+  F-Droid reads region-qualified codes fine, so nothing is lost there. The
+  per-locale sample report PDFs and `screenshots.html` were renamed/retargeted
+  along, `render-feature-graphic.py` now keys its CJK font fallback by
+  language/region instead of the literal directory name, the capture suites
+  resolve their resources via the detected APP language rather than the raw
+  store code — `no-NO` vs `nb` is the one pair Android's resource matcher
+  does not bridge, which made the screenshot run wait for an English label
+  the Norwegian UI never shows and the Norwegian sample report silently
+  render in English — and `release-check.sh` §4 gained Check D: every metadata directory must be a
+  valid Play code AND map 1:1 (full tag first, then language subtag, `no`→`nb`)
+  onto `SupportedLocales.ALL`. The app's resource qualifiers and the
+  `docs/guide` templates keep their own — platform-fixed — naming; the
+  "add a new language" checklists now document all three ecosystems.
+- QA: hygiene — the stale build-script comment claiming the Kover verify
+  thresholds are "deliberately NOT enabled yet" (they are enabled and gate
+  releases) rewritten; `setDayChangeTime` clamps hour/minute like every other
+  preferences setter (belt-and-suspenders, per the class contract); the
+  committed `fastlane/report.xml` run artifact removed and gitignored; the
+  "170 string keys" counts in two localization checklists made count-free
+  (`LocaleSyncTest` owns the number — it is 169 today).
+- Rewrote the versionCode-90 user release notes in all 21 store languages:
+  they now describe this release's user-visible QA fixes alongside the
+  OpenSSF process work (the previous note predated the QA round and claimed
+  "no functional changes").
+- Build tooling: the store-image pipeline now auto-generates and cascades.
+  Missing device screenshots (01..06) are captured automatically the first
+  time a feature graphic needs one — a single guarded `make screenshots`
+  run (device required), triggered ONLY by genuine absence, never by mere
+  staleness (which stays manual, as before). The eight shots are split by
+  producer: `make screenshots` now captures only the in-app shots 01..06 and
+  then refreshes the feature graphics; `make report-pdfs` owns the report
+  pages 07..08 (it now rasterizes them from the freshly exported PDFs) and
+  likewise refreshes the graphics — so renewing either half always renews the
+  graphics that depend on it. A new `make store-assets` target rebuilds the
+  whole set in one go, and a once-per-run stamp guarantees the feature
+  graphics render exactly once even when both producers run together (it also
+  removes the former double build in `make release`). `validate-screenshots.py`
+  gained `--in-app`/`--report` modes so each producer validates only its own
+  half. screengrab's own `clear_previous_screenshots` is disabled and replaced
+  by a targeted delete of exactly 01..06 in the `screenshots` recipe: screengrab
+  globs and deletes ALL `*.png` in each `phoneScreenshots/` directory, so with
+  the report pages no longer regenerated by `make screenshots` it would have
+  wiped the committed 07/08 without rebuilding them — the recipe now clears only
+  the six in-app shots it recaptures and never touches the report pages.
+- Deleted `docs/PLAY_STORE.md`.
 
 ---
 
@@ -3787,5 +3903,3 @@ What was done to produce this baseline:
 
 - No application behaviour changed in this baseline: the edits are limited to
   documentation/comments, the version strings, and the version-format check.
-- Not built or tested in this environment (no Android SDK). Run `make test` and
-  `make test-device` before tagging.

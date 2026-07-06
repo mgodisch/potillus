@@ -43,10 +43,14 @@ package de.godisch.potillus.l10n
 // HOW IT WORKS
 //   java.time exposes each locale's full SHORT date pattern (e.g. "dd.MM.yy"
 //   for de, "M/d/yy" for en-US, "y/MM/dd" for ja). Stripping the year field —
-//   together with the separator that attaches it — leaves exactly the
-//   locale's day/month order and separator. Repeated pattern letters are then
+//   together with the separator that attaches it — leaves the locale's
+//   day/month fields and separator. Repeated pattern letters are then
 //   collapsed ("dd.MM" → "d.M") so single-digit days/months render without
-//   padding, matching the app's previous compact style.
+//   padding, matching the app's previous compact style. Finally the day/month
+//   ORDER is aligned with the locale's MEDIUM pattern: a year-first SHORT
+//   pattern (Swedish "y-MM-dd") says nothing about the order the locale uses
+//   WITHOUT a year, and taking it literally rendered "6-28" for Swedish where
+//   the convention is "28/6" (see alignDayMonthOrder below).
 // =============================================================================
 
 import java.time.chrono.IsoChronology
@@ -67,15 +71,33 @@ private val YEAR_WITH_SEPARATORS = Regex("[^A-Za-z]*[yu]+[^A-Za-z]*")
 private val REPEATED_PATTERN_LETTER = Regex("([A-Za-z])\\1+")
 
 /**
+ * Matches a quoted pattern literal such as `'de'` (Portuguese "d 'de' MMM 'de' y")
+ * or the escaped quote `''`. Literals must be blanked before LOCATING the day and
+ * month fields, because their text may contain the letters 'd' or 'M' — the
+ * Portuguese `'de'` literal starts with a 'd' that is NOT a day field.
+ */
+private val QUOTED_LITERAL = Regex("'[^']*'")
+
+/**
+ * Splits a compact two-field day/month pattern into (leading separator, first
+ * field, middle separator, second field, trailing separator), where each field
+ * is a run of 'd' or 'M' letters. Used by [alignDayMonthOrder] to swap the two
+ * fields while keeping every separator character exactly where it was.
+ */
+private val TWO_FIELD_PATTERN = Regex("^([^A-Za-z]*)([dM]+)([^A-Za-z]*)([dM]+)([^A-Za-z]*)$")
+
+/**
  * The locale's SHORT date pattern reduced to its day and month fields, for
  * compact "day + month" labels such as "28.6" (de), "6/28" (en-US, ja).
  *
  * Derivation: take the locale's full SHORT date pattern from java.time
  * (ISO chronology, so no era field can appear), remove the year field and its
- * attached separators, and collapse repeated pattern letters so values render
- * unpadded. If the result unexpectedly lacks a day or month field (a defensive
- * guard — no CLDR locale shipped with the JDK/ICU behaves that way), the full
- * SHORT pattern is returned unchanged rather than something unusable.
+ * attached separators, collapse repeated pattern letters so values render
+ * unpadded, and finally align the day/month ORDER with the locale's MEDIUM
+ * pattern (see [alignDayMonthOrder] for why the SHORT order alone is not
+ * trustworthy). If the result unexpectedly lacks a day or month field (a
+ * defensive guard — no CLDR locale shipped with the JDK/ICU behaves that way),
+ * the full SHORT pattern is returned unchanged rather than something unusable.
  *
  * @param locale The locale whose day/month ORDER and SEPARATOR to use —
  *               normally `context.formattingLocale()` so the label follows the
@@ -93,5 +115,50 @@ fun shortDayMonthPattern(locale: Locale): String {
     val stripped = full
         .replace(YEAR_WITH_SEPARATORS, "")
         .replace(REPEATED_PATTERN_LETTER, "$1")
-    return if (stripped.contains('d') && stripped.contains('M')) stripped else full
+    if (!stripped.contains('d') || !stripped.contains('M')) return full
+    return alignDayMonthOrder(stripped, locale)
+}
+
+/**
+ * Swaps the day and month fields of [stripped] when their order contradicts
+ * the locale's MEDIUM date pattern, keeping every separator in place.
+ *
+ * WHY THE SHORT ORDER ALONE IS NOT TRUSTWORTHY (the Swedish case):
+ *   Some locales use an ISO-like, YEAR-FIRST short pattern — Swedish is
+ *   "y-MM-dd". Stripping the year from it leaves "M-d", i.e. MONTH first,
+ *   although the Swedish convention for a compact day+month label is day
+ *   first ("28/6"; CLDR's `Md` skeleton for sv is "d/M"). The year-first
+ *   layout says nothing about the day/month order the locale uses when no
+ *   year is present. The MEDIUM pattern, by contrast, spells the fields out
+ *   in the locale's natural reading order for every locale this app ships
+ *   ("d MMM y" for sv, "MMM d, y" for en-US, "y年M月d日" for zh), so its
+ *   day/month order is the authoritative one. Verified by executing both
+ *   derivations against all 21 shipped locales: the MEDIUM order matches the
+ *   CLDR `Md` skeleton everywhere, and Swedish is the single locale where the
+ *   SHORT-derived order disagrees (found in the v0.79.0 QA review — the
+ *   previous test suite even pinned the wrong Swedish expectation).
+ *
+ * Quoted literals (e.g. the Portuguese "d 'de' MMM 'de' y") are blanked before
+ * locating the fields so literal text containing 'd'/'M' cannot skew the order
+ * detection. If either pattern is too unusual to locate both fields, [stripped]
+ * is returned unchanged (defensive; does not occur for any shipped locale).
+ */
+private fun alignDayMonthOrder(stripped: String, locale: Locale): String {
+    val medium = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.MEDIUM,
+        null,
+        IsoChronology.INSTANCE,
+        locale,
+    ).replace(QUOTED_LITERAL, " ")
+
+    val mediumDayFirst = medium.indexOf('d') < medium.indexOf('M')
+    val strippedDayFirst = stripped.indexOf('d') < stripped.indexOf('M')
+    if (medium.indexOf('d') < 0 || medium.indexOf('M') < 0) return stripped // defensive
+    if (mediumDayFirst == strippedDayFirst) return stripped
+
+    // Swap the two fields, keeping the separators exactly where they are:
+    // "M-d" → "d-M", "M. d." → "d. M.".
+    val m = TWO_FIELD_PATTERN.matchEntire(stripped) ?: return stripped // defensive
+    val (lead, first, mid, second, trail) = m.destructured
+    return "$lead$second$mid$first$trail"
 }

@@ -69,10 +69,18 @@ locales(
      .sort_by { |l| [l == 'en-US' ? 0 : 1, l] }
 )
 
-# Wipe the previous PNGs so a re-run cannot leave stale shots behind. The PDF
-# pages (07/08) are added by the Makefile AFTER screengrab finishes, so this
-# clear never removes them.
-clear_previous_screenshots(true)
+# Do NOT let screengrab clear previous screenshots. screengrab's clearing globs
+# EVERY *.png in each phoneScreenshots/ directory and deletes them all
+# (screengrab/runner.rb: `Dir.glob('**/<device_type>/*.png')` -> `File.delete`),
+# with no name filter — so it removes the committed report pages 07/08 too, not
+# just the in-app shots 01..06 it is about to recapture. Since `make screenshots`
+# now owns only 01..06 (07/08 belong to `make report-pdfs`, rendered from the
+# per-locale PDFs), letting screengrab clear here would delete the committed 07/08
+# and they would not be regenerated in the same run — leaving the store listings
+# with two missing screenshots. Instead the `screenshots` recipe deletes exactly
+# 01..06 before the capture (see the Makefile), so a re-run cannot leave a stale
+# in-app shot behind while the report pages are never touched.
+clear_previous_screenshots(false)
 
 # Output root. screengrab writes <output_directory>/<locale>/images/
 # phoneScreenshots/, i.e. straight into the existing fastlane metadata tree that

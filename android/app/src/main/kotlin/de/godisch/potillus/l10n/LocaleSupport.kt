@@ -24,9 +24,11 @@ package de.godisch.potillus.l10n
 import android.content.Context
 import android.content.res.Configuration
 import android.os.LocaleList
+import android.text.format.DateFormat
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.ConfigurationCompat
 import androidx.core.os.LocaleListCompat
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 // =============================================================================
@@ -179,4 +181,47 @@ internal fun Context.localizedContextFor(locales: LocaleListCompat): Context {
     // strips languages from this app's AAB, and F-Droid APKs are unsplit anyway.
     config.setLocales(LocaleList.forLanguageTags(tags))
     return createConfigurationContext(config)
+}
+
+// =============================================================================
+// Month + year labels ("June 2026") — CLDR skeletons instead of literal patterns
+// =============================================================================
+//
+// WHY NOT DateTimeFormatter.ofPattern("MMMM yyyy", locale)?
+//   A literal pattern localizes only the month NAME. Two whole language groups
+//   need more (found in the v0.79.0 QA review, the same fault class as the
+//   fixed formatStatsDate/"d.M." labels):
+//     • FIELD ORDER — CJK writes the year first: "2026年6月" (zh/ja), "2026년
+//       6월" (ko). The literal pattern rendered "6月 2026".
+//     • GRAMMATICAL FORM — in inflected languages the "MMMM" (format-context)
+//       month is the GENITIVE, meant to follow a day number: "28 czerwca". A
+//       bare month+year label needs the STANDALONE form ("czerwiec 2026",
+//       "июнь 2026 г."), pattern letter "LLLL". Which form (and where the
+//       year's era suffix like the Russian "г." goes) is locale data, not
+//       something a hand-written pattern can know.
+//   ICU's getBestDateTimePattern solves both: given the SKELETON "yMMMM" (just
+//   the fields wanted), it returns the locale's own pattern for that field
+//   combination from CLDR — "y年M月" for zh/ja, "LLLL y 'г'." for ru,
+//   "MMMM y" for de. The TodayViewModel month caption solves the same problem
+//   with Month.getDisplayName(FULL_STANDALONE) — that API covers a month name
+//   WITHOUT a year, so it cannot be used here.
+//
+// WHY THESE LIVE IN THIS FILE
+//   android.text.format.DateFormat is an Android API, so the helpers cannot be
+//   JVM-unit-tested; this file's class (LocaleSupportKt) is already excluded
+//   from the Kover floor for exactly that reason, and the behaviour is asserted
+//   on-device in LocaleFormattingInstrumentedTest instead.
+// =============================================================================
+
+/**
+ * A formatter producing the locale's own "month + year" label — full month name
+ * ([abbreviated] = false, e.g. Calendar header "June 2026" / "2026年6月" /
+ * "czerwiec 2026") or abbreviated ([abbreviated] = true, e.g. the PDF's monthly
+ * rows "Jun 2026") — via the CLDR skeletons "yMMMM" / "yMMM" (see the section
+ * header above for why a literal "MMMM yyyy" is wrong in 6+ shipped languages).
+ */
+fun monthYearFormatter(locale: Locale, abbreviated: Boolean = false): DateTimeFormatter {
+    val skeleton = if (abbreviated) "yMMM" else "yMMMM"
+    val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+    return DateTimeFormatter.ofPattern(pattern, locale)
 }

@@ -26,10 +26,12 @@ package de.godisch.potillus.domain
 // =============================================================================
 //
 // WHAT IS TESTED:
-//   The three-step matching strategy of LocaleDetector.detect():
-//     1. Exact full-tag match   ("zh-CN" → "zh-CN")
-//     2. Base-language match    ("de-AT" → "de")
-//     3. English fallback       ("ar"    → "en")
+//   The five-step matching strategy of LocaleDetector.detect():
+//     1. Exact full-tag match          ("zh-CN"      → "zh-CN")
+//     2. Language+region, script-free  ("zh-Hant-TW" → "zh-TW")
+//     3. Chinese script/region mapping ("zh-Hant-HK" → "zh-TW")
+//     4. Base-language match           ("de-AT"      → "de", alias "no" → "nb")
+//     5. English fallback              ("ar"         → "en")
 //
 // WHY PURE JVM (no Android, no Robolectric):
 //   LocaleDetector has zero Android dependencies. java.util.Locale is part of
@@ -52,7 +54,7 @@ import java.util.Locale
 /**
  * Unit tests for [LocaleDetector.detect].
  *
- * Covers all three matching steps and several edge cases.
+ * Covers all five matching steps and several edge cases.
  */
 class LocaleDetectorTest {
 
@@ -173,5 +175,66 @@ class LocaleDetectorTest {
         assertEquals("EN", LocaleDetector.detect(Locale.of("en"), mixedCaseSupported))
         assertEquals("DE", LocaleDetector.detect(Locale.of("de"), mixedCaseSupported))
         assertEquals("PT-BR", LocaleDetector.detect(Locale.forLanguageTag("pt-BR"), mixedCaseSupported))
+    }
+
+    // ── Step 2/3: script-carrying Chinese locales (v0.79.0 QA regression) ────
+    //
+    // Modern Android reports Chinese WITH a script subtag ("zh-Hant-TW",
+    // "zh-Hans-CN"), which the original full-tag/base-language strategy could
+    // not match: Traditional- and Simplified-Chinese users were silently forced
+    // to English on first launch. These tests pin the script-aware steps.
+
+    /** Language+region matching must drop the script: zh-Hant-TW → zh-TW. */
+    @Test fun `zh-Hant-TW resolves to zh-TW`() {
+        assertEquals("zh-TW", LocaleDetector.detect(Locale.forLanguageTag("zh-Hant-TW"), supported))
+    }
+
+    /** Language+region matching must drop the script: zh-Hans-CN → zh-CN. */
+    @Test fun `zh-Hans-CN resolves to zh-CN`() {
+        assertEquals("zh-CN", LocaleDetector.detect(Locale.forLanguageTag("zh-Hans-CN"), supported))
+    }
+
+    /** No supported language+region, but Hant script → Traditional (zh-TW). */
+    @Test fun `zh-Hant-HK and zh-Hant-MO resolve to zh-TW via the script`() {
+        assertEquals("zh-TW", LocaleDetector.detect(Locale.forLanguageTag("zh-Hant-HK"), supported))
+        assertEquals("zh-TW", LocaleDetector.detect(Locale.forLanguageTag("zh-Hant-MO"), supported))
+    }
+
+    /** Without a script, the traditionally Traditional regions map to zh-TW. */
+    @Test fun `scriptless zh-HK resolves to zh-TW via the region`() {
+        assertEquals("zh-TW", LocaleDetector.detect(Locale.forLanguageTag("zh-HK"), supported))
+    }
+
+    /** Bare "zh" and Simplified-leaning variants resolve to zh-CN. */
+    @Test fun `bare zh and zh-SG resolve to zh-CN`() {
+        assertEquals("zh-CN", LocaleDetector.detect(Locale.forLanguageTag("zh"), supported))
+        assertEquals("zh-CN", LocaleDetector.detect(Locale.forLanguageTag("zh-SG"), supported))
+        assertEquals("zh-CN", LocaleDetector.detect(Locale.forLanguageTag("zh-Hans"), supported))
+    }
+
+    /**
+     * The Chinese step must never invent a tag the app does not ship: with only
+     * zh-CN supported, a Traditional locale still falls back through the
+     * remaining steps (here: to "en") instead of returning an unshipped zh-TW.
+     */
+    @Test fun `zh step returns only supported tags`() {
+        val simplifiedOnly = setOf("en", "zh-CN")
+        assertEquals("en", LocaleDetector.detect(Locale.forLanguageTag("zh-Hant-TW"), simplifiedOnly))
+    }
+
+    // ── Step 4 alias: Norwegian macrolanguage code (v0.79.0 QA) ──────────────
+
+    /**
+     * "no" / "no-NO" (the macrolanguage code Google Play's store locale uses)
+     * must find the Bokmål translation shipped as "nb" — Android's own resource
+     * matcher treats the two as compatible, and the screenshot suite feeds the
+     * store locale "no-NO" through this function.
+     */
+    @Test fun `no and no-NO resolve to nb`() {
+        val withNorwegian = supported + "nb"
+        assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("no"), withNorwegian))
+        assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("no-NO"), withNorwegian))
+        // The direct code keeps working, of course.
+        assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("nb-NO"), withNorwegian))
     }
 }

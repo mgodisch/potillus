@@ -170,4 +170,58 @@ class PdfReportDataTest {
         // two of them; the worst window therefore equals the single heaviest day.
         assertEquals(25.0, d.maxPer7Days, 0.001)
     }
+
+    // ── Abstinence streaks (v0.79.0 QA regression tests) ──────────────────────
+    //
+    // PdfReportData reads "today" through DayResolver.today(), which honours the
+    // test-only DayResolver.clockOverride. Pinning the clock makes the ongoing
+    // (tail) streak deterministic, so these tests can assert exact day counts.
+    // The pin is cleared in a finally block so it can never leak into other tests
+    // sharing the JVM (the override lives in the DayResolver singleton).
+
+    /**
+     * Runs [block] with the wall clock pinned to UTC midnight of [isoDate], and
+     * always clears the pin afterwards. AppSettings' default day-change time is
+     * 04:00, so a 12:00 UTC instant resolves to [isoDate] itself in every zone a
+     * CI runner realistically uses; midday is used for the same safety margin the
+     * screenshot suite applies.
+     */
+    private fun withToday(isoDate: String, block: () -> Unit) {
+        DayResolver.clockOverride = java.time.Clock.fixed(
+            java.time.Instant.parse("${isoDate}T12:00:00Z"),
+            java.time.ZoneOffset.UTC,
+        )
+        try {
+            block()
+        } finally {
+            DayResolver.clockOverride = null
+        }
+    }
+
+    @Test fun `longest abstinence includes the ongoing tail streak`() {
+        // Historical gaps: Jan 10 → Jan 20 (9 dry days) and Jan 20 → Feb 5 (15 dry
+        // days). With today pinned to 2026-03-01 the tail run after the last drink
+        // (Feb 6 … Feb 28) holds 23 completed dry days and must win. The legacy
+        // no-`today` computation ignored the tail and reported 15 here — smaller
+        // than the current streak, which is impossible by definition.
+        withToday("2026-03-01") {
+            val d = build()
+            assertEquals(23, d.currentAbstinence)
+            assertEquals(23, d.longestAbstinence)
+        }
+    }
+
+    @Test fun `longest abstinence is never smaller than the current streak`() {
+        // Definition invariant: the current streak IS one of the candidate runs, so
+        // longest >= current must hold for ANY "today". Probe a spread of dates.
+        for (today in listOf("2026-02-06", "2026-02-10", "2026-02-20", "2026-06-30")) {
+            withToday(today) {
+                val d = build()
+                assertTrue(
+                    "longest (${d.longestAbstinence}) < current (${d.currentAbstinence}) for today=$today",
+                    d.longestAbstinence >= d.currentAbstinence,
+                )
+            }
+        }
+    }
 }

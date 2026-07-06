@@ -60,6 +60,7 @@ import de.godisch.potillus.util.ExportResult
 import de.godisch.potillus.util.PdfReportBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -286,18 +287,47 @@ class StatsViewModel(
         val period: StatsPeriod,
         val settings: AppSettings,
         val allDates: List<String>,
+        /**
+         * The logical day the period bounds are anchored to. Carried INSIDE the
+         * params — and therefore part of their equality — so the pipeline
+         * restarts when the day rolls over while the screen stays subscribed:
+         * the [ticker] below re-emits the params once per minute and
+         * `distinctUntilChanged` drops every tick on which nothing (including
+         * this day string) actually changed (v0.79.0 QA fix; before it, the
+         * WEEK/MONTH/YEAR windows stayed pinned to the previous day across the
+         * configured day-change time until a new entry or settings edit
+         * happened to restart the chain).
+         */
+        val today: String,
     )
+
+    /**
+     * Emits [Unit] immediately, then once per minute — the impulse that lets
+     * [uiState] notice the logical-day rollover (see [StatsParams.today]). The
+     * interval matches the one-minute resolution of the day-change setting.
+     */
+    private val ticker: Flow<Unit> = flow {
+        while (true) {
+            emit(Unit)
+            delay(60_000L)
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<StatsUiState> = combine(
         _period,
         prefs.settingsFlow,
         entryRepo.getAllDatesFlow(),
-    ) { period, settings, allDates ->
-        StatsParams(period, settings, allDates)
-    }.flatMapLatest { params ->
-        val (period, settings, allDates) = params
-        val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+        ticker,
+    ) { period, settings, allDates, _ ->
+        StatsParams(
+            period,
+            settings,
+            allDates,
+            today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute),
+        )
+    }.distinctUntilChanged().flatMapLatest { params ->
+        val (period, settings, allDates, today) = params
         val todayDate = DayResolver.parseDate(today)
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         val fmt = DayResolver.DATE_FORMATTER

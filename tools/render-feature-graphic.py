@@ -400,19 +400,22 @@ def _badge_for_locale(locale: str) -> Path:
     the language subtag in lower case, keeping (and lower-casing) any region:
     ``pt-BR`` -> ``pt-br``, ``zh-CN`` -> ``zh-cn``. To pick one, we try the most
     specific name first and fall back to progressively broader ones, ending at
-    the English badge -- so a locale that ships no badge of its own (e.g. ``nb``,
-    ``uk``) still renders a valid, if English, badge instead of raising::
+    the English badge -- so a locale that ships no badge of its own (e.g.
+    ``no-NO``, ``uk``) still renders a valid, if English, badge instead of
+    raising::
 
         de-DE -> get-it-on-de-de.svg?  (no)  -> get-it-on-de.svg   (yes)
         en-US -> get-it-on-en-us.svg?  (no)  -> get-it-on-en.svg   (yes)
         pt-BR -> get-it-on-pt-br.svg   (yes)
+        cs-CZ -> get-it-on-cs-cz.svg?  (no)  -> get-it-on-cs.svg   (yes)
         zh-CN -> get-it-on-zh-cn.svg   (yes)
-        cs    -> get-it-on-cs.svg      (yes)
-        nb    -> get-it-on-nb.svg?     (no)  -> get-it-on-en.svg   (fallback)
+        no-NO -> get-it-on-no-no.svg? get-it-on-no.svg?  (no) -> get-it-on-en.svg
 
-    Because ``de-DE``/``en-US`` still resolve to the ``de``/``en`` badge exactly
-    as before, the two previously published graphics are unaffected (no
-    regression); every other shipped locale now picks up its own localized badge.
+    This language-first fallback is what lets the store-locale directories use
+    Google Play's region-qualified codes (``cs-CZ``, ``ja-JP``, … — see the
+    v0.79.0 store-locale migration) while the badge artwork keeps its upstream
+    bare-language file names: every renamed locale still resolves to the same
+    badge as before.
     """
     tag = locale.lower()
     candidates = [tag]                          # full tag, e.g. "pt-br", "de-de"
@@ -429,23 +432,40 @@ def _badge_for_locale(locale: str) -> Path:
 
 
 # The Noto Sans CJK families (bundled under tools/fonts/NotoSansCJK/) used as the
-# fallback after Inter for the four CJK locales, keyed by fastlane locale dir.
-# Inter has no CJK/Hangul glyphs, so without this the CJK copy would render as
-# missing-glyph boxes. Region-specific families are chosen so each locale gets
-# its expected Han variants (SC vs TC) and JP/KR kana/Hangul shaping. Locales not
-# in this map (all the Latin/Greek/Cyrillic ones) get no CJK fallback and render
-# from Inter exactly as before.
-_CJK_FAMILY = {
-    "ja":    "Noto Sans CJK JP",
-    "ko":    "Noto Sans CJK KR",
-    "zh-CN": "Noto Sans CJK SC",
-    "zh-TW": "Noto Sans CJK TC",
+# fallback after Inter for the CJK locales. Inter has no CJK/Hangul glyphs, so
+# without this the CJK copy would render as missing-glyph boxes. Region-specific
+# families are chosen so each locale gets its expected Han variants (SC vs TC)
+# and JP/KR kana/Hangul shaping. Locales without a CJK family (all the
+# Latin/Greek/Cyrillic ones) get no CJK fallback and render from Inter exactly
+# as before.
+#
+# Keyed by LANGUAGE SUBTAG (and, for Chinese, the region), NOT by the literal
+# fastlane directory name: the directory names are Google Play's store-locale
+# codes and may be region-qualified ("ja-JP", "ko-KR" — see the v0.79.0
+# store-locale migration in CHANGELOG.md), while the font choice depends only on
+# the language/script. A dict keyed by the old bare "ja"/"ko" names silently
+# stopped matching after the rename — exactly the trap this parser avoids.
+_CJK_BY_LANGUAGE = {
+    "ja": "Noto Sans CJK JP",
+    "ko": "Noto Sans CJK KR",
 }
 
 
 def _cjk_family_for_locale(locale: str) -> str | None:
-    """Return the Noto Sans CJK family to append after Inter, or None."""
-    return _CJK_FAMILY.get(locale)
+    """Return the Noto Sans CJK family to append after Inter, or None.
+
+    ``locale`` is the fastlane store-locale directory name (e.g. ``ja-JP``,
+    ``zh-CN``, ``de-DE``). The language subtag selects the family; for Chinese
+    the region decides between the Simplified (CN/SG) and Traditional (TW/HK/MO)
+    Han variants, defaulting to Simplified for a bare ``zh``.
+    """
+    parts = locale.split("-")
+    language = parts[0].lower()
+    region = parts[-1].upper() if len(parts) > 1 else ""
+    if language == "zh":
+        traditional = region in {"TW", "HK", "MO"}
+        return "Noto Sans CJK TC" if traditional else "Noto Sans CJK SC"
+    return _CJK_BY_LANGUAGE.get(language)
 
 
 def _font_family(cjk_family: str | None) -> str:

@@ -476,6 +476,23 @@ object BackupManager {
                 )
             }
 
+            // ── Guard 5: referential integrity – every entry must point at a drink
+            //    that is actually IN this backup. A dangling drinkId (hand-edited or
+            //    truncated file) previously slipped through to the repository, where
+            //    the REPLACE import's id-remap fallback kept the raw backup id: if
+            //    that number happened to equal a local preset's id, the entry was
+            //    silently attached to the WRONG drink (wrong category in every
+            //    statistic); otherwise the entries→drinks FK (RESTRICT) aborted the
+            //    whole transaction with only a generic error. Failing here instead
+            //    yields a precise, actionable message — and lets the repository drop
+            //    its fallback entirely (v0.79.0 QA fix).
+            val drinkIds = drinks.mapTo(HashSet()) { it.id }
+            entries.forEach { entry ->
+                require(entry.drinkId in drinkIds) {
+                    "entry references drinkId ${entry.drinkId}, which is not in the backup's drinks list"
+                }
+            }
+
             ImportResult(drinks, entries, sourceVersion = version)
         } catch (e: Exception) {
             ImportResult(error = ImportError.ReadError(e.message))

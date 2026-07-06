@@ -331,6 +331,42 @@ object AlcoholCalculator {
     const val WINDOW_DAYS = 7
 
     /**
+     * Comparison tolerance for gram-vs-limit checks.
+     *
+     * All gram amounts enter the system rounded to 0.1 g ([calculateGrams]), but
+     * day/window totals are built by summing binary [Double]s — in the sliding
+     * window of [countLimitViolations] even incrementally (add on entry, subtract
+     * on eviction). Binary floating point cannot represent most multiples of 0.1
+     * exactly, so a total that is EXACTLY at the limit (e.g. two 50.0 g days
+     * against a 100 g window limit) can accumulate to 100.000000000000014… and a
+     * strict `>` would flag it as an exceedance the user cannot see. That breaks
+     * the app-wide principle that the displayed number IS the compared number
+     * (see [calculateGrams]). Verified empirically in the v0.79.0 QA review:
+     * randomly generated 0.1-g-grid histories with an exactly-at-limit window
+     * flip the strict comparison in a substantial share of runs.
+     *
+     * 1e-6 g is three orders of magnitude below the 0.1 g data grid, so the
+     * tolerance can never absorb a REAL exceedance (the smallest possible one is
+     * 0.1 g) while comfortably exceeding any drift a realistic history (decades
+     * of entries, |sum| < 10⁶) can accumulate.
+     */
+    private const val LIMIT_EPSILON = 1e-6
+
+    /**
+     * Whether [totalGrams] exceeds [limitGrams], tolerating floating-point drift
+     * at the exact boundary (see [LIMIT_EPSILON]).
+     *
+     * This is the SINGLE definition of "over the limit" — used by
+     * [countLimitViolations], the report data/builder (over-limit months, binge
+     * days, peak-KPI warn flags, over-limit chart bars) and the on-screen
+     * over-limit markers (LimitBar, calendar day cells, chart bars) — so a total
+     * that reads "100.0 g" against a 100 g limit is consistently AT the limit,
+     * never over it, on every surface. Reaching the limit exactly is allowed:
+     * the limit is what the user may consume.
+     */
+    fun isOverLimit(totalGrams: Double, limitGrams: Double): Boolean = totalGrams > limitGrams + LIMIT_EPSILON
+
+    /**
      * Counts limit violations across a list of per-day summaries, used by the
      * Statistics screen and the PDF export.
      *
@@ -386,7 +422,7 @@ object AlcoholCalculator {
         weeklyLimitGrams: Double,
         maxDrinkDaysPerWeek: Int,
     ): LimitViolations {
-        val daysOverDaily = summaries.count { it.totalGrams > dailyLimitGrams }
+        val daysOverDaily = summaries.count { isOverLimit(it.totalGrams, dailyLimitGrams) }
 
         // Consumption days only (> 0 g), sorted ascending by date so the window can
         // advance with a single forward pass. We parse the ISO date once per day.
@@ -415,7 +451,7 @@ object AlcoholCalculator {
             }
 
             val windowDrinkDays = right - left + 1
-            if (windowGrams > weeklyLimitGrams) daysOverWeekly++
+            if (isOverLimit(windowGrams, weeklyLimitGrams)) daysOverWeekly++
             if (windowDrinkDays > maxDrinkDaysPerWeek) daysOverDrinkDay++
         }
 

@@ -40,6 +40,7 @@ package de.godisch.potillus.ui.screen
 // =============================================================================
 
 import app.cash.turbine.test
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.fake.FakeAppPreferences
@@ -170,5 +171,68 @@ class TodayViewModelTest {
         val entry = entryRepo.allEntries.first()
         vm.deleteEntry(entry)
         assertTrue("Entry should be removed after deleteEntry", entryRepo.allEntries.isEmpty())
+    }
+
+    // ── Logical-day rollover while subscribed (v0.79.0 QA regression) ─────────
+
+    /**
+     * A mutable fixed clock: [DayResolver.clockOverride] accepts any
+     * [java.time.Clock]; this one lets the test move the wall clock forward
+     * WITHOUT re-pinning (re-assigning clockOverride would not help anyway —
+     * the ViewModel pipeline captured the resolver, not the clock instance).
+     */
+    private class MutableClock(var now: java.time.Instant) : java.time.Clock() {
+        override fun getZone(): java.time.ZoneId = java.time.ZoneOffset.UTC
+        override fun withZone(zone: java.time.ZoneId): java.time.Clock = this
+        override fun instant(): java.time.Instant = now
+    }
+
+    /**
+     * THE v0.79.0 rollover regression: with the Today screen continuously
+     * subscribed across the configured day-change time (04:00), the pipeline
+     * must re-anchor to the NEW logical day on the next ticker beat — the old
+     * pipeline computed "today" once per settings emission, so entries logged
+     * after the boundary were stored under the new date but stayed invisible.
+     *
+     * Virtual time (runTest) drives the once-per-minute ticker: advancing the
+     * scheduler by one minute fires the tick that re-derives the day.
+     */
+    @Test fun `uiState rolls over to the new logical day while subscribed`() = runTest(dispatcher) {
+        val clock = MutableClock(java.time.Instant.parse("2026-06-10T20:00:00Z"))
+        DayResolver.clockOverride = clock
+        try {
+            // Logical "today" at 20:00 UTC with an 04:00 day-change is 2026-06-10.
+            val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
+            val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+            vm.uiState.test {
+                awaitItem() // initial empty state for 2026-06-10
+
+                // One beer late in the evening → visible on the 10th.
+                vm.addEntry(beer, 500, clock.now.toEpochMilli(), "")
+                assertEquals(1, awaitItem().entries.size)
+
+                // The night moves past the 04:00 boundary: 05:00 UTC on the 11th.
+                // Nothing may emit yet — the pipeline notices on the next tick.
+                clock.now = java.time.Instant.parse("2026-06-11T05:00:00Z")
+                testScheduler.advanceTimeBy(61_000)
+                testScheduler.runCurrent()
+
+                // The pipeline re-anchored: the new logical day has no entries.
+                val rolled = expectMostRecentItem()
+                assertTrue(
+                    "Yesterday's entry must not be shown after the rollover",
+                    rolled.entries.isEmpty(),
+                )
+
+                // A drink logged AFTER the boundary lands on 2026-06-11 and must
+                // be visible — this is the entry the old pipeline lost.
+                vm.addEntry(beer, 500, clock.now.toEpochMilli(), "")
+                assertEquals(1, expectMostRecentItem().entries.size)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
+        }
     }
 }

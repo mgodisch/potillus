@@ -221,7 +221,7 @@ data class PdfReportData(
                 maxDrinkDaysPerWeek = limitInfo.maxDrinkDaysPerWeek,
             )
             val binge = AlcoholCalculator.BINGE_THRESHOLD
-            val bingeDays = byDate.count { (_, es) -> es.sumOf { it.gramsAlcohol } > binge }
+            val bingeDays = byDate.count { (_, es) -> AlcoholCalculator.isOverLimit(es.sumOf { it.gramsAlcohol }, binge) }
 
             // ── Monthly aggregates (ascending). Unlike the old canvas exporter we do
             //    NOT truncate to a row budget here: the HTML report paginates
@@ -248,7 +248,7 @@ data class PdfReportData(
                     val effDays = ChronoUnit.DAYS.between(effStart, effEndExclusive)
                         .toInt().coerceAtLeast(1)
                     val mGrams = days.sumOf { it.value.sumOf { e -> e.gramsAlcohol } }
-                    val mOver = days.count { it.value.sumOf { e -> e.gramsAlcohol } > limitInfo.limitGrams }
+                    val mOver = days.count { AlcoholCalculator.isOverLimit(it.value.sumOf { e -> e.gramsAlcohol }, limitInfo.limitGrams) }
                     MonthStat(
                         monthKey = monthKey,
                         drinkDays = days.size,
@@ -333,9 +333,21 @@ data class PdfReportData(
             val weekdayAverages = dayTotals.map { list -> if (list.isEmpty()) null else list.average() }
 
             // ── Abstinence streaks (shared DayResolver logic).
+            //    `today` is passed to BOTH computations so the tail gap — the
+            //    completed dry days since the last recorded drink — is included in
+            //    the longest streak exactly as it is in the current streak. The
+            //    parameterless legacy call (today = "", tail gap ignored) produced a
+            //    report in which "current abstinence" could EXCEED "longest
+            //    abstinence" (impossible by definition) whenever the ongoing run was
+            //    the longest one — precisely the improving-user case this report is
+            //    for — and disagreed with the Statistics screen, against this file's
+            //    "identical figures" contract (fixed in the v0.79.0 QA review; see
+            //    PdfReportDataTest for the pinning tests). No statsFrom is passed:
+            //    the report is scoped to [firstDate, lastDate] and firstDate is by
+            //    construction a drink day, so no initial gap can exist here.
             val allDates = byDate.keys.sorted()
             val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
-            val longest = DayResolver.computeLongestAbstinence(allDates)
+            val longest = DayResolver.computeLongestAbstinence(allDates, today)
             val current = DayResolver.computeCurrentAbstinence(allDates, today)
 
             // Time-axis consumption series for the report chart. The span is the

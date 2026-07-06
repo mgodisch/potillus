@@ -372,4 +372,56 @@ class AlcoholCalculatorTest {
         assertEquals(1, v.daysOverWeeklyLimit)
         assertEquals(0, v.daysOverDrinkDayLimit)
     }
+
+    // ── isOverLimit / exactly-at-limit floating point (v0.79.0 QA) ────────────
+
+    /**
+     * Reaching a limit EXACTLY is allowed on every surface — even when the total
+     * is a binary-floating-point SUM of 0.1-g-grid values that does not hit the
+     * limit bit-exactly. 14.3 is not representable in binary, so seven summands
+     * of 14.3/14.2 accumulate to 100.000000000000014…; a strict `>` (the
+     * pre-v0.79.0 comparison) flagged that as an exceedance the user could not
+     * see, against the "displayed number == compared number" principle.
+     */
+    @Test fun `isOverLimit tolerates drift at the exact boundary but not a real exceedance`() {
+        // A total that DISPLAYS as exactly the limit but carries upward binary
+        // drift (the incremental window sum below produces exactly this kind of
+        // value) must not count as an exceedance …
+        assertFalse(AlcoholCalculator.isOverLimit(100.0 + 1e-12, 100.0))
+        assertFalse(AlcoholCalculator.isOverLimit(100.0, 100.0))
+        // … while the smallest REAL exceedance on the 0.1 g data grid still trips.
+        assertTrue(AlcoholCalculator.isOverLimit(100.1, 100.0))
+        assertFalse(AlcoholCalculator.isOverLimit(99.9, 100.0))
+    }
+
+    /**
+     * The sliding 7-day window of [AlcoholCalculator.countLimitViolations]
+     * maintains its gram sum INCREMENTALLY (add on entry, subtract on eviction),
+     * which accumulates additional drift on top of plain summation. A window
+     * whose days total exactly the 100 g limit — reached only after earlier days
+     * have been evicted, so the subtractive path is exercised — must not be
+     * counted as over the weekly limit.
+     */
+    @Test fun `countLimitViolations does not flag a window at exactly the weekly limit`() {
+        // Days 1–2 fall out of the window again (forcing the subtractive
+        // eviction path); days 3–9 form a full 7-day window summing exactly
+        // 100.0 on the 0.1 g grid. With THIS sequence the incrementally
+        // maintained double sum provably lands at 100.00000000000001 (verified
+        // by replaying the algorithm on the JVM), so the pre-v0.79.0 strict `>`
+        // counted the day as over the weekly limit — the regression this pins.
+        val exactWindow = listOf(14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.2)
+        val summaries = listOf(0.1, 0.1).mapIndexed { i, g ->
+            DaySummary("2026-06-%02d".format(i + 1), g, 1)
+        } + exactWindow.mapIndexed { i, g ->
+            DaySummary("2026-06-%02d".format(i + 3), g, 1)
+        }
+        val v = AlcoholCalculator.countLimitViolations(
+            summaries = summaries,
+            dailyLimitGrams = 100.0, // no day exceeds this; isolates the weekly check
+            weeklyLimitGrams = 100.0,
+            maxDrinkDaysPerWeek = 7,
+        )
+        assertEquals(0, v.daysOverWeeklyLimit)
+        assertEquals(0, v.daysOverDailyLimit)
+    }
 }

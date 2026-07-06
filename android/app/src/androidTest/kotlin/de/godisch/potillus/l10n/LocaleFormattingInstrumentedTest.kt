@@ -43,6 +43,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
@@ -100,5 +101,52 @@ class LocaleFormattingInstrumentedTest {
         val app: Context = ApplicationProvider.getApplicationContext()
         val localized = app.localizedContextFor(LocaleListCompat.forLanguageTags("fr"))
         assertEquals(Locale.FRENCH.language, localized.formattingLocale().language)
+    }
+
+    // ── monthYearFormatter (v0.79.0 QA fix) ──────────────────────────────────
+    //
+    // These assert the two properties a literal "MMMM yyyy" pattern got wrong
+    // (see the section header in LocaleSupport.kt). They run on-device because
+    // android.text.format.DateFormat.getBestDateTimePattern is ICU-backed and
+    // has no JVM equivalent; the exact strings come from CLDR, so structural
+    // properties (order, form) are asserted rather than byte-exact output.
+
+    /** CJK month+year labels are YEAR-first: "2026年6月", not "6月 2026". */
+    @Test
+    fun monthYearFormatter_cjkPutsYearFirst() {
+        val june2026 = java.time.YearMonth.of(2026, 6)
+        for (tag in listOf("zh-CN", "zh-TW", "ja")) {
+            val label = june2026.format(monthYearFormatter(Locale.forLanguageTag(tag)))
+            assertTrue(
+                "expected year before month for $tag, got: $label",
+                label.indexOf("2026") < label.indexOf("6"),
+            )
+        }
+        val ko = june2026.format(monthYearFormatter(Locale.forLanguageTag("ko")))
+        assertTrue("expected year before month for ko, got: $ko", ko.indexOf("2026") < ko.indexOf("6"))
+    }
+
+    /**
+     * Inflected languages use the STANDALONE (nominative) month in a bare
+     * month+year label: Polish "czerwiec 2026", not the genitive "czerwca"
+     * that the format-context "MMMM" letter produces after a day number.
+     */
+    @Test
+    fun monthYearFormatter_usesStandaloneMonthForm() {
+        val june2026 = java.time.YearMonth.of(2026, 6)
+        val pl = june2026.format(monthYearFormatter(Locale.forLanguageTag("pl")))
+        assertTrue("expected nominative 'czerwiec' for pl, got: $pl", pl.contains("czerwiec"))
+        val ru = june2026.format(monthYearFormatter(Locale.forLanguageTag("ru")))
+        assertTrue("expected nominative 'июнь' for ru, got: $ru", ru.contains("июнь"))
+    }
+
+    /** Latin-script locales keep their familiar "June 2026" / "Juni 2026". */
+    @Test
+    fun monthYearFormatter_keepsLatinConventions() {
+        val june2026 = java.time.YearMonth.of(2026, 6)
+        assertEquals("June 2026", june2026.format(monthYearFormatter(Locale.US)))
+        assertEquals("Juni 2026", june2026.format(monthYearFormatter(Locale.GERMAN)))
+        // Abbreviated variant (the PDF's monthly rows).
+        assertEquals("Jun 2026", june2026.format(monthYearFormatter(Locale.US, abbreviated = true)))
     }
 }

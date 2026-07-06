@@ -90,6 +90,8 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import de.godisch.potillus.MainActivity
 import de.godisch.potillus.PotillusApp
+import de.godisch.potillus.domain.LocaleDetector
+import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.PdfReportBuilder
 import de.godisch.potillus.util.WebViewPdfPrinter
@@ -248,16 +250,27 @@ class ReportExportTest {
     }
 
     /**
-     * A Context whose resources resolve in the run's target locale, so
+     * A Context whose resources resolve in the run's target APP language, so
      * [PdfReportBuilder.buildHtml] renders both its strings and its
-     * locale-formatted numbers/dates in that language, independent of the device
-     * language (Android resolves e.g. "zh-CN" to values-zh-rCN just as it does at
-     * runtime). Mirrors ScreenshotTest.localizedContext.
+     * locale-formatted numbers/dates exactly as the app itself would.
+     *
+     * The raw store code from [reportLocaleTag] names the OUTPUT FILE (it must
+     * match the store-locale directory); the CONTENT is resolved through
+     * [LocaleDetector.detect] — the same mapping the app applies — because the
+     * two ecosystems differ for Norwegian (store `no-NO` vs resource tag `nb`),
+     * a pair Android's resource matcher does not bridge: raw-code resolution
+     * silently produced an ENGLISH sample report for the Norwegian listing
+     * (surfaced by the v0.79.0 store-locale migration; the screenshot suite hit
+     * the same divergence loudly, see ScreenshotTest.localizedContext).
      */
     private fun localizedContext(): Context {
         val base = ApplicationProvider.getApplicationContext<Context>()
+        val appTag = LocaleDetector.detect(
+            Locale.forLanguageTag(reportLocaleTag()),
+            SupportedLocales.TAGS,
+        )
         val config = Configuration(base.resources.configuration)
-        config.setLocale(Locale.forLanguageTag(reportLocaleTag()))
+        config.setLocale(Locale.forLanguageTag(appTag))
         return base.createConfigurationContext(config)
     }
 

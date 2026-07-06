@@ -25,6 +25,7 @@ import android.content.Context
 import android.os.Build
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
@@ -34,6 +35,7 @@ import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
+import de.godisch.potillus.l10n.monthYearFormatter
 import de.godisch.potillus.l10n.shortDayMonthPattern
 import java.time.DayOfWeek
 import java.time.Instant
@@ -73,7 +75,7 @@ object PdfReportBuilder {
     private const val TEMPLATE_ASSET = "report_template.html"
 
     // Formatters that produce user-visible, locale-sensitive text (long dates,
-    // "MMM yyyy" month labels) must follow the PER-APP locale, not the system
+    // month+year labels) must follow the PER-APP locale, not the system
     // locale. They are therefore NOT created here as object-level fields: an
     // object field is initialised once at class load and would freeze whatever
     // locale happened to be active then — and it could only ever capture
@@ -122,7 +124,10 @@ object PdfReportBuilder {
         // two locale-sensitive formatters are built here, once per report.
         val locale = context.formattingLocale()
         val dateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
-        val monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", locale)
+        // monthYearFormatter (NOT a literal "MMM yyyy"): CJK reports need the
+        // year-first order ("2026年6月") and inflected languages the standalone
+        // month form — both are CLDR data, see l10n/LocaleSupport.kt.
+        val monthFmt = monthYearFormatter(locale, abbreviated = true)
         // Compact day+month formatter for the chart's x-axis tick labels. The
         // pattern is DERIVED from the locale (day/month order and separator, see
         // l10n/DatePatterns.kt) instead of the previously hard-coded European
@@ -225,8 +230,8 @@ object PdfReportBuilder {
                 d.bingeDays > 0,
             ),
 
-            kpi(context.getString(R.string.pdf_kpi_max_day), "${d.maxPerDay.fmt1()} g", d.maxPerDay > d.limitInfo.limitGrams),
-            kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g", d.maxPer7Days > d.limitInfo.weeklyLimitGrams),
+            kpi(context.getString(R.string.pdf_kpi_max_day), "${d.maxPerDay.fmt1()} g", AlcoholCalculator.isOverLimit(d.maxPerDay, d.limitInfo.limitGrams)),
+            kpi(context.getString(R.string.pdf_kpi_max_7days), "${d.maxPer7Days.fmt1()} g", AlcoholCalculator.isOverLimit(d.maxPer7Days, d.limitInfo.weeklyLimitGrams)),
             kpi(context.getString(R.string.pdf_kpi_avg_drink_days_month), d.avgDrinkDaysPerMonth.fmt1()),
             kpi(context.getString(R.string.pdf_kpi_median_drink_days_month), d.medianDrinkDaysPerMonth.fmt1()),
 
@@ -275,7 +280,7 @@ object PdfReportBuilder {
                     } else {
                         pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0()
                     },
-                    "BAR_CLASS" to if (b.avgPerDay > limit) "bar over" else "bar",
+                    "BAR_CLASS" to if (AlcoholCalculator.isOverLimit(b.avgPerDay, limit)) "bar over" else "bar",
                     // On-top value, same convention as the page-2 hour/weekday charts:
                     // the bucket's per-day average (one decimal), blank for abstinent
                     // (zero-consumption) buckets so the green tick stands alone.
@@ -469,7 +474,8 @@ object PdfReportBuilder {
      * granularity: locale-ordered day-and-month for daily/weekly buckets ("5.6" / "6/5"), month-and-year
      * for monthly buckets ("Jun 2026").
      *
-     * @param monthFmt The per-app-locale "MMM yyyy" formatter built in [buildHtml];
+     * @param monthFmt The per-app-locale month+year formatter built in [buildHtml]
+     *                 via [monthYearFormatter] (abbreviated month, locale field order);
      *                 passed in (rather than held as a shared field) so the month
      *                 name follows the in-app language, not the system locale.
      * @param dayMonthFmt The per-app-locale compact day+month formatter built in

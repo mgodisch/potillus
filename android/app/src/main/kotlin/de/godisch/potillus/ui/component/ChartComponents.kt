@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.l10n.fmt0
@@ -254,7 +255,7 @@ fun AlcoholBarChart(
                 val barH = (value / maxVal * chartH).toFloat().coerceAtLeast(2f)
                 val left = centerX - barW / 2f
                 // Over-limit red only applies when a daily-limit line is shown.
-                val color = if (showLimitLine && value > limitGrams) overColor else barColor
+                val color = if (showLimitLine && AlcoholCalculator.isOverLimit(value, limitGrams)) overColor else barColor
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(left, chartH - barH),

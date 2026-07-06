@@ -716,6 +716,82 @@ check_locale_consistency() {
     else
         pass "All translation files have $base_count string keys (matches base)"
     fi
+
+    # ── Check D: store-locale directories (fastlane ↔ Google Play ↔ app) ─────
+    #
+    # The fastlane metadata tree is pushed to Google Play by the deploy lane
+    # (`upload_to_play_store` in fastlane/Fastfile), and Play accepts ONLY the
+    # store-listing language codes from its fixed list — mostly region-qualified
+    # ("cs-CZ", "ja-JP", "no-NO"), a few bare ("ro", "uk"). A directory named
+    # with a bare code Play does not know is rejected at upload time, i.e. the
+    # listing silently never reaches the store (the v0.79.0 QA review found 14
+    # of the 21 listings in that state). F-Droid reads the SAME tree and accepts
+    # region-qualified codes, so the Play list is the binding constraint.
+    #
+    # Two invariants:
+    #   D1. Every metadata locale directory is a valid Play store-listing code.
+    #   D2. Mapped onto the app's translation tags (full tag first, then the
+    #       bare language subtag, with the Norwegian macrolanguage alias
+    #       no → nb — the same order LocaleDetector.detect uses), the store
+    #       locales cover SupportedLocales.ALL exactly: one listing per shipped
+    #       language, no listing without a translation.
+    #
+    # PLAY_LOCALES is Google Play's supported store-listing language list
+    # (source: Play Console "Supported languages", checked 2026-06). Update it
+    # here if Google extends the list.
+    local PLAY_LOCALES=" af sq am ar hy-AM az-AZ eu-ES be bn-BD bg my-MM ca \
+zh-HK zh-CN zh-TW hr cs-CZ da-DK nl-NL en-AU en-CA en-IN en-SG en-GB en-US \
+en-ZA et fil fi-FI fr-FR fr-CA gl-ES ka-GE de-DE el-GR gu iw-IL hi-IN hu-HU \
+is-IS id it-IT ja-JP kn-IN kk km-KH ko-KR ky-KG lo-LA lv lt mk-MK ms ml-IN \
+mr-IN mn-MN ne-NP no-NO fa pl-PL pt-BR pt-PT pa ro rm ru-RU sr si-LK sk sl \
+es-419 es-ES es-US sw sv-SE ta-IN te-IN th tr-TR uk ur vi zu "
+
+    local store_locales store_ok=1
+    store_locales=$(find "$FASTLANE_DIR" -mindepth 2 -maxdepth 2 -type d -name changelogs \
+                        | sed 's|/changelogs$||' | xargs -rn1 basename | sort)
+
+    # D1: every store directory carries a code Play actually accepts.
+    local loc
+    while IFS= read -r loc; do
+        [[ -z "$loc" ]] && continue
+        if [[ "$PLAY_LOCALES" != *" $loc "* ]]; then
+            fail "store locale '$loc' (fastlane/metadata/android/) is not a Google Play store-listing code — the deploy lane cannot upload this listing"
+            store_ok=0
+        fi
+    done <<< "$store_locales"
+
+    # D2: store locales ↔ app translations, via the store→app tag mapping.
+    local mapped_tags="" app_tag lang
+    while IFS= read -r loc; do
+        [[ -z "$loc" ]] && continue
+        lang="${loc%%-*}"
+        [[ "$lang" == "no" ]] && lang="nb"   # Norwegian macrolanguage alias
+        if echo "$kt_tags" | grep -qx "$loc"; then
+            app_tag="$loc"                    # full tag shipped (pt-BR, zh-CN, …)
+        elif echo "$kt_tags" | grep -qx "$lang"; then
+            app_tag="$lang"                   # language subtag shipped (cs, de, …)
+        else
+            fail "store locale '$loc' maps to no shipped translation (neither '$loc' nor '$lang' is in SupportedLocales.ALL)"
+            store_ok=0
+            continue
+        fi
+        mapped_tags+="$app_tag"$'\n'
+    done <<< "$store_locales"
+
+    local unlisted_tags
+    unlisted_tags=$(comm -23 <(echo "$kt_tags") <(printf '%s' "$mapped_tags" | sort -u) || true)
+    if [[ -n "$unlisted_tags" ]]; then
+        while IFS= read -r tag; do
+            [[ -n "$tag" ]] && fail "app language '$tag' has no store-listing directory under fastlane/metadata/android/"
+        done <<< "$unlisted_tags"
+        store_ok=0
+    fi
+
+    if [[ "$store_ok" -eq 1 ]]; then
+        local store_count
+        store_count=$(echo "$store_locales" | grep -c . || true)
+        pass "store-locale directories are valid Play codes and map 1:1 onto the app's $store_count languages"
+    fi
 }
 
 # =============================================================================

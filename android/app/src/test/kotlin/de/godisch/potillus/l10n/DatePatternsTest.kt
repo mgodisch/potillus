@@ -36,8 +36,10 @@ import java.util.Locale
  *   - The year field (and its attached separator) is removed for every locale
  *     the app ships — the pattern must never leak a year into the compact
  *     labels.
- *   - The locale's day/month ORDER is preserved: day-first for the European
- *     locales, month-first for en-US / ja / zh / sv.
+ *   - The locale's day/month ORDER matches the locale's convention: day-first
+ *     for the European locales INCLUDING Swedish (whose year-first SHORT
+ *     pattern must not leak a month-first order), month-first for
+ *     en-US / ja / zh / ko.
  *   - Repeated pattern letters are collapsed, so values render unpadded
  *     ("28.6", not "28.06").
  *   - Every produced pattern actually FORMATS (no stray literals that
@@ -91,7 +93,7 @@ class DatePatternsTest {
     }
 
     @Test fun `month-first locales put the month before the day`() {
-        for (tag in listOf("en-US", "ja", "zh-CN", "zh-TW", "sv")) {
+        for (tag in listOf("en-US", "ja", "zh-CN", "zh-TW")) {
             val pattern = shortDayMonthPattern(Locale.forLanguageTag(tag))
             assertTrue(
                 "month must precede day for $tag: $pattern",
@@ -101,7 +103,11 @@ class DatePatternsTest {
     }
 
     @Test fun `day-first locales put the day before the month`() {
-        for (tag in listOf("de", "fr", "it", "es", "nl", "pl", "ru", "uk", "el", "pt", "pt-BR")) {
+        // sv is deliberately in THIS list: its SHORT pattern is year-first
+        // ("y-MM-dd"), whose naive year-stripping yields month-first — but the
+        // Swedish day+month convention is day-first ("28/6", CLDR Md = "d/M").
+        // The pre-v0.79.0 suite pinned sv as month-first, enshrining the bug.
+        for (tag in listOf("de", "fr", "it", "es", "nl", "pl", "ru", "uk", "el", "pt", "pt-BR", "sv")) {
             val pattern = shortDayMonthPattern(Locale.forLanguageTag(tag))
             assertTrue(
                 "day must precede month for $tag: $pattern",
@@ -115,6 +121,34 @@ class DatePatternsTest {
             val pattern = shortDayMonthPattern(locale)
             assertFalse("padded day field for $locale: $pattern", pattern.contains("dd"))
             assertFalse("padded month field for $locale: $pattern", pattern.contains("MM"))
+        }
+    }
+
+    /**
+     * Property: for every shipped locale, the derived day/month ORDER equals the
+     * order of the locale's MEDIUM date pattern — the pattern that spells the
+     * fields out in the locale's natural reading order (quoted literals such as
+     * the Portuguese `'de'` are blanked before locating the fields, since their
+     * text may contain the letters 'd'/'M'). This is the invariant the Swedish
+     * fix rests on; it guards every locale, present and future, against the
+     * year-first-SHORT-pattern trap in one sweep.
+     */
+    @Test fun `derived order matches the MEDIUM pattern order for every app locale`() {
+        for (locale in appLocales) {
+            val medium = java.time.format.DateTimeFormatterBuilder
+                .getLocalizedDateTimePattern(
+                    java.time.format.FormatStyle.MEDIUM,
+                    null,
+                    java.time.chrono.IsoChronology.INSTANCE,
+                    locale,
+                )
+                .replace(Regex("'[^']*'"), " ")
+            val pattern = shortDayMonthPattern(locale)
+            assertEquals(
+                "day/month order for $locale (derived '$pattern' vs MEDIUM '$medium')",
+                medium.indexOf('d') < medium.indexOf('M'),
+                pattern.indexOf('d') < pattern.indexOf('M'),
+            )
         }
     }
 }

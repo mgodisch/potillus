@@ -407,12 +407,20 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      * hour has been updated but the minute has not (or vice versa), which
      * could temporarily assign a drink to the wrong logical date.
      *
-     * @param hour    New day-change hour (0–23).
-     * @param minute  New day-change minute (0–59).
+     * Values are clamped to the valid clock ranges — this was the ONE setter in
+     * this class without the belt-and-suspenders clamp the class contract
+     * promises ("range clamping lives in AppPreferences, so every call-site
+     * shares the same validation"). Today's only caller is the Material
+     * TimePicker, which cannot produce out-of-range values; the clamp protects
+     * the invariant against future callers, exactly like the other setters
+     * (v0.79.0 QA fix).
+     *
+     * @param hour    New day-change hour (0–23); out-of-range values are clamped.
+     * @param minute  New day-change minute (0–59); out-of-range values are clamped.
      */
     override suspend fun setDayChangeTime(hour: Int, minute: Int) = save {
-        it[KEY_DAY_HOUR] = hour
-        it[KEY_DAY_MINUTE] = minute
+        it[KEY_DAY_HOUR] = hour.coerceIn(0, 23)
+        it[KEY_DAY_MINUTE] = minute.coerceIn(0, 59)
     }
 
     /**

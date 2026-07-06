@@ -49,6 +49,7 @@ import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -179,12 +180,27 @@ class CalendarViewModel(
     val drinks: StateFlow<List<DrinkDefinition>> = drinkRepo.drinks
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * Emits [Unit] immediately, then once per minute, so the "today" highlight
+     * below can roll over at the configured day-change time while the Calendar
+     * stays open (v0.79.0 QA fix). CalendarParams is a data class and the chain
+     * below is deduplicated with `distinctUntilChanged`, so ticks on which the
+     * logical day did not change never reach the database stages.
+     */
+    private val ticker: Flow<Unit> = flow {
+        while (true) {
+            emit(Unit)
+            delay(60_000L)
+        }
+    }
+
     val uiState: StateFlow<CalendarUiState> = combine(
         _viewMode,
         _month,
         _selectedDate,
         prefs.settingsFlow,
-    ) { mode, month, selDate, settings ->
+        ticker,
+    ) { mode, month, selDate, settings, _ ->
         val todayStr = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val todayDate = DayResolver.parseDate(todayStr)
         // year is always derived from the current _month value so both
@@ -196,6 +212,11 @@ class CalendarViewModel(
         }
         CalendarParams(mode, month, year, todayDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
     }
+        // Swallow the once-per-minute ticks on which nothing — including the
+        // logical day — actually changed, so the DB stages below restart only on
+        // real navigation/settings/day changes (CalendarParams is a data class,
+        // giving the structural equality this operator needs).
+        .distinctUntilChanged()
         // ── Stage 1: load day summaries for the visible period ────────────────
         // flatMapLatest cancels the previous inner Flow and starts a new one every
         // time CalendarParams emits. This ensures that navigating to a different

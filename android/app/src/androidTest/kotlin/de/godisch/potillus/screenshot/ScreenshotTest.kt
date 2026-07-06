@@ -458,16 +458,26 @@ class ScreenshotTest {
     private fun label(resId: Int): String = localizedContext().getString(resId)
 
     /**
-     * Builds a Context whose resources resolve in the run's target locale, or the
-     * default app context when no `testLocale` was provided (non-screengrab runs).
+     * Builds a Context whose resources resolve in the run's target APP language,
+     * or the default app context when no `testLocale` was provided
+     * (non-screengrab runs).
+     *
+     * Resolution goes through [targetLanguageTag] — the DETECTED app tag — and
+     * deliberately NOT through the raw store-locale argument: the two differ for
+     * Norwegian (store code `no-NO` vs resource tag `nb`), and Android's
+     * resource matcher does not bridge that pair, so raw-code resolution fell
+     * back to ENGLISH labels while the live app (switched via the same detector
+     * in [applyCaptureLanguage]) rendered Norwegian — waitUntilReady() then
+     * waited for a label that could never appear (surfaced by the v0.79.0
+     * store-locale migration). Resolving expected labels and switching the app
+     * through ONE tag removes the divergence by construction, for every present
+     * and future store code.
      */
     private fun localizedContext(): Context {
         val base = ApplicationProvider.getApplicationContext<Context>()
-        val raw = screengrabLocaleArg() ?: return base
-        // screengrab passes locales as "en_US" or "en-US"; forLanguageTag wants '-'.
-        val tag = raw.replace('_', '-')
+        if (screengrabLocaleArg() == null) return base
         val config = Configuration(base.resources.configuration)
-        config.setLocale(Locale.forLanguageTag(tag))
+        config.setLocale(Locale.forLanguageTag(targetLanguageTag()))
         return base.createConfigurationContext(config)
     }
 

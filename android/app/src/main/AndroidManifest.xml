@@ -44,10 +44,10 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         ═══════════════════════════════════════════════════════════════════════
 
         Step 1 – String resources
-          Create app/src/main/res/values-<bcp47>/strings.xml and translate all
-          170 string keys.  Use values-de/strings.xml as the source of truth.
-          (The exact count is asserted by LocaleSyncTest; if this comment and the
-           test ever disagree, the test wins.)
+          Create app/src/main/res/values-<bcp47>/strings.xml and translate ALL
+          string keys - LocaleSyncTest pins the exact set, so the authoritative
+          count lives in that test, never in a comment.  Use
+          values-de/strings.xml as the source of truth.
           BCP-47 resource qualifier examples:
             • values-fr/          → French
             • values-pt/          → Portuguese (European)
@@ -72,6 +72,23 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
           Verify android:supportsRtl="true" is set on <application> below
           (it already is).  No further code changes are needed; Compose and
           the Android framework mirror the layout automatically.
+
+        Step 4 – Store listing (fastlane/metadata/android/<store-locale>/)
+          Create the store-listing directory using GOOGLE PLAY's store-locale
+          code, which is usually region-qualified and often differs from the
+          resource tag:
+            • values-cs/   → fastlane/metadata/android/cs-CZ/
+            • values-ja/   → fastlane/metadata/android/ja-JP/
+            • values-nb/   → fastlane/metadata/android/no-NO/  ← macrolanguage!
+            • values-ro/   → fastlane/metadata/android/ro/     (a few stay bare)
+          The deploy lane pushes this tree to Play, which rejects unknown
+          codes; F-Droid reads the same tree and accepts both forms.
+          tools/release-check.sh §4 (Check D) enforces the valid-code rule and
+          the 1:1 mapping onto SupportedLocales.ALL, and docs/guide/ templates
+          keep using the RESOURCE tag (usersguide.<tag>.md.in) — three naming
+          ecosystems, each fixed by its consumer, bridged by checks and by
+          LocaleDetector.detect (which the screenshot suite uses to map the
+          store locale back to the app language).
         ═══════════════════════════════════════════════════════════════════════
     -->
 

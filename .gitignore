@@ -9,6 +9,9 @@ __pycache__/
 /android/.kotlin
 /fastlane/.bundle
 /fastlane/.vendor
+# fastlane writes a JUnit-style run report after every invocation; it is a
+# build artifact (fresh timestamps each run), not a source file.
+/fastlane/report.xml
 
 /android/app/build
 /android/app/src/main/res/raw*/copyright.md

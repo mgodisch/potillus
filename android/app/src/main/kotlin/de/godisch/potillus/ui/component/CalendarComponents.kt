@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
@@ -109,7 +110,14 @@ fun YearCalendarView(
     // month abbreviations ignored the in-app language on every API level
     // (found in the v0.79.0 QA delta review).
     val locale = LocalContext.current.formattingLocale()
-    val monthFmt = DateTimeFormatter.ofPattern("MMM", locale)
+    // "LLL" (STANDALONE abbreviated month), not "MMM" (format context): these
+    // cells are bare month labels without a day, and in inflected languages the
+    // format context is the genitive meant to follow a day number. Most shipped
+    // locales render both identically, but the standalone letter is the
+    // grammatically correct one — same rule as the Today card's month caption
+    // (TextStyle.FULL_STANDALONE) and the month+year labels (monthYearFormatter,
+    // see l10n/LocaleSupport.kt).
+    val monthFmt = DateTimeFormatter.ofPattern("LLL", locale)
     val months = (1..12).map { YearMonth.of(year, it) }
 
     // Capture theme colours before entering Box/Column lambdas (see file header note)
@@ -156,7 +164,7 @@ fun YearCalendarView(
                                         val summary = summaries[date]
                                         val color = when {
                                             summary == null || summary.totalGrams == 0.0 -> empty
-                                            summary.totalGrams > limitGrams -> red
+                                            AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams) -> red
                                             else -> green
                                         }
                                         val isToday = ym.atDay(dayNum) == today

@@ -49,6 +49,7 @@ import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.formattingLocale
+import de.godisch.potillus.l10n.monthYearFormatter
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import java.time.DayOfWeek
@@ -388,7 +389,11 @@ private fun MonthCalendar(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
                 Text(
-                    currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)),
+                    // monthYearFormatter (NOT a literal "MMMM yyyy"): the label's
+                    // field order and month FORM are locale data — CJK is
+                    // year-first ("2026年6月") and inflected languages need the
+                    // standalone month ("czerwiec 2026"), see l10n/LocaleSupport.kt.
+                    currentMonth.format(monthYearFormatter(locale)),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 IconButton(onClick = onNextMonth) {
@@ -447,7 +452,7 @@ private fun MonthCalendar(
                                             Modifier.size(5.dp)
                                                 .clip(MaterialTheme.shapes.extraSmall)
                                                 .background(
-                                                    if (summary.totalGrams > limitGrams) {
+                                                    if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
                                                         overLimitColor
                                                     } else {
                                                         MaterialTheme.colorScheme.primary

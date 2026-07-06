@@ -29,12 +29,16 @@
 #                   and its SBOM   [needs a device; supply report PDFs yourself]
 #      install      copy the freshly built debug APK to the local install path
 #    Store assets
-#      screenshots        capture all 8 phone screenshots per locale [device]
-#      screenshots-crop   ) sub-steps of `screenshots`, also runnable on their
-#      screenshots-pdf    )   own (crop in-app shots / rasterize report pages)
+#      store-assets       full set in one go: screenshots + report-pdfs, then
+#                         feature graphics rendered exactly once       [device]
+#      screenshots        capture the six in-app shots 01..06 per locale, then
+#                         refresh the feature graphics                 [device]
+#      screenshots-crop   crop the in-app shots to <= 2:1 (sub-step of the above)
+#      screenshots-pdf    rasterize report pages 07..08 from the per-locale PDFs
 #      feature-graphics           (re)build every locale's featureGraphic*.png
 #      feature-graphics-existing  refresh only the graphics already on disk
-#      report-pdfs        semi-automatic per-locale PDF report export  [device]
+#      report-pdfs        semi-automatic per-locale PDF export -> 07..08, then
+#                         refresh the feature graphics                 [device]
 #      rokkitt-bold       bake the static Rokkitt Bold used by the badges
 #    Packaging
 #      tgz          release source tarball (exclusions derived from .gitignore)
@@ -122,14 +126,13 @@ debug:
 	$(MAKE) install
 
 # ── release ── refresh the store assets, then build the signed APK + SBOM.
-# `screenshots` recaptures every locale and rasterizes the report pages from the
-# PDFs you exported (via `report-pdfs`); `feature-graphics` then rebuilds each
-# locale's graphic whose inputs changed; the android `release` target produces
-# the signed release APK together with its CycloneDX SBOM. Needs a device (for
-# the capture); you supply the per-locale report PDFs manually beforehand.
+# `store-assets` recaptures every locale's in-app screenshots (01..06), drives
+# the human-in-the-loop report-PDF export and rasterizes the report pages
+# (07..08), then renders every feature graphic exactly once; the android
+# `release` target produces the signed release APK together with its CycloneDX
+# SBOM. Needs a device (for the capture and the "Save as PDF" export).
 release:
-	$(MAKE) screenshots
-	$(MAKE) feature-graphics
+	$(MAKE) store-assets
 	$(MAKE) -C android release
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
@@ -236,7 +239,18 @@ screenshots:
 	adb shell am broadcast -a com.android.systemui.demo -e command network      -e wifi show -e level 4
 	adb shell am broadcast -a com.android.systemui.demo -e command network      -e mobile hide
 	adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
-	# 5) Capture the six in-app screenshots in every configured locale
+	# 5) Clear ONLY the in-app shots 01..06 for every locale before capturing.
+	#    screengrab's own clear_previous_screenshots is disabled (see the
+	#    Screengrabfile) because it globs and deletes ALL *.png in each
+	#    phoneScreenshots/ dir — including the committed report pages 07/08 that
+	#    this target does not regenerate. Deleting exactly 01..06 here keeps the
+	#    "no stale in-app shot survives a re-run" guarantee without touching the
+	#    report pages. The glob nullglob-guards so a locale mid-migration (no old
+	#    shots yet) is not an error.
+	shopt -s nullglob
+	rm -f $(META)/*/images/phoneScreenshots/0[1-6]_*.png
+	shopt -u nullglob
+	# 6) Capture the six in-app screenshots in every configured locale
 	#    (SCREENSHOT_LOCALES, derived from the metadata tree).
 	#    The BUNDLED fastlane is mandatory (reproducible, pinned in fastlane/
 	#    Gemfile) — install it once with `cd fastlane && bundle install`. It runs
@@ -244,15 +258,22 @@ screenshots:
 	#    or the EXIT trap (which must run from the repository root, otherwise
 	#    `$(MAKE) screenshots-demo-off` finds no such target).
 	( cd fastlane && bundle exec fastlane screenshots )
-	# 6) Bottom-crop the six in-app screenshots to <= 2:1 (removes the Android
+	# 7) Bottom-crop the six in-app screenshots to <= 2:1 (removes the Android
 	#    navigation bar at the bottom and satisfies Google Play's max-2:1 rule on
-	#    tall phones/emulators). The PDF report pages are added in the next step
-	#    and are never cropped.
+	#    tall phones/emulators).
 	$(MAKE) screenshots-crop
-	# 7) Render the two PDF report pages per locale into the phoneScreenshots dirs.
-	$(MAKE) screenshots-pdf
-	# 8) Enforce the Google Play phone-screenshot requirements on all eight assets.
-	python3 tools/validate-screenshots.py $(SCREENSHOT_LOCALES)
+	# 8) Enforce the Google Play phone-screenshot requirements on the in-app shots.
+	#    Only 01..06 are (re)captured here; the report pages 07/08 are owned by
+	#    `make report-pdfs` (rendered from the per-locale PDFs, not the device),
+	#    which validates them there.
+	python3 tools/validate-screenshots.py --in-app $(SCREENSHOT_LOCALES)
+	# 9) Cascade: fresh 01..06 feed the feature graphics (their 01_today input just
+	#    changed), so rebuild every locale's now-stale graphic ("renew screenshots
+	#    -> renew feature graphics"). Routed through the once-per-run guard so a
+	#    combined run (`make screenshots report-pdfs`, or `store-assets`) renders
+	#    the graphics only ONCE, not after each producer. feature-graphics is
+	#    file-timestamp driven, so unchanged locales are a no-op regardless.
+	$(MAKE) _cascade-feature-graphics
 
 # Bottom-crop the in-app screenshots (01..06) to at most a 2:1 aspect ratio. Runs
 # AFTER capture and BEFORE the PDF pages are rendered, so it only ever sees the
@@ -360,10 +381,42 @@ endef
 $(foreach loc,$(SCREENSHOT_LOCALES),$(eval $(call potillus_pipeline_rules,$(loc))))
 
 # Device screenshots (01..06) come from `make screenshots` (screengrab on a
-# device) and have no build rule here. If one is missing when a feature graphic
-# needs it, fail with an actionable message instead of make's terse "No rule".
-$(META)/%/images/phoneScreenshots/01_today.png:
-	@echo "feature-graphics: missing device screenshot $@ — run 'make screenshots' first (needs a device)." >&2; exit 1
+# device) and have no per-file build rule of their own. If any is MISSING when a
+# feature graphic needs it, capture the whole set automatically — screengrab
+# always grabs every locale at once, so a missing shot means the set is
+# incomplete and one full recapture is the correct repair. This triggers ONLY on
+# a truly absent file, never on a merely stale one: staleness of device
+# screenshots is not reliably detectable (the project's long-standing reason for
+# capturing them by hand), but absence is unambiguous. Because `screenshots`
+# itself now cascades into `feature-graphics` (see that target), the graphics are
+# refreshed as part of the same capture.
+#
+# WHY THE MARKER FILE. If this recipe ran `$(MAKE) screenshots` directly, Make
+# would fire it once PER missing target — up to 14 full recaptures when a new
+# locale set is empty. Every missing screenshot instead order-only-depends on the
+# single marker $(SCREENSHOTS_CAPTURED_MARKER), whose recipe runs the one capture
+# and is built AT MOST ONCE per `make` invocation; the sentinels then merely
+# assert their file now exists. The marker lives under android/app/build/
+# (already git-ignored, removed by `make clean`), so a later invocation
+# re-checks the tree afresh instead of trusting an earlier run's capture.
+SCREENSHOTS_CAPTURED_MARKER := android/app/build/.screenshots-captured
+
+$(SCREENSHOTS_CAPTURED_MARKER):
+	$(call require-device,screenshots)
+	@echo "feature-graphics: device screenshots missing — capturing all locales via 'make screenshots'."
+	$(MAKE) screenshots
+	@mkdir -p "$(@D)"
+	@touch "$@"
+
+# One sentinel per in-app screenshot kind (01..06): order-only-depend on the
+# marker so the capture runs (once) before the file is needed, then assert the
+# file is really present afterwards — if the capture did not produce it, fail
+# loudly rather than let a downstream renderer read a missing input.
+define device_screenshot_sentinel
+$(META)/%/images/phoneScreenshots/$(1).png: | $$(SCREENSHOTS_CAPTURED_MARKER)
+	@test -f "$$@" || { echo "feature-graphics: $$@ still missing after 'make screenshots' — capture did not produce it." >&2; exit 1; }
+endef
+$(foreach shot,01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_settings,$(eval $(call device_screenshot_sentinel,$(shot))))
 
 # Aggregators: build every locale's outputs but ONLY the stale ones (real file
 # prerequisites -> timestamp-driven; an up-to-date tree is a no-op).
@@ -373,6 +426,53 @@ feature-graphics: $(FEATURE_GRAPHIC_PNGS)
 # which captures no screenshots): $(wildcard) never lists a locale without a
 # featureGraphic.png yet, so this can never trip the 01_today guard above.
 feature-graphics-existing: $(wildcard $(META)/*/images/featureGraphic.png)
+
+# ── Once-per-run feature-graphics cascade ─────────────────────────────────────
+# `screenshots` (producer of 01..06) and `report-pdfs` (producer of 07..08) each
+# must refresh the feature graphics afterwards — but when BOTH run in one
+# invocation (the `store-assets` orchestrator, or `make screenshots report-pdfs`)
+# the graphics must render only ONCE, not after each producer. They are separate
+# interactive recipes in separate recursive $(MAKE) subprocesses, so they cannot
+# share make's in-process target dedup; a filesystem STAMP coordinates them
+# instead. The first cascade in a run renders `feature-graphics` and drops the
+# stamp; a second cascade in the SAME run sees the stamp and skips. `store-assets`
+# creates the stamp up front (so neither producer renders early) and does the
+# single real render at the end; a lone `make screenshots` or `make report-pdfs`
+# finds no stamp and renders exactly once itself. The stamp lives under
+# android/app/build/ (git-ignored, cleared by `make clean`) and — because
+# feature-graphics is file-timestamp driven anyway — the worst case if a stale
+# stamp ever survived is a skipped no-op render, never a stale asset.
+CASCADE_FG_STAMP := android/app/build/.feature-graphics-cascaded
+
+# Internal: render feature-graphics unless this run already did (or was told to
+# defer by store-assets). Not for direct use.
+_cascade-feature-graphics:
+	@if [ -f "$(CASCADE_FG_STAMP)" ]; then \
+	    echo "feature-graphics: already refreshed in this run — skipping duplicate cascade."; \
+	else \
+	    mkdir -p "$(dir $(CASCADE_FG_STAMP))"; \
+	    touch "$(CASCADE_FG_STAMP)"; \
+	    $(MAKE) feature-graphics; \
+	fi
+
+# ── store-assets ── refresh the COMPLETE store-image set in one go: capture the
+# in-app screenshots (01..06), export+rasterize the report pages (07..08), then
+# render every feature graphic EXACTLY once. Use this instead of running
+# `screenshots` and `report-pdfs` separately when you want the whole set rebuilt;
+# both need a device, and report-pdfs is human-in-the-loop ("Save as PDF").
+store-assets:
+	# Defer both producers' cascades, then do the single real render at the end.
+	# The EXIT trap removes the stamp even if a producer aborts, so a stale stamp
+	# can never suppress the cascade in a LATER run (belt-and-suspenders — the
+	# stamp lives under the git-ignored build dir and feature-graphics is
+	# timestamp-driven anyway, so an orphan would cost only one skipped no-op).
+	@mkdir -p "$(dir $(CASCADE_FG_STAMP))"
+	trap 'rm -f "$(CASCADE_FG_STAMP)"' EXIT
+	@touch "$(CASCADE_FG_STAMP)"          # defer: neither producer renders early
+	$(MAKE) screenshots
+	$(MAKE) report-pdfs
+	@rm -f "$(CASCADE_FG_STAMP)"           # arm the single real render
+	$(MAKE) _cascade-feature-graphics
 
 # =============================================================================
 # REPORT PDF EXPORT  (semi-automatic, human-in-the-loop)
@@ -450,8 +550,18 @@ report-pdfs:
 	    fi; \
 	done
 	adb shell svc power stayon false || true
-	echo "report-pdfs: done. Run 'make feature-graphics' (and/or 'make screenshots-pdf') — the"
-	echo "report-pdfs: dependency graph picks up the new PDFs and rebuilds only what changed."
+	# 5) Rasterize the two report pages 07/08 from the freshly pulled per-locale
+	#    PDFs. This is report-pdfs' OWN half of the screenshot set (01..06 belong
+	#    to `make screenshots`); screenshots-pdf is file-timestamp driven, so only
+	#    locales whose PDF actually changed are re-rendered.
+	$(MAKE) screenshots-pdf
+	# 6) Validate the report pages against Play's phone-screenshot rules.
+	python3 tools/validate-screenshots.py --report $(SCREENSHOT_LOCALES)
+	# 7) Cascade: fresh 07/08 feed the feature graphics (their 07_report_page_1
+	#    input just changed), so rebuild every now-stale graphic ("renew PDFs ->
+	#    renew 07/08 -> renew feature graphics"). Via the once-per-run guard, so a
+	#    combined screenshots+report-pdfs run renders the graphics only ONCE.
+	$(MAKE) _cascade-feature-graphics
 
 # =============================================================================
 # FONTS
@@ -559,4 +669,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug release install screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing report-pdfs rokkitt-bold tgz push bestpractices-json clean distclean
+.PHONY: debug release install store-assets screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push bestpractices-json clean distclean

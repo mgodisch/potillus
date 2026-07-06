@@ -39,13 +39,15 @@ package de.godisch.potillus.domain
 //   the side-effectful parts (DataStore write, AppCompatDelegate call) and
 //   delegates the detection step to LocaleDetector.detect().
 //
-// MATCHING STRATEGY (unchanged, now documented centrally):
+// MATCHING STRATEGY (script-aware since the v0.79.0 QA review):
 //   1. Exact full-tag match on the IETF language tag, e.g. "zh-CN", "pt-BR".
-//      Covers region variants where a dedicated translation exists.
-//   2. Base-language match on the language subtag alone, e.g. "de", "fr".
-//      Covers systems configured for a dialect whose full tag is not in the
-//      supported set (e.g. "de-AT" → "de").
-//   3. Fall back to "en" (the base locale present in values/).
+//   2. Language + region with the script subtag DROPPED, e.g. the
+//      "zh-Hant-TW" that modern Android actually reports → "zh-TW".
+//   3. Chinese script/region disambiguation for the remaining zh variants
+//      (Hant script or TW/HK/MO region → "zh-TW", otherwise "zh-CN").
+//   4. Base-language match on the language subtag alone, e.g. "de-AT" → "de"
+//      (with the Norwegian macrolanguage alias "no" folded onto "nb").
+//   5. Fall back to "en" (the base locale present in values/).
 //
 //   Only locales present in [supportedTags] are ever returned; the app never
 //   falls back to a "best-guess sibling" that it does not actually ship.
@@ -68,8 +70,28 @@ object LocaleDetector {
      *
      * Matching is tried in order of specificity:
      * 1. Full IETF tag match (e.g. `"zh-CN"`, `"pt-BR"`, `"de"`).
-     * 2. Base-language match (e.g. `"de-AT"` → `"de"`).
-     * 3. `"en"` as the unconditional fallback.
+     * 2. Language + region with the SCRIPT subtag dropped. Modern Android
+     *    reports Chinese with an explicit script — `"zh-Hant-TW"`,
+     *    `"zh-Hans-CN"` — so the full tag never equals the shipped `"zh-TW"` /
+     *    `"zh-CN"`. Comparing only language+region closes that gap (found in
+     *    the v0.79.0 QA review: Traditional/Simplified Chinese users were
+     *    silently forced to English on first launch, and the persisted choice
+     *    even overrode Android's own — correct — resource fallback).
+     * 3. Chinese script/region mapping for the remaining `zh` variants that
+     *    carry neither a supported full tag nor a supported language+region:
+     *    the `Hant` script (or, without a script, the traditionally
+     *    Traditional-script regions TW/HK/MO) selects `"zh-TW"`; everything
+     *    else — `Hans`, bare `"zh"`, `"zh-SG"` — selects `"zh-CN"`. This step
+     *    only ever returns tags that are actually in [supportedTags].
+     * 4. Base-language match (e.g. `"de-AT"` → `"de"`).
+     * 5. `"en"` as the unconditional fallback.
+     *
+     * NORWEGIAN ALIAS: the ISO macrolanguage code `"no"` and the Bokmål code
+     * `"nb"` denote the same shipped translation. Android itself reports `nb`,
+     * but store-locale codes (Google Play uses `no-NO`) and older sources use
+     * `no`; [normalizeLanguage] folds `no` onto `nb` before the language-based
+     * steps so both spellings find the `values-nb` translation. (The screenshot
+     * suite feeds store locales through this function — see ScreenshotTest.)
      *
      * @param systemLocale  The JVM locale to match (typically [Locale.getDefault]).
      * @param supportedTags The set of BCP-47 tags the app ships translations for,
@@ -77,18 +99,48 @@ object LocaleDetector {
      * @return A tag from [supportedTags], or `"en"` if none matched.
      */
     fun detect(systemLocale: Locale, supportedTags: Set<String>): String {
-        val fullTag = systemLocale.toLanguageTag() // e.g. "zh-CN", "pt-BR", "de"
-        val baseLang = systemLocale.language // e.g. "zh",    "pt",    "de"
+        val fullTag = systemLocale.toLanguageTag() // e.g. "zh-Hant-TW", "pt-BR", "de"
+        val baseLang = normalizeLanguage(systemLocale.language) // e.g. "zh", "pt", "nb"
+        val region = systemLocale.country // e.g. "TW", "BR", "" when absent
 
-        // Step 1: exact full-tag match (covers region-specific translations).
+        // Step 1: exact full-tag match (covers region-specific translations on
+        // devices that report no script subtag).
         supportedTags.firstOrNull { it.equals(fullTag, ignoreCase = true) }
             ?.let { return it }
 
-        // Step 2: base-language match (e.g. "de-AT" → "de").
+        // Step 2: language + region, ignoring any script subtag
+        // ("zh-Hant-TW" → "zh-TW", "zh-Hans-CN" → "zh-CN").
+        if (region.isNotEmpty()) {
+            val langRegion = "$baseLang-$region"
+            supportedTags.firstOrNull { it.equals(langRegion, ignoreCase = true) }
+                ?.let { return it }
+        }
+
+        // Step 3: Chinese script/region disambiguation for the variants left
+        // over after steps 1–2 (e.g. "zh-Hant-HK", bare "zh", "zh-SG").
+        if (baseLang == "zh") {
+            val traditional = systemLocale.script.equals("Hant", ignoreCase = true) ||
+                (systemLocale.script.isEmpty() && region in setOf("TW", "HK", "MO"))
+            val zhTag = if (traditional) "zh-TW" else "zh-CN"
+            supportedTags.firstOrNull { it.equals(zhTag, ignoreCase = true) }
+                ?.let { return it }
+        }
+
+        // Step 4: base-language match (e.g. "de-AT" → "de", "no-NO" → "nb").
         supportedTags.firstOrNull { it.equals(baseLang, ignoreCase = true) }
             ?.let { return it }
 
-        // Step 3: English base-locale fallback.
+        // Step 5: English base-locale fallback.
         return "en"
     }
+
+    /**
+     * Folds language-code aliases onto the code the app's resources use.
+     *
+     * Currently only Norwegian: `"no"` (the ISO 639 macrolanguage) → `"nb"`
+     * (Bokmål, the code Android reports and `values-nb/` ships under). Android's
+     * own resource matcher treats the two as compatible; this keeps the pure-JVM
+     * detector in line with that behaviour.
+     */
+    private fun normalizeLanguage(language: String): String = if (language.equals("no", ignoreCase = true)) "nb" else language.lowercase(Locale.ROOT)
 }

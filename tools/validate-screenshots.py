@@ -30,10 +30,17 @@
 #
 #   For each locale's fastlane/metadata/android/<locale>/images/phoneScreenshots
 #   directory it asserts:
-#     * exactly EXPECTED_COUNT (8) PNG files are present,
+#     * the REQUIRED shots for the selected mode are present (see below),
 #     * each file is a real PNG (verified by signature, not by extension),
 #     * each side is within Play's [MIN_SIDE, MAX_SIDE] = [320, 3840] px range,
 #     * the long:short side ratio does not exceed MAX_RATIO (2:1).
+#
+#   MODES (optional leading flag): the eight shots have two producers, each of
+#   which validates only its own half right after generating it —
+#     --in-app   requires 01..06  (`make screenshots`)
+#     --report   requires 07..08  (`make report-pdfs`)
+#     (default)  requires all 8   (full-set validation)
+#   Any other PNG already on disk is still geometry-checked in every mode.
 #
 # WHY NO PILLOW / EXTERNAL DEPS
 #   The project's build tooling targets a plain Debian box and already relies on
@@ -55,7 +62,18 @@ import sys
 MIN_SIDE = 320       # px – Play minimum for any side
 MAX_SIDE = 3840      # px – Play maximum for any side
 MAX_RATIO = 2.0      # long:short side – Play maximum aspect ratio
-EXPECTED_COUNT = 8   # the task requires exactly eight assets per locale
+
+# The eight per-locale phone screenshots split by PRODUCER: the in-app shots
+# 01..06 come from `make screenshots` (screengrab on a device); the report pages
+# 07..08 come from `make report-pdfs` (rasterized from the per-locale PDF). Each
+# producer validates only its own half right after generating it, so a partial
+# set is not spuriously failed; the full eight are checked when both are present.
+IN_APP_SHOTS = (
+    "01_today", "02_calendar", "03_statistics",
+    "04_drinks", "05_add_drink", "06_settings",
+)
+REPORT_SHOTS = ("07_report_page_1", "08_report_page_2")
+ALL_SHOTS = IN_APP_SHOTS + REPORT_SHOTS
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
@@ -88,11 +106,16 @@ def png_dimensions(path):
     return width, height
 
 
-def validate_locale(locale):
+def validate_locale(locale, expected_shots):
     """Validate one locale's phoneScreenshots directory.
 
-    Returns a list of human-readable error strings (empty when the locale is
-    fully conformant).
+    ``expected_shots`` is the tuple of shot base names (without the .png suffix)
+    that must be present and conformant — the in-app set, the report set, or all
+    eight, depending on the caller's mode. Extra shots on disk are still checked
+    (an oversized 07 must fail even during an in-app run if it happens to exist),
+    but only the expected ones are REQUIRED.
+
+    Returns a list of human-readable error strings (empty when conformant).
     """
     errors = []
     shots_dir = os.path.join(META_ROOT, locale, "images", "phoneScreenshots")
@@ -100,22 +123,28 @@ def validate_locale(locale):
     if not os.path.isdir(shots_dir):
         return [f"{locale}: directory not found: {shots_dir}"]
 
-    pngs = sorted(
-        f for f in os.listdir(shots_dir) if f.lower().endswith(".png")
-    )
+    present = {
+        os.path.splitext(f)[0]
+        for f in os.listdir(shots_dir)
+        if f.lower().endswith(".png")
+    }
 
-    if len(pngs) != EXPECTED_COUNT:
+    missing = [f"{name}.png" for name in expected_shots if name not in present]
+    if missing:
         errors.append(
-            f"{locale}: expected {EXPECTED_COUNT} PNG screenshots, found {len(pngs)} "
-            f"({', '.join(pngs) or 'none'})"
+            f"{locale}: missing {len(missing)} required screenshot(s): "
+            f"{', '.join(missing)}"
         )
 
-    for name in pngs:
-        path = os.path.join(shots_dir, name)
+    # Check the geometry of every expected shot that IS present, plus any other
+    # PNG on disk (so a stray or oversized file never slips through unchecked).
+    to_check = sorted(present.union(expected_shots).intersection(present))
+    for name in to_check:
+        path = os.path.join(shots_dir, name + ".png")
         try:
             width, height = png_dimensions(path)
         except (ValueError, OSError) as exc:
-            errors.append(f"{locale}/{name}: {exc}")
+            errors.append(f"{locale}/{name}.png: {exc}")
             continue
 
         long_side, short_side = max(width, height), min(width, height)
@@ -123,12 +152,12 @@ def validate_locale(locale):
 
         if not (MIN_SIDE <= width <= MAX_SIDE) or not (MIN_SIDE <= height <= MAX_SIDE):
             errors.append(
-                f"{locale}/{name}: {width}x{height}px outside the allowed "
+                f"{locale}/{name}.png: {width}x{height}px outside the allowed "
                 f"{MIN_SIDE}..{MAX_SIDE}px range"
             )
         if ratio > MAX_RATIO + 1e-9:
             errors.append(
-                f"{locale}/{name}: aspect ratio {ratio:.3f}:1 exceeds the "
+                f"{locale}/{name}.png: aspect ratio {ratio:.3f}:1 exceeds the "
                 f"{MAX_RATIO:.0f}:1 maximum (use a device/emulator no taller "
                 f"than 2:1, e.g. 1080x2160)"
             )
@@ -137,19 +166,35 @@ def validate_locale(locale):
 
 
 def main(argv):
-    """Validate every locale passed on the command line; non-zero on any failure."""
-    locales = argv[1:]
+    """Validate every locale passed on the command line; non-zero on any failure.
+
+    An optional leading mode flag selects which shot set is REQUIRED:
+      --in-app   only the in-app shots 01..06 (used by `make screenshots`)
+      --report   only the report pages 07..08 (used by `make report-pdfs`)
+      (default)  all eight (used when validating a complete set)
+    """
+    args = argv[1:]
+    expected, label = ALL_SHOTS, "8"
+    if args and args[0] == "--in-app":
+        expected, label, args = IN_APP_SHOTS, "6 in-app", args[1:]
+    elif args and args[0] == "--report":
+        expected, label, args = REPORT_SHOTS, "2 report", args[1:]
+
+    locales = args
     if not locales:
-        print("usage: validate-screenshots.py <locale> [<locale> ...]", file=sys.stderr)
+        print(
+            "usage: validate-screenshots.py [--in-app|--report] <locale> [<locale> ...]",
+            file=sys.stderr,
+        )
         return 2
 
     all_errors = []
     for locale in locales:
-        locale_errors = validate_locale(locale)
+        locale_errors = validate_locale(locale, expected)
         if locale_errors:
             all_errors.extend(locale_errors)
         else:
-            print(f"  \u2713 {locale}: {EXPECTED_COUNT} screenshots conform to Play limits")
+            print(f"  \u2713 {locale}: {label} screenshots conform to Play limits")
 
     if all_errors:
         print("\nGoogle Play screenshot validation FAILED:", file=sys.stderr)
@@ -157,7 +202,7 @@ def main(argv):
             print(f"  \u2717 {err}", file=sys.stderr)
         return 1
 
-    print("\nAll screenshots satisfy the Google Play phone-screenshot requirements.")
+    print("\nAll checked screenshots satisfy the Google Play phone-screenshot requirements.")
     return 0
 
 
