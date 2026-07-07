@@ -91,6 +91,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
     <string name="back">Назад</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Предыдущий месяц</string>
+    <string name="cd_next_month">Следующий месяц</string>
+    <string name="cd_prev_year">Предыдущий год</string>
+    <string name="cd_next_year">Следующий год</string>
     <string name="delete">Удалить</string>
     <string name="change">Изменить</string>
     <string name="delete_confirm">Удалить \u00ab%1$s\u00bb?</string>
@@ -137,6 +143,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">нет записи</string>
     <string name="year_calendar_under_limit">ниже лимита</string>
     <string name="year_calendar_over_limit">выше лимита</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Нет записей для экспорта.</string>
     <string name="export_failed">Экспорт не удался.</string>
     <string name="backup_failed">Резервное копирование не удалось.</string>

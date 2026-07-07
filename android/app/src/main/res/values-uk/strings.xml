@@ -118,6 +118,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Зберегти</string>
     <string name="cancel">Скасувати</string>
     <string name="back">Назад</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Попередній місяць</string>
+    <string name="cd_next_month">Наступний місяць</string>
+    <string name="cd_prev_year">Попередній рік</string>
+    <string name="cd_next_year">Наступний рік</string>
     <string name="delete">Видалити</string>
     <string name="change">Змінити</string>
     <string name="delete_confirm">Справді видалити «%1$s»?</string>
@@ -176,6 +182,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">немає запису</string>
     <string name="year_calendar_under_limit">нижче ліміту</string>
     <string name="year_calendar_over_limit">вище ліміту</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Немає записів для експорту.</string>

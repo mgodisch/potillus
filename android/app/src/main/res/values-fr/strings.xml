@@ -101,6 +101,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Enregistrer</string>
     <string name="cancel">Annuler</string>
     <string name="back">Retour</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Mois précédent</string>
+    <string name="cd_next_month">Mois suivant</string>
+    <string name="cd_prev_year">Année précédente</string>
+    <string name="cd_next_year">Année suivante</string>
     <string name="delete">Supprimer</string>
     <string name="change">Modifier</string>
     <string name="delete_confirm">Supprimer «\u00a0%1$s\u00a0»\u00a0?</string>
@@ -151,6 +157,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">aucune entrée</string>
     <string name="year_calendar_under_limit">sous la limite</string>
     <string name="year_calendar_over_limit">au-dessus de la limite</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Aucune entrée à exporter.</string>

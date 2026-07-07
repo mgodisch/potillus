@@ -151,11 +151,20 @@ fun CalendarScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 IconButton(onClick = { vm.prevPeriod() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                                    // Accessible name for the icon-only navigation
+                                    // button: without it a screen reader announces
+                                    // just "button" (WCAG 4.1.2 / name-role-value).
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = stringResource(R.string.cd_prev_year),
+                                    )
                                 }
                                 Text(state.currentYear.toString(), style = MaterialTheme.typography.titleMedium)
                                 IconButton(onClick = { vm.nextPeriod() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowForward,
+                                        contentDescription = stringResource(R.string.cd_next_year),
+                                    )
                                 }
                             }
                             Spacer(Modifier.height(8.dp))
@@ -386,7 +395,12 @@ private fun MonthCalendar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onPrevMonth) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    // Accessible name for the icon-only navigation button (see the
+                    // year navigation above; WCAG 4.1.2 name-role-value).
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_prev_month),
+                    )
                 }
                 Text(
                     // monthYearFormatter (NOT a literal "MMMM yyyy"): the label's
@@ -397,7 +411,10 @@ private fun MonthCalendar(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 IconButton(onClick = onNextMonth) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = stringResource(R.string.cd_next_month),
+                    )
                 }
             }
             Row(Modifier.fillMaxWidth()) {

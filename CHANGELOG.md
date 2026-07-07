@@ -41,15 +41,104 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 Work toward OpenSSF gold badge criteria
 
 Development toward the OpenSSF Best Practices gold level (project 13480),
-plus the fixes from full QA reviews of the whole tree (the fourth and fifth
-review rounds folded into this release; the fourth was the first covering
+plus the fixes from full QA reviews of the whole tree (the fourth, fifth and
+sixth review rounds folded into this release; the fourth was the first covering
 every source, resource, tooling and store-metadata file at once, the fifth a
-follow-up full pass). The OpenSSF work is documentation and process only; the
-QA fixes include user-visible corrections — Chinese language detection, the
-report's longest-abstinence figure, month/date label localization, the day
-rollover on the Today screen, and the PDF report's CJK glyph orthography for
-Japanese/Korean/Traditional-Chinese — each listed individually below.
+follow-up full pass, the sixth a further full pass focused on accessibility and
+data-compatibility documentation). The OpenSSF work is documentation and process
+only; the QA fixes include user-visible corrections — Chinese language
+detection, the report's longest-abstinence figure, month/date label
+localization, the day rollover on the Today screen, the PDF report's CJK glyph
+orthography for Japanese/Korean/Traditional-Chinese, and accessible names for
+the calendar navigation arrows, the drink-category icon and the year heat-map's
+day cells (screen-reader only) — each listed individually below.
 
+- Accessibility — honest conformance documentation (sixth QA round): documented
+  the app's accessibility state truthfully and added a regression guard, without
+  claiming any WCAG level. `docs/ROADMAP.md` (Accessibility) now states plainly
+  that NO WCAG 2.2 conformance level is claimed and NONE of the W3C conformance
+  logos is used — because a logo is a formal claim that ALL criteria of a level
+  are met under a thorough human evaluation (not done here; W3C is explicit that
+  no tool check suffices), there are verified open Level AA items, and the logos
+  are web-page scoped rather than native-app scoped — and it lists the measured
+  gaps: non-text contrast 1.4.11 (empty heat-map cells 1.1–1.3∶1, today outline
+  1.2–1.5∶1, below 3∶1), text contrast 1.4.3 (`onSurfaceVariant` 4.39∶1;
+  warning-red as text 3.25–4.23∶1), target size 2.5.8 (10 dp cells), and the
+  on-screen chart's missing text alternative 1.1.1 (Level A). README gains a
+  factual Accessibility subsection (capabilities, no claim, pointer to the
+  roadmap); CONTRIBUTING §4 documents the labelling rule; and
+  `.bestpractices.json` (`accessibility_best_practices`) is corrected — the
+  heat-map labels are no longer a to-do, the over-broad "adequate touch targets"
+  wording is scoped to standard controls, and the entry now states no WCAG level
+  is claimed. A new `tools/release-check.sh` §13 (ACCESSIBILITY LABELS) fails the
+  build if any `Icon` inside an `IconButton` has `contentDescription = null`, so
+  the labels added in this release cannot silently regress (sections renumbered
+  "/ 12" → "/ 13"; the check skips gracefully without python3 and is a labelling
+  invariant only, not a WCAG conformance test). DELIBERATELY NOT changed: the
+  per-locale store `full_description` — a non-conformance is not marketing copy,
+  so the accessibility status lives in the roadmap, not the store listing.
+  Documentation and tooling only; no app-behaviour change.
+- Accessibility — year heat-map day cells (sixth QA round, accessibility
+  follow-up): the year calendar's day squares in `YearCalendarView` encoded the
+  under- vs. over-limit state by cell COLOUR alone, with no per-cell screen-reader
+  label — the last documented accessibility gap on docs/ROADMAP.md
+  (`accessibility_best_practices`, WCAG 1.4.1). Each day that carries data now
+  exposes a `contentDescription` built from a new `year_calendar_day_desc` string
+  ("date, grams, status"), where the status reuses the existing under/over-limit
+  legend captions and the date/number are formatted in the per-app locale; empty
+  days stay inert and silent so a reader is not flooded with hundreds of "no
+  entry" nodes. `year_calendar_day_desc` is a locale-neutral skeleton
+  (`%1$s, %2$s g, %3$s`) whose words come from already-localized sub-strings, but
+  it is still added to all 21 languages to satisfy `LocaleSyncTest` key parity.
+  No on-screen change. NOTE on the colour channel: the under/over palette is blue
+  (`primary`) vs. red (`dangerRed`), not a red/green pair, so it is already
+  colour-blind distinguishable; an additional non-colour VISUAL indicator is left
+  as an optional, low-priority roadmap nicety rather than forced onto the 10 dp
+  cells. (docs/ROADMAP.md updated to record the item as screen-reader-done.)
+- Accessibility — calendar navigation buttons (sixth QA round): the icon-only
+  previous/next arrows for the month view and the year view in `CalendarScreen`
+  set `contentDescription = null`, so a screen reader announced only "button",
+  with no way to tell previous from next or month from year (WCAG 4.1.2,
+  name-role-value). Every other actionable icon in the app already carries a
+  localized `contentDescription`; these four were the only exceptions. Added
+  four accessibility strings (`cd_prev_month`, `cd_next_month`, `cd_prev_year`,
+  `cd_next_year`), translated into all 21 languages, and wired them onto the
+  four arrow `Icon`s. Screen-reader only; nothing changes on screen.
+- Accessibility — drink-category icon (sixth QA round): `DrinkCategoryIcon`
+  used the raw enum constant (`category.name`, e.g. "BEER") as its
+  `contentDescription`, which a screen reader read out verbatim and unlocalized.
+  Switched it to the localized `DrinkCategory.displayLabel()` already defined in
+  the same file, so the icon is voiced in the app's own language. No new strings;
+  screen-reader only.
+- Statistics export — clock consistency (sixth QA round): the CSV/PDF export
+  date-range dialogs fell back to a bare `LocalDate.now()` while the stats flow
+  had not yet emitted its `today`, bypassing `DayResolver.clock()` (the
+  screenshot clock override) and the configured day-change boundary that every
+  other date-relative surface honors. The fallback now reads
+  `LocalDate.now(DayResolver.clock())`. It is only a transient placeholder for
+  the picker's initial date and is replaced the moment the flow emits, so there
+  is no user-visible change; the fix removes an inconsistency with the app-wide
+  "derive today from DayResolver" rule.
+- Documentation — data-compatibility guarantee (sixth QA round): CONTRIBUTING.md
+  §8 now records that, since the first F-Droid release (v0.77.4), the Room
+  database and the JSON backup format are guaranteed backward-compatible — Room
+  migrations are forward-only and never destructive, and the backup importer
+  keeps reading every `BACKUP_VERSION` from that baseline onward. Matching
+  breadcrumbs were added to `AppDatabase` and `BackupManager`. While there, a
+  stale cross-reference in `AppDatabase` was corrected: the migration workflow
+  is documented in CONTRIBUTING.md §8.1, not the §7.1 the comment pointed at.
+  Documentation only; no functional change.
+- Roadmap — accessibility status (sixth QA round): docs/ROADMAP.md now notes
+  that the two accessible-name gaps above are closed, leaving the accessible
+  year heatmap (WCAG 1.4.1, color-only day cells) as the remaining documented
+  accessibility item. Documentation only.
+- Store release notes (sixth QA round): the per-locale versionCode-90 store
+  changelogs are deliberately left unchanged. This round's only user-visible
+  effect is screen-reader accessible names (nothing changes on screen), which
+  the existing "Fixes from a full code review" framing already covers; and the
+  English master already sits at 464/500 characters, so adding a sentence would
+  breach the store's 500-character limit across locales. versionCode is
+  unchanged (these fixes fold into the unreleased v0.79.0).
 - PDF report — CJK glyph orthography: the report template's root element now
   carries a per-locale language hint (`<html lang="{{REPORT_LANG}}">`, filled
   by `PdfReportBuilder` from the per-app locale via `Locale.toLanguageTag()`).

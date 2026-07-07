@@ -121,7 +121,13 @@ fun DrinkCategoryIcon(
     val spec = categoryIconSpec(category)
     Icon(
         imageVector = spec.vector,
-        contentDescription = category.name,
+        // Accessible name = the LOCALISED category label (via displayLabel),
+        // never the raw enum constant. `category.name` would make a screen
+        // reader announce the developer-facing token ("BEER"/"WINE"), which is
+        // both unlocalised and jarring; displayLabel() resolves the same
+        // strings.xml captions the rest of the UI uses, so the icon is voiced in
+        // the app's own language with no new string keys (see [displayLabel]).
+        contentDescription = category.displayLabel(),
         modifier = modifier.size(spec.size),
         tint = tint,
     )

@@ -190,6 +190,13 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="cancel">Cancel</string>
     <!-- Back-arrow description (Settings, document viewer). -->
     <string name="back">Back</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for
+         the icon-only previous/next arrows. Screen-reader only; never shown on
+         screen. Keep short and action-oriented. -->
+    <string name="cd_prev_month">Previous month</string>
+    <string name="cd_next_month">Next month</string>
+    <string name="cd_prev_year">Previous year</string>
+    <string name="cd_next_year">Next year</string>
     <!-- Delete button, delete-confirm dialog title, and delete-icon description. -->
     <string name="delete">Delete</string>
     <!-- Edit-pencil icon description on Settings rows. -->
@@ -292,6 +299,13 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_under_limit">under limit</string>
     <!-- Year heat-map legend: day over the limit. -->
     <string name="year_calendar_over_limit">over limit</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell,
+         so the under/over-limit state shown by cell colour is also available to a
+         screen reader. Placeholders: %1$s = localized date, %2$s = grams (already
+         locale-formatted), %3$s = status caption (the under/over-limit legend text
+         above). "g" is the app-wide unit suffix; the comma is a reader pause.
+         Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
 
     <!-- Export and backup messages -->
     <!-- Export status: nothing to export. -->

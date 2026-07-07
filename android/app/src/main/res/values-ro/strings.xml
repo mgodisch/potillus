@@ -127,6 +127,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Salvează</string>
     <string name="cancel">Anulare</string>
     <string name="back">Înapoi</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Luna anterioară</string>
+    <string name="cd_next_month">Luna următoare</string>
+    <string name="cd_prev_year">Anul anterior</string>
+    <string name="cd_next_year">Anul următor</string>
     <string name="delete">Șterge</string>
     <string name="change">Modifică</string>
     <string name="delete_confirm">Se șterge „%1$s”?</string>
@@ -184,6 +190,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">fără înregistrare</string>
     <string name="year_calendar_under_limit">sub limită</string>
     <string name="year_calendar_over_limit">peste limită</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
 
     <!-- Export / import status messages -->
     <string name="export_no_entries">Nu există înregistrări de exportat.</string>

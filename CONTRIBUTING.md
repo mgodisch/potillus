@@ -261,6 +261,15 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
 - **Enum persistence:** enums stored in Room or DataStore must be stored by their
   `.name` string (not ordinal). Always deserialise with
   `runCatching { Foo.valueOf(name) }.getOrDefault(Foo.DEFAULT)` for forward compatibility.
+- **Accessibility labels:** every INTERACTIVE control needs an accessible name.
+  In practice, an `Icon` inside an `IconButton` (or any tappable icon-only
+  surface) must set a localized `contentDescription = stringResource(...)`;
+  only purely decorative icons that sit next to their own visible text label may
+  use `contentDescription = null`. `tools/release-check.sh` §13 enforces this for
+  `IconButton` icons and fails the build on a regression. This is a labelling
+  invariant only — the project does not claim a WCAG conformance level (see
+  `docs/ROADMAP.md` → Accessibility for the honest status and the open Level AA
+  gaps).
 
 ---
 
@@ -455,6 +464,16 @@ The three persistence surfaces are considered **frozen**: their
 on-disk/on-wire format is stable, and any change must be backward-compatible or
 ship explicit migration code. The goal is that a user who installs the app never
 loses their configured drinks, logged entries, or settings across an update.
+
+**Compatibility guarantee (since the first F-Droid release, v0.77.4).** From
+that release onward the database and the JSON backup format are guaranteed
+backward-compatible: any later app version can open a database and import a
+backup produced by v0.77.4 or newer. Concretely, Room migrations are
+forward-only and never destructive (`fallbackToDestructiveMigration` is banned,
+see §8.1), and the backup importer keeps reading every `BACKUP_VERSION` from
+that baseline up to the current one (older/newer field handling in §8.3). The
+rules in §8.1–§8.4 are how this guarantee is upheld in practice; do not weaken
+them without treating it as a breaking change to that promise.
 
 The three surfaces and their rules:
 

@@ -55,15 +55,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.DaySummary
+import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Compact full-year calendar heat-map.
@@ -118,6 +122,9 @@ fun YearCalendarView(
     // (TextStyle.FULL_STANDALONE) and the month+year labels (monthYearFormatter,
     // see l10n/LocaleSupport.kt).
     val monthFmt = DateTimeFormatter.ofPattern("LLL", locale)
+    // Localized MEDIUM date for the per-cell accessibility label (e.g. "28 Jun
+    // 2026" / "2026/06/28"). Built once and reused for every labelled day cell.
+    val dayDescDateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
     val months = (1..12).map { YearMonth.of(year, it) }
 
     // Capture theme colours before entering Box/Column lambdas (see file header note)
@@ -167,7 +174,32 @@ fun YearCalendarView(
                                             AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams) -> red
                                             else -> green
                                         }
-                                        val isToday = ym.atDay(dayNum) == today
+                                        val localDate = ym.atDay(dayNum)
+                                        val isToday = localDate == today
+                                        // Per-cell accessibility label: the under/over-limit
+                                        // state is conveyed on screen by cell COLOUR alone, so a
+                                        // screen reader would otherwise get no access to it (WCAG
+                                        // 1.4.1). We attach a "date, grams, status" description —
+                                        // status reuses the same localized legend captions shown
+                                        // below the grid. Only days that carry a summary are
+                                        // tappable and labelled; empty days stay inert and silent
+                                        // so the reader is not flooded with 300+ "no entry" nodes.
+                                        // (The blue/red under/over palette is already colour-blind
+                                        // distinguishable — it is not a red/green pair — so no
+                                        // extra non-colour VISUAL cue is added here.)
+                                        val cellDesc: String? = summary?.let { s ->
+                                            val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
+                                                R.string.year_calendar_over_limit
+                                            } else {
+                                                R.string.year_calendar_under_limit
+                                            }
+                                            stringResource(
+                                                R.string.year_calendar_day_desc,
+                                                dayDescDateFmt.format(localDate),
+                                                s.totalGrams.fmt1(locale),
+                                                stringResource(statusRes),
+                                            )
+                                        }
                                         Box(
                                             modifier = Modifier
                                                 .size(cellSize)
@@ -179,6 +211,14 @@ fun YearCalendarView(
                                                     } else {
                                                         Modifier
                                                     },
+                                                )
+                                                .then(
+                                                    // A labelled cell exposes its description to
+                                                    // accessibility services; an empty cell adds
+                                                    // no semantics and stays silent.
+                                                    cellDesc?.let { d ->
+                                                        Modifier.semantics { contentDescription = d }
+                                                    } ?: Modifier,
                                                 )
                                                 .clickable(enabled = summary != null) { onDayClick(date) },
                                         )

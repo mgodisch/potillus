@@ -75,8 +75,13 @@ import java.security.KeyStore
  */
 // SCHEMA FREEZE: the database schema is frozen. Any change must
 // bump `version`, add a `Migration`, commit the new app/schemas/<n>.json, and
-// add a case to MigrationTest. See CONTRIBUTING.md §7.1. Never use
+// add a case to MigrationTest. See CONTRIBUTING.md §8.1. Never use
 // fallbackToDestructiveMigration — it would wipe user data.
+//
+// BACKWARD-COMPATIBILITY FLOOR: since the first F-Droid release (v0.77.4) the
+// database is guaranteed readable by every later version — migrations are
+// forward-only and never destructive. See CONTRIBUTING.md §8 (compatibility
+// guarantee) for the promise this upholds.
 @Database(
     entities = [DrinkEntity::class, EntryEntity::class],
     version = 2,

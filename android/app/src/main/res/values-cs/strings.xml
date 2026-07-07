@@ -91,6 +91,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Uložit</string>
     <string name="cancel">Zrušit</string>
     <string name="back">Zpět</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Předchozí měsíc</string>
+    <string name="cd_next_month">Další měsíc</string>
+    <string name="cd_prev_year">Předchozí rok</string>
+    <string name="cd_next_year">Další rok</string>
     <string name="delete">Smazat</string>
     <string name="change">Změnit</string>
     <string name="delete_confirm">Opravdu smazat \u201e%1$s\u201c?</string>
@@ -137,6 +143,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">žádný záznam</string>
     <string name="year_calendar_under_limit">pod limitem</string>
     <string name="year_calendar_over_limit">nad limitem</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Žádné záznamy k exportu.</string>
     <string name="export_failed">Export se nezdařil.</string>
     <string name="backup_failed">Záloha se nezdařila.</string>

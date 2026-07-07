@@ -90,6 +90,12 @@ object BackupManager {
      * History:
      *   1 → initial format.
      *   2 → added the "category" field to drink objects.
+     *
+     * BACKWARD-COMPATIBILITY FLOOR: since the first F-Droid release (v0.77.4) the
+     * importer is guaranteed to read every backup written by v0.77.4 or newer —
+     * required fields via `getXxx`, optional/newer fields via `optXxx(key,
+     * default)`, and files from a newer app rejected with [ImportError.VersionTooHigh].
+     * See CONTRIBUTING.md §8 (compatibility guarantee) and §8.3.
      */
     private const val BACKUP_VERSION = 2
 

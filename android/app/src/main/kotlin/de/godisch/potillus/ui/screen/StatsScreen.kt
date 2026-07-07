@@ -395,8 +395,17 @@ fun StatsScreen(
 
     // ── Export date-range dialogs ──────────────────────────────────────────
     // `today` may be empty until the stats flow's first emission; fall back to
-    // the calendar date so the pickers always receive a valid initial value.
-    val exportToday = state.today.ifEmpty { LocalDate.now().toString() }
+    // a calendar date so the pickers always receive a valid initial value.
+    //
+    // The fallback reads the clock through DayResolver.clock() (not a bare
+    // LocalDate.now()) so it honours the screenshot clock override, matching the
+    // app-wide rule that every date-relative surface derives "today" from
+    // DayResolver (see DayResolver.clock). This value is only ever a transient
+    // placeholder for the picker's initial date: once the flow emits, `today`
+    // (which additionally applies the configured day-change boundary) replaces
+    // it, so the day-boundary nuance the raw calendar date cannot express is not
+    // observable in practice.
+    val exportToday = state.today.ifEmpty { LocalDate.now(DayResolver.clock()).toString() }
     if (showCsvRangeDialog) {
         ExportDateRangeDialog(
             initialFrom = state.statsFromDate.ifEmpty { exportToday },

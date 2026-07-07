@@ -317,7 +317,7 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 12 — VERSION CONSISTENCY"
+    section "1 / 13 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version
 
@@ -487,7 +487,7 @@ CHANGELOG version must bump versionCode by exactly 1"
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 12 — CHANGELOG ENTRY"
+    section "2 / 13 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -544,7 +544,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 12 — ROOM DATABASE MIGRATIONS"
+    section "3 / 13 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -615,7 +615,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 12 — LOCALE CONSISTENCY"
+    section "4 / 13 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -820,7 +820,7 @@ es-419 es-ES es-US sw sv-SE ta-IN te-IN th tr-TR uk ur vi zu "
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 12 — SOURCE CODE DOCUMENTATION"
+    section "5 / 13 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -964,7 +964,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 12 — LOG CALL GUARDS"
+    section "6 / 13 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -1016,7 +1016,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 12 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 13 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -1078,7 +1078,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 12 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 13 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -1129,7 +1129,7 @@ check_backup_version() {
 #   no balance check can satisfy, and they are never reformatted anyway).
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 12 — MARKDOWN SYNTAX"
+    section "9 / 13 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then
@@ -1187,7 +1187,7 @@ check_markdown_syntax() {
 #   full_description.txt    ≤ 4000
 #   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
 check_metadata_lengths() {
-    section "10 / 12 — STORE METADATA LENGTH LIMITS"
+    section "10 / 13 — STORE METADATA LENGTH LIMITS"
 
     # python3 is already a prerequisite (see §5); reuse it for correct,
     # locale-independent character counting.
@@ -1253,7 +1253,7 @@ PYEOF
 #   that re-adds the in-APK SBOM task.
 # =============================================================================
 check_reproducible_build_hygiene() {
-    section "11 / 12 — REPRODUCIBLE-BUILD HYGIENE"
+    section "11 / 13 — REPRODUCIBLE-BUILD HYGIENE"
 
     # The in-APK SBOM was wired via a `GenerateSbomAsset` task; its absence is
     # the signal that the SBOM stays out of the APK. (cyclonedxDirectBom, the
@@ -1292,7 +1292,7 @@ check_reproducible_build_hygiene() {
 #   it cannot produce false failures in environments that lack the inputs.
 # =============================================================================
 check_third_party_notices() {
-    section "12 / 12 — THIRD-PARTY NOTICE FILES"
+    section "12 / 13 — THIRD-PARTY NOTICE FILES"
 
     local sbom="app/build/outputs/sbom/libellus-potionis-sbom.json"
     if [[ ! -f "$sbom" ]]; then
@@ -1356,6 +1356,122 @@ PYEND
     else
         pass "No META-INF/NOTICE files in any shipped dependency (SBOM-verified)"
     fi
+}
+
+# =============================================================================
+# SECTION 13 – ACCESSIBILITY LABELS
+# =============================================================================
+#   Regression guard for the project's accessibility-labelling convention: an
+#   icon-only, actionable control must expose an accessible name, or a screen
+#   reader (TalkBack) announces only "button". In this codebase that means every
+#   Icon inside an IconButton sets a non-null contentDescription; purely
+#   decorative icons that sit beside their own visible text label (menu leading
+#   glyphs, the bottom-nav icons) may keep contentDescription = null and are not
+#   flagged. The check fails ONLY when an Icon that is the direct child of an
+#   IconButton { ... } lambda is left with contentDescription = null.
+#
+#   SCOPE / HONESTY: this is a labelling invariant, NOT a WCAG conformance test.
+#   Per W3C, no automated check can determine WCAG conformance — see
+#   docs/ROADMAP.md (Accessibility) for the honest status and the open Level AA
+#   gaps. The gate exists so the labels the project HAS added cannot silently
+#   regress. It skips gracefully (info) where python3 is unavailable and warns
+#   only on a real finding.
+check_accessibility_labels() {
+    section "13 / 13 — ACCESSIBILITY LABELS"
+
+    if ! command -v python3 >/dev/null 2>&1; then
+        info "python3 not found — skipping accessibility-label check"
+        return
+    fi
+
+    local files
+    mapfile -t files < <(find app/src/main/kotlin -name '*.kt' 2>/dev/null)
+    if [[ "${#files[@]}" -eq 0 ]]; then
+        info "No Kotlin sources found — nothing to check"
+        return
+    fi
+
+    # The scanner is brace-aware: it isolates each IconButton(...) { ... } lambda
+    # and only reports contentDescription = null WITHIN that lambda, so decorative
+    # icons elsewhere are never false-flagged. Guarded by `if` (not a bare
+    # assignment) so the python exit status 1 on findings does not abort the
+    # script under `set -e`; see the SECTION 9 note for the same pattern.
+    local out err
+    err=$(mktemp)
+    if out=$(python3 - "${files[@]}" 2>"$err" <<'PYEND'
+import re, sys
+
+NULL_DESC = re.compile(r'contentDescription\s*=\s*null')
+findings = []
+
+def line_of(text, idx):
+    return text.count('\n', 0, idx) + 1
+
+def match_delim(s, start, open_ch, close_ch):
+    """Return index of the delimiter that closes the one at s[start]."""
+    depth = 0
+    i = start
+    while i < len(s):
+        c = s[i]
+        if c == open_ch:
+            depth += 1
+        elif c == close_ch:
+            depth -= 1
+            if depth == 0:
+                return i
+        i += 1
+    return -1
+
+for path in sys.argv[1:]:
+    try:
+        s = open(path, encoding='utf-8').read()
+    except OSError:
+        continue
+    i = 0
+    while True:
+        m = re.search(r'\bIconButton\b', s[i:])
+        if not m:
+            break
+        after = i + m.end()
+        paren = s.find('(', after)
+        if paren < 0:
+            break
+        end_args = match_delim(s, paren, '(', ')')
+        if end_args < 0:
+            break
+        # Expect a trailing lambda immediately after the argument list.
+        k = end_args + 1
+        while k < len(s) and s[k] in ' \t\r\n':
+            k += 1
+        if k >= len(s) or s[k] != '{':
+            i = end_args + 1
+            continue
+        end_lambda = match_delim(s, k, '{', '}')
+        if end_lambda < 0:
+            break
+        block = s[k:end_lambda + 1]
+        for nm in NULL_DESC.finditer(block):
+            findings.append(
+                f"{path}:{line_of(s, k + nm.start())}: "
+                "Icon inside IconButton has contentDescription = null "
+                "(interactive control needs an accessible name)"
+            )
+        i = end_lambda + 1
+
+for f in sorted(findings):
+    print(f)
+sys.exit(1 if findings else 0)
+PYEND
+    ); then
+        pass "All interactive IconButton icons carry a non-null contentDescription"
+    elif [[ -s "$err" ]]; then
+        fail "accessibility-label check did not run cleanly: $(tr '\n' ' ' <"$err")"
+    else
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && fail "$line"
+        done <<< "$out"
+    fi
+    rm -f "$err"
 }
 
 # =============================================================================
@@ -1441,6 +1557,7 @@ main() {
     check_metadata_lengths
     check_reproducible_build_hygiene
     check_third_party_notices
+    check_accessibility_labels
     check_coverage
 
     # ── Final summary ─────────────────────────────────────────────────────────

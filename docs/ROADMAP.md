@@ -74,13 +74,64 @@ attainable until each is resolved. They are the most critical open items.
 
 ## Accessibility
 
-- **Accessible year heatmap** (`accessibility_best_practices`). The
-  `YearCalendarView` (`ui/component/CalendarComponents.kt`) distinguishes under-
-  vs. over-limit days by colour alone (10 dp green/red cells) with no per-cell
-  screen-reader label. Add a `contentDescription`/semantics per cell (date +
-  grams + within/over limit) and, ideally, a non-colour indicator, to address
-  WCAG 1.4.1. A new user-facing string triggers `LocaleSyncTest` across all
-  locales, so this is an i18n-touching change, not a one-liner.
+**Conformance status — no WCAG level is claimed.** Potillus follows accessibility
+best practices but does **not** claim conformance to any WCAG 2.2 level, and it
+uses **none** of the W3C WCAG conformance logos. The reasons are deliberate and
+honest:
+
+- A W3C conformance logo is a formal *claim* that **all** success criteria of
+  the chosen level are met, backed by a **thorough human evaluation** — W3C
+  states explicitly that no automated/tool check suffices. No such evaluation
+  has been performed here.
+- There are **verified unmet Level AA criteria** (listed below), so AA/AAA are
+  out regardless; and at least one **Level A** item (the on-screen chart's text
+  alternative) is unresolved, so even Level A is not cleanly established.
+- The W3C logos are **web-page scoped** (WCAG = *Web Content* Accessibility
+  Guidelines; a logo covers "a single page"). Potillus is a native Android app;
+  the per-page conformance model does not map onto it. (WCAG could be applied via
+  WCAG2ICT as a written claim, but that is not a W3C logo.)
+
+What the app *does* support today (capabilities, not a conformance claim):
+screen-reader (TalkBack) names on **all** interactive controls — including, since
+the sixth QA review, the calendar month/year navigation arrows, the
+drink-category icon, and every year heat-map day cell that carries data
+(`year_calendar_day_desc`); a per-app language selector with RTL support;
+`sp`-based text that honours the system font-scale (WCAG 1.4.4); and an
+under/over-limit palette that is **blue vs. red — not a red/green pair** — so it
+is colour-blind distinguishable.
+
+### Verified gaps toward Level AA (measured in the sixth QA review)
+
+Reaching full AA is a larger effort (roughly 1.5–2.5 person-weeks plus manual
+on-device assistive-technology testing that no sandbox check can replace). The
+concrete, measured gaps are:
+
+- **Non-text contrast (1.4.11, AA).** Empty heat-map cells
+  (`surfaceVariant`) sit at **1.1–1.3 : 1** against the background and the
+  "today" outline at **1.2–1.5 : 1** — both below the required 3 : 1. Needs a
+  heat-map palette rework for cell separation and the today indicator.
+- **Text contrast (1.4.3, AA).** The light-theme secondary caption colour
+  (`onSurfaceVariant`) is **4.39 : 1** (below 4.5 : 1 for small text); the
+  warning-red used as *text* is **3.25–4.23 : 1** in dark theme (fine as a
+  non-text indicator at ≥ 3 : 1, marginal as text).
+- **Target size (2.5.8, AA — new in 2.2).** The 10 dp heat-map day cells are
+  below the 24 px minimum; a ≥ 24 dp (ideally 48 dp) touch target should wrap the
+  10 dp visual. (Standard Material `IconButton`s already meet this.)
+- **Chart text alternative (1.1.1, A).** The on-screen bar/donut chart is a bare
+  `Canvas` with no `semantics`, so a screen reader gets nothing from it; it needs
+  a summary or per-bar semantics. (This is the Level-A blocker above.)
+- **Focus visibility / role (2.4.7 AA, 4.1.2 A).** The four custom
+  `clickable` heat-map/chart surfaces need a visible focus indicator and an
+  explicit `role = Button`.
+
+Each new user-facing string (e.g. a chart summary) triggers `LocaleSyncTest`
+across all locales, so these are i18n-touching changes, not one-liners.
+
+A lightweight regression guard exists in the meantime: `tools/release-check.sh`
+§13 fails the build if any `Icon` inside an `IconButton` is left with
+`contentDescription = null`, so the labels the project *has* added cannot silently
+regress. It is a labelling invariant only — it deliberately does **not** assert
+WCAG conformance, which (per W3C) a static check cannot.
 
 ## Finalize already-documented "Met" items
 

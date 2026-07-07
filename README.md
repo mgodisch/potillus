@@ -135,6 +135,24 @@ spectrum, including a Google Pixel 10 Pro running GrapheneOS (Android 16), a
 Fairphone 4 (Android 15), and a virtual Google Pixel 4 reference image (Android
 11).
 
+### Accessibility
+
+Libellus Potionis follows Android accessibility best practices: every
+interactive control carries a screen-reader (TalkBack) name — including the
+calendar navigation arrows, the drink-category icon, and each year heat-map day
+cell that holds data — text scales with the system font size (`sp` units), the
+layout mirrors for right-to-left languages, and the under/over-limit palette is
+blue vs. red (not a red/green pair) so it is colour-blind distinguishable. A
+release-check gate (§13) keeps interactive icons from silently losing their
+labels.
+
+**No formal WCAG conformance level is claimed and no W3C conformance logo is
+used**, because a conformance claim requires meeting *all* criteria of a level
+under a thorough human evaluation (which has not been done), there are known
+open Level AA items, and the W3C logos are scoped to web pages rather than a
+native app. The concrete, measured accessibility gaps and the path toward WCAG
+2.2 Level AA are tracked honestly in [`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility).
+
 ### Build Infrastructure & Tooling
 
 This project maintains a highly modern and robust build infrastructure by

@@ -108,6 +108,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">保存</string>
     <string name="cancel">取消</string>
     <string name="back">返回</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">上个月</string>
+    <string name="cd_next_month">下个月</string>
+    <string name="cd_prev_year">上一年</string>
+    <string name="cd_next_year">下一年</string>
     <string name="delete">删除</string>
     <string name="change">更改</string>
     <string name="delete_confirm">确定删除\u201c%1$s\u201d？</string>
@@ -166,6 +172,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">无记录</string>
     <string name="year_calendar_under_limit">低于限量</string>
     <string name="year_calendar_over_limit">超过限量</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">没有可导出的记录。</string>

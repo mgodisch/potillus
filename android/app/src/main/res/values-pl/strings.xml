@@ -91,6 +91,12 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="save">Zapisz</string>
     <string name="cancel">Anuluj</string>
     <string name="back">Wstecz</string>
+    <!-- Calendar month/year navigation: accessible names (contentDescription) for the
+         icon-only previous/next arrows. Screen-reader only; never shown on screen. -->
+    <string name="cd_prev_month">Poprzedni miesiąc</string>
+    <string name="cd_next_month">Następny miesiąc</string>
+    <string name="cd_prev_year">Poprzedni rok</string>
+    <string name="cd_next_year">Następny rok</string>
     <string name="delete">Usuń</string>
     <string name="change">Zmień</string>
     <string name="delete_confirm">Naprawdę usunąć \u201e%1$s\u201d?</string>
@@ -137,6 +143,11 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <string name="year_calendar_no_entry">brak wpisu</string>
     <string name="year_calendar_under_limit">poniżej limitu</string>
     <string name="year_calendar_over_limit">powyżej limitu</string>
+    <!-- Year heat-map: accessible label (contentDescription) for one day cell.
+         %1$s = localized date, %2$s = grams (locale-formatted), %3$s = status
+         caption. Locale-neutral skeleton; the words come from already-localized
+         sub-strings. Screen-reader only; never shown on screen. -->
+    <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Brak wpisów do eksportu.</string>
     <string name="export_failed">Eksport nie powiódł się.</string>
     <string name="backup_failed">Kopia zapasowa nie powiodła się.</string>
