@@ -235,6 +235,61 @@ class SettingsViewModelTest {
         }
     }
 
+    // ── Settings restore on import (applyImportedSettings) ──────────────────────
+
+    @Test fun `applyImportedSettings writes every field to prefs`() = runTest(dispatcher) {
+        val vm = buildVm()
+        val restored = AppSettings(
+            themeMode = ThemeMode.NIGHT,
+            dayChangeHour = 6,
+            dayChangeMinute = 30,
+            dailyLimitGrams = 24.0,
+            weeklyLimitGrams = 120.0,
+            maxDrinkDaysPerWeek = 3,
+            statsFromDate = "2024-01-15",
+            biometricEnabled = true,
+            allowScreenshots = true,
+            language = "de",
+            weightKg = 82.5,
+        )
+        vm.applyImportedSettings(restored)
+        val now = prefs.currentSettings
+        assertEquals(ThemeMode.NIGHT, now.themeMode)
+        assertEquals(6, now.dayChangeHour)
+        assertEquals(30, now.dayChangeMinute)
+        assertEquals(24.0, now.dailyLimitGrams, 0.0)
+        assertEquals(120.0, now.weeklyLimitGrams, 0.0)
+        assertEquals(3, now.maxDrinkDaysPerWeek)
+        assertEquals("2024-01-15", now.statsFromDate)
+        assertTrue(now.biometricEnabled)
+        assertTrue(now.allowScreenshots)
+        assertEquals("de", now.language)
+        assertEquals(82.5, now.weightKg, 0.0)
+    }
+
+    @Test fun `applyImportedSettings keeps weight unset when backup weight is zero`() = runTest(dispatcher) {
+        // weightKg 0.0 is the "not set" sentinel; applying it must NOT go through
+        // setWeightKg (which clamps to >= 1 kg) and fabricate a 1 kg body weight.
+        prefs = FakeAppPreferences(AppSettings(weightKg = 0.0))
+        val vm = buildVm()
+        vm.applyImportedSettings(AppSettings(weightKg = 0.0))
+        assertEquals(0.0, prefs.currentSettings.weightKg, 0.0)
+    }
+
+    @Test fun `applyImportedSettings leaves language untouched when backup language is blank`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(language = "en"))
+        val vm = buildVm()
+        vm.applyImportedSettings(AppSettings(language = ""))
+        assertEquals("en", prefs.currentSettings.language)
+    }
+
+    @Test fun `applyImportedSettings leaves stats-from date untouched when backup value is blank`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(statsFromDate = "2020-01-01"))
+        val vm = buildVm()
+        vm.applyImportedSettings(AppSettings(statsFromDate = ""))
+        assertEquals("2020-01-01", prefs.currentSettings.statsFromDate)
+    }
+
     // ── setBiometric ──────────────────────────────────────────────────────────
 
     @Test fun `setBiometric true writes to prefs`() = runTest(dispatcher) {

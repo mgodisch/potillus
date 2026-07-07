@@ -1,0 +1,1 @@
+Zálohy nyní obsahují také nastavení aplikace. Úplné obnovení (Nahradit) obnoví motiv, limity, čas změny dne, tělesnou hmotnost, jazyk a další — dříve se obnovovaly pouze nápoje a záznamy. Sloučení zachová stávající nastavení a pouze doplní data. Starší zálohy stále obnoví historii přesně jako dříve.

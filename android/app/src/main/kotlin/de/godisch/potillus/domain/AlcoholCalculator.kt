@@ -164,7 +164,14 @@ object AlcoholCalculator {
      */
     fun calculateGrams(volumeMl: Int, alcoholPercent: Double): Double {
         val rawGrams = volumeMl.toDouble() * (alcoholPercent / 100.0) * ETHANOL_DENSITY
-        return rawGrams.roundTo1Decimal()
+        val grams = rawGrams.roundTo1Decimal()
+        // Invariant: a real drink never has negative volume or ABV, so its pure-
+        // alcohol mass is never negative. Enabled under -ea during the test suite
+        // (see the ROADMAP dynamic-analysis item); a hit here would mean a negative
+        // volume/percent slipped past input validation. assert() is a no-op in
+        // release builds, so it costs shipped users nothing.
+        assert(grams >= 0.0) { "calculateGrams: negative grams $grams (volumeMl=$volumeMl, abv=$alcoholPercent)" }
+        return grams
     }
 
     /**
@@ -195,7 +202,11 @@ object AlcoholCalculator {
     ): Double {
         if (weightKg <= 0 || totalGrams <= 0) return 0.0
         val raw = (totalGrams / (weightKg * R_CONSERVATIVE)) - (BETA * hoursElapsed.coerceAtLeast(0.0))
-        return raw.coerceAtLeast(0.0).roundTo2Decimals()
+        val bac = raw.coerceAtLeast(0.0).roundTo2Decimals()
+        // Postcondition (see @return): the estimate is clamped to ≥ 0, so a BAC is
+        // never reported as negative. Verifies the coerceAtLeast above still holds.
+        assert(bac >= 0.0) { "calculateBAC: negative BAC $bac" }
+        return bac
     }
 
     // soberByMillis(bacPermille, nowMillis) has been removed: it was never
@@ -242,7 +253,12 @@ object AlcoholCalculator {
      */
     fun limitPercent(totalGrams: Double, limitGrams: Double): Float {
         if (limitGrams <= 0.0) return 0f
-        return (totalGrams / limitGrams).toFloat().coerceAtLeast(0f)
+        val fraction = (totalGrams / limitGrams).toFloat().coerceAtLeast(0f)
+        // Postcondition (see @return): the fill fraction is clamped to ≥ 0f, so it
+        // is always a valid LinearProgressIndicator input — even for a negative
+        // (already-cleared) gram total, as the limitPercent tests exercise.
+        assert(fraction >= 0f) { "limitPercent: negative fraction $fraction" }
+        return fraction
     }
 
     // bingeThreshold(gender) has been removed: the binge threshold is now the
@@ -324,7 +340,11 @@ object AlcoholCalculator {
      */
     private fun servingsFitting(remainingGrams: Double, gramsPerDrink: Double): Int {
         if (gramsPerDrink <= 0.0) return 0
-        return (remainingGrams.coerceAtLeast(0.0) / gramsPerDrink).toInt()
+        val count = (remainingGrams.coerceAtLeast(0.0) / gramsPerDrink).toInt()
+        // Invariant: the remaining budget is floored at 0 before the division, so
+        // the whole-serving count can never come out negative.
+        assert(count >= 0) { "servingsFitting: negative count $count" }
+        return count
     }
 
     /** Length of the gliding consumption window, in days (today + the previous 6). */
@@ -449,6 +469,10 @@ object AlcoholCalculator {
                 windowGrams -= days[left].second
                 left++
             }
+            // Two-pointer invariant: days are sorted ascending and windowStart is
+            // never after days[right], so the left pointer can never overtake right.
+            // A hit here would mean the sliding-window bookkeeping is broken.
+            assert(left <= right) { "countLimitViolations: window invariant left=$left > right=$right" }
 
             val windowDrinkDays = right - left + 1
             if (isOverLimit(windowGrams, weeklyLimitGrams)) daysOverWeekly++

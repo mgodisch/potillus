@@ -1,0 +1,1 @@
+I backup ora includono anche le impostazioni dell'app. Un ripristino completo (Sostituisci) riporta tema, limiti, ora di cambio giorno, peso corporeo, lingua e altro — prima venivano ripristinate solo bevande e voci. L'unione mantiene le impostazioni esistenti e aggiunge solo dati. I backup più vecchi ripristinano comunque la cronologia esattamente come prima.

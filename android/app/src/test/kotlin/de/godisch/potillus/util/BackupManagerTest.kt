@@ -36,6 +36,7 @@ package de.godisch.potillus.util
 //   version (2). Tests that need invalid values override specific fields.
 // =============================================================================
 
+import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.util.BackupManager.ImportError
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -270,6 +271,103 @@ class BackupManagerTest {
         assertEquals(7L, result.entries.first().drinkId)
     }
 
+    // ── Settings (backup format 3) ──────────────────────────────────────────────
+
+    @Test fun `version 2 backup without settings yields null settings`() {
+        val json = buildBackupJson(version = 2, drinks = listOf(drinkJson()), entries = listOf(entryJson()))
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertNull("Pre-v3 backups must not carry settings", result.settings)
+        assertEquals(1, result.drinks.size)
+    }
+
+    @Test fun `version 3 settings round-trip preserves all fields`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson())
+        val s = BackupManager.parseBackupJson(json).settings
+        assertNotNull("v3 backup must parse a settings object", s)
+        requireNotNull(s)
+        assertEquals(ThemeMode.NIGHT, s.themeMode)
+        assertEquals(6, s.dayChangeHour)
+        assertEquals(30, s.dayChangeMinute)
+        assertEquals(24.0, s.dailyLimitGrams, 0.0)
+        assertEquals(120.0, s.weeklyLimitGrams, 0.0)
+        assertEquals(3, s.maxDrinkDaysPerWeek)
+        assertEquals("2024-01-15", s.statsFromDate)
+        assertTrue(s.biometricEnabled)
+        assertTrue(s.allowScreenshots)
+        assertEquals("de", s.language)
+        assertEquals(82.5, s.weightKg, 0.0)
+    }
+
+    @Test fun `out-of-range numeric settings are clamped to the setter ranges`() {
+        val json = buildBackupJson(
+            version = 3,
+            settings = settingsJson(
+                dayChangeHour = 99,
+                dayChangeMinute = 99,
+                dailyLimitGrams = 9_999.0,
+                weeklyLimitGrams = 99_999.0,
+                maxDrinkDaysPerWeek = 99,
+                weightKg = 9_999.0,
+            ),
+        )
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(23, s.dayChangeHour)
+        assertEquals(59, s.dayChangeMinute)
+        assertEquals(500.0, s.dailyLimitGrams, 0.0)
+        assertEquals(3_500.0, s.weeklyLimitGrams, 0.0)
+        assertEquals(7, s.maxDrinkDaysPerWeek)
+        assertEquals(500.0, s.weightKg, 0.0)
+    }
+
+    @Test fun `unknown theme falls back to SYSTEM`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(themeMode = "TWILIGHT"))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(ThemeMode.SYSTEM, s.themeMode)
+    }
+
+    @Test fun `weight zero stays the unset sentinel`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(weightKg = 0.0))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(0.0, s.weightKg, 0.0)
+    }
+
+    @Test fun `non-finite weight degrades to unset`() {
+        val settings = """{"weightKg":1e309}"""
+        val json = buildBackupJson(version = 3, settings = settings)
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(0.0, s.weightKg, 0.0)
+    }
+
+    @Test fun `blank language stays the follow-system sentinel`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(language = ""))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals("", s.language)
+    }
+
+    @Test fun `non-canonical statsFromDate degrades to empty`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(statsFromDate = "2024-02-31"))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals("", s.statsFromDate)
+    }
+
+    @Test fun `malformed settings block never aborts the drink and entry import`() {
+        val settings = """{"dayChangeHour":"lots","weightKg":"heavy","themeMode":42}"""
+        val json = buildBackupJson(
+            version = 3,
+            drinks = listOf(drinkJson(name = "Stout")),
+            entries = listOf(entryJson(drinkName = "Stout")),
+            settings = settings,
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull("A bad settings block must not fail the whole import", result.error)
+        assertEquals("Stout", result.drinks.first().name)
+        val s = requireNotNull(result.settings)
+        assertEquals(ThemeMode.SYSTEM, s.themeMode)
+        assertEquals(4, s.dayChangeHour) // AppSettings default
+        assertEquals(0.0, s.weightKg, 0.0)
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun assertReadError(result: BackupManager.ImportResult) {
@@ -284,11 +382,38 @@ class BackupManagerTest {
         version: Int = 2,
         drinks: List<String> = emptyList(),
         entries: List<String> = emptyList(),
+        settings: String? = null,
     ): String {
         val drinksArr = drinks.joinToString(",", "[", "]")
         val entriesArr = entries.joinToString(",", "[", "]")
-        return """{"version":$version,"drinks":$drinksArr,"entries":$entriesArr}"""
+        val settingsPart = if (settings != null) ""","settings":$settings""" else ""
+        return """{"version":$version,"drinks":$drinksArr,"entries":$entriesArr$settingsPart}"""
     }
+
+    /**
+     * Builds a valid `"settings"` object string for a format-3 backup.
+     *
+     * Every field defaults to a distinctive, in-range value so a round-trip test
+     * can assert that each one survived the parse. Individual tests override a
+     * single field to exercise a clamp, an enum fallback or a sentinel.
+     */
+    private fun settingsJson(
+        themeMode: String = "NIGHT",
+        dayChangeHour: Int = 6,
+        dayChangeMinute: Int = 30,
+        dailyLimitGrams: Double = 24.0,
+        weeklyLimitGrams: Double = 120.0,
+        maxDrinkDaysPerWeek: Int = 3,
+        statsFromDate: String = "2024-01-15",
+        biometricEnabled: Boolean = true,
+        allowScreenshots: Boolean = true,
+        language: String = "de",
+        weightKg: Double = 82.5,
+    ) = """{"themeMode":"$themeMode","dayChangeHour":$dayChangeHour,"dayChangeMinute":$dayChangeMinute,""" +
+        """"dailyLimitGrams":$dailyLimitGrams,"weeklyLimitGrams":$weeklyLimitGrams,""" +
+        """"maxDrinkDaysPerWeek":$maxDrinkDaysPerWeek,"statsFromDate":"$statsFromDate",""" +
+        """"biometricEnabled":$biometricEnabled,"allowScreenshots":$allowScreenshots,""" +
+        """"language":"$language","weightKg":$weightKg}"""
 
     private fun drinkJson(
         id: Long = 1,

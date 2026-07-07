@@ -161,7 +161,11 @@ object DayResolver {
         val t = parseDate(today)
         if (f.isAfter(t)) return 0
         val completedDays = f.datesUntil(t).count().toInt() // [from, today) — excludes today
-        return completedDays + if (todayIsDrinkDay) 1 else 0
+        val days = completedDays + if (todayIsDrinkDay) 1 else 0
+        // Postcondition: the range is non-empty here (f ≤ t), so the effective day
+        // count is never negative; callers divide averages by it. Checked under -ea.
+        assert(days >= 0) { "effectivePeriodDays: negative count $days (from=$from, today=$today)" }
+        return days
     }
 
     /**
@@ -188,7 +192,12 @@ object DayResolver {
      *               device default locale.
      * @return ISO-8601 weekday number of the locale's first weekday (1..7).
      */
-    fun firstDayOfWeekIso(locale: Locale = Locale.getDefault()): Int = WeekFields.of(locale).firstDayOfWeek.value
+    fun firstDayOfWeekIso(locale: Locale = Locale.getDefault()): Int {
+        val iso = WeekFields.of(locale).firstDayOfWeek.value
+        // Invariant: an ISO-8601 weekday number is always in 1..7 (Mon..Sun).
+        assert(iso in 1..7) { "firstDayOfWeekIso: out-of-range ISO weekday $iso" }
+        return iso
+    }
 
     /**
      * Number of completed, alcohol-free days since the most recent drink (or since
@@ -235,8 +244,12 @@ object DayResolver {
         //     day, so the `- 1` drops it.
         // The guard above guarantees last < today, so the raw count is >= 1 and the
         // result is >= 0 (coerceAtLeast is defensive).
-        return (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
+        val streak = (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
             .coerceAtLeast(0)
+        // Postcondition (see @return): an abstinence streak is never negative; the
+        // coerceAtLeast is the guard and this verifies it under -ea.
+        assert(streak >= 0) { "computeCurrentAbstinence: negative streak $streak" }
+        return streak
     }
 
     /**

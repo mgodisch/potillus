@@ -133,7 +133,7 @@ debug:
 # SBOM. Needs a device (for the capture and the "Save as PDF" export).
 release:
 	$(MAKE) store-assets
-	$(MAKE) -C android release
+	$(MAKE) -C android bundle
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
 
@@ -470,7 +470,7 @@ store-assets:
 	trap 'rm -f "$(CASCADE_FG_STAMP)"' EXIT
 	@touch "$(CASCADE_FG_STAMP)"          # defer: neither producer renders early
 	$(MAKE) screenshots
-	$(MAKE) report-pdfs
+#	$(MAKE) report-pdfs
 	@rm -f "$(CASCADE_FG_STAMP)"           # arm the single real render
 	$(MAKE) _cascade-feature-graphics
 

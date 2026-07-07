@@ -1,0 +1,1 @@
+Backups now also include the app settings. A full restore (Replace) brings back the theme, limits, day-change time, body weight, language and more — previously only drinks and entries were restored. Merge keeps the existing settings and only adds data. Older backups still restore the history exactly as before.

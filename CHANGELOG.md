@@ -36,6 +36,50 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.80.0
+
+Include user settings in JSON backups
+
+The JSON backup now carries the user's settings, closing a data-loss gap:
+until now a "restore" on a fresh install brought back drinks and entries but
+silently reset every preference — including the body weight that feeds the
+blood-alcohol calculation — because the settings live in a separate encrypted
+DataStore that the backup never touched.
+
+- Backup format bumped from 2 to 3. The export writes a new top-level
+  `settings` object (theme, day-change time, daily/weekly limits, max drink
+  days per week, statistics start date, biometric lock, screenshot permission,
+  language and body weight). Older apps that only understand versions 1–2
+  reject a v3 file via the existing "version too high" guard rather than
+  dropping the settings unnoticed.
+- Restore semantics: a REPLACE import (full restore) applies the backup's
+  settings; a MERGE import keeps the local settings and only adds data, so it
+  never surprises the user by overwriting their current configuration. A
+  pre-v3 backup has no settings block and leaves the local settings untouched
+  in both modes — its drink/entry history still restores exactly as before.
+- On import the settings are validated defensively (enum fallback, range
+  clamping identical to the preference setters, canonical-date check for the
+  statistics start date), so a slightly corrupt or hand-edited backup can
+  never abort the restore of the primary drink/entry payload. The
+  `weightKg == 0` (not set) and `language == ""` (follow system) sentinels are
+  preserved rather than turned into a bogus 1 kg weight or an empty explicit
+  locale.
+- Restoring a language also re-applies it to the framework per-app locale
+  (AppCompatDelegate), matching what the in-app language picker does, so the
+  restored language takes effect immediately instead of drifting out of sync
+  with the stored preference.
+- Dynamic-analysis assertions: added `assert()` invariants to the domain layer
+  (`AlcoholCalculator`, `DayResolver`) — the non-negative grams / BAC / limit-
+  fraction / serving-count / streak / effective-day-count postconditions and the
+  countLimitViolations sliding-window invariant. They are checked under `-ea` in
+  the unit-test suite (fault detection during testing) and are no-ops in release
+  builds, addressing the gold `dynamic_analysis_enable_assertions` item.
+- Tests: settings round-trip and pre-v3 tolerance in BackupManagerTest;
+  REPLACE-applies / MERGE-keeps and the weight/language sentinel guards in
+  SettingsViewModelTest.
+
+---
+
 ## v0.79.0
 
 Work toward OpenSSF gold badge criteria

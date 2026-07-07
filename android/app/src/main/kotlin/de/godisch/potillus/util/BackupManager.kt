@@ -29,9 +29,11 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
+import de.godisch.potillus.domain.model.ThemeMode
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -54,11 +56,33 @@ import java.time.format.DateTimeFormatter
 //
 // BACKUP VERSIONING:
 //   The JSON root contains a "version" integer.
-//   BACKUP_VERSION = 2 (current).
+//   BACKUP_VERSION = 3 (current).
 //   Format 1: same structure but without the "category" field on
 //   drinks – optString("category", "OTHER") handles this transparently.
+//   Format 2: adds the "category" field on drinks.
+//   Format 3: adds a top-level "settings" object carrying the user's
+//   preferences (theme, limits, day-change time, body weight, language, …).
+//   A pre-v3 backup simply has no "settings" key; [parseBackupJson] then
+//   returns a null [ImportResult.settings] and the caller leaves the local
+//   settings untouched, so an old backup's drink/entry history still restores
+//   exactly as before.
 //   The importer rejects files with version > BACKUP_VERSION (written by a
 //   newer app) to avoid silently truncating unknown fields.
+//
+// WHY ARE SETTINGS PART OF THE BACKUP AT ALL?
+//   The preferences live in a SEPARATE, encrypted Jetpack DataStore
+//   ([de.godisch.potillus.data.prefs.AppPreferences]) – not in the Room
+//   database that supplies drinks/entries. Before format 3 the JSON backup only
+//   mirrored the database, so a "restore" on a fresh install silently dropped
+//   every preference (including the body weight that feeds the whole
+//   blood-alcohol calculation). Format 3 closes that data-loss gap.
+//
+// SETTINGS RESTORE (also handled in SettingsViewModel, not here):
+//   REPLACE – restores the backup's "settings" over the local preferences.
+//   MERGE   – KEEPS the local preferences and ignores the backup's "settings";
+//             a merge adds data only and must not surprise the user by
+//             overwriting their current theme, limits or body weight.
+//   A pre-v3 backup (no "settings" key) never changes settings in either mode.
 //
 // IMPORT MODES (handled in SettingsViewModel, not here):
 //   REPLACE – delete all local data, then import everything from the backup.
@@ -90,6 +114,9 @@ object BackupManager {
      * History:
      *   1 → initial format.
      *   2 → added the "category" field to drink objects.
+     *   3 → added the top-level "settings" object (user preferences). Older
+     *       apps that only know versions 1–2 reject a v3 file via the
+     *       VersionTooHigh guard rather than silently dropping the settings.
      *
      * BACKWARD-COMPATIBILITY FLOOR: since the first F-Droid release (v0.77.4) the
      * importer is guaranteed to read every backup written by v0.77.4 or newer —
@@ -97,7 +124,7 @@ object BackupManager {
      * default)`, and files from a newer app rejected with [ImportError.VersionTooHigh].
      * See CONTRIBUTING.md §8 (compatibility guarantee) and §8.3.
      */
-    private const val BACKUP_VERSION = 2
+    private const val BACKUP_VERSION = 3
 
     /**
      * Maximum accepted backup file size (10 MB).
@@ -122,10 +149,11 @@ object BackupManager {
      * The produced JSON structure:
      * ```json
      * {
-     *   "version": 2,
+     *   "version": 3,
      *   "exportedAt": "2025-05-26T14:30:00Z",
      *   "drinks": [ { "id": 1, "name": "Pils 0,5 l", … }, … ],
-     *   "entries": [ { "id": 1, "drinkId": 1, "gramsAlcohol": 19.6, … }, … ]
+     *   "entries": [ { "id": 1, "drinkId": 1, "gramsAlcohol": 19.6, … }, … ],
+     *   "settings": { "themeMode": "SYSTEM", "weightKg": 82.0, … }
      * }
      * ```
      *
@@ -135,6 +163,7 @@ object BackupManager {
      * @param context  Context for ContentResolver access.
      * @param drinks   Current drink catalogue (including presets).
      * @param entries  All consumption entries.
+     * @param settings Current user preferences snapshot to embed (format 3+).
      * @return [ExportResult] on success; `null` on I/O error.
      */
     @AndroidIoBound
@@ -142,6 +171,7 @@ object BackupManager {
         context: Context,
         drinks: List<DrinkDefinition>,
         entries: List<ConsumptionEntry>,
+        settings: AppSettings,
     ): ExportResult? {
         // Capture Instant.now() once so the file name and the
         // "exportedAt" field in the JSON root are guaranteed to match exactly,
@@ -193,6 +223,26 @@ object BackupManager {
                             },
                         )
                     }
+                },
+            )
+            put(
+                "settings",
+                // The user preferences live in a separate encrypted DataStore, so
+                // they must be serialised explicitly here (format 3+). Field names
+                // mirror [AppSettings]; enums are stored by their stable `name`.
+                // These keys are read back in [parseSettings] with the same names.
+                JSONObject().apply {
+                    put("themeMode", settings.themeMode.name)
+                    put("dayChangeHour", settings.dayChangeHour)
+                    put("dayChangeMinute", settings.dayChangeMinute)
+                    put("dailyLimitGrams", settings.dailyLimitGrams)
+                    put("weeklyLimitGrams", settings.weeklyLimitGrams)
+                    put("maxDrinkDaysPerWeek", settings.maxDrinkDaysPerWeek)
+                    put("statsFromDate", settings.statsFromDate)
+                    put("biometricEnabled", settings.biometricEnabled)
+                    put("allowScreenshots", settings.allowScreenshots)
+                    put("language", settings.language)
+                    put("weightKg", settings.weightKg)
                 },
             )
         }
@@ -280,12 +330,17 @@ object BackupManager {
      * @param entries        Parsed consumption entries; drinkId values reference
      *                       backup drink IDs and must be remapped by the caller.
      * @param sourceVersion  "version" field from the backup JSON.
+     * @param settings       Parsed user preferences, or `null` when the backup
+     *                       carries no "settings" object (any pre-v3 file). A
+     *                       `null` here MUST be treated as "do not touch the
+     *                       local settings", never as "reset to defaults".
      * @param error          Non-null when parsing failed.
      */
     data class ImportResult(
         val drinks: List<DrinkDefinition> = emptyList(),
         val entries: List<ConsumptionEntry> = emptyList(),
         val sourceVersion: Int = 1,
+        val settings: AppSettings? = null,
         val error: ImportError? = null,
     )
 
@@ -499,9 +554,84 @@ object BackupManager {
                 }
             }
 
-            ImportResult(drinks, entries, sourceVersion = version)
+            ImportResult(drinks, entries, sourceVersion = version, settings = parseSettings(root))
         } catch (e: Exception) {
             ImportResult(error = ImportError.ReadError(e.message))
         }
+    }
+
+    /**
+     * Parses the optional top-level `"settings"` object (backup format 3+).
+     *
+     * Returns `null` when the key is absent (any pre-v3 backup, or a v3 file that
+     * legitimately omits it) — the caller then leaves the local preferences
+     * untouched. When present, every field is read DEFENSIVELY: unknown, missing,
+     * non-finite or out-of-range values fall back to the [AppSettings] default or
+     * are clamped to the same ranges the [de.godisch.potillus.data.prefs.AppPreferences]
+     * setters enforce. This mirrors the tolerant reading already done in
+     * `AppPreferences.settingsFlow` and, crucially, means a malformed settings
+     * block can NEVER abort the surrounding import: the user's drink/entry history
+     * is the primary payload and must always restore, even from a slightly corrupt
+     * backup. Because of that contract this function never throws.
+     *
+     * Sentinels preserved on purpose:
+     *  - `weightKg == 0.0` means "not set" (the setter would clamp a real value to
+     *    ≥ 1 kg, so 0.0 must survive as-is rather than becoming a fake 1 kg body).
+     *  - `language == ""` means "follow the system language".
+     *  - `statsFromDate == ""` means "no explicit start date"; any non-empty value
+     *    must be a canonical ISO-8601 calendar date or it degrades back to "".
+     *
+     * @param root The parsed backup JSON root object.
+     * @return A validated [AppSettings], or `null` if no `"settings"` object exists.
+     */
+    private fun parseSettings(root: JSONObject): AppSettings? {
+        val obj = root.optJSONObject("settings") ?: return null
+        val def = AppSettings() // canonical defaults for any missing/invalid field
+
+        val theme = runCatching { ThemeMode.valueOf(obj.optString("themeMode", def.themeMode.name)) }
+            .getOrDefault(def.themeMode)
+
+        val daily = obj.optDouble("dailyLimitGrams", def.dailyLimitGrams)
+            .let { if (it.isFinite()) it.coerceIn(1.0, 500.0) else def.dailyLimitGrams }
+        val weekly = obj.optDouble("weeklyLimitGrams", def.weeklyLimitGrams)
+            .let { if (it.isFinite()) it.coerceIn(1.0, 3500.0) else def.weeklyLimitGrams }
+
+        // weightKg: keep the 0.0 "unset" sentinel; clamp a real value to 1..500 kg.
+        val rawWeight = obj.optDouble("weightKg", def.weightKg)
+        val weight = when {
+            !rawWeight.isFinite() -> def.weightKg // 0.0
+            rawWeight <= 0.0 -> 0.0 // preserve the unset sentinel
+            else -> rawWeight.coerceIn(1.0, 500.0)
+        }
+
+        // statsFromDate: "" stays "", otherwise require a canonical calendar date
+        // (same parse→format round-trip the entry loop uses) or degrade to "".
+        val statsFrom = obj.optString("statsFromDate", def.statsFromDate).let { raw ->
+            if (raw.isBlank()) {
+                ""
+            } else {
+                runCatching { DayResolver.formatDate(DayResolver.parseDate(raw)) == raw }
+                    .getOrDefault(false)
+                    .let { canonical -> if (canonical) raw else "" }
+            }
+        }
+
+        // language: a BCP-47 tag is short; reject an implausibly long value so a
+        // crafted backup cannot bloat the encrypted preferences file.
+        val language = obj.optString("language", def.language).let { if (it.length <= 35) it else "" }
+
+        return AppSettings(
+            themeMode = theme,
+            dayChangeHour = obj.optInt("dayChangeHour", def.dayChangeHour).coerceIn(0, 23),
+            dayChangeMinute = obj.optInt("dayChangeMinute", def.dayChangeMinute).coerceIn(0, 59),
+            dailyLimitGrams = daily,
+            weeklyLimitGrams = weekly,
+            maxDrinkDaysPerWeek = obj.optInt("maxDrinkDaysPerWeek", def.maxDrinkDaysPerWeek).coerceIn(1, 7),
+            statsFromDate = statsFrom,
+            biometricEnabled = obj.optBoolean("biometricEnabled", def.biometricEnabled),
+            allowScreenshots = obj.optBoolean("allowScreenshots", def.allowScreenshots),
+            language = language,
+            weightKg = weight,
+        )
     }
 }

@@ -1,0 +1,1 @@
+Os backups agora também incluem as configurações do app. Uma restauração completa (Substituir) recupera o tema, os limites, o horário de virada do dia, o peso corporal, o idioma e mais — antes, apenas bebidas e registros eram restaurados. A mesclagem mantém as configurações existentes e apenas adiciona dados. Backups antigos ainda restauram o histórico exatamente como antes.

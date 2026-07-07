@@ -1,0 +1,1 @@
+Kopie zapasowe zawierają teraz również ustawienia aplikacji. Pełne przywrócenie (Zastąp) przywraca motyw, limity, godzinę zmiany dnia, masę ciała, język i więcej — wcześniej przywracane były tylko napoje i wpisy. Scalanie zachowuje istniejące ustawienia i tylko dodaje dane. Starsze kopie zapasowe nadal przywracają historię dokładnie tak jak wcześniej.

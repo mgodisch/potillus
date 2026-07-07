@@ -1,0 +1,1 @@
+Copiile de rezervă includ acum și setările aplicației. O restaurare completă (Înlocuire) readuce tema, limitele, ora schimbării zilei, greutatea corporală, limba și altele — anterior se restaurau doar băuturile și înregistrările. Îmbinarea păstrează setările existente și adaugă doar date. Copiile mai vechi restaurează în continuare istoricul exact ca înainte.

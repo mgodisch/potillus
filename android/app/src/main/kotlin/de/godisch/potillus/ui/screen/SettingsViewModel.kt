@@ -54,7 +54,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Immutable
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.BuildConfig
@@ -227,8 +230,12 @@ class SettingsViewModel(
         viewModelScope.launch {
             val entries = entryRepo.getAll()
             val drinks = drinkRepo.drinks.first()
+            // The preferences live in a separate DataStore, so the backup only
+            // captures them if we read a snapshot here and hand it to the writer.
+            // Without this the exported JSON would omit every user setting.
+            val settings = prefs.settingsFlow.first()
             val result = withContext(Dispatchers.IO) {
-                BackupManager.exportToJson(appContext, drinks, entries)
+                BackupManager.exportToJson(appContext, drinks, entries, settings)
             }
             _exportStatus.value = if (result != null) {
                 _shareTarget.value = result
@@ -245,6 +252,12 @@ class SettingsViewModel(
      * Parsing/validation errors are mapped to a localised message; the actual
      * write (which spans both tables in one transaction) is delegated to
      * [backupRepo]. Updates [exportStatus] with a success or error message.
+     *
+     * SETTINGS RESTORE: for [ImportMode.REPLACE] (a full restore) the backup's
+     * preferences are applied via [applyImportedSettings]; for [ImportMode.MERGE]
+     * the local preferences are kept untouched. A pre-v3 backup carries no
+     * settings ([BackupManager.ImportResult.settings] is `null`) and changes
+     * nothing in either mode.
      *
      * @param uri  The content URI the user picked.
      * @param mode REPLACE (wipe then import) or MERGE (add, skipping duplicates).
@@ -273,6 +286,14 @@ class SettingsViewModel(
                     ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries)
                     ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries)
                 }
+
+                // Restore the preferences from the backup — but only for a full
+                // REPLACE. MERGE deliberately keeps the local settings (see the
+                // SETTINGS RESTORE note in BackupManager). A pre-v3 backup has
+                // result.settings == null and therefore changes nothing.
+                val restored = result.settings?.takeIf { mode == ImportMode.REPLACE }
+                if (restored != null) applyImportedSettings(restored)
+
                 _exportStatus.value = ExportStatus.Done(
                     if (mode == ImportMode.REPLACE) {
                         quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
@@ -280,11 +301,66 @@ class SettingsViewModel(
                         quantityStr(R.plurals.import_success_merge, stats.imported, stats.imported, stats.skipped)
                     },
                 )
+
+                // Keep the framework per-app locale in lock-step with the restored
+                // language preference, exactly as the Settings language picker and
+                // PotillusApp.applyLanguageOnFirstLaunch do. Writing only the
+                // DataStore side (in applyImportedSettings) would desynchronise the
+                // two, because AppCompatDelegate persists its own locale
+                // independently. setApplicationLocales recreates the Activity and
+                // must run on Main; the success state above lives in this ViewModel
+                // (which outlives the Activity), so it survives the recreation.
+                // The call sits in this framework-aware wrapper — not in the
+                // unit-tested applyImportedSettings — so that helper stays pure.
+                if (restored != null && restored.language.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(restored.language),
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) Log.e(TAG, "importBackup: unexpected error", e)
                 _exportStatus.value = ExportStatus.Err(str(R.string.import_error_read, ""))
             }
         }
+    }
+
+    /**
+     * Applies a restored [settings] snapshot to the persistent preferences.
+     *
+     * Called from [importBackup] on a REPLACE import. Kept as a small, pure
+     * (framework-free) helper so it can be unit-tested against a fake
+     * [IAppPreferences] without an Android runtime — the one framework side
+     * effect a language change needs (AppCompatDelegate) stays in the caller.
+     *
+     * Two sentinels are respected so a restore never fabricates data:
+     *  - `language == ""` (follow system) is NOT written back. The picker only
+     *    ever stores a concrete tag, and writing "" would be a redundant no-op
+     *    against the default; skipping it also means the [importBackup] locale
+     *    sync only fires for a real language.
+     *  - `weightKg == 0.0` (not set) is NOT written back, because
+     *    [IAppPreferences.setWeightKg] clamps to ≥ 1 kg and would otherwise turn
+     *    "unknown weight" into a bogus 1 kg body mass that feeds the BAC maths.
+     *
+     * All remaining values are written unconditionally; the setters re-clamp
+     * every numeric range, so this is idempotent and safe even for a backup that
+     * was hand-edited slightly out of range.
+     *
+     * @param settings The validated preferences parsed from the backup.
+     */
+    @VisibleForTesting
+    internal suspend fun applyImportedSettings(settings: AppSettings) {
+        prefs.setTheme(settings.themeMode)
+        prefs.setDayChangeTime(settings.dayChangeHour, settings.dayChangeMinute)
+        prefs.setDailyLimit(settings.dailyLimitGrams)
+        prefs.setWeeklyLimit(settings.weeklyLimitGrams)
+        prefs.setMaxDrinkDaysPerWeek(settings.maxDrinkDaysPerWeek)
+        prefs.setBiometric(settings.biometricEnabled)
+        prefs.setAllowScreenshots(settings.allowScreenshots)
+        if (settings.language.isNotEmpty()) prefs.setLanguage(settings.language)
+        if (settings.weightKg > 0.0) prefs.setWeightKg(settings.weightKg)
+        if (settings.statsFromDate.isNotBlank()) prefs.setStatsFromDate(settings.statsFromDate)
     }
 
     /** Resolves string resource [id] formatted with [args] via the injected [StringProvider]. */

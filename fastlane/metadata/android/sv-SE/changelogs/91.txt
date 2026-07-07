@@ -1,0 +1,1 @@
+Säkerhetskopior innehåller nu även appens inställningar. En fullständig återställning (Ersätt) återställer tema, gränser, tidpunkt för dygnsbyte, kroppsvikt, språk och mer — tidigare återställdes bara drycker och poster. Sammanfogning behåller de befintliga inställningarna och lägger bara till data. Äldre säkerhetskopior återställer fortfarande historiken exakt som förut.

@@ -1,0 +1,1 @@
+Sikkerhedskopier indeholder nu også appens indstillinger. En fuld gendannelse (Erstat) gendanner tema, grænser, tidspunkt for dagskifte, kropsvægt, sprog og mere — tidligere blev kun drikkevarer og registreringer gendannet. Fletning bevarer de eksisterende indstillinger og tilføjer kun data. Ældre sikkerhedskopier gendanner stadig historikken præcis som før.
