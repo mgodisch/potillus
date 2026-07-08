@@ -27,25 +27,65 @@ Prefer `make screenshots`, which also cleans the status bar (Demo Mode)
 
 and renders the PDF report pages as screenshots 07/08.
 
-### android deploy
+### android testing
 
 ```sh
-[bundle exec] fastlane android deploy
+[bundle exec] fastlane android testing
 ```
 
-Upload the SIGNED release App Bundle and the store metadata to Google Play.
+Upload the SIGNED release App Bundle to the closed-testing ALPHA track
 
-Build the bundle first with `make bundle` (needs a configured signing key,
+and OVERWRITE the store listing + release notes on Google Play (titles,
 
-see android/keystore.properties.example). Options (all optional):
+short/full descriptions, feature graphics, screenshots and changelogs
 
-  track:<name>   Play track to publish to (default: internal). Publishing to
+from fastlane/metadata/android/). Build the bundle first with
 
-                 production requires passing track:production explicitly.
+`make -C android bundle` (or `make release`); the Makefile `push-playstore`
 
-  status:<name>  release status: draft|completed|halted|inProgress (default: draft)
+target guards that prerequisite -- this lane does NOT build it.
 
-Example:  bundle exec fastlane deploy track:internal status:completed
+Options (all optional):
+
+  track:<name>   Play track (default: alpha). For production use the
+
+                 dedicated `production` lane below.
+
+  status:<name>  release status draft|completed|halted|inProgress
+
+                 (default: completed -- testing tracks expect completed).
+
+Example:  bundle exec fastlane testing track:beta status:draft
+
+### android production
+
+```sh
+[bundle exec] fastlane android production
+```
+
+Upload the SIGNED release App Bundle to the PRODUCTION track and OVERWRITE
+
+the store listing + release notes on Google Play. Same build prerequisite
+
+as `testing` (this lane does NOT build the AAB). Staged as a DRAFT by
+
+default: the release waits in the Play Console for you to review and
+
+publish manually, rather than going live automatically. NOTE: a new
+
+personal developer account cannot publish to production until the
+
+closed-testing gate is cleared (12 testers / 14 days -- docs/PLAY_STORE.md §5).
+
+Options (all optional):
+
+  track:<name>   Play track (default: production).
+
+  status:<name>  release status draft|completed|halted|inProgress
+
+                 (default: draft -- stage for manual review/publish).
+
+Example:  bundle exec fastlane production status:completed
 
 ----
 

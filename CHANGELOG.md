@@ -44,27 +44,34 @@ This release improves accessibility for colour-vision deficiency and for
 screen-reader users, addressing the roadmap's Level-A chart gap and the
 "Use of Color" concern on the traffic-light indicator.
 
-- Alternative status symbols (opt-in). A new switch under Settings →
-  Appearance makes the traffic-light capacity dot draw a distinct white glyph
-  inside its coloured circle in addition to the colour: a cross when the limit
-  is reached, a "1" when one serving remains, and an up-arrow when there is
-  room for more. This adds a shape cue on top of hue, so the three states are
-  distinguishable without relying on the red/yellow/green colours alone
-  (WCAG 1.4.1 "Use of Color"). It is off by default; the plain coloured sphere
-  is unchanged when the switch is off. The flag is `alternativeStatusSymbols`
-  in `AppSettings`, threaded from the setting through `TodayScreen`,
-  `DrinksScreen` and the log dialog into `TrafficLightDot`.
+- Alternative status symbols (opt-in). A switch under Settings → Appearance
+  makes the traffic-light capacity dot draw a distinct glyph inside its coloured
+  circle in addition to the colour: a cross when the limit is reached, a "1"
+  when one serving remains, and an up-arrow when there is room for more. This
+  adds a shape cue on top of hue, so the three states can be told apart without
+  relying on the red/yellow/green colours alone — an aid for red–green
+  colour-vision deficiency (WCAG 1.4.1 "Use of Color") when enabled. It is off
+  by default; the plain coloured sphere is shown until the user turns it on. The
+  flag is `alternativeStatusSymbols` in `AppSettings`, threaded from the setting
+  through `TodayScreen`, `DrinksScreen` and the log dialog into `TrafficLightDot`.
 - Screen-reader description for the capacity dot. `TrafficLightDot` now carries
   a localized `contentDescription` announcing the capacity state regardless of
   the symbol setting, so TalkBack conveys what sighted users read from the
-  colour/glyph. It uses `clearAndSetSemantics` so the bare "1" glyph is not
-  announced on its own.
+  colour/glyph. It uses `clearAndSetSemantics` so the dot reads as a single node
+  rather than leaking a raw glyph.
 - Chart text alternatives (WCAG 1.1.1, Level A). The three statistics charts —
   `AlcoholBarChart`, `ValueBarChart` and `CategoryDonutChart` — are drawn on a
   bare `Canvas` and were previously invisible to a screen reader. Each now
   exposes a summarising `contentDescription` via `semantics`; the generic
   `ValueBarChart` takes an optional caller-supplied label, which `StatsScreen`
   fills from the existing "time of day" and "weekday" section headings.
+- Custom clickable surfaces get a button role (WCAG 4.1.2 Name, Role, Value).
+  The calendar month-grid day cells and the year heat-map day cells are plain
+  `clickable` `Box`es; they now declare `role = Role.Button` so assistive tech
+  announces them as actionable. The month cells additionally gain a "date,
+  grams, status" `contentDescription` (reusing the year heat-map's caption
+  strings, so no new locale keys), exposing the over/under-limit state that was
+  previously conveyed only by the dot's colour.
 - Backups. The new preference is written into JSON backups within backup
   format 3 as an optional field, so no format bump is needed: an older
   format-3 backup that lacks the key restores with the setting defaulting to
@@ -76,6 +83,33 @@ screen-reader users, addressing the roadmap's Level-A chart gap and the
 - Tests. `SettingsViewModelTest` covers the new setter and its round-trip
   through restore; `BackupManagerTest` covers the settings round-trip with the
   new field and the tolerant default when a format-3 backup omits the key.
+- Docs. Added `docs/WCAG_LEVEL_A_CHECKLIST.md`, a manual WCAG 2.2 Level A
+  self-assessment protocol tailored to the app (per-criterion pass/fail, a
+  per-screen TalkBack walkthrough and a sign-off template) to guide the
+  on-device evaluation these accessibility changes prepare for.
+- Build & release tooling (Makefile / fastlane). Two new fastlane lanes in
+  `fastlane/Fastfile` upload the signed AAB together with the full store
+  metadata to Google Play: `testing` targets the closed-testing alpha track
+  (status completed) and `production` targets the production track staged as a
+  draft for manual review; both share a `private_lane :upload_release` helper
+  and neither builds the bundle. The root Makefile gained matching upload-only
+  targets `push-playstore` (drives the `testing` lane) and `push-codeberg`
+  (creates a Codeberg/Forgejo release for the already-pushed tag over the REST
+  API and attaches the release APK + SBOM). Both fail fast when a prerequisite
+  is missing and read their secrets from git-ignored files
+  (`fastlane/play-store-credentials.json`, `fastlane/codeberg-credentials.txt`).
+- Device-free default build. The on-device instrumentation tests were split out
+  of the default `debug` target into a separate `device-tests` target, so the
+  everyday build (release gate, lint, JVM unit tests, guide/copyright sync,
+  debug APK) no longer needs a device; `release` now refreshes the screenshots
+  and feature graphics and then builds the signed APK, AAB and SBOM in one step.
+- Makefile hygiene. Recipes now echo the commands they run (secrets stay in
+  shell variables, so no token value is printed); tool-presence checks were
+  reduced to plain `command -v` guards that fail fast under the Makefiles'
+  strict shell flags; a redundant `-` ignore-errors prefix was dropped from the
+  Demo-Mode tear-down, where the per-command `|| true` already makes each step
+  best-effort; and the in-Makefile target overviews / `help` texts were
+  brought back in sync with the current target set.
 
 ---
 

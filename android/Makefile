@@ -27,9 +27,10 @@ help:
 	@echo "  make debug          build debug APK"
 	@echo "  make release        build release APK (signed if a key is configured, else unsigned)"
 	@echo "  make bundle         build release App Bundle/AAB for Google Play (needs signing key)"
-	@echo "  make deploy         upload the signed AAB + metadata to Google Play (needs fastlane + key)"
+	@echo "  make deploy         upload the signed AAB + metadata to Google Play (fastlane 'testing' lane = closed alpha; needs key)"
 	@echo "  make sbom           generate the CycloneDX SBOM (reproducible JSON)"
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
+	@echo "  make lint           run ktlint + Android lint (build-breaking)"
 	@echo "  make guides         regenerate the localized user guides"
 	@echo "  make check-guides   verify guides and raw/copyright.md are in sync"
 	@echo "  make release-check  run the read-only release-readiness gate"
@@ -40,7 +41,7 @@ help:
 	@echo "  make install-debug  install debug APK on device (device needed)"
 	@echo "  make install        install debug APK on device (device needed)"
 	@echo "  make clean          clear the Gradle build cache"
-	@echo "  make dist-clean     clear all non-repo files"
+	@echo "  make distclean      clear all non-repo files"
 	@echo ""
 	@echo "Override the SDK path with:  make ANDROID_HOME=/path/to/android-sdk"
 	@echo "Skip the screenshot suite in a device-test run:  make test-device EXCLUDE_SCREENSHOTS=1"
@@ -236,14 +237,15 @@ bundle: prereq $(SBOM)
 	@echo "SBOM:        $(SBOM)  (attach to the Codeberg release)"
 
 # Upload the signed AAB and the store metadata to Google Play via the fastlane
-# `deploy` lane (see ../fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
+# `testing` lane (see ../fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
 # Requires: a configured signing key (keystore.properties / env), the bundled
 # fastlane (`cd ../fastlane && bundle install`), and a Play service-account key
 # (../fastlane/play-store-credentials.json or $SUPPLY_JSON_KEY — see ../fastlane/Appfile).
 # Runs fastlane in a SUBSHELL so the `cd ../fastlane` does not leak into make state.
-# Override the track/status, e.g.:  make deploy DEPLOY_ARGS="track:internal status:completed"
+# The `testing` lane defaults to the closed-testing alpha track (status completed);
+# override, e.g.:  make deploy DEPLOY_ARGS="track:internal status:completed"
 deploy: bundle
-	( cd ../fastlane && bundle exec fastlane deploy $(DEPLOY_ARGS) )
+	( cd ../fastlane && bundle exec fastlane testing $(DEPLOY_ARGS) )
 
 # Generate a standardized CycloneDX 1.6 JSON SBOM for the release runtime
 # classpath (configuration lives in app/build.gradle.kts). Two steps:

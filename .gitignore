@@ -20,8 +20,10 @@ __pycache__/
 /android/build
 /short
 
-# Release signing material and Play upload credentials — SECRET, never commit.
-# The committed templates are android/keystore.properties.example and the
-# SUPPLY_JSON_KEY note in fastlane/Appfile.
+# Release signing material and store upload credentials (Play + Codeberg) —
+# SECRET, never commit. The committed templates are
+# android/keystore.properties.example and the SUPPLY_JSON_KEY note in
+# fastlane/Appfile.
 /android/keystore.properties
 /fastlane/play-store-credentials.json
+/fastlane/codeberg-credentials.txt

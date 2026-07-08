@@ -310,6 +310,7 @@ class SettingsViewModelTest {
     // ── setAlternativeStatusSymbols ─────────────────────────────────────────────
 
     @Test fun `setAlternativeStatusSymbols true writes to prefs`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(alternativeStatusSymbols = false))
         val vm = buildVm()
         vm.setAlternativeStatusSymbols(true)
         assertTrue(prefs.currentSettings.alternativeStatusSymbols)

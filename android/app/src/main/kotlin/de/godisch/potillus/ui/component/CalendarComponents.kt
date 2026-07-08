@@ -55,7 +55,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
@@ -220,7 +222,7 @@ fun YearCalendarView(
                                                         Modifier.semantics { contentDescription = d }
                                                     } ?: Modifier,
                                                 )
-                                                .clickable(enabled = summary != null) { onDayClick(date) },
+                                                .clickable(enabled = summary != null, role = Role.Button) { onDayClick(date) },
                                         )
                                     }
                                 }

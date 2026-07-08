@@ -36,6 +36,7 @@ package de.godisch.potillus.util
 //   version (2). Tests that need invalid values override specific fields.
 // =============================================================================
 
+import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.util.BackupManager.ImportError
 import org.junit.Assert.assertEquals
@@ -300,16 +301,23 @@ class BackupManagerTest {
         assertTrue(s.alternativeStatusSymbols)
     }
 
-    @Test fun `version 3 backup without alternativeStatusSymbols key defaults to false`() {
+    @Test fun `version 3 backup without alternativeStatusSymbols key uses the default`() {
         // The field was added within format 3 as an OPTIONAL key (no version bump).
         // A format-3 backup written before it existed simply omits the key and must
-        // fall back to the canonical default rather than failing to parse.
+        // fall back to the canonical default (now true) rather than failing to parse.
         val settingsWithoutKey =
             """{"themeMode":"NIGHT","dayChangeHour":6,"dayChangeMinute":30,""" +
                 """"dailyLimitGrams":24.0,"weeklyLimitGrams":120.0,"maxDrinkDaysPerWeek":3,""" +
                 """"statsFromDate":"2024-01-15","biometricEnabled":true,"allowScreenshots":true,""" +
                 """"language":"de","weightKg":82.5}"""
         val json = buildBackupJson(version = 3, settings = settingsWithoutKey)
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(AppSettings().alternativeStatusSymbols, s.alternativeStatusSymbols)
+    }
+
+    @Test fun `alternativeStatusSymbols false in backup is preserved`() {
+        // An explicit false must survive the round-trip (not be masked by the default).
+        val json = buildBackupJson(version = 3, settings = settingsJson(alternativeStatusSymbols = false))
         val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
         assertEquals(false, s.alternativeStatusSymbols)
     }

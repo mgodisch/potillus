@@ -46,49 +46,75 @@ platform :android do
     capture_android_screenshots
   end
 
-  desc 'Upload the SIGNED release App Bundle and the store metadata to Google Play.'
-  desc 'Build the bundle first with `make bundle` (needs a configured signing key,'
-  desc 'see android/keystore.properties.example). Options (all optional):'
-  desc '  track:<name>   Play track to publish to (default: internal). Publishing to'
-  desc '                 production requires passing track:production explicitly.'
-  desc '  status:<name>  release status: draft|completed|halted|inProgress (default: draft)'
-  desc 'Example:  bundle exec fastlane deploy track:internal status:completed'
-  lane :deploy do |options|
-    # `upload_to_play_store` is the modern alias of the `supply` action. It reads
-    # the package_name and the service-account key from the Appfile, uploads the
-    # AAB produced by `./gradlew bundleRelease`, and syncs the listing texts,
-    # changelogs and images from fastlane/metadata/android/ — the SAME tree that
-    # F-Droid reads, so the two stores never diverge.
+  # ── upload_release ── the single upload_to_play_store call shared by the public
+  # `testing` and `production` lanes below. Only the track and release status differ
+  # between them, so the rest lives here ONCE (the same drift-avoidance principle
+  # the rest of the tooling follows). Private: not listed by `fastlane lanes` and
+  # not callable from the CLI -- go through `testing` / `production`.
+  #
+  # `upload_to_play_store` is the modern alias of the `supply` action. It reads the
+  # package_name and the service-account key from the Appfile, uploads the AAB
+  # produced by `./gradlew bundleRelease`, and syncs the listing texts, changelogs
+  # and images from fastlane/metadata/android/ -- the SAME tree F-Droid reads, so
+  # the two stores never diverge.
+  private_lane :upload_release do |options|
     upload_to_play_store(
       # AAB (not APK): Google Play requires the App Bundle format for new apps.
       aab: 'android/app/build/outputs/bundle/release/app-release.aab',
 
-      # Default to the INTERNAL testing track: it is the safe, low-blast-radius
-      # target, and a new personal developer account cannot publish to production
-      # at all until the closed-testing gate is cleared (12 testers / 14 days —
-      # see docs/PLAY_STORE.md §5). Reaching production is therefore a deliberate,
-      # explicit act: pass `track:production`. Staged rollouts use the same
-      # override (e.g. `track:closed`).
-      #
-      # `release_status: draft` keeps a production upload staged in the Play
-      # Console for manual review/publish instead of going live automatically.
-      # NOTE: the testing tracks (internal/closed) expect a COMPLETED release, so
-      # pair them with `status:completed` (as the Example line above shows); the
-      # draft default is meaningful for the production track.
-      track: options[:track] || 'internal',
-      release_status: options[:status] || 'draft',
+      # Track and release status are chosen by the calling lane.
+      track: options[:track],
+      release_status: options[:status],
 
       # We upload a bundle, never a bare APK, so disable the APK upload paths.
       skip_upload_apk: true,
 
-      # Sync the store listing from fastlane/metadata/android/. The full image set
-      # (icon, feature graphic and phone screenshots) is present, so images are
-      # pushed too. If you ever want to update only texts/changelogs, set
-      # skip_upload_images and skip_upload_screenshots to true.
+      # OVERWRITE the store listing from fastlane/metadata/android/: every skip_*
+      # is false, so the titles, descriptions, feature graphics, screenshots and
+      # changelogs are all (re)uploaded, replacing what is live -- making the repo
+      # the single source of truth for the listing on every track.
       skip_upload_metadata: false,
       skip_upload_changelogs: false,
       skip_upload_images: false,
       skip_upload_screenshots: false
+    )
+  end
+
+  desc 'Upload the SIGNED release App Bundle to the closed-testing ALPHA track'
+  desc 'and OVERWRITE the store listing + release notes on Google Play (titles,'
+  desc 'short/full descriptions, feature graphics, screenshots and changelogs'
+  desc 'from fastlane/metadata/android/). Build the bundle first with'
+  desc '`make -C android bundle` (or `make release`); the Makefile `push-playstore`'
+  desc 'target guards that prerequisite -- this lane does NOT build it.'
+  desc 'Options (all optional):'
+  desc '  track:<name>   Play track (default: alpha). For production use the'
+  desc '                 dedicated `production` lane below.'
+  desc '  status:<name>  release status draft|completed|halted|inProgress'
+  desc '                 (default: completed -- testing tracks expect completed).'
+  desc 'Example:  bundle exec fastlane testing track:beta status:draft'
+  lane :testing do |options|
+    upload_release(
+      track: options[:track] || 'alpha',
+      status: options[:status] || 'completed',
+    )
+  end
+
+  desc 'Upload the SIGNED release App Bundle to the PRODUCTION track and OVERWRITE'
+  desc 'the store listing + release notes on Google Play. Same build prerequisite'
+  desc 'as `testing` (this lane does NOT build the AAB). Staged as a DRAFT by'
+  desc 'default: the release waits in the Play Console for you to review and'
+  desc 'publish manually, rather than going live automatically. NOTE: a new'
+  desc 'personal developer account cannot publish to production until the'
+  desc 'closed-testing gate is cleared (12 testers / 14 days -- docs/PLAY_STORE.md §5).'
+  desc 'Options (all optional):'
+  desc '  track:<name>   Play track (default: production).'
+  desc '  status:<name>  release status draft|completed|halted|inProgress'
+  desc '                 (default: draft -- stage for manual review/publish).'
+  desc 'Example:  bundle exec fastlane production status:completed'
+  lane :production do |options|
+    upload_release(
+      track: options[:track] || 'production',
+      status: options[:status] || 'draft',
     )
   end
 end

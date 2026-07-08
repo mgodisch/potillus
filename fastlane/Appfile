@@ -24,7 +24,7 @@
 # WHAT THIS IS
 #   fastlane reads the Appfile automatically and uses it to identify the app and
 #   the credentials for the Google Play Developer API. It is consumed by the
-#   `deploy` lane in Fastfile (which calls `upload_to_play_store`/`supply`).
+#   `testing` lane in Fastfile (which calls `upload_to_play_store`/`supply`).
 #
 # package_name
 #   The applicationId of the RELEASE build (app/build.gradle.kts → applicationId).

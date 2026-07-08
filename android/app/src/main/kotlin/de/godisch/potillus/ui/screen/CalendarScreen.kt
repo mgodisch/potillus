@@ -39,6 +39,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -441,6 +445,9 @@ private fun MonthCalendar(
 
             // Capture composable color before the loop
             val overLimitColor = errorColor()
+            // Long, localized date used in each day cell's accessibility label
+            // (built once per grid composition rather than per cell).
+            val dayDescFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
 
             repeat(rows) { row ->
                 Row(Modifier.fillMaxWidth()) {
@@ -450,12 +457,37 @@ private fun MonthCalendar(
                             val date = DayResolver.formatDate(currentMonth.atDay(day))
                             val summary = daySummaries[date]
                             val isSelected = date == selectedDate
+                            // Accessibility label: the under/over-limit state is shown
+                            // on screen by the dot's COLOUR only, so a screen reader
+                            // would otherwise miss it (WCAG 1.4.1 / 1.1.1). Reuse the
+                            // year heat-map's "date, grams, status" caption strings so
+                            // no new locale keys are needed. Empty days stay unlabelled.
+                            val dayDesc: String? = summary?.let { s ->
+                                val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
+                                    R.string.year_calendar_over_limit
+                                } else {
+                                    R.string.year_calendar_under_limit
+                                }
+                                stringResource(
+                                    R.string.year_calendar_day_desc,
+                                    dayDescFmt.format(currentMonth.atDay(day)),
+                                    s.totalGrams.fmt0(locale),
+                                    stringResource(statusRes),
+                                )
+                            }
                             Box(
                                 modifier = Modifier
                                     .weight(1f).aspectRatio(1f)
                                     .clip(MaterialTheme.shapes.small)
                                     .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-                                    .clickable { onSelectDate(date) },
+                                    .then(
+                                        // Rich label for days with data; day-number text
+                                        // remains the name for empty days.
+                                        dayDesc?.let { d -> Modifier.semantics { contentDescription = d } } ?: Modifier,
+                                    )
+                                    // role = Button so assistive tech announces the cell as
+                                    // an actionable control (WCAG 4.1.2 Name, Role, Value).
+                                    .clickable(role = Role.Button) { onSelectDate(date) },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -23,10 +23,12 @@
 #
 #  TARGETS AT A GLANCE
 #    Convenience
-#      debug        (default) maximal on-device check + debug APK, then refresh
-#                   any feature graphics already on disk        [needs a device]
-#      release      fresh screenshots + feature graphics, then the signed APK
-#                   and its SBOM   [needs a device; supply report PDFs yourself]
+#      debug        (default) local checks (release-check, lint, unit tests,
+#                   guide sync) + debug APK, then refresh existing feature graphics
+#      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
+#                   split out of `debug`                          [needs a device]
+#      release      fresh screenshots + feature graphics (no new report PDFs),
+#                   then the signed release APK, AAB and SBOM      [needs a device]
 #      install      copy the freshly built debug APK to the local install path
 #    Store assets
 #      store-assets       full set in one go: screenshots + report-pdfs, then
@@ -43,6 +45,11 @@
 #    Packaging
 #      tgz          release source tarball (exclusions derived from .gitignore)
 #      push         git push + tags
+#    Publishing (upload already-built artifacts; these targets never build)
+#      push-playstore  upload the release AAB + store metadata to Google Play
+#                      via the fastlane `testing` lane (closed alpha) [AAB + key]
+#      push-codeberg   create the Codeberg release for the pushed tag and attach
+#                      the built APK + SBOM                    [tag + APK + SBOM]
 #    OpenSSF badge
 #      bestpractices-json  pull the badge answers from bestpractices.dev into
 #                          .bestpractices.json (site -> repo snapshot)
@@ -113,27 +120,36 @@ require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): f
 # =============================================================================
 
 # ── debug ── the everyday build. Maximal LOCAL verification, then the debug APK.
-# Runs (via android/) the release-check gate, Android lint, the JVM unit tests,
-# the on-device instrumentation tests and the guide/copyright sync check, then
-# builds the debug APK and refreshes any feature graphics that already exist. It
-# is deliberately incremental (no `clean`) for fast iteration, and needs a device
-# because the instrumentation tests do. It FAILS if any code or documentation
-# check would require a correction.
+# Runs (via android/) the release-check gate, Android lint, the JVM unit tests
+# and the guide/copyright sync check, then builds the debug APK and refreshes any
+# feature graphics that already exist. The on-device instrumentation tests are
+# NOT part of this target — they live in `device-tests` (run that separately when
+# a device is attached), so the default build no longer needs a device. It is
+# deliberately incremental (no `clean`) for fast iteration and FAILS if any code
+# or documentation check would require a correction.
 debug:
-	$(call require-device,debug)
-	$(MAKE) -C android debug test check-guides
+	$(MAKE) -C android debug unit-test lint check-guides
 	$(MAKE) feature-graphics-existing
 	$(MAKE) install
 
-# ── release ── refresh the store assets, then build the signed APK + SBOM.
-# `store-assets` recaptures every locale's in-app screenshots (01..06), drives
-# the human-in-the-loop report-PDF export and rasterizes the report pages
-# (07..08), then renders every feature graphic exactly once; the android
-# `release` target produces the signed release APK together with its CycloneDX
-# SBOM. Needs a device (for the capture and the "Save as PDF" export).
+# ── device-tests ── the on-device instrumentation tests (Compose UI / Espresso),
+# split out of `debug` so the default build runs device-free. Delegates to the
+# android `test-device` target (./gradlew connectedDebugAndroidTest), which wakes
+# the device and asserts one is attached before running.
+device-tests:
+	$(MAKE) -C android test-device
+
+# ── release ── fresh in-app screenshots (01..06) + feature graphics WITHOUT
+# re-exporting the report PDFs (07/08 are left as-is), then build the signed
+# release APK, the release AAB and the shared SBOM. `screenshots` recaptures
+# every locale's in-app shots and refreshes the feature graphics but does NOT
+# touch the report pages 07/08 or their source PDFs; the android `release` and
+# `bundle` targets then produce the release APK and AAB. Both depend on the same
+# `$(SBOM)` file target, so the CycloneDX SBOM is generated exactly once. Needs a
+# device (for the capture).
 release:
-	$(MAKE) store-assets
-	$(MAKE) -C android bundle
+	$(MAKE) screenshots
+	$(MAKE) -C android release bundle
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
 
@@ -287,12 +303,12 @@ screenshots-crop:
 # tolerant (|| true) so tear-down never fails the build; invoked from the
 # `screenshots` EXIT trap.
 screenshots-demo-off:
-	-adb shell am broadcast -a com.android.systemui.demo -e command exit || true
-	-adb shell settings put global sysui_demo_allowed 0 || true
-	-adb shell settings put global auto_time 1 || true
-	-adb shell settings put global window_animation_scale 1 || true
-	-adb shell settings put global transition_animation_scale 1 || true
-	-adb shell settings put global animator_duration_scale 1 || true
+	adb shell am broadcast -a com.android.systemui.demo -e command exit || true
+	adb shell settings put global sysui_demo_allowed 0 || true
+	adb shell settings put global auto_time 1 || true
+	adb shell settings put global window_animation_scale 1 || true
+	adb shell settings put global transition_animation_scale 1 || true
+	adb shell settings put global animator_duration_scale 1 || true
 
 # =============================================================================
 # REPORT PAGES & FEATURE GRAPHICS  (dependency pipeline)
@@ -447,7 +463,7 @@ CASCADE_FG_STAMP := android/app/build/.feature-graphics-cascaded
 # Internal: render feature-graphics unless this run already did (or was told to
 # defer by store-assets). Not for direct use.
 _cascade-feature-graphics:
-	@if [ -f "$(CASCADE_FG_STAMP)" ]; then \
+	if [ -f "$(CASCADE_FG_STAMP)" ]; then \
 	    echo "feature-graphics: already refreshed in this run — skipping duplicate cascade."; \
 	else \
 	    mkdir -p "$(dir $(CASCADE_FG_STAMP))"; \
@@ -633,6 +649,79 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 push:
 	git push && git push --tags
 
+# ── push-playstore ── upload the ALREADY-BUILT release AAB to Google Play and
+# OVERWRITE the store listing there (localized titles, short/full descriptions,
+# feature graphics, screenshots) plus the release notes, from
+# fastlane/metadata/android/. The fastlane OPTIONS (track alpha, status
+# completed, metadata-overwriting) live in the fastlane `testing` lane, NOT here —
+# override them there or via `fastlane testing track:...`.
+#
+# DELIBERATELY NOT A DEPENDENCY BUILD: this target has NO prerequisites, so it
+# never triggers a rebuild of the AAB or SBOM. It FAILS FAST if a precondition
+# is missing — the signed AAB, the bundled fastlane, or the Play service-account
+# key — so the push only runs against artifacts you built explicitly
+# (`make release`, or `make -C android bundle`) with credentials in place. Build
+# the AAB yourself first; this target purely uploads it.
+#
+# The credential path mirrors the Appfile: SUPPLY_JSON_KEY if set, else
+# fastlane/play-store-credentials.json.
+PLAYSTORE_AAB := android/app/build/outputs/bundle/release/app-release.aab
+push-playstore:
+	test -f "$(PLAYSTORE_AAB)" || { echo "push-playstore: release AAB not found at '$(PLAYSTORE_AAB)' -- build it first with 'make release' or 'make -C android bundle'. This target does NOT build it." >&2; exit 1; }
+	command -v bundle
+	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
+	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
+	( cd fastlane && bundle exec fastlane testing )
+
+# ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
+# release tag from the command line instead of the web UI, and attach the built
+# APK + SBOM. It uses the Forgejo REST API (Gitea-compatible): one POST creates
+# the release, two more upload the assets. Title is "Libellus Potionis vX.Y.Z"
+# and the body is the en-US Play release notes for this versionCode.
+#
+# Like push-playstore, this has NO build prerequisites and never builds: it FAILS
+# FAST if the tag, the APK, the SBOM, the release notes, curl/python3 or the
+# Codeberg token file are missing. Build the artifacts first (`make release`) and
+# push the tag first (`git tag -s vX.Y.Z ... && make push`); this only publishes.
+#
+# The Codeberg access token is READ FROM $(CODEBERG_TOKEN_FILE) (Settings ->
+# Applications, repository read+write scope). That file is a SECRET, git-ignored
+# and never committed -- mirroring the Play service-account key. The recipe's
+# commands are echoed (so you can see what runs), but that does NOT leak the
+# token: it lives in a SHELL variable -- written $$token in the recipe, i.e. the
+# shell's own $token -- read from the file at run time. make expands its own
+# make-variables when it echoes a line, but never shell-variables, so the echo
+# shows the literal "$token" and never the token VALUE.
+CODEBERG_API  := https://codeberg.org/api/v1
+CODEBERG_REPO := godisch/potillus
+CODEBERG_TOKEN_FILE := fastlane/codeberg-credentials.txt
+RELEASE_SBOM  := android/app/build/outputs/sbom/libellus-potionis-sbom.json
+VERSION_CODE  := $(shell grep -oE 'versionCode *= *[0-9]+' android/app/build.gradle.kts | grep -oE '[0-9]+' | head -1)
+push-codeberg:
+	command -v curl
+	command -v python3
+	@test -f "$(CODEBERG_TOKEN_FILE)" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' not found -- create it containing your Codeberg access token (Settings > Applications, repository read+write scope). It is git-ignored." >&2; exit 1; }
+	token="$$(tr -d '[:space:]' < "$(CODEBERG_TOKEN_FILE)")"
+	@test -n "$$token" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' is empty." >&2; exit 1; }
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
+	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
+	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
+	apk="$$(find android/app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' 2>/dev/null | sort | tail -1)"
+	@test -n "$$apk" || { echo "push-codeberg: no release APK under android/app/build/outputs/apk/release -- build it first with 'make release'. This target does NOT build it." >&2; exit 1; }
+	@test -f "$(RELEASE_SBOM)" || { echo "push-codeberg: SBOM '$(RELEASE_SBOM)' not found -- build it first with 'make release' (or 'make -C android sbom')." >&2; exit 1; }
+	# 1) Create the release for the existing tag; capture its numeric id. The body
+	#    is JSON-encoded from the en-US release-notes file (handles quotes/newlines).
+	body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
+	payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","body":%s,"draft":false,"prerelease":false}' "$(VERSION)" "$(VERSION)" "$$body")"
+	rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+	echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
+	# 2) Attach the APK and the SBOM as release assets (name= sets the asset name).
+	curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -F "attachment=@$$apk" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION).apk" >/dev/null
+	echo "push-codeberg: attached $$(basename "$$apk") as potillus-$(VERSION).apk"
+	curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -F "attachment=@$(RELEASE_SBOM)" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION)-sbom.json" >/dev/null
+	echo "push-codeberg: attached SBOM as potillus-$(VERSION)-sbom.json"
+	echo "push-codeberg: done -> https://codeberg.org/$(CODEBERG_REPO)/releases/tag/v$(VERSION)"
+
 # =============================================================================
 # OPENSSF BEST PRACTICES BADGE
 # =============================================================================
@@ -653,7 +742,7 @@ BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
 # _justification), sorted, so the committed snapshot diffs meaningfully. Review
 # `git diff .bestpractices.json` before committing.
 bestpractices-json:
-	@command -v curl >/dev/null || { echo "bestpractices-json: 'curl' not found — install it (Debian: apt install curl)"; exit 1; }
+	command -v curl
 	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 -c 'import json,sys; d=json.load(sys.stdin); a={k[:-7] for k,v in d.items() if k.endswith("_status") and str(v).strip() in {"Met","Unmet","N/A"}}; o={k:v for k,v in d.items() if (k.endswith("_status") and k[:-7] in a) or (k.endswith("_justification") and k[:-14] in a)}; json.dump(dict(sorted(o.items())), open(".bestpractices.json","w",encoding="utf-8"), indent=2, ensure_ascii=False); open(".bestpractices.json","a",encoding="utf-8").write(chr(10)); print("bestpractices-json: %d criteria written"%len(a), file=sys.stderr)'
 	@echo "bestpractices-json: review 'git diff .bestpractices.json' before committing."
 
@@ -669,4 +758,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug release install store-assets screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push bestpractices-json clean distclean
+.PHONY: debug device-tests release install store-assets screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

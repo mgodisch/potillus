@@ -398,16 +398,19 @@ fun LimitBar(
  *     semi-transparent white highlight spot in the upper-left quadrant, which
  *     simulates a point light source at 10 o'clock and gives a convex ball look
  *     without a shader or bitmap resource.
- *   - `true` — a *flat* coloured circle carrying a white glyph that redundantly
+ *   - `true` — a *flat* coloured circle carrying a glyph that redundantly
  *     encodes the same state by SHAPE, so the indicator no longer relies on hue
  *     alone (WCAG 1.4.1 "Use of Color", an aid for red–green colour-vision
- *     deficiency): a cross for RED, a "1" for YELLOW, an up-arrow for GREEN.
+ *     deficiency): a cross for RED, a "1" for YELLOW, an up-arrow for GREEN. The
+ *     glyph colour is chosen for contrast — white on the dark RED dot, black on
+ *     the lighter GREEN/YELLOW dots.
  *     The specular highlight is dropped in this style so it does not compete
  *     with the glyph. RED/GREEN are drawn as vector [Icon]s overlaid on the
  *     circle; the YELLOW "1" is drawn straight onto the [Canvas] and centred via
  *     the font metrics (baseline = centre − (ascent + descent) / 2), because an
- *     overlaid [Text] sits a hair too low inside the small box. The user opts in
- *     via Settings → Appearance; the flag is threaded down from
+ *     overlaid [Text] sits a hair too low inside the small box. Off by default;
+ *     the user opts in under Settings → Appearance, which shows the glyphs and
+ *     drops the plain sphere. The flag is threaded down from
  *     [de.godisch.potillus.domain.model.AppSettings.alternativeStatusSymbols].
  *
  * ACCESSIBILITY (independent of [useSymbols]):
@@ -491,7 +494,10 @@ fun TrafficLightDot(
             if (useSymbols && light == TrafficLight.YELLOW) {
                 val glyphPaint = android.graphics.Paint().apply {
                     isAntiAlias = true
-                    color = android.graphics.Color.WHITE
+                    // Black on the lighter yellow dot for better contrast than white
+                    // (the GREEN arrow is black too; only the dark RED dot keeps a
+                    // white glyph).
+                    color = android.graphics.Color.BLACK
                     textAlign = android.graphics.Paint.Align.CENTER
                     // 8 sp (a touch smaller than the 10 dp vector icons) at normal
                     // weight: synthetic bold (isFakeBoldText) thickened the strokes
@@ -504,10 +510,10 @@ fun TrafficLightDot(
         }
 
         // Redundant SHAPE cue for colour-vision deficiency. RED/GREEN are vector
-        // icons overlaid on the circle; contentDescription = null because the
-        // parent Box already carries the single, meaningful description. YELLOW's
-        // "1" is drawn on the canvas above (font-metric centring), so it is a no-op
-        // here.
+        // icons overlaid on the circle; YELLOW's "1" is drawn on the canvas above.
+        // contentDescription = null because the parent Box already carries the single,
+        // meaningful description. Glyph colour is chosen for contrast: white on the
+        // dark RED dot, black on the lighter GREEN/YELLOW dots.
         if (useSymbols) {
             when (light) {
                 TrafficLight.RED -> Icon(
@@ -519,7 +525,7 @@ fun TrafficLightDot(
                 TrafficLight.GREEN -> Icon(
                     imageVector = Icons.Filled.ArrowUpward,
                     contentDescription = null,
-                    tint = glyphColor,
+                    tint = androidx.compose.ui.graphics.Color.Black,
                     modifier = Modifier.size(10.dp),
                 )
                 TrafficLight.YELLOW -> Unit
