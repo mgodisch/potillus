@@ -218,4 +218,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="many">%1$d dias</item>
         <item quantity="other">%1$d dias</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Dentro dos seus limites</string>
+    <string name="capacity_status_low">Quase no seu limite</string>
+    <string name="capacity_status_reached">Limite atingido</string>
+    <string name="alt_status_symbols">Símbolos de estado alternativos</string>
+    <string name="alt_status_symbols_desc">Mostrar uma forma (cruz, 1, seta) no ponto de estado além da cor</string>
+    <string name="chart_desc_daily_avg">Gráfico de barras do álcool médio por dia</string>
+    <string name="chart_desc_value_bars">Gráfico de barras</string>
+    <string name="chart_desc_categories">Gráfico em anel de categorias de bebidas</string>
 </resources>

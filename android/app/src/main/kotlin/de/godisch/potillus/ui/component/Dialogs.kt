@@ -84,6 +84,9 @@ import java.time.ZoneOffset
  *                         the quick-bar tap or the DrinksScreen card tap).
  * @param capacity         Today's consumption context for the traffic-light dot.
  *                         Pass null (default) to suppress the indicator.
+ * @param useStatusSymbols When true, the traffic-light dot draws its accessible
+ *                         glyph variant (cross / "1" / up-arrow) in addition to
+ *                         the colour; forwarded to [TrafficLightDot.useSymbols].
  * @param onSave           Called with (drink, volumeMl, timestampMs, note) on confirm.
  * @param onDismiss        Called when the user cancels or taps outside.
  */
@@ -94,6 +97,7 @@ fun AddEditEntryDialog(
     drinks: List<DrinkDefinition>,
     preSelectedDrink: DrinkDefinition? = null,
     capacity: DrinkCapacity? = null,
+    useStatusSymbols: Boolean = false,
     onSave: (DrinkDefinition, Int, Long, String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -241,6 +245,7 @@ fun AddEditEntryDialog(
                                 TrafficLightDot(
                                     light = trafficLight,
                                     modifier = Modifier.padding(start = 4.dp),
+                                    useSymbols = useStatusSymbols,
                                 )
                             }
                         }

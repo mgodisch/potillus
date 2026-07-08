@@ -419,6 +419,24 @@ fun SettingsScreen(
             }
             item {
                 SettingsCard {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.alt_status_symbols), style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                stringResource(R.string.alt_status_symbols_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(
+                            checked = settings.alternativeStatusSymbols,
+                            onCheckedChange = { vm.setAlternativeStatusSymbols(it) },
+                        )
+                    }
+                }
+            }
+            item {
+                SettingsCard {
                     Text(stringResource(R.string.language), style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.height(8.dp))
                     LanguageDropdown(

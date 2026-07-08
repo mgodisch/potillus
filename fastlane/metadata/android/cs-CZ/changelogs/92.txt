@@ -1,0 +1,1 @@
+Nové možnosti přístupnosti. Ukazatel kapacity nyní může kromě barvy zobrazit i tvar (křížek, 1 nebo šipku) – zapněte jej v Nastavení → Vzhled jako pomoc při červeno-zelené barvosleposti. Grafy statistik nyní poskytují textový popis pro čtečky obrazovky.

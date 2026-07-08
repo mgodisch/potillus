@@ -221,4 +221,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="many">%1$d dni</item>
         <item quantity="other">%1$d dnia</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">W granicach limitu</string>
+    <string name="capacity_status_low">Prawie na granicy limitu</string>
+    <string name="capacity_status_reached">Osiągnięto limit</string>
+    <string name="alt_status_symbols">Alternatywne symbole stanu</string>
+    <string name="alt_status_symbols_desc">Oprócz koloru pokaż w kropce stanu kształt (krzyżyk, 1, strzałkę)</string>
+    <string name="chart_desc_daily_avg">Wykres słupkowy średniego alkoholu na dzień</string>
+    <string name="chart_desc_value_bars">Wykres słupkowy</string>
+    <string name="chart_desc_categories">Wykres pierścieniowy kategorii napojów</string>
 </resources>

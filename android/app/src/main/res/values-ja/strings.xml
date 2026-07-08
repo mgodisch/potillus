@@ -259,4 +259,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <plurals name="days">
         <item quantity="other">%1$d日</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">上限の範囲内です</string>
+    <string name="capacity_status_low">上限まであとわずかです</string>
+    <string name="capacity_status_reached">上限に達しました</string>
+    <string name="alt_status_symbols">代替ステータス記号</string>
+    <string name="alt_status_symbols_desc">色に加えて、状態のドット内に記号（×、1、矢印）を表示します</string>
+    <string name="chart_desc_daily_avg">1日あたりの平均アルコール量の棒グラフ</string>
+    <string name="chart_desc_value_bars">棒グラフ</string>
+    <string name="chart_desc_categories">飲料カテゴリのドーナツグラフ</string>
 </resources>

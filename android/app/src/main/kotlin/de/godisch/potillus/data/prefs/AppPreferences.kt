@@ -276,6 +276,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
         internal val KEY_MAX_DRINK_DAYS = intPreferencesKey("custom_max_drink_days")
         internal val KEY_BIOMETRIC = booleanPreferencesKey("biometric_lock")
         internal val KEY_ALLOW_SCREENSHOTS = booleanPreferencesKey("allow_screenshots")
+        internal val KEY_ALT_STATUS_SYMBOLS = booleanPreferencesKey("alt_status_symbols")
         internal val KEY_LANGUAGE = stringPreferencesKey("language")
         internal val KEY_WEIGHT_KG = doublePreferencesKey("weight_kg")
         internal val KEY_STATS_FROM = stringPreferencesKey("stats_from_date")
@@ -373,6 +374,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
             maxDrinkDaysPerWeek = prefs[KEY_MAX_DRINK_DAYS] ?: 5,
             biometricEnabled = prefs[KEY_BIOMETRIC] ?: false,
             allowScreenshots = prefs[KEY_ALLOW_SCREENSHOTS] ?: false,
+            alternativeStatusSymbols = prefs[KEY_ALT_STATUS_SYMBOLS] ?: false,
             language = prefs[KEY_LANGUAGE] ?: "",
             weightKg = prefs[KEY_WEIGHT_KG] ?: 0.0,
             statsFromDate = prefs[KEY_STATS_FROM] ?: installDate,
@@ -395,6 +397,7 @@ class AppPreferences(private val context: Context) : IAppPreferences {
     override suspend fun setWeeklyLimit(g: Double) = save { it[KEY_WEEKLY_LIMIT] = g.coerceIn(1.0, 3500.0) }
     override suspend fun setBiometric(v: Boolean) = save { it[KEY_BIOMETRIC] = v }
     override suspend fun setAllowScreenshots(v: Boolean) = save { it[KEY_ALLOW_SCREENSHOTS] = v }
+    override suspend fun setAlternativeStatusSymbols(v: Boolean) = save { it[KEY_ALT_STATUS_SYMBOLS] = v }
     override suspend fun setLanguage(lang: String) = save { it[KEY_LANGUAGE] = lang }
     override suspend fun setWeightKg(kg: Double) = save { it[KEY_WEIGHT_KG] = kg.coerceIn(1.0, 500.0) }
     override suspend fun setMaxDrinkDaysPerWeek(days: Int) = save { it[KEY_MAX_DRINK_DAYS] = days.coerceIn(1, 7) }

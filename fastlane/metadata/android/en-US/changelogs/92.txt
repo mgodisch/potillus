@@ -1,0 +1,1 @@
+New accessibility options. The capacity indicator can now show a shape (cross, 1 or arrow) in addition to its colour — enable it under Settings → Appearance to help with red–green colour-vision deficiency. The statistics charts now provide a text description for screen readers.

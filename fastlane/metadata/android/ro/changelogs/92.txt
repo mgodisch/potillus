@@ -1,0 +1,1 @@
+Noi opțiuni de accesibilitate. Indicatorul de capacitate poate afișa acum o formă (cruce, 1 sau săgeată) pe lângă culoare – activează-l din Setări → Aspect ca ajutor pentru daltonismul roșu-verde. Graficele de statistici oferă acum o descriere text pentru cititoarele de ecran.

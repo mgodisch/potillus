@@ -50,9 +50,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -378,62 +381,150 @@ fun LimitBar(
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * A 12 dp sphere-shaped indicator showing how many more servings of a drink
- * can be logged before the active limits are exceeded.
+ * A 12 dp indicator showing how many more servings of a drink can be logged
+ * before the active limits are exceeded.
  *
- * Colour semantics:
- *   - [TrafficLight.GREEN]  → two or more servings remain.
- *   - [TrafficLight.YELLOW] → exactly one serving remains.
+ * COLOUR SEMANTICS (always applied):
+ *   - [TrafficLight.GREEN]  → two or more servings remain (uses [successColor]).
+ *   - [TrafficLight.YELLOW] → exactly one serving remains (uses [warningColor]).
  *   - [TrafficLight.RED]    → no servings remain (uses [dangerRedColor]).
  *
- * 3-D EFFECT:
- *   Rendered on a [Canvas] with two draw calls:
- *   1. Base filled circle in the status colour.
- *   2. A semi-transparent white highlight spot placed in the upper-left
- *      quadrant, simulating a point light source at 10 o'clock.
- *   This gives a subtle sphere/ball appearance without requiring a shader or
- *   bitmap resource.
+ *   These three colours are the same palette used by the calendar over-limit
+ *   dots and the delete-action icon, keeping every status cue in the app
+ *   visually consistent.
  *
- * All three colours (red, yellow, green) use [dangerRedColor], [warningColor],
- * and [successColor] respectively – the same palette used by calendar
- * over-limit dots and the delete-action icon, ensuring visual consistency.
+ * TWO VISUAL STYLES, selected by [useSymbols]:
+ *   - `false` (default) — a coloured *sphere*: a filled base circle plus a
+ *     semi-transparent white highlight spot in the upper-left quadrant, which
+ *     simulates a point light source at 10 o'clock and gives a convex ball look
+ *     without a shader or bitmap resource.
+ *   - `true` — a *flat* coloured circle carrying a white glyph that redundantly
+ *     encodes the same state by SHAPE, so the indicator no longer relies on hue
+ *     alone (WCAG 1.4.1 "Use of Color", an aid for red–green colour-vision
+ *     deficiency): a cross for RED, a "1" for YELLOW, an up-arrow for GREEN.
+ *     The specular highlight is dropped in this style so it does not compete
+ *     with the glyph. RED/GREEN are drawn as vector [Icon]s overlaid on the
+ *     circle; the YELLOW "1" is drawn straight onto the [Canvas] and centred via
+ *     the font metrics (baseline = centre − (ascent + descent) / 2), because an
+ *     overlaid [Text] sits a hair too low inside the small box. The user opts in
+ *     via Settings → Appearance; the flag is threaded down from
+ *     [de.godisch.potillus.domain.model.AppSettings.alternativeStatusSymbols].
  *
- * @param light     The pre-calculated traffic-light status.
- * @param modifier  Optional layout modifier.
+ * ACCESSIBILITY (independent of [useSymbols]):
+ *   The whole indicator carries a localised [contentDescription] announcing the
+ *   capacity state, so a screen reader (TalkBack) conveys the status that sighted
+ *   users read from the colour/glyph. [clearAndSetSemantics] collapses the dot to
+ *   this single, meaningful node — the overlaid icons expose no description of
+ *   their own and the canvas-drawn digit has no semantics — instead of leaking a
+ *   raw glyph to assistive technology.
+ *
+ * @param light      The pre-calculated traffic-light status.
+ * @param modifier   Optional layout modifier.
+ * @param useSymbols When `true`, overlay the state-specific glyph (flat style);
+ *                   when `false`, render the plain coloured sphere.
  */
 @Composable
 fun TrafficLightDot(
     light: TrafficLight,
     modifier: Modifier = Modifier,
+    useSymbols: Boolean = false,
 ) {
     val baseColor = when (light) {
         TrafficLight.GREEN -> successColor()
         TrafficLight.YELLOW -> warningColor()
         TrafficLight.RED -> dangerRedColor()
     }
-    // Capture color BEFORE entering the Canvas lambda (DrawScope is not Composable)
+    // Localised, state-specific text alternative for screen readers. Resolved in
+    // the composable scope (stringResource is @Composable) before the Canvas.
+    val statusDescription = when (light) {
+        TrafficLight.GREEN -> stringResource(R.string.capacity_status_ok)
+        TrafficLight.YELLOW -> stringResource(R.string.capacity_status_low)
+        TrafficLight.RED -> stringResource(R.string.capacity_status_reached)
+    }
+    // Capture colours BEFORE entering the Canvas lambda (DrawScope is not Composable).
     val highlight = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.52f)
+    val glyphColor = androidx.compose.ui.graphics.Color.White
 
-    androidx.compose.foundation.Canvas(modifier = modifier.size(12.dp)) {
-        val r = size.minDimension / 2f
-        val cx = size.width / 2f
-        val cy = size.height / 2f
+    Box(
+        modifier = modifier
+            .size(12.dp)
+            // clearAndSetSemantics: expose ONE capacity description to assistive
+            // technology and drop any semantics from the child glyphs (the vector
+            // icons pass contentDescription = null; the "1" is canvas-drawn), so
+            // the dot reads as a single, meaningful node.
+            .clearAndSetSemantics { contentDescription = statusDescription },
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
+            val r = size.minDimension / 2f
+            val cx = size.width / 2f
+            val cy = size.height / 2f
 
-        // 1. Filled base circle
-        drawCircle(
-            color = baseColor,
-            radius = r,
-            center = androidx.compose.ui.geometry.Offset(cx, cy),
-        )
+            // 1. Filled base circle in the status colour.
+            drawCircle(
+                color = baseColor,
+                radius = r,
+                center = androidx.compose.ui.geometry.Offset(cx, cy),
+            )
 
-        // 2. Specular highlight – smaller circle offset to upper-left.
-        //    Radius = 35 % of sphere radius; offset = 28 % in each axis.
-        //    Creates the illusion of a convex surface lit from the top-left.
-        drawCircle(
-            color = highlight,
-            radius = r * 0.35f,
-            center = androidx.compose.ui.geometry.Offset(cx - r * 0.28f, cy - r * 0.28f),
-        )
+            // 2. Specular highlight – only in the plain sphere style. A smaller
+            //    circle offset to the upper-left (radius 35 %, offset 28 % per
+            //    axis) fakes a convex surface lit from the top-left. Skipped when
+            //    a glyph is drawn so the two do not visually clash.
+            if (!useSymbols) {
+                drawCircle(
+                    color = highlight,
+                    radius = r * 0.35f,
+                    center = androidx.compose.ui.geometry.Offset(cx - r * 0.28f, cy - r * 0.28f),
+                )
+            }
+
+            // 3. YELLOW glyph "1" — drawn directly on the canvas (not as an
+            //    overlaid Compose Text). A Text sits a hair too low inside the
+            //    12 dp box because of its line-box padding; drawing here lets us
+            //    place the baseline from the font metrics so the digit's optical
+            //    centre lands exactly on the circle centre:
+            //        baseline = centreY − (ascent + descent) / 2   (ascent < 0)
+            //    This mirrors how the statistics charts render their centred
+            //    on-bar value labels. RED/GREEN use vector icons (see the overlay
+            //    below); only the text digit needs metric-based centring.
+            if (useSymbols && light == TrafficLight.YELLOW) {
+                val glyphPaint = android.graphics.Paint().apply {
+                    isAntiAlias = true
+                    color = android.graphics.Color.WHITE
+                    textAlign = android.graphics.Paint.Align.CENTER
+                    // 8 sp (a touch smaller than the 10 dp vector icons) at normal
+                    // weight: synthetic bold (isFakeBoldText) thickened the strokes
+                    // so the "1" read heavier than the cross/arrow, so it is left off.
+                    textSize = 8.sp.toPx()
+                }
+                val baselineY = cy - (glyphPaint.ascent() + glyphPaint.descent()) / 2f
+                drawContext.canvas.nativeCanvas.drawText("1", cx, baselineY, glyphPaint)
+            }
+        }
+
+        // Redundant SHAPE cue for colour-vision deficiency. RED/GREEN are vector
+        // icons overlaid on the circle; contentDescription = null because the
+        // parent Box already carries the single, meaningful description. YELLOW's
+        // "1" is drawn on the canvas above (font-metric centring), so it is a no-op
+        // here.
+        if (useSymbols) {
+            when (light) {
+                TrafficLight.RED -> Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = null,
+                    tint = glyphColor,
+                    modifier = Modifier.size(10.dp),
+                )
+                TrafficLight.GREEN -> Icon(
+                    imageVector = Icons.Filled.ArrowUpward,
+                    contentDescription = null,
+                    tint = glyphColor,
+                    modifier = Modifier.size(10.dp),
+                )
+                TrafficLight.YELLOW -> Unit
+            }
+        }
     }
 }
 

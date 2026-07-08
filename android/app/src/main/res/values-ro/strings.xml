@@ -269,4 +269,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="few">%1$d zile</item>
         <item quantity="other">%1$d de zile</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">În limitele tale</string>
+    <string name="capacity_status_low">Aproape de limita ta</string>
+    <string name="capacity_status_reached">Limită atinsă</string>
+    <string name="alt_status_symbols">Simboluri de stare alternative</string>
+    <string name="alt_status_symbols_desc">Afișează o formă (cruce, 1, săgeată) în punctul de stare pe lângă culoare</string>
+    <string name="chart_desc_daily_avg">Grafic cu bare al alcoolului mediu pe zi</string>
+    <string name="chart_desc_value_bars">Grafic cu bare</string>
+    <string name="chart_desc_categories">Grafic inelar al categoriilor de băuturi</string>
 </resources>

@@ -1,0 +1,1 @@
+Nowe opcje ułatwień dostępu. Wskaźnik pojemności może teraz oprócz koloru pokazywać kształt (krzyżyk, 1 lub strzałkę) – włącz go w Ustawienia → Wygląd, aby pomóc przy ślepocie barw czerwono-zielonej. Wykresy statystyk zawierają teraz opis tekstowy dla czytników ekranu.

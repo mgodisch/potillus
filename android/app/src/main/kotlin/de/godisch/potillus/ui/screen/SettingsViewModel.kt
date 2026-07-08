@@ -196,6 +196,9 @@ class SettingsViewModel(
     /** Clears or re-sets FLAG_SECURE to allow/block screenshots and screen recordings. */
     fun setAllowScreenshots(v: Boolean) = viewModelScope.launch { prefs.setAllowScreenshots(v) }
 
+    /** Enables/disables the glyph style of the traffic-light capacity indicator. */
+    fun setAlternativeStatusSymbols(v: Boolean) = viewModelScope.launch { prefs.setAlternativeStatusSymbols(v) }
+
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
     fun setLanguage(lang: String) = viewModelScope.launch { prefs.setLanguage(lang) }
 
@@ -358,6 +361,7 @@ class SettingsViewModel(
         prefs.setMaxDrinkDaysPerWeek(settings.maxDrinkDaysPerWeek)
         prefs.setBiometric(settings.biometricEnabled)
         prefs.setAllowScreenshots(settings.allowScreenshots)
+        prefs.setAlternativeStatusSymbols(settings.alternativeStatusSymbols)
         if (settings.language.isNotEmpty()) prefs.setLanguage(settings.language)
         if (settings.weightKg > 0.0) prefs.setWeightKg(settings.weightKg)
         if (settings.statsFromDate.isNotBlank()) prefs.setStatsFromDate(settings.statsFromDate)

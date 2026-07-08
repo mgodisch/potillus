@@ -1,0 +1,1 @@
+Nye tilgjengelighetsvalg. Kapasitetsindikatoren kan nå vise en figur (kryss, 1 eller pil) i tillegg til fargen – slå det på under Innstillinger → Utseende som hjelp ved rød-grønn fargeblindhet. Statistikkdiagrammene gir nå en tekstbeskrivelse for skjermlesere.

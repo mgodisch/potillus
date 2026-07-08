@@ -58,6 +58,9 @@ interface IAppPreferences {
     /** Clears or re-sets [WindowManager.LayoutParams.FLAG_SECURE] for the app window. */
     suspend fun setAllowScreenshots(v: Boolean)
 
+    /** Enables/disables the alternative (glyph) style of the traffic-light capacity indicator. */
+    suspend fun setAlternativeStatusSymbols(v: Boolean)
+
     /** Persists the UI language BCP-47 tag [lang] (empty = follow system). */
     suspend fun setLanguage(lang: String)
 

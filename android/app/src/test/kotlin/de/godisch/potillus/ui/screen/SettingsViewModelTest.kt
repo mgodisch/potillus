@@ -251,6 +251,7 @@ class SettingsViewModelTest {
             allowScreenshots = true,
             language = "de",
             weightKg = 82.5,
+            alternativeStatusSymbols = true,
         )
         vm.applyImportedSettings(restored)
         val now = prefs.currentSettings
@@ -265,6 +266,7 @@ class SettingsViewModelTest {
         assertTrue(now.allowScreenshots)
         assertEquals("de", now.language)
         assertEquals(82.5, now.weightKg, 0.0)
+        assertTrue(now.alternativeStatusSymbols)
     }
 
     @Test fun `applyImportedSettings keeps weight unset when backup weight is zero`() = runTest(dispatcher) {
@@ -303,6 +305,21 @@ class SettingsViewModelTest {
         val vm = buildVm()
         vm.setBiometric(false)
         assertFalse(prefs.currentSettings.biometricEnabled)
+    }
+
+    // ── setAlternativeStatusSymbols ─────────────────────────────────────────────
+
+    @Test fun `setAlternativeStatusSymbols true writes to prefs`() = runTest(dispatcher) {
+        val vm = buildVm()
+        vm.setAlternativeStatusSymbols(true)
+        assertTrue(prefs.currentSettings.alternativeStatusSymbols)
+    }
+
+    @Test fun `setAlternativeStatusSymbols false writes to prefs`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(alternativeStatusSymbols = true))
+        val vm = buildVm()
+        vm.setAlternativeStatusSymbols(false)
+        assertFalse(prefs.currentSettings.alternativeStatusSymbols)
     }
 
     // ── uiState reflects settings changes ─────────────────────────────────────

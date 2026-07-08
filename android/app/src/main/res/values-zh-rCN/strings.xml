@@ -242,4 +242,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <plurals name="days">
         <item quantity="other">%1$d天</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">在您的限额之内</string>
+    <string name="capacity_status_low">即将达到您的限额</string>
+    <string name="capacity_status_reached">已达到限额</string>
+    <string name="alt_status_symbols">备用状态符号</string>
+    <string name="alt_status_symbols_desc">在状态圆点中除颜色外再显示一个符号（叉、1、箭头）</string>
+    <string name="chart_desc_daily_avg">每日平均酒精量的柱状图</string>
+    <string name="chart_desc_value_bars">柱状图</string>
+    <string name="chart_desc_categories">饮品类别的环形图</string>
 </resources>

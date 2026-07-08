@@ -267,4 +267,15 @@ data class AppSettings(
      */
     val language: String = "",
     val weightKg: Double = 0.0,
+    /**
+     * When `true`, the traffic-light capacity indicator draws a distinct glyph
+     * inside its coloured dot — a cross (limit reached), a "1" (one serving
+     * left) or an up-arrow (room for more) — in addition to the colour.
+     *
+     * This is an accessibility aid for red–green colour-vision deficiency: the
+     * three-state indicator otherwise relies on hue alone (WCAG 1.4.1 "Use of
+     * Color"). Default is `false` (colour only); the user opts in under
+     * Settings → Appearance. See [de.godisch.potillus.ui.component.TrafficLightDot].
+     */
+    val alternativeStatusSymbols: Boolean = false,
 )

@@ -241,6 +241,7 @@ object BackupManager {
                     put("statsFromDate", settings.statsFromDate)
                     put("biometricEnabled", settings.biometricEnabled)
                     put("allowScreenshots", settings.allowScreenshots)
+                    put("alternativeStatusSymbols", settings.alternativeStatusSymbols)
                     put("language", settings.language)
                     put("weightKg", settings.weightKg)
                 },
@@ -630,6 +631,10 @@ object BackupManager {
             statsFromDate = statsFrom,
             biometricEnabled = obj.optBoolean("biometricEnabled", def.biometricEnabled),
             allowScreenshots = obj.optBoolean("allowScreenshots", def.allowScreenshots),
+            // Added within format 3 as an optional field (no version bump: absent
+            // in older format-3 backups → falls back to the default here, so the
+            // change is backward- and forward-compatible).
+            alternativeStatusSymbols = obj.optBoolean("alternativeStatusSymbols", def.alternativeStatusSymbols),
             language = language,
             weightKg = weight,
         )

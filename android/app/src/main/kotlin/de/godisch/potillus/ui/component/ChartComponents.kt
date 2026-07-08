@@ -63,6 +63,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -191,7 +193,21 @@ fun AlcoholBarChart(
     // separator follows the in-app language, not the system locale.
     val locale = LocalContext.current.formattingLocale()
 
-    Canvas(modifier = modifier.fillMaxWidth().height(200.dp).padding(top = 8.dp, bottom = 24.dp)) {
+    // Text alternative for assistive technology (WCAG 1.1.1): a bar chart drawn
+    // on a bare Canvas is otherwise invisible to a screen reader. We summarise
+    // what the chart plots and attach it as the semantics contentDescription so
+    // TalkBack announces something meaningful. (No bucket count in the text: a
+    // "%d periods" phrasing trips Android lint's PluralsCandidate check, and the
+    // exact number adds little for a screen-reader summary.)
+    val chartDescription = stringResource(R.string.chart_desc_daily_avg)
+
+    Canvas(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(top = 8.dp, bottom = 24.dp)
+            .semantics { contentDescription = chartDescription },
+    ) {
         val chartH = size.height
         val chartW = size.width
         // Each bar occupies an equal horizontal slice (spacing = chartW / numBars).
@@ -349,6 +365,10 @@ fun AlcoholBarChart(
  *                 above it (one decimal). Bar heights then reserve headroom so the
  *                 topmost label is not clipped.
  * @param modifier Optional layout modifier.
+ * @param chartLabel Optional caller-supplied name for the chart (e.g. "Time of
+ *                 day"), used as the screen-reader text alternative (WCAG 1.1.1)
+ *                 since this generic chart has no inherent meaning of its own.
+ *                 When null, a neutral "bar chart with N bars" summary is used.
  */
 @Composable
 fun ValueBarChart(
@@ -356,6 +376,7 @@ fun ValueBarChart(
     labelFor: (Int) -> String,
     modifier: Modifier = Modifier,
     showValues: Boolean = false,
+    chartLabel: String? = null,
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
         Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {
@@ -380,7 +401,19 @@ fun ValueBarChart(
     // AlcoholBarChart for the same DrawScope/composition-local rationale).
     val locale = LocalContext.current.formattingLocale()
 
-    Canvas(modifier = modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp, bottom = 4.dp)) {
+    // Text alternative for assistive technology (WCAG 1.1.1). Prefer the caller's
+    // label (which knows what the bars mean); otherwise fall back to a neutral
+    // generic name. (No bar count in the fallback: "%d bars" trips Android lint's
+    // PluralsCandidate check.)
+    val chartDescription = chartLabel ?: stringResource(R.string.chart_desc_value_bars)
+
+    Canvas(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .padding(top = 8.dp, bottom = 4.dp)
+            .semantics { contentDescription = chartDescription },
+    ) {
         val chartH = size.height
         val chartW = size.width
         val spacing = chartW / values.size
@@ -506,10 +539,16 @@ fun CategoryDonutChart(
     // Per-app locale for the legend's gram/percent numbers (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
 
+    // Text alternative for assistive technology (WCAG 1.1.1): the donut arcs are
+    // drawn on a bare Canvas, so we announce what it breaks down. (No category
+    // count in the text: "%d drink categories" trips lint's PluralsCandidate check.)
+    val chartDescription = stringResource(R.string.chart_desc_categories)
+
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp),
+            .height(160.dp)
+            .semantics { contentDescription = chartDescription },
     ) {
         // Donut geometry: radius fills 88 % of the smaller canvas dimension;
         // stroke width is 38 % of the radius, giving the "ring" appearance.

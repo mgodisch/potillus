@@ -221,4 +221,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="many">%1$d dne</item>
         <item quantity="other">%1$d dní</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">V rámci vašich limitů</string>
+    <string name="capacity_status_low">Téměř na vašem limitu</string>
+    <string name="capacity_status_reached">Limit dosažen</string>
+    <string name="alt_status_symbols">Alternativní symboly stavu</string>
+    <string name="alt_status_symbols_desc">Kromě barvy zobrazit ve stavové tečce tvar (křížek, 1, šipku)</string>
+    <string name="chart_desc_daily_avg">Sloupcový graf průměrného alkoholu za den</string>
+    <string name="chart_desc_value_bars">Sloupcový graf</string>
+    <string name="chart_desc_categories">Prstencový graf kategorií nápojů</string>
 </resources>

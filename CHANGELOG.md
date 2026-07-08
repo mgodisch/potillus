@@ -36,6 +36,49 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
+## v0.81.0
+
+Add accessible capacity symbols and chart labels
+
+This release improves accessibility for colour-vision deficiency and for
+screen-reader users, addressing the roadmap's Level-A chart gap and the
+"Use of Color" concern on the traffic-light indicator.
+
+- Alternative status symbols (opt-in). A new switch under Settings →
+  Appearance makes the traffic-light capacity dot draw a distinct white glyph
+  inside its coloured circle in addition to the colour: a cross when the limit
+  is reached, a "1" when one serving remains, and an up-arrow when there is
+  room for more. This adds a shape cue on top of hue, so the three states are
+  distinguishable without relying on the red/yellow/green colours alone
+  (WCAG 1.4.1 "Use of Color"). It is off by default; the plain coloured sphere
+  is unchanged when the switch is off. The flag is `alternativeStatusSymbols`
+  in `AppSettings`, threaded from the setting through `TodayScreen`,
+  `DrinksScreen` and the log dialog into `TrafficLightDot`.
+- Screen-reader description for the capacity dot. `TrafficLightDot` now carries
+  a localized `contentDescription` announcing the capacity state regardless of
+  the symbol setting, so TalkBack conveys what sighted users read from the
+  colour/glyph. It uses `clearAndSetSemantics` so the bare "1" glyph is not
+  announced on its own.
+- Chart text alternatives (WCAG 1.1.1, Level A). The three statistics charts —
+  `AlcoholBarChart`, `ValueBarChart` and `CategoryDonutChart` — are drawn on a
+  bare `Canvas` and were previously invisible to a screen reader. Each now
+  exposes a summarising `contentDescription` via `semantics`; the generic
+  `ValueBarChart` takes an optional caller-supplied label, which `StatsScreen`
+  fills from the existing "time of day" and "weekday" section headings.
+- Backups. The new preference is written into JSON backups within backup
+  format 3 as an optional field, so no format bump is needed: an older
+  format-3 backup that lacks the key restores with the setting defaulting to
+  off, and a REPLACE (full) restore applies it while a MERGE keeps the local
+  value — matching how the other settings behave.
+- Localization. Eight new string keys (three capacity-state descriptions, the
+  toggle title and summary, and three chart descriptions) were added to all 21
+  locale files, keeping every locale complete for `LocaleSyncTest`.
+- Tests. `SettingsViewModelTest` covers the new setter and its round-trip
+  through restore; `BackupManagerTest` covers the settings round-trip with the
+  new field and the tolerant default when a format-3 backup omits the key.
+
+---
+
 ## v0.80.0
 
 Include user settings in JSON backups

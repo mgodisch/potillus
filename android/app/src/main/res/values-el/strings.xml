@@ -215,4 +215,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="one">%1$d ημέρα</item>
         <item quantity="other">%1$d ημέρες</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Εντός των ορίων σας</string>
+    <string name="capacity_status_low">Σχεδόν στο όριό σας</string>
+    <string name="capacity_status_reached">Το όριο συμπληρώθηκε</string>
+    <string name="alt_status_symbols">Εναλλακτικά σύμβολα κατάστασης</string>
+    <string name="alt_status_symbols_desc">Εκτός από το χρώμα, εμφάνιση σχήματος (σταυρός, 1, βέλος) στην κουκκίδα κατάστασης</string>
+    <string name="chart_desc_daily_avg">Ραβδόγραμμα μέσου αλκοόλ ανά ημέρα</string>
+    <string name="chart_desc_value_bars">Ραβδόγραμμα</string>
+    <string name="chart_desc_categories">Δακτυλιοειδές γράφημα κατηγοριών ποτών</string>
 </resources>

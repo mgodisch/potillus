@@ -1,0 +1,1 @@
+Nieuwe toegankelijkheidsopties. De capaciteitsindicator kan nu naast de kleur ook een vorm (kruis, 1 of pijl) tonen – schakel dit in via Instellingen → Weergave als hulp bij rood-groen kleurenblindheid. De statistiekgrafieken geven nu een tekstbeschrijving voor schermlezers.

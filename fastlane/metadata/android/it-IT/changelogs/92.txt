@@ -1,0 +1,1 @@
+Nuove opzioni di accessibilità. L'indicatore di capacità ora può mostrare una forma (croce, 1 o freccia) oltre al colore: attivalo in Impostazioni → Aspetto come aiuto per il daltonismo rosso-verde. I grafici delle statistiche ora forniscono una descrizione testuale per gli screen reader.

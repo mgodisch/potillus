@@ -239,6 +239,7 @@ fun DrinksScreen(
                             TrafficLightDot(
                                 light = light,
                                 modifier = Modifier.padding(end = 8.dp),
+                                useSymbols = todayState.settings.alternativeStatusSymbols,
                             )
                             // ── Name + category + volume info ─────────────────────────
                             Column(modifier = Modifier.weight(1f)) {
@@ -317,6 +318,7 @@ fun DrinksScreen(
             drinks = todayDrinks,
             preSelectedDrink = drink,
             capacity = capacity,
+            useStatusSymbols = todayState.settings.alternativeStatusSymbols,
             onSave = { d, vol, ts, note ->
                 todayVm.addEntry(d, vol, ts, note)
                 logDrink = null

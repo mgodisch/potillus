@@ -341,6 +341,7 @@ fun TodayScreen(
             drinks = drinks,
             preSelectedDrink = preSelectedDrink,
             capacity = capacity,
+            useStatusSymbols = state.settings.alternativeStatusSymbols,
             onSave = { drink, vol, ts, note ->
                 vm.addEntry(drink, vol, ts, note)
                 showAdd = false

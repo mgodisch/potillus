@@ -307,6 +307,7 @@ fun StatsScreen(
                                 values = state.hourBucketAverages,
                                 labelFor = { b -> "${b * 3}\u2013${b * 3 + 3}" },
                                 showValues = true,
+                                chartLabel = stringResource(R.string.stats_time_of_day),
                             )
                         }
                     }
@@ -337,6 +338,7 @@ fun StatsScreen(
                                 values = state.weekdayAverages.map { it ?: 0.0 },
                                 labelFor = { i -> weekdayLabels.getOrElse(i) { "" } },
                                 showValues = true,
+                                chartLabel = stringResource(R.string.stats_weekday),
                             )
                         }
                     }

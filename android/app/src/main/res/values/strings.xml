@@ -424,4 +424,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Within your limits</string>
+    <string name="capacity_status_low">Almost at your limit</string>
+    <string name="capacity_status_reached">Limit reached</string>
+    <string name="alt_status_symbols">Alternative Status Symbols</string>
+    <string name="alt_status_symbols_desc">Show a shape (cross, 1, arrow) in the capacity dot in addition to the colour</string>
+    <string name="chart_desc_daily_avg">Bar chart of average alcohol per day</string>
+    <string name="chart_desc_value_bars">Bar chart</string>
+    <string name="chart_desc_categories">Donut chart of drink categories</string>
 </resources>

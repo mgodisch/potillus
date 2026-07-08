@@ -297,6 +297,21 @@ class BackupManagerTest {
         assertTrue(s.allowScreenshots)
         assertEquals("de", s.language)
         assertEquals(82.5, s.weightKg, 0.0)
+        assertTrue(s.alternativeStatusSymbols)
+    }
+
+    @Test fun `version 3 backup without alternativeStatusSymbols key defaults to false`() {
+        // The field was added within format 3 as an OPTIONAL key (no version bump).
+        // A format-3 backup written before it existed simply omits the key and must
+        // fall back to the canonical default rather than failing to parse.
+        val settingsWithoutKey =
+            """{"themeMode":"NIGHT","dayChangeHour":6,"dayChangeMinute":30,""" +
+                """"dailyLimitGrams":24.0,"weeklyLimitGrams":120.0,"maxDrinkDaysPerWeek":3,""" +
+                """"statsFromDate":"2024-01-15","biometricEnabled":true,"allowScreenshots":true,""" +
+                """"language":"de","weightKg":82.5}"""
+        val json = buildBackupJson(version = 3, settings = settingsWithoutKey)
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals(false, s.alternativeStatusSymbols)
     }
 
     @Test fun `out-of-range numeric settings are clamped to the setter ranges`() {
@@ -409,11 +424,12 @@ class BackupManagerTest {
         allowScreenshots: Boolean = true,
         language: String = "de",
         weightKg: Double = 82.5,
+        alternativeStatusSymbols: Boolean = true,
     ) = """{"themeMode":"$themeMode","dayChangeHour":$dayChangeHour,"dayChangeMinute":$dayChangeMinute,""" +
         """"dailyLimitGrams":$dailyLimitGrams,"weeklyLimitGrams":$weeklyLimitGrams,""" +
         """"maxDrinkDaysPerWeek":$maxDrinkDaysPerWeek,"statsFromDate":"$statsFromDate",""" +
         """"biometricEnabled":$biometricEnabled,"allowScreenshots":$allowScreenshots,""" +
-        """"language":"$language","weightKg":$weightKg}"""
+        """"language":"$language","weightKg":$weightKg,"alternativeStatusSymbols":$alternativeStatusSymbols}"""
 
     private fun drinkJson(
         id: Long = 1,

@@ -259,4 +259,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
     <plurals name="days">
         <item quantity="other">%1$d일</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">한도 이내입니다</string>
+    <string name="capacity_status_low">한도에 거의 도달했습니다</string>
+    <string name="capacity_status_reached">한도에 도달했습니다</string>
+    <string name="alt_status_symbols">대체 상태 기호</string>
+    <string name="alt_status_symbols_desc">색상과 함께 상태 점 안에 기호(가위표, 1, 화살표)를 표시합니다</string>
+    <string name="chart_desc_daily_avg">하루 평균 알코올 막대 그래프</string>
+    <string name="chart_desc_value_bars">막대 그래프</string>
+    <string name="chart_desc_categories">음료 카테고리 도넛 차트</string>
 </resources>

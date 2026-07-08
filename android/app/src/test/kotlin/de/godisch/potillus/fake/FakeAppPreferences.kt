@@ -45,6 +45,7 @@ class FakeAppPreferences(
     override suspend fun setTheme(mode: ThemeMode) = _settings.update { it.copy(themeMode = mode) }
     override suspend fun setBiometric(v: Boolean) = _settings.update { it.copy(biometricEnabled = v) }
     override suspend fun setAllowScreenshots(v: Boolean) = _settings.update { it.copy(allowScreenshots = v) }
+    override suspend fun setAlternativeStatusSymbols(v: Boolean) = _settings.update { it.copy(alternativeStatusSymbols = v) }
     override suspend fun setLanguage(lang: String) = _settings.update { it.copy(language = lang) }
     override suspend fun setStatsFromDate(date: String) = _settings.update { it.copy(statsFromDate = date) }
 

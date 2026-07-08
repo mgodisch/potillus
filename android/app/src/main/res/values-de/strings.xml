@@ -246,4 +246,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="one">%1$d Tag</item>
         <item quantity="other">%1$d Tage</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Innerhalb der Grenzwerte</string>
+    <string name="capacity_status_low">Fast am Grenzwert</string>
+    <string name="capacity_status_reached">Grenzwert erreicht</string>
+    <string name="alt_status_symbols">Alternative Statussymbole</string>
+    <string name="alt_status_symbols_desc">Zusätzlich zur Farbe ein Symbol (Kreuz, 1, Pfeil) im Statuspunkt anzeigen</string>
+    <string name="chart_desc_daily_avg">Balkendiagramm des durchschnittlichen Alkohols pro Tag</string>
+    <string name="chart_desc_value_bars">Balkendiagramm</string>
+    <string name="chart_desc_categories">Ringdiagramm der Getränkekategorien</string>
 </resources>

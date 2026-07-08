@@ -215,4 +215,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="one">%1$d dag</item>
         <item quantity="other">%1$d dagen</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Binnen je limieten</string>
+    <string name="capacity_status_low">Bijna bij je limiet</string>
+    <string name="capacity_status_reached">Limiet bereikt</string>
+    <string name="alt_status_symbols">Alternatieve statussymbolen</string>
+    <string name="alt_status_symbols_desc">Toon naast de kleur een vorm (kruis, 1, pijl) in de statusstip</string>
+    <string name="chart_desc_daily_avg">Staafdiagram van gemiddelde alcohol per dag</string>
+    <string name="chart_desc_value_bars">Staafdiagram</string>
+    <string name="chart_desc_categories">Ringdiagram van drankcategorieën</string>
 </resources>

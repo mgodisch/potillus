@@ -261,4 +261,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="many">%1$d днів</item>
         <item quantity="other">%1$d дня</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">У межах ваших лімітів</string>
+    <string name="capacity_status_low">Майже на вашому ліміті</string>
+    <string name="capacity_status_reached">Ліміт досягнуто</string>
+    <string name="alt_status_symbols">Альтернативні символи стану</string>
+    <string name="alt_status_symbols_desc">Показувати у крапці стану фігуру (хрестик, 1, стрілку) на додаток до кольору</string>
+    <string name="chart_desc_daily_avg">Стовпчаста діаграма середнього алкоголю на день</string>
+    <string name="chart_desc_value_bars">Стовпчаста діаграма</string>
+    <string name="chart_desc_categories">Кільцева діаграма категорій напоїв</string>
 </resources>

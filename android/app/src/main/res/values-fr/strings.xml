@@ -234,4 +234,14 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
         <item quantity="many">%1$d jours</item>
         <item quantity="other">%1$d jours</item>
     </plurals>
+
+    <!-- v0.81.0: capacity-indicator status descriptions, alternative-symbols toggle, and chart text alternatives (WCAG 1.1.1). -->
+    <string name="capacity_status_ok">Dans vos limites</string>
+    <string name="capacity_status_low">Presque à votre limite</string>
+    <string name="capacity_status_reached">Limite atteinte</string>
+    <string name="alt_status_symbols">Symboles d\'état alternatifs</string>
+    <string name="alt_status_symbols_desc">Afficher une forme (croix, 1, flèche) dans le point d\'état en plus de la couleur</string>
+    <string name="chart_desc_daily_avg">Diagramme en barres de l\'alcool moyen par jour</string>
+    <string name="chart_desc_value_bars">Diagramme en barres</string>
+    <string name="chart_desc_categories">Diagramme en anneau des catégories de boissons</string>
 </resources>
