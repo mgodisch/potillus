@@ -107,6 +107,99 @@ public struct LimitViolations: Sendable, Equatable {
     }
 }
 
+/// Category of a drink, used for grouping and colour-coding.
+///
+/// Persisted as the case's raw string (never an ordinal), exactly as on Android,
+/// so inserting a new case can never re-label existing rows. An unknown value
+/// read from the database decays to `.other` rather than throwing — the forward
+/// compatibility rule from CONTRIBUTING.md section 4.
+public enum DrinkCategory: String, Sendable, Equatable, Codable, CaseIterable {
+    case beer = "BEER"
+    case wine = "WINE"
+    case spirits = "SPIRITS"
+    case longdrink = "LONGDRINK"
+    case liqueur = "LIQUEUR"
+    case other = "OTHER"
+
+    /// Decodes a stored category string, falling back to `.other`.
+    ///
+    /// The Swift counterpart of Kotlin's
+    /// `runCatching { valueOf(name) }.getOrDefault(OTHER)`.
+    public static func from(stored value: String) -> DrinkCategory {
+        DrinkCategory(rawValue: value) ?? .other
+    }
+}
+
+/// A drink the user can log. The domain view of the `drinks` table.
+///
+/// Mirrors Android's `DrinkDefinition`. `id == 0` means "not yet persisted",
+/// matching the Kotlin default; the database assigns the real id on insert.
+public struct DrinkDefinition: Sendable, Equatable, Identifiable {
+    public var id: Int64
+    public var name: String
+    public var volumeMl: Int
+    public var alcoholPercent: Double
+    public var isPreset: Bool
+    public var isFavorite: Bool
+    public var category: DrinkCategory
+
+    public init(
+        id: Int64 = 0,
+        name: String,
+        volumeMl: Int,
+        alcoholPercent: Double,
+        isPreset: Bool = false,
+        isFavorite: Bool = false,
+        category: DrinkCategory = .other
+    ) {
+        self.id = id
+        self.name = name
+        self.volumeMl = volumeMl
+        self.alcoholPercent = alcoholPercent
+        self.isPreset = isPreset
+        self.isFavorite = isFavorite
+        self.category = category
+    }
+}
+
+/// One logged consumption event. The domain view of the `entries` table.
+///
+/// Mirrors Android's `ConsumptionEntry`. The drink attributes are snapshots
+/// taken at logging time, so editing a drink never rewrites history.
+public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
+    public var id: Int64
+    public var drinkId: Int64
+    public var drinkName: String
+    public var volumeMl: Int
+    public var alcoholPercent: Double
+    public var gramsAlcohol: Double
+    public var timestampMillis: Int64
+    public var logicalDate: String
+    public var note: String
+
+    public init(
+        id: Int64 = 0,
+        drinkId: Int64,
+        drinkName: String,
+        volumeMl: Int,
+        alcoholPercent: Double,
+        gramsAlcohol: Double,
+        timestampMillis: Int64,
+        logicalDate: String,
+        note: String = ""
+    ) {
+        self.id = id
+        self.drinkId = drinkId
+        self.drinkName = drinkName
+        self.volumeMl = volumeMl
+        self.alcoholPercent = alcoholPercent
+        self.gramsAlcohol = gramsAlcohol
+        self.timestampMillis = timestampMillis
+        self.logicalDate = logicalDate
+        self.note = note
+    }
+}
+
 /// The subset of user preferences the calculator needs.
 ///
 /// The full Android `AppSettings` carries UI preferences too; only the limit

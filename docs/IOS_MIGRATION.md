@@ -454,10 +454,11 @@ Indicative ordering; refined as work starts.
    window and the chart buckets depend on. Not ported by design: the
    `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
    which are platform concerns and return with the iOS UI.
-3. **Data layer (in progress).** The schema and the GRDB record types are in
-   place, with both platforms asserting against the shared schema contract. Still
-   to do: repositories behind protocol seams, the JSON backup v3 reader/writer,
-   and the CSV export — each verified byte-compatible with Android output.
+3. **Data layer (in progress).** The schema, the GRDB record types and the
+   repositories behind protocol seams are in place, with both platforms asserting
+   against the shared schema contract. Still to do: the JSON backup v3
+   reader/writer and the CSV export — each verified byte-compatible with Android
+   output.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
@@ -507,6 +508,31 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Add iOS repositories behind protocol seams  (patch -10)
+
+- Port `DrinkDefinition`, `ConsumptionEntry` and `DrinkCategory` to the Swift
+  domain, with the same "stored by name, unknown decays to OTHER" rule that
+  CONTRIBUTING.md section 4 mandates for enum persistence.
+- Add `EntityMapping`, the single place where a persistence detail (an optional
+  row id, a category stored as text) becomes a domain value and back, so the
+  domain layer never learns that SQLite exists.
+- Add `DrinkRepositoryProtocol` / `EntryRepositoryProtocol` and their GRDB
+  implementations, mirroring Android's `IDrinkRepository` / `IEntryRepository`
+  operation for operation. Each query documents the Room DAO statement it is the
+  twin of, including the ordering guarantees callers depend on: favourites first
+  then alphabetical; entries oldest-first within a logical day; "most recent"
+  ordered by consumption time, not insertion order.
+- Bridge GRDB's `ValueObservation` into `AsyncThrowingStream` rather than
+  publishing the library type through the protocol. Exposing
+  `AsyncValueObservation` would have defeated the seam — every caller would
+  import GRDB. The bridging happens in one helper, and cancelling the consuming
+  task tears the observation down.
+- Test against a real in-memory database rather than a mock: the failures worth
+  catching (a wrong `ORDER BY`, an unenforced foreign key) only appear against
+  SQLite itself. Covers ordering, inclusive range bounds, the MERGE-import
+  de-duplication guard, `ON DELETE RESTRICT`, preset survival, unknown-category
+  decay, and that an observation re-emits after a committed write.
 
 #### Add the iOS data layer schema with GRDB  (patch -09)
 
