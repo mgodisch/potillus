@@ -147,35 +147,53 @@ fun TodayScreen(
                         // Row 1: captions — "Today's total" (left) vs "Ø <month>"
                         // (right, the current month's per-day average), mirrored
                         // across the card width.
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
+                        //
+                        // LAYOUT HARDENING (v0.81.0 QA, eighth round): the left
+                        // caption carries the weight, the right one is pinned to a
+                        // single line — the same rule LimitBar / DrinkDaysBar and
+                        // StatsScreen's StatRow follow. Both captions are localized
+                        // and the right one additionally embeds a month name, so in
+                        // a verbose language pair (e.g. el "Σύνολο σήμερα" +
+                        // "Ø Σεπτέμβριος") the unweighted layout would let the left
+                        // caption eat the row and break the month name across lines.
+                        Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 stringResource(R.string.total_today),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
                             )
                             Text(
                                 stringResource(R.string.avg_of_month, state.currentMonthLabel),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 8.dp),
+                                softWrap = false,
+                                maxLines = 1,
                             )
                         }
                         Spacer(Modifier.height(4.dp))
                         // Row 2: left shows today's own total in grams, right shows
                         // the month's per-day average. Both use the same headline
                         // figure + unit styling so the two values read as a pair.
+                        //
+                        // LAYOUT HARDENING (v0.81.0 QA, eighth round): the left
+                        // figure+unit group is weighted so the right group — whose
+                        // unit string is localized and can be long (el "γρ./ημέρα",
+                        // ru "г/день") — is measured first at its natural width and
+                        // never wraps. Without the weight the two headline figures
+                        // are measured in order and the right group can be squeezed.
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.Bottom,
                         ) {
-                            Row(verticalAlignment = Alignment.Bottom) {
+                            Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f)) {
                                 Text(
                                     state.totalGrams.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
                                     color = MaterialTheme.colorScheme.onSurface,
+                                    softWrap = false,
+                                    maxLines = 1,
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(

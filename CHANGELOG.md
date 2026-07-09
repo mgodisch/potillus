@@ -216,6 +216,25 @@ listed individually below.
   in any of the 21 languages. Test-only change; no production code is touched.
   The committed PNGs still show the old captures and must be refreshed with
   `make screenshots`.
+- Two-text rows no longer break in verbose languages (eighth QA round): on the
+  Today card the drink-days label and its week range shared a `SpaceBetween` row
+  in which BOTH texts were measured at their intrinsic width. A long localized
+  label ("3 / 5 дней с алкоголем (последние 7 дней)", "0 / 5 μέρες κατανάλωσης
+  (τελευταίες 7 ημέρες)") then claimed the whole row and the week range was
+  squeezed into the remainder, where it wrapped mid-token into a ragged second
+  line touching the label. The fix applies the rule `StatRow` has followed since
+  v0.78.0 — weight the FLEXIBLE text, pin the FIXED one to one unbroken line — to
+  `DrinkDaysBar`, `LimitBar` and the Today card's caption and headline rows. In
+  the affected languages the left label now wraps to a second line instead of
+  displacing the range, so those rows are one line taller; no text is truncated.
+  The same measurement trap was closed at three further sites found by sweeping
+  every two-child `Row` in the UI: the Settings rows for body weight, daily
+  limit, 7-day limit, max drink days, day-change time and statistics-start date
+  put their label ahead of a fixed-size edit button without a weight (the sibling
+  switch rows already had one), and the calendar's month header sat between two
+  icon buttons unweighted — a long month name could have pushed the "next month"
+  arrow off the row; it is now weighted, centred and ellipsized. Layout only, no
+  behavioural or data change.
 
 ---
 

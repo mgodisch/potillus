@@ -44,6 +44,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -413,6 +414,18 @@ private fun MonthCalendar(
                     // standalone month ("czerwiec 2026"), see l10n/LocaleSupport.kt.
                     currentMonth.format(monthYearFormatter(locale)),
                     style = MaterialTheme.typography.titleMedium,
+                    // LAYOUT HARDENING (v0.81.0 QA, eighth round): between two
+                    // fixed-size IconButtons an unweighted Text is measured at its
+                    // intrinsic width and can claim everything the previous sibling
+                    // left over, pushing the "next month" arrow off the row. The
+                    // weight bounds it; centring is preserved explicitly because the
+                    // weighted child now fills the gap that SpaceBetween used to
+                    // create, and a long name (el "Σεπτέμβριος 2026") ellipsizes
+                    // instead of displacing a control.
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 IconButton(onClick = onNextMonth) {
                     Icon(

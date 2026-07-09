@@ -188,11 +188,16 @@ fun SettingsScreen(
             item { SettingsSectionHeader(stringResource(R.string.personal_data)) }
             item {
                 SettingsCard {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    // LAYOUT HARDENING (v0.81.0 QA, eighth round): the label carries
+                    // the weight so the fixed-size edit button is measured first and
+                    // can never be pushed out of the row by a verbose translation.
+                    // The sibling switch rows below already used this pattern.
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.body_weight) + ": " +
                                 if (settings.weightKg > 0) "${settings.weightKg.toInt()} kg" else stringResource(R.string.not_set),
                             style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
                         )
                         IconButton(onClick = { showWeightInput = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
@@ -206,28 +211,31 @@ fun SettingsScreen(
             item {
                 SettingsCard {
                     // Daily gram limit
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.daily_limit_grams) + ": ${settings.dailyLimitGrams.toInt()} g",
                             style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
                         )
                         IconButton(onClick = { showDailyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                     Spacer(Modifier.height(4.dp))
                     // Weekly gram limit
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.weekly_limit_grams) + ": ${settings.weeklyLimitGrams.toInt()} g",
                             style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
                         )
                         IconButton(onClick = { showWeeklyLimit = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
                     Spacer(Modifier.height(4.dp))
                     // Max drink days per week
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             stringResource(R.string.drink_days_setting) + ": ${settings.maxDrinkDaysPerWeek}",
                             style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
                         )
                         IconButton(onClick = { showMaxDrinkDays = true }) {
                             Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary)
@@ -240,8 +248,8 @@ fun SettingsScreen(
             item { SettingsSectionHeader(stringResource(R.string.statistics)) }
             item {
                 SettingsCard {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.day_starts_at), style = MaterialTheme.typography.bodyMedium)
                             Text(
                                 stringResource(R.string.day_change_time_value, settings.dayChangeHour, settings.dayChangeMinute),
@@ -263,10 +271,9 @@ fun SettingsScreen(
                     Spacer(Modifier.height(8.dp))
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(Modifier.weight(1f)) {
                             Text(
                                 stringResource(R.string.stats_from_label),
                                 style = MaterialTheme.typography.bodyMedium,
