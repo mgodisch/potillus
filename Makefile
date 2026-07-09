@@ -788,6 +788,15 @@ ios-version:
 ios-version-check:
 	python3 tools/gen-ios-version.py --check
 
+# ios-project: the one command that produces a buildable Xcode project. The
+# `ios-version` prerequisite guarantees Version.xcconfig is regenerated BEFORE
+# XcodeGen reads it -- the ordering matters, and getting it wrong is the kind of
+# mistake that only surfaces as a wrong version number in the App Store.
+# `xcodegen` resolves project.yml relative to the working directory, hence the cd.
+ios-project: ios-version
+	command -v xcodegen
+	cd ios && xcodegen generate
+
 # check-headers: verifies that every project-owned file carries the canonical
 # licence header, including the section 7 pointer to the App Store distribution
 # exception in COPYING.md. Warnings (a file with no header at all) do not fail;
@@ -819,4 +828,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug device-tests release install store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: debug device-tests release install check-headers fix-headers ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

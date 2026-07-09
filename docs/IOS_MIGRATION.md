@@ -511,6 +511,23 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add a make target for the Xcode project  (patch -17)
+
+- Add `make ios-project`, which regenerates `Version.xcconfig` and then runs
+  `xcodegen generate` in `ios/`. The prerequisite enforces the ordering; getting
+  it wrong surfaces only as a wrong version number in a shipped build.
+- Fix the build instructions in `ios/README.md`, which put the `cd ios` BEFORE
+  `gmake ios-version`. That cannot work: the Makefile lives in the repository
+  root, while `xcodegen` resolves `project.yml` relative to the working
+  directory. The two commands run from different places.
+- Declare the targets added in patches -06, -16 and here in `.PHONY`, where they
+  were missing. Without it, a file named `check-headers` or `ios-project` in the
+  tree would silently disable the target.
+- Document how to VERIFY the version actually took effect: ask
+  `xcodebuild -showBuildSettings`, not the Xcode UI, which shows the unexpanded
+  `$(MARKETING_VERSION)` placeholder for a generated project and so proves
+  nothing either way.
+
 #### Derive the iOS version from the changelog  (patch -16)
 
 - Replace the `0.0.0` placeholder in `ios/project.yml` with a generated

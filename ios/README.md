@@ -45,10 +45,16 @@ Requires a Mac with Xcode and
 [XcodeGen](https://github.com/yonaskolb/XcodeGen):
 
     brew install xcodegen        # once
-    cd ios
-    gmake ios-version            # regenerate Version.xcconfig (see below)
-    xcodegen generate            # (re)generate Potillus.xcodeproj from project.yml
-    open Potillus.xcodeproj
+    gmake ios-project            # from the REPOSITORY ROOT, not from ios/
+    open ios/Potillus.xcodeproj
+
+`ios-project` regenerates `Version.xcconfig` and then runs `xcodegen generate`
+in `ios/`, in that order. Running the two by hand works too, but note that the
+Makefile lives in the repository root while `xcodegen` resolves `project.yml`
+relative to the working directory:
+
+    gmake ios-version                        # from the root
+    cd ios && xcodegen generate              # from ios/
 
 Select the `Potillus` scheme and an iPhone simulator, then Run. Building for a
 physical device additionally needs your Apple Development team set on the target
@@ -86,8 +92,17 @@ build number, and neither can drift from the changelog. Regenerate it with
 `gmake ios-version` (or `python3 tools/gen-ios-version.py`) before running
 `xcodegen generate`; without it, XcodeGen cannot resolve the config file.
 
-`gmake ios-version-check` verifies the file exists and is current — the release
-gate. The values must never be set in `project.yml` directly: a value in
+`gmake ios-project` regenerates it and the Xcode project together, in the right
+order. `gmake ios-version-check` verifies the file exists and is current — the
+release gate.
+
+To confirm the mechanism actually took effect, ask the build system rather than
+reading the Xcode UI, where a generated project shows the unexpanded
+`$(MARKETING_VERSION)` placeholder:
+
+    cd ios && xcodebuild -project Potillus.xcodeproj -target Potillus \
+        -showBuildSettings 2>/dev/null | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
+ The values must never be set in `project.yml` directly: a value in
 `settings` overrides an xcconfig and would silently defeat the generator.
 
 ## Dependencies
