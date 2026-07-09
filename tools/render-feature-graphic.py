@@ -83,6 +83,27 @@ TOOLS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_DIR.parent
 ANDROID_DIR = REPO_ROOT / "android"
 FONT_DIR = TOOLS_DIR / "fonts"
+
+# Every font FILE the pinned fontconfig must be able to serve (see
+# _require_bundled_fonts). fontconfig NEVER fails on a missing family -- it
+# silently substitutes the closest match among the fonts it can see -- so a
+# missing bundled face would not abort the render but quietly set its text in
+# the wrong typeface (found in the v0.81.0 QA review: the statically instanced
+# Rokkitt Bold was absent from the tree, and the "F-Droid" wordmark of every
+# badge would have been substituted without any warning). Listing the exact
+# files here and checking them UP FRONT turns that silent degradation into a
+# loud, actionable failure. Keep this list in sync with the families the SVG
+# markup requests: Inter (headline/body copy), DejaVu Sans ("GET IT ON"),
+# Rokkitt Bold ("F-Droid" wordmark; committed after `make rokkitt-bold`), and
+# Noto Sans CJK (ja/ko/zh copy and badge text).
+REQUIRED_FONT_FILES = (
+    FONT_DIR / "Inter" / "Inter-Regular.ttf",
+    FONT_DIR / "Inter" / "Inter-SemiBold.ttf",
+    FONT_DIR / "Inter" / "Inter-Bold.ttf",
+    FONT_DIR / "DejaVuSans" / "DejaVuSans.ttf",
+    FONT_DIR / "Rokkitt" / "Rokkitt-Bold.ttf",
+    FONT_DIR / "NotoSansCJK" / "NotoSansCJK-Regular.ttc",
+)
 META_DIR = REPO_ROOT / "fastlane" / "metadata" / "android"
 ICON_FG = (
     ANDROID_DIR
@@ -987,6 +1008,26 @@ def main(argv: list[str]) -> int:
         print(
             "render-feature-graphic: 'rsvg-convert' not found -- install it "
             "(Debian: apt install librsvg2-bin).",
+            file=sys.stderr,
+        )
+        return 1
+
+    # Verify the bundled font inventory BEFORE any rendering. See the
+    # REQUIRED_FONT_FILES comment for why this must be an up-front hard
+    # failure: the pinned fontconfig would otherwise substitute a missing
+    # family silently and the graphics would ship with the wrong typeface.
+    missing = [p for p in REQUIRED_FONT_FILES if not p.is_file()]
+    if missing:
+        for p in missing:
+            print(
+                f"render-feature-graphic: required bundled font missing: {p}",
+                file=sys.stderr,
+            )
+        print(
+            "render-feature-graphic: refusing to render -- fontconfig would "
+            "silently substitute another family. For Rokkitt-Bold.ttf run "
+            "`make rokkitt-bold` once and commit the result (see COPYING.md); "
+            "the other faces are committed under tools/fonts/.",
             file=sys.stderr,
         )
         return 1

@@ -101,8 +101,11 @@ the AndroidX Test stack (`androidx.test.ext:junit`, `androidx.test:runner`,
 `androidx.test.uiautomator:uiautomator`), `androidx.room:room-testing`, the
 Compose UI-test artifacts (`ui-test-junit4`, `ui-test-manifest`) and
 `tools.fastlane:screengrab`; `junit:junit` 4 (Eclipse Public License 1.0);
-`org.json:json` (the "JSON License"); and the CycloneDX Gradle plugin
-`org.cyclonedx.bom` (Apache-2.0).
+`org.json:json` (the "JSON License"); and the Gradle build plugins — the
+CycloneDX SBOM plugin `org.cyclonedx.bom`, the Kotlin Symbol Processing
+plugin `com.google.devtools.ksp`, the Kover coverage plugin
+`org.jetbrains.kotlinx.kover` and the ktlint wrapper plugin
+`org.jlleitschuh.gradle.ktlint` (all Apache-2.0).
 
 ## Third-Party Assets
 

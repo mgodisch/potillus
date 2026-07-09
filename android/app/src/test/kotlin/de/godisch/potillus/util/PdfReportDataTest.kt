@@ -224,4 +224,41 @@ class PdfReportDataTest {
             }
         }
     }
+
+    // ── Historical export ranges (v0.81.0 QA fix) ─────────────────────────────
+
+    /**
+     * A report over a HISTORICAL range anchors its streaks at the period end,
+     * not at the real today (v0.81.0 QA regression test).
+     *
+     * With today pinned four months after the data and periodEnd = 2026-02-28,
+     * the streaks must read exactly as they did "on" 2026-03-01 (periodEnd + 1,
+     * the anchor for a range whose last day is complete): the tail run Feb 6 …
+     * Feb 28 holds 23 completed dry days. Before the fix the anchor was the
+     * real today (2026-06-30 here), so every day from Feb 6 to Jun 29 counted
+     * as abstinent — 144 days of "current abstinence" in a report that ends in
+     * February, regardless of any drinking after the range.
+     */
+    @Test fun `historical range anchors the streaks at the period end`() {
+        withToday("2026-06-30") {
+            val d = PdfReportData.from(entries, drinks, settings, periodEnd = "2026-02-28")
+            assertEquals(23, d.currentAbstinence)
+            assertEquals(23, d.longestAbstinence)
+        }
+    }
+
+    /**
+     * A range that ends TODAY keeps the real-today anchor, preserving the
+     * in-progress-day semantics and the parity with the Statistics screen —
+     * the figures must equal the legacy (periodEnd = null) computation.
+     */
+    @Test fun `range ending today keeps the real-today streak anchor`() {
+        withToday("2026-03-01") {
+            val explicit = PdfReportData.from(entries, drinks, settings, periodEnd = "2026-03-01")
+            val legacy = build() // periodEnd = null → today anchor
+            assertEquals(legacy.currentAbstinence, explicit.currentAbstinence)
+            assertEquals(legacy.longestAbstinence, explicit.longestAbstinence)
+            assertEquals(23, explicit.currentAbstinence)
+        }
+    }
 }

@@ -229,7 +229,19 @@ class TodayViewModel(
         val statsFloor = settings.statsFromDate // "" = not configured
         // A baseline only exists when the statistics start lies before this month.
         val hasBaseline = statsFloor.isNotEmpty() && statsFloor < monthStr
-        val historyFrom = if (hasBaseline) statsFloor else monthStr
+        // Lower bound of the CURRENT month's figures. Normally the 1st of the
+        // month — but a statistics start date INSIDE the running month clips it
+        // (v0.81.0 QA fix): before this, a mid-month floor was silently ignored
+        // here, so the card's monthly average included entries and days the user
+        // had excluded, contradicting the setting's documented contract
+        // ("Entries before this date are ignored in all statistics", see
+        // R.string.stats_from_desc) and disagreeing with the Statistics screen's
+        // MONTH view, which clips correctly. `monthFromStr` feeds the widened
+        // query's lower bound (when no earlier baseline exists), the curMonth
+        // filter and the effective-day divisor below, so sum, filter and divisor
+        // always cover the identical span.
+        val monthFromStr = if (statsFloor.isNotEmpty() && statsFloor > monthStr) statsFloor else monthStr
+        val historyFrom = if (hasBaseline) statsFloor else monthFromStr
         val baselineDays = if (hasBaseline) {
             (prevEnd.toEpochDay() - DayResolver.parseDate(statsFloor).toEpochDay() + 1).toInt()
         } else {
@@ -303,10 +315,17 @@ class TodayViewModel(
             // rule; the baseline is its summed grams over the full day count from the
             // statistics start to the day before this month. Trend.of yields FLAT
             // when there is no baseline or the two are equal at 0.1 g.
-            val curMonth = historySummaries.filter { it.date >= monthStr }
+            //
+            // The current month's slice starts at monthFromStr — the 1st of the
+            // month, or the statistics start date when that lies inside the
+            // running month (see the monthFromStr derivation above). The baseline
+            // split below can keep comparing against monthStr: when the floor is
+            // mid-month there IS no baseline (hasBaseline is false, the query
+            // starts at monthFromStr), so the `< monthStr` branch is empty anyway.
+            val curMonth = historySummaries.filter { it.date >= monthFromStr }
             val curMonthAvg = run {
                 val days = DayResolver.effectivePeriodDays(
-                    from = monthStr,
+                    from = monthFromStr,
                     today = today,
                     todayIsDrinkDay = curMonth.any { it.date == today },
                 )

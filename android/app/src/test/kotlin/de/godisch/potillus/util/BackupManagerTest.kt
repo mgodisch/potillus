@@ -368,6 +368,30 @@ class BackupManagerTest {
         assertEquals("", s.language)
     }
 
+    /**
+     * An unsupported language tag degrades to the "" (follow system) sentinel
+     * (v0.81.0 QA fix): the picker only ever stores tags from SupportedLocales,
+     * so anything else must be a hand-edited or foreign file — accepting it
+     * verbatim used to persist an arbitrary tag and even apply it via
+     * AppCompatDelegate on a REPLACE restore.
+     */
+    @Test fun `unsupported language degrades to follow-system`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(language = "xx-XX"))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals("", s.language)
+    }
+
+    /**
+     * A supported tag written with non-canonical CASING is accepted and comes
+     * back in the registry's canonical spelling — the case-insensitive lookup
+     * restores exactly the value SupportedLocales (and the picker) uses.
+     */
+    @Test fun `language tag casing is canonicalised against SupportedLocales`() {
+        val json = buildBackupJson(version = 3, settings = settingsJson(language = "PT-br"))
+        val s = requireNotNull(BackupManager.parseBackupJson(json).settings)
+        assertEquals("pt-BR", s.language)
+    }
+
     @Test fun `non-canonical statsFromDate degrades to empty`() {
         val json = buildBackupJson(version = 3, settings = settingsJson(statsFromDate = "2024-02-31"))
         val s = requireNotNull(BackupManager.parseBackupJson(json).settings)

@@ -42,6 +42,7 @@ import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.l10n.formattingLocale
@@ -122,50 +123,27 @@ fun SettingsScreen(
     // Share the exported file immediately after a successful export.
     // The share chooser is opened once and then cleared so it does not
     // reappear on recomposition.
+    //
+    // Only the JSON backup export produces a shareTarget on this screen
+    // ("application/json" from BackupManager.exportToJson): CSV and PDF export
+    // moved to the Statistics screen, and the PDF path never writes a file at
+    // all — the system print dialog owns saving/sharing there. The former
+    // "application/pdf" chooser branch here (an ACTION_VIEW base with an
+    // injected ACTION_SEND for PDF readers) was therefore unreachable and was
+    // removed in the v0.81.0 QA review; its ACTION_VIEW rationale lives on in
+    // the git history should a viewable file type ever be shared from Settings
+    // again. ACTION_SEND is the right base for a JSON backup (messengers,
+    // email, cloud storage — there is no dedicated "JSON viewer" audience).
     val shareTarget = state.shareTarget
     LaunchedEffect(shareTarget) {
         shareTarget ?: return@LaunchedEffect
 
-        val intent = if (shareTarget.mimeType == "application/pdf") {
-            // For PDFs: base the chooser on ACTION_VIEW so PDF readers, file managers,
-            // and the print service appear in the list.
-            // Additionally inject an ACTION_SEND intent via EXTRA_INITIAL_INTENTS so
-            // messengers and cloud-storage apps (which only register ACTION_SEND) also show.
-            //
-            // WHY ACTION_VIEW as the base (not ACTION_SEND)?
-            //   PDF readers register for ACTION_VIEW + application/pdf.
-            //   They do NOT register for ACTION_SEND, so the old ALTERNATE_INTENTS trick
-            //   was silently ignored by them on modern Android (API 30+).
-            //   Reversing the base intent makes PDF readers the primary targets.
-            //
-            // WHY EXTRA_INITIAL_INTENTS (not EXTRA_ALTERNATE_INTENTS)?
-            //   EXTRA_ALTERNATE_INTENTS was deprecated in API 30 and is unreliable.
-            //   EXTRA_INITIAL_INTENTS prepends specific intents to the top of the chooser
-            //   list and is the current recommended approach.
-            val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                type = shareTarget.mimeType
-                putExtra(Intent.EXTRA_STREAM, shareTarget.uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            Intent.createChooser(
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(shareTarget.uri, shareTarget.mimeType)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                },
-                shareTarget.fileName,
-            ).apply {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(sendIntent))
-            }
-        } else {
-            // For CSV and JSON: ACTION_SEND is the right base (messengers, email,
-            // cloud storage). These file types don't need a dedicated viewer.
-            ShareCompat.IntentBuilder(context)
-                .setType(shareTarget.mimeType)
-                .addStream(shareTarget.uri)
-                .setChooserTitle(shareTarget.fileName)
-                .createChooserIntent()
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+        val intent = ShareCompat.IntentBuilder(context)
+            .setType(shareTarget.mimeType)
+            .addStream(shareTarget.uri)
+            .setChooserTitle(shareTarget.fileName)
+            .createChooserIntent()
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         context.startActivity(intent)
         vm.clearShareTarget()
     }
@@ -616,14 +594,25 @@ private fun StatsFromDatePickerDialog(
             System.currentTimeMillis()
         }
     }
-    // Prevent selecting a future date: the "Statistik ab" date must be today or earlier.
-    // SelectableDates is a Material 3 API for constraining the calendar.
-    // The DatePicker works in UTC milliseconds; comparing against System.currentTimeMillis()
-    // (also UTC) is correct here.
+    // Prevent selecting a future date: the "Statistics From" date must be today
+    // or earlier. SelectableDates is a Material 3 API for constraining the
+    // calendar.
+    //
+    // WHY LocalDate.now(DayResolver.clock()) and not LocalDate.now(ZoneOffset.UTC)?
+    //   The DatePicker addresses its day CELLS by UTC-midnight epoch millis, but
+    //   the day the user perceives as "today" is their LOCAL calendar day. The
+    //   previous bound, LocalDate.now(ZoneOffset.UTC), used the UTC day instead:
+    //   east of UTC (e.g. UTC+9) the local today was NOT selectable for up to
+    //   nine hours after local midnight, and west of UTC the local TOMORROW was
+    //   selectable for the mirror-image window (v0.81.0 QA fix). Deriving the
+    //   bound from the local calendar day — read through DayResolver.clock() so
+    //   screenshot runs pin it like every other date-relative surface — and
+    //   converting THAT day to the picker's UTC-midnight representation makes
+    //   the last selectable cell exactly the user's today on every timezone.
+    //   (ExportDateRangeDialog already used this derivation via the logical
+    //   today string; this brings the two pickers in line.)
     val today = remember {
-        // Align to start-of-day UTC so a day that "is today" is fully selectable,
-        // not blocked by hour/minute of the current time.
-        java.time.LocalDate.now(ZoneOffset.UTC)
+        java.time.LocalDate.now(DayResolver.clock())
             .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
     }
     val pickerState = rememberDatePickerState(

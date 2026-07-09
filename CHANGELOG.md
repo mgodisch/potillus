@@ -42,7 +42,13 @@ Add accessible capacity symbols and chart labels
 
 This release improves accessibility for colour-vision deficiency and for
 screen-reader users, addressing the roadmap's Level-A chart gap and the
-"Use of Color" concern on the traffic-light indicator.
+"Use of Color" concern on the traffic-light indicator. It additionally folds
+in the fixes from the seventh full QA review of the whole tree; those include
+user-visible corrections — the statistics trend baseline, the Today card's
+monthly average and the PDF report's abstinence figures now honour the
+"Statistics From" date and the chosen export range, and the date picker for
+that setting no longer blocks the local today on timezones east of UTC — each
+listed individually below.
 
 - Alternative status symbols (opt-in). A switch under Settings → Appearance
   makes the traffic-light capacity dot draw a distinct glyph inside its coloured
@@ -110,6 +116,60 @@ screen-reader users, addressing the roadmap's Level-A chart gap and the
   Demo-Mode tear-down, where the per-command `|| true` already makes each step
   best-effort; and the in-Makefile target overviews / `help` texts were
   brought back in sync with the current target set.
+- Statistics trend vs. "Statistics From" (seventh QA round): the trend arrow
+  and percentage on the Statistics screen compared the current period against
+  a previous-period baseline that ignored the configured statistics start
+  date. With a floor inside or after the previous window, the baseline summed
+  entries the setting promises are "ignored in all statistics"
+  (`stats_from_desc`). The baseline query and its per-day divisor are now
+  clipped to the same floor as the current period; a window entirely before
+  the floor yields no baseline and the trend reads FLAT, exactly like the
+  no-history case. Pinned by a new `StatsViewModelTest` regression test.
+- Today card monthly average vs. mid-month "Statistics From" (seventh QA
+  round): a statistics start date INSIDE the running month was ignored by the
+  Today card — its monthly average kept anchoring at the 1st of the month, so
+  excluded entries and days entered sum and divisor, disagreeing with the
+  Statistics screen's correctly clipped MONTH view. The card's month anchor is
+  now clamped to the floor; sum, filter and divisor cover the identical span.
+  Pinned by a new `TodayViewModelTest` regression test.
+- PDF report abstinence figures for historical export ranges (seventh QA
+  round): a report over a range that ended in the past anchored its "current"
+  and "longest abstinence" at the REAL today, counting every day from the last
+  in-range drink until now as abstinent — including post-period days on which
+  the user did drink. The streaks now anchor at the period end (range end + 1
+  day) for historical ranges and keep the real-today anchor when the range
+  ends today, preserving the Statistics-screen parity for the default export.
+  `StatsViewModel.exportPdf` threads the chosen range end through
+  `PdfReportBuilder.buildHtml` into `PdfReportData.from`; two new
+  `PdfReportDataTest` cases pin both anchors.
+- "Statistics From" date picker timezone bound (seventh QA round): the picker
+  capped selectable days at the UTC calendar day, so east of UTC the user's
+  local today was unselectable for up to the zone offset after midnight, and
+  west of UTC the local tomorrow was briefly selectable. The bound now derives
+  from the local calendar day (read through `DayResolver.clock()`, matching
+  the export range dialog and the screenshot-pinning convention).
+- Backup restore validates the language tag (seventh QA round): a restored
+  `language` value is now matched case-insensitively against
+  `SupportedLocales` and canonicalised; unknown tags degrade to the
+  follow-system sentinel instead of being persisted and applied verbatim from
+  a hand-edited file. Covered by new `BackupManagerTest` cases.
+- Feature-graphic renderer refuses to run with missing bundled fonts (seventh
+  QA round): fontconfig silently substitutes a missing family, so an absent
+  face under `tools/fonts/` (e.g. the statically instanced Rokkitt Bold, see
+  `make rokkitt-bold` and COPYING.md) would have set the F-Droid badge text in
+  the wrong typeface without any warning. `tools/render-feature-graphic.py`
+  now checks the exact bundled font files up front and fails loudly with the
+  recovery command.
+- Documentation corrections (seventh QA round): the Keystore KDoc no longer
+  claims StrongBox backing (`KeystoreSecretStore` / `AppPreferences` — the key
+  is TEE-backed; StrongBox would require `setIsStrongBoxBacked(true)`, which
+  is deliberately not requested); the `DrinkDaysBar` KDoc now describes the
+  trailing 7-day window instead of the pre-v0.62.0 "Mon–Sun week"; the
+  unreachable `application/pdf` chooser branch in `SettingsScreen`'s share
+  effect (dead since CSV/PDF export moved to Statistics and the PDF path
+  stopped producing a file) was removed; and COPYING.md's build-time tooling
+  list gained the KSP, Kover and ktlint Gradle plugins alongside the already
+  listed CycloneDX plugin.
 
 ---
 

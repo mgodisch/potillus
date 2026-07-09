@@ -179,16 +179,23 @@ data class PdfReportData(
         /**
          * Computes the full report dataset for [entries] in the chosen period.
          *
-         * @param entries  Consumption entries for the (inclusive) date range. Must be
-         *                 non-empty; the caller checks this before calling.
-         * @param drinks   Drink catalogue, used to map each entry to its category.
-         * @param settings Current limits, weight and day-change configuration.
+         * @param entries   Consumption entries for the (inclusive) date range. Must be
+         *                  non-empty; the caller checks this before calling.
+         * @param drinks    Drink catalogue, used to map each entry to its category.
+         * @param settings  Current limits, weight and day-change configuration.
+         * @param periodEnd The user-chosen INCLUSIVE end of the export range
+         *                  ("YYYY-MM-DD"), or `null` when the caller has no explicit
+         *                  range (legacy behaviour: the streaks anchor at the real
+         *                  logical today). Used only to anchor the abstinence
+         *                  streaks — see the streak block below for why a HISTORICAL
+         *                  range must not anchor at today (v0.81.0 QA fix).
          * @return A fully computed [PdfReportData].
          */
         fun from(
             entries: List<ConsumptionEntry>,
             drinks: List<DrinkDefinition>,
             settings: AppSettings,
+            periodEnd: String? = null,
         ): PdfReportData {
             val drinkMap = drinks.associateBy { it.id }
 
@@ -333,7 +340,7 @@ data class PdfReportData(
             val weekdayAverages = dayTotals.map { list -> if (list.isEmpty()) null else list.average() }
 
             // ── Abstinence streaks (shared DayResolver logic).
-            //    `today` is passed to BOTH computations so the tail gap — the
+            //    The anchor is passed to BOTH computations so the tail gap — the
             //    completed dry days since the last recorded drink — is included in
             //    the longest streak exactly as it is in the current streak. The
             //    parameterless legacy call (today = "", tail gap ignored) produced a
@@ -345,10 +352,30 @@ data class PdfReportData(
             //    PdfReportDataTest for the pinning tests). No statsFrom is passed:
             //    the report is scoped to [firstDate, lastDate] and firstDate is by
             //    construction a drink day, so no initial gap can exist here.
+            //
+            //    STREAK ANCHOR for historical ranges (v0.81.0 QA fix): the export
+            //    dialog lets the user pick a range that ended in the past. Anchoring
+            //    such a report's streaks at the REAL today counted every day from
+            //    the last in-range drink up to now as abstinent — including days
+            //    outside the report on which the user did drink — so "current
+            //    abstinence" was arbitrarily inflated and "longest abstinence"
+            //    could overrun the report period. The anchor is therefore clamped
+            //    to the report range: for a range ending before today it is
+            //    periodEnd + 1 day, which makes computeCurrentAbstinence count the
+            //    completed dry days up to AND INCLUDING the (finished) last report
+            //    day — i.e. "abstinence as of the period end". For a range ending
+            //    today (the default export) the anchor stays the real logical
+            //    today, preserving the in-progress-day semantics and the screen
+            //    parity. A null periodEnd keeps the legacy today anchor.
             val allDates = byDate.keys.sorted()
             val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
-            val longest = DayResolver.computeLongestAbstinence(allDates, today)
-            val current = DayResolver.computeCurrentAbstinence(allDates, today)
+            val streakAnchor = if (periodEnd != null && periodEnd < today) {
+                DayResolver.formatDate(DayResolver.parseDate(periodEnd).plusDays(1))
+            } else {
+                today
+            }
+            val longest = DayResolver.computeLongestAbstinence(allDates, streakAnchor)
+            val current = DayResolver.computeCurrentAbstinence(allDates, streakAnchor)
 
             // Time-axis consumption series for the report chart. The span is the
             // recorded range [firstDate, lastDate]; granularity scales with its

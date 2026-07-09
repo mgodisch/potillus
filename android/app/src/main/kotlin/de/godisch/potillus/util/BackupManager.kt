@@ -34,6 +34,7 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.domain.model.ThemeMode
+import de.godisch.potillus.l10n.SupportedLocales
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -578,7 +579,9 @@ object BackupManager {
      * Sentinels preserved on purpose:
      *  - `weightKg == 0.0` means "not set" (the setter would clamp a real value to
      *    ≥ 1 kg, so 0.0 must survive as-is rather than becoming a fake 1 kg body).
-     *  - `language == ""` means "follow the system language".
+     *  - `language == ""` means "follow the system language"; any non-empty value
+     *    must be a tag from [de.godisch.potillus.l10n.SupportedLocales] (matched
+     *    case-insensitively, canonical casing restored) or it degrades back to "".
      *  - `statsFromDate == ""` means "no explicit start date"; any non-empty value
      *    must be a canonical ISO-8601 calendar date or it degrades back to "".
      *
@@ -617,9 +620,20 @@ object BackupManager {
             }
         }
 
-        // language: a BCP-47 tag is short; reject an implausibly long value so a
-        // crafted backup cannot bloat the encrypted preferences file.
-        val language = obj.optString("language", def.language).let { if (it.length <= 35) it else "" }
+        // language: must be one of the app's shipped locales or the "" (follow
+        // system) sentinel. The picker only ever stores exact tags from
+        // [de.godisch.potillus.l10n.SupportedLocales], so any other value can
+        // only come from a hand-edited or foreign file. Accepting it verbatim
+        // used to persist an arbitrary tag AND apply it via
+        // AppCompatDelegate.setApplicationLocales on a REPLACE restore, leaving
+        // the resources on the English fallback while the Settings picker held
+        // an unknown value (v0.81.0 QA fix). The lookup is case-insensitive and
+        // returns the registry's CANONICAL casing; anything unknown degrades to
+        // "" — follow the system language — matching this function's
+        // degrade-to-default contract for every other field. (The former
+        // length cap is subsumed: registry tags are all short.)
+        val rawLanguage = obj.optString("language", def.language)
+        val language = SupportedLocales.TAGS.firstOrNull { it.equals(rawLanguage, ignoreCase = true) } ?: ""
 
         return AppSettings(
             themeMode = theme,

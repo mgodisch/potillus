@@ -42,6 +42,7 @@ package de.godisch.potillus.ui.screen
 import app.cash.turbine.test
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
+import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeDrinkRepository
@@ -172,6 +173,75 @@ class TodayViewModelTest {
         vm.deleteEntry(entry)
         assertTrue("Entry should be removed after deleteEntry", entryRepo.allEntries.isEmpty())
     }
+
+    // ── Statistics start date inside the running month (v0.81.0 QA fix) ───────
+
+    /**
+     * The Today card's monthly average honours a statistics start date that lies
+     * INSIDE the running month (v0.81.0 QA regression test).
+     *
+     * Scenario: the floor is set to two days ago; an old entry from five days ago
+     * (same month, before the floor) still exists. Before the fix the card's
+     * month anchor stayed at the 1st of the month, so the pre-floor entry's grams
+     * entered the sum AND the pre-floor days entered the divisor — contradicting
+     * the setting's contract ("Entries before this date are ignored in all
+     * statistics", R.string.stats_from_desc) and disagreeing with the Statistics
+     * screen's MONTH view, which clips correctly. After the fix the month figures
+     * cover exactly [floor … today]: 10 g over the 2 completed days = 5 g/day.
+     *
+     * The wall clock is pinned mid-June (12:00 UTC, the same safety margin the
+     * PdfReportDataTest streak tests use) so today resolves to June 20th or 21st
+     * depending on the runner's zone — either way all derived dates (today−5 …
+     * today) stay inside one calendar month, keeping the expectation exact
+     * without depending on the zone.
+     */
+    @Test fun `monthly average honours a mid-month statistics start date`() = runTest(dispatcher) {
+        DayResolver.clockOverride = java.time.Clock.fixed(
+            java.time.Instant.parse("2026-06-20T12:00:00Z"),
+            java.time.ZoneOffset.UTC,
+        )
+        try {
+            val today = DayResolver.today(4, 0)
+            val todayDate = java.time.LocalDate.parse(today)
+            val floor = todayDate.minusDays(2).toString()
+            val preFloorDay = todayDate.minusDays(5).toString()
+            val inRangeDay = todayDate.minusDays(1).toString()
+            prefs = FakeAppPreferences(
+                AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = floor),
+            )
+            // Pre-floor grams that must NOT enter the monthly average …
+            entryRepo.add(monthEntry(id = 1, date = preFloorDay, grams = 60.0))
+            // … and the in-range grams that alone define it.
+            entryRepo.add(monthEntry(id = 2, date = inRangeDay, grams = 10.0))
+
+            val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+            vm.uiState.test {
+                // Skip the seed and any intermediate emission until the computed
+                // state (non-zero average) arrives.
+                var state = awaitItem()
+                while (state.monthlyAvgPerDay == 0.0) state = awaitItem()
+                // effectivePeriodDays(from = floor, today, todayIsDrinkDay=false)
+                // = the 2 completed days [floor, today-1]; 10 g / 2 d = 5 g/day.
+                assertEquals(5.0, state.monthlyAvgPerDay, 0.001)
+                cancelAndIgnoreRemainingEvents()
+            }
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
+        }
+    }
+
+    /** Minimal [ConsumptionEntry] on a given logical [date] for the floor test. */
+    private fun monthEntry(id: Long, date: String, grams: Double) = ConsumptionEntry(
+        id = id,
+        drinkId = 1L,
+        drinkName = "TestDrink",
+        volumeMl = 500,
+        alcoholPercent = 5.0,
+        gramsAlcohol = grams,
+        timestampMillis = java.time.LocalDate.parse(date)
+            .atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli(),
+        logicalDate = date,
+    )
 
     // ── Logical-day rollover while subscribed (v0.79.0 QA regression) ─────────
 

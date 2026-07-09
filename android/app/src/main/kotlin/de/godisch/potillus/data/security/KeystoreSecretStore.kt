@@ -57,9 +57,15 @@ import javax.crypto.spec.GCMParameterSpec
  * WHAT "ENVELOPE ENCRYPTION" MEANS HERE
  * ────────────────────────────────────────────────────────────────────────────
  * A symmetric AES-256-GCM key is generated **inside** the Android Keystore
- * under [keyAlias] and never leaves it — on devices with a StrongBox secure
- * element the key material stays in dedicated hardware; otherwise it lives in
- * the TEE-backed Keystore. We use that key to encrypt ("seal") the secret and
+ * under [keyAlias] and never leaves it — the key material lives in the
+ * TEE-backed Keystore (minSdk 30 guarantees hardware-backed key storage).
+ * Note that it is NOT StrongBox-backed even on devices that have a StrongBox
+ * secure element: that would require `setIsStrongBoxBacked(true)` at key
+ * generation, which this class deliberately does not request — StrongBox is
+ * absent on most devices, so requesting it needs an availability-probe /
+ * fallback dance, and the TEE Keystore already meets this secret's threat
+ * model (protecting a preferences blob at rest). We use that key to encrypt
+ * ("seal") the secret and
  * store only the resulting ciphertext. To use the secret again we ask the
  * Keystore to decrypt ("open") it. The plaintext secret therefore exists only
  * transiently in process memory and is never written to disk.

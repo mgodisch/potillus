@@ -103,10 +103,16 @@ object PdfReportBuilder {
     /**
      * Renders the full two-page report as a self-contained HTML string.
      *
-     * @param context  Context for asset loading and string-resource localisation.
-     * @param entries  Consumption entries for the period (must be non-empty).
-     * @param drinks   Drink catalogue for category look-ups.
-     * @param settings Current user preferences (limits, weight, week start, …).
+     * @param context   Context for asset loading and string-resource localisation.
+     * @param entries   Consumption entries for the period (must be non-empty).
+     * @param drinks    Drink catalogue for category look-ups.
+     * @param settings  Current user preferences (limits, weight, week start, …).
+     * @param periodEnd The user-chosen inclusive end of the export range
+     *                  ("YYYY-MM-DD"), or `null` when no explicit range exists.
+     *                  Forwarded to [PdfReportData.from], which uses it to anchor
+     *                  the abstinence streaks so a HISTORICAL report does not
+     *                  count post-period days as abstinent (v0.81.0 QA fix; see
+     *                  the streak block there).
      * @return Complete HTML ready to be loaded into a WebView for printing.
      */
     fun buildHtml(
@@ -114,8 +120,9 @@ object PdfReportBuilder {
         entries: List<ConsumptionEntry>,
         drinks: List<DrinkDefinition>,
         settings: AppSettings,
+        periodEnd: String? = null,
     ): String {
-        val d = PdfReportData.from(entries, drinks, settings)
+        val d = PdfReportData.from(entries, drinks, settings, periodEnd)
 
         // Locale for all value formatting in this report. We take it from the
         // Context (which already reflects the per-app language, exactly like the

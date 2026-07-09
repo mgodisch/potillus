@@ -539,8 +539,16 @@ fun TrafficLightDot(
 // ════════════════════════════════════════════════════════════════════════════
 
 /**
- * A labelled horizontal progress bar showing how many days this Mon–Sun week
- * have already included alcohol consumption.
+ * A labelled horizontal progress bar showing how many days of the trailing
+ * 7-day window (today plus the previous six calendar days) have already
+ * included alcohol consumption.
+ *
+ * The KDoc previously described a fixed "Mon–Sun week" — stale since the
+ * rolling-window refactor (v0.62.0) replaced all fixed calendar weeks with the
+ * gliding 7-day window; the values wired in here (TodayScreen passes
+ * [de.godisch.potillus.ui.screen.TodayUiState.drinkDaysThisWeek] and
+ * [de.godisch.potillus.ui.screen.TodayUiState.weeklyRangeLabel]) had long been
+ * the trailing-window figures (corrected in the v0.81.0 QA review).
  *
  * Colour semantics mirror [LimitBar]:
  *   - < 75 % used   → primary (blue)
@@ -550,10 +558,11 @@ fun TrafficLightDot(
  * The bar is always shown (0 drink days is displayed as an empty bar) so the
  * limit is visible even when the week has just started.
  *
- * @param drinkDays    Days this week on which alcohol was consumed (including today
- *                     when today has entries).
+ * @param drinkDays    Days within the trailing 7-day window on which alcohol was
+ *                     consumed (including today when today has entries).
  * @param maxDrinkDays Maximum allowed drink days (from [LimitInfo.maxDrinkDaysPerWeek]).
- * @param weekLabel    Formatted week-range label, e.g. "19.5.–25.5." for display.
+ * @param weekLabel    Formatted window-range label in the per-app locale's
+ *                     day/month order, e.g. "28.6–4.7" (de) or "6/28–7/4" (en-US).
  * @param modifier     Optional layout modifier.
  */
 @Composable

@@ -99,8 +99,9 @@ import java.time.ZoneId
  * DataStore [Serializer] that wraps [PreferencesSerializer] with AES-256-GCM.
  *
  * The symmetric key is generated once in the Android Keystore under [keyAlias]
- * and never leaves the secure hardware (or software Keystore emulation on
- * devices without a StrongBox). Each [writeTo] call generates a fresh 12-byte
+ * and never leaves it — TEE-backed on the minSdk-30 device population; it is
+ * deliberately NOT StrongBox-backed (see [KeystoreSecretStore] for why). Each
+ * [writeTo] call generates a fresh 12-byte
  * IV; the on-disk format is `[IV (12 bytes)] || [GCM ciphertext + 16-byte tag]`.
  *
  * WHY wrap [PreferencesSerializer] instead of encrypting individual values?

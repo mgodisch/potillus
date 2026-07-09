@@ -253,8 +253,11 @@ class StatsViewModel(
             // number format of the report is resolved from this context.
             val reportContext = appContext.perAppLocalizedContext()
             // HTML assembly (template fill) is CPU work, not UI work → off the main thread.
+            // `to` (the user-chosen inclusive range end) is forwarded so a report
+            // over a HISTORICAL range anchors its abstinence streaks at the period
+            // end instead of the real today (v0.81.0 QA fix; see PdfReportData).
             val html = withContext(Dispatchers.Default) {
-                runCatching { PdfReportBuilder.buildHtml(reportContext, entries, drinks, settings) }
+                runCatching { PdfReportBuilder.buildHtml(reportContext, entries, drinks, settings, periodEnd = to) }
                     .getOrNull()
             }
             if (html != null) {
@@ -358,9 +361,24 @@ class StatsViewModel(
         val effectiveFrom = if (statsFloor.isNotEmpty() && statsFloor > from) statsFloor else from
         val streakDates = if (statsFloor.isNotEmpty()) allDates.filter { it >= statsFloor } else allDates
 
+        // The PREVIOUS-period baseline honours the same lower bound (v0.81.0 QA
+        // fix). Before this, only the current period was clipped, so the trend
+        // arrow/percentage compared against days the user had excluded via the
+        // "Statistics From" date — contradicting that setting's documented
+        // contract ("Entries before this date are ignored in all statistics",
+        // see R.string.stats_from_desc). Clipping may leave the previous window
+        // partially covered (fewer baseline days) or entirely before the floor:
+        //  - partially: the baseline average is taken over the remaining days
+        //    (effectivePrevFrom..prevTo), keeping the per-day comparison fair;
+        //  - entirely (floor > prevTo): there is no comparable baseline at all.
+        //    The query range is then inverted, Room returns no rows, prevDays
+        //    computes ≤ 0, and the trend degrades to FLAT / 0 % exactly like the
+        //    no-history case — the behaviour the Today card's baseline already had.
+        val effectivePrevFrom = if (statsFloor.isNotEmpty() && statsFloor > prevFrom) statsFloor else prevFrom
+
         combine(
             entryRepo.getDailySummaries(effectiveFrom, to),
-            entryRepo.getDailySummaries(prevFrom, prevTo),
+            entryRepo.getDailySummaries(effectivePrevFrom, prevTo),
             entryRepo.getEntriesForPeriod(effectiveFrom, to),
             drinkRepo.drinks,
         ) { current, previous, periodEntries, drinks ->
@@ -455,13 +473,18 @@ class StatsViewModel(
             // so an in-progress period compares fairly against a full previous one.
             // The current average already uses the superposition rule (effective
             // days); the previous period is complete, so it is divided by its full
-            // day count [prevFrom, prevTo]. A non-positive previous average means
-            // "no comparable previous value" → Trend.FLAT (shown as "–").
+            // CLIPPED day count [effectivePrevFrom, prevTo] — the same statistics-
+            // start clipping its query uses above, so sum and divisor always cover
+            // the identical span. When the floor lies after prevTo the range is
+            // inverted, prevDays comes out ≤ 0, and the trend degrades to FLAT
+            // (v0.81.0 QA fix; see the effectivePrevFrom derivation above). A
+            // non-positive previous average likewise means "no comparable previous
+            // value" → Trend.FLAT (shown as "–").
             val avgPerDay = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0
             val prevSum = previous.sumOf { it.totalGrams }
             val prevDays = (
                 DayResolver.parseDate(prevTo).toEpochDay() -
-                    DayResolver.parseDate(prevFrom).toEpochDay() + 1
+                    DayResolver.parseDate(effectivePrevFrom).toEpochDay() + 1
                 ).toInt()
             val prevAvgPerDay = if (prevDays > 0) prevSum / prevDays else 0.0
             val trend = Trend.of(avgPerDay, prevAvgPerDay)

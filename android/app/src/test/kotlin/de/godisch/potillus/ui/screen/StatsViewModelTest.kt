@@ -45,6 +45,7 @@ import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -335,6 +336,50 @@ class StatsViewModelTest {
         val vm = makeVm()
         vm.uiState.test {
             assertEquals(0.0, awaitItem().trendPercent, 0.001)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * The previous-period trend baseline honours the statistics start date
+     * (v0.81.0 QA regression test).
+     *
+     * Scenario: the user sets "Statistics From" to TODAY, so the entire previous
+     * 7-day window lies before the floor. An old entry inside that window still
+     * exists in the database. Before the fix the baseline query ignored the
+     * floor, summed that entry and produced a non-FLAT trend — comparing
+     * against data the setting's contract says is "ignored in all statistics"
+     * (R.string.stats_from_desc). After the fix the clipped baseline range is
+     * inverted (floor > prevTo), no rows qualify, and the trend degrades to
+     * FLAT / 0 % exactly like the genuine no-history case.
+     *
+     * Dates are derived from the LOGICAL today (see the over-limit-day test for
+     * why LocalDate.now() would be off by one between midnight and 04:00), so
+     * the test is wall-clock independent.
+     */
+    @Test fun `previous-period baseline is clipped by the statistics start date`() = runTest {
+        val today = DayResolver.today(4, 0)
+        prefs = FakeAppPreferences(
+            AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = today),
+        )
+        // Inside the previous WEEK window (today-13 … today-7) and before the floor.
+        val preFloorDay = LocalDate.parse(today).minusDays(10).toString()
+        entryRepo.add(entry(id = 1, date = preFloorDay, grams = 50.0))
+        // Inside the current (floored) window, so the state differs from the seed.
+        entryRepo.add(entry(id = 2, date = today, grams = 10.0))
+
+        val vm = makeVm()
+        vm.setPeriod(StatsPeriod.WEEK)
+        vm.uiState.test {
+            val state = awaitComputed()
+            assertEquals(StatsPeriod.WEEK, state.period)
+            assertEquals(10.0, state.totalGrams, 0.001) // pre-floor entry excluded
+            assertEquals(
+                "a fully pre-floor previous window must yield no baseline (FLAT)",
+                Trend.FLAT,
+                state.trend,
+            )
+            assertEquals(0.0, state.trendPercent, 0.001)
             cancelAndIgnoreRemainingEvents()
         }
     }
