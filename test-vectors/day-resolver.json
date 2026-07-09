@@ -1,0 +1,408 @@
+{
+  "_comment": [
+    "Shared golden vectors for DayResolver. Loaded by BOTH the Android (JVM) and iOS",
+    "(Swift) suites. The logical day boundary decides which day every entry belongs to,",
+    "so a divergence here would silently corrupt every downstream figure.",
+    "resolve: epochMillis is absolute; zoneId is an IANA identifier. Cases cover DST",
+    "spring-forward/fall-back and cross-timezone instants."
+  ],
+  "resolve": [
+    {
+      "description": "04:01 stays same day",
+      "epochMillis": 1748052060000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "12:00 stays same day",
+      "epochMillis": 1748080800000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "23:59 stays same day",
+      "epochMillis": 1748123940000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "03:59 maps to previous day",
+      "epochMillis": 1748051940000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "02:30 maps to previous day",
+      "epochMillis": 1748046600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "midnight maps to previous day",
+      "epochMillis": 1748037600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "exactly at change time stays same day",
+      "epochMillis": 1748052000000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "custom change time 06:00, before",
+      "epochMillis": 1748059140000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 6,
+      "changeMinute": 0,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "custom change time 06:00, at",
+      "epochMillis": 1748059200000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 6,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "change time with minutes, before 04:30",
+      "epochMillis": 1748053740000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 30,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "change time with minutes, at 04:30",
+      "epochMillis": 1748053800000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 30,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "midnight Jan 1 maps to Dec 31",
+      "epochMillis": 1735686000000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2024-12-31"
+    },
+    {
+      "description": "midnight Mar 1 maps to Feb 28 (non-leap)",
+      "epochMillis": 1740783600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-02-28"
+    },
+    {
+      "description": "midnight Mar 1 maps to Feb 29 (leap year)",
+      "epochMillis": 1709247600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2024-02-29"
+    },
+    {
+      "description": "midnight change boundary keeps calendar day",
+      "epochMillis": 1748037600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 0,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "DST spring-forward: 01:30 before the 02:00 gap",
+      "epochMillis": 1743294600000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-29"
+    },
+    {
+      "description": "DST spring-forward: 03:30 after the gap, still before 04:00",
+      "epochMillis": 1743298200000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-29"
+    },
+    {
+      "description": "DST spring-forward: 04:30 after change time",
+      "epochMillis": 1743301800000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-30"
+    },
+    {
+      "description": "DST fall-back day: 01:30 (ambiguous local time)",
+      "epochMillis": 1761435000000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-10-25"
+    },
+    {
+      "description": "DST fall-back day: 05:00 after change time",
+      "epochMillis": 1761451200000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-10-26"
+    },
+    {
+      "description": "New York 22:00 stays same day",
+      "epochMillis": 1748138400000,
+      "zoneId": "America/New_York",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "New York 03:00 maps to previous day",
+      "epochMillis": 1748070000000,
+      "zoneId": "America/New_York",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-23"
+    },
+    {
+      "description": "Same instant, New York: 23:00 -> same day",
+      "epochMillis": 1748142000000,
+      "zoneId": "America/New_York",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-24"
+    },
+    {
+      "description": "Same instant, Berlin: 05:00 next day -> next day",
+      "epochMillis": 1748142000000,
+      "zoneId": "Europe/Berlin",
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-05-25"
+    }
+  ],
+  "effectivePeriodDays": [
+    {
+      "description": "excludes in-progress day unless it is a drink day",
+      "from": "2025-05-01",
+      "today": "2025-05-10",
+      "todayIsDrinkDay": false,
+      "expected": 9
+    },
+    {
+      "description": "in-progress day counts once it is a drink day",
+      "from": "2025-05-01",
+      "today": "2025-05-10",
+      "todayIsDrinkDay": true,
+      "expected": 10
+    },
+    {
+      "description": "first day, dry",
+      "from": "2025-05-10",
+      "today": "2025-05-10",
+      "todayIsDrinkDay": false,
+      "expected": 0
+    },
+    {
+      "description": "first day, after a drink",
+      "from": "2025-05-10",
+      "today": "2025-05-10",
+      "todayIsDrinkDay": true,
+      "expected": 1
+    },
+    {
+      "description": "inverted range returns 0",
+      "from": "2025-05-11",
+      "today": "2025-05-10",
+      "todayIsDrinkDay": true,
+      "expected": 0
+    }
+  ],
+  "computeCurrentAbstinence": [
+    {
+      "description": "empty list, no statsFrom",
+      "dates": [],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "empty list, statsFrom 5 days ago",
+      "dates": [],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-05",
+      "expected": 5
+    },
+    {
+      "description": "empty list, statsFrom equals today",
+      "dates": [],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-10",
+      "expected": 0
+    },
+    {
+      "description": "empty list, statsFrom in the future",
+      "dates": [],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-20",
+      "expected": 0
+    },
+    {
+      "description": "last date is today",
+      "dates": [
+        "2025-05-10"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "last drink 3 days ago, 2 completed dry days",
+      "dates": [
+        "2025-05-07"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 2
+    },
+    {
+      "description": "last drink two days ago counts 1",
+      "dates": [
+        "2025-05-08"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 1
+    },
+    {
+      "description": "drank yesterday, today not over, counts 0",
+      "dates": [
+        "2025-05-09"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "with entries, statsFrom is ignored",
+      "dates": [
+        "2025-05-07"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "2025-01-01",
+      "expected": 2
+    },
+    {
+      "description": "future drink date returns 0",
+      "dates": [
+        "2025-05-20"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 0
+    }
+  ],
+  "computeLongestAbstinence": [
+    {
+      "description": "empty list, nothing given",
+      "dates": [],
+      "today": "",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "empty list with statsFrom and today",
+      "dates": [],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-01",
+      "expected": 9
+    },
+    {
+      "description": "single entry, no today",
+      "dates": [
+        "2025-05-05"
+      ],
+      "today": "",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "consecutive days, no gap",
+      "dates": [
+        "2025-05-05",
+        "2025-05-06",
+        "2025-05-07"
+      ],
+      "today": "",
+      "statsFrom": "",
+      "expected": 0
+    },
+    {
+      "description": "finds the longest inter-drink gap",
+      "dates": [
+        "2025-05-01",
+        "2025-05-05",
+        "2025-05-12"
+      ],
+      "today": "",
+      "statsFrom": "",
+      "expected": 6
+    },
+    {
+      "description": "tail gap included",
+      "dates": [
+        "2025-05-01"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 8
+    },
+    {
+      "description": "tail gap two days ago counts 1",
+      "dates": [
+        "2025-05-08"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "",
+      "expected": 1
+    },
+    {
+      "description": "initial gap dominates",
+      "dates": [
+        "2025-05-20"
+      ],
+      "today": "2025-05-21",
+      "statsFrom": "2025-05-01",
+      "expected": 19
+    },
+    {
+      "description": "backward compat: no today, no statsFrom",
+      "dates": [
+        "2025-05-01",
+        "2025-05-04"
+      ],
+      "today": "",
+      "statsFrom": "",
+      "expected": 2
+    }
+  ]
+}

@@ -491,6 +491,27 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port DayResolver to Swift with shared vectors  (patch -05)
+
+- Add `test-vectors/day-resolver.json`: 48 golden cases for the logical-day
+  boundary, effective period length, and the abstinence streaks, harvested from
+  `DayResolverTest.kt`. The `resolve` cases carry an absolute instant plus an
+  IANA zone and cover both DST edges and cross-timezone instants.
+- Port `DayResolver` to Swift, mirroring the `assert` postconditions. Document
+  why this is the riskiest port: the logical day decides which day every entry
+  belongs to, so a one-day divergence would silently corrupt every downstream
+  figure. The zone stays an explicit parameter rather than an ambient global,
+  wall-clock readings are resolved through the zone so DST is handled by
+  Foundation, and date-string arithmetic is pinned to a UTC calendar at noon.
+- Pin the date formatter to `en_US_POSIX`, so a device locale can never
+  substitute an alternate calendar (a naive formatter prints Buddhist-era years
+  on a Thai device, corrupting every stored `logicalDate`).
+- Assert both suites against the vectors, and add structural tests for
+  round-tripping, malformed input, locale independence, and non-negative streaks.
+- Not ported by design: `clockOverride`/`clock()`/`today()` (a screenshot test
+  seam) and `firstDayOfWeekIso` (a locale-driven visual detail); both are
+  platform concerns that return with the iOS UI.
+
 #### Port AlcoholCalculator to Swift with shared vectors  (patch -04)
 
 - Add `test-vectors/alcohol-calculator.json`: 45 golden input/output cases
