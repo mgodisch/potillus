@@ -510,6 +510,17 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Clear the Swift 6 concurrency warnings  (patch -13)
+
+- Fix six `#SendableClosureCaptures` warnings in `SchemaParityTests`: a `Drink`
+  or `Entry` was declared outside the write closure and mutated inside it. GRDB's
+  `write` takes a `@Sendable` closure, so that is a data race, and an error in
+  the Swift 6 language mode rather than a warning.
+- Create and mutate the record inside the closure, returning only the assigned
+  row id (or the finished value), so mutable state never crosses the isolation
+  boundary. The production repositories already used this shape; only the tests
+  had drifted.
+
 #### Port the JSON backup format to Swift  (patch -12)
 
 - Port Android's `BackupManager` reader/writer. This is the project's single

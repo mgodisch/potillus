@@ -221,15 +221,25 @@ final class SchemaParityTests: XCTestCase {
     /// and this asserts the effect rather than the setting.
     func testDeletingAReferencedDrinkIsRefused() throws {
         let database = try makeDatabase()
-        var drink = Drink(name: "Pils", volumeMl: 500, alcoholPercent: 4.9, category: "beer")
-        try database.write { db in try drink.insert(db) }
 
-        let drinkId = try XCTUnwrap(drink.id)
-        var entry = Entry(
-            drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: 19.3, timestampMillis: 1_748_142_000_000, logicalDate: "2025-05-24"
-        )
-        try database.write { db in try entry.insert(db) }
+        // The record is created and mutated INSIDE the write closure. GRDB's
+        // `write` takes a `@Sendable` closure, so mutating a variable captured
+        // from the enclosing scope is a data race the Swift 6 language mode
+        // rejects. Returning the assigned id instead keeps the value from ever
+        // crossing the isolation boundary while still mutable.
+        let drinkId = try database.write { db -> Int64 in
+            var drink = Drink(name: "Pils", volumeMl: 500, alcoholPercent: 4.9, category: "beer")
+            try drink.insert(db)
+            return drink.id!
+        }
+
+        try database.write { db in
+            var entry = Entry(
+                drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
+                gramsAlcohol: 19.3, timestampMillis: 1_748_142_000_000, logicalDate: "2025-05-24"
+            )
+            try entry.insert(db)
+        }
 
         XCTAssertThrowsError(
             try database.write { db in try Drink.deleteOne(db, id: drinkId) },
@@ -241,29 +251,40 @@ final class SchemaParityTests: XCTestCase {
     /// reference cannot silently resolve to a different drink.
     func testRowIdsAreNotReusedAfterDeletion() throws {
         let database = try makeDatabase()
-        var first = Drink(name: "A", volumeMl: 100, alcoholPercent: 1.0, category: "beer")
-        try database.write { db in try first.insert(db) }
-        let firstId = try XCTUnwrap(first.id)
+
+        let firstId = try database.write { db -> Int64 in
+            var first = Drink(name: "A", volumeMl: 100, alcoholPercent: 1.0, category: "beer")
+            try first.insert(db)
+            return first.id!
+        }
 
         try database.write { db in _ = try Drink.deleteOne(db, id: firstId) }
 
-        var second = Drink(name: "B", volumeMl: 100, alcoholPercent: 1.0, category: "beer")
-        try database.write { db in try second.insert(db) }
+        let secondId = try database.write { db -> Int64 in
+            var second = Drink(name: "B", volumeMl: 100, alcoholPercent: 1.0, category: "beer")
+            try second.insert(db)
+            return second.id!
+        }
 
-        XCTAssertNotEqual(second.id, firstId, "AUTOINCREMENT must not reuse the freed id")
+        XCTAssertNotEqual(secondId, firstId, "AUTOINCREMENT must not reuse the freed id")
     }
 
     /// A round trip through the database must preserve every field exactly.
     func testRecordsRoundTripThroughTheDatabase() throws {
         let database = try makeDatabase()
-        var drink = Drink(
-            name: "Whisky", volumeMl: 40, alcoholPercent: 40.0,
-            isPreset: true, isFavorite: true, category: "spirits"
-        )
-        try database.write { db in try drink.insert(db) }
 
-        let fetched = try database.read { db in try Drink.fetchOne(db, id: drink.id!) }
-        XCTAssertEqual(fetched, drink)
+        let inserted = try database.write { db -> Drink in
+            var drink = Drink(
+                name: "Whisky", volumeMl: 40, alcoholPercent: 40.0,
+                isPreset: true, isFavorite: true, category: "spirits"
+            )
+            try drink.insert(db)
+            return drink
+        }
+
+        let id = try XCTUnwrap(inserted.id)
+        let fetched = try database.read { db in try Drink.fetchOne(db, id: id) }
+        XCTAssertEqual(fetched, inserted)
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
