@@ -354,20 +354,36 @@ fun LimitBar(
         else -> warningColor()
     }
     Column(modifier = modifier) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        // LAYOUT HARDENING (v0.81.0 QA, eighth round) — same rule as StatsScreen's
+        // StatRow: the FLEXIBLE text gets the weight, the FIXED one is pinned to a
+        // single unbroken line.
+        //
+        // Without a weight, Row measures both Texts at their intrinsic width in
+        // order, so the left one may consume the whole row; the right one is then
+        // squeezed into the leftover sliver and wraps mid-token into a ragged
+        // second line. That is exactly what the Russian and Greek store screenshots
+        // showed on the Today card. Weighting the left text makes Compose measure
+        // the unweighted [caption] FIRST at its natural width; the left text then
+        // wraps (never truncates — the gram figure and the week range both stay
+        // readable) into whatever space remains. `SpaceBetween` is dropped because
+        // the weighted child already fills the row, which keeps the caption flush
+        // right exactly as before.
+        Row(Modifier.fillMaxWidth()) {
             val leftText = if (leftSuffix.isNotEmpty()) {
                 "${totalGrams.fmt1(locale)} g $leftSuffix"
             } else {
                 "${totalGrams.fmt1(locale)} g"
             }
-            Text(leftText, style = MaterialTheme.typography.bodySmall)
+            Text(leftText, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
             Text(
                 caption,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 // Guaranteed minimum visual gap from the left text so the two
-                // values never visually merge in SpaceBetween layout.
+                // values never visually merge.
                 modifier = Modifier.padding(start = 8.dp),
+                softWrap = false,
+                maxLines = 1,
             )
         }
         Spacer(Modifier.height(4.dp))
@@ -588,16 +604,27 @@ fun DrinkDaysBar(
         else -> warningColor()
     }
     Column(modifier = modifier) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        // LAYOUT HARDENING (v0.81.0 QA, eighth round) — see LimitBar for the full
+        // rationale. This row is where the defect was first observed: the Greek and
+        // Russian "N / M drinking days (last 7 days)" label is long enough to claim
+        // the entire row, after which the unweighted [weekLabel] wrapped into a
+        // second, right-aligned line ("24.6–30." / "6") and collided with the label.
+        Row(Modifier.fillMaxWidth()) {
             Text(
                 "$drinkDays / $maxDrinkDays ${stringResource(R.string.drink_days_label)}",
                 style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.weight(1f),
             )
             if (weekLabel.isNotEmpty()) {
                 Text(
                     weekLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    // Mirrors LimitBar: a minimum gap, and a value that can never
+                    // be broken across lines.
+                    modifier = Modifier.padding(start = 8.dp),
+                    softWrap = false,
+                    maxLines = 1,
                 )
             }
         }
