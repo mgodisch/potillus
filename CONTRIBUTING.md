@@ -303,8 +303,10 @@ Verbatim third-party texts (`LICENSE.md`, `LICENSE.Apache-2.0.md`, `COPYING.md`,
 comment) do not carry it. `release-check.sh` verifies every Kotlin file contains
 the GPL notice.
 
-Run `make check-headers` to verify the whole tree, and `make fix-headers` to
-insert a missing section 7 pointer into an existing header. This matters most
+Run `make check-headers` to verify every file the repository TRACKS (the list
+comes from `git ls-files`, so `.gitignore` decides what the project owns), and
+`make fix-headers` to insert a missing section 7 pointer into an existing
+header. This matters most
 when merging a long-running branch into a tree that has grown new files
 meanwhile — the tool finds the ones that were created before the exception
 existed.

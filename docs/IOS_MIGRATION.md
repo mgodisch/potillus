@@ -511,6 +511,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Check only the files the repository tracks  (patch -18)
+
+- Fix `tools/check-headers.py`, which walked the file system and therefore
+  reported on files the project does not own: the vendored Ruby gems under
+  `fastlane/.vendor/`, a developer's local `android/keystore.properties`, and
+  scratch output — several hundred warnings, and one spurious ERROR for the
+  keystore file, which is generated from the tracked `.example` and predates the
+  section 7 pointer.
+- Take the file list from `git ls-files` instead. "The project owns it" and "the
+  repository tracks it" are the same statement, and `.gitignore` already records
+  it; reimplementing its matching rules would only let the two disagree.
+- Keep a fallback for a tree that is not a git checkout (an exported tarball):
+  walk, skipping dot-directories as well as `SKIP_DIRS`. Best effort, and the
+  reason the git list is preferred.
+- Exempt `fastlane/metadata/android/screenshots.html`, which is tracked but
+  written by fastlane screengrab. It surfaced once the directory-pruning of the
+  old walk no longer hid it.
+
 #### Add a make target for the Xcode project  (patch -17)
 
 - Add `make ios-project`, which regenerates `Version.xcconfig` and then runs
