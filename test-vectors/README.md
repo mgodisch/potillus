@@ -45,6 +45,11 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
   fractions, the traffic-light capacity status, and the rolling seven-day
   violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+- `chart-bucketing.json` — `Trend` classification, granularity selection, and the
+  bucketing rules, including the two consequences of the in-progress day (it
+  leaves the bucket's divisor until it becomes a drink day, and its bucket is
+  never marked abstinent). Harvested from `ChartBucketingTest.kt` and
+  `TrendTest.kt`.
 - `day-resolver.json` — the logical-day boundary, effective period length, and
   the abstinence streaks. Harvested from `DayResolverTest.kt`. The `resolve`
   cases carry an absolute `epochMillis` plus an IANA `zoneId`, and deliberately

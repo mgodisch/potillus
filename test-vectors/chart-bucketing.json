@@ -1,0 +1,393 @@
+{
+  "_comment": [
+    "Shared golden vectors for ChartBucketing and Trend. Loaded by BOTH the Android",
+    "(JVM) and iOS (Swift) suites.",
+    "bucketize expands sparse day summaries into a gap-free bucket list; the",
+    "in-progress ('today in superposition') day is dropped from a bucket's divisor",
+    "unless it is already a drink day, and its bucket is never marked abstinent.",
+    "avgPerDay is compared with an absolute epsilon of 0.001."
+  ],
+  "trend": [
+    {
+      "description": "Higher current average is UP",
+      "currentAvg": 12.0,
+      "prevAvg": 10.0,
+      "expected": "UP"
+    },
+    {
+      "description": "Lower current average is DOWN",
+      "currentAvg": 8.0,
+      "prevAvg": 10.0,
+      "expected": "DOWN"
+    },
+    {
+      "description": "Equal averages are FLAT",
+      "currentAvg": 10.0,
+      "prevAvg": 10.0,
+      "expected": "FLAT"
+    },
+    {
+      "description": "No usable previous value is FLAT",
+      "currentAvg": 10.0,
+      "prevAvg": 0.0,
+      "expected": "FLAT"
+    },
+    {
+      "description": "Negative previous value is FLAT",
+      "currentAvg": 10.0,
+      "prevAvg": -1.0,
+      "expected": "FLAT"
+    },
+    {
+      "description": "Difference below 0.1 g precision reads as FLAT",
+      "currentAvg": 10.04,
+      "prevAvg": 10.0,
+      "expected": "FLAT"
+    },
+    {
+      "description": "Difference that rounds up to 0.1 g is UP",
+      "currentAvg": 10.05,
+      "prevAvg": 10.0,
+      "expected": "UP"
+    },
+    {
+      "description": "Rounding is applied to both sides",
+      "currentAvg": 10.04,
+      "prevAvg": 10.04999,
+      "expected": "FLAT"
+    },
+    {
+      "description": "Zero current against positive previous is DOWN",
+      "currentAvg": 0.0,
+      "prevAvg": 5.0,
+      "expected": "DOWN"
+    }
+  ],
+  "granularityForSpan": [
+    {
+      "description": "1 day is DAILY",
+      "days": 1,
+      "expected": "DAILY"
+    },
+    {
+      "description": "35 days is the DAILY boundary",
+      "days": 35,
+      "expected": "DAILY"
+    },
+    {
+      "description": "36 days becomes WEEKLY",
+      "days": 36,
+      "expected": "WEEKLY"
+    },
+    {
+      "description": "366 days is the WEEKLY boundary",
+      "days": 366,
+      "expected": "WEEKLY"
+    },
+    {
+      "description": "367 days becomes MONTHLY",
+      "days": 367,
+      "expected": "MONTHLY"
+    },
+    {
+      "description": "a decade is MONTHLY",
+      "days": 3650,
+      "expected": "MONTHLY"
+    }
+  ],
+  "bucketize": [
+    {
+      "description": "Empty range yields no buckets",
+      "summaries": [],
+      "from": "2025-05-10",
+      "to": "2025-05-01",
+      "granularity": "DAILY",
+      "expected": []
+    },
+    {
+      "description": "Daily buckets fill gaps with abstinent zero days",
+      "summaries": [
+        [
+          "2025-05-01",
+          10.0
+        ],
+        [
+          "2025-05-03",
+          20.0
+        ]
+      ],
+      "from": "2025-05-01",
+      "to": "2025-05-04",
+      "granularity": "DAILY",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 10.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-02",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-03",
+          "avgPerDay": 20.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-04",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        }
+      ]
+    },
+    {
+      "description": "Weekly buckets average over their days",
+      "summaries": [
+        [
+          "2025-05-01",
+          14.0
+        ],
+        [
+          "2025-05-05",
+          7.0
+        ]
+      ],
+      "from": "2025-05-01",
+      "to": "2025-05-14",
+      "granularity": "WEEKLY",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 3.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-08",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        }
+      ]
+    },
+    {
+      "description": "Final weekly bucket is clamped to the period end",
+      "summaries": [
+        [
+          "2025-05-01",
+          10.0
+        ]
+      ],
+      "from": "2025-05-01",
+      "to": "2025-05-09",
+      "granularity": "WEEKLY",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 1.4285714285714286,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-08",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        }
+      ]
+    },
+    {
+      "description": "Monthly buckets snap to the first of the next month",
+      "summaries": [
+        [
+          "2025-01-15",
+          31.0
+        ],
+        [
+          "2025-02-10",
+          28.0
+        ]
+      ],
+      "from": "2025-01-15",
+      "to": "2025-03-31",
+      "granularity": "MONTHLY",
+      "expected": [
+        {
+          "labelDate": "2025-01-15",
+          "avgPerDay": 1.8235294117647058,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-02-01",
+          "avgPerDay": 1.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-03-01",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        }
+      ]
+    },
+    {
+      "description": "A leap February is averaged over 29 days",
+      "summaries": [
+        [
+          "2024-02-01",
+          29.0
+        ]
+      ],
+      "from": "2024-02-01",
+      "to": "2024-02-29",
+      "granularity": "MONTHLY",
+      "expected": [
+        {
+          "labelDate": "2024-02-01",
+          "avgPerDay": 1.0,
+          "isAbstinent": false
+        }
+      ]
+    },
+    {
+      "description": "In-progress day that is not a drink day leaves the divisor",
+      "summaries": [
+        [
+          "2025-05-01",
+          10.0
+        ]
+      ],
+      "from": "2025-05-01",
+      "to": "2025-05-03",
+      "granularity": "DAILY",
+      "inProgressDay": "2025-05-03",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 10.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-02",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-03",
+          "avgPerDay": 0.0,
+          "isAbstinent": false
+        }
+      ]
+    },
+    {
+      "description": "In-progress day that IS a drink day stays in the divisor",
+      "summaries": [
+        [
+          "2025-05-01",
+          10.0
+        ],
+        [
+          "2025-05-03",
+          6.0
+        ]
+      ],
+      "from": "2025-05-01",
+      "to": "2025-05-03",
+      "granularity": "DAILY",
+      "inProgressDay": "2025-05-03",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 10.0,
+          "isAbstinent": false
+        },
+        {
+          "labelDate": "2025-05-02",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-03",
+          "avgPerDay": 6.0,
+          "isAbstinent": false
+        }
+      ]
+    },
+    {
+      "description": "Bucket holding the in-progress day is never abstinent",
+      "summaries": [],
+      "from": "2025-05-01",
+      "to": "2025-05-07",
+      "granularity": "WEEKLY",
+      "inProgressDay": "2025-05-07",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 0.0,
+          "isAbstinent": false
+        }
+      ]
+    },
+    {
+      "description": "Bucket without the in-progress day may still be abstinent",
+      "summaries": [],
+      "from": "2025-05-01",
+      "to": "2025-05-14",
+      "granularity": "WEEKLY",
+      "inProgressDay": "2025-05-14",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-08",
+          "avgPerDay": 0.0,
+          "isAbstinent": false
+        }
+      ]
+    },
+    {
+      "description": "Null in-progress day (PDF export) marks every zero bucket abstinent",
+      "summaries": [],
+      "from": "2025-05-01",
+      "to": "2025-05-03",
+      "granularity": "DAILY",
+      "expected": [
+        {
+          "labelDate": "2025-05-01",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-02",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        },
+        {
+          "labelDate": "2025-05-03",
+          "avgPerDay": 0.0,
+          "isAbstinent": true
+        }
+      ]
+    },
+    {
+      "description": "In-progress week average divides by completed days only",
+      "summaries": [
+        [
+          "2025-05-05",
+          14.0
+        ]
+      ],
+      "from": "2025-05-05",
+      "to": "2025-05-08",
+      "granularity": "WEEKLY",
+      "inProgressDay": "2025-05-08",
+      "expected": [
+        {
+          "labelDate": "2025-05-05",
+          "avgPerDay": 4.666666666666667,
+          "isAbstinent": false
+        }
+      ]
+    }
+  ]
+}

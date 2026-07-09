@@ -432,13 +432,13 @@ Indicative ordering; refined as work starts.
    `appstore/` stubs. Verified on macOS: the app runs in the simulator and
    `swift test` runs the package suite natively. Still to add: a CI skeleton for
    the Swift toolchain.
-2. **Domain port + parity (in progress).** `AlcoholCalculator` and `DayResolver`
-   are ported, with both suites green against the shared vectors — including
-   `isOverLimit`'s floating-point tolerance, and the timezone- and DST-safe
-   calendar arithmetic the logical day and the seven-day window depend on. Still
-   to port: chart bucketing and trend. Not ported by design: the `clockOverride`
-   screenshot seam and the locale-driven `firstDayOfWeekIso`, which are platform
-   concerns and return with the iOS UI.
+2. **Domain port + parity (done).** `AlcoholCalculator`, `DayResolver`,
+   `ChartBucketing` and `Trend` are ported, with both suites green against the
+   shared vectors — including `isOverLimit`'s floating-point tolerance, and the
+   timezone- and DST-safe calendar arithmetic the logical day, the seven-day
+   window and the chart buckets depend on. Not ported by design: the
+   `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
+   which are platform concerns and return with the iOS UI.
 3. **Data layer.** SQLite schema (identical), repositories, JSON backup v3
    reader/writer, CSV export — verified byte-compatible with Android output.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
@@ -490,6 +490,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Port ChartBucketing and Trend to Swift  (patch -08)
+
+- Add `test-vectors/chart-bucketing.json`: 27 golden cases harvested from
+  `ChartBucketingTest.kt` and `TrendTest.kt`, covering trend classification, the
+  granularity thresholds, month-boundary snapping, period clamping, a leap
+  February, and both consequences of the in-progress day.
+- Port `ChartBucketing` and `Trend` to Swift, completing the domain layer. Month
+  buckets snap to the first of the next month, buckets are clamped to the period
+  end, and calendar arithmetic runs on a UTC-pinned calendar so a device time
+  zone or DST transition can never shift a bar.
+- Assert both suites against the vectors, and add structural tests: buckets tile
+  the period contiguously without gaps, duplicates, or overlaps at every
+  granularity; an inverted range is empty rather than an error; a leap February
+  averages over 29 days; and the bucket holding the in-progress day is never
+  marked abstinent.
 
 #### Document the GNU Make requirement on macOS  (patch -07)
 
