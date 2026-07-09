@@ -185,6 +185,37 @@ listed individually below.
   still imports PIL for the phone mockup and would otherwise fail with a bare
   ImportError. All 21 locales' in-app screenshots 01..06 are recaptured at the
   new geometry; store assets only, no app behaviour change.
+- Screenshot capture waited on the wrong signals (eighth QA round): the store
+  assets disagreed across languages although every locale renders the same
+  `fastlane/demo-backup.json` — e.g. `01_today.png` showed a monthly average of
+  0.0 g/day in 14 of 21 locales and the correct 8.0 g/day in the other 7. The
+  captures waited for STATIC elements (a nav label, or the mere disappearance of
+  an empty-state label), which are laid out in the very first frame; every screen
+  ViewModel, however, publishes its state through `stateIn(..., <UiState>())`,
+  whose all-empty SEED is shown until the backing Room Flow emits. Whether a run
+  caught the seed frame was pure timing luck, and the luck differed per locale
+  because the capture language switch recreates the Activity — and its
+  ViewModels — only in locales other than the device language. Two further
+  symptoms had the same root: `02_calendar.png` was captured without day markers
+  and without the day-detail card in 6 locales, and `04_drinks.png` showed the
+  empty "no drinks" screen in 7 (its wait for the DISAPPEARANCE of that label was
+  satisfied vacuously while the page had not composed yet, so its timeout never
+  fired). `ScreenshotTest` now routes every capture through one helper that
+  enforces a two-stage readiness contract: the screen must expose a POSITIVE,
+  data-derived marker that cannot exist in the seed state (the month name in the
+  Today caption, the Calendar's day-detail label, the fixture's period total on
+  Statistics, a drink row's edit icon), and that marker must then be visible in
+  the device's own accessibility tree with the device idle. The second stage also
+  fixes `06_settings.png`, which showed the Drinks screen in 9 locales: the
+  previous wait proved only that the Settings destination had COMPOSED, while
+  screengrab grabs the compositor's surface, which was still drawing the
+  predecessor. Both stages now fail loudly instead of silently saving a wrong
+  asset. Every expected string is resolved through the same sources production
+  uses (localized context, `FULL_STANDALONE` month names on the detected app
+  language tag, `Double.fmt1`), so the markers cannot drift from the rendered UI
+  in any of the 21 languages. Test-only change; no production code is touched.
+  The committed PNGs still show the old captures and must be refreshed with
+  `make screenshots`.
 
 ---
 

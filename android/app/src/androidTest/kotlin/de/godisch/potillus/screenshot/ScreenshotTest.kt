@@ -80,6 +80,54 @@ package de.godisch.potillus.screenshot
 //     targets are selected by their localized label TEXT combined with a click
 //     action, which uniquely identifies the merged NavigationBarItem and never
 //     collides with the (non-clickable) TopAppBar title of the same text.
+//   - Every capture goes through [capture], which enforces the two-stage
+//     readiness contract described below. No screenshot is ever taken directly.
+//
+// THE TWO-STAGE READINESS CONTRACT (v0.81.0 QA fix)
+//   A screenshot is only correct when BOTH of these hold:
+//
+//     (a) DATA-READY — the screen's ViewModel has emitted its first real value.
+//         Every screen ViewModel exposes its state via
+//         `stateIn(..., <UiState>())`, whose SEED is an all-empty snapshot shown
+//         until the backing Room Flow emits. Waiting for a STATIC element (a nav
+//         label, a section heading) therefore proves nothing: those are laid out
+//         in the very first frame, seed data and all. The captures previously
+//         waited exactly like that, so whether a run caught the seed frame or the
+//         real one was pure timing luck — and the luck differed per locale,
+//         because applyCaptureLanguage() recreates the Activity (and with it the
+//         ViewModels) only in locales that differ from the device language. The
+//         committed store assets showed the symptom directly: 14 of 21 locales
+//         had a Today card reading "Ø" with 0.0 g/day instead of "Ø June" with
+//         8.0 g/day, 6 of 21 had a Calendar with no day markers and no detail
+//         card, and 7 of 21 had an EMPTY Drinks list. Each wait therefore now
+//         keys on a POSITIVE, DATA-DERIVED marker that cannot exist in the seed
+//         state (the month name in the Today caption, the day-detail label the
+//         Calendar only renders once a day is selected, the fixture's period
+//         total on Statistics, a drink row's edit icon on Drinks).
+//
+//     (b) FRAME-READY — the window that carries those nodes is actually the one
+//         on the display. Compose's idling machinery answers questions about the
+//         SEMANTICS tree; screengrab's UiAutomatorScreenshotStrategy grabs the
+//         COMPOSITOR's surface. The two are not synchronized: a destination that
+//         has composed (so its semantics, e.g. the Settings back arrow, are
+//         already findable) may still be mid-transition on screen. That gap
+//         explains the 9 of 21 `06_settings.png` assets that show the Drinks
+//         screen. [capture] therefore additionally waits for the marker in the
+//         DEVICE's accessibility tree via UiAutomator and then for the device to
+//         go idle (no window updates), which is the observable signal that the
+//         transition has finished.
+//
+//   Both stages FAIL LOUDLY on timeout (ComposeTimeoutException / an explicit
+//   check()). That is the point: a red test is cheap, a silently wrong store
+//   asset in 14 languages is not.
+//
+// WHY THE MARKERS ARE LOCALE-SAFE
+//   Every expected string is resolved through the SAME sources production uses:
+//   string resources via [localizedContext] (keyed on the detected app language
+//   tag), month names via `TextStyle.FULL_STANDALONE` on that tag — exactly what
+//   TodayViewModel does — and numbers via `Double.fmt1(locale)`, the app's own
+//   formatter. A marker can therefore never drift from what the UI renders, in
+//   any of the 21 shipped languages.
 //
 // HOW TO RUN
 //   Normally via:   make screenshots         (drives demo mode + both locales)
@@ -92,6 +140,7 @@ package de.godisch.potillus.screenshot
 import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
@@ -102,13 +151,17 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.BySelector
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import de.godisch.potillus.MainActivity
 import de.godisch.potillus.PotillusApp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.l10n.SupportedLocales
+import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.util.BackupManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -121,6 +174,8 @@ import org.junit.runner.RunWith
 import tools.fastlane.screengrab.Screengrab
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy
 import tools.fastlane.screengrab.locale.LocaleTestRule
+import java.time.LocalDate
+import java.time.format.TextStyle
 import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
@@ -150,6 +205,16 @@ class ScreenshotTest {
 
     private lateinit var app: PotillusApp
     private lateinit var device: UiDevice
+
+    /**
+     * The parsed demo fixture, kept for the whole test.
+     *
+     * The capture markers are derived FROM THE FIXTURE rather than hard-coded, so
+     * they follow `fastlane/demo-backup.json` when it changes: the Statistics
+     * marker is the fixture's own capture-month total, and the Drinks marker only
+     * asserts that at least one imported drink row exists. See [capture].
+     */
+    private lateinit var fixture: BackupManager.ImportResult
 
     // ── Capture timing constants ──────────────────────────────────────────────
     private val readyTimeoutMs = 15_000L
@@ -200,6 +265,7 @@ class ScreenshotTest {
 
         val parsed = BackupManager.parseBackupJson(json)
         check(parsed.error == null) { "Demo backup fixture failed to parse: ${parsed.error}" }
+        fixture = parsed
 
         runBlocking {
             // 1a) DETERMINISTIC PRESET PREPOPULATION (fixes duplicate drink rows).
@@ -286,17 +352,26 @@ class ScreenshotTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             waitUntilReady()
 
-            // Today is the pager start page, so it is already on screen.
-            Screengrab.screenshot("01_today")
+            // Today is the pager start page, so it is already on screen. Its marker
+            // is the summary card's average caption WITH the month name: the seed
+            // state renders the same string with an empty month ("Ø "), so the
+            // month's presence proves the first DB emission has landed.
+            capture("01_today", avgOfMonthCaption())
 
             navigateToTab(R.string.calendar)
-            Screengrab.screenshot("02_calendar")
+            // The day-detail label below the month grid is rendered only once
+            // CalendarUiState.selectedDate is non-null, which happens with the first
+            // emission; the seed state shows the bare grid without markers.
+            capture("02_calendar", label(R.string.no_entries_day))
 
             // The Statistics tab renders `nav_statistics` (a short synonym of the
             // screen title), so the tab must be located by that label — in some
             // locales (e.g. fr: "Stats") it differs from `statistics`.
             navigateToTab(R.string.nav_statistics)
-            Screengrab.screenshot("03_statistics")
+            // Marker: the "Total in Period" VALUE for the capture month, computed
+            // from the fixture and formatted exactly as the screen formats it. The
+            // seed state shows "0.0 g" there.
+            capture("03_statistics", expectedPeriodTotalText())
         }
 
         // ── DARK phase: Drinks, Add-drink dialog, Settings ────────────────────
@@ -305,17 +380,120 @@ class ScreenshotTest {
             waitUntilReady()
 
             navigateToTab(R.string.drinks)
-            waitUntilDrinksLoaded()
-            Screengrab.screenshot("04_drinks")
+            // Marker: a drink row's edit icon. It exists per row and only once the
+            // drinks Flow has emitted; the seed state shows the "no drinks" label
+            // instead. Using a per-row icon keeps the marker independent of the
+            // fixture's drink NAMES and of LazyColumn's viewport (the first row is
+            // always composed).
+            captureByDescription("04_drinks", label(R.string.edit_drink))
 
             openAddDrinkDialog()
-            Screengrab.screenshot("05_add_drink")
+            capture("05_add_drink", label(R.string.add_drink))
             dismissDialog()
 
             openSettings()
-            Screengrab.screenshot("06_settings")
+            // Marker: the Settings top-bar Back arrow — the only node in the app
+            // with this contentDescription besides the document viewer, which this
+            // suite never opens.
+            captureByDescription("06_settings", label(R.string.back))
         }
     }
+
+    // ── Capture ───────────────────────────────────────────────────────────────
+
+    /**
+     * Captures [name] once the screen is both DATA-READY and FRAME-READY, keyed on
+     * a marker TEXT that only the loaded screen can render. See the file header's
+     * "two-stage readiness contract" for the full rationale.
+     *
+     * @param name   screengrab asset name (also the PNG's basename).
+     * @param marker localized text that exists on the finished screen and NOT in
+     *               its `stateIn` seed state.
+     */
+    private fun capture(name: String, marker: String) =
+        captureWhen(name, hasText(marker), By.text(marker))
+
+    /**
+     * Same contract as [capture], but keyed on a `contentDescription` instead of a
+     * text node — used where the loaded state is proven by an ICON (the Drinks
+     * rows' edit pencil, the Settings back arrow) rather than by a string.
+     *
+     * @param name   screengrab asset name.
+     * @param marker localized contentDescription of the marker node.
+     */
+    private fun captureByDescription(name: String, marker: String) =
+        captureWhen(name, hasContentDescription(marker), By.desc(marker))
+
+    /**
+     * The shared implementation of the readiness contract.
+     *
+     * Stage (a) DATA-READY: block until Compose's semantics tree contains at least
+     * one node matching [semantics]. `waitUntil` drives the test clock, so pending
+     * recompositions and animations are advanced while we wait, and it THROWS on
+     * timeout — a screenshot is never taken from a screen that failed to load.
+     *
+     * Stage (b) FRAME-READY: block until UiAutomator sees the same marker in the
+     * DEVICE's accessibility tree (i.e. the window carrying it is the one attached
+     * to the display), then wait for the device to stop reporting window updates.
+     * Only then does the compositor's surface — which is what
+     * `UiAutomatorScreenshotStrategy` grabs — reliably show this screen. Without
+     * this stage a destination could be captured while its predecessor was still
+     * being drawn.
+     *
+     * @param name      screengrab asset name.
+     * @param semantics Compose matcher for stage (a).
+     * @param selector  equivalent UiAutomator selector for stage (b).
+     */
+    private fun captureWhen(name: String, semantics: SemanticsMatcher, selector: BySelector) {
+        composeRule.waitUntil(readyTimeoutMs) {
+            composeRule.onAllNodes(semantics).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.waitForIdle()
+        check(device.wait(Until.hasObject(selector), uiTimeoutMs)) {
+            "Screen for '$name' never became visible on the device (marker: $selector)"
+        }
+        device.waitForIdle()
+        Screengrab.screenshot(name)
+    }
+
+    /**
+     * The Today card's average caption exactly as the card renders it for the
+     * pinned capture date, e.g. `Ø June` / `Ø Juni` / `Ø 6月`.
+     *
+     * It mirrors [de.godisch.potillus.ui.screen.TodayViewModel]'s own derivation:
+     * the STANDALONE month name of the logical today, resolved in the app language
+     * tag (not `Locale.getDefault()`), substituted into `R.string.avg_of_month`.
+     * The seed state substitutes an empty string there, which is precisely why this
+     * caption is a sound data-ready marker.
+     */
+    private fun avgOfMonthCaption(): String {
+        val month = LocalDate.parse(ScreenshotClock.SCREENSHOT_DATE).month
+        val monthName = month.getDisplayName(TextStyle.FULL_STANDALONE, captureLocale())
+        return localizedContext().getString(R.string.avg_of_month, monthName)
+    }
+
+    /**
+     * The Statistics screen's "Total in Period" value for the default MONTH period,
+     * formatted the way `StatsScreen` formats it (`Double.fmt1(locale) + " g"`).
+     *
+     * The grams are summed from the fixture's entries whose logical date falls in
+     * the capture month, so the marker follows the demo data instead of pinning a
+     * magic number. Summation-order differences against the ViewModel's per-day
+     * SQL sums cannot matter: `%.1f` rounds far above the floating-point noise.
+     */
+    private fun expectedPeriodTotalText(): String {
+        val monthPrefix = ScreenshotClock.SCREENSHOT_DATE.substring(0, 7) // "YYYY-MM"
+        val total = fixture.entries
+            .filter { it.logicalDate.startsWith(monthPrefix) }
+            .sumOf { it.gramsAlcohol }
+        check(total > 0.0) {
+            "Demo fixture has no entries in the capture month $monthPrefix — no Statistics marker"
+        }
+        return "${total.fmt1(captureLocale())} g"
+    }
+
+    /** The [Locale] the app renders this run in — see [targetLanguageTag]. */
+    private fun captureLocale(): Locale = Locale.forLanguageTag(targetLanguageTag())
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -378,45 +556,23 @@ class ScreenshotTest {
     }
 
     /**
-     * Blocks until the Drinks list has actually rendered its rows, rather than only
-     * until Compose is idle.
-     *
-     * WHY THIS IS NEEDED
-     *   DrinksViewModel.uiState is a StateFlow seeded with an EMPTY DrinksUiState()
-     *   that is filled only once its backing Room Flow emits (it is built with
-     *   stateIn(..., DrinksUiState())). composeRule.waitForIdle() returns as soon as
-     *   Compose has no pending recomposition or animation work, which can happen
-     *   BEFORE that first database emission arrives — capturing then yields the
-     *   empty-state screen ("No drinks defined yet."), the cause of the
-     *   intermittently blank 04_drinks shot (empty in one locale run, populated in
-     *   the other — the signature of a race).
-     *
-     *   We wait until the empty-state label (R.string.no_drinks) is gone, i.e. the
-     *   real list has replaced it. This asserts only that loading finished, not how
-     *   many rows exist, so it stays correct if the demo fixture changes. The
-     *   preceding navigateToTab() already idles on the composed (still-empty) screen,
-     *   so the label is present when we start waiting and its disappearance is a
-     *   reliable "data has loaded" signal.
-     */
-    private fun waitUntilDrinksLoaded() {
-        val emptyLabel = label(R.string.no_drinks)
-        composeRule.waitUntil(uiTimeoutMs) {
-            composeRule.onAllNodes(hasText(emptyLabel)).fetchSemanticsNodes().isEmpty()
-        }
-        composeRule.waitForIdle()
-    }
-
-    /**
      * Opens the "Add drink" dialog from the Drinks screen by tapping the FAB
-     * (identified by its localized contentDescription) and waits until the dialog
-     * title (a Text node carrying the same localized string) is present.
+     * (identified by its localized contentDescription).
+     *
+     * The dialog's own readiness is asserted by the subsequent [capture] call,
+     * which waits for the dialog title (a Text node carrying the same localized
+     * string as the FAB's description) and for the dialog window to be on screen.
+     *
+     * BREADCRUMB: `waitUntilDrinksLoaded()` used to live next to this helper. It
+     * waited for the DISAPPEARANCE of the "no drinks" empty-state label — an
+     * absence condition that is satisfied VACUOUSLY while the Drinks page has not
+     * been composed yet, so it never fired its timeout and let the empty screen be
+     * captured in 7 of 21 locales. It was replaced in the v0.81.0 QA round by the
+     * positive marker in [captureByDescription] ("04_drinks").
      */
     private fun openAddDrinkDialog() {
         val addDrink = label(R.string.add_drink)
         composeRule.onNode(hasContentDescription(addDrink) and hasClickAction()).performClick()
-        composeRule.waitUntil(uiTimeoutMs) {
-            composeRule.onAllNodes(hasText(addDrink)).fetchSemanticsNodes().isNotEmpty()
-        }
         composeRule.waitForIdle()
     }
 
@@ -429,8 +585,14 @@ class ScreenshotTest {
     /**
      * Opens the Settings screen via the top-bar overflow menu: tap the menu icon
      * (localized contentDescription "Menu"), then the "Settings" dropdown entry
-     * (the only clickable node with that text). Waits for the Settings screen's
-     * Back button to appear so the screen is fully laid out before capture.
+     * (the only clickable node with that text).
+     *
+     * It deliberately does NOT wait for the Settings screen here. Waiting for the
+     * back arrow's SEMANTICS only proves that the destination has composed, not
+     * that it is drawn — which is how 9 of 21 locales captured the Drinks screen
+     * under the name `06_settings`. The wait now lives in [captureByDescription],
+     * which additionally requires the marker to be visible in the device's own
+     * accessibility tree and the device to be idle.
      */
     private fun openSettings() {
         composeRule.onNode(hasContentDescription(label(R.string.menu)) and hasClickAction())
@@ -439,12 +601,6 @@ class ScreenshotTest {
 
         composeRule.onNode(hasText(label(R.string.settings)) and hasClickAction())
             .performClick()
-
-        val backLabel = label(R.string.back)
-        composeRule.waitUntil(uiTimeoutMs) {
-            composeRule.onAllNodes(hasContentDescription(backLabel)).fetchSemanticsNodes().isNotEmpty()
-        }
-        composeRule.waitForIdle()
     }
 
     /**
