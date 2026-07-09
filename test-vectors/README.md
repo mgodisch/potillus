@@ -45,6 +45,11 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
   fractions, the traffic-light capacity status, and the rolling seven-day
   violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+- `csv-export.json` — RFC 4180 field escaping, the OWASP formula-injection
+  guard, and complete CSV documents (CRLF endings included). The `buildCsv` cases
+  carry a `zoneId`, because the `HH:mm` column renders the entry's instant in the
+  device zone; the JVM test pins the default zone, the Swift port takes it as a
+  parameter.
 - `db-schema.json` — the SQLite schema contract (tables, columns, affinities,
   primary keys, indices, foreign-key actions). Unlike the other files this one is
   *generated* from Android's Room schema export, which is authoritative. Android

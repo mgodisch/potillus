@@ -454,12 +454,13 @@ Indicative ordering; refined as work starts.
    window and the chart buckets depend on. Not ported by design: the
    `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
    which are platform concerns and return with the iOS UI.
-3. **Data layer (in progress).** The schema, the GRDB record types, the
-   repositories behind protocol seams, and the JSON backup v3 reader/writer are
-   in place. Compatibility is demonstrated, not asserted: the iOS suite parses
+3. **Data layer (done).** The schema, the GRDB record types, the repositories
+   behind protocol seams, the JSON backup v3 reader/writer and the CSV export are
+   all in place, with both platforms asserting against shared vectors.
+   Compatibility is demonstrated, not asserted: the iOS suite parses
    `fastlane/demo-backup.json`, a genuine Android-written backup already in the
-   repository. Still to do: the CSV export, and applying the backup's `settings`
-   block once an iOS preferences store exists.
+   repository. One deferral remains: applying the backup's `settings` block,
+   which waits on an iOS preferences store.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
@@ -509,6 +510,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Port the CSV export to Swift  (patch -14)
+
+- Add `test-vectors/csv-export.json`: 15 escaping cases and 6 complete CSV
+  documents, harvested from `CsvExporterTest.kt` and `CsvExporterBuildTest.kt`.
+  The documents carry their CRLF endings, so a divergence in quoting, ordering
+  or number formatting turns one side red.
+- Port the Android-free core of `CsvExporter`. Byte-identical output requires
+  four details to line up: CRLF after every record INCLUDING the last (RFC 4180
+  §2); a '.' decimal separator in the grams column, whatever the locale, since a
+  comma would split the value across two columns; escaped column headers, because
+  a translator's comma would misalign every row; and the OWASP formula-injection
+  guard that prefixes `= + - @ TAB CR` with a single quote, since the file exists
+  to be shared and the recipient's spreadsheet would be the victim.
+- Mirror the asymmetry deliberately: only free text (headers, drink name, note)
+  is escaped, while generated cells (dates, times, category, numbers) are not.
+  "Escaping everything for safety" would produce a different document.
+- Make the time zone an explicit parameter rather than reading a global. Android
+  calls `ZoneId.systemDefault()` inside `buildCsv`, so the JVM vector test pins
+  the default zone and restores it; the Swift port takes the zone as an argument.
+  Same behaviour in the app, but the shared vectors can now assert a clock time —
+  the same instant reads 20:14 in Berlin and 14:14 in New York.
+- Keep the UTF-8 BOM out of `buildCsv`, as Android does: it is a property of the
+  file (so Excel detects the encoding), not of the document.
 
 #### Clear the Swift 6 concurrency warnings  (patch -13)
 

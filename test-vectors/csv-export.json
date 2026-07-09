@@ -1,0 +1,323 @@
+{
+  "_comment": [
+    "Shared golden vectors for the CSV export. Loaded by BOTH the Android (JVM) and",
+    "iOS (Swift) suites.",
+    "escapeField = rfc4180Quote(neutralizeFormula(raw)): the OWASP formula guard runs",
+    "first, then RFC 4180 quoting wraps the guarded value if structurally required.",
+    "buildCsv emits CRLF line endings and terminates the LAST record with CRLF too.",
+    "Only free-text cells (headers, drinkName, note) are escaped; generated cells",
+    "(logicalDate, time, category, numbers) are not, exactly as on Android.",
+    "The UTF-8 BOM is added when writing the file, not by buildCsv.",
+    "zoneId renders the HH:mm column; the same instant is a different clock time per zone."
+  ],
+  "escapeField": [
+    {
+      "description": "plain value untouched",
+      "input": "Pils",
+      "expected": "Pils"
+    },
+    {
+      "description": "empty stays empty",
+      "input": "",
+      "expected": ""
+    },
+    {
+      "description": "comma forces quoting",
+      "input": "Wine, red",
+      "expected": "\"Wine, red\""
+    },
+    {
+      "description": "double quote is doubled and wrapped",
+      "input": "He said \"hi\"",
+      "expected": "\"He said \"\"hi\"\"\""
+    },
+    {
+      "description": "line feed forces quoting",
+      "input": "line1\nline2",
+      "expected": "\"line1\nline2\""
+    },
+    {
+      "description": "bare carriage return forces quoting",
+      "input": "line1\rline2",
+      "expected": "\"line1\rline2\""
+    },
+    {
+      "description": "equals sign is a formula trigger",
+      "input": "=1+1",
+      "expected": "'=1+1"
+    },
+    {
+      "description": "plus sign is a formula trigger",
+      "input": "+1",
+      "expected": "'+1"
+    },
+    {
+      "description": "minus sign is a formula trigger",
+      "input": "-5 today",
+      "expected": "'-5 today"
+    },
+    {
+      "description": "at sign is a formula trigger",
+      "input": "@SUM(A1)",
+      "expected": "'@SUM(A1)"
+    },
+    {
+      "description": "leading tab is a formula trigger",
+      "input": "\t=1+1",
+      "expected": "'\t=1+1"
+    },
+    {
+      "description": "leading CR is a trigger and then forces quoting",
+      "input": "\r=1+1",
+      "expected": "\"'\r=1+1\""
+    },
+    {
+      "description": "hyperlink attack is neutralised",
+      "input": "=HYPERLINK(\"http://evil\",\"click\")",
+      "expected": "\"'=HYPERLINK(\"\"http://evil\"\",\"\"click\"\")\""
+    },
+    {
+      "description": "trigger only matters at the start",
+      "input": "a=1+1",
+      "expected": "a=1+1"
+    },
+    {
+      "description": "guard then quote compose",
+      "input": "=a,b",
+      "expected": "\"'=a,b\""
+    }
+  ],
+  "buildCsv": [
+    {
+      "description": "header only, no entries",
+      "headers": [
+        "Date",
+        "Time",
+        "Drink",
+        "Category",
+        "Volume (ml)",
+        "Alcohol (%)",
+        "Grams",
+        "Note"
+      ],
+      "entries": [],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "Europe/Berlin",
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n"
+    },
+    {
+      "description": "one plain row",
+      "headers": [
+        "Date",
+        "Time",
+        "Drink",
+        "Category",
+        "Volume (ml)",
+        "Alcohol (%)",
+        "Grams",
+        "Note"
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "drinkName": "Pils",
+          "volumeMl": 500,
+          "alcoholPercent": 4.9,
+          "gramsAlcohol": 19.3,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": ""
+        }
+      ],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "Europe/Berlin",
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+    },
+    {
+      "description": "quoting, formula guard and unknown drink fall back to OTHER",
+      "headers": [
+        "Date",
+        "Time",
+        "Drink",
+        "Category",
+        "Volume (ml)",
+        "Alcohol (%)",
+        "Grams",
+        "Note"
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "drinkName": "Pils",
+          "volumeMl": 500,
+          "alcoholPercent": 4.9,
+          "gramsAlcohol": 19.3,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": ""
+        },
+        {
+          "drinkId": 2,
+          "drinkName": "Wine, red",
+          "volumeMl": 200,
+          "alcoholPercent": 13.0,
+          "gramsAlcohol": 20.5,
+          "timestampMillis": 1767398400000,
+          "logicalDate": "2026-01-02",
+          "note": "=1+1"
+        },
+        {
+          "drinkId": 99,
+          "drinkName": "Ghost",
+          "volumeMl": 100,
+          "alcoholPercent": 40.0,
+          "gramsAlcohol": 31.56,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": "a\"b"
+        }
+      ],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "Europe/Berlin",
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n2026-01-02,01:00,\"Wine, red\",WINE,200,13.0,20.50,'=1+1\r\n2026-01-02,20:14,Ghost,OTHER,100,40.0,31.56,\"a\"\"b\"\r\n"
+    },
+    {
+      "description": "localised headers are escaped too",
+      "headers": [
+        "Date",
+        "Time",
+        "Drink, name",
+        "Category",
+        "Volume (ml)",
+        "Alcohol (%)",
+        "Grams",
+        "Note"
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "drinkName": "Pils",
+          "volumeMl": 500,
+          "alcoholPercent": 4.9,
+          "gramsAlcohol": 19.3,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": ""
+        }
+      ],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "Europe/Berlin",
+      "expected": "Date,Time,\"Drink, name\",Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+    },
+    {
+      "description": "German headers, same data",
+      "headers": [
+        "Datum",
+        "Uhrzeit",
+        "Getränk",
+        "Kategorie",
+        "Menge (ml)",
+        "Alkohol (%)",
+        "Gramm",
+        "Notiz"
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "drinkName": "Pils",
+          "volumeMl": 500,
+          "alcoholPercent": 4.9,
+          "gramsAlcohol": 19.3,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": ""
+        }
+      ],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "Europe/Berlin",
+      "expected": "Datum,Uhrzeit,Getränk,Kategorie,Menge (ml),Alkohol (%),Gramm,Notiz\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+    },
+    {
+      "description": "time is rendered in the given zone",
+      "headers": [
+        "Date",
+        "Time",
+        "Drink",
+        "Category",
+        "Volume (ml)",
+        "Alcohol (%)",
+        "Grams",
+        "Note"
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "drinkName": "Pils",
+          "volumeMl": 500,
+          "alcoholPercent": 4.9,
+          "gramsAlcohol": 19.3,
+          "timestampMillis": 1767381240000,
+          "logicalDate": "2026-01-02",
+          "note": ""
+        }
+      ],
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "zoneId": "America/New_York",
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,14:14,Pils,BEER,500,4.9,19.30,\r\n"
+    }
+  ]
+}
