@@ -509,6 +509,18 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Declare NOT NULL on the iOS primary keys  (patch -11)
+
+- Fix the schema-parity failure the contract caught on its first real run: Room
+  declares `id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL`, while GRDB's
+  `autoIncrementedPrimaryKey` omits the `NOT NULL`. Both behave identically — an
+  INTEGER PRIMARY KEY is a rowid alias and can never be NULL, and inserting a
+  NULL id still lets SQLite assign the next value — but `PRAGMA table_info` only
+  reports a column as NOT NULL when the constraint was *declared*. The two
+  schemas therefore differed on paper. iOS now declares it too.
+- This is exactly what the shared schema contract exists for: a difference that
+  no behavioural test would have surfaced, found mechanically on both sides.
+
 #### Add iOS repositories behind protocol seams  (patch -10)
 
 - Port `DrinkDefinition`, `ConsumptionEntry` and `DrinkCategory` to the Swift

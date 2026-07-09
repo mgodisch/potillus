@@ -114,11 +114,20 @@ public final class AppDatabase: Sendable {
         migrator.registerMigration("v2-initial-schema") { db in
             // `drinks`: the catalogue of loggable drinks.
             try db.create(table: "drinks") { table in
-                // INTEGER PRIMARY KEY AUTOINCREMENT, matching Room's autoGenerate.
-                // AUTOINCREMENT (rather than a bare rowid alias) guarantees ids
-                // are never reused after a delete, so a stale reference can never
-                // silently resolve to a different drink.
-                table.autoIncrementedPrimaryKey("id")
+                // INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, matching Room's
+                // autoGenerate. AUTOINCREMENT (rather than a bare rowid alias)
+                // guarantees ids are never reused after a delete, so a stale
+                // reference can never silently resolve to a different drink.
+                //
+                // The explicit `.notNull()` looks redundant — an INTEGER PRIMARY
+                // KEY is a rowid alias and can never hold NULL — but it is not
+                // cosmetic here. SQLite only reports a column as NOT NULL in
+                // `PRAGMA table_info` when the constraint was DECLARED, and Room
+                // declares it. Omitting it makes the two schemas differ on paper
+                // while behaving identically, which the shared schema-parity test
+                // rightly rejects. Behaviour is unchanged either way: inserting a
+                // NULL id still lets SQLite assign the next value.
+                table.autoIncrementedPrimaryKey("id").notNull()
                 table.column("name", .text).notNull()
                 table.column("volumeMl", .integer).notNull()
                 table.column("alcoholPercent", .double).notNull()
@@ -129,7 +138,8 @@ public final class AppDatabase: Sendable {
 
             // `entries`: the log. Drink attributes are denormalised (see Entry).
             try db.create(table: "entries") { table in
-                table.autoIncrementedPrimaryKey("id")
+                // See the note on `drinks.id` for why `.notNull()` is spelled out.
+                table.autoIncrementedPrimaryKey("id").notNull()
                 // RESTRICT, not CASCADE: deleting a drink that still has entries
                 // must fail loudly rather than erase the user's history.
                 table.column("drinkId", .integer)
