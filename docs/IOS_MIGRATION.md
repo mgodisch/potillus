@@ -511,6 +511,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Derive the iOS version from the changelog  (patch -16)
+
+- Replace the `0.0.0` placeholder in `ios/project.yml` with a generated
+  `Version.xcconfig`: `MARKETING_VERSION` comes from the top `## vX.Y.Z` entry of
+  `CHANGELOG.md`, `CURRENT_PROJECT_VERSION` from the Android `versionCode`. Both
+  stores then report the same version and the same build number.
+- Derive rather than introduce. The earlier plan was a root `VERSION` file that
+  the Android build, the Makefile and `release-check.sh` would all read. That
+  would have rewritten the one number the release pipeline is built on, for no
+  gain on the Android side, where `release-check.sh` SECTION 1 already ties
+  `versionName`, README.md and CHANGELOG.md together. The changelog was already
+  the single source of truth; iOS now reads it too.
+- Keep the generated file git-ignored, so a stale copy can never contradict its
+  own sources, and add `make ios-version` / `make ios-version-check` — the second
+  suitable as a release gate.
+- Note the trap in `project.yml`: a value in `settings` overrides an xcconfig, so
+  `MARKETING_VERSION` must NOT be set there or the generator is silently defeated.
+
 #### Record GRDB in COPYING.md  (patch -15)
 
 - Add a "Third-Party Software (bundled in the iOS application)" section to

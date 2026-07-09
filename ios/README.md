@@ -46,6 +46,7 @@ Requires a Mac with Xcode and
 
     brew install xcodegen        # once
     cd ios
+    gmake ios-version            # regenerate Version.xcconfig (see below)
     xcodegen generate            # (re)generate Potillus.xcodeproj from project.yml
     open Potillus.xcodeproj
 
@@ -72,6 +73,22 @@ If `xcodebuild` complains that it "requires Xcode" but finds the command line
 tools, point it at the full Xcode once:
 
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+## Version numbers
+
+`ios/Version.xcconfig` is **generated** and git-ignored. It carries:
+
+- `MARKETING_VERSION`, taken from the top `## vX.Y.Z` entry of `CHANGELOG.md`
+- `CURRENT_PROJECT_VERSION`, taken from the Android `versionCode`
+
+so the App Store and Play Store builds report the same version and the same
+build number, and neither can drift from the changelog. Regenerate it with
+`gmake ios-version` (or `python3 tools/gen-ios-version.py`) before running
+`xcodegen generate`; without it, XcodeGen cannot resolve the config file.
+
+`gmake ios-version-check` verifies the file exists and is current — the release
+gate. The values must never be set in `project.yml` directly: a value in
+`settings` overrides an xcconfig and would silently defeat the generator.
 
 ## Dependencies
 

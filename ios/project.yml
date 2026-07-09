@@ -34,10 +34,21 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # MARKETING_VERSION and CURRENT_PROJECT_VERSION deliberately do NOT live
+    # here: a value in `settings` overrides an xcconfig, which would silently
+    # defeat the generator. They come from Version.xcconfig (see configFiles
+    # below), derived from CHANGELOG.md and the Android versionCode by
+    # `make ios-version`.
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""
+
+# Version.xcconfig is GENERATED (and git-ignored) by tools/gen-ios-version.py.
+# Run `make ios-version` before `xcodegen generate`, or the project will not
+# resolve. This is the single-source-of-truth rule from CONTRIBUTING.md section 7
+# extended to the iOS build.
+configFiles:
+  Debug: Version.xcconfig
+  Release: Version.xcconfig
 
 packages:
   # PotillusKit depends on GRDB (SwiftPM resolves it transitively), so the app

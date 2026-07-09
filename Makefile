@@ -777,6 +777,17 @@ BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
 # only the answered criteria (<name>_status in Met/Unmet/N/A plus the matching
 # _justification), sorted, so the committed snapshot diffs meaningfully. Review
 # `git diff .bestpractices.json` before committing.
+# ios-version: regenerates ios/Version.xcconfig from the project's sources of
+# truth (the top CHANGELOG.md entry and the Android versionCode), so the iOS
+# build carries the same version as the Android one. Run before `xcodegen
+# generate`. `ios-version-check` verifies the file exists and is current, and is
+# suitable for a release gate.
+ios-version:
+	python3 tools/gen-ios-version.py
+
+ios-version-check:
+	python3 tools/gen-ios-version.py --check
+
 # check-headers: verifies that every project-owned file carries the canonical
 # licence header, including the section 7 pointer to the App Store distribution
 # exception in COPYING.md. Warnings (a file with no header at all) do not fail;
