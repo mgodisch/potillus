@@ -276,6 +276,38 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
   `docs/ROADMAP.md` → Accessibility for the honest status and the open Level AA
   gaps).
 
+
+### File header
+
+Every source file the project owns carries the same header: the `vim` modeline,
+the project title and copyright line, the standard GPL-3.0-or-later notice, and a
+generic pointer to any additional permissions granted under section 7 (the App
+Store distribution exception itself lives in `COPYING.md`). The pointer
+paragraph, wrapped to match the rest of the header, reads:
+
+```
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+```
+
+It sits directly after the `If not, see <https://www.gnu.org/licenses/>` line,
+separated by a blank comment line. Only the comment leader changes with the
+file's language — `/* ... */` for Kotlin/Swift, `//` for Gradle Kotlin scripts,
+`#` for shell/Python/Make/YAML, `<!-- ... -->` for Markdown/XML — while the
+wording and line breaks stay identical everywhere. New files, including the iOS
+Swift sources, reproduce this header verbatim.
+
+Verbatim third-party texts (`LICENSE.md`, `LICENSE.Apache-2.0.md`, `COPYING.md`,
+`CODE_OF_CONDUCT.md`), binary assets, and strict-JSON files (which cannot hold a
+comment) do not carry it. `release-check.sh` verifies every Kotlin file contains
+the GPL notice.
+
+Run `make check-headers` to verify the whole tree, and `make fix-headers` to
+insert a missing section 7 pointer into an existing header. This matters most
+when merging a long-running branch into a tree that has grown new files
+meanwhile — the tool finds the ones that were created before the exception
+existed.
 ---
 
 ## 5. Testing strategy

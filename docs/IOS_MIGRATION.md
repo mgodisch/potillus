@@ -491,6 +491,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add a header checker and licence the WCAG doc  (patch -06)
+
+- Add `tools/check-headers.py`, a dependency-free checker in the style of
+  `md-syntax.py`. It fails on a stale header (GPL notice present, section 7
+  pointer missing) and warns on a file that carries no header at all, keeping
+  the two cases apart because only the first has a mechanical fix. `--fix`
+  inserts the pointer after the anchor line, reusing that file's own comment
+  leader, so one routine is correct for every comment style; the repair is a
+  byte-exact round trip, verified across block, line, hash and HTML comments.
+- Wire it up as `make check-headers` / `make fix-headers` and document both in
+  CONTRIBUTING.md. This removes the manual step that would otherwise recur every
+  time the long-running `ios` branch merges a tree that has grown new files.
+- Add the canonical header to `docs/WCAG_LEVEL_A_CHECKLIST.md`, which was
+  created without one — the first file the new checker found.
+- Fix a dangling reference introduced in patch -01: CONTRIBUTING.md section 2
+  pointed at a "file-header convention in Section 4" that had failed to apply
+  against the newer tree, so the section itself was missing. It is now present.
+
 #### Port DayResolver to Swift with shared vectors  (patch -05)
 
 - Add `test-vectors/day-resolver.json`: 48 golden cases for the logical-day

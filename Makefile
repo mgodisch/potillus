@@ -777,6 +777,20 @@ BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
 # only the answered criteria (<name>_status in Met/Unmet/N/A plus the matching
 # _justification), sorted, so the committed snapshot diffs meaningfully. Review
 # `git diff .bestpractices.json` before committing.
+# check-headers: verifies that every project-owned file carries the canonical
+# licence header, including the section 7 pointer to the App Store distribution
+# exception in COPYING.md. Warnings (a file with no header at all) do not fail;
+# a stale header -- GPL notice present, pointer missing -- does. Run
+# `make fix-headers` to repair those in place.
+check-headers:
+	python3 tools/check-headers.py
+
+# fix-headers: inserts the missing section 7 pointer into any header that lacks
+# it, reusing that file's own comment leader. Never invents a whole header for
+# an unlicensed file; that stays a human decision.
+fix-headers:
+	python3 tools/check-headers.py --fix
+
 bestpractices-json:
 	command -v curl
 	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 -c 'import json,sys; d=json.load(sys.stdin); a={k[:-7] for k,v in d.items() if k.endswith("_status") and str(v).strip() in {"Met","Unmet","N/A"}}; o={k:v for k,v in d.items() if (k.endswith("_status") and k[:-7] in a) or (k.endswith("_justification") and k[:-14] in a)}; json.dump(dict(sorted(o.items())), open(".bestpractices.json","w",encoding="utf-8"), indent=2, ensure_ascii=False); open(".bestpractices.json","a",encoding="utf-8").write(chr(10)); print("bestpractices-json: %d criteria written"%len(a), file=sys.stderr)'
