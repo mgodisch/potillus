@@ -491,6 +491,27 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port AlcoholCalculator to Swift with shared vectors  (patch -04)
+
+- Add `test-vectors/alcohol-calculator.json`: 45 golden input/output cases
+  harvested from the authoritative Android `AlcoholCalculatorTest.kt`, covering
+  gram conversion, Widmark BAC, limit fractions, `isOverLimit`, the traffic-light
+  gate, and the rolling seven-day violation counts.
+- Port `AlcoholCalculator` and its domain models to Swift, including
+  `isOverLimit`'s 1e-6 tolerance and the `assert` postconditions. Document the
+  rounding trap: Kotlin rounds halves toward +infinity, Swift away from zero;
+  they coincide here because every rounded value is non-negative.
+- Add a regression vector for the floating-point drift the tolerance fixes
+  (44.5 + 80.9 + 65.2 sums to 190.60000000000002 against a 190.6 g limit), plus
+  explicit tests on both platforms proving a strict `>` would fail it and that
+  the tolerance cannot absorb the smallest real (0.1 g) exceedance.
+- Add the `TestVectors` loaders and parity suites on both sides — the Swift one
+  derives the repository root from `#filePath` (SwiftPM cannot bundle resources
+  outside a target), the JVM one reuses the existing `org.json` test dependency
+  and the `potillus.project.dir` convention, so no new dependency, no SBOM entry,
+  and no change to the reproducible release build. This closes the parity loop:
+  a formula changed on one platform alone now turns the other red.
+
 #### Document iOS migration strategy and licence  (patch -01)
 
 - Add `docs/IOS_MIGRATION.md` recording the agreed native-Swift strategy:
