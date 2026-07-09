@@ -73,6 +73,18 @@ tools, point it at the full Xcode once:
 
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
+## Dependencies
+
+The only iOS dependency is [GRDB.swift](https://github.com/groue/GRDB.swift)
+(MIT), resolved by Swift Package Manager. `PotillusKit/Package.resolved` records
+the exact revision and **is committed on purpose**: a checkout of this repository
+must build the same bytes as the release, which is the same reason the Android
+build pins its dependency versions. Run `swift package update` deliberately, and
+review the resulting diff.
+
+GRDB is recorded in `COPYING.md`. Its MIT licence text must be reproduced in the
+app's about screen before the first App Store submission.
+
 ## A note on `make`
 
 None of the iOS workflow needs the repository `Makefile`. If you do invoke it on

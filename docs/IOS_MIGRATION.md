@@ -511,6 +511,19 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Record GRDB in COPYING.md  (patch -15)
+
+- Add a "Third-Party Software (bundled in the iOS application)" section to
+  `COPYING.md` recording GRDB.swift (MIT, Copyright 2015-2025 Gwendal Roué),
+  parallel to the existing APK section rather than hidden inside it. Note that
+  MIT is GPL-3.0 compatible, so the combined work stays distributable.
+- Note the outstanding obligation: the iOS about screen must reproduce the MIT
+  licence text before release, as the Android one already does. Recording the
+  dependency in this file is necessary but not sufficient.
+- `ios/PotillusKit/Package.resolved` pins the resolved GRDB revision and is
+  committed, so a build is reproducible from the repository alone. It was never
+  git-ignored; this only makes the intent explicit.
+
 #### Port the CSV export to Swift  (patch -14)
 
 - Add `test-vectors/csv-export.json`: 15 escaping cases and 6 complete CSV

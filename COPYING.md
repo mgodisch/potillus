@@ -116,6 +116,31 @@ plugin `com.google.devtools.ksp`, the Kover coverage plugin
 `org.jetbrains.kotlinx.kover` and the ktlint wrapper plugin
 `org.jlleitschuh.gradle.ktlint` (all Apache-2.0).
 
+## Third-Party Software (bundled in the iOS application)
+
+The library below is compiled into the released iOS application and is therefore
+redistributed together with this program.  It is consumed exclusively as a Swift
+Package Manager dependency (declared in `ios/PotillusKit/Package.swift`, with the
+resolved revision pinned in `ios/PotillusKit/Package.resolved`), never as a
+vendored source copy, so it is "de-embedded" via build-depends as required.
+
+### MIT License
+
+- **GRDB.swift** &mdash; Copyright &copy; 2015&ndash;2025 Gwendal Rou&eacute;,
+  licensed under the MIT License
+  (<[https://github.com/groue/GRDB.swift/blob/master/LICENSE](https://github.com/groue/GRDB.swift/blob/master/LICENSE)>).
+  GRDB is the iOS counterpart to Room: typed records, a schema migrator, and
+  database observation on top of the SQLite that ships with the operating
+  system.  It has no transitive dependencies, performs no network access, and
+  collects no telemetry.
+
+The MIT License permits redistribution provided the copyright notice and the
+permission notice accompany the software.  This file records them; the iOS
+application must additionally reproduce the licence text in its about screen
+before release, as the Android application already does.  MIT is compatible with
+the GNU GPL version 3, so the combined work is distributable under the terms
+stated at the top of this document.
+
 ## Third-Party Assets
 
 ### GPLv3 logo
