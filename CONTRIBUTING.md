@@ -204,8 +204,9 @@ is expected to have met (Section 2, step 3):
   change (the mandatory test policy, Section 5), and existing tests still pass.
 - **Localization.** Any new or changed user-facing string is complete across all
   locales per the translation workflow (Section 6), so `LocaleSyncTest` passes.
-- **Licensing.** New source files carry the standard copyright-and-licence header,
-  and the change respects third-party licences (see COPYING.md).
+- **Licensing.** New source files carry the standard copyright-and-licence header
+  (see the file-header convention in Section 4), and the change respects
+  third-party licences (see COPYING.md).
 - **Provenance.** All commits are signed off under the DCO (see above).
 - **Data safety.** Any change touching persistence honours the schema-freeze
   rules (Section 8).

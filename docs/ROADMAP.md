@@ -265,7 +265,10 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Publish on the Google Play Store.** In addition to F-Droid, make the app
   available on Google Play so more users can find and install it.
 - **Port the app to iOS.** Bring Libellus Potionis to Apple devices, preserving
-  the same privacy-first, offline-first design and feature set.
+  the same privacy-first, offline-first design and feature set. The concrete
+  strategy — a native Swift/SwiftUI app in this same repository, sharing a data
+  interchange format (not live sync) and a single human-readable version with
+  Android — is worked out in [IOS_MIGRATION.md](IOS_MIGRATION.md).
 - **Publish on the Apple App Store.** Once the iOS port is ready, distribute it
   through the Apple App Store.
 

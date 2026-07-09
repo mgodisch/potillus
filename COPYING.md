@@ -19,6 +19,15 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see
 <[https://www.gnu.org/licenses/](https://www.gnu.org/licenses/)>.
 
+## App Store Distribution Exception
+
+As an additional permission under section 7 of the GNU General Public License,
+version 3, you are allowed to distribute the software through an app store, even
+if that store has restrictive terms and conditions that are incompatible with
+the GPL, provided that the source is also available under the GPL with or
+without this permission through a channel without those restrictive terms and
+conditions.
+
 ## Third-Party Software (bundled in the release APK)
 
 The libraries below are compiled into the released application package (the
