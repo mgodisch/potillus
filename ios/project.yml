@@ -1,0 +1,92 @@
+# vim: set et ts=4:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+
+name: Potillus
+
+options:
+  bundleIdPrefix: de.godisch
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+
+packages:
+  PotillusKit:
+    path: PotillusKit
+
+targets:
+  Potillus:
+    type: application
+    platform: iOS
+    sources:
+      - path: Potillus
+    dependencies:
+      - package: PotillusKit
+        product: PotillusKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.godisch.potillus
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: "Libellus Potionis"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+
+  PotillusTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PotillusTests
+    dependencies:
+      - target: Potillus
+      - package: PotillusKit
+        product: PotillusKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.godisch.potillus.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+
+# An explicit scheme is needed so the test action knows about the test target;
+# without it, `Cmd+U` and `xcodebuild test` fail with "not configured for the
+# test action".
+schemes:
+  Potillus:
+    build:
+      targets:
+        Potillus: all
+        PotillusTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - PotillusTests
