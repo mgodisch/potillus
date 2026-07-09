@@ -35,7 +35,6 @@
 #                         feature graphics rendered exactly once       [device]
 #      screenshots        capture the six in-app shots 01..06 per locale, then
 #                         refresh the feature graphics                 [device]
-#      screenshots-crop   crop the in-app shots to <= 2:1 (sub-step of the above)
 #      screenshots-pdf    rasterize report pages 07..08 from the per-locale PDFs
 #      feature-graphics           (re)build every locale's featureGraphic*.png
 #      feature-graphics-existing  refresh only the graphics already on disk
@@ -90,6 +89,28 @@ SCREENSHOT_LOCALES := $(sort $(notdir $(patsubst %/changelogs,%,$(wildcard fastl
 # last logged day (2026-06-30 is a deliberately dry "today", one day after the
 # last 2026-06-29 entry); the `screenshots` preflight guard enforces both.
 SCREENSHOT_DATE  := 2026-06-30
+
+# Display geometry forced onto the capture device (see the `screenshots` recipe;
+# reset again by `screenshots-demo-off`).
+#
+# WHY FORCE IT AT ALL?
+#   Google Play rejects phone screenshots whose long side exceeds twice the short
+#   side. Most modern panels are 19.5:9 or 20:9 and thus fail. Instead of trimming
+#   the captures afterwards (the former `screenshots-crop` step, dropped together
+#   with its Pillow dependency), the panel is overridden to an exactly 2:1
+#   geometry, so every capture is compliant by construction and shows the real,
+#   uncropped app — including the system navigation row.
+#
+# WHY 1428x2856 @ 640 dpi?
+#   2856 / 1428 = 2.000, i.e. exactly at Play's limit and comfortably inside its
+#   320..3840 px per-side bounds. 640 dpi (xxxhdpi) makes the app render at
+#   1428 / 640 * 160 = 357 dp of usable width — close to the 360 dp baseline the
+#   layouts are designed against, so no locale's strings reflow differently than
+#   on a typical device. (Alternatives for the record: 480 dpi → 476 dp is a
+#   tablet-like layout width; 560 dpi → 408 dp still reads as a large phone. Both
+#   are legal here; 640 was chosen for closest baseline parity.)
+SCREENSHOT_SIZE    := 1428x2856
+SCREENSHOT_DENSITY := 640
 # Inputs the drift guard cross-checks against SCREENSHOT_DATE (see the guard in
 # the `screenshots` recipe): the in-app capture-date pin and the demo fixture
 # whose last logged day the "Today" screenshot must land on.
@@ -112,6 +133,10 @@ REPORT_PDF_DIR := fastlane/report-pdf
 require-device    = adb devices 2>/dev/null | grep -q 'device$$' || { echo "$(1): no device/emulator connected (adb) -- connect one first."; exit 1; }
 require-pdftoppm  = command -v pdftoppm >/dev/null || { echo "$(1): 'pdftoppm' not found — install poppler-utils"; exit 1; }
 require-rsvg      = command -v rsvg-convert >/dev/null 2>&1 || { echo "$(1): 'rsvg-convert' not found — install librsvg2-bin"; exit 1; }
+# Still needed after `screenshots-crop` was dropped: tools/render-feature-graphic.py
+# imports PIL (it draws the phone mockup and perspective-warps it before embedding
+# the result in the SVG). Without this pre-flight the feature-graphic build dies
+# with a bare ImportError traceback instead of an actionable message.
 require-pillow    = python3 -c 'import PIL' 2>/dev/null || { echo "$(1): Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
 require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): fonttools not found — install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
 
@@ -172,11 +197,14 @@ install: ../downloads/potillus-$(VERSION)-debug.apk
 #   ALWAYS switched off again at the end, even on failure, via a bash EXIT trap.
 #
 #   Prerequisites on the build host (see fastlane/Gemfile and the project README):
-#     * a connected device/emulator with an aspect ratio <= 2:1
-#       (e.g. 1080x2160) so the captures satisfy Play's max-2:1 rule;
+#     * a connected device/emulator — ANY panel geometry will do: the recipe
+#       overrides the display to $(SCREENSHOT_SIZE) @ $(SCREENSHOT_DENSITY) (an
+#       exact 2:1) for the duration of the capture and resets it afterwards, so
+#       Play's max-2:1 rule is satisfied by construction rather than by cropping;
 #     * Ruby + bundler with fastlane installed: `cd fastlane && bundle install`;
 #     * poppler-utils (`pdftoppm`) for rendering the PDF report pages.
-#     * Pillow (`python3-pil`) for bottom-cropping the in-app shots to <= 2:1.
+#     * Pillow (`python3-pil`) for the feature graphics rebuilt by the final
+#       cascade step (tools/render-feature-graphic.py draws the phone mockup).
 #
 #   The capture perspective (logical "today") is pinned IN-APP by the capture
 #   suite (ScreenshotClock.pin() → DayResolver.clockOverride = $(SCREENSHOT_DATE)),
@@ -195,8 +223,8 @@ screenshots:
 	#    install`; if that bundle is missing, the `bundle exec fastlane` capture in
 	#    step 5 aborts late with the cryptic "bundler: command not found: fastlane"
 	#    (Error 127) AFTER a full build and after toggling Demo Mode. Fail fast with
-	#    an actionable message instead — mirrors the Pillow / pdftoppm pre-flight
-	#    checks in screenshots-crop / screenshots-pdf. `bundle check` only verifies
+	#    an actionable message instead — mirrors the pdftoppm pre-flight
+	#    checks in screenshots-pdf. `bundle check` only verifies
 	#    the bundle is satisfied (it does not load fastlane), so it is cheap.
 	command -v bundle >/dev/null 2>&1 || { echo "screenshots: 'bundle' (Ruby Bundler) not found -- install Ruby + Bundler 4.0.15, then run 'cd fastlane && bundle install'."; exit 1; }
 	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots: fastlane gems are not installed in fastlane -- run 'cd fastlane && bundle install' (gems vendor into fastlane/.vendor; Bundler 4.0.15 is pinned in fastlane/Gemfile.lock)."; exit 1; }
@@ -229,6 +257,12 @@ screenshots:
 	#    the device date — the capture PERSPECTIVE itself is already pinned in-app).
 	adb shell svc power stayon true
 	adb shell input keyevent KEYCODE_WAKEUP
+	# Force an exactly-2:1 panel so the captures satisfy Play's aspect rule
+	# without any post-processing (see SCREENSHOT_SIZE / SCREENSHOT_DENSITY).
+	# Both overrides are sticky and are undone by the EXIT trap's
+	# `screenshots-demo-off`, which runs even on Ctrl-C or a failed capture.
+	adb shell wm size $(SCREENSHOT_SIZE)
+	adb shell wm density $(SCREENSHOT_DENSITY)
 	adb shell wm dismiss-keyguard
 	adb shell settings put global window_animation_scale 0
 	adb shell settings put global transition_animation_scale 0
@@ -274,16 +308,12 @@ screenshots:
 	#    or the EXIT trap (which must run from the repository root, otherwise
 	#    `$(MAKE) screenshots-demo-off` finds no such target).
 	( cd fastlane && bundle exec fastlane screenshots )
-	# 7) Bottom-crop the six in-app screenshots to <= 2:1 (removes the Android
-	#    navigation bar at the bottom and satisfies Google Play's max-2:1 rule on
-	#    tall phones/emulators).
-	$(MAKE) screenshots-crop
-	# 8) Enforce the Google Play phone-screenshot requirements on the in-app shots.
+	# 7) Enforce the Google Play phone-screenshot requirements on the in-app shots.
 	#    Only 01..06 are (re)captured here; the report pages 07/08 are owned by
 	#    `make report-pdfs` (rendered from the per-locale PDFs, not the device),
 	#    which validates them there.
 	python3 tools/validate-screenshots.py --in-app $(SCREENSHOT_LOCALES)
-	# 9) Cascade: fresh 01..06 feed the feature graphics (their 01_today input just
+	# 8) Cascade: fresh 01..06 feed the feature graphics (their 01_today input just
 	#    changed), so rebuild every locale's now-stale graphic ("renew screenshots
 	#    -> renew feature graphics"). Routed through the once-per-run guard so a
 	#    combined run (`make screenshots report-pdfs`, or `store-assets`) renders
@@ -291,20 +321,22 @@ screenshots:
 	#    file-timestamp driven, so unchanged locales are a no-op regardless.
 	$(MAKE) _cascade-feature-graphics
 
-# Bottom-crop the in-app screenshots (01..06) to at most a 2:1 aspect ratio. Runs
-# AFTER capture and BEFORE the PDF pages are rendered, so it only ever sees the
-# in-app shots; the tool additionally skips any "report" page and any image that
-# is already <= 2:1, so re-runs and the PDF pages are safe.
-screenshots-crop:
-	$(call require-pillow,screenshots-crop)
-	python3 tools/crop-screenshots.py $(SCREENSHOT_LOCALES)
-
 # Leave Android Demo Mode and restore the normal device state. Each step is
 # tolerant (|| true) so tear-down never fails the build; invoked from the
 # `screenshots` EXIT trap.
+#
+# The display overrides deserve special mention: `screenshots` forces the panel
+# to $(SCREENSHOT_SIZE) / $(SCREENSHOT_DENSITY) so every capture is exactly 2:1
+# (see the recipe). Those overrides are STICKY — they survive the make run, a
+# reboot and, on a physical phone, the rest of the day. Resetting them here (and
+# not at the end of the recipe) means a Ctrl-C or a failed capture leaves the
+# device usable, exactly like the Demo Mode teardown. `wm size|density reset`
+# restores the panel's native values and is a no-op when nothing was overridden.
 screenshots-demo-off:
 	adb shell am broadcast -a com.android.systemui.demo -e command exit || true
 	adb shell settings put global sysui_demo_allowed 0 || true
+	adb shell wm size reset || true
+	adb shell wm density reset || true
 	adb shell settings put global auto_time 1 || true
 	adb shell settings put global window_animation_scale 1 || true
 	adb shell settings put global transition_animation_scale 1 || true
@@ -758,4 +790,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug device-tests release install store-assets screenshots screenshots-crop screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: debug device-tests release install store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

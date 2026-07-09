@@ -170,6 +170,21 @@ listed individually below.
   stopped producing a file) was removed; and COPYING.md's build-time tooling
   list gained the KSP, Kover and ktlint Gradle plugins alongside the already
   listed CycloneDX plugin.
+- Screenshot pipeline captures at an exact 2:1 instead of cropping (seventh QA
+  round, follow-up): `make screenshots` now overrides the capture device's
+  display to 1428x2856 @ 640 dpi (`SCREENSHOT_SIZE` / `SCREENSHOT_DENSITY`, an
+  exact 2:1 at ~357 dp usable width), so Google Play's max-2:1 rule is met by
+  construction and the store shots show the full, uncropped app. The former
+  `screenshots-crop` step and `tools/crop-screenshots.py` are removed with it,
+  and any device geometry is now acceptable. Two robustness fixes on top of that
+  change: the sticky `wm size` / `wm density` overrides are reset in
+  `screenshots-demo-off`, so the EXIT trap restores the device even after a
+  Ctrl-C or a failed capture (previously a phone stayed scaled indefinitely);
+  and the `require-pillow` pre-flight — dropped with the crop step — is
+  reinstated for `feature-graphics`, because `tools/render-feature-graphic.py`
+  still imports PIL for the phone mockup and would otherwise fail with a bare
+  ImportError. All 21 locales' in-app screenshots 01..06 are recaptured at the
+  new geometry; store assets only, no app behaviour change.
 
 ---
 

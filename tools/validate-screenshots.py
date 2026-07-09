@@ -79,9 +79,8 @@ PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 # Root of the fastlane metadata tree. It lives at the repository root (a sibling
 # of android/ and of this script's tools/ dir). Anchor to it from __file__ so the
-# script is cwd-independent (the parent of tools/ is the repository root) --
-# matching crop-screenshots.py; it no longer relies on being invoked from the
-# android/ project dir.
+# script is cwd-independent (the parent of tools/ is the repository root); it
+# does not rely on being invoked from the android/ project dir.
 META_ROOT = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "fastlane", "metadata", "android",
