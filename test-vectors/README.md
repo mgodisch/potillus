@@ -45,6 +45,10 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
   fractions, the traffic-light capacity status, and the rolling seven-day
   violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+- `db-schema.json` — the SQLite schema contract (tables, columns, affinities,
+  primary keys, indices, foreign-key actions). Unlike the other files this one is
+  *generated* from Android's Room schema export, which is authoritative. Android
+  asserts its export still matches; iOS introspects the database GRDB builds.
 - `chart-bucketing.json` — `Trend` classification, granularity selection, and the
   bucketing rules, including the two consequences of the in-progress day (it
   leaves the bucket's divisor until it becomes a drink day, and its bucket is

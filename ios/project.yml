@@ -40,6 +40,8 @@ settings:
     DEVELOPMENT_TEAM: ""
 
 packages:
+  # PotillusKit depends on GRDB (SwiftPM resolves it transitively), so the app
+  # target needs no direct GRDB entry here.
   PotillusKit:
     path: PotillusKit
 

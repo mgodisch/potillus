@@ -38,8 +38,20 @@ let package = Package(
     products: [
         .library(name: "PotillusKit", targets: ["PotillusKit"])
     ],
+    dependencies: [
+        // GRDB is the iOS counterpart to Room: typed records, a migrator, and
+        // change observation over plain SQLite. MIT-licensed, no transitive
+        // dependencies, no network — it satisfies the project's dependency policy
+        // (see docs/IOS_MIGRATION.md, "iOS dependency licence policy").
+        .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.0.0")
+    ],
     targets: [
-        .target(name: "PotillusKit"),
+        .target(
+            name: "PotillusKit",
+            dependencies: [
+                .product(name: "GRDB", package: "GRDB.swift")
+            ]
+        ),
         .testTarget(name: "PotillusKitTests", dependencies: ["PotillusKit"])
     ]
 )

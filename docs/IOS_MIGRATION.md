@@ -188,9 +188,21 @@ Each has a native iOS counterpart:
 Three artefacts define interoperability. They are treated as a versioned
 contract; any change to them is a coordinated, cross-platform change.
 
-1. **SQLite schema.** Both platforms use the same tables and columns so the
-   domain logic maps one-to-one and a power user could, in principle, copy the
-   database file across platforms. Current shape (schema version 2):
+1. **SQLite schema.** Both platforms use the same tables and columns, so the
+   domain logic maps one-to-one and the backup JSON maps cleanly onto rows. The
+   shape is pinned by `test-vectors/db-schema.json`, generated from Room's
+   authoritative export; Android asserts its export still matches it, and iOS
+   introspects the database GRDB actually builds (`PRAGMA table_info`,
+   `index_list`, `foreign_key_list`) against the same file.
+
+   **Correction to an earlier assumption:** a database *file* is NOT an
+   interchange format between the platforms. Room keeps its own bookkeeping (a
+   `room_master_table` holding an identity hash, plus `user_version`), and GRDB
+   keeps a `grdb_migrations` table instead; neither would open the other's file.
+   Only the JSON backup is a supported interchange path. What "shared schema"
+   buys is that the tables mean the same thing on both sides.
+
+   Current shape (schema version 2):
    - `drinks(id, name, volumeMl, alcoholPercent, isPreset, isFavorite,
      category)`
    - `entries(id, drinkId FK, drinkName, volumeMl, alcoholPercent, gramsAlcohol,
@@ -373,7 +385,10 @@ third-party copyleft, which the maintainer has no authority to re-permit. So the
 binary shipped on the App Store must contain no foreign copyleft:
 
 - Prefer permissive licences for iOS dependencies (MIT / BSD / Apache-2.0 / SIL
-  OFL). GRDB.swift, for example, is MIT.
+  OFL). GRDB.swift — the project's first and so far only iOS dependency — is MIT,
+  has no transitive dependencies, performs no network access, and ships no
+  telemetry. It must be added to `COPYING.md` before the first App Store
+  submission.
 - **No GPL/AGPL** in the shipped iOS binary.
 - **Avoid LGPL too**, not just GPL: LGPL requires that the end user be able to
   relink/replace the library, which iOS's static, signed, sandboxed model
@@ -439,8 +454,10 @@ Indicative ordering; refined as work starts.
    window and the chart buckets depend on. Not ported by design: the
    `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
    which are platform concerns and return with the iOS UI.
-3. **Data layer.** SQLite schema (identical), repositories, JSON backup v3
-   reader/writer, CSV export — verified byte-compatible with Android output.
+3. **Data layer (in progress).** The schema and the GRDB record types are in
+   place, with both platforms asserting against the shared schema contract. Still
+   to do: repositories behind protocol seams, the JSON backup v3 reader/writer,
+   and the CSV export — each verified byte-compatible with Android output.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
@@ -490,6 +507,29 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Add the iOS data layer schema with GRDB  (patch -09)
+
+- Add GRDB (MIT) as the first iOS dependency, the counterpart to Room: typed
+  records, a migrator, and change observation over plain SQLite. Chosen over raw
+  `SQLite3` because migrations and observation are exactly the infrastructure
+  that is dangerous to hand-roll in an app whose database is the user's only
+  copy of their history.
+- Add `test-vectors/db-schema.json`, generated from Android's authoritative Room
+  export, and assert against it from BOTH sides: Android checks its export still
+  matches, iOS builds a real in-memory database and introspects it with
+  `PRAGMA table_info`, `index_list` and `foreign_key_list`. Introspection rather
+  than DDL-string comparison, because Room and GRDB spell the same table
+  differently.
+- Add `Drink` and `Entry` GRDB records mirroring the Room entities, and
+  `AppDatabase` with a migrator that builds the version 2 shape: AUTOINCREMENT
+  primary keys, the two `entries` indices, and the `ON DELETE RESTRICT` foreign
+  key. Behavioural tests assert the schema actually protects the data — deleting
+  a referenced drink is refused, freed row ids are never reused.
+- Correct the shared-data-contract section: a database *file* is not an
+  interchange format (Room and GRDB keep incompatible bookkeeping tables). The
+  JSON backup is. The shared schema means the tables mean the same thing, not
+  that the files are swappable.
 
 #### Port ChartBucketing and Trend to Swift  (patch -08)
 

@@ -1,0 +1,142 @@
+{
+  "_comment": [
+    "Shared schema contract for the SQLite database, generated from the Android",
+    "Room export (android/app/schemas/.../2.json), which is authoritative.",
+    "Android asserts that its exported schema still matches this file; iOS asserts",
+    "that the database GRDB creates matches it, by introspecting PRAGMA table_info,",
+    "index_list and foreign_key_list. Neither platform can drift.",
+    "Room's own bookkeeping (room_master_table, user_version) is NOT part of the",
+    "contract: a database FILE is not an interchange format between the platforms.",
+    "The JSON backup is. What is shared is the table shape, so the domain logic and",
+    "the queries mean the same thing on both sides.",
+    "Column order follows the Room export and is significant only for readability."
+  ],
+  "schemaVersion": 2,
+  "tables": [
+    {
+      "name": "drinks",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notNull": true
+        },
+        {
+          "name": "volumeMl",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "alcoholPercent",
+          "type": "REAL",
+          "notNull": true
+        },
+        {
+          "name": "isPreset",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "isFavorite",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "notNull": true
+        }
+      ],
+      "primaryKey": [
+        "id"
+      ],
+      "autoIncrement": true,
+      "indices": [],
+      "foreignKeys": []
+    },
+    {
+      "name": "entries",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "drinkId",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "drinkName",
+          "type": "TEXT",
+          "notNull": true
+        },
+        {
+          "name": "volumeMl",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "alcoholPercent",
+          "type": "REAL",
+          "notNull": true
+        },
+        {
+          "name": "gramsAlcohol",
+          "type": "REAL",
+          "notNull": true
+        },
+        {
+          "name": "timestampMillis",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "logicalDate",
+          "type": "TEXT",
+          "notNull": true
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "notNull": true
+        }
+      ],
+      "primaryKey": [
+        "id"
+      ],
+      "autoIncrement": true,
+      "indices": [
+        {
+          "name": "index_entries_drinkId",
+          "unique": false,
+          "columns": [
+            "drinkId"
+          ]
+        },
+        {
+          "name": "index_entries_logicalDate",
+          "unique": false,
+          "columns": [
+            "logicalDate"
+          ]
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "drinkId",
+          "referencesTable": "drinks",
+          "referencesColumn": "id",
+          "onDelete": "RESTRICT",
+          "onUpdate": "NO ACTION"
+        }
+      ]
+    }
+  ]
+}
