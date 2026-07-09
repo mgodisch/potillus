@@ -59,6 +59,21 @@ enum TestVectors {
             .deletingLastPathComponent()     // repository root
     }
 
+    /// Reads any file from the repository, by path relative to the root.
+    ///
+    /// Used for fixtures that are not vectors but real artefacts the project
+    /// already ships — `fastlane/demo-backup.json` above all, which is a genuine
+    /// backup written by the Android app. Reading THAT file, rather than a
+    /// hand-written sample, is what makes the interoperability claim a
+    /// demonstration instead of an assertion.
+    static func repositoryFile(_ relativePath: String) throws -> Data {
+        var url = repositoryRoot
+        for component in relativePath.split(separator: "/") {
+            url.appendPathComponent(String(component))
+        }
+        return try Data(contentsOf: url)
+    }
+
     /// Loads and decodes a vector file from `test-vectors/`.
     ///
     /// - Parameter name: File name without the `.json` extension.

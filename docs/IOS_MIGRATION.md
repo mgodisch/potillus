@@ -454,11 +454,12 @@ Indicative ordering; refined as work starts.
    window and the chart buckets depend on. Not ported by design: the
    `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
    which are platform concerns and return with the iOS UI.
-3. **Data layer (in progress).** The schema, the GRDB record types and the
-   repositories behind protocol seams are in place, with both platforms asserting
-   against the shared schema contract. Still to do: the JSON backup v3
-   reader/writer and the CSV export — each verified byte-compatible with Android
-   output.
+3. **Data layer (in progress).** The schema, the GRDB record types, the
+   repositories behind protocol seams, and the JSON backup v3 reader/writer are
+   in place. Compatibility is demonstrated, not asserted: the iOS suite parses
+   `fastlane/demo-backup.json`, a genuine Android-written backup already in the
+   repository. Still to do: the CSV export, and applying the backup's `settings`
+   block once an iOS preferences store exists.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
@@ -508,6 +509,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Port the JSON backup format to Swift  (patch -12)
+
+- Port Android's `BackupManager` reader/writer. This is the project's single
+  most important interoperability surface: the JSON backup is the only supported
+  way a user carries their history between an Android phone and an iPhone.
+- Prove compatibility against the real artefact rather than a hand-written
+  sample: the suite parses `fastlane/demo-backup.json`, a genuine format 2
+  backup the Android app wrote and the repository already ships as the
+  screenshot fixture — 15 drinks, 85 entries, no settings block.
+- Mirror the compatibility rules exactly: required fields strict, optional and
+  newer fields defaulted (a format 1 drink with no `category` restores as
+  OTHER), unknown keys ignored, and a file from a newer app REJECTED rather than
+  read with unknown fields silently dropped.
+- Restore the numeric leniency `org.json` has and `JSONSerialization` lacks: an
+  ABV written as `5` rather than `5.0` must still read as a Double, or a backup
+  would fail to cross the platform boundary in one direction.
+- Reject a malformed `logicalDate` at the door; it would otherwise silently
+  mis-bucket every statistic built on it.
+- Write with sorted keys, so an export is deterministic and a diff of two
+  backups shows only real changes.
+- Carry the `settings` block through unchanged without applying it: on Android
+  the settings live in an encrypted DataStore, and iOS has no preferences store
+  yet. An iOS export therefore omits the key, exactly as a format 1/2 file does,
+  and an Android import leaves the local preferences untouched — the behaviour a
+  pre-v3 backup already produces.
 
 #### Declare NOT NULL on the iOS primary keys  (patch -11)
 
