@@ -73,5 +73,11 @@ tools, point it at the full Xcode once:
 
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
+## A note on `make`
+
+None of the iOS workflow needs the repository `Makefile`. If you do invoke it on
+macOS, use `gmake` (`brew install make`): the bundled GNU Make 3.81 cannot parse
+the `VERSION` assignment. See "Building on macOS" in `CONTRIBUTING.md`.
+
 This is a scaffold: the app shows a placeholder screen and the domain logic is
 not ported yet.

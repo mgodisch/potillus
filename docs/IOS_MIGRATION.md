@@ -491,6 +491,14 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Document the GNU Make requirement on macOS  (patch -07)
+
+- Record that the `Makefile` needs GNU Make 4.x: macOS ships 3.81, where a `#`
+  ends the line as a comment even inside `$(shell ...)`, so the `VERSION`
+  assignment (which greps `CHANGELOG.md` for `'^## v'`) aborts with
+  "unterminated call to function `shell'". Use `gmake`. Note that the iOS
+  workflow never needs the `Makefile`, and that the checker script runs directly.
+
 #### Add a header checker and licence the WCAG doc  (patch -06)
 
 - Add `tools/check-headers.py`, a dependency-free checker in the style of

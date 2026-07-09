@@ -308,6 +308,34 @@ insert a missing section 7 pointer into an existing header. This matters most
 when merging a long-running branch into a tree that has grown new files
 meanwhile — the tool finds the ones that were created before the exception
 existed.
+
+The checker is a plain script and can always be run directly
+(`python3 tools/check-headers.py [--fix]`), which is the portable way — see the
+note on GNU Make below.
+
+### Building on macOS
+
+The `Makefile` requires **GNU Make 4.x**. macOS still ships GNU Make 3.81, in
+which a `#` terminates the line as a comment even inside a `$(shell ...)` call.
+The `VERSION` assignment greps `CHANGELOG.md` for `'^## v'`, so 3.81 never sees
+the closing parenthesis and aborts with:
+
+```
+Makefile: *** unterminated call to function `shell': missing `)'.  Stop.
+```
+
+Make 4.x fixed this. Install it and use `gmake`:
+
+```
+brew install make
+gmake check-headers
+```
+
+The `Makefile` is not needed for iOS work at all: `xcodegen`, `swift test`, and
+Xcode are invoked directly (see `ios/README.md`). It also assumes a Linux
+toolchain elsewhere (`rsvg-convert`, `pdftoppm`, screengrab, the F-Droid and
+reproducible-build targets), so the Android release pipeline stays on Linux by
+design.
 ---
 
 ## 5. Testing strategy
