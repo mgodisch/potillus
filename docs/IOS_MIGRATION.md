@@ -512,21 +512,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
-#### Port the drink validator, with shared bounds  (patch -29)
+#### Add the Drinks screen  (patch -31)
 
-- Port `DrinkValidator`, added to Android in v0.81.0 after its rules were found
-  to exist twice with two different answers. Add
-  `test-vectors/drink-validation.json`, whose `bounds` block is GENERATED from the
-  Kotlin source and asserted by both suites: a fourth copy of these numbers
-  cannot now drift unnoticed.
-- Correct two string semantics that look identical across the languages and are
-  not. Kotlin is the authority, because a drink Android accepts must be accepted
-  here:
-  - `String.length` counts UTF-16 CODE UNITS; Swift's `String.count` counts
-    grapheme clusters. A name of 51 beer emojis is 102 units (rejected) and 51
-    characters (accepted). The Swift port measures `utf16.count`.
-  Pinned by vectors and by tests on each side, since it would never surface as a
-  bug report — the user would simply find a name rejected on one of their devices.
+- Add `DrinksModel` and `DrinksScreen`: the catalogue, a favourite toggle, an
+  add/edit sheet, and swipe-to-delete.
+- Let the Save button ask `DrinkValidator` the same question the model will ask,
+  so it cannot offer to save what the model then rejects. The editor NAMES the
+  offending field rather than greying out Save in silence, and the sheet stays
+  open when a write is refused.
+- Guard deletion instead of attempting it. `entries.drinkId` references
+  `drinks.id` with ON DELETE RESTRICT, so deleting a used drink fails at the
+  database; relying on that would show a SQLite error code. The model counts the
+  entries first and reports "Pils is used by 23 entries". The constraint remains
+  the real guarantee — between the count and the delete an entry could still be
+  logged, and then the database refuses. The guard improves the message, it does
+  not replace the constraint.
+- Validate `update` and the favourite toggle, both of which take the same path as
+  `add`. Android's `updateDrink` trusted its caller until v0.81.0, while the
+  favourite toggle was already a second caller.
+- Store the trimmed name via `DrinkValidator.canonicalName`, the helper that
+  measured it. Validating one string and persisting another is how a
+  101-character name reaches the table.
+- Omit `deinit` on the `@MainActor` model. A `deinit` is nonisolated, and reaching
+  into isolated state from there is a rule that has shifted between Swift
+  versions; the observation task holds `self` weakly and the view calls `stop()`.
+- Restore the newest-first order of this list: patch -30's entry was filed below
+  patch -29's.
 
 #### Correct the whitespace claim the vectors refuted  (patch -30)
 
@@ -544,6 +555,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 - Check finiteness BEFORE the range test, as Kotlin does. `(0.0...100.0).contains(.nan)`
   is false and happens to reject it, but a hand-written `!(percent > 100)` would
   not, and a NaN reaching `SUM(gramsAlcohol)` poisons every total after it.
+
+#### Port the drink validator, with shared bounds  (patch -29)
+
+- Port `DrinkValidator`, added to Android in v0.81.0 after its rules were found
+  to exist twice with two different answers. Add
+  `test-vectors/drink-validation.json`, whose `bounds` block is GENERATED from the
+  Kotlin source and asserted by both suites: a fourth copy of these numbers
+  cannot now drift unnoticed.
+- Correct two string semantics that look identical across the languages and are
+  not. Kotlin is the authority, because a drink Android accepts must be accepted
+  here:
+  - `String.length` counts UTF-16 CODE UNITS; Swift's `String.count` counts
+    grapheme clusters. A name of 51 beer emojis is 102 units (rejected) and 51
+    characters (accepted). The Swift port measures `utf16.count`.
+  Pinned by vectors and by tests on each side, since it would never surface as a
+  bug report — the user would simply find a name rejected on one of their devices.
 
 #### Silence a real warning, not the compiler  (patch -28)
 

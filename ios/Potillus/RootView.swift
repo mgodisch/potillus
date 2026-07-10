@@ -80,7 +80,7 @@ struct RootView: View {
             PlaceholderScreen(title: "Statistics")
                 .tabItem { Label("Statistics", systemImage: "chart.bar") }
 
-            PlaceholderScreen(title: "Drinks")
+            DrinksScreen(environment: environment)
                 .tabItem { Label("Drinks", systemImage: "wineglass") }
         }
         // nil means "follow the system", which is exactly what ThemeMode.system
