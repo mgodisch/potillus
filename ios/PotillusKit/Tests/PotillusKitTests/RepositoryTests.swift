@@ -145,6 +145,22 @@ final class RepositoryTests: XCTestCase {
     }
 
     /// `ON DELETE RESTRICT`: history is never silently erased.
+    /// The other direction of the same foreign key. Deleting a referenced drink is
+    /// refused; so is inserting an entry that references nothing. Untested until
+    /// the CalendarModel suite tripped over it, having invented a `drinkId` of 1.
+    func testAnEntryAgainstAnUnknownDrinkIsRefused() throws {
+        XCTAssertThrowsError(
+            try entries.add(
+                ConsumptionEntry(
+                    drinkId: 999_999, drinkName: "ghost", volumeMl: 500, alcoholPercent: 4.9,
+                    gramsAlcohol: 19.3, timestampMillis: 1_000, logicalDate: "2026-01-01"
+                )
+            ),
+            "an entry may not reference a drink that does not exist"
+        )
+        XCTAssertTrue(try entries.all().isEmpty, "and nothing is stored")
+    }
+
     func testDeletingADrinkWithEntriesThrows() throws {
         let id = try addDrink("Pils")
         try addEntry(drinkId: id, at: 1_000, on: "2026-01-01")

@@ -512,6 +512,17 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix the calendar tests, and test what caught them  (patch -35)
+
+- `CalendarModelTests` inserted entries with a hard-coded `drinkId` of 1 and never
+  created that drink, so seven tests failed on the foreign key. The constraint was
+  right and the test was wrong: every entry references a drink. The suite now adds
+  a real drink in `setUp` and uses its row id.
+- Add the test that would have caught this: an entry referencing a drink that does
+  not exist must be REFUSED, and nothing may be stored. Only the other direction
+  of the same foreign key was covered — deleting a referenced drink — so the
+  insert side went unguarded until a broken test discovered it.
+
 #### Port the statistics aggregations  (patch -34)
 
 - Add `StatsAggregator`: the category breakdown, the time-of-day histogram, the

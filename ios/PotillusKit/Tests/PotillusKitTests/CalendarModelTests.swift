@@ -41,6 +41,11 @@ final class CalendarModelTests: XCTestCase {
 
     private var environment: AppEnvironment!
 
+    /// A real drink, because `entries.drinkId` references `drinks.id`. Inserting
+    /// an entry against an id that does not exist is refused by the foreign key —
+    /// which is the constraint working, not a test-harness inconvenience.
+    private var drinkId: Int64 = 0
+
     /// 2026-01-15, 12:00 UTC — mid-month, so navigation cannot rely on an edge.
     private let midJanuary: Int64 = 1_768_478_400_000
 
@@ -49,6 +54,9 @@ final class CalendarModelTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         environment = try AppEnvironment.makeEphemeral()
+        drinkId = try environment.drinks.add(
+            DrinkDefinition(name: "Pils", volumeMl: 500, alcoholPercent: 4.9, category: .beer)
+        )
     }
 
     private func makeModel(at millis: Int64, firstDayOfWeekIso: Int = 1) -> CalendarModel {
@@ -65,7 +73,7 @@ final class CalendarModelTests: XCTestCase {
     private func addEntry(on date: String, grams: Double, at millis: Int64) throws -> Int64 {
         try environment.entries.add(
             ConsumptionEntry(
-                drinkId: 1, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
+                drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
                 gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
             )
         )
