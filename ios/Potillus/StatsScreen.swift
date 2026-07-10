@@ -60,6 +60,12 @@ struct StatsScreen: View {
     @State var isBuildingPdf = false
     @State var exportFailure: String?
 
+    /// Non-nil while the range sheet is up; carries what the range is for.
+    @State var pendingExport: ExportRangeSheet.Kind?
+
+    /// Pre-fill for the sheet, resolved when the button is tapped.
+    @State var exportDefaults: (from: Date, to: Date)?
+
     init(environment: AppEnvironment) {
         self.environment = environment
         _model = State(initialValue: StatsModel(
@@ -85,12 +91,12 @@ struct StatsScreen: View {
             .toolbar {
                 Menu {
                     Button {
-                        prepareCsv()
+                        Task { await beginExport(.csv) }
                     } label: {
                         Label("Export CSV", systemImage: "tablecells")
                     }
                     Button {
-                        Task { await preparePdf() }
+                        Task { await beginExport(.pdf) }
                     } label: {
                         Label("Export PDF report", systemImage: "doc.richtext")
                     }
@@ -101,7 +107,12 @@ struct StatsScreen: View {
                         Label("Export", systemImage: "square.and.arrow.up")
                     }
                 }
-                .disabled(model.state.dataPoints.isEmpty || isBuildingPdf)
+                // NOT disabled on an empty window. The range is chosen in the sheet,
+                // and the window on screen has no say in it. Android asks first too.
+                .disabled(isBuildingPdf)
+            }
+            .sheet(item: $pendingExport) { kind in
+                exportRangeSheet(for: kind)
             }
             .task { await model.load() }
             .refreshable { await model.load() }

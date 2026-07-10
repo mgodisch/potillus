@@ -512,6 +512,55 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Ask which days to export  (patch -67)
+
+Android asks before every export, CSV and PDF alike: a date-range picker pre-filled
+with the "statistics from" date and today, future days greyed out. The exported
+range is INDEPENDENT of the period on screen — you may be looking at this month and
+export the whole year.
+
+The iOS port silently exported whatever window the statistics screen happened to
+show, and disabled the button when that window was empty. Import a backup of last
+spring, open the app in July, and the export button is grey. Nothing is wrong with
+the data; the app simply never asked the question.
+
+`ExportRangeSheet` asks it. Two `DatePicker`s rather than a range picker, because
+SwiftUI has none — same information architecture, native controls, which is this
+port's rule. The upper bound of the second picker is the first, so an inverted range
+cannot be expressed; Android greys those days out, this control will not scroll to
+them.
+
+The button is now disabled only while a PDF is rendering. An empty range is still
+refused, with a sentence, at the moment of export — as on Android, because a file
+with no rows looks like a broken export rather than an empty month.
+
+`DayResolver` anchors logical days at 12:00 UTC so they survive time-zone shifts;
+`DatePicker` shows a `Date` in the device's zone. Noon-UTC is the same calendar day
+from UTC-11 to UTC+12, which is every zone in use, and `formatDate` reads it back in
+UTC. The round trip is exact.
+
+#### Known deviation: the report's footer sits higher on iOS
+
+Left as it stands, deliberately, and recorded here so it is not mistaken for an
+oversight.
+
+WebKit's print layout inflates absolute CSS lengths in the block flow by a constant
+just over 1.2 (measured: 267mm asked, 320.9mm printed; 240mm asked, 288.4mm
+printed), and resolves `100vh` against something that is not the page box (596.7mm).
+There is therefore no unit in which the template can state "one page tall" and be
+believed.
+
+Patch -66 stopped trying: the sheet is as tall as its content, and the disclaimer
+follows the content instead of the paper — about 40 pt higher than Android's on
+sheet one, 110 pt on sheet two. The report is correct, two pages, and every number
+in it is right.
+
+Pinning the footer again needs one number: `267 / 1.2018 = 222.2mm`. That is a
+measurement of one WebKit on one iOS, not a derivation, and it would move without
+warning. If it is ever adopted it must arrive with the three data points above, a
+name that says it was measured, and a test that recomputes it — so that the day it
+stops being true, the build says so instead of the report growing by two pages.
+
 #### Stop asking WebKit how tall a page is  (patch -66)
 
 Patch -65 replaced `min-height: 267mm` with `100vh`, on the reasoning that a page

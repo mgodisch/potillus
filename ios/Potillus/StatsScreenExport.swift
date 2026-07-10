@@ -42,17 +42,71 @@ import UIKit
 
 extension StatsScreen {
 
+    /// The range sheet, built from the pre-fill `beginExport` resolved.
+    ///
+    /// It lives here rather than inline in `body` because the view had outgrown
+    /// SwiftLint's limit, and because a sheet about exporting belongs beside the
+    /// exporters. A missing pre-fill renders nothing: `beginExport` sets it before
+    /// it sets `pendingExport`, so the sheet cannot appear without one.
+    @ViewBuilder
+    func exportRangeSheet(for kind: ExportRangeSheet.Kind) -> some View {
+        if let defaults = exportDefaults {
+            ExportRangeSheet(
+                kind: kind,
+                initialFrom: defaults.from,
+                initialTo: defaults.to,
+                latest: defaults.to,
+                onConfirm: { from, to in
+                    pendingExport = nil
+                    Task { await runExport(kind, from: from, to: to) }
+                },
+                onCancel: { pendingExport = nil }
+            )
+        }
+    }
+
+    /// Resolves the sheet's pre-fill, then shows it.
+    ///
+    /// Android pre-fills with the "statistics from" date and today — NOT with the
+    /// window on screen. Someone looking at July who imported a backup of last
+    /// spring wants the spring, and the app should offer it rather than hide it
+    /// behind a greyed-out button.
+    ///
+    /// An empty `statsFromDate` means "from the first entry", which the window's own
+    /// start already expresses.
+    func beginExport(_ kind: ExportRangeSheet.Kind) async {
+        let settings = await environment.preferences.load()
+        let floor = settings.statsFromDate.isEmpty ? model.state.from : settings.statsFromDate
+
+        guard
+            let start = DayResolver.parseDate(floor),
+            let end = DayResolver.parseDate(model.state.today)
+        else {
+            exportFailure = "The statistics period could not be read."
+            return
+        }
+
+        exportDefaults = (from: start, to: end)
+        pendingExport = kind
+    }
+
+    /// Sends the confirmed range to whichever exporter asked for it.
+    func runExport(_ kind: ExportRangeSheet.Kind, from: String, to: String) async {
+        switch kind {
+        case .csv: prepareCsv(from: from, to: to)
+        case .pdf: await preparePdf(from: from, to: to)
+        }
+    }
+
     /// Builds the CSV for the VISIBLE period, then presents the document browser.
     ///
     /// The range is `state.from ... state.to`, so what the user exports is what
     /// the screen shows. Filtering happens in SQLite, over the index on
     /// `logicalDate`, rather than by loading the whole log into memory — the same
     /// choice Android's `exportCsv` makes, and for the same reason.
-    func prepareCsv() {
+    func prepareCsv(from: String, to: String) {
         do {
-            let entries = try environment.entries.inRange(
-                from: model.state.from, to: model.state.to
-            )
+            let entries = try environment.entries.inRange(from: from, to: to)
             // Android refuses an empty export rather than writing a lone header.
             // A file with no rows looks like a broken export, not an empty period.
             guard !entries.isEmpty else {
@@ -93,14 +147,12 @@ extension StatsScreen {
     /// The layout happens on the main actor because a `WKWebView` insists on it.
     /// The user sees a spinner in place of the export button, and the button is
     /// disabled meanwhile: a second tap would start a second web view.
-    func preparePdf() async {
+    func preparePdf(from: String, to: String) async {
         isBuildingPdf = true
         defer { isBuildingPdf = false }
 
         do {
-            let entries = try environment.entries.inRange(
-                from: model.state.from, to: model.state.to
-            )
+            let entries = try environment.entries.inRange(from: from, to: to)
             // Android refuses an empty report rather than printing empty tables. A
             // report of nothing is not a report; it is a page of dashes.
             guard !entries.isEmpty else {
@@ -115,7 +167,7 @@ extension StatsScreen {
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),
                 settings: await environment.preferences.load(),
-                periodEnd: model.state.to,
+                periodEnd: to,
                 today: model.state.today
             ) else {
                 exportFailure = "No entries in this period."
