@@ -470,10 +470,11 @@ object PdfReportBuilder {
      * (de.godisch.potillus.ui.component.categoryColors) so the PDF donut and the app
      * use the same colours. Escape-safe (no `< > & " '`), so it can flow through
      * SimpleTemplate into an SVG `stroke`/CSS `background`.
+     *
+     * `internal` rather than private: ReportChartVectorTest checks these colours
+     * against the shared vectors that the Swift renderer reads too. They must
+     * match, or the same drinking prints in different colours on the two platforms.
      */
-    // `internal`, not private: ReportChartVectorTest checks it against the shared
-    // vectors that the Swift renderer reads too. The colours must match, or the
-    // same drinking prints in different colours on the two platforms.
     internal fun categoryColor(name: String): String = when (name) {
         "BEER" -> "#F59E0B" // amber-500
         "WINE" -> "#9333EA" // purple-600

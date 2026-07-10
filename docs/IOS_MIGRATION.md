@@ -512,6 +512,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Restore the KDoc adjacency broken by patch -54  (patch -55)
+
+`release-check.sh --Werror` refused the tree: `PdfReportBuilder.categoryColor`
+appeared to have no KDoc. It has one, and always did. Patch -54 slipped three
+`//` lines — the reason the function is `internal` — BETWEEN the KDoc and the
+declaration, and the check looks for a KDoc immediately above, skipping only
+blank lines and annotations. `pct` and `chartLabelIndices` kept their KDoc
+adjacent and were never flagged.
+
+The rationale is not deleted; it belongs to the reader of that function. It is now
+a paragraph INSIDE the KDoc, where the tool can see it and a reader still finds it.
+
+Verified by running the check's own heuristic, extracted from the script, rather
+than by reasoning about it: silent on the corrected file, and it names
+`categoryColor` again the moment a comment is put back between the two.
+
 #### Port the report's presentation arithmetic  (patch -54)
 
 The renderer divides cleanly into arithmetic that decides what the PDF LOOKS like
