@@ -512,6 +512,47 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Render the report  (patch -57)
+
+`ReportRenderer` fills the 37 document placeholders and the ten repeat blocks of
+`report/report_template.html` from a `ReportData`. `ReportLabels` holds every word
+the PDF says.
+
+- NOT YET LOCALISED, and shaped so that becoming localised is a change of one
+  initialiser rather than a change of the renderer. The defaults are the English
+  strings from `res/values/strings.xml`, read out of the file rather than typed.
+  Labels that take a number are closures, because Android writes them as `%1$s`
+  and lets each translation put the number where its grammar wants it; the plural
+  of "day" is a closure for the same reason, since other languages have up to six
+  forms.
+- `footer2` — the licence and warranty notice — is English on both platforms, by
+  decision. The GPL's disclaimer is quoted, not paraphrased.
+- `REPORT_LANG` fills `<html lang="…">`, because a WebView picks its CJK glyph
+  orthography from the document language. With no hint it prints Simplified-Chinese
+  glyph shapes in a Japanese report. Latin locales are unaffected, which is exactly
+  why it is easy to forget.
+- THERE IS NO GOLDEN HTML FILE, on purpose. The template exists so that a person
+  can rearrange the report by hand without touching code; a golden file would turn
+  every such edit into a failing test to re-bless, and the tool would fight the
+  thing it was built for. The tests assert PROPERTIES instead: no placeholder is
+  left unfilled, the renderer fills exactly the blocks the template declares, the
+  charts have as many bars as labels, the KPI grid holds sixteen tiles, a hostile
+  category name comes out escaped, and — in a German report — the reader's numbers
+  carry a comma while every `stroke-dasharray` still carries a dot.
+- Split across two files: `private` in Swift means FILE scope, and SwiftLint's body
+  limit was reached at the seam where the type divides anyway — one file decides
+  the document's values, the other builds its rows.
+
+Two mistakes caught in my own tests before delivery, both of the kind that pass for
+the wrong reason: the fixture had no month inside the daily limit, so the test that
+checks a clean month prints an en dash could never have held; and the comment
+stripper used `.` without `(?s)`, so the template's multi-line documentation comment
+survived and carried its example `{{PLACEHOLDER}}` into the "nothing left behind"
+assertion.
+
+Coverage was checked mechanically, not by eye: the placeholders the template wants
+and the ones the renderer sets are the same 37, with none left over on either side.
+
 #### Make Swift round a number the way Kotlin does  (patch -56)
 
 Before the report can print a figure, the two platforms have to agree on what the
