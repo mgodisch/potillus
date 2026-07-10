@@ -80,10 +80,12 @@ final class SettingsModelTests: XCTestCase {
 
     func testDrinkDaysAreClampedIntoAWeek() async {
         await model.update { $0.maxDrinkDaysPerWeek = 99 }
-        XCTAssertEqual(await stored().maxDrinkDaysPerWeek, 7)
+        let clampedHigh = await stored().maxDrinkDaysPerWeek
+        XCTAssertEqual(clampedHigh, 7)
 
         await model.update { $0.maxDrinkDaysPerWeek = 0 }
-        XCTAssertEqual(await stored().maxDrinkDaysPerWeek, 1)
+        let clampedLow = await stored().maxDrinkDaysPerWeek
+        XCTAssertEqual(clampedLow, 1)
     }
 
     /// A NaN must not be clamped into the range; it must be rejected outright, or
@@ -98,14 +100,16 @@ final class SettingsModelTests: XCTestCase {
 
     func testAnUnknownLanguageTagIsCanonicalised() async {
         await model.update { $0.language = "DE-de" }
-        XCTAssertEqual(await stored().language, SupportedLocales.canonicalTag("DE-de"))
+        let language = await stored().language
+        XCTAssertEqual(language, SupportedLocales.canonicalTag("DE-de"))
     }
 
     // ── Weight: zero is absence, not a measurement ───────────────────────────
 
     func testAPositiveWeightIsClampedButZeroIsPreserved() async {
         await model.update { $0.weightKg = 9_999 }
-        XCTAssertEqual(await stored().weightKg, SettingsSanitizer.weightRange.upperBound)
+        let clamped = await stored().weightKg
+        XCTAssertEqual(clamped, SettingsSanitizer.weightRange.upperBound)
         XCTAssertTrue(model.hasWeight)
 
         await model.clearWeight()
@@ -117,17 +121,20 @@ final class SettingsModelTests: XCTestCase {
     /// A negative weight is nonsense, and nonsense means "unset" — not 1 kg.
     func testANegativeWeightBecomesUnset() async {
         await model.update { $0.weightKg = -80 }
-        XCTAssertEqual(await stored().weightKg, 0.0)
+        let weight = await stored().weightKg
+        XCTAssertEqual(weight, 0.0)
     }
 
     // ── The statistics floor ─────────────────────────────────────────────────
 
     func testOnlyACanonicalStatsDateSurvives() async {
         await model.update { $0.statsFromDate = "2026-1-5" }
-        XCTAssertEqual(await stored().statsFromDate, "", "a non-canonical date is dropped")
+        let dropped = await stored().statsFromDate
+        XCTAssertEqual(dropped, "", "a non-canonical date is dropped")
 
         await model.update { $0.statsFromDate = "2026-01-05" }
-        XCTAssertEqual(await stored().statsFromDate, "2026-01-05")
+        let kept = await stored().statsFromDate
+        XCTAssertEqual(kept, "2026-01-05")
         XCTAssertTrue(model.hasStatsFloor)
 
         await model.clearStatsFromDate()

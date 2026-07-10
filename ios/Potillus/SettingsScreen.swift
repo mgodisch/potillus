@@ -46,7 +46,24 @@ struct SettingsScreen: View {
     @State private var model: SettingsModel
     @Environment(\.dismiss) private var dismiss
 
+    private let environment: AppEnvironment
+
+    // ── Backup state ─────────────────────────────────────────────────────────
+
+    @State private var exportedDocument: BackupDocument?
+    @State private var isExporting = false
+    @State private var isImporting = false
+    @State private var includeSettingsInExport = true
+
+    /// Set while the user chooses between replacing and merging.
+    @State private var pendingImport: URL?
+
+    /// The outcome of the last import, shown once and dismissed.
+    @State private var importSummary: String?
+    @State private var backupFailure: String?
+
     init(environment: AppEnvironment) {
+        self.environment = environment
         _model = State(initialValue: SettingsModel(preferences: environment.preferences))
     }
 
@@ -58,6 +75,7 @@ struct SettingsScreen: View {
                 bodyWeightSection
                 statisticsSection
                 appearanceSection
+                backupSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -74,6 +92,56 @@ struct SettingsScreen: View {
                 presenting: model.failure
             ) { _ in
                 Button("OK", role: .cancel) { model.clearFailure() }
+            } message: { message in
+                Text(message)
+            }
+            .fileExporter(
+                isPresented: $isExporting,
+                document: exportedDocument,
+                contentType: .json,
+                defaultFilename: BackupExporter.suggestedFileName()
+            ) { result in
+                if case .failure(let error) = result {
+                    backupFailure = String(describing: error)
+                }
+            }
+            .fileImporter(
+                isPresented: $isImporting,
+                allowedContentTypes: [.json]
+            ) { result in
+                switch result {
+                case .success(let url): pendingImport = url
+                case .failure(let error): backupFailure = String(describing: error)
+                }
+            }
+            // The choice is destructive one way and not the other, so it is made
+            // explicitly, after the file is chosen and before anything is written.
+            .confirmationDialog(
+                "Import backup",
+                isPresented: .constant(pendingImport != nil),
+                presenting: pendingImport
+            ) { url in
+                Button("Merge with my data") { runImport(url, mode: .merge) }
+                Button("Replace my data", role: .destructive) { runImport(url, mode: .replace) }
+                Button("Cancel", role: .cancel) { pendingImport = nil }
+            } message: { _ in
+                Text("Replacing deletes your log and the drinks you created. Presets are kept.")
+            }
+            .alert(
+                "Import finished",
+                isPresented: .constant(importSummary != nil),
+                presenting: importSummary
+            ) { _ in
+                Button("OK", role: .cancel) { importSummary = nil }
+            } message: { summary in
+                Text(summary)
+            }
+            .alert(
+                "Backup failed",
+                isPresented: .constant(backupFailure != nil),
+                presenting: backupFailure
+            ) { _ in
+                Button("OK", role: .cancel) { backupFailure = nil }
             } message: { message in
                 Text(message)
             }
@@ -225,5 +293,80 @@ struct SettingsScreen: View {
                 Task { await model.update { $0[keyPath: keyPath] = newValue } }
             }
         )
+    }
+}
+
+// =============================================================================
+// Backup section
+// =============================================================================
+
+extension SettingsScreen {
+
+    var backupSection: some View {
+        Section {
+            Toggle("Include settings", isOn: $includeSettingsInExport)
+
+            Button("Export backup") {
+                Task { await prepareExport() }
+            }
+            Button("Import backup") {
+                isImporting = true
+            }
+        } header: {
+            Text("Backup")
+        } footer: {
+            // The one sentence that makes the feature trustworthy, and true.
+            Text(
+                includeSettingsInExport
+                    ? "A JSON file containing your drinks, your log, and your settings — including your body weight. It never leaves this device unless you send it somewhere."
+                    : "A JSON file containing your drinks and your log. Your settings, including your body weight, are left out."
+            )
+        }
+    }
+
+    /// Builds the file, then hands it to the system's document browser.
+    ///
+    /// Assembling before presenting means a failure surfaces as an alert, rather
+    /// than as an empty file the user has already saved somewhere.
+    private func prepareExport() async {
+        do {
+            let exporter = BackupExporter(
+                drinks: environment.drinks,
+                entries: environment.entries,
+                preferences: environment.preferences
+            )
+            exportedDocument = BackupDocument(
+                data: try await exporter.makeBackup(includeSettings: includeSettingsInExport)
+            )
+            isExporting = true
+        } catch {
+            backupFailure = String(describing: error)
+        }
+    }
+
+    /// Reads the chosen file and restores it.
+    ///
+    /// The URL comes from outside the sandbox, so it must be opened inside a
+    /// security-scoped access. Forgetting `startAccessingSecurityScopedResource`
+    /// is the classic way an import works in the simulator and fails on a device.
+    private func runImport(_ url: URL, mode: ImportMode) {
+        pendingImport = nil
+
+        Task {
+            do {
+                let scoped = url.startAccessingSecurityScopedResource()
+                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+
+                let data = try Data(contentsOf: url)
+                let file = try Backup.parse(data)
+                let stats = try await environment.importer.restore(file, mode: mode)
+
+                importSummary = stats.skipped > 0
+                    ? "Imported \(stats.imported) entries, skipped \(stats.skipped) already present."
+                    : "Imported \(stats.imported) entries."
+            } catch {
+                backupFailure = String(describing: error)
+            }
+        }
     }
 }

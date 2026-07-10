@@ -512,6 +512,43 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add backup export and import  (patch -40)
+
+- Add `BackupExporter`, the missing half of the backup path: `Backup.makeJSON`
+  could already write a `BackupFile`, and nothing assembled one from the live
+  stores. The test that matters is the round trip — what the exporter writes, the
+  importer reads back into an identical database.
+- Export the PRESETS too. The importer recreates them, so omitting them looks
+  harmless, until a user has renamed or re-categorised one and the edit is lost.
+- Omit the `settings` KEY entirely when the user excludes settings, rather than
+  emitting defaults. An absent key means "leave mine alone"; a defaulted one would
+  overwrite the recipient's with someone else's. A test checks the key is absent,
+  not null, and that a recipient keeps their own body weight.
+- Copy Android's file name exactly — `potillus_backup_yyyyMMdd_HHmm.json`,
+  underscores and all — so a user with both phones finds their backups sorted
+  together. The stamp is LOCAL time, while `exportedAt` inside the file is UTC;
+  that is Android's split, and it is right: the file lives among the user's
+  documents, and they look for "the backup from Friday evening".
+- Present the system document browser through `.fileExporter` / `.fileImporter`.
+  The app never touches the file system, asks for no permissions, and the user
+  decides where their data goes — or that it goes nowhere.
+- Open the imported URL inside `startAccessingSecurityScopedResource`. It comes
+  from outside the sandbox; forgetting this is the classic import that works in
+  the simulator and fails on a device.
+- Ask whether to merge or replace AFTER the file is chosen and BEFORE anything is
+  written, and say plainly what replacing deletes.
+- Assemble the export before presenting the browser, so a failure is an alert
+  rather than an empty file the user has already saved.
+
+#### Fix uncompilable assertions shipped in patch -39  (patch -40)
+
+- `SettingsModelTests` awaited inside `XCTAssert` autoclosures in seven places,
+  which does not compile. `tools/check-swift-tests.py` exists to catch exactly
+  this and reported nothing, because it walks `git ls-files`: a `git apply`
+  without `--index` leaves new files untracked, and untracked files were silently
+  skipped. The verification, not only the test, was at fault. Awaited values are
+  now bound to a `let` first.
+
 #### Add the Settings screen  (patch -39)
 
 - Add `SettingsModel` and `SettingsScreen`: limits, day-change time, body weight,
