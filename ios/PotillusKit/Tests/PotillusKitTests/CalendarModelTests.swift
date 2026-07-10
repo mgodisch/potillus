@@ -265,4 +265,94 @@ final class CalendarModelTests: XCTestCase {
         XCTAssertNil(model.state.summaries["2026-01-10"])
         XCTAssertNil(model.failure)
     }
+
+    // ── The month is live ────────────────────────────────────────────────────
+    //
+    // The calendar used to load on `.task` and never again. A backup imported while
+    // it sat in another tab left the month showing its old dots. It observes now,
+    // reloading the CURRENT month whatever the change was.
+
+    /// `start()` loads the visible month without a separate `load()`.
+    func testStartLoadsTheMonth() async throws {
+        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
+
+        let model = makeModel(at: midJanuary)
+        await model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.summaries["2026-01-10"] != nil }
+    }
+
+    /// An entry added after `start()` reaches the visible month.
+    func testAnEntryAppearsInTheVisibleMonth() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.summaries.isEmpty }
+
+        try addEntry(on: "2026-01-20", grams: 8.0, at: midJanuary)
+        try await waitUntil { model.state.summaries["2026-01-20"] != nil }
+    }
+
+    /// The case that decides the design: a second entry on a day that already has
+    /// one leaves `SELECT DISTINCT logicalDate` unchanged, and the dot must still
+    /// update. GRDB fires on the write regardless.
+    func testASecondEntryOnAnExistingDayUpdatesTheDot() async throws {
+        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
+
+        let model = makeModel(at: midJanuary)
+        await model.start()
+        defer { model.stop() }
+
+        try await waitUntil {
+            (model.state.summaries["2026-01-10"]?.totalGrams ?? 0) == 12.0
+        }
+
+        try addEntry(on: "2026-01-10", grams: 8.0, at: midJanuary)
+        try await waitUntil {
+            (model.state.summaries["2026-01-10"]?.totalGrams ?? 0) == 20.0
+        }
+    }
+
+    /// After paging to another month, the observation reloads THAT month, not the
+    /// one that was showing when `start()` ran.
+    func testObservationFollowsThePagedMonth() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.month == 1 }
+        await model.nextMonth()
+        try await waitUntil { model.state.month == 2 }
+
+        try addEntry(on: "2026-02-14", grams: 30.0, at: midJanuary)
+        try await waitUntil { model.state.summaries["2026-02-14"] != nil }
+    }
+
+    /// A stopped model observes nothing.
+    func testStopEndsTheSubscription() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.start()
+        try await waitUntil { model.state.summaries.isEmpty }
+        model.stop()
+
+        try addEntry(on: "2026-01-15", grams: 42.0, at: midJanuary)
+        try await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertNil(model.state.summaries["2026-01-15"], "a stopped observation still fired")
+    }
+
+    /// Polls the main actor until `condition` holds. The observation is a stream, so
+    /// there is no completion to await; a fixed sleep would be flaky.
+    private func waitUntil(
+        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        XCTFail("condition not met within \(timeout) s")
+    }
 }

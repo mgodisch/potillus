@@ -57,7 +57,10 @@ struct CalendarScreen: View {
                 if model.state.selectedDate != nil { selectedDay }
             }
             .navigationTitle("Calendar")
-            .task { await model.load() }
+            // `start()` loads and then subscribes; a database change in another
+            // tab reaches this month without a manual reload.
+            .task { await model.start() }
+            .onDisappear { model.stop() }
         }
     }
 

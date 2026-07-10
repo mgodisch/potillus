@@ -84,6 +84,9 @@ public final class CalendarModel {
     private let timeZone: TimeZone
     private let firstDayOfWeekIso: Int
 
+    /// The live subscriptions, torn down by `stop()`.
+    private var observations: [Task<Void, Never>] = []
+
     public init(
         entries: any EntryRepositoryProtocol,
         preferences: any PreferencesStoring,
@@ -149,6 +152,61 @@ public final class CalendarModel {
         let dayEntries = try entries.inRange(from: date, to: date)
         state.selectedEntries = dayEntries
         state.totalGramsSelected = dayEntries.reduce(0.0) { $0 + $1.gramsAlcohol }
+    }
+
+    // ── Observation ──────────────────────────────────────────────────────────
+    //
+    // The calendar observes the SAME triggers as the statistics screen — the set of
+    // logged dates and the settings — but reloads the CURRENT month rather than a
+    // fixed window. The month changes underfoot when the user pages, so the stream
+    // must not carry a range: it carries the fact that something changed, and
+    // `reloadMonth()` reads whichever month is on screen when it fires.
+    //
+    // `observeDailySummaries(from:to:)` would tie the stream to one month and would
+    // have to be resubscribed on every page turn. `observeAllDates()` is month-blind
+    // and fires on every entry write — including a second entry on a day that
+    // already has one, where the DISTINCT date list is unchanged but GRDB notifies
+    // anyway (it does not remove duplicates unless asked). One subscription, correct
+    // across paging.
+    //
+    // Without this, a backup imported while the calendar sat in another tab left the
+    // month showing the dots it had before the import, with nothing to say so.
+
+    /// Loads once, then subscribes. Safe to call again; the previous subscriptions
+    /// are cancelled first.
+    ///
+    /// Unlike `StatsModel`, this calls `load()` up front rather than leaning on the
+    /// first emission: `load()` resolves today and seeds `state.year`/`state.month`,
+    /// which `reloadMonth()` needs before it can pick a month. The entry stream then
+    /// drives `reloadMonth()` — the grid, not the whole model — and the settings
+    /// stream drives `load()`, because a changed day-boundary moves what today is.
+    public func start() async {
+        stop()
+        await load()
+
+        observations = [
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    for try await _ in self.entries.observeAllDates() {
+                        await self.reloadMonth()
+                    }
+                } catch {
+                    self.failure = String(describing: error)
+                }
+            },
+            Task { [weak self] in
+                guard let self else { return }
+                for await _ in await self.preferences.observe() {
+                    await self.load()
+                }
+            }
+        ]
+    }
+
+    public func stop() {
+        observations.forEach { $0.cancel() }
+        observations = []
     }
 
     // ── Navigation ───────────────────────────────────────────────────────────

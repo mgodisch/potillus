@@ -512,6 +512,34 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Make the calendar live  (patch -70)
+
+The last snapshot but one. The calendar loaded on `.task` and never again; a backup
+imported while it sat in another tab left the month showing the dots it had before.
+
+It observes the SAME triggers as the statistics screen — the set of logged dates and
+the settings — but with a twist the statistics screen does not have: the month
+changes underfoot when the user pages. So the stream must not carry a range. It
+carries the fact that something changed, and `reloadMonth()` reads whichever month
+is on screen when it fires. `observeDailySummaries(from:to:)` would have tied the
+subscription to one month and forced a resubscribe on every page turn; `observeAllDates()`
+is month-blind and fires on every write, so one subscription stays correct across
+paging. A test pages to February and adds an entry there to prove it.
+
+Unlike `StatsModel`, `start()` calls `load()` up front rather than leaning on the
+first emission: `load()` seeds `state.year`/`state.month`, which `reloadMonth()`
+needs before it can choose a month. The entry stream then drives `reloadMonth()` —
+the grid alone — while the settings stream drives `load()`, because a changed
+day-boundary moves what today is.
+
+Six tests, written against `makeModel(at:)` and `addEntry(on:grams:at:)` — the
+fixture that file actually has, read before writing this time rather than after the
+compiler complained.
+
+ONE SNAPSHOT LEFT: `TodayModel`. It reloads when the entry sheet closes, which
+hides the gap on its own screen, but an import in another tab still leaves it stale.
+Next.
+
 #### Build the statistics tests against the fixture that exists  (patch -69)
 
 Patch -68 wrote `self.model` into `StatsModelTests`. `DrinksModelTests` has a
