@@ -47,6 +47,8 @@ import UniformTypeIdentifiers
 
 struct SettingsScreen: View {
 
+    @Environment(\.appLocale) private var locale
+
     @State private var model: SettingsModel
     @Environment(\.dismiss) private var dismiss
 
@@ -86,11 +88,11 @@ struct SettingsScreen: View {
                 securitySection
                 backupSection
             }
-            .navigationTitle("Settings")
+            .navigationTitle(Loc.string("Settings", locale: locale))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(Loc.string("Done", locale: locale)) { dismiss() }
                 }
             }
             .task { model.start() }
@@ -100,7 +102,7 @@ struct SettingsScreen: View {
                 isPresented: .constant(model.failure != nil),
                 presenting: model.failure
             ) { _ in
-                Button("OK", role: .cancel) { model.clearFailure() }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { model.clearFailure() }
             } message: { message in
                 Text(message)
             }
@@ -130,18 +132,23 @@ struct SettingsScreen: View {
                 isPresented: .constant(pendingImport != nil),
                 presenting: pendingImport
             ) { url in
-                Button("Merge with my data") { runImport(url, mode: .merge) }
-                Button("Replace my data", role: .destructive) { runImport(url, mode: .replace) }
-                Button("Cancel", role: .cancel) { pendingImport = nil }
+                Button(Loc.string("Merge with my data", locale: locale)) { runImport(url, mode: .merge) }
+                Button(Loc.string("Replace my data", locale: locale), role: .destructive) {
+                    runImport(url, mode: .replace)
+                }
+                Button(Loc.string("Cancel", locale: locale), role: .cancel) { pendingImport = nil }
             } message: { _ in
-                Text("Replacing deletes your log and the drinks you created. Presets are kept.")
+                Text(Loc.string(
+                    "Replacing deletes your log and the drinks you created. Presets are kept.",
+                    locale: locale
+                ))
             }
             .alert(
                 "Import finished",
                 isPresented: .constant(importSummary != nil),
                 presenting: importSummary
             ) { _ in
-                Button("OK", role: .cancel) { importSummary = nil }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { importSummary = nil }
             } message: { summary in
                 Text(summary)
             }
@@ -150,7 +157,7 @@ struct SettingsScreen: View {
                 isPresented: .constant(backupFailure != nil),
                 presenting: backupFailure
             ) { _ in
-                Button("OK", role: .cancel) { backupFailure = nil }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { backupFailure = nil }
             } message: { message in
                 Text(message)
             }
@@ -160,12 +167,12 @@ struct SettingsScreen: View {
     // ── Limits ───────────────────────────────────────────────────────────────
 
     private var limitsSection: some View {
-        Section("Limits") {
+        Section(Loc.string("Limits", locale: locale)) {
             Stepper(
                 value: bind(\.dailyLimitGrams, set: { $0.dailyLimitGrams = $1 }),
                 in: SettingsSanitizer.dailyLimitRange, step: 1
             ) {
-                LabeledContent("Daily limit") {
+                LabeledContent(Loc.string("Daily limit", locale: locale)) {
                     Text(String(format: "%.0f g", model.settings.dailyLimitGrams)).monospacedDigit()
                 }
             }
@@ -173,7 +180,7 @@ struct SettingsScreen: View {
                 value: bind(\.weeklyLimitGrams, set: { $0.weeklyLimitGrams = $1 }),
                 in: SettingsSanitizer.weeklyLimitRange, step: 5
             ) {
-                LabeledContent("Weekly limit") {
+                LabeledContent(Loc.string("Weekly limit", locale: locale)) {
                     Text(String(format: "%.0f g", model.settings.weeklyLimitGrams)).monospacedDigit()
                 }
             }
@@ -181,7 +188,7 @@ struct SettingsScreen: View {
                 value: bind(\.maxDrinkDaysPerWeek, set: { $0.maxDrinkDaysPerWeek = $1 }),
                 in: SettingsSanitizer.drinkDaysRange
             ) {
-                LabeledContent("Drink days per week") {
+                LabeledContent(Loc.string("Drink days per week", locale: locale)) {
                     Text("\(model.settings.maxDrinkDaysPerWeek)").monospacedDigit()
                 }
             }
@@ -209,10 +216,10 @@ struct SettingsScreen: View {
                 displayedComponents: .hourAndMinute
             )
         } header: {
-            Text("Day change")
+            Text(Loc.string("Day change", locale: locale))
         } footer: {
             // The single most confusing setting in the app, if unexplained.
-            Text("A drink logged before this time counts towards the previous day.")
+            Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
         }
     }
 
@@ -234,21 +241,21 @@ struct SettingsScreen: View {
                     value: bind(\.weightKg, set: { $0.weightKg = $1 }),
                     in: SettingsSanitizer.weightRange, step: 0.5
                 ) {
-                    LabeledContent("Body weight") {
+                    LabeledContent(Loc.string("Body weight", locale: locale)) {
                         Text(String(format: "%.1f kg", model.settings.weightKg)).monospacedDigit()
                     }
                 }
-                Button("Clear body weight", role: .destructive) {
+                Button(Loc.string("Clear body weight", locale: locale), role: .destructive) {
                     Task { await model.clearWeight() }
                 }
             } else {
                 // Absence is offered as absence, not as 0.0 kg in a stepper.
-                Button("Set body weight") {
+                Button(Loc.string("Set body weight", locale: locale)) {
                     Task { await model.update { $0.weightKg = 75.0 } }
                 }
             }
         } header: {
-            Text("Personal data")
+            Text(Loc.string("Personal data", locale: locale))
         } footer: {
             Text(
                 model.hasWeight
@@ -263,35 +270,38 @@ struct SettingsScreen: View {
     private var statisticsSection: some View {
         Section {
             if model.hasStatsFloor {
-                LabeledContent("Statistics start", value: model.settings.statsFromDate)
-                Button("Include all history", role: .destructive) {
+                LabeledContent(Loc.string("Statistics start", locale: locale), value: model.settings.statsFromDate)
+                Button(Loc.string("Include all history", locale: locale), role: .destructive) {
                     Task { await model.clearStatsFromDate() }
                 }
             } else {
-                Text("Statistics cover the whole history.")
+                Text(Loc.string("Statistics cover the whole history.", locale: locale))
                     .foregroundStyle(.secondary)
             }
         } header: {
-            Text("Statistics")
+            Text(Loc.string("Statistics", locale: locale))
         } footer: {
-            Text("Days before this date are ignored in statistics. Entries are not deleted.")
+            Text(Loc.string(
+                "Days before this date are ignored in statistics. Entries are not deleted.",
+                locale: locale
+            ))
         }
     }
 
     // ── Appearance ───────────────────────────────────────────────────────────
 
     private var appearanceSection: some View {
-        Section("Appearance") {
-            Picker("Theme", selection: bind(\.themeMode, set: { $0.themeMode = $1 })) {
-                Text("System").tag(ThemeMode.system)
-                Text("Light").tag(ThemeMode.day)
-                Text("Dark").tag(ThemeMode.night)
+        Section(Loc.string("Appearance", locale: locale)) {
+            Picker(Loc.string("Theme", locale: locale), selection: bind(\.themeMode, set: { $0.themeMode = $1 })) {
+                Text(Loc.string("System", locale: locale)).tag(ThemeMode.system)
+                Text(Loc.string("Light", locale: locale)).tag(ThemeMode.day)
+                Text(Loc.string("Dark", locale: locale)).tag(ThemeMode.night)
             }
             Toggle(
                 "Alternative status symbols",
                 isOn: bind(\.alternativeStatusSymbols, set: { $0.alternativeStatusSymbols = $1 })
             )
-            Picker("Language", selection: bind(\.language, set: { $0.language = $1 })) {
+            Picker(Loc.string("Language", locale: locale), selection: bind(\.language, set: { $0.language = $1 })) {
                 // The autonym: a language picker shows "Deutsch", not "German".
                 // Someone who needs the list cannot necessarily read the current
                 // interface language.
@@ -353,7 +363,7 @@ extension SettingsScreen {
                 // No biometrics enrolled and no passcode set. Offering the toggle
                 // would arm a lock the device cannot open, locking the diary away
                 // for good. Android runs the same check before showing its switch.
-                Text("App lock needs Face ID, Touch ID, or a device passcode.")
+                Text(Loc.string("App lock needs Face ID, Touch ID, or a device passcode.", locale: locale))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -363,7 +373,7 @@ extension SettingsScreen {
                 isOn: bind(\.allowScreenshots, set: { $0.allowScreenshots = $1 })
             )
         } header: {
-            Text("Security")
+            Text(Loc.string("Security", locale: locale))
         } footer: {
             // Two footers would be tidier but a Section takes one. Both switches are
             // explained here, in the order they appear.
@@ -379,16 +389,16 @@ extension SettingsScreen {
 
     var backupSection: some View {
         Section {
-            Toggle("Include settings", isOn: $includeSettingsInExport)
+            Toggle(Loc.string("Include settings", locale: locale), isOn: $includeSettingsInExport)
 
-            Button("Export backup") {
+            Button(Loc.string("Export backup", locale: locale)) {
                 Task { await prepareExport() }
             }
-            Button("Import backup") {
+            Button(Loc.string("Import backup", locale: locale)) {
                 isImporting = true
             }
         } header: {
-            Text("Backup")
+            Text(Loc.string("Backup", locale: locale))
         } footer: {
             // The one sentence that makes the feature trustworthy, and true.
             Text(

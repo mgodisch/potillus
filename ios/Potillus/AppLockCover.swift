@@ -40,6 +40,7 @@ import SwiftUI
 struct AppLockCover: View {
 
     let state: AppLockState
+    let locale: Locale
     let onUnlock: () async -> Void
 
     var body: some View {
@@ -52,14 +53,14 @@ struct AppLockCover: View {
                     .font(.system(size: 44))
                     .foregroundStyle(.secondary)
 
-                Text("Libellus Potionis is locked")
+                Text(Loc.string("Libellus Potionis is locked", locale: locale))
                     .font(.headline)
 
                 if state == .locked {
                     Button {
                         Task { await onUnlock() }
                     } label: {
-                        Label("Unlock", systemImage: "faceid")
+                        Label(Loc.string("Unlock", locale: locale), systemImage: "faceid")
                     }
                     .buttonStyle(.borderedProminent)
                 } else {

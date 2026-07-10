@@ -53,6 +53,7 @@ struct EntrySheet: View {
     let onSave: (DrinkDefinition, Int, Int64, String) async -> Bool
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.appLocale) private var locale
 
     @State private var selection: DrinkDefinition?
     @State private var volumeText: String
@@ -88,7 +89,7 @@ struct EntrySheet: View {
             Form {
                 Section {
                     if drinks.count > 1 {
-                        Picker("Drink", selection: $selection) {
+                        Picker(Loc.string("Drink", locale: locale), selection: $selection) {
                             ForEach(drinks, id: \.id) { drink in
                                 Text(drink.name).tag(Optional(drink))
                             }
@@ -99,15 +100,15 @@ struct EntrySheet: View {
                             if let drink { volumeText = String(drink.volumeMl) }
                         }
                     } else if let only = drinks.first {
-                        LabeledContent("Drink", value: only.name)
+                        LabeledContent(Loc.string("Drink", locale: locale), value: only.name)
                     }
 
-                    TextField("Volume (ml)", text: $volumeText)
+                    TextField(Loc.string("Volume (ml)", locale: locale), text: $volumeText)
                         .keyboardType(.numberPad)
 
-                    DatePicker("Time", selection: $timestamp)
+                    DatePicker(Loc.string("Time", locale: locale), selection: $timestamp)
 
-                    TextField("Note", text: $note, axis: .vertical)
+                    TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
                 } footer: {
                     if let volume, !DrinkValidator.volumeMlRange.contains(volume) {
                         // Interpolated, not typed: a message that names a bound
@@ -122,7 +123,7 @@ struct EntrySheet: View {
                 }
 
                 if let drink = selection, let volume, canSave {
-                    LabeledContent("Alcohol") {
+                    LabeledContent(Loc.string("Alcohol", locale: locale)) {
                         Text(String(
                             format: "%.1f g",
                             AlcoholCalculator.calculateGrams(
@@ -133,14 +134,14 @@ struct EntrySheet: View {
                     }
                 }
             }
-            .navigationTitle("Log a drink")
+            .navigationTitle(Loc.string("Log a drink", locale: locale))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(Loc.string("Cancel", locale: locale)) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
+                    Button(Loc.string("Save", locale: locale)) { save() }
                         .disabled(!canSave || isSaving)
                 }
             }

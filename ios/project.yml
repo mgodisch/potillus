@@ -30,6 +30,29 @@ options:
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - da
+    - de
+    - es
+    - fr
+    - it
+    - nl
+    - nb
+    - pl
+    - pt
+    - pt-BR
+    - ro
+    - sv
+    - cs
+    - el
+    - ru
+    - uk
+    - zh-Hans
+    - zh-Hant
+    - ja
+    - ko
 
 settings:
   base:

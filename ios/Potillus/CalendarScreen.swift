@@ -38,6 +38,8 @@ import SwiftUI
 
 struct CalendarScreen: View {
 
+    @Environment(\.appLocale) private var locale
+
     @State private var model: CalendarModel
 
     init(environment: AppEnvironment) {
@@ -56,7 +58,7 @@ struct CalendarScreen: View {
                 grid
                 if model.state.selectedDate != nil { selectedDay }
             }
-            .navigationTitle("Calendar")
+            .navigationTitle(Loc.string("Calendar", locale: locale))
             // `start()` loads and then subscribes; a database change in another
             // tab reaches this month without a manual reload.
             .task { await model.start() }
@@ -200,7 +202,7 @@ struct CalendarScreen: View {
             }
 
             if model.state.selectedEntries.isEmpty {
-                Text("Nothing logged on this day.")
+                Text(Loc.string("Nothing logged on this day.", locale: locale))
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.selectedEntries, id: \.id) { entry in
@@ -216,7 +218,7 @@ struct CalendarScreen: View {
                         Image(systemName: "trash")
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Delete \(entry.drinkName)")
+                    .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
                 }
             }
         }

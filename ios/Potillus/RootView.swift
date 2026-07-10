@@ -76,21 +76,45 @@ struct RootView: View {
         //   itself; spelling it out would defeat that.
         TabView {
             TodayScreen(environment: environment)
-                .tabItem { Label("Today", systemImage: "calendar.badge.clock") }
+                .tabItem {
+                    Label(
+                        Loc.string("Today", locale: Loc.locale(for: settings.language)),
+                        systemImage: "calendar.badge.clock"
+                    )
+                }
 
             CalendarScreen(environment: environment)
-                .tabItem { Label("Calendar", systemImage: "calendar") }
+                .tabItem {
+                    Label(
+                        Loc.string("Calendar", locale: Loc.locale(for: settings.language)),
+                        systemImage: "calendar"
+                    )
+                }
 
             StatsScreen(environment: environment)
-                .tabItem { Label("Statistics", systemImage: "chart.bar") }
+                .tabItem {
+                    Label(
+                        Loc.string("Statistics", locale: Loc.locale(for: settings.language)),
+                        systemImage: "chart.bar"
+                    )
+                }
 
             DrinksScreen(environment: environment)
-                .tabItem { Label("Drinks", systemImage: "wineglass") }
+                .tabItem {
+                    Label(
+                        Loc.string("Drinks", locale: Loc.locale(for: settings.language)),
+                        systemImage: "wineglass"
+                    )
+                }
         }
         // nil means "follow the system", which is exactly what ThemeMode.system
         // asks for. Reading the device setting directly would ignore the user's
         // in-app override — the trap the Android Color.kt comments call out.
         .preferredColorScheme(settings.themeMode.colorScheme)
+        // Every screen reads `\.appLocale` and passes it to `Loc.string`, so the
+        // in-app language wins over the system's. Set here, once, from the observed
+        // setting: change the language and the whole tree re-renders in it.
+        .environment(\.appLocale, Loc.locale(for: settings.language))
         .task {
             // The stream yields the current value at once, then after every
             // change, so the theme applies without a restart.

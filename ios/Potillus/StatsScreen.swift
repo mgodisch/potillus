@@ -47,6 +47,8 @@ import UniformTypeIdentifiers
 
 struct StatsScreen: View {
 
+    @Environment(\.appLocale) private var locale
+
     // `internal`, not private: `private` in Swift is FILE scope, and the export
     // code lives in StatsScreenExport.swift.
     @State var model: StatsModel
@@ -87,24 +89,24 @@ struct StatsScreen: View {
                 timeOfDay
                 weekdays
             }
-            .navigationTitle("Statistics")
+            .navigationTitle(Loc.string("Statistics", locale: locale))
             .toolbar {
                 Menu {
                     Button {
                         Task { await beginExport(.csv) }
                     } label: {
-                        Label("Export CSV", systemImage: "tablecells")
+                        Label(Loc.string("Export CSV", locale: locale), systemImage: "tablecells")
                     }
                     Button {
                         Task { await beginExport(.pdf) }
                     } label: {
-                        Label("Export PDF report", systemImage: "doc.richtext")
+                        Label(Loc.string("Export PDF report", locale: locale), systemImage: "doc.richtext")
                     }
                 } label: {
                     if isBuildingPdf {
                         ProgressView()
                     } else {
-                        Label("Export", systemImage: "square.and.arrow.up")
+                        Label(Loc.string("Export", locale: locale), systemImage: "square.and.arrow.up")
                     }
                 }
                 // NOT disabled on an empty window. The range is chosen in the sheet,
@@ -145,7 +147,7 @@ struct StatsScreen: View {
                 isPresented: .constant(exportFailure != nil),
                 presenting: exportFailure
             ) { _ in
-                Button("OK", role: .cancel) { exportFailure = nil }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { exportFailure = nil }
             } message: { message in
                 Text(message)
             }
@@ -155,13 +157,13 @@ struct StatsScreen: View {
     // ── Period ───────────────────────────────────────────────────────────────
 
     private var periodPicker: some View {
-        Picker("Period", selection: Binding(
+        Picker(Loc.string("Period", locale: locale), selection: Binding(
             get: { model.state.period },
             set: { period in Task { await model.setPeriod(period) } }
         )) {
-            Text("Week").tag(StatsPeriod.week)
-            Text("Month").tag(StatsPeriod.month)
-            Text("Year").tag(StatsPeriod.year)
+            Text(Loc.string("Week", locale: locale)).tag(StatsPeriod.week)
+            Text(Loc.string("Month", locale: locale)).tag(StatsPeriod.month)
+            Text(Loc.string("Year", locale: locale)).tag(StatsPeriod.year)
         }
         .pickerStyle(.segmented)
         .listRowInsets(EdgeInsets())
@@ -172,15 +174,15 @@ struct StatsScreen: View {
 
     private var headline: some View {
         Section {
-            LabeledContent("Total") { grams(model.state.totalGrams) }
-            LabeledContent("Per day") { grams(model.state.averagePerDay) }
+            LabeledContent(Loc.string("Total", locale: locale)) { grams(model.state.totalGrams) }
+            LabeledContent(Loc.string("Per day", locale: locale)) { grams(model.state.averagePerDay) }
             // A different question from "per day": how much when I drink at all.
-            LabeledContent("Per drink day") { grams(model.state.averagePerDrinkDay) }
+            LabeledContent(Loc.string("Per drink day", locale: locale)) { grams(model.state.averagePerDrinkDay) }
 
             // Hidden, not zeroed: without a previous period there is nothing to
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
-                LabeledContent("Trend") {
+                LabeledContent(Loc.string("Trend", locale: locale)) {
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
@@ -216,7 +218,7 @@ struct StatsScreen: View {
     // ── Consumption over time ────────────────────────────────────────────────
 
     private var consumptionChart: some View {
-        Section("Consumption") {
+        Section(Loc.string("Consumption", locale: locale)) {
             Chart(model.state.chartBuckets, id: \.labelDate) { bucket in
                 BarMark(
                     x: .value("Date", bucket.labelDate),
@@ -230,7 +232,7 @@ struct StatsScreen: View {
                 // Labels only every few buckets: 31 dates do not fit.
                 AxisMarks(values: .automatic(desiredCount: 5))
             }
-            .chartYAxisLabel("g / day")
+            .chartYAxisLabel(Loc.string("g / day", locale: locale))
             .frame(height: 180)
         }
     }
@@ -238,33 +240,33 @@ struct StatsScreen: View {
     // ── Limits ───────────────────────────────────────────────────────────────
 
     private var limits: some View {
-        Section("Days over limit") {
-            LabeledContent("Daily limit") {
+        Section(Loc.string("Days over limit", locale: locale)) {
+            LabeledContent(Loc.string("Daily limit", locale: locale)) {
                 count(model.state.daysOverDailyLimit)
             }
-            LabeledContent("Weekly limit") {
+            LabeledContent(Loc.string("Weekly limit", locale: locale)) {
                 count(model.state.daysOverWeeklyLimit)
             }
-            LabeledContent("Drink days") {
+            LabeledContent(Loc.string("Drink days", locale: locale)) {
                 count(model.state.daysOverDrinkDayLimit)
             }
         }
     }
 
     private var streaks: some View {
-        Section("Abstinence") {
+        Section(Loc.string("Abstinence", locale: locale)) {
             // Today is excluded from the current streak: the day is not over, and a
             // drink may still be logged.
-            LabeledContent("Current streak") { days(model.state.currentStreak) }
-            LabeledContent("Longest streak") { days(model.state.longestStreak) }
-            LabeledContent("Dry days in period") { days(model.state.abstinentDays) }
+            LabeledContent(Loc.string("Current streak", locale: locale)) { days(model.state.currentStreak) }
+            LabeledContent(Loc.string("Longest streak", locale: locale)) { days(model.state.longestStreak) }
+            LabeledContent(Loc.string("Dry days in period", locale: locale)) { days(model.state.abstinentDays) }
         }
     }
 
     // ── Breakdowns ───────────────────────────────────────────────────────────
 
     private var categories: some View {
-        Section("By category") {
+        Section(Loc.string("By category", locale: locale)) {
             let total = model.state.categoryBreakdown.values.reduce(0, +)
             ForEach(sortedCategories, id: \.category) { entry in
                 let (category, value) = (entry.category, entry.grams)
@@ -288,14 +290,14 @@ struct StatsScreen: View {
     }
 
     private var timeOfDay: some View {
-        Section("Time of day") {
+        Section(Loc.string("Time of day", locale: locale)) {
             Chart(hourPoints) { point in
                 BarMark(
                     x: .value("Hour", point.label),
                     y: .value("Grams per day", point.average)
                 )
             }
-            .chartYAxisLabel("g / day")
+            .chartYAxisLabel(Loc.string("g / day", locale: locale))
             .frame(height: 140)
         }
     }
@@ -314,14 +316,14 @@ struct StatsScreen: View {
     }
 
     private var weekdays: some View {
-        Section("By weekday") {
+        Section(Loc.string("By weekday", locale: locale)) {
             Chart(weekdayPoints) { point in
                 BarMark(
                     x: .value("Weekday", point.label),
                     y: .value("Grams", point.average)
                 )
             }
-            .chartYAxisLabel("g")
+            .chartYAxisLabel(Loc.string("g", locale: locale))
             .frame(height: 140)
         }
     }

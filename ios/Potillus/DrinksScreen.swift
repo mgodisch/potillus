@@ -38,6 +38,8 @@ import SwiftUI
 
 struct DrinksScreen: View {
 
+    @Environment(\.appLocale) private var locale
+
     @State private var model: DrinksModel
     @State private var logger: EntryLogModel
     @State private var editing: DrinkDefinition?
@@ -54,22 +56,22 @@ struct DrinksScreen: View {
             List {
                 if model.state.drinks.isEmpty {
                     ContentUnavailableView(
-                        "No drinks yet",
+                        Loc.string("No drinks yet", locale: locale),
                         systemImage: "wineglass",
-                        description: Text("Add a drink to start logging.")
+                        description: Text(Loc.string("Add a drink to start logging.", locale: locale))
                     )
                 }
                 ForEach(model.state.drinks, id: \.id) { drink in
                     row(drink)
                 }
             }
-            .navigationTitle("Drinks")
+            .navigationTitle(Loc.string("Drinks", locale: locale))
             .toolbar {
                 Button {
                     model.clearErrors()
                     isAdding = true
                 } label: {
-                    Label("Add", systemImage: "plus")
+                    Label(Loc.string("Add", locale: locale), systemImage: "plus")
                 }
             }
             .task { model.start() }
@@ -106,7 +108,7 @@ struct DrinksScreen: View {
                 isPresented: .constant(logger.failure != nil),
                 presenting: logger.failure
             ) { _ in
-                Button("OK", role: .cancel) { logger.clearFailure() }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { logger.clearFailure() }
             } message: { message in
                 Text(message)
             }
@@ -115,10 +117,13 @@ struct DrinksScreen: View {
                 isPresented: .constant(model.deleteBlocked != nil),
                 presenting: model.deleteBlocked
             ) { _ in
-                Button("OK", role: .cancel) { model.clearErrors() }
+                Button(Loc.string("OK", locale: locale), role: .cancel) { model.clearErrors() }
             } message: { blocked in
                 // The sentence the user needs, instead of a foreign-key error.
-                Text("\(blocked.drinkName) is used by \(blocked.entryCount) entries.")
+                Text(Loc.string(
+                    "%1$@ is used by %2$lld entries.",
+                    blocked.drinkName, blocked.entryCount, locale: locale
+                ))
             }
         }
     }
@@ -132,11 +137,13 @@ struct DrinksScreen: View {
                     .foregroundStyle(drink.isFavorite ? .yellow : .secondary)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(drink.isFavorite ? "Remove from favourites" : "Add to favourites")
+            .accessibilityLabel(drink.isFavorite
+                ? Loc.string("Remove from favourites", locale: locale)
+                : Loc.string("Add to favourites", locale: locale))
 
             VStack(alignment: .leading) {
                 Text(drink.name)
-                Text("\(drink.volumeMl) ml · \(percent(drink.alcoholPercent))")
+                Text(Loc.string("%1$lld ml · %2$@", drink.volumeMl, percent(drink.alcoholPercent), locale: locale))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -147,7 +154,7 @@ struct DrinksScreen: View {
             if drink.isPreset {
                 Image(systemName: "lock")
                     .foregroundStyle(.tertiary)
-                    .accessibilityLabel("Preset")
+                    .accessibilityLabel(Loc.string("Preset", locale: locale))
             }
 
             // The pencil, not the row, opens the editor. Tapping a drink LOGS it:
@@ -161,7 +168,7 @@ struct DrinksScreen: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(.tint)
-            .accessibilityLabel("Edit \(drink.name)")
+            .accessibilityLabel(Loc.string("Edit %@", drink.name, locale: locale))
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -173,7 +180,7 @@ struct DrinksScreen: View {
             Button(role: .destructive) {
                 model.delete(drink)
             } label: {
-                Label("Delete", systemImage: "trash")
+                Label(Loc.string("Delete", locale: locale), systemImage: "trash")
             }
         }
     }
@@ -196,6 +203,7 @@ private struct DrinkEditor: View {
     let onSave: (String, Int, Double, DrinkCategory) -> Bool
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.appLocale) private var locale
 
     @State private var name: String
     @State private var volumeText: String
@@ -230,12 +238,12 @@ private struct DrinkEditor: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $name)
-                    TextField("Volume (ml)", text: $volumeText)
+                    TextField(Loc.string("Name", locale: locale), text: $name)
+                    TextField(Loc.string("Volume (ml)", locale: locale), text: $volumeText)
                         .keyboardType(.numberPad)
-                    TextField("Alcohol (%)", text: $percentText)
+                    TextField(Loc.string("Alcohol (%)", locale: locale), text: $percentText)
                         .keyboardType(.decimalPad)
-                    Picker("Category", selection: $category) {
+                    Picker(Loc.string("Category", locale: locale), selection: $category) {
                         ForEach(DrinkCategory.allCases, id: \.self) { value in
                             Text(value.rawValue.capitalized).tag(value)
                         }
@@ -250,7 +258,7 @@ private struct DrinkEditor: View {
                 }
 
                 if let volume, let percent, canSave {
-                    LabeledContent("Alcohol") {
+                    LabeledContent(Loc.string("Alcohol", locale: locale)) {
                         Text(String(
                             format: "%.1f g",
                             AlcoholCalculator.calculateGrams(
@@ -265,10 +273,10 @@ private struct DrinkEditor: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(Loc.string("Cancel", locale: locale)) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(Loc.string("Save", locale: locale)) {
                         guard let volume, let percent else { return }
                         if onSave(name, volume, percent, category) { dismiss() }
                     }

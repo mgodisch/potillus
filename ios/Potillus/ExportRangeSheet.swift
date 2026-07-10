@@ -54,6 +54,8 @@ import SwiftUI
 
 struct ExportRangeSheet: View {
 
+    @Environment(\.appLocale) private var locale
+
     /// What the confirmed range will be used for. The sheet does not care; the
     /// caller does, and carrying it here keeps one sheet instead of two.
     /// `Identifiable` because `.sheet(item:)` wants it; the case IS the identity.
@@ -63,7 +65,10 @@ struct ExportRangeSheet: View {
 
         var id: Self { self }
 
-        var title: String {
+        /// The English source string, which is also the catalogue key. The view
+        /// resolves it against the chosen locale; returning a localised string here
+        /// would bake in the system language instead.
+        var titleKey: String {
             switch self {
             case .csv: return "Export CSV"
             case .pdf: return "Export PDF report"
@@ -118,17 +123,17 @@ struct ExportRangeSheet: View {
                         displayedComponents: .date
                     )
                 } footer: {
-                    Text("Days after today cannot be selected.")
+                    Text(Loc.string("Days after today cannot be selected.", locale: locale))
                 }
             }
-            .navigationTitle(kind.title)
+            .navigationTitle(Loc.string(kind.titleKey, locale: locale))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: onCancel)
+                    Button(Loc.string("Cancel", locale: locale), action: onCancel)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Export") {
+                    Button(Loc.string("Export", locale: locale)) {
                         onConfirm(DayResolver.formatDate(from), DayResolver.formatDate(to))
                     }
                 }

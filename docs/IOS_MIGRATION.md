@@ -512,6 +512,61 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Localise every screen, German complete  (patch -73)
+
+Android has an in-app language picker; this port keeps it (same feature, native
+idiom). That one decision shapes everything here, because it fights SwiftUI's grain.
+
+THE CONFLICT. `Text("Today")` becomes a `LocalizedStringKey` resolved against the
+ENVIRONMENT locale, which follows the SYSTEM language. Setting `.environment(\.locale,
+chosen)` moves some views but, by Apple's documentation and wide report, not all of
+them reliably. A privacy app that promises a language must not show half its labels
+in another.
+
+THE MECHANISM (path A). Every user-facing string goes through `Loc.string(_:locale:)`,
+which calls `String(localized:locale:)` — a real API since iOS 16 — with the CHOSEN
+locale explicitly. The result is a plain `String`, which is exactly why views must
+call it rather than hand a literal to `Text`: `Text(runtimeString)` does not
+re-localise. `\.appLocale` carries the choice down from the root, set once from
+`settings.language`. The two covers that sit ABOVE the root (they must show before
+the tree exists) take the locale as a parameter instead.
+
+THE CATALOGUE. `Localizable.xcstrings`, Apple's String Catalog, keyed by the English
+source text. It is not hand-edited: `tools/build-xcstrings.py` regenerates it from
+the views and the translation tables, so it cannot silently disagree with the code.
+It reads both raw `Text("...")` and converted `Loc.string("...")`, so a key does not
+vanish as its screen is converted — a bug that bit once and is now designed out.
+
+GERMAN. 102 keys; 98 translated, 4 language-neutral (`%lld ml`, a bare `%@`), 0
+untranslated. Nineteen came verbatim from Android's `values-de` where the English
+matched word for word; the rest are this port's own, written into `tools/l10n_de.py`
+as ordinary catalogue entries.
+
+PLACEHOLDERS. SwiftUI renders an `Int` interpolation as `%lld` and a `String` as
+`%@`; the catalogue key must match what SwiftUI generates or the lookup misses. The
+generator infers the specifier from the interpolated expression, and positional
+`%1$…`/`%2$…` once there is more than one argument.
+
+WHAT IS NOT LOCALISED, on purpose: the app's proper name; pure number-and-unit
+strings; the startup-failure view, which renders before the locale exists and is
+meant to be quoted verbatim into a bug report — the same reasoning that keeps the
+kit's technical error strings in English. The PDF report (`ReportLabels`,
+`REPORT_LANG`) is a SEPARATE localisation axis and stays for its own patch; until
+then the report prints English even under a German UI.
+
+THE GUARD. `tools/check-l10n.py`, wired into `make ios`, fails the build on any raw
+localizable literal in a view. It understands that a unit suffix after an
+interpolation is neutral, so it agrees with the catalogue on which strings need no
+lookup. Self-tested: reintroduce a `Text("literal")` and it fires.
+
+The `.xcstrings` builds into the bundle from the scanned source path; `project.yml`
+now declares `developmentLanguage: en` and the 21 `knownRegions` matching
+`SupportedLocales.all`. A two-versus-four-space indentation error in that file cost
+a round to find — the anchor was real, the whitespace was not what it looked like.
+
+STILL TO DO: the other 19 languages (harvested from Android per the agreed plan),
+the report's own localisation, and the three Android plurals.
+
 #### Hide the app-switcher preview  (patch -72)
 
 `allowScreenshots` was the last stored-but-unread setting. Android sets FLAG_SECURE,

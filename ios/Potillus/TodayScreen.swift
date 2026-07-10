@@ -40,6 +40,9 @@ import SwiftUI
 
 struct TodayScreen: View {
 
+    /// The chosen language, applied at the root; every label resolves against it.
+    @Environment(\.appLocale) private var locale
+
     /// Owned by the view, rebuilt only when the environment changes.
     @State private var model: TodayModel
 
@@ -68,7 +71,7 @@ struct TodayScreen: View {
                 if !model.state.favorites.isEmpty { favouritesSection }
                 entriesSection
             }
-            .navigationTitle("Today")
+            .navigationTitle(Loc.string("Today", locale: locale))
             .toolbar {
                 // The gear, as on Android: settings sit above the tabs, not in
                 // them. Leading, so the primary action keeps the trailing corner.
@@ -76,7 +79,7 @@ struct TodayScreen: View {
                     Button {
                         isConfiguring = true
                     } label: {
-                        Label("Settings", systemImage: "gearshape")
+                        Label(Loc.string("Settings", locale: locale), systemImage: "gearshape")
                     }
                 }
                 // iOS puts the primary action in the toolbar; Android uses a
@@ -85,7 +88,7 @@ struct TodayScreen: View {
                     Button {
                         isLogging = true
                     } label: {
-                        Label("Log a drink", systemImage: "plus")
+                        Label(Loc.string("Log a drink", locale: locale), systemImage: "plus")
                     }
                     .disabled(model.state.drinks.isEmpty)
                 }
@@ -118,7 +121,7 @@ struct TodayScreen: View {
                 isPresented: .constant(model.failure != nil),
                 presenting: model.failure
             ) { _ in
-                Button("OK", role: .cancel) {}
+                Button(Loc.string("OK", locale: locale), role: .cancel) {}
             } message: { message in
                 Text(message)
             }
@@ -179,7 +182,7 @@ struct TodayScreen: View {
             // Absent rather than zero: without a body weight, or with nothing
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
-                LabeledContent("Estimated BAC") {
+                LabeledContent(Loc.string("Estimated BAC", locale: locale)) {
                     Text(String(format: "%.2f ‰", bac)).monospacedDigit()
                 }
             }
@@ -189,7 +192,7 @@ struct TodayScreen: View {
     /// One tap logs the favourite at its own serving size — the shortcut the
     /// whole screen exists for. The sheet is for anything else.
     private var favouritesSection: some View {
-        Section("Favourites") {
+        Section(Loc.string("Favourites", locale: locale)) {
             ForEach(model.state.favorites, id: \.id) { drink in
                 Button {
                     Task { await model.addEntry(drink: drink, volumeMl: drink.volumeMl) }
@@ -204,9 +207,9 @@ struct TodayScreen: View {
     }
 
     private var entriesSection: some View {
-        Section("Entries") {
+        Section(Loc.string("Entries", locale: locale)) {
             if model.state.entries.isEmpty {
-                Text("Nothing logged yet.")
+                Text(Loc.string("Nothing logged yet.", locale: locale))
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.entries, id: \.id) { entry in

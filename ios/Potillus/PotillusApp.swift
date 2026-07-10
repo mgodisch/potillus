@@ -64,6 +64,10 @@ struct PotillusApp: App {
     /// Settings takes effect without a relaunch.
     @State private var allowScreenshots = false
 
+    /// The chosen language, for the covers that sit above the root and so cannot
+    /// read `\.appLocale`. Observed alongside `allowScreenshots`.
+    @State private var language = ""
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -91,10 +95,10 @@ struct PotillusApp: App {
                 if PrivacyCoverDecision.isCovered(
                     isActive: scenePhase == .active, allowScreenshots: allowScreenshots
                 ) {
-                    PrivacyCover()
+                    PrivacyCover(locale: Loc.locale(for: language))
                 }
                 if lock.state != .unlocked {
-                    AppLockCover(state: lock.state) { await lock.retry() }
+                    AppLockCover(state: lock.state, locale: Loc.locale(for: language)) { await lock.retry() }
                 }
             }
             .task { await lock.onLaunch() }
@@ -106,6 +110,7 @@ struct PotillusApp: App {
                 if case .ready(let environment) = startup {
                     for await updated in await environment.preferences.observe() {
                         allowScreenshots = updated.allowScreenshots
+                        language = updated.language
                     }
                 }
             }
@@ -156,6 +161,10 @@ struct StartupFailureView: View {
 
     var body: some View {
         ContentUnavailableView {
+            // NOT localised, deliberately: this renders before the environment —
+            // and therefore the chosen language — exists, and it is meant to be
+            // quoted verbatim into a bug report. Same reasoning as the kit's
+            // technical error strings.
             Label("Libellus Potionis could not start", systemImage: "exclamationmark.triangle")
         } description: {
             Text(message)

@@ -76,6 +76,8 @@ enum PrivacyCoverDecision {
 
 struct PrivacyCover: View {
 
+    let locale: Locale
+
     var body: some View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
