@@ -212,6 +212,36 @@ public enum DayResolver {
         return max(components.day ?? 0, 0)
     }
 
+    // ── Day arithmetic ───────────────────────────────────────────────────────
+
+    /// The date `count` days after `date`.
+    ///
+    /// Goes through `utcCalendar`, so it inherits the noon anchoring that keeps a
+    /// day from slipping across a daylight-saving boundary. Adding 86400 seconds
+    /// would not: some days are 23 or 25 hours long.
+    public static func addingDays(_ count: Int, to date: Date) -> Date {
+        utcCalendar.date(byAdding: .day, value: count, to: date) ?? date
+    }
+
+    /// Every date from `from` to `to`, INCLUSIVE, ascending. Empty if `to < from`
+    /// or either string is malformed.
+    ///
+    /// The report uses this to give abstinent days a row of their own: a day with
+    /// no entries has no key in the log, yet it must still contribute a zero to the
+    /// median and to the rolling seven-day window.
+    public static func inclusiveDates(from: String, to: String) -> [String] {
+        guard let start = parseDate(from), let end = parseDate(to), start <= end else {
+            return []
+        }
+        var dates: [String] = []
+        var day = start
+        while day <= end {
+            dates.append(formatDate(day))
+            day = addingDays(1, to: day)
+        }
+        return dates
+    }
+
     // ── Period length ────────────────────────────────────────────────────────
 
     /// Number of *effective* days in the inclusive range `[from, today]` for the

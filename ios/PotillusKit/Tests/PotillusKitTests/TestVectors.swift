@@ -93,6 +93,72 @@ enum TestVectors {
 // =============================================================================
 
 /// Root of `test-vectors/alcohol-calculator.json`.
+/// `report-data.json` — the PDF report's computed figures.
+///
+/// Only the zone-, locale- and clock-independent ones: Android reads all three
+/// from the device, so its `PdfReportData.from` cannot be driven from a file.
+struct ReportDataVectors: Decodable {
+    let cases: [Case]
+
+    struct Case: Decodable {
+        let description: String
+        let dailyLimitGrams: Double
+        let weeklyLimitGrams: Double
+        let maxDrinkDaysPerWeek: Int
+        let drinks: [Drink]
+        let entries: [Entry]
+        let expected: Expected
+    }
+
+    struct Drink: Decodable {
+        let id: Int64
+        /// The stored spelling, `"BEER"` … `"OTHER"`.
+        let category: String
+    }
+
+    struct Entry: Decodable {
+        let id: Int64
+        let drinkId: Int64
+        let logicalDate: String
+        let gramsAlcohol: Double
+    }
+
+    struct Expected: Decodable {
+        let firstDate: String
+        let lastDate: String
+        let totalDays: Int
+        let drinkDays: Int
+        let abstinentDays: Int
+        let totalGrams: Double
+        let avgPerDay: Double
+        let avgPerDrinkDay: Double
+        let bingeDays: Int
+        let daysOverDailyLimit: Int
+        let medianPerDay: Double
+        let medianPerDrinkDay: Double
+        let avgDrinkDaysPerMonth: Double
+        let medianDrinkDaysPerMonth: Double
+        let maxPerDay: Double
+        let maxPer7Days: Double
+        let months: [Month]
+        let categories: [Category]
+    }
+
+    struct Month: Decodable {
+        let monthKey: String
+        let drinkDays: Int
+        let totalGrams: Double
+        let avgPerCalendarDay: Double
+        let daysOverDailyLimit: Int
+    }
+
+    struct Category: Decodable {
+        let categoryName: String
+        let grams: Double
+        let percent: Int
+    }
+}
+
 /// `template-render.json` — the engine that fills report/report_template.html.
 struct TemplateVectors: Decodable {
     let render: [RenderCase]

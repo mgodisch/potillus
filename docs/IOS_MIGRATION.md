@@ -512,6 +512,49 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the report's figures  (patch -52)
+
+`ReportData` is the Swift counterpart of Android's `PdfReportData.from`. It
+computes and does not format: no locale, no number formatting, no HTML. That is
+what makes every figure testable.
+
+- Wherever the Statistics screen already answers a question, the report asks the
+  SAME code — `countLimitViolations`, `bucketize`, `weekdayAverages`,
+  `computeLongestAbstinence`. A report that disagreed with the screen would be
+  worse than none: the user would not know which to believe.
+- New here, and nowhere else: medians, binge days, the monthly table, the 24-hour
+  profile, the rolling seven-day peak.
+- `DayResolver` gains `addingDays` and `inclusiveDates`, because date arithmetic
+  belongs in the file that owns the noon-anchor trick. Adding 86400 seconds is not
+  adding a day; some days are 23 hours long.
+- TIES BETWEEN CATEGORIES ARE BROKEN BY FIRST APPEARANCE. Kotlin accumulates into
+  a `linkedMapOf` and `sortedByDescending` is stable, so equal grams keep the order
+  the log first mentioned them in. Swift's `Dictionary` has no order and
+  `sorted(by:)` is not stable — two equal categories would come out in whichever
+  order the hash seed chose that morning. The index is carried explicitly, and a
+  vector pins it.
+- A partial month divides by ITS DAYS INSIDE THE PERIOD, not by the month's full
+  length, or a month begun yesterday would look like a very sober one.
+- The abstinence streaks anchor at the day after a historical range ends, not at
+  the real today — Android's v0.81.0 lesson, ported with its reasoning. A test
+  asserts the impossible thing that bug produced: current abstinence exceeding the
+  longest.
+
+Shared vectors, `test-vectors/report-data.json`, read by BOTH suites — Swift's
+`ReportDataTests` and Kotlin's new `ReportDataVectorTest`, which is the Kotlin
+side's first vector coverage of these figures.
+
+SCOPE, STATED HONESTLY: the vectors pin only what does not depend on the device
+time zone, the device locale or the real clock. `PdfReportData.from` reads all
+three itself, so its hour-of-day profile, weekday columns and streaks cannot be
+driven from a file without reshaping the Kotlin signature. Swift injects all
+three, so those fields are covered by Swift tests instead. Where a figure can be
+shared, it is shared; where it cannot, the reason is written down rather than the
+gap being papered over.
+
+Delivered pre-checked: ktlint over the Kotlin (it caught an import order), and
+SwiftLint `--strict` over the Swift.
+
 #### Port the template engine, pinned by shared vectors  (patch -51)
 
 First piece of the PDF report. `Template` is the Swift counterpart of Android's
