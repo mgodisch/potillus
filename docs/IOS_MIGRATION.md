@@ -511,6 +511,37 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the encrypted preferences store  (patch -20)
+
+- Add `PreferencesStore`, the counterpart to Android's encrypted DataStore, and
+  refuse the easy option. `UserDefaults` writes a plist that is plain text
+  whenever the device is unlocked and is copied into unencrypted Finder backups.
+  The app stores body weight and alcohol limits, and PRIVACY.md makes its promise
+  without qualifying it by platform: an unencrypted iOS store would have been a
+  silent downgrade at the platform boundary.
+- Use the same on-disk format as Android: `[12-byte nonce] || [AES-256-GCM
+  ciphertext] || [16-byte tag]`, which is exactly CryptoKit's
+  `SealedBox.combined`. A fresh nonce per write, and an authentication tag that
+  turns a flipped bit into a detected forgery rather than a changed limit.
+- Keep the AES key in the Keychain as `WhenUnlockedThisDeviceOnly`: unreadable
+  while the phone is locked, and excluded from every backup. The consequence is
+  deliberate — restoring a device backup brings the encrypted file but not the
+  key — so the store treats an undecryptable file exactly like a missing one and
+  returns the canonical defaults. Key loss is a normal event, not a crash; the
+  user's real settings travel in the JSON backup, which is the supported path.
+- Inject the key behind `SecretKeyProviding`. The Keychain is unreachable from a
+  plain `swift test` process, which has no keychain entitlement; injecting the
+  key lets the tests exercise the shipping crypto against a temporary file.
+- Test what matters rather than what is easy: no field value appears in the bytes
+  on disk; two saves of identical settings differ; a tampered tag falls back to
+  defaults; a wrong key falls back to defaults; the store still writes afterwards;
+  and an atomic write leaves no temporary file behind.
+- Expose changes as `AsyncStream`, the shape the repositories already use, so a
+  SwiftUI view consumes settings and drinks identically. Registration happens
+  inside the actor via `makeStream()`; the older `AsyncStream { ... }` builder
+  runs its closure outside actor isolation, and touching the observer table from
+  there is a data race the Swift 6 mode rejects.
+
 #### Port the backup settings sanitiser  (patch -19)
 
 - Extend the Swift `AppSettings` from the calculator's three-field slice to the

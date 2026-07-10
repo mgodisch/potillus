@@ -204,7 +204,9 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
 ///
 /// The full Android `AppSettings` carries UI preferences too; only the limit
 /// fields are relevant to the domain maths, so only those are modelled here.
-public struct AppSettings: Sendable, Equatable {
+/// Codable, because `PreferencesStore` persists it as encrypted JSON. The field
+/// names are the wire format, so renaming one is a migration, not a refactor.
+public struct AppSettings: Sendable, Equatable, Codable {
 
     /// Follow the system, or force light/dark. Persisted by name, never ordinal.
     public var themeMode: ThemeMode
