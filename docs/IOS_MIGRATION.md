@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Build the statistics tests against the fixture that exists  (patch -69)
+
+Patch -68 wrote `self.model` into `StatsModelTests`. `DrinksModelTests` has a
+`model` property; `StatsModelTests` has a `makeModel()` factory and no such field.
+Five tests, sixteen compile errors, and the build had to reach the type checker on a
+machine that is not this one to say so.
+
+Rule 7 — no identifier without evidence — was applied to the model under test and
+not to the test fixture around it. The fixture is code too, and it was two lines
+away in the same file.
+
+Each test now takes its own model from the factory, as every other test in that file
+already did, and stops it in a `defer`.
+
+A LINTER RULE WAS WRITTEN FOR THIS AND THEN DELETED. It flagged `self.foo` where the
+file declares no `foo`, which sounds right and is useless here: `model` IS declared
+in that file, as a local binding inside a dozen other tests. Catching this needs
+scope analysis, which needs a parser. The rule as drafted also called `self.init` an
+error in three source files.
+
+A check that misses the bug it was written for, while inventing three others, gives
+false confidence twice over. `swift test` catches this, in one second, and it
+already runs in `make ios`.
+
 #### Make the statistics screen live  (patch -68)
 
 Android's `StatsViewModel` combines the period selector, the settings and the set of

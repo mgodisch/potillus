@@ -92,10 +92,11 @@ final class StatsModelTests: XCTestCase {
     func testStartLoadsWithoutAnExplicitLoad() async throws {
         try log("2026-01-15", grams: 20.0)
 
+        let model = makeModel()
         model.start()
-        try await waitUntil { self.model.state.totalGrams == 20.0 }
+        defer { model.stop() }
 
-        model.stop()
+        try await waitUntil { model.state.totalGrams == 20.0 }
     }
 
     /// The case that decides the design: a second entry on a day that already has
@@ -106,24 +107,26 @@ final class StatsModelTests: XCTestCase {
     func testASecondEntryOnAnExistingDayIsNoticed() async throws {
         try log("2026-01-15", grams: 20.0)
 
+        let model = makeModel()
         model.start()
-        try await waitUntil { self.model.state.totalGrams == 20.0 }
+        defer { model.stop() }
+
+        try await waitUntil { model.state.totalGrams == 20.0 }
 
         try log("2026-01-15", grams: 5.0, hour: 20)
-        try await waitUntil { self.model.state.totalGrams == 25.0 }
-
-        model.stop()
+        try await waitUntil { model.state.totalGrams == 25.0 }
     }
 
     /// A new day changes the date list, which is the easy half.
     func testAnEntryOnANewDayIsNoticed() async throws {
+        let model = makeModel()
         model.start()
-        try await waitUntil { self.model.state.totalGrams == 0.0 }
+        defer { model.stop() }
+
+        try await waitUntil { model.state.totalGrams == 0.0 }
 
         try log("2026-01-14", grams: 12.0)
-        try await waitUntil { self.model.state.totalGrams == 12.0 }
-
-        model.stop()
+        try await waitUntil { model.state.totalGrams == 12.0 }
     }
 
     /// `statsFromDate` moves the floor of every window, so the settings stream
@@ -132,20 +135,22 @@ final class StatsModelTests: XCTestCase {
         try log("2026-01-02", grams: 10.0)
         try log("2026-01-15", grams: 20.0)
 
+        let model = makeModel()
         model.start()
-        try await waitUntil { self.model.state.totalGrams == 30.0 }
+        defer { model.stop() }
+
+        try await waitUntil { model.state.totalGrams == 30.0 }
 
         try await environment.preferences.update { $0.statsFromDate = "2026-01-10" }
-        try await waitUntil { self.model.state.totalGrams == 20.0 }
-
-        model.stop()
+        try await waitUntil { model.state.totalGrams == 20.0 }
     }
 
     /// A stopped model is a dead model. A view that has disappeared must not keep a
     /// database observation alive behind it.
     func testStopEndsTheSubscription() async throws {
+        let model = makeModel()
         model.start()
-        try await waitUntil { self.model.state.totalGrams == 0.0 }
+        try await waitUntil { model.state.totalGrams == 0.0 }
         model.stop()
 
         try log("2026-01-15", grams: 42.0)
