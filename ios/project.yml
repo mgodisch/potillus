@@ -62,6 +62,16 @@ targets:
     platform: iOS
     sources:
       - path: Potillus
+      # The PDF template lives at the repository root because BOTH platforms read
+      # it: Android registers report/ as an asset directory, and this line copies
+      # the same file into the iOS bundle. One file, two reports, no drift.
+      #
+      # `buildPhase` must be stated: XcodeGen guesses from the extension, and an
+      # .html would not be guessed into the Copy Bundle Resources phase. `type: file`
+      # keeps it a file reference instead of a group.
+      - path: ../report/report_template.html
+        type: file
+        buildPhase: resources
     dependencies:
       - package: PotillusKit
         product: PotillusKit

@@ -26,6 +26,7 @@
 import Charts
 import PotillusKit
 import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 // =============================================================================
@@ -46,13 +47,18 @@ import UniformTypeIdentifiers
 
 struct StatsScreen: View {
 
-    @State private var model: StatsModel
+    // `internal`, not private: `private` in Swift is FILE scope, and the export
+    // code lives in StatsScreenExport.swift.
+    @State var model: StatsModel
 
-    private let environment: AppEnvironment
+    let environment: AppEnvironment
 
-    @State private var exportedCsv: CsvDocument?
-    @State private var isExporting = false
-    @State private var exportFailure: String?
+    @State var exportedCsv: CsvDocument?
+    @State var isExporting = false
+    @State var exportedPdf: PdfDocument?
+    @State var isExportingPdf = false
+    @State var isBuildingPdf = false
+    @State var exportFailure: String?
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -77,12 +83,25 @@ struct StatsScreen: View {
             }
             .navigationTitle("Statistics")
             .toolbar {
-                Button {
-                    prepareCsv()
+                Menu {
+                    Button {
+                        prepareCsv()
+                    } label: {
+                        Label("Export CSV", systemImage: "tablecells")
+                    }
+                    Button {
+                        Task { await preparePdf() }
+                    } label: {
+                        Label("Export PDF report", systemImage: "doc.richtext")
+                    }
                 } label: {
-                    Label("Export CSV", systemImage: "square.and.arrow.up")
+                    if isBuildingPdf {
+                        ProgressView()
+                    } else {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
                 }
-                .disabled(model.state.dataPoints.isEmpty)
+                .disabled(model.state.dataPoints.isEmpty || isBuildingPdf)
             }
             .task { await model.load() }
             .refreshable { await model.load() }
@@ -91,6 +110,16 @@ struct StatsScreen: View {
                 document: exportedCsv,
                 contentType: .commaSeparatedText,
                 defaultFilename: CsvExporter.suggestedFileName()
+            ) { result in
+                if case .failure(let error) = result {
+                    exportFailure = String(describing: error)
+                }
+            }
+            .fileExporter(
+                isPresented: $isExportingPdf,
+                document: exportedPdf,
+                contentType: .pdf,
+                defaultFilename: ReportJob.fileName(date: Date())
             ) { result in
                 if case .failure(let error) = result {
                     exportFailure = String(describing: error)
@@ -319,36 +348,6 @@ struct StatsScreen: View {
     }
 
     // ── CSV ──────────────────────────────────────────────────────────────────
-
-    /// Builds the CSV for the VISIBLE period, then presents the document browser.
-    ///
-    /// The range is `state.from ... state.to`, so what the user exports is what
-    /// the screen shows. Filtering happens in SQLite, over the index on
-    /// `logicalDate`, rather than by loading the whole log into memory — the same
-    /// choice Android's `exportCsv` makes, and for the same reason.
-    private func prepareCsv() {
-        do {
-            let entries = try environment.entries.inRange(
-                from: model.state.from, to: model.state.to
-            )
-            // Android refuses an empty export rather than writing a lone header.
-            // A file with no rows looks like a broken export, not an empty period.
-            guard !entries.isEmpty else {
-                exportFailure = "No entries in this period."
-                return
-            }
-
-            let csv = CsvExporter.buildCsv(
-                headerCells: CsvExporter.englishHeaderCells,
-                entries: entries,
-                drinks: try environment.drinks.allOnce()
-            )
-            exportedCsv = CsvDocument(data: CsvExporter.fileData(csv: csv))
-            isExporting = true
-        } catch {
-            exportFailure = String(describing: error)
-        }
-    }
 }
 
 // =============================================================================

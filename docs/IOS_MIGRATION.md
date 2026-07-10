@@ -512,6 +512,47 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Print the report  (patch -59)
+
+The last step. The Statistics toolbar now exports a PDF as well as a CSV.
+
+- `ReportPdfPrinter` loads the HTML in a `WKWebView` and hands
+  `viewPrintFormatter()` to a `UIPrintPageRenderer`, which paginates it. What comes
+  out is what Safari would print, which is what Android's print framework produces
+  from the same file.
+- NOT `WKWebView.createPDF`, though it is the newer API and needs no subclass. It
+  captures a rectangle, usually the whole scroll height: one endless sheet. The
+  template is two A4 pages with page-break rules and a running footer, and an
+  endless sheet would be a different document.
+- PAPER SIZE WITHOUT KVC. `paperRect` and `printableRect` are read-only, and every
+  recipe on the web writes them with `setValue(_:forKey:)`. They are also `open`, so
+  `PaperSizedRenderer` overrides the getters instead: same result, no reflection,
+  and the compiler checks it. There is no key-value coding in this app.
+- The template is copied into the app bundle by `ios/project.yml`, from
+  `report/report_template.html` at the repository root — the same file Android
+  registers as an asset. One file, two reports, no chance of drift.
+- `ReportJob.fileName` is the only testable part of exporting a PDF, so it lives in
+  the kit and is tested there. Its formatter is pinned to `en_US_POSIX`: a
+  locale-aware one would name a file after a Japanese era year, and an Arabic one
+  would write the digits in Eastern Arabic numerals. Neither sorts.
+- The report takes its "today" from `model.state.today` rather than asking a clock
+  again. Asking twice could straddle the day-change hour and give the report a
+  different today than the screen behind it.
+
+`StatsScreen` split at the seam SwiftLint's body limit exposed: one file shows the
+statistics, the other carries them out of the app. Doing so meant widening `model`
+and `environment` from `private`, because `private` in Swift is FILE scope — the
+same trap the renderer walked into two patches ago, caught this time before the
+compiler had to say it.
+
+Rule 7 earned its keep here: `DayResolver.today`, `Bundle.appVersion` and an
+unimported `UIDevice` were all written down from memory and all three were wrong.
+The grep found them before the compiler did.
+
+`ReportPdfPrinter` has no tests and cannot have any: it needs a screen, a web
+engine and a run loop. Everything that could be tested was moved out of it long
+before it was written.
+
 #### Stop capturing a key path across an actor boundary  (patch -58)
 
 The compiler warned that `SettingsScreen.bind` captured a

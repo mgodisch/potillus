@@ -104,3 +104,29 @@ struct CsvDocument: FileDocument {
         FileWrapper(regularFileWithContents: data)
     }
 }
+
+// =============================================================================
+// PdfDocument
+// =============================================================================
+
+/// The finished report, on its way to `fileExporter`.
+struct PdfDocument: FileDocument {
+
+    /// `.pdf`, so the system offers Files, Books and Mail rather than a text editor.
+    static let readableContentTypes: [UTType] = [.pdf]
+
+    let data: Data
+
+    init(data: Data) {
+        self.data = data
+    }
+
+    /// Never read back by this app; required by the protocol.
+    init(configuration: ReadConfiguration) throws {
+        data = configuration.file.regularFileContents ?? Data()
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
+    }
+}
