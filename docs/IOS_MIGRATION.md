@@ -461,7 +461,8 @@ Indicative ordering; refined as work starts.
    asserted: the iOS suite parses AND imports `fastlane/demo-backup.json`, a
    genuine Android-written backup already in the repository, and gets back its 15
    drinks and 85 entries with no orphans. Nothing is deferred any more.
-4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
+4. **UI (in progress).** The app shell — composition root, tab bar, theming,
+   startup-failure path — is in place, with placeholder screens. SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
 5. **Localisation.** Port 21 locales to String Catalogs; extend the translation
@@ -510,6 +511,35 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Add the SwiftUI app shell  (patch -23)
+
+- Add `AppEnvironment`, the composition root: one place that chooses the concrete
+  database, repositories and preferences store, and hands protocols to everything
+  downstream. It lives in the kit, not the app target, because the app target is
+  not covered by `swift test` — the wiring itself is worth testing, and an
+  ephemeral variant (in-memory database, temporary preferences file, ephemeral
+  key) serves previews and screenshot runs without touching the file system.
+- Add `AppDatabase.makeDefault()` alongside the existing preferences one, placing
+  the database in Application Support rather than Documents: it is app-managed
+  state, not a user-visible document. The user's export path is the JSON backup.
+- Add the app shell: a `TabView` over the same four sections Android has, in the
+  same order — Today, Calendar, Statistics, Drinks. The information architecture
+  is shared; the presentation is not. Compose puts labelled icons in a bottom
+  NavigationBar, SwiftUI uses a tab bar. Porting Material 3 onto iOS would make
+  the app feel foreign to its users and conspicuous to App Review. The rule for
+  the rest of this port: identical behaviour, native idiom.
+- Apply `themeMode` through `preferredColorScheme`, with `.system` mapped to
+  `nil` — SwiftUI's "do not override". Reading the device setting directly would
+  ignore the user's in-app choice, the exact trap Android's `Color.kt` documents.
+  The setting is observed, so a change applies without a restart.
+- Handle a failed launch honestly. Opening the database runs migrations and the
+  Keychain can refuse; a crash at launch is the worst possible bug report ("it
+  just closes"). The failure is caught and displayed with a selectable error the
+  user can quote. The app does NOT delete and recreate the database: that trades
+  a visible failure for silent data loss.
+- Use `.tabItem` rather than the `Tab { }` builder, which is iOS 18 while this app
+  supports iOS 17. They render identically here.
 
 #### Apply a restored backup, settings included  (patch -22)
 

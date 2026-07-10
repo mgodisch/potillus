@@ -76,6 +76,20 @@ public final class AppDatabase: Sendable {
         try Self.migrator.migrate(writer)
     }
 
+    /// The database at the app's standard location,
+    /// `Application Support/potillus.sqlite`.
+    ///
+    /// Application Support, not Documents: the file is app-managed state, not a
+    /// user-visible document, and Documents is exposed by the Files app when
+    /// `UIFileSharingEnabled` is set. The user's export path is the JSON backup.
+    public static func makeDefault() throws -> AppDatabase {
+        let directory = try FileManager.default.url(
+            for: .applicationSupportDirectory, in: .userDomainMask,
+            appropriateFor: nil, create: true
+        )
+        return try AppDatabase(path: directory.appendingPathComponent("potillus.sqlite").path)
+    }
+
     /// An empty in-memory database, for tests. Never touches the file system.
     public init(inMemory: Bool) throws {
         precondition(inMemory, "Use init(path:) for on-disk databases")
