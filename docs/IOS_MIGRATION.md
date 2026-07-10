@@ -512,6 +512,35 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the statistics aggregations  (patch -34)
+
+- Add `StatsAggregator`: the category breakdown, the time-of-day histogram, the
+  weekday profile, and the trend percentage. On Android these live inside
+  `StatsViewModel`, where nothing tests them. Ported as pure functions, for the
+  reason the drink-day gate was extracted: an unnamed calculation buried in a view
+  model is one nobody can check and everybody will copy.
+- Bucket the histogram by WALL-CLOCK hour while the day totals follow the LOGICAL
+  date. A drink at 01:00 counts towards the previous day and still happened at one
+  in the morning; the histogram answers "when do I drink", not "on which day does
+  it count". The two clocks are deliberate and now carry a test.
+- Divide each of the eight buckets by the period's length, not by the days it
+  appears on, so the bars sum to the overall average grams per day. A bucket that
+  is empty on most days should look small.
+- Average the weekday profile over DAILY SUMMARIES rather than entries: a day with
+  six beers counts once, as a day. Android's PDF does the same, and screen and
+  report must not disagree.
+- Keep a weekday column with no days at all `nil`, not `0.0`. "No Tuesdays in this
+  period" and "Tuesdays were dry" are different statements, and a bar chart must
+  draw both.
+- Mirror an asymmetry rather than smooth it over: `trendPercent` compares the RAW
+  averages, while `Trend.of` rounds both to one decimal first. A rise from 10.00
+  to 10.04 g/day therefore reports +0.4 % beside a FLAT arrow. Android behaves
+  identically; the arrow is meant to be less twitchy than the number. A test pins
+  it, because it reads like a bug.
+- Assert that `StatsAggregator.weekdayOrder` equals `MonthGrid`'s, across all seven
+  first-days. If they ever drift, the calendar and the profile label different
+  columns.
+
 #### Add the Calendar screen  (patch -33)
 
 - Add `MonthGrid`, the calendar's arithmetic, as a pure tested type rather than a
