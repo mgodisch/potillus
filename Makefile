@@ -834,8 +834,12 @@ ios-project: ios-version
 #
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
-ios: check-headers check-swift-tests check-swift-symbols ios-project
-	cd ios/PotillusKit && swift test
+ios: check-headers check-makefile check-swift-tests check-swift-symbols ios-project
+	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
+	# bare `cd` would leak into every step below it -- xcodebuild would then look
+	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
+	# target learned this first; see the note beside its `cd fastlane`.
+	( cd ios/PotillusKit && swift test )
 	command -v xcodebuild
 	xcodebuild \
 	    -project ios/Potillus.xcodeproj \
@@ -853,6 +857,12 @@ ios: check-headers check-swift-tests check-swift-symbols ios-project
 debug:
 	@echo "make debug: renamed to 'make android' (this repository now builds two platforms)" >&2
 	$(MAKE) android
+
+# check-makefile: catches a bare `cd` inside a .ONESHELL recipe, which silently
+# changes the working directory for every line below it. Cost one green test run
+# followed by "'ios/Potillus.xcodeproj' does not exist".
+check-makefile:
+	python3 tools/check-makefile.py
 
 # check-swift-symbols: catches an invented type (`Backup.parse`, where only
 # `BackupReader` and `BackupWriter` exist) and a missing module import (`UTType`
@@ -903,4 +913,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-swift-tests check-swift-symbols ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

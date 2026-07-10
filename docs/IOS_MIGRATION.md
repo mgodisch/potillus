@@ -512,6 +512,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Stop a bare `cd` from leaking through the ios recipe  (patch -46)
+
+- `make ios` ran `cd ios/PotillusKit && swift test` and then invoked `xcodebuild`
+  with a path relative to the repository root. Under `.ONESHELL` the whole recipe
+  is ONE shell, so the `cd` moved every line below it: 256 tests passed, and then
+  xcodebuild reported that `ios/Potillus.xcodeproj` does not exist — a working
+  directory error wearing the costume of a missing file. Wrapped in a subshell.
+- The `screenshots` target already knew this and says so beside its own
+  `cd fastlane`. The knowledge was in the file; the discipline was missing. So it
+  is now a check rather than a comment.
+- Add `tools/check-makefile.py`: under `.ONESHELL`, a recipe line starting with
+  `cd ` must be the last line of its recipe or be wrapped in parentheses. Recipes
+  end at target boundaries — make starts a fresh shell per target — so a trailing
+  `cd` cannot leak, and `ios-project` was never affected. Verified by
+  reintroducing the fault, watching it fire, and removing it again.
+
 #### Stop SettingsModel lying about its own state  (patch -45)
 
 - `SettingsModel.update` wrote to the store and left its own `settings` stale.
