@@ -95,6 +95,19 @@ def printer_margins(swift):
     return tuple(float(value) for value in match.groups())
 
 
+def printer_zeroes_formatter_insets(swift):
+    """`UIPrintFormatter.perPageContentInsets` defaults to one inch on every side.
+
+    That inch is invisible, undocumented at the call site, and subtracted from a
+    printable box that already carries the template's `@page` margins. 72 pt top and
+    bottom is 50.8 mm, and a 267 mm sheet handed 216 mm prints on two pages. It cost
+    three patches to find.
+
+    Nothing in the type system stops a future edit from dropping the line. This does.
+    """
+    return re.search(r"perPageContentInsets\s*=\s*\.zero", swift) is not None
+
+
 def main():
     root = repository_root()
     problems = []
@@ -119,6 +132,13 @@ def main():
             f"top {in_css[0]}, right {in_css[1]}, bottom {in_css[2]}, left {in_css[3]} mm, "
             f"while {PRINTER} says "
             f"top {in_swift[0]}, right {in_swift[1]}, bottom {in_swift[2]}, left {in_swift[3]} mm"
+        )
+
+    if not printer_zeroes_formatter_insets(swift):
+        problems.append(
+            f"{PRINTER}: the print formatter's `perPageContentInsets` are not set to "
+            f"`.zero`. They default to one inch on every side, which is subtracted "
+            f"from a printable box that already has the template's margins."
         )
 
     if in_css and sheet is not None:

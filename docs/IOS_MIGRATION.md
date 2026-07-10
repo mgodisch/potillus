@@ -512,6 +512,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Take the formatter's inch away  (patch -63)
+
+`UIPrintFormatter.perPageContentInsets` defaults to ONE INCH on every side. Nothing
+at the call site says so.
+
+72 pt at the top and 72 at the bottom is 50.8 mm, subtracted from a printable box
+that already carries the template's `@page` margins. A 267 mm sheet was handed
+216 mm. It printed on two pages, and the report on four — even after `pageZoom`
+made every millimetre the right size, which patch -62 confirmed by the donut coming
+out at its intended 44 mm.
+
+The same inch on the left and right is the loose end from patch -61: changing the
+web view's width moved the line breaks and nothing else, because the formatter had
+been re-flowing the text inside its own narrower column the whole time. Both
+observations now have one cause.
+
+`tools/check-report-paper.py` fails the build if `perPageContentInsets = .zero`
+ever disappears. Nothing in the type system would notice, and the symptom is a
+report that is silently one page too long.
+
+MEASUREMENT AND PREDICTION DO NOT QUITE AGREE: 50.8 mm computed against roughly
+61 mm measured off a screen. That is within a ruler's slop, but it is not zero. If
+a narrow strip still overflows after this patch, the cause is a sheet whose content
+is taller than its own `min-height`, which would be a fault in the template rather
+than in the printer.
+
 #### Scale the page, not the view  (patch -62)
 
 Third attempt at the same four pages, and the first one aimed at the actual cause.

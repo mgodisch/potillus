@@ -164,7 +164,19 @@ final class ReportPdfPrinter: NSObject {
     /// Draws every page the formatter produces into one PDF.
     private func render(_ webView: WKWebView) throws -> Data {
         let renderer = PaperSizedRenderer(paper: Self.a4Paper, printable: Self.printableBox)
-        renderer.addPrintFormatter(webView.viewPrintFormatter(), startingAtPageAt: 0)
+        // THE FORMATTER HAS MARGINS OF ITS OWN, and they default to a full inch on
+        // every side. 72 pt top and bottom is 50.8 mm taken out of a printable box
+        // that already carries the template's `@page` margins — so a 267 mm sheet
+        // never fit the 216 mm it was actually given, and printed on two pages.
+        //
+        // The same inch on each side is why patch -61's change to the view's width
+        // moved the line breaks and nothing else: the formatter was re-flowing the
+        // text inside its own narrower column all along.
+        //
+        // `printableBox` is the margin box. Nothing else may add to it.
+        let formatter = webView.viewPrintFormatter()
+        formatter.perPageContentInsets = .zero
+        renderer.addPrintFormatter(formatter, startingAtPageAt: 0)
 
         let output = NSMutableData()
         UIGraphicsBeginPDFContextToData(output, Self.a4Paper, nil)
