@@ -1,0 +1,291 @@
+{
+  "_comment": [
+    "Golden vectors for the PDF report's presentation arithmetic.",
+    "Read by BOTH suites: ReportChartTests (Swift) and ReportChartVectorTest (Kotlin).",
+    "",
+    "labelIndices IS COMPUTED IN 32-BIT FLOAT, and that is not an accident of the",
+    "Kotlin source: `((n - 1).toFloat() / (target - 1))` truncates differently from",
+    "the same expression in Double for 16 of the first 400 series lengths. n = 32 \u2014",
+    "a month of daily buckets \u2014 is one of them. Swift therefore uses Float too, and",
+    "these vectors would catch it if either side stopped.",
+    "",
+    "Colours must match: the same drinking would otherwise print in different",
+    "colours on the two platforms."
+  ],
+  "pct": [
+    {
+      "description": "a value against a positive maximum",
+      "value": 25.0,
+      "max": 100.0,
+      "expected": 25.0
+    },
+    {
+      "description": "a zero maximum yields zero rather than a division by zero",
+      "value": 25.0,
+      "max": 0.0,
+      "expected": 0.0
+    },
+    {
+      "description": "a negative maximum is treated as no maximum",
+      "value": 25.0,
+      "max": -5.0,
+      "expected": 0.0
+    },
+    {
+      "description": "a value above its maximum exceeds one hundred",
+      "value": 150.0,
+      "max": 100.0,
+      "expected": 150.0
+    },
+    {
+      "description": "zero over anything is zero",
+      "value": 0.0,
+      "max": 50.0,
+      "expected": 0.0
+    }
+  ],
+  "labelIndices": [
+    {
+      "description": "an empty series has no labels",
+      "count": 0,
+      "expected": []
+    },
+    {
+      "description": "a single bucket is labelled",
+      "count": 1,
+      "expected": [
+        0
+      ]
+    },
+    {
+      "description": "twelve buckets or fewer are all labelled",
+      "count": 12,
+      "expected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "description": "past twelve the labels are thinned to about eight",
+      "count": 13,
+      "expected": [
+        0,
+        1,
+        3,
+        5,
+        6,
+        8,
+        10,
+        12
+      ]
+    },
+    {
+      "description": "a month of daily buckets",
+      "count": 31,
+      "expected": [
+        0,
+        4,
+        8,
+        12,
+        17,
+        21,
+        25,
+        30
+      ]
+    },
+    {
+      "description": "the Float step differs from Double here: index 30 survives",
+      "count": 32,
+      "expected": [
+        0,
+        4,
+        8,
+        13,
+        17,
+        22,
+        26,
+        30,
+        31
+      ]
+    },
+    {
+      "description": "and here Double would keep 60, Float does not",
+      "count": 62,
+      "expected": [
+        0,
+        8,
+        17,
+        26,
+        34,
+        43,
+        52,
+        61
+      ]
+    },
+    {
+      "description": "one more, where the two disagree again",
+      "count": 63,
+      "expected": [
+        0,
+        8,
+        17,
+        26,
+        35,
+        44,
+        53,
+        61,
+        62
+      ]
+    },
+    {
+      "description": "a long series",
+      "count": 100,
+      "expected": [
+        0,
+        14,
+        28,
+        42,
+        56,
+        70,
+        84,
+        99
+      ]
+    },
+    {
+      "description": "a year of daily buckets",
+      "count": 365,
+      "expected": [
+        0,
+        52,
+        104,
+        156,
+        208,
+        260,
+        312,
+        364
+      ]
+    }
+  ],
+  "barHeight": [
+    {
+      "description": "no value at all draws no bar",
+      "value": null,
+      "ceiling": 100.0,
+      "expected": 0.0
+    },
+    {
+      "description": "a dry bucket draws no bar",
+      "value": 0.0,
+      "ceiling": 100.0,
+      "expected": 0.0
+    },
+    {
+      "description": "a tiny but non-zero value keeps a visible sliver",
+      "value": 0.5,
+      "ceiling": 100.0,
+      "expected": 2.0
+    },
+    {
+      "description": "the sliver floor does not lift an ordinary bar",
+      "value": 40.0,
+      "ceiling": 100.0,
+      "expected": 40.0
+    },
+    {
+      "description": "a value at the ceiling fills the plot",
+      "value": 100.0,
+      "ceiling": 100.0,
+      "expected": 100.0
+    },
+    {
+      "description": "a zero ceiling cannot divide, and the floor still applies",
+      "value": 5.0,
+      "ceiling": 0.0,
+      "expected": 2.0
+    }
+  ],
+  "categoryColor": [
+    {
+      "categoryName": "BEER",
+      "expected": "#F59E0B"
+    },
+    {
+      "categoryName": "WINE",
+      "expected": "#9333EA"
+    },
+    {
+      "categoryName": "SPIRITS",
+      "expected": "#EF4444"
+    },
+    {
+      "categoryName": "LONGDRINK",
+      "expected": "#3B82F6"
+    },
+    {
+      "categoryName": "LIQUEUR",
+      "expected": "#10B981"
+    },
+    {
+      "categoryName": "OTHER",
+      "expected": "#6B7280"
+    },
+    {
+      "categoryName": "NONSENSE",
+      "expected": "#6B7280"
+    }
+  ],
+  "donut": [
+    {
+      "description": "three slices fill the ring clockwise from twelve o'clock",
+      "fractions": [
+        40.0,
+        35.0,
+        25.0
+      ],
+      "expected": [
+        {
+          "fraction": 40.0,
+          "dash": "40.00",
+          "gap": "60.00",
+          "offset": "25.00"
+        },
+        {
+          "fraction": 35.0,
+          "dash": "35.00",
+          "gap": "65.00",
+          "offset": "-15.00"
+        },
+        {
+          "fraction": 25.0,
+          "dash": "25.00",
+          "gap": "75.00",
+          "offset": "-50.00"
+        }
+      ]
+    },
+    {
+      "description": "a single category fills the whole ring",
+      "fractions": [
+        100.0
+      ],
+      "expected": [
+        {
+          "fraction": 100.0,
+          "dash": "100.00",
+          "gap": "0.00",
+          "offset": "25.00"
+        }
+      ]
+    }
+  ]
+}

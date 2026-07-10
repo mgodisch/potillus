@@ -93,6 +93,54 @@ enum TestVectors {
 // =============================================================================
 
 /// Root of `test-vectors/alcohol-calculator.json`.
+/// `report-chart.json` — the PDF report's presentation arithmetic.
+struct ReportChartVectors: Decodable {
+    let pct: [PercentCase]
+    let labelIndices: [LabelCase]
+    let barHeight: [BarCase]
+    let categoryColor: [ColorCase]
+    let donut: [DonutCase]
+
+    struct PercentCase: Decodable {
+        let description: String
+        let value: Double
+        let max: Double
+        let expected: Double
+    }
+
+    struct LabelCase: Decodable {
+        let description: String
+        let count: Int
+        let expected: [Int]
+    }
+
+    struct BarCase: Decodable {
+        let description: String
+        /// `null` means the weekday never occurred.
+        let value: Double?
+        let ceiling: Double
+        let expected: Double
+    }
+
+    struct ColorCase: Decodable {
+        let categoryName: String
+        let expected: String
+    }
+
+    struct DonutCase: Decodable {
+        let description: String
+        let fractions: [Double]
+        let expected: [Slice]
+
+        struct Slice: Decodable {
+            let fraction: Double
+            let dash: String
+            let gap: String
+            let offset: String
+        }
+    }
+}
+
 /// `report-data.json` — the PDF report's computed figures.
 ///
 /// Only the zone-, locale- and clock-independent ones: Android reads all three

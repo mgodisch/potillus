@@ -512,6 +512,41 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the report's presentation arithmetic  (patch -54)
+
+The renderer divides cleanly into arithmetic that decides what the PDF LOOKS like
+and text that decides what it SAYS. The arithmetic needs no language, so it is
+ported first and pinned by shared vectors; the text waits for localisation.
+
+- `ReportChart` and `ReportPalette`: bar heights, axis-label thinning, donut
+  geometry, category colours.
+- THE AXIS-LABEL STEP IS A 32-BIT FLOAT. Kotlin writes
+  `((n - 1).toFloat() / (target - 1))`, and the truncation that follows lands on
+  different indices than the same expression in `Double` — for 16 of the first 400
+  series lengths, `n = 32` among them, which is a month of daily buckets. Ported
+  as `Double`, iOS would have drawn a different x-axis than Android for the same
+  drinking. Swift uses `Float`, a vector pins `n = 32`, and both suites carry a
+  test that FAILS if the two ever agree, because agreement would mean the `Float`
+  was quietly widened.
+- Bar heights: a dry bucket and a bucket that never occurred both draw nothing,
+  while a tiny non-zero value keeps a two-percent sliver — one beer in a heavy
+  month must not round to abstinence.
+- Donut geometry: `stroke-dasharray` on a circle of radius 15.9155, whose
+  circumference is very nearly 100, so a slice's dash length IS its percentage.
+  Numbers are formatted POSIX: SVG reads `,` as a list separator, so a German
+  `40,00 60,00` would become the four values `40 0 60 0` and paint the ring solid.
+  Kotlin escapes this with `Locale.ROOT`; Swift's `String(format:)` already does
+  it, and the locale is passed anyway — a requirement stated in code outlives one
+  stated in a comment.
+- `PdfReportBuilder.pct`, `.chartLabelIndices` and `.categoryColor` become
+  `internal` so the Kotlin vector test can reach them. The Android renderer is
+  otherwise untouched.
+
+New shared vectors, `test-vectors/report-chart.json`, read by `ReportChartTests`
+(Swift) and `ReportChartVectorTest` (Kotlin).
+
+Delivered pre-checked: ktlint over the Kotlin, SwiftLint `--strict` over the Swift.
+
 #### Fix two compile errors from patch -52  (patch -53)
 
 - `DayResolver.addingDays` already existed, PRIVATELY, a few lines above where a

@@ -471,7 +471,10 @@ object PdfReportBuilder {
      * use the same colours. Escape-safe (no `< > & " '`), so it can flow through
      * SimpleTemplate into an SVG `stroke`/CSS `background`.
      */
-    private fun categoryColor(name: String): String = when (name) {
+    // `internal`, not private: ReportChartVectorTest checks it against the shared
+    // vectors that the Swift renderer reads too. The colours must match, or the
+    // same drinking prints in different colours on the two platforms.
+    internal fun categoryColor(name: String): String = when (name) {
         "BEER" -> "#F59E0B" // amber-500
         "WINE" -> "#9333EA" // purple-600
         "SPIRITS" -> "#EF4444" // red-500
@@ -481,7 +484,7 @@ object PdfReportBuilder {
     }
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
-    private fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
+    internal fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
 
     /**
      * Indices of the buckets that should carry an x-axis label. For a short
@@ -489,7 +492,7 @@ object PdfReportBuilder {
      * evenly spaced subset (~8 labels) keeps the axis readable. The first and
      * last buckets are always included.
      */
-    private fun chartLabelIndices(n: Int): Set<Int> {
+    internal fun chartLabelIndices(n: Int): Set<Int> {
         if (n <= 0) return emptySet()
         if (n <= 12) return (0 until n).toSet()
         val target = 8
