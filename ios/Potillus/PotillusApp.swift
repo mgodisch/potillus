@@ -59,6 +59,11 @@ struct PotillusApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
 
+    /// Whether the user has allowed screenshots. Default false — secure by default,
+    /// as on Android. Observed from the environment once it is ready, so a change in
+    /// Settings takes effect without a relaunch.
+    @State private var allowScreenshots = false
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -79,11 +84,31 @@ struct PotillusApp: App {
             // The cover sits ABOVE everything, including the failure view: a locked
             // app reveals nothing, not even why it could not start.
             .overlay {
+                // The app-switcher cover sits UNDER the lock cover: when both apply
+                // the lock wins, but neither depends on the other. It shows in the
+                // transient .inactive phase too, so the switcher never photographs
+                // the diary. `allowScreenshots` lets the user opt out.
+                if PrivacyCoverDecision.isCovered(
+                    isActive: scenePhase == .active, allowScreenshots: allowScreenshots
+                ) {
+                    PrivacyCover()
+                }
                 if lock.state != .unlocked {
                     AppLockCover(state: lock.state) { await lock.retry() }
                 }
             }
             .task { await lock.onLaunch() }
+            // Keyed on readiness so the observing task RESTARTS when the
+            // environment appears. A plain `.task` fires once, while `startup` is
+            // still `.loading`, sees no environment, and never observes the flag —
+            // leaving the cover stuck on. `.task(id:)` re-runs when the id changes.
+            .task(id: startup.isReady) {
+                if case .ready(let environment) = startup {
+                    for await updated in await environment.preferences.observe() {
+                        allowScreenshots = updated.allowScreenshots
+                    }
+                }
+            }
             .onChange(of: scenePhase) { _, phase in
                 // .inactive is the transient state during the switcher animation;
                 // only .background is a real departure, and only .active a real
@@ -104,6 +129,13 @@ enum StartupState {
     case loading
     case ready(AppEnvironment)
     case failed(String)
+
+    /// Whether the environment is ready. Drives `.task(id:)` so the scene's
+    /// observation starts the moment the environment exists, not a moment before.
+    var isReady: Bool {
+        if case .ready = self { return true }
+        return false
+    }
 
     /// Assembles the live environment, converting a throw into a shown message.
     static func make() -> StartupState {

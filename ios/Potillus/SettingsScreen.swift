@@ -36,11 +36,13 @@ import UniformTypeIdentifiers
 // user set a value the app silently discards — precisely the divergence that made
 // Android's Save button lie until v0.81.0.
 //
-// ONE SWITCH IS STILL MISSING ON PURPOSE
-//   `allowScreenshots` is stored and ported, but nothing reads it yet. It arrives
-//   with the screenshot cover, a separate change. `biometricEnabled` is now wired:
-//   its toggle refuses to arm on a device that can take neither a biometric nor a
-//   passcode, which would lock the owner out permanently.
+// BOTH SECURITY SWITCHES ARE NOW WIRED
+//   `biometricEnabled` gates the app behind Face ID / Touch ID / passcode; its
+//   toggle refuses to arm on a device that can satisfy none of those, which would
+//   lock the owner out permanently. `allowScreenshots` controls the app-switcher
+//   privacy cover — NOT active screenshots, which iOS has no clean way to block
+//   (see PrivacyCover.swift). The toggle's wording says what it actually does on
+//   this platform rather than promising Android's FLAG_SECURE behaviour.
 // =============================================================================
 
 struct SettingsScreen: View {
@@ -355,10 +357,23 @@ extension SettingsScreen {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+
+            Toggle(
+                "Show in app switcher",
+                isOn: bind(\.allowScreenshots, set: { $0.allowScreenshots = $1 })
+            )
         } header: {
             Text("Security")
         } footer: {
-            Text("When on, Libellus Potionis asks to unlock after 30 seconds in the background.")
+            // Two footers would be tidier but a Section takes one. Both switches are
+            // explained here, in the order they appear.
+            Text(
+                """
+                When app lock is on, Libellus Potionis asks to unlock after 30 \
+                seconds in the background. When "Show in app switcher" is off, the \
+                app's preview is hidden while it is in the background.
+                """
+            )
         }
     }
 

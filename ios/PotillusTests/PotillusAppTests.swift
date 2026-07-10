@@ -24,6 +24,8 @@
 // =============================================================================
 
 import XCTest
+
+@testable import Potillus
 import PotillusKit
 
 /// Smoke tests for the app target.
@@ -36,5 +38,37 @@ final class PotillusAppTests: XCTestCase {
 
     func testKitIsLinkedIntoTheApp() {
         XCTAssertFalse(PotillusKit.about().isEmpty)
+    }
+
+    // ── The app-switcher privacy cover ───────────────────────────────────────
+    //
+    // The cover has no arithmetic, but its VISIBILITY RULE is a truth table, and a
+    // truth table can be got wrong. Secure by default (Android's stance): covered
+    // whenever the app is not active, unless the user opted out.
+
+    func testCoveredWhenBackgroundedAndScreenshotsDisallowed() {
+        XCTAssertTrue(
+            PrivacyCoverDecision.isCovered(isActive: false, allowScreenshots: false)
+        )
+    }
+
+    func testNotCoveredWhileActive() {
+        XCTAssertFalse(
+            PrivacyCoverDecision.isCovered(isActive: true, allowScreenshots: false),
+            "the cover must never hide the app the user is using"
+        )
+    }
+
+    func testNotCoveredWhenScreenshotsAllowed() {
+        XCTAssertFalse(
+            PrivacyCoverDecision.isCovered(isActive: false, allowScreenshots: true)
+        )
+    }
+
+    /// Allowing screenshots wins even while active — the app is simply never hidden.
+    func testAllowedAndActiveIsNotCovered() {
+        XCTAssertFalse(
+            PrivacyCoverDecision.isCovered(isActive: true, allowScreenshots: true)
+        )
     }
 }

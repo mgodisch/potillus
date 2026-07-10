@@ -512,6 +512,41 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Hide the app-switcher preview  (patch -72)
+
+`allowScreenshots` was the last stored-but-unread setting. Android sets FLAG_SECURE,
+one flag that blanks the Recents thumbnail AND blocks active screenshots. iOS has no
+such flag, and the one setting splits into two problems with very different answers.
+
+DONE: the app-switcher thumbnail. When the app leaves the foreground iOS snapshots
+the window; an opaque `PrivacyCover` over the content during `.inactive`/`.background`
+means the snapshot is of the cover. Ordinary SwiftUI, no private API. Secure by
+default as on Android — the cover shows unless the user allows screenshots.
+
+DELIBERATELY NOT DONE: blocking an ACTIVE screenshot. The only known way is the
+`isSecureTextEntry` trick — wrapping the UI in a secure text field. That is
+undocumented, fragile across releases, and the wrong thing to ship inside a privacy
+app that is meant to contain no such tricks. Android gets active blocking free from
+the platform; iOS would charge a hack, and we decline. The toggle is therefore
+labelled "Show in app switcher", saying what it does here rather than promising
+Android's behaviour.
+
+THE COVER IS INDEPENDENT OF THE APP LOCK. When the lock is on, its cover is already
+up on background, so this is redundant then; when the lock is off, this is the only
+protection for the thumbnail. Keeping them separate means either can go without
+touching the other.
+
+The visibility rule — covered unless active, unless opted out — is a truth table,
+and a truth table can be got wrong, so it is a pure `PrivacyCoverDecision.isCovered`
+with four tests rather than an inline `&&`. One subtlety it encodes: `.inactive`
+counts as not-active, because the switcher snapshot is taken during that transient
+phase, and waiting for `.background` would photograph the diary a frame too late.
+
+One SwiftUI timing bug found and fixed on the way: the scene's observation of the
+flag was keyed with `.task(id: startup.isReady)`, because a plain `.task` fires once
+while startup is still `.loading`, never sees the environment, and would leave the
+cover stuck on.
+
 #### Add the biometric app lock  (patch -71)
 
 `biometricEnabled` was stored, ported through backup, and read by nothing. It reads
