@@ -26,6 +26,7 @@
 import Charts
 import PotillusKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 // =============================================================================
 // StatsScreen.swift – the period, and what it says
@@ -47,7 +48,14 @@ struct StatsScreen: View {
 
     @State private var model: StatsModel
 
+    private let environment: AppEnvironment
+
+    @State private var exportedCsv: CsvDocument?
+    @State private var isExporting = false
+    @State private var exportFailure: String?
+
     init(environment: AppEnvironment) {
+        self.environment = environment
         _model = State(initialValue: StatsModel(
             entries: environment.entries,
             drinks: environment.drinks,
@@ -68,8 +76,35 @@ struct StatsScreen: View {
                 weekdays
             }
             .navigationTitle("Statistics")
+            .toolbar {
+                Button {
+                    prepareCsv()
+                } label: {
+                    Label("Export CSV", systemImage: "square.and.arrow.up")
+                }
+                .disabled(model.state.dataPoints.isEmpty)
+            }
             .task { await model.load() }
             .refreshable { await model.load() }
+            .fileExporter(
+                isPresented: $isExporting,
+                document: exportedCsv,
+                contentType: .commaSeparatedText,
+                defaultFilename: CsvExporter.suggestedFileName()
+            ) { result in
+                if case .failure(let error) = result {
+                    exportFailure = String(describing: error)
+                }
+            }
+            .alert(
+                "Export failed",
+                isPresented: .constant(exportFailure != nil),
+                presenting: exportFailure
+            ) { _ in
+                Button("OK", role: .cancel) { exportFailure = nil }
+            } message: { message in
+                Text(message)
+            }
         }
     }
 
@@ -281,6 +316,38 @@ struct StatsScreen: View {
 
     private func days(_ value: Int) -> some View {
         Text("\(value)").monospacedDigit()
+    }
+
+    // ── CSV ──────────────────────────────────────────────────────────────────
+
+    /// Builds the CSV for the VISIBLE period, then presents the document browser.
+    ///
+    /// The range is `state.from ... state.to`, so what the user exports is what
+    /// the screen shows. Filtering happens in SQLite, over the index on
+    /// `logicalDate`, rather than by loading the whole log into memory — the same
+    /// choice Android's `exportCsv` makes, and for the same reason.
+    private func prepareCsv() {
+        do {
+            let entries = try environment.entries.inRange(
+                from: model.state.from, to: model.state.to
+            )
+            // Android refuses an empty export rather than writing a lone header.
+            // A file with no rows looks like a broken export, not an empty period.
+            guard !entries.isEmpty else {
+                exportFailure = "No entries in this period."
+                return
+            }
+
+            let csv = CsvExporter.buildCsv(
+                headerCells: CsvExporter.englishHeaderCells,
+                entries: entries,
+                drinks: try environment.drinks.allOnce()
+            )
+            exportedCsv = CsvDocument(data: CsvExporter.fileData(csv: csv))
+            isExporting = true
+        } catch {
+            exportFailure = String(describing: error)
+        }
     }
 }
 

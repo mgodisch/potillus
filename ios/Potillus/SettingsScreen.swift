@@ -25,6 +25,7 @@
 
 import PotillusKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 // =============================================================================
 // SettingsScreen.swift – the user's own numbers

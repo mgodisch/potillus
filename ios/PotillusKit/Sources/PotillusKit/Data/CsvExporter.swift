@@ -194,6 +194,32 @@ public enum CsvExporter {
     /// Excel does not detect UTF-8 automatically; the BOM signals it so that ä,
     /// ö, ü survive without a manual import wizard. Other tools (LibreOffice,
     /// Python's csv module) handle it transparently.
+    /// The file name Android writes: `potillus_export_yyyyMMdd_HHmm.csv`.
+    ///
+    /// Local wall-clock time, as there too. The user finds this file among their
+    /// documents and thinks in the time their watch shows.
+    public static func suggestedFileName(now: Date = Date()) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMdd_HHmm"
+        return "potillus_export_\(formatter.string(from: now)).csv"
+    }
+
+    /// The column captions Android's English resources carry, in column order.
+    ///
+    /// Android localises these; iOS cannot yet, having no string catalogue. The
+    /// English set is therefore the CURRENT truth, not a placeholder to be quietly
+    /// forgotten: a German user gets German drink names in an English-headed file
+    /// until localisation lands. `buildCsv` still takes the captions as a
+    /// parameter, so that change will not touch the exporter.
+    ///
+    /// The underscores are Android's, kept so a spreadsheet built against one
+    /// platform's export opens against the other's.
+    public static let englishHeaderCells = [
+        "Date", "Time", "Drink", "Category",
+        "Amount_ml", "Alcohol_Percent", "Grams_Alcohol", "Note",
+    ]
+
     public static let utf8BOM = Data([0xEF, 0xBB, 0xBF])
 
     /// The bytes of a complete `.csv` file: BOM followed by UTF-8 text.

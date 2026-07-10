@@ -28,7 +28,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 // =============================================================================
-// BackupDocument.swift – handing the file to iOS
+// BackupDocument.swift – handing files to iOS
 // =============================================================================
 //
 // `.fileExporter` and `.fileImporter` present the system's own document browser,
@@ -64,6 +64,43 @@ struct BackupDocument: FileDocument {
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
+    }
+}
+
+// =============================================================================
+// CsvDocument
+// =============================================================================
+//
+// The CSV a spreadsheet opens. Separate from `BackupDocument` because it is a
+// different content type and a different promise: a backup round-trips, a CSV is
+// a one-way report.
+// =============================================================================
+
+/// A UTF-8 CSV export, byte-identical to what `CsvExporter.fileData` produced.
+struct CsvDocument: FileDocument {
+
+    /// `.commaSeparatedText`, so the system offers Numbers and Excel rather than a
+    /// text editor.
+    static let readableContentTypes: [UTType] = [.commaSeparatedText]
+
+    let data: Data
+
+    init(data: Data) {
+        self.data = data
+    }
+
+    /// Never read back by this app; required by the protocol.
+    init(configuration: ReadConfiguration) throws {
+        guard let contents = configuration.file.regularFileContents else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        self.data = contents
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        // The bytes already carry the BOM that `CsvExporter.fileData` prepends;
+        // adding one here would write it twice and Excel would show it as text.
         FileWrapper(regularFileWithContents: data)
     }
 }

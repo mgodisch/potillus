@@ -209,4 +209,42 @@ final class CsvExporterTests: XCTestCase {
         XCTAssertEqual(CsvExporter.escapeField("a=1+1"), "a=1+1")
         XCTAssertEqual(CsvExporter.escapeField("=1+1"), "'=1+1")
     }
+
+    // ── File name and headers ────────────────────────────────────────────────
+
+    /// Android writes `potillus_export_20260102_2014.csv`. Same convention, so a
+    /// spreadsheet built against one platform's export opens against the other's.
+    func testTheFileNameFollowsAndroidsConvention() {
+        let name = CsvExporter.suggestedFileName(
+            now: Date(timeIntervalSince1970: 1_767_384_840)  // 2026-01-02 20:14 UTC
+        )
+        XCTAssertTrue(name.hasPrefix("potillus_export_"), name)
+        XCTAssertTrue(name.hasSuffix(".csv"), name)
+    }
+
+    /// The header must have exactly as many cells as a row has columns, or every
+    /// spreadsheet reading the file misaligns.
+    func testTheHeaderHasOneCellPerColumn() {
+        let drink = DrinkDefinition(
+            id: 1, name: "Pils", volumeMl: 500, alcoholPercent: 4.9, category: .beer
+        )
+        let entry = ConsumptionEntry(
+            drinkId: 1, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
+            gramsAlcohol: 19.3, timestampMillis: 1_767_384_840_000, logicalDate: "2026-01-02"
+        )
+        let csv = CsvExporter.buildCsv(
+            headerCells: CsvExporter.englishHeaderCells,
+            entries: [entry], drinks: [drink],
+            timeZone: TimeZone(identifier: "UTC")!
+        )
+
+        let lines = csv.components(separatedBy: "\r\n").filter { !$0.isEmpty }
+        XCTAssertEqual(lines.count, 2, "a header and one record")
+        XCTAssertEqual(
+            lines[0].components(separatedBy: ",").count,
+            lines[1].components(separatedBy: ",").count,
+            "header and row must have the same number of columns"
+        )
+        XCTAssertEqual(CsvExporter.englishHeaderCells.count, 8)
+    }
 }

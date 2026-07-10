@@ -512,6 +512,28 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add CSV export, and fix a missing import from patch -40  (patch -42)
+
+- Wire `CsvExporter` — long since ported and tested — to a button in the
+  Statistics toolbar. It exports the VISIBLE period, so what the user gets is what
+  the screen shows.
+- Filter the range in SQLite, over the index on `logicalDate`, rather than loading
+  the whole log and filtering in memory. The same choice Android's `exportCsv`
+  makes, for the same reason.
+- Refuse an empty export, as Android does. A file containing nothing but a header
+  looks like a broken export, not an empty period.
+- Copy Android's file name, `potillus_export_yyyyMMdd_HHmm.csv`, and its column
+  captions, underscores included, so a spreadsheet built against one platform's
+  export opens against the other's.
+- Name the captions `englishHeaderCells` rather than `headerCells`. Android
+  localises them and iOS has no string catalogue yet; the English set is the
+  CURRENT truth, not a placeholder to be quietly forgotten. `buildCsv` keeps taking
+  them as a parameter, so localisation will not touch the exporter.
+- `SettingsScreen` used `.json` as a `UTType` without importing
+  `UniformTypeIdentifiers`, which does not compile. Shipped in patch -40 and found
+  by auditing every file that names a content type, rather than only the one being
+  written.
+
 #### Give the root Makefile a per-platform entry point  (patch -41)
 
 - Add `make ios`, the counterpart of `make android`. It depends on `ios-project`,
