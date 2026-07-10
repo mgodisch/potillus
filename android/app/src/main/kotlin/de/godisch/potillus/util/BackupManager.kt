@@ -469,6 +469,14 @@ object BackupManager {
                 // ── Guard 2: drink value ranges ───────────────────────────────
                 // Reject physically impossible values that could corrupt BAC
                 // calculations (e.g. NaN / Infinity propagates through SUM()).
+                //
+                // This bound is DELIBERATELY wider than DrinkValidator.VOLUME_ML_RANGE,
+                // which the editor enforces. A reader should be tolerant: a backup may
+                // come from a future version, or from a version whose bounds differed,
+                // and refusing the whole file over one large serving would cost the user
+                // their history. An imported drink outside the editor's range stays
+                // usable; it simply has to be brought into range before it can be saved
+                // again. Narrowing this to 5000 would reject such files outright.
                 val volumeMl = obj.getInt("volumeMl")
                     .also { require(it in 1..10_000) { "volumeMl out of range: $it" } }
                 val alcoholPercent = obj.getDouble("alcoholPercent")

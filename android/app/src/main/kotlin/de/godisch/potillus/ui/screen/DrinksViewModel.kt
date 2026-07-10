@@ -45,6 +45,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.data.repository.IDrinkRepository
+import de.godisch.potillus.domain.DrinkValidator
 import de.godisch.potillus.domain.model.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -100,15 +101,6 @@ sealed class DrinksEvent {
 @Immutable
 data class DrinksUiState(val drinks: List<DrinkDefinition> = emptyList())
 
-/** Maximum length of a user-defined drink name. */
-private const val MAX_DRINK_NAME_LEN = 100
-
-/** Accepted volume range in ml (1 ml … 10 l). */
-private val VALID_VOLUME_ML_RANGE = 1..10_000
-
-/** Accepted alcohol-by-volume range (0 % … 100 %). */
-private val VALID_ALCOHOL_PCT_RANGE = 0.0..100.0
-
 class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
 
     companion object {
@@ -129,75 +121,15 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
      * reason) so the screen can show a localised message; nothing is written to
      * the database unless every field is valid.
      *
-     * @param name           Drink name (non-blank, ≤ [MAX_DRINK_NAME_LEN] chars).
-     * @param volumeMl       Serving volume in millilitres (in [VALID_VOLUME_ML_RANGE]).
-     * @param alcoholPercent Alcohol by volume in percent (finite, in [VALID_ALCOHOL_PCT_RANGE]).
+     * @param name           Drink name (non-blank, ≤ [DrinkValidator.MAX_NAME_LENGTH] chars).
+     * @param volumeMl       Serving volume in millilitres (in [DrinkValidator.VOLUME_ML_RANGE]).
+     * @param alcoholPercent Alcohol by volume, percent (finite, in [DrinkValidator.ALCOHOL_PERCENT_RANGE]).
      * @param category       The drink category.
      */
     fun addDrink(name: String, volumeMl: Int, alcoholPercent: Double, category: DrinkCategory) {
-        // Validation failures emit a [DrinksEvent.ValidationError] so the UI can
-        // show a localised error message instead of only writing a logcat warning
-        // (which would leave the user with no feedback when "Save" did nothing).
-        // The ViewModel emits a machine-readable FieldId + Reason pair; DrinksScreen
-        // maps those to string resources, keeping the ViewModel free of resources.
-        if (name.isBlank()) {
-            if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – name blank")
-            viewModelScope.launch {
-                _events.emit(
-                    DrinksEvent.ValidationError(
-                        DrinksEvent.ValidationError.FieldId.NAME,
-                        DrinksEvent.ValidationError.Reason.BLANK,
-                    ),
-                )
-            }
-            return
-        }
-        if (name.length > MAX_DRINK_NAME_LEN) {
-            if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – name too long (${name.length})")
-            viewModelScope.launch {
-                _events.emit(
-                    DrinksEvent.ValidationError(
-                        DrinksEvent.ValidationError.FieldId.NAME,
-                        DrinksEvent.ValidationError.Reason.TOO_LONG,
-                    ),
-                )
-            }
-            return
-        }
-        if (volumeMl !in VALID_VOLUME_ML_RANGE) {
-            if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – volumeMl=$volumeMl out of range")
-            viewModelScope.launch {
-                _events.emit(
-                    DrinksEvent.ValidationError(
-                        DrinksEvent.ValidationError.FieldId.VOLUME_ML,
-                        DrinksEvent.ValidationError.Reason.OUT_OF_RANGE,
-                    ),
-                )
-            }
-            return
-        }
-        if (!alcoholPercent.isFinite()) {
-            if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – alcoholPercent=$alcoholPercent not finite")
-            viewModelScope.launch {
-                _events.emit(
-                    DrinksEvent.ValidationError(
-                        DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
-                        DrinksEvent.ValidationError.Reason.NOT_FINITE,
-                    ),
-                )
-            }
-            return
-        }
-        if (alcoholPercent !in VALID_ALCOHOL_PCT_RANGE) {
-            if (BuildConfig.DEBUG) Log.w(TAG, "addDrink: rejected – alcoholPercent=$alcoholPercent out of range")
-            viewModelScope.launch {
-                _events.emit(
-                    DrinksEvent.ValidationError(
-                        DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT,
-                        DrinksEvent.ValidationError.Reason.OUT_OF_RANGE,
-                    ),
-                )
-            }
+        val violation = DrinkValidator.validate(name, volumeMl, alcoholPercent)
+        if (violation != null) {
+            reject("addDrink", violation)
             return
         }
         viewModelScope.launch {
@@ -213,13 +145,51 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
     }
 
     /**
-     * Persists edits to an existing [drink].
+     * Persists an edited drink.
      *
-     * @param drink The modified drink definition (validation is the caller's
-     *              responsibility; the edit dialog reuses the same field checks).
+     * Validated exactly like [addDrink]. Before v0.81.0 this trusted its caller,
+     * which happened to be a dialog that validated — but the favourite toggle
+     * already called it too, and any third caller would have been free to write a
+     * 0 ml drink straight into the database.
      */
     fun updateDrink(drink: DrinkDefinition) {
-        viewModelScope.launch { drinkRepo.update(drink) }
+        val violation = DrinkValidator.validate(drink.name, drink.volumeMl, drink.alcoholPercent)
+        if (violation != null) {
+            reject("updateDrink", violation)
+            return
+        }
+        viewModelScope.launch { drinkRepo.update(drink.copy(name = drink.name.trim())) }
+    }
+
+    /**
+     * Reports a [DrinkValidator.Violation] to the UI as a [DrinksEvent].
+     *
+     * The domain's enums are mapped onto the UI's rather than shared: the domain
+     * must not depend on the presentation layer. The two vocabularies coincide
+     * only because they describe the same rules.
+     */
+    private fun reject(caller: String, violation: DrinkValidator.Violation) {
+        if (BuildConfig.DEBUG) Log.w(TAG, "$caller: rejected - $violation")
+        viewModelScope.launch {
+            _events.emit(
+                DrinksEvent.ValidationError(
+                    when (violation.field) {
+                        DrinkValidator.Field.NAME -> DrinksEvent.ValidationError.FieldId.NAME
+                        DrinkValidator.Field.VOLUME_ML -> DrinksEvent.ValidationError.FieldId.VOLUME_ML
+                        DrinkValidator.Field.ALCOHOL_PERCENT ->
+                            DrinksEvent.ValidationError.FieldId.ALCOHOL_PERCENT
+                    },
+                    when (violation.reason) {
+                        DrinkValidator.Reason.BLANK -> DrinksEvent.ValidationError.Reason.BLANK
+                        DrinkValidator.Reason.TOO_LONG -> DrinksEvent.ValidationError.Reason.TOO_LONG
+                        DrinkValidator.Reason.OUT_OF_RANGE ->
+                            DrinksEvent.ValidationError.Reason.OUT_OF_RANGE
+                        DrinkValidator.Reason.NOT_FINITE ->
+                            DrinksEvent.ValidationError.Reason.NOT_FINITE
+                    },
+                ),
+            )
+        }
     }
 
     /**

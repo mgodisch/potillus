@@ -64,6 +64,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DrinkValidator
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -124,7 +125,10 @@ fun AddEditEntryDialog(
 
     val volume = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0
-    val canSave = selectedDrink != null && (volumeText.toIntOrNull() ?: 0) in 1..5000
+    // The serving size an entry may record is the serving size a drink may have:
+    // one constant, not a fourth copy of the same number.
+    val canSave = selectedDrink != null &&
+        (volumeText.toIntOrNull() ?: 0) in DrinkValidator.VOLUME_ML_RANGE
     // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
 
@@ -198,7 +202,8 @@ fun AddEditEntryDialog(
                     label = { Text(stringResource(R.string.volume_ml)) },
                     suffix = { Text("ml") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = volumeText.isNotEmpty() && (volumeText.toIntOrNull() ?: 0) !in 1..5000,
+                    isError = volumeText.isNotEmpty() &&
+                        (volumeText.toIntOrNull() ?: 0) !in DrinkValidator.VOLUME_ML_RANGE,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -377,9 +382,15 @@ fun AddEditDrinkDialog(
     val volume = volText.toIntOrNull()
     val percent = pctText.toDoubleOrNull()
 
-    val volumeValid = volume != null && volume in 1..5000 // 5000 ml = 5 litres max
-    val percentValid = percent != null && percent in 0.0..100.0
-    val canSave = name.isNotBlank() && volumeValid && percentValid
+    // One source of truth, shared with DrinksViewModel: the Save button can no
+    // longer be enabled for input the ViewModel would then reject. Before v0.81.0
+    // a name longer than 100 characters left this button enabled, and the write
+    // was silently dropped afterwards.
+    val volumeValid = volume != null && volume in DrinkValidator.VOLUME_ML_RANGE
+    val percentValid = percent != null && percent in DrinkValidator.ALCOHOL_PERCENT_RANGE
+    val canSave = volume != null &&
+        percent != null &&
+        DrinkValidator.isValid(name, volume, percent)
 
     val previewGrams = if (volume != null && percent != null && volumeValid && percentValid) {
         AlcoholCalculator.calculateGrams(volume, percent)
@@ -400,6 +411,13 @@ fun AddEditDrinkDialog(
                     label = { Text(stringResource(R.string.drink_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
+                    // Same convention as the volume and alcohol fields: the field
+                    // turns red, no supporting text. A too-long name now disables
+                    // Save, so the user must be able to see which field is at
+                    // fault. Only flagged once something was typed, so an empty
+                    // dialog does not open in an alarming state.
+                    isError = name.isNotEmpty() &&
+                        name.trim().length > DrinkValidator.MAX_NAME_LENGTH,
                 )
                 OutlinedTextField(
                     value = volText,
