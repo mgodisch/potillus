@@ -54,6 +54,20 @@ monthly average and the PDF report's abstinence figures now honour the
 that setting no longer blocks the local today on timezones east of UTC — each
 listed individually below.
 
+- Drink-days bar: fix the colour at exactly the allowance. The bar turned red
+  only once the drink-day count strictly exceeded the maximum, so a user who had
+  already spent every permitted drink day but had not yet drunk today saw an
+  amber bar next to a red traffic-light dot — the two indicators answered the
+  same question, "may I drink now?", differently. A drink day, once spent, stays
+  spent for the whole day: at 5 / 5 with today already a drink day the bar is
+  amber, because another drink adds no further drink day; at 5 / 5 with today
+  still dry it is now red, because the first drink would spend a day that is no
+  longer available. Both displays now share one predicate,
+  `AlcoholCalculator.drinkDayLimitReached`, extracted from the traffic light's
+  own gate, and a test walks the whole grid to keep them in step. The gram bars
+  are unaffected: reaching a gram limit leaves no room for the next drink, so
+  they stay red at 100 %.
+
 - Alternative status symbols (opt-in). A switch under Settings → Appearance
   makes the traffic-light capacity dot draw a distinct glyph inside its coloured
   circle in addition to the colour: a cross when the limit is reached, a "1"

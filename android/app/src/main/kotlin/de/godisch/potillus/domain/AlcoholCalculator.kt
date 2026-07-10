@@ -270,6 +270,38 @@ object AlcoholCalculator {
     // constant directly.
 
     /**
+     * Whether the drink-day allowance is already spent, so that drinking *now*
+     * would exceed it.
+     *
+     * A drink day, once spent, stays spent for the rest of that day. What decides
+     * the question is therefore the number of drink days **strictly before today**:
+     *
+     * ```
+     * pastDrinkDays = drinkDaysThisWeek − (todayIsDrinkDay ? 1 : 0)
+     * ```
+     *
+     * - Today is already a drink day and completed the count (e.g. 5/5): another
+     *   drink today adds no further drink day, so the allowance is *not* reached.
+     * - Today is still dry and the count is already full (also 5/5): the first
+     *   drink would spend a day the user does not have. The allowance *is* reached.
+     *
+     * The two cases show the same "5 / 5" to the user, and differ in their answer.
+     * Extracted so that [trafficLight] and the drink-days bar cannot disagree.
+     *
+     * @param drinkDaysThisWeek Distinct drink days in the rolling window, today included.
+     * @param maxDrinkDaysPerWeek The configured allowance.
+     * @param todayIsDrinkDay Whether today has already seen alcohol (`todayGrams > 0`).
+     */
+    fun drinkDayLimitReached(
+        drinkDaysThisWeek: Int,
+        maxDrinkDaysPerWeek: Int,
+        todayIsDrinkDay: Boolean,
+    ): Boolean {
+        val pastDrinkDays = drinkDaysThisWeek - (if (todayIsDrinkDay) 1 else 0)
+        return pastDrinkDays >= maxDrinkDaysPerWeek
+    }
+
+    /**
      * Computes the traffic-light capacity status for one drink serving.
      *
      * Answers: "How many more of this drink can I log before exceeding ANY of my
@@ -321,9 +353,9 @@ object AlcoholCalculator {
         if (gramsPerDrink <= 0.0) return TrafficLight.GREEN
 
         // Drink-day gate: count drink days strictly before today.
-        val todayIsDrinkDay = todayGrams > 0.0
-        val pastDrinkDays = drinkDaysThisWeek - (if (todayIsDrinkDay) 1 else 0)
-        if (pastDrinkDays >= maxDrinkDaysPerWeek) return TrafficLight.RED
+        if (drinkDayLimitReached(drinkDaysThisWeek, maxDrinkDaysPerWeek, todayGrams > 0.0)) {
+            return TrafficLight.RED
+        }
 
         // Gram checks: whole servings that fit into the remaining daily / weekly budget.
         val dailyCount = servingsFitting(dailyLimitGrams - todayGrams, gramsPerDrink)

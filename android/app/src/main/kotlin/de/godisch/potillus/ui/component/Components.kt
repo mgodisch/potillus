@@ -589,17 +589,27 @@ fun TrafficLightDot(
 fun DrinkDaysBar(
     drinkDays: Int,
     maxDrinkDays: Int,
+    todayIsDrinkDay: Boolean,
     modifier: Modifier = Modifier,
     weekLabel: String = "",
 ) {
     val fraction = (drinkDays.toFloat() / maxDrinkDays.toFloat().coerceAtLeast(1f))
         .coerceAtLeast(0f)
-    // Red only when the allowance is *exceeded* (strictly more drink days than
-    // permitted), consistent with LimitBar and countLimitViolations. Using exactly
-    // the last allowed drink day (drinkDays == maxDrinkDays) is still within the
-    // limit and stays amber ("at cap, none left"); the next drink day is over.
+    // Red exactly when drinking *now* would exceed the allowance, which is the
+    // same question [TrafficLightDot] answers — so both use the same predicate,
+    // [AlcoholCalculator.drinkDayLimitReached].
+    //
+    // A full bar does not settle the question on its own. At 5/5 with today
+    // already a drink day, another drink adds no further drink day: amber, "at
+    // cap, but today is free". At 5/5 with today still dry, the first drink
+    // spends a day the user does not have: red. The bar looks identical in both
+    // cases; the answer does not.
+    //
+    // Before v0.81.0 this used `drinkDays > maxDrinkDays`, which left the bar
+    // amber in the second case while the dot beside it was already red.
     val barColor = when {
-        drinkDays > maxDrinkDays -> dangerRedColor()
+        AlcoholCalculator.drinkDayLimitReached(drinkDays, maxDrinkDays, todayIsDrinkDay) ->
+            dangerRedColor()
         fraction < 0.75f -> MaterialTheme.colorScheme.primary
         else -> warningColor()
     }
