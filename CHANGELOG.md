@@ -50,6 +50,20 @@ monthly average and the PDF report's abstinence figures now honour the
 that setting no longer blocks the local today on timezones east of UTC — each
 listed individually below.
 
+- Drink validation: one rule set instead of two. The rules for a drink
+  definition lived in both `DrinksViewModel` and `AddEditDrinkDialog`, and the two
+  disagreed. The dialog capped the serving size at 5000 ml while the ViewModel
+  accepted up to 10 000, so no user could ever create the larger drink the domain
+  allowed; and the dialog never checked the name's length, so a name beyond 100
+  characters left the Save button enabled and the write was then silently dropped
+  — a button that lied about what it would do. Both now consult
+  `AlcoholCalculator`'s neighbour `DrinkValidator`, which fixes the serving size
+  at 1…5000 ml, the alcohol content at a finite 0…100 %, and the name at 1…100
+  characters measured after trimming. A too-long name marks the name field in
+  error and disables Save, matching how the volume and alcohol fields already
+  behave. `updateDrink` is now validated as well; it previously trusted its
+  caller, which happened to be the dialog.
+
 - Drink-days bar: fix the colour at exactly the allowance. The bar turned red
   only once the drink-day count strictly exceeded the maximum, so a user who had
   already spent every permitted drink day but had not yet drunk today saw an

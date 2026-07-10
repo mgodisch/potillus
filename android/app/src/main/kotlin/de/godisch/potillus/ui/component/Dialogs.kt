@@ -60,6 +60,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DrinkValidator
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -373,9 +374,14 @@ fun AddEditDrinkDialog(
     val volume = volText.toIntOrNull()
     val percent = pctText.toDoubleOrNull()
 
-    val volumeValid = volume != null && volume in 1..5000 // 5000 ml = 5 litres max
-    val percentValid = percent != null && percent in 0.0..100.0
-    val canSave = name.isNotBlank() && volumeValid && percentValid
+    // One source of truth, shared with DrinksViewModel: the Save button can no
+    // longer be enabled for input the ViewModel would then reject. Before v0.81.0
+    // a name longer than 100 characters left this button enabled, and the write
+    // was silently dropped afterwards.
+    val volumeValid = volume != null && volume in DrinkValidator.VOLUME_ML_RANGE
+    val percentValid = percent != null && percent in DrinkValidator.ALCOHOL_PERCENT_RANGE
+    val canSave = volume != null && percent != null &&
+        DrinkValidator.isValid(name, volume, percent)
 
     val previewGrams = if (volume != null && percent != null && volumeValid && percentValid) {
         AlcoholCalculator.calculateGrams(volume, percent)
@@ -396,6 +402,13 @@ fun AddEditDrinkDialog(
                     label = { Text(stringResource(R.string.drink_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
+                    // Same convention as the volume and alcohol fields: the field
+                    // turns red, no supporting text. A too-long name now disables
+                    // Save, so the user must be able to see which field is at
+                    // fault. Only flagged once something was typed, so an empty
+                    // dialog does not open in an alarming state.
+                    isError = name.isNotEmpty() &&
+                        name.trim().length > DrinkValidator.MAX_NAME_LENGTH,
                 )
                 OutlinedTextField(
                     value = volText,
