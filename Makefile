@@ -30,8 +30,8 @@
 #      help         (default) print this list and do nothing else
 #      android      local checks (release-check, lint, unit tests, guide sync)
 #                   + debug APK, then refresh existing feature graphics
-#      ios          regenerate the Xcode project, then the kit's tests and a
-#                   simulator build of the app                          [needs a Mac]
+#      ios          static checks, regenerate the Xcode project, then the kit's
+#                   tests and a simulator build of the app              [needs a Mac]
 #    Convenience
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
 #                   split out of `android`                        [needs a device]
@@ -834,7 +834,7 @@ ios-project: ios-version
 #
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
-ios: check-headers check-swift-tests ios-project
+ios: check-headers check-swift-tests check-swift-symbols ios-project
 	cd ios/PotillusKit && swift test
 	command -v xcodebuild
 	xcodebuild \
@@ -854,12 +854,21 @@ debug:
 	@echo "make debug: renamed to 'make android' (this repository now builds two platforms)" >&2
 	$(MAKE) android
 
+# check-swift-symbols: catches an invented type (`Backup.parse`, where only
+# `BackupReader` and `BackupWriter` exist) and a missing module import (`UTType`
+# without UniformTypeIdentifiers). Both are compile errors; both were shipped by
+# someone writing Swift on a machine that could not build it. Milliseconds.
+check-swift-symbols:
+	python3 tools/check-swift-symbols.py
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
 #
-# It walks `git ls-files`, so a file that is not tracked is not checked. Add new
-# tests to the index before trusting a green run.
+# It walks the FILE SYSTEM, not `git ls-files`. It used to ask the index, and so
+# passed silently over any file not yet added -- which is the state every new
+# file is in while it is being written. Patch -39 shipped uncompilable tests
+# through that gap.
 check-swift-tests:
 	python3 tools/check-swift-tests.py
 
@@ -894,4 +903,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-swift-tests ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-swift-tests check-swift-symbols ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

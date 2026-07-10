@@ -57,7 +57,6 @@ USAGE
 
 import os
 import re
-import subprocess
 import sys
 
 # `XCTAssertEqual(await x, y)` and `XCTUnwrap(await x)`, but not a line that
@@ -73,17 +72,26 @@ def repository_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+# Build products and dependencies. Everything else under ios/ is ours.
+SKIPPED_DIRECTORIES = {".build", ".swiftpm", "DerivedData", "Potillus.xcodeproj"}
+
+
 def default_paths(root):
-    """Every tracked Swift file under ios/, or [] outside a checkout."""
-    try:
-        result = subprocess.run(
-            ["git", "-C", root, "ls-files", "-z", "ios"],
-            capture_output=True, check=True,
-        )
-    except (OSError, subprocess.CalledProcessError):
-        return []
-    names = result.stdout.decode("utf-8").split("\0")
-    return [os.path.join(root, n) for n in names if n.endswith(".swift")]
+    """Every Swift file under ios/, tracked or not.
+
+    This used to ask `git ls-files`, and therefore skipped files that had been
+    written but not yet added to the index -- which is precisely the state a file
+    is in while it is being reviewed. A linter that silently passes over the file
+    under scrutiny is worse than no linter: it reports green for work it never
+    looked at. Patch -39 shipped uncompilable tests through exactly that gap.
+    """
+    paths = []
+    for directory, subdirectories, names in os.walk(os.path.join(root, "ios")):
+        subdirectories[:] = [d for d in subdirectories if d not in SKIPPED_DIRECTORIES]
+        for name in names:
+            if name.endswith(".swift"):
+                paths.append(os.path.join(directory, name))
+    return sorted(paths)
 
 
 def check_file(path, root):

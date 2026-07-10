@@ -512,6 +512,39 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Catch by machine what review kept missing  (patch -44)
+
+Three compile errors reached the repository in four patches, all from the same
+root: Swift is written here on a machine that cannot build it. All three are
+mechanical, and none needed a Mac to find.
+
+- Add `tools/check-swift-symbols.py`, checking two things it can be RIGHT about:
+  - A NEAR-MISS TYPE. `Backup.parse` where no `Backup` exists but `BackupReader`,
+    `BackupWriter` and `BackupFile` do. Shortening a real family of types into one
+    that never existed is what memory does to a name.
+  - A MISSING IMPORT. `UTType` without UniformTypeIdentifiers, `BarMark` without
+    Charts, `@Observable` without Observation.
+- The first attempt at the symbol check verified that `Type.member` named a
+  declared member. It was worthless twice over: it MISSED the very bug it was
+  written for, because `Backup` is not a declared type and undeclared types were
+  exactly what it skipped; and it raised twenty false alarms, because
+  `Drink.filter` and `Entry.order` come from GRDB's protocols and `allCases` from
+  CaseIterable. A linter that misses the real fault and cries wolf about the rest
+  gets switched off, and then finds nothing ever again. The rule was inverted.
+- The near-miss rule then assumed no Apple type could be a prefix of one of ours.
+  `Calendar` and `CalendarModel` disproved that within a minute. The exceptions
+  are named in `EXTERNAL_TYPES`, where a missing entry costs a false alarm rather
+  than a missed bug — the failure mode points the right way.
+- Make `check-swift-tests.py` walk the FILE SYSTEM instead of `git ls-files`. It
+  passed silently over untracked files, which is the state every new file is in
+  while it is being written, and is how patch -39 shipped uncompilable tests.
+- Run both from `make ios`, before `xcodegen` and long before `swift test`. A grep
+  costs milliseconds; the build costs minutes.
+
+Each check was validated by reintroducing the real bug it exists for and watching
+it fire, then removing it and watching the tree fall silent. A linter nobody has
+seen fail is a linter nobody has tested.
+
 #### Fix an invented type name shipped in patch -40  (patch -43)
 
 - `BackupExporter`, its tests, and `SettingsScreen` called `Backup.parse` and
