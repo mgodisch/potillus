@@ -109,6 +109,10 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// disagree about what a day's total is.
     func dailySummaries(from: String, to: String) throws -> [DaySummary]
 
+    /// The most recently logged entry, by timestamp, or nil when the log is empty.
+    /// Drives the pre-selected drink in the entry sheet.
+    func lastEntry() throws -> ConsumptionEntry?
+
     /// Inserts `entry` and returns its new database id.
     func add(_ entry: ConsumptionEntry) throws -> Int64
 
@@ -335,6 +339,12 @@ public struct EntryRepository: EntryRepositoryProtocol {
 
     public func dailySummaries(from: String, to: String) throws -> [DaySummary] {
         try database.read { db in try Self.fetchDailySummaries(db, from: from, to: to) }
+    }
+
+    public func lastEntry() throws -> ConsumptionEntry? {
+        try database.read { db in
+            try Entry.order(Column("timestampMillis").desc).fetchOne(db)?.domain
+        }
     }
 
     public func add(_ entry: ConsumptionEntry) throws -> Int64 {

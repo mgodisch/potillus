@@ -39,11 +39,14 @@ import SwiftUI
 struct DrinksScreen: View {
 
     @State private var model: DrinksModel
+    @State private var logger: EntryLogModel
     @State private var editing: DrinkDefinition?
+    @State private var logging: DrinkDefinition?
     @State private var isAdding = false
 
     init(environment: AppEnvironment) {
         _model = State(initialValue: DrinksModel(drinks: environment.drinks))
+        _logger = State(initialValue: EntryLogModel(environment: environment))
     }
 
     var body: some View {
@@ -88,6 +91,24 @@ struct DrinksScreen: View {
                     return model.update(edited)
                 }
             }
+            .sheet(item: $logging) { drink in
+                // One drink, so the sheet shows its name instead of a picker.
+                EntrySheet(drinks: [drink], preselected: drink, now: logger.now()) {
+                    chosen, volume, millis, note in
+                    await logger.log(
+                        drink: chosen, volumeMl: volume, timestampMillis: millis, note: note
+                    )
+                }
+            }
+            .alert(
+                "Could not log the drink",
+                isPresented: .constant(logger.failure != nil),
+                presenting: logger.failure
+            ) { _ in
+                Button("OK", role: .cancel) { logger.clearFailure() }
+            } message: { message in
+                Text(message)
+            }
             .alert(
                 "Cannot delete",
                 isPresented: .constant(model.deleteBlocked != nil),
@@ -127,12 +148,26 @@ struct DrinksScreen: View {
                     .foregroundStyle(.tertiary)
                     .accessibilityLabel("Preset")
             }
+
+            // The pencil, not the row, opens the editor. Tapping a drink LOGS it:
+            // that is the action a user performs many times a day, and editing is
+            // the rare one. Android makes the same split.
+            Button {
+                model.clearErrors()
+                editing = drink
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
+            .accessibilityLabel("Edit \(drink.name)")
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            model.clearErrors()
-            editing = drink
+            logger.clearFailure()
+            logging = drink
         }
+        .accessibilityHint("Logs this drink")
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
                 model.delete(drink)
@@ -246,7 +281,10 @@ private struct DrinkEditor: View {
         switch (violation.field, violation.reason) {
         case (.name, .blank): return "The name cannot be empty."
         case (.name, .tooLong): return "The name is too long."
-        case (.volumeMl, _): return "The volume must be between 1 and 5000 ml."
+        case (.volumeMl, _):
+            // Interpolated, not typed: see EntrySheet.
+            return "The volume must be between \(DrinkValidator.volumeMlRange.lowerBound) "
+                + "and \(DrinkValidator.volumeMlRange.upperBound) ml."
         case (.alcoholPercent, .notFinite): return "The alcohol content is not a number."
         case (.alcoholPercent, _): return "The alcohol content must be between 0 and 100 %."
         default: return "Please check your input."

@@ -134,7 +134,9 @@ public enum DrinkCategory: String, Sendable, Equatable, Codable, CaseIterable {
 ///
 /// Mirrors Android's `DrinkDefinition`. `id == 0` means "not yet persisted",
 /// matching the Kotlin default; the database assigns the real id on insert.
-public struct DrinkDefinition: Sendable, Equatable, Identifiable {
+/// `Hashable` because SwiftUI's `Picker` tags its options by value; every stored
+/// property is already hashable, so the conformance is synthesised.
+public struct DrinkDefinition: Sendable, Equatable, Hashable, Identifiable {
     public var id: Int64
     public var name: String
     public var volumeMl: Int

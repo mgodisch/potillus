@@ -43,6 +43,9 @@ struct TodayScreen: View {
     /// Owned by the view, rebuilt only when the environment changes.
     @State private var model: TodayModel
 
+    /// Set while the entry sheet is open.
+    @State private var isLogging = false
+
     init(environment: AppEnvironment) {
         _model = State(initialValue: TodayModel(
             entries: environment.entries,
@@ -59,8 +62,31 @@ struct TodayScreen: View {
                 entriesSection
             }
             .navigationTitle("Today")
+            .toolbar {
+                // iOS puts the primary action in the toolbar; Android uses a
+                // floating action button. Same action, native placement.
+                Button {
+                    isLogging = true
+                } label: {
+                    Label("Log a drink", systemImage: "plus")
+                }
+                .disabled(model.state.drinks.isEmpty)
+            }
             .task { await model.load() }
             .refreshable { await model.load() }
+            .sheet(isPresented: $isLogging) {
+                EntrySheet(
+                    drinks: model.state.drinks,
+                    // People tend to repeat what they just had.
+                    preselected: model.state.lastUsedDrink,
+                    now: Date()
+                ) { drink, volume, millis, note in
+                    await model.addEntry(
+                        drink: drink, volumeMl: volume, timestampMillis: millis, note: note
+                    )
+                    return model.failure == nil
+                }
+            }
             .alert(
                 "Something went wrong",
                 isPresented: .constant(model.failure != nil),
@@ -134,6 +160,8 @@ struct TodayScreen: View {
         }
     }
 
+    /// One tap logs the favourite at its own serving size — the shortcut the
+    /// whole screen exists for. The sheet is for anything else.
     private var favouritesSection: some View {
         Section("Favourites") {
             ForEach(model.state.favorites, id: \.id) { drink in

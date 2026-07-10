@@ -79,6 +79,13 @@ public struct TodayState: Sendable, Equatable {
     /// The drinks the user starred, for one-tap logging.
     public var favorites: [DrinkDefinition] = []
 
+    /// The whole catalogue, for the entry sheet's picker.
+    public var drinks: [DrinkDefinition] = []
+
+    /// The drink of the most recent entry, pre-selected when the sheet opens.
+    /// Nil when nothing has ever been logged.
+    public var lastUsedDrink: DrinkDefinition?
+
     public var settings: AppSettings = AppSettings()
 
     public init() {}
@@ -148,7 +155,14 @@ public final class TodayModel {
             next.totalGrams = totalGrams
             next.limitInfo = AlcoholCalculator.getLimitInfo(settings)
             next.settings = settings
-            next.favorites = try drinks.allOnce().filter(\.isFavorite)
+            let catalogue = try drinks.allOnce()
+            next.drinks = catalogue
+            next.favorites = catalogue.filter(\.isFavorite)
+            // Pre-selection follows the LAST entry, not the most frequent one:
+            // people tend to repeat what they just had.
+            if let last = try entries.lastEntry() {
+                next.lastUsedDrink = catalogue.first { $0.id == last.drinkId }
+            }
             next.bacPermille = Self.bac(for: todaysEntries, totalGrams: totalGrams,
                                         settings: settings, nowMillis: nowMillis)
 
@@ -205,26 +219,16 @@ public final class TodayModel {
     public func addEntry(
         drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64? = nil, note: String = ""
     ) async {
-        let timestamp = timestampMillis
-            ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
-        let settings = state.settings
-
-        let entry = ConsumptionEntry(
-            drinkId: drink.id,
-            drinkName: drink.name,
+        // The derivation lives in `EntryLogger`, so the Drinks screen and this one
+        // cannot produce differently-shaped entries.
+        let entry = EntryLogger.makeEntry(
+            drink: drink,
             volumeMl: volumeMl,
-            alcoholPercent: drink.alcoholPercent,
-            gramsAlcohol: AlcoholCalculator.calculateGrams(
-                volumeMl: volumeMl, alcoholPercent: drink.alcoholPercent
-            ),
-            timestampMillis: timestamp,
-            logicalDate: DayResolver.resolve(
-                timestampMillis: timestamp,
-                changeHour: settings.dayChangeHour,
-                changeMinute: settings.dayChangeMinute,
-                timeZone: timeZone
-            ),
-            note: note
+            timestampMillis: timestampMillis
+                ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded()),
+            note: note,
+            settings: state.settings,
+            timeZone: timeZone
         )
 
         // The new row id is discarded explicitly rather than silenced with

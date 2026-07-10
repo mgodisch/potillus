@@ -512,6 +512,27 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Make it possible to log a drink  (patch -32)
+
+- Patch -31 shipped a Drinks screen on which a row tap opened the EDITOR, and a
+  Today screen with no way to add anything. Both were wrong. Tapping a drink now
+  LOGS it — the action a user performs several times a day — and a pencil opens
+  the editor, which is the rare one. Android splits them the same way.
+- Add the Today screen's primary action. Android uses a floating action button;
+  iOS puts the primary action in the toolbar. Same action, native placement.
+- Add `EntryLogger`, so both screens produce identical entries. `gramsAlcohol` and
+  `logicalDate` are DERIVED there and can never be supplied by a view: a view that
+  could pass its own would eventually pass a wrong one, and a drink logged at
+  02:00 would stop counting towards the evening it belongs to.
+- Pre-select the drink of the most recent entry, as Android does. People repeat
+  what they just had, not what they had most often. This needed a one-shot
+  `lastEntry()` on the entry repository.
+- Reuse `DrinkValidator.volumeMlRange` for the entry's volume: the serving size an
+  entry may record is the serving size a drink may have, and a fifth copy of
+  "1...5000" would be a fifth chance to disagree.
+- Make `DrinkDefinition` `Hashable`, which SwiftUI's `Picker` needs to tag its
+  options by value. Every stored property already is, so it is synthesised.
+
 #### Add the Drinks screen  (patch -31)
 
 - Add `DrinksModel` and `DrinksScreen`: the catalogue, a favourite toggle, an
