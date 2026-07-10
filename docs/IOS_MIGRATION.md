@@ -512,6 +512,23 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Romance languages  (patch -75)
+
+Six: Spanish, French, Italian, European Portuguese, Brazilian Portuguese, Romanian.
+Same shape as the Germanic patch — 27 keys harvested from each `values-XX`, 71
+translated for this port — and no new machinery; the generator already took a
+language list, so this patch is six tables and one line added to it.
+
+European and Brazilian Portuguese are kept as SEPARATE languages, not one with a
+region fallback, because they diverge in ordinary vocabulary the app uses:
+"Eliminar" vs "Excluir" for delete, "Registos" vs "Registros" for entries,
+"definições" vs "configurações" for settings. A Brazilian user given the European
+wording would read it as stilted; the split costs one extra table and reads right to
+both.
+
+Eleven languages now, 98 keys each. STILL TO DO: Slavic + Greek (cs, pl, ru, uk, el),
+CJK (ja, ko, zh-Hans, zh-Hant); the report's own localisation; the three plurals.
+
 #### Add the Germanic languages, migrate the Chinese codes  (patch -74)
 
 Four languages — Danish, Dutch, Norwegian Bokmål, Swedish — the first of four

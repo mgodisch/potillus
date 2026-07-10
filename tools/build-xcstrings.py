@@ -62,7 +62,10 @@ from l10n_de import MINE_DE, MINE_DE_INTERP, PURE_INTERP  # noqa: E402
 # keyed by the English source, holding BOTH plain and interpolated strings (the
 # split MINE_DE / MINE_DE_INTERP was only needed for the first one). The Android
 # resource dir differs from the iOS tag in a few cases; ANDROID_DIR maps them.
-LANGUAGES = ["da", "nl", "nb", "sv"]
+LANGUAGES = [
+    "da", "nl", "nb", "sv",
+    "es", "fr", "it", "pt", "pt-BR", "ro",
+]
 ANDROID_DIR = {
     "nb": "nb", "pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW",
 }
