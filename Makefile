@@ -26,11 +26,15 @@
 # =============================================================================
 #
 #  TARGETS AT A GLANCE
+#    Platforms
+#      help         (default) print this list and do nothing else
+#      android      local checks (release-check, lint, unit tests, guide sync)
+#                   + debug APK, then refresh existing feature graphics
+#      ios          regenerate the Xcode project, then the kit's tests and a
+#                   simulator build of the app                          [needs a Mac]
 #    Convenience
-#      debug        (default) local checks (release-check, lint, unit tests,
-#                   guide sync) + debug APK, then refresh existing feature graphics
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
-#                   split out of `debug`                          [needs a device]
+#                   split out of `android`                        [needs a device]
 #      release      fresh screenshots + feature graphics (no new report PDFs),
 #                   then the signed release APK, AAB and SBOM      [needs a device]
 #      install      copy the freshly built debug APK to the local install path
@@ -70,7 +74,9 @@ VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
-.DEFAULT_GOAL := debug
+# The default goal prints the target list and changes nothing. A bare `make` in a
+# repository that builds two platforms should not silently pick one of them.
+.DEFAULT_GOAL := help
 
 # ── Play-Store screenshot pipeline (see the `screenshots` target) ─────────────
 # Locales captured: EVERY store locale under the metadata tree. Each locale dir
@@ -148,15 +154,29 @@ require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): f
 # CONVENIENCE & INSTALL
 # =============================================================================
 
-# ── debug ── the everyday build. Maximal LOCAL verification, then the debug APK.
-# Runs (via android/) the release-check gate, Android lint, the JVM unit tests
-# and the guide/copyright sync check, then builds the debug APK and refreshes any
-# feature graphics that already exist. The on-device instrumentation tests are
-# NOT part of this target — they live in `device-tests` (run that separately when
-# a device is attached), so the default build no longer needs a device. It is
+# ── help ── the default goal: print the target list, build nothing.
+#
+# The text is not duplicated here. It is the "TARGETS AT A GLANCE" block at the
+# top of this file, printed by stripping the leading `#`. A help text kept
+# separately from the comment it paraphrases is a help text that will one day
+# describe a target that no longer exists.
+#
+# The range ends at the block's closing rule line, which `$$d` then drops.
+help:
+	@sed -n '/^#  TARGETS AT A GLANCE/,/^# ====/p' Makefile | sed -e 's/^#//' -e '$$d'
+
+# ── android ── the everyday Android build. Maximal LOCAL verification, then the
+# debug APK. Runs (via android/) the release-check gate, Android lint, the JVM
+# unit tests and the guide/copyright sync check, then builds the debug APK and
+# refreshes any feature graphics that already exist. The on-device instrumentation
+# tests are NOT part of this target — they live in `device-tests` (run that
+# separately when a device is attached), so this build needs no device. It is
 # deliberately incremental (no `clean`) for fast iteration and FAILS if any code
 # or documentation check would require a correction.
-debug:
+#
+# Formerly the default goal, and formerly called `debug`. It was renamed when the
+# repository grew a second platform: `make debug` no longer says which one.
+android:
 	$(MAKE) -C android debug unit-test lint check-guides
 	$(MAKE) feature-graphics-existing
 	$(MAKE) install
@@ -797,9 +817,49 @@ ios-project: ios-version
 	command -v xcodegen
 	cd ios && xcodegen generate
 
+# ── ios ── the everyday iOS build, and the counterpart of `android`.
+#
+# WHY ios-project IS A PREREQUISITE AND NOT A SUGGESTION
+#   `ios/project.yml` collects the app's sources with a directory glob, which
+#   XcodeGen resolves ONCE, at generation time, and freezes into the .xcodeproj.
+#   A newly added file under ios/Potillus/ is therefore invisible to a project
+#   generated before it existed, and the build fails with "Cannot find X in
+#   scope" — a compile error that looks like a code error and is not one. The
+#   package under ios/PotillusKit/ does not suffer from this, because SwiftPM
+#   rereads its directory on every build, which is exactly why the mistake only
+#   ever surfaces in the app target.
+#
+#   Making it a prerequisite means the failure cannot recur: the project is
+#   regenerated before anything is compiled.
+#
+# The cheap checks run first: a grep that costs milliseconds should not wait
+# behind a Swift build that costs minutes.
+ios: check-headers check-swift-tests ios-project
+	cd ios/PotillusKit && swift test
+	command -v xcodebuild
+	xcodebuild \
+	    -project ios/Potillus.xcodeproj \
+	    -target Potillus \
+	    -sdk iphonesimulator \
+	    -configuration Debug \
+	    CODE_SIGNING_ALLOWED=NO \
+	    build
+
+# ── debug ── the old name of `android`, kept as a shim.
+#
+# Removing it outright would turn years of muscle memory and every stale README
+# into a confusing "No rule to make target". It says so and then does the right
+# thing, rather than doing nothing loudly or something silently.
+debug:
+	@echo "make debug: renamed to 'make android' (this repository now builds two platforms)" >&2
+	$(MAKE) android
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
+#
+# It walks `git ls-files`, so a file that is not tracked is not checked. Add new
+# tests to the index before trusting a green run.
 check-swift-tests:
 	python3 tools/check-swift-tests.py
 
@@ -834,4 +894,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug device-tests release install check-headers fix-headers check-swift-tests ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-swift-tests ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

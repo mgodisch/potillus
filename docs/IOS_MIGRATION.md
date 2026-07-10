@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Give the root Makefile a per-platform entry point  (patch -41)
+
+- Add `make ios`, the counterpart of `make android`. It depends on `ios-project`,
+  so the Xcode project is REGENERATED before anything compiles. `project.yml`
+  collects the app's sources with a directory glob that XcodeGen resolves once and
+  freezes into the `.xcodeproj`; a file added afterwards is invisible to the app
+  target, and the build fails with "Cannot find X in scope" — a compile error that
+  looks like a code error and is not one. Making it a prerequisite means it cannot
+  recur. `ios/PotillusKit/` never had the problem, because SwiftPM rereads its
+  directory every build, which is why the mistake only ever surfaced in the app.
+- Run the cheap checks first: `check-headers` and `check-swift-tests` cost
+  milliseconds and should not wait behind a Swift build that costs minutes.
+- Rename `debug` to `android`. In a repository that builds two platforms, `make
+  debug` no longer says which one. `debug` survives as a shim that prints the new
+  name and forwards, rather than greeting years of muscle memory with "No rule to
+  make target".
+- Make `help` the default goal, and let it print nothing but the target list. A
+  bare `make` should not silently pick one of two platforms.
+- Generate that help from the "TARGETS AT A GLANCE" comment block at the top of
+  the file, by stripping the leading `#`. A help text kept separately from the
+  comment it paraphrases will one day describe a target that no longer exists.
+- Note in `check-swift-tests`'s comment that it walks `git ls-files`, so untracked
+  files are skipped. That gap is what let patch -39 ship uncompilable tests.
+
 #### Add backup export and import  (patch -40)
 
 - Add `BackupExporter`, the missing half of the backup path: `Backup.makeJSON`
