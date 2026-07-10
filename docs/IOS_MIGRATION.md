@@ -512,6 +512,43 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the biometric app lock  (patch -71)
+
+`biometricEnabled` was stored, ported through backup, and read by nothing. It reads
+by something now.
+
+Android gates the app behind a strong-biometric-or-device-credential prompt; unlock
+lasts the process session, and after more than 30 seconds in the background it
+re-authenticates on return, measured with `elapsedRealtime` so an overnight lock
+holds. This reproduces all of that.
+
+THE SPLIT. The decision that matters — has enough background time passed to prompt
+again? — is `AppLock.requiresReauth`, pure arithmetic over two monotonic readings,
+driven by shared vectors in `app-lock.json` (seven cases, the threshold carried in
+the file so a drift on either platform shows up as a mismatch). The state machine is
+`AppLockModel`, which talks to the sensor through a `BiometricAuthenticator`
+protocol and takes its clock as a closure, so every transition is tested with a fake
+and time is advanced by hand — nine tests, no device. Only `DeviceBiometricAuthenticator`,
+in the app shell, imports LocalAuthentication.
+
+THE CHOICES, as agreed:
+- `.deviceOwnerAuthentication`, not the biometrics-only policy — it accepts Face ID,
+  Touch ID, Apple Watch, OR the passcode, matching Android's `BIOMETRIC_STRONG or
+  DEVICE_CREDENTIAL`, and it is the only policy a passcode-only device can satisfy.
+- A cancelled or failed prompt leaves the cover up with a Retry, never a way past.
+- The settings toggle refuses to arm on a device that can neither take a biometric
+  nor a passcode: arming there would lock the diary away for good. Android runs the
+  same `canAuthenticate` check before showing its switch.
+- A fresh `LAContext` per prompt: a reused one that already succeeded passes the
+  next `evaluatePolicy` automatically, which is exactly wrong for a re-lock.
+
+`allowScreenshots` and the switcher-thumbnail cover are deliberately still separate;
+they are the next patch. The kit found one of its own bugs on the way: `@Observable`
+without `import Observation`, caught by `check-swift-symbols` before the compiler.
+
+`.inactive` scene phase is ignored: only `.background` arms the timer and only
+`.active` checks it, or the app would prompt every time it briefly lost focus.
+
 #### Make the calendar live  (patch -70)
 
 The last snapshot but one. The calendar loaded on `.task` and never again; a backup

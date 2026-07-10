@@ -83,6 +83,11 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: "Libellus Potionis"
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        # Required by the system before it will show a Face ID prompt. Without it
+        # `evaluatePolicy` fails outright. The passcode fallback needs no key; this
+        # one string is the whole Info.plist cost of the app lock. Shown to the user
+        # in the Face ID permission dialog the first time the lock is armed.
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "Unlock Libellus Potionis with Face ID."
 
   PotillusTests:
     type: bundle.unit-test

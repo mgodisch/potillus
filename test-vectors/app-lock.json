@@ -1,0 +1,55 @@
+{
+  "_comment": [
+    "Shared golden vectors for the re-auth threshold. Loaded by BOTH suites if the",
+    "Android side adopts them; the arithmetic is identical (elapsedRealtime on",
+    "Android, systemUptime on iOS). All times in SECONDS. thresholdSeconds is 30 on",
+    "both platforms; it is repeated here so a vector is self-contained and a change",
+    "to the constant on one side shows up as a vector mismatch on the other.",
+    "backgroundedAt null means the app never left the foreground this session."
+  ],
+  "thresholdSeconds": 30,
+  "requiresReauth": [
+    {
+      "description": "never backgrounded: no prompt",
+      "backgroundedAt": null,
+      "now": 5000.0,
+      "expected": false
+    },
+    {
+      "description": "backgrounded a moment ago: no prompt",
+      "backgroundedAt": 1000.0,
+      "now": 1005.0,
+      "expected": false
+    },
+    {
+      "description": "one second under the threshold: no prompt",
+      "backgroundedAt": 1000.0,
+      "now": 1029.0,
+      "expected": false
+    },
+    {
+      "description": "exactly at the threshold: prompt",
+      "backgroundedAt": 1000.0,
+      "now": 1030.0,
+      "expected": true
+    },
+    {
+      "description": "well past the threshold: prompt",
+      "backgroundedAt": 1000.0,
+      "now": 1600.0,
+      "expected": true
+    },
+    {
+      "description": "an overnight gap: prompt",
+      "backgroundedAt": 1000.0,
+      "now": 44200.0,
+      "expected": true
+    },
+    {
+      "description": "a backwards reading is not trusted to unlock",
+      "backgroundedAt": 1000.0,
+      "now": 990.0,
+      "expected": false
+    }
+  ]
+}

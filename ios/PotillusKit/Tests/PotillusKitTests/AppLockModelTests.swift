@@ -1,0 +1,169 @@
+// vim: set et ts=4:
+// =============================================================================
+// Libellus Potionis - Privacy-Friendly Alcohol Tracker
+// Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+// =============================================================================
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+// details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// In addition, as permitted by section 7 of the GNU General Public License,
+// this program may carry additional permissions; any such permissions that
+// apply to it are stated in the accompanying COPYING.md file.
+//
+// =============================================================================
+
+import XCTest
+
+@testable import PotillusKit
+
+/// A stand-in sensor: it answers however the test tells it to, and counts how many
+/// times it was asked, so a test can prove a prompt did or did not happen.
+private final class FakeAuthenticator: BiometricAuthenticator, @unchecked Sendable {
+    var capable = true
+    var willSucceed = true
+    private(set) var evaluateCount = 0
+
+    func canEvaluate() -> Bool { capable }
+
+    func evaluate(reason: String) async -> Bool {
+        evaluateCount += 1
+        return willSucceed
+    }
+}
+
+@MainActor
+final class AppLockModelTests: XCTestCase {
+
+    private var fake: FakeAuthenticator!
+    private var clock: TimeInterval = 1000
+
+    private func makeModel() -> AppLockModel {
+        AppLockModel(authenticator: fake, uptime: { [weak self] in self?.clock ?? 0 })
+    }
+
+    override func setUp() {
+        super.setUp()
+        fake = FakeAuthenticator()
+        clock = 1000
+    }
+
+    // ── The lock off ─────────────────────────────────────────────────────────
+
+    func testAnUnenabledLockNeverPrompts() async {
+        let model = makeModel()
+        await model.onLaunch()
+        model.onBackground()
+        clock += 10_000
+        await model.onForeground()
+
+        XCTAssertEqual(model.state, .unlocked)
+        XCTAssertEqual(fake.evaluateCount, 0)
+    }
+
+    // ── Launch ───────────────────────────────────────────────────────────────
+
+    func testAColdStartBehindTheLockShowsTheCover() async {
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+
+        XCTAssertEqual(model.state, .unlocked, "a successful prompt clears the cover")
+        XCTAssertEqual(fake.evaluateCount, 1)
+    }
+
+    func testAFailedLaunchPromptLeavesTheCoverUp() async {
+        fake.willSucceed = false
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+
+        XCTAssertEqual(model.state, .locked)
+    }
+
+    // ── The background threshold ─────────────────────────────────────────────
+
+    func testABriefBackgroundDoesNotRelock() async {
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+
+        model.onBackground()
+        clock += 29                 // under 30
+        await model.onForeground()
+
+        XCTAssertEqual(model.state, .unlocked)
+        XCTAssertEqual(fake.evaluateCount, 1, "no second prompt for a brief background")
+    }
+
+    func testALongBackgroundRelocks() async {
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+
+        model.onBackground()
+        clock += 30                 // exactly the threshold
+        await model.onForeground()
+
+        XCTAssertEqual(model.state, .unlocked, "re-auth succeeded")
+        XCTAssertEqual(fake.evaluateCount, 2, "a second prompt was shown")
+    }
+
+    func testAFailedReauthKeepsTheCoverUp() async {
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+
+        fake.willSucceed = false
+        model.onBackground()
+        clock += 60
+        await model.onForeground()
+
+        XCTAssertEqual(model.state, .locked)
+    }
+
+    // ── Retry ────────────────────────────────────────────────────────────────
+
+    func testRetryReopensAfterAFailure() async {
+        fake.willSucceed = false
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+        XCTAssertEqual(model.state, .locked)
+
+        fake.willSucceed = true
+        await model.retry()
+        XCTAssertEqual(model.state, .unlocked)
+    }
+
+    // ── Toggling the setting ─────────────────────────────────────────────────
+
+    func testTurningTheLockOffUnlocksAtOnce() async {
+        fake.willSucceed = false
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch()
+        XCTAssertEqual(model.state, .locked)
+
+        model.isEnabled = false
+        XCTAssertEqual(model.state, .unlocked, "disabling the lock clears the cover")
+    }
+
+    func testDeviceCapabilityIsReported() {
+        let model = makeModel()
+        fake.capable = false
+        XCTAssertFalse(model.deviceCanAuthenticate())
+        fake.capable = true
+        XCTAssertTrue(model.deviceCanAuthenticate())
+    }
+}

@@ -36,10 +36,11 @@ import UniformTypeIdentifiers
 // user set a value the app silently discards — precisely the divergence that made
 // Android's Save button lie until v0.81.0.
 //
-// TWO SWITCHES ARE MISSING ON PURPOSE
-//   `biometricEnabled` and `allowScreenshots` are stored and ported, but nothing
-//   reads them yet. A switch that promises a lock which does not exist is worse
-//   than no switch. They appear with LocalAuthentication.
+// ONE SWITCH IS STILL MISSING ON PURPOSE
+//   `allowScreenshots` is stored and ported, but nothing reads it yet. It arrives
+//   with the screenshot cover, a separate change. `biometricEnabled` is now wired:
+//   its toggle refuses to arm on a device that can take neither a biometric nor a
+//   passcode, which would lock the owner out permanently.
 // =============================================================================
 
 struct SettingsScreen: View {
@@ -63,6 +64,10 @@ struct SettingsScreen: View {
     @State private var importSummary: String?
     @State private var backupFailure: String?
 
+    /// Asked when the lock toggle is drawn, to decide whether it may be armed.
+    /// Stateless, so the screen owns one rather than receiving the whole lock model.
+    private let biometrics = DeviceBiometricAuthenticator()
+
     init(environment: AppEnvironment) {
         self.environment = environment
         _model = State(initialValue: SettingsModel(preferences: environment.preferences))
@@ -76,6 +81,7 @@ struct SettingsScreen: View {
                 bodyWeightSection
                 statisticsSection
                 appearanceSection
+                securitySection
                 backupSection
             }
             .navigationTitle("Settings")
@@ -333,6 +339,28 @@ struct SettingsScreen: View {
 // =============================================================================
 
 extension SettingsScreen {
+
+    private var securitySection: some View {
+        Section {
+            if biometrics.canEvaluate() {
+                Toggle(
+                    "App lock",
+                    isOn: bind(\.biometricEnabled, set: { $0.biometricEnabled = $1 })
+                )
+            } else {
+                // No biometrics enrolled and no passcode set. Offering the toggle
+                // would arm a lock the device cannot open, locking the diary away
+                // for good. Android runs the same check before showing its switch.
+                Text("App lock needs Face ID, Touch ID, or a device passcode.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Security")
+        } footer: {
+            Text("When on, Libellus Potionis asks to unlock after 30 seconds in the background.")
+        }
+    }
 
     var backupSection: some View {
         Section {

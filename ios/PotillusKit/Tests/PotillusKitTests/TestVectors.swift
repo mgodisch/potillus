@@ -96,6 +96,19 @@ enum TestVectors {
 /// `report-format.json` — how the report prints a number.
 ///
 /// Every expected string was produced by the JVM, not typed by hand.
+struct AppLockVectors: Decodable {
+    let thresholdSeconds: Double
+    let requiresReauth: [Case]
+
+    struct Case: Decodable {
+        let description: String
+        /// `null` when the app was never backgrounded this session.
+        let backgroundedAt: Double?
+        let now: Double
+        let expected: Bool
+    }
+}
+
 struct ReportFormatVectors: Decodable {
     let cases: [Case]
 

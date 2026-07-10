@@ -49,20 +49,51 @@ struct PotillusApp: App {
     /// the view tree observes, and SwiftUI must own its lifetime.
     @State private var startup: StartupState = .loading
 
+    /// The biometric gate. Built here, at the scene, because only the scene sees
+    /// the phase transitions that arm and disarm it. The real LAContext sensor is
+    /// injected now; the tests inject a fake into the same model.
+    @State private var lock = AppLockModel(
+        authenticator: DeviceBiometricAuthenticator(),
+        uptime: { ProcessInfo.processInfo.systemUptime }
+    )
+
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some Scene {
         WindowGroup {
-            switch startup {
-            case .loading:
-                // The database opens in milliseconds; this is a guard against a
-                // blank window, not a real loading screen.
-                ProgressView()
-                    .task { startup = StartupState.make() }
+            Group {
+                switch startup {
+                case .loading:
+                    // The database opens in milliseconds; this is a guard against a
+                    // blank window, not a real loading screen.
+                    ProgressView()
+                        .task { startup = StartupState.make() }
 
-            case .ready(let environment):
-                RootView(environment: environment)
+                case .ready(let environment):
+                    RootView(environment: environment, lock: lock)
 
-            case .failed(let message):
-                StartupFailureView(message: message)
+                case .failed(let message):
+                    StartupFailureView(message: message)
+                }
+            }
+            // The cover sits ABOVE everything, including the failure view: a locked
+            // app reveals nothing, not even why it could not start.
+            .overlay {
+                if lock.state != .unlocked {
+                    AppLockCover(state: lock.state) { await lock.retry() }
+                }
+            }
+            .task { await lock.onLaunch() }
+            .onChange(of: scenePhase) { _, phase in
+                // .inactive is the transient state during the switcher animation;
+                // only .background is a real departure, and only .active a real
+                // return. Acting on .inactive would prompt every time the app
+                // briefly lost focus.
+                switch phase {
+                case .background: lock.onBackground()
+                case .active: Task { await lock.onForeground() }
+                default: break
+                }
             }
         }
     }

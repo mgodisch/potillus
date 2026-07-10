@@ -48,6 +48,10 @@ struct RootView: View {
 
     let environment: AppEnvironment
 
+    /// The biometric gate, built at the scene and passed down so the settings
+    /// observation below can arm or disarm it the moment the user toggles it.
+    let lock: AppLockModel
+
     /// The user's theme choice, observed so a change applies immediately.
     @State private var settings = AppSettings()
 
@@ -92,6 +96,9 @@ struct RootView: View {
             // change, so the theme applies without a restart.
             for await updated in await environment.preferences.observe() {
                 settings = updated
+                // Keep the gate in step: turning the lock on arms the next
+                // background return; turning it off clears the cover at once.
+                lock.isEnabled = updated.biometricEnabled
             }
         }
     }
