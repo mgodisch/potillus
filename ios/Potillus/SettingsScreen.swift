@@ -449,9 +449,14 @@ extension SettingsScreen {
                 let file = try BackupReader.parse(data)
                 let stats = try await environment.importer.restore(file, mode: mode)
 
+                // Both messages are plurals (see the catalogue): the noun agrees
+                // with the count in every language. The merge form's FIRST count
+                // drives the plural; the replace form has one count.
                 importSummary = stats.skipped > 0
-                    ? "Imported \(stats.imported) entries, skipped \(stats.skipped) already present."
-                    : "Imported \(stats.imported) entries."
+                    ? Loc.importedMergedPlural(
+                        imported: stats.imported, skipped: stats.skipped, locale: locale
+                    )
+                    : Loc.importedPlural(count: stats.imported, locale: locale)
             } catch {
                 backupFailure = String(describing: error)
             }

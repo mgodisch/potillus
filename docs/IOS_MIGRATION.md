@@ -512,6 +512,39 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Localise the three plurals, in the UI too  (patch -78)
+
+Android has three `<plurals>`: `days` (statistics streaks, and the report), and the
+two import-summary messages. iOS handled none of them — the statistics showed a bare
+number with no noun, and the import summary always said "entries" even for one. Now
+all three inflect, in every language, in the UI.
+
+THE MECHANISM. String Catalogs store plurals under `variations.plural`, a form
+(one/few/many/other) per language: two forms for English and German, four for Polish
+and Russian, one for Japanese. The runtime picks the form for the count. `Loc` builds
+the lookup by interpolating the count as an `Int` into a `String.LocalizationValue` —
+`String(localized: "\(count) days")` — which is what makes the key `"%lld days"` AND
+lets iOS inflect. Passing the number as a String would defeat both; that subtlety is
+the whole reason these are three written-out helpers rather than one format-string
+call.
+
+Every form is harvested from Android — 156 forms across twenty languages and three
+plurals — none invented, since Android defines them all. Android's `%1$d` becomes
+iOS's `%lld` (or positional `%1$lld`/`%2$lld` for the merge message's two counts).
+
+THE GUARD. `check-l10n.py` now reads the built catalogue and fails if any plural form
+carries a different number of `%lld` placeholders than its English `other`. A
+harvested form with a dropped placeholder would crash or mis-format at runtime, and
+only for the language and count that hits that form — the hardest bug to see.
+Self-tested: corrupt one Polish form and it fires.
+
+NOTE for device testing: plural selection with an EXPLICIT locale (not the system
+one) is the path this app relies on but cannot compile-check here. Worth a look on
+device that Polish "2 dni" / "5 dni" / "1 dzień" pick the right forms.
+
+STILL TO DO: the report's own localisation (ReportLabels, REPORT_LANG), which will
+reuse the days plural built here.
+
 #### Add the CJK languages, completing the twenty  (patch -77)
 
 Japanese, Korean, Simplified Chinese, Traditional Chinese — the last four, matching

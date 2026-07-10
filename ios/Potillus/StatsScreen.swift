@@ -361,7 +361,10 @@ struct StatsScreen: View {
     }
 
     private func days(_ value: Int) -> some View {
-        Text("\(value)").monospacedDigit()
+        // The plural noun is part of the value now, so it agrees with the count in
+        // every language: "1 day" / "7 days", "1 Tag" / "7 Tage", the four Polish
+        // forms, the single Japanese one. The catalogue inflects; the view only asks.
+        Text(Loc.daysPlural(count: value, locale: locale)).monospacedDigit()
     }
 
     // ── CSV ──────────────────────────────────────────────────────────────────

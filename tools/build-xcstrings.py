@@ -155,6 +155,61 @@ def collect_literals():
 def unit(value, state="translated"):
     return {"stringUnit": {"state": state, "value": value}}
 
+# The three plurals live in Android's <plurals> blocks. Their keys in the catalogue
+# are the English "other" form with iOS placeholders, matching what the call site
+# passes to Loc.plural. Every form for every language is harvested — none invented,
+# since Android defines them all.
+PLURALS = {
+    # catalogue key            android <plurals name=...>
+    "%lld days": "days",
+    "%lld entries imported.": "import_success_replace",
+    "%lld entries imported, %lld skipped.": "import_success_merge",
+}
+
+# Android locale dir per catalogue tag, reusing ANDROID_DIR where it differs.
+PLURAL_DIRS = {
+    "en": "", "de": "-de", "da": "-da", "nl": "-nl", "nb": "-nb", "sv": "-sv",
+    "es": "-es", "fr": "-fr", "it": "-it", "pt": "-pt", "pt-BR": "-pt-rBR",
+    "ro": "-ro", "cs": "-cs", "pl": "-pl", "ru": "-ru", "uk": "-uk", "el": "-el",
+    "ja": "-ja", "ko": "-ko", "zh-Hans": "-zh-rCN", "zh-Hant": "-zh-rTW",
+}
+
+
+def android_plurals(tag):
+    """Returns {plural_name: {form: value}} for one language, placeholders converted."""
+    path = ROOT / f"android/app/src/main/res/values{PLURAL_DIRS[tag]}/strings.xml"
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    out = {}
+    for name, body in re.findall(r'<plurals name="([^"]+)">(.*?)</plurals>', text, re.S):
+        forms = {}
+        for form, value in re.findall(r'<item quantity="(\w+)">(.*?)</item>', body, re.S):
+            import html as _html
+            v = _html.unescape(value).strip()
+            # Android %1$d / %2$d -> iOS %lld positional; single arg stays %lld.
+            v = re.sub(r"%(\d+)\$d", lambda m: f"%{m.group(1)}$lld", v)
+            v = v.replace("%d", "%lld")
+            forms[form] = v
+        out[name] = forms
+    return out
+
+
+def plural_entry(catalogue_key, android_name):
+    """Builds one catalogue entry whose localisations carry plural variations."""
+    localizations = {}
+    for tag in ["en", "de"] + LANGUAGES:
+        forms = android_plurals(tag).get(android_name)
+        if not forms:
+            continue
+        variations = {
+            form: {"stringUnit": {"state": "translated", "value": value}}
+            for form, value in forms.items()
+        }
+        localizations[tag] = {"variations": {"plural": variations}}
+    return {"extractionState": "manual", "localizations": localizations}
+
+
 
 def load_language(tag):
     """Returns {english_key: translation} for one language.
@@ -212,6 +267,9 @@ def build():
                 entry["localizations"][tag] = unit(value)
 
         strings[key] = entry
+
+    for catalogue_key, android_name in PLURALS.items():
+        strings[catalogue_key] = plural_entry(catalogue_key, android_name)
 
     catalogue = {"sourceLanguage": "en", "version": "1.0", "strings": strings}
     OUT.write_text(json.dumps(catalogue, ensure_ascii=False, indent=2) + "\n",

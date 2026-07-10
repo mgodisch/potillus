@@ -101,12 +101,50 @@ def offenders():
     return problems
 
 
+def plural_placeholder_problems():
+    """Every plural form must carry the same %lld placeholders as its English other.
+
+    A harvested plural form with a dropped or added placeholder would crash or
+    mis-format at runtime, and only in the language and count that triggers that
+    form — the hardest kind of bug to see. This reads the built catalogue and
+    fails if any form disagrees with its English `other`.
+    """
+    import json
+    catalogue = ROOT / "ios" / "Potillus" / "Localizable.xcstrings"
+    if not catalogue.exists():
+        return []
+    strings = json.loads(catalogue.read_text(encoding="utf-8"))["strings"]
+    problems = []
+    for key, entry in strings.items():
+        english = entry["localizations"].get("en", {})
+        plural = english.get("variations", {}).get("plural")
+        if not plural:
+            continue
+        other = plural["other"]["stringUnit"]["value"]
+        want = len(re.findall(r"%\d*\$?lld", other))
+        for lang, loc in entry["localizations"].items():
+            for form, unit in loc.get("variations", {}).get("plural", {}).items():
+                value = unit["stringUnit"]["value"]
+                got = len(re.findall(r"%\d*\$?lld", value))
+                if got != want:
+                    problems.append(
+                        f"{key!r} [{lang}/{form}]: {got} placeholder(s), "
+                        f"expected {want} — {value!r}"
+                    )
+    return problems
+
+
 def main():
     found = offenders()
     for line in found:
         print(f"check-l10n: {line}", file=sys.stderr)
-    if found:
-        print(f"check-l10n: {len(found)} unlocalised literal(s)", file=sys.stderr)
+    plural_problems = plural_placeholder_problems()
+    for line in plural_problems:
+        print(f"check-l10n: {line}", file=sys.stderr)
+    total = len(found) + len(plural_problems)
+    if total:
+        print(f"check-l10n: {len(found)} unlocalised literal(s), "
+              f"{len(plural_problems)} plural placeholder problem(s)", file=sys.stderr)
         return 1
     return 0
 

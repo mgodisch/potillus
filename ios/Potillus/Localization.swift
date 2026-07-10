@@ -82,6 +82,38 @@ enum Loc {
     ) -> String {
         String(format: string(key, locale: locale), locale: locale, arg, arg2)
     }
+
+    /// A pluralised string with one count. The catalogue key carries plural
+    /// variations (one/few/many/other, per language); the runtime picks the form
+    /// for `count` in the CHOSEN locale.
+    ///
+    /// The key is built by interpolating `count` as an `Int` into a
+    /// `String.LocalizationValue`, exactly as `Text("\(count) days")` would — that is
+    /// what makes the lookup key `"%lld days"` and lets iOS inflect. Passing the
+    /// number as a String instead would defeat both, which is the whole subtlety
+    /// here. Only two shapes exist in this app, so they are written out rather than
+    /// built from a format string.
+    static func daysPlural(count: Int, locale: Locale) -> String {
+        String(localized: "\(count) days", locale: locale)
+    }
+
+    /// "%lld entries imported." — the replace-import summary.
+    static func importedPlural(count: Int, locale: Locale) -> String {
+        String(localized: "\(count) entries imported.", locale: locale)
+    }
+
+    /// "%lld entries imported, %lld skipped." — the merge-import summary. The FIRST
+    /// count drives the plural form; the second is a plain number in the string.
+    static func importedMergedPlural(
+        imported: Int, skipped: Int, locale: Locale
+    ) -> String {
+        String(localized: "\(imported) entries imported, \(skipped) skipped.", locale: locale)
+    } else if let range = interpolation.range(of: "%1$lld") {
+                interpolation.replaceSubrange(range, with: String(arg))
+            }
+        }
+        return interpolation
+    }
 }
 
 // =============================================================================
