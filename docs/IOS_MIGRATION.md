@@ -455,12 +455,12 @@ Indicative ordering; refined as work starts.
    `clockOverride` screenshot seam and the locale-driven `firstDayOfWeekIso`,
    which are platform concerns and return with the iOS UI.
 3. **Data layer (done).** The schema, the GRDB record types, the repositories
-   behind protocol seams, the JSON backup v3 reader/writer and the CSV export are
-   all in place, with both platforms asserting against shared vectors.
-   Compatibility is demonstrated, not asserted: the iOS suite parses
-   `fastlane/demo-backup.json`, a genuine Android-written backup already in the
-   repository. One deferral remains: applying the backup's `settings` block,
-   which waits on an iOS preferences store.
+   behind protocol seams, the JSON backup v3 reader/writer, the CSV export, the
+   encrypted preferences store and the backup importer are all in place, with both
+   platforms asserting against shared vectors. Compatibility is demonstrated, not
+   asserted: the iOS suite parses AND imports `fastlane/demo-backup.json`, a
+   genuine Android-written backup already in the repository, and gets back its 15
+   drinks and 85 entries with no orphans. Nothing is deferred any more.
 4. **UI.** SwiftUI screens to feature parity (Today, Calendar, Statistics,
    Drinks, Add-drink, Settings, Document viewer), app lock via
    `LocalAuthentication`, PDF report via `WKWebView` reusing the HTML template.
@@ -510,6 +510,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Apply a restored backup, settings included  (patch -22)
+
+- Add `BackupImporter`, the counterpart to Android's
+  `BackupRepository.importReplace/importMerge`, and close the gap left open in
+  patch -12: the `settings` block is now applied, not merely carried through.
+- Remap drink ids rather than trust them. A backup's `drinkId` values are row ids
+  from the device that WROTE it; on the importing device they belong to different
+  drinks, or none. Copying them across would silently re-attribute history — an
+  entry logged as "Pils" reappearing as "Whisky". The join is made on the drink
+  NAME, the only identifier that means the same thing on both devices.
+- Mirror both modes: REPLACE wipes the log and user-created drinks (presets
+  survive, so an old entry can always resolve its drink); MERGE keeps what is
+  there and skips entries identified by timestamp plus drink, so importing the
+  same file twice cannot double the history.
+- Move drinks and entries inside ONE write transaction. A backup whose entry
+  references a drink the file never defines is internally inconsistent: the
+  import aborts and the transaction rolls back, because a half-imported history
+  is worse than none — the user cannot tell which half is missing.
+- Sanitise restored settings before storing them, and `replace` rather than merge:
+  the file describes a complete settings state, and mixing it with the local one
+  would produce a state neither device ever had. Settings are applied outside the
+  data transaction, since they live in a different store and a settings failure
+  must not roll back a good import.
+- End-to-end proof: parse and import the real Android demo backup, and get back
+  exactly 15 drinks, 85 entries, and no orphaned rows.
 
 #### Fix two await-in-autoclosure compile errors  (patch -21)
 
