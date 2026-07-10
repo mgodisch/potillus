@@ -512,6 +512,34 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Settings screen  (patch -39)
+
+- Add `SettingsModel` and `SettingsScreen`: limits, day-change time, body weight,
+  statistics floor, theme, language, alternative status symbols. Reached from a
+  gear in the Today toolbar, as on Android, where settings sit above the tabs.
+- Make the `SettingsSanitizer` bounds PUBLIC, and drive every control from them.
+  A stepper offering 1…600 while the sanitiser clamps at 500 would let the user
+  set a value the app silently discards — the same divergence that made Android's
+  Save button lie until v0.81.0.
+- Add `sanitize(AppSettings)` beside `sanitize(BackupSettings)`. A settings screen
+  can hand over an out-of-range number as easily as a backup can. The two
+  overloads share every clamping helper and repeat only a field list; a test
+  asserts they agree on every field, and a second that sanitising is idempotent.
+- Route every control through `SettingsModel.update`, which sanitises the WHOLE
+  value before it reaches the store. Clamping is defined over the value, and a
+  caller cannot know which other field a change invalidates. The store's invariant
+  then holds for any future writer, not just for today's views.
+- Offer absence as absence. A missing body weight is a button, not a stepper
+  showing `0.0 kg`, and clearing it is its own operation, so no view has to know
+  that a magic zero means "not set".
+- Reload the Today screen when the settings sheet closes: the day-change hour
+  decides which day is "today", and the screen would otherwise show yesterday.
+- Do NOT offer `biometricEnabled` or `allowScreenshots`. Both are stored and
+  ported, and nothing reads them yet. A switch that promises a lock which does not
+  exist is worse than a missing switch.
+- Label the language picker with each locale's autonym: someone who needs the list
+  cannot necessarily read the current interface language.
+
 #### Add the Statistics screen  (patch -38)
 
 - Add `StatsScreen`: period picker, consumption chart, limit violations, streaks,

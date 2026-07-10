@@ -219,4 +219,54 @@ final class SettingsSanitizerTests: XCTestCase {
         XCTAssertEqual(try sanitized(["dayChangeHour": -3]).dayChangeHour, 0)
         XCTAssertEqual(try sanitized(["dayChangeMinute": 90]).dayChangeMinute, 59)
     }
+
+    // ── The two overloads must agree ─────────────────────────────────────────
+
+    /// `sanitize(BackupSettings)` reads a file; `sanitize(AppSettings)` guards a
+    /// screen. They repeat a field list, so a test — not a comment — keeps them
+    /// from repeating a rule differently.
+    func testBothOverloadsAgreeOnEveryField() {
+        let raw = BackupSettings(
+            themeMode: "NIGHT",
+            dayChangeHour: 47,
+            dayChangeMinute: -3,
+            dailyLimitGrams: 9_000,
+            weeklyLimitGrams: .nan,
+            maxDrinkDaysPerWeek: 99,
+            statsFromDate: "2026-1-5",
+            biometricEnabled: true,
+            allowScreenshots: true,
+            alternativeStatusSymbols: true,
+            language: "DE-de",
+            weightKg: -80
+        )
+
+        let fromBackup = SettingsSanitizer.sanitize(raw)
+
+        // The same values, already typed as the app holds them.
+        let asApp = AppSettings(
+            themeMode: .night,
+            dayChangeHour: 47,
+            dayChangeMinute: -3,
+            dailyLimitGrams: 9_000,
+            weeklyLimitGrams: .nan,
+            maxDrinkDaysPerWeek: 99,
+            statsFromDate: "2026-1-5",
+            biometricEnabled: true,
+            allowScreenshots: true,
+            alternativeStatusSymbols: true,
+            language: "DE-de",
+            weightKg: -80
+        )
+
+        XCTAssertEqual(SettingsSanitizer.sanitize(asApp), fromBackup)
+    }
+
+    /// Sanitising twice must change nothing the first pass did not.
+    func testSanitisingIsIdempotent() {
+        let once = SettingsSanitizer.sanitize(
+            AppSettings(dailyLimitGrams: 9_000, maxDrinkDaysPerWeek: 99, weightKg: -1)
+        )
+        XCTAssertEqual(SettingsSanitizer.sanitize(once), once)
+    }
 }

@@ -57,12 +57,29 @@ public enum SettingsSanitizer {
 
     // The ranges. Named, because a bare `1...500` in two places is two chances
     // to disagree with Android.
-    private static let hourRange = 0...23
-    private static let minuteRange = 0...59
-    private static let drinkDaysRange = 1...7
-    private static let dailyLimitRange = 1.0...500.0
-    private static let weeklyLimitRange = 1.0...3500.0
-    private static let weightRange = 1.0...500.0
+    // PUBLIC, because the settings screen must offer exactly the values this type
+    // will accept. A view that carried its own copy of "1...500" would eventually
+    // offer a value the sanitizer then silently clamps — the same divergence that
+    // let Android's drink dialog and view model disagree until v0.81.0.
+
+    /// Hour of the day the logical day rolls over.
+    public static let hourRange = 0...23
+
+    /// Minute of that hour.
+    public static let minuteRange = 0...59
+
+    /// Permitted drink days per week.
+    public static let drinkDaysRange = 1...7
+
+    /// Grams of pure alcohol per day.
+    public static let dailyLimitRange = 1.0...500.0
+
+    /// Grams of pure alcohol per week.
+    public static let weeklyLimitRange = 1.0...3500.0
+
+    /// Body weight in kilograms. Note that `0` is the sentinel for "not set" and
+    /// is NOT clamped up to this floor; only a positive weight is clamped.
+    public static let weightRange = 1.0...500.0
 
     /// Converts the raw `settings` block of a backup into `AppSettings`, forcing
     /// every value into a range the rest of the app can rely on.
@@ -79,6 +96,38 @@ public enum SettingsSanitizer {
             dayChangeMinute: clamp(raw.dayChangeMinute, to: minuteRange),
             dailyLimitGrams: clamp(raw.dailyLimitGrams, to: dailyLimitRange, default: defaults.dailyLimitGrams),
             weeklyLimitGrams: clamp(raw.weeklyLimitGrams, to: weeklyLimitRange, default: defaults.weeklyLimitGrams),
+            maxDrinkDaysPerWeek: clamp(raw.maxDrinkDaysPerWeek, to: drinkDaysRange),
+            statsFromDate: canonicalDate(raw.statsFromDate),
+            biometricEnabled: raw.biometricEnabled,
+            allowScreenshots: raw.allowScreenshots,
+            alternativeStatusSymbols: raw.alternativeStatusSymbols,
+            language: SupportedLocales.canonicalTag(raw.language),
+            weightKg: sanitizedWeight(raw.weightKg, default: defaults.weightKg)
+        )
+    }
+
+    /// The same rules applied to a value that is already an `AppSettings`.
+    ///
+    /// `BackupSettings` is what a FILE contains: strings where the app has enums,
+    /// and any number a writer felt like. `AppSettings` is what the app holds. Both
+    /// need clamping — a settings screen can hand over an out-of-range number as
+    /// easily as a backup can — so both go through the same helpers below. Only
+    /// the field list is repeated; not one rule.
+    ///
+    /// A test asserts that the two overloads agree on every field.
+    public static func sanitize(_ raw: AppSettings) -> AppSettings {
+        let defaults = AppSettings()
+
+        return AppSettings(
+            themeMode: raw.themeMode,
+            dayChangeHour: clamp(raw.dayChangeHour, to: hourRange),
+            dayChangeMinute: clamp(raw.dayChangeMinute, to: minuteRange),
+            dailyLimitGrams: clamp(
+                raw.dailyLimitGrams, to: dailyLimitRange, default: defaults.dailyLimitGrams
+            ),
+            weeklyLimitGrams: clamp(
+                raw.weeklyLimitGrams, to: weeklyLimitRange, default: defaults.weeklyLimitGrams
+            ),
             maxDrinkDaysPerWeek: clamp(raw.maxDrinkDaysPerWeek, to: drinkDaysRange),
             statsFromDate: canonicalDate(raw.statsFromDate),
             biometricEnabled: raw.biometricEnabled,

@@ -46,7 +46,14 @@ struct TodayScreen: View {
     /// Set while the entry sheet is open.
     @State private var isLogging = false
 
+    /// Set while the settings sheet is open.
+    @State private var isConfiguring = false
+
+    /// Kept so the settings sheet can be built; the screen owns its own model.
+    private let environment: AppEnvironment
+
     init(environment: AppEnvironment) {
+        self.environment = environment
         _model = State(initialValue: TodayModel(
             entries: environment.entries,
             drinks: environment.drinks,
@@ -63,17 +70,36 @@ struct TodayScreen: View {
             }
             .navigationTitle("Today")
             .toolbar {
+                // The gear, as on Android: settings sit above the tabs, not in
+                // them. Leading, so the primary action keeps the trailing corner.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isConfiguring = true
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
                 // iOS puts the primary action in the toolbar; Android uses a
                 // floating action button. Same action, native placement.
-                Button {
-                    isLogging = true
-                } label: {
-                    Label("Log a drink", systemImage: "plus")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isLogging = true
+                    } label: {
+                        Label("Log a drink", systemImage: "plus")
+                    }
+                    .disabled(model.state.drinks.isEmpty)
                 }
-                .disabled(model.state.drinks.isEmpty)
             }
             .task { await model.load() }
             .refreshable { await model.load() }
+            .sheet(isPresented: $isConfiguring) {
+                SettingsScreen(environment: environment)
+            }
+            // Settings can change the day-change hour, which changes which day is
+            // "today". Reload when the sheet closes rather than showing yesterday.
+            .onChange(of: isConfiguring) { _, isOpen in
+                if !isOpen { Task { await model.load() } }
+            }
             .sheet(isPresented: $isLogging) {
                 EntrySheet(
                     drinks: model.state.drinks,
