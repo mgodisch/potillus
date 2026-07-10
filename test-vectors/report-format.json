@@ -1,0 +1,277 @@
+{
+  "_comment": [
+    "Golden vectors for the report's number formatting.",
+    "Read by BOTH suites: ReportFormattingTests (Swift) and NumberFormatVectorTest (Kotlin).",
+    "",
+    "EVERY EXPECTED STRING WAS PRODUCED BY THE JVM, not written by hand: the values",
+    "below are the output of `String.format(locale, \"%.1f\", v)` and `\"%.0f\"` on",
+    "OpenJDK 21, which is what Android's unit tests run against.",
+    "",
+    "WHY THIS FILE EXISTS. Kotlin rounds HALF UP, applied to the SHORTEST decimal",
+    "representation of the double. C's printf -- which is what Swift's",
+    "`String(format:)` calls -- rounds the exact binary value to nearest, ties to",
+    "even. They disagree on 0.25 (0.3 vs 0.2), on 2.5 (3 vs 2), on 20.5 (21 vs 20)",
+    "and on 12.35 (12.4 vs 12.3). A daily limit of 20.5 g would print as 21 in the",
+    "Android report and as 20 in the iOS one.",
+    "",
+    "So Swift does NOT use String(format:) here. It rounds the shortest decimal",
+    "representation with NSDecimalRound(.plain), which is half away from zero, and",
+    "only then hands the settled number to a locale-aware formatter.",
+    "",
+    "Grouping is off: `%.1f` never groups, so 1234.5 stays 1234.5 and not 1,234.5."
+  ],
+  "cases": [
+    {
+      "locale": "en",
+      "value": 0.0,
+      "fmt1": "0.0",
+      "fmt0": "0"
+    },
+    {
+      "locale": "en",
+      "value": 0.05,
+      "fmt1": "0.1",
+      "fmt0": "0"
+    },
+    {
+      "locale": "en",
+      "value": 0.15,
+      "fmt1": "0.2",
+      "fmt0": "0"
+    },
+    {
+      "locale": "en",
+      "value": 0.25,
+      "fmt1": "0.3",
+      "fmt0": "0"
+    },
+    {
+      "locale": "en",
+      "value": 0.75,
+      "fmt1": "0.8",
+      "fmt0": "1"
+    },
+    {
+      "locale": "en",
+      "value": 1.05,
+      "fmt1": "1.1",
+      "fmt0": "1"
+    },
+    {
+      "locale": "en",
+      "value": 2.5,
+      "fmt1": "2.5",
+      "fmt0": "3"
+    },
+    {
+      "locale": "en",
+      "value": 3.5,
+      "fmt1": "3.5",
+      "fmt0": "4"
+    },
+    {
+      "locale": "en",
+      "value": 12.35,
+      "fmt1": "12.4",
+      "fmt0": "12"
+    },
+    {
+      "locale": "en",
+      "value": 20.5,
+      "fmt1": "20.5",
+      "fmt0": "21"
+    },
+    {
+      "locale": "en",
+      "value": 60.0,
+      "fmt1": "60.0",
+      "fmt0": "60"
+    },
+    {
+      "locale": "en",
+      "value": 100.0,
+      "fmt1": "100.0",
+      "fmt0": "100"
+    },
+    {
+      "locale": "en",
+      "value": 1234.5,
+      "fmt1": "1234.5",
+      "fmt0": "1235"
+    },
+    {
+      "locale": "en",
+      "value": 99.95,
+      "fmt1": "100.0",
+      "fmt0": "100"
+    },
+    {
+      "locale": "de",
+      "value": 0.0,
+      "fmt1": "0,0",
+      "fmt0": "0"
+    },
+    {
+      "locale": "de",
+      "value": 0.05,
+      "fmt1": "0,1",
+      "fmt0": "0"
+    },
+    {
+      "locale": "de",
+      "value": 0.15,
+      "fmt1": "0,2",
+      "fmt0": "0"
+    },
+    {
+      "locale": "de",
+      "value": 0.25,
+      "fmt1": "0,3",
+      "fmt0": "0"
+    },
+    {
+      "locale": "de",
+      "value": 0.75,
+      "fmt1": "0,8",
+      "fmt0": "1"
+    },
+    {
+      "locale": "de",
+      "value": 1.05,
+      "fmt1": "1,1",
+      "fmt0": "1"
+    },
+    {
+      "locale": "de",
+      "value": 2.5,
+      "fmt1": "2,5",
+      "fmt0": "3"
+    },
+    {
+      "locale": "de",
+      "value": 3.5,
+      "fmt1": "3,5",
+      "fmt0": "4"
+    },
+    {
+      "locale": "de",
+      "value": 12.35,
+      "fmt1": "12,4",
+      "fmt0": "12"
+    },
+    {
+      "locale": "de",
+      "value": 20.5,
+      "fmt1": "20,5",
+      "fmt0": "21"
+    },
+    {
+      "locale": "de",
+      "value": 60.0,
+      "fmt1": "60,0",
+      "fmt0": "60"
+    },
+    {
+      "locale": "de",
+      "value": 100.0,
+      "fmt1": "100,0",
+      "fmt0": "100"
+    },
+    {
+      "locale": "de",
+      "value": 1234.5,
+      "fmt1": "1234,5",
+      "fmt0": "1235"
+    },
+    {
+      "locale": "de",
+      "value": 99.95,
+      "fmt1": "100,0",
+      "fmt0": "100"
+    },
+    {
+      "locale": "fr",
+      "value": 0.0,
+      "fmt1": "0,0",
+      "fmt0": "0"
+    },
+    {
+      "locale": "fr",
+      "value": 0.05,
+      "fmt1": "0,1",
+      "fmt0": "0"
+    },
+    {
+      "locale": "fr",
+      "value": 0.15,
+      "fmt1": "0,2",
+      "fmt0": "0"
+    },
+    {
+      "locale": "fr",
+      "value": 0.25,
+      "fmt1": "0,3",
+      "fmt0": "0"
+    },
+    {
+      "locale": "fr",
+      "value": 0.75,
+      "fmt1": "0,8",
+      "fmt0": "1"
+    },
+    {
+      "locale": "fr",
+      "value": 1.05,
+      "fmt1": "1,1",
+      "fmt0": "1"
+    },
+    {
+      "locale": "fr",
+      "value": 2.5,
+      "fmt1": "2,5",
+      "fmt0": "3"
+    },
+    {
+      "locale": "fr",
+      "value": 3.5,
+      "fmt1": "3,5",
+      "fmt0": "4"
+    },
+    {
+      "locale": "fr",
+      "value": 12.35,
+      "fmt1": "12,4",
+      "fmt0": "12"
+    },
+    {
+      "locale": "fr",
+      "value": 20.5,
+      "fmt1": "20,5",
+      "fmt0": "21"
+    },
+    {
+      "locale": "fr",
+      "value": 60.0,
+      "fmt1": "60,0",
+      "fmt0": "60"
+    },
+    {
+      "locale": "fr",
+      "value": 100.0,
+      "fmt1": "100,0",
+      "fmt0": "100"
+    },
+    {
+      "locale": "fr",
+      "value": 1234.5,
+      "fmt1": "1234,5",
+      "fmt0": "1235"
+    },
+    {
+      "locale": "fr",
+      "value": 99.95,
+      "fmt1": "100,0",
+      "fmt0": "100"
+    }
+  ]
+}

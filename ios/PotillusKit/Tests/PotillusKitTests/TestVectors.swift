@@ -93,6 +93,23 @@ enum TestVectors {
 // =============================================================================
 
 /// Root of `test-vectors/alcohol-calculator.json`.
+/// `report-format.json` — how the report prints a number.
+///
+/// Every expected string was produced by the JVM, not typed by hand.
+struct ReportFormatVectors: Decodable {
+    let cases: [Case]
+
+    struct Case: Decodable {
+        /// A BCP-47 tag: `"en"`, `"de"`, `"fr"`.
+        let locale: String
+        let value: Double
+        /// `String.format(locale, "%.1f", value)` on OpenJDK 21.
+        let fmt1: String
+        /// `String.format(locale, "%.0f", value)`.
+        let fmt0: String
+    }
+}
+
 /// `report-chart.json` — the PDF report's presentation arithmetic.
 struct ReportChartVectors: Decodable {
     let pct: [PercentCase]

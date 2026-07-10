@@ -512,6 +512,45 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Make Swift round a number the way Kotlin does  (patch -56)
+
+Before the report can print a figure, the two platforms have to agree on what the
+figure IS. They did not.
+
+`String.format(locale, "%.1f", x)` rounds HALF UP, applied to the shortest decimal
+representation of the double. C's `printf` — which is what Swift's
+`String(format:)` calls — rounds the exact binary value to nearest, ties to even.
+Measured, on OpenJDK 21 and on glibc, not assumed:
+
+| value | Kotlin `%.1f` | printf `%.1f` | Kotlin `%.0f` | printf `%.0f` |
+|-------|---------------|---------------|---------------|---------------|
+| 0.25  | 0.3           | 0.2           | 0             | 0             |
+| 2.5   | 2.5           | 2.5           | 3             | 2             |
+| 20.5  | 20.5          | 20.5          | 21            | 20            |
+| 12.35 | 12.4          | 12.3          | 12            | 12            |
+
+A daily limit of 20.5 g — a limit a person might actually set — would print as
+"21" in the Android report and as "20" in the iOS one, from the same data, on the
+same day. Nobody would ever have filed that bug; they would simply have stopped
+trusting the app.
+
+`ReportFormatting` therefore does NOT use `String(format:)` for anything a reader
+sees. It rounds the shortest decimal representation with `NSDecimalRound(.plain)`
+— half away from zero, which is HALF_UP for the non-negative values this app deals
+in — and only then asks a locale-aware formatter for the decimal mark. Grouping is
+off, because `%.1f` never groups and 1234.5 must not become "1,234.5".
+
+`ReportChart.svgNumber` stays on `String(format:)`, and that is the exception that
+shows the rule: it feeds a renderer, not a reader, so it wants POSIX and does not
+care which way a tie falls.
+
+New shared vectors, `test-vectors/report-format.json`, 42 cases across three
+locales. EVERY EXPECTED STRING WAS PRODUCED BY THE JVM rather than typed by hand:
+the file is the JVM's own output, and the Swift implementation reproduces all 84
+comparisons. Kotlin's `NumberFormatVectorTest` reads the same file, where it acts
+as a guard: if a Kotlin change ever alters how a gram figure is printed, it fails
+there first, before the two reports drift apart.
+
 #### Restore the KDoc adjacency broken by patch -54  (patch -55)
 
 `release-check.sh --Werror` refused the tree: `PdfReportBuilder.categoryColor`
