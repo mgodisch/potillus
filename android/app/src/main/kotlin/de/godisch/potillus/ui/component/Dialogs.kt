@@ -121,7 +121,10 @@ fun AddEditEntryDialog(
 
     val volume = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0
-    val canSave = selectedDrink != null && (volumeText.toIntOrNull() ?: 0) in 1..5000
+    // The serving size an entry may record is the serving size a drink may have:
+    // one constant, not a fourth copy of the same number.
+    val canSave = selectedDrink != null &&
+        (volumeText.toIntOrNull() ?: 0) in DrinkValidator.VOLUME_ML_RANGE
     // Per-app locale for the gram preview (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
 
@@ -195,7 +198,8 @@ fun AddEditEntryDialog(
                     label = { Text(stringResource(R.string.volume_ml)) },
                     suffix = { Text("ml") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = volumeText.isNotEmpty() && (volumeText.toIntOrNull() ?: 0) !in 1..5000,
+                    isError = volumeText.isNotEmpty() &&
+                        (volumeText.toIntOrNull() ?: 0) !in DrinkValidator.VOLUME_ML_RANGE,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
@@ -380,7 +384,8 @@ fun AddEditDrinkDialog(
     // was silently dropped afterwards.
     val volumeValid = volume != null && volume in DrinkValidator.VOLUME_ML_RANGE
     val percentValid = percent != null && percent in DrinkValidator.ALCOHOL_PERCENT_RANGE
-    val canSave = volume != null && percent != null &&
+    val canSave = volume != null &&
+        percent != null &&
         DrinkValidator.isValid(name, volume, percent)
 
     val previewGrams = if (volume != null && percent != null && volumeValid && percentValid) {
