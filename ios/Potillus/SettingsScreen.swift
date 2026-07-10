@@ -153,17 +153,26 @@ struct SettingsScreen: View {
 
     private var limitsSection: some View {
         Section("Limits") {
-            Stepper(value: bind(\.dailyLimitGrams), in: SettingsSanitizer.dailyLimitRange, step: 1) {
+            Stepper(
+                value: bind(\.dailyLimitGrams, set: { $0.dailyLimitGrams = $1 }),
+                in: SettingsSanitizer.dailyLimitRange, step: 1
+            ) {
                 LabeledContent("Daily limit") {
                     Text(String(format: "%.0f g", model.settings.dailyLimitGrams)).monospacedDigit()
                 }
             }
-            Stepper(value: bind(\.weeklyLimitGrams), in: SettingsSanitizer.weeklyLimitRange, step: 5) {
+            Stepper(
+                value: bind(\.weeklyLimitGrams, set: { $0.weeklyLimitGrams = $1 }),
+                in: SettingsSanitizer.weeklyLimitRange, step: 5
+            ) {
                 LabeledContent("Weekly limit") {
                     Text(String(format: "%.0f g", model.settings.weeklyLimitGrams)).monospacedDigit()
                 }
             }
-            Stepper(value: bind(\.maxDrinkDaysPerWeek), in: SettingsSanitizer.drinkDaysRange) {
+            Stepper(
+                value: bind(\.maxDrinkDaysPerWeek, set: { $0.maxDrinkDaysPerWeek = $1 }),
+                in: SettingsSanitizer.drinkDaysRange
+            ) {
                 LabeledContent("Drink days per week") {
                     Text("\(model.settings.maxDrinkDaysPerWeek)").monospacedDigit()
                 }
@@ -213,7 +222,10 @@ struct SettingsScreen: View {
     private var bodyWeightSection: some View {
         Section {
             if model.hasWeight {
-                Stepper(value: bind(\.weightKg), in: SettingsSanitizer.weightRange, step: 0.5) {
+                Stepper(
+                    value: bind(\.weightKg, set: { $0.weightKg = $1 }),
+                    in: SettingsSanitizer.weightRange, step: 0.5
+                ) {
                     LabeledContent("Body weight") {
                         Text(String(format: "%.1f kg", model.settings.weightKg)).monospacedDigit()
                     }
@@ -262,13 +274,16 @@ struct SettingsScreen: View {
 
     private var appearanceSection: some View {
         Section("Appearance") {
-            Picker("Theme", selection: bind(\.themeMode)) {
+            Picker("Theme", selection: bind(\.themeMode, set: { $0.themeMode = $1 })) {
                 Text("System").tag(ThemeMode.system)
                 Text("Light").tag(ThemeMode.day)
                 Text("Dark").tag(ThemeMode.night)
             }
-            Toggle("Alternative status symbols", isOn: bind(\.alternativeStatusSymbols))
-            Picker("Language", selection: bind(\.language)) {
+            Toggle(
+                "Alternative status symbols",
+                isOn: bind(\.alternativeStatusSymbols, set: { $0.alternativeStatusSymbols = $1 })
+            )
+            Picker("Language", selection: bind(\.language, set: { $0.language = $1 })) {
                 // The autonym: a language picker shows "Deutsch", not "German".
                 // Someone who needs the list cannot necessarily read the current
                 // interface language.
@@ -285,13 +300,29 @@ struct SettingsScreen: View {
     ///
     /// Writing straight to `model.settings` would bypass the sanitiser and the
     /// store; this is the only way a control changes anything.
+    ///
+    /// WHY THE WRITE IS A CLOSURE AND NOT A `WritableKeyPath`.
+    ///   `SettingsModel.update` takes a `@Sendable` transform, because the change
+    ///   travels from the main actor into the store's. A key path handed to that
+    ///   transform is CAPTURED by it, and a `WritableKeyPath<AppSettings, Value>`
+    ///   is not `Sendable` — the compiler said so, and under Swift 6 it will refuse
+    ///   rather than warn.
+    ///
+    ///   Passing the write as a closure LITERAL at each call site captures nothing
+    ///   at all, so the transform is trivially sendable. The read still uses a key
+    ///   path: it runs on the main actor and never crosses.
+    ///
+    ///   The cost is one repeated property name per control. The alternative was to
+    ///   wrap the key path in an unchecked-sendable box, which would silence the
+    ///   compiler by asserting something no-one had checked.
     private func bind<Value>(
-        _ keyPath: WritableKeyPath<AppSettings, Value>
+        _ keyPath: KeyPath<AppSettings, Value>,
+        set write: @escaping @Sendable (inout AppSettings, Value) -> Void
     ) -> Binding<Value> where Value: Sendable {
         Binding(
             get: { model.settings[keyPath: keyPath] },
             set: { newValue in
-                Task { await model.update { $0[keyPath: keyPath] = newValue } }
+                Task { await model.update { write(&$0, newValue) } }
             }
         )
     }

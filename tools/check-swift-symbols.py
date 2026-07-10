@@ -361,6 +361,35 @@ def check_duplicate_declarations(paths):
     return problems
 
 
+def check_binding_paths(paths):
+    """Flags `bind(\\.a, set: { $0.b = $1 })` — a control that reads one setting and
+    writes another.
+
+    This check exists because the fix for a concurrency warning created the hazard
+    it guards. `bind` used to take a single `WritableKeyPath`, which could not
+    disagree with itself. A `WritableKeyPath` is not `Sendable`, though, and the
+    transform it was captured by crosses an actor boundary, so the write became a
+    closure literal — and a closure literal can name whatever property it likes.
+
+    A stepper that displays the weight and stores it as the daily limit would look
+    entirely correct on screen until the moment it was used.
+    """
+    call = re.compile(
+        r"bind\(\s*\\\.(?P<read>\w+)\s*,\s*set:\s*\{\s*\$0\.(?P<write>\w+)\s*=\s*\$1\s*\}"
+    )
+    problems = []
+
+    for path in paths:
+        for number, line in enumerate(read(path).split("\n"), start=1):
+            for match in call.finditer(line):
+                if match.group("read") != match.group("write"):
+                    problems.append(
+                        f"{path}:{number}: bind reads '{match.group('read')}' but "
+                        f"writes '{match.group('write')}'"
+                    )
+    return problems
+
+
 def repository_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -376,6 +405,7 @@ def main(argv):
     declarations = collect_declarations(swift_files(root))
 
     problems = check_duplicate_declarations(paths)
+    problems.extend(check_binding_paths(paths))
     for path in paths:
         problems.extend(check_symbols(path, declarations))
         problems.extend(check_imports(path))

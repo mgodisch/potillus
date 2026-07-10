@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Stop capturing a key path across an actor boundary  (patch -58)
+
+The compiler warned that `SettingsScreen.bind` captured a
+`WritableKeyPath<AppSettings, Value>` in a `@Sendable` closure. It is right, and
+under Swift 6 it will refuse rather than warn.
+
+`SettingsModel.update` takes a `@Sendable` transform because the change travels
+from the main actor into the store's. A key path handed to that transform is
+captured by it, and a `WritableKeyPath` is not `Sendable`.
+
+The write is now a CLOSURE LITERAL at each call site, capturing nothing at all, so
+the transform is trivially sendable. The read still uses a key path: it runs on the
+main actor and never crosses. The alternative — wrapping the key path in an
+unchecked-sendable box — would have silenced the compiler by asserting something
+nobody had checked.
+
+THE FIX INTRODUCED A HAZARD, so the fix carries its own guard. `bind` used to take
+one key path, which could not disagree with itself; two halves can. A stepper that
+reads the body weight and writes the daily limit would look entirely correct on
+screen until the moment somebody used it. `check-swift-symbols.py` now flags any
+`bind(\.a, set: { $0.b = $1 })` where `a` and `b` differ. Verified both ways:
+silent on the seven real call sites, and it names the line the moment one is
+crossed.
+
 #### Render the report  (patch -57)
 
 `ReportRenderer` fills the 37 document placeholders and the ten repeat blocks of
