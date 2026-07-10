@@ -841,10 +841,26 @@ ios: check-headers check-makefile check-swift-tests check-swift-symbols ios-proj
 	# target learned this first; see the note beside its `cd fastlane`.
 	( cd ios/PotillusKit && swift test )
 	command -v xcodebuild
+	# -scheme, not -target, and -destination, not -sdk.
+	#
+	#   `-target Potillus -sdk iphonesimulator` names no destination, so xcodebuild
+	#   cannot compute an active architecture. It then honours ARCHS in full and
+	#   builds arm64 AND x86_64 -- while the Swift package's GRDB module is
+	#   resolved for one slice only. The build dies with
+	#
+	#       error: Unable to resolve module dependency: 'GRDB'
+	#
+	#   which reads like a missing dependency and is really a missing destination.
+	#   The `ONLY_ACTIVE_ARCH=YES ... no active architecture could be computed`
+	#   warning above it is the actual diagnosis.
+	#
+	#   `generic/platform=iOS Simulator` fixes one architecture without naming a
+	#   simulator device, so the build does not depend on which runtimes happen to
+	#   be installed. The Potillus scheme already exists in ios/project.yml.
 	xcodebuild \
 	    -project ios/Potillus.xcodeproj \
-	    -target Potillus \
-	    -sdk iphonesimulator \
+	    -scheme Potillus \
+	    -destination 'generic/platform=iOS Simulator' \
 	    -configuration Debug \
 	    CODE_SIGNING_ALLOWED=NO \
 	    build

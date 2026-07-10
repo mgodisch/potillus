@@ -512,6 +512,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Give xcodebuild a destination  (patch -47)
+
+- `make ios` invoked `xcodebuild -target Potillus -sdk iphonesimulator`, which
+  names no destination. xcodebuild could not compute an active architecture, so it
+  honoured `ARCHS` in full and built arm64 AND x86_64 — while the Swift package's
+  GRDB module was resolved for one slice only. The build died with
+
+      error: Unable to resolve module dependency: 'GRDB'
+
+  which reads like a missing dependency and is really a missing destination. The
+  `ONLY_ACTIVE_ARCH=YES ... no active architecture could be computed` warning
+  standing above it was the actual diagnosis.
+- Build `-scheme Potillus -destination 'generic/platform=iOS Simulator'` instead.
+  The generic destination fixes one architecture without naming a simulator
+  device, so the build does not depend on which runtimes are installed. The
+  `Potillus` scheme was already declared in `ios/project.yml`; nothing was added
+  to it.
+
 #### Stop a bare `cd` from leaking through the ios recipe  (patch -46)
 
 - `make ios` ran `cd ios/PotillusKit && swift test` and then invoked `xcodebuild`
