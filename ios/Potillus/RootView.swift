@@ -74,7 +74,7 @@ struct RootView: View {
             TodayScreen(environment: environment)
                 .tabItem { Label("Today", systemImage: "calendar.badge.clock") }
 
-            PlaceholderScreen(title: "Calendar")
+            CalendarScreen(environment: environment)
                 .tabItem { Label("Calendar", systemImage: "calendar") }
 
             PlaceholderScreen(title: "Statistics")

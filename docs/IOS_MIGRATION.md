@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Calendar screen  (patch -33)
+
+- Add `MonthGrid`, the calendar's arithmetic, as a pure tested type rather than a
+  view helper. This is where calendars go wrong: a leading-blank count off by one
+  puts every date under the wrong weekday, nothing crashes, and the bug is
+  invisible in any month that happens to begin in the first column. Tested against
+  months chosen for their first weekday, in Monday-first and Sunday-first locales.
+- Add `DayResolver.firstDayOfWeekIso()`, the counterpart of Kotlin's
+  `WeekFields.of(locale).firstDayOfWeek.value`. Two numbering schemes meet here:
+  `Calendar.firstWeekday` counts 1 = SUNDAY, ISO counts 1 = MONDAY. Sunday is 1 in
+  one and 7 in the other, and every other day is off by one. The conversion is the
+  reason the function exists instead of a bare `Calendar.current.firstWeekday` at
+  the call site.
+- Navigate months with INTEGER arithmetic, never dates: December to January cannot
+  then go wrong, and no DST transition can shift the grid relative to the entries
+  it displays. A cell is a logical day — the string the entries carry.
+- Keep a day with no entries ABSENT from the summary map rather than present with
+  zero, so the view can distinguish "nothing logged" from "logged nothing". The
+  cell shows no dot at all.
+- Clear the selection when navigating away: a selection belongs to the month it
+  was made in, or January's entries appear under a February heading.
+- Defer the YEAR view. It is a second layout over the same summaries, and it
+  belongs with the Statistics screen, which already owns per-month aggregation.
+
 #### Make it possible to log a drink  (patch -32)
 
 - Patch -31 shipped a Drinks screen on which a row tap opened the EDITOR, and a

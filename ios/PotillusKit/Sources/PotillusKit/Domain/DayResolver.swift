@@ -166,6 +166,25 @@ public enum DayResolver {
     ///
     /// Unlike Kotlin's `LocalDate.parse`, which throws, this returns an optional:
     /// the Swift idiom for a recoverable parse failure.
+    /// The locale's first day of the week, as an ISO-8601 weekday number
+    /// (1 = Monday … 7 = Sunday).
+    ///
+    /// Two numbering schemes meet here, and confusing them shifts the whole
+    /// calendar grid by a day:
+    ///   - `Calendar.firstWeekday` counts 1 = SUNDAY … 7 = Saturday.
+    ///   - ISO-8601, which Kotlin's `WeekFields.of(locale).firstDayOfWeek.value`
+    ///     returns, counts 1 = MONDAY … 7 = Sunday.
+    ///
+    /// So Sunday is 1 in one scheme and 7 in the other, and every other day is off
+    /// by one. The conversion below is the whole reason this function exists
+    /// rather than a bare `Calendar.current.firstWeekday` at the call site.
+    public static func firstDayOfWeekIso(locale: Locale = .current) -> Int {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        let sundayBased = calendar.firstWeekday          // 1 = Sunday … 7 = Saturday
+        return sundayBased == 1 ? 7 : sundayBased - 1    // 1 = Monday … 7 = Sunday
+    }
+
     public static func parseDate(_ dateString: String) -> Date? {
         guard let parsed = dateFormatter.date(from: dateString) else { return nil }
         // The formatter yields midnight UTC; re-anchor at noon so later day
