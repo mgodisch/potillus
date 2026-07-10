@@ -512,6 +512,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Format the Kotlin tests as ktlint demands  (patch -49)
+
+- 36 `argument-list-wrapping` violations across the five Kotlin vector tests, plus
+  2 `spacing-between-declarations-with-comments` from the comment block patch -48
+  added. Once an argument list is multi-line, ktlint wants EVERY argument on its
+  own line; the vector tests packed two or three per line and had done so since the
+  day they were written. Nothing had ever checked them.
+- Corrected with `ktlint --format` at the version the project pins, then verified
+  by hand: every string literal survived byte for byte, and each file holds exactly
+  as many non-whitespace characters as before. A formatter may change style; it may
+  never change meaning.
+- The whole Android module is now silent under ktlint, main and test alike.
+
+NOTE FOR FUTURE SESSIONS: ktlint runs perfectly well without Gradle and without a
+build — a single self-contained jar and a JVM. It reproduced the failure exactly,
+36 + 2, before a line was changed. Kotlin style is therefore checkable in the same
+place the Kotlin is written, and there is no excuse for shipping it unchecked.
+
 #### Lift the report template above both platforms  (patch -48)
 
 Groundwork for the PDF export. The report's layout is about to become a contract

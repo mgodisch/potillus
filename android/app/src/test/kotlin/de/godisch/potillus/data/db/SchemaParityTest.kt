@@ -112,11 +112,13 @@ class SchemaParityTest {
                 val field = roomFields[columnName] ?: error("$name: missing column '$columnName'")
                 assertEquals(
                     "$name.$columnName: affinity",
-                    column.getString("type"), field.getString("affinity"),
+                    column.getString("type"),
+                    field.getString("affinity"),
                 )
                 assertEquals(
                     "$name.$columnName: notNull",
-                    column.getBoolean("notNull"), field.getBoolean("notNull"),
+                    column.getBoolean("notNull"),
+                    field.getBoolean("notNull"),
                 )
             }
         }
@@ -169,7 +171,8 @@ class SchemaParityTest {
                 )
                 assertEquals(
                     "index $indexName: unique",
-                    index.getBoolean("unique"), roomIndex.getBoolean("unique"),
+                    index.getBoolean("unique"),
+                    roomIndex.getBoolean("unique"),
                 )
             }
         }
@@ -200,11 +203,13 @@ class SchemaParityTest {
                 // must fail loudly rather than erase the user's history.
                 assertEquals(
                     "$name.$column: onDelete",
-                    fk.getString("onDelete"), roomFk.getString("onDelete"),
+                    fk.getString("onDelete"),
+                    roomFk.getString("onDelete"),
                 )
                 assertEquals(
                     "$name.$column: onUpdate",
-                    fk.getString("onUpdate"), roomFk.getString("onUpdate"),
+                    fk.getString("onUpdate"),
+                    roomFk.getString("onUpdate"),
                 )
             }
         }

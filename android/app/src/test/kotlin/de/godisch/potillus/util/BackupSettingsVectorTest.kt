@@ -92,28 +92,36 @@ class BackupSettingsVectorTest {
             assertEquals("dayChangeMinute: $label", want.getInt("dayChangeMinute"), actual.dayChangeMinute)
             assertEquals(
                 "dailyLimitGrams: $label",
-                want.getDouble("dailyLimitGrams"), actual.dailyLimitGrams, EPS,
+                want.getDouble("dailyLimitGrams"),
+                actual.dailyLimitGrams,
+                EPS,
             )
             assertEquals(
                 "weeklyLimitGrams: $label",
-                want.getDouble("weeklyLimitGrams"), actual.weeklyLimitGrams, EPS,
+                want.getDouble("weeklyLimitGrams"),
+                actual.weeklyLimitGrams,
+                EPS,
             )
             assertEquals(
                 "maxDrinkDaysPerWeek: $label",
-                want.getInt("maxDrinkDaysPerWeek"), actual.maxDrinkDaysPerWeek,
+                want.getInt("maxDrinkDaysPerWeek"),
+                actual.maxDrinkDaysPerWeek,
             )
             assertEquals("statsFromDate: $label", want.getString("statsFromDate"), actual.statsFromDate)
             assertEquals(
                 "biometricEnabled: $label",
-                want.getBoolean("biometricEnabled"), actual.biometricEnabled,
+                want.getBoolean("biometricEnabled"),
+                actual.biometricEnabled,
             )
             assertEquals(
                 "allowScreenshots: $label",
-                want.getBoolean("allowScreenshots"), actual.allowScreenshots,
+                want.getBoolean("allowScreenshots"),
+                actual.allowScreenshots,
             )
             assertEquals(
                 "alternativeStatusSymbols: $label",
-                want.getBoolean("alternativeStatusSymbols"), actual.alternativeStatusSymbols,
+                want.getBoolean("alternativeStatusSymbols"),
+                actual.alternativeStatusSymbols,
             )
             assertEquals("language: $label", want.getString("language"), actual.language)
             assertEquals("weightKg: $label", want.getDouble("weightKg"), actual.weightKg, EPS)

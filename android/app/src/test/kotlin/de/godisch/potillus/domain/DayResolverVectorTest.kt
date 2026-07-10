@@ -76,7 +76,8 @@ class DayResolverVectorTest {
             )
             assertEquals(
                 "resolve: ${case.getString("description")}",
-                case.getString("expected"), actual,
+                case.getString("expected"),
+                actual,
             )
         }
     }
@@ -107,7 +108,8 @@ class DayResolverVectorTest {
             )
             assertEquals(
                 "effectivePeriodDays: ${case.getString("description")}",
-                case.getInt("expected"), actual,
+                case.getInt("expected"),
+                actual,
             )
         }
     }
@@ -124,7 +126,8 @@ class DayResolverVectorTest {
             )
             assertEquals(
                 "computeCurrentAbstinence: ${case.getString("description")}",
-                case.getInt("expected"), actual,
+                case.getInt("expected"),
+                actual,
             )
         }
     }
@@ -141,7 +144,8 @@ class DayResolverVectorTest {
             )
             assertEquals(
                 "computeLongestAbstinence: ${case.getString("description")}",
-                case.getInt("expected"), actual,
+                case.getInt("expected"),
+                actual,
             )
         }
     }

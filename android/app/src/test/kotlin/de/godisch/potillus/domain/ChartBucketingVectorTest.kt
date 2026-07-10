@@ -78,7 +78,8 @@ class ChartBucketingVectorTest {
             val expected = ChartGranularity.valueOf(case.getString("expected"))
             assertEquals(
                 "granularityForSpan: ${case.getString("description")}",
-                expected, actual,
+                expected,
+                actual,
             )
         }
     }
@@ -103,15 +104,19 @@ class ChartBucketingVectorTest {
                 val want = expected.getJSONObject(index)
                 assertEquals(
                     "labelDate[$index]: $label",
-                    want.getString("labelDate"), actual[index].labelDate,
+                    want.getString("labelDate"),
+                    actual[index].labelDate,
                 )
                 assertEquals(
                     "avgPerDay[$index]: $label",
-                    want.getDouble("avgPerDay"), actual[index].avgPerDay, EPS,
+                    want.getDouble("avgPerDay"),
+                    actual[index].avgPerDay,
+                    EPS,
                 )
                 assertEquals(
                     "isAbstinent[$index]: $label",
-                    want.getBoolean("isAbstinent"), actual[index].isAbstinent,
+                    want.getBoolean("isAbstinent"),
+                    actual[index].isAbstinent,
                 )
             }
         }

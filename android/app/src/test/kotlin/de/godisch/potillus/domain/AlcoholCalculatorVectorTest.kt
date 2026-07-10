@@ -92,7 +92,9 @@ class AlcoholCalculatorVectorTest {
             )
             assertEquals(
                 "calculateGrams: ${case.getString("description")}",
-                case.getDouble("expected"), actual, EPS,
+                case.getDouble("expected"),
+                actual,
+                EPS,
             )
         }
     }
@@ -109,7 +111,9 @@ class AlcoholCalculatorVectorTest {
             )
             assertEquals(
                 "calculateBAC: ${case.getString("description")}",
-                case.getDouble("expected"), actual, EPS,
+                case.getDouble("expected"),
+                actual,
+                EPS,
             )
         }
     }
@@ -125,7 +129,9 @@ class AlcoholCalculatorVectorTest {
             )
             assertEquals(
                 "limitPercent: ${case.getString("description")}",
-                case.getDouble("expected"), actual.toDouble(), EPS,
+                case.getDouble("expected"),
+                actual.toDouble(),
+                EPS,
             )
         }
     }
@@ -145,7 +151,8 @@ class AlcoholCalculatorVectorTest {
             )
             assertEquals(
                 "isOverLimit: ${case.getString("description")}",
-                case.getBoolean("expected"), actual,
+                case.getBoolean("expected"),
+                actual,
             )
         }
     }
@@ -196,15 +203,18 @@ class AlcoholCalculatorVectorTest {
             val label = case.getString("description")
             assertEquals(
                 "daysOverDailyLimit: $label",
-                expected.getInt("daysOverDailyLimit"), actual.daysOverDailyLimit,
+                expected.getInt("daysOverDailyLimit"),
+                actual.daysOverDailyLimit,
             )
             assertEquals(
                 "daysOverWeeklyLimit: $label",
-                expected.getInt("daysOverWeeklyLimit"), actual.daysOverWeeklyLimit,
+                expected.getInt("daysOverWeeklyLimit"),
+                actual.daysOverWeeklyLimit,
             )
             assertEquals(
                 "daysOverDrinkDayLimit: $label",
-                expected.getInt("daysOverDrinkDayLimit"), actual.daysOverDrinkDayLimit,
+                expected.getInt("daysOverDrinkDayLimit"),
+                actual.daysOverDrinkDayLimit,
             )
         }
     }
@@ -218,12 +228,16 @@ class AlcoholCalculatorVectorTest {
         VECTORS.getJSONArray("countLimitViolations").objects().forEach { case ->
             val summaries = case.daySummaries()
             val forward = AlcoholCalculator.countLimitViolations(
-                summaries, case.getDouble("dailyLimitGrams"),
-                case.getDouble("weeklyLimitGrams"), case.getInt("maxDrinkDaysPerWeek"),
+                summaries,
+                case.getDouble("dailyLimitGrams"),
+                case.getDouble("weeklyLimitGrams"),
+                case.getInt("maxDrinkDaysPerWeek"),
             )
             val reversed = AlcoholCalculator.countLimitViolations(
-                summaries.reversed(), case.getDouble("dailyLimitGrams"),
-                case.getDouble("weeklyLimitGrams"), case.getInt("maxDrinkDaysPerWeek"),
+                summaries.reversed(),
+                case.getDouble("dailyLimitGrams"),
+                case.getDouble("weeklyLimitGrams"),
+                case.getInt("maxDrinkDaysPerWeek"),
             )
             assertEquals("order dependence: ${case.getString("description")}", forward, reversed)
         }

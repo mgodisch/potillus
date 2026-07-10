@@ -73,6 +73,7 @@ class PdfReportLangTest {
             val override = System.getProperty("potillus.project.dir")
             if (override != null) File(override) else File(".")
         }
+
         // The template moved out of app/src/main/assets and up to the repository
         // root, so that the iOS report renderer reads the same file. MODULE_DIR is
         // android/app; the root is two levels above it.
