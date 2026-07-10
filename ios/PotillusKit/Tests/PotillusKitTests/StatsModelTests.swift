@@ -63,9 +63,17 @@ final class StatsModelTests: XCTestCase {
 
     /// Noon on `date`, so the wall-clock hour is unambiguous.
     @discardableResult
+    /// Logs an entry at `hour` o'clock UTC on the given logical day.
+    ///
+    /// `DayResolver.parseDate` anchors a day at NOON, not midnight — deliberately,
+    /// so that adding whole days cannot be derailed by a DST transition. Adding
+    /// `hour` to that would place a "20:00" entry at 08:00 the next morning, which
+    /// is exactly the mistake this helper made until the time-of-day histogram
+    /// caught it.
     private func log(_ date: String, grams: Double, hour: Int = 12) throws -> Int64 {
-        let day = try XCTUnwrap(DayResolver.parseDate(date))
-        let millis = Int64(day.timeIntervalSince1970 * 1000) + Int64(hour) * 3_600_000
+        let noon = try XCTUnwrap(DayResolver.parseDate(date))
+        let midnight = noon.addingTimeInterval(-12 * 3_600)
+        let millis = Int64(midnight.timeIntervalSince1970 * 1000) + Int64(hour) * 3_600_000
         return try environment.entries.add(
             ConsumptionEntry(
                 drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
@@ -202,7 +210,10 @@ final class StatsModelTests: XCTestCase {
         let model = makeModel()
         await model.setPeriod(.month)
 
-        XCTAssertEqual(model.state.currentStreak, 15, "the whole floored period is dry")
+        // 1 to 15 January is fifteen dates, but `computeCurrentAbstinence` excludes
+        // TODAY: the day is not over, and a drink may still be logged. Fourteen
+        // completed dry days.
+        XCTAssertEqual(model.state.currentStreak, 14, "today is unfinished and does not count")
     }
 
     // ── The chart and the aggregations are wired through ─────────────────────

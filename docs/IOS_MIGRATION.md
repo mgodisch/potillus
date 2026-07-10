@@ -512,6 +512,19 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix two wrong expectations in the statistics tests  (patch -37)
+
+- The suite's `log()` helper built its timestamp by adding `hour` to
+  `DayResolver.parseDate(date)`, which anchors a day at NOON rather than midnight
+  — deliberately, so that adding whole days survives a DST transition. A "20:00"
+  entry therefore landed at 08:00 the next morning, and the time-of-day histogram
+  reported an empty bucket. The model was right; the helper subtracts the twelve
+  hours now, and a comment says why they are there.
+- `testTheFloorAlsoAppliesToStreaks` expected fifteen dry days between 1 and 15
+  January. `computeCurrentAbstinence` excludes TODAY, because the day is not over
+  and a drink may still be logged: fourteen COMPLETED dry days. The vectors and
+  Android agree; the expectation was wrong.
+
 #### Add the statistics model  (patch -36)
 
 - Add `StatsWindows`, the period arithmetic, as a pure type. Week is a rolling
