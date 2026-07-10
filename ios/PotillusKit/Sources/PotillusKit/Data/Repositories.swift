@@ -60,6 +60,10 @@ public protocol DrinkRepositoryProtocol: Sendable {
     /// Observable stream of all drinks: favourites first, then alphabetically.
     func observeDrinks() -> AsyncThrowingStream<[DrinkDefinition], Error>
 
+    /// The catalogue, read once. For screens that compute a snapshot rather than
+    /// observe one, and for the importer's name lookup.
+    func allOnce() throws -> [DrinkDefinition]
+
     /// Inserts `drink` and returns its new database id.
     func add(_ drink: DrinkDefinition) throws -> Int64
 
@@ -95,9 +99,15 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// The most recently *consumed* entry, or nil when the log is empty.
     func observeMostRecentEntry() -> AsyncThrowingStream<ConsumptionEntry?, Error>
 
-    /// One-shot reads, for exports and backups.
+    /// One-shot reads, for exports, backups, and screens that compute a snapshot
+    /// rather than observe one.
     func all() throws -> [ConsumptionEntry]
     func inRange(from: String, to: String) throws -> [ConsumptionEntry]
+
+    /// Per-day totals across an inclusive range, chronologically. The one-shot
+    /// twin of `observeDailySummaries`, sharing its SQL so the two can never
+    /// disagree about what a day's total is.
+    func dailySummaries(from: String, to: String) throws -> [DaySummary]
 
     /// Inserts `entry` and returns its new database id.
     func add(_ entry: ConsumptionEntry) throws -> Int64
@@ -154,6 +164,18 @@ public struct DrinkRepository: DrinkRepositoryProtocol {
     /// database do it once per change rather than once per render.
     public func observeDrinks() -> AsyncThrowingStream<[DrinkDefinition], Error> {
         observing(reader: database.reader) { db in
+            try Drink
+                .order(Column("isFavorite").desc, Column("name").asc)
+                .fetchAll(db)
+                .map(\.domain)
+        }
+    }
+
+    public func allOnce() throws -> [DrinkDefinition] {
+        try database.read { db in
+            // The SAME ordering as `observeDrinks`: favourites first, then by
+            // name. A snapshot that ordered differently from the stream would
+            // reshuffle the list the moment a screen switched between them.
             try Drink
                 .order(Column("isFavorite").desc, Column("name").asc)
                 .fetchAll(db)
@@ -231,26 +253,34 @@ public struct EntryRepository: EntryRepositoryProtocol {
     /// Days without entries are simply absent; `ChartBucketing` fills the gaps.
     public func observeDailySummaries(from: String, to: String) -> AsyncThrowingStream<[DaySummary], Error> {
         observing(reader: database.reader) { db in
-            try Row.fetchAll(
-                db,
-                sql: """
-                    SELECT logicalDate,
-                           SUM(gramsAlcohol) AS totalGrams,
-                           COUNT(*) AS entryCount
-                    FROM entries
-                    WHERE logicalDate >= ? AND logicalDate <= ?
-                    GROUP BY logicalDate
-                    ORDER BY logicalDate ASC
-                    """,
-                arguments: [from, to]
+            try Self.fetchDailySummaries(db, from: from, to: to)
+        }
+    }
+
+    /// The single definition of the summary query, used by both the observing and
+    /// the one-shot reader above. Two copies would eventually disagree.
+    private static func fetchDailySummaries(
+        _ db: Database, from: String, to: String
+    ) throws -> [DaySummary] {
+        try Row.fetchAll(
+            db,
+            sql: """
+                SELECT logicalDate,
+                       SUM(gramsAlcohol) AS totalGrams,
+                       COUNT(*) AS entryCount
+                FROM entries
+                WHERE logicalDate >= ? AND logicalDate <= ?
+                GROUP BY logicalDate
+                ORDER BY logicalDate ASC
+                """,
+            arguments: [from, to]
+        )
+        .map { row in
+            DaySummary(
+                date: row["logicalDate"],
+                totalGrams: row["totalGrams"],
+                entryCount: row["entryCount"]
             )
-            .map { row in
-                DaySummary(
-                    date: row["logicalDate"],
-                    totalGrams: row["totalGrams"],
-                    entryCount: row["entryCount"]
-                )
-            }
         }
     }
 
@@ -301,6 +331,10 @@ public struct EntryRepository: EntryRepositoryProtocol {
                 .fetchAll(db)
                 .map(\.domain)
         }
+    }
+
+    public func dailySummaries(from: String, to: String) throws -> [DaySummary] {
+        try database.read { db in try Self.fetchDailySummaries(db, from: from, to: to) }
     }
 
     public func add(_ entry: ConsumptionEntry) throws -> Int64 {

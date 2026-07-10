@@ -512,6 +512,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Today screen  (patch -26)
+
+- Add `Clock`, so "now" is injected rather than read from a global. The Today
+  screen needs the instant twice — to pick the logical day, and to age the
+  blood-alcohol estimate — and a test for "the day flips at 04:00" cannot wait
+  until 4am. This is also where Android's `clockOverride` screenshot seam will
+  land, as another `Clock` at the composition root, with no mutable global.
+- Add `TodayModel` in the KIT, not the app target: that is where the arithmetic
+  is, and the app target is not covered by `swift test`. `TodayScreen` decides
+  where things sit and computes nothing.
+- Keep `bacPermille` OPTIONAL, and render it as absent rather than zero. Nil
+  means "we cannot know" — no body weight, or nothing alcoholic logged. Showing
+  0.00 permille would assert a sobriety the app cannot vouch for.
+- Derive an entry's grams and logical date inside the model. A view that could
+  pass its own would eventually pass a wrong one, and a drink logged at 02:00
+  would stop counting towards the evening it belongs to.
+- Add one-shot `dailySummaries(from:to:)` and `allOnce()` to the repositories,
+  each sharing the query of its observing twin. The summary SQL now exists once:
+  two copies would eventually disagree about what a day's total is. `allOnce()`
+  repeats the stream's ordering (favourites first, then name) so a screen cannot
+  reshuffle its list by switching between snapshot and stream.
+- Defer `monthlyAvgPerDay`, `monthTrend`, `weeklyRangeLabel` and
+  `currentMonthLabel`. Each is a formatted, locale-dependent string or a statistic
+  the Statistics screen owns; porting them now would mean inventing a date format
+  before the String Catalogs exist, and inventing it twice.
+
 #### Use a calendar symbol for the Today tab  (patch -25)
 
 - Replace `sun.max` with `calendar.badge.clock`. The sun was wrong: in Apple's

@@ -71,7 +71,7 @@ struct RootView: View {
         //   filled form for tab items on iOS and the outlined one on macOS by
         //   itself; spelling it out would defeat that.
         TabView {
-            PlaceholderScreen(title: "Today")
+            TodayScreen(environment: environment)
                 .tabItem { Label("Today", systemImage: "calendar.badge.clock") }
 
             PlaceholderScreen(title: "Calendar")
