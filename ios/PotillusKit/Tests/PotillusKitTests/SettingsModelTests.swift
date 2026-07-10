@@ -141,6 +141,25 @@ final class SettingsModelTests: XCTestCase {
         XCTAssertFalse(model.hasStatsFloor)
     }
 
+    // ── The model must not lie about its own state ───────────────────────────
+
+    /// `settings` means "what is stored", not "what was asked for". The sanitiser
+    /// may keep something else, and until the model reads back, it reports the
+    /// request. Without `start()` there is no observation to correct it — the
+    /// state a test, or a screen not yet visible, is in.
+    func testAfterAWriteTheModelReportsWhatWasStoredNotWhatWasAsked() async {
+        // Deliberately no `start()`: observation would mask the defect.
+        await model.update { $0.dailyLimitGrams = 9_000 }
+
+        XCTAssertEqual(
+            model.settings.dailyLimitGrams,
+            SettingsSanitizer.dailyLimitRange.upperBound,
+            "the model must report the clamped value, not the 9000 it was handed"
+        )
+        let onDisk = await stored().dailyLimitGrams
+        XCTAssertEqual(model.settings.dailyLimitGrams, onDisk, accuracy: 1e-9)
+    }
+
     // ── Observation ──────────────────────────────────────────────────────────
 
     /// A backup import writes settings behind this screen's back. The screen must

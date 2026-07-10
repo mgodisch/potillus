@@ -512,6 +512,27 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Stop SettingsModel lying about its own state  (patch -45)
+
+- `SettingsModel.update` wrote to the store and left its own `settings` stale.
+  The field was refreshed ONLY by the observation loop, so between a write and the
+  store's next emission the model reported the value the caller ASKED for rather
+  than the one that was kept: a weight of 9999 kg read as set while the store held
+  500, and a stepper could bounce back under the user's thumb. A model that never
+  called `start()` — a test, or a screen not yet visible — would never learn the
+  truth at all.
+- `update` now reads the value back. `settings` therefore means "what is stored",
+  which is the only definition the sanitiser leaves room for: the store may
+  legitimately keep something other than what was asked for.
+- Found by two failing tests, and the tests were right. They asserted `hasWeight`
+  and `hasStatsFloor` after a write without starting observation — exactly the
+  state that exposed the defect. The regression test now says so in its name and
+  omits `start()` deliberately, because observation would mask it.
+- Checked the other models for the same gap. `TodayModel` and `CalendarModel`
+  reload after every write; `DrinksModel` leans on GRDB's database observation,
+  which emits on commit. The defect was unique to the one model whose store is a
+  file rather than a database.
+
 #### Catch by machine what review kept missing  (patch -44)
 
 Three compile errors reached the repository in four patches, all from the same

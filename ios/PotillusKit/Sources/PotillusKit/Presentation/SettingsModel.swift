@@ -85,17 +85,30 @@ public final class SettingsModel {
 
     // ── Writing ──────────────────────────────────────────────────────────────
 
-    /// Applies `transform`, sanitises the result, and stores it.
+    /// Applies `transform`, sanitises the result, stores it, and reads it back.
     ///
     /// The sanitiser runs on the WHOLE settings value, not on the changed field:
     /// clamping is defined over the value, and a caller cannot know which other
     /// field a change invalidates.
+    ///
+    /// WHY READ BACK RATHER THAN TRUST THE WRITE
+    ///   `settings` used to be refreshed only by the observation loop, so between
+    ///   a write and the store's next emission the model reported the value the
+    ///   caller ASKED for rather than the one that was kept. A weight of 9999 kg
+    ///   would read as set while the store held 500; a stepper could bounce back
+    ///   under the user's thumb; and a model that has not called `start()` — a
+    ///   test, or a screen not yet on screen — would never learn the truth at all.
+    ///
+    ///   Reading back makes `settings` mean "what is stored", which is the only
+    ///   definition the sanitiser leaves room for: the store may legitimately keep
+    ///   something other than what was asked for.
     public func update(_ transform: @escaping @Sendable (inout AppSettings) -> Void) async {
         do {
             try await preferences.update { draft in
                 transform(&draft)
                 draft = SettingsSanitizer.sanitize(draft)
             }
+            settings = await preferences.load()
             failure = nil
         } catch {
             failure = String(describing: error)
