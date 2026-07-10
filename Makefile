@@ -835,7 +835,7 @@ ios-project: ios-version
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
 ios: check-headers check-makefile check-swift-tests check-swift-symbols \
-     check-report-paper check-l10n check-swiftlint ios-project
+     check-report-paper check-report-labels check-l10n check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
@@ -926,6 +926,13 @@ check-report-paper:
 check-l10n:
 	python3 tools/check-l10n.py
 
+# check-report-labels: ReportLabelsCatalog.swift is generated from Android's report
+# strings and excluded from SwiftLint, so this guards it — it must match the
+# generator's current output (no drift, no hand edits) and every language's closure
+# must carry the same interpolation count as English.
+check-report-labels:
+	python3 tools/check-report-labels.py
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
@@ -968,4 +975,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-report-labels ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper

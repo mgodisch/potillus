@@ -163,10 +163,11 @@ extension StatsScreen {
             // The model already resolved the logical today when it loaded the
             // window; asking a clock again could straddle the day-change hour and
             // give the report a different today than the screen behind it.
+            let settings = await environment.preferences.load()
             guard let data = ReportData.make(
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),
-                settings: await environment.preferences.load(),
+                settings: settings,
                 periodEnd: to,
                 today: model.state.today
             ) else {
@@ -174,13 +175,20 @@ extension StatsScreen {
                 return
             }
 
+            // The report follows the UI language, as Android's does: the labels come
+            // from that language and the locale drives numbers, dates, and the CJK
+            // glyph orthography (REPORT_LANG). An empty tag ("System") yields English
+            // labels and the current locale.
+            let reportLocale = Loc.locale(for: settings.language)
             let html = ReportRenderer.render(
                 data: data,
                 context: ReportRenderer.Context(
                     template: try ReportTemplate.load(),
                     appVersion: Self.appVersion,
                     systemVersion: UIDevice.current.systemVersion,
-                    exportDate: Date()
+                    exportDate: Date(),
+                    locale: reportLocale,
+                    labels: ReportLabels(language: settings.language)
                 )
             )
 

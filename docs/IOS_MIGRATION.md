@@ -512,6 +512,42 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Localise the PDF report, following the UI language  (patch -79)
+
+The report was the last English-only surface. Now its title, sections, KPI labels,
+table headers, category names, and the risk-section closures all follow the UI
+language — as Android's report does, where `Context.formattingLocale` drives the
+labels, the numbers, and the dates from one per-app locale.
+
+FULLY HARVESTED. Android localised the report completely: 46 `pdf_`/`category_`
+strings in all twenty languages, 100% present, nothing missing. So this patch invents
+no report text — `tools/build-report-labels.py` reads Android's strings.xml and emits
+`ReportLabelsCatalog.swift`, a `ReportLabels(language:)` that carries every label in
+every language. `%1$s`/`%1$d` in the harvested closures become Swift `\($0)`.
+
+WHY A GENERATED FILE, EXCLUDED FROM SWIFTLINT. Twenty languages is 800-plus strings
+and a 20-way dispatch; the switch's complexity and the file's length are inherent to
+that, not signs of messy hand-written code. The file is generated and excluded from
+SwiftLint, and `tools/check-report-labels.py` guards it instead: it regenerates and
+compares byte for byte (so a hand edit or a changed Android string is caught as
+drift), and checks that every language's closures carry the same `\($0)` count as
+English (so a dropped placeholder can't crash the report at print time). Both checks
+are self-tested.
+
+ReportLabels declares an explicit `init()`, which suppresses the memberwise
+initialiser — so the generated code assigns fields on a `var`, it does not call
+`init(title:...)`, which would not compile.
+
+REPORT_LANG. The renderer already emitted the BCP-47 tag into `<html lang>`; now it
+is the chosen language's tag. That matters beyond text: a WebView picks its CJK glyph
+orthography (Simplified vs Traditional Han, Japanese kanji, Korean hanja) from the
+document language, so a Japanese report now renders Japanese glyph forms rather than
+defaulting to Simplified-Chinese shapes for the code points the scripts share.
+
+Localisation is complete: twenty UI languages, the report, and the plurals. A device
+check worth doing: export a report under each script and confirm the glyph forms and
+the number/date formats follow the chosen language.
+
 #### Localise the three plurals, in the UI too  (patch -78)
 
 Android has three `<plurals>`: `days` (statistics streaks, and the report), and the
