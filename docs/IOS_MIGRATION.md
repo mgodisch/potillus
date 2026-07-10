@@ -512,6 +512,28 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the limit bars to the Today screen  (patch -27)
+
+- Add `LimitGauge` in the kit: the rules a progress bar needs, extracted so they
+  can be tested. The SwiftUI `LimitBar` maps `Emphasis` onto a colour and does
+  nothing else — a colour chosen in a view would be a rule nobody could test.
+- Separate the two fractions. The bar's FILL is clamped to `0...1`, or a 130 %
+  day would draw past its track; the COLOUR comes from the UNCLAMPED value, so
+  the overflow still reads as red. Conflating them either breaks the layout or
+  hides the violation.
+- Colour the drink-day bar by the same gate `AlcoholCalculator.trafficLight`
+  already uses, rather than the simpler `days > max`:
+
+      pastDrinkDays = drinkDaysThisWeek - (todayIsDrinkDay ? 1 : 0)
+      if pastDrinkDays >= maxDrinkDaysPerWeek -> red
+
+  Both the bar and the dot answer "may I drink now?", and a full drink-day bar
+  does not settle it. At 5/5 with today already a drink day, another drink adds
+  no further day: amber. At 5/5 with today still dry, the first drink spends a
+  day the user does not have: red. The bar looks identical; the answer does not.
+- A test walks the whole `days x maxDays x todayIsDrinkDay` grid asserting the bar
+  and the dot agree, so the two cannot drift apart.
+
 #### Add the Today screen  (patch -26)
 
 - Add `Clock`, so "now" is injected rather than read from a global. The Today

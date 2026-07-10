@@ -77,23 +77,53 @@ struct TodayScreen: View {
 
     private var summarySection: some View {
         Section {
-            LabeledContent("Today") {
-                Text(grams(model.state.totalGrams))
-                    .monospacedDigit()
-            }
-            LabeledContent("Daily limit") {
-                Text(grams(model.state.limitInfo.limitGrams))
-                    .monospacedDigit()
-                    .foregroundStyle(isOverLimit ? .red : .primary)
-            }
-            LabeledContent("This week") {
-                Text(grams(model.state.weeklyTotalGrams))
-                    .monospacedDigit()
-            }
-            LabeledContent("Drink days") {
-                Text("\(model.state.drinkDaysThisWeek) / \(model.state.limitInfo.maxDrinkDaysPerWeek)")
-                    .monospacedDigit()
-            }
+            LimitBar(
+                caption: "Today",
+                value: grams(model.state.totalGrams),
+                limit: grams(model.state.limitInfo.limitGrams),
+                fill: LimitGauge.fillFraction(
+                    totalGrams: model.state.totalGrams,
+                    limitGrams: model.state.limitInfo.limitGrams
+                ),
+                emphasis: LimitGauge.emphasis(
+                    totalGrams: model.state.totalGrams,
+                    limitGrams: model.state.limitInfo.limitGrams
+                )
+            )
+
+            LimitBar(
+                caption: "This week",
+                value: grams(model.state.weeklyTotalGrams),
+                limit: grams(model.state.limitInfo.weeklyLimitGrams),
+                fill: LimitGauge.fillFraction(
+                    totalGrams: model.state.weeklyTotalGrams,
+                    limitGrams: model.state.limitInfo.weeklyLimitGrams
+                ),
+                emphasis: LimitGauge.emphasis(
+                    totalGrams: model.state.weeklyTotalGrams,
+                    limitGrams: model.state.limitInfo.weeklyLimitGrams
+                )
+            )
+
+            LimitBar(
+                caption: "Drink days",
+                value: "\(model.state.drinkDaysThisWeek)",
+                limit: "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
+                fill: LimitGauge.drinkDaysFillFraction(
+                    drinkDays: model.state.drinkDaysThisWeek,
+                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek
+                ),
+                // Today's own status decides the colour. A day already spent as
+                // a drink day costs nothing further, so a full bar can stay amber;
+                // a dry day at the cap means the next drink spends a day the user
+                // does not have, and the bar goes red.
+                emphasis: LimitGauge.drinkDaysEmphasis(
+                    drinkDays: model.state.drinkDaysThisWeek,
+                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek,
+                    todayIsDrinkDay: model.state.totalGrams > 0
+                )
+            )
+
             // Absent rather than zero: without a body weight, or with nothing
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
@@ -139,15 +169,63 @@ struct TodayScreen: View {
 
     // ── Formatting ───────────────────────────────────────────────────────────
 
-    private var isOverLimit: Bool {
-        AlcoholCalculator.isOverLimit(
-            totalGrams: model.state.totalGrams, limitGrams: model.state.limitInfo.limitGrams
-        )
-    }
-
     /// Grams, one decimal. A `NumberFormatter` and its locale arrive with the
     /// String Catalogs; this is display text, not the export's fixed format.
     private func grams(_ value: Double) -> String {
         String(format: "%.1f g", value)
+    }
+}
+
+// =============================================================================
+// LimitBar – a labelled progress bar
+// =============================================================================
+//
+// Layout and colour. Both the fill and the emphasis are decided by `LimitGauge`
+// in the kit, where they are tested: the fill is clamped so the bar cannot
+// overflow its track, while the emphasis comes from the unclamped value so a
+// 130 % day still reads as red.
+// =============================================================================
+
+struct LimitBar: View {
+    let caption: String
+    let value: String
+    let limit: String
+    let fill: Double
+    let emphasis: Emphasis
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(caption)
+                Spacer(minLength: 8)
+                Text("\(value) / \(limit)")
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                    // The label may be long once translated; let it shrink rather
+                    // than wrap into the caption, the defect the Android layout
+                    // hardening fixed for Greek and Russian.
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .font(.subheadline)
+
+            ProgressView(value: fill)
+                .tint(emphasis.tint)
+                // The bar is decoration; the numbers above already say it.
+                .accessibilityHidden(true)
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+extension Emphasis {
+    /// The colour band. `.accentColor` follows the app tint, so a calm bar is
+    /// calm in both light and dark mode without a hand-picked hex value.
+    var tint: Color {
+        switch self {
+        case .calm: return .accentColor
+        case .warning: return .orange
+        case .danger: return .red
+        }
     }
 }
