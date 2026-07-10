@@ -16,6 +16,30 @@
             "state": "translated",
             "value": "%1$@ wird von %2$lld Einträgen verwendet."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ bruges af %2$lld registreringer."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ wordt gebruikt door %2$lld registraties."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ brukes av %2$lld registreringer."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ används av %2$lld poster."
+          }
         }
       }
     },
@@ -29,6 +53,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld ml · %2$@"
@@ -50,6 +98,30 @@
             "state": "translated",
             "value": "Ein Getränk vor dieser Uhrzeit zählt zum Vortag."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En drik registreret før dette tidspunkt tæller til den foregående dag."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een drankje dat vóór dit tijdstip wordt geregistreerd, telt voor de vorige dag."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En drink registrert før dette tidspunktet teller til dagen før."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En dryck som registreras före denna tid räknas till föregående dag."
+          }
         }
       }
     },
@@ -66,6 +138,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abstinenz"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afholdenhed"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onthouding"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avhold"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avhållsamhet"
           }
         }
       }
@@ -84,6 +180,30 @@
             "state": "translated",
             "value": "Hinzufügen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilføj"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toevoegen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legg til"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till"
+          }
         }
       }
     },
@@ -100,6 +220,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Füge ein Getränk hinzu, um zu beginnen."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilføj en drik for at begynde at registrere."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg een drankje toe om te beginnen met registreren."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legg til en drink for å begynne å registrere."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till en dryck för att börja registrera."
           }
         }
       }
@@ -118,6 +262,30 @@
             "state": "translated",
             "value": "Zu Favoriten hinzufügen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Føj til favoritter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan favorieten toevoegen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legg til i favoritter"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till i favoriter"
+          }
         }
       }
     },
@@ -131,6 +299,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcohol"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "Alkohol"
@@ -152,6 +344,30 @@
             "state": "translated",
             "value": "Alkohol (%)"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol (%)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcohol (%)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol (%)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol (%)"
+          }
         }
       }
     },
@@ -168,6 +384,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alternative Statussymbole"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternative statussymboler"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternatieve statussymbolen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternative statussymboler"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternativa statussymboler"
           }
         }
       }
@@ -186,6 +426,30 @@
             "state": "translated",
             "value": "App-Sperre"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-lås"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-vergrendeling"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-lås"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applås"
+          }
         }
       }
     },
@@ -202,6 +466,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Die App-Sperre benötigt Face ID, Touch ID oder einen Gerätecode."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-lås kræver Face ID, Touch ID eller en enhedsadgangskode."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-vergrendeling vereist Face ID, Touch ID of een toegangscode."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App-lås krever Face ID, Touch ID eller en enhetskode."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applås kräver Face ID, Touch ID eller en enhetskod."
           }
         }
       }
@@ -220,6 +508,30 @@
             "state": "translated",
             "value": "Erscheinungsbild"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Udseende"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weergave"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utseende"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utseende"
+          }
         }
       }
     },
@@ -236,6 +548,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Backup"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sikkerhedskopi"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back-up"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sikkerhetskopiering"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Säkerhetskopia"
           }
         }
       }
@@ -254,6 +590,30 @@
             "state": "translated",
             "value": "Körpergewicht"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legemsvægt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lichaamsgewicht"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kroppsvekt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kroppsvikt"
+          }
         }
       }
     },
@@ -270,6 +630,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nach Kategorie"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efter kategori"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Op categorie"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etter kategori"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efter kategori"
           }
         }
       }
@@ -288,6 +672,30 @@
             "state": "translated",
             "value": "Nach Wochentag"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efter ugedag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Op weekdag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etter ukedag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efter veckodag"
+          }
         }
       }
     },
@@ -301,6 +709,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalender"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalender"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalender"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalender"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "Kalender"
@@ -322,6 +754,30 @@
             "state": "translated",
             "value": "Abbrechen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuller"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuleren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avbryt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avbryt"
+          }
         }
       }
     },
@@ -338,6 +794,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kategorie"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategori"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categorie"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategori"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategori"
           }
         }
       }
@@ -356,6 +836,30 @@
             "state": "translated",
             "value": "Körpergewicht löschen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ryd legemsvægt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lichaamsgewicht wissen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern kroppsvekt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rensa kroppsvikt"
+          }
         }
       }
     },
@@ -372,6 +876,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Konsum"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbrug"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consumptie"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbruk"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konsumtion"
           }
         }
       }
@@ -390,6 +918,30 @@
             "state": "translated",
             "value": "Aktuelle Serie"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuværende stime"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huidige reeks"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nåværende rekke"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuvarande svit"
+          }
         }
       }
     },
@@ -406,6 +958,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tageslimit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daglig grænse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daglimiet"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daglig grense"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daglig gräns"
           }
         }
       }
@@ -424,6 +1000,30 @@
             "state": "translated",
             "value": "Nacht"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mørk"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Donker"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mørk"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mörkt"
+          }
         }
       }
     },
@@ -440,6 +1040,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tageswechsel"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagskifte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagwisseling"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagskifte"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dygnsskifte"
           }
         }
       }
@@ -458,6 +1082,30 @@
             "state": "translated",
             "value": "Tag beginnt um"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen begynder kl."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dag begint om"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen begynner kl."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen börjar kl."
+          }
         }
       }
     },
@@ -474,6 +1122,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tage nach heute können nicht gewählt werden."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dage efter i dag kan ikke vælges."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen na vandaag kunnen niet worden geselecteerd."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dager etter i dag kan ikke velges."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagar efter i dag kan inte väljas."
           }
         }
       }
@@ -492,6 +1164,30 @@
             "state": "translated",
             "value": "Tage vor diesem Datum werden in der Statistik ignoriert. Einträge werden nicht gelöscht."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dage før denne dato ignoreres i statistikken. Registreringer slettes ikke."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen vóór deze datum worden in de statistieken genegeerd. Registraties worden niet verwijderd."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dager før denne datoen ignoreres i statistikken. Registreringer slettes ikke."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagar före detta datum ignoreras i statistiken. Poster raderas inte."
+          }
         }
       }
     },
@@ -508,6 +1204,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tage über Limit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dage over grænsen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen boven limiet"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dager over grensen"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagar över gränsen"
           }
         }
       }
@@ -526,6 +1246,30 @@
             "state": "translated",
             "value": "Löschen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijderen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slett"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radera"
+          }
         }
       }
     },
@@ -542,6 +1286,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ löschen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slet %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ verwijderen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slett %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radera %@"
           }
         }
       }
@@ -560,6 +1328,30 @@
             "state": "translated",
             "value": "Fertig"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Færdig"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klaar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferdig"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klar"
+          }
         }
       }
     },
@@ -576,6 +1368,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Getränk"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drik"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drank"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikk"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dryck"
           }
         }
       }
@@ -594,6 +1410,30 @@
             "state": "translated",
             "value": "Trinktage"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkedage"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drinkdagen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkedager"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dryckesdagar"
+          }
         }
       }
     },
@@ -610,6 +1450,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trinktage pro Woche"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkedage pr. uge"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drinkdagen per week"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkedager per uke"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dryckesdagar per vecka"
           }
         }
       }
@@ -628,6 +1492,30 @@
             "state": "translated",
             "value": "Getränke"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkevarer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dranken"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikker"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drycker"
+          }
         }
       }
     },
@@ -644,6 +1532,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trockene Tage im Zeitraum"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tørre dage i perioden"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Droge dagen in periode"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tørre dager i perioden"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Torra dagar i perioden"
           }
         }
       }
@@ -662,6 +1574,30 @@
             "state": "translated",
             "value": "%@ bearbeiten"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rediger %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ bewerken"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rediger %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redigera %@"
+          }
         }
       }
     },
@@ -678,6 +1614,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Einträge"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registreringer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registraties"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registreringer"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poster"
           }
         }
       }
@@ -696,6 +1656,30 @@
             "state": "translated",
             "value": "Geschätzter BAK"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anslået promille"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geschat promillage"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anslått promille"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uppskattad promille"
+          }
         }
       }
     },
@@ -712,6 +1696,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Exportieren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksporter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exporteren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksporter"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportera"
           }
         }
       }
@@ -730,6 +1738,30 @@
             "state": "translated",
             "value": "CSV exportieren"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksportér CSV"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV exporteren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksporter CSV"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportera CSV"
+          }
         }
       }
     },
@@ -746,6 +1778,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "PDF-Bericht exportieren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksportér PDF-rapport"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF-rapport exporteren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksporter PDF-rapport"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportera PDF-rapport"
           }
         }
       }
@@ -764,6 +1820,30 @@
             "state": "translated",
             "value": "Backup exportieren"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksportér sikkerhedskopi"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back-up exporteren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksporter sikkerhetskopi"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportera säkerhetskopia"
+          }
         }
       }
     },
@@ -780,6 +1860,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Favoriten"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoritter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorieten"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoritter"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriter"
           }
         }
       }
@@ -798,6 +1902,30 @@
             "state": "translated",
             "value": "Von"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fra"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Van"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fra"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Från"
+          }
         }
       }
     },
@@ -814,6 +1942,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Backup importieren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importér sikkerhedskopi"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back-up importeren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer sikkerhetskopi"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importera säkerhetskopia"
           }
         }
       }
@@ -832,6 +1984,30 @@
             "state": "translated",
             "value": "Gesamten Verlauf einbeziehen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medtag hele historikken"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volledige geschiedenis opnemen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta med hele historikken"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inkludera hela historiken"
+          }
         }
       }
     },
@@ -848,6 +2024,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Einstellungen einbeziehen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medtag indstillinger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen opnemen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta med innstillinger"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inkludera inställningar"
           }
         }
       }
@@ -866,6 +2066,30 @@
             "state": "translated",
             "value": "Sprache"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprog"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taal"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Språk"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Språk"
+          }
         }
       }
     },
@@ -879,6 +2103,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "Libellus Potionis"
@@ -900,6 +2148,30 @@
             "state": "translated",
             "value": "Libellus Potionis konnte nicht starten"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis kunne ikke starte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis kon niet starten"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis kunne ikke starte"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis kunde inte starta"
+          }
         }
       }
     },
@@ -916,6 +2188,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Libellus Potionis ist gesperrt"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis er låst"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis is vergrendeld"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis er låst"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis är låst"
           }
         }
       }
@@ -934,6 +2230,30 @@
             "state": "translated",
             "value": "Tag"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lys"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licht"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lys"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ljust"
+          }
         }
       }
     },
@@ -950,6 +2270,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Limits"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grænser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limieten"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grenser"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gränser"
           }
         }
       }
@@ -968,6 +2312,30 @@
             "state": "translated",
             "value": "Getränk erfassen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrér en drik"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een drankje registreren"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrer en drink"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrera en dryck"
+          }
         }
       }
     },
@@ -984,6 +2352,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Längste Serie"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Længste stime"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langste reeks"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lengste rekke"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Längsta svit"
           }
         }
       }
@@ -1002,6 +2394,30 @@
             "state": "translated",
             "value": "Mit meinen Daten zusammenführen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flet med mine data"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Samenvoegen met mijn gegevens"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå sammen med mine data"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå samman med mina data"
+          }
         }
       }
     },
@@ -1018,6 +2434,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Monat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måned"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maand"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måned"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Månad"
           }
         }
       }
@@ -1036,6 +2476,30 @@
             "state": "translated",
             "value": "Name"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navn"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naam"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navn"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Namn"
+          }
         }
       }
     },
@@ -1052,6 +2516,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Noch keine Getränke"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen drikke endnu"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog geen drankjes"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen drinker ennå"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inga drycker ännu"
           }
         }
       }
@@ -1070,6 +2558,30 @@
             "state": "translated",
             "value": "Notiz"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notitie"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notat"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anteckning"
+          }
         }
       }
     },
@@ -1086,6 +2598,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "An diesem Tag nichts erfasst."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intet registreret denne dag."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niets geregistreerd op deze dag."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingenting registrert denne dagen."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inget registrerat denna dag."
           }
         }
       }
@@ -1104,6 +2640,30 @@
             "state": "translated",
             "value": "Noch nichts erfasst."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intet registreret endnu."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog niets geregistreerd."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingenting registrert ennå."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inget registrerat ännu."
+          }
         }
       }
     },
@@ -1117,6 +2677,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oké"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "OK"
@@ -1138,6 +2722,30 @@
             "state": "translated",
             "value": "Pro Tag"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pr. dag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per dag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per dag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per dag"
+          }
         }
       }
     },
@@ -1154,6 +2762,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pro Trinktag"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pr. drikkedag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per drinkdag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per drikkedag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per dryckesdag"
           }
         }
       }
@@ -1172,6 +2804,30 @@
             "state": "translated",
             "value": "Zeitraum"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periode"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periode"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periode"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Period"
+          }
         }
       }
     },
@@ -1188,6 +2844,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Persönliche Daten"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personlige data"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persoonlijke gegevens"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personlige data"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personuppgifter"
           }
         }
       }
@@ -1206,6 +2886,30 @@
             "state": "translated",
             "value": "Vorlage"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forudindstilling"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorinstelling"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forhåndsinnstilling"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förinställning"
+          }
         }
       }
     },
@@ -1222,6 +2926,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aus Favoriten entfernen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern fra favoritter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uit favorieten verwijderen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern fra favoritter"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta bort från favoriter"
           }
         }
       }
@@ -1240,6 +2968,30 @@
             "state": "translated",
             "value": "Meine Daten ersetzen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstat mine data"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mijn gegevens vervangen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstatt mine data"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ersätt mina data"
+          }
         }
       }
     },
@@ -1256,6 +3008,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Beim Ersetzen werden dein Logbuch und die von dir erstellten Getränke gelöscht. Vorlagen bleiben erhalten."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstatning sletter din log og de drikke, du har oprettet. Forudindstillinger bevares."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervangen verwijdert je logboek en de door jou gemaakte drankjes. Voorinstellingen blijven behouden."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstatning sletter loggen din og drinkene du har opprettet. Forhåndsinnstillinger beholdes."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ersättning raderar din logg och de drycker du har skapat. Förinställningar behålls."
           }
         }
       }
@@ -1274,6 +3050,30 @@
             "state": "translated",
             "value": "Speichern"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gem"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opslaan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagre"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spara"
+          }
         }
       }
     },
@@ -1290,6 +3090,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sicherheit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sikkerhed"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beveiliging"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sikkerhet"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Säkerhet"
           }
         }
       }
@@ -1308,6 +3132,30 @@
             "state": "translated",
             "value": "Körpergewicht festlegen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angiv legemsvægt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lichaamsgewicht instellen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angi kroppsvekt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ange kroppsvikt"
+          }
         }
       }
     },
@@ -1324,6 +3172,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Einstellungen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indstillinger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Innstillinger"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inställningar"
           }
         }
       }
@@ -1342,6 +3214,30 @@
             "state": "translated",
             "value": "In App-Übersicht anzeigen"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis i app-skifter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tonen in app-wisselaar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis i app-veksler"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visa i appväxlaren"
+          }
         }
       }
     },
@@ -1355,6 +3251,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistik"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistik"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistieken"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikk"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "Statistik"
@@ -1376,6 +3296,30 @@
             "state": "translated",
             "value": "Die Statistik umfasst den gesamten Verlauf."
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikken dækker hele historikken."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De statistieken omvatten de volledige geschiedenis."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikken dekker hele historikken."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistiken omfattar hela historiken."
+          }
         }
       }
     },
@@ -1393,6 +3337,30 @@
             "state": "translated",
             "value": "Statistikbeginn"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikstart"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistiekstart"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikkstart"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistikstart"
+          }
         }
       }
     },
@@ -1406,6 +3374,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeem"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "System"
@@ -1427,6 +3419,30 @@
             "state": "translated",
             "value": "Das Volumen muss liegen zwischen "
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mængden skal være mellem "
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het volume moet liggen tussen "
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumet må være mellom "
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volymen måste vara mellan "
+          }
         }
       }
     },
@@ -1443,6 +3459,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Design"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thema"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
           }
         }
       }
@@ -1461,6 +3501,30 @@
             "state": "translated",
             "value": "Uhrzeit"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidspunkt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tijdstip"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidspunkt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tid"
+          }
         }
       }
     },
@@ -1477,6 +3541,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tageszeit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidspunkt på dagen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tijdstip van de dag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tid på dagen"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tid på dygnet"
           }
         }
       }
@@ -1495,6 +3583,30 @@
             "state": "translated",
             "value": "Bis"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tot"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Till"
+          }
         }
       }
     },
@@ -1511,6 +3623,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Heute"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I dag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vandaag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I dag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idag"
           }
         }
       }
@@ -1529,6 +3665,30 @@
             "state": "translated",
             "value": "Gesamt"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I alt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Totaal"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Totalt"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Totalt"
+          }
         }
       }
     },
@@ -1542,6 +3702,30 @@
           }
         },
         "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tendens"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend"
+          }
+        },
+        "sv": {
           "stringUnit": {
             "state": "translated",
             "value": "Trend"
@@ -1563,6 +3747,30 @@
             "state": "translated",
             "value": "Entsperren"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lås op"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ontgrendelen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lås opp"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lås upp"
+          }
         }
       }
     },
@@ -1579,6 +3787,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Volumen (ml)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mængde (ml)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume (ml)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volum (ml)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volym (ml)"
           }
         }
       }
@@ -1597,6 +3829,30 @@
             "state": "translated",
             "value": "Woche"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uge"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uke"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vecka"
+          }
         }
       }
     },
@@ -1614,6 +3870,30 @@
             "state": "translated",
             "value": "Wochenlimit"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ugentlig grænse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weeklimiet"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ukentlig grense"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veckogräns"
+          }
         }
       }
     },
@@ -1630,6 +3910,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jahr"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "År"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "År"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "År"
           }
         }
       }
@@ -1696,6 +4000,30 @@
             "state": "translated",
             "value": "g"
           }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
         }
       }
     },
@@ -1712,6 +4040,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "g/Tag"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/dag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/dag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/dag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/dag"
           }
         }
       }

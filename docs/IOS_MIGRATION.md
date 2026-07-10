@@ -512,6 +512,35 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Germanic languages, migrate the Chinese codes  (patch -74)
+
+Four languages — Danish, Dutch, Norwegian Bokmål, Swedish — the first of four
+family-grouped patches that bring the catalogue to Android's twenty. Each language
+is one flat table in `tools/l10n_XX.py`, keyed by the English source. Of the 98
+translated keys, 27 are harvested verbatim from Android's `values-XX` where the
+English matched a string there; the other 71 are this port's own, translated the
+same way German was, since Android's own translations were made under the same
+conditions.
+
+The generator, German-only until now, took a language list. Harvested Android values
+merge UNDER the port's own table, so a hand-written string wins over a harvested one
+where a key exists in both — the port's wording is the source of truth for its own
+keys.
+
+THE CHINESE MIGRATION. `SupportedLocales` stored `zh-CN`/`zh-TW`; iOS String Catalogs
+key Chinese by script, `zh-Hans`/`zh-Hant`. The two now agree — `SupportedLocales`,
+`knownRegions`, and the catalogue all use the script tags, and the two sets are byte
+-for-byte equal for the first time. But a backup or a stored setting written before
+this carries the old region code, and `String(localized:locale:)` with an explicit
+locale would not find a script-tagged entry from a region tag. So `canonicalTag`
+migrates `zh-CN` → `zh-Hans` and `zh-TW` → `zh-Hant` FIRST, before it validates
+against the current list. Every stored language runs through `canonicalTag`, so an
+upgrading Simplified-Chinese user keeps their language instead of dropping to System.
+Five tests, including a case-insensitive one and the pass-through of the new codes.
+
+STILL TO DO: Romance (es, fr, it, pt, pt-BR, ro), Slavic + Greek (cs, pl, ru, uk,
+el), CJK (ja, ko, zh-Hans, zh-Hant); the report's own localisation; the three plurals.
+
 #### Localise every screen, German complete  (patch -73)
 
 Android has an in-app language picker; this port keeps it (same feature, native

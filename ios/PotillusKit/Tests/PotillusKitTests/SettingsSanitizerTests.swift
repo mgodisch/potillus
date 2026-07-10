@@ -182,6 +182,16 @@ final class SettingsSanitizerTests: XCTestCase {
         XCTAssertEqual(SupportedLocales.canonicalTag("pt-br"), "pt-BR")
         XCTAssertEqual(SupportedLocales.canonicalTag("xx"), "")
         XCTAssertEqual(SupportedLocales.canonicalTag(""), "")
+
+        // Migration: the Chinese codes this app stored before the String Catalog
+        // existed must resolve to the script tags the catalogue now uses, so a
+        // backup or setting written under the old code keeps its language on upgrade
+        // instead of silently dropping to System.
+        XCTAssertEqual(SupportedLocales.canonicalTag("zh-CN"), "zh-Hans")
+        XCTAssertEqual(SupportedLocales.canonicalTag("zh-TW"), "zh-Hant")
+        XCTAssertEqual(SupportedLocales.canonicalTag("ZH-cn"), "zh-Hans", "migration is case-insensitive")
+        XCTAssertEqual(SupportedLocales.canonicalTag("zh-Hans"), "zh-Hans")
+        XCTAssertEqual(SupportedLocales.canonicalTag("zh-Hant"), "zh-Hant")
     }
 
     // ── The two rules that look like bugs ────────────────────────────────────

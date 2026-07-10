@@ -58,6 +58,15 @@ OUT = ROOT / "ios" / "Potillus" / "Localizable.xcstrings"
 sys.path.insert(0, str(ROOT / "tools"))
 from l10n_de import MINE_DE, MINE_DE_INTERP, PURE_INTERP  # noqa: E402
 
+# Languages beyond German each carry one flat table `MINE` in tools/l10n_XX.py,
+# keyed by the English source, holding BOTH plain and interpolated strings (the
+# split MINE_DE / MINE_DE_INTERP was only needed for the first one). The Android
+# resource dir differs from the iOS tag in a few cases; ANDROID_DIR maps them.
+LANGUAGES = ["da", "nl", "nb", "sv"]
+ANDROID_DIR = {
+    "nb": "nb", "pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW",
+}
+
 
 def android_map(path):
     d = {}
@@ -142,10 +151,28 @@ def unit(value, state="translated"):
     return {"stringUnit": {"state": state, "value": value}}
 
 
+def load_language(tag):
+    """Returns {english_key: translation} for one language.
+
+    Harvested Android values (where the English matched an Android string) merged
+    UNDER the port's own table, so a hand-written translation wins over a harvested
+    one if both exist — the port's wording is the source of truth for its own keys.
+    """
+    module = __import__(f"l10n_{tag.replace('-', '_')}")
+    andr = ANDROID_DIR.get(tag, tag)
+    translated = android_map(ROOT / f"android/app/src/main/res/values-{andr}/strings.xml")
+    en = android_map(ANDROID_EN)
+    harvested = {en[k]: translated[k] for k in en if k in translated}
+    return {**harvested, **module.MINE}
+
+
 def build():
     en = android_map(ANDROID_EN)
     de = android_map(ANDROID_DE)
-    harvested = {en[k]: de[k] for k in en if k in de}
+    harvested_de = {en[k]: de[k] for k in en if k in de}
+
+    # German keeps its original two-table shape; the rest use the flat loader.
+    extra = {tag: load_language(tag) for tag in LANGUAGES}
 
     literals = collect_literals()          # raw literal -> catalogue key
     strings = {}
@@ -161,8 +188,8 @@ def build():
             continue
 
         german = None
-        if raw in harvested:               # exact English match to an Android string
-            german = harvested[raw]
+        if raw in harvested_de:            # exact English match to an Android string
+            german = harvested_de[raw]
         elif raw in MINE_DE:               # plain iOS-only string
             german = MINE_DE[raw]
         elif key in MINE_DE_INTERP:        # interpolated, words translated
@@ -170,6 +197,15 @@ def build():
 
         if german is not None:
             entry["localizations"]["de"] = unit(german)
+
+        # Every other language: its table is keyed by the English source (`raw` for
+        # plain strings, `key` for interpolated ones, since the interpolated table
+        # stores the %-placeholder form under the catalogue key).
+        for tag, table in extra.items():
+            value = table.get(raw) or table.get(key)
+            if value is not None:
+                entry["localizations"][tag] = unit(value)
+
         strings[key] = entry
 
     catalogue = {"sourceLanguage": "en", "version": "1.0", "strings": strings}
@@ -177,11 +213,12 @@ def build():
                    encoding="utf-8")
 
     total = len(strings)
-    translated = sum(1 for s in strings.values() if "de" in s["localizations"])
-    source_only = sum(1 for s in strings.values() if s.get("shouldTranslate") is False)
+    source_only = sum(1 for v in strings.values() if v.get("shouldTranslate") is False)
     print(f"  wrote {OUT.relative_to(ROOT)}")
-    print(f"  keys: {total}   german: {translated}   source-only: {source_only}")
-    print(f"  untranslated (de missing): {total - translated - source_only}")
+    print(f"  keys: {total}   source-only: {source_only}")
+    for tag in ["de"] + LANGUAGES:
+        n = sum(1 for v in strings.values() if tag in v["localizations"])
+        print(f"    {tag}: {n} translated")
 
 
 if __name__ == "__main__":

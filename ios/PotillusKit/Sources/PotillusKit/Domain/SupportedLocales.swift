@@ -68,8 +68,8 @@ public enum SupportedLocales {
         Locale(tag: "el", autonym: "Ελληνικά"),
         Locale(tag: "ru", autonym: "Русский"),
         Locale(tag: "uk", autonym: "Українська"),
-        Locale(tag: "zh-CN", autonym: "简体中文"),
-        Locale(tag: "zh-TW", autonym: "繁體中文"),
+        Locale(tag: "zh-Hans", autonym: "简体中文"),
+        Locale(tag: "zh-Hant", autonym: "繁體中文"),
         Locale(tag: "ja", autonym: "日本語"),
         Locale(tag: "ko", autonym: "한국어"),
     ]
@@ -83,7 +83,29 @@ public enum SupportedLocales {
     /// `"pt-br"` becomes `"pt-BR"`), or the empty string — "follow the system" —
     /// for a tag this build does not ship. A backup written by a newer app that
     /// added a language therefore restores gracefully.
+    /// Language tags that were stored under an older code and now live under a
+    /// different one. iOS String Catalogs key Chinese by script (`zh-Hans`,
+    /// `zh-Hant`); this app used the region codes (`zh-CN`, `zh-TW`) until the
+    /// catalogue was added. A backup or a stored setting written before that carries
+    /// the old code, and must keep working — otherwise a Simplified-Chinese user
+    /// silently drops to the system language on upgrade.
+    static let migratedTags: [String: String] = [
+        "zh-CN": "zh-Hans",
+        "zh-TW": "zh-Hant",
+    ]
+
+    /// Normalises a raw language tag to a supported one, or `""` (meaning "System").
+    ///
+    /// Runs the migration FIRST, so an old code is rewritten before it is checked
+    /// against the current list; then case-insensitively matches a supported tag.
+    /// An unknown tag becomes `""` rather than an error, so a backup from a newer
+    /// version naming a language this build lacks falls back to System cleanly.
     public static func canonicalTag(_ raw: String) -> String {
-        tags.first { $0.compare(raw, options: .caseInsensitive) == .orderedSame } ?? ""
+        let migrated = migratedTags.first {
+            $0.key.compare(raw, options: .caseInsensitive) == .orderedSame
+        }?.value ?? raw
+        return tags.first {
+            $0.compare(migrated, options: .caseInsensitive) == .orderedSame
+        } ?? ""
     }
 }
