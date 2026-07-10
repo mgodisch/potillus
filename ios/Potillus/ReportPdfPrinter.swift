@@ -69,12 +69,70 @@ final class ReportPdfPrinter: NSObject {
         }
     }
 
-    /// A4 at 72 points per inch, which is the unit `UIPrintPageRenderer` draws in.
-    /// 595.2 × 841.8 pt is 210 × 297 mm.
-    private static let a4Paper = CGRect(x: 0, y: 0, width: 595.2, height: 841.8)
+    // ── Paper, and the one number that decides everything ────────────────────
+    //
+    // The template measures in MILLIMETRES:
+    //
+    //     @page  { size: A4; margin: 14mm 12mm 16mm 12mm; }
+    //     .sheet { min-height: 267mm; }        /* 297 − 14 − 16 */
+    //
+    // CSS resolves a millimetre at 96 dpi; `UIPrintPageRenderer` draws at 72. The
+    // print formatter scales the web view's width down to the printable width, and
+    // whatever ratio that happens to be is applied to the heights as well.
+    //
+    // Patch -59 let the ratio fall where it may: an A4-wide web view (595 pt) into
+    // a printable box inset by an invented 24 pt gave 0.9194. A 267 mm sheet is
+    // 1009 CSS px; at 0.9194 it prints 928 pt tall, and only 794 pt were printable.
+    // Each sheet overflowed by 134 pt, and the two-page report came out as four.
+    //
+    // THE RATIO MUST BE EXACTLY 0.75, which is 72/96. Then one CSS millimetre is one
+    // printed millimetre, `min-height: 267mm` is precisely the printable height, and
+    // the sheet ends where the template says it ends. That is arranged by laying the
+    // web view out in the CSS PIXELS of the printable box — its points times 4/3 —
+    // and by taking the printable box from the template's own `@page` margins rather
+    // than from a number that felt about right.
 
-    /// The margin the template does NOT draw itself. Its own padding sits inside.
-    private static let margin: CGFloat = 24
+    /// Points per millimetre: 72 dpi over 25.4 mm per inch.
+    private static let pointsPerMm: CGFloat = 72.0 / 25.4
+
+    /// CSS pixels per point. The whole bug, expressed as a fraction.
+    private static let pixelsPerPoint: CGFloat = 96.0 / 72.0
+
+    /// A4: 210 × 297 mm, in points.
+    private static let a4Paper = CGRect(
+        x: 0, y: 0, width: 210 * pointsPerMm, height: 297 * pointsPerMm
+    )
+
+    /// The template's `@page` margins, in millimetres: top, right, bottom, left.
+    ///
+    /// `UIViewPrintFormatter` ignores `@page`, so the margins are applied here
+    /// instead. They are duplicated from the template, and `tools/check-report-paper.py`
+    /// fails the build if the two ever disagree.
+    private static let pageMarginsMm = (top: 14.0, right: 12.0, bottom: 16.0, left: 12.0)
+
+    /// The margin box: what `@page` would have left to draw in.
+    private static var printableBox: CGRect {
+        CGRect(
+            x: CGFloat(pageMarginsMm.left) * pointsPerMm,
+            y: CGFloat(pageMarginsMm.top) * pointsPerMm,
+            width: a4Paper.width
+                - CGFloat(pageMarginsMm.left + pageMarginsMm.right) * pointsPerMm,
+            height: a4Paper.height
+                - CGFloat(pageMarginsMm.top + pageMarginsMm.bottom) * pointsPerMm
+        )
+    }
+
+    /// The same box, in the CSS pixels the web view lays out in.
+    ///
+    /// Laying out here and printing there is what pins the formatter's scale to
+    /// 0.75. Give the web view any other width and the ratio changes with it.
+    private static var layoutBox: CGRect {
+        CGRect(
+            x: 0, y: 0,
+            width: printableBox.width * pixelsPerPoint,
+            height: printableBox.height * pixelsPerPoint
+        )
+    }
 
     /// Held for the duration of the render. A `WKWebView` with no owner is
     /// deallocated mid-load, and its delegate is never called.
@@ -86,7 +144,7 @@ final class ReportPdfPrinter: NSObject {
     /// Suspends until the web view reports the page loaded. A load that fails
     /// resumes the continuation with the error rather than hanging the caller.
     func pdfData(html: String) async throws -> Data {
-        let webView = WKWebView(frame: Self.a4Paper)
+        let webView = WKWebView(frame: Self.layoutBox)
         webView.navigationDelegate = self
         self.webView = webView
 
@@ -105,9 +163,7 @@ final class ReportPdfPrinter: NSObject {
 
     /// Draws every page the formatter produces into one PDF.
     private func render(_ webView: WKWebView) throws -> Data {
-        let renderer = PaperSizedRenderer(
-            paper: Self.a4Paper, printable: Self.a4Paper.insetBy(dx: Self.margin, dy: Self.margin)
-        )
+        let renderer = PaperSizedRenderer(paper: Self.a4Paper, printable: Self.printableBox)
         renderer.addPrintFormatter(webView.viewPrintFormatter(), startingAtPageAt: 0)
 
         let output = NSMutableData()

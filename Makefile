@@ -834,7 +834,8 @@ ios-project: ios-version
 #
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
-ios: check-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint ios-project
+ios: check-headers check-makefile check-swift-tests check-swift-symbols \
+     check-report-paper check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
@@ -907,6 +908,16 @@ check-swiftlint:
 check-swift-symbols:
 	python3 tools/check-swift-symbols.py
 
+# check-report-paper: the report template and the iOS printer both describe one
+# sheet of paper, and only one of them is read by the printer. Android's print
+# framework honours the template's `@page` margins; UIViewPrintFormatter honours
+# nothing but the rectangle it is handed, so ReportPdfPrinter restates them.
+#
+# Two truths about one thing drift. This one drifted silently: patch -59 printed a
+# two-page report on four pages, and nothing warned. Milliseconds to check.
+check-report-paper:
+	python3 tools/check-report-paper.py
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
@@ -949,4 +960,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper

@@ -512,6 +512,38 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Pin the print scale to 72/96  (patch -61)
+
+The report printed on four pages. Each of its two sheets overflowed by a strip.
+
+The template measures in millimetres — `@page { margin: 14mm 12mm 16mm 12mm }` and
+`.sheet { min-height: 267mm }`, which is exactly 297 minus the two vertical
+margins. CSS resolves a millimetre at 96 dpi; `UIPrintPageRenderer` draws at 72.
+The formatter scales the web view's width down to the printable width and applies
+that same ratio to the heights.
+
+Patch -59 let the ratio fall where it may. An A4-wide web view printed into a box
+inset by an invented 24 pt gives 0.9194. A 267 mm sheet is 1009 CSS px; at 0.9194
+it prints 928 pt tall, and 794 pt were printable. Overflow: 134 pt per sheet —
+arithmetic that matches the four pages exactly.
+
+The ratio must be 0.75, which is 72/96, and nothing else. Then one CSS millimetre
+is one printed millimetre and the sheet ends where the template says. That is
+arranged by laying the web view out in the CSS PIXELS of the printable box (its
+points times 4/3) and by taking the printable box from the template's own `@page`
+margins instead of a number that felt about right.
+
+The type never looked too large, which is what made this hard to see and easy to
+mis-diagnose: the width was being scaled correctly all along. Only the heights,
+written in absolute millimetres, refused to come along.
+
+TWO TRUTHS ABOUT ONE SHEET OF PAPER NOW EXIST — the template's `@page` and the
+printer's `pageMarginsMm` — because `UIViewPrintFormatter` reads no CSS. So
+`tools/check-report-paper.py` fails `make ios` if they disagree, and also if
+`.sheet`'s min-height stops matching what those margins leave of an A4 page. Tested
+four ways: silent when they agree, loud when the template moves, loud when the
+Swift moves, loud when the sheet outgrows its page.
+
 #### Close the PDF context before reading its buffer  (patch -60)
 
 The report exported in patch -59 could not be opened. It had a `%PDF-` header, it
