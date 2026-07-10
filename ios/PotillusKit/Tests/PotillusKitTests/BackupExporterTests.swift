@@ -74,7 +74,7 @@ final class BackupExporterTests: XCTestCase {
         try await environment.preferences.update { $0.weightKg = 82.5 }
 
         let data = try await exporter.makeBackup()
-        let parsed = try Backup.parse(data)
+        let parsed = try BackupReader.parse(data)
 
         // A fresh device, restoring the file.
         let fresh = try AppEnvironment.makeEphemeral()
@@ -102,7 +102,7 @@ final class BackupExporterTests: XCTestCase {
                             isPreset: true, category: .beer)
         )
 
-        let file = try Backup.parse(try await exporter.makeBackup())
+        let file = try BackupReader.parse(try await exporter.makeBackup())
         XCTAssertEqual(file.drinks.map(\.name), ["My renamed preset"])
         XCTAssertTrue(try XCTUnwrap(file.drinks.first).isPreset)
     }
@@ -114,7 +114,7 @@ final class BackupExporterTests: XCTestCase {
         try await environment.preferences.update { $0.weightKg = 82.5 }
 
         let data = try await exporter.makeBackup(includeSettings: false)
-        XCTAssertNil(try Backup.parse(data).settings)
+        XCTAssertNil(try BackupReader.parse(data).settings)
 
         let object = try XCTUnwrap(
             try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -124,7 +124,7 @@ final class BackupExporterTests: XCTestCase {
         // And the recipient keeps their own.
         let fresh = try AppEnvironment.makeEphemeral()
         try await fresh.preferences.update { $0.weightKg = 70.0 }
-        _ = try await fresh.importer.restore(try Backup.parse(data), mode: .replace)
+        _ = try await fresh.importer.restore(try BackupReader.parse(data), mode: .replace)
         let untouched = await fresh.preferences.load().weightKg
         XCTAssertEqual(untouched, 70.0, accuracy: 1e-9)
     }
@@ -132,12 +132,12 @@ final class BackupExporterTests: XCTestCase {
     /// A body weight is the one field nobody should share by accident.
     func testSettingsCarryTheBodyWeightWhenIncluded() async throws {
         try await environment.preferences.update { $0.weightKg = 82.5 }
-        let file = try Backup.parse(try await exporter.makeBackup(includeSettings: true))
+        let file = try BackupReader.parse(try await exporter.makeBackup(includeSettings: true))
         XCTAssertEqual(try XCTUnwrap(file.settings).weightKg, 82.5, accuracy: 1e-9)
     }
 
     func testAnEmptyDatabaseExportsAValidEmptyBackup() async throws {
-        let file = try Backup.parse(try await exporter.makeBackup())
+        let file = try BackupReader.parse(try await exporter.makeBackup())
         XCTAssertTrue(file.drinks.isEmpty)
         XCTAssertTrue(file.entries.isEmpty)
         XCTAssertEqual(file.version, BackupFile.currentVersion)

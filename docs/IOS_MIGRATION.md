@@ -512,6 +512,16 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix an invented type name shipped in patch -40  (patch -43)
+
+- `BackupExporter`, its tests, and `SettingsScreen` called `Backup.parse` and
+  `Backup.makeJSON`. No type `Backup` exists: the file declares `BackupReader` and
+  `BackupWriter`, and every older caller spells them correctly. Nine call sites in
+  three files, all from patch -40, all written from memory of a file that had been
+  read weeks earlier.
+- Cross-checked afterwards that every kit symbol the new app and exporter code
+  names does exist and is public. It does — this was the only invention.
+
 #### Add CSV export, and fix a missing import from patch -40  (patch -42)
 
 - Wire `CsvExporter` — long since ported and tested — to a button in the

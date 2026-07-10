@@ -359,7 +359,7 @@ extension SettingsScreen {
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
 
                 let data = try Data(contentsOf: url)
-                let file = try Backup.parse(data)
+                let file = try BackupReader.parse(data)
                 let stats = try await environment.importer.restore(file, mode: mode)
 
                 importSummary = stats.skipped > 0

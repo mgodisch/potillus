@@ -32,7 +32,7 @@ import Foundation
 // The JSON backup is the ONLY route between Android and iOS. Room writes a
 // `room_master_table`, GRDB a `grdb_migrations`; a copied `.db` would be refused
 // by the other platform. So this file must be byte-for-byte acceptable to the
-// Android reader, and `Backup.makeJSON` — already tested against the real Android
+// Android reader, and `BackupWriter.makeJSON` — already tested against the real Android
 // demo backup — decides how it is written. This type only decides WHAT goes in.
 //
 // EVERYTHING, INCLUDING THE PRESETS
@@ -78,7 +78,7 @@ public struct BackupExporter: Sendable {
             ? Self.backupSettings(from: await preferences.load())
             : nil
 
-        return try Backup.makeJSON(
+        return try BackupWriter.makeJSON(
             BackupFile(
                 exportedAt: Self.timestamp(),
                 drinks: allDrinks,
