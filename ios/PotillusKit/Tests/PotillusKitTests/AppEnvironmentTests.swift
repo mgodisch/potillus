@@ -54,7 +54,11 @@ final class AppEnvironmentTests: XCTestCase {
         )
 
         XCTAssertEqual(try environment.entries.all().count, 1)
-        XCTAssertEqual(await environment.preferences.load(), AppSettings())
+
+        // The await is hoisted: XCTAssert* takes autoclosures, which are
+        // synchronous, so `await` cannot appear inside one.
+        let settings = await environment.preferences.load()
+        XCTAssertEqual(settings, AppSettings())
     }
 
     /// Both repositories must see the same rows, or a drink added on one screen

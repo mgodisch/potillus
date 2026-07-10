@@ -512,6 +512,16 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Lint for await inside XCTAssert autoclosures  (patch -24)
+
+- Fix a third `await`-in-autoclosure compile error, in `AppEnvironmentTests`.
+  The same mistake was made in patch -20, fixed in -21, and made again in -23.
+- Add `tools/check-swift-tests.py` and `make check-swift-tests` rather than
+  resolving to remember. `XCTAssert*` takes autoclosures, which are synchronous,
+  so an awaited value must be bound to a `let` first; a grep catches that in a
+  second, while the compiler only reports it after a full build — on a Mac, which
+  is not always to hand. Comment text mentioning `await` is not a false positive.
+
 #### Add the SwiftUI app shell  (patch -23)
 
 - Add `AppEnvironment`, the composition root: one place that chooses the concrete

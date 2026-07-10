@@ -797,6 +797,12 @@ ios-project: ios-version
 	command -v xcodegen
 	cd ios && xcodegen generate
 
+# check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
+# Swift compiler rejects but only after a full build -- and which is easy to
+# re-introduce. A grep is cheaper than a compile, and runs without a Mac.
+check-swift-tests:
+	python3 tools/check-swift-tests.py
+
 # check-headers: verifies that every project-owned file carries the canonical
 # licence header, including the section 7 pointer to the App Store distribution
 # exception in COPYING.md. Warnings (a file with no header at all) do not fail;
@@ -828,4 +834,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: debug device-tests release install check-headers fix-headers ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: debug device-tests release install check-headers fix-headers check-swift-tests ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

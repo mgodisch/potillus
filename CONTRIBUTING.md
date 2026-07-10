@@ -303,6 +303,10 @@ Verbatim third-party texts (`LICENSE.md`, `LICENSE.Apache-2.0.md`, `COPYING.md`,
 comment) do not carry it. `release-check.sh` verifies every Kotlin file contains
 the GPL notice.
 
+Run `make check-swift-tests` before pushing iOS test changes: `XCTAssert*` takes
+its arguments as autoclosures, so an `await` inside one does not compile, and the
+compiler only says so after a full build.
+
 Run `make check-headers` to verify every file the repository TRACKS (the list
 comes from `git ls-files`, so `.gitignore` decides what the project owns), and
 `make fix-headers` to insert a missing section 7 pointer into an existing
