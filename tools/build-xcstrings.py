@@ -65,6 +65,7 @@ from l10n_de import MINE_DE, MINE_DE_INTERP, PURE_INTERP  # noqa: E402
 LANGUAGES = [
     "da", "nl", "nb", "sv",
     "es", "fr", "it", "pt", "pt-BR", "ro",
+    "cs", "pl", "ru", "uk", "el",
 ]
 ANDROID_DIR = {
     "nb": "nb", "pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW",

@@ -512,6 +512,26 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Slavic and Greek languages  (patch -76)
+
+Five: Czech, Polish, Russian, Ukrainian, Greek. 27 harvested from each `values-XX`,
+71 translated for this port, no new machinery.
+
+The action labels follow the register Android already set for these languages — the
+imperative-infinitive form for buttons (Exportovat, Eksportuj, Экспортировать,
+Експортувати, Εξαγωγή), read from the harvested strings so the port's own verbs match
+the harvested ones rather than clashing with them. Cyrillic carries its own unit
+tokens: "мл" for millilitres, "г/день" for grams per day, so those strings ARE
+translated here where the Latin-script languages left "ml"/"g" untouched.
+
+Every placeholder survives every translation: a check across all sixteen languages
+confirms no `%@` or `%lld` was dropped or reordered against the English source. That
+matters most for the positional `%1$…`/`%2$…` strings, where a translator moving the
+arguments would silently corrupt the format.
+
+Sixteen languages now, 98 keys each. STILL TO DO: CJK (ja, ko, zh-Hans, zh-Hant);
+the report's own localisation; the three plurals.
+
 #### Add the Romance languages  (patch -75)
 
 Six: Spanish, French, Italian, European Portuguese, Brazilian Portuguese, Romanian.
