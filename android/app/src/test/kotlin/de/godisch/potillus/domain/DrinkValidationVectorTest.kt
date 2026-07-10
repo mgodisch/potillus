@@ -122,12 +122,23 @@ class DrinkValidationVectorTest {
         assertNull(DrinkValidator.validate("\uD83C\uDF7A".repeat(50), 500, 4.9))
     }
 
+    /**
+     * `Char.isWhitespace()` in Kotlin is `Character.isWhitespace(c) ||
+     * Character.isSpaceChar(c)`, and `isSpaceChar` covers the whole Zs category —
+     * so a non-breaking space IS trimmed, unlike under Java's `isWhitespace`
+     * alone. Swift's `.whitespacesAndNewlines` behaves the same way. The
+     * distinction is subtle enough that the iOS port initially matched Java and
+     * had to be corrected; this test is why.
+     */
     @Test
-    fun `a non-breaking space is a character, not whitespace`() {
-        assertNull(DrinkValidator.validate("\u00A0", 500, 4.9))
-        assertEquals(
-            DrinkValidator.Violation(DrinkValidator.Field.NAME, DrinkValidator.Reason.BLANK),
-            DrinkValidator.validate(" \t\n ", 500, 4.9),
+    fun `non-breaking spaces are trimmed like any other space`() {
+        val blank = DrinkValidator.Violation(
+            DrinkValidator.Field.NAME,
+            DrinkValidator.Reason.BLANK,
         )
+        assertEquals(blank, DrinkValidator.validate("\u00A0", 500, 4.9))
+        assertEquals(blank, DrinkValidator.validate("\u202F", 500, 4.9))
+        assertEquals(blank, DrinkValidator.validate(" \t\n ", 500, 4.9))
+        assertNull(DrinkValidator.validate("\u00A0Pils\u00A0", 500, 4.9))
     }
 }

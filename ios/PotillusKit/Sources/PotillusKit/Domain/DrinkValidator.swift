@@ -59,12 +59,18 @@ import Foundation
 //      units to Kotlin (rejected) and 100 characters to Swift (accepted). The
 //      count is therefore taken over `utf16`.
 //
-//   2. WHITESPACE. Java's `Character.isWhitespace`, which Kotlin's `trim()` uses,
-//      deliberately EXCLUDES the non-breaking spaces U+00A0, U+2007 and U+202F —
-//      they are spaces that must not break, so they are not "whitespace" for
-//      trimming. Swift's `.whitespacesAndNewlines` includes them. A name of one
-//      NBSP is a one-character name on Android and blank on iOS unless the set is
-//      corrected, which it is below.
+//   2. WHITESPACE. Kotlin's `Char.isWhitespace()` is NOT Java's
+//      `Character.isWhitespace()`. It is defined as
+//
+//          Character.isWhitespace(ch) || Character.isSpaceChar(ch)
+//
+//      and `isSpaceChar` covers the whole Zs category, non-breaking spaces
+//      included. Kotlin therefore trims U+00A0, and Swift's
+//      `.whitespacesAndNewlines` agrees. The two are equivalent for every
+//      character a drink name can carry, and no custom set is needed. (This was
+//      not obvious: Java alone excludes the non-breaking spaces, and an earlier
+//      version of this file "corrected" Swift to match Java, which the shared
+//      vectors then proved wrong on the JVM.)
 // =============================================================================
 
 /// Validates the three user-supplied fields of a `DrinkDefinition`.
@@ -82,14 +88,6 @@ public enum DrinkValidator {
     /// Accepted alcohol content, percent by volume.
     public static let alcoholPercentRange = 0.0...100.0
 
-    /// The characters `trim()` removes on the JVM: `.whitespacesAndNewlines`
-    /// minus the three non-breaking spaces Java's `Character.isWhitespace`
-    /// excludes. See the file header.
-    private static let trimmedCharacters: CharacterSet = {
-        var set = CharacterSet.whitespacesAndNewlines
-        set.remove(charactersIn: "\u{00A0}\u{2007}\u{202F}")
-        return set
-    }()
 
     /// Which field a `Violation` refers to.
     public enum Field: String, Sendable, Equatable {
@@ -126,7 +124,7 @@ public enum DrinkValidator {
     public static func validate(
         name: String, volumeMl: Int, alcoholPercent: Double
     ) -> Violation? {
-        let trimmed = name.trimmingCharacters(in: trimmedCharacters)
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if trimmed.isEmpty { return Violation(field: .name, reason: .blank) }
         // utf16, not `count`: Kotlin measures UTF-16 code units. See the header.
@@ -158,6 +156,6 @@ public enum DrinkValidator {
     /// Kept next to the rules that measured it, so a caller cannot validate the
     /// trimmed name and then persist the untrimmed one.
     public static func canonicalName(_ name: String) -> String {
-        name.trimmingCharacters(in: trimmedCharacters)
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

@@ -7,10 +7,12 @@
     "`expected` is null when acceptable, else the FIRST violation in field order.",
     "JSON cannot express NaN or the infinities, so those cases carry",
     "`alcoholPercentSpecial` instead of `alcoholPercent`.",
-    "Two cases pin string semantics Kotlin and Swift do not share by default: the",
-    "name length counts UTF-16 code units (Kotlin's String.length), and U+00A0 is a",
-    "character rather than whitespace (Java's Character.isWhitespace excludes the",
-    "non-breaking spaces, Swift's CharacterSet does not)."
+    "The emoji cases pin a semantic the languages do NOT share: the name length",
+    "counts UTF-16 code units (Kotlin's String.length), not grapheme clusters.",
+    "The non-breaking-space cases pin one they DO share, which is not obvious:",
+    "Kotlin's Char.isWhitespace() is `Character.isWhitespace(c) || isSpaceChar(c)`,",
+    "and isSpaceChar covers all of Zs, so U+00A0 trims away exactly as it does",
+    "under Swift's .whitespacesAndNewlines. Java's isWhitespace alone would not."
   ],
   "bounds": {
     "maxNameLength": 100,
@@ -96,7 +98,7 @@
       "expected": null
     },
     {
-      "description": "length counts UTF-16 code units, so 100 emoji exceed the limit",
+      "description": "length counts UTF-16 code units, so 51 emoji exceed the limit",
       "name": "🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺",
       "volumeMl": 500,
       "alcoholPercent": 4.9,
@@ -113,15 +115,28 @@
       "expected": null
     },
     {
-      "description": "a non-breaking space is a character, not whitespace",
+      "description": "a non-breaking space is whitespace and trims away to blank",
       "name": " ",
       "volumeMl": 500,
       "alcoholPercent": 4.9,
-      "expected": null
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
     },
     {
-      "description": "a name trimmed only of real whitespace keeps its NBSP",
-      "name": "   ",
+      "description": "the narrow no-break space also trims away",
+      "name": " ",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
+    },
+    {
+      "description": "a name padded with non-breaking spaces keeps only its core",
+      "name": " Pils ",
       "volumeMl": 500,
       "alcoholPercent": 4.9,
       "expected": null

@@ -145,13 +145,23 @@ final class DrinkValidatorTests: XCTestCase {
         ))
     }
 
-    /// `.whitespacesAndNewlines` would call this blank; Java's `isWhitespace`
-    /// does not, because a non-breaking space is a space that must not break.
-    func testNonBreakingSpacesAreCharactersNotWhitespace() {
-        XCTAssertNil(DrinkValidator.validate(name: "\u{00A0}", volumeMl: 500, alcoholPercent: 4.9))
-        XCTAssertEqual(DrinkValidator.canonicalName(" \u{00A0} "), "\u{00A0}")
+    /// Kotlin's `Char.isWhitespace()` is `Character.isWhitespace(c) || isSpaceChar(c)`,
+    /// and `isSpaceChar` covers all of Zs — so Kotlin trims the non-breaking
+    /// spaces, and Swift's `.whitespacesAndNewlines` agrees. Java's `isWhitespace`
+    /// alone would not, which is what makes this worth a test rather than a
+    /// comment: an earlier version of the port matched Java and was wrong.
+    func testNonBreakingSpacesAreTrimmedLikeAnyOtherSpace() {
+        XCTAssertEqual(
+            DrinkValidator.validate(name: "\u{00A0}", volumeMl: 500, alcoholPercent: 4.9),
+            .init(field: .name, reason: .blank)
+        )
+        XCTAssertEqual(
+            DrinkValidator.validate(name: "\u{202F}", volumeMl: 500, alcoholPercent: 4.9),
+            .init(field: .name, reason: .blank)
+        )
+        XCTAssertEqual(DrinkValidator.canonicalName("\u{00A0}Pils\u{00A0}"), "Pils")
 
-        // Ordinary whitespace is still trimmed away.
+        // Ordinary whitespace, unchanged.
         XCTAssertEqual(
             DrinkValidator.validate(name: " \t\n ", volumeMl: 500, alcoholPercent: 4.9),
             .init(field: .name, reason: .blank)

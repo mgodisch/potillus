@@ -525,13 +525,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
   - `String.length` counts UTF-16 CODE UNITS; Swift's `String.count` counts
     grapheme clusters. A name of 51 beer emojis is 102 units (rejected) and 51
     characters (accepted). The Swift port measures `utf16.count`.
-  - Java's `Character.isWhitespace`, which Kotlin's `trim()` uses, EXCLUDES the
-    non-breaking spaces U+00A0, U+2007 and U+202F. Swift's
-    `.whitespacesAndNewlines` includes them, so a name of one NBSP was a valid
-    name on Android and blank on iOS. The trimming set now subtracts the three.
-  Both are pinned by vectors and by tests on each side, since neither would ever
-  surface as a bug report — the user would simply find a name rejected on one of
-  their devices.
+  Pinned by vectors and by tests on each side, since it would never surface as a
+  bug report — the user would simply find a name rejected on one of their devices.
+
+#### Correct the whitespace claim the vectors refuted  (patch -30)
+
+- Patch -29 asserted that Kotlin's `trim()` keeps the non-breaking spaces,
+  because Java's `Character.isWhitespace` excludes them, and "corrected" the Swift
+  port to match. The shared vectors then failed on the JVM, which is what they are
+  for. Kotlin's `Char.isWhitespace()` is
+  `Character.isWhitespace(c) || Character.isSpaceChar(c)`, and `isSpaceChar`
+  covers the whole Zs category — so U+00A0 IS trimmed, exactly as Swift's
+  `.whitespacesAndNewlines` trims it. The custom trimming set is removed.
+- Keep the UTF-16 length correction from -29: that divergence is real, and the
+  emoji vector passed on both sides.
+- Regenerate the vectors and turn both suites' assertions around, so the file now
+  records what the platforms do rather than what the author believed.
 - Check finiteness BEFORE the range test, as Kotlin does. `(0.0...100.0).contains(.nan)`
   is false and happens to reject it, but a hand-written `!(percent > 100)` would
   not, and a NaN reaching `SUM(gramsAlcohol)` poisons every total after it.
