@@ -76,27 +76,35 @@ final class ReportPdfPrinter: NSObject {
     //     @page  { size: A4; margin: 14mm 12mm 16mm 12mm; }
     //     .sheet { min-height: 267mm; }        /* 297 − 14 − 16 */
     //
-    // CSS resolves a millimetre at 96 dpi; `UIPrintPageRenderer` draws at 72. The
-    // print formatter scales the web view's width down to the printable width, and
-    // whatever ratio that happens to be is applied to the heights as well.
+    // CSS resolves a millimetre at 96 dpi. `UIPrintPageRenderer` draws at 72. Left
+    // alone, one CSS pixel prints as one point, every millimetre comes out 4/3 too
+    // large, and each 267 mm sheet needs 356 mm of a 267 mm page. Two sheets, four
+    // pages. That is what the report did.
     //
-    // Patch -59 let the ratio fall where it may: an A4-wide web view (595 pt) into
-    // a printable box inset by an invented 24 pt gave 0.9194. A 267 mm sheet is
-    // 1009 CSS px; at 0.9194 it prints 928 pt tall, and only 794 pt were printable.
-    // Each sheet overflowed by 134 pt, and the two-page report came out as four.
+    // TWO WRONG FIXES CAME FIRST, and both are worth remembering.
     //
-    // THE RATIO MUST BE EXACTLY 0.75, which is 72/96. Then one CSS millimetre is one
-    // printed millimetre, `min-height: 267mm` is precisely the printable height, and
-    // the sheet ends where the template says it ends. That is arranged by laying the
-    // web view out in the CSS PIXELS of the printable box — its points times 4/3 —
-    // and by taking the printable box from the template's own `@page` margins rather
-    // than from a number that felt about right.
+    //   Patch -59 inset the printable box by an invented 24 pt and let the scale
+    //   fall where it may.
+    //
+    //   Patch -61 assumed `UIViewPrintFormatter` SCALES the view down to the
+    //   printable width, and sized the view in CSS pixels so that the scale would
+    //   land on 0.75. It does not scale. It RE-LAYS-OUT the content for the page
+    //   width, so the view's width changed the line breaks and nothing else. Still
+    //   four pages, and the type never looked too large — which is exactly why the
+    //   wrong theory survived a round.
+    //
+    // `pageZoom` ends the argument. It scales the CONTENT, whatever the formatter
+    // then does with it, and 72/96 is 0.75 exactly. One CSS millimetre becomes one
+    // printed millimetre, and `min-height: 267mm` is precisely the printable height.
 
     /// Points per millimetre: 72 dpi over 25.4 mm per inch.
     private static let pointsPerMm: CGFloat = 72.0 / 25.4
 
-    /// CSS pixels per point. The whole bug, expressed as a fraction.
-    private static let pixelsPerPoint: CGFloat = 96.0 / 72.0
+    /// Points per CSS pixel: 72 over 96, which is 0.75.
+    ///
+    /// The whole bug, as a fraction. Given to `pageZoom`, it makes the web view lay
+    /// out in CSS pixels and print in points at the same physical size.
+    private static let printScale: CGFloat = 72.0 / 96.0
 
     /// A4: 210 × 297 mm, in points.
     private static let a4Paper = CGRect(
@@ -122,18 +130,6 @@ final class ReportPdfPrinter: NSObject {
         )
     }
 
-    /// The same box, in the CSS pixels the web view lays out in.
-    ///
-    /// Laying out here and printing there is what pins the formatter's scale to
-    /// 0.75. Give the web view any other width and the ratio changes with it.
-    private static var layoutBox: CGRect {
-        CGRect(
-            x: 0, y: 0,
-            width: printableBox.width * pixelsPerPoint,
-            height: printableBox.height * pixelsPerPoint
-        )
-    }
-
     /// Held for the duration of the render. A `WKWebView` with no owner is
     /// deallocated mid-load, and its delegate is never called.
     private var webView: WKWebView?
@@ -144,7 +140,11 @@ final class ReportPdfPrinter: NSObject {
     /// Suspends until the web view reports the page loaded. A load that fails
     /// resumes the continuation with the error rather than hanging the caller.
     func pdfData(html: String) async throws -> Data {
-        let webView = WKWebView(frame: Self.layoutBox)
+        // The view is exactly the printable box, in points. `pageZoom` then gives
+        // the page a layout viewport of box ÷ 0.75 CSS pixels — 703 px for 186 mm —
+        // so the template's millimetres survive the trip onto the paper.
+        let webView = WKWebView(frame: Self.printableBox)
+        webView.pageZoom = Self.printScale
         webView.navigationDelegate = self
         self.webView = webView
 

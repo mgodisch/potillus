@@ -512,6 +512,36 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Scale the page, not the view  (patch -62)
+
+Third attempt at the same four pages, and the first one aimed at the actual cause.
+
+CSS resolves a millimetre at 96 dpi; `UIPrintPageRenderer` draws at 72. Left alone,
+one CSS pixel prints as one point and every millimetre comes out 4/3 too large. A
+267 mm sheet then needs 356 mm of a 267 mm page — a third more — and each of the
+report's two sheets spills onto a page of its own.
+
+WHAT THE TWO WRONG FIXES ASSUMED. Patch -59 inset the printable box by an invented
+24 pt and let the scale fall where it may. Patch -61 assumed
+`UIViewPrintFormatter` SCALES the view down to the printable width, and sized the
+view in CSS pixels so the scale would land on 0.75. It does not scale. It RE-LAYS-
+OUT the content for the page width, so the view's width moved the line breaks and
+nothing else.
+
+The evidence that settled it was a measurement, not an argument: the overflow was
+"a good third" of a page. 96/72 − 1 is a third. Had the formatter been scaling, the
+type would have looked too large, and it never did.
+
+`webView.pageZoom = 0.75` scales the CONTENT, whatever the formatter does with it
+afterwards. The view is the printable box in points; the zoom gives the page a
+layout viewport of 703 × 1009 CSS px, which is 186 × 267 mm. One CSS millimetre
+becomes one printed millimetre. `min-height: 267mm` lands on 756.85 pt, and the
+printable height is 756.85 pt.
+
+The reasoning of both failed attempts stays in the source, above the constant that
+replaced them. A comment that only records the right answer teaches nobody why the
+wrong ones were plausible.
+
 #### Pin the print scale to 72/96  (patch -61)
 
 The report printed on four pages. Each of its two sheets overflowed by a strip.
