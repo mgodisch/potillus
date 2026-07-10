@@ -512,6 +512,41 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Express the sheet height in pages, not millimetres  (patch -65)
+
+Two exported PDFs, measured rather than reasoned about:
+
+| `min-height` asked | sheet printed | ratio  |
+| ------------------ | ------------- | ------ |
+| 267 mm             | 320.9 mm      | 1.2018 |
+| 240 mm             | 288.4 mm      | 1.2017 |
+
+Linear through the origin. The printable box is exactly 267 mm, verified in the
+PDF. WebKit's print layout inflates absolute lengths in the block flow by a
+constant a little over 1.2, so each of the report's two sheets overflows and it
+prints on four pages. The donut, `44mm` square in the SVG, comes out 40.1 mm —
+neither 44 nor 1.2018 × 44. Two length resolutions in one document.
+
+`267 / 1.2018 = 222.2mm` would work today, mean nothing, and wait for the next iOS
+to move it. `100vh` is one page box by definition in paged media: whatever factor
+WebKit applies, it applies to the page too, and it cancels.
+
+`ReportPageBox.inject` appends that one rule at the end of the `<head>`, where it
+outranks the template's own same-specificity rule. `min-height`, never `height` —
+a sheet whose content outgrows a page must still grow; clipping would drop rows
+from an alcohol report without saying so. iOS only: Android prints this template
+correctly, and `267mm` states an intent that `100vh` states only obliquely.
+
+Six tests. Not for the arithmetic, which has none, but for the splice: that the
+rule lands inside the head, after the template's, exactly once for three sheets,
+that the document is otherwise byte-for-byte itself, and that a document without a
+`</head>` comes back unchanged rather than silently repaired.
+
+FOUR WRONG DIAGNOSES PRECEDED THIS ONE — invented margins, a formatter that was
+assumed to scale, an inch of insets that was not there, a footer blamed on flexbox.
+Each was plausible and each was argued from the code rather than from the artefact.
+The measurement that ended it took two exports and one subtraction.
+
 #### Let the sheet be shorter than its page  (patch -64)
 
 `check-report-paper.py` demanded that `.sheet`'s min-height EQUAL what the `@page`

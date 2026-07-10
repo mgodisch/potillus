@@ -157,7 +157,11 @@ final class ReportPdfPrinter: NSObject {
             self.continuation = continuation
             // `nil` base URL: the template is self-contained, and a base URL would
             // let a future edit reach the network from a report about drinking.
-            webView.loadHTMLString(html, baseURL: nil)
+            // `ReportPageBox` restates the sheet height in page units. WebKit's
+            // print layout inflates absolute lengths by a factor a little over 1.2
+            // — measured, not guessed — and `100vh` is one page whatever that
+            // factor is. See ReportPageBox.swift.
+            webView.loadHTMLString(ReportPageBox.inject(into: html), baseURL: nil)
         }
     }
 
