@@ -54,9 +54,25 @@ struct RootView: View {
     var body: some View {
         // `.tabItem` rather than the `Tab { }` builder: that builder is iOS 18,
         // and this app supports iOS 17. The two render identically here.
+        //
+        // ON THE SYMBOLS
+        //   Android pairs `Icons.Default.Today` (a calendar sheet with the day
+        //   marked) against `Icons.Default.CalendarMonth` (a month grid): the two
+        //   differ by DAY versus MONTH, not by metaphor. SF Symbols has no sheet
+        //   with an inner day marker — Apple places badges outside the glyph — so
+        //   `calendar.badge.clock` carries the "now" sense while staying in the
+        //   same family as its neighbour, and remains legible at tab-bar size.
+        //
+        //   `sun.max` was the first choice and was wrong: in Apple's own apps it
+        //   means weather or screen brightness, so it would read as a different
+        //   feature entirely. A tab symbol should depict the content, not a mood.
+        //
+        //   No `.fill` variants are named anywhere here. SwiftUI selects the
+        //   filled form for tab items on iOS and the outlined one on macOS by
+        //   itself; spelling it out would defeat that.
         TabView {
             PlaceholderScreen(title: "Today")
-                .tabItem { Label("Today", systemImage: "sun.max") }
+                .tabItem { Label("Today", systemImage: "calendar.badge.clock") }
 
             PlaceholderScreen(title: "Calendar")
                 .tabItem { Label("Calendar", systemImage: "calendar") }

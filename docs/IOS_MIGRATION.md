@@ -512,6 +512,20 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Use a calendar symbol for the Today tab  (patch -25)
+
+- Replace `sun.max` with `calendar.badge.clock`. The sun was wrong: in Apple's
+  own apps that symbol means weather or screen brightness, so in a tab bar it
+  reads as a different feature. A tab symbol depicts the content, not a mood.
+- Android pairs `Today` (a calendar sheet with the day marked) against
+  `CalendarMonth` (a month grid) — the two differ by day versus month, not by
+  metaphor. SF Symbols has no sheet with an inner day marker, because Apple
+  places badges outside the glyph, so `calendar.badge.clock` is the closest
+  reading: the same family as its neighbour, with the "now" sense, still legible
+  at tab-bar size.
+- Record why no `.fill` variant is named: SwiftUI picks the filled form for tab
+  items on iOS and the outlined one on macOS on its own.
+
 #### Lint for await inside XCTAssert autoclosures  (patch -24)
 
 - Fix a third `await`-in-autoclosure compile error, in `AppEnvironmentTests`.
