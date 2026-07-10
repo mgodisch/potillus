@@ -512,6 +512,14 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Silence a real warning, not the compiler  (patch -28)
+
+- `TodayModel.addEntry` fed `entries.add`, which returns the new row id, into a
+  `Void` closure and dropped the value. Discard it explicitly with `_ =` rather
+  than annotating the protocol with `@discardableResult`: the row id is real
+  information, and a caller that does not want it should have to say so.
+- Drop the pointless `_ =` in `perform`, whose closure returns `Void`.
+
 #### Add the limit bars to the Today screen  (patch -27)
 
 - Add `LimitGauge` in the kit: the rules a progress bar needs, extracted so they

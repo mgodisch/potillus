@@ -227,7 +227,10 @@ public final class TodayModel {
             note: note
         )
 
-        await perform { try self.entries.add(entry) }
+        // The new row id is discarded explicitly rather than silenced with
+        // `@discardableResult` on the protocol: it is real information, and a
+        // caller that does not want it should have to say so.
+        await perform { _ = try self.entries.add(entry) }
     }
 
     public func deleteEntry(_ entry: ConsumptionEntry) async {
@@ -242,7 +245,7 @@ public final class TodayModel {
     /// surfaces the reason rather than pretending the entry was saved.
     private func perform(_ write: @escaping () throws -> Void) async {
         do {
-            _ = try write()
+            try write()
         } catch {
             failure = String(describing: error)
             return
