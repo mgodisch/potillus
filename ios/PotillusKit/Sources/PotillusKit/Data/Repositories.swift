@@ -113,6 +113,10 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// Drives the pre-selected drink in the entry sheet.
     func lastEntry() throws -> ConsumptionEntry?
 
+    /// Every logical date on which anything was logged, ascending and distinct.
+    /// The one-shot twin of `observeAllDates`, for the abstinence streaks.
+    func allDates() throws -> [String]
+
     /// Inserts `entry` and returns its new database id.
     func add(_ entry: ConsumptionEntry) throws -> Int64
 
@@ -288,14 +292,19 @@ public struct EntryRepository: EntryRepositoryProtocol {
         }
     }
 
+    /// The single definition of the distinct-dates query, shared by the observing
+    /// and one-shot readers, so a streak cannot be computed over a different set of
+    /// days than the one the chart draws.
+    private static func fetchAllDates(_ db: Database) throws -> [String] {
+        try String.fetchAll(
+            db,
+            sql: "SELECT DISTINCT logicalDate FROM entries ORDER BY logicalDate ASC"
+        )
+    }
+
     /// `SELECT DISTINCT logicalDate FROM entries ORDER BY logicalDate ASC`
     public func observeAllDates() -> AsyncThrowingStream<[String], Error> {
-        observing(reader: database.reader) { db in
-            try String.fetchAll(
-                db,
-                sql: "SELECT DISTINCT logicalDate FROM entries ORDER BY logicalDate ASC"
-            )
-        }
+        observing(reader: database.reader) { db in try Self.fetchAllDates(db) }
     }
 
     public func observeEntries(from: String, to: String) -> AsyncThrowingStream<[ConsumptionEntry], Error> {
@@ -345,6 +354,10 @@ public struct EntryRepository: EntryRepositoryProtocol {
         try database.read { db in
             try Entry.order(Column("timestampMillis").desc).fetchOne(db)?.domain
         }
+    }
+
+    public func allDates() throws -> [String] {
+        try database.read { db in try Self.fetchAllDates(db) }
     }
 
     public func add(_ entry: ConsumptionEntry) throws -> Int64 {

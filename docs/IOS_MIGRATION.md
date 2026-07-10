@@ -512,6 +512,33 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the statistics model  (patch -36)
+
+- Add `StatsWindows`, the period arithmetic, as a pure type. Week is a rolling
+  seven days against the seven before; month and year run from their first day and
+  compare against the WHOLE previous month or year. The lengths differ on purpose:
+  the trend compares grams per day, so a half-finished January is still comparable
+  to a complete December. Boundaries — the first of a month, 1 January, a leap
+  February — are tested against independently computed dates.
+- Model the `statsFromDate` floor as raising the start of BOTH windows, and make
+  its third case explicit. A floor inside the CURRENT period leaves the baseline
+  inverted, which means "there is no comparable history", not "the baseline was
+  zero". `StatsState.hasBaseline` carries that distinction to the view, so a
+  trend of 0 % is never mistaken for "no change".
+- Compare the floor by STRING. That works only because `yyyy-MM-dd` sorts
+  chronologically, which is why the schema stores dates that way; a test says so.
+- Add `StatsModel`, which computes nothing. The window comes from `StatsWindows`,
+  the aggregations from `StatsAggregator`, the violations from `AlcoholCalculator`,
+  the streaks from `DayResolver`, the chart from `ChartBucketing`. It fetches,
+  delegates, and assembles — which is all a view model should do, and is exactly
+  what Android's `StatsViewModel` does not.
+- Compute the streaks over the whole history above the floor, not over the period:
+  a dry streak that began in December is still a streak in January.
+- Add a one-shot `allDates()` to the entry repository, sharing the query of
+  `observeAllDates` so a streak cannot be computed over a different set of days
+  than the chart draws.
+- Leave the CSV and PDF exports for their own patches.
+
 #### Fix the calendar tests, and test what caught them  (patch -35)
 
 - `CalendarModelTests` inserted entries with a hard-coded `drinkId` of 1 and never
