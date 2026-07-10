@@ -512,6 +512,31 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Close the PDF context before reading its buffer  (patch -60)
+
+The report exported in patch -59 could not be opened. It had a `%PDF-` header, it
+had page objects, and it had no ending.
+
+`UIGraphicsEndPDFContext()` is what writes the cross-reference table and the
+`%%EOF` marker — the parts that make the bytes a document rather than a heap of
+drawing commands. Patch -59 called it from a `defer`, and `defer` runs AFTER the
+return value has been evaluated. `output as Data` took the buffer while the
+document was still open.
+
+Worse: the draft before -59 had the explicit call AND the `defer`, and I removed
+the explicit one as a redundant double-close. It was not redundant. It was the one
+that mattered; the `defer` was the safety net for the throwing path. Both are back,
+with a flag so the net does not fire twice, and with the reason written down.
+
+`ReportJob.isWellFormed` now checks that the bytes begin `%PDF-` and end `%%EOF`.
+It is not a validator and does not pretend to be. It answers the single question
+this bug turned on, it is pure, and so it lives in the kit with four tests — one of
+which feeds it exactly the truncated buffer that shipped.
+
+The printer refuses to hand such a buffer to `fileExporter`. A report that cannot
+be opened should fail at the moment of export, with a sentence, and not three taps
+later in Preview.
+
 #### Print the report  (patch -59)
 
 The last step. The Statistics toolbar now exports a PDF as well as a CSV.

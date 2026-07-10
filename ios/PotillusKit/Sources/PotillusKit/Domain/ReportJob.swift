@@ -55,4 +55,23 @@ public enum ReportJob {
         formatter.dateFormat = "yyyyMMdd_HHmm"
         return "potillus_report_\(formatter.string(from: date)).pdf"
     }
+
+    /// Whether `data` is structurally a PDF: it begins `%PDF-` and ends `%%EOF`.
+    ///
+    /// This is not a validator. It answers one question, and the question is not
+    /// academic: `UIGraphicsEndPDFContext` writes the cross-reference table and the
+    /// `%%EOF` marker, so a buffer read BEFORE the context was closed carries a
+    /// perfectly good header, real page objects, and no ending. Every reader calls
+    /// such a file corrupt, and it is the exact shape of the bug that shipped in
+    /// patch -59.
+    ///
+    /// It lives here, in the kit, because it is the last thing about exporting a PDF
+    /// that can be tested without a screen.
+    public static func isWellFormed(_ data: Data) -> Bool {
+        guard data.count > 8, data.starts(with: Array("%PDF-".utf8)) else { return false }
+
+        // The trailer may be followed by a newline or two, so look near the end
+        // rather than demanding the very last byte.
+        return data.suffix(32).range(of: Data("%%EOF".utf8)) != nil
+    }
 }

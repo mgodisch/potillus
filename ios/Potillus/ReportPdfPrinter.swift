@@ -23,6 +23,7 @@
 //
 // =============================================================================
 
+import PotillusKit
 import UIKit
 import WebKit
 
@@ -111,10 +112,17 @@ final class ReportPdfPrinter: NSObject {
 
         let output = NSMutableData()
         UIGraphicsBeginPDFContextToData(output, Self.a4Paper, nil)
-        // Ends the context on every path out of this function, including the throw
-        // below. A context left open leaks the drawing surface for the process's
-        // lifetime.
-        defer { UIGraphicsEndPDFContext() }
+
+        // THE CONTEXT MUST BE CLOSED BEFORE THE BUFFER IS READ, and `defer` is too
+        // late: it runs after the return value has been evaluated. A PDF whose
+        // context was never ended has a `%PDF-` header, page objects, and no
+        // cross-reference table or `%%EOF` — a file every reader calls corrupt.
+        //
+        // The flag is not decoration. `drawPage` can throw its way out of the loop,
+        // and a context left open leaks its drawing surface for the life of the
+        // process, so the deferred close still has to exist for that path.
+        var contextIsOpen = true
+        defer { if contextIsOpen { UIGraphicsEndPDFContext() } }
 
         // `numberOfPages` is what the formatter decided, honouring the template's
         // page breaks. Asking is what makes it decide; nothing paginates before.
@@ -126,6 +134,16 @@ final class ReportPdfPrinter: NSObject {
             renderer.drawPage(at: page, in: renderer.paperRect)
         }
 
+        UIGraphicsEndPDFContext()
+        contextIsOpen = false
+
+        // A file that starts `%PDF-` and ends `%%EOF` is not proof of a good report,
+        // but the absence of either is proof of a broken one. `ReportJob` holds the
+        // check because it is pure, and this file is the one place that can be wrong
+        // about it.
+        guard output.length > 0, ReportJob.isWellFormed(output as Data) else {
+            throw Failure.emptyDocument
+        }
         return output as Data
     }
 }

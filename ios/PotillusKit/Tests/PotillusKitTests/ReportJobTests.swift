@@ -49,6 +49,28 @@ final class ReportJobTests: XCTestCase {
         )
     }
 
+    // ── Structure ────────────────────────────────────────────────────────────
+
+    /// The shape of the bug that shipped in patch -59: a header, pages, no ending.
+    func testABufferReadBeforeTheContextWasClosedIsRejected() {
+        let truncated = Data("%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nendobj\n".utf8)
+        XCTAssertFalse(ReportJob.isWellFormed(truncated), "no %%EOF means no document")
+    }
+
+    func testAFinishedDocumentIsAccepted() {
+        let complete = Data("%PDF-1.7\n1 0 obj\nendobj\ntrailer\n%%EOF\n".utf8)
+        XCTAssertTrue(ReportJob.isWellFormed(complete))
+    }
+
+    func testAnEmptyBufferIsNotAPdf() {
+        XCTAssertFalse(ReportJob.isWellFormed(Data()))
+        XCTAssertFalse(ReportJob.isWellFormed(Data("%PDF-".utf8)), "a header alone is not a file")
+    }
+
+    func testSomethingElseEntirelyIsNotAPdf() {
+        XCTAssertFalse(ReportJob.isWellFormed(Data("<html>%%EOF</html>".utf8)))
+    }
+
     /// It sorts, which is the point of putting the date first.
     func testNamesSortChronologically() {
         let earlier = ReportJob.fileName(
