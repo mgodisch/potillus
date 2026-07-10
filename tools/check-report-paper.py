@@ -142,11 +142,20 @@ def main():
         )
 
     if in_css and sheet is not None:
-        expected = A4_HEIGHT_MM - in_css[0] - in_css[2]
-        if abs(sheet - expected) > 1e-9:
+        available = A4_HEIGHT_MM - in_css[0] - in_css[2]
+
+        # AN INEQUALITY, NOT AN EQUATION. The first version of this check demanded
+        # equality and then described the failure as "a sheet taller than its page",
+        # which was true of only one side of it. It rejected a 240mm sheet — shorter
+        # than its page, and therefore harmless — and in doing so blocked the very
+        # experiment that was meant to diagnose the four-page report.
+        #
+        # A shorter sheet only lifts the pinned footer off the bottom edge. A taller
+        # one prints on two pages. Only the second is a fault.
+        if sheet > available + 1e-9:
             problems.append(
                 f"{TEMPLATE}: `.sheet` min-height is {sheet}mm, but the `@page` margins "
-                f"leave {expected}mm of an A4 sheet. A sheet taller than its page "
+                f"leave only {available}mm of an A4 sheet. A sheet taller than its page "
                 f"prints on two."
             )
 

@@ -512,6 +512,25 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Let the sheet be shorter than its page  (patch -64)
+
+`check-report-paper.py` demanded that `.sheet`'s min-height EQUAL what the `@page`
+margins leave of an A4 sheet, and then described the failure as "a sheet taller than
+its page prints on two" — a sentence true of one side of an equality it was testing
+as both.
+
+So it rejected a 240 mm sheet: shorter than its page, harmless, and precisely the
+experiment meant to diagnose why the report prints on four pages. A check that
+blocks a diagnosis is worse than no check.
+
+It is an inequality. A shorter sheet only lifts the pinned footer off the bottom
+edge; a taller one prints on two pages. Only the second is a fault.
+
+The failing case was never tested when the check was written — the three tests it
+did have were "clean", "template moved", "Swift moved". None of them made the sheet
+SHORTER. The test list now covers both directions, which is what the message had
+been claiming all along.
+
 #### Take the formatter's inch away  (patch -63)
 
 `UIPrintFormatter.perPageContentInsets` defaults to ONE INCH on every side. Nothing
