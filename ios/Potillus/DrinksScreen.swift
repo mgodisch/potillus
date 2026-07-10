@@ -93,8 +93,9 @@ struct DrinksScreen: View {
             }
             .sheet(item: $logging) { drink in
                 // One drink, so the sheet shows its name instead of a picker.
-                EntrySheet(drinks: [drink], preselected: drink, now: logger.now()) {
-                    chosen, volume, millis, note in
+                EntrySheet(
+                    drinks: [drink], preselected: drink, now: logger.now()
+                ) { chosen, volume, millis, note in
                     await logger.log(
                         drink: chosen, volumeMl: volume, timestampMillis: millis, note: note
                     )

@@ -319,8 +319,11 @@ extension SettingsScreen {
             // The one sentence that makes the feature trustworthy, and true.
             Text(
                 includeSettingsInExport
-                    ? "A JSON file containing your drinks, your log, and your settings — including your body weight. It never leaves this device unless you send it somewhere."
-                    : "A JSON file containing your drinks and your log. Your settings, including your body weight, are left out."
+                    ? "A JSON file containing your drinks, your log, and your settings"
+                        + " — including your body weight. It never leaves this device"
+                        + " unless you send it somewhere."
+                    : "A JSON file containing your drinks and your log. Your settings,"
+                        + " including your body weight, are left out."
             )
         }
     }

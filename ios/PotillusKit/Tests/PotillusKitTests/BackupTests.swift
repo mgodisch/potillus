@@ -220,14 +220,14 @@ final class BackupTests: XCTestCase {
     }
 
     func testNonJSONDataIsAnError() throws {
-        let data = try XCTUnwrap("not json at all".data(using: .utf8))
+        let data = Data("not json at all".utf8)
         XCTAssertThrowsError(try BackupReader.parse(data)) { error in
             XCTAssertEqual(error as? BackupError, .invalidJSON)
         }
     }
 
     func testAJSONArrayRootIsAnError() throws {
-        let data = try XCTUnwrap("[1,2,3]".data(using: .utf8))
+        let data = Data("[1,2,3]".utf8)
         XCTAssertThrowsError(try BackupReader.parse(data)) { error in
             XCTAssertEqual(error as? BackupError, .invalidJSON)
         }

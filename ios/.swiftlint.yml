@@ -1,0 +1,111 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#  .swiftlint.yml -- the Swift counterpart to android/.editorconfig
+# =============================================================================
+#
+#  SwiftLint arrives with opinions. Most are sound; a few contradict decisions
+#  this project made deliberately, and one is simply wrong about Swift. Every
+#  rule switched off below carries the reason, because an unexplained exception
+#  is not a decision, it is a problem in hiding.
+#
+#  The build runs this with --strict, so a warning stops the build. A checker
+#  that only grumbles checks nothing.
+# =============================================================================
+
+included:
+  - PotillusKit/Sources
+  - PotillusKit/Tests
+  - Potillus
+
+excluded:
+  - PotillusKit/.build
+  - Potillus.xcodeproj
+
+disabled_rules:
+  # `override class func setUp()` is XCTestCase's own signature. A subclass
+  # overrides it; `static` means `final class` and cannot be overridden. All
+  # seven hits are that one line, and the rule does not recognise `override`.
+  - static_over_final_class
+
+  # Trailing commas in multi-line literals are house style, here as in the
+  # Kotlin sources: adding an element then touches one line, not two, and the
+  # diff shows what changed rather than where a comma moved.
+  - trailing_comma
+
+  # `calculateBAC` takes seven parameters and `EntryLogger.log` six, mirroring
+  # the Android signatures they were ported from. Grouping them into a struct
+  # for a lint rule would break that correspondence, which is the one property
+  # the port must preserve.
+  - function_parameter_count
+
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - last_where
+  - toggle_bool
+
+# ── Rules kept, with the project's numbers ──────────────────────────────────
+
+identifier_name:
+  # `db` is GRDB's own idiom, in its documentation and in every example: the
+  # database handle passed into a transaction block. `to` is the second half of
+  # `inRange(from:to:)`, which names the Android method it mirrors. `up` is a
+  # trend direction. Two-letter names are not always laziness.
+  excluded:
+    - db
+    - to
+    - up
+    - id
+
+file_length:
+  # Files here carry teaching-level commentary: `AlcoholCalculator.swift` is 454
+  # lines of which most are prose explaining why the arithmetic is what it is.
+  # Counting those against a length budget would reward stripping the comments.
+  ignore_comment_only_lines: true
+  warning: 500
+
+function_body_length:
+  # `StatsModel.load()` runs one aggregation after another, each two or three
+  # lines. Splitting it would spread a linear sequence across the file for no
+  # reader's benefit. 100 lines is the ceiling; past that, something is wrong.
+  warning: 100
+
+cyclomatic_complexity:
+  # A vector-driven test walks a switch over case kinds. That branching is the
+  # test's whole purpose and does not make it hard to read.
+  warning: 15
+
+nesting:
+  # A test's fixture types live inside the test that uses them, and the shared
+  # vector loader nests a decoding type inside its namespace enum. Two levels.
+  type_level: 2
+
+line_length:
+  # 120, as the Kotlin side. Comments and URLs are exempt: a URL cannot be
+  # wrapped, and a wrapped sentence is harder to read than a long one.
+  warning: 120
+  ignores_comments: true
+  ignores_urls: true

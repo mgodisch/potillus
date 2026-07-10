@@ -88,7 +88,6 @@ public enum DrinkValidator {
     /// Accepted alcohol content, percent by volume.
     public static let alcoholPercentRange = 0.0...100.0
 
-
     /// Which field a `Violation` refers to.
     public enum Field: String, Sendable, Equatable {
         case name = "NAME"

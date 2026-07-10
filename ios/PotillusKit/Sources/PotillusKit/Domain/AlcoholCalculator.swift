@@ -358,7 +358,9 @@ public enum AlcoholCalculator {
         weeklyLimitGrams: Double,
         maxDrinkDaysPerWeek: Int
     ) -> LimitViolations {
-        let daysOverDaily = summaries.filter { isOverLimit(totalGrams: $0.totalGrams, limitGrams: dailyLimitGrams) }.count
+        let daysOverDaily = summaries.filter {
+            isOverLimit(totalGrams: $0.totalGrams, limitGrams: dailyLimitGrams)
+        }.count
 
         // Consumption days only (> 0 g), sorted ascending so the window can
         // advance in a single forward pass. Each ISO date is parsed once.

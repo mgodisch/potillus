@@ -834,7 +834,7 @@ ios-project: ios-version
 #
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
-ios: check-headers check-makefile check-swift-tests check-swift-symbols ios-project
+ios: check-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
@@ -879,6 +879,26 @@ debug:
 # followed by "'ios/Potillus.xcodeproj' does not exist".
 check-makefile:
 	python3 tools/check-makefile.py
+
+# check-swiftlint: the Swift counterpart to ktlint. Install with
+# `brew install swiftlint`.
+#
+#   PINNED, because SwiftLint changes its rules between releases and a build that
+#   is green on one version can be red on the next. The Kotlin side gets this for
+#   free through the Gradle plugin; Swift has no such mechanism, so the version is
+#   checked here.
+#
+#   --strict, because a warning nobody must act on is a warning nobody reads.
+#
+#   REQUIRED, not optional. A target that skips itself when the tool is absent
+#   reports success for work it never did.
+SWIFTLINT_VERSION := 0.65.0
+
+check-swiftlint:
+	command -v swiftlint >/dev/null 2>&1 || { echo "check-swiftlint: swiftlint not found -- install it with 'brew install swiftlint' (version $(SWIFTLINT_VERSION))." >&2; exit 1; }
+	@have=$$(swiftlint version); \
+	  test "$$have" = "$(SWIFTLINT_VERSION)" || { echo "check-swiftlint: swiftlint $$have found, but this project pins $(SWIFTLINT_VERSION). Rules differ between releases." >&2; exit 1; }
+	( cd ios && swiftlint lint --strict --quiet --config .swiftlint.yml )
 
 # check-swift-symbols: catches an invented type (`Backup.parse`, where only
 # `BackupReader` and `BackupWriter` exist) and a missing module import (`UTType`
@@ -929,4 +949,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean

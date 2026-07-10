@@ -512,6 +512,42 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Lint the Swift the way ktlint lints the Kotlin  (patch -50)
+
+SwiftLint ships a portable Linux binary that needs no Swift toolchain, so Swift
+style is checkable wherever the Swift is written — not only on a Mac. Out of the
+box it found 110 things and was wrong about most of them.
+
+- Add `ios/.swiftlint.yml`, the counterpart to `android/.editorconfig`. Every rule
+  switched off carries its reason, because an unexplained exception is not a
+  decision, it is a problem in hiding:
+  - `static_over_final_class` — all seven hits are `override class func setUp()`,
+    XCTestCase's own signature. `static` means `final class` and cannot be
+    overridden. The rule does not recognise `override`.
+  - `trailing_comma` — house style, as on the Kotlin side: adding an element
+    touches one line, not two.
+  - `function_parameter_count` — `calculateBAC` takes seven parameters because
+    Android's does. Packing them into a struct for a lint rule would break the
+    correspondence the port exists to preserve.
+  - `identifier_name` excludes `db`, `to`, `up`, `id`. 42 of the 58 hits were
+    `db`, which is GRDB's own idiom, and 15 were the `to:` of `inRange(from:to:)`.
+  - `file_length` ignores comment-only lines. These files are mostly prose
+    explaining the arithmetic; counting it against a budget rewards deleting it.
+- Fix the ten findings that survived, all of them real:
+  - `Data("[1,2,3]".utf8)` rather than `try XCTUnwrap(...data(using: .utf8))`. The
+    conversion cannot fail, so there was never anything to unwrap.
+  - Two 175- and 129-character strings in `SettingsScreen` split across lines,
+    then verified by concatenation that not one character of the sentences moved.
+  - A doubled blank line, a 122-character filter, and four closure parameters
+    that belonged on the brace line.
+- Run it from `make ios` as `check-swiftlint`, PINNED to 0.65.0 and `--strict`.
+  SwiftLint changes rules between releases, and the Kotlin side gets version
+  pinning free through its Gradle plugin; Swift has no such mechanism, so the
+  Makefile checks. `--strict` because a warning nobody must act on is a warning
+  nobody reads. Required rather than optional, because a target that skips itself
+  when its tool is missing reports success for work it never did.
+- Install with `brew install swiftlint`.
+
 #### Format the Kotlin tests as ktlint demands  (patch -49)
 
 - 36 `argument-list-wrapping` violations across the five Kotlin vector tests, plus
