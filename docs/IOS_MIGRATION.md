@@ -511,6 +511,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the backup settings sanitiser  (patch -19)
+
+- Extend the Swift `AppSettings` from the calculator's three-field slice to the
+  full twelve-field model, and add `ThemeMode` and `SupportedLocales`.
+- Add `test-vectors/backup-settings.json`: 24 clamping cases harvested from
+  `BackupManager.parseSettings`, plus the 21-tag locale catalogue GENERATED from
+  `l10n/SupportedLocales.kt`. Both suites assert the catalogue, so a language
+  added on one platform cannot be quietly forgotten on the other — the failure
+  mode would be a restored `language` silently degrading to "follow the system",
+  which no user would ever report as a bug.
+- Port the clamping. A backup is plain JSON in the user's Files app: editable,
+  truncatable, possibly written by a newer app. Its numbers flow straight into
+  the alcohol maths, so every value is range-checked at the boundary and each
+  screen downstream can treat `AppSettings` as sound.
+- Two rules that look like bugs and are not, now documented and tested on both
+  sides: `weightKg == 0` is the "not set" SENTINEL and must never be clamped up
+  to the 1 kg floor, or a restore invents a one-kilogram body; and
+  `statsFromDate` survives only if it round-trips through the canonical
+  formatter, so "2026-1-1" and the non-existent "2026-02-30" both become blank
+  rather than mis-bucketing every statistic.
+- No Android change was needed after all: `parseBackupJson` is already
+  `internal` + `@VisibleForTesting`, so the JVM vector test drives the real
+  restore path — the reader's defaulting AND the clamping — exactly as iOS does.
+
 #### Check only the files the repository tracks  (patch -18)
 
 - Fix `tools/check-headers.py`, which walked the file system and therefore

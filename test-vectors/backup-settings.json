@@ -1,0 +1,542 @@
+{
+  "_comment": [
+    "Shared golden vectors for the backup 'settings' block sanitiser, harvested from",
+    "Android's BackupManager.parseSettings. Loaded by BOTH suites.",
+    "A backup file is user-editable and may come from a newer app, so every value is",
+    "range-checked before it can influence the alcohol maths. weightKg keeps 0.0 as",
+    "the 'not set' sentinel: it is NOT clamped up to the 1 kg floor, or an unset",
+    "weight would silently become a 1 kg body.",
+    "statsFromDate is kept only when it round-trips through the canonical yyyy-MM-dd",
+    "formatter; anything else becomes blank rather than mis-bucketing statistics.",
+    "language is matched case-insensitively against the locale catalogue and",
+    "canonicalised to the catalogue's own spelling."
+  ],
+  "defaults": {
+    "themeMode": "SYSTEM",
+    "dayChangeHour": 4,
+    "dayChangeMinute": 0,
+    "dailyLimitGrams": 20.0,
+    "weeklyLimitGrams": 100.0,
+    "maxDrinkDaysPerWeek": 5,
+    "statsFromDate": "",
+    "biometricEnabled": false,
+    "allowScreenshots": false,
+    "language": "",
+    "weightKg": 0.0,
+    "alternativeStatusSymbols": false
+  },
+  "localeTags": [
+    "da",
+    "de",
+    "en",
+    "es",
+    "fr",
+    "it",
+    "nl",
+    "nb",
+    "pl",
+    "pt",
+    "pt-BR",
+    "ro",
+    "sv",
+    "cs",
+    "el",
+    "ru",
+    "uk",
+    "zh-CN",
+    "zh-TW",
+    "ja",
+    "ko"
+  ],
+  "sanitize": [
+    {
+      "description": "empty settings object yields the canonical defaults",
+      "input": {},
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a complete, valid object survives unchanged",
+      "input": {
+        "themeMode": "NIGHT",
+        "dayChangeHour": 5,
+        "dayChangeMinute": 30,
+        "dailyLimitGrams": 24.0,
+        "weeklyLimitGrams": 120.0,
+        "maxDrinkDaysPerWeek": 4,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": true,
+        "allowScreenshots": true,
+        "alternativeStatusSymbols": true,
+        "language": "de",
+        "weightKg": 82.5
+      },
+      "expected": {
+        "themeMode": "NIGHT",
+        "dayChangeHour": 5,
+        "dayChangeMinute": 30,
+        "dailyLimitGrams": 24.0,
+        "weeklyLimitGrams": 120.0,
+        "maxDrinkDaysPerWeek": 4,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": true,
+        "allowScreenshots": true,
+        "alternativeStatusSymbols": true,
+        "language": "de",
+        "weightKg": 82.5
+      }
+    },
+    {
+      "description": "unknown theme decays to SYSTEM",
+      "input": {
+        "themeMode": "MIDNIGHT"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "day-change hour above the range clamps to 23",
+      "input": {
+        "dayChangeHour": 25
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 23,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "negative day-change hour clamps to 0",
+      "input": {
+        "dayChangeHour": -1
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 0,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "day-change minute clamps to 59",
+      "input": {
+        "dayChangeMinute": 90
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 59,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "drink days below one clamp to one",
+      "input": {
+        "maxDrinkDaysPerWeek": 0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 1,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "drink days above seven clamp to seven",
+      "input": {
+        "maxDrinkDaysPerWeek": 9
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 7,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "daily limit below the floor clamps to 1 g",
+      "input": {
+        "dailyLimitGrams": 0.5
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 1.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "daily limit above the ceiling clamps to 500 g",
+      "input": {
+        "dailyLimitGrams": 9999.0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 500.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "weekly limit clamps into 1..3500",
+      "input": {
+        "weeklyLimitGrams": 99999.0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 3500.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "zero weight keeps the 'unset' sentinel",
+      "input": {
+        "weightKg": 0.0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "negative weight keeps the 'unset' sentinel",
+      "input": {
+        "weightKg": -5.0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a positive weight below the floor clamps to 1 kg",
+      "input": {
+        "weightKg": 0.4
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 1.0
+      }
+    },
+    {
+      "description": "weight above the ceiling clamps to 500 kg",
+      "input": {
+        "weightKg": 900.0
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 500.0
+      }
+    },
+    {
+      "description": "a canonical stats date is kept",
+      "input": {
+        "statsFromDate": "2026-01-01"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a non-canonical stats date is dropped",
+      "input": {
+        "statsFromDate": "2026-1-1"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "an impossible stats date is dropped",
+      "input": {
+        "statsFromDate": "2026-02-30"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a differently formatted date is dropped",
+      "input": {
+        "statsFromDate": "01/02/2026"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a blank stats date stays blank",
+      "input": {
+        "statsFromDate": "   "
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a known language tag is kept",
+      "input": {
+        "language": "fr"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "fr",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "language matching is case-insensitive and canonicalised",
+      "input": {
+        "language": "DE"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "de",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "a regional tag is kept verbatim",
+      "input": {
+        "language": "pt-BR"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "pt-BR",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "an unknown language falls back to the system default",
+      "input": {
+        "language": "xx"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 100.0,
+        "maxDrinkDaysPerWeek": 5,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "",
+        "weightKg": 0.0
+      }
+    }
+  ]
+}

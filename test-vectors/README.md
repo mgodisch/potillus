@@ -45,6 +45,10 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
   fractions, the traffic-light capacity status, and the rolling seven-day
   violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+- `backup-settings.json` — the clamping every value from a backup's `settings`
+  block passes through, plus the locale catalogue. The `localeTags` array is
+  GENERATED from `l10n/SupportedLocales.kt`; both suites assert against it, so a
+  language added on one platform cannot be forgotten on the other.
 - `csv-export.json` — RFC 4180 field escaping, the OWASP formula-injection
   guard, and complete CSV documents (CRLF endings included). The `buildCsv` cases
   carry a `zoneId`, because the `HH:mm` column renders the entry's instant in the

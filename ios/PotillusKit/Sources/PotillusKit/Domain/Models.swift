@@ -205,17 +205,74 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
 /// The full Android `AppSettings` carries UI preferences too; only the limit
 /// fields are relevant to the domain maths, so only those are modelled here.
 public struct AppSettings: Sendable, Equatable {
-    public let dailyLimitGrams: Double
-    public let weeklyLimitGrams: Double
-    public let maxDrinkDaysPerWeek: Int
 
+    /// Follow the system, or force light/dark. Persisted by name, never ordinal.
+    public var themeMode: ThemeMode
+
+    /// The hour and minute at which one logical day becomes the next. A drink at
+    /// 02:00 belongs to the previous evening, which is why this is not midnight.
+    public var dayChangeHour: Int
+    public var dayChangeMinute: Int
+
+    public var dailyLimitGrams: Double
+    public var weeklyLimitGrams: Double
+    public var maxDrinkDaysPerWeek: Int
+
+    /// Statistics start here, `yyyy-MM-dd`. Empty means "from the first entry".
+    public var statsFromDate: String
+
+    public var biometricEnabled: Bool
+    public var allowScreenshots: Bool
+    public var alternativeStatusSymbols: Bool
+
+    /// A locale tag from `SupportedLocales.tags`, or empty for the system locale.
+    public var language: String
+
+    /// Body weight in kilograms, feeding the Widmark estimate.
+    ///
+    /// `0.0` is the SENTINEL for "not set", not a real weight. It must never be
+    /// clamped up to the 1 kg floor, or an unset weight would silently become a
+    /// one-kilogram body and the BAC estimate would be nonsense.
+    public var weightKg: Double
+
+    /// The canonical defaults, identical to Kotlin's `AppSettings()`.
     public init(
+        themeMode: ThemeMode = .system,
+        dayChangeHour: Int = 4,
+        dayChangeMinute: Int = 0,
         dailyLimitGrams: Double = 20.0,
         weeklyLimitGrams: Double = 100.0,
-        maxDrinkDaysPerWeek: Int = 5
+        maxDrinkDaysPerWeek: Int = 5,
+        statsFromDate: String = "",
+        biometricEnabled: Bool = false,
+        allowScreenshots: Bool = false,
+        alternativeStatusSymbols: Bool = false,
+        language: String = "",
+        weightKg: Double = 0.0
     ) {
+        self.themeMode = themeMode
+        self.dayChangeHour = dayChangeHour
+        self.dayChangeMinute = dayChangeMinute
         self.dailyLimitGrams = dailyLimitGrams
         self.weeklyLimitGrams = weeklyLimitGrams
         self.maxDrinkDaysPerWeek = maxDrinkDaysPerWeek
+        self.statsFromDate = statsFromDate
+        self.biometricEnabled = biometricEnabled
+        self.allowScreenshots = allowScreenshots
+        self.alternativeStatusSymbols = alternativeStatusSymbols
+        self.language = language
+        self.weightKg = weightKg
+    }
+}
+
+/// How the app picks its colour scheme. Persisted by raw name, as on Android.
+public enum ThemeMode: String, Sendable, Equatable, Codable, CaseIterable {
+    case system = "SYSTEM"
+    case day = "DAY"
+    case night = "NIGHT"
+
+    /// Decodes a stored value, falling back to `.system` for anything unknown.
+    public static func from(stored value: String) -> ThemeMode {
+        ThemeMode(rawValue: value) ?? .system
     }
 }
