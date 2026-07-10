@@ -401,23 +401,33 @@ public struct ReportData: Sendable, Equatable {
         // Guards the division when a period somehow totals zero grams.
         let denominator = max(totalGrams, 0.01)
 
-        return grams
-            .map { name, value in
-                (
-                    stat: CategoryStat(
-                        categoryName: name,
-                        grams: value,
-                        percent: Int((value / denominator * 100).rounded())
-                    ),
-                    order: firstSeen[name] ?? 0
-                )
+        // Spelled out in steps, with every intermediate type written down. Chained
+        // as `map` -> tuple -> `sorted` -> `map(\.stat)` this defeated Swift's type
+        // checker outright: "unable to type-check this expression in reasonable
+        // time". The inference cost of an unannotated tuple inside a closure inside
+        // a sort predicate is not linear.
+        struct Ranked {
+            let stat: CategoryStat
+            let firstAppearance: Int
+        }
+
+        var ranked: [Ranked] = []
+        for (name, value) in grams {
+            let percent = Int((value / denominator * 100).rounded())
+            ranked.append(Ranked(
+                stat: CategoryStat(categoryName: name, grams: value, percent: percent),
+                firstAppearance: firstSeen[name] ?? 0
+            ))
+        }
+
+        ranked.sort { left, right in
+            if left.stat.grams == right.stat.grams {
+                return left.firstAppearance < right.firstAppearance
             }
-            .sorted { left, right in
-                left.stat.grams == right.stat.grams
-                    ? left.order < right.order
-                    : left.stat.grams > right.stat.grams
-            }
-            .map(\.stat)
+            return left.stat.grams > right.stat.grams
+        }
+
+        return ranked.map { $0.stat }
     }
 
     /// The worst sum over seven consecutive calendar days.

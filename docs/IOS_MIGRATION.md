@@ -512,6 +512,29 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix two compile errors from patch -52  (patch -53)
+
+- `DayResolver.addingDays` already existed, PRIVATELY, a few lines above where a
+  second copy was added. The grep that should have found it asked for `addDays`
+  and `nextDay`. Looking with the wrong name is not looking. The duplicate is gone
+  and the original is now `public`, carrying the reasoning that was written for
+  the copy.
+- `categoryStats` chained `map` into an unannotated tuple, into `sorted`, into
+  `map(\.stat)`. Swift's type checker gave up: "unable to type-check this
+  expression in reasonable time". Rewritten as explicit steps with a named local
+  type. The behaviour is unchanged and the vectors still pin it.
+- `tools/check-swift-symbols.py` gains a duplicate-declaration check, because the
+  first error was mechanical and a grep with the right name would have caught it.
+  Its first draft keyed on the function name and argument labels, and promptly
+  flagged three LEGAL overloads — `encode(_ value: Double)` beside
+  `encode(_ value: String)`. Swift distinguishes overloads by label AND by type,
+  so the types are part of the key. Verified three ways: silent on the corrected
+  tree, loud on the real duplicate, silent on overloads that differ by label and
+  on overloads that differ by type.
+
+The type-checker timeout is not mechanically catchable and remains the compiler's
+to find. The redeclaration now is.
+
 #### Port the report's figures  (patch -52)
 
 `ReportData` is the Swift counterpart of Android's `PdfReportData.from`. It

@@ -288,6 +288,79 @@ def check_imports(path):
     return problems
 
 
+def parameter_key(params):
+    """`_ days: Int, to date: Date` -> `(('_', 'Int'), ('to', 'Date'))`.
+
+    Swift distinguishes overloads by argument LABEL and by parameter TYPE, and by
+    nothing else. `encode(_ value: Double)` and `encode(_ value: String)` are two
+    functions; `addingDays(_ days: Int, to:)` and `addingDays(_ count: Int, to:)`
+    are one function declared twice. The internal parameter name is not part of the
+    signature, so it must not be part of the key.
+    """
+    key = []
+    for parameter in params.split(","):
+        parameter = parameter.strip()
+        if not parameter:
+            continue
+        head, _, type_name = parameter.partition(":")
+        words = head.split()
+        label = words[0] if words else "_"
+        key.append((label, type_name.strip().rstrip("=").strip()))
+    return tuple(key)
+
+
+def check_duplicate_declarations(paths):
+    """Flags a function declared twice in the same type with the same signature.
+
+    Swift calls this "invalid redeclaration". It happens when a helper is added
+    that already existed a hundred lines up -- privately, so a grep for it came back
+    empty and the absence looked real. Patch -52 did exactly that to
+    `DayResolver.addingDays`, and the compiler found it a minute later.
+
+    The first draft of this check keyed on the name and argument labels alone and
+    flagged three legal overloads, which is the failure mode that gets a linter
+    switched off. The types belong in the key.
+    """
+    seen = {}
+    problems = []
+
+    signature = re.compile(
+        r"^\s*(?:public\s+|internal\s+|private\s+|fileprivate\s+|open\s+)?"
+        r"(?:static\s+|class\s+)?"
+        r"(?:override\s+)?"
+        r"func\s+(?P<name>\w+)\s*\((?P<params>[^)]*)\)"
+    )
+
+    for path in paths:
+        text = strip_noise(read(path))
+        stack = []
+        for number, line in enumerate(text.split("\n"), start=1):
+            if not line.strip():
+                continue
+            indent = len(line) - len(line.lstrip())
+            while stack and indent <= stack[-1][0]:
+                stack.pop()
+
+            declaration = TYPE_DECLARATION.match(line) or EXTENSION.match(line)
+            if declaration:
+                stack.append((indent, declaration.group("name")))
+                continue
+
+            match = signature.match(line)
+            if not match or not stack:
+                continue
+
+            key = (stack[-1][1], match.group("name"), parameter_key(match.group("params")))
+            if key in seen:
+                problems.append(
+                    f"{path}:{number}: '{key[0]}.{key[1]}' is already declared with "
+                    f"this signature at {seen[key]}"
+                )
+            else:
+                seen[key] = f"{os.path.basename(path)}:{number}"
+    return problems
+
+
 def repository_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -302,7 +375,7 @@ def main(argv):
     # types too, and a screen calling its own model must be checked as well.
     declarations = collect_declarations(swift_files(root))
 
-    problems = []
+    problems = check_duplicate_declarations(paths)
     for path in paths:
         problems.extend(check_symbols(path, declarations))
         problems.extend(check_imports(path))

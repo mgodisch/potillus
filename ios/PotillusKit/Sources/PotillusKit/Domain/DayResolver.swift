@@ -198,7 +198,14 @@ public enum DayResolver {
     }
 
     /// Returns the date `days` calendar days from `date` (negative to go back).
-    private static func addingDays(_ days: Int, to date: Date) -> Date {
+    ///
+    /// Goes through `utcCalendar`, so it inherits the noon anchoring that keeps a
+    /// day from slipping across a daylight-saving boundary. Adding 86400 seconds
+    /// would not: some days are 23 or 25 hours long.
+    ///
+    /// Public because the report walks months and clips them to a period. It was
+    /// private until then, which is why a second copy of it briefly existed here.
+    public static func addingDays(_ days: Int, to date: Date) -> Date {
         utcCalendar.date(byAdding: .day, value: days, to: date) ?? date
     }
 
@@ -213,15 +220,6 @@ public enum DayResolver {
     }
 
     // ── Day arithmetic ───────────────────────────────────────────────────────
-
-    /// The date `count` days after `date`.
-    ///
-    /// Goes through `utcCalendar`, so it inherits the noon anchoring that keeps a
-    /// day from slipping across a daylight-saving boundary. Adding 86400 seconds
-    /// would not: some days are 23 or 25 hours long.
-    public static func addingDays(_ count: Int, to date: Date) -> Date {
-        utcCalendar.date(byAdding: .day, value: count, to: date) ?? date
-    }
 
     /// Every date from `from` to `to`, INCLUSIVE, ascending. Empty if `to < from`
     /// or either string is malformed.
