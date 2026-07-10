@@ -512,6 +512,46 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the template engine, pinned by shared vectors  (patch -51)
+
+First piece of the PDF report. `Template` is the Swift counterpart of Android's
+`SimpleTemplate`: scalar `{{KEY}}` placeholders and `<!-- repeat:NAME -->` blocks,
+nothing more. Both fill `report/report_template.html`, so both must agree
+character for character.
+
+- Add `test-vectors/template-render.json`, 20 cases, read by BOTH suites — Swift's
+  `TemplateTests` and Kotlin's new `TemplateVectorTest`. Until now the Kotlin
+  engine had no vector test at all; its behaviour was whatever it happened to do.
+- Two subtleties the vectors pin, because both are easy to get wrong and neither
+  is obvious from the code:
+  - The document pass runs over the WHOLE expanded text, so a `{{Y}}` that arrives
+    as a ROW VALUE is itself substituted if `scalars` knows `Y`. The first draft of
+    the vectors claimed the opposite; the reference implementation caught it.
+  - A row value shadows a document scalar of the same name, but only inside its
+    block.
+- `\w` MEANS DIFFERENT THINGS. Kotlin's `\w` on the JVM is ASCII `[a-zA-Z0-9_]`;
+  `NSRegularExpression` follows ICU, where `\w` matches `Ö` as well. Left as `\w`
+  on both sides, `{{TÖTAL}}` would be substituted on iOS and left verbatim on
+  Android. `Template` writes the class out. This cannot be a shared vector —
+  Android's own two regex engines disagree, JVM in unit tests and ICU on a device
+  — so a Swift test states it instead.
+- `replaceMatches` is written by hand rather than with
+  `stringByReplacingMatches(in:withTemplate:)`, which reads `$1` in the REPLACEMENT
+  as a back-reference. A drink named `$1` would interpolate itself. Kotlin's
+  replacement lambda does no such thing, so neither may this; two tests hold it
+  there.
+- The result is built forward, slice by slice, not by mutating the input. A
+  `String.Index` belongs to the string it came from, and carrying indices of the
+  original into a partially rewritten copy is reading a map of a city that has
+  since been rebuilt. The first draft did exactly that.
+- Two tests read the REAL template: one asserts that every repeat block collapses
+  to nothing when handed no rows (or the PDF would show an HTML comment), and one
+  asserts that the template declares exactly the ten blocks the renderer knows —
+  so a new block cannot be added without someone noticing.
+
+Both linters ran before delivery: ktlint over the new Kotlin test, SwiftLint
+`--strict` over the Swift.
+
 #### Lint the Swift the way ktlint lints the Kotlin  (patch -50)
 
 SwiftLint ships a portable Linux binary that needs no Swift toolchain, so Swift

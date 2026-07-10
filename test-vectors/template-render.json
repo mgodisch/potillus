@@ -1,0 +1,245 @@
+{
+  "_comment": [
+    "Golden vectors for the template engine that fills report/report_template.html.",
+    "Read by BOTH suites: TemplateTests (Swift) and TemplateVectorTest (Kotlin).",
+    "",
+    "The engine has exactly two features, and the cases below pin both plus every",
+    "edge the PDF report actually walks into. Values are HTML-escaped on",
+    "substitution; the template's own text is trusted and never escaped.",
+    "",
+    "An unknown {{KEY}} is left verbatim, on purpose: a typo in the template must",
+    "show up in the PDF rather than vanish silently."
+  ],
+  "render": [
+    {
+      "description": "a scalar placeholder is replaced by its value",
+      "template": "<h1>{{TITLE}}</h1>",
+      "scalars": {
+        "TITLE": "Report"
+      },
+      "repeats": {},
+      "expected": "<h1>Report</h1>"
+    },
+    {
+      "description": "the same placeholder may appear more than once",
+      "template": "{{A}}-{{A}}",
+      "scalars": {
+        "A": "x"
+      },
+      "repeats": {},
+      "expected": "x-x"
+    },
+    {
+      "description": "an unknown placeholder survives verbatim, to surface typos",
+      "template": "<p>{{TYPOED_KEY}}</p>",
+      "scalars": {
+        "TITLE": "Report"
+      },
+      "repeats": {},
+      "expected": "<p>{{TYPOED_KEY}}</p>"
+    },
+    {
+      "description": "keys may hold digits and underscores",
+      "template": "{{KPI_1}}",
+      "scalars": {
+        "KPI_1": "42"
+      },
+      "repeats": {},
+      "expected": "42"
+    },
+    {
+      "description": "a hyphen is not a key character, so the token is not a placeholder",
+      "template": "{{A-B}}",
+      "scalars": {
+        "A-B": "never"
+      },
+      "repeats": {},
+      "expected": "{{A-B}}"
+    },
+    {
+      "description": "all five HTML-significant characters are escaped in values",
+      "template": "{{NAME}}",
+      "scalars": {
+        "NAME": "Beer & <Cider> \"x\" 'y'"
+      },
+      "repeats": {},
+      "expected": "Beer &amp; &lt;Cider&gt; &quot;x&quot; &#39;y&#39;"
+    },
+    {
+      "description": "an ampersand already in the template is left alone",
+      "template": "AT&T {{V}}",
+      "scalars": {
+        "V": "&"
+      },
+      "repeats": {},
+      "expected": "AT&T &amp;"
+    },
+    {
+      "description": "escaping happens once, not twice",
+      "template": "{{V}}",
+      "scalars": {
+        "V": "&amp;"
+      },
+      "repeats": {},
+      "expected": "&amp;amp;"
+    },
+    {
+      "description": "an empty value erases the placeholder",
+      "template": "[{{V}}]",
+      "scalars": {
+        "V": ""
+      },
+      "repeats": {},
+      "expected": "[]"
+    },
+    {
+      "description": "a repeat block emits its body once per row",
+      "template": "<!-- repeat:MONTHS --><tr>{{MONTH}}</tr><!-- end:MONTHS -->",
+      "scalars": {},
+      "repeats": {
+        "MONTHS": [
+          {
+            "MONTH": "Jan"
+          },
+          {
+            "MONTH": "Feb"
+          }
+        ]
+      },
+      "expected": "<tr>Jan</tr><tr>Feb</tr>"
+    },
+    {
+      "description": "an empty row list removes the block and its markers entirely",
+      "template": "before<!-- repeat:ROWS --><tr>{{X}}</tr><!-- end:ROWS -->after",
+      "scalars": {},
+      "repeats": {
+        "ROWS": []
+      },
+      "expected": "beforeafter"
+    },
+    {
+      "description": "a block body may span lines",
+      "template": "<!-- repeat:R -->\n  <tr>{{X}}</tr>\n<!-- end:R -->",
+      "scalars": {},
+      "repeats": {
+        "R": [
+          {
+            "X": "1"
+          },
+          {
+            "X": "2"
+          }
+        ]
+      },
+      "expected": "\n  <tr>1</tr>\n\n  <tr>2</tr>\n"
+    },
+    {
+      "description": "adjacent blocks do not bleed into one another",
+      "template": "<!-- repeat:A -->a{{X}}<!-- end:A --><!-- repeat:B -->b{{X}}<!-- end:B -->",
+      "scalars": {},
+      "repeats": {
+        "A": [
+          {
+            "X": "1"
+          }
+        ],
+        "B": [
+          {
+            "X": "2"
+          }
+        ]
+      },
+      "expected": "a1b2"
+    },
+    {
+      "description": "whitespace around the markers is tolerated",
+      "template": "<!--repeat:R--><tr>{{X}}</tr><!--  end:R  -->",
+      "scalars": {},
+      "repeats": {
+        "R": [
+          {
+            "X": "1"
+          }
+        ]
+      },
+      "expected": "<tr>1</tr>"
+    },
+    {
+      "description": "row values are HTML-escaped exactly like document scalars",
+      "template": "<!-- repeat:R -->{{X}}<!-- end:R -->",
+      "scalars": {},
+      "repeats": {
+        "R": [
+          {
+            "X": "a<b"
+          }
+        ]
+      },
+      "expected": "a&lt;b"
+    },
+    {
+      "description": "a key unknown to the row is filled by the later document pass",
+      "template": "<!-- repeat:R -->{{ROW}}/{{DOC}}<!-- end:R -->",
+      "scalars": {
+        "DOC": "d"
+      },
+      "repeats": {
+        "R": [
+          {
+            "ROW": "r1"
+          },
+          {
+            "ROW": "r2"
+          }
+        ]
+      },
+      "expected": "r1/dr2/d"
+    },
+    {
+      "description": "a row value shadows a document scalar of the same name",
+      "template": "<!-- repeat:R -->{{K}}<!-- end:R -->|{{K}}",
+      "scalars": {
+        "K": "doc"
+      },
+      "repeats": {
+        "R": [
+          {
+            "K": "row"
+          }
+        ]
+      },
+      "expected": "row|doc"
+    },
+    {
+      "description": "a block named in the template but absent from repeats keeps its markers",
+      "template": "<!-- repeat:MISSING -->x<!-- end:MISSING -->",
+      "scalars": {},
+      "repeats": {},
+      "expected": "<!-- repeat:MISSING -->x<!-- end:MISSING -->"
+    },
+    {
+      "description": "a placeholder produced by a row IS filled by the later document pass",
+      "template": "<!-- repeat:R -->{{X}}<!-- end:R -->",
+      "scalars": {
+        "Y": "boom"
+      },
+      "repeats": {
+        "R": [
+          {
+            "X": "{{Y}}"
+          }
+        ]
+      },
+      "expected": "boom"
+    },
+    {
+      "description": "the empty template renders empty",
+      "template": "",
+      "scalars": {
+        "A": "1"
+      },
+      "repeats": {},
+      "expected": ""
+    }
+  ]
+}

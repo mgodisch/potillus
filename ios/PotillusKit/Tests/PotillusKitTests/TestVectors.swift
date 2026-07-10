@@ -93,6 +93,20 @@ enum TestVectors {
 // =============================================================================
 
 /// Root of `test-vectors/alcohol-calculator.json`.
+/// `template-render.json` — the engine that fills report/report_template.html.
+struct TemplateVectors: Decodable {
+    let render: [RenderCase]
+
+    struct RenderCase: Decodable {
+        let description: String
+        let template: String
+        let scalars: [String: String]
+        /// Block name to rows; each row is its own scalar map.
+        let repeats: [String: [[String: String]]]
+        let expected: String
+    }
+}
+
 struct AlcoholCalculatorVectors: Decodable {
     let constants: Constants
     let calculateGrams: [GramsCase]
