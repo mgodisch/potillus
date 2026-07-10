@@ -512,6 +512,33 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Make the Today screen reactive  (patch -80)
+
+TodayModel was the last snapshot model; the other four already observe the database.
+It loaded on appear and after its own writes, which hid the gap: a drink imported or
+an entry edited in another tab left the Today screen showing yesterday's numbers until
+something made it reload.
+
+Now it observes, in the same shape as StatsModel and CalendarModel. `start()` opens
+three subscriptions — entries, drinks, settings — and each carries only the FACT that
+something changed; `load()` recomputes the one consistent moment. The streams cannot
+each hold their own slice, because all three windows depend on the settings:
+`dayChangeHour` moves what "today" is, and "today" moves the trailing weekly window.
+Weaving three data streams would redraw the screen into an inconsistent instant; a
+single recompute cannot.
+
+The view drops its `.task { load() }` for `.task { start() }` + `.onDisappear {
+stop() }`, exactly like the other reactive screens, and loses the reload-on-sheet-
+close hack: the settings stream now covers a changed day-change hour, and the entry
+and drink streams cover a log or an import from anywhere.
+
+Four tests prove reaction to a change made ELSEWHERE — a repository write not routed
+through this model — since a write through the model would reload regardless and prove
+nothing. They use the real ephemeral GRDB, so the observation path is the one that
+runs in the app.
+
+All five models are reactive now.
+
 #### Localise the PDF report, following the UI language  (patch -79)
 
 The report was the last English-only surface. Now its title, sections, KPI labels,

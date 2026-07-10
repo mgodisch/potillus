@@ -111,6 +111,9 @@ public final class TodayModel {
     private let clock: any Clock
     private let timeZone: TimeZone
 
+    /// The live subscriptions, torn down by `stop()`.
+    private var observations: [Task<Void, Never>] = []
+
     public init(
         entries: any EntryRepositoryProtocol,
         drinks: any DrinkRepositoryProtocol,
@@ -125,15 +128,72 @@ public final class TodayModel {
         self.timeZone = timeZone
     }
 
+    // ── Observation ──────────────────────────────────────────────────────────
+    //
+    // WHY THE TICKERS ARE `_` AND THE WORK IS `load()`
+    //   The three windows this screen shows — today's entries, the drinks
+    //   catalogue, the trailing seven days — all depend on the settings:
+    //   `dayChangeHour` moves what "today" is, and "today" moves the weekly window.
+    //   So the streams cannot each carry their own slice of data; only `load()`
+    //   knows which days matter. The streams carry the FACT that something changed,
+    //   and `load()` recomputes the one consistent moment. This is the same shape
+    //   as StatsModel and CalendarModel.
+    //
+    //   `observeAllDates()` fires on any transaction touching the entries — a new
+    //   entry, an edited one, a deleted one — even when the DISTINCT date list is
+    //   unchanged (GRDB may notify identical values, and this does not ask it to
+    //   dedupe). `observeDrinks()` covers a drink added or a backup imported in
+    //   another tab. `preferences.observe()` covers a changed day-change hour or
+    //   limit. The first emission of each arrives at once, which loads the screen —
+    //   the view needs no separate `load()` on appear.
+
+    /// Subscribes to the database and the settings. Safe to call again; the previous
+    /// subscriptions are cancelled first, so a re-appearing view does not accumulate
+    /// them.
+    public func start() {
+        stop()
+
+        observations = [
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    for try await _ in self.entries.observeAllDates() {
+                        await self.load()
+                    }
+                } catch {
+                    self.failure = String(describing: error)
+                }
+            },
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    for try await _ in self.drinks.observeDrinks() {
+                        await self.load()
+                    }
+                } catch {
+                    self.failure = String(describing: error)
+                }
+            },
+            Task { [weak self] in
+                guard let self else { return }
+                for await _ in await self.preferences.observe() {
+                    await self.load()
+                }
+            }
+        ]
+    }
+
+    /// Cancels the live subscriptions. Called from the view's `onDisappear` and on
+    /// the next `start()`.
+    public func stop() {
+        observations.forEach { $0.cancel() }
+        observations = []
+    }
+
     // ── Loading ──────────────────────────────────────────────────────────────
 
-    /// Recomputes the whole state from the stores.
-    ///
-    /// A snapshot, not a subscription. The screen calls it on appear and after
-    /// each of its own writes. Live observation across three independent streams
-    /// — entries, drinks, settings — whose windows depend on the settings, is a
-    /// separate problem, and doing it wrong means a screen that redraws itself
-    /// into an inconsistent moment.
+    /// Recomputes the whole state from the stores in one consistent pass. Driven by
+    /// `start()`'s streams now, and still safe to call directly after a write.
     public func load() async {
         do {
             let settings = await preferences.load()

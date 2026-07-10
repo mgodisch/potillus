@@ -93,15 +93,11 @@ struct TodayScreen: View {
                     .disabled(model.state.drinks.isEmpty)
                 }
             }
-            .task { await model.load() }
+            .task { model.start() }
+            .onDisappear { model.stop() }
             .refreshable { await model.load() }
             .sheet(isPresented: $isConfiguring) {
                 SettingsScreen(environment: environment)
-            }
-            // Settings can change the day-change hour, which changes which day is
-            // "today". Reload when the sheet closes rather than showing yesterday.
-            .onChange(of: isConfiguring) { _, isOpen in
-                if !isOpen { Task { await model.load() } }
             }
             .sheet(isPresented: $isLogging) {
                 EntrySheet(

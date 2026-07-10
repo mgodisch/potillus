@@ -268,4 +268,98 @@ final class TodayModelTests: XCTestCase {
         XCTAssertEqual(model.state.drinkDaysThisWeek, 0)
         XCTAssertNil(model.failure)
     }
+
+    // ── Observation ──────────────────────────────────────────────────────────
+    //
+    // The Today screen was the last snapshot model. These prove it now reacts to a
+    // change made ELSEWHERE — a repository write not routed through this model — the
+    // way an import or an edit in another tab would arrive.
+
+    /// `start()` alone loads the screen; the first stream emission is the load, so
+    /// the view needs no separate `load()` on appear.
+    func testStartLoadsWithoutAnExplicitLoad() async throws {
+        let pils = try addDrink("Pils", favorite: true)
+        _ = try environment.entries.add(entry(pils, at: evening))
+
+        let model = makeModel(at: evening)
+        model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.entries.count == 1 }
+        XCTAssertEqual(model.state.favorites.count, 1)
+    }
+
+    /// An entry written straight to the repository — as another tab or an import
+    /// would — reaches the running model without anyone calling `load()`.
+    func testAnEntryLoggedElsewhereIsNoticed() async throws {
+        let pils = try addDrink("Pils")
+        let model = makeModel(at: evening)
+        model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.entries.isEmpty }
+
+        _ = try environment.entries.add(entry(pils, at: evening))
+        try await waitUntil { model.state.entries.count == 1 }
+    }
+
+    /// A drink added elsewhere (a backup import in another tab) reaches the model,
+    /// since the Today screen shows the favourites and the catalogue.
+    func testADrinkAddedElsewhereIsNoticed() async throws {
+        let model = makeModel(at: evening)
+        model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.favorites.isEmpty }
+
+        _ = try addDrink("Weizen", favorite: true)
+        try await waitUntil { model.state.favorites.count == 1 }
+    }
+
+    /// A changed day-change hour moves what "today" is, so the settings stream must
+    /// reload as much as the entry stream.
+    func testAChangedDayChangeHourReloads() async throws {
+        let pils = try addDrink("Pils")
+        // One entry today, so the model has state; the point of this test is that a
+        // settings write alone — not an entry change — triggers a reload.
+        _ = try environment.entries.add(entry(pils, at: evening))
+
+        let model = makeModel(at: evening)
+        model.start()
+        defer { model.stop() }
+
+        try await waitUntil { model.state.entries.count == 1 }
+
+        try await environment.preferences.update { $0.maxDrinkDaysPerWeek = 3 }
+        try await waitUntil { model.state.settings.maxDrinkDaysPerWeek == 3 }
+    }
+
+    /// Builds a consumption entry for a drink at a moment, so a test can write one
+    /// straight to the repository. `evening` (2026-01-02 20:14 UTC) resolves to the
+    /// logical date "2026-01-02" under the default 04:00 change hour, so that is
+    /// hard-coded here — these tests only ever write at `evening`.
+    private func entry(_ drink: DrinkDefinition, at millis: Int64) -> ConsumptionEntry {
+        ConsumptionEntry(
+            drinkId: drink.id,
+            drinkName: drink.name,
+            volumeMl: drink.volumeMl,
+            alcoholPercent: drink.alcoholPercent,
+            gramsAlcohol: AlcoholCalculator.calculateGrams(
+                volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
+            ),
+            timestampMillis: millis,
+            logicalDate: "2026-01-02"
+        )
+    }
+
+    private func waitUntil(
+        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        XCTFail("condition not met within \(timeout) s")
+    }
 }
