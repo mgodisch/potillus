@@ -271,6 +271,9 @@ fun TodayScreen(
                         DrinkDaysBar(
                             drinkDays = state.drinkDaysThisWeek,
                             maxDrinkDays = state.limitInfo.maxDrinkDaysPerWeek,
+                            // Today's own status decides whether a full bar means
+                            // "stop": a day already spent costs nothing further.
+                            todayIsDrinkDay = state.totalGrams > 0.0,
                             weekLabel = state.weeklyRangeLabel,
                         )
                         // BAC estimate (Widmark formula) – only shown when weight is configured
