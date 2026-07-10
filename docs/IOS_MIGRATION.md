@@ -512,6 +512,28 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Lift the report template above both platforms  (patch -48)
+
+Groundwork for the PDF export. The report's layout is about to become a contract
+between two platforms, so it stops belonging to one of them.
+
+- Move `android/app/src/main/assets/report_template.html` to
+  `report/report_template.html`. Its placeholders and repeat blocks are what the
+  Android builder and the coming iOS renderer must agree on; one copy means a
+  layout fix is made once, and the two cannot silently drift apart.
+- Register the directory as a MAIN assets source in `app/build.gradle.kts`, using
+  the `assets.directories` DSL already used for the androidTest schemas. The
+  merged asset root is unchanged, so `context.assets.open("report_template.html")`
+  needs no edit — the runtime lookup does not know the file moved.
+- Point `PdfTemplatePlaceholderTest` and `PdfReportLangTest` at the new path. Both
+  read the template as a FILE rather than an asset, so both had to follow it.
+- Fix the comments in `SimpleTemplate` and `PdfReportBuilder` that named the old
+  location. A comment that describes a path the file no longer occupies is not
+  stale documentation, it is a false statement.
+
+`report/` sits beside `test-vectors/`, and for the same reason: what both
+platforms must agree on belongs to neither of them.
+
 #### Give xcodebuild a destination  (patch -47)
 
 - `make ios` invoked `xcodebuild -target Potillus -sdk iphonesimulator`, which

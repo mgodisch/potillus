@@ -31,7 +31,7 @@ package de.godisch.potillus.util
 //
 // WHY DOES THIS EXIST?
 //   The PDF report (see PdfReportBuilder) is authored as an HTML/CSS file in
-//   app/src/main/assets/report_template.html so that its *layout* can be edited
+//   report/report_template.html so that its *layout* can be edited
 //   by hand — column widths, fonts, spacing, section order, page breaks — WITHOUT
 //   touching Kotlin code or recompiling the report logic. This engine is the glue
 //   that injects the computed numbers and the localised labels into that template.

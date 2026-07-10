@@ -502,6 +502,22 @@ android {
     //   the historical schema for each version. Without this, the migration test
     //   fails with "Cannot find the schema file in the assets folder".
     sourceSets {
+        // THE REPORT TEMPLATE LIVES ABOVE BOTH PLATFORMS.
+        //   report/report_template.html is read by Android's PdfReportBuilder and,
+        //   once the port lands, by the iOS report renderer. It defines the PDF's
+        //   layout: its placeholders and repeat blocks are the contract between
+        //   the two. Keeping one copy means a layout fix is made once, and the
+        //   two platforms cannot silently drift apart.
+        //
+        //   Registering it as an assets directory leaves the runtime lookup
+        //   unchanged: the merged asset root still contains report_template.html,
+        //   so `context.assets.open("report_template.html")` needs no edit.
+        //
+        //   $projectDir is android/app, so the repository root is two levels up.
+        getByName("main") {
+            assets.directories += "$projectDir/../../report"
+        }
+
         getByName("androidTest") {
             // AGP 9 deprecates AndroidSourceSet.srcDirs(...) in favour of the
             // `directories` mutable set, to which you append String paths with

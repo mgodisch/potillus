@@ -65,7 +65,7 @@ import kotlin.math.roundToInt
 //      respects the user's language) and FORMAT every number for display.
 //   2. Pack those strings into the scalar and repeat-row maps that the HTML
 //      template expects (the placeholder/​block contract is documented inside
-//      assets/report_template.html).
+//      report/report_template.html, shared with iOS).
 //   3. Load that template from the APK assets and expand it with SimpleTemplate.
 //
 // It performs NO drawing and NO file/printer I/O, so it stays free of Canvas and
@@ -76,6 +76,9 @@ import kotlin.math.roundToInt
 object PdfReportBuilder {
 
     /** Asset path of the editable report layout (see that file's header for the contract). */
+    // Still opened by this bare name: the file now lives at report/ in the
+    // repository root, but Gradle registers that directory as a main assets
+    // source, so the merged asset root is unchanged. See app/build.gradle.kts.
     private const val TEMPLATE_ASSET = "report_template.html"
 
     // Formatters that produce user-visible, locale-sensitive text (long dates,
