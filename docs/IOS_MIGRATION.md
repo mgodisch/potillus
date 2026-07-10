@@ -511,6 +511,13 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix two await-in-autoclosure compile errors  (patch -21)
+
+- `XCTAssert*` takes its arguments as autoclosures, which are synchronous, so an
+  `await` cannot appear inside one. Two assertions in `PreferencesStoreTests`
+  did. Hoist the awaits into named values, which also makes a failure report name
+  the case that broke rather than the line.
+
 #### Add the encrypted preferences store  (patch -20)
 
 - Add `PreferencesStore`, the counterpart to Android's encrypted DataStore, and

@@ -159,11 +159,17 @@ final class PreferencesStoreTests: XCTestCase {
     }
 
     func testAnEmptyOrTruncatedFileFallsBackToDefaults() async throws {
+        // The awaits are hoisted out of the assertions: XCTAssert* takes its
+        // arguments as autoclosures, which are synchronous, so `await` cannot
+        // appear inside one. Naming the values also makes a failure report say
+        // which of the two cases broke.
         try Data().write(to: fileURL)
-        XCTAssertEqual(await makeStore().load(), AppSettings())
+        let fromEmptyFile = await makeStore().load()
+        XCTAssertEqual(fromEmptyFile, AppSettings(), "an empty file must read as defaults")
 
         try Data([0x00, 0x01, 0x02]).write(to: fileURL)
-        XCTAssertEqual(await makeStore().load(), AppSettings())
+        let fromTruncatedFile = await makeStore().load()
+        XCTAssertEqual(fromTruncatedFile, AppSettings(), "a truncated file must read as defaults")
     }
 
     /// After falling back, a save must succeed and produce a readable file, so a
