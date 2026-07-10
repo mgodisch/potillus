@@ -64,6 +64,16 @@ ktlint_standard_no-wildcard-imports = disabled
 # the backing-property-naming rule (which assumes _x ⇒ public x) does not fit it.
 ktlint_standard_backing-property-naming = disabled
 
+# `function-signature` belongs to the `ktlint_official` code style, not to the
+# `intellij_idea` style this project selects above. ktlint 1.5.0 applies it
+# regardless. The rule asks for a single-expression body to sit on the signature
+# line whenever it "fits" — and because `max_line_length` is off (see above), it
+# considers every body to fit, however long. In androidTest/ScreenshotTest.kt it
+# would fuse two readable declarations into unbreakable lines of 107 and 134
+# characters, the very shape a line-length rule would forbid once one is enabled.
+# Disable the rule rather than reflow the tree against its own stated style.
+ktlint_standard_function-signature = disabled
+
 # ── File 'ViewModels.kt' should not be empty ─────────────────────────────────
 # ui/screen/ViewModels.kt is an intentional package-overview documentation file
 # (GPL header + package KDoc, no declarations). Keep the documentation and exempt
