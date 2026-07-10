@@ -106,6 +106,9 @@ public final class StatsModel {
     private let timeZone: TimeZone
     private let firstDayOfWeekIso: Int
 
+    /// The live subscriptions, torn down by `stop()`.
+    private var observations: [Task<Void, Never>] = []
+
     public init(
         entries: any EntryRepositoryProtocol,
         drinks: any DrinkRepositoryProtocol,
@@ -125,6 +128,67 @@ public final class StatsModel {
     public func setPeriod(_ period: StatsPeriod) async {
         state.period = period
         await load()
+    }
+
+    // ── Observation ──────────────────────────────────────────────────────────
+    //
+    // Android's StatsViewModel combines the period selector, the settings, and the
+    // set of logged dates into one Flow, and re-runs the inner database queries with
+    // `flatMapLatest`. The screen is live: log a drink, and the statistics behind it
+    // have already changed.
+    //
+    // This model used to be a SNAPSHOT. It loaded on `.task` and on pull-to-refresh,
+    // and nothing else. Import a backup while the statistics screen sits in another
+    // tab, come back, and it shows the numbers from before the import. Add an entry
+    // on the Today screen, and the totals here are a drink behind. Neither says so.
+    //
+    // WHY THE TICKERS ARE `_` AND THE WORK IS `reload()`
+    //   `reload()` recomputes the window from the period and the settings, and then
+    //   fetches. It is the only thing that knows which days matter, so the streams
+    //   do not carry data — they carry the fact that something changed.
+    //
+    //   `observeAllDates()` fetches `SELECT DISTINCT logicalDate`, whose value does
+    //   NOT change when the grams on an existing day are edited. It still fires:
+    //   GRDB's `ValueObservation` notifies on every transaction that touches the
+    //   tracked region and, by its own documentation, "may notify consecutive
+    //   identical values". Duplicates are removed only by asking for
+    //   `removeDuplicates()`, which this deliberately does not.
+    //
+    //   The settings stream matters as much: `dayChangeHour` moves what "today" is,
+    //   and `statsFromDate` moves the floor of every window.
+
+    /// Subscribes to the database and to the settings.
+    ///
+    /// Safe to call again; the previous subscriptions are cancelled first, so a
+    /// re-appearing view does not accumulate them. The first emission of each stream
+    /// arrives immediately, which is what loads the screen — no separate `load()`
+    /// call is needed on appear.
+    public func start() {
+        stop()
+
+        observations = [
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    for try await _ in self.entries.observeAllDates() {
+                        await self.load()
+                    }
+                } catch {
+                    self.failure = String(describing: error)
+                }
+            },
+            Task { [weak self] in
+                guard let self else { return }
+                for await _ in await self.preferences.observe() {
+                    await self.load()
+                }
+            }
+        ]
+    }
+
+    public func stop() {
+        observations.forEach { $0.cancel() }
+        observations = []
     }
 
     /// Recomputes the whole state.

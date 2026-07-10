@@ -512,6 +512,40 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Make the statistics screen live  (patch -68)
+
+Android's `StatsViewModel` combines the period selector, the settings and the set of
+logged dates into one Flow and re-runs its queries with `flatMapLatest`. Log a
+drink, and the statistics behind it have already changed.
+
+The iOS `StatsModel` was a SNAPSHOT. It loaded on `.task` and on pull-to-refresh,
+and nothing else. Import a backup while the statistics sit in another tab, come
+back, and the screen shows the numbers from before the import. Add an entry on the
+Today screen, and the totals are a drink behind. Neither says so. It was not a
+decision; three of five models were written this way and two were not.
+
+`start()` now subscribes to two streams, following the shape `DrinksModel` and
+`SettingsModel` already used. They carry no data — `reload()` is the only code that
+knows which days the window covers — they carry the fact that something changed.
+
+THE CASE THAT DECIDED THE DESIGN is a second entry logged on a day that already has
+one. `observeAllDates()` fetches `SELECT DISTINCT logicalDate`, whose value is then
+unchanged. It fires regardless: GRDB's `ValueObservation` notifies on every
+transaction touching the tracked region and, by its own documentation, "may notify
+consecutive identical values". Duplicates are dropped only when `removeDuplicates()`
+is asked for, and it deliberately is not. There is a test that logs exactly that
+entry.
+
+The settings stream matters as much: `dayChangeHour` moves what today is, and
+`statsFromDate` moves the floor of every window.
+
+Six tests, including one that stops the model and then writes to the database, to
+show that a view which has disappeared is not still observing behind it.
+
+STILL SNAPSHOTS: `TodayModel` and `CalendarModel`. Today reloads when the entry
+sheet closes, which hides the problem; the calendar has no such trigger and will
+show a stale month after an import. Next patches.
+
 #### Ask which days to export  (patch -67)
 
 Android asks before every export, CSV and PDF alike: a date-range picker pre-filled

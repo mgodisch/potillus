@@ -82,6 +82,91 @@ final class StatsModelTests: XCTestCase {
         )
     }
 
+    // ── The screen is live ───────────────────────────────────────────────────
+    //
+    // Android's statistics screen hangs off Room flows. This one used to be a
+    // snapshot: it loaded on appear and on pull-to-refresh, so a backup imported in
+    // another tab left it showing yesterday's numbers with no hint that it had.
+
+    /// `start()` is enough; the first emission of the stream loads the screen.
+    func testStartLoadsWithoutAnExplicitLoad() async throws {
+        try log("2026-01-15", grams: 20.0)
+
+        model.start()
+        try await waitUntil { self.model.state.totalGrams == 20.0 }
+
+        model.stop()
+    }
+
+    /// The case that decides the design: a second entry on a day that already has
+    /// one. `SELECT DISTINCT logicalDate` returns the SAME list, and the observation
+    /// must fire anyway. GRDB notifies every transaction on the tracked region and
+    /// "may notify consecutive identical values" — duplicates are dropped only when
+    /// `removeDuplicates()` is asked for, and it is not.
+    func testASecondEntryOnAnExistingDayIsNoticed() async throws {
+        try log("2026-01-15", grams: 20.0)
+
+        model.start()
+        try await waitUntil { self.model.state.totalGrams == 20.0 }
+
+        try log("2026-01-15", grams: 5.0, hour: 20)
+        try await waitUntil { self.model.state.totalGrams == 25.0 }
+
+        model.stop()
+    }
+
+    /// A new day changes the date list, which is the easy half.
+    func testAnEntryOnANewDayIsNoticed() async throws {
+        model.start()
+        try await waitUntil { self.model.state.totalGrams == 0.0 }
+
+        try log("2026-01-14", grams: 12.0)
+        try await waitUntil { self.model.state.totalGrams == 12.0 }
+
+        model.stop()
+    }
+
+    /// `statsFromDate` moves the floor of every window, so the settings stream
+    /// matters as much as the entry stream.
+    func testAChangedStatsFloorReloads() async throws {
+        try log("2026-01-02", grams: 10.0)
+        try log("2026-01-15", grams: 20.0)
+
+        model.start()
+        try await waitUntil { self.model.state.totalGrams == 30.0 }
+
+        try await environment.preferences.update { $0.statsFromDate = "2026-01-10" }
+        try await waitUntil { self.model.state.totalGrams == 20.0 }
+
+        model.stop()
+    }
+
+    /// A stopped model is a dead model. A view that has disappeared must not keep a
+    /// database observation alive behind it.
+    func testStopEndsTheSubscription() async throws {
+        model.start()
+        try await waitUntil { self.model.state.totalGrams == 0.0 }
+        model.stop()
+
+        try log("2026-01-15", grams: 42.0)
+        try await Task.sleep(nanoseconds: 100_000_000)
+
+        XCTAssertEqual(model.state.totalGrams, 0.0, "a stopped observation still fired")
+    }
+
+    /// Polls the main actor until `condition` holds. The observation is a stream, so
+    /// there is no completion to await; a fixed sleep would be flaky.
+    private func waitUntil(
+        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        XCTFail("condition not met within \(timeout) s")
+    }
+
     // ── The window reaches the repositories ──────────────────────────────────
 
     func testTheMonthPeriodCoversTheMonthSoFar() async throws {

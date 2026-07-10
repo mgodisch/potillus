@@ -114,7 +114,11 @@ struct StatsScreen: View {
             .sheet(item: $pendingExport) { kind in
                 exportRangeSheet(for: kind)
             }
-            .task { await model.load() }
+            // `start()` subscribes; the first emission of each stream loads the
+            // screen. Pull-to-refresh stays: it costs nothing and it is the gesture
+            // people reach for when they doubt what they see.
+            .task { model.start() }
+            .onDisappear { model.stop() }
             .refreshable { await model.load() }
             .fileExporter(
                 isPresented: $isExporting,
