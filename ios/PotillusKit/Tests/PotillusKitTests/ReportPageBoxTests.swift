@@ -34,7 +34,7 @@ final class ReportPageBoxTests: XCTestCase {
         let out = ReportPageBox.inject(into: html)
 
         let head = try XCTUnwrap(out.range(of: "</head>"))
-        let style = try XCTUnwrap(out.range(of: ".sheet { min-height: 100vh; }"))
+        let style = try XCTUnwrap(out.range(of: ".sheet { min-height: 0; }"))
         XCTAssertLessThan(style.lowerBound, head.lowerBound, "the style must precede </head>")
     }
 
@@ -45,7 +45,7 @@ final class ReportPageBoxTests: XCTestCase {
         let out = ReportPageBox.inject(into: html)
 
         let original = try XCTUnwrap(out.range(of: "267mm"))
-        let override = try XCTUnwrap(out.range(of: "100vh"))
+        let override = try XCTUnwrap(out.range(of: "min-height: 0;"))
         XCTAssertLessThan(original.lowerBound, override.lowerBound)
     }
 
@@ -72,14 +72,21 @@ final class ReportPageBoxTests: XCTestCase {
             </body></html>
             """
         let out = ReportPageBox.inject(into: html)
-        XCTAssertEqual(out.components(separatedBy: "100vh").count - 1, 1)
+        XCTAssertEqual(out.components(separatedBy: "min-height: 0;").count - 1, 1)
     }
 
-    /// `min-height`, never `height`: a sheet whose content outgrows a page must
-    /// still be able to grow. Clipping would drop rows from an alcohol report.
-    func testTheOverrideDoesNotClipTheSheet() {
-        XCTAssertTrue(ReportPageBox.stylesheet.contains("min-height"))
-        XCTAssertFalse(ReportPageBox.stylesheet.contains("height: 100vh;\n"))
+    /// Nothing here may clip: a sheet whose content one day outgrows a page must
+    /// break across two, not lose rows from an alcohol report in silence.
+    func testTheOverrideNeverClips() {
         XCTAssertFalse(ReportPageBox.stylesheet.contains("overflow"))
+        XCTAssertFalse(ReportPageBox.stylesheet.contains("max-height"))
+    }
+
+    /// `auto` is what pins the disclaimer to the sheet's bottom. With the height
+    /// gone, that bottom is the content's, and the gap would collapse to nothing.
+    func testTheFooterIsUnpinnedAndSpaced() {
+        XCTAssertTrue(ReportPageBox.stylesheet.contains(".sheet > .disclaimer"))
+        XCTAssertTrue(ReportPageBox.stylesheet.contains("margin-top: 18pt"))
+        XCTAssertFalse(ReportPageBox.stylesheet.contains("margin-top: auto"))
     }
 }

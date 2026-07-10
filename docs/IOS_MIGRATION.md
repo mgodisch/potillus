@@ -512,40 +512,54 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Stop asking WebKit how tall a page is  (patch -66)
+
+Patch -65 replaced `min-height: 267mm` with `100vh`, on the reasoning that a page
+box is one page box by definition. It printed a sheet 1691 pt tall — 2.23 pages —
+and the report came out on six.
+
+| `min-height` asked | sheet printed | sheet / page |
+| ------------------ | ------------- | ------------ |
+| 267 mm             | 320.9 mm      | 1.2018       |
+| 240 mm             | 288.4 mm      | 1.0802       |
+| 100 vh             | 596.7 mm      | 2.2348       |
+
+Millimetres inflate by a constant just over 1.2, linear through the origin.
+Viewport units resolve against something that is not the page. WebKit's print
+layout gives the page box no height that CSS can ask for.
+
+SO THE REPORT STOPS ASKING. The sheet is only tall because `margin-top: auto`
+needs a tall box to push the disclaimer against its bottom edge. The content fits
+with room to spare — sheet one ends 66 pt above the page bottom, sheet two 138 pt.
+Drop the height, and `page-break-before: always` between sheets yields exactly two
+pages. Nothing in that sentence depends on how a length resolves.
+
+The cost is cosmetic and real: on iOS the disclaimer now sits under the last table
+rather than at the foot of the page, about 40 pt higher on sheet one and 110 pt
+higher on sheet two. Android's print framework resolves millimetres correctly and
+keeps the pinned footer. A report that is right in the wrong place beats a report
+on twice the pages.
+
+`margin-top: 18pt` replaces the `auto`, which would otherwise pin the disclaimer to
+a bottom edge that is now the content's own and collapse the gap to nothing.
+
+FIVE WRONG DIAGNOSES PRECEDED THIS — invented margins, a formatter assumed to
+scale, an inch of insets that was not there, a footer blamed on flexbox, and a
+viewport unit that resolves against nothing useful. Every one was argued from the
+source. The two that mattered came from measuring the artefact: a constant ratio
+across two exports, and a donut that was neither 44 mm nor 1.2018 × 44 mm.
+
 #### Express the sheet height in pages, not millimetres  (patch -65)
 
-Two exported PDFs, measured rather than reasoned about:
+Superseded by -66; the reasoning is kept because the measurement in it stands.
 
-| `min-height` asked | sheet printed | ratio  |
-| ------------------ | ------------- | ------ |
-| 267 mm             | 320.9 mm      | 1.2018 |
-| 240 mm             | 288.4 mm      | 1.2017 |
+Two exported PDFs, measured rather than reasoned about, established that WebKit's
+print layout inflates absolute lengths in the block flow by a constant a little over
+1.2, and that the donut — `44mm` square in the SVG — comes out 40.1 mm, neither 44
+nor 1.2018 × 44. Two length resolutions in one document.
 
-Linear through the origin. The printable box is exactly 267 mm, verified in the
-PDF. WebKit's print layout inflates absolute lengths in the block flow by a
-constant a little over 1.2, so each of the report's two sheets overflows and it
-prints on four pages. The donut, `44mm` square in the SVG, comes out 40.1 mm —
-neither 44 nor 1.2018 × 44. Two length resolutions in one document.
-
-`267 / 1.2018 = 222.2mm` would work today, mean nothing, and wait for the next iOS
-to move it. `100vh` is one page box by definition in paged media: whatever factor
-WebKit applies, it applies to the page too, and it cancels.
-
-`ReportPageBox.inject` appends that one rule at the end of the `<head>`, where it
-outranks the template's own same-specificity rule. `min-height`, never `height` —
-a sheet whose content outgrows a page must still grow; clipping would drop rows
-from an alcohol report without saying so. iOS only: Android prints this template
-correctly, and `267mm` states an intent that `100vh` states only obliquely.
-
-Six tests. Not for the arithmetic, which has none, but for the splice: that the
-rule lands inside the head, after the template's, exactly once for three sheets,
-that the document is otherwise byte-for-byte itself, and that a document without a
-`</head>` comes back unchanged rather than silently repaired.
-
-FOUR WRONG DIAGNOSES PRECEDED THIS ONE — invented margins, a formatter that was
-assumed to scale, an inch of insets that was not there, a footer blamed on flexbox.
-Each was plausible and each was argued from the code rather than from the artefact.
-The measurement that ended it took two exports and one subtraction.
+The fix chosen here, `min-height: 100vh`, assumed viewport units would resolve
+against the page box. They do not.
 
 #### Let the sheet be shorter than its page  (patch -64)
 

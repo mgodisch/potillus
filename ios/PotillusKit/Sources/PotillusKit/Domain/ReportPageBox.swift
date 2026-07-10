@@ -49,36 +49,54 @@ import Foundation
 //   1.2018 × 44. Two different length resolutions in one document. Whatever WebKit
 //   is doing here, this is not the file in which to reverse-engineer it.
 //
-// WHAT THIS DOES INSTEAD
+// WHY `100vh` DID NOT WORK EITHER
 //
-//   `267 / 1.2018 = 222.2mm` would work today and would be a number with no
-//   meaning, derived from two data points, waiting for the next iOS to move it.
+//   It was the obvious answer: one page box, by definition, in paged media. It
+//   printed a sheet 1691 pt tall — 2.23 pages — and the report came out on six.
+//   WebKit's print layout gives the page box no height that CSS can ask for, in
+//   millimetres or in viewport units.
 //
-//   `100vh` is one page box, by definition, in paged media. Whatever factor WebKit
-//   applies, it applies to the page as well, and it cancels. The sheet is one page
-//   tall because it is told to be one page tall, not because a conversion happened
-//   to come out right.
+// WHAT THIS DOES INSTEAD: IT STOPS ASKING
+//
+//   The sheet is only tall because `margin-top: auto` needs a tall box to push the
+//   disclaimer to its bottom edge. The CONTENT fits with room to spare — sheet one
+//   ends 66 pt above the page bottom, sheet two 138 pt.
+//
+//   So the height is dropped, and the disclaimer follows the content instead of the
+//   paper. `page-break-before: always` between sheets then yields exactly two pages,
+//   and nothing in that sentence depends on how WebKit resolves a length.
+//
+//   THE COST IS COSMETIC AND REAL: on iOS the disclaimer sits under the last table
+//   rather than at the foot of the page, some 40 pt higher on sheet one and 110 pt
+//   higher on sheet two. Android, whose print framework resolves millimetres
+//   correctly, keeps the pinned footer. A report that is right in the wrong place
+//   beats a report on twice the pages.
 //
 // WHY iOS ONLY
 //
 //   Android prints this template correctly today. A change to the shared template
 //   would have to be re-verified there, and `min-height: 267mm` states an intent —
-//   the printable area of A4 — that `100vh` states only obliquely. So the override
-//   is appended at print time, on this platform, where it is needed, and the
-//   template goes on saying what it means.
+//   the printable area of A4 — worth keeping. So the override is appended at print
+//   time, on the platform that needs it, and the template goes on saying what it
+//   means.
 // =============================================================================
 
 public enum ReportPageBox {
 
-    /// Overrides the sheet height, and nothing else.
+    /// Frees the sheet from a height it cannot compute, and unpins the footer.
     ///
-    /// `min-height` alone: the sheet must be free to grow if its content ever
-    /// exceeds a page, exactly as the template intends. `height: 100vh` would clip
-    /// it instead, and clipping an alcohol report loses rows without saying so.
+    /// `min-height: 0` — the sheet becomes as tall as its content, which fits.
+    /// `margin-top` — a fixed gap replaces `auto`, which would otherwise still push
+    /// the disclaimer against a bottom edge that is now the content's, not the
+    /// page's, and would collapse the gap to nothing.
+    ///
+    /// Nothing here clips: a sheet whose content one day outgrows a page will simply
+    /// break across two, which is what the template would do anyway.
     public static let stylesheet = """
         <style>
         /* Injected by the iOS printer; see ReportPageBox.swift. */
-        .sheet { min-height: 100vh; }
+        .sheet { min-height: 0; }
+        .sheet > .disclaimer { margin-top: 18pt; }
         </style>
         """
 
