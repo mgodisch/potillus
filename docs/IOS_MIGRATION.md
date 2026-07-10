@@ -512,6 +512,26 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the CJK languages, completing the twenty  (patch -77)
+
+Japanese, Korean, Simplified Chinese, Traditional Chinese — the last four, matching
+Android's full set. 27 harvested from each `values-XX` (Android's zh-rCN/zh-rTW map
+to the catalogue's zh-Hans/zh-Hant, wired in patch -74), 71 translated for this port.
+
+Simplified and Traditional Chinese are kept separate, as Android keeps them: they
+differ in script and in wording (导出 vs 匯出 for export, 添加 vs 新增 for add,
+数据 vs 資料 for data). The zh-Hans/zh-Hant split here is the payoff of the code
+migration in -74 — a stored "zh-CN" now resolves to the zh-Hans catalogue entries.
+
+CJK punctuation follows each language's convention: the ideographic full stop 。in
+Japanese and Chinese, the interpunct ・between number and unit in Japanese. The "ml"
+and "g" units stay Latin, as Android leaves them, since that is how the units are
+written in these locales in practice.
+
+Twenty languages now — the whole of Android's set — 98 keys each, and a check
+confirms every placeholder survives every one of the twenty translations. STILL TO
+DO: the report's own localisation (ReportLabels, REPORT_LANG), and the three plurals.
+
 #### Add the Slavic and Greek languages  (patch -76)
 
 Five: Czech, Polish, Russian, Ukrainian, Greek. 27 harvested from each `values-XX`,

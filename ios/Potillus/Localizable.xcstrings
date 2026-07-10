@@ -106,6 +106,30 @@
             "state": "translated",
             "value": "Το %1$@ χρησιμοποιείται από %2$lld καταχωρίσεις."
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ は %2$lld 件の記録で使用されています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@은(는) %2$lld개의 기록에서 사용됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 被 %2$lld 条记录使用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 被 %2$lld 筆記錄使用。"
+          }
         }
       }
     },
@@ -209,6 +233,30 @@
           }
         },
         "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml・%2$@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ml · %2$@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld ml · %2$@"
@@ -320,6 +368,30 @@
             "state": "translated",
             "value": "Ένα ποτό που καταγράφεται πριν από αυτήν την ώρα προσμετράται στην προηγούμενη ημέρα."
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この時刻より前に記録された飲み物は前日に数えられます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 시간 이전에 기록된 음료는 전날로 계산됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此时间之前记录的饮品计入前一天。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此時間之前記錄的飲品計入前一天。"
+          }
         }
       }
     },
@@ -426,6 +498,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αποχή"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "禁酒"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "금주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戒酒"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戒酒"
           }
         }
       }
@@ -534,6 +630,30 @@
             "state": "translated",
             "value": "Προσθήκη"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增"
+          }
         }
       }
     },
@@ -640,6 +760,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Προσθέστε ένα ποτό για να ξεκινήσετε την καταγραφή."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物を追加して記録を始めましょう。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료를 추가하여 기록을 시작하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加一杯饮品以开始记录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增一杯飲品以開始記錄。"
           }
         }
       }
@@ -748,6 +892,30 @@
             "state": "translated",
             "value": "Προσθήκη στα αγαπημένα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お気に入りに追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기에 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加到收藏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入收藏"
+          }
         }
       }
     },
@@ -854,6 +1022,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αλκοόλ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルコール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알코올"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精"
           }
         }
       }
@@ -962,6 +1154,30 @@
             "state": "translated",
             "value": "Αλκοόλ (%)"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルコール (%)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알코올 (%)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精 (%)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精 (%)"
+          }
         }
       }
     },
@@ -1068,6 +1284,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εναλλακτικά σύμβολα κατάστασης"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代替ステータス記号"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "대체 상태 기호"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备用状态符号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替代狀態符號"
           }
         }
       }
@@ -1176,6 +1416,30 @@
             "state": "translated",
             "value": "Κλείδωμα εφαρμογής"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appロック"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 잠금"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用锁"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App 鎖定"
+          }
         }
       }
     },
@@ -1282,6 +1546,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το κλείδωμα εφαρμογής απαιτεί Face ID, Touch ID ή κωδικό συσκευής."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AppロックにはFace ID、Touch ID、またはデバイスのパスコードが必要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 잠금에는 Face ID, Touch ID 또는 기기 암호가 필요합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用锁需要 Face ID、Touch ID 或设备密码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App 鎖定需要 Face ID、Touch ID 或裝置密碼。"
           }
         }
       }
@@ -1390,6 +1678,30 @@
             "state": "translated",
             "value": "Εμφάνιση"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外観"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "외관"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外观"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外觀"
+          }
         }
       }
     },
@@ -1496,6 +1808,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αντίγραφο ασφαλείας"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백업"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備份"
           }
         }
       }
@@ -1604,6 +1940,30 @@
             "state": "translated",
             "value": "Σωματικό βάρος"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체중"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "體重"
+          }
         }
       }
     },
@@ -1710,6 +2070,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ανά κατηγορία"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カテゴリ別"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "범주별"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按类别"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依類別"
           }
         }
       }
@@ -1818,6 +2202,30 @@
             "state": "translated",
             "value": "Ανά ημέρα εβδομάδας"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曜日別"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "요일별"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按星期"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依星期"
+          }
         }
       }
     },
@@ -1924,6 +2332,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ημερολόγιο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カレンダー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "달력"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日历"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行事曆"
           }
         }
       }
@@ -2032,6 +2464,30 @@
             "state": "translated",
             "value": "Ακύρωση"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
         }
       }
     },
@@ -2138,6 +2594,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Κατηγορία"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カテゴリ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "카테고리"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "类别"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "類別"
           }
         }
       }
@@ -2246,6 +2726,30 @@
             "state": "translated",
             "value": "Εκκαθάριση σωματικού βάρους"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重を消去"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체중 지우기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除体重"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除體重"
+          }
         }
       }
     },
@@ -2352,6 +2856,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Κατανάλωση"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摂取量"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "섭취량"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摄入量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "攝取量"
           }
         }
       }
@@ -2460,6 +2988,30 @@
             "state": "translated",
             "value": "Τρέχον σερί"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の連続日数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 연속 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前连续天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前連續天數"
+          }
         }
       }
     },
@@ -2566,6 +3118,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ημερήσιο όριο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1日の上限"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일일 한도"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日上限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日上限"
           }
         }
       }
@@ -2674,6 +3250,30 @@
             "state": "translated",
             "value": "Σκοτεινό"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダーク"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다크"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
         }
       }
     },
@@ -2780,6 +3380,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αλλαγή ημέρας"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日付の変わり目"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "날짜 전환"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期变更"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期變更"
           }
         }
       }
@@ -2888,6 +3512,30 @@
             "state": "translated",
             "value": "Η ημέρα ξεκινά στις"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1日の始まり"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "하루 시작 시각"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一天开始于"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一天開始於"
+          }
         }
       }
     },
@@ -2994,6 +3642,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Δεν είναι δυνατή η επιλογή ημερών μετά τη σημερινή."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日より後の日付は選択できません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘 이후의 날짜는 선택할 수 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法选择今天之后的日期。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法選擇今天之後的日期。"
           }
         }
       }
@@ -3102,6 +3774,30 @@
             "state": "translated",
             "value": "Οι ημέρες πριν από αυτήν την ημερομηνία αγνοούνται στα στατιστικά. Οι καταχωρίσεις δεν διαγράφονται."
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この日付より前の日は統計で無視されます。記録は削除されません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 날짜 이전의 날은 통계에서 무시됩니다. 기록은 삭제되지 않습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此日期之前的日子在统计中被忽略。记录不会被删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此日期之前的日子在統計中會被忽略。記錄不會被刪除。"
+          }
         }
       }
     },
@@ -3208,6 +3904,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ημέρες πάνω από το όριο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上限を超えた日数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한도 초과 일수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超限天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超限天數"
           }
         }
       }
@@ -3316,6 +4036,30 @@
             "state": "translated",
             "value": "Διαγραφή"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "삭제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除"
+          }
         }
       }
     },
@@ -3422,6 +4166,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Διαγραφή %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ を削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 삭제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除 %@"
           }
         }
       }
@@ -3530,6 +4298,30 @@
             "state": "translated",
             "value": "Τέλος"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
         }
       }
     },
@@ -3636,6 +4428,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ποτό"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "饮品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲品"
           }
         }
       }
@@ -3744,6 +4560,30 @@
             "state": "translated",
             "value": "Ημέρες κατανάλωσης"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲酒日数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음주 일수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "饮酒天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲酒天數"
+          }
         }
       }
     },
@@ -3850,6 +4690,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ημέρες κατανάλωσης ανά εβδομάδα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週あたりの飲酒日数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주당 음주 일수"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周饮酒天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每週飲酒天數"
           }
         }
       }
@@ -3958,6 +4822,30 @@
             "state": "translated",
             "value": "Ποτά"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "饮品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲品"
+          }
         }
       }
     },
@@ -4064,6 +4952,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ημέρες χωρίς αλκοόλ στην περίοδο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期間内の休肝日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기간 내 금주일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期间内无酒天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期間內無酒天數"
           }
         }
       }
@@ -4172,6 +5084,30 @@
             "state": "translated",
             "value": "Επεξεργασία %@"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ を編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯 %@"
+          }
         }
       }
     },
@@ -4278,6 +5214,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Καταχωρίσεις"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記録"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記錄"
           }
         }
       }
@@ -4386,6 +5346,30 @@
             "state": "translated",
             "value": "Εκτιμώμενη αλκοόλη αίματος"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "推定血中アルコール濃度"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예상 혈중 알코올 농도"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估计血液酒精浓度"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估計血液酒精濃度"
+          }
         }
       }
     },
@@ -4492,6 +5476,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εξαγωγή"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보내기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出"
           }
         }
       }
@@ -4600,6 +5608,30 @@
             "state": "translated",
             "value": "Εξαγωγή CSV"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSVをエクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CSV 내보내기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出 CSV"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出 CSV"
+          }
         }
       }
     },
@@ -4706,6 +5738,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εξαγωγή αναφοράς PDF"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDFレポートをエクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF 보고서 내보내기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出 PDF 报告"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出 PDF 報告"
           }
         }
       }
@@ -4814,6 +5870,30 @@
             "state": "translated",
             "value": "Εξαγωγή αντιγράφου ασφαλείας"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップをエクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백업 내보내기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出備份"
+          }
         }
       }
     },
@@ -4920,6 +6000,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αγαπημένα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お気に入り"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收藏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收藏"
           }
         }
       }
@@ -5028,6 +6132,30 @@
             "state": "translated",
             "value": "Από"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從"
+          }
         }
       }
     },
@@ -5134,6 +6262,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εισαγωγή αντιγράφου ασφαλείας"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップをインポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백업 가져오기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯入備份"
           }
         }
       }
@@ -5242,6 +6394,30 @@
             "state": "translated",
             "value": "Συμπερίληψη όλου του ιστορικού"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全履歴を含める"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전체 기록 포함"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含全部历史"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含全部歷史"
+          }
         }
       }
     },
@@ -5348,6 +6524,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Συμπερίληψη ρυθμίσεων"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定を含める"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 포함"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包含設定"
           }
         }
       }
@@ -5456,6 +6656,30 @@
             "state": "translated",
             "value": "Γλώσσα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "言語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语言"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "語言"
+          }
         }
       }
     },
@@ -5559,6 +6783,30 @@
           }
         },
         "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "Libellus Potionis"
@@ -5670,6 +6918,30 @@
             "state": "translated",
             "value": "Το Libellus Potionis δεν μπόρεσε να ξεκινήσει"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis を起動できませんでした"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis을(를) 시작할 수 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis 无法启动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis 無法啟動"
+          }
         }
       }
     },
@@ -5776,6 +7048,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Το Libellus Potionis είναι κλειδωμένο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis はロックされています"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis이(가) 잠겨 있습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis 已锁定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libellus Potionis 已鎖定"
           }
         }
       }
@@ -5884,6 +7180,30 @@
             "state": "translated",
             "value": "Φωτεινό"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라이트"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浅色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淺色"
+          }
         }
       }
     },
@@ -5990,6 +7310,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Όρια"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上限"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한도"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "限额"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上限"
           }
         }
       }
@@ -6098,6 +7442,30 @@
             "state": "translated",
             "value": "Καταγραφή ποτού"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物を記録"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录饮品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記錄飲品"
+          }
         }
       }
     },
@@ -6204,6 +7572,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Μεγαλύτερο σερί"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最長の連続日数"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최장 연속 기록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最长连续天数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最長連續天數"
           }
         }
       }
@@ -6312,6 +7704,30 @@
             "state": "translated",
             "value": "Συγχώνευση με τα δεδομένα μου"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分のデータと統合"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 데이터와 병합"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与我的数据合并"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "與我的資料合併"
+          }
         }
       }
     },
@@ -6418,6 +7834,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Μήνας"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "월"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月"
           }
         }
       }
@@ -6526,6 +7966,30 @@
             "state": "translated",
             "value": "Όνομα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名稱"
+          }
         }
       }
     },
@@ -6632,6 +8096,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Κανένα ποτό ακόμη"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ飲み物がありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 음료가 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无饮品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無飲品"
           }
         }
       }
@@ -6740,6 +8228,30 @@
             "state": "translated",
             "value": "Σημείωση"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "메모"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備注"
+          }
         }
       }
     },
@@ -6846,6 +8358,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Τίποτα δεν καταγράφηκε αυτήν την ημέρα."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この日は記録がありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 날에 기록된 것이 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这一天没有记录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這一天沒有記錄。"
           }
         }
       }
@@ -6954,6 +8490,30 @@
             "state": "translated",
             "value": "Τίποτα δεν καταγράφηκε ακόμη."
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだ記録がありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 기록된 것이 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚无记录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚無記錄。"
+          }
         }
       }
     },
@@ -7060,6 +8620,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
           }
         }
       }
@@ -7168,6 +8752,30 @@
             "state": "translated",
             "value": "Ανά ημέρα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1日あたり"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "하루당"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天"
+          }
         }
       }
     },
@@ -7274,6 +8882,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ανά ημέρα κατανάλωσης"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲酒日あたり"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음주일당"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每个饮酒日"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個飲酒日"
           }
         }
       }
@@ -7382,6 +9014,30 @@
             "state": "translated",
             "value": "Περίοδος"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期間"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기간"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "期間"
+          }
         }
       }
     },
@@ -7488,6 +9144,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Προσωπικά δεδομένα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "個人データ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "개인 데이터"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人数据"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "個人資料"
           }
         }
       }
@@ -7596,6 +9276,30 @@
             "state": "translated",
             "value": "Προεπιλογή"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プリセット"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "프리셋"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预设"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預設"
+          }
         }
       }
     },
@@ -7702,6 +9406,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Αφαίρεση από τα αγαπημένα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お気に入りから削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기에서 제거"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从收藏中移除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從收藏中移除"
           }
         }
       }
@@ -7810,6 +9538,30 @@
             "state": "translated",
             "value": "Αντικατάσταση των δεδομένων μου"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分のデータを置き換える"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 데이터 교체"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换我的数据"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取代我的資料"
+          }
         }
       }
     },
@@ -7916,6 +9668,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Η αντικατάσταση διαγράφει το ημερολόγιό σας και τα ποτά που δημιουργήσατε. Οι προεπιλογές διατηρούνται."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "置き換えると記録と作成した飲み物が削除されます。プリセットは保持されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "교체하면 기록과 직접 만든 음료가 삭제됩니다. 프리셋은 유지됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "替换会删除你的记录和你创建的饮品。预设会保留。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取代會刪除你的記錄和你建立的飲品。預設會保留。"
           }
         }
       }
@@ -8024,6 +9800,30 @@
             "state": "translated",
             "value": "Αποθήκευση"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "儲存"
+          }
         }
       }
     },
@@ -8130,6 +9930,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ασφάλεια"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "セキュリティ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보안"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全性"
           }
         }
       }
@@ -8238,6 +10062,30 @@
             "state": "translated",
             "value": "Ορισμός σωματικού βάρους"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체중 설정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置体重"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定體重"
+          }
         }
       }
     },
@@ -8344,6 +10192,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ρυθμίσεις"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定"
           }
         }
       }
@@ -8452,6 +10324,30 @@
             "state": "translated",
             "value": "Εμφάνιση στην εναλλαγή εφαρμογών"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appスイッチャーに表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 전환기에 표시"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在应用切换器中显示"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 App 切換器中顯示"
+          }
         }
       }
     },
@@ -8558,6 +10454,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Στατιστικά"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "통계"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "统计"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計"
           }
         }
       }
@@ -8666,6 +10586,30 @@
             "state": "translated",
             "value": "Τα στατιστικά καλύπτουν όλο το ιστορικό."
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計は全履歴を対象とします。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "통계는 전체 기록을 포함합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "统计涵盖全部历史。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計涵蓋全部歷史。"
+          }
         }
       }
     },
@@ -8772,6 +10716,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Έναρξη στατιστικών"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計の開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "통계 시작"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "统计起点"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統計起點"
           }
         }
       }
@@ -8880,6 +10848,30 @@
             "state": "translated",
             "value": "Σύστημα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システム"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟隨系統"
+          }
         }
       }
     },
@@ -8986,6 +10978,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ο όγκος πρέπει να είναι μεταξύ "
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量は次の範囲でなければなりません: "
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "용량은 다음 범위여야 합니다: "
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量必须介于 "
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量必須介於 "
           }
         }
       }
@@ -9094,6 +11110,30 @@
             "state": "translated",
             "value": "Θέμα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テーマ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테마"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主题"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主題"
+          }
         }
       }
     },
@@ -9200,6 +11240,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ώρα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時刻"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間"
           }
         }
       }
@@ -9308,6 +11372,30 @@
             "state": "translated",
             "value": "Ώρα της ημέρας"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時間帯"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간대"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時段"
+          }
         }
       }
     },
@@ -9414,6 +11502,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Έως"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到"
           }
         }
       }
@@ -9522,6 +11634,30 @@
             "state": "translated",
             "value": "Σήμερα"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
         }
       }
     },
@@ -9628,6 +11764,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Σύνολο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合計"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "합계"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合计"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合計"
           }
         }
       }
@@ -9736,6 +11896,30 @@
             "state": "translated",
             "value": "Τάση"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傾向"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추세"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "趋势"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "趨勢"
+          }
         }
       }
     },
@@ -9842,6 +12026,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ξεκλείδωμα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロック解除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잠금 해제"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解锁"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解鎖"
           }
         }
       }
@@ -9950,6 +12158,30 @@
             "state": "translated",
             "value": "Όγκος (ml)"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量 (ml)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "용량 (ml)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量 (ml)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "容量 (ml)"
+          }
         }
       }
     },
@@ -10056,6 +12288,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Εβδομάδα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週"
           }
         }
       }
@@ -10164,6 +12420,30 @@
             "state": "translated",
             "value": "Εβδομαδιαίο όριο"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週の上限"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "주간 한도"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周上限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每週上限"
+          }
         }
       }
     },
@@ -10270,6 +12550,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Έτος"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "년"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年"
           }
         }
       }
@@ -10426,6 +12730,30 @@
             "state": "translated",
             "value": "g"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g"
+          }
         }
       }
     },
@@ -10532,6 +12860,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "g/ημέρα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/日"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/일"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "g/天"
           }
         }
       }

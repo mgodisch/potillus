@@ -66,6 +66,7 @@ LANGUAGES = [
     "da", "nl", "nb", "sv",
     "es", "fr", "it", "pt", "pt-BR", "ro",
     "cs", "pl", "ru", "uk", "el",
+    "ja", "ko", "zh-Hans", "zh-Hant",
 ]
 ANDROID_DIR = {
     "nb": "nb", "pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW",
