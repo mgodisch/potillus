@@ -1,0 +1,261 @@
+{
+  "_comment": [
+    "Shared golden vectors for the drink-definition validator. Loaded by BOTH suites.",
+    "The bounds are GENERATED from android/.../domain/DrinkValidator.kt: a bound",
+    "changed on one platform and not the other turns a test red rather than letting",
+    "the two drift, which is how the rules came to disagree before v0.81.0.",
+    "`expected` is null when acceptable, else the FIRST violation in field order.",
+    "JSON cannot express NaN or the infinities, so those cases carry",
+    "`alcoholPercentSpecial` instead of `alcoholPercent`.",
+    "Two cases pin string semantics Kotlin and Swift do not share by default: the",
+    "name length counts UTF-16 code units (Kotlin's String.length), and U+00A0 is a",
+    "character rather than whitespace (Java's Character.isWhitespace excludes the",
+    "non-breaking spaces, Swift's CharacterSet does not)."
+  ],
+  "bounds": {
+    "maxNameLength": 100,
+    "volumeMlMin": 1,
+    "volumeMlMax": 5000,
+    "alcoholPercentMin": 0.0,
+    "alcoholPercentMax": 100.0
+  },
+  "validate": [
+    {
+      "description": "an ordinary drink is accepted",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "alcohol-free beer is a drink worth logging",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercent": 0.0,
+      "expected": null
+    },
+    {
+      "description": "a blank name is rejected",
+      "name": "",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
+    },
+    {
+      "description": "a whitespace-only name is blank, not three characters",
+      "name": "   ",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
+    },
+    {
+      "description": "a tab-and-newline name is blank",
+      "name": "\t\n",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
+    },
+    {
+      "description": "a name at the limit is accepted",
+      "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "a name beyond the limit is rejected",
+      "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "TOO_LONG"
+      }
+    },
+    {
+      "description": "length is measured after trimming",
+      "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   ",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "leading whitespace is trimmed too",
+      "name": "   Pils",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "length counts UTF-16 code units, so 100 emoji exceed the limit",
+      "name": "🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "TOO_LONG"
+      }
+    },
+    {
+      "description": "50 emoji are 100 code units and fit exactly",
+      "name": "🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺🍺",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "a non-breaking space is a character, not whitespace",
+      "name": " ",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "a name trimmed only of real whitespace keeps its NBSP",
+      "name": "   ",
+      "volumeMl": 500,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "the lower volume bound is inclusive",
+      "name": "Pils",
+      "volumeMl": 1,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "the upper volume bound is inclusive",
+      "name": "Pils",
+      "volumeMl": 5000,
+      "alcoholPercent": 4.9,
+      "expected": null
+    },
+    {
+      "description": "zero volume is rejected",
+      "name": "Pils",
+      "volumeMl": 0,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "VOLUME_ML",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "a negative volume is rejected",
+      "name": "Pils",
+      "volumeMl": -1,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "VOLUME_ML",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "one millilitre past the bound is rejected",
+      "name": "Pils",
+      "volumeMl": 5001,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "VOLUME_ML",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "the typo the bound exists to catch",
+      "name": "Pils",
+      "volumeMl": 50000,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "VOLUME_ML",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "the upper alcohol bound is inclusive",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercent": 100.0,
+      "expected": null
+    },
+    {
+      "description": "a negative alcohol percentage is rejected",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercent": -0.1,
+      "expected": {
+        "field": "ALCOHOL_PERCENT",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "an alcohol percentage above 100 is rejected",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercent": 100.1,
+      "expected": {
+        "field": "ALCOHOL_PERCENT",
+        "reason": "OUT_OF_RANGE"
+      }
+    },
+    {
+      "description": "NaN is not finite",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercentSpecial": "NAN",
+      "expected": {
+        "field": "ALCOHOL_PERCENT",
+        "reason": "NOT_FINITE"
+      }
+    },
+    {
+      "description": "positive infinity is not finite",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercentSpecial": "POSITIVE_INFINITY",
+      "expected": {
+        "field": "ALCOHOL_PERCENT",
+        "reason": "NOT_FINITE"
+      }
+    },
+    {
+      "description": "negative infinity is not finite",
+      "name": "Pils",
+      "volumeMl": 500,
+      "alcoholPercentSpecial": "NEGATIVE_INFINITY",
+      "expected": {
+        "field": "ALCOHOL_PERCENT",
+        "reason": "NOT_FINITE"
+      }
+    },
+    {
+      "description": "the first violation in field order wins: name before volume",
+      "name": "",
+      "volumeMl": 0,
+      "alcoholPercent": 4.9,
+      "expected": {
+        "field": "NAME",
+        "reason": "BLANK"
+      }
+    },
+    {
+      "description": "the first violation in field order wins: volume before alcohol",
+      "name": "Pils",
+      "volumeMl": 0,
+      "alcoholPercentSpecial": "NAN",
+      "expected": {
+        "field": "VOLUME_ML",
+        "reason": "OUT_OF_RANGE"
+      }
+    }
+  ]
+}

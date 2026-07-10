@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Port the drink validator, with shared bounds  (patch -29)
+
+- Port `DrinkValidator`, added to Android in v0.81.0 after its rules were found
+  to exist twice with two different answers. Add
+  `test-vectors/drink-validation.json`, whose `bounds` block is GENERATED from the
+  Kotlin source and asserted by both suites: a fourth copy of these numbers
+  cannot now drift unnoticed.
+- Correct two string semantics that look identical across the languages and are
+  not. Kotlin is the authority, because a drink Android accepts must be accepted
+  here:
+  - `String.length` counts UTF-16 CODE UNITS; Swift's `String.count` counts
+    grapheme clusters. A name of 51 beer emojis is 102 units (rejected) and 51
+    characters (accepted). The Swift port measures `utf16.count`.
+  - Java's `Character.isWhitespace`, which Kotlin's `trim()` uses, EXCLUDES the
+    non-breaking spaces U+00A0, U+2007 and U+202F. Swift's
+    `.whitespacesAndNewlines` includes them, so a name of one NBSP was a valid
+    name on Android and blank on iOS. The trimming set now subtracts the three.
+  Both are pinned by vectors and by tests on each side, since neither would ever
+  surface as a bug report — the user would simply find a name rejected on one of
+  their devices.
+- Check finiteness BEFORE the range test, as Kotlin does. `(0.0...100.0).contains(.nan)`
+  is false and happens to reject it, but a hand-written `!(percent > 100)` would
+  not, and a NaN reaching `SUM(gramsAlcohol)` poisons every total after it.
+
 #### Silence a real warning, not the compiler  (patch -28)
 
 - `TodayModel.addEntry` fed `entries.add`, which returns the new row id, into a

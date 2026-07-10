@@ -45,6 +45,12 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
   fractions, the traffic-light capacity status, and the rolling seven-day
   violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+- `drink-validation.json` — the rules a drink definition must satisfy. The
+  `bounds` block is GENERATED from `domain/DrinkValidator.kt`, and both suites
+  assert it, so a bound narrowed on one platform cannot pass unnoticed on the
+  other. Two cases exist purely to pin string semantics the languages do not
+  share: the name length counts UTF-16 code units, and U+00A0 is a character
+  rather than whitespace.
 - `backup-settings.json` — the clamping every value from a backup's `settings`
   block passes through, plus the locale catalogue. The `localeTags` array is
   GENERATED from `l10n/SupportedLocales.kt`; both suites assert against it, so a
