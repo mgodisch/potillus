@@ -512,6 +512,29 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add the Statistics screen  (patch -38)
+
+- Add `StatsScreen`: period picker, consumption chart, limit violations, streaks,
+  category breakdown, time-of-day and weekday profiles. Every number arrives from
+  `StatsModel`; the view computes nothing.
+- Respect three absences rather than flattening them to zero:
+  - `hasBaseline == false` hides the trend row. The stats floor cut into the
+    current period, so there is nothing to compare against, and "0 %" would claim
+    there was.
+  - A weekday whose average is nil is OMITTED from its chart. That weekday never
+    fell in the period, which is not a dry weekday.
+  - An empty category breakdown draws no section, rather than an empty pie.
+- Colour an abstinent chart bucket green. Its bar has zero height and would
+  otherwise be indistinguishable from missing data.
+- Colour a rising trend RED and a falling one green. Down is the good direction
+  here, and the default green-for-up would congratulate the user for drinking
+  more.
+- Use named `Identifiable` structs for the chart points instead of tuples: `Chart`
+  and `ForEach` want identity, and a key path into a tuple element is not a
+  promise worth leaning on.
+- Delete `PlaceholderScreen`. Every tab is now a real screen, and dead scaffolding
+  outlives its usefulness quickly.
+
 #### Fix two wrong expectations in the statistics tests  (patch -37)
 
 - The suite's `log()` helper built its timestamp by adding `hour` to

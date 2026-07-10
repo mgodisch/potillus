@@ -77,7 +77,7 @@ struct RootView: View {
             CalendarScreen(environment: environment)
                 .tabItem { Label("Calendar", systemImage: "calendar") }
 
-            PlaceholderScreen(title: "Statistics")
+            StatsScreen(environment: environment)
                 .tabItem { Label("Statistics", systemImage: "chart.bar") }
 
             DrinksScreen(environment: environment)
@@ -106,25 +106,6 @@ extension ThemeMode {
         case .system: return nil
         case .day: return .light
         case .night: return .dark
-        }
-    }
-}
-
-/// Stands in for a screen that has not been built yet.
-///
-/// Kept until the real screen lands, so the shell is runnable at every commit
-/// and the tab bar can be exercised on a device from day one.
-struct PlaceholderScreen: View {
-    let title: String
-
-    var body: some View {
-        NavigationStack {
-            ContentUnavailableView(
-                title,
-                systemImage: "hammer",
-                description: Text("This screen is not built yet.")
-            )
-            .navigationTitle(title)
         }
     }
 }
