@@ -50,18 +50,23 @@ public struct AppEnvironment: Sendable {
     public let drinks: any DrinkRepositoryProtocol
     public let entries: any EntryRepositoryProtocol
     public let preferences: any PreferencesStoring
+    /// "Now", injected. Production uses `SystemClock`; a screenshot run pins it to
+    /// a fixed instant so every capture shows the same dated data.
+    public let clock: any Clock
     public let importer: BackupImporter
 
     public init(
         database: AppDatabase,
         drinks: any DrinkRepositoryProtocol,
         entries: any EntryRepositoryProtocol,
-        preferences: any PreferencesStoring
+        preferences: any PreferencesStoring,
+        clock: any Clock = SystemClock()
     ) {
         self.database = database
         self.drinks = drinks
         self.entries = entries
         self.preferences = preferences
+        self.clock = clock
         self.importer = BackupImporter(database: database, preferences: preferences)
     }
 
@@ -81,7 +86,7 @@ public struct AppEnvironment: Sendable {
     ///
     /// For previews, screenshot runs and tests. The crypto and the SQL are the
     /// real ones; only their storage is disposable.
-    public static func makeEphemeral() throws -> AppEnvironment {
+    public static func makeEphemeral(clock: any Clock = SystemClock()) throws -> AppEnvironment {
         let database = try AppDatabase(inMemory: true)
         let directory = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent(UUID().uuidString)
@@ -94,7 +99,8 @@ public struct AppEnvironment: Sendable {
             preferences: PreferencesStore(
                 fileURL: directory.appendingPathComponent("prefs.bin"),
                 keyProvider: InMemoryKeyProvider()
-            )
+            ),
+            clock: clock
         )
     }
 }

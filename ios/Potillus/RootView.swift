@@ -82,6 +82,7 @@ struct RootView: View {
                         systemImage: "calendar.badge.clock"
                     )
                 }
+                .accessibilityIdentifier("tab.today")
 
             CalendarScreen(environment: environment)
                 .tabItem {
@@ -90,6 +91,7 @@ struct RootView: View {
                         systemImage: "calendar"
                     )
                 }
+                .accessibilityIdentifier("tab.calendar")
 
             StatsScreen(environment: environment)
                 .tabItem {
@@ -98,6 +100,7 @@ struct RootView: View {
                         systemImage: "chart.bar"
                     )
                 }
+                .accessibilityIdentifier("tab.statistics")
 
             DrinksScreen(environment: environment)
                 .tabItem {
@@ -106,6 +109,7 @@ struct RootView: View {
                         systemImage: "wineglass"
                     )
                 }
+                .accessibilityIdentifier("tab.drinks")
         }
         // nil means "follow the system", which is exactly what ThemeMode.system
         // asks for. Reading the device setting directly would ignore the user's

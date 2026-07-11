@@ -512,6 +512,41 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add iOS screenshot-mode app hooks  (patch -100)
+
+The app side of the automated App Store screenshot capture — the deterministic
+state a UI test needs, and the report pages it cannot reach through the UI. Split
+from the test target and Makefile recipe, which follow in patch -101. Everything
+here is gated on the `-screenshotMode` launch argument, so a normal build is
+untouched.
+
+WHAT LANDS:
+  - `ScreenshotMode` (new, app target): on a `-screenshotMode` launch it builds an
+    EPHEMERAL, clock-pinned environment — `AppEnvironment.makeEphemeral` with a
+    `FixedClock` frozen at 2026-06-30 (matching the Makefile's SCREENSHOT_DATE and
+    the demo fixture's range) — seeds it from the demo backup passed as JSON via
+    the `SCREENSHOT_FIXTURE_JSON` environment variable (`BackupReader.parse` +
+    `importer.restore(.replace)`), and renders the two report pages 07/08 to a PDF
+    programmatically (no "Save as PDF" dialog, unlike the manual Android step),
+    writing `screenshot_report_<locale>.pdf` into the app's Documents directory
+    for the fastlane recipe to pull out.
+  - `AppEnvironment` (kit): gains an injected `clock` (default `SystemClock`), so
+    the pin reaches the models through the existing composition root rather than a
+    global. The `Clock.swift` seam the domain reserved for exactly this is now used.
+  - `TodayScreen`, `StatsScreen`, `CalendarScreen`: pass `environment.clock` into
+    their models, so "today" follows the pinned clock in a screenshot run.
+  - `RootView` + `TodayScreen`: stable `accessibilityIdentifier`s on the four tabs
+    (`tab.today` …) and the Settings and add-drink toolbar buttons (`nav.settings`,
+    `nav.addDrink`), so the UI test navigates by identifier, not by localized label
+    — a hard requirement across the 21 store locales.
+
+CONTRACT with patch -101 (the UI-test target and recipe):
+  `-screenshotMode` launch argument enables the mode; `SCREENSHOT_FIXTURE_JSON`
+  carries the demo backup; `SCREENSHOT_LOCALE` names the store locale for the report
+  file. The app writes the report PDF; the recipe rasterizes it to pages 07/08.
+
+This is app-target code, verified only by a full Xcode build on the Mac.
+
 #### Split asset make targets by platform  (patch -99)
 
 The root Makefile's store-asset and release targets were named as if the project

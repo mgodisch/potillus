@@ -44,7 +44,8 @@ struct CalendarScreen: View {
 
     init(environment: AppEnvironment) {
         _model = State(initialValue: CalendarModel(
-            entries: environment.entries, preferences: environment.preferences
+            entries: environment.entries, preferences: environment.preferences,
+            clock: environment.clock
         ))
     }
 

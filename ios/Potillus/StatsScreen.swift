@@ -73,7 +73,8 @@ struct StatsScreen: View {
         _model = State(initialValue: StatsModel(
             entries: environment.entries,
             drinks: environment.drinks,
-            preferences: environment.preferences
+            preferences: environment.preferences,
+            clock: environment.clock
         ))
     }
 

@@ -143,7 +143,17 @@ enum StartupState {
     }
 
     /// Assembles the live environment, converting a throw into a shown message.
+    ///
+    /// A `-screenshotMode` launch takes a different path: an ephemeral, clock-pinned
+    /// environment seeded from the demo fixture (see `ScreenshotMode`), never the
+    /// on-disk database. The report render is fired alongside it.
     static func make() -> StartupState {
+        if ScreenshotMode.isActive {
+            guard let environment = ScreenshotMode.makeEnvironment() else {
+                return .failed("The screenshot environment could not be built.")
+            }
+            return .ready(environment)
+        }
         do {
             return .ready(try AppEnvironment.makeLive())
         } catch {

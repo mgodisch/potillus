@@ -60,7 +60,8 @@ struct TodayScreen: View {
         _model = State(initialValue: TodayModel(
             entries: environment.entries,
             drinks: environment.drinks,
-            preferences: environment.preferences
+            preferences: environment.preferences,
+            clock: environment.clock
         ))
     }
 
@@ -81,6 +82,7 @@ struct TodayScreen: View {
                     } label: {
                         Label(Loc.string("Settings", locale: locale), systemImage: "gearshape")
                     }
+                    .accessibilityIdentifier("nav.settings")
                 }
                 // iOS puts the primary action in the toolbar; Android uses a
                 // floating action button. Same action, native placement.
@@ -91,6 +93,7 @@ struct TodayScreen: View {
                         Label(Loc.string("Log a drink", locale: locale), systemImage: "plus")
                     }
                     .disabled(model.state.drinks.isEmpty)
+                    .accessibilityIdentifier("nav.addDrink")
                 }
             }
             .task { model.start() }
