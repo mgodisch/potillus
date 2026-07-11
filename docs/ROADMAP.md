@@ -42,9 +42,12 @@ traceability.
 Libellus Potionis is no longer Android-only. A native Swift/SwiftUI port lives in
 this same repository under `ios/`, sharing the data-interchange backup format (not
 live sync) and a single human-readable version with Android. It is feature-complete
-— the five screens, CSV and PDF export, the app lock, the twenty UI languages with
-localised report and plurals — and its behaviour is pinned to Android's by a shared
-set of golden test vectors. The design and the parity strategy are documented in
+for daily use — the five screens, CSV and PDF export, the app lock, the twenty UI
+languages with localised report and plurals — and its behaviour is pinned to
+Android's by a shared set of golden test vectors. Two Android features are
+consciously not ported (the calendar year heat-map and, pending on-device
+verification, a PDF footer tweak); both are recorded as possible future work below.
+The design and the parity strategy are documented in
 [IOS_MIGRATION.md](IOS_MIGRATION.md). What is still open is App Store distribution
 (listing, screenshots, and the compliance declarations), tracked below.
 
@@ -286,6 +289,19 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Small, in-scope UX and feature refinements.** Incremental improvements to the
   existing screens and reports that stay within the app's purpose, without
   expanding its scope or permissions.
+- **Two deferred iOS parity items (possible, not planned).** Both are conscious
+  omissions, not oversights, and neither blocks the port:
+  - *Calendar year view.* Android's calendar offers a Month/Year toggle whose
+    year layout is a 12-month heat-map of coloured day squares. iOS ships the
+    month view only, because the *analytical* year overview it would duplicate is
+    already covered by the Statistics screen's `year` period (KPIs, trend, and a
+    monthly-bucket chart). The year heat-map would be a second, purely visual take
+    on the same data; it can be added later if it proves wanted.
+  - *PDF report footer position.* The two-page report pins its footer with a
+    `min-height: 267mm` sheet (A4 minus the page margins). Whether the footer sits
+    exactly right in the WebKit-printed iOS PDF is unverified against a real
+    device; if a correction is needed it is a template tweak, deferred until
+    observed on-device.
 - **Publish on the Google Play Store.** In addition to F-Droid, make the app
   available on Google Play so more users can find and install it.
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see

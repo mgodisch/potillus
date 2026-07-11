@@ -512,6 +512,21 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Record deferred year view and PDF footer on roadmap  (patch -92)
+
+Two Android features are consciously not ported; both are now recorded as possible
+future work in `docs/ROADMAP.md` (Longer-term direction) rather than left as silent
+gaps, and the iOS-port status line no longer claims unqualified feature-completeness.
+
+  - Calendar year view (Month/Year toggle, 12-month heat-map). Omitted because the
+    analytical year overview it duplicates is already covered by the Statistics
+    screen's `year` period (`StatsPeriod.year` exists on iOS). Verified scope-local
+    on Android: `CalendarViewMode.YEAR` touches only the calendar screen, never the
+    PDF date range (the independent `periodEnd`) or the Statistics period.
+  - PDF report footer position. Deferred pending on-device verification; the shared
+    template's `min-height: 267mm` (A4 minus margins) is arithmetically correct, and
+    any correction is a template tweak once observed.
+
 #### Fix locale-vector and stopped-observation test failures  (patch -91)
 
 The first on-device/simulator test run surfaced three failures (all latent, none
