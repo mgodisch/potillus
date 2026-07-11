@@ -512,6 +512,35 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Use Libellus Potionis in export file names  (patch -97)
+
+The internal codename "Potillus" is meant to stay internal, but it leaked into the
+one place a user actually reads a generated name: the suggested file name in the
+share/save dialog and the Files app. The three user-facing export names now use the
+public product name instead — on BOTH platforms, changed identically so the
+cross-platform "same convention, backups sort together" contract still holds:
+
+  - `potillus_backup_…json`  → `libellus_potionis_backup_…json`
+  - `potillus_export_…csv`   → `libellus_potionis_export_…csv`
+  - `potillus_report_…pdf`   → `libellus_potionis_report_…pdf`
+
+The timestamp also gains seconds: the stamp pattern goes from `yyyyMMdd_HHmm` to
+`yyyyMMdd_HHmmss` on both platforms, so two exports within the same minute no longer
+collide. iOS: ReportJob/BackupExporter/CsvExporter in PotillusKit and their tests
+(ReportJobTests asserts the exact stamped name; the two exporter tests assert only
+the prefix/suffix). Android: PdfReportBuilder/BackupManager/CsvExporter and the
+ExportResult doc example; no Android test asserted these names, so none changed.
+
+DELIBERATELY LEFT UNCHANGED
+  - The Keychain/Keystore secret alias `potillus_prefs_key` (iOS SecretKeyProviding,
+    Android AppPreferences). It is never shown to a user, and renaming it would
+    orphan data already encrypted under the old alias.
+  - The internal screenshot fixtures — the fixed `jobName` in the androidTest
+    ReportExportTest and the committed `fastlane/report-pdf/potillus_report_<locale>.pdf`
+    inputs — which are tooling artifacts, not user-facing names.
+  - Historical CHANGELOG.md and this log's earlier entries, which accurately record
+    the prior convention and are left as a faithful history rather than rewritten.
+
 #### Correct stale build-tool versions in README  (patch -96)
 
 The "Build Infrastructure & Tooling" prose in README.md listed several tool versions

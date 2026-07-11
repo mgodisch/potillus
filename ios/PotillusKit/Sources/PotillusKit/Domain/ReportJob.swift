@@ -29,7 +29,7 @@ import Foundation
 // ReportJob – what the exported file is called
 // =============================================================================
 //
-// Android names its print job `potillus_report_20260603_1430.pdf`, and the print
+// Android names its print job `libellus_potionis_report_20260603_143000.pdf`, and the print
 // dialog offers that name verbatim as the default file name. The suffix is spelled
 // out for the same reason there: without it the dialog showed a bare stem that
 // looked unfinished and hid the file type.
@@ -41,10 +41,10 @@ import Foundation
 
 public enum ReportJob {
 
-    /// `potillus_report_yyyyMMdd_HHmm.pdf`, in `timeZone`'s wall clock.
+    /// `libellus_potionis_report_yyyyMMdd_HHmmss.pdf`, in `timeZone`'s wall clock.
     ///
     /// The formatter is pinned to `en_US_POSIX`. A locale-aware one would honour a
-    /// Japanese calendar and name the file `potillus_report_00080603_1430.pdf`, and
+    /// Japanese calendar and name the file `libellus_potionis_report_00080603_143000.pdf`, and
     /// an Arabic one would write the digits in Eastern Arabic numerals — neither of
     /// which sorts, and one of which is not even the same year.
     public static func fileName(date: Date, timeZone: TimeZone = .current) -> String {
@@ -52,8 +52,8 @@ public enum ReportJob {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.timeZone = timeZone
-        formatter.dateFormat = "yyyyMMdd_HHmm"
-        return "potillus_report_\(formatter.string(from: date)).pdf"
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return "libellus_potionis_report_\(formatter.string(from: date)).pdf"
     }
 
     /// Whether `data` is structurally a PDF: it begins `%PDF-` and ends `%%EOF`.

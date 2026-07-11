@@ -90,10 +90,10 @@ object PdfReportBuilder {
     // the locale from its Context (see formattingLocale()) and builds these
     // formatters per call. Only the locale-INDEPENDENT job-name formatter (a
     // purely numeric timestamp pattern) is safe to keep as a shared constant.
-    private val JOBNAME_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
+    private val JOBNAME_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault())
 
     /**
-     * Builds a job/file name for the report, e.g. `potillus_report_20260603_1430.pdf`.
+     * Builds a job/file name for the report, e.g. `libellus_potionis_report_20260603_143000.pdf`.
      *
      * Used as the print-job name; print services derive the saved PDF's file name
      * from it. Capture [Instant.now] once so name and content share a timestamp.
@@ -101,11 +101,11 @@ object PdfReportBuilder {
      * WHY THE EXPLICIT `.pdf` SUFFIX?
      *   The Android print framework offers the job name verbatim as the default
      *   file name in the system "Save as PDF" dialog. Without an extension the
-     *   dialog showed a bare name (e.g. `potillus_report_20260603_1430`), which
+     *   dialog showed a bare name (e.g. `libellus_potionis_report_20260603_143000`), which
      *   looked unfinished and hid the file type from the user. Appending `.pdf`
      *   makes the dialog pre-fill a complete, recognisable file name.
      */
-    fun jobName(now: Instant = Instant.now()): String = "potillus_report_${JOBNAME_FMT.format(now)}.pdf"
+    fun jobName(now: Instant = Instant.now()): String = "libellus_potionis_report_${JOBNAME_FMT.format(now)}.pdf"
 
     /**
      * Renders the full two-page report as a self-contained HTML string.

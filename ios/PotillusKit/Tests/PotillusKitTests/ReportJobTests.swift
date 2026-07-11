@@ -37,7 +37,7 @@ final class ReportJobTests: XCTestCase {
     func testTheNameCarriesTheDateAndTheSuffix() {
         XCTAssertEqual(
             ReportJob.fileName(date: moment, timeZone: TimeZone(identifier: "UTC")!),
-            "potillus_report_20260603_1430.pdf"
+            "libellus_potionis_report_20260603_143000.pdf"
         )
     }
 
@@ -45,7 +45,7 @@ final class ReportJobTests: XCTestCase {
     func testTheNameFollowsTheGivenZone() {
         XCTAssertEqual(
             ReportJob.fileName(date: moment, timeZone: TimeZone(identifier: "Europe/Berlin")!),
-            "potillus_report_20260603_1630.pdf"
+            "libellus_potionis_report_20260603_163000.pdf"
         )
     }
 

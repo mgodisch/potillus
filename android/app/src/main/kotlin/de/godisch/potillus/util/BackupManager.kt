@@ -144,7 +144,7 @@ object BackupManager {
     private const val MAX_BACKUP_BYTES = 10L * 1_024 * 1_024 // 10 MB
 
     /** Timestamp format for the backup file name. */
-    private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
+    private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault())
 
     // ── Export ────────────────────────────────────────────────────────────────
 
@@ -182,7 +182,7 @@ object BackupManager {
         // "exportedAt" field in the JSON root are guaranteed to match exactly,
         // even on devices where the clock is adjusted between two calls.
         val now = Instant.now()
-        val fileName = "potillus_backup_${FILE_FMT.format(now)}.json"
+        val fileName = "libellus_potionis_backup_${FILE_FMT.format(now)}.json"
 
         val root = JSONObject().apply {
             // Non-evaluated GPLv3 notice. JSON has no comment syntax, so the

@@ -194,15 +194,15 @@ public enum CsvExporter {
     /// Excel does not detect UTF-8 automatically; the BOM signals it so that ä,
     /// ö, ü survive without a manual import wizard. Other tools (LibreOffice,
     /// Python's csv module) handle it transparently.
-    /// The file name Android writes: `potillus_export_yyyyMMdd_HHmm.csv`.
+    /// The file name Android writes: `libellus_potionis_export_yyyyMMdd_HHmmss.csv`.
     ///
     /// Local wall-clock time, as there too. The user finds this file among their
     /// documents and thinks in the time their watch shows.
     public static func suggestedFileName(now: Date = Date()) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd_HHmm"
-        return "potillus_export_\(formatter.string(from: now)).csv"
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return "libellus_potionis_export_\(formatter.string(from: now)).csv"
     }
 
     /// The column captions Android's English resources carry, in column order.

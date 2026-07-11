@@ -69,7 +69,7 @@ import java.util.Locale
 object CsvExporter {
 
     /** Timestamp format for the file name ("yyyyMMdd_HHmm"). */
-    private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withZone(ZoneId.systemDefault())
+    private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault())
 
     /**
      * Exports all [entries] as a CSV file and saves it to the system Downloads folder
@@ -92,7 +92,7 @@ object CsvExporter {
         entries: List<ConsumptionEntry>,
         drinks: List<DrinkDefinition>,
     ): ExportResult? {
-        val fileName = "potillus_export_${FILE_FMT.format(Instant.now())}.csv"
+        val fileName = "libellus_potionis_export_${FILE_FMT.format(Instant.now())}.csv"
 
         // Resolve the localised column headers from string resources here (the
         // only step that needs a Context), then delegate the Android-free CSV

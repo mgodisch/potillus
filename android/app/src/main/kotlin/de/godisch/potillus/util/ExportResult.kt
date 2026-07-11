@@ -56,7 +56,7 @@ import android.net.Uri
  * message from string resources.
  *
  * @param fileName  Human-readable name of the created file
- *                  (e.g. "potillus_export_20250526_1430.csv"). Shown in the
+ *                  (e.g. "libellus_potionis_export_20250526_143000.csv"). Shown in the
  *                  share-sheet title and in the success banner.
  * @param uri       MediaStore `content://` URI of the created file.
  *                  Used to build the share [android.content.Intent] with

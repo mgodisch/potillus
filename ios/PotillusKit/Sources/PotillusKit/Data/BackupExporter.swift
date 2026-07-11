@@ -101,7 +101,7 @@ public struct BackupExporter: Sendable {
         return formatter.string(from: now)
     }
 
-    /// The file name Android writes: `potillus_backup_yyyyMMdd_HHmm.json`.
+    /// The file name Android writes: `libellus_potionis_backup_yyyyMMdd_HHmmss.json`.
     ///
     /// Copied exactly, underscores and all, so a user with both phones sees one
     /// convention and their backups sort together in the Files app.
@@ -113,8 +113,8 @@ public struct BackupExporter: Sendable {
     public static func suggestedFileName(now: Date = Date()) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd_HHmm"
-        return "potillus_backup_\(formatter.string(from: now)).json"
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return "libellus_potionis_backup_\(formatter.string(from: now)).json"
     }
 
     /// `AppSettings` as the file format spells it.

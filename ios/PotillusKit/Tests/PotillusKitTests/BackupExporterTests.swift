@@ -170,13 +170,13 @@ final class BackupExporterTests: XCTestCase {
         XCTAssertEqual(mapped.weightKg, 82.5, accuracy: 1e-9)
     }
 
-    /// Android writes `potillus_backup_20260102_2014.json`. Same convention, so a
+    /// Android writes `libellus_potionis_backup_20260102_201400.json`. Same convention, so a
     /// user with both phones finds their backups sorted together.
     func testTheFileNameFollowsAndroidsConvention() {
         let name = BackupExporter.suggestedFileName(
             now: Date(timeIntervalSince1970: 1_767_384_840)  // 2026-01-02 20:14 UTC
         )
-        XCTAssertTrue(name.hasPrefix("potillus_backup_"), name)
+        XCTAssertTrue(name.hasPrefix("libellus_potionis_backup_"), name)
         XCTAssertTrue(name.hasSuffix(".json"), name)
         XCTAssertFalse(name.contains("-"), "underscores, as on Android")
     }

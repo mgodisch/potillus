@@ -212,13 +212,13 @@ final class CsvExporterTests: XCTestCase {
 
     // ── File name and headers ────────────────────────────────────────────────
 
-    /// Android writes `potillus_export_20260102_2014.csv`. Same convention, so a
+    /// Android writes `libellus_potionis_export_20260102_201400.csv`. Same convention, so a
     /// spreadsheet built against one platform's export opens against the other's.
     func testTheFileNameFollowsAndroidsConvention() {
         let name = CsvExporter.suggestedFileName(
             now: Date(timeIntervalSince1970: 1_767_384_840)  // 2026-01-02 20:14 UTC
         )
-        XCTAssertTrue(name.hasPrefix("potillus_export_"), name)
+        XCTAssertTrue(name.hasPrefix("libellus_potionis_export_"), name)
         XCTAssertTrue(name.hasSuffix(".csv"), name)
     }
 
