@@ -332,8 +332,9 @@ listed individually below.
   Both publishing targets were still untested, so this latent abort had not surfaced.
 - Docs. A stale `deploy`-lane reference in SECURITY.md (the Play-credentials bullet)
   was corrected to the current `testing` / `production` Play-upload lanes, and the
-  illustrative versionCode in `fastlane/README.txt` was refreshed from the outdated
-  66 to the current 92. Tooling and documentation only; still no app-visible
+  illustrative versionCode in `fastlane/README.txt` — long outdated at 66 — was
+  replaced with a drift-free `<N>` placeholder so the example needs no edit on
+  future releases. Tooling and documentation only; still no app-visible
   behaviour change, so no versionCode bump and no store-note changes.
 
 ---
