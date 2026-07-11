@@ -1,7 +1,7 @@
 <!-- vim: set et ts=4:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
-Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 =============================================================================
 
 This file adopts the Contributor Covenant, version 2.1, for Libellus Potionis.

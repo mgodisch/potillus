@@ -1,7 +1,7 @@
 <!-- vim: set et ts=4:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
-Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 =============================================================================
 
 This program is free software: you can redistribute it and/or modify it under
@@ -38,6 +38,12 @@ alcohol consumption tracker designed to help users monitor, pace, and manage
 their drinking habits entirely offline. It requires absolutely no invasive
 device permissions—no camera, microphone, or location access—and completely
 operates without network connectivity.
+
+It runs on both **Android** and **iOS**. The two are separate native apps in
+this one repository — Kotlin/Jetpack Compose for Android, Swift/SwiftUI for iOS —
+that share the same design, the same feature set, and a common JSON backup format,
+so a backup exported on one platform imports on the other. Their behaviour is kept
+in lock-step by a shared set of golden test vectors.
 
 ### Key Features
 
@@ -124,11 +130,11 @@ and confirming that nothing is ever transmitted — is available in
 
 ### Platform Compatibility
 
-The app runs on **Android 11 (API 30) and newer**. API 30 is a deliberate
-floor: it is the lowest level at which the app can save CSV, PDF, and backup
-files to the public `Downloads` folder via `MediaStore` *without* requesting
-any runtime storage permissions, keeping the app's minimal-permission promise
-completely intact. 
+**Android.** The app runs on **Android 11 (API 30) and newer**. API 30 is a
+deliberate floor: it is the lowest level at which the app can save CSV, PDF, and
+backup files to the public `Downloads` folder via `MediaStore` *without*
+requesting any runtime storage permissions, keeping the app's minimal-permission
+promise completely intact. 
 
 While the system-level per-app language picker is restricted to API 33+,
 Libellus Potionis features a fully independent in-app language selector that
@@ -138,6 +144,14 @@ The application is actively maintained and verified across a modern device
 spectrum, including a Google Pixel 10 Pro running GrapheneOS (Android 16), a
 Fairphone 4 (Android 15), and a virtual Google Pixel 4 reference image (Android
 11).
+
+**iOS.** The iOS app runs on **iOS 17 and newer**, on iPhone. iOS 17 is a
+deliberate floor: it is where the SwiftUI Observation framework and String
+Catalog localisation the app relies on became available, while the pre-iOS-17
+installed base is a small, shrinking tail. The hardware floor that follows is
+iPhone XS (2018) and later. The same fully independent in-app language selector
+works across all supported versions, and the JSON backup format is shared with
+Android, so a backup moves between the two platforms unchanged.
 
 ### Accessibility
 
@@ -149,6 +163,10 @@ layout mirrors for right-to-left languages, and the under/over-limit palette is
 blue vs. red (not a red/green pair) so it is colour-blind distinguishable. A
 release-check gate (§13) keeps interactive icons from silently losing their
 labels.
+
+On iOS the same principles apply through the platform's own facilities: controls
+carry VoiceOver labels, text scales with Dynamic Type, the layout mirrors for
+right-to-left languages, and the same blue-vs-red limit palette is used.
 
 **No formal WCAG conformance level is claimed and no W3C conformance logo is
 used**, because a conformance claim requires meeting *all* criteria of a level
@@ -220,7 +238,7 @@ Changes are documented in
 ## License
 
 Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright
-&copy; 2026 Martin A. Godisch <[android@godisch.de](mailto:android@godisch.de)>
+&copy; 2026 Martin A. Godisch <[martin@godisch.de](mailto:martin@godisch.de)>
 
 The source code can be found at the [canonical repository at
 codeberg.org](https://codeberg.org/godisch/potillus/).

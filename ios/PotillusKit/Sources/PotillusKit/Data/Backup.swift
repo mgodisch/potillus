@@ -1,7 +1,7 @@
 // vim: set et ts=4:
 // =============================================================================
 // Libellus Potionis - Privacy-Friendly Alcohol Tracker
-// Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+// Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 // =============================================================================
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -315,7 +315,7 @@ public enum BackupWriter {
     /// it is and under what terms.
     public static let commentLines = [
         "Libellus Potionis - Privacy-Friendly Alcohol Tracker",
-        "Copyright (c) 2026 Martin A. Godisch <android@godisch.de>",
+        "Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>",
         "License: GNU General Public License v3 or later",
         "https://www.gnu.org/licenses/",
     ]

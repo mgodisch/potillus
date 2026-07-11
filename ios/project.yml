@@ -1,7 +1,7 @@
 # vim: set et ts=4:
 # =============================================================================
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
-# Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 # =============================================================================
 #
 # This program is free software: you can redistribute it and/or modify it under
@@ -117,6 +117,15 @@ targets:
         # one string is the whole Info.plist cost of the app lock. Shown to the user
         # in the Face ID permission dialog the first time the lock is armed.
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Unlock Libellus Potionis with Face ID."
+        # Export-compliance declaration. The app is fully offline and uses only the
+        # encryption built into the operating system — the Keychain (Security
+        # framework) for the app-lock secret, and SQLite for the database. It ships
+        # no proprietary cryptography and makes no network calls, so it uses no
+        # NON-exempt encryption; the honest, binding answer is "NO". Setting it here
+        # answers App Store Connect's prompt once for every build and unblocks a
+        # TestFlight build from "Missing Compliance". A regulatory declaration, not a
+        # UI shortcut — correct because the app genuinely has no non-exempt crypto.
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: "NO"
 
   PotillusTests:
     type: bundle.unit-test

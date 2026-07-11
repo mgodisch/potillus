@@ -1,7 +1,7 @@
 <!-- vim: set et ts=4:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
-Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 =============================================================================
 
 This program is free software: you can redistribute it and/or modify it under
@@ -36,6 +36,17 @@ promise: priorities may shift, and items may be reordered, deferred, or dropped.
 Many near-term items arose while working toward the OpenSSF Best Practices badges
 (project 13480); each notes its originating criterion in `code` font for
 traceability.
+
+## Current state: the iOS port
+
+Libellus Potionis is no longer Android-only. A native Swift/SwiftUI port lives in
+this same repository under `ios/`, sharing the data-interchange backup format (not
+live sync) and a single human-readable version with Android. It is feature-complete
+— the five screens, CSV and PDF export, the app lock, the twenty UI languages with
+localised report and plurals — and its behaviour is pinned to Android's by a shared
+set of golden test vectors. The design and the parity strategy are documented in
+[IOS_MIGRATION.md](IOS_MIGRATION.md). What is still open is App Store distribution
+(listing, screenshots, and the compliance declarations), tracked below.
 
 ## Blocking the OpenSSF silver badge (MUST)
 
@@ -268,13 +279,9 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   expanding its scope or permissions.
 - **Publish on the Google Play Store.** In addition to F-Droid, make the app
   available on Google Play so more users can find and install it.
-- **Port the app to iOS.** Bring Libellus Potionis to Apple devices, preserving
-  the same privacy-first, offline-first design and feature set. The concrete
-  strategy — a native Swift/SwiftUI app in this same repository, sharing a data
-  interchange format (not live sync) and a single human-readable version with
-  Android — is worked out in [IOS_MIGRATION.md](IOS_MIGRATION.md).
-- **Publish on the Apple App Store.** Once the iOS port is ready, distribute it
-  through the Apple App Store.
+- **Publish on the Apple App Store.** The iOS port is feature-complete (see
+  below); what remains before submission is App Store tooling — the store
+  listing, screenshots, and the export-compliance and privacy declarations.
 
 ## Explicitly out of scope (what the project will not do)
 

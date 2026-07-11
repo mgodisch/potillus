@@ -1,7 +1,7 @@
 <!-- vim: set et ts=4:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
-Copyright (c) 2026 Martin A. Godisch <android@godisch.de>
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
 =============================================================================
 
 This program is free software: you can redistribute it and/or modify it under
@@ -511,6 +511,39 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 0.79.0 base went stale; the archived pre-rebase work is equivalent in content.
 
 ### vX.Y.Z-ios (unreleased placeholder)
+
+#### Parity pass P1: headers, export compliance, iOS in the docs  (patch -82)
+
+First of a prioritised Android/iOS parity sweep. This patch clears the three P1
+items — the ones that block a release or misstate the project.
+
+CONTACT ADDRESSES. Every copyright/licence header now carries `martin@godisch.de`,
+on both platforms — 349 header lines — because a copyright line names the person, not
+a platform. The content contact addresses (security reports, privacy, governance,
+code of conduct, feedback, the F-Droid `AuthorEmail`) stay `android@godisch.de`, as
+project-wide maintainer contacts that are not iOS-specific. `ios@godisch.de` is
+reserved for genuinely iOS-specific content as it appears.
+
+EXPORT COMPLIANCE. `ios/project.yml` now sets
+`INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: "NO"`. App Store Connect blocks every
+submission (TestFlight first) until this is answered. The app is fully offline and
+uses only the OS's own encryption — Keychain for the app-lock secret, SQLite for the
+database — and ships no proprietary cryptography, so it uses no non-exempt encryption
+and the honest, binding answer is "NO". This is a regulatory declaration, correct
+because the app genuinely has no non-exempt crypto, not a prompt-silencing trick.
+
+iOS IN THE DOCUMENTATION. The port was still written up as a future goal.
+- `docs/ROADMAP.md`: the "Port the app to iOS" future item is replaced by a
+  "Current state: the iOS port" section stating it exists and is feature-complete;
+  only App Store distribution remains, reframed accordingly.
+- `README.md`: the intro now says the app runs on Android AND iOS (two native apps,
+  one repository, shared backup format); Platform Compatibility gains the iOS floor
+  (iOS 17+, iPhone XS and later); Accessibility gains the VoiceOver/Dynamic Type
+  counterpart to the Android TalkBack paragraph.
+
+Still to come in this sweep: P2 (security & compatibility docs, best-practices, the
+iOS declarative constraints incl. the iCloud-backup switch), P3 (fastlane/store
+tooling, reproducibility), P4 (the year calendar view).
 
 #### Add the About screen with the GRDB licence  (patch -81)
 
