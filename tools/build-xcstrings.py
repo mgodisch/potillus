@@ -226,6 +226,11 @@ def load_language(tag):
     return {**harvested, **module.MINE}
 
 
+# Product names shown verbatim, never translated. Kept in sync with the l10n
+# linter's ALLOWED_EXACT proper nouns.
+PROPER_NOUNS = {"GRDB.swift"}
+
+
 def build():
     en = android_map(ANDROID_EN)
     de = android_map(ANDROID_DE)
@@ -243,6 +248,13 @@ def build():
 
         # Pure-interpolation keys carry no words: source only, do not translate.
         if key in PURE_INTERP:
+            entry["shouldTranslate"] = False
+            strings[key] = entry
+            continue
+
+        # Proper nouns are the same in every language: source only. GRDB.swift is a
+        # product name shown verbatim in the About screen.
+        if key in PROPER_NOUNS:
             entry["shouldTranslate"] = False
             strings[key] = entry
             continue

@@ -27,6 +27,7 @@
 # Spanish translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Incluir en la copia de seguridad del dispositivo",
     "About": "Acerca de",
     "Version": "Versión",
     "Licence": "Licencia",

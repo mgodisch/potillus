@@ -29,6 +29,7 @@
 # keep their %-placeholders; pure-interpolation strings are absent (language-neutral).
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Inkluder i enhedssikkerhedskopi",
     "About": "Om",
     "Version": "Version",
     "Licence": "Licens",

@@ -48,11 +48,26 @@ requirements are met — including the threat model and trust boundaries — is 
   microphone, location, contacts, or runtime storage permissions. It collects
   only the data you enter.
 - **On-device, sandboxed storage.** Your drinks, log entries, and settings live
-  in the app's private, sandboxed storage, protected at rest by Android's
-  file-based storage encryption. The preferences store is additionally sealed
-  with an AES-256-GCM key held in the hardware-backed Android Keystore.
-- **Optional biometric lock.** You can enable a fingerprint lock as a
-  convenience gate against casual physical access to an unlocked device.
+  in the app's private, sandboxed storage, protected at rest by the operating
+  system's file-based storage encryption. On **Android**, the preferences store
+  is additionally sealed with an AES-256-GCM key held in the hardware-backed
+  Android Keystore. On **iOS**, the same preferences are sealed with an
+  AES-256-GCM key held in the Keychain (a `ThisDeviceOnly` key, so it never leaves
+  the device), and the database is kept out of the device backup by default (see
+  "Backup control" below).
+- **Optional biometric lock.** You can enable a lock as a convenience gate against
+  casual physical access to an unlocked device — a fingerprint lock on Android,
+  Face ID or Touch ID (with device-passcode fallback) on iOS.
+- **App-switcher privacy.** On both platforms the app hides its own contents in
+  the app switcher / recents preview by default, so a glance at the running-apps
+  list does not reveal the diary; a setting lets you turn this off.
+- **Backup control.** On **Android**, `android:allowBackup="false"` removes the
+  app from Google's automatic cloud and device-transfer backup entirely. On
+  **iOS**, the consumption log is excluded from every device backup (both iCloud
+  and a local computer backup) by default, with an opt-in for users who want the
+  log restored onto a new phone. Either way, personal data does not leave the
+  device through an automatic backup unless you choose otherwise; the supported
+  way to move data is the user-initiated JSON export.
 - **No tracking.** No analytics, telemetry, crash reporting, or advertising.
 
 **What users cannot expect (out of scope / known limits):**

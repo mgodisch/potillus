@@ -70,8 +70,13 @@ public final class AppDatabase: Sendable {
     /// Read-only access for callers that only observe or query.
     public var reader: any DatabaseReader { writer }
 
+    /// The on-disk path, or `nil` for an in-memory database. Exposed so the
+    /// iCloud-backup exclusion can be read and set on the file (see BackupExclusion).
+    public let path: String?
+
     /// Opens (and migrates) the database at `path`.
     public init(path: String) throws {
+        self.path = path
         writer = try DatabaseQueue(path: path)
         try Self.migrator.migrate(writer)
     }
@@ -87,12 +92,19 @@ public final class AppDatabase: Sendable {
             for: .applicationSupportDirectory, in: .userDomainMask,
             appropriateFor: nil, create: true
         )
-        return try AppDatabase(path: directory.appendingPathComponent("potillus.sqlite").path)
+        let dbPath = directory.appendingPathComponent("potillus.sqlite").path
+        let database = try AppDatabase(path: dbPath)
+        // Re-assert the device-backup exclusion at every launch. A file write can
+        // reset the attribute, so it must be renewed; the stored preference (default:
+        // excluded, matching Android's allowBackup="false") is the durable record.
+        try? BackupExclusion.applyPreference(databasePath: dbPath)
+        return database
     }
 
     /// An empty in-memory database, for tests. Never touches the file system.
     public init(inMemory: Bool) throws {
         precondition(inMemory, "Use init(path:) for on-disk databases")
+        self.path = nil
         writer = try DatabaseQueue()
         try Self.migrator.migrate(writer)
     }

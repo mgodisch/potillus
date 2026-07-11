@@ -27,6 +27,7 @@
 # Brazilian Portuguese translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Incluir no backup do dispositivo",
     "About": "Sobre",
     "Version": "Versão",
     "Licence": "Licença",

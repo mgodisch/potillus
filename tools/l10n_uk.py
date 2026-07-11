@@ -27,6 +27,7 @@
 # Ukrainian translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Включити в резервну копію пристрою",
     "About": "Про застосунок",
     "Version": "Версія",
     "Licence": "Ліцензія",

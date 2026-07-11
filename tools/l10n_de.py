@@ -30,6 +30,7 @@
 # here: they carry no words and are the same in every language.
 MINE_DE = {
     # About screen (patch -81)
+    "Include in device backup": "In Gerätesicherung einschließen",
     "About": "Über",
     "Version": "Version",
     "Licence": "Lizenz",

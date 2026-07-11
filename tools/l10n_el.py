@@ -27,6 +27,7 @@
 # Greek translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Συμπερίληψη στο αντίγραφο ασφαλείας συσκευής",
     "About": "Σχετικά",
     "Version": "Έκδοση",
     "Licence": "Άδεια",

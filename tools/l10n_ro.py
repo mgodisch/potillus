@@ -27,6 +27,7 @@
 # Romanian translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Include în backupul dispozitivului",
     "About": "Despre",
     "Version": "Versiune",
     "Licence": "Licență",

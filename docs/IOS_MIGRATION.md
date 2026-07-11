@@ -512,6 +512,47 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Parity P2a: keep the consumption log out of device backups  (patch -83)
+
+Android declares `android:allowBackup="false"`, removing the whole app from Google's
+automatic backup. iOS has no blanket switch, so this adds the per-file counterpart:
+the database `potillus.sqlite` — which holds the consumption entries — is excluded
+from every device backup by default, with a Settings switch to opt in.
+
+DEVICE BACKUP, NOT iCLOUD. The one attribute this uses, `isExcludedFromBackup`, is
+defined by Apple as excluding a file from ALL backups of app data — the automatic
+iCloud backup AND the local encrypted Finder/iTunes backup over a cable. The switch
+is named "Include in device backup" and the docs say "device backup", never "iCloud",
+because naming it after iCloud alone would understate the cable path.
+
+WHAT IS PROTECTED. Only the database file, which carries the entries (the sensitive
+data) alongside the drinks list. The settings in `prefs.bin` are sealed with a
+`ThisDeviceOnly` Keychain key a restored backup cannot decrypt anyway, so they need
+no exclusion; the drinks list travelling with the database is not a privacy concern.
+
+WHY A MARKER AND A RE-APPLY. Apple warns that some file writes reset
+`isExcludedFromBackup` back to false. The database is written constantly, so a
+once-only set would silently decay. So the user's choice lives in a UserDefaults
+marker (a plain "include in backup?" boolean — not health data, so UserDefaults is
+fine), and `AppDatabase.makeDefault` re-asserts the preference on every launch via
+`BackupExclusion.applyPreference`. The marker decouples "what the user wants" from
+the attribute, which can be reset out from under us: an opted-in file is never
+re-excluded, and an excluded file whose flag got reset is renewed. Ten tests cover
+this with a real temp file and an isolated UserDefaults suite.
+
+The switch is iOS-only by design: Android's `allowBackup="false"` is a hard,
+absolute manifest guarantee with no per-file granularity and no cloud/device backup
+to opt into, so a switch there would only weaken a closed door. Both platforms
+protect the data by default; they just use the mechanism each platform offers.
+
+DOCS. SECURITY.md now lists the iOS at-rest, app-lock, app-switcher, and backup
+protections next to Android's; PRIVACY.md gains an "Automatic device backups"
+section stating both platforms exclude personal data by default.
+
+Also in this patch: "GRDB.swift" is marked source-only in the string catalogue (a
+product name, never translated), and the new switch label is translated into all
+twenty languages.
+
 #### Parity pass P1: headers, export compliance, iOS in the docs  (patch -82)
 
 First of a prioritised Android/iOS parity sweep. This patch clears the three P1

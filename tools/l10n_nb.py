@@ -27,6 +27,7 @@
 # Norwegian Bokmål translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Ta med i enhetssikkerhetskopi",
     "About": "Om",
     "Version": "Versjon",
     "Licence": "Lisens",

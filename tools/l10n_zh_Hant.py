@@ -27,6 +27,7 @@
 # Traditional Chinese translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "包含在裝置備份中",
     "About": "關於",
     "Version": "版本",
     "Licence": "授權",

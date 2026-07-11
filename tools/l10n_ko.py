@@ -27,6 +27,7 @@
 # Korean translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "기기 백업에 포함",
     "About": "정보",
     "Version": "버전",
     "Licence": "라이선스",

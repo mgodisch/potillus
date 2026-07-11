@@ -98,6 +98,22 @@ Once a file leaves the app this way, it is under your control and the control of
 whatever apps or people you subsequently share it with; this policy no longer
 governs it. The developer is never involved in and never receives these exports.
 
+## Automatic device backups
+
+Beyond the files you export yourself, mobile platforms can copy an app's data into
+an automatic device backup. Libellus Potionis keeps your data out of these by
+default:
+
+- On **Android**, the app declares `android:allowBackup="false"`, so it is excluded
+  from Google's automatic cloud and device-transfer backup entirely.
+- On **iOS**, your consumption log is excluded from every device backup — both the
+  iCloud backup and a local computer (Finder/iTunes) backup — by default. A setting
+  ("Include in device backup") lets you opt in if you would rather your log be
+  restored automatically onto a new phone.
+
+Either way, the supported and recommended way to move your data to a new device is
+the JSON backup you export yourself, described above.
+
 ## Permissions
 
 The app requests a single, optional permission:

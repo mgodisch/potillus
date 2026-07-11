@@ -27,6 +27,7 @@
 # Swedish translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Inkludera i enhetssäkerhetskopia",
     "About": "Om",
     "Version": "Version",
     "Licence": "Licens",

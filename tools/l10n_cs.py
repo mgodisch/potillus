@@ -27,6 +27,7 @@
 # Czech translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Zahrnout do zálohy zařízení",
     "About": "O aplikaci",
     "Version": "Verze",
     "Licence": "Licence",

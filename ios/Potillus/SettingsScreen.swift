@@ -66,6 +66,10 @@ struct SettingsScreen: View {
 
     /// The outcome of the last import, shown once and dismissed.
     @State private var importSummary: String?
+    /// Mirrors the database file's `isExcludedFromBackup` attribute. Not an
+    /// AppSettings field: the attribute on the file is the single source of truth,
+    /// so this is loaded from it on appear and written straight back on change.
+    @State private var includeInDeviceBackup = false
     @State private var backupFailure: String?
 
     /// Asked when the lock toggle is drawn, to decide whether it may be armed.
@@ -373,18 +377,36 @@ extension SettingsScreen {
                 "Show in app switcher",
                 isOn: bind(\.allowScreenshots, set: { $0.allowScreenshots = $1 })
             )
+
+            // The consumption log is kept out of the device backup by default
+            // (Android's allowBackup="false" equivalent). This lets a user opt back
+            // in, so a new phone restored from backup keeps the diary. The choice is
+            // stored as a preference and re-applied each launch; see BackupExclusion.
+            Toggle(Loc.string("Include in device backup", locale: locale), isOn: $includeInDeviceBackup)
+                .onChange(of: includeInDeviceBackup) { _, include in
+                    if let path = environment.database.path {
+                        try? BackupExclusion.setIncludesInBackup(include, databasePath: path)
+                    }
+                }
         } header: {
             Text(Loc.string("Security", locale: locale))
         } footer: {
-            // Two footers would be tidier but a Section takes one. Both switches are
+            // Two footers would be tidier but a Section takes one. All switches are
             // explained here, in the order they appear.
             Text(
                 """
                 When app lock is on, Libellus Potionis asks to unlock after 30 \
                 seconds in the background. When "Show in app switcher" is off, the \
-                app's preview is hidden while it is in the background.
+                app's preview is hidden while it is in the background. When "Include \
+                in device backup" is off, your consumption log is kept out of every \
+                device backup — both iCloud and a computer backup — so it never \
+                leaves the device; the JSON backup remains the way to move data to a \
+                new device.
                 """
             )
+        }
+        .task {
+            includeInDeviceBackup = BackupExclusion.includesInBackup()
         }
     }
 

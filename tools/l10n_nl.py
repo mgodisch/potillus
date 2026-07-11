@@ -27,6 +27,7 @@
 # Dutch translations for the iOS-only and reworded strings.
 MINE = {
     # About screen (patch -81)
+    "Include in device backup": "Opnemen in apparaatback-up",
     "About": "Over",
     "Version": "Versie",
     "Licence": "Licentie",
