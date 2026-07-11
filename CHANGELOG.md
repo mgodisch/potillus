@@ -264,6 +264,42 @@ listed individually below.
   arrow off the row; it is now weighted, centred and ellipsized. Layout only, no
   behavioural or data change.
 
+- Publishing tooling verifies the signer key (ninth QA round, release-tooling
+  focus). `make push-playstore` and `make push-codeberg` previously checked only
+  that a release artifact existed, not that it was signed — and for the AAB the
+  unsigned and signed outputs share the name `app-release.aab`, so an unsigned
+  bundle would have been uploaded and rejected by Play only after the full
+  metadata round-trip. Both targets now prove the signature and pin the signer
+  before doing anything: `push-playstore` runs `jarsigner -verify` on the bundle
+  (reading its "jar verified." verdict, because the exit code alone passes an
+  unsigned archive) and `keytool -printcert` to read the signer certificate;
+  `push-codeberg` requires the signed `app-release.apk` name and runs
+  `apksigner verify` / `--print-certs`. Both compare the certificate SHA-256
+  against the fingerprint published in SECURITY.md, so an artifact signed with
+  the wrong key is refused. The signing tools run non-interactively and are found
+  on `PATH`, else from `JAVA_HOME` / `ANDROID_HOME`.
+- `push-codeberg` verifies the tag is pushed, not merely created locally.
+  Codeberg's release API resolves the release against a server-side tag, so a
+  purely local tag made the create call fail late; the target now checks the tag
+  on the same remote `make push` uses (the branch upstream, else `origin`) and
+  fails fast with an actionable message.
+- Release-tooling hygiene. The `command -v` tool guards in `push-playstore`,
+  `push-codeberg` and `bestpractices-json` regained their actionable "install X"
+  messages (a bare `command -v` failure gave no hint), and the redundant early
+  `command -v bundle` in `push-playstore` was dropped in favour of the friendly
+  `bundle check` guard. A stale reference to a non-existent `docs/PLAY_STORE.md`
+  was removed from `fastlane/Fastfile` and `fastlane/README.md`.
+- Docs. SECURITY.md now states key custody per channel accurately: the maintainer
+  holds the app-signing key for the Codeberg / F-Droid APK, and — under Google
+  Play App Signing — the upload key for Play, while Google holds Play's own
+  app-signing key. The certificate-fingerprint verification note clarifies that
+  the published fingerprint identifies the F-Droid / Codeberg APK signer and that
+  a Play-delivered APK carries Google's re-signing key. `release-check.sh` gained
+  a section (14 / 14) that fails the build unless SECURITY.md carries exactly one
+  canonical signing-key fingerprint, since the publishing targets read the pin
+  from there. Tooling and documentation only; no app-visible behaviour changed,
+  so no versionCode bump and no store-note changes.
+
 ---
 
 ## v0.80.0

@@ -105,7 +105,7 @@ platform :android do
   desc 'default: the release waits in the Play Console for you to review and'
   desc 'publish manually, rather than going live automatically. NOTE: a new'
   desc 'personal developer account cannot publish to production until the'
-  desc 'closed-testing gate is cleared (12 testers / 14 days -- docs/PLAY_STORE.md §5).'
+  desc 'closed-testing gate is cleared (12 testers / 14 days).'
   desc 'Options (all optional):'
   desc '  track:<name>   Play track (default: production).'
   desc '  status:<name>  release status draft|completed|halted|inProgress'

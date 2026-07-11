@@ -697,10 +697,42 @@ push:
 #
 # The credential path mirrors the Appfile: SUPPLY_JSON_KEY if set, else
 # fastlane/play-store-credentials.json.
+# Expected release signing-key fingerprint (SHA-256 of the DER signing
+# certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
+# "Verifying releases" section rather than duplicated here, so the pin and the
+# document that publishes it to users can never drift. release-check.sh §14
+# guards that SECURITY.md carries exactly one such token in canonical form, so a
+# reformat is caught at build time instead of at push time. The same key signs
+# the Play upload bundle (its role as the Play upload key) and the Codeberg/
+# F-Droid release APK, so both publishing targets pin against this one value.
+SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1)
+
 PLAYSTORE_AAB := android/app/build/outputs/bundle/release/app-release.aab
 push-playstore:
 	test -f "$(PLAYSTORE_AAB)" || { echo "push-playstore: release AAB not found at '$(PLAYSTORE_AAB)' -- build it first with 'make release' or 'make -C android bundle'. This target does NOT build it." >&2; exit 1; }
-	command -v bundle
+	# Prove the bundle is SIGNED and signed with the EXPECTED key before any upload.
+	# Two independent, non-interactive checks:
+	#   (1) jarsigner proves a valid v1/JAR signature is present. Its OUTPUT, not
+	#       its exit code, is authoritative: `jarsigner -verify` returns 0 even for
+	#       an UNSIGNED archive without -strict, so a bare exit-code test would wave
+	#       an unsigned bundle through. -strict is deliberately avoided -- the
+	#       Android upload key is self-signed, which -strict flags as a chain error
+	#       and would fail a correct bundle -- so the "jar verified." verdict line
+	#       is the robust signal.
+	#   (2) keytool pins the SIGNER to $(SIGNING_KEY_FINGERPRINT) (from SECURITY.md),
+	#       so a bundle signed with the wrong key is refused. keytool prints the
+	#       certificate SHA-256 as "SHA256: 75:06:..." (colon/upper); it is
+	#       normalized to bare lowercase hex to compare. Exactly one signer is
+	#       expected; anything else aborts rather than trusting the first.
+	@fp="$(SIGNING_KEY_FINGERPRINT)"; test -n "$$fp" || { echo "push-playstore: could not read a signing-key fingerprint from SECURITY.md." >&2; exit 1; }
+	js="$${JARSIGNER:-$$(command -v jarsigner || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}jarsigner")}"
+	command -v "$$js" >/dev/null 2>&1 || { echo "push-playstore: 'jarsigner' not found -- install a JDK (Debian: apt install openjdk-21-jdk-headless) or set JARSIGNER / JAVA_HOME." >&2; exit 1; }
+	"$$js" -verify "$(PLAYSTORE_AAB)" 2>&1 | grep -q '^jar verified\.' || { echo "push-playstore: '$(PLAYSTORE_AAB)' is not signed (jarsigner reported no 'jar verified.'). Configure android/keystore.properties and rebuild with 'make -C android bundle'." >&2; exit 1; }
+	kt="$${KEYTOOL:-$$(command -v keytool || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}keytool")}"
+	command -v "$$kt" >/dev/null 2>&1 || { echo "push-playstore: 'keytool' not found -- install a JDK or set KEYTOOL / JAVA_HOME." >&2; exit 1; }
+	got="$$("$$kt" -printcert -jarfile "$(PLAYSTORE_AAB)" 2>/dev/null | grep -oiE 'SHA-?256:[[:space:]]*[0-9A-F:]+' | sed -E 's/.*SHA-?256:[[:space:]]*//I; s/://g' | tr 'A-F' 'a-f' | sort -u)"
+	n=$$(printf '%s\n' "$$got" | grep -c . || true); test "$$n" -eq 1 || { echo "push-playstore: expected exactly one signer certificate in '$(PLAYSTORE_AAB)', found $$n -- refusing to upload." >&2; exit 1; }
+	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)" || { echo "push-playstore: signer key mismatch for '$(PLAYSTORE_AAB)' -- got '$$got', expected '$(SIGNING_KEY_FINGERPRINT)' (SECURITY.md). Refusing to upload a bundle signed with the wrong key." >&2; exit 1; }
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
 	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
 	( cd fastlane && bundle exec fastlane testing )
@@ -730,16 +762,38 @@ CODEBERG_TOKEN_FILE := fastlane/codeberg-credentials.txt
 RELEASE_SBOM  := android/app/build/outputs/sbom/libellus-potionis-sbom.json
 VERSION_CODE  := $(shell grep -oE 'versionCode *= *[0-9]+' android/app/build.gradle.kts | grep -oE '[0-9]+' | head -1)
 push-codeberg:
-	command -v curl
-	command -v python3
+	@command -v curl >/dev/null 2>&1 || { echo "push-codeberg: 'curl' not found -- install it (Debian: apt install curl)." >&2; exit 1; }
+	@command -v python3 >/dev/null 2>&1 || { echo "push-codeberg: 'python3' not found -- install it (Debian: apt install python3)." >&2; exit 1; }
 	@test -f "$(CODEBERG_TOKEN_FILE)" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' not found -- create it containing your Codeberg access token (Settings > Applications, repository read+write scope). It is git-ignored." >&2; exit 1; }
 	token="$$(tr -d '[:space:]' < "$(CODEBERG_TOKEN_FILE)")"
 	@test -n "$$token" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' is empty." >&2; exit 1; }
 	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
+	# The Codeberg release API resolves the release against a tag that must exist
+	# ON THE SERVER; a purely local tag would make the create call fail late with a
+	# cryptic error. Verify the tag is pushed to the same remote `make push` uses
+	# (the current branch's upstream, else origin), so the guard matches its
+	# fail-fast promise instead of relying on the operator to remember `make push`.
+	@remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1)"; remote="$${remote:-origin}"; git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null 2>&1 || { echo "push-codeberg: tag 'v$(VERSION)' is not on remote '$$remote' yet -- push it first with 'make push'. Codeberg's release API needs the tag server-side." >&2; exit 1; }
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
-	apk="$$(find android/app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' 2>/dev/null | sort | tail -1)"
-	@test -n "$$apk" || { echo "push-codeberg: no release APK under android/app/build/outputs/apk/release -- build it first with 'make release'. This target does NOT build it." >&2; exit 1; }
+	# Require the SIGNED release APK by name: Gradle writes the unsigned output as
+	# app-release-unsigned.apk and the signed one as app-release.apk, so demanding
+	# the signed name is the first, dependency-free signal that a key was used --
+	# an unsigned APK must never reach the Codeberg release F-Droid downloads from.
+	apk="android/app/build/outputs/apk/release/app-release.apk"
+	@test -f "$$apk" || { echo "push-codeberg: signed release APK not found at '$$apk' ('app-release-unsigned.apk' means no signing key was configured) -- configure android/keystore.properties and run 'make release'. This target does NOT build it." >&2; exit 1; }
+	# Cryptographically verify the APK and pin its signer to the fingerprint in
+	# SECURITY.md. apksigner is non-interactive: `verify` exits non-zero unless the
+	# APK verifies, and `--print-certs` reports the signer certificate SHA-256 as
+	# bare lowercase hex -- exactly the form SECURITY.md records. Located on PATH,
+	# else from the newest build-tools under ANDROID_HOME (mirroring android/Makefile).
+	aps="$${APKSIGNER:-$$(command -v apksigner || ls -1 "$${ANDROID_HOME:-$$HOME/android-sdk}"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)}"
+	@test -n "$$aps" -a -x "$$aps" || { echo "push-codeberg: 'apksigner' not found -- install Android build-tools or set APKSIGNER / ANDROID_HOME." >&2; exit 1; }
+	"$$aps" verify "$$apk" >/dev/null 2>&1 || { echo "push-codeberg: '$$apk' fails apksigner signature verification." >&2; exit 1; }
+	@fp="$(SIGNING_KEY_FINGERPRINT)"; test -n "$$fp" || { echo "push-codeberg: could not read a signing-key fingerprint from SECURITY.md." >&2; exit 1; }
+	got="$$("$$aps" verify --print-certs "$$apk" 2>/dev/null | grep -oiE 'SHA-?256 digest:[[:space:]]*[0-9a-f]{64}' | grep -oiE '[0-9a-f]{64}' | tr 'A-F' 'a-f' | sort -u)"
+	n=$$(printf '%s\n' "$$got" | grep -c . || true); test "$$n" -eq 1 || { echo "push-codeberg: expected exactly one signer certificate in '$$apk', found $$n -- refusing." >&2; exit 1; }
+	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)" || { echo "push-codeberg: signer key mismatch for '$$apk' -- got '$$got', expected '$(SIGNING_KEY_FINGERPRINT)' (SECURITY.md)." >&2; exit 1; }
 	@test -f "$(RELEASE_SBOM)" || { echo "push-codeberg: SBOM '$(RELEASE_SBOM)' not found -- build it first with 'make release' (or 'make -C android sbom')." >&2; exit 1; }
 	# 1) Create the release for the existing tag; capture its numeric id. The body
 	#    is JSON-encoded from the en-US release-notes file (handles quotes/newlines).
@@ -774,7 +828,7 @@ BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
 # _justification), sorted, so the committed snapshot diffs meaningfully. Review
 # `git diff .bestpractices.json` before committing.
 bestpractices-json:
-	command -v curl
+	@command -v curl >/dev/null 2>&1 || { echo "bestpractices-json: 'curl' not found -- install it (Debian: apt install curl)." >&2; exit 1; }
 	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 -c 'import json,sys; d=json.load(sys.stdin); a={k[:-7] for k,v in d.items() if k.endswith("_status") and str(v).strip() in {"Met","Unmet","N/A"}}; o={k:v for k,v in d.items() if (k.endswith("_status") and k[:-7] in a) or (k.endswith("_justification") and k[:-14] in a)}; json.dump(dict(sorted(o.items())), open(".bestpractices.json","w",encoding="utf-8"), indent=2, ensure_ascii=False); open(".bestpractices.json","a",encoding="utf-8").write(chr(10)); print("bestpractices-json: %d criteria written"%len(a), file=sys.stderr)'
 	@echo "bestpractices-json: review 'git diff .bestpractices.json' before committing."
 

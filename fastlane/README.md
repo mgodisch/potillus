@@ -75,7 +75,7 @@ publish manually, rather than going live automatically. NOTE: a new
 
 personal developer account cannot publish to production until the
 
-closed-testing gate is cleared (12 testers / 14 days -- docs/PLAY_STORE.md §5).
+closed-testing gate is cleared (12 testers / 14 days).
 
 Options (all optional):
 

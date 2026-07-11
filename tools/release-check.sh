@@ -317,7 +317,7 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 13 — VERSION CONSISTENCY"
+    section "1 / 14 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version
 
@@ -487,7 +487,7 @@ CHANGELOG version must bump versionCode by exactly 1"
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 13 — CHANGELOG ENTRY"
+    section "2 / 14 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -544,7 +544,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 13 — ROOM DATABASE MIGRATIONS"
+    section "3 / 14 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -615,7 +615,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 13 — LOCALE CONSISTENCY"
+    section "4 / 14 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -820,7 +820,7 @@ es-419 es-ES es-US sw sv-SE ta-IN te-IN th tr-TR uk ur vi zu "
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 13 — SOURCE CODE DOCUMENTATION"
+    section "5 / 14 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -964,7 +964,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 13 — LOG CALL GUARDS"
+    section "6 / 14 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -1016,7 +1016,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 13 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 14 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -1078,7 +1078,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 13 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 14 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -1129,7 +1129,7 @@ check_backup_version() {
 #   no balance check can satisfy, and they are never reformatted anyway).
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 13 — MARKDOWN SYNTAX"
+    section "9 / 14 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then
@@ -1187,7 +1187,7 @@ check_markdown_syntax() {
 #   full_description.txt    ≤ 4000
 #   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
 check_metadata_lengths() {
-    section "10 / 13 — STORE METADATA LENGTH LIMITS"
+    section "10 / 14 — STORE METADATA LENGTH LIMITS"
 
     # python3 is already a prerequisite (see §5); reuse it for correct,
     # locale-independent character counting.
@@ -1253,7 +1253,7 @@ PYEOF
 #   that re-adds the in-APK SBOM task.
 # =============================================================================
 check_reproducible_build_hygiene() {
-    section "11 / 13 — REPRODUCIBLE-BUILD HYGIENE"
+    section "11 / 14 — REPRODUCIBLE-BUILD HYGIENE"
 
     # The in-APK SBOM was wired via a `GenerateSbomAsset` task; its absence is
     # the signal that the SBOM stays out of the APK. (cyclonedxDirectBom, the
@@ -1292,7 +1292,7 @@ check_reproducible_build_hygiene() {
 #   it cannot produce false failures in environments that lack the inputs.
 # =============================================================================
 check_third_party_notices() {
-    section "12 / 13 — THIRD-PARTY NOTICE FILES"
+    section "12 / 14 — THIRD-PARTY NOTICE FILES"
 
     local sbom="app/build/outputs/sbom/libellus-potionis-sbom.json"
     if [[ ! -f "$sbom" ]]; then
@@ -1377,7 +1377,7 @@ PYEND
 #   regress. It skips gracefully (info) where python3 is unavailable and warns
 #   only on a real finding.
 check_accessibility_labels() {
-    section "13 / 13 — ACCESSIBILITY LABELS"
+    section "13 / 14 — ACCESSIBILITY LABELS"
 
     if ! command -v python3 >/dev/null 2>&1; then
         info "python3 not found — skipping accessibility-label check"
@@ -1475,6 +1475,50 @@ PYEND
 }
 
 # =============================================================================
+# SECTION 14 – SIGNING-KEY FINGERPRINT (SECURITY.md ↔ release tooling)
+# =============================================================================
+# WHY THIS MATTERS:
+#   The publishing targets `push-playstore` and `push-codeberg` pin the release
+#   signer to the SHA-256 fingerprint recorded in SECURITY.md ("Verifying
+#   releases"), extracting it with `grep -oiE '\b[0-9a-f]{64}\b' | head -1`. That
+#   extraction is only well-defined when SECURITY.md carries EXACTLY ONE such
+#   64-character lowercase-hex token in canonical form. If a future edit drops
+#   it, adds a second one, or reformats it (spaces, colons, uppercase), the pin
+#   would silently read the wrong value — or nothing — and that would surface
+#   only at push time. This check moves the failure forward to build time.
+#
+#   The fingerprint is deliberately NOT duplicated into the Makefile: SECURITY.md
+#   is the single source that also publishes it to users, so the pin and the
+#   document cannot drift. This section guards the one invariant that coupling
+#   relies on.
+# =============================================================================
+check_signing_key_fingerprint() {
+    section "14 / 14 — SIGNING-KEY FINGERPRINT"
+
+    local security="../SECURITY.md"
+    if [[ ! -f "$security" ]]; then
+        info "SECURITY.md not found ($security) — fingerprint check skipped"
+        pass "Signing-key fingerprint check is gated on SECURITY.md being present"
+        return
+    fi
+
+    # Canonical form the release tooling greps for: a bare 64-char lowercase-hex
+    # token (SHA-256 of the DER signing certificate). Count them; the pin needs
+    # exactly one. The `|| true` guards the pipeline under `set -euo pipefail`
+    # (grep exits non-zero when there is no match, which is a legitimate count 0).
+    local count
+    count=$(grep -oiE '\b[0-9a-f]{64}\b' "$security" | grep -c . || true)
+
+    if [[ "$count" -eq 1 ]]; then
+        pass "SECURITY.md carries exactly one canonical signing-key fingerprint"
+    elif [[ "$count" -eq 0 ]]; then
+        fail "SECURITY.md has no 64-hex signing-key fingerprint — push-playstore/push-codeberg cannot pin the signer (see the 'Verifying releases' section)"
+    else
+        fail "SECURITY.md has $count 64-hex tokens; the release tooling's 'head -1' pin is ambiguous — keep exactly one canonical signing-key fingerprint"
+    fi
+}
+
+# =============================================================================
 #  OPT-IN — CODE COVERAGE (Kover)
 # =============================================================================
 #   Runs the build-breaking Kover verification (:app:koverVerify), whose bounds
@@ -1558,6 +1602,7 @@ main() {
     check_reproducible_build_hygiene
     check_third_party_notices
     check_accessibility_labels
+    check_signing_key_fingerprint
     check_coverage
 
     # ── Final summary ─────────────────────────────────────────────────────────
