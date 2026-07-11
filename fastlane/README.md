@@ -23,7 +23,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Capture the in-app Play-Store screenshots (all store locales) via screengrab.
 
-Prefer `make screenshots`, which also cleans the status bar (Demo Mode)
+Prefer `make screenshots-android`, which also cleans the status bar (Demo Mode)
 
 and renders the PDF report pages as screenshots 07/08.
 
@@ -41,7 +41,7 @@ short/full descriptions, feature graphics, screenshots and changelogs
 
 from fastlane/metadata/android/). Build the bundle first with
 
-`make -C android bundle` (or `make release`); the Makefile `push-playstore`
+`make -C android bundle` (or `make release-android`); the Makefile `push-playstore`
 
 target guards that prerequisite -- this lane does NOT build it.
 

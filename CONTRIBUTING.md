@@ -607,7 +607,7 @@ Before tagging a new version:
       "Verifying releases").
 - [ ] Publish the release on Codeberg from the signed tag and attach the CycloneDX
       SBOM (`android/app/build/outputs/sbom/libellus-potionis-sbom.json`, built by
-      `make release`/`make bundle`) as a release asset, so every released version is
+      `make release-android`/`make bundle`) as a release asset, so every released version is
       accompanied by its software bill of materials.
 
 To avoid forgetting the signature, configure Git to sign annotated tags

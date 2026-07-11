@@ -27,20 +27,20 @@
 #
 # Currently this defines a single lane, `screenshots`, that captures the six
 # in-app Play-Store screenshots through Fastlane screengrab (configuration in
-# Screengrabfile). It is intended to be invoked by the `make screenshots` target
+# Screengrabfile). It is intended to be invoked by the `make screenshots-android` target
 # (android/Makefile), which wraps it with Android Demo Mode set-up/tear-down,
 # device-date pinning and PDF-report rendering (screenshots 07/08).
 #
 # Running the lane on its own is possible (`bundle exec fastlane screenshots`),
 # but then the status bar is NOT cleaned and the PDF pages are NOT produced —
-# use `make screenshots` for the complete, Play-ready asset set.
+# use `make screenshots-android` for the complete, Play-ready asset set.
 # =============================================================================
 
 default_platform(:android)
 
 platform :android do
   desc 'Capture the in-app Play-Store screenshots (all store locales) via screengrab.'
-  desc 'Prefer `make screenshots`, which also cleans the status bar (Demo Mode)'
+  desc 'Prefer `make screenshots-android`, which also cleans the status bar (Demo Mode)'
   desc 'and renders the PDF report pages as screenshots 07/08.'
   lane :screenshots do
     # `capture_android_screenshots` is the modern alias of the `screengrab`
@@ -152,9 +152,9 @@ end
 platform :ios do
   desc 'Capture the App Store screenshots (all store locales) via snapshot.'
   desc 'Requires a UI-test scheme that drives the app through the six screens;'
-  desc 'configuration lives in Snapfile. Prefer `make -C ios screenshots`, which'
+  desc 'configuration lives in Snapfile. Prefer `make screenshots-ios`, which'
   desc 'pins the device date and renders the two PDF-report pages, mirroring the'
-  desc 'Android `make screenshots` flow.'
+  desc 'Android `make screenshots-android` flow.'
   lane :screenshots do
     # `capture_ios_screenshots` is the modern alias of the `snapshot` action. It
     # reads Snapfile, builds the UI-test target, and runs it across every

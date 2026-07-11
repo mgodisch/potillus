@@ -512,6 +512,41 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Split asset make targets by platform  (patch -99)
+
+The root Makefile's store-asset and release targets were named as if the project
+had one platform. With the iOS port they now carry a platform suffix, so the two
+tracks read unambiguously and an iOS counterpart has a place to live.
+
+RENAMED (all Android-specific, root Makefile only):
+  release → release-android, screenshots → screenshots-android,
+  feature-graphics → feature-graphics-android, store-assets → store-assets-android,
+  and the four helpers they call: screenshots-pdf, screenshots-demo-off,
+  feature-graphics-existing and _cascade-feature-graphics (each + "-android").
+  Every internal `$(MAKE) …` caller, the `.PHONY` list, the help-text block and the
+  diagnostic echo labels were updated to match. The nested `$(MAKE) -C android
+  release bundle` was left untouched: those are the android/ sub-Makefile's own
+  targets, already namespaced by the sub-directory (decision: root targets only).
+
+ADDED:
+  screenshots-ios — the iOS counterpart entry point, driven by the fastlane `ios
+  screenshots` lane (fastlane/Snapfile). It is a self-documenting placeholder: it
+  cannot capture until a `PotillusUITests` UI-test target (plus the fastlane
+  SnapshotHelper) is authored with the app target on the Mac, so the recipe prints
+  exactly what is missing and exits non-zero rather than pretending to work. The
+  real capture target is a separate, larger follow-up.
+
+DOCS:
+  CONTRIBUTING.md and the fastlane Fastfile (source of the generated
+  fastlane/README.md, updated in step) now name the -android targets; the ios lane
+  description points at `make screenshots-ios`. .bestpractices.json was updated too
+  (its `make release` mention), on the understanding that the authoritative badge
+  answer is edited on bestpractices.dev and re-synced. Historical CHANGELOG.md
+  entries were left as an accurate record. iOS release/feature-graphic instructions
+  were deliberately NOT invented: the App Store has no feature graphic, and the iOS
+  release/upload flow is still undecided — only the accurate screenshots-ios entry
+  point was added. This change is tooling/naming only; no app behaviour changes.
+
 #### Fix stale app name in manifest locale comment  (patch -98)
 
 A developer comment in AndroidManifest.xml described the per-app language picker's

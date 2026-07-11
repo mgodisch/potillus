@@ -35,20 +35,23 @@
 #    Convenience
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
 #                   split out of `android`                        [needs a device]
-#      release      fresh screenshots + feature graphics (no new report PDFs),
-#                   then the signed release APK, AAB and SBOM      [needs a device]
+#      release-android  fresh screenshots + feature graphics (no new report PDFs),
+#                       then the signed release APK, AAB and SBOM  [needs a device]
 #      install      copy the freshly built debug APK to the local install path
-#    Store assets
-#      store-assets       full set in one go: screenshots + report-pdfs, then
-#                         feature graphics rendered exactly once       [device]
-#      screenshots        capture the six in-app shots 01..06 per locale, then
-#                         refresh the feature graphics                 [device]
-#      screenshots-pdf    rasterize report pages 07..08 from the per-locale PDFs
-#      feature-graphics           (re)build every locale's featureGraphic*.png
-#      feature-graphics-existing  refresh only the graphics already on disk
+#    Store assets (Android -> Play Store)
+#      store-assets-android  full set in one go: screenshots + report-pdfs, then
+#                            feature graphics rendered exactly once      [device]
+#      screenshots-android   capture the six in-app shots 01..06 per locale, then
+#                            refresh the feature graphics                [device]
+#      screenshots-pdf-android    rasterize report pages 07..08 from per-locale PDFs
+#      feature-graphics-android   (re)build every locale's featureGraphic*.png
+#      feature-graphics-existing-android  refresh only graphics already on disk
 #      report-pdfs        semi-automatic per-locale PDF export -> 07..08, then
 #                         refresh the feature graphics                 [device]
 #      rokkitt-bold       bake the static Rokkitt Bold used by the badges
+#    Store assets (iOS -> App Store)
+#      screenshots-ios    capture the App Store screenshots via the iOS Simulator
+#                         [needs a Mac + the PotillusUITests UI-test target]
 #    Packaging
 #      tgz          release source tarball (exclusions derived from .gitignore)
 #      push         git push + tags
@@ -78,7 +81,7 @@ SHELL := /bin/bash
 # repository that builds two platforms should not silently pick one of them.
 .DEFAULT_GOAL := help
 
-# ── Play-Store screenshot pipeline (see the `screenshots` target) ─────────────
+# ── Play-Store screenshot pipeline (see the `screenshots-android` target) ─────────────
 # Locales captured: EVERY store locale under the metadata tree. Each locale dir
 # carries a changelogs/ sub-dir, so globbing those and stripping the suffix
 # yields exactly the locale set (and skips the non-locale screenshots.html file,
@@ -94,14 +97,14 @@ SCREENSHOT_LOCALES := $(sort $(notdir $(patsubst %/changelogs,%,$(wildcard fastl
 # AUTHORITATIVE PIN: the capture suite pins this perspective IN-APP
 # (DayResolver.clockOverride, set by ScreenshotClock.pin()), so it holds on ANY
 # device — including a locked production phone where the `adb shell date` pin in
-# the `screenshots` recipe is silently rejected. This SCREENSHOT_DATE must stay
+# the `screenshots-android` recipe is silently rejected. This SCREENSHOT_DATE must stay
 # equal to ScreenshotClock.SCREENSHOT_DATE and must not fall before the fixture's
 # last logged day (2026-06-30 is a deliberately dry "today", one day after the
-# last 2026-06-29 entry); the `screenshots` preflight guard enforces both.
+# last 2026-06-29 entry); the `screenshots-android` preflight guard enforces both.
 SCREENSHOT_DATE  := 2026-06-30
 
-# Display geometry forced onto the capture device (see the `screenshots` recipe;
-# reset again by `screenshots-demo-off`).
+# Display geometry forced onto the capture device (see the `screenshots-android` recipe;
+# reset again by `screenshots-demo-off-android`).
 #
 # WHY FORCE IT AT ALL?
 #   Google Play rejects phone screenshots whose long side exceeds twice the short
@@ -122,7 +125,7 @@ SCREENSHOT_DATE  := 2026-06-30
 SCREENSHOT_SIZE    := 1428x2856
 SCREENSHOT_DENSITY := 640
 # Inputs the drift guard cross-checks against SCREENSHOT_DATE (see the guard in
-# the `screenshots` recipe): the in-app capture-date pin and the demo fixture
+# the `screenshots-android` recipe): the in-app capture-date pin and the demo fixture
 # whose last logged day the "Today" screenshot must land on.
 SCREENSHOT_PIN_KT := android/app/src/androidTest/kotlin/de/godisch/potillus/screenshot/ScreenshotClock.kt
 DEMO_BACKUP_JSON  := fastlane/demo-backup.json
@@ -179,7 +182,7 @@ help:
 android:
 	$(MAKE) check-l10n-parity
 	$(MAKE) -C android debug unit-test lint check-guides
-	$(MAKE) feature-graphics-existing
+	$(MAKE) feature-graphics-existing-android
 	$(MAKE) install
 
 # ── device-tests ── the on-device instrumentation tests (Compose UI / Espresso),
@@ -191,14 +194,14 @@ device-tests:
 
 # ── release ── fresh in-app screenshots (01..06) + feature graphics WITHOUT
 # re-exporting the report PDFs (07/08 are left as-is), then build the signed
-# release APK, the release AAB and the shared SBOM. `screenshots` recaptures
+# release APK, the release AAB and the shared SBOM. `screenshots-android` recaptures
 # every locale's in-app shots and refreshes the feature graphics but does NOT
 # touch the report pages 07/08 or their source PDFs; the android `release` and
 # `bundle` targets then produce the release APK and AAB. Both depend on the same
 # `$(SBOM)` file target, so the CycloneDX SBOM is generated exactly once. Needs a
 # device (for the capture).
-release:
-	$(MAKE) screenshots
+release-android:
+	$(MAKE) screenshots-android
 	$(MAKE) -C android release bundle
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
@@ -238,7 +241,7 @@ install: ../downloads/potillus-$(VERSION)-debug.apk
 #   might read the raw device clock; it needs an emulator or a rooted userdebug
 #   build and is skipped (|| true) on a locked production device WITHOUT affecting
 #   the captured screenshots.
-screenshots:
+screenshots-android:
 	$(MAKE) -C android prereq
 	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
 	test "$${DEV_COUNT:-0}" -ne 0
@@ -251,8 +254,8 @@ screenshots:
 	#    an actionable message instead — mirrors the pdftoppm pre-flight
 	#    checks in screenshots-pdf. `bundle check` only verifies
 	#    the bundle is satisfied (it does not load fastlane), so it is cheap.
-	command -v bundle >/dev/null 2>&1 || { echo "screenshots: 'bundle' (Ruby Bundler) not found -- install Ruby + Bundler 4.0.15, then run 'cd fastlane && bundle install'."; exit 1; }
-	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots: fastlane gems are not installed in fastlane -- run 'cd fastlane && bundle install' (gems vendor into fastlane/.vendor; Bundler 4.0.15 is pinned in fastlane/Gemfile.lock)."; exit 1; }
+	command -v bundle >/dev/null 2>&1 || { echo "screenshots-android: 'bundle' (Ruby Bundler) not found -- install Ruby + Bundler 4.0.15, then run 'cd fastlane && bundle install'."; exit 1; }
+	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots-android: fastlane gems are not installed in fastlane -- run 'cd fastlane && bundle install' (gems vendor into fastlane/.vendor; Bundler 4.0.15 is pinned in fastlane/Gemfile.lock)."; exit 1; }
 	# 0b) Perspective-pin consistency guard (cheap; runs before the expensive build).
 	#     The captured perspective is pinned IN-APP (ScreenshotClock.pin() sets
 	#     DayResolver.clockOverride), so it no longer depends on the device date.
@@ -267,17 +270,17 @@ screenshots:
 	last_entry="$$(grep -oE '"logicalDate"[[:space:]]*:[[:space:]]*"[0-9]{4}-[0-9]{2}-[0-9]{2}"' "$(DEMO_BACKUP_JSON)" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | sort | tail -n1)"
 	newest="$$(printf '%s\n%s\n' "$$last_entry" "$(SCREENSHOT_DATE)" | sort | tail -n1)"
 	if [ "$$pin_kt" != "$(SCREENSHOT_DATE)" ]; then
-		echo "screenshots: capture-date pins disagree -- Makefile SCREENSHOT_DATE='$(SCREENSHOT_DATE)' vs ScreenshotClock.SCREENSHOT_DATE='$$pin_kt'. Align the two and re-run."
+		echo "screenshots-android: capture-date pins disagree -- Makefile SCREENSHOT_DATE='$(SCREENSHOT_DATE)' vs ScreenshotClock.SCREENSHOT_DATE='$$pin_kt'. Align the two and re-run."
 		exit 1
 	fi
 	if [ "$$newest" != "$(SCREENSHOT_DATE)" ]; then
-		echo "screenshots: capture date '$(SCREENSHOT_DATE)' is BEFORE the demo fixture's last logged day '$$last_entry' -- seeded entries would fall on a future day the pinned Today cannot show. Move SCREENSHOT_DATE to on/after '$$last_entry'."
+		echo "screenshots-android: capture date '$(SCREENSHOT_DATE)' is BEFORE the demo fixture's last logged day '$$last_entry' -- seeded entries would fall on a future day the pinned Today cannot show. Move SCREENSHOT_DATE to on/after '$$last_entry'."
 		exit 1
 	fi
 	# 1) Build the app + instrumentation APKs that screengrab installs.
 	$(MAKE) -C android screenshot-apks
 	# 2) Demo Mode is torn down no matter how this recipe exits.
-	trap '$(MAKE) screenshots-demo-off' EXIT
+	trap '$(MAKE) screenshots-demo-off-android' EXIT
 	# 3) Prepare the device: wake, disable animations, pin clock (and, best-effort,
 	#    the device date — the capture PERSPECTIVE itself is already pinned in-app).
 	adb shell svc power stayon true
@@ -285,7 +288,7 @@ screenshots:
 	# Force an exactly-2:1 panel so the captures satisfy Play's aspect rule
 	# without any post-processing (see SCREENSHOT_SIZE / SCREENSHOT_DENSITY).
 	# Both overrides are sticky and are undone by the EXIT trap's
-	# `screenshots-demo-off`, which runs even on Ctrl-C or a failed capture.
+	# `screenshots-demo-off-android`, which runs even on Ctrl-C or a failed capture.
 	adb shell wm size $(SCREENSHOT_SIZE)
 	adb shell wm density $(SCREENSHOT_DENSITY)
 	adb shell wm dismiss-keyguard
@@ -331,7 +334,7 @@ screenshots:
 	#    Gemfile) — install it once with `cd fastlane && bundle install`. It runs
 	#    in a SUBSHELL so the `cd fastlane` does not leak into the following steps
 	#    or the EXIT trap (which must run from the repository root, otherwise
-	#    `$(MAKE) screenshots-demo-off` finds no such target).
+	#    `$(MAKE) screenshots-demo-off-android` finds no such target).
 	( cd fastlane && bundle exec fastlane screenshots )
 	# 7) Enforce the Google Play phone-screenshot requirements on the in-app shots.
 	#    Only 01..06 are (re)captured here; the report pages 07/08 are owned by
@@ -341,23 +344,23 @@ screenshots:
 	# 8) Cascade: fresh 01..06 feed the feature graphics (their 01_today input just
 	#    changed), so rebuild every locale's now-stale graphic ("renew screenshots
 	#    -> renew feature graphics"). Routed through the once-per-run guard so a
-	#    combined run (`make screenshots report-pdfs`, or `store-assets`) renders
+	#    combined run (`make screenshots-android report-pdfs`, or `store-assets-android`) renders
 	#    the graphics only ONCE, not after each producer. feature-graphics is
 	#    file-timestamp driven, so unchanged locales are a no-op regardless.
-	$(MAKE) _cascade-feature-graphics
+	$(MAKE) _cascade-feature-graphics-android
 
 # Leave Android Demo Mode and restore the normal device state. Each step is
 # tolerant (|| true) so tear-down never fails the build; invoked from the
-# `screenshots` EXIT trap.
+# `screenshots-android` EXIT trap.
 #
-# The display overrides deserve special mention: `screenshots` forces the panel
+# The display overrides deserve special mention: `screenshots-android` forces the panel
 # to $(SCREENSHOT_SIZE) / $(SCREENSHOT_DENSITY) so every capture is exactly 2:1
 # (see the recipe). Those overrides are STICKY — they survive the make run, a
 # reboot and, on a physical phone, the rest of the day. Resetting them here (and
 # not at the end of the recipe) means a Ctrl-C or a failed capture leaves the
 # device usable, exactly like the Demo Mode teardown. `wm size|density reset`
 # restores the panel's native values and is a no-op when nothing was overridden.
-screenshots-demo-off:
+screenshots-demo-off-android:
 	adb shell am broadcast -a com.android.systemui.demo -e command exit || true
 	adb shell settings put global sysui_demo_allowed 0 || true
 	adb shell wm size reset || true
@@ -386,7 +389,7 @@ screenshots-demo-off:
 # `-singlefile` makes pdftoppm write exactly <root>.png (no page-number suffix).
 #
 # DEPENDENCY-DRIVEN PIPELINE: the report pages and feature graphics are proper
-# FILE targets, so `make screenshots-pdf` / `make feature-graphics` rebuild ONLY
+# FILE targets, so `make screenshots-pdf-android` / `make feature-graphics-android` rebuild ONLY
 # the locales whose inputs actually changed:
 #
 #   $(REPORT_PDF_DIR)/potillus_report_<locale>.pdf (source PDF; named exactly)
@@ -398,7 +401,7 @@ screenshots-demo-off:
 #        v  render-feature-graphic.py         +-- $(FG_SHARED_DEPS)
 #   $(META)/<loc>/images/featureGraphic.png <-'
 #
-# So dropping a newer source PDF makes `make feature-graphics` re-rasterize that
+# So dropping a newer source PDF makes `make feature-graphics-android` re-rasterize that
 # locale's report page AND re-render its feature graphic, with no extra step.
 
 # Per-locale source PDF, named EXACTLY for the store locale. No fallback: 07/08
@@ -429,7 +432,7 @@ define report_page_rule
 $(META)/$(1)/images/phoneScreenshots/$(2)_report_page_$(3).png: $(call report_src,$(1))
 	@$(call require-pdftoppm,screenshots-pdf)
 	@mkdir -p "$$(@D)"
-	@echo "screenshots-pdf: $(1) p$(3) <- $$(notdir $$<)"
+	@echo "screenshots-pdf-android: $(1) p$(3) <- $$(notdir $$<)"
 	@pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f $(3) -l $(3) "$$<" "$$(@:.png=)"
 endef
 
@@ -439,7 +442,7 @@ define feature_graphic_rule
 $(META)/$(1)/images/featureGraphic.png $(META)/$(1)/images/featureGraphic-4K.png &: $(META)/$(1)/feature-graphic.txt $(META)/$(1)/images/phoneScreenshots/01_today.png $(META)/$(1)/images/phoneScreenshots/07_report_page_1.png $(FG_SHARED_DEPS)
 	@$(call require-rsvg,feature-graphics)
 	@$(call require-pillow,feature-graphics)
-	@echo "feature-graphics: $(1)"
+	@echo "feature-graphics-android: $(1)"
 	@python3 $(FG_RENDERER) $(1)
 endef
 
@@ -453,18 +456,18 @@ FEATURE_GRAPHIC_PNGS += $(META)/$(1)/images/featureGraphic.png $(META)/$(1)/imag
 endef
 $(foreach loc,$(SCREENSHOT_LOCALES),$(eval $(call potillus_pipeline_rules,$(loc))))
 
-# Device screenshots (01..06) come from `make screenshots` (screengrab on a
+# Device screenshots (01..06) come from `make screenshots-android` (screengrab on a
 # device) and have no per-file build rule of their own. If any is MISSING when a
 # feature graphic needs it, capture the whole set automatically — screengrab
 # always grabs every locale at once, so a missing shot means the set is
 # incomplete and one full recapture is the correct repair. This triggers ONLY on
 # a truly absent file, never on a merely stale one: staleness of device
 # screenshots is not reliably detectable (the project's long-standing reason for
-# capturing them by hand), but absence is unambiguous. Because `screenshots`
-# itself now cascades into `feature-graphics` (see that target), the graphics are
+# capturing them by hand), but absence is unambiguous. Because `screenshots-android`
+# itself now cascades into `feature-graphics-android` (see that target), the graphics are
 # refreshed as part of the same capture.
 #
-# WHY THE MARKER FILE. If this recipe ran `$(MAKE) screenshots` directly, Make
+# WHY THE MARKER FILE. If this recipe ran `$(MAKE) screenshots-android` directly, Make
 # would fire it once PER missing target — up to 14 full recaptures when a new
 # locale set is empty. Every missing screenshot instead order-only-depends on the
 # single marker $(SCREENSHOTS_CAPTURED_MARKER), whose recipe runs the one capture
@@ -476,8 +479,8 @@ SCREENSHOTS_CAPTURED_MARKER := android/app/build/.screenshots-captured
 
 $(SCREENSHOTS_CAPTURED_MARKER):
 	$(call require-device,screenshots)
-	@echo "feature-graphics: device screenshots missing — capturing all locales via 'make screenshots'."
-	$(MAKE) screenshots
+	@echo "feature-graphics-android: device screenshots missing — capturing all locales via 'make screenshots-android'."
+	$(MAKE) screenshots-android
 	@mkdir -p "$(@D)"
 	@touch "$@"
 
@@ -487,30 +490,30 @@ $(SCREENSHOTS_CAPTURED_MARKER):
 # loudly rather than let a downstream renderer read a missing input.
 define device_screenshot_sentinel
 $(META)/%/images/phoneScreenshots/$(1).png: | $$(SCREENSHOTS_CAPTURED_MARKER)
-	@test -f "$$@" || { echo "feature-graphics: $$@ still missing after 'make screenshots' — capture did not produce it." >&2; exit 1; }
+	@test -f "$$@" || { echo "feature-graphics-android: $$@ still missing after 'make screenshots-android' — capture did not produce it." >&2; exit 1; }
 endef
 $(foreach shot,01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_settings,$(eval $(call device_screenshot_sentinel,$(shot))))
 
 # Aggregators: build every locale's outputs but ONLY the stale ones (real file
 # prerequisites -> timestamp-driven; an up-to-date tree is a no-op).
-screenshots-pdf: $(REPORT_PAGE_PNGS)
-feature-graphics: $(FEATURE_GRAPHIC_PNGS)
+screenshots-pdf-android: $(REPORT_PAGE_PNGS)
+feature-graphics-android: $(FEATURE_GRAPHIC_PNGS)
 # Refresh ONLY the feature graphics already on disk (used by the `debug` build,
 # which captures no screenshots): $(wildcard) never lists a locale without a
 # featureGraphic.png yet, so this can never trip the 01_today guard above.
-feature-graphics-existing: $(wildcard $(META)/*/images/featureGraphic.png)
+feature-graphics-existing-android: $(wildcard $(META)/*/images/featureGraphic.png)
 
 # ── Once-per-run feature-graphics cascade ─────────────────────────────────────
-# `screenshots` (producer of 01..06) and `report-pdfs` (producer of 07..08) each
+# `screenshots-android` (producer of 01..06) and `report-pdfs` (producer of 07..08) each
 # must refresh the feature graphics afterwards — but when BOTH run in one
-# invocation (the `store-assets` orchestrator, or `make screenshots report-pdfs`)
+# invocation (the `store-assets-android` orchestrator, or `make screenshots-android report-pdfs`)
 # the graphics must render only ONCE, not after each producer. They are separate
 # interactive recipes in separate recursive $(MAKE) subprocesses, so they cannot
 # share make's in-process target dedup; a filesystem STAMP coordinates them
-# instead. The first cascade in a run renders `feature-graphics` and drops the
-# stamp; a second cascade in the SAME run sees the stamp and skips. `store-assets`
+# instead. The first cascade in a run renders `feature-graphics-android` and drops the
+# stamp; a second cascade in the SAME run sees the stamp and skips. `store-assets-android`
 # creates the stamp up front (so neither producer renders early) and does the
-# single real render at the end; a lone `make screenshots` or `make report-pdfs`
+# single real render at the end; a lone `make screenshots-android` or `make report-pdfs`
 # finds no stamp and renders exactly once itself. The stamp lives under
 # android/app/build/ (git-ignored, cleared by `make clean`) and — because
 # feature-graphics is file-timestamp driven anyway — the worst case if a stale
@@ -519,21 +522,21 @@ CASCADE_FG_STAMP := android/app/build/.feature-graphics-cascaded
 
 # Internal: render feature-graphics unless this run already did (or was told to
 # defer by store-assets). Not for direct use.
-_cascade-feature-graphics:
+_cascade-feature-graphics-android:
 	if [ -f "$(CASCADE_FG_STAMP)" ]; then \
-	    echo "feature-graphics: already refreshed in this run — skipping duplicate cascade."; \
+	    echo "feature-graphics-android: already refreshed in this run — skipping duplicate cascade."; \
 	else \
 	    mkdir -p "$(dir $(CASCADE_FG_STAMP))"; \
 	    touch "$(CASCADE_FG_STAMP)"; \
-	    $(MAKE) feature-graphics; \
+	    $(MAKE) feature-graphics-android; \
 	fi
 
 # ── store-assets ── refresh the COMPLETE store-image set in one go: capture the
 # in-app screenshots (01..06), export+rasterize the report pages (07..08), then
 # render every feature graphic EXACTLY once. Use this instead of running
-# `screenshots` and `report-pdfs` separately when you want the whole set rebuilt;
+# `screenshots-android` and `report-pdfs` separately when you want the whole set rebuilt;
 # both need a device, and report-pdfs is human-in-the-loop ("Save as PDF").
-store-assets:
+store-assets-android:
 	# Defer both producers' cascades, then do the single real render at the end.
 	# The EXIT trap removes the stamp even if a producer aborts, so a stale stamp
 	# can never suppress the cascade in a LATER run (belt-and-suspenders — the
@@ -542,10 +545,27 @@ store-assets:
 	@mkdir -p "$(dir $(CASCADE_FG_STAMP))"
 	trap 'rm -f "$(CASCADE_FG_STAMP)"' EXIT
 	@touch "$(CASCADE_FG_STAMP)"          # defer: neither producer renders early
-	$(MAKE) screenshots
+	$(MAKE) screenshots-android
 #	$(MAKE) report-pdfs
 	@rm -f "$(CASCADE_FG_STAMP)"           # arm the single real render
-	$(MAKE) _cascade-feature-graphics
+	$(MAKE) _cascade-feature-graphics-android
+
+# ── screenshots-ios ── capture the App Store screenshots on the iOS Simulator.
+# The iOS counterpart to `screenshots-android`, driven by the fastlane `ios
+# screenshots` lane (its configuration lives in fastlane/Snapfile). It CANNOT run
+# yet: the capture is performed by a `PotillusUITests` UI-test target (plus the
+# fastlane SnapshotHelper) that drives the app through the six screens and calls
+# snapshot("01_...") -- and that target is authored with the app target on the
+# Mac and does not exist here. This stub names the entry point and fails loudly
+# until then, rather than silently pretending to work. See fastlane/Snapfile and
+# docs/IOS_MIGRATION.md.
+screenshots-ios:
+	@echo "screenshots-ios: not yet available." >&2
+	@echo "  The PotillusUITests UI-test target (scheme 'PotillusUITests' + the" >&2
+	@echo "  fastlane SnapshotHelper) must be added to the Xcode project first;" >&2
+	@echo "  it is authored with the app target on the Mac. See fastlane/Snapfile" >&2
+	@echo "  and docs/IOS_MIGRATION.md." >&2
+	@exit 1
 
 # =============================================================================
 # REPORT PDF EXPORT  (semi-automatic, human-in-the-loop)
@@ -553,7 +573,7 @@ store-assets:
 
 # Semi-automatic per-locale PDF report export (feeds screenshots-pdf).
 #
-#   The 07/08 report pages are rasterized by `screenshots-pdf` from per-locale
+#   The 07/08 report pages are rasterized by `screenshots-pdf-android` from per-locale
 #   source PDFs `$(REPORT_PDF_DIR)/potillus_report_<locale>.pdf`. Exporting those
 #   for 21 locales is tedious, so this target drives the app's export ONCE per
 #   locale and leaves only the system "Save as PDF" dialog to you — with the file
@@ -568,7 +588,7 @@ store-assets:
 #
 #   It is a HUMAN-IN-THE-LOOP target: the ReportExportTest is skipped in every
 #   other run (a `-e reportExport true` Assume guard), so ordinary `make test` and
-#   `make screenshots` never open a dialog. Run it explicitly, on a device/emulator
+#   `make screenshots-android` never open a dialog. Run it explicitly, on a device/emulator
 #   whose print stack offers "Save as PDF".
 #
 #   INSTR is the instrumentation component: the debug applicationId
@@ -625,16 +645,16 @@ report-pdfs:
 	adb shell svc power stayon false || true
 	# 5) Rasterize the two report pages 07/08 from the freshly pulled per-locale
 	#    PDFs. This is report-pdfs' OWN half of the screenshot set (01..06 belong
-	#    to `make screenshots`); screenshots-pdf is file-timestamp driven, so only
+	#    to `make screenshots-android`); screenshots-pdf is file-timestamp driven, so only
 	#    locales whose PDF actually changed are re-rendered.
-	$(MAKE) screenshots-pdf
+	$(MAKE) screenshots-pdf-android
 	# 6) Validate the report pages against Play's phone-screenshot rules.
 	python3 tools/validate-screenshots.py --report $(SCREENSHOT_LOCALES)
 	# 7) Cascade: fresh 07/08 feed the feature graphics (their 07_report_page_1
 	#    input just changed), so rebuild every now-stale graphic ("renew PDFs ->
 	#    renew 07/08 -> renew feature graphics"). Via the once-per-run guard, so a
 	#    combined screenshots+report-pdfs run renders the graphics only ONCE.
-	$(MAKE) _cascade-feature-graphics
+	$(MAKE) _cascade-feature-graphics-android
 
 # =============================================================================
 # FONTS
@@ -717,14 +737,14 @@ push:
 # never triggers a rebuild of the AAB or SBOM. It FAILS FAST if a precondition
 # is missing — the signed AAB, the bundled fastlane, or the Play service-account
 # key — so the push only runs against artifacts you built explicitly
-# (`make release`, or `make -C android bundle`) with credentials in place. Build
+# (`make release-android`, or `make -C android bundle`) with credentials in place. Build
 # the AAB yourself first; this target purely uploads it.
 #
 # The credential path mirrors the Appfile: SUPPLY_JSON_KEY if set, else
 # fastlane/play-store-credentials.json.
 PLAYSTORE_AAB := android/app/build/outputs/bundle/release/app-release.aab
 push-playstore:
-	test -f "$(PLAYSTORE_AAB)" || { echo "push-playstore: release AAB not found at '$(PLAYSTORE_AAB)' -- build it first with 'make release' or 'make -C android bundle'. This target does NOT build it." >&2; exit 1; }
+	test -f "$(PLAYSTORE_AAB)" || { echo "push-playstore: release AAB not found at '$(PLAYSTORE_AAB)' -- build it first with 'make release-android' or 'make -C android bundle'. This target does NOT build it." >&2; exit 1; }
 	command -v bundle
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
 	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
@@ -738,7 +758,7 @@ push-playstore:
 #
 # Like push-playstore, this has NO build prerequisites and never builds: it FAILS
 # FAST if the tag, the APK, the SBOM, the release notes, curl/python3 or the
-# Codeberg token file are missing. Build the artifacts first (`make release`) and
+# Codeberg token file are missing. Build the artifacts first (`make release-android`) and
 # push the tag first (`git tag -s vX.Y.Z ... && make push`); this only publishes.
 #
 # The Codeberg access token is READ FROM $(CODEBERG_TOKEN_FILE) (Settings ->
@@ -764,8 +784,8 @@ push-codeberg:
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
 	apk="$$(find android/app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' 2>/dev/null | sort | tail -1)"
-	@test -n "$$apk" || { echo "push-codeberg: no release APK under android/app/build/outputs/apk/release -- build it first with 'make release'. This target does NOT build it." >&2; exit 1; }
-	@test -f "$(RELEASE_SBOM)" || { echo "push-codeberg: SBOM '$(RELEASE_SBOM)' not found -- build it first with 'make release' (or 'make -C android sbom')." >&2; exit 1; }
+	@test -n "$$apk" || { echo "push-codeberg: no release APK under android/app/build/outputs/apk/release -- build it first with 'make release-android'. This target does NOT build it." >&2; exit 1; }
+	@test -f "$(RELEASE_SBOM)" || { echo "push-codeberg: SBOM '$(RELEASE_SBOM)' not found -- build it first with 'make release-android' (or 'make -C android sbom')." >&2; exit 1; }
 	# 1) Create the release for the existing tag; capture its numeric id. The body
 	#    is JSON-encoded from the en-US release-notes file (handles quotes/newlines).
 	body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
@@ -846,7 +866,7 @@ ios: check-headers check-makefile check-swift-tests check-swift-symbols \
      check-report-paper check-l10n-parity check-l10n check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
-	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
+	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots-android`
 	# target learned this first; see the note beside its `cd fastlane`.
 	( cd ios/PotillusKit && swift test )
 	command -v xcodebuild
@@ -984,4 +1004,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
