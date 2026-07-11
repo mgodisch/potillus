@@ -283,12 +283,12 @@ listed individually below.
   purely local tag made the create call fail late; the target now checks the tag
   on the same remote `make push` uses (the branch upstream, else `origin`) and
   fails fast with an actionable message.
-- Release-tooling hygiene. The `command -v` tool guards in `push-playstore`,
-  `push-codeberg` and `bestpractices-json` regained their actionable "install X"
-  messages (a bare `command -v` failure gave no hint), and the redundant early
-  `command -v bundle` in `push-playstore` was dropped in favour of the friendly
-  `bundle check` guard. A stale reference to a non-existent `docs/PLAY_STORE.md`
-  was removed from `fastlane/Fastfile` and `fastlane/README.md`.
+- Release-tooling hygiene. The redundant early `command -v bundle` in
+  `push-playstore` was dropped (the `bundle check` guard already covers it), and
+  a stale reference to a non-existent `docs/PLAY_STORE.md` was removed from
+  `fastlane/Fastfile` and `fastlane/README.md`. Tool availability is checked with
+  plain `command -v` calls, documented in a comment above each, so the recipes
+  show exactly what they run.
 - Docs. SECURITY.md now states key custody per channel accurately: the maintainer
   holds the app-signing key for the Codeberg / F-Droid APK, and — under Google
   Play App Signing — the upload key for Play, while Google holds Play's own
