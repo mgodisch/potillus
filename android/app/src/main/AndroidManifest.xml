@@ -65,7 +65,7 @@ apply to it are stated in the accompanying COPYING.md file.
           app/src/main/res/xml/locale_config.xml.
           Without this entry the language is INVISIBLE in:
             • Android's per-app language picker
-              (Settings → Apps → Potillus → Language, API 33+)
+              (Settings → Apps → Libellus Potionis → Language, API 33+)
             • the in-app language selector
               (SettingsScreen → AppCompatDelegate)
           The android:name value is a plain BCP-47 tag — no "r" prefix,

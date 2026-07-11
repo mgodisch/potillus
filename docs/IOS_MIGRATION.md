@@ -512,6 +512,14 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix stale app name in manifest locale comment  (patch -98)
+
+A developer comment in AndroidManifest.xml described the per-app language picker's
+path as "Settings → Apps → Potillus → Language". In that Android system list the app
+appears under its launcher label, which is "Libellus Potionis", so the internal
+codename was the wrong name to show. Corrected to the label the user actually sees.
+Comment-only; no code or build behaviour changes.
+
 #### Use Libellus Potionis in export file names  (patch -97)
 
 The internal codename "Potillus" is meant to stay internal, but it leaked into the
