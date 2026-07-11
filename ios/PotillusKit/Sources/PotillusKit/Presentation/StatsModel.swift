@@ -171,6 +171,10 @@ public final class StatsModel {
                 guard let self else { return }
                 do {
                     for try await _ in self.entries.observeAllDates() {
+                        // See CalendarModel.start(): a late element delivered
+                        // between stop() and teardown would otherwise still write
+                        // state ("a stopped observation still fired").
+                        if Task.isCancelled { break }
                         await self.load()
                     }
                 } catch {
@@ -180,6 +184,7 @@ public final class StatsModel {
             Task { [weak self] in
                 guard let self else { return }
                 for await _ in await self.preferences.observe() {
+                    if Task.isCancelled { break }
                     await self.load()
                 }
             }

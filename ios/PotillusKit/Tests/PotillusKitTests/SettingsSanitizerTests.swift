@@ -170,11 +170,19 @@ final class SettingsSanitizerTests: XCTestCase {
 
     // ── The locale catalogue must not drift ──────────────────────────────────
 
-    /// The vector's tag list is generated from `SupportedLocales.kt`. If Android
-    /// gains a language and iOS does not, a restored `language` would silently
-    /// degrade to "follow the system" — a bug the user would never report.
+    /// The vector's tag list is the Android catalogue (`SupportedLocales.kt`),
+    /// which is the canonical cross-platform source. iOS ships the SAME languages
+    /// but spells Chinese by script (`zh-Hans`/`zh-Hant`) where Android spells it
+    /// by region (`zh-CN`/`zh-TW`), because iOS String Catalogs key Chinese that
+    /// way. Rather than duplicate the list, this maps each Android tag through the
+    /// very migration the app uses when RESTORING an Android backup on iOS
+    /// (`canonicalTag`, which rewrites `zh-CN`→`zh-Hans` etc.). So this asserts two
+    /// things at once: the language SETS agree (no drift — if Android gains a
+    /// language and iOS does not, a mapped tag becomes `""` and the lists differ),
+    /// and the real backup-interop path produces exactly the iOS catalogue.
     func testLocaleCatalogueMatchesAndroid() {
-        XCTAssertEqual(SupportedLocales.tags, vectors.localeTags)
+        let expected = vectors.localeTags.map { SupportedLocales.canonicalTag($0) }
+        XCTAssertEqual(SupportedLocales.tags, expected)
     }
 
     func testCanonicalTagIsCaseInsensitiveAndCanonicalising() {

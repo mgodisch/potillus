@@ -99,6 +99,10 @@ public final class DrinksModel {
             guard let self else { return }
             do {
                 for try await catalogue in self.drinks.observeDrinks() {
+                    // See CalendarModel.start(): guard against a late element
+                    // delivered between stop() and teardown, which would otherwise
+                    // still write state.
+                    if Task.isCancelled { break }
                     self.state.drinks = catalogue
                 }
             } catch {

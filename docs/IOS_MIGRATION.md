@@ -512,6 +512,31 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix locale-vector and stopped-observation test failures  (patch -91)
+
+The first on-device/simulator test run surfaced three failures (all latent, none
+from patch -90's build fix):
+
+LOCALE CATALOGUE (SettingsSanitizerTests.testLocaleCatalogueMatchesAndroid)
+  The shared `test-vectors/backup-settings.json` is Android-canonical and lists
+  Chinese by region (`zh-CN`/`zh-TW`); iOS ships the same languages but keys
+  Chinese by script (`zh-Hans`/`zh-Hant`), because iOS String Catalogs do. The test
+  compared the two spellings literally and failed. It now maps each Android tag
+  through `SupportedLocales.canonicalTag` — the very migration the app runs when
+  restoring an Android backup on iOS — so it asserts the language SETS agree AND
+  that the real backup-interop path yields exactly the iOS catalogue. The shared
+  vector stays Android-canonical, so the Android test is unaffected. Drift is still
+  caught: an Android-only language maps to `""` and the lists differ.
+
+STOPPED OBSERVATION (CalendarModelTests / StatsModelTests testStopEndsTheSubscription)
+  After `stop()` cancels the observation task, the GRDB-backed `AsyncThrowingStream`
+  can still deliver one element before it tears down (cancellation is cooperative
+  and asynchronous). The consuming `for try await` loop then wrote state once more —
+  "a stopped observation still fired". Each loop now checks `Task.isCancelled`
+  before writing. The same latent bug existed in TodayModel and DrinksModel (no test
+  exercised it); those were fixed too, so all four presentation models are
+  consistent and a future stop-test on Today/Drinks cannot regress.
+
 #### Fix main-actor clock capture in AppLockModelTests  (patch -90)
 
 A real-device/simulator build under stricter Swift concurrency checking rejected

@@ -158,6 +158,10 @@ public final class TodayModel {
                 guard let self else { return }
                 do {
                     for try await _ in self.entries.observeAllDates() {
+                        // See CalendarModel.start(): guard against a late element
+                        // delivered between stop() and the observation tearing
+                        // down, which would otherwise still write state.
+                        if Task.isCancelled { break }
                         await self.load()
                     }
                 } catch {
@@ -168,6 +172,7 @@ public final class TodayModel {
                 guard let self else { return }
                 do {
                     for try await _ in self.drinks.observeDrinks() {
+                        if Task.isCancelled { break }
                         await self.load()
                     }
                 } catch {
@@ -177,6 +182,7 @@ public final class TodayModel {
             Task { [weak self] in
                 guard let self else { return }
                 for await _ in await self.preferences.observe() {
+                    if Task.isCancelled { break }
                     await self.load()
                 }
             }

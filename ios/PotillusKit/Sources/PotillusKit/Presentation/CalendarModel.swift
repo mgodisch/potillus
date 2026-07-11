@@ -189,6 +189,12 @@ public final class CalendarModel {
                 guard let self else { return }
                 do {
                     for try await _ in self.entries.observeAllDates() {
+                        // The stream may deliver one more element between stop()
+                        // cancelling this task and the underlying observation
+                        // tearing down (they cancel asynchronously). Without this
+                        // check that late element would still write state — the
+                        // "a stopped observation still fired" the tests guard.
+                        if Task.isCancelled { break }
                         await self.reloadMonth()
                     }
                 } catch {
@@ -198,6 +204,7 @@ public final class CalendarModel {
             Task { [weak self] in
                 guard let self else { return }
                 for await _ in await self.preferences.observe() {
+                    if Task.isCancelled { break }
                     await self.load()
                 }
             }
