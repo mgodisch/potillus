@@ -512,6 +512,15 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix StatsScreen body length after clock arg  (patch -102)
+
+`StatsScreen`'s struct body sat exactly at SwiftLint's `type_body_length` limit of
+250 lines, so the single `clock: environment.clock` argument added to the
+`StatsModel` construction in patch -100 pushed it to 251 and failed
+`swiftlint --strict`. The argument is folded onto the preceding `preferences:` line
+— net zero lines, and the same one-line style `CalendarScreen` already uses for its
+model construction — restoring the body to 250. No behaviour change.
+
 #### Harden l10n check against missing localizations  (patch -101)
 
 `tools/check-l10n.py` crashed with `KeyError: 'localizations'` on any String
