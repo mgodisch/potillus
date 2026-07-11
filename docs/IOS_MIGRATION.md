@@ -512,6 +512,21 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix main-actor clock capture in AppLockModelTests  (patch -90)
+
+A real-device/simulator build under stricter Swift concurrency checking rejected
+AppLockModelTests: its `clock` was a `@MainActor`-isolated stored property of the
+(main-actor) test case, but `AppLockModel.uptime` is `@Sendable`, so the closure
+`{ [weak self] in self?.clock ?? 0 }` could not read it ("main actor-isolated
+property 'clock' can not be referenced from a Sendable closure").
+
+The clock is now a small `TestClock` reference box (`@unchecked Sendable`, like the
+existing `FakeAuthenticator`), captured by value into the closure as `[clock]`. The
+tests still advance it after the model is built (`clock.now += …`), because a
+reference box shares the mutation with the closure — a plain value copy would not.
+No production code changed; the other model tests were already using the by-value
+`FixedClock(millis:)` pattern and were unaffected.
+
 #### Add iOS fastlane lanes and App Store metadata  (patch -89)
 
 The App Store delivery path now mirrors the existing Play Store one: the

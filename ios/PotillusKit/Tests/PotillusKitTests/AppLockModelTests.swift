@@ -42,20 +42,31 @@ private final class FakeAuthenticator: BiometricAuthenticator, @unchecked Sendab
     }
 }
 
+/// A mutable clock the test can advance at will, held in a reference type so the
+/// `@Sendable` `uptime` closure can read it. The model's `uptime` parameter is
+/// `@Sendable`, so it cannot capture a `@MainActor`-isolated stored property of
+/// the (main-actor) test case; a small reference box sidesteps that while keeping
+/// the "advance the clock after the model is built" semantics the tests rely on.
+/// `@unchecked Sendable` mirrors `FakeAuthenticator` above: the test drives it
+/// serially on the main actor, so there is no real concurrent access to guard.
+private final class TestClock: @unchecked Sendable {
+    var now: TimeInterval = 1000
+}
+
 @MainActor
 final class AppLockModelTests: XCTestCase {
 
     private var fake: FakeAuthenticator!
-    private var clock: TimeInterval = 1000
+    private let clock = TestClock()
 
     private func makeModel() -> AppLockModel {
-        AppLockModel(authenticator: fake, uptime: { [weak self] in self?.clock ?? 0 })
+        AppLockModel(authenticator: fake, uptime: { [clock] in clock.now })
     }
 
     override func setUp() {
         super.setUp()
         fake = FakeAuthenticator()
-        clock = 1000
+        clock.now = 1000
     }
 
     // ── The lock off ─────────────────────────────────────────────────────────
@@ -64,7 +75,7 @@ final class AppLockModelTests: XCTestCase {
         let model = makeModel()
         await model.onLaunch()
         model.onBackground()
-        clock += 10_000
+        clock.now += 10_000
         await model.onForeground()
 
         XCTAssertEqual(model.state, .unlocked)
@@ -99,7 +110,7 @@ final class AppLockModelTests: XCTestCase {
         await model.onLaunch()
 
         model.onBackground()
-        clock += 29                 // under 30
+        clock.now += 29                 // under 30
         await model.onForeground()
 
         XCTAssertEqual(model.state, .unlocked)
@@ -112,7 +123,7 @@ final class AppLockModelTests: XCTestCase {
         await model.onLaunch()
 
         model.onBackground()
-        clock += 30                 // exactly the threshold
+        clock.now += 30                 // exactly the threshold
         await model.onForeground()
 
         XCTAssertEqual(model.state, .unlocked, "re-auth succeeded")
@@ -126,7 +137,7 @@ final class AppLockModelTests: XCTestCase {
 
         fake.willSucceed = false
         model.onBackground()
-        clock += 60
+        clock.now += 60
         await model.onForeground()
 
         XCTAssertEqual(model.state, .locked)
