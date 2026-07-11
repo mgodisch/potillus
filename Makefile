@@ -733,7 +733,15 @@ push-playstore:
 	# tag), so this is a RELEASE-HYGIENE gate: a build only reaches Play when its
 	# exact version is recorded and pushed as a tag others can reproduce from.
 	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
-	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1)"; remote="$${remote:-origin}"
+	# Pick the remote `make push` publishes to: the current branch's upstream, else
+	# origin. The `|| true` inside the command substitution is essential under this
+	# Makefile's `.SHELLFLAGS := -eu -o pipefail`: with no upstream configured,
+	# `git rev-parse @{u}` exits non-zero, pipefail propagates that through the pipe,
+	# and `set -e` would then abort the whole recipe ON THE ASSIGNMENT -- before the
+	# `$${remote:-origin}` fallback on the same line could ever run. Swallowing the
+	# failure makes the substitution yield the empty string, so the fallback below
+	# supplies `origin` as intended.
+	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
 	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null
 	# Prove the bundle is signed with the EXPECTED key before uploading; jarsigner
 	# and keytool run non-interactively and any failure aborts the recipe here.
@@ -791,7 +799,11 @@ push-codeberg:
 	# ON THE SERVER; a purely local tag makes the create call fail late. Require the
 	# tag on the same remote `make push` uses (the branch upstream, else origin);
 	# git ls-remote --exit-code aborts here if the tag has not been pushed.
-	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1)"; remote="$${remote:-origin}"
+	# The `|| true` inside the substitution keeps a missing upstream from aborting
+	# the recipe under `-eu -o pipefail`: without it, `git rev-parse @{u}` failing
+	# would kill the assignment via set -e before the `$${remote:-origin}` fallback
+	# on the same line runs (see the fuller note in push-playstore above).
+	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
 	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }

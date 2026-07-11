@@ -186,7 +186,7 @@ to version control:
   keystore file it references), used to sign the release artifacts — the Google
   Play upload bundle and the Codeberg/F-Droid APK;
 - the **Google Play upload credentials** (`fastlane/play-store-credentials.json`),
-  used only by the Fastlane `deploy` lane; and
+  used only by the Fastlane Play-upload lanes (`testing` and `production`); and
 - the maintainer's **OpenPGP signing key**, used to sign release tags and commits.
 
 **Storing.** Secrets are never hard-coded in source and never stored in the

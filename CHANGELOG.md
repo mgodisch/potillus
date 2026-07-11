@@ -321,6 +321,20 @@ listed individually below.
   canonical signing-key fingerprint, since the publishing targets read the pin
   from there. Tooling and documentation only; no app-visible behaviour changed,
   so no versionCode bump and no store-note changes.
+- Release-tooling correctness (eighth QA pass). The remote-detection line shared by
+  `push-playstore` and `push-codeberg` could abort the whole recipe instead of
+  falling back to `origin`. Under the Makefile's `.SHELLFLAGS := -eu -o pipefail`, a
+  checkout with no configured upstream makes `git rev-parse @{u}` exit non-zero;
+  pipefail propagates that through the pipe and `set -e` then kills the recipe ON THE
+  ASSIGNMENT, before the `${remote:-origin}` fallback on the same line can run. A
+  `|| true` inside the command substitution now swallows the failure so the fallback
+  supplies `origin` as designed; the happy path (upstream configured) is unchanged.
+  Both publishing targets were still untested, so this latent abort had not surfaced.
+- Docs. A stale `deploy`-lane reference in SECURITY.md (the Play-credentials bullet)
+  was corrected to the current `testing` / `production` Play-upload lanes, and the
+  illustrative versionCode in `fastlane/README.txt` was refreshed from the outdated
+  66 to the current 92. Tooling and documentation only; still no app-visible
+  behaviour change, so no versionCode bump and no store-note changes.
 
 ---
 
