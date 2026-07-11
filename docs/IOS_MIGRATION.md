@@ -512,6 +512,30 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Fix broken importedMergedPlural in Localization.swift  (patch -93)
+
+The first full-app `xcodebuild` (not just `swift test` on the kit) surfaced a syntax
+error in `ios/Potillus/Localization.swift`: `importedMergedPlural` ended with its
+`String(localized:)` expression but then carried a stray fragment of an older,
+manual-interpolation implementation (`} else if let range = interpolation.range(of:
+"%1$lld")…`), leaving two extra `}` and a cascade of "Extraneous '}' at top level".
+
+The fragment references an `interpolation` variable that no longer exists; the
+function was rewritten to `String(localized:)` (like its siblings `daysPlural` and
+`importedPlural`) but the old body was not fully removed. The orphaned lines are
+deleted and the function closed cleanly. The catalogue key
+`"%lld entries imported, %lld skipped."` is a positional plural (`%1$lld`/`%2$lld`);
+`String(localized: "\(imported) … \(skipped) …")` reproduces it and inflects on the
+first count, exactly as the doc comment describes, and the one caller
+(`SettingsScreen.swift`) is unchanged.
+
+WHY IT SURVIVED THIS LONG
+  The defect entered with an early plurals patch (108d46e). `ios/Potillus/` is the
+  APP target, compiled only by the full `xcodebuild`; the container linters and
+  `swift test` cover the KIT (`ios/PotillusKit/`) only, so a syntax error in an app
+  file passes every check until a real device/simulator build runs. No behaviour
+  changed — the file never compiled with the fragment present.
+
 #### Record deferred year view and PDF footer on roadmap  (patch -92)
 
 Two Android features are consciously not ported; both are now recorded as possible

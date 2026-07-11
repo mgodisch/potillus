@@ -110,11 +110,6 @@ enum Loc {
         imported: Int, skipped: Int, locale: Locale
     ) -> String {
         String(localized: "\(imported) entries imported, \(skipped) skipped.", locale: locale)
-    } else if let range = interpolation.range(of: "%1$lld") {
-                interpolation.replaceSubrange(range, with: String(arg))
-            }
-        }
-        return interpolation
     }
 }
 
