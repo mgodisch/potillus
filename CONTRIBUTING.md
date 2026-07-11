@@ -458,6 +458,75 @@ pull request (see Section 2) with the language and the improved string(s).
 4. Run `./gradlew :app:test` (`LocaleSyncTest`) to confirm all three artefacts
    are in sync and the new `strings.xml` is complete.
 
+### 6.1 iOS strings and the two-platform parity rule
+
+The project ships an iOS port alongside Android, and it carries its **own** copy of
+every translation. The iOS build is self-contained: it does not read anything under
+`android/`. If you translate, you will touch the iOS files too — this section is the
+map.
+
+**Where the iOS strings live.** There are two files, split by what they cover:
+
+- **`ios/Potillus/Localizable.xcstrings`** — every on-screen UI string (screens,
+  buttons, labels, toggles, plurals). This is Apple's *String Catalog* format: a
+  single JSON file holding all languages at once, which Xcode shows as a friendly
+  table with one column per language. It is the iOS counterpart to Android's many
+  `values-<qualifier>/strings.xml` folders — same content, one file instead of one
+  folder per language.
+- **`ios/PotillusKit/Sources/PotillusKit/Domain/ReportLabelsCatalog.swift`** — the
+  labels printed in the exported **PDF report** (section headings, table columns,
+  KPI names). These live apart from the UI catalogue because the report is rendered
+  inside the reusable `PotillusKit` module; each language is a small Swift function
+  named `apply<tag>()` (e.g. `applyde()`, `applyptBR()`) that assigns each label.
+
+Both files are **committed, hand-maintained source of truth** — there is no
+generator and no build step that produces them. You edit them directly (in Xcode for
+the catalogue, or in a text editor), exactly as you would in a native iOS app.
+
+**The key IS the English text.** In `Localizable.xcstrings` the lookup key is the
+English source string itself: the app calls `Loc.string("Today")` and the catalogue
+translates `"Today"` per language. A missing key returns itself, so an un-added
+string shows in English rather than crashing — visible, not fatal.
+
+**Format differences from Android to watch for.** When you carry a string across:
+
+- Placeholders differ. Android's `%1$s` / `%1$d` become iOS's `%@` (string) and
+  `%lld` (integer). A single-argument `%d` becomes `%lld`.
+- Plurals: Android's `<plurals>` blocks map to plural *variations* on a catalogue
+  entry (the `one` / `other` forms), keyed by the English "other" form.
+- Product names are never translated (e.g. `GRDB.swift`); they are marked
+  "don't translate" in the catalogue.
+
+**The parity rule — iOS and Android must not drift.** Because both platforms hold
+their own translations, they could silently disagree. A check prevents that:
+[`tools/check-l10n-parity.py`](tools/check-l10n-parity.py), which by design runs in
+**both** `make ios` **and** `make android`. It reads `android/` only to *compare* —
+it never generates iOS content. It enforces three things:
+
+1. every UI literal in the iOS views has a key in the catalogue (so no string is
+   left untranslatable);
+2. every catalogue translation whose English key matches an Android string is
+   **identical** to Android's translation for it, in every language;
+3. the PDF report labels match Android's report strings for the same keys.
+
+The practical consequence: **if you change a translation on one platform, change it
+on the other too.** If you reword an Android string whose English text is also an
+iOS key, the next `make ios` *or* `make android` will fail and name the exact string
+that diverged. Fixing it means bringing the two sides back into agreement. (One
+subtlety the check handles for you: a single English word can back several Android
+strings with different translations — e.g. `month` → "月" and `pdf_col_month` →
+"月份" — so the iOS value is accepted if it matches *any* Android string sharing that
+English word.)
+
+**Adding a new locale on iOS.** After adding it on the Android side (above):
+1. In `Localizable.xcstrings`, add the language (in Xcode: the "+" in the language
+   list, or add its `localizations` entry in the JSON) and translate every key.
+2. In `ReportLabelsCatalog.swift`, add a `case "<tag>": apply<tag>()` line to the
+   `switch` in `init(language:)` and write the matching `apply<tag>()` function with
+   every report label.
+3. Run `make ios` (or `python3 tools/check-l10n-parity.py` directly) to confirm the
+   catalogue is complete and agrees with Android.
+
 ---
 
 ## 7. Versioning & release checklist
