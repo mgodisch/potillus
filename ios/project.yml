@@ -141,6 +141,32 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: de.godisch.potillus.tests
         GENERATE_INFOPLIST_FILE: "YES"
 
+  # The UI-test target that fastlane snapshot drives to capture the App Store
+  # screenshots. `TEST_TARGET_NAME` makes it a UI test of the app, so the runner
+  # launches Potillus in the simulator.
+  PotillusUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      # The test sources. SnapshotHelper.swift is fastlane's, materialized here by
+      # `make screenshots-ios` from the installed fastlane and git-ignored (never
+      # vendored, so it always matches the local fastlane version); this glob picks
+      # it up once it is present.
+      - path: PotillusUITests
+      # The demo fixture the screenshot run seeds the store from — shared with the
+      # Android screengrab flow. It rides into the UI-test bundle so the test can
+      # hand it to the app in SCREENSHOT_FIXTURE_JSON.
+      - path: ../fastlane/demo-backup.json
+        type: file
+        buildPhase: resources
+    dependencies:
+      - target: Potillus
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.godisch.potillus.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+        TEST_TARGET_NAME: Potillus
+
 # An explicit scheme is needed so the test action knows about the test target;
 # without it, `Cmd+U` and `xcodebuild test` fail with "not configured for the
 # test action".
@@ -156,3 +182,17 @@ schemes:
       config: Debug
       targets:
         - PotillusTests
+
+  # The scheme fastlane snapshot builds (see fastlane/Snapfile). It hosts the
+  # UI-test target that drives the screenshots.
+  PotillusUITests:
+    build:
+      targets:
+        Potillus: all
+        PotillusUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - PotillusUITests

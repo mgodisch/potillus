@@ -76,7 +76,7 @@ languages(
 # The simulator device to render on. iPhone-only app; a single 6.7"/6.9" device
 # covers the required App Store screenshot dimension. PLACEHOLDER: pin to whatever
 # simulator the Mac has installed (e.g. "iPhone 16 Pro Max").
-devices(["iPhone 16 Pro Max"])
+devices(["iPhone 17 Pro"])
 
 # A clean status bar (full battery, strong signal, fixed time) like Android Demo
 # Mode. snapshot can override the simulator status bar for this.

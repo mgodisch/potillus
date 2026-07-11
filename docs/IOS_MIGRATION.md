@@ -512,6 +512,33 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add PotillusUITests screenshot target  (patch -103)
+
+The capture half of the automated App Store screenshots — a UI-test target that
+drives the app through the six screens, wired into the project. The Makefile recipe
+that orchestrates it (report pages 07/08, rasterization) follows in patch -104.
+
+WHAT LANDS:
+  - `ios/PotillusUITests/PotillusUITests.swift`: one XCUITest that fastlane snapshot
+    runs once per locale. It launches the app in `-screenshotMode` (patch -100),
+    hands it the demo fixture as `SCREENSHOT_FIXTURE_JSON` and the store locale as
+    `SCREENSHOT_LOCALE`, waits for the seed, and snapshots 01_today … 06_settings —
+    navigating by accessibilityIdentifier, never by localized label, and dismissing
+    sheets with a swipe, so the one path holds across all 21 store locales.
+  - `project.yml`: a `PotillusUITests` UI-testing target (with the demo fixture as a
+    bundle resource and `TEST_TARGET_NAME: Potillus`) and the matching
+    `PotillusUITests` scheme the Snapfile already names.
+  - `fastlane/Snapfile`: the capture device set to the installed `iPhone 17 Pro`.
+  - `.gitignore`: fastlane's `SnapshotHelper.swift`, which `make screenshots-ios`
+    materializes from the installed fastlane (version-matched, never vendored).
+
+VERIFY ON THE MAC (before the recipe exists): materialize the helper once with
+`cd ios/PotillusUITests && fastlane snapshot init && rm -f SnapfileExample Snapfile`,
+then `make ios-project` and `cd fastlane && bundle exec fastlane ios screenshots`.
+The six PNGs per locale should appear under fastlane/screenshots/ios/<locale>/.
+
+This is UI-test and project code, verified only by a full Xcode build on the Mac.
+
 #### Fix StatsScreen body length after clock arg  (patch -102)
 
 `StatsScreen`'s struct body sat exactly at SwiftLint's `type_body_length` limit of
