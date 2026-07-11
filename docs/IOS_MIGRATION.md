@@ -512,6 +512,49 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add iOS fastlane lanes and App Store metadata  (patch -89)
+
+The App Store delivery path now mirrors the existing Play Store one: the
+repository is the single source of truth for the listing, and an upload
+overwrites the store texts from the committed metadata tree.
+
+WHAT WAS ADDED
+  - fastlane/metadata/ios/ — the App Store listing for 21 locales (deliver's
+    format): per-locale name/subtitle/keywords/description/release_notes and the
+    support/marketing/privacy URLs, plus global copyright, primary/secondary
+    category (HEALTH_AND_FITNESS / FOOD_AND_DRINK) and review_information/
+    placeholders. Field limits (name/subtitle ≤30, keywords ≤100, description
+    ≤4000) are all respected. Locale codes follow App Store Connect (no, zh-Hans,
+    zh-Hant, pt-PT, pt-BR), which differs from Android's.
+  - fastlane/Fastfile — a `platform :ios` block with `screenshots` (snapshot),
+    `testing` (upload only) and `production` (upload + submit) lanes, authenticated
+    with an App Store Connect API key (.p8) via the APP_STORE_CONNECT_API_KEY_*
+    environment variables. The Android block is untouched; default_platform stays
+    android.
+  - fastlane/Snapfile — snapshot configuration for the App Store screenshots,
+    deriving its locale set from the metadata tree (as Screengrabfile does).
+  - fastlane/Appfile — an app_identifier (de.godisch.potillus) beside the existing
+    package_name; the .p8 is git-ignored.
+  - appstore/README.md — the end-to-end release procedure (setup, signed .ipa,
+    screenshots, upload, console-side answers). Documents that the build is
+    reproducible up to upload; Apple re-signs on ingestion, as already noted for
+    Play in .bestpractices.json.
+
+PROVENANCE (honesty)
+  English and German store texts are the author's wording. The other 19 languages'
+  descriptions reuse the existing translator-written Play Store text with only the
+  two platform-specific sentences swapped to iOS (iOS 17, iOS Data Protection, Face
+  ID / Touch ID); their subtitles and keywords are machine-translated and
+  unreviewed. CONTRIBUTING §6 now carries a prominent native-speaker call-to-action
+  and §6.2 declares this machine provenance.
+
+#### Document iOS l10n paths for translators  (patch -88)
+
+CONTRIBUTING §6.1 now maps the two iOS localisation files (Localizable.xcstrings
+for UI strings, ReportLabelsCatalog.swift for the PDF report labels), explains the
+String Catalog format and the Android→iOS format differences (%1$s→%@, %d→%lld),
+and states the two-platform parity rule enforced by tools/check-l10n-parity.py.
+
 #### Decouple the iOS build from android/: self-contained l10n  (patch -87)
 
 The iOS localisation is now laid out the way a native iOS app's would be, and the

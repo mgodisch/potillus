@@ -1,0 +1,24 @@
+Libellus Potionis to dbający o prywatność, bezpłatny, otwartoźródłowy i wolny od reklam monitor spożycia alkoholu. Pomaga monitorować, dawkować i kontrolować spożycie całkowicie w trybie offline. Nie wymaga inwazyjnych uprawnień — ani aparatu, ani mikrofonu, ani lokalizacji — i działa zupełnie bez dostępu do sieci.
+
+NAJWAŻNIEJSZE FUNKCJE
+
+• Inteligentne rejestrowanie: zdefiniuj własne napoje lub wybierz spośród popularnych na świecie szablonów. Rejestruj spożycie od razu lub wstecznie z precyzyjną korektą czasu.
+• Kilka limitów jednocześnie: ustaw trzy limity równolegle — limit dzienny (gramy czystego alkoholu), kroczący limit tygodniowy z 7 dni (gramy) oraz maksymalną liczbę dni picia w tygodniu. Paski postępu informują Cię w czasie rzeczywistym.
+• Szacowanie stężenia alkoholu we krwi (BAC): podaj masę ciała, aby uzyskać przybliżenie na żywo oparte na uznanym wzorze Widmarka.
+• Raporty na konsultacje: wygeneruj przejrzysty, dobrze uporządkowany, dwustronicowy raport PDF przeznaczony na konsultacje i spotkania doradcze, który statystycznie podsumowuje Twoje nawyki.
+• Przenośność danych: wyeksportuj cały zbiór danych jako standardowy plik CSV do przetwarzania zewnętrznego (np. w LibreOffice Calc) lub utwórz bezpieczne kopie zapasowe JSON, aby przenosić dane między urządzeniami.
+• Precyzyjne ustawienia: dostosuj godzinę "początku dnia", aby napoje spożyte późno w nocy liczyły się do właściwego wieczoru, i ustaw własne daty początku oceny dla czystych restartów.
+
+Obszerny przewodnik użytkownika jest dostępny w aplikacji.
+
+PRYWATNOŚĆ I BEZPIECZEŃSTWO
+
+Libellus Potionis opiera się na pełnej suwerenności danych i ścisłej minimalizacji danych. Działa z minimalnym profilem uprawnień, który całkowicie wyklucza dostęp do sieci, dzięki czemu Twoje dane osobowe nigdy nie opuszczają urządzenia. Twoje dane pozostają w prywatnej pamięci aplikacji, chronione w spoczynku przez iOS Data Protection (sprzętowo wspierane szyfrowanie plików) i piaskownicę aplikacji. Opcjonalna blokada Face ID lub Touch ID chroni przed nieuprawnionym dostępem fizycznym. To podejście offline eliminuje śledzenie, synchronizację w chmurze i wyciek danych na zewnątrz.
+
+ZGODNOŚĆ
+
+Aplikacja działa na iPhonie z iOS 17 i nowszym. W pełni niezależny, wbudowany wybór języka pozwala zmienić język aplikacji w dowolnym momencie, niezależnie od języka systemu.
+
+OTWARTE ŹRÓDŁO
+
+Libellus Potionis to wolne oprogramowanie wydane na licencji GNU General Public License v3 (lub nowszej). Kod źródłowy jest udokumentowany na poziomie podręcznikowym i dostępny w kanonicznym repozytorium: https://codeberg.org/godisch/potillus/

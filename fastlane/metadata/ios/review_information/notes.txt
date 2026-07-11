@@ -1,0 +1,1 @@
+Libellus Potionis is a fully offline alcohol-tracking app. It makes no network requests, requires no account, and needs no demo credentials. All features are reachable without login. Source: https://codeberg.org/godisch/potillus

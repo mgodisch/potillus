@@ -1,0 +1,24 @@
+Libellus Potionis est un outil de suivi de consommation d'alcool respectueux de la vie privée, gratuit, open source et sans publicité. Il vous aide à surveiller, doser et gérer votre consommation entièrement hors ligne. Il ne nécessite aucune autorisation intrusive — ni caméra, ni microphone, ni localisation — et fonctionne sans aucun accès au réseau.
+
+FONCTIONNALITÉS PRINCIPALES
+
+• Saisie intelligente : définissez vos propres boissons ou choisissez parmi des modèles courants à l'international. Enregistrez vos consommations sur le moment ou rétroactivement avec une correction d'heure précise.
+• Plusieurs limites simultanées : fixez trois limites en parallèle — une limite quotidienne (grammes d'alcool pur), une limite hebdomadaire glissante sur 7 jours (grammes) et un nombre maximal de jours de consommation par semaine. Des barres de progression vous tiennent informé en temps réel.
+• Estimation de l'alcoolémie (BAC) : saisissez votre poids corporel pour obtenir une approximation en direct fondée sur la formule de Widmark, bien établie.
+• Rapports pour le suivi : générez un rapport PDF clair et bien organisé de deux pages, conçu pour les consultations et les rendez-vous de conseil, qui résume statistiquement vos habitudes.
+• Portabilité des données : exportez l'ensemble de vos données dans un fichier CSV standard pour un traitement externe (par exemple dans LibreOffice Calc), ou créez des sauvegardes JSON sécurisées pour transférer vos données d'un appareil à l'autre.
+• Réglages fins : personnalisez votre heure de « début de journée » pour que les boissons de fin de nuit soient comptées sur la bonne soirée, et définissez des dates de début d'évaluation personnalisées pour repartir à zéro proprement.
+
+Un guide d'utilisation complet est disponible dans l'application.
+
+CONFIDENTIALITÉ ET SÉCURITÉ
+
+Libellus Potionis est conçu autour d'une souveraineté absolue des données et d'une stricte minimisation des données. Il fonctionne avec un profil d'autorisations minimal qui exclut totalement l'accès au réseau : vos données personnelles ne quittent donc jamais l'appareil. Vos données restent dans le stockage privé de l'application, protégées au repos par iOS Data Protection (chiffrement des fichiers assisté par le matériel) et le bac à sable de l'application. Un verrouillage facultatif par Face ID ou Touch ID protège contre tout accès physique non autorisé. Cette approche hors ligne élimine le pistage, la synchronisation dans le nuage et les fuites de données externes.
+
+COMPATIBILITÉ
+
+L'application fonctionne sur iPhone avec iOS 17 et versions ultérieures. Un sélecteur de langue intégré et entièrement indépendant vous permet de changer la langue de l'application à tout moment, indépendamment de la langue du système.
+
+OPEN SOURCE
+
+Libellus Potionis est un logiciel libre publié sous la GNU General Public License v3 (ou ultérieure). Le code source est documenté selon un standard pédagogique et est disponible dans le dépôt canonique : https://codeberg.org/godisch/potillus/

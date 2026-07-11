@@ -1,0 +1,1 @@
+alcohol,tracker,drink,drinking,sobriety,BAC,units,limit,diary,report,free,privacy,health,offline,log

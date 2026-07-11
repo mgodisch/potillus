@@ -122,3 +122,100 @@ platform :android do
     )
   end
 end
+
+# =============================================================================
+# iOS platform -- App Store Connect lanes (mirror of the Android block above)
+# =============================================================================
+#
+# These lanes manage the App Store listing the same way the Android lanes manage
+# the Play listing: the repository is the single source of truth. The listing
+# texts, keywords and release notes live in fastlane/metadata/ios/ and are pushed
+# verbatim on every upload, so the App Store and the Play Store never drift from
+# what is committed here.
+#
+# AUTHENTICATION -- App Store Connect API key (.p8), the modern, 2FA-proof method.
+#   `app_store_connect_api_key` reads three values and stores the resulting token
+#   in fastlane's lane context, from where `deliver`/`snapshot` pick it up
+#   automatically. All three are SECRETS injected via the environment (never
+#   committed); fastlane's own default env names are used, so no wiring is needed:
+#     APP_STORE_CONNECT_API_KEY_KEY_ID       -- the key's ID (e.g. D383SF739)
+#     APP_STORE_CONNECT_API_KEY_ISSUER_ID    -- the team's issuer ID (a UUID)
+#     APP_STORE_CONNECT_API_KEY_KEY_FILEPATH -- path to the downloaded AuthKey_*.p8
+#   Create the key in App Store Connect → Users and Access → Integrations → Keys.
+#   The .p8 is git-ignored (.gitignore → /fastlane/AuthKey_*.p8); it downloads
+#   ONCE and cannot be re-downloaded, so store it safely.
+#
+# BUILDING -- like the Android lanes, these lanes do NOT build the app. Produce a
+#   signed .ipa on the Mac first (Xcode or `make -C ios archive`, see ios/), then
+#   run the upload lane. Screenshots are produced by the `screenshots` lane below.
+
+platform :ios do
+  desc 'Capture the App Store screenshots (all store locales) via snapshot.'
+  desc 'Requires a UI-test scheme that drives the app through the six screens;'
+  desc 'configuration lives in Snapfile. Prefer `make -C ios screenshots`, which'
+  desc 'pins the device date and renders the two PDF-report pages, mirroring the'
+  desc 'Android `make screenshots` flow.'
+  lane :screenshots do
+    # `capture_ios_screenshots` is the modern alias of the `snapshot` action. It
+    # reads Snapfile, builds the UI-test target, and runs it across every
+    # simulator/locale pair, collecting the PNGs into the fastlane screenshots
+    # tree. Status-bar cleanup and PDF rendering are handled around this by the
+    # Makefile, exactly as on Android.
+    capture_ios_screenshots
+  end
+
+  # ── upload_appstore ── the single upload_to_app_store call shared by the public
+  # `testing` and `production` lanes below. Only submit_for_review and the review
+  # submission differ between them; the rest lives here ONCE (same drift-avoidance
+  # principle as the Android upload_release). Private: go through `testing` /
+  # `production`.
+  #
+  # `upload_to_app_store` is the modern alias of the `deliver` action. It reads the
+  # app_identifier from the Appfile, uploads the signed .ipa, and syncs the listing
+  # texts, keywords and release notes from fastlane/metadata/ios/ -- the single
+  # source of truth for the App Store listing.
+  private_lane :upload_appstore do |options|
+    # Authenticate first; the token lands in lane_context for deliver to use.
+    app_store_connect_api_key
+
+    upload_to_app_store(
+      # The signed app binary. Build it on the Mac before running this lane.
+      ipa: 'ios/build/Potillus.ipa',
+
+      # Metadata + screenshots come from fastlane/metadata/ios/ (the default path
+      # once platform is ios). Push them on every upload so the listing matches
+      # the repository -- every skip_* below is false.
+      skip_metadata: false,
+      skip_screenshots: false,
+
+      # precheck scans the listing for common rejection reasons before upload.
+      run_precheck_before_submit: true,
+
+      # Whether to actually submit the uploaded build for Apple review is chosen
+      # by the calling lane; `production` submits, `testing` only uploads.
+      submit_for_review: options[:submit],
+
+      # Never overwrite the (manually curated) age rating or pricing.
+      force: true, # skip the HTML-report confirmation prompt (non-interactive)
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  desc 'Upload the SIGNED .ipa and OVERWRITE the App Store listing + release notes'
+  desc '(names, subtitles, keywords, descriptions and screenshots from'
+  desc 'fastlane/metadata/ios/) WITHOUT submitting for review. The build lands in'
+  desc 'App Store Connect as "Prepare for Submission" / TestFlight for you to check.'
+  desc 'Build the .ipa first (Xcode or `make -C ios archive`); this lane does NOT'
+  desc 'build it.'
+  lane :testing do
+    upload_appstore(submit: false)
+  end
+
+  desc 'Upload the SIGNED .ipa, OVERWRITE the App Store listing, and SUBMIT the'
+  desc 'build for Apple review. Same build prerequisite as `testing` (this lane'
+  desc 'does NOT build the .ipa). Apple review gates the actual release; nothing'
+  desc 'goes live automatically without passing review.'
+  lane :production do
+    upload_appstore(submit: true)
+  end
+end

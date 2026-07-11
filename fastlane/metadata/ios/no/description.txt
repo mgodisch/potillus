@@ -1,0 +1,24 @@
+Libellus Potionis er en personvernvennlig, gratis, åpen kildekode-basert og reklamefri alkoholsporer. Den hjelper deg å overvåke, dosere og styre forbruket ditt helt frakoblet. Den krever ingen inngripende tillatelser – verken kamera, mikrofon eller posisjon – og fungerer helt uten nettverkstilgang.
+
+HOVEDFUNKSJONER
+
+• Smart registrering: lag dine egne drikker eller velg blant internasjonalt vanlige maler. Registrer drikker med en gang eller i ettertid med presise tidskorrigeringer.
+• Flere grenser samtidig: sett tre grenser parallelt – en daglig grense (gram ren alkohol), en glidende ukesgrense over 7 dager (gram) og et maksimalt antall drikkedager per uke. Fremdriftslinjer holder deg oppdatert i sanntid.
+• Promilleanslag (BAC): skriv inn kroppsvekten din for å få en sanntidstilnærming basert på den veletablerte Widmark-formelen.
+• Rapporter for rådgivning: lag en tydelig, oversiktlig PDF-rapport på to sider, laget for konsultasjoner og rådgivningstimer, som oppsummerer vanene dine statistisk.
+• Dataportabilitet: eksporter hele datasettet ditt som en standard CSV-fil for ekstern behandling (for eksempel i LibreOffice Calc), eller lag sikre JSON-sikkerhetskopier for å flytte data mellom enheter.
+• Finjusteringer: tilpass "dagstart"-tidspunktet ditt slik at sene nattdrikker telles på riktig kveld, og angi egne startdatoer for evaluering for rene omstarter.
+
+En fyldig brukerveiledning er tilgjengelig inne i appen.
+
+PERSONVERN OG SIKKERHET
+
+Libellus Potionis er bygget rundt full datasuverenitet og streng dataminimering. Den kjører med en minimal tillatelsesprofil som fullstendig utelukker nettverkstilgang, slik at de personlige dataene dine aldri forlater enheten. Dataene dine blir værende i appens private lager, beskyttet i hvile av iOS Data Protection (maskinvarebasert filkryptering) og app-sandkassen. En valgfri Face ID-/Touch ID-lås beskytter mot uautorisert fysisk tilgang. Denne frakoblet-først-tilnærmingen fjerner sporing, skysynkronisering og eksterne datalekkasjer.
+
+KOMPATIBILITET
+
+Appen kjører på iPhone med iOS 17 og nyere. En helt uavhengig språkvelger i appen lar deg bytte appens språk når som helst, uavhengig av systemspråket.
+
+ÅPEN KILDEKODE
+
+Libellus Potionis er fri programvare utgitt under GNU General Public License v3 (eller senere). Kildekoden er dokumentert etter lærebokstandard og er tilgjengelig i det kanoniske kodelageret: https://codeberg.org/godisch/potillus/

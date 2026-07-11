@@ -1,0 +1,24 @@
+Libellus Potionis je sledování konzumace alkoholu šetrné k soukromí, zdarma, s otevřeným zdrojovým kódem a bez reklam. Pomáhá vám sledovat, dávkovat a řídit vaši spotřebu zcela offline. Nevyžaduje žádná invazivní oprávnění – ani fotoaparát, ani mikrofon, ani polohu – a funguje úplně bez přístupu k síti.
+
+HLAVNÍ FUNKCE
+
+• Chytré zaznamenávání: vytvořte si vlastní nápoje nebo vyberte z mezinárodně běžných šablon. Zaznamenávejte nápoje ihned nebo zpětně s přesnou korekcí času.
+• Více limitů najednou: nastavte tři limity souběžně – denní limit (gramy čistého alkoholu), klouzavý týdenní limit za 7 dní (gramy) a maximální počet dní pití za týden. Ukazatele průběhu vás informují v reálném čase.
+• Odhad hladiny alkoholu v krvi (BAC): zadejte svou tělesnou hmotnost a získejte živý odhad založený na osvědčeném Widmarkově vzorci.
+• Reporty pro poradenství: vygenerujte přehledný, dobře uspořádaný dvoustránkový PDF report určený pro konzultace a poradenské schůzky, který statisticky shrnuje vaše návyky.
+• Přenositelnost dat: exportujte celou sadu dat jako standardní soubor CSV pro externí zpracování (například v LibreOffice Calc) nebo vytvořte bezpečné zálohy JSON pro přesun dat mezi zařízeními.
+• Jemná nastavení: přizpůsobte si čas "začátku dne", aby se nápoje pozdě v noci počítaly do správného večera, a nastavte vlastní data začátku vyhodnocení pro čisté restarty.
+
+V aplikaci je k dispozici obsáhlá uživatelská příručka.
+
+SOUKROMÍ A ZABEZPEČENÍ
+
+Libellus Potionis je postaven na naprosté svrchovanosti nad daty a přísné minimalizaci dat. Běží s minimálním profilem oprávnění, který zcela vylučuje přístup k síti, takže vaše osobní data nikdy neopustí zařízení. Vaše data zůstávají v soukromém úložišti aplikace, v klidovém stavu chráněná pomocí iOS Data Protection (hardwarově podporované šifrování souborů) a sandboxem aplikace. Volitelný zámek Face ID nebo Touch ID chrání před neoprávněným fyzickým přístupem. Tento offline přístup vylučuje sledování, synchronizaci s cloudem a únik dat ven.
+
+KOMPATIBILITA
+
+Aplikace běží na iPhonu s iOS 17 a novějším. Plně nezávislý výběr jazyka v aplikaci umožňuje kdykoli změnit jazyk aplikace bez ohledu na jazyk systému.
+
+OTEVŘENÝ ZDROJOVÝ KÓD
+
+Libellus Potionis je svobodný software vydaný pod licencí GNU General Public License v3 (nebo novější). Zdrojový kód je zdokumentován na učebnicové úrovni a je dostupný v kanonickém repozitáři: https://codeberg.org/godisch/potillus/

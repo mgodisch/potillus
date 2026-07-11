@@ -48,3 +48,11 @@
 package_name("de.godisch.potillus")
 
 json_key_file(ENV["SUPPLY_JSON_KEY"] || "fastlane/play-store-credentials.json")
+
+# app_identifier -- the iOS bundle identifier, consumed by the `platform :ios`
+# lanes (deliver/snapshot). It matches ios/project.yml → PRODUCT_BUNDLE_IDENTIFIER
+# and the Android applicationId above; both platforms share the one identifier.
+# The App Store Connect API key (the iOS credential) is NOT configured here: it is
+# injected via the APP_STORE_CONNECT_API_KEY_* environment variables that the
+# Fastfile's `app_store_connect_api_key` call reads (see Fastfile, iOS block).
+app_identifier("de.godisch.potillus")

@@ -413,6 +413,19 @@ are reached.
 
 ## 6. Translation workflow
 
+> **🌍 Native speakers wanted — this is the easiest way to help.**
+> Only **English** and **German** are written by the author. Every other
+> language — both the in-app strings **and** the App Store / Play Store listing
+> texts (name subtitle, keywords, description) — is **machine-translated and has
+> never been checked by a native speaker.** It is very likely to read awkwardly
+> or be subtly wrong, and the store keywords in particular are a best-effort
+> guess at what people actually search for in each market. If you are fluent in
+> any non-German language we ship, reviewing even one screen's worth of strings
+> is a valuable, self-contained contribution: open an issue or pull request (see
+> Section 2) with the language and the improved wording. No build setup is
+> required to propose better text. The paths to every translatable file are
+> below.
+
 Libellus Potionis is fully localized. String resources live in
 `app/src/main/res/values-<qualifier>/strings.xml`, where `<qualifier>` is the
 Android resource qualifier (e.g. `values-fr/`, `values-pt-rBR/`,
@@ -526,6 +539,36 @@ English word.)
    every report label.
 3. Run `make ios` (or `python3 tools/check-l10n-parity.py` directly) to confirm the
    catalogue is complete and agrees with Android.
+
+### 6.2 Store listing texts (Play Store and App Store)
+
+Separate from the in-app strings above are the **store listing** texts — the
+title, short/long description, keywords and release notes that appear on the
+Play Store and App Store product pages. These are **not** covered by the parity
+check and follow each store's own format:
+
+- **Play Store** — `fastlane/metadata/android/<locale>/`: `title.txt`,
+  `short_description.txt` (≤80 chars), `full_description.txt`, and
+  `changelogs/<versionCode>.txt`. Read by `fastlane supply` (`make push-playstore`)
+  and by F-Droid.
+- **App Store** — `fastlane/metadata/ios/<locale>/`: `name.txt` (≤30),
+  `subtitle.txt` (≤30), `keywords.txt` (≤100, comma-separated, **no spaces**),
+  `description.txt` (≤4000), `release_notes.txt`, plus the support/marketing/
+  privacy URLs. Global files (`copyright.txt`, `primary_category.txt`,
+  `secondary_category.txt`, `review_information/`) sit at the top of that tree.
+  Read by `fastlane deliver` (see [`appstore/README.md`](appstore/README.md)).
+  Locale codes follow App Store Connect, which differs from Android in a few
+  cases (`no`, `zh-Hans`, `zh-Hant`, `pt-PT`, `pt-BR`).
+
+**Provenance — please read before trusting these.** English and German are the
+author's wording. **The App Store texts for all other languages were produced
+mechanically**: the description reuses the existing (translator-written) Play
+Store text with only the two platform-specific sentences swapped for their iOS
+equivalents, while the **subtitle and keywords were machine-translated from the
+English reference and are unreviewed**. The keyword lists especially are a
+best-effort guess — real App Store search terms are market-specific and are
+exactly the kind of thing a native speaker should refine. Corrections are
+welcome through the same issue/PR path as the in-app strings.
 
 ---
 
