@@ -512,6 +512,37 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add from-scratch Android and iOS install guides  (patch -95)
+
+Two root-level onboarding documents now take a blank OS to a runnable debug build,
+so a new contributor no longer has to reverse-engineer the toolchain from the
+Makefiles: INSTALL-ANDROID.md goes from a fresh Debian GNU/Linux stable install to
+`android/app/build/outputs/apk/debug/app-debug.apk`, and INSTALL-IOS.md goes from a
+fresh macOS install to the app running in the iPhone Simulator.
+
+WHAT THEY COVER
+  - INSTALL-ANDROID.md: the apt packages (JDK 21, git/unzip/curl/python3/make), the
+    manual Android SDK setup via `sdkmanager` (platform-tools, build-tools,
+    platforms;android-35 and android-36, licence acceptance, ANDROID_HOME), and the
+    build itself (`make debug` → `./gradlew assembleDebug`). It explains that Gradle
+    9.6.1 arrives through the committed wrapper and AGP 9.2.0/Kotlin 2.4.0 through
+    Maven, that no NDK is needed, and that compileSdk/targetSdk is 36 with minSdk 30.
+  - INSTALL-IOS.md: Xcode 26 (iOS 17 SDK) plus `xcode-select`, Homebrew, and
+    `brew install make xcodegen`; project generation with `gmake ios-project`
+    (Version.xcconfig then `xcodegen generate`, since Potillus.xcodeproj is generated,
+    not committed); the Simulator build as the primary path (Xcode Run, and the
+    headless `xcodebuild -destination 'generic/platform=iOS Simulator' ...` with the
+    GRDB-arch pitfall explained); GRDB 7.11.1 resolved automatically by SwiftPM via
+    PotillusKit; and a physical-device appendix using free personal-team signing.
+
+SCOPE AND CONVENTIONS
+  Publishing (F-Droid, Play Store, App Store) is deliberately excluded, matching the
+  request. Both files carry the canonical GPL file header and live at the repository
+  root beside README.md, which gains a short pointer to them. INSTALL-ANDROID.md is
+  Android-scoped, but it is logged here in the ios-branch §12 log because it was
+  produced in this working session; at merge these collapse into the root changelog
+  as usual. This change is documentation-only; no code or build behaviour changes.
+
 #### Note container syntax check on roadmap  (patch -94)
 
 A Mac-independent brace/delimiter-balance pre-check is recorded as a low-priority

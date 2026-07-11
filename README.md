@@ -177,6 +177,12 @@ native app. The concrete, measured accessibility gaps and the path toward WCAG
 
 ### Build Infrastructure & Tooling
 
+To build the app from source, follow the step-by-step guides that take a blank
+operating system to a runnable debug build:
+[INSTALL-ANDROID.md](INSTALL-ANDROID.md) (debug APK from a fresh Debian GNU/Linux
+install) and [INSTALL-IOS.md](INSTALL-IOS.md) (debug build in the iPhone Simulator
+from a fresh macOS install).
+
 This project maintains a highly modern and robust build infrastructure by
 leveraging the cutting-edge Android Gradle Plugin 9.2.0, Gradle 9.4.1, and the
 Kotlin 2.3.21 compiler line. To ensure architecture stability and compliance
