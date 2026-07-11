@@ -280,11 +280,14 @@ lint: prereq
 	./gradlew ktlintCheck lintDebug
 
 test-device: prereq
-	# A connected device/emulator (state "device") is required before the work
-	# below; adb's list is printed so a missing or offline device is visible,
-	# then grep aborts the recipe here if none is ready.
+	# A connected device/emulator (state "device") is required. `set -x` traces the
+	# probe so the actual `adb devices` command is visible AT the point it runs
+	# (.ONESHELL echoes the whole recipe once, up front and far from any failure);
+	# grep aborts the recipe here if none is ready.
+	set -x
 	adb devices
 	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
 	# Compose UI tests need the host Activity RESUMED and VISIBLE. On a device whose
 	# screen is OFF or LOCKED the Activity is immediately paused/stopped (logcat:
 	# isSleeping=true) and no Compose hierarchy attaches -> "No compose hierarchies
@@ -299,11 +302,14 @@ test-device: prereq
 install: install-debug
 
 install-debug: app/build/outputs/apk/debug/app-debug.apk
-	# A connected device/emulator (state "device") is required before the work
-	# below; adb's list is printed so a missing or offline device is visible,
-	# then grep aborts the recipe here if none is ready.
+	# A connected device/emulator (state "device") is required. `set -x` traces the
+	# probe so the actual `adb devices` command is visible AT the point it runs
+	# (.ONESHELL echoes the whole recipe once, up front and far from any failure);
+	# grep aborts the recipe here if none is ready.
+	set -x
 	adb devices
 	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
 	adb install -r $<
 
 clean: prereq

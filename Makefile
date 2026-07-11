@@ -214,12 +214,16 @@ install: ../downloads/potillus-$(VERSION)-debug.apk
 #   build and is skipped (|| true) on a locked production device WITHOUT affecting
 #   the captured screenshots.
 screenshots:
-	$(MAKE) -C android prereq
-	# A connected device/emulator (state "device") is required before the work
-	# below; adb's list is printed so a missing or offline device is visible,
-	# then grep aborts the recipe here if none is ready.
+	# A connected device/emulator (state "device") is required; fail fast BEFORE
+	# the expensive build below. `set -x` traces the probe so the actual
+	# `adb devices` command is visible AT the point it runs -- .ONESHELL echoes the
+	# whole recipe once, up front and far from any failure, so the trace (not that
+	# echo) is what shows next to the error. grep aborts here if none is ready.
+	set -x
 	adb devices
 	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
+	$(MAKE) -C android prereq
 	# 0) Pre-flight: the BUNDLED fastlane must be installed in fastlane before any
 	#    expensive work (the Gradle build and the device / Demo-Mode setup below).
 	#    The gems are vendored under fastlane/.vendor via `cd fastlane && bundle
@@ -554,12 +558,16 @@ store-assets:
 #   `.test` androidTest suffix, with the AndroidX JUnit runner.
 INSTR := de.godisch.potillus.debug.test/androidx.test.runner.AndroidJUnitRunner
 report-pdfs:
-	$(MAKE) -C android prereq
-	# A connected device/emulator (state "device") is required before the work
-	# below; adb's list is printed so a missing or offline device is visible,
-	# then grep aborts the recipe here if none is ready.
+	# A connected device/emulator (state "device") is required; fail fast BEFORE
+	# the expensive build below. `set -x` traces the probe so the actual
+	# `adb devices` command is visible AT the point it runs -- .ONESHELL echoes the
+	# whole recipe once, up front and far from any failure, so the trace (not that
+	# echo) is what shows next to the error. grep aborts here if none is ready.
+	set -x
 	adb devices
 	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
+	$(MAKE) -C android prereq
 	# 1) Build, then (re)install the app + instrumentation APKs. Any prior copy is
 	#    removed first so a signature/downgrade mismatch cannot block the install
 	#    (that failure prints an empty reason after "Performing Streamed Install"),
