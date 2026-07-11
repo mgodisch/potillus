@@ -177,6 +177,7 @@ help:
 # Formerly the default goal, and formerly called `debug`. It was renamed when the
 # repository grew a second platform: `make debug` no longer says which one.
 android:
+	$(MAKE) check-l10n-parity
 	$(MAKE) -C android debug unit-test lint check-guides
 	$(MAKE) feature-graphics-existing
 	$(MAKE) install
@@ -842,7 +843,7 @@ ios/Potillus/Resources/copyright.md: COPYING.md LICENSE.md LICENSE.Apache-2.0.md
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
 ios: check-headers check-makefile check-swift-tests check-swift-symbols \
-     check-report-paper check-report-labels check-l10n check-swiftlint ios-project
+     check-report-paper check-l10n-parity check-l10n check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots`
@@ -933,12 +934,13 @@ check-report-paper:
 check-l10n:
 	python3 tools/check-l10n.py
 
-# check-report-labels: ReportLabelsCatalog.swift is generated from Android's report
-# strings and excluded from SwiftLint, so this guards it — it must match the
-# generator's current output (no drift, no hand edits) and every language's closure
-# must carry the same interpolation count as English.
-check-report-labels:
-	python3 tools/check-report-labels.py
+# check-l10n-parity: the iOS catalogue is self-contained (the build reads neither
+# android/ nor any generator), so this is the anti-drift safety net. It runs in BOTH
+# `make ios` and `make android`, reading android/ ONLY to compare: every UI literal
+# has a catalogue key, every catalogue translation whose English matches an Android
+# string is identical to Android's, and the report labels match Android too.
+check-l10n-parity:
+	python3 tools/check-l10n-parity.py
 
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
@@ -982,4 +984,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-report-labels ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project store-assets screenshots screenshots-demo-off screenshots-pdf feature-graphics feature-graphics-existing _cascade-feature-graphics report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper

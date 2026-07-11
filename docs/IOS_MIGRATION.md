@@ -512,6 +512,47 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Decouple the iOS build from android/: self-contained l10n  (patch -87)
+
+The iOS localisation is now laid out the way a native iOS app's would be, and the
+iOS build no longer depends on android/ for any of its content.
+
+WHAT WAS COUPLED
+  Two committed artefacts used to be GENERATED from android/'s strings.xml:
+  Localizable.xcstrings (via build-xcstrings.py) and ReportLabelsCatalog.swift (via
+  build-report-labels.py). Worse, check-report-labels.py ran the report generator as
+  a subprocess DURING `make ios`, so the iOS build read android/ transitively — it
+  would break if android/ were absent.
+
+WHAT CHANGED (Variante A — the catalogue IS the truth)
+  - Localizable.xcstrings and ReportLabelsCatalog.swift are now the committed,
+    hand-maintained source of truth, edited like any native iOS resource. Their
+    values were frozen from the last generator run, so nothing changed for users.
+  - Removed the android-reading generators and helpers: build-xcstrings.py,
+    build-report-labels.py, and the twenty l10n_XX.py translation tables.
+  - Removed check-report-labels.py (it regenerated from android/ to compare).
+  - The iOS BUILD now reads neither android/ nor any generator for its l10n.
+
+ANTI-DRIFT SAFETY NET (tools/check-l10n-parity.py)
+  A single new check keeps the platforms from silently diverging, and by explicit
+  design runs in BOTH `make ios` and `make android`. It reads android/ ONLY to
+  compare — it never generates iOS content from it. Three checks:
+    1. every UI string literal in the views has a key in the catalogue (the
+       untranslated-key safety the generator used to provide);
+    2. every catalogue translation whose English key equals an Android string is
+       IDENTICAL to Android's translation, in all twenty languages;
+    3. the report labels match Android's strings.xml for the same keys.
+  A mismatch is a hard error: the platforms have diverged and a human must decide
+  which wording wins and update the other side. Building the check surfaced that
+  several apparent divergences (e.g. French "Stats", Chinese "月") were NOT drift —
+  iOS matches a DIFFERENT Android string that shares the English word (nav_statistics
+  vs statistics; month vs pdf_col_month), so the check compares against every Android
+  string sharing the English value and passes if any matches.
+
+NOTE ON check-headers: it still scans android/ headers in `make ios`, but that is
+the repo-wide licence-header lint, not an l10n content dependency; it is unchanged
+and out of scope here.
+
 #### Parity P2d: add iOS coverage to .bestpractices.json  (patch -86)
 
 The badge answers described only the Android build, tooling, crypto, and tests. This

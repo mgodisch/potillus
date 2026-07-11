@@ -48,10 +48,12 @@ import SwiftUI
 // runtime value — which is exactly why the views must call this rather than pass a
 // literal to `Text`, since `Text(runtimeString)` does NOT re-localise.
 //
-// THE KEY is the English source text, as the String Catalog is built (see
-// tools/build-xcstrings.py). `Loc.string("Today")` looks up "Today". A missing key
-// returns itself, so an un-added string shows in English rather than crashing —
-// visible, not fatal.
+// THE KEY is the English source text, as Apple's String Catalog uses it.
+// `Loc.string("Today")` looks up "Today" in Localizable.xcstrings — the committed,
+// hand-maintained catalogue (no generator, no android/). A missing key returns
+// itself, so an un-added string shows in English rather than crashing — visible,
+// not fatal — and tools/check-l10n-parity.py flags any literal with no catalogue
+// key so it does not slip through.
 // =============================================================================
 
 enum Loc {
