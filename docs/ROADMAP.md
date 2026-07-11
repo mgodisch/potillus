@@ -86,6 +86,15 @@ attainable until each is resolved. They are the most critical open items.
   `KeystoreSecretStore`, so a future algorithm can be selected per record. A
   security-critical change: requires thorough tests, including an instrumented
   round-trip, a legacy-blob read, and tamper/downgrade rejection.
+- **Re-visit explicit iOS App Transport Security.** ATS is currently left at its
+  strict Xcode default, which is correct: the app makes no network connections at
+  all, so there is nothing for an explicit declaration to harden, and the only way
+  to state one (a nested Info.plist dictionary) would trade a working
+  `GENERATE_INFOPLIST_FILE` setup for either an `info:`/`properties:` block or a
+  PlistBuddy build step, all for zero behavioural change. If a future auditor or a
+  store reviewer wants an explicit `NSAllowsArbitraryLoads = false` on record as a
+  visible commitment, revisit this and add it deliberately, verifying the Info.plist
+  generation stays intact.
 
 ## Accessibility
 

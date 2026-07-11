@@ -41,9 +41,15 @@ requirements are met — including the threat model and trust boundaries — is 
 
 **What users can expect:**
 
-- **The app never transmits your data.** It holds no network permission at all,
-  so it cannot exfiltrate data, sync to a cloud, or contact any server. It works
-  entirely offline.
+- **The app never transmits your data.** It works entirely offline and contacts
+  no server. On **Android** it holds no network permission at all, so it is
+  incapable of network access. On **iOS**, where there is no equivalent
+  install-time network permission, the guarantee is upheld in the code: the app
+  contains no networking APIs whatsoever — no `URLSession`, no `Network`
+  framework, no sockets — and its one web view (used only to lay out the PDF
+  report) loads a local HTML string with no base URL, so it too reaches nothing.
+  App Transport Security is left at its strict default, though with no connections
+  to govern it has nothing to enforce.
 - **Data minimization and least privilege.** The app requests no camera,
   microphone, location, contacts, or runtime storage permissions. It collects
   only the data you enter.

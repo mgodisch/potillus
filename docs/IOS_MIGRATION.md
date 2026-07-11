@@ -512,6 +512,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Parity P2b: document the no-network guarantee; ATS stays default  (patch -84)
+
+The iOS counterpart of Android's "no INTERNET permission". iOS has no install-time
+network permission, so the guarantee is stated where it actually lives — the code.
+An exhaustive scan confirms the iOS source contains no networking APIs at all: no
+URLSession, no Network framework, no sockets, and the one WKWebView (PDF report
+layout) loads a local HTML string with baseURL:nil, reaching nothing.
+
+App Transport Security is deliberately LEFT AT ITS STRICT XCODE DEFAULT rather than
+declared explicitly. ATS is already at its most restrictive by default, and with no
+connections to govern it has nothing to enforce; the only way to state it explicitly
+is a nested Info.plist dictionary, which would trade the working
+GENERATE_INFOPLIST_FILE setup for an info:/properties: block or a PlistBuddy step —
+real risk for zero behavioural change. SECURITY.md now states both the Android and
+the iOS form of the guarantee. A roadmap note (SHOULD section) records that an
+explicit ATS declaration can be revisited if an auditor or store reviewer ever wants
+it on record.
+
 #### Parity P2a: keep the consumption log out of device backups  (patch -83)
 
 Android declares `android:allowBackup="false"`, removing the whole app from Google's
