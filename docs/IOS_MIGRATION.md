@@ -512,6 +512,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Harden l10n check against missing localizations  (patch -101)
+
+`tools/check-l10n.py` crashed with `KeyError: 'localizations'` on any String
+Catalog entry that carries no `localizations` key — a legitimate state Xcode
+produces (an entry marked `shouldTranslate: false`, or a freshly harvested key it
+has not localized yet). The plural-placeholder check now reads the key defensively
+(`entry.get("localizations", {})`) and treats such an entry as "no plurals to
+check" instead of aborting the whole `make -C ios` run.
+
+Found while verifying patch -100 on the Mac: the check is run before the build, so
+its crash blocked compilation even though it is unrelated to the Swift changes
+(the committed catalogue is well-formed; the missing key came from a locally
+Xcode-modified catalogue). No translation coverage is hidden — parity is a
+separate check, and this one only compares plural placeholders, which an entry
+without localizations does not have.
+
 #### Add iOS screenshot-mode app hooks  (patch -100)
 
 The app side of the automated App Store screenshot capture — the deterministic

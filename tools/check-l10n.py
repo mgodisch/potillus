@@ -117,13 +117,18 @@ def plural_placeholder_problems():
     strings = json.loads(catalogue.read_text(encoding="utf-8"))["strings"]
     problems = []
     for key, entry in strings.items():
-        english = entry["localizations"].get("en", {})
+        # A String Catalog entry may legitimately carry no `localizations` key at
+        # all — e.g. one marked `shouldTranslate: false`, or a freshly harvested key
+        # Xcode has not localized yet. Treat that as "no plurals to check" rather
+        # than crashing the whole run on a KeyError.
+        localizations = entry.get("localizations", {})
+        english = localizations.get("en", {})
         plural = english.get("variations", {}).get("plural")
         if not plural:
             continue
         other = plural["other"]["stringUnit"]["value"]
         want = len(re.findall(r"%\d*\$?lld", other))
-        for lang, loc in entry["localizations"].items():
+        for lang, loc in localizations.items():
             for form, unit in loc.get("variations", {}).get("plural", {}).items():
                 value = unit["stringUnit"]["value"]
                 got = len(re.findall(r"%\d*\$?lld", value))
