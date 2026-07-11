@@ -27,8 +27,8 @@
 #                   guide sync) + debug APK, then refresh existing feature graphics
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
 #                   split out of `debug`                          [needs a device]
-#      release      fresh screenshots + feature graphics (no new report PDFs),
-#                   then the signed release APK, AAB and SBOM      [needs a device]
+#      release      the signed release APK, AAB and SBOM (device-free; does NOT
+#                   capture screenshots -- run `make screenshots` first if needed)
 #      install      copy the freshly built debug APK to the local install path
 #    Store assets
 #      store-assets       full set in one go: screenshots + report-pdfs, then
@@ -164,16 +164,15 @@ debug:
 device-tests:
 	$(MAKE) -C android test-device
 
-# ── release ── fresh in-app screenshots (01..06) + feature graphics WITHOUT
-# re-exporting the report PDFs (07/08 are left as-is), then build the signed
-# release APK, the release AAB and the shared SBOM. `screenshots` recaptures
-# every locale's in-app shots and refreshes the feature graphics but does NOT
-# touch the report pages 07/08 or their source PDFs; the android `release` and
-# `bundle` targets then produce the release APK and AAB. Both depend on the same
-# `$(SBOM)` file target, so the CycloneDX SBOM is generated exactly once. Needs a
-# device (for the capture).
+# ── release ── build the signed release APK, the release AAB and the shared
+# SBOM. This target is DEVICE-FREE and deliberately does NOT (re)capture the
+# store screenshots or feature graphics: those are store assets, refreshed on
+# demand (`make screenshots`, or `make store-assets` for the whole set) and then
+# uploaded by `push-playstore` / attached by `push-codeberg` — independently of
+# building the artifacts here, exactly as the report pages 07/08 already work.
+# The android `release` and `bundle` targets produce the APK and AAB; both depend
+# on the same `$(SBOM)` file target, so the CycloneDX SBOM is generated once.
 release:
-	$(MAKE) screenshots
 	$(MAKE) -C android release bundle
 
 install: ../downloads/potillus-$(VERSION)-debug.apk

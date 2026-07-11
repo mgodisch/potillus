@@ -291,6 +291,13 @@ listed individually below.
   requires the release tag `vX.Y.Z` to exist locally and on the push remote before
   uploading -- Play has no notion of git tags, so this is a release-hygiene gate
   that keeps every published build tied to a recorded, pushed tag.
+- `make release` no longer captures screenshots, and is now device-free. It
+  previously ran `make screenshots` first, forcing a connected device/emulator
+  just to build the signed APK/AAB/SBOM. Screenshots and feature graphics are
+  store assets needed only at publish time, so capturing them is now decoupled:
+  run `make screenshots` (or `make store-assets` for the whole set) on demand,
+  exactly as the report pages 07/08 already worked. Building the release
+  artifacts needs no device.
 - Release-tooling hygiene. The redundant early `command -v bundle` in
   `push-playstore` was dropped (the `bundle check` guard already covers it), and
   a stale reference to a non-existent `docs/PLAY_STORE.md` was removed from
