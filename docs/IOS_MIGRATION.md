@@ -512,6 +512,23 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Correct stale build-tool versions in README  (patch -96)
+
+The "Build Infrastructure & Tooling" prose in README.md listed several tool versions
+that had drifted behind the actual pins. Each figure was re-checked against its
+authoritative source and corrected where stale:
+
+  - Gradle 9.4.1 → 9.6.1 (from android/gradle/wrapper/gradle-wrapper.properties).
+  - Kotlin 2.3.21 → 2.4.0, KSP 2.3.7 → 2.3.9, Compose BOM 2026.04.01 → 2026.06.00,
+    Navigation Compose 2.8.9 → 2.9.7 (all from android/gradle/libs.versions.toml).
+
+Figures already matching the pins were left untouched (AGP 9.2.0, Activity 1.12.3,
+Lifecycle 2.10.0, Room 2.8.4, Desugar 2.1.5). Two that are not keyed in the
+[versions] table were verified before deciding not to change them: the Compose
+runtime 1.11 line is what BOM 2026.06.00 pulls (per the toml's own note), and
+kotlinx-serialization-core 1.11.0 matches its inline library pin. This change is
+documentation-only; no code or build behaviour changes.
+
 #### Add from-scratch Android and iOS install guides  (patch -95)
 
 Two root-level onboarding documents now take a blank OS to a runnable debug build,

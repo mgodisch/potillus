@@ -184,14 +184,14 @@ install) and [INSTALL-IOS.md](INSTALL-IOS.md) (debug build in the iPhone Simulat
 from a fresh macOS install).
 
 This project maintains a highly modern and robust build infrastructure by
-leveraging the cutting-edge Android Gradle Plugin 9.2.0, Gradle 9.4.1, and the
-Kotlin 2.3.21 compiler line. To ensure architecture stability and compliance
+leveraging the cutting-edge Android Gradle Plugin 9.2.0, Gradle 9.6.1, and the
+Kotlin 2.4.0 compiler line. To ensure architecture stability and compliance
 with modern platform standards, the application fully decouples Kotlin Symbol
-Processing via KSP 2.3.7 and structures its UI layer around the Jetpack Compose
-BOM 2026.04.01 (Compose Runtime 1.11.0), Jetpack Activity 1.12.3, and Jetpack
+Processing via KSP 2.3.9 and structures its UI layer around the Jetpack Compose
+BOM 2026.06.00 (Compose Runtime 1.11.0), Jetpack Activity 1.12.3, and Jetpack
 Lifecycle 2.10.0. 
 
-UI navigation is anchored on the type-safe Navigation Compose 2.8.9 stable
+UI navigation is anchored on the type-safe Navigation Compose 2.9.7 stable
 release, and the runtime environment utilizes Kotlinx Serialization Core 1.11.0
 to eliminate compiler compatibility conflicts. On the data and security front,
 the app utilizes Room 2.8.4 over a plain SQLite database that is protected at
