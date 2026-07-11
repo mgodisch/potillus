@@ -512,6 +512,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Parity P2c: correct the reproducibility/signing claims for stores  (patch -85)
+
+The `build_reproducible` and `signed_releases` justifications in .bestpractices.json
+stated the reproducible-build and author-signing story as if it were universal. It is
+not — it is bound to the productive channels. This corrects them, from official store
+documentation:
+
+  • Codeberg release tags and F-Droid (PRODUCTIVE): the maintainer signs, and anyone
+    can rebuild from a tag and compare bit-for-bit. Unchanged; still accurate.
+  • Google Play (PLANNED): Play App Signing has the developer sign the upload with an
+    upload key, and Google re-signs the distributed APK with a Google-held key.
+  • Apple App Store (PLANNED): the developer signs with a distribution certificate and
+    App Store Connect re-signs with an Apple identity.
+
+So on the store channels the store — not the maintainer — holds the distribution
+signing key, and the published binary is not author-reproducible bit-for-bit. That is
+a property of those platforms, not a project choice. The iOS build itself is
+deterministic from the repository (declarative XcodeGen project, pinned Swift package
+for the one dependency), but App Store distribution offers no F-Droid-style
+reproducible re-signing.
+
+NOTE FOR THE MAINTAINER: .bestpractices.json is a downloaded SNAPSHOT of the answers
+on bestpractices.dev (the Makefile `bestpractices-json` target pulls site → repo; the
+reverse is not available). These edits improve the in-repo copy; the authoritative
+badge answers on bestpractices.dev must be updated there by hand to match.
+
 #### Parity P2b: document the no-network guarantee; ATS stays default  (patch -84)
 
 The iOS counterpart of Android's "no INTERNET permission". iOS has no install-time
