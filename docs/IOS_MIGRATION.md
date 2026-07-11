@@ -512,6 +512,32 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Parity P2d: add iOS coverage to .bestpractices.json  (patch -86)
+
+The badge answers described only the Android build, tooling, crypto, and tests. This
+adds the iOS counterpart to 21 justifications, appended (never replacing the Android
+text), each backed by a checked fact in the tree:
+
+  • Crypto (6): Android's javax.crypto + Keystore has the iOS counterpart CryptoKit
+    AES-256-GCM + the Security-framework Keychain — SymmetricKey(size: .bits256), a
+    fresh per-seal nonce, only published algorithms, no re-implemented primitives.
+  • Build tooling (3): Gradle/Kotlin-DSL/wrapper → the Swift toolchain, Swift Package
+    Manager, and XcodeGen, driven by the same Makefile; all FLOSS or free.
+  • Testing (3): ./gradlew test → `swift test` for PotillusKit and xcodebuild for the
+    app target, sharing golden vectors with Android.
+  • Static analysis / style (3): Android Lint / Kotlin conventions → SwiftLint pinned
+    to 0.65.0 and run --strict as a release gate, plus the seven project linters.
+  • Dependencies (2): AndroidX/Jetpack → the single pinned SwiftPM dependency GRDB.
+  • i18n / a11y / versioning (4): String Catalog with the same locale set; VoiceOver
+    and Dynamic Type; MARKETING_VERSION from the same CHANGELOG source of truth.
+
+HONESTY NOTE: interfaces_current does NOT claim deprecation-as-error parity, because
+iOS has no SWIFT_TREAT_WARNINGS_AS_ERRORS in the project — the addition states plainly
+that currency rests on the modern target and review, not a warnings-as-errors flag.
+The ~67 justifications that mention Kotlin/Gradle only in passing were left untouched;
+adding iOS boilerplate there would be noise. As with -85, .bestpractices.json is a
+snapshot of bestpractices.dev and the authoritative answers must be updated there.
+
 #### Parity P2c: correct the reproducibility/signing claims for stores  (patch -85)
 
 The `build_reproducible` and `signed_releases` justifications in .bestpractices.json
