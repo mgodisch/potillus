@@ -135,11 +135,10 @@ vendored source copy, so it is "de-embedded" via build-depends as required.
   collects no telemetry.
 
 The MIT License permits redistribution provided the copyright notice and the
-permission notice accompany the software.  This file records them; the iOS
-application must additionally reproduce the licence text in its about screen
-before release, as the Android application already does.  MIT is compatible with
-the GNU GPL version 3, so the combined work is distributable under the terms
-stated at the top of this document.
+permission notice accompany the software.  This file records them, and both the
+Android and the iOS application reproduce the licence text in their about screen.
+MIT is compatible with the GNU GPL version 3, so the combined work is
+distributable under the terms stated at the top of this document.
 
 ## Third-Party Assets
 

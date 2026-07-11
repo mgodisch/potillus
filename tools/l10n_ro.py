@@ -26,6 +26,14 @@
 
 # Romanian translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Despre",
+    "Version": "Versiune",
+    "Licence": "Licență",
+    "Copyright & licence": "Drepturi de autor și licență",
+    "Open-source components": "Componente open-source",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis este software liber sub licența GNU GPL, versiunea 3 sau ulterioară.",
+    "This document could not be loaded.": "Acest document nu a putut fi încărcat.",
     "%1$@ is used by %2$lld entries.": "%1$@ este folosit de %2$lld înregistrări.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

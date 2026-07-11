@@ -26,6 +26,14 @@
 
 # Japanese translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "情報",
+    "Version": "バージョン",
+    "Licence": "ライセンス",
+    "Copyright & licence": "著作権とライセンス",
+    "Open-source components": "オープンソースコンポーネント",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis は GNU GPL バージョン 3 以降のもとで提供されるフリーソフトウェアです。",
+    "This document could not be loaded.": "このドキュメントを読み込めませんでした。",
     "%1$@ is used by %2$lld entries.": "%1$@ は %2$lld 件の記録で使用されています。",
     "%1$lld ml · %2$@": "%1$lld ml・%2$@",
     "A drink logged before this time counts towards the previous day.":

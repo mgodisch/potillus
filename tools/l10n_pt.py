@@ -26,6 +26,14 @@
 
 # European Portuguese translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Acerca de",
+    "Version": "Versão",
+    "Licence": "Licença",
+    "Copyright & licence": "Direitos de autor e licença",
+    "Open-source components": "Componentes de código aberto",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "O Libellus Potionis é software livre sob a GNU GPL, versão 3 ou posterior.",
+    "This document could not be loaded.": "Não foi possível carregar este documento.",
     "%1$@ is used by %2$lld entries.": "%1$@ é usado por %2$lld registos.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

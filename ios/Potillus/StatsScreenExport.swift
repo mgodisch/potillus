@@ -126,17 +126,9 @@ extension StatsScreen {
         }
     }
 
-    /// `MAJOR.MINOR.PATCH`, with any build suffix removed.
-    ///
-    /// Android prints `BuildConfig.VERSION_NAME.substringBefore("-")` so that a
-    /// debug build's `-debug` never reaches the footer. `MARKETING_VERSION` comes
-    /// from `Version.xcconfig`, which `tools/gen-ios-version.py` derives from
-    /// CHANGELOG.md, so the same rule applies for the same reason.
-    static var appVersion: String {
-        let raw = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
-        let version = (raw as? String) ?? "0.0.0"
-        return String(version.prefix(while: { $0 != "-" }))
-    }
+    /// `MAJOR.MINOR.PATCH`, defined once in `AppInfo`; the report footer and the
+    /// About screen read the same value rather than two copies of the lookup.
+    static var appVersion: String { AppInfo.version }
 
     /// Builds the PDF report for the period on screen.
     ///

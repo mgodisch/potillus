@@ -87,6 +87,7 @@ struct SettingsScreen: View {
                 appearanceSection
                 securitySection
                 backupSection
+                aboutSection
             }
             .navigationTitle(Loc.string("Settings", locale: locale))
             .navigationBarTitleDisplayMode(.inline)
@@ -459,6 +460,14 @@ extension SettingsScreen {
                     : Loc.importedPlural(count: stats.imported, locale: locale)
             } catch {
                 backupFailure = String(describing: error)
+            }
+        }
+    }
+
+    private var aboutSection: some View {
+        Section {
+            NavigationLink(Loc.string("About", locale: locale)) {
+                AboutScreen()
             }
         }
     }

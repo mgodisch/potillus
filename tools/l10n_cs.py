@@ -26,6 +26,14 @@
 
 # Czech translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "O aplikaci",
+    "Version": "Verze",
+    "Licence": "Licence",
+    "Copyright & licence": "Autorská práva a licence",
+    "Open-source components": "Open source komponenty",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis je svobodný software pod licencí GNU GPL, verze 3 nebo novější.",
+    "This document could not be loaded.": "Tento dokument se nepodařilo načíst.",
     "%1$@ is used by %2$lld entries.": "%1$@ používá %2$lld záznamů.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

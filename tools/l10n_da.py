@@ -28,6 +28,14 @@
 # (from Android values-da) is merged separately by the builder. Interpolation keys
 # keep their %-placeholders; pure-interpolation strings are absent (language-neutral).
 MINE = {
+    # About screen (patch -81)
+    "About": "Om",
+    "Version": "Version",
+    "Licence": "Licens",
+    "Copyright & licence": "Ophavsret & licens",
+    "Open-source components": "Open source-komponenter",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis er fri software under GNU GPL, version 3 eller nyere.",
+    "This document could not be loaded.": "Dette dokument kunne ikke indlæses.",
     "%1$@ is used by %2$lld entries.": "%1$@ bruges af %2$lld registreringer.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

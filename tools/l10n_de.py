@@ -29,6 +29,14 @@
 # separately by the builder. Pure-interpolation strings are intentionally ABSENT
 # here: they carry no words and are the same in every language.
 MINE_DE = {
+    # About screen (patch -81)
+    "About": "Über",
+    "Version": "Version",
+    "Licence": "Lizenz",
+    "Copyright & licence": "Copyright & Lizenz",
+    "Open-source components": "Open-Source-Komponenten",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis ist freie Software unter der GNU GPL, Version 3 oder höher.",
+    "This document could not be loaded.": "Dieses Dokument konnte nicht geladen werden.",
     'Alcohol': 'Alkohol',
     'Alcohol (%)': 'Alkohol (%)',
     'Category': 'Kategorie',

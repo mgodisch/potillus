@@ -26,6 +26,14 @@
 
 # Greek translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Σχετικά",
+    "Version": "Έκδοση",
+    "Licence": "Άδεια",
+    "Copyright & licence": "Πνευματικά δικαιώματα και άδεια",
+    "Open-source components": "Στοιχεία ανοιχτού κώδικα",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Το Libellus Potionis είναι ελεύθερο λογισμικό υπό την GNU GPL, έκδοση 3 ή νεότερη.",
+    "This document could not be loaded.": "Δεν ήταν δυνατή η φόρτωση αυτού του εγγράφου.",
     "%1$@ is used by %2$lld entries.": "Το %1$@ χρησιμοποιείται από %2$lld καταχωρίσεις.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

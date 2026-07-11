@@ -26,6 +26,14 @@
 
 # Ukrainian translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Про застосунок",
+    "Version": "Версія",
+    "Licence": "Ліцензія",
+    "Copyright & licence": "Авторські права та ліцензія",
+    "Open-source components": "Компоненти з відкритим кодом",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis — вільне ПЗ за ліцензією GNU GPL версії 3 або новішої.",
+    "This document could not be loaded.": "Не вдалося завантажити цей документ.",
     "%1$@ is used by %2$lld entries.": "%1$@ використовується в %2$lld записах.",
     "%1$lld ml · %2$@": "%1$lld мл · %2$@",
     "A drink logged before this time counts towards the previous day.":

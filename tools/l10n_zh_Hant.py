@@ -26,6 +26,14 @@
 
 # Traditional Chinese translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "關於",
+    "Version": "版本",
+    "Licence": "授權",
+    "Copyright & licence": "版權與授權",
+    "Open-source components": "開放原始碼元件",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis 是遵循 GNU GPL 第 3 版或更新版本的自由軟體。",
+    "This document could not be loaded.": "無法載入此文件。",
     "%1$@ is used by %2$lld entries.": "%1$@ 被 %2$lld 筆記錄使用。",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

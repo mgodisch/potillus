@@ -26,6 +26,14 @@
 
 # Russian translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "О приложении",
+    "Version": "Версия",
+    "Licence": "Лицензия",
+    "Copyright & licence": "Авторские права и лицензия",
+    "Open-source components": "Компоненты с открытым исходным кодом",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis — свободное ПО под лицензией GNU GPL версии 3 или новее.",
+    "This document could not be loaded.": "Не удалось загрузить этот документ.",
     "%1$@ is used by %2$lld entries.": "%1$@ используется в %2$lld записях.",
     "%1$lld ml · %2$@": "%1$lld мл · %2$@",
     "A drink logged before this time counts towards the previous day.":

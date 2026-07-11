@@ -26,6 +26,14 @@
 
 # Korean translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "정보",
+    "Version": "버전",
+    "Licence": "라이선스",
+    "Copyright & licence": "저작권 및 라이선스",
+    "Open-source components": "오픈 소스 구성 요소",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis은(는) GNU GPL 버전 3 이상에 따른 자유 소프트웨어입니다.",
+    "This document could not be loaded.": "이 문서를 불러올 수 없습니다.",
     "%1$@ is used by %2$lld entries.": "%1$@은(는) %2$lld개의 기록에서 사용됩니다.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

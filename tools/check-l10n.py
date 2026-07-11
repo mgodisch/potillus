@@ -57,6 +57,7 @@ ALLOWED_EXACT = {
     "Libellus Potionis",                       # proper noun
     "Libellus Potionis could not start",       # pre-locale failure view (documented)
     "Libellus Potionis is locked",             # cover, localised via Loc elsewhere
+    "GRDB.swift",                              # proper noun: the dependency's name
 }
 # Pure interpolation or number+unit: no words to translate.
 NEUTRAL = re.compile(r"^[%\d\$@lld /·.\\()a-z_A-Z]*$")

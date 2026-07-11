@@ -26,6 +26,14 @@
 
 # Norwegian Bokmål translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Om",
+    "Version": "Versjon",
+    "Licence": "Lisens",
+    "Copyright & licence": "Opphavsrett og lisens",
+    "Open-source components": "Åpen kildekode-komponenter",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis er fri programvare under GNU GPL, versjon 3 eller nyere.",
+    "This document could not be loaded.": "Dette dokumentet kunne ikke lastes inn.",
     "%1$@ is used by %2$lld entries.": "%1$@ brukes av %2$lld registreringer.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

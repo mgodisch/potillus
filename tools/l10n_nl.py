@@ -26,6 +26,14 @@
 
 # Dutch translations for the iOS-only and reworded strings.
 MINE = {
+    # About screen (patch -81)
+    "About": "Over",
+    "Version": "Versie",
+    "Licence": "Licentie",
+    "Copyright & licence": "Copyright & licentie",
+    "Open-source components": "Opensourcecomponenten",
+    "Libellus Potionis is free software under the GNU GPL, version 3 or later.": "Libellus Potionis is vrije software onder de GNU GPL, versie 3 of later.",
+    "This document could not be loaded.": "Dit document kon niet worden geladen.",
     "%1$@ is used by %2$lld entries.": "%1$@ wordt gebruikt door %2$lld registraties.",
     "%1$lld ml · %2$@": "%1$lld ml · %2$@",
     "A drink logged before this time counts towards the previous day.":

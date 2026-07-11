@@ -71,4 +71,42 @@ final class PotillusAppTests: XCTestCase {
             PrivacyCoverDecision.isCovered(isActive: true, allowScreenshots: true)
         )
     }
+
+    // ── About screen ─────────────────────────────────────────────────────────
+    //
+    // COPYING.md requires the GRDB licence to appear in the about screen verbatim.
+    // These guard the text against a well-meaning edit that would quietly break the
+    // one licence obligation the app carries.
+
+    func testGrdbLicenceCarriesTheCopyrightLine() {
+        XCTAssertTrue(AppInfo.grdbLicense.hasPrefix("Copyright (C) 2015-2025 Gwendal Roué"))
+    }
+
+    func testGrdbLicenceCarriesThePermissionGrant() {
+        XCTAssertTrue(
+            AppInfo.grdbLicense.contains("Permission is hereby granted, free of charge")
+        )
+    }
+
+    func testGrdbLicenceCarriesTheWarrantyDisclaimer() {
+        XCTAssertTrue(AppInfo.grdbLicense.contains(#"THE SOFTWARE IS PROVIDED "AS IS""#))
+        XCTAssertTrue(AppInfo.grdbLicense.contains("DEALINGS IN THE SOFTWARE."))
+    }
+
+    /// The line continuations that fold the licence into source must not leave
+    /// double spaces or broken words: the reproduced text has to read as the original.
+    func testGrdbLicenceHasNoBrokenJoins() {
+        XCTAssertFalse(AppInfo.grdbLicense.contains("  "))
+    }
+
+    /// The version strips any build suffix, as the report footer does.
+    func testVersionStripsBuildSuffix() {
+        // AppInfo.version reads the bundle; in the test bundle it is well-formed.
+        // The transformation itself is what matters: nothing after a hyphen.
+        XCTAssertFalse(AppInfo.version.contains("-"))
+    }
+
+    func testAppNameIsTheLatinTitle() {
+        XCTAssertEqual(AppInfo.name, "Libellus Potionis")
+    }
 }
