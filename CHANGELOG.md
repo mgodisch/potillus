@@ -283,6 +283,14 @@ listed individually below.
   purely local tag made the create call fail late; the target now checks the tag
   on the same remote `make push` uses (the branch upstream, else `origin`) and
   fails fast with an actionable message.
+- `push-playstore` gains a Play-side dry run and the same tag guard. A new
+  `VALIDATE_ONLY=1` switch threads fastlane supply's `validate_only` through the
+  `testing` / `production` lanes, so `make push-playstore VALIDATE_ONLY=1`
+  validates the upload (credentials, AAB, metadata) against the Play API without
+  changing anything on Google Play. And, mirroring `push-codeberg`, the target now
+  requires the release tag `vX.Y.Z` to exist locally and on the push remote before
+  uploading -- Play has no notion of git tags, so this is a release-hygiene gate
+  that keeps every published build tied to a recorded, pushed tag.
 - Release-tooling hygiene. The redundant early `command -v bundle` in
   `push-playstore` was dropped (the `bundle check` guard already covers it), and
   a stale reference to a non-existent `docs/PLAY_STORE.md` was removed from

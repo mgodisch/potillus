@@ -711,6 +711,10 @@ push:
 #
 # The credential path mirrors the Appfile: SUPPLY_JSON_KEY if set, else
 # fastlane/play-store-credentials.json.
+#
+# VALIDATE_ONLY=1 makes this a NON-PUBLISHING dry run: fastlane supply validates
+# the upload against the Play API without changing anything on Google Play
+# (supply's validate_only). Use it to exercise credentials and metadata safely.
 # Expected release signing-key fingerprint (SHA-256 of the DER signing
 # certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
 # "Verifying releases" section rather than duplicated here, so the pin and the
@@ -724,6 +728,14 @@ SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | he
 PLAYSTORE_AAB := android/app/build/outputs/bundle/release/app-release.aab
 push-playstore:
 	test -f "$(PLAYSTORE_AAB)" || { echo "push-playstore: release AAB not found at '$(PLAYSTORE_AAB)' -- build it first with 'make release' or 'make -C android bundle'. This target does NOT build it." >&2; exit 1; }
+	# Require the release tag v$(VERSION) to exist locally AND on the push remote,
+	# mirroring the push-codeberg precondition. Play has no notion of git tags
+	# (unlike the Codeberg API, which resolves the release against a server-side
+	# tag), so this is a RELEASE-HYGIENE gate: a build only reaches Play when its
+	# exact version is recorded and pushed as a tag others can reproduce from.
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
+	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1)"; remote="$${remote:-origin}"
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null
 	# Prove the bundle is signed with the EXPECTED key before uploading; jarsigner
 	# and keytool run non-interactively and any failure aborts the recipe here.
 	# jarsigner -verify prints "jar verified." for a signed archive but returns 0
@@ -741,7 +753,7 @@ push-playstore:
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
 	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
-	( cd fastlane && bundle exec fastlane testing )
+	( cd fastlane && bundle exec fastlane testing $(if $(VALIDATE_ONLY),validate_only:true) )
 
 # ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
 # release tag from the command line instead of the web UI, and attach the built

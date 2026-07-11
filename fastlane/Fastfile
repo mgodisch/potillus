@@ -66,6 +66,12 @@ platform :android do
       track: options[:track],
       release_status: options[:status],
 
+      # Dry-run switch. When true, supply VALIDATES the edit against the Play API
+      # but changes nothing on Google Play (default false). Passed through from the
+      # testing / production lanes; coerced with to_s so it behaves whether the
+      # lane option arrives as a boolean or as a string CLI argument.
+      validate_only: options[:validate_only].to_s == 'true',
+
       # We upload a bundle, never a bare APK, so disable the APK upload paths.
       skip_upload_apk: true,
 
@@ -91,11 +97,14 @@ platform :android do
   desc '                 dedicated `production` lane below.'
   desc '  status:<name>  release status draft|completed|halted|inProgress'
   desc '                 (default: completed -- testing tracks expect completed).'
+  desc '  validate_only:<bool>  Dry run -- validate the upload against the Play API'
+  desc '                 without changing anything on Google Play (default false).'
   desc 'Example:  bundle exec fastlane testing track:beta status:draft'
   lane :testing do |options|
     upload_release(
       track: options[:track] || 'alpha',
       status: options[:status] || 'completed',
+      validate_only: options[:validate_only],
     )
   end
 
@@ -110,11 +119,14 @@ platform :android do
   desc '  track:<name>   Play track (default: production).'
   desc '  status:<name>  release status draft|completed|halted|inProgress'
   desc '                 (default: draft -- stage for manual review/publish).'
+  desc '  validate_only:<bool>  Dry run -- validate the upload against the Play API'
+  desc '                 without changing anything on Google Play (default false).'
   desc 'Example:  bundle exec fastlane production status:completed'
   lane :production do |options|
     upload_release(
       track: options[:track] || 'production',
       status: options[:status] || 'draft',
+      validate_only: options[:validate_only],
     )
   end
 end

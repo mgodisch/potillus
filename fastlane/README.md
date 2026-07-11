@@ -55,6 +55,10 @@ Options (all optional):
 
                  (default: completed -- testing tracks expect completed).
 
+  validate_only:<bool>  Dry run -- validate the upload against the Play API
+
+                 without changing anything on Google Play (default false).
+
 Example:  bundle exec fastlane testing track:beta status:draft
 
 ### android production
@@ -84,6 +88,10 @@ Options (all optional):
   status:<name>  release status draft|completed|halted|inProgress
 
                  (default: draft -- stage for manual review/publish).
+
+  validate_only:<bool>  Dry run -- validate the upload against the Play API
+
+                 without changing anything on Google Play (default false).
 
 Example:  bundle exec fastlane production status:completed
 
