@@ -512,6 +512,17 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Note container syntax check on roadmap  (patch -94)
+
+A Mac-independent brace/delimiter-balance pre-check is recorded as a low-priority
+developer-tooling item in docs/ROADMAP.md (Longer-term direction) rather than built
+now. It targets exactly the fault class of patch -93: an orphaned fragment that left
+two unbalanced `}` in an app file, invisible to every container check and surfaced
+only by the full `xcodebuild` on the Mac. The maintainer decided the tool is not
+worth the maintained code today — the Xcode build already gates syntax — so only the
+intent is captured, keeping the gap a listed decision rather than a silent one. This
+change is documentation-only; no code or build behaviour changes.
+
 #### Fix broken importedMergedPlural in Localization.swift  (patch -93)
 
 The first full-app `xcodebuild` (not just `swift test` on the kit) surfaced a syntax

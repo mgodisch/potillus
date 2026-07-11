@@ -307,6 +307,16 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see
   below); what remains before submission is App Store tooling — the store
   listing, screenshots, and the export-compliance and privacy declarations.
+- **Mac-independent Swift syntax pre-check (developer tooling).** A lightweight
+  brace/delimiter-balance check under `tools/`, run from `gmake ios` beside the
+  existing `check-swift-symbols.py`/`check-swift-tests.py` guards. None of the
+  container checks verifies delimiter balance today, so the one mechanical fault
+  that reached the `ios` branch — an orphaned code fragment leaving two unbalanced
+  `}` in an app file (change-log patch -93) — passed every container check and was
+  caught only by the Mac `xcodebuild`. A pre-check would catch that narrow class
+  where the code is written, one machine and several steps earlier. Low priority:
+  the full Xcode build stays the real syntax gate, so this only shortens the
+  edit→Linux→Mac round-trip for typo-class errors and adds code to maintain.
 
 ## Explicitly out of scope (what the project will not do)
 
