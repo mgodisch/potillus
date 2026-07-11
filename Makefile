@@ -215,8 +215,11 @@ install: ../downloads/potillus-$(VERSION)-debug.apk
 #   the captured screenshots.
 screenshots:
 	$(MAKE) -C android prereq
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required before the work
+	# below; adb's list is printed so a missing or offline device is visible,
+	# then grep aborts the recipe here if none is ready.
+	adb devices
+	adb devices | grep -qw device
 	# 0) Pre-flight: the BUNDLED fastlane must be installed in fastlane before any
 	#    expensive work (the Gradle build and the device / Demo-Mode setup below).
 	#    The gems are vendored under fastlane/.vendor via `cd fastlane && bundle
@@ -552,8 +555,11 @@ store-assets:
 INSTR := de.godisch.potillus.debug.test/androidx.test.runner.AndroidJUnitRunner
 report-pdfs:
 	$(MAKE) -C android prereq
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required before the work
+	# below; adb's list is printed so a missing or offline device is visible,
+	# then grep aborts the recipe here if none is ready.
+	adb devices
+	adb devices | grep -qw device
 	# 1) Build, then (re)install the app + instrumentation APKs. Any prior copy is
 	#    removed first so a signature/downgrade mismatch cannot block the install
 	#    (that failure prints an empty reason after "Performing Streamed Install"),

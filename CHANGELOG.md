@@ -288,7 +288,11 @@ listed individually below.
   a stale reference to a non-existent `docs/PLAY_STORE.md` was removed from
   `fastlane/Fastfile` and `fastlane/README.md`. Tool availability is checked with
   plain `command -v` calls, documented in a comment above each, so the recipes
-  show exactly what they run.
+  show exactly what they run. Relatedly, the device- and Java-version pre-flight
+  checks in `screenshots`, `report-pdfs`, `test-device`, `install-debug` and
+  `java` no longer fail silently: they print `adb devices` / `java -version` and
+  gate on the result, so a not-running emulator or a wrong JDK shows up in the
+  make output instead of a bare `Error 1` blamed on the recipe's first line.
 - Docs. SECURITY.md now states key custody per channel accurately: the maintainer
   holds the app-signing key for the Codeberg / F-Droid APK, and — under Google
   Play App Signing — the upload key for Play, while Google holds Play's own

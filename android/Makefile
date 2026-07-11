@@ -101,6 +101,9 @@ endif
 prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md $(GUIDE_OUTPUTS) release-check
 
 java:
+	# Require Java $(JAVA_VERSION). Print the active version first so a mismatch --
+	# or a missing java -- is visible instead of a bare, reason-less test failure.
+	java -version
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
 
 android: \
@@ -277,8 +280,11 @@ lint: prereq
 	./gradlew ktlintCheck lintDebug
 
 test-device: prereq
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required before the work
+	# below; adb's list is printed so a missing or offline device is visible,
+	# then grep aborts the recipe here if none is ready.
+	adb devices
+	adb devices | grep -qw device
 	# Compose UI tests need the host Activity RESUMED and VISIBLE. On a device whose
 	# screen is OFF or LOCKED the Activity is immediately paused/stopped (logcat:
 	# isSleeping=true) and no Compose hierarchy attaches -> "No compose hierarchies
@@ -293,8 +299,11 @@ test-device: prereq
 install: install-debug
 
 install-debug: app/build/outputs/apk/debug/app-debug.apk
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required before the work
+	# below; adb's list is printed so a missing or offline device is visible,
+	# then grep aborts the recipe here if none is ready.
+	adb devices
+	adb devices | grep -qw device
 	adb install -r $<
 
 clean: prereq
