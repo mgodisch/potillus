@@ -245,7 +245,7 @@ private struct DrinkEditor: View {
                         .keyboardType(.decimalPad)
                     Picker(Loc.string("Category", locale: locale), selection: $category) {
                         ForEach(DrinkCategory.allCases, id: \.self) { value in
-                            Text(value.rawValue.capitalized).tag(value)
+                            Text(Loc.string(value.categoryDisplayKey, locale: locale)).tag(value)
                         }
                     }
                 } footer: {

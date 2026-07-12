@@ -132,7 +132,7 @@ struct TodayScreen: View {
     private var summarySection: some View {
         Section {
             LimitBar(
-                caption: "Today",
+                caption: Loc.string("Today", locale: locale),
                 value: grams(model.state.totalGrams),
                 limit: grams(model.state.limitInfo.limitGrams),
                 fill: LimitGauge.fillFraction(
@@ -146,7 +146,7 @@ struct TodayScreen: View {
             )
 
             LimitBar(
-                caption: "This week",
+                caption: Loc.string("7 Days", locale: locale),
                 value: grams(model.state.weeklyTotalGrams),
                 limit: grams(model.state.limitInfo.weeklyLimitGrams),
                 fill: LimitGauge.fillFraction(
@@ -160,7 +160,7 @@ struct TodayScreen: View {
             )
 
             LimitBar(
-                caption: "Drink days",
+                caption: Loc.string("Drink days", locale: locale),
                 value: "\(model.state.drinkDaysThisWeek)",
                 limit: "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
                 fill: LimitGauge.drinkDaysFillFraction(

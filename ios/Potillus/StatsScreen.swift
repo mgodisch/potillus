@@ -345,7 +345,7 @@ struct StatsScreen: View {
     }
 
     private func name(_ category: DrinkCategory) -> String {
-        category.rawValue.capitalized
+        Loc.string(category.categoryDisplayKey, locale: locale)
     }
 
     // ── Formatting ───────────────────────────────────────────────────────────

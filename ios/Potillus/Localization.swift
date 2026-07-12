@@ -127,6 +127,33 @@ enum Loc {
 }
 
 // =============================================================================
+// Drink-category display names
+// =============================================================================
+//
+// `DrinkCategory` stores raw enum tokens ("BEER", "WINE", …). The UI must show a
+// translated, human-readable name rather than the token, so each case maps to a
+// catalogue key whose English text and translations mirror Android's `category_*`
+// string resources. Because the keys equal Android's English values,
+// tools/check-l10n-parity.py links the two and verifies the platforms agree.
+// This lives beside `Loc` because both call sites — the drink editor's category
+// picker and the statistics breakdown — resolve the key through `Loc.string`.
+// =============================================================================
+
+extension DrinkCategory {
+    /// Catalogue key for this category's display name (mirrors Android `category_*`).
+    var categoryDisplayKey: String {
+        switch self {
+        case .beer:      return "Beer"
+        case .wine:      return "Wine / Sparkling Wine"
+        case .spirits:   return "Spirits"
+        case .longdrink: return "Long Drink / Mix"
+        case .liqueur:   return "Liqueur"
+        case .other:     return "Other"
+        }
+    }
+}
+
+// =============================================================================
 // SwiftUI glue
 // =============================================================================
 //

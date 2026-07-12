@@ -512,6 +512,34 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Localize limit-bar captions and category names  (patch -114)
+
+Several strings on the Today screen showed English in every language — the daily,
+weekly, and drink-days bar captions — and the drink-category name showed English
+in both the drink editor's picker and the statistics breakdown. One root cause:
+SwiftUI localizes only string *literals* passed to `Text`, which it reads as a
+`LocalizedStringKey`. A `String` *variable* is rendered verbatim. `LimitBar`
+renders `Text(caption)` where `caption` is a `String`, and its three callers passed
+raw English (`"Today"`, `"This week"`, `"Drink days"`), so the words bypassed the
+catalogue entirely — which is also why `"This week"` never had a key and why
+`check-l10n-parity` never saw it (it flags literals inside localizing calls, and
+these were not). The category picker and stats used `DrinkCategory.rawValue`
+`.capitalized` — the stored enum token, never translated — the same class of bug.
+
+The callers now pass `Loc.string(…, locale: locale)`. `"Today"` and `"Drink days"`
+reuse their existing keys. The weekly caption becomes **`"7 Days"`**, not `"This
+week"`: the limit is a rolling seven-day window, not a calendar week, so `"Week"`
+would mislead. It is a new key mirroring Android's `week` string. Category names now
+resolve through a new `DrinkCategory.categoryDisplayKey`, mapping each case to a key
+that mirrors Android's `category_*` resources — including the fuller `"Wine /
+Sparkling Wine"` and `"Long Drink / Mix"` that the raw `.capitalized` token dropped.
+
+All seven new catalogue keys use Android's own English values as their keys, so
+`check-l10n-parity` links each to its Android counterpart by English text and
+verifies every language matches, and the 21 translations are copied from Android's
+`values-*/strings.xml` rather than invented. App-target change; the container has no
+Swift compiler, so this is Mac-verified only.
+
 #### Localize report for the System language  (patch -113)
 
 Screenshots 07–08 rendered the PDF report in English for every locale. Root cause,
