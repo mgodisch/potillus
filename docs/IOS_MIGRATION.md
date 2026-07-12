@@ -512,6 +512,18 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Record iOS report rendering on roadmap  (patch -111)
+
+Confirms the direction for the report pages after the capture pipeline settled: iOS
+keeps rendering its OWN report PDF (never copying Android's) and rasterizes it into
+screenshots 07–08 fully non-interactively, unlike Android's semi-manual `report-pdfs`.
+The iOS `ReportRenderer` output does not yet match Android's layout exactly — the
+footer placement is still off — and that imperfection is knowingly accepted as
+visible in 07–08 for now. The pre-existing "PDF report footer position" roadmap item
+is broadened to cover this (footer, sheet height, two-page split) as deferred polish;
+no code changes, since -110 already makes the pipeline produce the pages correctly per
+locale.
+
 #### Name report PDF by fastlane run locale  (patch -110)
 
 `make screenshots-ios` produced report pages 07–08 for one locale only (de-DE), and

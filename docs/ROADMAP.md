@@ -297,11 +297,16 @@ Lower-criticality, forward-looking directions, roughly in priority order:
     already covered by the Statistics screen's `year` period (KPIs, trend, and a
     monthly-bucket chart). The year heat-map would be a second, purely visual take
     on the same data; it can be added later if it proves wanted.
-  - *PDF report footer position.* The two-page report pins its footer with a
-    `min-height: 267mm` sheet (A4 minus the page margins). Whether the footer sits
-    exactly right in the WebKit-printed iOS PDF is unverified against a real
-    device; if a correction is needed it is a template tweak, deferred until
-    observed on-device.
+  - *iOS PDF report rendering (footer and layout parity).* The two-page report is
+    now rendered by the app itself and rasterized into store screenshots 07–08 by
+    `make screenshots-ios`, fully non-interactively (unlike Android's semi-manual
+    `report-pdfs`). The WebKit-printed iOS output does not yet match Android's
+    layout exactly — the footer placement in particular is still off — and this
+    imperfection is knowingly accepted as VISIBLE in the 07–08 screenshots for now.
+    Bringing the iOS `ReportRenderer` output into full parity with Android (footer
+    position, the `min-height: 267mm` sheet, and the two-page split) is a
+    template/renderer tweak, deferred here; the capture pipeline already produces
+    the pages, so this is polish, not a blocker.
 - **Publish on the Google Play Store.** In addition to F-Droid, make the app
   available on Google Play so more users can find and install it.
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see
