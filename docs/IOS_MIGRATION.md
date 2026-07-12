@@ -512,6 +512,22 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Name report PDF by fastlane run locale  (patch -110)
+
+`make screenshots-ios` produced report pages 07–08 for one locale only (de-DE), and
+that pair was wrong. The app names its report PDF from `SCREENSHOT_LOCALE`, which the
+UI test set from `Locale.preferredLanguages.first` — read in the TEST RUNNER, whose
+language snapshot never changes (it relocalizes only the app under test;
+`localize_simulator` is off). So all 21 runs wrote to one file named for the
+simulator's system language (de-DE), each overwriting the last; the recipe then found
+only that name, holding the final run's content.
+
+The UI test now reads the run's real locale from the `-AppleLanguages` argument
+snapshot injects during `setupSnapshot` — the same value that already names the
+01–06 directories — so each locale writes `screenshot_report_<locale>.pdf` under its
+own name and the recipe rasterizes all 21. Re-running `make screenshots-ios`
+regenerates the full 8-page set. UI-test only; verified by a Mac capture run.
+
 #### Shift dark screenshots to 04-06  (patch -109)
 
 Patch -105 split the set 01–02 light, 03–06 dark; the intended split is 01–03 light,

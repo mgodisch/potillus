@@ -63,9 +63,15 @@ final class PotillusUITests: XCTestCase {
            let json = try? String(contentsOf: url, encoding: .utf8) {
             app.launchEnvironment["SCREENSHOT_FIXTURE_JSON"] = json
         }
-        // BCP-47 (e.g. "de-DE", "zh-Hans", "pt-BR") — the same shape as the store
-        // locale directory names, so the report file the app writes matches.
-        app.launchEnvironment["SCREENSHOT_LOCALE"] = Locale.preferredLanguages.first ?? "en-US"
+        // The app names the report PDF it writes for this locale; the recipe that
+        // rasterizes pages 07–08 looks it up by the store-locale directory name. Read
+        // the run's language from the -AppleLanguages argument snapshot injected in
+        // setupSnapshot — NOT Locale.preferredLanguages, which returns the TEST
+        // RUNNER's own language. snapshot only relocalizes the app under test (it
+        // leaves the simulator's system language alone, localize_simulator being off),
+        // so the runner reports the same locale for all 21 runs and every report would
+        // collapse onto one file name.
+        app.launchEnvironment["SCREENSHOT_LOCALE"] = snapshotLanguage(app)
         app.launch()
 
         let tabBar = app.tabBars.firstMatch
@@ -108,5 +114,21 @@ final class PotillusUITests: XCTestCase {
         // 05 — Add a drink. Shot last, so no dismissal is needed afterwards.
         app.buttons["nav.addDrink"].tap()
         snapshot("05_add_drink")
+    }
+
+    /// The store locale of the current snapshot run, e.g. "de-DE" or "zh-Hans".
+    /// setupSnapshot injects it into the app as `-AppleLanguages "(<locale>)"`; this
+    /// reads it back so the value matches the fastlane store-locale exactly (and thus
+    /// the metadata directory the recipe expects). Falls back to the runner's own
+    /// preferred language outside a snapshot run, where the argument is absent.
+    private func snapshotLanguage(_ app: XCUIApplication) -> String {
+        let args = app.launchArguments
+        if let i = args.firstIndex(of: "-AppleLanguages"), i + 1 < args.count {
+            let locale = args[i + 1].trimmingCharacters(in: CharacterSet(charactersIn: "()\" "))
+            if !locale.isEmpty {
+                return locale
+            }
+        }
+        return Locale.preferredLanguages.first ?? "en-US"
     }
 }
