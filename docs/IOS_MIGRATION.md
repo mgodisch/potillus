@@ -512,6 +512,19 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Guard against GNU Make 3.x  (patch -112)
+
+A non-interactive `ssh mini 'make screenshots-ios'` runs the macOS system make —
+GNU Make 3.81, frozen at the last GPLv2 release — because the login-shell PATH that
+points at a newer `gmake` is not applied to non-interactive ssh. 3.81 lacks
+`.ONESHELL` (3.82+) and grouped targets (`&:`, 4.3+), and it mis-parses the `#`
+inside `VERSION = $(shell grep '^## v' ...)`, stripping it as a comment and aborting
+with the cryptic "unterminated call to function `shell'". A version guard now fires
+first, in 3.81-safe syntax and placed before that line, with an actionable message
+(install a current GNU Make, run `gmake`). Under Make 4.x it is inert. The guard's
+major-version test was checked against faked 2/3/4/5 majors; the running Make cannot
+be exercised at 3.81 in the container, so that path is verified by construction.
+
 #### Record iOS report rendering on roadmap  (patch -111)
 
 Confirms the direction for the report pages after the capture pipeline settled: iOS

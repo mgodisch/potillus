@@ -72,6 +72,20 @@
 # CONFIGURATION
 # =============================================================================
 
+# ── GNU Make version guard ───────────────────────────────────────────────────
+# This Makefile needs GNU Make 4.x: it uses .ONESHELL (3.82+) and grouped targets
+# (`&:`, 4.3+), and 3.81 additionally mis-parses the `#` inside the $(shell ...)
+# just below (it strips from `#` as a comment, truncating the call). macOS still
+# ships GNU Make 3.81 as /usr/bin/make -- frozen at the last GPLv2 release -- which
+# a non-interactive `ssh host 'make ...'` picks up unless PATH points at a newer
+# one. Fire a legible error HERE, before the first line 3.81 chokes on, instead of
+# the cryptic "unterminated call to function `shell'" it would raise further down.
+# 3.81-safe syntax only: major = first dot-separated field; abort when it is <= 3.
+make_major := $(firstword $(subst ., ,$(MAKE_VERSION)))
+ifeq ($(filter-out 0 1 2 3,$(make_major)),)
+$(error This Makefile needs GNU Make 4.0 or newer, but you are running $(MAKE_VERSION). On macOS the system 'make' is 3.81; install a current GNU Make (brew install make) and run 'gmake' instead of 'make'.)
+endif
+
 VERSION = $(shell grep '^## v' CHANGELOG.md | head -n 1 | cut -c5-)
 
 # Run each recipe in ONE bash process with strict error handling
