@@ -104,7 +104,7 @@ struct DrinksScreen: View {
                 }
             }
             .alert(
-                "Could not log the drink",
+                Loc.string("Could not log the drink", locale: locale),
                 isPresented: .constant(logger.failure != nil),
                 presenting: logger.failure
             ) { _ in
@@ -113,7 +113,7 @@ struct DrinksScreen: View {
                 Text(message)
             }
             .alert(
-                "Cannot delete",
+                Loc.string("Cannot delete", locale: locale),
                 isPresented: .constant(model.deleteBlocked != nil),
                 presenting: model.deleteBlocked
             ) { _ in
@@ -175,7 +175,7 @@ struct DrinksScreen: View {
             logger.clearFailure()
             logging = drink
         }
-        .accessibilityHint("Logs this drink")
+        .accessibilityHint(Loc.string("Logs this drink", locale: locale))
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
                 model.delete(drink)

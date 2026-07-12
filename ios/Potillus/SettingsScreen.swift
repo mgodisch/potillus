@@ -103,7 +103,7 @@ struct SettingsScreen: View {
             .task { model.start() }
             .onDisappear { model.stop() }
             .alert(
-                "Could not save",
+                Loc.string("Could not save", locale: locale),
                 isPresented: .constant(model.failure != nil),
                 presenting: model.failure
             ) { _ in
@@ -133,7 +133,7 @@ struct SettingsScreen: View {
             // The choice is destructive one way and not the other, so it is made
             // explicitly, after the file is chosen and before anything is written.
             .confirmationDialog(
-                "Import backup",
+                Loc.string("Import backup", locale: locale),
                 isPresented: .constant(pendingImport != nil),
                 presenting: pendingImport
             ) { url in
@@ -149,7 +149,7 @@ struct SettingsScreen: View {
                 ))
             }
             .alert(
-                "Import finished",
+                Loc.string("Import finished", locale: locale),
                 isPresented: .constant(importSummary != nil),
                 presenting: importSummary
             ) { _ in
@@ -158,7 +158,7 @@ struct SettingsScreen: View {
                 Text(summary)
             }
             .alert(
-                "Backup failed",
+                Loc.string("Backup failed", locale: locale),
                 isPresented: .constant(backupFailure != nil),
                 presenting: backupFailure
             ) { _ in
@@ -205,7 +205,7 @@ struct SettingsScreen: View {
     private var dayChangeSection: some View {
         Section {
             DatePicker(
-                "Day starts at",
+                Loc.string("Day starts at", locale: locale),
                 selection: Binding(
                     get: { dayChangeDate },
                     set: { newValue in
@@ -303,7 +303,7 @@ struct SettingsScreen: View {
                 Text(Loc.string("Dark", locale: locale)).tag(ThemeMode.night)
             }
             Toggle(
-                "Alternative status symbols",
+                Loc.string("Alternative status symbols", locale: locale),
                 isOn: bind(\.alternativeStatusSymbols, set: { $0.alternativeStatusSymbols = $1 })
             )
             Picker(Loc.string("Language", locale: locale), selection: bind(\.language, set: { $0.language = $1 })) {
@@ -361,7 +361,7 @@ extension SettingsScreen {
         Section {
             if biometrics.canEvaluate() {
                 Toggle(
-                    "App lock",
+                    Loc.string("App lock", locale: locale),
                     isOn: bind(\.biometricEnabled, set: { $0.biometricEnabled = $1 })
                 )
             } else {
@@ -374,7 +374,7 @@ extension SettingsScreen {
             }
 
             Toggle(
-                "Show in app switcher",
+                Loc.string("Show in app switcher", locale: locale),
                 isOn: bind(\.allowScreenshots, set: { $0.allowScreenshots = $1 })
             )
 

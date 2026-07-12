@@ -181,8 +181,13 @@ struct CalendarScreen: View {
     }
 
     private func accessibilityLabel(_ date: String, summary: DaySummary?) -> String {
-        guard let summary else { return "\(date), nothing logged" }
-        return String(format: "%@, %.1f grams", date, summary.totalGrams)
+        guard let summary else {
+            return Loc.string("%@, nothing logged", date, locale: locale)
+        }
+        // The grams number is formatted separately (locale-independent, one
+        // decimal, as before) and passed as the second positional argument.
+        let grams = String(format: "%.1f", summary.totalGrams)
+        return Loc.string("%1$@, %2$@ grams", date, grams, locale: locale)
     }
 
     // ── Selected day ─────────────────────────────────────────────────────────

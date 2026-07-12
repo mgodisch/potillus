@@ -108,7 +108,7 @@ struct ExportRangeSheet: View {
             Form {
                 Section {
                     DatePicker(
-                        "From",
+                        Loc.string("From", locale: locale),
                         selection: $from,
                         in: ...latest,
                         displayedComponents: .date
@@ -117,7 +117,7 @@ struct ExportRangeSheet: View {
                     // expressed. Android greys out the same days; this control
                     // refuses to scroll to them at all.
                     DatePicker(
-                        "To",
+                        Loc.string("To", locale: locale),
                         selection: $to,
                         in: from...latest,
                         displayedComponents: .date

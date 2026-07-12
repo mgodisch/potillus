@@ -143,7 +143,7 @@ struct StatsScreen: View {
                 }
             }
             .alert(
-                "Export failed",
+                Loc.string("Export failed", locale: locale),
                 isPresented: .constant(exportFailure != nil),
                 presenting: exportFailure
             ) { _ in

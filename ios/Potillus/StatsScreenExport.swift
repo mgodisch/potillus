@@ -82,7 +82,7 @@ extension StatsScreen {
             let start = DayResolver.parseDate(floor),
             let end = DayResolver.parseDate(model.state.today)
         else {
-            exportFailure = "The statistics period could not be read."
+            exportFailure = Loc.string("The statistics period could not be read.", locale: locale)
             return
         }
 
@@ -110,7 +110,7 @@ extension StatsScreen {
             // Android refuses an empty export rather than writing a lone header.
             // A file with no rows looks like a broken export, not an empty period.
             guard !entries.isEmpty else {
-                exportFailure = "No entries in this period."
+                exportFailure = Loc.string("No entries in this period.", locale: locale)
                 return
             }
 
@@ -152,7 +152,7 @@ extension StatsScreen {
             // Android refuses an empty report rather than printing empty tables. A
             // report of nothing is not a report; it is a page of dashes.
             guard !entries.isEmpty else {
-                exportFailure = "No entries in this period."
+                exportFailure = Loc.string("No entries in this period.", locale: locale)
                 return
             }
 
@@ -167,7 +167,7 @@ extension StatsScreen {
                 periodEnd: to,
                 today: model.state.today
             ) else {
-                exportFailure = "No entries in this period."
+                exportFailure = Loc.string("No entries in this period.", locale: locale)
                 return
             }
 

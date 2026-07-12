@@ -30,7 +30,10 @@
 # `Loc.string`. Path (A) — the in-app language picker — only works if EVERY such
 # string is looked up against the chosen locale; a stray `Text("New label")` would
 # silently show in the system language, and only in that one spot, which is the
-# confusing half-translated screen this whole mechanism exists to prevent.
+# confusing half-translated screen this whole mechanism exists to prevent. The scan
+# covers the display calls below plus alert/confirmationDialog titles and the
+# accessibilityLabel/Hint/Value strings a screen reader speaks, and is multiline so
+# a title on the line after `.alert(` is caught too.
 #
 # WHAT IS ALLOWED
 #   - `Loc.string("...")`            the routed form
@@ -49,9 +52,18 @@ VIEWS = sorted((ROOT / "ios" / "Potillus").glob("*.swift"))
 
 CALLS = (
     r"(?:Text|Label|Button|Toggle|navigationTitle|Section|ContentUnavailableView"
-    r"|Picker|LabeledContent|TextField|DatePicker|Stepper)"
+    r"|Picker|LabeledContent|TextField|DatePicker|Stepper"
+    # Modifiers whose first argument is user-facing but which the earlier version
+    # of this linter missed: alert and dialog titles and the accessibility strings
+    # a screen reader speaks. They are matched here so a raw literal in any of them
+    # fails the build, the same as a stray Text("…").
+    r"|alert|confirmationDialog|accessibilityLabel|accessibilityHint|accessibilityValue)"
 )
-LITERAL = re.compile(CALLS + r'\(\s*"([^"]+)"')
+# DOTALL so the `\s*` between the call's `(` and its first `"` may span lines: an
+# `.alert(\n    "Title")` is as much a raw literal as a single-line one, and the
+# per-line scan this replaced could not see it. Line numbers are recovered from the
+# match offset in offenders().
+LITERAL = re.compile(CALLS + r'\(\s*"([^"]+)"', re.DOTALL)
 
 ALLOWED_EXACT = {
     "Libellus Potionis",                       # proper noun
@@ -87,18 +99,23 @@ def offenders():
     for path in VIEWS:
         if path.name == "Localization.swift":
             continue
-        for number, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
-            for match in LITERAL.finditer(line):
-                start = match.start()
-                # Already routed if this call sits inside a Loc.string(...).
-                if "Loc.string(" in line[max(0, start - 12):start + 30]:
-                    continue
-                text = match.group(1)
-                if text in ALLOWED_EXACT:
-                    continue
-                if is_pure_interpolation(text):
-                    continue
-                problems.append(f"{path.name}:{number}: raw literal {text!r} — route it through Loc.string")
+        source = path.read_text(encoding="utf-8")
+        for match in LITERAL.finditer(source):
+            start = match.start()
+            # Already routed if this call wraps a Loc.string(...): then the first
+            # character after the `(` is `L`, not `"`, so LITERAL cannot match in
+            # the first place. The window check remains a belt-and-braces guard.
+            if "Loc.string(" in source[max(0, start - 12):start + 30]:
+                continue
+            literal = match.group(1)
+            if literal in ALLOWED_EXACT:
+                continue
+            if is_pure_interpolation(literal):
+                continue
+            line = source.count("\n", 0, start) + 1
+            problems.append(
+                f"{path.name}:{line}: raw literal {literal!r} — route it through Loc.string"
+            )
     return problems
 
 

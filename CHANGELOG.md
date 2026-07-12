@@ -186,6 +186,21 @@ and corrects documentation that the port had outgrown:
   announced the raw SF Symbol. They now carry localized "Previous month" / "Next
   month" labels, copied from Android's `cd_prev_month` / `cd_next_month`, matching
   the labelled controls beside them.
+- **Twenty hardcoded English strings across the screens are now localized, and
+  the linter that should have caught them is fixed.** `check-l10n` scanned line by
+  line, so it was blind to any localizable literal whose call spanned two lines,
+  and it did not look at alert or dialog titles or at the accessibility strings a
+  screen reader speaks. Under that blind spot sat raw English in every screen:
+  eight `.alert` / `.confirmationDialog` titles ("Export failed", "Backup failed",
+  "Something went wrong", …), the drink-row VoiceOver hint, the calendar day-cell
+  VoiceOver label, three export error messages, and a set of `Toggle` / `DatePicker`
+  labels written across two lines ("App lock", "Show in app switcher", "From",
+  "To", …). All are now routed through `Loc.string`: the labels reuse catalogue
+  keys that already carried all twenty translations, while the titles, hints and
+  error messages are added as English source strings for the translation pipeline
+  to pick up. `check-l10n` now scans the whole file (so a title on the line after
+  `.alert(` is caught) and covers alert/dialog titles and `accessibilityLabel` /
+  `Hint` / `Value`, so this class of miss cannot recur.
 
 ---
 

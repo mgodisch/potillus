@@ -116,7 +116,7 @@ struct TodayScreen: View {
                 }
             }
             .alert(
-                "Something went wrong",
+                Loc.string("Something went wrong", locale: locale),
                 isPresented: .constant(model.failure != nil),
                 presenting: model.failure
             ) { _ in

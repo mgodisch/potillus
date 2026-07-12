@@ -114,7 +114,7 @@ struct EntrySheet: View {
                         // Interpolated, not typed: a message that names a bound
                         // it does not read is a message that will one day lie.
                         Text(
-                            "The volume must be between "
+                            Loc.string("The volume must be between ", locale: locale)
                             + "\(DrinkValidator.volumeMlRange.lowerBound) and "
                             + "\(DrinkValidator.volumeMlRange.upperBound) ml."
                         )
