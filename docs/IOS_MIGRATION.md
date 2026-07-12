@@ -512,6 +512,25 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Pin status-bar clock, dark-mode shots 3-6  (patch -105)
+
+Two finishes on the now-working capture, both matching the Android set.
+
+CLOCK: `override_status_bar(true)` alone renders the status-bar time from an
+ISO-8601 timestamp in the host time zone, so in CET/CEST it reads 10:41/11:41, not
+Apple's canonical 9:41. The Snapfile now also sets `override_status_bar_arguments`
+with a bare `--time 9:41` (no date, no zone) — the documented, timezone-immune fix —
+and restates snapshot's own signal/battery defaults.
+
+DARK MODE: screens 03–06 are now captured in dark mode (01–02 stay light), the same
+split as Android. `ScreenshotMode.forcedColorScheme` returns `.dark` when the app is
+launched with `-screenshotDark`, and RootView prefers it over the in-app theme; a
+normal build passes nil and is unchanged. The UI test shoots 01–02, then relaunches
+with `-screenshotDark` (screenshot mode re-seeds identically every launch, so this
+stays deterministic) and shoots 03–06.
+
+App and UI-test code, verified only by a full Xcode build + capture run on the Mac.
+
 #### Navigate screenshot tabs by index  (patch -104)
 
 The first `fastlane ios screenshots` run built cleanly and captured `01_today`,

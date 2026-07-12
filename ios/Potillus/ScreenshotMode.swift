@@ -25,6 +25,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 import PotillusKit
 
 // =============================================================================
@@ -79,6 +80,13 @@ enum ScreenshotMode {
     /// Whether the app was launched for a screenshot run.
     static var isActive: Bool {
         ProcessInfo.processInfo.arguments.contains("-screenshotMode")
+    }
+
+    /// The colour scheme a screenshot run forces, or nil to follow the in-app theme.
+    /// The UI test relaunches with `-screenshotDark` for the dark half of the set
+    /// (screens 03–06), mirroring the Android light/dark split.
+    static var forcedColorScheme: ColorScheme? {
+        ProcessInfo.processInfo.arguments.contains("-screenshotDark") ? .dark : nil
     }
 
     /// Builds the ephemeral, clock-pinned environment and kicks off the seed and

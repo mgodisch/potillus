@@ -114,7 +114,8 @@ struct RootView: View {
         // nil means "follow the system", which is exactly what ThemeMode.system
         // asks for. Reading the device setting directly would ignore the user's
         // in-app override — the trap the Android Color.kt comments call out.
-        .preferredColorScheme(settings.themeMode.colorScheme)
+        // A screenshot run in its dark half forces .dark ahead of the in-app theme.
+        .preferredColorScheme(ScreenshotMode.forcedColorScheme ?? settings.themeMode.colorScheme)
         // Every screen reads `\.appLocale` and passes it to `Loc.string`, so the
         // in-app language wins over the system's. Set here, once, from the observed
         // setting: change the language and the whole tree re-renders in it.

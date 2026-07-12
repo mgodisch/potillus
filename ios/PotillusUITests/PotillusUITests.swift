@@ -83,6 +83,16 @@ final class PotillusUITests: XCTestCase {
         tabBar.buttons.element(boundBy: 1).tap()
         snapshot("02_calendar")
 
+        // Screens 03–06 are shot in dark mode, mirroring the Android light/dark
+        // split. Relaunch with the dark flag — screenshot mode re-seeds identically
+        // on every launch, so this is deterministic — then wait for the fresh tab
+        // bar and seeded content before continuing.
+        app.terminate()
+        app.launchArguments += ["-screenshotDark"]
+        app.launch()
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 60), "the tab bar never reappeared")
+        _ = app.cells.firstMatch.waitForExistence(timeout: 30)
+
         tabBar.buttons.element(boundBy: 2).tap()
         snapshot("03_statistics")
 
