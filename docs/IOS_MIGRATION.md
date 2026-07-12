@@ -512,6 +512,23 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Detect collapsed divergent l10n mappings  (patch -108)
+
+The French "Stats" heading (patch -106) slipped past the parity check, and this is
+why: CHECK 2 accepts an iOS translation that matches ANY Android string sharing its
+English text, so iOS's single `Statistics` key was in parity as long as "Stats"
+matched Android's `nav_statistics` — even while that key also rendered the full
+title. The drift was structural (iOS had one key where Android has two), and a
+value-parity check cannot see a missing distinction.
+
+CHECK 4 closes that gap. When one English word backs several Android names that
+differ in some language, iOS must carry a dedicated source for all but one of them —
+a catalogue key of the same name, or a report label (FIELDS). Left with two or more
+diverging names under one plain iOS key, the check fails. An audit over the whole
+catalogue confirms it is silent today (the three split words — Statistics, Month,
+g/day — are each covered, the latter two by report labels) and that, run against a
+pre-106 catalogue, it flags `statistics` exactly. Tooling only; container-verified.
+
 #### Add screenshots-ios capture recipe  (patch -107)
 
 Replaces the `screenshots-ios` stub (patch -99) with the real recipe, now that the

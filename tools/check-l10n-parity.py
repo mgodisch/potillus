@@ -35,7 +35,7 @@
 # `make ios` and `make android`. It reads android/ only to COMPARE — it never
 # generates iOS artefacts from it.
 #
-# THREE CHECKS
+# FOUR CHECKS
 #   1. Every UI literal in the iOS views has a key in the catalogue. Previously a
 #      generator inserted missing keys as untranslated; with the generator gone,
 #      this guards against a literal that no catalogue entry covers.
@@ -45,6 +45,11 @@
 #      iOS too, or this fails.
 #   3. The report labels (ReportLabelsCatalog.swift) match Android's strings.xml
 #      for the same keys, in every language.
+#   4. Where Android translates one English word two ways -- the screen title
+#      `statistics` beside the short tab label `nav_statistics` ("Statistiques" vs
+#      "Stats" in French) -- iOS must split it too. CHECK 2 alone would accept the
+#      short value in the title's place (it matches SOME Android string), so this
+#      catches the missing split that let the French "Stats" heading through.
 #
 # A mismatch is a hard error: the platforms have diverged and someone must decide
 # which wording is correct and update the other side.
@@ -261,12 +266,72 @@ def check_report_labels():
     return problems
 
 
+def check_collapsed_divergent_mappings(catalog):
+    """CHECK 4 — an English word Android translates two ways must be split on iOS too.
+
+    CHECK 2 lets an iOS key match ANY Android string that shares its English text.
+    That is right when those strings agree, but blind when they DIVERGE: the French
+    "Statistics" heading bug passed CHECK 2 because iOS's single `Statistics` key
+    matched the short tab label `nav_statistics` ("Stats") even while it also rendered
+    the full screen title. CHECK 2 cannot tell which context is wrong; this check
+    catches the setup that lets a context BE wrong.
+
+    When one English value backs several Android names that differ in some language,
+    iOS must carry a dedicated source for all but (at most) one of them — a catalogue
+    key of the same name (as `nav_statistics` mirrors Android's `nav_statistics`) or a
+    report label (a FIELDS value, rendered from ReportLabelsCatalog — which is how
+    `month` vs `pdf_col_month`, "月" vs "月份", stays correct). If two or more of the
+    DIVERGING names are left for one plain iOS key to cover, that key cannot be right
+    in every place, and this fails."""
+    en = android_map(ANDROID_EN)
+    if not en:
+        return [f"cannot read {ANDROID_EN.relative_to(ROOT)} for the parity check"]
+    value_to_names = {}
+    for name, value in en.items():
+        value_to_names.setdefault(value, []).append(name)
+
+    # Android translations per language, loaded once (English included).
+    per_lang = {"en": en}
+    for tag in LANGUAGES:
+        per_lang[tag] = android_map(ROOT / f"android/app/src/main/res/values-{android_dir_suffix(tag)}/strings.xml")
+
+    def diverging_language(names):
+        """A language in which the given Android names do not all agree, or None."""
+        for tag, amap in per_lang.items():
+            values = {amap[n] for n in names if n in amap}
+            if len(values) > 1:
+                return tag
+        return None
+
+    # An Android name is "covered" on iOS when iOS renders it from its own dedicated
+    # source: a catalogue key of the same name, or a report label (FIELDS value).
+    covered = set(catalog.keys()) | set(FIELDS.values())
+
+    problems = []
+    for value, names in sorted(value_to_names.items()):
+        if len(names) < 2 or diverging_language(names) is None:
+            continue  # one name, or several that agree everywhere: nothing to split
+        uncovered = [n for n in names if n not in covered]
+        if len(uncovered) < 2:
+            continue  # at most one falls to the plain iOS key — it can serve that one
+        tag = diverging_language(uncovered)
+        if tag is not None:
+            shown = ", ".join(sorted(uncovered))
+            problems.append(
+                f"[{tag}] {value!r}: Android splits this into differently-translated "
+                f"strings ({shown}); a single iOS key cannot be right in every context "
+                f"— give each its own key, as nav_statistics mirrors Android's."
+            )
+    return problems
+
+
 def main():
     catalog = load_catalog()
     problems = []
     problems += check_missing_keys(catalog)
     problems += check_translation_parity(catalog)
     problems += check_report_labels()
+    problems += check_collapsed_divergent_mappings(catalog)
 
     if problems:
         for p in problems:
