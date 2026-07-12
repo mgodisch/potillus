@@ -182,4 +182,27 @@ interface DrinkDao {
      */
     @Query("DELETE FROM drinks WHERE isPreset = 0")
     suspend fun deleteUserCreatedDrinks()
+
+    /**
+     * Deletes ALL drinks, presets included.
+     *
+     * Called during a REPLACE backup import to clear the ENTIRE drink catalogue
+     * before inserting the backup's drinks. REPLACE means "replace everything with
+     * the backup": a backup that is meant to keep the presets already contains
+     * them (with `isPreset = 1`), so they are restored from the backup rather than
+     * preserved locally. Preserving the local presets instead would leave them
+     * beside the backup's own copies — the very "my drinks were added, the presets
+     * were not replaced" behaviour this fixes.
+     *
+     * Note: entries must be deleted BEFORE this runs because of the FK RESTRICT
+     * constraint. [de.godisch.potillus.data.repository.BackupRepository.importReplace]
+     * calls [de.godisch.potillus.data.db.dao.EntryDao.deleteAll] first, inside the
+     * same transaction.
+     *
+     * This does NOT re-seed presets: [de.godisch.potillus.data.db.AppDatabase]'s
+     * prepopulate callback runs only on database creation, never when the table is
+     * emptied at runtime, so the catalogue after a REPLACE is exactly the backup's.
+     */
+    @Query("DELETE FROM drinks")
+    suspend fun deleteAllDrinks()
 }

@@ -86,7 +86,10 @@ import java.time.format.DateTimeFormatter
 //   A pre-v3 backup (no "settings" key) never changes settings in either mode.
 //
 // IMPORT MODES (handled in SettingsViewModel, not here):
-//   REPLACE – delete all local data, then import everything from the backup.
+//   REPLACE – delete ALL local data (entries AND drinks, presets included), then
+//             import everything from the backup. The presets a user wants to keep
+//             are in the backup already, so they are restored from it rather than
+//             preserved locally.
 //   MERGE   – keep local data, add backup entries that are not duplicates.
 //             Duplicates are detected by (timestampMillis, drinkId) pairs.
 //             MERGE also merges the backup's DRINK CATALOGUE: a backup drink whose
