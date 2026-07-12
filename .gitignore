@@ -19,6 +19,10 @@ __pycache__/
 /android/guides.d
 /android/build
 /short
+# Staged release artifacts: `make release` copies the signed AAB/APK and the SBOM
+# here under their canonical <applicationId>_<versionCode>.<ext> names, and
+# push-playstore / push-codeberg upload from here. Build outputs, never source.
+/releases
 
 # Release signing material and store upload credentials (Play + Codeberg) —
 # SECRET, never commit. The committed templates are

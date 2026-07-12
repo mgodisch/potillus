@@ -40,6 +40,50 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
+## v0.82.0
+
+Harden Play publishing and store-metadata gate
+
+A release-tooling and quality-gate release with no user-facing changes: it makes
+`make push-playstore` fail fast on a Play permission problem before uploading
+anything, and fixes the store-metadata length check so an over-long release note
+or title is caught at build time instead of being rejected by Google mid-upload.
+It follows up on the first real Play upload of 0.81.0, whose "caller does not
+have permission" error surfaced only after all 21 locales of metadata had been
+sent, and whose el-GR release note was rejected as 501 > 500 characters.
+
+- `push-playstore` runs a real PRE-FLIGHT auth check before uploading. It calls
+  fastlane's `validate_play_store_json_key` and requires its success line, so a
+  service account that is not (yet) invited to the Play Console — the actual
+  cause of the "caller does not have permission" failure that first surfaced only
+  after all 21 locales of metadata had been sent — now fails immediately with an
+  actionable message. That fastlane action logs a success line but does NOT raise
+  on failure, so the guard checks for the success line explicitly rather than
+  trusting the exit code.
+- The store-metadata length check (`tools/release-check.sh` section 10) had three
+  bugs that let an over-long note reach Google. It counted the text WITHOUT the
+  trailing newline, but Google counts with it — a 500-visible-character el-GR note
+  plus "\n" was rejected as 501 > 500. It never checked `title.txt` (limit 30) at
+  all. And, most seriously, its unguarded `output=$(...)` assignment aborted the
+  whole gate under `set -e` the moment it actually found a violation, so a genuine
+  catch killed the run instead of reporting it. All three are fixed: counting now
+  includes the trailing newline (matching supply's verbatim `File.read` and
+  Google's server-side count), the title limit is enforced, and the checker runs
+  under an `if` guard like its siblings. The enforced limits — title 30, short
+  description 80, full description 4000, release notes 500 — are Google Play's
+  documented store-listing limits.
+- The fixed check caught a latent fr-FR short-description overflow (81 > 80 with
+  the trailing newline) that had not yet been uploaded; it is trimmed by its one
+  trailing newline, with no change to the visible text (the same one-character
+  trim already applied to the el-GR note in 0.81.0).
+- The two publishing recipes were de-noised. The long rationale comments that
+  `.ONESHELL` echoed on every run are moved into non-recipe header comments above
+  each target (which make never echoes), leaving only short per-step markers in
+  the recipe. The executed commands and status lines are unchanged; only what the
+  terminal prints changed.
+
+---
+
 ## v0.81.0
 
 Add accessible capacity symbols and chart labels
@@ -392,6 +436,25 @@ listed individually below.
   describing a manual Codeberg upload that attached only the SBOM; and the
   eighth-round screenshot note above was corrected — the committed PNGs are
   the post-fix captures, not the old ones.
+
+- Release artifacts are staged into a git-ignored `releases/` directory and the
+  publishing targets upload from there (eleventh QA round, follow-up request).
+  `make release` now copies the signed AAB, APK and SBOM into `releases/` under
+  canonical, self-describing names — `de.godisch.potillus_<versionCode>.apk`,
+  `_<versionCode>.aab`, `_<versionCode>_sbom.json` (e.g.
+  `de.godisch.potillus_92.apk`) — with `cp --archive`, and refuses to start if a
+  file for this versionCode is already staged (so a published set is never
+  silently overwritten). `push-playstore` and `push-codeberg` now upload EXACTLY
+  those staged files (fastlane's `aab:` option receives the staged path; the
+  lane threads it through), run their signature/signer checks against the staged
+  bytes, and use the canonical names as the Codeberg asset names. Neither push
+  target builds or stages any more: each fails fast if the staged file is absent
+  and does not trigger `make release`. After each Codeberg upload the published
+  asset is re-downloaded from its release URL and its sha256 is compared with the
+  staged file (one 2-second retry to absorb asset-endpoint lag), so a corrupted
+  upload is caught. `.gitignore` gains `/releases`; the release checklist in
+  CONTRIBUTING documents the staging step and the new asset names. Tooling and
+  documentation only; no app-visible change, so no versionCode bump.
 
 ---
 
