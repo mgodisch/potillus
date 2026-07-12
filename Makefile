@@ -595,21 +595,75 @@ store-assets-android:
 	$(MAKE) _cascade-feature-graphics-android
 
 # ── screenshots-ios ── capture the App Store screenshots on the iOS Simulator.
-# The iOS counterpart to `screenshots-android`, driven by the fastlane `ios
-# screenshots` lane (its configuration lives in fastlane/Snapfile). It CANNOT run
-# yet: the capture is performed by a `PotillusUITests` UI-test target (plus the
-# fastlane SnapshotHelper) that drives the app through the six screens and calls
-# snapshot("01_...") -- and that target is authored with the app target on the
-# Mac and does not exist here. This stub names the entry point and fails loudly
-# until then, rather than silently pretending to work. See fastlane/Snapfile and
-# docs/IOS_MIGRATION.md.
+# The iOS counterpart to `screenshots-android`. Run it from the repo root ON THE
+# MAC (the simulator, Xcode and the Homebrew tools are macOS-only). In order it
+#   0) pre-flights the tools and materializes the fastlane SnapshotHelper if it is
+#      not already vendored (it is git-ignored, one copy per machine),
+#   1) (re)generates the buildable Xcode project (`ios-project`),
+#   2) drives the fastlane `ios screenshots` lane, which builds the app plus the
+#      PotillusUITests target and captures 01..06 into
+#      fastlane/screenshots/ios/<locale>/ (configuration in fastlane/Snapfile), then
+#   3) renders the two trailing report pages 07..08 so the iOS set matches
+#      Android's eight.
+#
+# The app writes one PDF report per locale DURING the capture (see
+# ScreenshotMode.swift) into its Documents container as screenshot_report_<loc>.pdf.
+# Step 3 pulls those back out with `simctl get_app_container` and rasterizes them
+# with pdftoppm, exactly as screenshots-pdf-android does for the Android report.
+#
+# IOS_SIM_DEVICE must match the device pinned in fastlane/Snapfile: it names both
+# the simulator to query and the "<device>-" filename prefix fastlane prepends to
+# every shot, so 07..08 must carry it too or they would sort before 01 instead of
+# after 06.
+IOS_SIM_DEVICE ?= iPhone 17 Pro
+IOS_APP_ID     := de.godisch.potillus
+IOS_SHOTS      := fastlane/screenshots/ios
+IOS_SCREENSHOT_LOCALES := $(patsubst fastlane/metadata/ios/%/name.txt,%,$(wildcard fastlane/metadata/ios/*/name.txt))
+
 screenshots-ios:
-	@echo "screenshots-ios: not yet available." >&2
-	@echo "  The PotillusUITests UI-test target (scheme 'PotillusUITests' + the" >&2
-	@echo "  fastlane SnapshotHelper) must be added to the Xcode project first;" >&2
-	@echo "  it is authored with the app target on the Mac. See fastlane/Snapfile" >&2
-	@echo "  and docs/IOS_MIGRATION.md." >&2
-	@exit 1
+	# A non-interactive `ssh mini make screenshots-ios` gets a minimal PATH, so the
+	# Homebrew tools (bundle, xcodegen, pdftoppm, python3) must be put on it first.
+	export PATH="/opt/homebrew/bin:$$PATH"
+	# 0) Pre-flight the macOS-only tools before any expensive build, mirroring the
+	#    screenshots-android checks. xcodegen is verified by `ios-project` itself.
+	command -v xcrun  >/dev/null 2>&1 || { echo "screenshots-ios: 'xcrun' not found -- install Xcode and its command-line tools."; exit 1; }
+	command -v bundle >/dev/null 2>&1 || { echo "screenshots-ios: 'bundle' (Ruby Bundler) not found -- install Homebrew Ruby + Bundler, then run 'cd fastlane && bundle install'."; exit 1; }
+	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots-ios: fastlane gems are not installed -- run 'cd fastlane && bundle install'."; exit 1; }
+	$(call require-pdftoppm,screenshots-ios)
+	# 0b) The fastlane SnapshotHelper is git-ignored and vendored once per machine by
+	#     `fastlane snapshot init`. Create it on first run; `snapshot init` also drops
+	#     a sample Snapfile next to it that we do not want (the real one lives in
+	#     fastlane/), so remove that again. A SUBSHELL keeps the cd from leaking.
+	if [ ! -f ios/PotillusUITests/SnapshotHelper.swift ]; then
+	    ( cd ios/PotillusUITests && BUNDLE_GEMFILE=../../fastlane/Gemfile bundle exec fastlane snapshot init )
+	    rm -f ios/PotillusUITests/Snapfile ios/PotillusUITests/SnapfileExample
+	fi
+	# 1) The one command that produces a buildable Xcode project.
+	$(MAKE) ios-project
+	# 2) Capture 01..06 for every locale. fastlane runs from fastlane/ so it finds
+	#    its Snapfile/Appfile; a SUBSHELL keeps the cd from leaking (.ONESHELL).
+	( cd fastlane && bundle exec fastlane ios screenshots )
+	# 3) Render report pages 07..08 from the PDFs the app left in its data container.
+	#    `|| true` guards the lookups so a clean, explained failure replaces the raw
+	#    grep/simctl exit under `set -e -o pipefail`.
+	UDID="$$(xcrun simctl list devices available | grep -F "$(IOS_SIM_DEVICE) (" | grep -oE '[0-9A-Fa-f-]{36}' | head -n1 || true)"
+	if [ -z "$$UDID" ]; then echo "screenshots-ios: no available '$(IOS_SIM_DEVICE)' simulator found."; exit 1; fi
+	CONTAINER="$$(xcrun simctl get_app_container "$$UDID" $(IOS_APP_ID) data 2>/dev/null || true)"
+	if [ -z "$$CONTAINER" ] || [ ! -d "$$CONTAINER/Documents" ]; then
+	    echo "screenshots-ios: no Documents container for $(IOS_APP_ID) on $$UDID -- did the capture install and run the app?"; exit 1
+	fi
+	for loc in $(IOS_SCREENSHOT_LOCALES); do
+	    pdf="$$CONTAINER/Documents/screenshot_report_$$loc.pdf"
+	    dir="$(IOS_SHOTS)/$$loc"
+	    if [ -f "$$pdf" ]; then
+	        mkdir -p "$$dir"
+	        pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 1 -l 1 "$$pdf" "$$dir/$(IOS_SIM_DEVICE)-07_report_page_1"
+	        pdftoppm -png -singlefile -r $(SCREENSHOT_PDF_DPI) -f 2 -l 2 "$$pdf" "$$dir/$(IOS_SIM_DEVICE)-08_report_page_2" || echo "screenshots-ios: $$loc report has no page 2" >&2
+	        echo "screenshots-ios: $$loc <- report pages 07,08"
+	    else
+	        echo "screenshots-ios: WARNING no report PDF for $$loc ($$pdf)" >&2
+	    fi
+	done
 
 # =============================================================================
 # REPORT PDF EXPORT  (semi-automatic, human-in-the-loop)

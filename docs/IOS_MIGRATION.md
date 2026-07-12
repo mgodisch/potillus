@@ -512,6 +512,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Add screenshots-ios capture recipe  (patch -107)
+
+Replaces the `screenshots-ios` stub (patch -99) with the real recipe, now that the
+capture app hooks (-100), the UI-test target (-103), the navigation and appearance
+fixes (-104, -105) all run green on the Mac. Run from the repo root on the Mac, it
+pre-flights the Homebrew tools (putting them on the minimal PATH a non-interactive
+`ssh mini` gets), materializes the git-ignored fastlane SnapshotHelper on first run,
+regenerates the Xcode project, drives the `ios screenshots` lane for pages 01–06,
+then rasterizes the per-locale PDF report the app wrote during capture into pages
+07–08 with pdftoppm — pulled from the simulator's Documents container via
+`simctl get_app_container`, exactly as screenshots-pdf-android does. Report pages
+carry the same `<device>-` filename prefix fastlane gives 01–06 so they sort after
+06. `IOS_SIM_DEVICE` (default "iPhone 17 Pro") must match fastlane/Snapfile.
+
+The whole set is then one command: `ssh mini 'cd … && make screenshots-ios'`.
+
+Makefile only; verified by check-makefile in the container and a full run on the Mac.
+
 #### Split Statistics tab label from heading  (patch -106)
 
 The French Statistics screen showed the heading "Stats". That abbreviation was only
