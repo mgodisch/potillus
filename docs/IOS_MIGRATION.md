@@ -512,6 +512,19 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Navigate screenshot tabs by index  (patch -104)
+
+The first `fastlane ios screenshots` run built cleanly and captured `01_today`,
+then failed at `tab.calendar`: `No matches found for "tab.calendar" IN
+identifiers`. SwiftUI does not forward a view's `accessibilityIdentifier` onto its
+tab-bar button, so the `tab.*` identifiers added in patch -100 never reached the
+buttons the UI test tapped. The test now addresses the tab bar by position
+(`buttons.element(boundBy:)`, order matching RootView's TabView) — locale-
+independent and free of the propagation problem. The toolbar buttons keep their
+working `nav.settings` / `nav.addDrink` identifiers (those sit on real `Button`s,
+which do propagate). The now-unused `tab.*` identifiers are left in place: harmless,
+and ready should a future SwiftUI forward them.
+
 #### Add PotillusUITests screenshot target  (patch -103)
 
 The capture half of the automated App Store screenshots — a UI-test target that

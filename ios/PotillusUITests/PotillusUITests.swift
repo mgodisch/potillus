@@ -76,17 +76,21 @@ final class PotillusUITests: XCTestCase {
         _ = app.cells.firstMatch.waitForExistence(timeout: 30)
         snapshot("01_today")
 
-        tabBar.buttons["tab.calendar"].tap()
+        // Tabs are addressed by position, not identifier: SwiftUI does not forward a
+        // view's accessibilityIdentifier onto its tab-bar button (so `tab.*` never
+        // matched), and the visible titles are localized. The order matches
+        // RootView's TabView: 0 Today, 1 Calendar, 2 Statistics, 3 Drinks.
+        tabBar.buttons.element(boundBy: 1).tap()
         snapshot("02_calendar")
 
-        tabBar.buttons["tab.statistics"].tap()
+        tabBar.buttons.element(boundBy: 2).tap()
         snapshot("03_statistics")
 
-        tabBar.buttons["tab.drinks"].tap()
+        tabBar.buttons.element(boundBy: 3).tap()
         snapshot("04_drinks")
 
         // 06 — Settings, opened from Today's toolbar, then dismissed with a swipe.
-        tabBar.buttons["tab.today"].tap()
+        tabBar.buttons.element(boundBy: 0).tap()
         app.buttons["nav.settings"].tap()
         snapshot("06_settings")
         app.swipeDown(velocity: .fast)
