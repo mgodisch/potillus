@@ -246,8 +246,9 @@ listed individually below.
   uses (localized context, `FULL_STANDALONE` month names on the detected app
   language tag, `Double.fmt1`), so the markers cannot drift from the rendered UI
   in any of the 21 languages. Test-only change; no production code is touched.
-  The committed PNGs still show the old captures and must be refreshed with
-  `make screenshots`.
+  The committed PNGs have since been recaptured with the fixed suite (verified
+  in the tenth QA round: all 21 locales show the fixture data, none the seed
+  state), so the store assets in the tree are the correct ones.
 - Two-text rows no longer break in verbose languages (eighth QA round): on the
   Today card the drink-days label and its week range shared a `SpaceBetween` row
   in which BOTH texts were measured at their intrinsic width. A long localized
@@ -267,6 +268,130 @@ listed individually below.
   icon buttons unweighted — a long month name could have pushed the "next month"
   arrow off the row; it is now weighted, centred and ellipsized. Layout only, no
   behavioural or data change.
+
+- Publishing tooling verifies the signer key (ninth QA round, release-tooling
+  focus). `make push-playstore` and `make push-codeberg` previously checked only
+  that a release artifact existed, not that it was signed — and for the AAB the
+  unsigned and signed outputs share the name `app-release.aab`, so an unsigned
+  bundle would have been uploaded and rejected by Play only after the full
+  metadata round-trip. Both targets now prove the signature and pin the signer
+  before doing anything: `push-playstore` runs `jarsigner -verify` on the bundle
+  (reading its "jar verified." verdict, because the exit code alone passes an
+  unsigned archive) and `keytool -printcert` to read the signer certificate;
+  `push-codeberg` requires the signed `app-release.apk` name and runs
+  `apksigner verify` / `--print-certs`. Both compare the certificate SHA-256
+  against the fingerprint published in SECURITY.md, so an artifact signed with
+  the wrong key is refused. The signing tools run non-interactively and are found
+  on `PATH`, else from `JAVA_HOME` / `ANDROID_HOME`.
+- `push-codeberg` verifies the tag is pushed, not merely created locally.
+  Codeberg's release API resolves the release against a server-side tag, so a
+  purely local tag made the create call fail late; the target now checks the tag
+  on the same remote `make push` uses (the branch upstream, else `origin`) and
+  fails fast with an actionable message.
+- `push-playstore` gains a Play-side dry run and the same tag guard. A new
+  `VALIDATE_ONLY=1` switch threads fastlane supply's `validate_only` through the
+  `testing` / `production` lanes, so `make push-playstore VALIDATE_ONLY=1`
+  validates the upload (credentials, AAB, metadata) against the Play API without
+  changing anything on Google Play. And, mirroring `push-codeberg`, the target now
+  requires the release tag `vX.Y.Z` to exist locally and on the push remote before
+  uploading -- Play has no notion of git tags, so this is a release-hygiene gate
+  that keeps every published build tied to a recorded, pushed tag.
+- `make release` no longer captures screenshots, and is now device-free. It
+  previously ran `make screenshots` first, forcing a connected device/emulator
+  just to build the signed APK/AAB/SBOM. Screenshots and feature graphics are
+  store assets needed only at publish time, so capturing them is now decoupled:
+  run `make screenshots` (or `make store-assets` for the whole set) on demand,
+  exactly as the report pages 07/08 already worked. Building the release
+  artifacts needs no device.
+- Release-tooling hygiene. The redundant early `command -v bundle` in
+  `push-playstore` was dropped (the `bundle check` guard already covers it), and
+  a stale reference to a non-existent `docs/PLAY_STORE.md` was removed from
+  `fastlane/Fastfile` and `fastlane/README.md`. Tool availability is checked with
+  plain `command -v` calls, documented in a comment above each, so the recipes
+  show exactly what they run. Relatedly, the device pre-flight checks in
+  `screenshots`, `report-pdfs`, `test-device` and `install-debug` no longer fail
+  silently: the `adb devices` probe is traced with a scoped `set -x` so the literal
+  command shows up next to the failure (`.ONESHELL` echoes the whole recipe once,
+  up front and far from where it runs), and in `screenshots` / `report-pdfs` it now
+  runs BEFORE the Gradle build so a not-running emulator fails fast instead of
+  after a full build. The `java` target likewise prints `java -version` before its
+  version test, so a wrong JDK is visible instead of a bare `Error 1`.
+- Docs. SECURITY.md now states key custody per channel accurately: the maintainer
+  holds the app-signing key for the Codeberg / F-Droid APK, and — under Google
+  Play App Signing — the upload key for Play, while Google holds Play's own
+  app-signing key. The certificate-fingerprint verification note clarifies that
+  the published fingerprint identifies the F-Droid / Codeberg APK signer and that
+  a Play-delivered APK carries Google's re-signing key. `release-check.sh` gained
+  a section (14 / 14) that fails the build unless SECURITY.md carries exactly one
+  canonical signing-key fingerprint, since the publishing targets read the pin
+  from there. Tooling and documentation only; no app-visible behaviour changed,
+  so no versionCode bump and no store-note changes.
+- Release-tooling correctness (eighth QA pass). The remote-detection line shared by
+  `push-playstore` and `push-codeberg` could abort the whole recipe instead of
+  falling back to `origin`. Under the Makefile's `.SHELLFLAGS := -eu -o pipefail`, a
+  checkout with no configured upstream makes `git rev-parse @{u}` exit non-zero;
+  pipefail propagates that through the pipe and `set -e` then kills the recipe ON THE
+  ASSIGNMENT, before the `${remote:-origin}` fallback on the same line can run. A
+  `|| true` inside the command substitution now swallows the failure so the fallback
+  supplies `origin` as designed; the happy path (upstream configured) is unchanged.
+  Both publishing targets were still untested, so this latent abort had not surfaced.
+- Docs. A stale `deploy`-lane reference in SECURITY.md (the Play-credentials bullet)
+  was corrected to the current `testing` / `production` Play-upload lanes, and the
+  illustrative versionCode in `fastlane/README.txt` — long outdated at 66 — was
+  replaced with a drift-free `<N>` placeholder so the example needs no edit on
+  future releases. Tooling and documentation only; still no app-visible
+  behaviour change, so no versionCode bump and no store-note changes.
+
+- Favourite toggle no longer re-validates untouched fields (tenth QA round).
+  `DrinksViewModel.updateDrink` gained full `DrinkValidator` checks earlier in
+  this release, and the Drinks screen's favourite star ran through it — so a
+  drink imported from a backup with a serving size outside the editor's
+  1…5000 ml (the reader deliberately accepts up to 10 000 and promises such a
+  drink "stays usable"; see the BackupManager import comment) could no longer
+  be favourited: the star tap failed with a volume validation error for a field
+  the user never touched. The star now goes through a dedicated
+  `DrinksViewModel.setFavorite`, which writes only the flipped flag and leaves
+  the stored, already-accepted values byte-identical; genuine edits keep the
+  full validation. The regression was introduced within this unreleased version
+  and never shipped, so no store-note change is needed. Two new
+  `DrinksViewModelTest` cases pin the contrast (star works on an out-of-range
+  import, a real edit of it is still rejected).
+- Publishing-tooling verification and hardening (tenth QA round). `release`,
+  `push-playstore` and `push-codeberg` were exercised end to end in a stubbed
+  environment — signed dummy artifacts, a local git remote with a pushed tag,
+  real jarsigner/keytool/apksigner, every guard triggered individually — and
+  the lane options and path resolution were verified against the pinned
+  fastlane 2.237.0 sources. Findings fixed on top: the signing-key pin read
+  from SECURITY.md is now lowercase-normalized in the Makefile AND
+  release-check §14 fails on a non-lowercase fingerprint, so a reformatted pin
+  is caught at build time (as that section promises) instead of making both
+  push targets refuse correctly signed artifacts at push time; the
+  unpushed-tag guard in both targets now fails with a named-tag message
+  instead of a bare git exit code; `push-codeberg` is safe to re-run after a
+  partial failure — it reuses an existing release for the tag and skips
+  already-attached assets instead of tripping Forgejo's duplicate-release
+  409 — and no longer places the access token on any curl command line (it
+  goes into a mode-0600 temp header file passed with `-H @file` and removed
+  by an EXIT trap, keeping it out of `/proc/<pid>/cmdline`).
+- The `deploy` target in android/Makefile was removed (tenth QA round): it
+  duplicated the root `push-playstore` while bypassing every safeguard that
+  target adds — the jarsigner verification, the signer-fingerprint pin and the
+  pushed-tag guards — and it rebuilt the bundle on the way, against the
+  publishing targets' upload-only doctrine. Upload with `make push-playstore`
+  (dry run: `VALIDATE_ONLY=1`); a breadcrumb comment marks the old spot.
+- Makefile hygiene (tenth QA round): `prereq`'s `$(GUIDE_OUTPUTS)` prerequisite
+  silently expanded to nothing — the rule precedes `-include guides.d` and make
+  expands prerequisite lists the moment it reads a rule, so the variable was
+  still empty there. The guide outputs are now attached on a second dependency
+  line placed after the include (make merges prerequisite lists; verified with
+  `make -p`). No build was ever wrong: Gradle's own `generateUserGuides` task
+  had masked the gap, which is exactly why it stayed unnoticed.
+- Docs (tenth QA round): CONTRIBUTING's release checklist now publishes via
+  `make push-codeberg` (signer pin, APK + SBOM release assets, re-runnable) and
+  `make push-playstore` (with the `VALIDATE_ONLY=1` dry run) instead of
+  describing a manual Codeberg upload that attached only the SBOM; and the
+  eighth-round screenshot note above was corrected — the committed PNGs are
+  the post-fix captures, not the old ones.
 
 ---
 

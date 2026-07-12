@@ -31,7 +31,6 @@ help:
 	@echo "  make debug          build debug APK"
 	@echo "  make release        build release APK (signed if a key is configured, else unsigned)"
 	@echo "  make bundle         build release App Bundle/AAB for Google Play (needs signing key)"
-	@echo "  make deploy         upload the signed AAB + metadata to Google Play (fastlane 'testing' lane = closed alpha; needs key)"
 	@echo "  make sbom           generate the CycloneDX SBOM (reproducible JSON)"
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
 	@echo "  make lint           run ktlint + Android lint (build-breaking)"
@@ -102,9 +101,18 @@ else
 SCREENSHOT_EXCLUDE_FLAG :=
 endif
 
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md $(GUIDE_OUTPUTS) release-check
+# prereq gains the guide outputs as ADDITIONAL prerequisites further down, on a
+# second dependency line AFTER `-include guides.d` — see the comment there. The
+# reference must not appear here: make expands a rule's prerequisite list the
+# moment it reads the rule, and at this line GUIDE_OUTPUTS (defined in guides.d)
+# is still empty, so `$(GUIDE_OUTPUTS)` written here would silently contribute
+# nothing (found in the v0.81.0 QA review with `make -p`).
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md release-check
 
 java:
+	# Require Java $(JAVA_VERSION). Print the active version first so a mismatch --
+	# or a missing java -- is visible instead of a bare, reason-less test failure.
+	java -version
 	test "$(shell java -version 2>&1 | head -1 | sed 's/.*version "\([0-9]*\).*/\1/')" -eq "${JAVA_VERSION}"
 
 android: \
@@ -148,10 +156,20 @@ app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md ../LICENSE.Apache
 # render-guide.py` rule per language into guides.d. That fragment is auto-
 # regenerated whenever a template, a strings.xml or the renderer changes and pulled
 # in with `-include`, so make (not a phony that runs every build) decides which
-# guides are stale, and `prereq` depends on the real $(GUIDE_OUTPUTS). The shared
-# recipe renders on demand; render-guide.py rewrites only the outputs whose inputs
-# are newer, so a per-target re-invocation is a cheap near-no-op after the first.
+# guides are stale, and `prereq` depends on the real $(GUIDE_OUTPUTS) via the
+# second dependency line below (it must come AFTER this include — see there). The
+# shared recipe renders on demand; render-guide.py rewrites only the outputs whose
+# inputs are newer, so a per-target re-invocation is a cheap near-no-op after the
+# first.
 -include guides.d
+
+# The guide outputs as prerequisites of `prereq` — as a SECOND dependency line
+# (make merges prerequisite lists for the same target), placed after the include
+# because prerequisite lists expand immediately: on the `prereq:` rule near the
+# top of this file GUIDE_OUTPUTS is not yet defined and would expand to nothing.
+# Here the include has run (make rebuilds a missing guides.d and RESTARTS, so on
+# the parse that matters the variable is populated) and the dependency is real.
+prereq: $(GUIDE_OUTPUTS)
 
 guides.d: $(wildcard docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/values*/strings.xml) ../tools/render-guide.py
 	python3 ../tools/render-guide.py --make-deps > $@
@@ -240,16 +258,14 @@ bundle: prereq $(SBOM)
 	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"
 	@echo "SBOM:        $(SBOM)  (attach to the Codeberg release)"
 
-# Upload the signed AAB and the store metadata to Google Play via the fastlane
-# `testing` lane (see ../fastlane/Fastfile). Depends on `bundle` so the AAB is fresh.
-# Requires: a configured signing key (keystore.properties / env), the bundled
-# fastlane (`cd ../fastlane && bundle install`), and a Play service-account key
-# (../fastlane/play-store-credentials.json or $SUPPLY_JSON_KEY — see ../fastlane/Appfile).
-# Runs fastlane in a SUBSHELL so the `cd ../fastlane` does not leak into make state.
-# The `testing` lane defaults to the closed-testing alpha track (status completed);
-# override, e.g.:  make deploy DEPLOY_ARGS="track:internal status:completed"
-deploy: bundle
-	( cd ../fastlane && bundle exec fastlane testing $(DEPLOY_ARGS) )
+# The former `deploy` target (bundle + fastlane `testing` upload in one step) was
+# removed in the v0.81.0 QA review: it duplicated the root Makefile's
+# `push-playstore` while bypassing every safeguard that target adds — the
+# jarsigner signature check, the signer-fingerprint pin against SECURITY.md and
+# the pushed-release-tag guards — and it rebuilt the bundle on the way, against
+# the publishing targets' "upload only what you built explicitly" doctrine.
+# Upload with `make push-playstore` from the repository root instead (build first
+# with `make release` or `make -C android bundle`; dry-run with VALIDATE_ONLY=1).
 
 # Generate a standardized CycloneDX 1.6 JSON SBOM for the release runtime
 # classpath (configuration lives in app/build.gradle.kts). Two steps:
@@ -281,8 +297,14 @@ lint: prereq
 	./gradlew ktlintCheck lintDebug
 
 test-device: prereq
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required. `set -x` traces the
+	# probe so the actual `adb devices` command is visible AT the point it runs
+	# (.ONESHELL echoes the whole recipe once, up front and far from any failure);
+	# grep aborts the recipe here if none is ready.
+	set -x
+	adb devices
+	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
 	# Compose UI tests need the host Activity RESUMED and VISIBLE. On a device whose
 	# screen is OFF or LOCKED the Activity is immediately paused/stopped (logcat:
 	# isSleeping=true) and no Compose hierarchy attaches -> "No compose hierarchies
@@ -297,8 +319,14 @@ test-device: prereq
 install: install-debug
 
 install-debug: app/build/outputs/apk/debug/app-debug.apk
-	DEV_COUNT=$$(adb devices 2>/dev/null | grep -cw 'device' || true)
-	test "$${DEV_COUNT:-0}" -ne 0
+	# A connected device/emulator (state "device") is required. `set -x` traces the
+	# probe so the actual `adb devices` command is visible AT the point it runs
+	# (.ONESHELL echoes the whole recipe once, up front and far from any failure);
+	# grep aborts the recipe here if none is ready.
+	set -x
+	adb devices
+	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
 	adb install -r $<
 
 clean: prereq
@@ -309,4 +337,4 @@ distclean: clean
 	rm app/src/main/res/raw*/usersguide.md
 	rm -f guides.d
 
-.PHONY: help prereq release-check java android guides check-guides debug release bundle deploy sbom test unit-test lint test-device screenshot-apks install install-debug clean distclean
+.PHONY: help prereq release-check java android guides check-guides debug release bundle sbom test unit-test lint test-device screenshot-apks install install-debug clean distclean

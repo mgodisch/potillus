@@ -220,7 +220,11 @@ fun DrinksScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             // ── Favourite star ────────────────────────────────────────
-                            IconButton(onClick = { vm.updateDrink(drink.copy(isFavorite = !drink.isFavorite)) }) {
+                            // Deliberately setFavorite, NOT updateDrink: the star changes
+                            // no validated field, and an imported drink may sit outside
+                            // the editor's bounds (see the setFavorite KDoc) — a full
+                            // re-validation here made such a drink un-favouritable.
+                            IconButton(onClick = { vm.setFavorite(drink, !drink.isFavorite) }) {
                                 Icon(
                                     imageVector = if (drink.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                                     contentDescription = stringResource(R.string.favorite),

@@ -148,9 +148,13 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
      * Persists an edited drink.
      *
      * Validated exactly like [addDrink]. Before v0.81.0 this trusted its caller,
-     * which happened to be a dialog that validated — but the favourite toggle
-     * already called it too, and any third caller would have been free to write a
-     * 0 ml drink straight into the database.
+     * which happened to be a dialog that validated — any third caller would have
+     * been free to write a 0 ml drink straight into the database.
+     *
+     * The favourite STAR does not go through here: it changes none of the
+     * validated fields, and a drink imported from a backup may legitimately sit
+     * outside the editor's bounds (see [setFavorite] for the full rationale).
+     * This function is for edits of the validated fields themselves.
      */
     fun updateDrink(drink: DrinkDefinition) {
         val violation = DrinkValidator.validate(drink.name, drink.volumeMl, drink.alcoholPercent)
@@ -159,6 +163,32 @@ class DrinksViewModel(private val drinkRepo: IDrinkRepository) : ViewModel() {
             return
         }
         viewModelScope.launch { drinkRepo.update(drink.copy(name = drink.name.trim())) }
+    }
+
+    /**
+     * Sets or clears the favourite flag of an existing [drink] WITHOUT running
+     * [DrinkValidator] over the other fields.
+     *
+     * WHY A SEPARATE, VALIDATION-FREE PATH?
+     *   The star toggle changes exactly one field that no validation rule covers.
+     *   Routing it through [updateDrink] (as the screen did until the v0.81.0 QA
+     *   review) re-validated the UNTOUCHED name/volume/alcohol values — and those
+     *   may legitimately violate the editor's bounds: [de.godisch.potillus.util.BackupManager]
+     *   deliberately imports drinks up to 10 000 ml (wider than
+     *   [DrinkValidator.VOLUME_ML_RANGE]) so a backup from a foreign or future
+     *   version is not refused, and documents that such a drink "stays usable".
+     *   Tapping the star on such an imported drink then failed with a VOLUME
+     *   validation error for a field the user never touched, and the toggle was
+     *   impossible. Writing only the flipped flag keeps the stored (already
+     *   accepted) values byte-identical, so no invalid data can enter the
+     *   database through this path.
+     *
+     * @param drink    The stored drink whose flag to change (all other fields are
+     *                 written back unmodified).
+     * @param favorite The new favourite state.
+     */
+    fun setFavorite(drink: DrinkDefinition, favorite: Boolean) {
+        viewModelScope.launch { drinkRepo.update(drink.copy(isFavorite = favorite)) }
     }
 
     /**

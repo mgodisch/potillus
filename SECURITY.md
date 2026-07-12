@@ -208,9 +208,10 @@ The project uses a small, fixed set of secrets, none of which are ever committed
 to version control:
 
 - the **release code-signing keystore** (`android/keystore.properties` and the
-  keystore file it references), used only to sign Google Play artifacts;
+  keystore file it references), used to sign the release artifacts — the Google
+  Play upload bundle and the Codeberg/F-Droid APK;
 - the **Google Play upload credentials** (`fastlane/play-store-credentials.json`),
-  used only by the Fastlane `deploy` lane; and
+  used only by the Fastlane Play-upload lanes (`testing` and `production`); and
 - the maintainer's **OpenPGP signing key**, used to sign release tags and commits.
 
 **Storing.** Secrets are never hard-coded in source and never stored in the
@@ -240,10 +241,14 @@ replaced before the next release.
 
 ## Verifying releases
 
-Releases are distributed through F-Droid and are cryptographically signed with
-the project maintainer's own Android app-signing key. The build is reproducible,
-and the private signing key is held only by the maintainer — it is never stored
-on Codeberg, F-Droid, or any other distribution site.
+Releases are cryptographically signed. The Codeberg release APK and the F-Droid
+build are signed with the maintainer's own Android app-signing key (fingerprint
+below); that private key is held only by the maintainer and is never stored on
+Codeberg, F-Droid, or any other distribution site. On Google Play the maintainer
+signs the uploaded App Bundle with the same private key in its role as the Play
+upload key and likewise holds it alone, while Google holds the separate
+app-signing key under Play App Signing and re-signs the artifact delivered to
+Play users. The build is reproducible.
 
 You can verify a downloaded or installed release in any of these ways:
 
@@ -264,6 +269,12 @@ You can verify a downloaded or installed release in any of these ways:
   ```
   7506f17184b31a2d67621305d190a73e497806b39f7d64463ff5dbc0afd8317b
   ```
+
+  This fingerprint identifies the maintainer's app-signing key, which signs the
+  F-Droid and Codeberg release APKs. An APK delivered by Google Play is re-signed
+  by Google under Play App Signing and therefore reports a different signer
+  certificate; verify a Play build against the app-signing certificate shown in
+  the Play Console instead.
 
 - **By reproducing the build.** Because the build is reproducible, you can
   rebuild the app from source at the corresponding release tag and compare the

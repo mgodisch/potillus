@@ -22,7 +22,7 @@ Conventions used here
 * Locale folders use Play's BCP-47 style codes (en-US, de-DE). F-Droid accepts
   these as well, so a single tree serves both stores.
 * Release notes are named after the integer `versionCode` from
-  app/build.gradle.kts (currently 66 -> changelogs/66.txt). This coupling is
+  app/build.gradle.kts (versionCode <N> -> changelogs/<N>.txt). This coupling is
   verified on every build by tools/release-check.sh (section 1), which runs as
   part of the Makefile `prereq` target: add a note for each locale whenever you
   bump the versionCode, or the build fails.

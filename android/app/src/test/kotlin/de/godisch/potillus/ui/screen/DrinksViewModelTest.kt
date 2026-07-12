@@ -176,6 +176,49 @@ class DrinksViewModelTest {
         }
     }
 
+    // ── setFavorite vs updateDrink on imported out-of-editor-range drinks ─────
+    // BackupManager deliberately imports drinks up to 10 000 ml (wider than
+    // DrinkValidator.VOLUME_ML_RANGE) and promises they "stay usable". These two
+    // tests pin the contract that makes that promise hold at the ViewModel:
+    // the favourite star must work on such a drink (setFavorite skips field
+    // validation, v0.81.0 QA fix), while a real EDIT of it is still rejected
+    // until the values are brought into range.
+
+    @Test fun `setFavorite toggles an imported out-of-range drink`() = runTest(dispatcher) {
+        // 8000 ml is legal for the backup reader (1..10 000) but outside the
+        // editor's 1..5000 — exactly the shape an imported foreign drink can have.
+        val imported = DrinkDefinition(id = 1, name = "Party keg", volumeMl = 8000, alcoholPercent = 5.0)
+        drinkRepo = FakeDrinkRepository(listOf(imported))
+        val vm = DrinksViewModel(drinkRepo)
+
+        vm.setFavorite(imported, true)
+
+        vm.uiState.test {
+            var drinks = awaitItem().drinks
+            while (drinks.none { it.isFavorite }) drinks = awaitItem().drinks
+            val stored = drinks.single()
+            assertTrue("Favourite flag must be set", stored.isFavorite)
+            // The untouched (out-of-range) fields must be written back unmodified.
+            assertEquals(8000, stored.volumeMl)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `updateDrink still rejects an out-of-range volume`() = runTest(dispatcher) {
+        val imported = DrinkDefinition(id = 1, name = "Party keg", volumeMl = 8000, alcoholPercent = 5.0)
+        drinkRepo = FakeDrinkRepository(listOf(imported))
+        val vm = DrinksViewModel(drinkRepo)
+
+        // A genuine edit (here: a rename) of the still-out-of-range drink is
+        // rejected — the editor path keeps its bounds; only the star bypasses them.
+        vm.updateDrink(imported.copy(name = "Renamed keg"))
+
+        vm.uiState.test {
+            assertEquals("Rejected edit must not be persisted", "Party keg", awaitItem().drinks.single().name)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ── deleteDrink ───────────────────────────────────────────────────────────
 
     @Test fun `deleteDrink with no entries deletes the drink`() = runTest(dispatcher) {
