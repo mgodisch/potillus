@@ -28,7 +28,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Language-neutral golden input/output cases for the health-relevant domain logic,
 loaded by **both** platforms so the Android (JVM) and iOS (Swift) implementations
-can never silently diverge. See `docs/IOS_MIGRATION.md`, "Correctness parity".
+can never silently diverge.
 
 Each file is a JSON document with a `cases` array; every case pairs an `input`
 with its `expected` output. Adding or changing a case here is a deliberate,

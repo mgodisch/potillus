@@ -33,7 +33,7 @@ import GRDB
 // The iOS counterparts of the Android Room entities `DrinkEntity` and
 // `EntryEntity`. They map one-to-one onto the same two tables, because the
 // SQLite schema is a shared contract between the platforms (see
-// `test-vectors/db-schema.json` and docs/IOS_MIGRATION.md).
+// `test-vectors/db-schema.json`).
 //
 // WHY STRUCTS AND NOT CLASSES
 //   GRDB 7 discourages the old `Record` base class. A plain `struct` conforming

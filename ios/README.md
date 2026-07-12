@@ -26,8 +26,9 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Potillus for iOS
 
-Native Swift/SwiftUI port of Libellus Potionis. See
-[`../docs/IOS_MIGRATION.md`](../docs/IOS_MIGRATION.md) for the full strategy.
+Native Swift/SwiftUI port of Libellus Potionis. Its scope and parity strategy are
+summarised in the `v0.82.0` [changelog](../CHANGELOG.md) entry; remaining work is
+tracked in the [roadmap](../docs/ROADMAP.md).
 
 ## Layout
 

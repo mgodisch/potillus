@@ -47,8 +47,9 @@ languages with localised report and plurals — and its behaviour is pinned to
 Android's by a shared set of golden test vectors. Two Android features are
 consciously not ported (the calendar year heat-map and, pending on-device
 verification, a PDF footer tweak); both are recorded as possible future work below.
-The design and the parity strategy are documented in
-[IOS_MIGRATION.md](IOS_MIGRATION.md). What is still open is App Store distribution
+The design and parity strategy are recorded in the `v0.82.0`
+[changelog](../CHANGELOG.md) entry and enforced by the shared golden test vectors
+in `test-vectors/`. What is still open is App Store distribution
 (listing, screenshots, and the compliance declarations), tracked below.
 
 ## Blocking the OpenSSF silver badge (MUST)
@@ -67,7 +68,10 @@ attainable until each is resolved. They are the most critical open items.
   pipeline (`.woodpecker.yml`) on Codeberg that runs the automated test suite on
   each push and reports success/failure. `./gradlew testDebugUnitTest` plus
   `lintDebug` and `ktlintCheck` is sufficient; instrumented tests need an
-  emulator and are optional. Requires enabling Woodpecker for the repository.
+  emulator and are optional. The iOS side has no CI runner yet; once the pipeline
+  exists it should also run the Swift package suite (`swift test` in
+  `ios/PotillusKit`) and the container-runnable `tools/` checks, so the Swift
+  toolchain is covered too. Requires enabling Woodpecker for the repository.
   Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
   gold) and `static_analysis_often`, and is the natural home for the periodic
   `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
@@ -312,6 +316,9 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see
   below); what remains before submission is App Store tooling — the store
   listing, screenshots, and the export-compliance and privacy declarations.
+- **iPad / universal app.** The iOS layouts are written adaptively, so a
+  universal iPhone-and-iPad build can be added later without a rewrite. It is not
+  planned for the first release; the port targets iPhone only for now.
 - **Mac-independent Swift syntax pre-check (developer tooling).** A lightweight
   brace/delimiter-balance check under `tools/`, run from `gmake ios` beside the
   existing `check-swift-symbols.py`/`check-swift-tests.py` guards. None of the

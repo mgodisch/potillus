@@ -33,7 +33,7 @@ package de.godisch.potillus.domain
 // Gradle module, because the iOS (Swift) test suite loads the very same files.
 // Neither platform can change a health-relevant formula without either updating
 // the shared vectors — a visible, reviewable change — or turning its own suite
-// red. See docs/IOS_MIGRATION.md, "Correctness parity".
+// red.
 //
 // FILE-PATH STRATEGY
 //   Gradle runs unit tests with the module root (…/android/app/) as the working

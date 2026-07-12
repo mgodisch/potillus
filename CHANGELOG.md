@@ -42,15 +42,62 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.82.0
 
-Harden Play publishing and store-metadata gate
+Add the native Swift/SwiftUI iOS port
 
-A release-tooling and quality-gate release with no user-facing changes: it makes
-`make push-playstore` fail fast on a Play permission problem before uploading
-anything, and fixes the store-metadata length check so an over-long release note
-or title is caught at build time instead of being rejected by Google mid-upload.
-It follows up on the first real Play upload of 0.81.0, whose "caller does not
-have permission" error surfaced only after all 21 locales of metadata had been
-sent, and whose el-GR release note was rejected as 501 > 500 characters.
+This release makes Libellus Potionis multi-platform. A native Swift/SwiftUI port
+of the app now lives in the same repository under `ios/`, feature-complete for
+daily use and pinned to the Android app's behaviour by a shared set of golden
+test vectors. The two apps share one human-readable version and the JSON backup
+interchange format — not a live sync and not a common binary. The Android
+Play-publishing tooling that 0.82.0 began with is hardened as well, below.
+
+The iOS port, section by section:
+
+- **Shared core, ported not shared.** The health-relevant domain logic —
+  `AlcoholCalculator`, `DayResolver`, `ChartBucketing` and `Trend` — is
+  re-implemented in Swift rather than shipped as a Kotlin Multiplatform binary. A
+  language-neutral golden-vector suite in `test-vectors/`, loaded by both the JVM
+  and the Swift test targets, keeps the two implementations from drifting: neither
+  platform can change a formula without either updating a reviewable shared vector
+  or turning its own suite red. The tricky cases are covered — `isOverLimit`'s
+  floating-point tolerance, and the timezone- and DST-safe calendar arithmetic
+  behind the logical day, the rolling seven-day window and the chart buckets.
+- **Data layer on GRDB.** The SQLite schema, the record types, the repositories
+  behind protocol seams, the JSON backup (v3) reader/writer, the CSV export and an
+  encrypted preferences store are all in place; GRDB is the iOS counterpart to
+  Android's Room. The database files are not interchangeable between platforms —
+  the supported bridge is the JSON backup, and the iOS suite proves it by parsing
+  and importing a real Android-written backup (15 drinks, 85 entries) with no
+  orphaned rows.
+- **Every screen in SwiftUI.** Today, Calendar, Statistics, Drinks, Add-drink,
+  Settings and the document viewer are built to feature parity, reactive to
+  database changes, with a startup-failure path, an app lock via
+  `LocalAuthentication` (and an app-switcher privacy cover), and the two-page PDF
+  report rendered by WebKit from the same HTML template Android uses, in the UI
+  language.
+- **Twenty languages.** Every screen, the PDF-report labels and the plurals are
+  localised across the twenty UI languages as String Catalogs with English as the
+  source. A parity check (`tools/check-l10n-parity.py`) verifies the iOS
+  translations against Android's resources, and a System-language user gets the
+  report in the device language rather than English.
+- **Release plumbing and screenshots.** The iOS build derives `MARKETING_VERSION`
+  from this changelog's top entry and its build number from Android's
+  `versionCode`, so the two stores' counters stay in step. fastlane iOS lanes and
+  App Store metadata for 21 locales are in place, and `make screenshots-ios`
+  captures the store screenshots fully non-interactively — pinning the simulator
+  clock, driving the UI-test target through the screens in light and dark mode,
+  and rasterizing the rendered report pages — mirroring the Android flow.
+- **GPLv3 on the App Store.** Apple's store terms are reconciled with the GPL by
+  an additional permission under GPL section 7 — an App-Store distribution
+  exception whose wording is adapted from the Feeel project — carried in every
+  file header and stated in `COPYING.md`; GPLv3-or-later and full copyleft remain
+  intact. The port's only third-party dependency is GRDB.swift (MIT, no transitive
+  dependencies, no network), which satisfies the project's dependency policy.
+- **Container-runnable guards.** The repository's static checks — GPL headers,
+  Swift symbols and test presence, l10n and l10n-parity, Makefile hygiene — run
+  without a Mac; compiling Swift remains the one step that needs one.
+
+The Android Play-publishing tooling is hardened as well:
 
 - `push-playstore` runs a real PRE-FLIGHT auth check before uploading. It calls
   fastlane's `validate_play_store_json_key` and requires its success line, so a

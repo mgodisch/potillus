@@ -41,8 +41,7 @@ let package = Package(
     dependencies: [
         // GRDB is the iOS counterpart to Room: typed records, a migrator, and
         // change observation over plain SQLite. MIT-licensed, no transitive
-        // dependencies, no network — it satisfies the project's dependency policy
-        // (see docs/IOS_MIGRATION.md, "iOS dependency licence policy").
+        // dependencies, no network — it satisfies the project's dependency policy.
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.0.0")
     ],
     targets: [

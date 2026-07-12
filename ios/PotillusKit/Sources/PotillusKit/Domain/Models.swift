@@ -36,7 +36,7 @@ import Foundation
 //
 // WHY MIRROR RATHER THAN SHARE?
 //   The project deliberately ports the domain logic to Swift instead of sharing
-//   a Kotlin Multiplatform binary (see docs/IOS_MIGRATION.md). The guard against
+//   a Kotlin Multiplatform binary. The guard against
 //   the two implementations drifting apart is the shared golden-vector suite in
 //   `test-vectors/`, which both platforms load and assert against.
 // =============================================================================

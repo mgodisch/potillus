@@ -43,7 +43,7 @@ import GRDB
 //   phone and an iPhone: Room keeps its own bookkeeping (a `room_master_table`
 //   holding an identity hash, plus `user_version`), and GRDB keeps a
 //   `grdb_migrations` table instead. Neither would accept the other's file. The
-//   supported interchange path is the JSON backup — see docs/IOS_MIGRATION.md.
+//   supported interchange path is the JSON backup.
 //
 // MIGRATIONS
 //   `DatabaseMigrator` is GRDB's answer to Room's migrations: named steps, run
