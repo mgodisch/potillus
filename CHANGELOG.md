@@ -129,6 +129,32 @@ The Android Play-publishing tooling is hardened as well:
   the recipe. The executed commands and status lines are unchanged; only what the
   terminal prints changed.
 
+The iOS branch's first quality-assurance round hardens it against untrusted input
+and corrects documentation that the port had outgrown:
+
+- **Backup import is validated like Android's.** The iOS reader accepted a
+  backup's drink and entry numbers on trust — only their presence was checked, not
+  their range — while Android's `BackupManager` has long rejected physically
+  impossible values. The GRDB schema constrains only nullability, so an
+  out-of-range value (a negative volume, a non-finite alcohol percentage, a
+  February 30th that a lenient formatter would silently clamp) would have entered
+  the database and corrupted every BAC and statistics figure that touched it. The
+  reader now enforces the same bounds as Android's Guard 2/3/4 — `volumeMl` in
+  1…10 000, `alcoholPercent` a finite 0…100, `gramsAlcohol` a finite non-negative,
+  `timestampMillis` positive, and a `logicalDate` that survives a parse→format
+  round-trip — throwing a typed `valueOutOfRange` the UI can localise.
+- **Backup files are size-capped.** The import read the whole chosen file into
+  memory with no ceiling; Android caps it at 10 MiB with a fast advertised-size
+  check plus a bounded read for the case where the size is misreported. iOS now
+  does the same through `BackupReader.readData`, refusing an oversized file before
+  it can exhaust memory, and `parse` keeps a backstop for any caller that hands
+  over bytes directly.
+- **Stale reader documentation corrected.** The backup reader still described a
+  time when iOS "has no preferences store yet" and therefore never applied a
+  restored settings block. That store now exists and the importer does apply
+  settings (sanitised); the scope notes and a test comment are updated to match
+  the shipped behaviour.
+
 ---
 
 ## v0.81.0

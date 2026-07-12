@@ -468,7 +468,10 @@ extension SettingsScreen {
                 let scoped = url.startAccessingSecurityScopedResource()
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
 
-                let data = try Data(contentsOf: url)
+                // A bounded read, not `Data(contentsOf:)`: an over-sized file is
+                // refused before it is loaded, so a hostile pick cannot exhaust
+                // memory. See `BackupReader.readData`.
+                let data = try BackupReader.readData(from: url)
                 let file = try BackupReader.parse(data)
                 let stats = try await environment.importer.restore(file, mode: mode)
 

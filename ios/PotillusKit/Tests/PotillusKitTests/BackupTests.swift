@@ -211,6 +211,133 @@ final class BackupTests: XCTestCase {
         }
     }
 
+    // ── Value ranges (Android BackupManager Guard 2/3/4 parity) ──────────────
+    //
+    // Physically impossible values must be refused at parse time, before they
+    // reach the database and corrupt the BAC / statistics maths. The GRDB schema
+    // only constrains nullability, so the reader is the last line of defence.
+
+    func testAnOutOfRangeDrinkVolumeIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [["id": 1, "name": "Pils", "volumeMl": 0, "alcoholPercent": 4.9]],
+            "entries": [],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "drink", key: "volumeMl", value: "0"))
+        }
+    }
+
+    func testAnOutOfRangeDrinkAlcoholPercentIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [["id": 1, "name": "Pils", "volumeMl": 500, "alcoholPercent": 150.0]],
+            "entries": [],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "drink", key: "alcoholPercent", value: "150.0"))
+        }
+    }
+
+    func testANegativeEntryGramsAlcoholIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [],
+            "entries": [["id": 1, "drinkId": 1, "drinkName": "Pils", "volumeMl": 500,
+                         "alcoholPercent": 4.9, "gramsAlcohol": -1.0,
+                         "timestampMillis": 1_767_381_240_000, "logicalDate": "2026-01-01"]],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "entry", key: "gramsAlcohol", value: "-1.0"))
+        }
+    }
+
+    func testANonPositiveEntryTimestampIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [],
+            "entries": [["id": 1, "drinkId": 1, "drinkName": "Pils", "volumeMl": 500,
+                         "alcoholPercent": 4.9, "gramsAlcohol": 19.3,
+                         "timestampMillis": 0, "logicalDate": "2026-01-01"]],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "entry", key: "timestampMillis", value: "0"))
+        }
+    }
+
+    /// A non-finite number (JSON `1e400` decodes to `Double.infinity`) would
+    /// propagate through every SUM(); it must not slip through as a finite value.
+    func testANonFiniteEntryAlcoholPercentIsRejected() throws {
+        let raw = """
+        {"version":2,"drinks":[],"entries":[{"id":1,"drinkId":1,"drinkName":"Pils",\
+        "volumeMl":500,"alcoholPercent":1e400,"gramsAlcohol":19.3,\
+        "timestampMillis":1767381240000,"logicalDate":"2026-01-01"}]}
+        """
+        XCTAssertThrowsError(try BackupReader.parse(Data(raw.utf8)))
+    }
+
+    /// A lenient formatter can CLAMP an impossible day to a valid one; the
+    /// parse -> format round-trip rejects the clamped result. February 30th does
+    /// not exist, so it must be refused rather than quietly stored as the 28th.
+    func testAClampedCalendarDateIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [],
+            "entries": [["id": 1, "drinkId": 1, "drinkName": "Pils", "volumeMl": 500,
+                         "alcoholPercent": 4.9, "gramsAlcohol": 19.3,
+                         "timestampMillis": 1_767_381_240_000, "logicalDate": "2026-02-30"]],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError, .malformedDate("2026-02-30"))
+        }
+    }
+
+    // ── Size limit (Android MAX_BACKUP_BYTES parity) ─────────────────────────
+
+    /// The in-`parse` backstop refuses an over-limit buffer before the JSON
+    /// parser walks it, regardless of how the bytes were obtained.
+    func testOversizedDataIsRejected() {
+        let data = Data(count: BackupReader.maxBackupBytes + 1)
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(
+                error as? BackupError,
+                .fileTooLarge(foundBytes: BackupReader.maxBackupBytes + 1,
+                              maxBytes: BackupReader.maxBackupBytes))
+        }
+    }
+
+    func testReadDataReadsAWellSizedFile() throws {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".json")
+        let payload = Data(#"{"version":2,"drinks":[],"entries":[]}"#.utf8)
+        try payload.write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let read = try BackupReader.readData(from: url)
+        XCTAssertEqual(read, payload)
+        // And the bytes parse into an empty, valid backup.
+        let backup = try BackupReader.parse(read)
+        XCTAssertTrue(backup.drinks.isEmpty)
+        XCTAssertTrue(backup.entries.isEmpty)
+    }
+
+    func testReadDataRejectsAnOversizedFile() throws {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".bin")
+        try Data(count: BackupReader.maxBackupBytes + 1).write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        XCTAssertThrowsError(try BackupReader.readData(from: url)) { error in
+            guard case .fileTooLarge = (error as? BackupError) else {
+                return XCTFail("expected .fileTooLarge, got \(error)")
+            }
+        }
+    }
+
     // ── Malformed input ──────────────────────────────────────────────────────
 
     func testEmptyDataIsAnError() {
@@ -235,8 +362,9 @@ final class BackupTests: XCTestCase {
 
     // ── Settings block ───────────────────────────────────────────────────────
 
-    /// A format 3 settings block survives a read/write round trip unchanged, even
-    /// though nothing applies it yet.
+    /// A format 3 settings block survives a read/write round trip unchanged. The
+    /// raw block is preserved verbatim by the reader; `SettingsSanitizer` clamps
+    /// it only later, at import time.
     func testSettingsSurviveARoundTrip() throws {
         let settings = BackupSettings(
             themeMode: "DARK", dayChangeHour: 5, dayChangeMinute: 30,
