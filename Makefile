@@ -32,6 +32,9 @@
 #                   + debug APK, then refresh existing feature graphics
 #      ios          static checks, regenerate the Xcode project, then the kit's
 #                   tests and a simulator build of the app              [needs a Mac]
+#      check-ios-static   the Mac-free iOS static gates (Swift symbols/tests,
+#                   headers, l10n, l10n-parity, report paper). Run it on the Linux
+#                   release path so a release-check run never leaves iOS unverified
 #    Convenience
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
 #                   split out of `android`                        [needs a device]
@@ -1094,8 +1097,18 @@ ios/Potillus/Resources/copyright.md: COPYING.md LICENSE.md LICENSE.Apache-2.0.md
 #
 # The cheap checks run first: a grep that costs milliseconds should not wait
 # behind a Swift build that costs minutes.
-ios: check-headers check-makefile check-swift-tests check-swift-symbols \
-     check-report-paper check-l10n-parity check-l10n check-swiftlint ios-project
+# check-ios-static: every iOS gate that needs no Mac — the pure-Python static
+# checks. It exists so the LINUX release path can verify iOS too. release-check.sh
+# is the Android gate and knows nothing about Swift, and `make ios` cannot run on
+# Linux because it ends in `swift test` and `xcodebuild`. Splitting the Mac-free
+# checks out lets CI run BOTH `release-check.sh` (Android) and `check-ios-static`
+# (iOS) on Linux, while a Mac runs `make ios` for the compile-and-test steps.
+# Neither gate alone covers a release; together they do. Each sub-check already
+# skips gracefully when its inputs are absent, so this is safe in any checkout.
+check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
+                  check-report-paper check-l10n-parity check-l10n
+
+ios: check-ios-static check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots-android`

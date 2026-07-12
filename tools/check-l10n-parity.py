@@ -35,7 +35,7 @@
 # `make ios` and `make android`. It reads android/ only to COMPARE — it never
 # generates iOS artefacts from it.
 #
-# FOUR CHECKS
+# FIVE CHECKS
 #   1. Every UI literal in the iOS views has a key in the catalogue. Previously a
 #      generator inserted missing keys as untranslated; with the generator gone,
 #      this guards against a literal that no catalogue entry covers.
@@ -50,6 +50,8 @@
 #      "Stats" in French) -- iOS must split it too. CHECK 2 alone would accept the
 #      short value in the title's place (it matches SOME Android string), so this
 #      catches the missing split that let the French "Stats" heading through.
+#   5. The CSV export captions (CsvHeaderLabels.swift) match Android's csv_col_*
+#      strings, in column order, for English and every language.
 #
 # A mismatch is a hard error: the platforms have diverged and someone must decide
 # which wording is correct and update the other side.
@@ -64,6 +66,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "ios/Potillus/Localizable.xcstrings"
 REPORT_LABELS = ROOT / "ios/PotillusKit/Sources/PotillusKit/Domain/ReportLabelsCatalog.swift"
+CSV_HEADERS = ROOT / "ios/PotillusKit/Sources/PotillusKit/Data/CsvHeaderLabels.swift"
 VIEWS = sorted((ROOT / "ios" / "Potillus").glob("*.swift"))
 ANDROID_EN = ROOT / "android/app/src/main/res/values/strings.xml"
 
@@ -71,6 +74,13 @@ ANDROID_EN = ROOT / "android/app/src/main/res/values/strings.xml"
 LANGUAGES = ["de", "da", "nl", "nb", "sv", "es", "fr", "it", "pt", "pt-BR", "ro",
              "cs", "pl", "ru", "uk", "el", "ja", "ko", "zh-Hans", "zh-Hant"]
 ANDROID_DIR = {"pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW"}
+
+# The eight CSV export captions, in the column order CsvExporter writes them. Each
+# maps to the Android string name whose value CsvHeaderLabels must reproduce.
+CSV_COLUMN_ORDER = [
+    "csv_col_date", "csv_col_time", "csv_col_drink", "csv_col_category",
+    "csv_col_volume_ml", "csv_col_alcohol_pct", "csv_col_grams", "csv_col_note",
+]
 
 # Proper nouns are shown verbatim, never translated: they legitimately match across
 # languages and carry no Android counterpart to compare against.
@@ -325,6 +335,50 @@ def check_collapsed_divergent_mappings(catalog):
     return problems
 
 
+def check_csv_headers():
+    """CHECK 5 — the CSV export captions in CsvHeaderLabels.swift match Android's
+    csv_col_* strings, in column order, for English and every language.
+
+    CsvHeaderLabels carries the localized column captions the CSV exporter writes,
+    copied verbatim from Android so a spreadsheet built against one platform's
+    export opens against the other's. This check is what turns "copied verbatim"
+    into an enforced invariant: it parses the English `englishCells` array and each
+    `case "<tag>": return [...]` and compares the eight cells, in order, to the
+    Android values they mirror. A drift on either side fails the build.
+    """
+    if not CSV_HEADERS.exists():
+        return [f"missing {CSV_HEADERS.relative_to(ROOT)}"]
+    text = CSV_HEADERS.read_text(encoding="utf-8")
+    problems = []
+
+    def cells_from(block):
+        return [swift_unescape(x) for x in re.findall(r'"((?:[^"\\]|\\.)*)"', block)]
+
+    def android_cells(strings_path):
+        amap = android_map(strings_path)
+        return [amap.get(name) for name in CSV_COLUMN_ORDER]
+
+    english = re.search(r"englishCells\s*=\s*\[(.*?)\]", text, re.S)
+    if not english:
+        problems.append("CsvHeaderLabels: cannot find englishCells")
+    elif cells_from(english.group(1)) != android_cells(ANDROID_EN):
+        problems.append(
+            f"[en] CSV headers: iOS {cells_from(english.group(1))!r} "
+            f"!= Android {android_cells(ANDROID_EN)!r}"
+        )
+
+    cases = dict(re.findall(r'case\s*"([^"]+)"\s*:\s*return\s*\[(.*?)\]', text, re.S))
+    for tag in LANGUAGES:
+        if tag not in cases:
+            problems.append(f"CsvHeaderLabels: no case for {tag!r}")
+            continue
+        got = cells_from(cases[tag])
+        want = android_cells(ROOT / f"android/app/src/main/res/values-{android_dir_suffix(tag)}/strings.xml")
+        if got != want:
+            problems.append(f"[{tag}] CSV headers: iOS {got!r} != Android {want!r}")
+    return problems
+
+
 def main():
     catalog = load_catalog()
     problems = []
@@ -332,6 +386,7 @@ def main():
     problems += check_translation_parity(catalog)
     problems += check_report_labels()
     problems += check_collapsed_divergent_mappings(catalog)
+    problems += check_csv_headers()
 
     if problems:
         for p in problems:

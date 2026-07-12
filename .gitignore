@@ -12,6 +12,7 @@ __pycache__/
 # fastlane writes a JUnit-style run report after every invocation; it is a
 # build artifact (fresh timestamps each run), not a source file.
 /fastlane/report.xml
+/fastlane/metadata/android/*/images/.goutputstream-
 
 /android/app/build
 /android/app/src/main/res/raw*/copyright.md

@@ -74,6 +74,7 @@ struct CalendarScreen: View {
             Button { Task { await model.previousMonth() } } label: {
                 Image(systemName: "chevron.left")
             }
+            .accessibilityLabel(Loc.string("Previous month", locale: locale))
             Spacer()
             Text(monthName)
                 .font(.headline)
@@ -81,6 +82,7 @@ struct CalendarScreen: View {
             Button { Task { await model.nextMonth() } } label: {
                 Image(systemName: "chevron.right")
             }
+            .accessibilityLabel(Loc.string("Next month", locale: locale))
         }
         .padding(.horizontal)
     }

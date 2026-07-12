@@ -170,6 +170,22 @@ and corrects documentation that the port had outgrown:
   restructured to an explicit substitution that pluralises on the imported count —
   matching Android's `import_success_merge`, which keys its plural on the same
   argument — with the skipped count rendered as a plain number.
+- **The Linux release path now verifies iOS too.** `release-check.sh` is the
+  Android gate and knows nothing about Swift, and `make ios` cannot run on Linux
+  because it ends in `swift test` and `xcodebuild` — so a green release check left
+  the iOS static invariants unchecked on a Linux CI. A new `make check-ios-static`
+  groups the Mac-free iOS gates (Swift symbols and tests, headers, l10n, l10n
+  parity, report paper) so CI can run it alongside `release-check.sh`; `make ios`
+  now reuses it for its own static phase.
+- **CSV header parity is now enforced, not just intended.** A new
+  `check-l10n-parity.py` check compares the localized `CsvHeaderLabels` captions,
+  in column order, against Android's `csv_col_*` strings for English and every
+  language, so the two platforms' export headers cannot drift.
+- **Calendar month-navigation is labelled for VoiceOver.** The previous/next
+  chevrons were icon-only buttons with no accessibility label, so VoiceOver
+  announced the raw SF Symbol. They now carry localized "Previous month" / "Next
+  month" labels, copied from Android's `cd_prev_month` / `cd_next_month`, matching
+  the labelled controls beside them.
 
 ---
 
