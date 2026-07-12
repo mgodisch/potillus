@@ -42,12 +42,34 @@ import Foundation
 
 extension ReportLabels {
 
-    /// Returns the report labels for a UI language tag (e.g. `de`, `zh-Hans`).
-    /// An unknown or empty tag yields the English labels, matching how the rest
-    /// of the app treats "System" and unsupported tags.
+    /// The languages the report can render: the `init(language:)` switch cases below,
+    /// plus English. Keep in sync with those cases (and tools/check-l10n-parity.py).
+    static let supportedLanguages = [
+        "en", "de", "da", "nl", "nb", "sv", "es", "fr", "it", "pt", "pt-BR",
+        "ro", "cs", "pl", "ru", "uk", "el", "ja", "ko", "zh-Hans", "zh-Hant",
+    ]
+
+    /// The report-label tag for a UI language setting. A concrete supported tag is
+    /// returned unchanged. The empty string is the app's "System" choice: like the
+    /// screens (localized through the system locale, see `Loc.locale(for:)`), the
+    /// report then follows the device's preferred languages instead of defaulting to
+    /// English — otherwise a System user, or a per-locale screenshot run, gets
+    /// localized screens but an English report. `preferredLocalizations` returns a
+    /// member of `supportedLanguages`, so the result always hits a case or English.
+    static func reportTag(for language: String) -> String {
+        guard language.isEmpty else { return language }
+        return Bundle.preferredLocalizations(
+            from: supportedLanguages, forPreferences: Locale.preferredLanguages
+        ).first ?? "en"
+    }
+
+    /// Returns the report labels for a UI language setting. A concrete supported tag
+    /// (e.g. `de`, `zh-Hans`) is used directly; the empty "System" choice resolves via
+    /// `reportTag(for:)` to the device's language, so the report follows the system
+    /// language like the screens do. An unsupported non-empty tag keeps English.
     public init(language: String) {
         self.init()   // English defaults; a known tag overwrites them
-        switch language {
+        switch Self.reportTag(for: language) {
         case "de": applyde()
         case "da": applyda()
         case "nl": applynl()

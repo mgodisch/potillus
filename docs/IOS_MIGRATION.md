@@ -512,6 +512,24 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Localize report for the System language  (patch -113)
+
+Screenshots 07–08 rendered the PDF report in English for every locale. Root cause,
+and a real bug beyond screenshots: `ReportLabels(language:)` maps the empty "System"
+language setting (the default) to English, while the rest of the app treats System as
+"follow the device language" (`Loc.locale(for: "")` is `.current`). So a System user —
+or any per-locale screenshot run, where the app's language is set but the stored
+setting stays "System" — got localized screens beside an English report. Both report
+call sites (`StatsScreenExport`, `ScreenshotMode`) pass `settings.language`, so both
+were affected.
+
+`ReportLabels` now resolves an empty tag through `Bundle.preferredLocalizations`
+against the device's preferred languages, picking the best supported label set (the
+same match Apple uses for the String Catalog the screens read); a concrete tag is
+still used directly, and an unsupported non-empty tag still falls back to English.
+This changes shipped behaviour: System-language users now get the report in their
+system language. Kit change, Mac-verified only (no Swift in the container).
+
 #### Guard against GNU Make 3.x  (patch -112)
 
 A non-interactive `ssh mini 'make screenshots-ios'` runs the macOS system make —
