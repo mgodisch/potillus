@@ -201,6 +201,13 @@ and corrects documentation that the port had outgrown:
   to pick up. `check-l10n` now scans the whole file (so a title on the line after
   `.alert(` is caught) and covers alert/dialog titles and `accessibilityLabel` /
   `Hint` / `Value`, so this class of miss cannot recur.
+- **The backup tests are split so the strict SwiftLint build passes.** The
+  import-guard tests added earlier this round pushed `BackupTests` past
+  SwiftLint's `type_body_length` limit, which `--strict` (the project's `make
+  ios` gate) turns into a build error. The value-range and size-cap tests now
+  live in a dedicated `BackupValidationTests`, leaving `BackupTests` with the
+  format-compatibility suite; both classes are well within the limit and every
+  test is preserved.
 
 ---
 
