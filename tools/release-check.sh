@@ -1196,20 +1196,33 @@ check_metadata_lengths() {
         return
     fi
 
-    local output rc
-    output=$(python3 - "$FASTLANE_DIR" <<'PYEOF'
+    # Run the checker under an `if`, NOT a bare `output=$(...)` assignment: under
+    # `set -euo pipefail` a standalone assignment whose command substitution exits
+    # non-zero aborts the WHOLE script here -- before the captured problems can be
+    # printed (the same trap documented in check_markdown_syntax). Since the
+    # checker deliberately exits 1 when it FINDS violations, the unguarded form
+    # silently killed the run on exactly the case this section exists to report.
+    local output
+    if output=$(python3 - "$FASTLANE_DIR" <<'PYEOF'
 import sys, glob, os
 
 root = sys.argv[1]
-# (filename glob, character limit)
-FIXED = [("short_description.txt", 80), ("full_description.txt", 4000)]
+# (filename glob, character limit). These are Google Play's store-listing limits
+# (Play Console Help: title 30, short description 80, full description 4000;
+# release notes 500 per language).
+FIXED = [("title.txt", 30), ("short_description.txt", 80), ("full_description.txt", 4000)]
 problems = []
 
 def length(path):
-    # Count characters, ignoring a single trailing newline, the way the stores
-    # measure the visible text.
+    # Count the RAW character length, INCLUDING a trailing newline. supply sends
+    # the file's bytes to Google verbatim (File.read, no strip), and Google counts
+    # what it receives -- an el-GR note of 500 visible chars + "\n" was rejected as
+    # 501 > 500. Counting the newline here mirrors that exactly, so the gate fails
+    # at build time on the same length Google would reject at push time. Unicode
+    # code points (Python str) match Google's rule that limits apply per character
+    # regardless of full-/half-width.
     with open(path, encoding="utf-8") as fh:
-        return len(fh.read().rstrip("\n"))
+        return len(fh.read())
 
 for name, limit in FIXED:
     for path in sorted(glob.glob(os.path.join(root, "*", name))):
@@ -1226,11 +1239,8 @@ for p in problems:
     print(p)
 sys.exit(1 if problems else 0)
 PYEOF
-)
-    rc=$?
-
-    if [[ $rc -eq 0 ]]; then
-        pass "Store metadata within length limits (summary ≤80, full ≤4000, changelog ≤500)"
+    ); then
+        pass "Store metadata within length limits (title ≤30, summary ≤80, full ≤4000, changelog ≤500; counted incl. trailing newline as Google does)"
     else
         # One "path: N chars > LIMIT" per offending file on stdout.
         while IFS= read -r line; do

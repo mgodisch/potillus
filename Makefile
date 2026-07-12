@@ -763,39 +763,38 @@ push:
 # F-Droid release APK, so both publishing targets pin against this one value.
 SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1 | tr 'A-F' 'a-f')
 
+# ── push-playstore ── upload the STAGED release bundle to Google Play via the
+# fastlane `testing` lane. Never builds or stages (that is `make release`); FAILS
+# FAST if the staged AAB is missing. Uploads only the staged bundle so the exact
+# verified bytes reach Play.
+#
+# Guards, in order: (1) staged AAB present; (2) release tag v$(VERSION) exists
+# locally AND on the push remote -- a RELEASE-HYGIENE gate mirroring push-codeberg
+# (Play itself has no notion of git tags), so a build only reaches Play when its
+# exact version is a reproducible, pushed tag; (3) the AAB is signed with the
+# EXPECTED key. For (3): jarsigner -verify prints "jar verified." for a signed
+# archive but returns 0 even for an UNSIGNED one, so grepping the verdict line is
+# what fails an unsigned bundle; -strict is avoided (the self-signed upload key
+# would trip its chain check and fail a correct bundle); keytool then prints the
+# signer SHA-256 (colon/upper), normalized to bare lowercase hex and required to
+# equal the pin in SECURITY.md. Then (4) a real PRE-FLIGHT auth check against the
+# Play API (validate_play_store_json_key) so a missing/again-misconfigured key or
+# revoked access fails HERE, before any metadata is uploaded -- that action logs
+# a success line but does NOT raise on failure, so its success line is required
+# explicitly. The remote pick uses `|| true` inside the substitution because,
+# under `.SHELLFLAGS := -eu -o pipefail`, `git rev-parse @{u}` with no upstream
+# would abort the recipe on the assignment before the `${remote:-origin}` fallback
+# runs. fastlane runs actions from the PROJECT ROOT (chdir one level up from
+# fastlane/), so the staged path passed to the lane's aab: option is
+# repo-root-relative -- exactly $(STAGED_AAB), no ../ prefix.
 push-playstore:
-	# Upload the STAGED bundle only (releases/$(RELEASE_ID)_$(VERSION_CODE).aab).
-	# This target never builds and never stages: `make release` produces and stages
-	# the artifact. Fail fast (and do NOT trigger a build) if it is absent.
+	# 1) staged AAB must exist (never builds/stages)
 	@test -f "$(STAGED_AAB)" || { echo "push-playstore: staged AAB not found at '$(STAGED_AAB)' -- run 'make release' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
-	# Require the release tag v$(VERSION) to exist locally AND on the push remote,
-	# mirroring the push-codeberg precondition. Play has no notion of git tags
-	# (unlike the Codeberg API, which resolves the release against a server-side
-	# tag), so this is a RELEASE-HYGIENE gate: a build only reaches Play when its
-	# exact version is recorded and pushed as a tag others can reproduce from.
+	# 2) release tag must exist locally and on the push remote
 	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
-	# Pick the remote `make push` publishes to: the current branch's upstream, else
-	# origin. The `|| true` inside the command substitution is essential under this
-	# Makefile's `.SHELLFLAGS := -eu -o pipefail`: with no upstream configured,
-	# `git rev-parse @{u}` exits non-zero, pipefail propagates that through the pipe,
-	# and `set -e` would then abort the whole recipe ON THE ASSIGNMENT -- before the
-	# `$${remote:-origin}` fallback on the same line could ever run. Swallowing the
-	# failure makes the substitution yield the empty string, so the fallback below
-	# supplies `origin` as intended.
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	# The bare git exit code alone reads as an unexplained "Error 2" at the end of
-	# the (up-front) recipe echo, so the guard names the tag and the remedy.
 	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (make push)." >&2; exit 1; }
-	# Prove the bundle is signed with the EXPECTED key before uploading; jarsigner
-	# and keytool run non-interactively and any failure aborts the recipe here.
-	# jarsigner -verify prints "jar verified." for a signed archive but returns 0
-	# even for an UNSIGNED one, so grepping the verdict line is what makes an
-	# unsigned bundle fail. -strict is avoided: the self-signed upload key would
-	# trip its chain check and fail a correct bundle. keytool then prints the signer
-	# certificate SHA-256 (colon/upper); it is normalized to bare lowercase hex and
-	# must equal the fingerprint in SECURITY.md, so a bundle signed with the wrong
-	# key is refused. Checks run on the STAGED AAB -- the exact upload artifact.
-	# Tools resolve from PATH, else JAVA_HOME.
+	# 3) staged AAB must be signed with the expected key (jarsigner verdict + keytool SHA-256 pin)
 	js="$${JARSIGNER:-$$(command -v jarsigner || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}jarsigner")}"
 	"$$js" -verify "$(STAGED_AAB)" | grep '^jar verified\.'
 	kt="$${KEYTOOL:-$$(command -v keytool || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}keytool")}"
@@ -804,11 +803,10 @@ push-playstore:
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
 	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
-	# Hand fastlane the staged AAB via the lane's aab: option. fastlane runs its
-	# actions from the PROJECT ROOT (it chdirs one level up from fastlane/), so the
-	# path is repo-root-relative -- the same convention as the lane's Gradle-path
-	# default -- i.e. exactly $(STAGED_AAB) with no ../ prefix. The staged bytes are
-	# what supply uploads.
+	# 4) pre-flight: prove the key can actually reach the Play API BEFORE uploading
+	#    (the action never raises, so its success line is required explicitly)
+	key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; ( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$$key" ) | grep -q 'Successfully established connection to Google Play Store' || { echo "push-playstore: the Play service-account key at '$$key' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1; }
+	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir)
 	( cd fastlane && bundle exec fastlane testing aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
 
 # ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
@@ -856,86 +854,46 @@ CODEBERG_TOKEN_FILE := fastlane/codeberg-credentials.txt
 # staging" section above -- the staged files, not the raw Gradle outputs, are
 # what this uploads.)
 push-codeberg:
-	# curl and python3 are required below (Codeberg REST calls + JSON encoding);
-	# a missing tool aborts here with a plain "command not found".
+	# require curl + python3 (Codeberg REST + JSON encoding)
 	command -v curl
 	command -v python3
 	@test -f "$(CODEBERG_TOKEN_FILE)" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' not found -- create it containing your Codeberg access token (Settings > Applications, repository read+write scope). It is git-ignored." >&2; exit 1; }
 	token="$$(tr -d '[:space:]' < "$(CODEBERG_TOKEN_FILE)")"
 	@test -n "$$token" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' is empty." >&2; exit 1; }
-	# Pass the token to curl via a header FILE (`-H @file`, curl >= 7.55), never
-	# on the command line: argv is readable by every local process through
-	# /proc/<pid>/cmdline for the duration of each call. mktemp creates the file
-	# mode 0600; the EXIT trap removes it on every exit path, success or failure.
+	# token -> mode-0600 header file (never on argv); removed by the EXIT trap
 	hdr="$$(mktemp)"
 	trap 'rm -f "$$hdr"' EXIT
 	printf 'Authorization: token %s\n' "$$token" > "$$hdr"
+	# release tag must exist locally and on the push remote (server resolves the release against it)
 	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
-	# The Codeberg release API resolves the release against a tag that must exist
-	# ON THE SERVER; a purely local tag makes the create call fail late. Require the
-	# tag on the same remote `make push` uses (the branch upstream, else origin);
-	# git ls-remote --exit-code aborts here if the tag has not been pushed (with a
-	# named-tag message; the bare exit code alone read as an unexplained Error 2).
-	# The `|| true` inside the substitution keeps a missing upstream from aborting
-	# the recipe under `-eu -o pipefail`: without it, `git rev-parse @{u}` failing
-	# would kill the assignment via set -e before the `$${remote:-origin}` fallback
-	# on the same line runs (see the fuller note in push-playstore above).
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
 	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (make push)." >&2; exit 1; }
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
-	# Require the SIGNED release APK, staged into releases/ under its canonical name
-	# by `make release`. Gradle writes the unsigned output as app-release-unsigned.apk
-	# and the signed one as app-release.apk; the staged copy carries the canonical
-	# name, so its presence is the first, dependency-free signal that a key was used
-	# -- an unsigned APK must never reach the Codeberg release F-Droid downloads
-	# from. This target never builds or stages; fail fast if the staged file is
-	# absent. The staged file is the exact artifact uploaded and re-verified below.
+	# staged, signed APK must exist (canonical name = proof a key was used; never builds/stages)
 	apk="$(STAGED_APK)"
 	@test -f "$(STAGED_APK)" || { echo "push-codeberg: staged APK not found at '$(STAGED_APK)' -- run 'make release' first (it builds and stages the APK). This target does NOT build or stage it." >&2; exit 1; }
-	# Cryptographically verify the APK and pin its signer to SECURITY.md. apksigner
-	# is non-interactive; `verify` aborts on an unsigned/invalid APK and
-	# `--print-certs` reports the signer SHA-256 as bare lowercase hex. It resolves
-	# from PATH, else the newest build-tools under ANDROID_HOME (as android/Makefile
-	# does); a missing apksigner aborts when it is invoked below. The extracted
-	# fingerprint is printed, then required to equal the one in SECURITY.md.
+	# verify APK signature and pin its signer SHA-256 to SECURITY.md (apksigner from PATH, else ANDROID_HOME build-tools)
 	aps="$${APKSIGNER:-$$(command -v apksigner || ls -1 "$${ANDROID_HOME:-$$HOME/android-sdk}"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)}"
 	"$$aps" verify "$$apk"
 	got="$$("$$aps" verify --print-certs "$$apk" | grep -oiE 'SHA-?256 digest:[[:space:]]*[0-9a-f]{64}' | grep -oiE '[0-9a-f]{64}' | tr 'A-F' 'a-f' | sort -u)"
 	echo "push-codeberg: APK signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@test -f "$(STAGED_SBOM)" || { echo "push-codeberg: staged SBOM not found at '$(STAGED_SBOM)' -- run 'make release' first (it builds and stages the SBOM). This target does NOT build or stage it." >&2; exit 1; }
-	# 1) Look the release up by tag and REUSE it when it already exists: a previous
-	#    run may have created it and then died on an asset upload, and Forgejo
-	#    answers a duplicate create with 409 -- which would leave this target
-	#    permanently stuck without the reuse. curl runs WITHOUT -f here because a
-	#    404 body is the expected "not created yet" answer; the python steps map
-	#    any body without an "id" to the empty string. The release's existing
-	#    asset names are captured for the skip logic in step 3.
+	# 1) look the release up by tag and REUSE it if present (rerun-safe; 404 body = not created yet)
 	release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/tags/v$(VERSION)" || true)"
 	rel_id="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("id",""))' 2>/dev/null || true)"
 	have_assets="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join(a.get("name","") for a in d.get("assets") or []))' 2>/dev/null || true)"
 	if [ -n "$$rel_id" ]; then
 		echo "push-codeberg: release for tag v$(VERSION) already exists (id $$rel_id) -- reusing it"
 	else
-		# 2) Create the release for the existing tag; capture its numeric id. The
-		#    body is JSON-encoded from the en-US release-notes file (handles
-		#    quotes/newlines).
+		# 2) create the release for the existing tag (body = JSON-encoded en-US notes)
 		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
 		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","body":%s,"draft":false,"prerelease":false}' "$(VERSION)" "$(VERSION)" "$$body")"
 		rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
 		echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
 	fi
-	# 3) Attach the staged APK and SBOM as release assets under their canonical
-	#    names (releases/<applicationId>_<versionCode>.<ext>), skipping any asset
-	#    the (reused) release already carries -- a duplicate upload would fail and a
-	#    rerun should only complete what is missing. Each freshly uploaded asset is
-	#    then re-downloaded from its public release URL and its sha256 is compared
-	#    against the staged file, so a corrupted or truncated upload is caught. The
-	#    check runs ONLY for assets uploaded in THIS run (a just-skipped, previously
-	#    uploaded asset is not re-verified). grep -qxF: fixed-string whole-line
-	#    match against the captured asset-name list. dl_base is the public download
-	#    prefix for this tag's assets.
+	# 3) upload staged APK + SBOM under canonical names, skip already-attached, verify published sha256
 	dl_base="https://codeberg.org/$(CODEBERG_REPO)/releases/download/v$(VERSION)"
 	for staged in "$$apk" "$(STAGED_SBOM)"; do
 		asset="$$(basename "$$staged")"
@@ -945,10 +903,7 @@ push-codeberg:
 		fi
 		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -F "attachment=@$$staged" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=$$asset" >/dev/null
 		echo "push-codeberg: attached $$asset"
-		# Verify the PUBLISHED bytes: download the asset and diff its sha256 against
-		# the staged file. A freshly created asset can lag the download endpoint by a
-		# moment, so allow one 2-second retry before failing (raise the sleep if a
-		# slow mirror needs it). want/got_dl are bare 64-hex digests from sha256sum.
+		# download the published asset and diff its sha256 against the staged file (one 2s retry for endpoint lag)
 		want="$$(sha256sum "$$staged" | cut -d' ' -f1)"
 		got_dl=""
 		for attempt in 1 2; do
