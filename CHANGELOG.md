@@ -208,6 +208,12 @@ and corrects documentation that the port had outgrown:
   live in a dedicated `BackupValidationTests`, leaving `BackupTests` with the
   format-compatibility suite; both classes are well within the limit and every
   test is preserved.
+- **The twelve new iOS strings are now translated into every language.** The
+  alert titles, accessibility strings and export error messages added earlier
+  this round shipped as English source keys; they are now filled in for all
+  twenty non-English locales. As with the rest of the app's non-English/German
+  text (see CONTRIBUTING §6), these are best-effort machine-quality translations
+  awaiting native-speaker review, not hand-authored prose.
 
 ---
 
