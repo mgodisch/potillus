@@ -15885,438 +15885,648 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld entry imported, %2$lld skipped."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld entries imported, %2$lld skipped."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg entry imported, %2$lld skipped."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg entries imported, %2$lld skipped."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "de": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld Eintrag importiert, %2$lld übersprungen."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld Einträge importiert, %2$lld übersprungen."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg Eintrag importiert, %2$lld übersprungen."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg Einträge importiert, %2$lld übersprungen."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "da": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importeret, %2$lld sprunget over."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importeret, %2$lld sprunget over."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importeret, %2$lld sprunget over."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importeret, %2$lld sprunget over."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "nl": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld geïmporteerd, %2$lld overgeslagen."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld geïmporteerd, %2$lld overgeslagen."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg geïmporteerd, %2$lld overgeslagen."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg geïmporteerd, %2$lld overgeslagen."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "nb": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importert, %2$lld hoppet over."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importert, %2$lld hoppet over."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importert, %2$lld hoppet over."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importert, %2$lld hoppet over."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "sv": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importerade, %2$lld hoppade över."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importerade, %2$lld hoppade över."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importerade, %2$lld hoppade över."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importerade, %2$lld hoppade över."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "es": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importada, %2$lld omitidas."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importadas, %2$lld omitidas."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importadas, %2$lld omitidas."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importada, %2$lld omitidas."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importadas, %2$lld omitidas."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importadas, %2$lld omitidas."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "fr": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importée, %2$lld ignorées."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importées, %2$lld ignorées."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importées, %2$lld ignorées."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importée, %2$lld ignorées."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importées, %2$lld ignorées."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importées, %2$lld ignorées."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "it": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importata, %2$lld saltate."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importate, %2$lld saltate."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importate, %2$lld saltate."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importata, %2$lld saltate."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importate, %2$lld saltate."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importate, %2$lld saltate."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "pt": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importado, %2$lld ignorados."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importados, %2$lld ignorados."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importados, %2$lld ignorados."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importado, %2$lld ignorados."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importados, %2$lld ignorados."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importados, %2$lld ignorados."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "pt-BR": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importado, %2$lld ignorados."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importados, %2$lld ignorados."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importados, %2$lld ignorados."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importado, %2$lld ignorados."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importados, %2$lld ignorados."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importados, %2$lld ignorados."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "ro": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importată, %2$lld omise."
-                }
-              },
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importate, %2$lld omise."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importate, %2$lld omise."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importată, %2$lld omise."
+                    }
+                  },
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importate, %2$lld omise."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importate, %2$lld omise."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "cs": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importováno, %2$lld přeskočeno."
-                }
-              },
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importováno, %2$lld přeskočeno."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importováno, %2$lld přeskočeno."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld importováno, %2$lld přeskočeno."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importováno, %2$lld přeskočeno."
+                    }
+                  },
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importováno, %2$lld přeskočeno."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importováno, %2$lld přeskočeno."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg importováno, %2$lld přeskočeno."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "pl": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld zaimportowano, %2$lld pominięto."
-                }
-              },
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld zaimportowano, %2$lld pominięto."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld zaimportowano, %2$lld pominięto."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld zaimportowano, %2$lld pominięto."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg zaimportowano, %2$lld pominięto."
+                    }
+                  },
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg zaimportowano, %2$lld pominięto."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg zaimportowano, %2$lld pominięto."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg zaimportowano, %2$lld pominięto."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "ru": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld импортировано, %2$lld пропущено."
-                }
-              },
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld импортировано, %2$lld пропущено."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld импортировано, %2$lld пропущено."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld импортировано, %2$lld пропущено."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg импортировано, %2$lld пропущено."
+                    }
+                  },
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg импортировано, %2$lld пропущено."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg импортировано, %2$lld пропущено."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg импортировано, %2$lld пропущено."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "uk": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld імпортовано, %2$lld пропущено."
-                }
-              },
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld імпортовано, %2$lld пропущено."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld імпортовано, %2$lld пропущено."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld імпортовано, %2$lld пропущено."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg імпортовано, %2$lld пропущено."
+                    }
+                  },
+                  "few": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg імпортовано, %2$lld пропущено."
+                    }
+                  },
+                  "many": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg імпортовано, %2$lld пропущено."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg імпортовано, %2$lld пропущено."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "el": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld εισήχθη, %2$lld παραλείφθηκαν."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld εισήχθησαν, %2$lld παραλείφθηκαν."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg εισήχθη, %2$lld παραλείφθηκαν."
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg εισήχθησαν, %2$lld παραλείφθηκαν."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "ja": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld 件インポート、%2$lld 件スキップ。"
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg 件インポート、%2$lld 件スキップ。"
+                    }
+                  }
                 }
               }
             }
           }
         },
         "ko": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%1$lld 개 가져오기, %2$lld 개 건너뜀."
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg 개 가져오기, %2$lld 개 건너뜀."
+                    }
+                  }
                 }
               }
             }
           }
         },
         "zh-Hans": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "已导入 %1$lld 条，跳过 %2$lld 条。"
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "已导入 %arg 条，跳过 %2$lld 条。"
+                    }
+                  }
                 }
               }
             }
           }
         },
         "zh-Hant": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "已匯入 %1$lld 筆，略過 %2$lld 筆。"
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$#@imported@"
+          },
+          "substitutions": {
+            "imported": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "已匯入 %arg 筆，略過 %2$lld 筆。"
+                    }
+                  }
                 }
               }
             }

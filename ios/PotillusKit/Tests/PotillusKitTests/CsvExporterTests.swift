@@ -247,4 +247,29 @@ final class CsvExporterTests: XCTestCase {
         )
         XCTAssertEqual(CsvExporter.englishHeaderCells.count, 8)
     }
+
+    // ── Localized headers (Android csv_col_* parity) ─────────────────────────
+
+    func testHeaderCellsAreLocalized() {
+        // Verbatim from Android's values-de/strings.xml csv_col_*.
+        XCTAssertEqual(
+            CsvHeaderLabels.cells(language: "de"),
+            ["Datum", "Uhrzeit", "Getränk", "Kategorie",
+             "Menge_ml", "Alkohol_Prozent", "Gramm_Alkohol", "Notiz"])
+    }
+
+    func testHeaderCellsFallBackToEnglish() {
+        // The "System" setting (empty tag) and any unknown language use English.
+        XCTAssertEqual(CsvHeaderLabels.cells(language: ""), CsvHeaderLabels.englishCells)
+        XCTAssertEqual(CsvHeaderLabels.cells(language: "xx"), CsvHeaderLabels.englishCells)
+        XCTAssertEqual(CsvExporter.englishHeaderCells, CsvHeaderLabels.englishCells)
+    }
+
+    func testEveryLanguageHasEightHeaderCells() {
+        let tags = ["", "de", "da", "nl", "nb", "sv", "es", "fr", "it", "pt", "pt-BR",
+                    "ro", "cs", "pl", "ru", "uk", "el", "ja", "ko", "zh-Hans", "zh-Hant"]
+        for tag in tags {
+            XCTAssertEqual(CsvHeaderLabels.cells(language: tag).count, 8, "language \(tag)")
+        }
+    }
 }

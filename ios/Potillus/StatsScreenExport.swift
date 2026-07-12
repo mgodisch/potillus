@@ -93,7 +93,7 @@ extension StatsScreen {
     /// Sends the confirmed range to whichever exporter asked for it.
     func runExport(_ kind: ExportRangeSheet.Kind, from: String, to: String) async {
         switch kind {
-        case .csv: prepareCsv(from: from, to: to)
+        case .csv: await prepareCsv(from: from, to: to)
         case .pdf: await preparePdf(from: from, to: to)
         }
     }
@@ -104,7 +104,7 @@ extension StatsScreen {
     /// the screen shows. Filtering happens in SQLite, over the index on
     /// `logicalDate`, rather than by loading the whole log into memory — the same
     /// choice Android's `exportCsv` makes, and for the same reason.
-    func prepareCsv(from: String, to: String) {
+    func prepareCsv(from: String, to: String) async {
         do {
             let entries = try environment.entries.inRange(from: from, to: to)
             // Android refuses an empty export rather than writing a lone header.
@@ -114,8 +114,12 @@ extension StatsScreen {
                 return
             }
 
+            // The export follows the UI language, as Android's does: an empty tag
+            // ("System") falls back to the English captions. The header cells come
+            // from `CsvHeaderLabels`, the drink names from the user's own data.
+            let language = await environment.preferences.load().language
             let csv = CsvExporter.buildCsv(
-                headerCells: CsvExporter.englishHeaderCells,
+                headerCells: CsvHeaderLabels.cells(language: language),
                 entries: entries,
                 drinks: try environment.drinks.allOnce()
             )

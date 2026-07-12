@@ -75,11 +75,12 @@ The iOS port, section by section:
   `LocalAuthentication` (and an app-switcher privacy cover), and the two-page PDF
   report rendered by WebKit from the same HTML template Android uses, in the UI
   language.
-- **Twenty languages.** Every screen, the PDF-report labels and the plurals are
-  localised across the twenty UI languages as String Catalogs with English as the
-  source. A parity check (`tools/check-l10n-parity.py`) verifies the iOS
-  translations against Android's resources, and a System-language user gets the
-  report in the device language rather than English.
+- **Twenty languages.** Every screen, the PDF-report labels, the CSV export
+  headers and the plurals are localised across the twenty UI languages as String
+  Catalogs with English as the source. A parity check
+  (`tools/check-l10n-parity.py`) verifies the iOS translations against Android's
+  resources, and a System-language user gets the report in the device language
+  rather than English.
 - **Release plumbing and screenshots.** The iOS build derives `MARKETING_VERSION`
   from this changelog's top entry and its build number from Android's
   `versionCode`, so the two stores' counters stay in step. fastlane iOS lanes and
@@ -154,6 +155,21 @@ and corrects documentation that the port had outgrown:
   restored settings block. That store now exists and the importer does apply
   settings (sanitised); the scope notes and a test comment are updated to match
   the shipped behaviour.
+- **CSV export headers follow the UI language.** The export shipped its eight
+  column captions in English regardless of the chosen language, while Android
+  localises them from string resources — so a German user got an English-headed
+  file. The captions now live in `CsvHeaderLabels`, copied verbatim from Android's
+  `csv_col_*` strings for all twenty languages, and the exporter resolves them
+  from the in-app language exactly as the PDF report already did. English remains
+  the source and the "System" fallback. (The reader doc that claimed iOS had "no
+  string catalogue" was itself stale and is corrected.)
+- **The merge-import plural no longer warns.** The "N imported, M skipped."
+  string carried a single plural variation over a message with two numbers, which
+  made Xcode emit "cannot reliably infer argument number" in every one of the
+  twenty-one localisations and risked pluralising on the wrong count. It is
+  restructured to an explicit substitution that pluralises on the imported count —
+  matching Android's `import_success_merge`, which keys its plural on the same
+  argument — with the skipped count rendered as a plain number.
 
 ---
 

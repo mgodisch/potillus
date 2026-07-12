@@ -205,20 +205,18 @@ public enum CsvExporter {
         return "libellus_potionis_export_\(formatter.string(from: now)).csv"
     }
 
-    /// The column captions Android's English resources carry, in column order.
+    /// The English column captions, in column order — the source language and
+    /// the fallback for the "System" language setting.
     ///
-    /// Android localises these; iOS cannot yet, having no string catalogue. The
-    /// English set is therefore the CURRENT truth, not a placeholder to be quietly
-    /// forgotten: a German user gets German drink names in an English-headed file
-    /// until localisation lands. `buildCsv` still takes the captions as a
-    /// parameter, so that change will not touch the exporter.
+    /// iOS DOES localize these now: the captions for every UI language live in
+    /// `CsvHeaderLabels`, copied verbatim from Android's `csv_col_*` resources.
+    /// The caller resolves them from the in-app language and passes them to
+    /// `buildCsv`, exactly as Android resolves its string resources at the call
+    /// site — so a German user gets a German-headed file, not an English one.
     ///
     /// The underscores are Android's, kept so a spreadsheet built against one
     /// platform's export opens against the other's.
-    public static let englishHeaderCells = [
-        "Date", "Time", "Drink", "Category",
-        "Amount_ml", "Alcohol_Percent", "Grams_Alcohol", "Note",
-    ]
+    public static let englishHeaderCells = CsvHeaderLabels.englishCells
 
     public static let utf8BOM = Data([0xEF, 0xBB, 0xBF])
 
