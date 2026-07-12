@@ -512,6 +512,13 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Shift dark screenshots to 04-06  (patch -109)
+
+Patch -105 split the set 01–02 light, 03–06 dark; the intended split is 01–03 light,
+04–06 dark. The UI test now captures 03_statistics in the first (light) launch and
+relaunches into dark just before 04_drinks. ScreenshotMode's comment is updated to
+match. UI-test wording only; verified by a Mac capture run.
+
 #### Detect collapsed divergent l10n mappings  (patch -108)
 
 The French "Stats" heading (patch -106) slipped past the parity check, and this is

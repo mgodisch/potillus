@@ -84,7 +84,7 @@ enum ScreenshotMode {
 
     /// The colour scheme a screenshot run forces, or nil to follow the in-app theme.
     /// The UI test relaunches with `-screenshotDark` for the dark half of the set
-    /// (screens 03–06), mirroring the Android light/dark split.
+    /// (screens 04–06), mirroring the Android light/dark split.
     static var forcedColorScheme: ColorScheme? {
         ProcessInfo.processInfo.arguments.contains("-screenshotDark") ? .dark : nil
     }
