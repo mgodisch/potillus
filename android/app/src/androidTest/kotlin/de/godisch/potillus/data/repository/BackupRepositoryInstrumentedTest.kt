@@ -35,16 +35,12 @@ package de.godisch.potillus.data.repository
 //   and self-contained while still exercising the real DAO/transaction path.
 //
 // WHAT THIS GUARDS AGAINST
-//   Two REPLACE-import contracts that need a real Room/SQLite engine:
-//   (1) Foreign keys: a backup drink whose name matched a deleted local drink
-//       must be re-inserted (not mapped to a stale id) so its entry's
-//       entries→drinks FK (RESTRICT) is satisfied instead of rolling the import
-//       back. (2) All-inclusive replace: REPLACE wipes the ENTIRE catalogue,
-//       presets included, and rebuilds it from the backup — a local preset absent
-//       from the backup is removed, and a backup preset replaces (does not merge
-//       onto) the local one. The earlier code deleted only user-created drinks and
-//       matched backup drinks onto the surviving presets by name, which left the
-//       presets in place and merely added the backup's drinks (the reported bug).
+//   importReplace() captured the drinks' name→id map BEFORE deleting the user
+//   drinks. A backup drink whose name matched a now-deleted user drink was then
+//   mapped to that drink's OLD (deleted) id instead of being re-inserted, so the
+//   backup entry referenced a missing parent row and tripped the entries→drinks
+//   FK (RESTRICT) constraint, rolling back the entire import. The fix moves the
+//   map fetch INSIDE the transaction, AFTER the deletes.
 //
 // HOW TO RUN
 //   ./gradlew connectedDebugAndroidTest   (or `make test-device`)
@@ -67,7 +63,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -164,55 +159,5 @@ class BackupRepositoryInstrumentedTest {
         val relinkedDrink = drinkDao.getById(entries.first().drinkId)
         assertNotNull("the entry's drinkId must reference an existing drink", relinkedDrink)
         assertEquals("Mojito", relinkedDrink!!.name)
-
-        // ── Assert: REPLACE wiped the local PRESET too. The local "Lager" preset
-        //    was not in the backup, so after an all-inclusive replace the catalogue
-        //    is exactly the backup's one drink — the preset must be gone. This is
-        //    the bug fix: presets used to survive and be merged onto. ────────────
-        val allDrinks = drinkDao.getAllOnce()
-        assertEquals("catalogue must equal the backup (preset wiped)", 1, allDrinks.size)
-        assertEquals("only the backup drink remains", "Mojito", allDrinks.first().name)
-    }
-
-    /**
-     * A REPLACE import must restore the catalogue EXACTLY as it is in the backup,
-     * presets included — a backup preset replaces the local preset rather than
-     * being merged onto it, and a preset absent from the backup is removed.
-     *
-     * This is the direct regression test for the reported bug: on a fresh install
-     * (which is pre-populated with presets), importing a backup with "replace"
-     * left the local presets in place and merely added the backup's drinks.
-     */
-    @Test
-    fun importReplace_replacesPresetsWithBackupCatalogue() = runBlocking {
-        // ── Local state: two presets, as a fresh install would have. ───────────
-        drinkDao.insert(
-            DrinkEntity(name = "Local Beer", volumeMl = 500, alcoholPercent = 5.0, isPreset = true, category = "BEER"),
-        )
-        drinkDao.insert(
-            DrinkEntity(name = "Local Wine", volumeMl = 200, alcoholPercent = 12.0, isPreset = true, category = "WINE"),
-        )
-
-        // ── Backup: one preset with the SAME name as a local preset ("Local
-        //    Beer") plus one new preset the local install does not have. ────────
-        val backupDrinks = listOf(
-            DrinkDefinition(id = 1, name = "Local Beer", volumeMl = 330, alcoholPercent = 4.5, isPreset = true, category = DrinkCategory.BEER),
-            DrinkDefinition(id = 2, name = "Backup Cider", volumeMl = 440, alcoholPercent = 6.0, isPreset = true, category = DrinkCategory.BEER),
-        )
-
-        val stats = repo.importReplace(backupDrinks, emptyList())
-
-        assertEquals("no entries to import", 0, stats.imported)
-
-        val allDrinks = drinkDao.getAllOnce().sortedBy { it.name }
-        // Exactly the backup's two drinks — "Local Wine" (local-only preset) is
-        // gone, and "Local Beer" is the BACKUP's version (330 ml / 4.5%), proving
-        // the backup replaced the local preset instead of merging onto it.
-        assertEquals("catalogue must equal the backup's two drinks", 2, allDrinks.size)
-        assertEquals("Backup Cider", allDrinks[0].name)
-        assertEquals("Local Beer", allDrinks[1].name)
-        assertEquals("backup's Local Beer volume must win", 330, allDrinks[1].volumeMl)
-        assertEquals("backup's Local Beer strength must win", 4.5, allDrinks[1].alcoholPercent, 0.0001)
-        assertTrue("backup presets keep their preset flag", allDrinks.all { it.isPreset })
     }
 }

@@ -77,19 +77,6 @@ sent, and whose el-GR release note was rejected as 501 > 500 characters.
   each target (which make never echoes), leaving only short per-step markers in
   the recipe. The executed commands and status lines are unchanged; only what the
   terminal prints changed.
-- Backup "Replace" now truly replaces the whole drink catalogue, presets
-  included. On a fresh install (which is pre-populated with the built-in presets)
-  importing a backup with "Replace" left those presets in place and merely added
-  the backup's drinks: `importReplace` deleted only user-created drinks
-  (`isPreset = 0`) and then name-matched the backup's drinks onto the surviving
-  presets. It now deletes ALL drinks via a new `DrinkDao.deleteAllDrinks()` and
-  rebuilds the catalogue solely from the backup, so a backup preset replaces the
-  local one and a preset absent from the backup is removed — a backup meant to
-  keep presets already contains them. The preset seed only runs on database
-  creation, never when the table is emptied at runtime, so it does not re-add the
-  old presets after a replace. MERGE is unchanged. Covered by a new
-  `BackupRepositoryInstrumentedTest` case and an extra assertion on the existing
-  FK-relink test.
 
 ---
 
