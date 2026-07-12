@@ -1506,11 +1506,22 @@ check_signing_key_fingerprint() {
     # token (SHA-256 of the DER signing certificate). Count them; the pin needs
     # exactly one. The `|| true` guards the pipeline under `set -euo pipefail`
     # (grep exits non-zero when there is no match, which is a legitimate count 0).
-    local count
+    local count lower_count
     count=$(grep -oiE '\b[0-9a-f]{64}\b' "$security" | grep -c . || true)
+    # Lowercase is part of the canonical form, not just a style choice: the
+    # Makefile pin now normalizes (v0.81.0 QA fix), but downstream consumers of
+    # the published document (users copying the value into `apksigner verify
+    # --print-certs` comparisons) get the exact bytes printed here, and apksigner
+    # itself reports lowercase. An uppercase token — e.g. pasted from keytool
+    # with only the colons stripped — is therefore a reformat this gate must
+    # catch, exactly per its charter ("caught at build time instead of at push
+    # time"). Counted separately so the failure message can name the problem.
+    lower_count=$(grep -oE '\b[0-9a-f]{64}\b' "$security" | grep -c . || true)
 
-    if [[ "$count" -eq 1 ]]; then
+    if [[ "$count" -eq 1 && "$lower_count" -eq 1 ]]; then
         pass "SECURITY.md carries exactly one canonical signing-key fingerprint"
+    elif [[ "$count" -eq 1 ]]; then
+        fail "SECURITY.md's signing-key fingerprint is not lowercase — canonicalize it (tr 'A-F' 'a-f'); apksigner prints lowercase and users compare byte-for-byte"
     elif [[ "$count" -eq 0 ]]; then
         fail "SECURITY.md has no 64-hex signing-key fingerprint — push-playstore/push-codeberg cannot pin the signer (see the 'Verifying releases' section)"
     else

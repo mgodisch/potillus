@@ -422,10 +422,17 @@ Before tagging a new version:
       `git tag -s vX.Y.Z -m "vX.Y.Z"`, signed with the maintainer's key, and push
       it. Tags are verifiable with `git tag -v vX.Y.Z` (see SECURITY.md,
       "Verifying releases").
-- [ ] Publish the release on Codeberg from the signed tag and attach the CycloneDX
-      SBOM (`android/app/build/outputs/sbom/libellus-potionis-sbom.json`, built by
-      `make release`/`make bundle`) as a release asset, so every released version is
-      accompanied by its software bill of materials.
+- [ ] Publish the release on Codeberg from the signed tag with
+      `make push-codeberg` (after `make release`): it verifies the APK's signer
+      against the fingerprint in SECURITY.md, creates the release for the pushed
+      tag over the Forgejo API and attaches the release APK plus the CycloneDX
+      SBOM (`android/app/build/outputs/sbom/libellus-potionis-sbom.json`) as
+      assets, so every released version is accompanied by its software bill of
+      materials. The target is safe to re-run after a partial failure.
+- [ ] Upload the release to Google Play with `make push-playstore` (closed-testing
+      alpha track; it verifies the AAB's signature and signer first and never
+      builds). Exercise credentials and metadata beforehand with the
+      non-publishing dry run `make push-playstore VALIDATE_ONLY=1`.
 
 To avoid forgetting the signature, configure Git to sign annotated tags
 automatically in this repository (this requires `user.signingkey` to be set):

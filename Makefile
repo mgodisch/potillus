@@ -718,11 +718,14 @@ push:
 # certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
 # "Verifying releases" section rather than duplicated here, so the pin and the
 # document that publishes it to users can never drift. release-check.sh §14
-# guards that SECURITY.md carries exactly one such token in canonical form, so a
-# reformat is caught at build time instead of at push time. The same key signs
+# guards that SECURITY.md carries exactly one such token in canonical (lowercase)
+# form, so a reformat is caught at build time instead of at push time. The
+# `tr` mirrors the normalization the push targets apply to the MEASURED
+# fingerprint, so the comparison stays case-insensitive end to end even if an
+# uppercase pin ever slips past the gate. The same key signs
 # the Play upload bundle (its role as the Play upload key) and the Codeberg/
 # F-Droid release APK, so both publishing targets pin against this one value.
-SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1)
+SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1 | tr 'A-F' 'a-f')
 
 PLAYSTORE_AAB := android/app/build/outputs/bundle/release/app-release.aab
 push-playstore:
@@ -742,7 +745,9 @@ push-playstore:
 	# failure makes the substitution yield the empty string, so the fallback below
 	# supplies `origin` as intended.
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null
+	# The bare git exit code alone reads as an unexplained "Error 2" at the end of
+	# the (up-front) recipe echo, so the guard names the tag and the remedy.
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (make push)." >&2; exit 1; }
 	# Prove the bundle is signed with the EXPECTED key before uploading; jarsigner
 	# and keytool run non-interactively and any failure aborts the recipe here.
 	# jarsigner -verify prints "jar verified." for a signed archive but returns 0
@@ -764,9 +769,16 @@ push-playstore:
 
 # ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
 # release tag from the command line instead of the web UI, and attach the built
-# APK + SBOM. It uses the Forgejo REST API (Gitea-compatible): one POST creates
-# the release, two more upload the assets. Title is "Libellus Potionis vX.Y.Z"
-# and the body is the en-US Play release notes for this versionCode.
+# APK + SBOM. It uses the Forgejo REST API (Gitea-compatible): one GET looks the
+# release up by tag, one POST creates it when absent, two more upload the assets.
+# Title is "Libellus Potionis vX.Y.Z" and the body is the en-US Play release
+# notes for this versionCode.
+#
+# SAFE TO RE-RUN: a previous invocation may have created the release and then
+# died on an asset upload (network). The recipe therefore REUSES an existing
+# release for the tag instead of failing on Forgejo's duplicate-release 409, and
+# it skips any asset that is already attached — so a rerun completes exactly the
+# missing steps and never duplicates anything.
 #
 # Like push-playstore, this has NO build prerequisites and never builds: it FAILS
 # FAST if the tag, the APK, the SBOM, the release notes, curl/python3 or the
@@ -780,7 +792,11 @@ push-playstore:
 # token: it lives in a SHELL variable -- written $$token in the recipe, i.e. the
 # shell's own $token -- read from the file at run time. make expands its own
 # make-variables when it echoes a line, but never shell-variables, so the echo
-# shows the literal "$token" and never the token VALUE.
+# shows the literal "$token" and never the token VALUE. The token also never
+# appears on a curl COMMAND LINE (which any local process could read from
+# /proc/<pid>/cmdline while curl runs): it is written into a mode-0600 temp file
+# and passed with curl's `-H @file` form (curl >= 7.55; Debian stable qualifies),
+# removed again by an EXIT trap.
 CODEBERG_API  := https://codeberg.org/api/v1
 CODEBERG_REPO := godisch/potillus
 CODEBERG_TOKEN_FILE := fastlane/codeberg-credentials.txt
@@ -794,17 +810,25 @@ push-codeberg:
 	@test -f "$(CODEBERG_TOKEN_FILE)" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' not found -- create it containing your Codeberg access token (Settings > Applications, repository read+write scope). It is git-ignored." >&2; exit 1; }
 	token="$$(tr -d '[:space:]' < "$(CODEBERG_TOKEN_FILE)")"
 	@test -n "$$token" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' is empty." >&2; exit 1; }
+	# Pass the token to curl via a header FILE (`-H @file`, curl >= 7.55), never
+	# on the command line: argv is readable by every local process through
+	# /proc/<pid>/cmdline for the duration of each call. mktemp creates the file
+	# mode 0600; the EXIT trap removes it on every exit path, success or failure.
+	hdr="$$(mktemp)"
+	trap 'rm -f "$$hdr"' EXIT
+	printf 'Authorization: token %s\n' "$$token" > "$$hdr"
 	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
 	# The Codeberg release API resolves the release against a tag that must exist
 	# ON THE SERVER; a purely local tag makes the create call fail late. Require the
 	# tag on the same remote `make push` uses (the branch upstream, else origin);
-	# git ls-remote --exit-code aborts here if the tag has not been pushed.
+	# git ls-remote --exit-code aborts here if the tag has not been pushed (with a
+	# named-tag message; the bare exit code alone read as an unexplained Error 2).
 	# The `|| true` inside the substitution keeps a missing upstream from aborting
 	# the recipe under `-eu -o pipefail`: without it, `git rev-parse @{u}` failing
 	# would kill the assignment via set -e before the `$${remote:-origin}` fallback
 	# on the same line runs (see the fuller note in push-playstore above).
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (make push)." >&2; exit 1; }
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
 	# Require the SIGNED release APK by name: Gradle writes the unsigned output as
@@ -826,17 +850,44 @@ push-codeberg:
 	echo "push-codeberg: APK signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@test -f "$(RELEASE_SBOM)" || { echo "push-codeberg: SBOM '$(RELEASE_SBOM)' not found -- build it first with 'make release' (or 'make -C android sbom')." >&2; exit 1; }
-	# 1) Create the release for the existing tag; capture its numeric id. The body
-	#    is JSON-encoded from the en-US release-notes file (handles quotes/newlines).
-	body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
-	payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","body":%s,"draft":false,"prerelease":false}' "$(VERSION)" "$(VERSION)" "$$body")"
-	rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
-	echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
-	# 2) Attach the APK and the SBOM as release assets (name= sets the asset name).
-	curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -F "attachment=@$$apk" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION).apk" >/dev/null
-	echo "push-codeberg: attached $$(basename "$$apk") as potillus-$(VERSION).apk"
-	curl -fsS --proto '=https' --tlsv1.2 -X POST -H "Authorization: token $$token" -F "attachment=@$(RELEASE_SBOM)" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION)-sbom.json" >/dev/null
-	echo "push-codeberg: attached SBOM as potillus-$(VERSION)-sbom.json"
+	# 1) Look the release up by tag and REUSE it when it already exists: a previous
+	#    run may have created it and then died on an asset upload, and Forgejo
+	#    answers a duplicate create with 409 -- which would leave this target
+	#    permanently stuck without the reuse. curl runs WITHOUT -f here because a
+	#    404 body is the expected "not created yet" answer; the python steps map
+	#    any body without an "id" to the empty string. The release's existing
+	#    asset names are captured for the skip logic in step 3.
+	release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/tags/v$(VERSION)" || true)"
+	rel_id="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("id",""))' 2>/dev/null || true)"
+	have_assets="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join(a.get("name","") for a in d.get("assets") or []))' 2>/dev/null || true)"
+	if [ -n "$$rel_id" ]; then
+		echo "push-codeberg: release for tag v$(VERSION) already exists (id $$rel_id) -- reusing it"
+	else
+		# 2) Create the release for the existing tag; capture its numeric id. The
+		#    body is JSON-encoded from the en-US release-notes file (handles
+		#    quotes/newlines).
+		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
+		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","body":%s,"draft":false,"prerelease":false}' "$(VERSION)" "$(VERSION)" "$$body")"
+		rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+		echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
+	fi
+	# 3) Attach the APK and the SBOM as release assets (name= sets the asset
+	#    name), skipping any asset the (reused) release already carries -- a
+	#    duplicate upload would fail and a rerun should only complete what is
+	#    missing. grep -qxF: fixed-string, whole-line match against the captured
+	#    asset-name list.
+	if printf '%s\n' "$$have_assets" | grep -qxF "potillus-$(VERSION).apk"; then
+		echo "push-codeberg: asset potillus-$(VERSION).apk already attached -- skipping"
+	else
+		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -F "attachment=@$$apk" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION).apk" >/dev/null
+		echo "push-codeberg: attached $$(basename "$$apk") as potillus-$(VERSION).apk"
+	fi
+	if printf '%s\n' "$$have_assets" | grep -qxF "potillus-$(VERSION)-sbom.json"; then
+		echo "push-codeberg: asset potillus-$(VERSION)-sbom.json already attached -- skipping"
+	else
+		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -F "attachment=@$(RELEASE_SBOM)" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=potillus-$(VERSION)-sbom.json" >/dev/null
+		echo "push-codeberg: attached SBOM as potillus-$(VERSION)-sbom.json"
+	fi
 	echo "push-codeberg: done -> https://codeberg.org/$(CODEBERG_REPO)/releases/tag/v$(VERSION)"
 
 # =============================================================================
