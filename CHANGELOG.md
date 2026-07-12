@@ -394,7 +394,7 @@ listed individually below.
   `make release` now copies the signed AAB, APK and SBOM into `releases/` under
   canonical, self-describing names — `de.godisch.potillus_<versionCode>.apk`,
   `_<versionCode>.aab`, `_<versionCode>_sbom.json` (e.g.
-  de.godisch.potillus_92.apk) — with `cp --archive`, and refuses to start if a
+  `de.godisch.potillus_92.apk`) — with `cp --archive`, and refuses to start if a
   file for this versionCode is already staged (so a published set is never
   silently overwritten). `push-playstore` and `push-codeberg` now upload EXACTLY
   those staged files (fastlane's `aab:` option receives the staged path; the
