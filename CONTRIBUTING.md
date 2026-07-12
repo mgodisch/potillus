@@ -422,17 +422,25 @@ Before tagging a new version:
       `git tag -s vX.Y.Z -m "vX.Y.Z"`, signed with the maintainer's key, and push
       it. Tags are verifiable with `git tag -v vX.Y.Z` (see SECURITY.md,
       "Verifying releases").
+- [ ] Build and stage the release artifacts with `make release`: it produces the
+      signed APK, the AAB and the CycloneDX SBOM and copies all three into the
+      git-ignored `releases/` directory under their canonical names
+      `de.godisch.potillus_<versionCode>.{apk,aab}` and
+      `de.godisch.potillus_<versionCode>_sbom.json`. It refuses to overwrite a
+      release already staged for this versionCode (clear `releases/` or bump the
+      versionCode first).
 - [ ] Publish the release on Codeberg from the signed tag with
-      `make push-codeberg` (after `make release`): it verifies the APK's signer
-      against the fingerprint in SECURITY.md, creates the release for the pushed
-      tag over the Forgejo API and attaches the release APK plus the CycloneDX
-      SBOM (`android/app/build/outputs/sbom/libellus-potionis-sbom.json`) as
-      assets, so every released version is accompanied by its software bill of
-      materials. The target is safe to re-run after a partial failure.
+      `make push-codeberg` (after `make release`): it verifies the staged APK's
+      signer against the fingerprint in SECURITY.md, creates the release for the
+      pushed tag over the Forgejo API, attaches the staged APK and SBOM as assets,
+      and re-downloads each to confirm its sha256 matches the staged file — so
+      every released version is accompanied by its software bill of materials and
+      the published bytes are verified. The target is safe to re-run after a
+      partial failure.
 - [ ] Upload the release to Google Play with `make push-playstore` (closed-testing
-      alpha track; it verifies the AAB's signature and signer first and never
-      builds). Exercise credentials and metadata beforehand with the
-      non-publishing dry run `make push-playstore VALIDATE_ONLY=1`.
+      alpha track; it verifies the staged AAB's signature and signer first and
+      never builds or stages). Exercise credentials and metadata beforehand with
+      the non-publishing dry run `make push-playstore VALIDATE_ONLY=1`.
 
 To avoid forgetting the signature, configure Git to sign annotated tags
 automatically in this repository (this requires `user.signingkey` to be set):

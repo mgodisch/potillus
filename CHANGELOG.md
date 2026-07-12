@@ -389,6 +389,25 @@ listed individually below.
   eighth-round screenshot note above was corrected — the committed PNGs are
   the post-fix captures, not the old ones.
 
+- Release artifacts are staged into a git-ignored `releases/` directory and the
+  publishing targets upload from there (eleventh QA round, follow-up request).
+  `make release` now copies the signed AAB, APK and SBOM into `releases/` under
+  canonical, self-describing names — `de.godisch.potillus_<versionCode>.apk`,
+  `_<versionCode>.aab`, `_<versionCode>_sbom.json` (e.g.
+  de.godisch.potillus_92.apk) — with `cp --archive`, and refuses to start if a
+  file for this versionCode is already staged (so a published set is never
+  silently overwritten). `push-playstore` and `push-codeberg` now upload EXACTLY
+  those staged files (fastlane's `aab:` option receives the staged path; the
+  lane threads it through), run their signature/signer checks against the staged
+  bytes, and use the canonical names as the Codeberg asset names. Neither push
+  target builds or stages any more: each fails fast if the staged file is absent
+  and does not trigger `make release`. After each Codeberg upload the published
+  asset is re-downloaded from its release URL and its sha256 is compared with the
+  staged file (one 2-second retry to absorb asset-endpoint lag), so a corrupted
+  upload is caught. `.gitignore` gains `/releases`; the release checklist in
+  CONTRIBUTING documents the staging step and the new asset names. Tooling and
+  documentation only; no app-visible change, so no versionCode bump.
+
 ---
 
 ## v0.80.0

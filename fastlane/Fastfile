@@ -60,7 +60,11 @@ platform :android do
   private_lane :upload_release do |options|
     upload_to_play_store(
       # AAB (not APK): Google Play requires the App Bundle format for new apps.
-      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
+      # The path is supplied by the caller so `make push-playstore` can upload the
+      # STAGED bundle (releases/<applicationId>_<versionCode>.aab) it has verified,
+      # rather than the raw Gradle output. Falls back to the Gradle path when the
+      # lane is run directly without an aab: option.
+      aab: options[:aab] || 'android/app/build/outputs/bundle/release/app-release.aab',
 
       # Track and release status are chosen by the calling lane.
       track: options[:track],
@@ -105,6 +109,7 @@ platform :android do
       track: options[:track] || 'alpha',
       status: options[:status] || 'completed',
       validate_only: options[:validate_only],
+      aab: options[:aab],
     )
   end
 
@@ -127,6 +132,7 @@ platform :android do
       track: options[:track] || 'production',
       status: options[:status] || 'draft',
       validate_only: options[:validate_only],
+      aab: options[:aab],
     )
   end
 end
