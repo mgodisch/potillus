@@ -512,6 +512,27 @@ The series was rebased onto the 0.81.0 development tree after the branch's
 
 ### vX.Y.Z-ios (unreleased placeholder)
 
+#### Split Statistics tab label from heading  (patch -106)
+
+The French Statistics screen showed the heading "Stats". That abbreviation was only
+ever meant for the bottom tab bar, where the full "Statistiques" would wrap under the
+icon — the iOS port had folded both uses onto a single `Statistics` key, so shortening
+the tab shortened the title too. Android already avoids this with two resources
+(`statistics` for the title, `nav_statistics` for the tab), which the iOS port had not
+replicated; this restores that split.
+
+`Statistics` is now the full word in every language (French corrected to
+"Statistiques") and stays on the screen title. A new `nav_statistics` key carries the
+tab label, its values mirroring Android's — identical to the full word everywhere
+except French "Stats". RootView's tab reads it through a new `Loc.string(key:english:)`
+overload, needed because the key (`nav_statistics`) is not its own English text.
+
+Audit: across the four tab words (Today, Calendar, Statistics, Drinks) French
+"Stats" was the sole abbreviation on either platform; no other language or tab needed
+changing, and Android was already correct and is untouched.
+
+App and localization only; verified by the container l10n checks and a Mac build.
+
 #### Pin status-bar clock, dark-mode shots 3-6  (patch -105)
 
 Two finishes on the now-working capture, both matching the Android set.

@@ -96,7 +96,15 @@ struct RootView: View {
             StatsScreen(environment: environment)
                 .tabItem {
                     Label(
-                        Loc.string("Statistics", locale: Loc.locale(for: settings.language)),
+                        // Deliberately short tab label (French "Stats") kept separate
+                        // from the full screen title (`Statistics`, French
+                        // "Statistiques"): a long word would wrap under the tab icon.
+                        // Mirrors Android's nav_statistics / statistics split.
+                        Loc.string(
+                            key: "nav_statistics",
+                            english: "Statistics",
+                            locale: Loc.locale(for: settings.language)
+                        ),
                         systemImage: "chart.bar"
                     )
                 }

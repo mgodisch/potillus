@@ -73,6 +73,19 @@ enum Loc {
         String(localized: String.LocalizationValue(key), locale: locale)
     }
 
+    /// A string whose catalogue key differs from its English text. This is needed
+    /// when one English word must be translated two ways by context: the tab bar
+    /// wants a label short enough not to wrap under its icon, while the screen title
+    /// wants the full word. `nav_statistics` (French "Stats") sits beside the full
+    /// `Statistics` title (French "Statistiques"), mirroring Android's
+    /// `nav_statistics` / `statistics` split. `defaultValue` gives the English text,
+    /// so the key need not be an English phrase.
+    static func string(
+        key: StaticString, english: String.LocalizationValue, locale: Locale
+    ) -> String {
+        String(localized: key, defaultValue: english, locale: locale)
+    }
+
     /// One interpolated argument. The catalogue key carries a single `%@`/`%lld`.
     static func string(_ key: String, _ arg: CVarArg, locale: Locale) -> String {
         String(format: string(key, locale: locale), locale: locale, arg)
