@@ -429,6 +429,13 @@ and corrects documentation that the port had outgrown:
   Three `TodayModelTests` cover the divisor, the trend against a previous month,
   and the mid-month floor.
 
+- **Kept the Today tests within SwiftLint's class-length budget.** The three new
+  `TodayModelTests` pushed the class body past the 250-line `type_body_length`
+  limit. The fixtures (`entry`, `waitUntil`, `logDay`) now live in an
+  `extension TodayModelTests`, which SwiftLint does not count against the class:
+  the test methods stay in the class so XCTest still discovers them, and a test
+  class earns its length from tests, not fixtures.
+
 ---
 
 ## v0.81.0

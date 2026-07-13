@@ -337,51 +337,7 @@ final class TodayModelTests: XCTestCase {
         try await waitUntil { model.state.settings.maxDrinkDaysPerWeek == 3 }
     }
 
-    /// Builds a consumption entry for a drink at a moment, so a test can write one
-    /// straight to the repository. `evening` (2026-01-02 20:14 UTC) resolves to the
-    /// logical date "2026-01-02" under the default 04:00 change hour, so that is
-    /// hard-coded here — these tests only ever write at `evening`.
-    private func entry(_ drink: DrinkDefinition, at millis: Int64) -> ConsumptionEntry {
-        ConsumptionEntry(
-            drinkId: drink.id,
-            drinkName: drink.name,
-            volumeMl: drink.volumeMl,
-            alcoholPercent: drink.alcoholPercent,
-            gramsAlcohol: AlcoholCalculator.calculateGrams(
-                volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
-            ),
-            timestampMillis: millis,
-            logicalDate: "2026-01-02"
-        )
-    }
-
-    private func waitUntil(
-        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
-    ) async throws {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if condition() { return }
-            try await Task.sleep(nanoseconds: 5_000_000)
-        }
-        XCTFail("condition not met within \(timeout) s")
-    }
-
     // ── The monthly average ──────────────────────────────────────────────────
-
-    /// Writes one entry straight to the repository on a chosen logical day, so a
-    /// test can lay down a month of history. The logical date is explicit, so the
-    /// timestamp only needs to be plausible.
-    @discardableResult
-    private func logDay(_ drink: DrinkDefinition, _ date: String, grams: Double) throws -> Int64 {
-        let noon = try XCTUnwrap(DayResolver.parseDate(date)).addingTimeInterval(12 * 3_600)
-        return try environment.entries.add(
-            ConsumptionEntry(
-                drinkId: drink.id, drinkName: drink.name, volumeMl: drink.volumeMl,
-                alcoholPercent: drink.alcoholPercent, gramsAlcohol: grams,
-                timestampMillis: Int64(noon.timeIntervalSince1970 * 1000), logicalDate: date
-            )
-        )
-    }
 
     /// The month's grams divided by the days elapsed, 1st through today inclusive.
     func testTheMonthlyAverageDividesThisMonthByItsElapsedDays() async throws {
@@ -428,5 +384,54 @@ final class TodayModelTests: XCTestCase {
         // Only 2026-01-10…15 count: 12 g over 6 days = 2.0, not (90 + 12) / 15 = 6.8.
         XCTAssertEqual(model.state.monthlyAvgPerDay, 2.0, accuracy: 1e-9)
         XCTAssertEqual(model.state.monthTrend, .flat, "a floor inside the month leaves no baseline")
+    }
+}
+
+// Fixtures live in an extension: SwiftLint's `type_body_length` counts only the
+// class body, and a test class should earn its length from tests, not fixtures.
+extension TodayModelTests {
+
+    /// Builds a consumption entry for a drink at a moment, so a test can write one
+    /// straight to the repository. `evening` (2026-01-02 20:14 UTC) resolves to the
+    /// logical date "2026-01-02" under the default 04:00 change hour, so that is
+    /// hard-coded here — these tests only ever write at `evening`.
+    private func entry(_ drink: DrinkDefinition, at millis: Int64) -> ConsumptionEntry {
+        ConsumptionEntry(
+            drinkId: drink.id,
+            drinkName: drink.name,
+            volumeMl: drink.volumeMl,
+            alcoholPercent: drink.alcoholPercent,
+            gramsAlcohol: AlcoholCalculator.calculateGrams(
+                volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
+            ),
+            timestampMillis: millis,
+            logicalDate: "2026-01-02"
+        )
+    }
+
+    private func waitUntil(
+        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        XCTFail("condition not met within \(timeout) s")
+    }
+
+    /// Writes one entry straight to the repository on a chosen logical day, so a
+    /// test can lay down a month of history. The logical date is explicit, so the
+    /// timestamp only needs to be plausible.
+    @discardableResult
+    private func logDay(_ drink: DrinkDefinition, _ date: String, grams: Double) throws -> Int64 {
+        let noon = try XCTUnwrap(DayResolver.parseDate(date)).addingTimeInterval(12 * 3_600)
+        return try environment.entries.add(
+            ConsumptionEntry(
+                drinkId: drink.id, drinkName: drink.name, volumeMl: drink.volumeMl,
+                alcoholPercent: drink.alcoholPercent, gramsAlcohol: grams,
+                timestampMillis: Int64(noon.timeIntervalSince1970 * 1000), logicalDate: date
+            )
+        )
     }
 }
