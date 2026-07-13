@@ -298,6 +298,14 @@ and corrects documentation that the port had outgrown:
   the unlock path (`retry`, and the reprompt on returning while locked) no longer
   depends on the auto-lock setting, so a manual lock can always be cleared and
   never strands the user. It stays hidden when the device has no authenticator.
+- **Folded `ios/README.md` into the root `README.md`.** The iOS developer notes
+  (package layout, the XcodeGen build, `swift test` and the smoke-test bundle,
+  the generated `Version.xcconfig`, and the GRDB dependency) now live in a
+  "Building the iOS app" section under Technical Aspects, so there is a single
+  README. Two stale lines were dropped in the move: the domain layer no longer
+  "will live" in the package (it does), and the closing "this is a scaffold …
+  domain logic is not ported yet" no longer held. The two pointers to the old
+  file (`tools/gen-ios-version.py`, `CONTRIBUTING.md`) were repointed.
 
 ---
 

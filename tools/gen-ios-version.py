@@ -51,7 +51,7 @@ OUTPUT
     ios/Version.xcconfig, which ios/project.yml includes.  The file is GENERATED
     and therefore git-ignored: it is reproduced from tracked sources on demand,
     so it can never be committed out of date.  Run it before `xcodegen generate`
-    (see ios/README.md), or via `make ios-version`.
+    (see "Building the iOS app" in README.md), or via `make ios-version`.
 
 USAGE
     tools/gen-ios-version.py [--check]

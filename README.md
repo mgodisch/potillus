@@ -203,6 +203,87 @@ crypto wrappers, while reliable backward compatibility for advanced Java time AP
 guaranteed across all target devices through the inclusion of Desugar JDK Libs
 2.1.5 alongside a consolidated Jetpack and Turbine test stack.
 
+### Building the iOS app
+
+The iOS app is a native Swift/SwiftUI port that lives alongside the Android app
+in this repository. Its source is split in two, plus a generator spec:
+
+- `ios/PotillusKit/` — a Swift package holding the ported domain and data layer:
+  `AlcoholCalculator`, `DayResolver`, the GRDB-backed SQLite store, and the JSON
+  backup reader/writer. The package also builds for macOS, so its unit tests run
+  natively with `swift test`, no simulator needed.
+- `ios/Potillus/` — the SwiftUI app shell that depends on `PotillusKit`.
+- `ios/project.yml` — the XcodeGen spec; `Potillus.xcodeproj` is generated from
+  it and is git-ignored.
+
+Building requires a Mac with Xcode and
+[XcodeGen](https://github.com/yonaskolb/XcodeGen). The from-scratch setup is in
+[INSTALL-IOS.md](INSTALL-IOS.md); the everyday workflow is:
+
+    brew install xcodegen        # once
+    gmake ios-project            # from the REPOSITORY ROOT, not from ios/
+    open ios/Potillus.xcodeproj
+
+`ios-project` regenerates `Version.xcconfig` and then runs `xcodegen generate`
+in `ios/`, in that order. Running the two by hand works too, but note that the
+`Makefile` lives in the repository root while `xcodegen` resolves `project.yml`
+relative to the working directory:
+
+    gmake ios-version                        # from the root
+    cd ios && xcodegen generate              # from ios/
+
+Select the `Potillus` scheme and an iPhone simulator, then Run. Building for a
+physical device additionally needs your Apple Development team set on the target
+(Signing & Capabilities), or `DEVELOPMENT_TEAM` in `project.yml`.
+
+The domain tests live in the package and are platform-neutral, so they run on
+the Mac without a simulator:
+
+    cd ios/PotillusKit
+    swift test
+
+The app target additionally has a smoke-test bundle, run from the app scheme
+with `Cmd+U` in Xcode, or on the command line:
+
+    cd ios
+    xcodebuild test -project Potillus.xcodeproj -scheme Potillus \
+      -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+
+If `xcodebuild` complains that it "requires Xcode" but finds only the command
+line tools, point it at the full Xcode once:
+
+    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+`ios/Version.xcconfig` is **generated** and git-ignored. It carries
+`MARKETING_VERSION`, taken from the top `## vX.Y.Z` entry of `CHANGELOG.md`, and
+`CURRENT_PROJECT_VERSION`, taken from the Android `versionCode`, so the App Store
+and Play Store builds report the same version and the same build number, and
+neither can drift from the changelog. `gmake ios-project` regenerates it together
+with the Xcode project, in the right order; `gmake ios-version-check` verifies it
+exists and is current — the release gate. To confirm the values took effect, ask
+the build system rather than the Xcode UI, where a generated project shows the
+unexpanded `$(MARKETING_VERSION)` placeholder:
+
+    cd ios && xcodebuild -project Potillus.xcodeproj -target Potillus \
+        -showBuildSettings 2>/dev/null | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
+
+The values must never be set in `project.yml` directly: a value in `settings`
+overrides an xcconfig and would silently defeat the generator.
+
+The only iOS dependency is [GRDB.swift](https://github.com/groue/GRDB.swift)
+(MIT), resolved by Swift Package Manager. `ios/PotillusKit/Package.resolved`
+records the exact revision and **is committed on purpose**: a checkout of this
+repository must build the same bytes as the release, the same reason the Android
+build pins its dependency versions. Run `swift package update` deliberately, and
+review the resulting diff. GRDB is recorded in `COPYING.md`; its MIT licence text
+must be reproduced in the app's about screen before the first App Store
+submission.
+
+None of the iOS workflow needs the repository `Makefile`. If you do invoke it on
+macOS, use `gmake` (`brew install make`): the bundled GNU Make 3.81 cannot parse
+the `VERSION` assignment. See "Building on macOS" in
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ### Source Code Documentation
 
 Libellus Potionis treats its own source code as a teaching artifact. Every
