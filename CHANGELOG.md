@@ -436,6 +436,20 @@ and corrects documentation that the port had outgrown:
   the test methods stay in the class so XCTest still discovers them, and a test
   class earns its length from tests, not fixtures.
 
+- **A container guard now catches SwiftLint's length limits.** SwiftLint is a
+  macOS binary, so the Linux `check-ios-static` gate could not run it, and its
+  length rules — the ones that fail a build without a compile error — surfaced
+  only on the Mac, one round-trip late (the two fixes above were both such
+  overruns). `tools/check-swift-length.py` reproduces those counts in Python:
+  `type_body_length` (250, SwiftLint's default — the config does not override
+  it), `file_length` (500) and `line_length` (120), reading the limits and the
+  included/excluded roots from `ios/.swiftlint.yml` so the two cannot drift. It is
+  an early warning beside `check-swiftlint`, never a replacement — the Mac's
+  `--strict` pass stays authoritative for every rule — and it is calibrated to
+  agree with SwiftLint on the whole committed tree, so it never fails a build
+  SwiftLint would pass. `function_body_length` and the non-length rules remain
+  SwiftLint's alone.
+
 ---
 
 ## v0.81.0

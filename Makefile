@@ -1121,7 +1121,8 @@ check-ios-guides:
 # Neither gate alone covers a release; together they do. Each sub-check already
 # skips gracefully when its inputs are absent, so this is safe in any checkout.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
-                  check-report-paper check-l10n-parity check-l10n check-ios-guides
+                  check-swift-length check-report-paper check-l10n-parity check-l10n \
+                  check-ios-guides
 
 ios: check-ios-static check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
@@ -1196,6 +1197,14 @@ check-swiftlint:
 check-swift-symbols:
 	python3 tools/check-swift-symbols.py
 
+# check-swift-length: SwiftLint's length rules -- type_body_length, file_length,
+# line_length -- reproduced in Python, because SwiftLint is a macOS binary and
+# cannot run on the Linux gate. An early warning that catches an overrun here,
+# with the other static checks, instead of one round-trip later on the Mac; the
+# Mac's --strict SwiftLint pass stays the authority for every rule.
+check-swift-length:
+	python3 tools/check-swift-length.py
+
 # check-report-paper: the report template and the iOS printer both describe one
 # sheet of paper, and only one of them is read by the printer. Android's print
 # framework honours the template's `@page` margins; UIViewPrintFormatter honours
@@ -1265,4 +1274,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
