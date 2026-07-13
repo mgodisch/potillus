@@ -306,6 +306,21 @@ and corrects documentation that the port had outgrown:
   "will live" in the package (it does), and the closing "this is a scaffold …
   domain logic is not ported yet" no longer held. The two pointers to the old
   file (`tools/gen-ios-version.py`, `CONTRIBUTING.md`) were repointed.
+- **Extended the assurance case to cover the iOS port.** `docs/ASSURANCE_CASE.md`
+  argued security for the Android app alone. Every claim that rests on a platform
+  facility now names the Android and iOS mechanism side by side: the Keychain
+  (`WhenUnlockedThisDeviceOnly`) AES-256-GCM preferences sealing via CryptoKit
+  next to the Android Keystore, database backup exclusion next to
+  `allowBackup="false"`, GRDB parameterized queries and migrations next to Room's,
+  Swift/ARC memory safety next to Kotlin/ART, and the shared validators and CSV
+  neutralization. The screen boundary is stated honestly: iOS has no `FLAG_SECURE`
+  equivalent, so active screen capture is added as an explicit iOS residual risk,
+  with the app-switcher cover addressing only the passive preview. The review
+  record now notes that the iOS security-relevant areas are argued here and
+  exercised by the package tests and gates, with a dedicated on-device iOS review
+  pass to be recorded when performed. Claims were checked against the iOS sources
+  (`SecretKeyProviding`, `PreferencesStore`, `BackupExclusion`, `CsvExporter`,
+  `AppDatabase`) rather than asserted.
 
 ---
 
