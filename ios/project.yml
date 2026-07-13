@@ -194,6 +194,12 @@ targets:
         # `evaluatePolicy` fails outright. The passcode fallback needs no key; this
         # one string is the whole Info.plist cost of the app lock. Shown to the user
         # in the Face ID permission dialog the first time the lock is armed.
+        #
+        # This value here is the ENGLISH FALLBACK only. The dialog is a system
+        # surface and follows the SYSTEM language, so the sentence is localized —
+        # like every other user-visible string — via Potillus/InfoPlist.xcstrings,
+        # the String Catalog Xcode consults for generated-Info.plist keys (0.83.0
+        # QA round: without it, all twenty non-English languages saw English here).
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Unlock Libellus Potionis with Face ID."
         # Export-compliance declaration. The app is fully offline and uses only the
         # encryption built into the operating system — the Keychain (Security
