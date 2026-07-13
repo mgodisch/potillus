@@ -44,14 +44,17 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Bump version to 0.83.0
 
-This opens the 0.83.0 cycle with the version bump only — `versionCode` 93 → 94 and
+This opens the 0.83.0 cycle with the version bump — `versionCode` 93 → 94 and
 the human version 0.82.0 → 0.83.0 — to take the iOS app to the public App Store
 listing via the `ios testing` lane. The App Store export-compliance declaration is
 already in place (`ITSAppUsesNonExemptEncryption` = NO in `ios/project.yml`), so no
-change is needed there. Functional changes and the final, localised release notes
-follow later in the 0.83.0 cycle; until then the Android per-locale `94.txt`
-changelogs and the iOS `release_notes.txt` are independent placeholders (the two
-stores' notes need not match).
+change is needed there. The iOS app icon introduced in 0.82.0 is also enlarged —
+less padding, so the glass matches its on-device Android appearance (Android's
+adaptive-icon mask crops more of the border) — regenerated crisply at 1024×1024
+from the vector master at `ios/icon/appicon.svg`. Functional changes and the final,
+localised release notes follow later in the 0.83.0 cycle; until then the Android
+per-locale `94.txt` changelogs and the iOS `release_notes.txt` are independent
+placeholders (the two stores' notes need not match).
 
 ---
 
