@@ -142,6 +142,13 @@ public struct KeychainKeyProvider: SecretKeyProviding {
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 
         let status = SecItemAdd(attributes as CFDictionary, nil)
+        // errSecDuplicateItem means another code path created the key between
+        // our loadKey() miss and this add — the classic first-launch race. The
+        // key that won is just as good (it IS the app's key from here on), so
+        // read it back instead of failing the launch over a lost race.
+        if status == errSecDuplicateItem, let existing = try loadKey() {
+            return existing
+        }
         guard status == errSecSuccess else { throw KeychainError.unexpectedStatus(status) }
         return key
     }

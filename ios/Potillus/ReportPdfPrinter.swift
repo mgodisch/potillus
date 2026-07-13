@@ -140,10 +140,19 @@ final class ReportPdfPrinter: NSObject {
     /// Suspends until the web view reports the page loaded. A load that fails
     /// resumes the continuation with the error rather than hanging the caller.
     func pdfData(html: String) async throws -> Data {
+        // JavaScript stays OFF. The template ships no scripts, every substituted
+        // value is HTML-escaped (vector-pinned), and the base URL below is nil —
+        // but WKWebView's DEFAULT is JavaScript ON, unlike Android's WebView,
+        // whose disabled default the report render there simply keeps. One line
+        // makes the two platforms' stance identical and turns "escaping holds"
+        // from the only line of defence into one of two (0.83.0 QA round).
+        let configuration = WKWebViewConfiguration()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = false
+
         // The view is exactly the printable box, in points. `pageZoom` then gives
         // the page a layout viewport of box ÷ 0.75 CSS pixels — 703 px for 186 mm —
         // so the template's millimetres survive the trip onto the paper.
-        let webView = WKWebView(frame: Self.printableBox)
+        let webView = WKWebView(frame: Self.printableBox, configuration: configuration)
         webView.pageZoom = Self.printScale
         webView.navigationDelegate = self
         self.webView = webView
