@@ -1,1 +1,1 @@
-Libellus Potionis iOS 版首次发布。这是一款私密、离线的饮品与酒精摄入记录工具，提供统计、日历概览、设备本地 PDF 报告、可选的应用锁（Face ID / Touch ID）以及 JSON/CSV 备份，支持二十种语言。
+Release notes will follow.

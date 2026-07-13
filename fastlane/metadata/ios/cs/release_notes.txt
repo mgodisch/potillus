@@ -1,1 +1,1 @@
-První vydání Libellus Potionis pro iOS – soukromý, offline přehled vašich nápojů a příjmu alkoholu: se statistikami, kalendářním přehledem, PDF přehledem přímo v zařízení, volitelným zámkem aplikace (Face ID / Touch ID) a zálohou JSON/CSV, ve dvaceti jazycích.
+Release notes will follow.

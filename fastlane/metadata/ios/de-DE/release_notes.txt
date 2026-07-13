@@ -1,1 +1,1 @@
-Erstveröffentlichung von Libellus Potionis für iOS – ein privater, offline arbeitender Tracker für Getränke und Alkoholkonsum: mit Statistiken, Kalenderübersicht, PDF-Bericht auf dem Gerät, optionaler App-Sperre (Face ID / Touch ID) und JSON/CSV-Backup, in zwanzig Sprachen.
+Release notes will follow.

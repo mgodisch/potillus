@@ -1,1 +1,1 @@
-Primeira versão do Libellus Potionis para iOS: um registo privado e offline das suas bebidas e do seu consumo de álcool, com estatísticas, vista geral do calendário, relatório PDF no dispositivo, bloqueio opcional da aplicação (Face ID / Touch ID) e cópia de segurança JSON/CSV, em vinte idiomas.
+Release notes will follow.

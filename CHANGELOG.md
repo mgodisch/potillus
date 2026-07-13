@@ -50,7 +50,8 @@ listing via the `ios testing` lane. The App Store export-compliance declaration 
 already in place (`ITSAppUsesNonExemptEncryption` = NO in `ios/project.yml`), so no
 change is needed there. Functional changes and the final, localised release notes
 follow later in the 0.83.0 cycle; until then the Android per-locale `94.txt`
-changelogs are placeholders, and the iOS release notes are unchanged from 0.82.0.
+changelogs and the iOS `release_notes.txt` are independent placeholders (the two
+stores' notes need not match).
 
 ---
 

@@ -1,1 +1,1 @@
-iOS 版 Libellus Potionis の初リリースです。飲み物とアルコール摂取量を記録する、プライベートでオフラインのアプリです。統計、カレンダー概要、端末上での PDF レポート、任意のアプリロック（Face ID / Touch ID）、JSON/CSV バックアップに対応し、20 言語で利用できます。
+Release notes will follow.

@@ -1,1 +1,1 @@
-iOS용 Libellus Potionis의 첫 번째 릴리스입니다. 음료와 음주량을 기록하는 비공개 오프라인 앱으로, 통계, 캘린더 개요, 기기 내 PDF 보고서, 선택적 앱 잠금(Face ID / Touch ID), JSON/CSV 백업을 지원하며 20개 언어로 제공됩니다.
+Release notes will follow.
