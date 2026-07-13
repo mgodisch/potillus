@@ -93,7 +93,18 @@ struct TodayScreen: View {
                     drinks: model.state.drinks,
                     // People tend to repeat what they just had.
                     preselected: model.state.lastUsedDrink,
-                    now: Date()
+                    now: Date(),
+                    // The Today model already holds the day's totals and limits,
+                    // so the log sheet gets the capacity dot too, as on Android.
+                    capacity: DrinkCapacity(
+                        todayGrams: model.state.totalGrams,
+                        dailyLimitGrams: model.state.limitInfo.limitGrams,
+                        weeklyTotalGrams: model.state.weeklyTotalGrams,
+                        weeklyLimitGrams: model.state.limitInfo.weeklyLimitGrams,
+                        drinkDaysThisWeek: model.state.drinkDaysThisWeek,
+                        maxDrinkDaysPerWeek: model.state.limitInfo.maxDrinkDaysPerWeek
+                    ),
+                    useSymbols: model.state.settings.alternativeStatusSymbols
                 ) { drink, volume, millis, note in
                     await model.addEntry(
                         drink: drink, volumeMl: volume, timestampMillis: millis, note: note

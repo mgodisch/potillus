@@ -42,6 +42,7 @@ struct DrinksScreen: View {
 
     @State private var model: DrinksModel
     @State private var logger: EntryLogModel
+    @State private var capacity: DrinkCapacityModel
     @State private var editing: DrinkDefinition?
     @State private var logging: DrinkDefinition?
     @State private var isAdding = false
@@ -54,6 +55,7 @@ struct DrinksScreen: View {
         self.environment = environment
         _model = State(initialValue: DrinksModel(drinks: environment.drinks))
         _logger = State(initialValue: EntryLogModel(environment: environment))
+        _capacity = State(initialValue: DrinkCapacityModel(environment: environment))
     }
 
     var body: some View {
@@ -80,8 +82,8 @@ struct DrinksScreen: View {
                     Label(Loc.string("Add", locale: locale), systemImage: "plus")
                 }
             }
-            .task { model.start() }
-            .onDisappear { model.stop() }
+            .task { model.start(); capacity.start() }
+            .onDisappear { model.stop(); capacity.stop() }
             .sheet(isPresented: $isAdding) {
                 DrinkEditor(drink: nil) { name, volume, percent, category in
                     model.add(
@@ -102,7 +104,8 @@ struct DrinksScreen: View {
             .sheet(item: $logging) { drink in
                 // One drink, so the sheet shows its name instead of a picker.
                 EntrySheet(
-                    drinks: [drink], preselected: drink, now: logger.now()
+                    drinks: [drink], preselected: drink, now: logger.now(),
+                    capacity: capacity.capacity, useSymbols: capacity.useSymbols
                 ) { chosen, volume, millis, note in
                     await logger.log(
                         drink: chosen, volumeMl: volume, timestampMillis: millis, note: note
@@ -167,6 +170,18 @@ struct DrinksScreen: View {
             .accessibilityLabel(drink.isFavorite
                 ? Loc.string("Remove from favourites", locale: locale)
                 : Loc.string("Add to favourites", locale: locale))
+
+            // Capacity dot: how many more of this drink fit within today's
+            // remaining budget, against the same snapshot for every row. Between
+            // the star and the name, as on Android.
+            TrafficLightDot(
+                light: capacity.capacity.status(
+                    forServing: AlcoholCalculator.calculateGrams(
+                        volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
+                    )
+                ),
+                useSymbols: capacity.useSymbols
+            )
 
             VStack(alignment: .leading) {
                 Text(drink.name)

@@ -55,6 +55,60 @@ public enum TrafficLight: String, Sendable, Equatable, Codable {
     case red = "RED"
 }
 
+/// A snapshot of the day's consumption against the active limits — everything the
+/// traffic-light question needs, gathered once so every drink in a list is judged
+/// against the same moment. Mirrors Android's `DrinkCapacity`.
+///
+/// The screen builds one of these from the current day's totals, then asks
+/// `status(forServing:)` for each drink's default serving. Keeping the snapshot
+/// separate from the per-drink call is what lets a whole list stay consistent:
+/// the budget is read once, not re-read between rows.
+public struct DrinkCapacity: Sendable, Equatable {
+    /// Grams already logged today.
+    public var todayGrams: Double
+    /// Today's gram limit.
+    public var dailyLimitGrams: Double
+    /// Grams across the trailing seven-day window.
+    public var weeklyTotalGrams: Double
+    /// The seven-day gram limit.
+    public var weeklyLimitGrams: Double
+    /// Distinct drinking days in that window, today included.
+    public var drinkDaysThisWeek: Int
+    /// The drinking-days allowance.
+    public var maxDrinkDaysPerWeek: Int
+
+    public init(
+        todayGrams: Double = 0,
+        dailyLimitGrams: Double = 0,
+        weeklyTotalGrams: Double = 0,
+        weeklyLimitGrams: Double = 0,
+        drinkDaysThisWeek: Int = 0,
+        maxDrinkDaysPerWeek: Int = 0
+    ) {
+        self.todayGrams = todayGrams
+        self.dailyLimitGrams = dailyLimitGrams
+        self.weeklyTotalGrams = weeklyTotalGrams
+        self.weeklyLimitGrams = weeklyLimitGrams
+        self.drinkDaysThisWeek = drinkDaysThisWeek
+        self.maxDrinkDaysPerWeek = maxDrinkDaysPerWeek
+    }
+
+    /// The traffic-light status for one serving of `gramsPerDrink` grams, against
+    /// this snapshot. A thin pass-through to `AlcoholCalculator.trafficLight`, so
+    /// the dot and the shared test vectors compute the identical answer.
+    public func status(forServing gramsPerDrink: Double) -> TrafficLight {
+        AlcoholCalculator.trafficLight(
+            gramsPerDrink: gramsPerDrink,
+            todayGrams: todayGrams,
+            dailyLimitGrams: dailyLimitGrams,
+            weeklyTotalGrams: weeklyTotalGrams,
+            weeklyLimitGrams: weeklyLimitGrams,
+            drinkDaysThisWeek: drinkDaysThisWeek,
+            maxDrinkDaysPerWeek: maxDrinkDaysPerWeek
+        )
+    }
+}
+
 /// Total alcohol consumed on one logical day.
 ///
 /// - Parameters:

@@ -52,6 +52,13 @@ struct EntrySheet: View {
     /// Returns whether the entry was stored, so the sheet stays open on failure.
     let onSave: (DrinkDefinition, Int, Int64, String) async -> Bool
 
+    /// Today's budget snapshot, for the capacity dot next to the grams preview.
+    /// `nil` hides the dot (the caller had no snapshot to give).
+    let capacity: DrinkCapacity?
+
+    /// Whether the capacity dot uses colour-blind glyphs.
+    let useSymbols: Bool
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appLocale) private var locale
 
@@ -65,10 +72,14 @@ struct EntrySheet: View {
         drinks: [DrinkDefinition],
         preselected: DrinkDefinition?,
         now: Date,
+        capacity: DrinkCapacity? = nil,
+        useSymbols: Bool = false,
         onSave: @escaping (DrinkDefinition, Int, Int64, String) async -> Bool
     ) {
         self.drinks = drinks
         self.preselected = preselected
+        self.capacity = capacity
+        self.useSymbols = useSymbols
         self.onSave = onSave
 
         let initial = preselected ?? drinks.first
@@ -123,14 +134,22 @@ struct EntrySheet: View {
                 }
 
                 if let drink = selection, let volume, canSave {
+                    let grams = AlcoholCalculator.calculateGrams(
+                        volumeMl: volume, alcoholPercent: drink.alcoholPercent
+                    )
                     LabeledContent(Loc.string("Alcohol", locale: locale)) {
-                        Text(String(
-                            format: "%.1f g",
-                            AlcoholCalculator.calculateGrams(
-                                volumeMl: volume, alcoholPercent: drink.alcoholPercent
-                            )
-                        ))
-                        .monospacedDigit()
+                        HStack(spacing: 8) {
+                            if let capacity {
+                                // Same dot as the drinks list, recomputed for the
+                                // volume actually entered here.
+                                TrafficLightDot(
+                                    light: capacity.status(forServing: grams),
+                                    useSymbols: useSymbols
+                                )
+                            }
+                            Text(String(format: "%.1f g", grams))
+                                .monospacedDigit()
+                        }
                     }
                 }
             }

@@ -271,6 +271,19 @@ and corrects documentation that the port had outgrown:
   with `ContinuousClock`, which keeps counting while the device sleeps, instead of
   `ProcessInfo.systemUptime`, which stops; a phone left locked in a pocket past the
   window now correctly re-prompts on return, matching Android's `elapsedRealtime`.
+- **The capacity traffic-light dots are now shown on iOS.** Android marks each
+  drink with a green/yellow/red dot — how many more servings fit before a limit
+  is crossed — in the drinks list and next to the grams preview in the log dialog.
+  On iOS the calculation (`AlcoholCalculator.trafficLight`) and its shared test
+  vectors were already there, but no view drew the dot, and the Settings toggle
+  for colour-blind status symbols therefore did nothing. The dot now appears in
+  the drinks list (between the star and the name) and beside the grams preview in
+  the log sheet, on both the Drinks and Today screens. A small `DrinkCapacityModel`
+  publishes the day's budget snapshot and refreshes when an entry is logged or a
+  limit changes; the dot reuses the limit bars' colours so bar and dot agree, adds
+  the colour-blind glyphs (cross / arrow / "1") when the symbols toggle is on —
+  which now has an effect — and carries a localised VoiceOver label. Three
+  capacity-status labels were added in all languages, from Android.
 
 ---
 
