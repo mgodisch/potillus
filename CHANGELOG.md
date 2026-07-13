@@ -321,6 +321,16 @@ and corrects documentation that the port had outgrown:
   pass to be recorded when performed. Claims were checked against the iOS sources
   (`SecretKeyProviding`, `PreferencesStore`, `BackupExclusion`, `CsvExporter`,
   `AppDatabase`) rather than asserted.
+- **Recorded the deferred iOS parity items on the roadmap.** The parity sweep left
+  two conscious iOS omissions for a decision. The calendar year view was already
+  tracked under "Two deferred iOS parity items" in `docs/ROADMAP.md`, so it needed
+  nothing. The accessibility side was not: an iOS/VoiceOver counterpart to the
+  Android/TalkBack self-assessment (`docs/WCAG_LEVEL_A_CHECKLIST.md`) is now added
+  as future work under Accessibility, noting that the port already labels its
+  controls for VoiceOver but has no recorded structured pass, and that the
+  Compose-specific Level-AA gaps do not transfer to the separate iOS views. A
+  stale "native Android app" aside in the same section was corrected to "native
+  mobile app."
 
 ---
 

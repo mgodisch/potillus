@@ -118,7 +118,7 @@ honest:
   out regardless; and at least one **Level A** item (the on-screen chart's text
   alternative) is unresolved, so even Level A is not cleanly established.
 - The W3C logos are **web-page scoped** (WCAG = *Web Content* Accessibility
-  Guidelines; a logo covers "a single page"). Potillus is a native Android app;
+  Guidelines; a logo covers "a single page"). Potillus is a native mobile app;
   the per-page conformance model does not map onto it. (WCAG could be applied via
   WCAG2ICT as a written claim, but that is not a W3C logo.)
 
@@ -163,6 +163,23 @@ A lightweight regression guard exists in the meantime: `tools/release-check.sh`
 `contentDescription = null`, so the labels the project *has* added cannot silently
 regress. It is a labelling invariant only — it deliberately does **not** assert
 WCAG conformance, which (per W3C) a static check cannot.
+
+### iOS accessibility assessment (future work)
+
+The conformance discussion, the measured Level-AA gaps, and the on-device
+self-assessment protocol ([WCAG_LEVEL_A_CHECKLIST.md](WCAG_LEVEL_A_CHECKLIST.md))
+above are scoped to the Android app and TalkBack. The iOS port already provides
+VoiceOver names on its controls — the calendar navigation arrows and the capacity
+traffic-light dot, for instance, carry explicit accessibility labels — but no
+structured VoiceOver evaluation has been recorded for it, and the checklist does
+not yet cover it. Future accessibility work therefore includes an iOS/VoiceOver
+counterpart to that protocol: walk the same success criteria on-device with
+VoiceOver, record the iOS-specific findings (the Compose-specific heat-map and
+`Canvas`-chart gaps above do not transfer verbatim — the iOS chart and calendar
+are separate implementations that must be assessed on their own terms), and
+extend or fork the checklist so each platform's self-assessment is tracked
+separately. Like the Android assessment, this is a manual on-device effort no
+sandbox check can replace.
 
 ## Finalize already-documented "Met" items
 
