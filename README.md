@@ -152,8 +152,9 @@ backup format is shared with Android, so a backup moves between the two
 platforms unchanged.
 
 The application is actively maintained and verified across a Google Pixel 10
-Pro running GrapheneOS (Android 16), a Fairphone 4 (Android 15), an iPhone 16e
-running iOS 26, as well as several Android and iPhone emulators.
+Pro running [GrapheneOS](https://grapheneos.org/) (Android 16), a Fairphone 4
+(Android 15), an iPhone 16e running iOS 26, as well as several Android and
+iPhone emulators.
 
 ### Accessibility
 

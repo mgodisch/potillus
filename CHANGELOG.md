@@ -403,6 +403,16 @@ and corrects documentation that the port had outgrown:
   versions were also dropped from the README's build-infrastructure section so it
   no longer drifts on every dependency bump; the Gradle build files remain the
   single source of truth for exact versions.
+- **Fixed a cross-file access error that broke the Statistics export build.**
+  An earlier round localized the export failure messages in
+  `StatsScreenExport.swift` — an `extension StatsScreen` that lives in its own
+  file — to `Loc.string(…, locale: locale)`. But `locale` was declared `private`
+  on `StatsScreen`, and Swift's `private` is file-scoped: a same-type extension in
+  another file cannot see it, so the four `locale` references failed to compile.
+  The neighbouring `model` and export state are already `internal` for exactly
+  this reason (with a comment saying so); `locale` now joins them. The error only
+  surfaced now because earlier builds aborted before reaching this file. No
+  behaviour changed.
 
 ---
 

@@ -47,10 +47,10 @@ import UniformTypeIdentifiers
 
 struct StatsScreen: View {
 
-    @Environment(\.appLocale) private var locale
-
     // `internal`, not private: `private` in Swift is FILE scope, and the export
-    // code lives in StatsScreenExport.swift.
+    // code in StatsScreenExport.swift reads both the locale and the model.
+    @Environment(\.appLocale) var locale
+
     @State var model: StatsModel
 
     let environment: AppEnvironment
