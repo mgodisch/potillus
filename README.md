@@ -104,6 +104,9 @@ architecture, coding, testing, and release conventions a change must follow —
 is documented in
 [CONTRIBUTING.md](https://codeberg.org/godisch/potillus/src/branch/main/CONTRIBUTING.md).
 
+All participants are expected to follow the project's
+[Code of Conduct](https://codeberg.org/godisch/potillus/src/branch/main/docs/CODE_OF_CONDUCT.md).
+
 ## Security
 
 To report a security vulnerability, please do **not** open a public issue.
@@ -179,8 +182,8 @@ native app. The concrete, measured accessibility gaps and the path toward WCAG
 
 To build the app from source, follow the step-by-step guides that take a blank
 operating system to a runnable debug build:
-[INSTALL-ANDROID.md](INSTALL-ANDROID.md) (debug APK from a fresh Debian GNU/Linux
-install) and [INSTALL-IOS.md](INSTALL-IOS.md) (debug build in the iPhone Simulator
+[docs/INSTALL-ANDROID.md](docs/INSTALL-ANDROID.md) (debug APK from a fresh Debian GNU/Linux
+install) and [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md) (debug build in the iPhone Simulator
 from a fresh macOS install).
 
 This project maintains a highly modern and robust build infrastructure by
@@ -218,7 +221,7 @@ in this repository. Its source is split in two, plus a generator spec:
 
 Building requires a Mac with Xcode and
 [XcodeGen](https://github.com/yonaskolb/XcodeGen). The from-scratch setup is in
-[INSTALL-IOS.md](INSTALL-IOS.md); the everyday workflow is:
+[docs/INSTALL-IOS.md](docs/INSTALL-IOS.md); the everyday workflow is:
 
     brew install xcodegen        # once
     gmake ios-project            # from the REPOSITORY ROOT, not from ios/

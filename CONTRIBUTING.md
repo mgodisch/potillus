@@ -63,7 +63,7 @@ Libellus Potionis is a personal project maintained by a single author. Feedback
 is always welcome; external code contributions are considered on a case-by-case
 basis. The steps below describe how a change moves from idea to merge. All
 participation in the project is expected to follow our
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 1. **Open an issue first.** Before writing code, describe the bug or proposed
    enhancement in the [Codeberg issue
@@ -299,7 +299,7 @@ wording and line breaks stay identical everywhere. New files, including the iOS
 Swift sources, reproduce this header verbatim.
 
 Verbatim third-party texts (`LICENSE.md`, `LICENSE.Apache-2.0.md`, `COPYING.md`,
-`CODE_OF_CONDUCT.md`), binary assets, and strict-JSON files (which cannot hold a
+`docs/CODE_OF_CONDUCT.md`), binary assets, and strict-JSON files (which cannot hold a
 comment) do not carry it. `release-check.sh` verifies every Kotlin file contains
 the GPL notice.
 

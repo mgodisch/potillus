@@ -237,7 +237,7 @@ under its own license and is listed here for completeness.
 
 ### Contributor Covenant (Code of Conduct)
 
-`CODE_OF_CONDUCT.md` reproduces the **Contributor Covenant, version 2.1**
+`docs/CODE_OF_CONDUCT.md` reproduces the **Contributor Covenant, version 2.1**
 (Copyright &copy; the Contributor Covenant authors), licensed under the
 **Creative Commons Attribution 4.0 International (CC BY 4.0)** license
 (<[https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/)>).

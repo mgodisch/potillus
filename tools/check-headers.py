@@ -109,7 +109,7 @@ EXCLUDED_PATHS = {
     "COPYING.md",
     "LICENSE.md",
     "LICENSE.Apache-2.0.md",
-    "CODE_OF_CONDUCT.md",
+    "docs/CODE_OF_CONDUCT.md",
 }
 
 # Strict JSON cannot hold a comment; binaries and generated artefacts are not

@@ -331,6 +331,18 @@ and corrects documentation that the port had outgrown:
   Compose-specific Level-AA gaps do not transfer to the separate iOS views. A
   stale "native Android app" aside in the same section was corrected to "native
   mobile app."
+- **Moved the install guides and the Code of Conduct under `docs/`.**
+  `INSTALL-ANDROID.md`, `INSTALL-IOS.md`, and `CODE_OF_CONDUCT.md` now live in
+  `docs/` alongside the other project documents, leaving the repository root less
+  cluttered. The README links all three (the Code of Conduct newly, from
+  "Feedback & Contributing"; the install guides repointed), and every other
+  pointer was updated to the new paths: `CONTRIBUTING.md` and `COPYING.md`, the
+  `code_of_conduct_justification` in `.bestpractices.json` (location text and
+  Codeberg URL), and `tools/check-headers.py`, whose licence-header exclusion is
+  matched on the repository-relative path and would otherwise have demanded a GPL
+  header on the CC-BY-licensed Code of Conduct. Historical changelog entries that
+  named the old paths were left as written. The forge recognizes a Code of
+  Conduct under `docs/`, so its badge status is unaffected.
 
 ---
 
