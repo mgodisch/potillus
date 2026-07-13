@@ -1006,10 +1006,12 @@ check_log_guards() {
 # SECTION 7 – NO GERMAN IN SOURCE CODE
 #
 # WHY THIS MATTERS:
-#   The project documentation standard (CONTRIBUTING.md §3) requires all
-#   source code comments and KDoc to be written in English.  German prose in
-#   code comments is confusing for international contributors.  Translation
-#   strings in values-de/strings.xml are explicitly excluded.
+#   The project documentation standard (CONTRIBUTING.md, "English
+#   everywhere") requires all source code comments, KDoc, and BUILD FILES to
+#   be written in English.  German prose in code comments is confusing for
+#   international contributors.  The scan covers the Kotlin sources, the
+#   Gradle build scripts, and the Swift sources of the iOS port (when
+#   present).  Translation strings in values-de/strings.xml are excluded.
 #
 # NOTE ON FALSE POSITIVES:
 #   The word list was calibrated against the current source tree.  Short or
@@ -1048,12 +1050,28 @@ check_no_german_comments() {
     pattern=$(printf '%s\n' "${german_words[@]}" | paste -sd'|')
 
     local matches
-    # Search only Kotlin source files; exclude blank lines and pure-code lines
-    # (i.e. lines that contain // or * indicating a comment).
+    # Scan the Kotlin sources, the Gradle build scripts, and — the convention
+    # covers "all source code … build files" (CONTRIBUTING, "English
+    # everywhere") — the Swift sources of the iOS port. Widened in the 0.83.0
+    # QA round: the German prose this gate exists for sat in build.gradle.kts,
+    # exactly the file class the old *.kt-only filter skipped. The build
+    # scripts are named explicitly (a recursive *.kts glob would descend into
+    # .gradle/ caches), the iOS root is scanned only when present so an
+    # Android-only source drop skips it gracefully, and every grep is
+    # `|| true`-guarded: "found nothing" is grep exit 1, which `set -e` would
+    # otherwise turn into a dead gate — the §10 lesson.
     # We pipe through grep -E twice: first to find comment lines, then to find German.
-    matches=$(grep -rn --include='*.kt' "//\|^\s*\*" "$SOURCE_ROOT" \
-                  | grep -iE "\b(${pattern})\b" \
-                  | head -15 || true)
+    matches=$(
+        {
+            grep -rn --include='*.kt' "//\|^\s*\*" "$SOURCE_ROOT" || true
+            grep -n "//" build.gradle.kts settings.gradle.kts app/build.gradle.kts \
+                2>/dev/null || true
+            if [[ -d ../ios ]]; then
+                grep -rn --include='*.swift' --exclude-dir='.build' \
+                     --exclude-dir='DerivedData' "//" ../ios || true
+            fi
+        } | grep -iE "\b(${pattern})\b" | head -15 || true
+    )
 
     if [[ -n "$matches" ]]; then
         warn "Possible German text in source comments (review manually):"

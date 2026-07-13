@@ -24,7 +24,7 @@
 // =============================================================================
 
 // =============================================================================
-// settings.gradle.kts – Projektstruktur und Repository-Konfiguration
+// settings.gradle.kts – project structure and repository configuration
 // =============================================================================
 //
 // This file is read by Gradle FIRST, before any build.gradle.kts.

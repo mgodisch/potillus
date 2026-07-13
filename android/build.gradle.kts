@@ -24,22 +24,22 @@
 // =============================================================================
 
 // =============================================================================
-// build.gradle.kts – Projekt-level Build-Datei (Wurzelverzeichnis)
+// build.gradle.kts – project-level build file (repository root's android/)
 // =============================================================================
 //
-// UNTERSCHIED ZU app/build.gradle.kts:
-//   Diese Datei gilt für das GESAMTE Projekt (alle Module).
-//   app/build.gradle.kts gilt nur für das ":app"-Modul.
+// DIFFERENCE TO app/build.gradle.kts:
+//   This file applies to the WHOLE project (every module).
+//   app/build.gradle.kts applies to the ":app" module only.
 //
-//   In einem einfachen Projekt mit nur einem App-Modul enthält diese
-//   Datei fast nichts – sie deklariert lediglich welche Plugins
-//   VERFÜGBAR sind, ohne sie direkt anzuwenden (apply false).
+//   In a simple project with a single app module this file contains
+//   almost nothing – it merely declares which plugins are AVAILABLE,
+//   without applying them directly (apply false).
 //
-// WARUM "apply false"?
-//   Die Plugins werden hier nur "bekannt gemacht" (mit fester Version),
-//   aber erst in den Untermodulen tatsächlich angewendet.
-//   Das verhindert Versionskonflikte wenn mehrere Module dieselben
-//   Plugins in unterschiedlichen Versionen benötigen würden.
+// WHY "apply false"?
+//   The plugins are only "made known" here (with a fixed version) and
+//   are actually applied in the submodules. That prevents version
+//   conflicts if several modules were to need the same plugins in
+//   different versions.
 // =============================================================================
 
 // ── built-in Kotlin: pin the compiler version ───────────────────────────────
@@ -66,17 +66,17 @@ buildscript {
 }
 
 plugins {
-    // Android Gradle Plugin – Kernwerkzeug für Android-Builds
-    // "apply false": hier nur registrieren, nicht aktivieren
+    // Android Gradle Plugin – the core tool for Android builds.
+    // "apply false": only registered here, not activated
     alias(libs.plugins.android.application) apply false
 
     // No kotlin-android plugin: AGP 9's built-in Kotlin replaces it (the
     // compiler version is pinned via the buildscript block above).
 
-    // Kotlin Compose Plugin – Compose-Compiler-Erweiterung
+    // Kotlin Compose plugin – the Compose compiler extension
     alias(libs.plugins.kotlin.compose)      apply false
 
-    // KSP – Kotlin Symbol Processor (für Room-Code-Generierung)
+    // KSP – Kotlin Symbol Processor (for Room code generation)
     alias(libs.plugins.ksp)                 apply false
 
     // CycloneDX – generates a standardized SBOM for the release APK. Registered
