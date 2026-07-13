@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Обслуживающий выпуск: внутренние улучшения инструментов выпуска и контроля качества. Никаких изменений в работе приложения.

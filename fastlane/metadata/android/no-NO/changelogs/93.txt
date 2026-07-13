@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Vedlikeholdsutgivelse: interne forbedringer av utgivelsesverktøy og kvalitetssikring. Ingen endringer i hvordan appen fungerer.

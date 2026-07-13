@@ -330,7 +330,7 @@ release-ios: ios-project
 		'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
 		'<plist version="1.0">' \
 		'<dict>' \
-		'    <key>method</key>          <string>app-store</string>' \
+		'    <key>method</key>          <string>app-store-connect</string>' \
 		'    <key>destination</key>     <string>export</string>' \
 		'    <key>signingStyle</key>    <string>automatic</string>' \
 		"    <key>teamID</key>          <string>$$team</string>" \

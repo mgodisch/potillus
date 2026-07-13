@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Maintenance release: internal release-tooling and quality-assurance improvements. No changes to how the app works.

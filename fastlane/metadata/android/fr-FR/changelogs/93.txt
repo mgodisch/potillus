@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Version de maintenance : améliorations internes des outils de publication et de l'assurance qualité. Aucun changement dans le fonctionnement de l'application.

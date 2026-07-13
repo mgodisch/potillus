@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Versiune de întreținere: îmbunătățiri interne ale instrumentelor de lansare și ale asigurării calității. Fără modificări în modul de funcționare al aplicației.

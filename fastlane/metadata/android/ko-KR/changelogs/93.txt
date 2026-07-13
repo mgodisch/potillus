@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+유지 관리 릴리스: 릴리스 도구 및 품질 보증에 대한 내부 개선입니다. 앱 작동 방식에는 변경이 없습니다.

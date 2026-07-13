@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Onderhoudsrelease: interne verbeteringen aan release-tooling en kwaliteitsborging. Geen wijzigingen in de werking van de app.

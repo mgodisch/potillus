@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+メンテナンスリリース: リリースツールと品質保証に関する内部的な改善です。アプリの動作に変更はありません。

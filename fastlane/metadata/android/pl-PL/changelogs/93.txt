@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Wydanie konserwacyjne: wewnętrzne usprawnienia narzędzi wydawniczych i zapewnienia jakości. Bez zmian w działaniu aplikacji.

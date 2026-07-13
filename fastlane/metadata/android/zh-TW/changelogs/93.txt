@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+維護版本：發布工具與品質保證方面的內部改進。應用程式的使用方式沒有變更。

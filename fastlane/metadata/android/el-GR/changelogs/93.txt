@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Έκδοση συντήρησης: εσωτερικές βελτιώσεις στα εργαλεία έκδοσης και στη διασφάλιση ποιότητας. Καμία αλλαγή στον τρόπο λειτουργίας της εφαρμογής.

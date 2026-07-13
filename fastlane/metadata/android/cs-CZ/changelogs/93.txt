@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Údržbové vydání: interní vylepšení nástrojů pro vydávání a zajištění kvality. Žádné změny ve fungování aplikace.

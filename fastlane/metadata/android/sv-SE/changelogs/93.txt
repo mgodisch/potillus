@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Underhållsversion: interna förbättringar av utgivningsverktyg och kvalitetssäkring. Inga ändringar i hur appen fungerar.

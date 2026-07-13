@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Wartungs-Release: interne Verbesserungen an Release-Werkzeugen und Qualitätssicherung. Keine Änderungen an der Funktionsweise der App.

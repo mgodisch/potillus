@@ -1,1 +1,1 @@
-Internal release-tooling and quality-check improvements. No user-facing changes.
+Технічний випуск: внутрішні покращення інструментів випуску та забезпечення якості. Без змін у роботі застосунку.
