@@ -391,6 +391,18 @@ and corrects documentation that the port had outgrown:
   literal. The value now goes through a small `trend` formatting helper beside the
   existing `grams` one, keeping the interpolation on one line and the call site
   short. No behaviour changed.
+- **Moved the iOS build how-to out of the README into `docs/INSTALL-IOS.md`.**
+  The README's "Building the iOS app" section was a full build walkthrough that
+  belonged with the from-scratch install guide, not in the project overview. Its
+  unique material — the `ios/` source layout, the app's smoke-test bundle, the
+  `Version.xcconfig` confirmation and "never set it in `project.yml`" rule, and
+  the GRDB `Package.resolved`/`COPYING.md`/App-Store note — was folded into
+  `docs/INSTALL-IOS.md`, and the section was removed from the README. The README
+  now links both install guides in a single short paragraph. The stale pointer in
+  `CONTRIBUTING.md` was repointed at the install guide. Concrete dependency
+  versions were also dropped from the README's build-infrastructure section so it
+  no longer drifts on every dependency bump; the Gradle build files remain the
+  single source of truth for exact versions.
 
 ---
 

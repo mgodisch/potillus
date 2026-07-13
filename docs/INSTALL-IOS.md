@@ -59,6 +59,14 @@ file. You never edit `Potillus.xcodeproj`; you edit `project.yml` and
 regenerate. This keeps the project definition small, reviewable and free of the
 merge conflicts a checked-in `.xcodeproj` is famous for.
 
+**The one dependency.** GRDB.swift (MIT) is the only iOS dependency, resolved by
+Swift Package Manager. `ios/PotillusKit/Package.resolved` records the exact
+revision and **is committed on purpose**: a checkout of this repository must
+build the same bytes as the release, the same reason the Android build pins its
+dependency versions. Run `swift package update` deliberately, and review the
+resulting diff. GRDB is recorded in `COPYING.md`; its MIT licence text must be
+reproduced in the app's about screen before the first App Store submission.
+
 ---
 
 ## 2. Install Xcode and the Command Line Tools
@@ -115,6 +123,16 @@ The repository holds both platforms side by side (`android/` and `ios/`); the
 iOS build lives under `ios/`, but the `Makefile` you drive it with sits at the
 **repository root**.
 
+Inside `ios/`, the source is split in two, plus a generator spec:
+
+- `ios/PotillusKit/` — a Swift package holding the ported domain and data layer:
+  `AlcoholCalculator`, `DayResolver`, the GRDB-backed SQLite store, and the JSON
+  backup reader/writer. The package also builds for macOS, so its unit tests run
+  natively with `swift test`, no simulator needed.
+- `ios/Potillus/` — the SwiftUI app shell that depends on `PotillusKit`.
+- `ios/project.yml` — the XcodeGen spec; `Potillus.xcodeproj` is generated from
+  it and is git-ignored.
+
 ---
 
 ## 5. Generate the Xcode project
@@ -133,6 +151,19 @@ This does two things in the required order:
 
 You must re-run `gmake ios-project` whenever `project.yml` or the version
 changes; for a plain build-from-scratch you run it once here.
+
+`Version.xcconfig` carries `MARKETING_VERSION`, taken from the top `## vX.Y.Z`
+entry of `CHANGELOG.md`, and `CURRENT_PROJECT_VERSION`, taken from the Android
+`versionCode`, so the App Store and Play Store builds report the same version and
+the same build number, and neither can drift from the changelog. `gmake
+ios-version-check` verifies the file exists and is current — the release gate.
+The values must **never** be set in `project.yml` directly: a value in `settings`
+overrides an xcconfig and would silently defeat the generator. To confirm the
+values took effect, ask the build system rather than the Xcode UI, where a
+generated project shows the unexpanded `$(MARKETING_VERSION)` placeholder:
+
+    cd ios && xcodebuild -project Potillus.xcodeproj -target Potillus \
+        -showBuildSettings 2>/dev/null | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
 
 ---
 
@@ -178,6 +209,15 @@ The domain logic lives in the `PotillusKit` Swift package, which also builds
 for macOS, so its tests run natively with no simulator:
 
     cd ios/PotillusKit && swift test
+
+### (Optional) The app's smoke-test bundle
+
+The app target additionally has a small smoke-test bundle, run from the app
+scheme with ⌘U in Xcode, or on the command line:
+
+    cd ios
+    xcodebuild test -project Potillus.xcodeproj -scheme Potillus \
+      -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 ### (Optional) The full verification gate
 

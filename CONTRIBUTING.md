@@ -338,7 +338,7 @@ gmake check-headers
 ```
 
 The `Makefile` is not needed for iOS work at all: `xcodegen`, `swift test`, and
-Xcode are invoked directly (see "Building the iOS app" in [README.md](README.md)).
+Xcode are invoked directly (see [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md)).
 It also assumes a Linux
 toolchain elsewhere (`rsvg-convert`, `pdftoppm`, screengrab, the F-Droid and
 reproducible-build targets), so the Android release pipeline stays on Linux by
