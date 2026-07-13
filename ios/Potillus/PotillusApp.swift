@@ -66,7 +66,15 @@ struct PotillusApp: App {
     /// window is measured against. `ContinuousClock` is the sleep-inclusive clock;
     /// `ProcessInfo.systemUptime` (used before) STOPS during sleep, so a phone left
     /// locked in a pocket could return under the window and skip the prompt.
-    private static func continuousUptime() -> TimeInterval {
+    ///
+    /// `nonisolated` because the reading depends on nothing actor-isolated — a
+    /// monotonic clock and an immutable `Sendable` epoch. `PotillusApp` is an `App`
+    /// and therefore `@MainActor`, which would otherwise isolate this static method
+    /// to the main actor; but `AppLockModel` stores the `uptime` closure as
+    /// `@Sendable` and calls it off the main actor, so the call has to be allowed
+    /// from a nonisolated context. The epoch, a `Sendable` `let`, is already
+    /// readable from here without annotation (SE-0412).
+    nonisolated private static func continuousUptime() -> TimeInterval {
         let elapsed = ContinuousClock().now - uptimeEpoch
         return Double(elapsed.components.seconds)
             + Double(elapsed.components.attoseconds) * 1e-18

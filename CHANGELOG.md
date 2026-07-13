@@ -450,6 +450,16 @@ and corrects documentation that the port had outgrown:
   SwiftLint would pass. `function_body_length` and the non-length rules remain
   SwiftLint's alone.
 
+- **Silenced a strict-concurrency warning at the app entry point.**
+  `PotillusApp.continuousUptime()` — the sleep-inclusive monotonic clock AppLock's
+  re-auth window is measured against — was main-actor-isolated by inference, since
+  `PotillusApp` is an `App` and therefore `@MainActor`. But `AppLockModel` stores
+  the `uptime` closure as `@Sendable` and calls it off the main actor, so the call
+  sat in a nonisolated context and Swift's concurrency checking flagged it. The
+  reading depends on nothing actor-isolated — a `ContinuousClock` and an immutable
+  `Sendable` epoch — so the method is now `nonisolated`, matching the existing
+  `StatsModel.dayCount` pattern. Behaviour is unchanged; the warning is gone.
+
 ---
 
 ## v0.81.0
