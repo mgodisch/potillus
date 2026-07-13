@@ -183,7 +183,7 @@ struct SettingsScreen: View {
                 in: SettingsSanitizer.dailyLimitRange, step: 1
             ) {
                 LabeledContent(Loc.string("Daily limit", locale: locale)) {
-                    Text(String(format: "%.0f g", model.settings.dailyLimitGrams)).monospacedDigit()
+                    Text(measure(model.settings.dailyLimitGrams, fractionDigits: 0, unit: "g")).monospacedDigit()
                 }
             }
             Stepper(
@@ -191,7 +191,7 @@ struct SettingsScreen: View {
                 in: SettingsSanitizer.weeklyLimitRange, step: 5
             ) {
                 LabeledContent(Loc.string("Weekly limit", locale: locale)) {
-                    Text(String(format: "%.0f g", model.settings.weeklyLimitGrams)).monospacedDigit()
+                    Text(measure(model.settings.weeklyLimitGrams, fractionDigits: 0, unit: "g")).monospacedDigit()
                 }
             }
             Stepper(
@@ -252,7 +252,7 @@ struct SettingsScreen: View {
                     in: SettingsSanitizer.weightRange, step: 0.5
                 ) {
                     LabeledContent(Loc.string("Body weight", locale: locale)) {
-                        Text(String(format: "%.1f kg", model.settings.weightKg)).monospacedDigit()
+                        Text(measure(model.settings.weightKg, fractionDigits: 1, unit: "kg")).monospacedDigit()
                     }
                 }
                 Button(Loc.string("Clear body weight", locale: locale), role: .destructive) {
@@ -378,6 +378,13 @@ struct SettingsScreen: View {
 // =============================================================================
 
 extension SettingsScreen {
+
+    /// A measured value in the in-app locale plus its unit, e.g. "140 g" / "80,0 kg"
+    /// — kept here in the extension so the row call sites stay short and the main
+    /// type body stays within SwiftLint's `type_body_length`.
+    private func measure(_ value: Double, fractionDigits: Int, unit: String) -> String {
+        "\(Loc.number(value, fractionDigits: fractionDigits, locale: locale)) \(unit)"
+    }
 
     private var securitySection: some View {
         Section {

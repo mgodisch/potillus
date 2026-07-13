@@ -237,7 +237,7 @@ struct DrinksScreen: View {
     }
 
     private func percent(_ value: Double) -> String {
-        String(format: "%.1f %%", value)
+        "\(Loc.number(value, fractionDigits: 1, locale: locale)) %"
     }
 }
 
@@ -310,12 +310,12 @@ private struct DrinkEditor: View {
 
                 if let volume, let percent, canSave {
                     LabeledContent(Loc.string("Alcohol", locale: locale)) {
-                        Text(String(
-                            format: "%.1f g",
+                        Text("\(Loc.number(
                             AlcoholCalculator.calculateGrams(
                                 volumeMl: volume, alcoholPercent: percent
-                            )
-                        ))
+                            ),
+                            fractionDigits: 1, locale: locale
+                        )) g")
                         .monospacedDigit()
                     }
                 }

@@ -179,7 +179,7 @@ struct TodayScreen: View {
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
                 LabeledContent(Loc.string("Estimated BAC", locale: locale)) {
-                    Text(String(format: "%.2f ‰", bac)).monospacedDigit()
+                    Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
                 }
             }
         }
@@ -222,10 +222,10 @@ struct TodayScreen: View {
 
     // ── Formatting ───────────────────────────────────────────────────────────
 
-    /// Grams, one decimal. A `NumberFormatter` and its locale arrive with the
-    /// String Catalogs; this is display text, not the export's fixed format.
+    /// Grams, one decimal, in the in-app locale; this is display text, not the
+    /// export's fixed POSIX format.
     private func grams(_ value: Double) -> String {
-        String(format: "%.1f g", value)
+        "\(Loc.number(value, fractionDigits: 1, locale: locale)) g"
     }
 }
 

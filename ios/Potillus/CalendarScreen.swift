@@ -189,9 +189,10 @@ struct CalendarScreen: View {
         guard let summary else {
             return Loc.string("%@, nothing logged", date, locale: locale)
         }
-        // The grams number is formatted separately (locale-independent, one
-        // decimal, as before) and passed as the second positional argument.
-        let grams = String(format: "%.1f", summary.totalGrams)
+        // The grams number is formatted in the in-app locale (one decimal) and
+        // passed as the second positional argument, so VoiceOver reads it in the
+        // same language as the rest of the label.
+        let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
         return Loc.string("%1$@, %2$@ grams", date, grams, locale: locale)
     }
 
@@ -203,7 +204,7 @@ struct CalendarScreen: View {
                 HStack {
                     Text(date).font(.headline)
                     Spacer()
-                    Text(String(format: "%.1f g", model.state.totalGramsSelected))
+                    Text("\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g")
                         .monospacedDigit()
                         .foregroundStyle(
                             AlcoholCalculator.isOverLimit(
@@ -222,7 +223,7 @@ struct CalendarScreen: View {
                 HStack {
                     Text(entry.drinkName)
                     Spacer()
-                    Text(String(format: "%.1f g", entry.gramsAlcohol))
+                    Text("\(Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale)) g")
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
                     Button(role: .destructive) {

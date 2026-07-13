@@ -351,6 +351,20 @@ and corrects documentation that the port had outgrown:
   type body while Swift still shares the type's `private` scope, so the view code
   reaches them unchanged. Body length drops to about 233. An orphaned `// ── CSV`
   section marker left over from an earlier edit was removed in passing.
+- **On-screen numbers now follow the in-app language (iOS).** Grams, the BAC
+  estimate, percentages, and the body weight were formatted with POSIX
+  `String(format:)`, so they always showed a dot — a German or French user saw
+  "20.0 g" and "0.50 ‰" instead of "20,0 g" and "0,50 ‰", out of step with the
+  rest of the localized UI. This mirrors an Android fix (numbers had followed the
+  system rather than the in-app locale). A new
+  `Loc.number(_:fractionDigits:locale:signed:)` — the `NumberFormatter` the display
+  code had long noted was pending — formats every on-screen figure in the chosen
+  locale, applied across Today, Statistics, Calendar, Drinks, the entry sheet, and
+  Settings (including the trend's leading sign and a VoiceOver grams label).
+  Exports are untouched: CSV and the PDF report keep their fixed POSIX format by
+  design. To keep the Settings and Statistics view bodies within SwiftLint's
+  `type_body_length`, the Settings rows format through a small `measure` helper in
+  the existing extension.
 
 ---
 

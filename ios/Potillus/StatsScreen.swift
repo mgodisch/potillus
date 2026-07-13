@@ -187,7 +187,10 @@ struct StatsScreen: View {
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
-                        Text(String(format: "%+.1f %%", model.state.trendPercent))
+                        Text("\(Loc.number(
+                            model.state.trendPercent, fractionDigits: 1,
+                            locale: locale, signed: true
+                        )) %")
                             .monospacedDigit()
                     }
                 }
@@ -273,7 +276,7 @@ struct StatsScreen: View {
                 let (category, value) = (entry.category, entry.grams)
                 LabeledContent(name(category)) {
                     HStack(spacing: 8) {
-                        Text(String(format: "%.0f %%", total > 0 ? value / total * 100 : 0))
+                        Text("\(Loc.number(total > 0 ? value / total * 100 : 0, fractionDigits: 0, locale: locale)) %")
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                         grams(value)
@@ -363,7 +366,7 @@ extension StatsScreen {
     // ── Formatting ───────────────────────────────────────────────────────────
 
     private func grams(_ value: Double) -> some View {
-        Text(String(format: "%.1f g", value)).monospacedDigit()
+        Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g").monospacedDigit()
     }
 
     private func count(_ value: Int) -> some View {

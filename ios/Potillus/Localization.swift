@@ -98,6 +98,25 @@ enum Loc {
         String(format: string(key, locale: locale), locale: locale, arg, arg2)
     }
 
+    /// A decimal number in the CHOSEN locale: its decimal separator and grouping,
+    /// so a comma-decimal language shows "20,0" where a dot language shows "20.0".
+    /// This is for on-SCREEN numbers (grams, BAC, percentages, body weight); it
+    /// follows the in-app language just like the surrounding text. Exports keep
+    /// their own fixed POSIX format and must NOT use this. `signed` forces a
+    /// leading plus on non-negative values, as the statistics trend readout wants.
+    static func number(
+        _ value: Double, fractionDigits: Int, locale: Locale, signed: Bool = false
+    ) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = locale
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = fractionDigits
+        formatter.maximumFractionDigits = fractionDigits
+        if signed { formatter.positivePrefix = formatter.plusSign }
+        return formatter.string(from: value as NSNumber)
+            ?? String(format: "%.\(fractionDigits)f", value)
+    }
+
     /// A pluralised string with one count. The catalogue key carries plural
     /// variations (one/few/many/other, per language); the runtime picks the form
     /// for `count` in the CHOSEN locale.

@@ -147,7 +147,7 @@ struct EntrySheet: View {
                                     useSymbols: useSymbols
                                 )
                             }
-                            Text(String(format: "%.1f g", grams))
+                            Text("\(Loc.number(grams, fractionDigits: 1, locale: locale)) g")
                                 .monospacedDigit()
                         }
                     }
