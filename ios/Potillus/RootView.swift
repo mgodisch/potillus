@@ -139,6 +139,12 @@ struct RootView: View {
                 // Keep the gate in step: turning the lock on arms the next
                 // background return; turning it off clears the cover at once.
                 lock.isEnabled = updated.biometricEnabled
+                // Localize the unlock prompt in the in-app language. Reuses the
+                // same string as the settings toggle, matching Android, which
+                // shows "Please authenticate" for every biometric prompt.
+                lock.reason = Loc.string(
+                    "Please authenticate", locale: Loc.locale(for: updated.language)
+                )
             }
         }
     }

@@ -60,7 +60,12 @@ public final class AppLockModel {
 
     private let authenticator: any BiometricAuthenticator
     private let uptime: @Sendable () -> TimeInterval
-    private let reason: String
+    /// The prompt message shown when the lock asks to unlock. A settable `var`
+    /// because the shell localizes it: the model is built once at launch, before
+    /// the in-app language is known, so `RootView` writes the translated string
+    /// here whenever the language setting emits (the same place it arms the gate).
+    /// The default is the English fallback for the very first prompt.
+    public var reason: String
 
     /// The monotonic reading taken when the app last went to the background, or
     /// `nil` if it has not since it unlocked.
@@ -68,7 +73,7 @@ public final class AppLockModel {
 
     public init(
         authenticator: any BiometricAuthenticator,
-        reason: String = "Unlock Libellus Potionis",
+        reason: String = "Please authenticate",
         uptime: @escaping @Sendable () -> TimeInterval
     ) {
         self.authenticator = authenticator

@@ -284,6 +284,12 @@ and corrects documentation that the port had outgrown:
   the colour-blind glyphs (cross / arrow / "1") when the symbols toggle is on —
   which now has an effect — and carries a localised VoiceOver label. Three
   capacity-status labels were added in all languages, from Android.
+- **The unlock prompt is now localized.** The running lock's prompt showed a
+  hard-coded English string, while the rest of the app — including the toggle
+  prompt added alongside the lock hardening — speaks the in-app language. The
+  reason is now set from the language setting each time it changes (the same place
+  the gate is armed), reusing the "Please authenticate" string, which is exactly
+  what Android shows for every biometric prompt.
 
 ---
 
