@@ -343,6 +343,14 @@ and corrects documentation that the port had outgrown:
   header on the CC-BY-licensed Code of Conduct. Historical changelog entries that
   named the old paths were left as written. The forge recognizes a Code of
   Conduct under `docs/`, so its badge status is unaffected.
+- **Fixed a SwiftLint `type_body_length` failure in `StatsScreen`.** The view's
+  body had grown to 251 lines, one over the configured 250-line limit, breaking
+  the `check-swiftlint` gate on macOS. Five presentation helpers (`weekdaySymbol`,
+  `name`, and the `grams`/`count`/`days` formatters) were moved verbatim into a
+  same-file `extension StatsScreen`, which SwiftLint does not count toward the
+  type body while Swift still shares the type's `private` scope, so the view code
+  reaches them unchanged. Body length drops to about 233. An orphaned `// ── CSV`
+  section marker left over from an earlier edit was removed in passing.
 
 ---
 

@@ -337,8 +337,19 @@ struct StatsScreen: View {
                 average.map { WeekdayPoint(id: iso, label: weekdaySymbol(iso), average: $0) }
             }
     }
+}
 
-    /// `veryShortStandaloneWeekdaySymbols` is Sunday-indexed; the model speaks ISO.
+// =============================================================================
+// Presentation helpers
+// =============================================================================
+//
+// These live in a same-file extension rather than the main type so that
+// `StatsScreen`'s body stays within SwiftLint's `type_body_length`. A same-file
+// extension shares the type's `private` scope, so the view code above still
+// reaches them.
+// =============================================================================
+
+extension StatsScreen {
     private func weekdaySymbol(_ iso: Int) -> String {
         let symbols = DateFormatter().shortStandaloneWeekdaySymbols ?? []
         guard symbols.count == 7 else { return "" }
@@ -367,8 +378,6 @@ struct StatsScreen: View {
         // forms, the single Japanese one. The catalogue inflects; the view only asks.
         Text(Loc.daysPlural(count: value, locale: locale)).monospacedDigit()
     }
-
-    // ── CSV ──────────────────────────────────────────────────────────────────
 }
 
 // =============================================================================
