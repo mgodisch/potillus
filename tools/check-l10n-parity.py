@@ -343,8 +343,8 @@ def check_csv_headers():
     copied verbatim from Android so a spreadsheet built against one platform's
     export opens against the other's. This check is what turns "copied verbatim"
     into an enforced invariant: it parses the English `englishCells` array and each
-    `case "<tag>": return [...]` and compares the eight cells, in order, to the
-    Android values they mirror. A drift on either side fails the build.
+    `"<tag>": [...]` row of the `localizedCells` table and compares the eight cells,
+    in order, to the Android values they mirror. A drift on either side fails the build.
     """
     if not CSV_HEADERS.exists():
         return [f"missing {CSV_HEADERS.relative_to(ROOT)}"]
@@ -367,7 +367,7 @@ def check_csv_headers():
             f"!= Android {android_cells(ANDROID_EN)!r}"
         )
 
-    cases = dict(re.findall(r'case\s*"([^"]+)"\s*:\s*return\s*\[(.*?)\]', text, re.S))
+    cases = dict(re.findall(r'"([^"]+)"\s*:\s*\[(.*?)\]', text, re.S))
     for tag in LANGUAGES:
         if tag not in cases:
             problems.append(f"CsvHeaderLabels: no case for {tag!r}")

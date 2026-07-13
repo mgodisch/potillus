@@ -232,6 +232,15 @@ and corrects documentation that the port had outgrown:
   authenticate; iOS ties the entry to the lock being enabled, which is what its
   authenticate/retry path requires and what keeps a manual lock from ever
   stranding the user.) The Help entry follows once the user guide is bundled.
+- **The CSV header table builds under SwiftLint `--strict`.** `CsvHeaderLabels`
+  had grown a twenty-one-branch `switch` (one `case` per language) whose
+  cyclomatic complexity and per-line length both tripped the strict lint that
+  `make ios` runs, failing the build before any test ran. The captions now live
+  in a keyed `[String: [String]]` table with a flat lookup — complexity one, no
+  over-long lines — with every caption preserved byte-for-byte. The
+  `check-l10n-parity` CHECK 5 parser reads the table rows instead of the former
+  `case` arms, and still enforces column-by-column identity with Android (a
+  deliberately corrupted caption is still caught).
 
 ---
 

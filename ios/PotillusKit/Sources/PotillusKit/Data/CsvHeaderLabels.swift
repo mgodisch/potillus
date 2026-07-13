@@ -53,33 +53,104 @@ public enum CsvHeaderLabels {
     ///
     /// English is the source language and the fallback for the "System" setting
     /// (an empty tag) and for any language without its own row.
-    public static let englishCells = ["Date", "Time", "Drink", "Category", "Amount_ml", "Alcohol_Percent", "Grams_Alcohol", "Note"]
+    public static let englishCells = [
+        "Date", "Time", "Drink", "Category",
+        "Amount_ml", "Alcohol_Percent", "Grams_Alcohol", "Note",
+    ]
 
     /// The localized captions for `language` (an app language tag such as `"de"`
     /// or `"zh-Hant"`), in column order. Falls back to `englishCells`.
+    ///
+    /// A keyed table rather than a `switch`: one language per row, and a lookup
+    /// that stays flat as locales are added. (The former switch had one branch
+    /// per language and tripped SwiftLint's cyclomatic-complexity limit.)
     public static func cells(language: String) -> [String] {
-        switch language {
-        case "de": return ["Datum", "Uhrzeit", "Getränk", "Kategorie", "Menge_ml", "Alkohol_Prozent", "Gramm_Alkohol", "Notiz"]
-        case "da": return ["Dato", "Tidspunkt", "Drik", "Kategori", "Mængde_ml", "Alkohol_procent", "Gram_alkohol", "Note"]
-        case "nl": return ["Datum", "Tijdstip", "Drank", "Categorie", "Hoeveelheid_ml", "Alcohol_percentage", "Gram_alcohol", "Notitie"]
-        case "nb": return ["Dato", "Tidspunkt", "Drikk", "Kategori", "Volum_ml", "Alkohol_prosent", "Gram_alkohol", "Notat"]
-        case "sv": return ["Datum", "Tid", "Dryck", "Kategori", "Mängd_ml", "Alkohol_procent", "Gram_alkohol", "Anteckning"]
-        case "es": return ["Fecha", "Hora", "Bebida", "Categoría", "Volumen_ml", "Alcohol_porcentaje", "Gramos_alcohol", "Nota"]
-        case "fr": return ["Date", "Heure", "Boisson", "Catégorie", "Volume_ml", "Alcool_pourcentage", "Grammes_alcool", "Note"]
-        case "it": return ["Data", "Orario", "Bevanda", "Categoria", "Quantità_ml", "Alcol_percentuale", "Grammi_alcol", "Nota"]
-        case "pt": return ["Data", "Hora", "Bebida", "Categoria", "Quantidade_ml", "Álcool_percentagem", "Gramas_álcool", "Nota"]
-        case "pt-BR": return ["Data", "Horário", "Bebida", "Categoria", "Quantidade_ml", "Álcool_porcentagem", "Gramas_álcool", "Nota"]
-        case "ro": return ["Dată", "Oră", "Băutură", "Categorie", "Cantitate_ml", "Alcool_procent", "Grame_alcool", "Notă"]
-        case "cs": return ["Datum", "Čas", "Nápoj", "Kategorie", "Množství_ml", "Alkohol_procento", "Gramy_alkoholu", "Poznámka"]
-        case "pl": return ["Data", "Godzina", "Napój", "Kategoria", "Ilość_ml", "Alkohol_procent", "Gramy_alkoholu", "Notatka"]
-        case "ru": return ["Дата", "Время", "Напиток", "Категория", "Объём_мл", "Алкоголь_процент", "Граммы_алкоголя", "Заметка"]
-        case "uk": return ["Дата", "Час", "Напій", "Категорія", "Кількість_мл", "Алкоголь_відсоток", "Грами_алкоголю", "Примітка"]
-        case "el": return ["Ημερομηνία", "Ώρα", "Ποτό", "Κατηγορία", "Ποσότητα_ml", "Αλκοόλη_ποσοστό", "Γρ_αλκοόλης", "Σημείωση"]
-        case "ja": return ["日付", "時刻", "飲み物", "カテゴリ", "量_ml", "アルコール_パーセント", "グラム_アルコール", "メモ"]
-        case "ko": return ["날짜", "시간", "음료", "카테고리", "양_ml", "알코올_퍼센트", "그램_알코올", "메모"]
-        case "zh-Hans": return ["日期", "时间", "饮品", "类别", "数量_ml", "酒精_百分比", "克_酒精", "备注"]
-        case "zh-Hant": return ["日期", "時間", "飲品", "類別", "份量_毫升", "酒精_百分比", "公克_酒精", "備注"]
-        default: return englishCells
-        }
+        localizedCells[language] ?? englishCells
     }
+
+    /// One row per language, each copied VERBATIM from Android (see the file
+    /// header); `check-l10n-parity` CHECK 5 enforces the identity column by
+    /// column, so this table can never drift from Android’s `csv_col_*`.
+    private static let localizedCells: [String: [String]] = [
+        "de": [
+            "Datum", "Uhrzeit", "Getränk", "Kategorie",
+            "Menge_ml", "Alkohol_Prozent", "Gramm_Alkohol", "Notiz",
+        ],
+        "da": [
+            "Dato", "Tidspunkt", "Drik", "Kategori",
+            "Mængde_ml", "Alkohol_procent", "Gram_alkohol", "Note",
+        ],
+        "nl": [
+            "Datum", "Tijdstip", "Drank", "Categorie",
+            "Hoeveelheid_ml", "Alcohol_percentage", "Gram_alcohol", "Notitie",
+        ],
+        "nb": [
+            "Dato", "Tidspunkt", "Drikk", "Kategori",
+            "Volum_ml", "Alkohol_prosent", "Gram_alkohol", "Notat",
+        ],
+        "sv": [
+            "Datum", "Tid", "Dryck", "Kategori",
+            "Mängd_ml", "Alkohol_procent", "Gram_alkohol", "Anteckning",
+        ],
+        "es": [
+            "Fecha", "Hora", "Bebida", "Categoría",
+            "Volumen_ml", "Alcohol_porcentaje", "Gramos_alcohol", "Nota",
+        ],
+        "fr": [
+            "Date", "Heure", "Boisson", "Catégorie",
+            "Volume_ml", "Alcool_pourcentage", "Grammes_alcool", "Note",
+        ],
+        "it": [
+            "Data", "Orario", "Bevanda", "Categoria",
+            "Quantità_ml", "Alcol_percentuale", "Grammi_alcol", "Nota",
+        ],
+        "pt": [
+            "Data", "Hora", "Bebida", "Categoria",
+            "Quantidade_ml", "Álcool_percentagem", "Gramas_álcool", "Nota",
+        ],
+        "pt-BR": [
+            "Data", "Horário", "Bebida", "Categoria",
+            "Quantidade_ml", "Álcool_porcentagem", "Gramas_álcool", "Nota",
+        ],
+        "ro": [
+            "Dată", "Oră", "Băutură", "Categorie",
+            "Cantitate_ml", "Alcool_procent", "Grame_alcool", "Notă",
+        ],
+        "cs": [
+            "Datum", "Čas", "Nápoj", "Kategorie",
+            "Množství_ml", "Alkohol_procento", "Gramy_alkoholu", "Poznámka",
+        ],
+        "pl": [
+            "Data", "Godzina", "Napój", "Kategoria",
+            "Ilość_ml", "Alkohol_procent", "Gramy_alkoholu", "Notatka",
+        ],
+        "ru": [
+            "Дата", "Время", "Напиток", "Категория",
+            "Объём_мл", "Алкоголь_процент", "Граммы_алкоголя", "Заметка",
+        ],
+        "uk": [
+            "Дата", "Час", "Напій", "Категорія",
+            "Кількість_мл", "Алкоголь_відсоток", "Грами_алкоголю", "Примітка",
+        ],
+        "el": [
+            "Ημερομηνία", "Ώρα", "Ποτό", "Κατηγορία",
+            "Ποσότητα_ml", "Αλκοόλη_ποσοστό", "Γρ_αλκοόλης", "Σημείωση",
+        ],
+        "ja": [
+            "日付", "時刻", "飲み物", "カテゴリ",
+            "量_ml", "アルコール_パーセント", "グラム_アルコール", "メモ",
+        ],
+        "ko": [
+            "날짜", "시간", "음료", "카테고리",
+            "양_ml", "알코올_퍼센트", "그램_알코올", "메모",
+        ],
+        "zh-Hans": [
+            "日期", "时间", "饮品", "类别",
+            "数量_ml", "酒精_百分比", "克_酒精", "备注",
+        ],
+        "zh-Hant": [
+            "日期", "時間", "飲品", "類別",
+            "份量_毫升", "酒精_百分比", "公克_酒精", "備注",
+        ],
+    ]
 }
