@@ -103,7 +103,7 @@ The iOS port, section by section:
   keystore — the `DEVELOPMENT_TEAM` environment variable wins, else a git-ignored
   `ios/signing.properties` (committed template `ios/signing.properties.example`) —
   and injected as an xcodebuild build setting plus the `teamID` of a generated
-  ExportOptions.plist. A new fastlane `ios beta` lane uploads the staged `.ipa` to
+  ExportOptions.plist. A new fastlane `ios alpha` lane uploads the staged `.ipa` to
   TestFlight for internal testing (`upload_to_testflight`, no listing metadata);
   the existing `ios testing`/`production` lanes now take the staged `.ipa` as
   `ipa:`, mirroring the Android `aab:` option. `docs/RELEASE-IOS.md` documents the

@@ -87,7 +87,7 @@ Then pick the destination — both take the staged path the build just printed:
 - **TestFlight (device testing).** Internal testing; no App Store metadata or
   screenshots are involved:
 
-      cd fastlane && bundle exec fastlane ios beta ipa:../releases/de.godisch.potillus_<versionCode>.ipa
+      cd fastlane && bundle exec fastlane ios alpha ipa:../releases/de.godisch.potillus_<versionCode>.ipa
 
   The build appears under TestFlight in App Store Connect once Apple finishes
   processing it; internal testers are notified per your App Store Connect
@@ -102,7 +102,7 @@ Then pick the destination — both take the staged path the build just printed:
 
 ## Internal vs. external TestFlight
 
-The `beta` lane distributes **internally** (`distribute_external: false`):
+The `alpha` lane distributes **internally** (`distribute_external: false`):
 immediate, no Beta App Review, up to the team's internal-tester limit. External
 testing (public groups) additionally needs a Beta App Review and beta metadata
 and is intentionally not wired here yet; add `groups:` and

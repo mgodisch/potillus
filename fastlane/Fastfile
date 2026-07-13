@@ -190,8 +190,8 @@ platform :ios do
   desc 'App Store lanes below, this pushes NO listing metadata or screenshots --'
   desc 'internal TestFlight does not use them. Build the .ipa first with'
   desc '`make release-ios`, then pass the staged path, e.g.'
-  desc '`bundle exec fastlane ios beta ipa:../releases/de.godisch.potillus_<code>.ipa`.'
-  lane :beta do |options|
+  desc '`bundle exec fastlane ios alpha ipa:../releases/de.godisch.potillus_<code>.ipa`.'
+  lane :alpha do |options|
     # Authenticate with the App Store Connect API key. Capturing the return value
     # and passing it explicitly to upload_to_testflight is the documented pattern
     # for that action (the App Store lanes below instead rely on the token that

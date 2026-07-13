@@ -42,7 +42,7 @@
 #                       NOT capture screenshots -- run `make screenshots-android`
 #                       first if needed)
 #      release-ios  the signed .ipa, archived, exported and staged into releases/
-#                   (uploads via the fastlane `ios beta`/`testing` lanes) [Mac]
+#                   (uploads via the fastlane `ios alpha`/`testing` lanes) [Mac]
 #      install      copy the freshly built debug APK to the local install path
 #    Store assets (Android -> Play Store)
 #      store-assets-android  full set in one go: screenshots + report-pdfs, then
@@ -281,7 +281,7 @@ release-android:
 # Unlike release-android this needs a MAC with Xcode — xcodebuild cannot run in
 # the container — so it is the one release target that is not device-/host-free.
 # Like release-android it never touches screenshots (those are `make
-# screenshots-ios`) and never uploads (that is the fastlane `ios beta` /
+# screenshots-ios`) and never uploads (that is the fastlane `ios alpha` /
 # `ios testing` lanes, which read the staged .ipa).
 #
 # Signing uses AUTOMATIC signing with the Team ID resolved the same way the
@@ -391,7 +391,7 @@ release-ios: ios-project
 	mkdir -p "$(RELEASES_DIR)"
 	cp -a "$(IOS_IPA)" "$(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IPA)"
-	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios beta ipa:\"../$(STAGED_IPA)\" )"
+	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"../$(STAGED_IPA)\" )"
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
 
