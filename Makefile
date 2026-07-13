@@ -1257,7 +1257,7 @@ check-ios-guides:
 # skips gracefully when its inputs are absent, so this is safe in any checkout.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
-                  check-ios-guides
+                  check-ios-guides check-ios-metadata
 
 ios: check-ios-static check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
@@ -1366,6 +1366,14 @@ check-l10n:
 check-l10n-parity:
 	python3 tools/check-l10n-parity.py
 
+# check-ios-metadata: the App Store metadata twin of release-check.sh section 10
+# (Google Play limits). Length limits, locale file-set parity, non-empty name and
+# description; skips gracefully when fastlane/metadata/ios/ is absent. Added in
+# the 0.83.0 QA round -- the Android side's upload-time length failures (see the
+# 0.82.0 changelog) were one careless edit away from repeating on the iOS side.
+check-ios-metadata:
+	python3 tools/check-ios-metadata.py
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
@@ -1409,4 +1417,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
