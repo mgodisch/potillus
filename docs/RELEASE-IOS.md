@@ -76,18 +76,30 @@ Connect API key as the upload: when `APP_STORE_CONNECT_API_KEY_KEY_ID`,
 are set, `release-ios` passes them to `xcodebuild` explicitly, so the whole
 release runs head-less (e.g. over SSH) without a signed-in Xcode account. If those
 variables are not set, it falls back to the Apple ID signed into Xcode (Settings →
-Accounts). If the export reports “No Accounts” or “No signing certificate … found”,
-the credentials were not seen — check the three variables (and that the `.p8` path
-is absolute) — or, on the Xcode-account path, sign in again and ensure “Access to
-Cloud Managed Distribution Certificate” is enabled for your account in App Store
-Connect → Users and Access.
+Accounts).
+
+Troubleshooting the export's Apple authentication:
+
+- **“No Accounts”** — no credentials were seen. Set the three variables, or sign
+  in to Xcode (Settings → Accounts).
+- **“Your Apple Account or password was entered incorrectly” / HTTP 401** — the
+  API key ID and the `.p8` file are from different keys, or the path is wrong.
+  Check that `APP_STORE_CONNECT_API_KEY_KEY_ID` matches the `AuthKey_<id>.p8` that
+  `APP_STORE_CONNECT_API_KEY_KEY_FILEPATH` points at (an absolute path), and that
+  the issuer ID belongs to the same team.
+- **“Cloud signing permission error” / “No signing certificate ‘iOS Distribution’
+  found”** — the API key lacks access to cloud-managed distribution certificates.
+  For an API key this requires the **Admin** role: there is no per-key web toggle
+  for it (the “Access to Cloud Managed Distribution Certificate” checkbox exists
+  only for Apple-ID users on the Xcode-account path). Create an Admin-role key, or
+  install a distribution certificate in the keychain so the export signs locally.
 
 Then pick the destination — both take the staged path the build just printed:
 
 - **TestFlight (device testing).** Internal testing; no App Store metadata or
   screenshots are involved:
 
-      cd fastlane && bundle exec fastlane ios alpha ipa:../releases/de.godisch.potillus_<versionCode>.ipa
+      cd fastlane && bundle exec fastlane ios alpha ipa:releases/de.godisch.potillus_<versionCode>.ipa
 
   The build appears under TestFlight in App Store Connect once Apple finishes
   processing it; internal testers are notified per your App Store Connect

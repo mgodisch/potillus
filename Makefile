@@ -391,7 +391,7 @@ release-ios: ios-project
 	mkdir -p "$(RELEASES_DIR)"
 	cp -a "$(IOS_IPA)" "$(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IPA)"
-	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"../$(STAGED_IPA)\" )"
+	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"$(STAGED_IPA)\" )"
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
 

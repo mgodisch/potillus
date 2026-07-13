@@ -190,7 +190,7 @@ platform :ios do
   desc 'App Store lanes below, this pushes NO listing metadata or screenshots --'
   desc 'internal TestFlight does not use them. Build the .ipa first with'
   desc '`make release-ios`, then pass the staged path, e.g.'
-  desc '`bundle exec fastlane ios alpha ipa:../releases/de.godisch.potillus_<code>.ipa`.'
+  desc '`bundle exec fastlane ios alpha ipa:releases/de.godisch.potillus_<code>.ipa`.'
   lane :alpha do |options|
     # Authenticate with the App Store Connect API key. Capturing the return value
     # and passing it explicitly to upload_to_testflight is the documented pattern
@@ -262,7 +262,7 @@ platform :ios do
   desc 'fastlane/metadata/ios/) WITHOUT submitting for review. The build lands in'
   desc 'App Store Connect as "Prepare for Submission" / TestFlight for you to check.'
   desc 'Build the .ipa first with `make release-ios`; this lane does NOT build it.'
-  desc 'Pass the staged path as ipa:, e.g. ipa:../releases/de.godisch.potillus_<code>.ipa.'
+  desc 'Pass the staged path as ipa:, e.g. ipa:releases/de.godisch.potillus_<code>.ipa.'
   lane :testing do |options|
     upload_appstore(submit: false, ipa: options[:ipa])
   end
