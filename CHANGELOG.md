@@ -365,6 +365,14 @@ and corrects documentation that the port had outgrown:
   design. To keep the Settings and Statistics view bodies within SwiftLint's
   `type_body_length`, the Settings rows format through a small `measure` helper in
   the existing extension.
+- **Fixed a strict-concurrency build error in `DrinkCapacityModel`.** Its `deinit`
+  cancelled the observation tasks by reaching into the `@MainActor`-isolated
+  `observations` array, which a nonisolated `deinit` may not touch — the iOS build
+  failed to compile with "main actor-isolated property 'observations' can not be
+  referenced from a nonisolated context". The `deinit` was removed: the tasks
+  already capture `self` weakly, so they cannot keep the model alive, and the view
+  calls `stop()` on disappearance. This is exactly the no-`deinit` pattern the
+  other models (Today, Calendar, Statistics, Drinks) already follow and document.
 
 ---
 

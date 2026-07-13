@@ -168,7 +168,9 @@ public final class DrinkCapacityModel {
         return try entries.dailySummaries(from: DayResolver.formatDate(start), to: today)
     }
 
-    deinit {
-        observations.forEach { $0.cancel() }
-    }
+    // No `deinit` cancelling the observations: a `deinit` on a `@MainActor` class
+    // is nonisolated, so it cannot reach the main-actor-isolated `observations`
+    // (a hard error under strict concurrency). Each task captures `self` weakly and
+    // so cannot keep the model alive; the view calls `stop()` when it disappears.
+    // This matches TodayModel, CalendarModel, StatsModel, and DrinksModel.
 }
