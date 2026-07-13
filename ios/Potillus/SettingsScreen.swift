@@ -123,7 +123,7 @@ struct SettingsScreen: View {
                 defaultFilename: BackupExporter.suggestedFileName()
             ) { result in
                 if case .failure(let error) = result {
-                    backupFailure = String(describing: error)
+                    backupFailure = describeBackupFailure(error)
                 }
             }
             .fileImporter(
@@ -132,7 +132,7 @@ struct SettingsScreen: View {
             ) { result in
                 switch result {
                 case .success(let url): pendingImport = url
-                case .failure(let error): backupFailure = String(describing: error)
+                case .failure(let error): backupFailure = describeBackupFailure(error)
                 }
             }
             // The choice is destructive one way and not the other, so it is made
@@ -494,7 +494,7 @@ extension SettingsScreen {
             )
             isExporting = true
         } catch {
-            backupFailure = String(describing: error)
+            backupFailure = describeBackupFailure(error)
         }
     }
 
@@ -527,8 +527,49 @@ extension SettingsScreen {
                     )
                     : Loc.importedPlural(count: stats.imported, locale: locale)
             } catch {
-                backupFailure = String(describing: error)
+                backupFailure = describeBackupFailure(error)
             }
+        }
+    }
+
+    /// The user-facing text for a failed backup export or import.
+    ///
+    /// Android maps every import failure onto a localized resource
+    /// (`SettingsViewModel`'s `import_error_*` strings); this view used to show
+    /// `String(describing: error)` instead, which put raw English — or a raw
+    /// Swift error dump — into the alert in all twenty non-English languages
+    /// (0.83.0 QA round). The mapping mirrors Android's keys:
+    ///
+    ///   - the four failures a user can act on (empty file, broken JSON, a
+    ///     newer format, an oversized file) get their own sentence;
+    ///   - every structural reader error (a missing field, an out-of-range
+    ///     value, a malformed date, an entry pointing at an undefined drink)
+    ///     folds into the generic "Read error: %@" with the typed description
+    ///     as the detail — exactly how Android folds its parse failures into
+    ///     `import_error_read`. The detail stays technical BY DESIGN: it names
+    ///     the offending field for a bug report, as the kit's error strings do.
+    ///   - anything else (a system file error from the pickers or the export
+    ///     path) takes the same generic form; Android reuses that string for
+    ///     its export failures too.
+    private func describeBackupFailure(_ error: Error) -> String {
+        switch error {
+        case BackupError.fileEmpty:
+            return Loc.string("Backup file is empty.", locale: locale)
+        case BackupError.invalidJSON:
+            return Loc.string("Invalid JSON format.", locale: locale)
+        case let BackupError.versionTooHigh(found, max):
+            return Loc.string(
+                "Backup version %1$lld is not supported (max. %2$lld).",
+                found, max, locale: locale
+            )
+        case let BackupError.fileTooLarge(_, maxBytes):
+            // Bytes → whole mebibytes, the unit Android's message uses.
+            return Loc.string(
+                "Backup file too large (max. %lld MB).",
+                maxBytes / 1_024 / 1_024, locale: locale
+            )
+        default:
+            return Loc.string("Read error: %@", String(describing: error), locale: locale)
         }
     }
 
