@@ -127,6 +127,16 @@ public final class TodayModel {
     private let clock: any Clock
     private let timeZone: TimeZone
 
+    /// How long the ticker in `start()` sleeps between reloads.
+    ///
+    /// 60 seconds, Android's `TICK_INTERVAL_MS`, and for the same two reasons
+    /// spelled out in its KDoc: BAC changes about 0.0025 ‰ per minute, so a
+    /// finer resolution buys nothing the eye can see, and one wakeup per minute
+    /// also bounds the day-rollover latency to the resolution of the
+    /// day-change setting itself. Injectable so a test can tick in
+    /// milliseconds instead of sleeping a minute.
+    private let tickInterval: Duration
+
     /// The live subscriptions, torn down by `stop()`.
     private var observations: [Task<Void, Never>] = []
 
@@ -135,13 +145,15 @@ public final class TodayModel {
         drinks: any DrinkRepositoryProtocol,
         preferences: any PreferencesStoring,
         clock: any Clock = SystemClock(),
-        timeZone: TimeZone = .current
+        timeZone: TimeZone = .current,
+        tickInterval: Duration = .seconds(60)
     ) {
         self.entries = entries
         self.drinks = drinks
         self.preferences = preferences
         self.clock = clock
         self.timeZone = timeZone
+        self.tickInterval = tickInterval
     }
 
     // ── Observation ──────────────────────────────────────────────────────────
@@ -198,6 +210,27 @@ public final class TodayModel {
             Task { [weak self] in
                 guard let self else { return }
                 for await _ in await self.preferences.observe() {
+                    if Task.isCancelled { break }
+                    await self.load()
+                }
+            },
+            // The ticker. The three streams above fire on DATA events; nothing
+            // fires on the passage of time — yet two of this screen's numbers
+            // are functions of "now". Without the ticker the BAC estimate stays
+            // frozen at the value of the last load (it is advertised as live,
+            // and it decays ~0.15 ‰/h), and the logical day never rolls over
+            // while the screen stays open: every window stays pinned to
+            // yesterday past the day-change time. Android runs the same
+            // 60-second ticker for the same two jobs (TodayViewModel's KDoc).
+            // The reload is unconditional here — unlike Stats and Calendar,
+            // which tick day-keyed — because the BAC needs every minute, not
+            // just the boundary one.
+            Task { [weak self] in
+                guard let self else { return }
+                while !Task.isCancelled {
+                    // A cancellation during the sleep throws; `try?` turns that
+                    // into a normal wakeup and the loop condition ends the task.
+                    try? await Task.sleep(for: self.tickInterval)
                     if Task.isCancelled { break }
                     await self.load()
                 }

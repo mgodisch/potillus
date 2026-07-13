@@ -43,6 +43,9 @@ struct TodayScreen: View {
     /// The chosen language, applied at the root; every label resolves against it.
     @Environment(\.appLocale) private var locale
 
+    /// Observed so a return from the background reloads at once (below).
+    @Environment(\.scenePhase) private var scenePhase
+
     /// Owned by the view, rebuilt only when the environment changes.
     @State private var model: TodayModel
 
@@ -87,6 +90,15 @@ struct TodayScreen: View {
             }
             .task { model.start() }
             .onDisappear { model.stop() }
+            // A return from the background reloads immediately. `onAppear` does
+            // not fire on foregrounding (the view never disappeared), and the
+            // model's ticker bounds staleness only to a minute -- after a night
+            // in the app switcher the screen would show yesterday for up to
+            // that long. Android gets this for free from its lifecycle-aware
+            // flow collection; this is the SwiftUI equivalent.
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await model.load() } }
+            }
             .refreshable { await model.load() }
             .sheet(isPresented: $isLogging) {
                 EntrySheet(

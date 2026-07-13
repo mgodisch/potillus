@@ -51,6 +51,9 @@ struct StatsScreen: View {
     // code in StatsScreenExport.swift reads both the locale and the model.
     @Environment(\.appLocale) var locale
 
+    /// Observed so a return from the background reloads at once (below).
+    @Environment(\.scenePhase) private var scenePhase
+
     @State var model: StatsModel
 
     let environment: AppEnvironment
@@ -122,6 +125,11 @@ struct StatsScreen: View {
             // people reach for when they doubt what they see.
             .task { model.start() }
             .onDisappear { model.stop() }
+            // Reload on foregrounding; see TodayScreen for the full rationale
+            // (onAppear does not fire, the ticker only bounds staleness).
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await model.load() } }
+            }
             .refreshable { await model.load() }
             .fileExporter(
                 isPresented: $isExporting,

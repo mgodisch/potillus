@@ -106,6 +106,11 @@ public final class StatsModel {
     private let timeZone: TimeZone
     private let firstDayOfWeekIso: Int
 
+    /// How long the ticker in `start()` sleeps between day checks. 60 seconds,
+    /// Android's `TICK_INTERVAL_MS`; see `TodayModel.tickInterval` for the full
+    /// rationale. Injectable so a test can tick in milliseconds.
+    private let tickInterval: Duration
+
     /// The live subscriptions, torn down by `stop()`.
     private var observations: [Task<Void, Never>] = []
 
@@ -115,7 +120,8 @@ public final class StatsModel {
         preferences: any PreferencesStoring,
         clock: any Clock = SystemClock(),
         timeZone: TimeZone = .current,
-        firstDayOfWeekIso: Int = DayResolver.firstDayOfWeekIso()
+        firstDayOfWeekIso: Int = DayResolver.firstDayOfWeekIso(),
+        tickInterval: Duration = .seconds(60)
     ) {
         self.entries = entries
         self.drinks = drinks
@@ -123,6 +129,7 @@ public final class StatsModel {
         self.clock = clock
         self.timeZone = timeZone
         self.firstDayOfWeekIso = firstDayOfWeekIso
+        self.tickInterval = tickInterval
     }
 
     public func setPeriod(_ period: StatsPeriod) async {
@@ -186,6 +193,30 @@ public final class StatsModel {
                 for await _ in await self.preferences.observe() {
                     if Task.isCancelled { break }
                     await self.load()
+                }
+            },
+            // The ticker. The streams above fire on data events only, so a
+            // screen left open across the day-change time kept yesterday's
+            // window: every aggregate stayed pinned until the next database
+            // write. Android's StatsViewModel runs the same 60-second ticker.
+            // Unlike TodayModel — which reloads unconditionally because the
+            // BAC needs every minute — this one is DAY-KEYED: it re-derives
+            // the logical day each tick and reloads only when it moved, so
+            // the database queries do not rerun once a minute for nothing.
+            Task { [weak self] in
+                guard let self else { return }
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: self.tickInterval)
+                    if Task.isCancelled { break }
+                    let settings = await self.preferences.load()
+                    let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
+                    let today = DayResolver.resolve(
+                        timestampMillis: nowMillis,
+                        changeHour: settings.dayChangeHour,
+                        changeMinute: settings.dayChangeMinute,
+                        timeZone: self.timeZone
+                    )
+                    if today != self.state.today { await self.load() }
                 }
             }
         ]

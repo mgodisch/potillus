@@ -84,6 +84,11 @@ public final class CalendarModel {
     private let timeZone: TimeZone
     private let firstDayOfWeekIso: Int
 
+    /// How long the ticker in `start()` sleeps between day checks. 60 seconds,
+    /// Android's `TICK_INTERVAL_MS`; see `TodayModel.tickInterval` for the full
+    /// rationale. Injectable so a test can tick in milliseconds.
+    private let tickInterval: Duration
+
     /// The live subscriptions, torn down by `stop()`.
     private var observations: [Task<Void, Never>] = []
 
@@ -92,13 +97,15 @@ public final class CalendarModel {
         preferences: any PreferencesStoring,
         clock: any Clock = SystemClock(),
         timeZone: TimeZone = .current,
-        firstDayOfWeekIso: Int = DayResolver.firstDayOfWeekIso()
+        firstDayOfWeekIso: Int = DayResolver.firstDayOfWeekIso(),
+        tickInterval: Duration = .seconds(60)
     ) {
         self.entries = entries
         self.preferences = preferences
         self.clock = clock
         self.timeZone = timeZone
         self.firstDayOfWeekIso = firstDayOfWeekIso
+        self.tickInterval = tickInterval
     }
 
     // ── Loading ──────────────────────────────────────────────────────────────
@@ -206,6 +213,29 @@ public final class CalendarModel {
                 for await _ in await self.preferences.observe() {
                     if Task.isCancelled { break }
                     await self.load()
+                }
+            },
+            // The ticker. Day-keyed like StatsModel's (see there): the grid's
+            // "today" highlight — and, while the user has not paged away, the
+            // shown month — must follow the logical day across the day-change
+            // time even when no entry is written. `load()` is safe to call
+            // from here: it re-derives today and touches `state.year/month`
+            // only while they are unset, so a user browsing another month is
+            // not yanked back (its own doc: "unless a month is already shown").
+            Task { [weak self] in
+                guard let self else { return }
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: self.tickInterval)
+                    if Task.isCancelled { break }
+                    let settings = await self.preferences.load()
+                    let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
+                    let today = DayResolver.resolve(
+                        timestampMillis: nowMillis,
+                        changeHour: settings.dayChangeHour,
+                        changeMinute: settings.dayChangeMinute,
+                        timeZone: self.timeZone
+                    )
+                    if today != self.state.today { await self.load() }
                 }
             }
         ]

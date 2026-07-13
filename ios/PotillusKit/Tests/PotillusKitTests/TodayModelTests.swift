@@ -35,6 +35,17 @@ import XCTest
 // decays with time" testable at all.
 // =============================================================================
 
+/// A clock the test can advance while a model observes it. `Clock` is
+/// `Sendable`, so the mutable instant lives in a reference box the model's
+/// ticker reads on each call — the same shape as `TestClock` in
+/// AppLockModelTests, and `@unchecked Sendable` for the same reason: the test
+/// drives it serially on the main actor.
+private final class SteppingClock: Clock, @unchecked Sendable {
+    var millis: Int64
+    init(millis: Int64) { self.millis = millis }
+    func now() -> Date { Date(timeIntervalSince1970: Double(millis) / 1000.0) }
+}
+
 @MainActor
 final class TodayModelTests: XCTestCase {
 
@@ -407,6 +418,34 @@ extension TodayModelTests {
             timestampMillis: millis,
             logicalDate: "2026-01-02"
         )
+    }
+
+    // ── The ticker ───────────────────────────────────────────────────────────
+
+    /// Nothing in the database changes overnight, yet the screen must not keep
+    /// showing yesterday. The 0.83.0 QA round found the iOS models had no
+    /// counterpart to Android's 60-second ticker: the "live" BAC froze at its
+    /// last-loaded value and the logical day never rolled over while the screen
+    /// stayed open. This pins the fix: ONLY time passes — no entry, no settings
+    /// write — and the model still notices the new day.
+    func testTheTickerRollsTheLogicalDayOverWithoutADatabaseEvent() async throws {
+        // 2026-01-03 at 03:59 UTC: one minute before the default change hour.
+        let clock = SteppingClock(millis: 1_767_412_740_000)
+        let model = TodayModel(
+            entries: environment.entries,
+            drinks: environment.drinks,
+            preferences: environment.preferences,
+            clock: clock,
+            timeZone: TimeZone(identifier: "UTC")!,
+            tickInterval: .milliseconds(10)
+        )
+        model.start()
+        defer { model.stop() }
+        try await waitUntil { model.state.logicalDate == "2026-01-02" }
+
+        // Cross the day boundary by advancing the clock alone.
+        clock.millis = 1_767_416_400_000  // 2026-01-03, 05:00 UTC
+        try await waitUntil { model.state.logicalDate == "2026-01-03" }
     }
 
     private func waitUntil(

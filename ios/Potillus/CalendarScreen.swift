@@ -40,6 +40,9 @@ struct CalendarScreen: View {
 
     @Environment(\.appLocale) private var locale
 
+    /// Observed so a return from the background reloads at once (below).
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var model: CalendarModel
 
     /// Kept so the overflow menu's Settings sheet can be built.
@@ -69,6 +72,11 @@ struct CalendarScreen: View {
             // tab reaches this month without a manual reload.
             .task { await model.start() }
             .onDisappear { model.stop() }
+            // Reload on foregrounding; see TodayScreen for the full rationale
+            // (onAppear does not fire, the ticker only bounds staleness).
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await model.load() } }
+            }
         }
     }
 
