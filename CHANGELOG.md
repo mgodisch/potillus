@@ -214,6 +214,14 @@ and corrects documentation that the port had outgrown:
   twenty non-English locales. As with the rest of the app's non-English/German
   text (see CONTRIBUTING §6), these are best-effort machine-quality translations
   awaiting native-speaker review, not hand-authored prose.
+- **The drinks list matches Android's row.** Two differences from Android are
+  corrected. The padlock that iOS drew beside preset drinks is gone — Android
+  shows no such marker, and the icon read as "locked/disabled" rather than
+  "built-in". And a delete affordance is now visible in the row: a red trash
+  button beside the edit pencil, so a drink can be removed without discovering
+  the swipe gesture. Both the button and the swipe now open the same
+  confirmation dialog ("Really delete …?", with a red Delete and a Cancel),
+  mirroring Android's, so a removal is always a deliberate two-step action.
 
 ---
 

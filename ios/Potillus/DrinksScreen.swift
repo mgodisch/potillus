@@ -45,6 +45,7 @@ struct DrinksScreen: View {
     @State private var editing: DrinkDefinition?
     @State private var logging: DrinkDefinition?
     @State private var isAdding = false
+    @State private var deleting: DrinkDefinition?
 
     init(environment: AppEnvironment) {
         _model = State(initialValue: DrinksModel(drinks: environment.drinks))
@@ -125,6 +126,27 @@ struct DrinksScreen: View {
                     blocked.drinkName, blocked.entryCount, locale: locale
                 ))
             }
+            // Delete confirmation, shown by both the row's trash button and the
+            // swipe action. Mirrors Android's AlertDialog: a red "Delete" and a
+            // "Cancel", so removing a drink is always a two-step, reversible tap.
+            .alert(
+                Loc.string("Delete", locale: locale),
+                isPresented: Binding(
+                    get: { deleting != nil },
+                    set: { presented in if !presented { deleting = nil } }
+                ),
+                presenting: deleting
+            ) { drink in
+                Button(Loc.string("Delete", locale: locale), role: .destructive) {
+                    model.delete(drink)
+                    deleting = nil
+                }
+                Button(Loc.string("Cancel", locale: locale), role: .cancel) {
+                    deleting = nil
+                }
+            } message: { drink in
+                Text(Loc.string("Really delete “%@”?", drink.name, locale: locale))
+            }
         }
     }
 
@@ -150,13 +172,6 @@ struct DrinksScreen: View {
 
             Spacer()
 
-            // A preset is part of the app, not the user's data.
-            if drink.isPreset {
-                Image(systemName: "lock")
-                    .foregroundStyle(.tertiary)
-                    .accessibilityLabel(Loc.string("Preset", locale: locale))
-            }
-
             // The pencil, not the row, opens the editor. Tapping a drink LOGS it:
             // that is the action a user performs many times a day, and editing is
             // the rare one. Android makes the same split.
@@ -169,6 +184,21 @@ struct DrinksScreen: View {
             .buttonStyle(.plain)
             .foregroundStyle(.tint)
             .accessibilityLabel(Loc.string("Edit %@", drink.name, locale: locale))
+
+            // The trash button mirrors Android's row, which shows a delete
+            // affordance without requiring a swipe. It does not delete on the spot:
+            // it opens the same confirmation the swipe now uses, so a misplaced tap
+            // costs a dialog, not a drink. Drawn in the system red to read as
+            // destructive, matching Android's danger tint.
+            Button {
+                model.clearErrors()
+                deleting = drink
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.red)
+            .accessibilityLabel(Loc.string("Delete %@", drink.name, locale: locale))
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -178,7 +208,8 @@ struct DrinksScreen: View {
         .accessibilityHint(Loc.string("Logs this drink", locale: locale))
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
-                model.delete(drink)
+                model.clearErrors()
+                deleting = drink
             } label: {
                 Label(Loc.string("Delete", locale: locale), systemImage: "trash")
             }
