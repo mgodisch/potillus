@@ -358,11 +358,33 @@ release-ios: ios-project
 		-archivePath "$(IOS_ARCHIVE)" \
 		DEVELOPMENT_TEAM="$$team" \
 		CODE_SIGNING_ALLOWED=NO
-	xcodebuild -exportArchive \
-		-archivePath "$(IOS_ARCHIVE)" \
-		-exportPath "$(IOS_BUILD_DIR)" \
-		-exportOptionsPlist "$(IOS_EXPORT_PLIST)" \
-		-allowProvisioningUpdates
+	# Authenticate the export with Apple. -allowProvisioningUpdates needs either a
+	# signed-in Xcode account or an App Store Connect API key passed EXPLICITLY --
+	# xcodebuild does not read the APP_STORE_CONNECT_API_KEY_* variables itself
+	# (those are a fastlane convention). When all three are set we pass them via
+	# -authenticationKey*, so the export -- and thus the whole release -- runs
+	# head-less (e.g. over SSH) with the same key the upload lane uses; otherwise we
+	# omit the flags and fall back to the Xcode-signed-in account. The ${VAR:-}
+	# defaults keep -u (nounset) happy, and the two full invocations keep every
+	# value quoted (a key path may contain spaces) rather than splitting a string.
+	if [ -n "$${APP_STORE_CONNECT_API_KEY_KEY_ID:-}" ] && \
+	   [ -n "$${APP_STORE_CONNECT_API_KEY_ISSUER_ID:-}" ] && \
+	   [ -n "$${APP_STORE_CONNECT_API_KEY_KEY_FILEPATH:-}" ]; then \
+		xcodebuild -exportArchive \
+			-archivePath "$(IOS_ARCHIVE)" \
+			-exportPath "$(IOS_BUILD_DIR)" \
+			-exportOptionsPlist "$(IOS_EXPORT_PLIST)" \
+			-allowProvisioningUpdates \
+			-authenticationKeyID "$$APP_STORE_CONNECT_API_KEY_KEY_ID" \
+			-authenticationKeyIssuerID "$$APP_STORE_CONNECT_API_KEY_ISSUER_ID" \
+			-authenticationKeyPath "$$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH"; \
+	else \
+		xcodebuild -exportArchive \
+			-archivePath "$(IOS_ARCHIVE)" \
+			-exportPath "$(IOS_BUILD_DIR)" \
+			-exportOptionsPlist "$(IOS_EXPORT_PLIST)" \
+			-allowProvisioningUpdates; \
+	fi
 	# Stage the .ipa under its canonical name. `cp -a` (not the GNU-only
 	# `cp --archive`) because this target runs on macOS, whose BSD cp accepts the
 	# short -a but not the long option.

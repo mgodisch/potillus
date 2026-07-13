@@ -91,7 +91,10 @@ The iOS port, section by section:
 - **iOS build-and-release tooling.** A `make release-ios` target now archives the
   app WITHOUT code signing and signs only at the App-Store export (automatic
   cloud signing via `-allowProvisioningUpdates`, which mints the distribution
-  certificate and App-Store profile without a registered device), then stages the
+  certificate and App-Store profile without a registered device; the export
+  authenticates with the App Store Connect API key from the
+  `APP_STORE_CONNECT_API_KEY_*` environment, or a signed-in Xcode account, so it
+  runs head-less), then stages the
   `.ipa` into
   `releases/` under the same `<applicationId>_<versionCode>` name as the Android
   AAB — the iOS counterpart of `make release-android`, with the same fail-fast

@@ -69,11 +69,18 @@ profile itself. It stages a copy into `releases/` under the canonical
 refuses to overwrite an already-staged release — and prints the exact upload
 commands when it finishes.
 
-The first export may prompt for authentication with the Apple Developer website.
-`-allowProvisioningUpdates` uses the Apple ID signed into Xcode (Settings →
-Accounts); if it reports a login/session error, sign in there again, or ensure
-“Access to Cloud Managed Distribution Certificate” is enabled for your account in
-App Store Connect → Users and Access.
+The export needs to authenticate with the Apple Developer website (to mint the
+distribution certificate and App-Store profile). It uses the same App Store
+Connect API key as the upload: when `APP_STORE_CONNECT_API_KEY_KEY_ID`,
+`APP_STORE_CONNECT_API_KEY_ISSUER_ID` and `APP_STORE_CONNECT_API_KEY_KEY_FILEPATH`
+are set, `release-ios` passes them to `xcodebuild` explicitly, so the whole
+release runs head-less (e.g. over SSH) without a signed-in Xcode account. If those
+variables are not set, it falls back to the Apple ID signed into Xcode (Settings →
+Accounts). If the export reports “No Accounts” or “No signing certificate … found”,
+the credentials were not seen — check the three variables (and that the `.p8` path
+is absolute) — or, on the Xcode-account path, sign in again and ensure “Access to
+Cloud Managed Distribution Certificate” is enabled for your account in App Store
+Connect → Users and Access.
 
 Then pick the destination — both take the staged path the build just printed:
 
