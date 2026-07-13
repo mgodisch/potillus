@@ -300,16 +300,31 @@ release-android:
 # releases/ artifact for this versionCode, or bump the versionCode, before
 # re-staging.
 release-ios: ios-project
-	@if test -e "$(STAGED_IPA)"; then echo "release-ios: staged file '$(STAGED_IPA)' already exists -- refusing to overwrite a staged release. Remove the releases/ artifact for this versionCode (or bump versionCode) and re-run." >&2; exit 1; fi
-	# Resolve the signing Team ID (environment overrides the file), fail fast when
-	# it is missing or still the placeholder, then archive + export in one shell so
-	# the resolved value is in scope throughout.
-	team="$${DEVELOPMENT_TEAM:-$$(sed -n 's/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*//p' ios/signing.properties 2>/dev/null | head -1)}"; \
-	if test -z "$$team" || test "$$team" = "XXXXXXXXXX"; then \
-		echo "release-ios: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; exit 1; \
-	fi; \
-	rm -rf "$(IOS_ARCHIVE)" "$(IOS_IPA)"; \
-	mkdir -p "$(IOS_BUILD_DIR)"; \
+	@# This recipe runs as ONE bash script under `.SHELLFLAGS := -eu -o pipefail`
+	@# (see the .ONESHELL block near the top). Two consequences shape the style
+	@# below: independent commands sit on their own lines (backslashes only join a
+	@# SINGLE multi-line command), and every step must be errexit/pipefail-clean --
+	@# a stray non-zero (e.g. sed on a missing file) would abort the whole target.
+	@if test -e "$(STAGED_IPA)"; then \
+		echo "release-ios: staged file '$(STAGED_IPA)' already exists -- refusing to overwrite a staged release. Remove the releases/ artifact for this versionCode (or bump versionCode) and re-run." >&2; \
+		exit 1; \
+	fi
+	# Resolve the signing Team ID: the DEVELOPMENT_TEAM environment variable wins,
+	# else read it from ios/signing.properties. The `${VAR:-}` default keeps `-u`
+	# (nounset) happy when the variable is unset, and the file is read ONLY when it
+	# exists -- running sed on a missing file would fail under `-o pipefail -e` and
+	# abort this .ONESHELL recipe before the friendly check below could report.
+	team="$${DEVELOPMENT_TEAM:-}"
+	if [ -z "$$team" ] && [ -f ios/signing.properties ]; then \
+		team="$$(sed -n 's/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*//p' ios/signing.properties | head -n 1)"; \
+	fi
+	if [ -z "$$team" ] || [ "$$team" = "XXXXXXXXXX" ]; then \
+		echo "release-ios: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
+		exit 1; \
+	fi
+	rm -rf "$(IOS_ARCHIVE)" "$(IOS_IPA)"
+	mkdir -p "$(IOS_BUILD_DIR)"
+	# Generate the (git-ignored) ExportOptions.plist carrying the resolved teamID.
 	printf '%s\n' \
 		'<?xml version="1.0" encoding="UTF-8"?>' \
 		'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
@@ -321,7 +336,11 @@ release-ios: ios-project
 		"    <key>teamID</key>          <string>$$team</string>" \
 		'    <key>manageAppVersionAndBuildNumber</key> <false/>' \
 		'</dict>' \
-		'</plist>' > "$(IOS_EXPORT_PLIST)"; \
+		'</plist>' > "$(IOS_EXPORT_PLIST)"
+	# Archive (injecting the Team ID as a command-line build setting, which
+	# overrides the empty project value for this invocation), then export the
+	# signed .ipa. errexit aborts the recipe if the archive step fails, so the two
+	# commands stand on their own lines rather than in an && chain.
 	xcodebuild archive \
 		-project "$(IOS_XCODEPROJ)" \
 		-scheme "$(IOS_SCHEME)" \
@@ -329,14 +348,17 @@ release-ios: ios-project
 		-destination 'generic/platform=iOS' \
 		-archivePath "$(IOS_ARCHIVE)" \
 		-allowProvisioningUpdates \
-		DEVELOPMENT_TEAM="$$team" && \
+		DEVELOPMENT_TEAM="$$team"
 	xcodebuild -exportArchive \
 		-archivePath "$(IOS_ARCHIVE)" \
 		-exportPath "$(IOS_BUILD_DIR)" \
 		-exportOptionsPlist "$(IOS_EXPORT_PLIST)" \
 		-allowProvisioningUpdates
+	# Stage the .ipa under its canonical name. `cp -a` (not the GNU-only
+	# `cp --archive`) because this target runs on macOS, whose BSD cp accepts the
+	# short -a but not the long option.
 	mkdir -p "$(RELEASES_DIR)"
-	cp --archive "$(IOS_IPA)" "$(STAGED_IPA)"
+	cp -a "$(IOS_IPA)" "$(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios beta ipa:\"../$(STAGED_IPA)\" )"
 
