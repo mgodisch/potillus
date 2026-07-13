@@ -42,7 +42,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.83.0
 
-Bump version to 0.83.0
+Fix iOS cold-start lock and freezes, sync gates
 
 This opens the 0.83.0 cycle with the version bump — `versionCode` 93 → 94 and
 the human version 0.82.0 → 0.83.0 — to take the iOS app to the public App Store
@@ -51,10 +51,116 @@ already in place (`ITSAppUsesNonExemptEncryption` = NO in `ios/project.yml`), so
 change is needed there. The iOS app icon introduced in 0.82.0 is also enlarged —
 less padding, so the glass matches its on-device Android appearance (Android's
 adaptive-icon mask crops more of the border) — regenerated crisply at 1024×1024
-from the vector master at `ios/icon/appicon.svg`. Functional changes and the final,
-localised release notes follow later in the 0.83.0 cycle; until then the Android
-per-locale `94.txt` changelogs and the iOS `release_notes.txt` are independent
-placeholders (the two stores' notes need not match).
+from the vector master at `ios/icon/appicon.svg`. The cycle then folds in the
+fixes from the eleventh QA review — the first to review Android, iOS and the
+cross-platform seam between them as one subject. The final, localised release
+notes still follow at release time; until then the Android per-locale `94.txt`
+changelogs and the iOS `release_notes.txt` remain independent placeholders (the
+two stores' notes need not match).
+
+- **The iOS app lock now engages on a cold start (eleventh QA round).** The
+  launch prompt was fired from a bare `.task { lock.onLaunch() }`, which ran
+  while `isEnabled` still held its `false` default — the stored setting arrives
+  asynchronously from the encrypted preferences, and arming it later
+  deliberately does not lock. Net effect: after every process death the diary
+  opened WITHOUT a prompt, and the lock only re-engaged after the next
+  30-second background trip. The model-level test armed the flag by hand
+  before calling `onLaunch` and so never saw the shell's ordering race.
+  `StartupState.make(arming:)` now loads the settings BEFORE returning
+  `.ready` and completes the new `AppLockModel.armAndLaunch(enabled:reason:)`
+  — which takes the freshly loaded setting as a parameter, so the race cannot
+  be written — strictly before any content view exists; while the prompt is up
+  the cover overlays a plain progress spinner. Two kit tests pin the contract.
+- **The iOS screens now follow the clock (eleventh QA round).** Nothing on iOS
+  re-derived "now": the models reloaded on database and settings events only,
+  so the advertised live BAC estimate froze at its last-loaded value, and
+  Today, Statistics and Calendar kept yesterday's logical day across the
+  day-change time for as long as the screen stayed open. Android has run a
+  60-second ticker for both jobs since its own review rounds
+  (`TodayViewModel.TICK_INTERVAL_MS`); the three iOS models now do too —
+  unconditional on Today (the BAC needs every minute), day-keyed on Statistics
+  and Calendar (a reload only when the logical day moved, so the queries do
+  not rerun for nothing) — and the three screens additionally reload on the
+  scene turning active, because `onAppear` does not fire on foregrounding and
+  the ticker only bounds staleness to a minute. The tick interval is
+  injectable; a new test rolls the day over by advancing the clock alone.
+- **iOS backup and import failures speak the app's language (eleventh QA
+  round).** The failure alerts showed `String(describing: error)` — raw
+  English, or a raw Swift error dump — in all twenty non-English languages,
+  while Android has long mapped every import failure onto localized
+  resources. A `describeBackupFailure` mapping now mirrors Android's
+  `import_error_*` strings: the four actionable failures (empty file, broken
+  JSON, newer format, oversized file) get their own sentence, everything
+  structural folds into "Read error: %@" with the typed detail — Android's own
+  shape. Six catalogue keys were added with all twenty translations copied
+  from Android's resources (specifiers converted `%1$d`→`lld`, `%1$s`→`%@`);
+  the three keys whose English matches Android verbatim are enforced
+  word-for-word by `check-l10n-parity` from now on.
+- **The iOS in-app guide and licence render as paragraphs (eleventh QA
+  round).** The document viewer turned every hard-wrapped SOURCE LINE into its
+  own block, so the guide showed ragged shreds of sentences with a gap after
+  each, and a wrapped list item broke apart mid-entry. The small Markdown pass
+  now joins consecutive non-blank lines into one paragraph (blank line =
+  separator, Markdown's own rule), a list item starts its own block and keeps
+  its wrapped continuation lines, and headings/rules flush as before. Pinned
+  by a new smoke-test file; the Help and Copyright screens visibly change
+  (for the better) in every language.
+- **The Face ID permission dialog is localized (eleventh QA round).**
+  `NSFaceIDUsageDescription` existed only as the English value in
+  `project.yml`, so the system dialog shown when the lock is first armed was
+  English in all twenty-one languages. A new `InfoPlist.xcstrings` carries the
+  sentence in every app language (best-effort translations awaiting native
+  review, like the rest); the `project.yml` value remains as the English
+  fallback and its comment says so.
+- **The app-lock threshold is now vector-pinned on BOTH platforms (eleventh QA
+  round).** `test-vectors/app-lock.json` was one-sided — only the Swift suite
+  loaded it — and behind that blind spot Android's strict `>` diverged from
+  the `>=` boundary the vectors pin ("exactly at the threshold: prompt").
+  The arithmetic is extracted from `MainActivity` into `domain/AppLock.kt`
+  (testable on the JVM, `>=` like iOS; a background gap of exactly 30 seconds
+  now prompts on Android too — a one-millisecond behavioural change), a new
+  `AppLockVectorTest.kt` loads the shared file, and the vector's `_comment` no
+  longer claims "identical arithmetic" conditionally nor names the retired
+  `systemUptime` clock.
+- **The App Store metadata gains the gate the Play metadata has (eleventh QA
+  round).** `release-check.sh` §10 enforces Google Play's limits; the files
+  under `fastlane/metadata/ios/` had no counterpart, so the upload-time length
+  failures the Android side fixed in 0.82.0 were one careless edit away from
+  repeating. A new `tools/check-ios-metadata.py` enforces App Store Connect's
+  store-listing limits (name/subtitle 30, keywords 100, promotional text 170,
+  description and release notes 4000), locale file-set parity, and non-empty
+  name/description; it skips gracefully when the directory is absent and is
+  wired into `make check-ios-static`.
+- **English-only comments now hold in the build files too (eleventh QA
+  round).** CONTRIBUTING's "English everywhere" covers build files, but the
+  German-comment gate scanned only `*.kt` — and the German prose it exists for
+  sat in `build.gradle.kts` and `settings.gradle.kts`. Those comments are
+  translated, and release-check §7 now also scans the three Gradle build
+  scripts (named explicitly, so it cannot descend into `.gradle/` caches) and
+  the Swift sources when `ios/` is present, each grep guarded against the
+  found-nothing exit code so the gate cannot die under `set -e`.
+- **Hardening and repository hygiene (eleventh QA round).** The report's
+  `WKWebView` now disables content JavaScript explicitly — the template ships
+  no scripts and every value is HTML-escaped, but WebKit's default is ON,
+  unlike the Android WebView default the report keeps there; one line makes
+  the platforms' stance identical. `KeychainKeyProvider` tolerates the
+  first-launch creation race (`errSecDuplicateItem` now reads the winning key
+  back instead of failing the launch). And `.gitignore` finally contains the
+  two entries the documentation already promised: `ios/Version.xcconfig`
+  (whose generator documents itself as "therefore git-ignored") and
+  `ios/Potillus.xcodeproj` ("not committed", per INSTALL-IOS.md).
+- **Documentation corrections (eleventh QA round).** `test-vectors/README.md`
+  now inventories all twelve vector files (app-lock, report-chart,
+  report-data, report-format and template-render were missing from its
+  "Files" list). `COPYING.md` no longer claims BOTH apps reproduce the GRDB
+  licence text in their about screen — only iOS ships GRDB and does so
+  (test-pinned); Android carries no MIT obligation. `docs/INSTALL-IOS.md` no
+  longer derives the version from a "shared `VERSION` file" that never
+  existed (the sources are `CHANGELOG.md` and the Android `versionCode`, as
+  its own next paragraph says). And `ios/.swiftlint.yml` no longer cites two
+  scripts that are not in the tree (`build-report-labels.py`,
+  `check-report-labels.py`) nor contradicts the report-label catalogue's own
+  "hand-maintained" header; the real guard is `check-l10n-parity.py` CHECK 3.
 
 ---
 
