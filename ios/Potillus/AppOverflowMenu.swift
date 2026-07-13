@@ -64,6 +64,7 @@ struct AppOverflowMenu: ViewModifier {
     @Environment(AppLockModel.self) private var lock: AppLockModel?
 
     @State private var showingSettings = false
+    @State private var showingHelp = false
     @State private var showingCopyright = false
 
     func body(content: Content) -> some View {
@@ -79,6 +80,11 @@ struct AppOverflowMenu: ViewModifier {
                             Label(Loc.string("Settings", locale: locale), systemImage: "gearshape")
                         }
                         .accessibilityIdentifier("nav.settings")
+                        Button {
+                            showingHelp = true
+                        } label: {
+                            Label(Loc.string("Help", locale: locale), systemImage: "questionmark.circle")
+                        }
                         Button {
                             showingCopyright = true
                         } label: {
@@ -104,6 +110,22 @@ struct AppOverflowMenu: ViewModifier {
             .sheet(isPresented: $showingSettings) {
                 SettingsScreen(environment: environment)
             }
+            .sheet(isPresented: $showingHelp) {
+                // The user guide, in the app's language with an English fallback.
+                NavigationStack {
+                    DocumentViewerScreen(
+                        title: Loc.string("Help", locale: locale),
+                        resource: guideResource()
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button(Loc.string("Done", locale: locale)) {
+                                showingHelp = false
+                            }
+                        }
+                    }
+                }
+            }
             .sheet(isPresented: $showingCopyright) {
                 // Pushed with a back button under Settings > About; in the menu it
                 // is presented on its own, so it carries its own stack and a Done
@@ -123,12 +145,35 @@ struct AppOverflowMenu: ViewModifier {
                 }
             }
     }
+
+    /// The bundled guide for the app's language, English as the guaranteed
+    /// fallback. Tries the exact tag (`usersguide_zh-Hant`), then the base
+    /// language (`usersguide_de` for a `de-DE` system locale), then
+    /// `usersguide_en`. Only the guides whose templates have been authored ship,
+    /// so an as-yet-untranslated language resolves to English rather than a blank
+    /// page.
+    private func guideResource() -> String {
+        var candidates: [String] = []
+        let tag = locale.identifier(.bcp47)
+        if !tag.isEmpty {
+            candidates.append("usersguide_\(tag)")
+            if let dash = tag.firstIndex(of: "-") {
+                candidates.append("usersguide_\(tag[..<dash])")
+            }
+        }
+        candidates.append("usersguide_en")
+        for name in candidates where Bundle.main.url(forResource: name, withExtension: "md") != nil {
+            return name
+        }
+        return "usersguide_en"
+    }
 }
 
 extension View {
-    /// Add the shared overflow menu (Settings, Copyright, Lock app) to a screen's
-    /// navigation bar. Apply it inside the screen's `NavigationStack`, on the same
-    /// view that carries `.navigationTitle`, so the button lands in that bar.
+    /// Add the shared overflow menu (Settings, Help, Copyright, Lock app) to a
+    /// screen's navigation bar. Apply it inside the screen's `NavigationStack`, on
+    /// the same view that carries `.navigationTitle`, so the button lands in that
+    /// bar.
     func appOverflowMenu(environment: AppEnvironment) -> some View {
         modifier(AppOverflowMenu(environment: environment))
     }

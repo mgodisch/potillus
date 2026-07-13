@@ -241,6 +241,21 @@ and corrects documentation that the port had outgrown:
   `check-l10n-parity` CHECK 5 parser reads the table rows instead of the former
   `case` arms, and still enforces column-by-column identity with Android (a
   deliberately corrupted caption is still caught).
+- **The overflow menu's Help now opens an in-app user guide.** Android's Help
+  shows a per-language user guide generated from templates; iOS had no counterpart
+  and the menu's Help entry was deferred. It now exists. An iOS-specific guide
+  template (`ios/docs/guide/usersguide.md.in`) is adapted from Android's in the
+  few spots that differ — iOS 17 system requirements, Face ID / Touch ID rather
+  than a fingerprint, the App Switcher rather than the recent-apps overview, and
+  the menu in the top-left — while the rest, describing features that behave
+  identically, is shared. A new `tools/render-guide-ios.py` resolves the
+  `{{token}}` labels against the String Catalogue (so the guide always names the
+  labels the app shows, e.g. "App lock", not Android's "Biometric Lock") and
+  writes a gitignored `usersguide_<tag>.md` per language, exactly as
+  `copyright.md` is generated. The `make ios` static gate gains `check-ios-guides`
+  to catch a stale guide. Help opens the guide for the app's language with an
+  English fallback. Only the English guide ships in this step; the translations
+  follow as their templates are authored.
 
 ---
 

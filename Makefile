@@ -1069,7 +1069,7 @@ ios-version-check:
 # XcodeGen reads it -- the ordering matters, and getting it wrong is the kind of
 # mistake that only surfaces as a wrong version number in the App Store.
 # `xcodegen` resolves project.yml relative to the working directory, hence the cd.
-ios-project: ios-version ios/Potillus/Resources/copyright.md
+ios-project: ios-version ios/Potillus/Resources/copyright.md ios-guides
 	command -v xcodegen
 	cd ios && xcodegen generate
 
@@ -1079,6 +1079,21 @@ ios-project: ios-version ios/Potillus/Resources/copyright.md
 # in, exactly like Version.xcconfig: a copy in the tree would drift from COPYING.md.
 ios/Potillus/Resources/copyright.md: COPYING.md LICENSE.md LICENSE.Apache-2.0.md tools/render-copyright.py
 	python3 tools/render-copyright.py $@ COPYING.md LICENSE.md LICENSE.Apache-2.0.md
+
+# The localized in-app user guides, one per language, generated from the
+# templates under ios/docs/guide/ with the {{token}} labels resolved against the
+# String Catalogue — the iOS counterpart of Android's res/raw-*/usersguide.md.
+# Generated (gitignored) like copyright.md above; the app picks the file for its
+# in-app language, English as the fallback. Phony because the output set is one
+# file per language rather than one fixed name: the renderer rewrites only the
+# guides whose template or catalogue entry changed, so a rebuild is a near-no-op.
+ios-guides:
+	python3 tools/render-guide-ios.py
+
+# The build-time counterpart: fail if any committed template or catalogue change
+# would leave a rendered guide stale. Part of the Mac-free iOS static gate.
+check-ios-guides:
+	python3 tools/render-guide-ios.py --check
 
 # ── ios ── the everyday iOS build, and the counterpart of `android`.
 #
@@ -1106,7 +1121,7 @@ ios/Potillus/Resources/copyright.md: COPYING.md LICENSE.md LICENSE.Apache-2.0.md
 # Neither gate alone covers a release; together they do. Each sub-check already
 # skips gracefully when its inputs are absent, so this is safe in any checkout.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
-                  check-report-paper check-l10n-parity check-l10n
+                  check-report-paper check-l10n-parity check-l10n check-ios-guides
 
 ios: check-ios-static check-swiftlint ios-project
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
@@ -1250,4 +1265,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-l10n check-l10n-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
