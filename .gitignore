@@ -28,9 +28,10 @@ __pycache__/
 
 # Release signing material and store upload credentials (Play + Codeberg) —
 # SECRET, never commit. The committed templates are
-# android/keystore.properties.example and the SUPPLY_JSON_KEY note in
-# fastlane/Appfile.
+# android/keystore.properties.example, ios/signing.properties.example and the
+# SUPPLY_JSON_KEY note in fastlane/Appfile.
 /android/keystore.properties
+/ios/signing.properties
 /fastlane/play-store-credentials.json
 /fastlane/codeberg-credentials.txt
 # App Store Connect API key (.p8) for the iOS deliver lanes — SECRET, downloads

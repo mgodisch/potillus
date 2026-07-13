@@ -88,6 +88,21 @@ The iOS port, section by section:
   captures the store screenshots fully non-interactively — pinning the simulator
   clock, driving the UI-test target through the screens in light and dark mode,
   and rasterizing the rendered report pages — mirroring the Android flow.
+- **iOS build-and-release tooling.** A `make release-ios` target now archives the
+  app, exports a signed `.ipa` with automatic signing, and stages it into
+  `releases/` under the same `<applicationId>_<versionCode>` name as the Android
+  AAB — the iOS counterpart of `make release-android`, with the same fail-fast
+  guard against overwriting a staged release (it needs a Mac, the one release
+  target that is not host-free). The signing Team ID is resolved like the Android
+  keystore — the `DEVELOPMENT_TEAM` environment variable wins, else a git-ignored
+  `ios/signing.properties` (committed template `ios/signing.properties.example`) —
+  and injected as an xcodebuild build setting plus the `teamID` of a generated
+  ExportOptions.plist. A new fastlane `ios beta` lane uploads the staged `.ipa` to
+  TestFlight for internal testing (`upload_to_testflight`, no listing metadata);
+  the existing `ios testing`/`production` lanes now take the staged `.ipa` as
+  `ipa:`, mirroring the Android `aab:` option. `docs/RELEASE-IOS.md` documents the
+  flow. Editorial fix noticed on the way: the Fastfile comments pointed at a
+  `make -C ios archive` target that never existed — corrected to `make release-ios`.
 - **GPLv3 on the App Store.** Apple's store terms are reconciled with the GPL by
   an additional permission under GPL section 7 — an App-Store distribution
   exception whose wording is adapted from the Feeel project — carried in every

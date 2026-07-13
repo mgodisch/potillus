@@ -164,8 +164,12 @@ end
 #   ONCE and cannot be re-downloaded, so store it safely.
 #
 # BUILDING -- like the Android lanes, these lanes do NOT build the app. Produce a
-#   signed .ipa on the Mac first (Xcode or `make -C ios archive`, see ios/), then
-#   run the upload lane. Screenshots are produced by the `screenshots` lane below.
+#   signed .ipa on the Mac first with `make release-ios` (which archives, exports
+#   and stages it into releases/; Xcode's Archive → Distribute flow works too),
+#   then run an upload lane. Every upload lane takes the staged .ipa as `ipa:`
+#   (mirroring how the Android lanes take `aab:`), defaulting to the raw build
+#   output ios/build/Potillus.ipa when none is passed. Screenshots are produced by
+#   the `screenshots` lane below.
 
 platform :ios do
   desc 'Capture the App Store screenshots (all store locales) via snapshot.'
@@ -180,6 +184,38 @@ platform :ios do
     # tree. Status-bar cleanup and PDF rendering are handled around this by the
     # Makefile, exactly as on Android.
     capture_ios_screenshots
+  end
+
+  desc 'Upload the SIGNED .ipa to TestFlight for INTERNAL testing. Unlike the'
+  desc 'App Store lanes below, this pushes NO listing metadata or screenshots --'
+  desc 'internal TestFlight does not use them. Build the .ipa first with'
+  desc '`make release-ios`, then pass the staged path, e.g.'
+  desc '`bundle exec fastlane ios beta ipa:../releases/de.godisch.potillus_<code>.ipa`.'
+  lane :beta do |options|
+    # Authenticate with the App Store Connect API key. Capturing the return value
+    # and passing it explicitly to upload_to_testflight is the documented pattern
+    # for that action (the App Store lanes below instead rely on the token that
+    # the same call leaves in lane_context for deliver).
+    api_key = app_store_connect_api_key
+
+    upload_to_testflight(
+      api_key: api_key,
+
+      # The signed binary. Defaults to the raw build output, but normally the
+      # caller passes the staged releases/ path that `make release-ios` prints --
+      # the same `ipa:`/`aab:` option convention the Android lanes use.
+      ipa: options[:ipa] || 'ios/build/Potillus.ipa',
+
+      # Internal testing only: no Beta App Review, no external groups. External
+      # distribution (public groups) would additionally need a review and beta
+      # metadata and is intentionally not wired here (see docs/RELEASE-IOS.md).
+      distribute_external: false,
+
+      # Do not block the lane waiting for App Store Connect to finish processing
+      # the build: the upload is what matters here, and internal testers are
+      # notified per the App Store Connect settings once processing completes.
+      skip_waiting_for_build_processing: true
+    )
   end
 
   # ── upload_appstore ── the single upload_to_app_store call shared by the public
@@ -197,8 +233,10 @@ platform :ios do
     app_store_connect_api_key
 
     upload_to_app_store(
-      # The signed app binary. Build it on the Mac before running this lane.
-      ipa: 'ios/build/Potillus.ipa',
+      # The signed app binary. Defaults to the raw build output, but the caller
+      # normally passes the staged releases/ path from `make release-ios` as
+      # `ipa:` -- mirroring how the Android lanes take `aab:`.
+      ipa: options[:ipa] || 'ios/build/Potillus.ipa',
 
       # Metadata + screenshots come from fastlane/metadata/ios/ (the default path
       # once platform is ios). Push them on every upload so the listing matches
@@ -223,17 +261,17 @@ platform :ios do
   desc '(names, subtitles, keywords, descriptions and screenshots from'
   desc 'fastlane/metadata/ios/) WITHOUT submitting for review. The build lands in'
   desc 'App Store Connect as "Prepare for Submission" / TestFlight for you to check.'
-  desc 'Build the .ipa first (Xcode or `make -C ios archive`); this lane does NOT'
-  desc 'build it.'
-  lane :testing do
-    upload_appstore(submit: false)
+  desc 'Build the .ipa first with `make release-ios`; this lane does NOT build it.'
+  desc 'Pass the staged path as ipa:, e.g. ipa:../releases/de.godisch.potillus_<code>.ipa.'
+  lane :testing do |options|
+    upload_appstore(submit: false, ipa: options[:ipa])
   end
 
   desc 'Upload the SIGNED .ipa, OVERWRITE the App Store listing, and SUBMIT the'
   desc 'build for Apple review. Same build prerequisite as `testing` (this lane'
   desc 'does NOT build the .ipa). Apple review gates the actual release; nothing'
   desc 'goes live automatically without passing review.'
-  lane :production do
-    upload_appstore(submit: true)
+  lane :production do |options|
+    upload_appstore(submit: true, ipa: options[:ipa])
   end
 end

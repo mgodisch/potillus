@@ -1,0 +1,74 @@
+# vim: set et ts=4:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+# signing.properties.example – template for iOS release code-signing
+# =============================================================================
+#
+# WHAT THIS IS
+#   A template for the (git-ignored) file `ios/signing.properties`, which
+#   supplies the Apple Developer Team ID to the `make release-ios` build. It is
+#   the iOS counterpart of `android/keystore.properties` and is read the SAME
+#   way: an environment variable wins, and the file is the fallback. The one
+#   value it carries is the ten-character Team ID that Xcode's *automatic*
+#   signing needs to pick the App-Store distribution certificate and
+#   provisioning profile when the build runs head-less under xcodebuild.
+#
+# WHY IT IS NOT IN project.yml
+#   `ios/project.yml` sets `DEVELOPMENT_TEAM: ""` under `settings.base` on
+#   purpose: a value there is account-specific and would be committed, and a
+#   non-empty `settings` value also OVERRIDES any xcconfig (see the comment in
+#   project.yml), which would defeat the version generator. Keeping the Team ID
+#   out of the tree entirely — here, next to the Play signing secrets — avoids
+#   both problems. `make release-ios` injects the value as an xcodebuild
+#   command-line build setting (`DEVELOPMENT_TEAM=…`), which takes precedence
+#   over the empty project value for that one invocation, and also writes it as
+#   the `teamID` of the generated ExportOptions.plist so the export step re-signs
+#   with the right team.
+#
+# WHEN YOU NEED IT
+#   ONLY for producing a SIGNED .ipa for App Store Connect / TestFlight via
+#   `make release-ios` on a Mac. You do NOT need it for ordinary development
+#   (the Simulator does not code-sign), for the container-runnable static checks,
+#   or for any Android target. Without this file and without the environment
+#   variable below, `make release-ios` stops early with an actionable message
+#   rather than attempting an unsigned or mis-signed archive.
+#
+# HOW TO USE IT
+#   1. Copy this file to `ios/signing.properties` (same directory, drop the
+#      `.example` suffix). That copy is git-ignored and never committed.
+#   2. Replace the placeholder below with your Team ID. You can read it from
+#      Xcode (Settings → Accounts → your Apple ID → the team's 10-character ID)
+#      or from the Apple Developer portal (Membership details → Team ID).
+#   3. Run `make release-ios`. To override the file for a single build without
+#      editing it, set the environment variable instead, e.g.
+#      `DEVELOPMENT_TEAM=ABCDE12345 make release-ios` — the environment always
+#      wins over the file, mirroring the Android keystore contract.
+#
+# The App Store Connect API key that the fastlane upload lanes use is a
+# SEPARATE secret (the `.p8` referenced by the APP_STORE_CONNECT_API_KEY_*
+# environment variables; see fastlane/Appfile and fastlane/Fastfile). This file
+# is only about the code-signing Team ID for the local build.
+
+# Your Apple Developer Team ID (10 characters, letters and digits).
+DEVELOPMENT_TEAM=XXXXXXXXXX
