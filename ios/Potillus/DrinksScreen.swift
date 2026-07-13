@@ -310,13 +310,8 @@ private struct DrinkEditor: View {
 
                 if let volume, let percent, canSave {
                     LabeledContent(Loc.string("Alcohol", locale: locale)) {
-                        Text("\(Loc.number(
-                            AlcoholCalculator.calculateGrams(
-                                volumeMl: volume, alcoholPercent: percent
-                            ),
-                            fractionDigits: 1, locale: locale
-                        )) g")
-                        .monospacedDigit()
+                        Text(grams(volumeMl: volume, alcoholPercent: percent))
+                            .monospacedDigit()
                     }
                 }
             }
@@ -335,6 +330,17 @@ private struct DrinkEditor: View {
                 }
             }
         }
+    }
+
+    /// The pure-alcohol grams for the live volume/percent, in the in-app locale.
+    /// Computing the value here keeps the number interpolation single-level, which
+    /// the display and the l10n scanner both prefer, and the unit stays a neutral
+    /// "g".
+    private func grams(volumeMl: Int, alcoholPercent: Double) -> String {
+        let value = AlcoholCalculator.calculateGrams(
+            volumeMl: volumeMl, alcoholPercent: alcoholPercent
+        )
+        return "\(Loc.number(value, fractionDigits: 1, locale: locale)) g"
     }
 
     private func message(for violation: DrinkValidator.Violation) -> String {

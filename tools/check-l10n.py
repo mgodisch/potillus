@@ -77,7 +77,7 @@ NEUTRAL = re.compile(r"^[%\d\$@lld /·.\\()a-z_A-Z]*$")
 
 # Units that carry no translation: they are the same token in every language this
 # app ships. A string that is only interpolation plus these is language-neutral.
-NEUTRAL_UNITS = ("ml", "g", "%")
+NEUTRAL_UNITS = ("ml", "g", "%", "‰")  # ‰ = permille, universal like %
 
 
 def is_pure_interpolation(text):

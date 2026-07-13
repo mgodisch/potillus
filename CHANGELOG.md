@@ -373,6 +373,17 @@ and corrects documentation that the port had outgrown:
   already capture `self` weakly, so they cannot keep the model alive, and the view
   calls `stop()` on disappearance. This is exactly the no-`deinit` pattern the
   other models (Today, Calendar, Statistics, Drinks) already follow and document.
+- **Fixed two `check-l10n` failures introduced by the number localization.**
+  Routing on-screen numbers through `Loc.number` moved two literals into a form the
+  localization scanner rejected. The BAC readout's `"\(…) ‰"` tripped because the
+  permille sign was missing from the scanner's neutral-unit list — a genuine
+  oversight, since `‰` is as language-neutral as `%`, so it was added there rather
+  than pointlessly routing a non-translatable symbol through `Loc.string`. The
+  drink editor's live grams label nested `calculateGrams(…)` inside the number
+  interpolation, and the scanner's single-level parenthesis strip could not see
+  through two levels; the value is now computed in a small `grams` helper so the
+  interpolation is single-level and the `Text` holds no literal at all. Both were
+  format-only; no user-visible behaviour changed.
 
 ---
 
