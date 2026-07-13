@@ -89,7 +89,10 @@ The iOS port, section by section:
   clock, driving the UI-test target through the screens in light and dark mode,
   and rasterizing the rendered report pages — mirroring the Android flow.
 - **iOS build-and-release tooling.** A `make release-ios` target now archives the
-  app, exports a signed `.ipa` with automatic signing, and stages it into
+  app WITHOUT code signing and signs only at the App-Store export (automatic
+  cloud signing via `-allowProvisioningUpdates`, which mints the distribution
+  certificate and App-Store profile without a registered device), then stages the
+  `.ipa` into
   `releases/` under the same `<applicationId>_<versionCode>` name as the Android
   AAB — the iOS counterpart of `make release-android`, with the same fail-fast
   guard against overwriting a staged release (it needs a Mac, the one release

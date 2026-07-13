@@ -59,11 +59,21 @@ Build and stage the signed `.ipa` (this is the iOS analogue of
 
     make release-ios
 
-`release-ios` archives the `Potillus` scheme in the Release configuration,
-exports a signed `.ipa` with automatic signing, and stages a copy into
-`releases/` under the canonical `de.godisch.potillus_<versionCode>.ipa` name —
-with the same fail-fast guard that refuses to overwrite an already-staged
-release. It prints the exact upload commands when it finishes.
+`release-ios` archives the `Potillus` scheme in the Release configuration
+*without code signing*, then signs the `.ipa` only at the App-Store export step
+(automatic cloud signing via `-allowProvisioningUpdates`). That keeps the release
+device-independent: no registered device and no development provisioning profile
+are needed — the export mints the distribution certificate and the App-Store
+profile itself. It stages a copy into `releases/` under the canonical
+`de.godisch.potillus_<versionCode>.ipa` name — with the same fail-fast guard that
+refuses to overwrite an already-staged release — and prints the exact upload
+commands when it finishes.
+
+The first export may prompt for authentication with the Apple Developer website.
+`-allowProvisioningUpdates` uses the Apple ID signed into Xcode (Settings →
+Accounts); if it reports a login/session error, sign in there again, or ensure
+“Access to Cloud Managed Distribution Certificate” is enabled for your account in
+App Store Connect → Users and Access.
 
 Then pick the destination — both take the staged path the build just printed:
 

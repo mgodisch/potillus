@@ -337,9 +337,18 @@ release-ios: ios-project
 		'    <key>manageAppVersionAndBuildNumber</key> <false/>' \
 		'</dict>' \
 		'</plist>' > "$(IOS_EXPORT_PLIST)"
-	# Archive (injecting the Team ID as a command-line build setting, which
-	# overrides the empty project value for this invocation), then export the
-	# signed .ipa. errexit aborts the recipe if the archive step fails, so the two
+	# Archive WITHOUT code signing, then sign only at the App-Store export. This
+	# keeps the whole release device-independent. Signing an archive under
+	# automatic signing would provision an iOS App *Development* profile, which
+	# Apple issues only once the team has a REGISTERED DEVICE -- a requirement a
+	# TestFlight/App-Store build should not carry (and one an MDM-managed device may
+	# make impossible). With CODE_SIGNING_ALLOWED=NO the archive needs no profile at
+	# all (this also sidesteps Xcode's attempt to code-sign GRDB's SwiftPM resource
+	# bundle), and the export step below mints the DISTRIBUTION certificate and the
+	# App-Store provisioning profile through -allowProvisioningUpdates -- neither of
+	# which is tied to a device. DEVELOPMENT_TEAM is still passed so any team-scoped
+	# lookup resolves; the ExportOptions.plist carries the same teamID for the
+	# export. errexit aborts the recipe if the archive step fails, so the two
 	# commands stand on their own lines rather than in an && chain.
 	xcodebuild archive \
 		-project "$(IOS_XCODEPROJ)" \
@@ -347,8 +356,8 @@ release-ios: ios-project
 		-configuration Release \
 		-destination 'generic/platform=iOS' \
 		-archivePath "$(IOS_ARCHIVE)" \
-		-allowProvisioningUpdates \
-		DEVELOPMENT_TEAM="$$team"
+		DEVELOPMENT_TEAM="$$team" \
+		CODE_SIGNING_ALLOWED=NO
 	xcodebuild -exportArchive \
 		-archivePath "$(IOS_ARCHIVE)" \
 		-exportPath "$(IOS_BUILD_DIR)" \
