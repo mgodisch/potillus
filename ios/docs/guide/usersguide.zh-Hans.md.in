@@ -1,0 +1,118 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+# Libellus Potionis -- 用户指南
+
+欢迎使用 Libellus Potionis，你的个人饮酒记录工具！本页介绍该应用的特性与功能。
+
+## 主要特性
+
+Libellus Potionis 是开源软件。任何人都可以查看并验证其源代码。Libellus Potionis 注重隐
+私。它不需要任何权限——无论是摄像头、麦克风，还是 GPS 或网络。Libellus Potionis 很安全：
+你的数据保存在设备上应用的私有存储中，受设备加密保护，并且可以用 Face ID 或 Touch ID 来限制对应用的访
+问。Libellus Potionis 通过随时告诉你「la petite sœur」是否仍在你的额度之内，帮助你有节制
+地接近自己的上限。此外，在与成瘾咨询机构会面时，应用还可以应你的要求，把你的全部饮酒情况
+整理成一份清晰的两页 PDF 文档。Libellus Potionis 完全免费且无广
+告。
+
+Libellus Potionis 需要 iOS 17.0 或更高版本。作者在 iPhone 16E 上持续使用它，并另外在 iPhone 17 Pro 模拟器上进行测试。
+
+## “{{today}}”界面
+
+在此界面你会看到今天所饮用酒精饮品的列表。如果你在录入时出了差错，可以在这里编辑或删除
+相应条目。用加号按钮可以添加更多饮品。
+
+在饮品列表上方有当天的概览，包含以下信息：今天已摄入的酒精量（以克计）；相对于你的每日
+上限和 7 天上限，今天已摄入的量（以克计并以柱状图显示）；以及今天及其前六天（滑动七天窗
+口／滑动周）内，相对于你的上限的迄今饮酒天数（以数字并以柱状图显示）。
+
+此外，标有“Ø”的徽标会显示当月的平均消费量（每天纯酒精的平均克数）。
+
+## “{{calendar}}”界面
+
+在此界面你会看到日历。饮用过酒精的日子会以蓝点（未达临界量）或红点（已超过上限）标记。
+当你选择某一天时，会列出当天的饮品，必要时可对其进行修正或删除。也可以事后补录已饮用的
+饮品。
+
+## “{{statistics}}”界面
+
+此界面显示对你饮酒情况的统计分析，可按周、月或年选择。为便于在电子表格中进一步处理数据，
+内置了 CSV 导出。此外还提供 PDF 导出，它以针对成瘾咨询机构优化的格式，将你的饮酒情况整
+理为两页。
+
+## “{{drinks}}”界面
+
+此界面包含可用饮品的列表。应用预置了若干国际上常见的饮品。这些饮品可任意修改或删除。通过
+加号符号你可以定义新的饮品。点按某个饮品会打开对话框，将其直接记录为已饮用。
+
+## “{{settings}}”界面
+
+设置菜单可通过左上角的菜单图标（☰）打开。Libellus Potionis 支持以下配置：
+
+### {{personal_data}}
+
+在此类别中可以填写自己的体重，以便依据
+[魏德马克公式](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
+近似计算血液酒精浓度。该数值随后会显示在“{{today}}”界面上。
+
+### {{limits}}
+
+在此类别中设定适用于你自身饮酒的上限。需要填写：以纯酒精克数计的每日最大上限、最大七天上
+限，以及每周最多饮酒天数。所有上限同时生效。在“{{today}}”界面上相应地会显示三条进度条。
+若需要数值方面的参考，可以在
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+上参考各国适用的建议值。
+
+### {{statistics}}
+
+在统计设置中可以设定新的一天从几点开始（例如让凌晨 1 点的一杯饮品仍计入前一天），并且——
+例如为了在元旦重新开始——设定从哪个日期起对数据进行分析。
+
+### {{backup_section}}
+
+**你的数据绝不会自行离开本设备。** Libellus Potionis 将一切都保存在应用的私有
+存储中，并刻意**不**参与任何自动云备份，也**不**参与任何设备间传输。如果你更换
+手机、恢复出厂设置或重新安装应用，**保留数据的唯一方法就是自己备份**——没有
+其他恢复途径，未导出的数据事后将无法找回。
+
+备份是一个 JSON 文件，包含你所有的饮品和完整记录。要将数据迁移到另一部手机：
+
+1. 在**旧**手机上，打开 **“{{settings}}” → {{backup_section}} →
+   {{backup_export}}**，并将该 JSON 文件保存到安全的位置——例如你自己的云盘、
+   发给自己的电子邮件，或通过 USB 传输。
+2. 在**新**手机上安装 Libellus Potionis。
+3. 打开 **“{{settings}}” → {{backup_section}} → {{backup_import}}**，并选择该
+   JSON 文件。选择 **{{import_replace}}** 以覆盖全部，或选择 **{{import_merge}}**
+   以与现有条目合并。
+
+请定期导出：备份只能保护创建那一刻已存在的数据。
+
+### {{security}}
+
+此类别保护对应用的访问并控制其可见性。启用 {{biometric_lock}} 后，每次打开应用都需要 Face ID 或 Touch ID。{{allow_screenshots}} 开关控制应用内容是否显示在 App Switcher（应用切换器）中；它默认关闭，因此离开应用后应用会在其中隐藏。iOS 不允许应用阻止截屏或录屏，因此此设置不会影响它们。
+
+### {{appearance}}
+
+在此类别中可独立于系统设置来设定配色方案与语言。

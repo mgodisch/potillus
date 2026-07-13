@@ -1,0 +1,147 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+# Libellus Potionis -- Brugervejledning
+
+Velkommen til Libellus Potionis, den personlige logbog over dit alkoholforbrug!
+Denne side beskriver appens egenskaber og funktioner.
+
+## Højdepunkter
+
+Libellus Potionis er open source. Kildekoden kan ses og verificeres af enhver.
+Libellus Potionis er privatlivsvenlig. Den kræver ingen tilladelser, hverken til
+kamera eller mikrofon eller til GPS eller netværksadgang. Libellus Potionis er
+sikker: dine data forbliver i appens private lager på din enhed, beskyttet af
+din enheds kryptering, og adgangen til appen kan begrænses med Face ID eller Touch ID.
+Libellus Potionis hjælper dig med at dosere dig op til din grænse ved til enhver
+tid at fortælle dig, om "la petite sœur" stadig er inden for dit budget.
+Libellus Potionis støtter dig i din misbrugsbehandling ved på anmodning at
+levere en omfattende, tosidet PDF-rapport over dine drikkevaner. Libellus
+Potionis er gratis og reklamefri.
+
+Libellus Potionis kræver iOS 17.0 eller nyere. Den bruges løbende af
+forfatteren på en iPhone 16E og testes desuden på en iPhone 17 Pro-emulator.
+
+## Skærm "{{today}}"
+
+På denne skærm finder du en liste over de alkoholholdige drikkevarer, du har
+nydt i dag. Hvis du har lavet en fejl, da du registrerede en drik, kan du
+redigere eller slette posterne her. Brug plusknappen til at tilføje flere
+drikkevarer.
+
+Over listen over drikkevarer finder du en oversigt over den aktuelle dag med
+følgende oplysninger: mængden af alkohol, der allerede er indtaget i dag (i
+gram), den samme mængde i forhold til dine dags- og ugegrænser (i gram og som
+statuslinje) samt antallet af dage med alkoholforbrug indtil videre i denne uge i
+forhold til din grænse (som tal og som statuslinje).
+
+Desuden viser et mærke med „Ø“ dit gennemsnitlige forbrug i den aktuelle måned
+(gennemsnitlige gram ren alkohol pr. dag).
+
+## Skærm "{{calendar}}"
+
+På denne skærm finder du kalenderen. Dage, hvor der blev indtaget alkohol, er
+markeret med en blå prik (ikke-kritisk mængde) eller en rød prik (grænsen
+overskredet). Når du vælger en dag, vises de tilhørende drikkevarer, som om
+nødvendigt kan rettes eller slettes. Det er også muligt at tilføje indtagne
+drikkevarer med tilbagevirkende kraft.
+
+## Skærm "{{statistics}}"
+
+Denne skærm viser statistiske analyser af dit alkoholforbrug, der kan filtreres
+efter uge, måned eller år. Der findes en CSV-eksport til videre behandling af
+data i et regneark. Derudover tilbydes en PDF-eksport, der præsenterer
+drikkevanerne i et format, der er egnet til misbrugsbehandling.
+
+## Skærm "{{drinks}}"
+
+Denne skærm indeholder listen over drikkevarer. Appen leveres forudkonfigureret
+med et sæt internationalt udbredte drikkevarer. De kan alle ændres eller slettes.
+Med plusikonet kan du definere en ny drik. Når du trykker på en drik, åbnes en
+dialog, hvor du kan registrere den som indtaget.
+
+## Skærm "{{settings}}"
+
+Indstillingsmenuen er tilgængelig via menuikonet (☰) øverst til venstre. Libellus
+Potionis tilbyder følgende konfigurationsmuligheder:
+
+### {{personal_data}}
+
+I denne kategori kan du notere din kropsvægt for at beregne din
+alkoholkoncentration i blodet tilnærmelsesvis ved hjælp af Widmark-formlen.
+
+### {{limits}}
+
+I denne kategori indtaster du de grænser, der gælder for dit alkoholforbrug.
+Felterne, der skal udfyldes, er: den maksimale daglige grænse i gram ren alkohol,
+den maksimale ugentlige grænse og det maksimale antal drikkedage pr. uge. Alle
+grænser gælder samtidig. Derfor er der tre statuslinjer synlige på skærmen
+"{{today}}". Hvis du er i tvivl om, hvad du skal indstille her, kan du hente
+inspiration fra forskellige landes anbefalinger på Wikipedia.
+
+### {{statistics}}
+
+De statistiske indstillinger giver dig mulighed for at fastlægge tidspunktet, hvor
+en ny dag begynder (så f.eks. en drik kl. 01.00 om natten stadig tæller med til
+dagen før) og — til nytårsforsætter — datoen, fra hvilken dataanalysen skal
+begynde.
+
+### {{backup_section}}
+
+**Dine data forlader aldrig denne enhed af sig selv.** Libellus Potionis gemmer
+alt i appens private lager og deltager bevidst **ikke** i nogen automatisk
+sky-sikkerhedskopiering og **ikke** i nogen overførsel mellem enheder. Hvis du
+skifter telefon, udfører en fabriksnulstilling eller geninstallerer appen, er
+**den eneste måde at beholde dine data på at sikkerhedskopiere dem selv** — der
+er ingen anden vej til gendannelse, og data, der ikke blev eksporteret, kan ikke
+hentes bagefter.
+
+En sikkerhedskopi er en enkelt JSON-fil, der indeholder alle dine drikkevarer og
+hele din log. Sådan flytter du dine data til en anden telefon:
+
+1. På den **gamle** telefon skal du åbne **"{{settings}}" → {{backup_section}} →
+   {{backup_export}}** og gemme JSON-filen et sikkert sted — for eksempel dit
+   eget skylager, en e-mail til dig selv eller en USB-overførsel.
+2. Installer Libellus Potionis på den **nye** telefon.
+3. Åbn **"{{settings}}" → {{backup_section}} → {{backup_import}}** og vælg den
+   JSON-fil. Vælg **{{import_replace}}** for at overskrive alt, eller
+   **{{import_merge}}** for at kombinere den med poster, der allerede findes.
+
+Eksportér regelmæssigt: en sikkerhedskopi beskytter kun de data, der fandtes i
+det øjeblik, du oprettede den.
+
+### {{security}}
+
+Denne kategori beskytter adgangen til appen og styrer dens synlighed. Aktivér
+{{biometric_lock}} for at kræve Face ID eller Touch ID, hver gang appen åbnes.
+Kontakten {{allow_screenshots}} styrer, om appens indhold vises i App
+Switcheren; den er slået fra som standard, så appen er skjult der, når du
+forlader den. iOS lader ikke en app blokere skærmbilleder eller
+skærmoptagelser, så denne indstilling påvirker dem ikke.
+
+### {{appearance}}
+
+I denne kategori kan du indstille farvetema og sprog uafhængigt af
+systemindstillingerne.

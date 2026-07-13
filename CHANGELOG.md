@@ -254,8 +254,13 @@ and corrects documentation that the port had outgrown:
   writes a gitignored `usersguide_<tag>.md` per language, exactly as
   `copyright.md` is generated. The `make ios` static gate gains `check-ios-guides`
   to catch a stale guide. Help opens the guide for the app's language with an
-  English fallback. Only the English guide ships in this step; the translations
-  follow as their templates are authored.
+  English fallback. Only the English guide shipped at first; the guide now exists
+  in all of the app's languages. The twenty translations are adapted from
+  Android's per-language guides, with the four platform-specific passages — Face
+  ID / Touch ID rather than a fingerprint, the App Switcher rather than the
+  recent-apps overview (and the note that iOS cannot block screenshots), the iOS
+  system requirements, and the top-left menu — rewritten for iOS. They are
+  best-effort and await native review, exactly like the string translations.
 
 ---
 

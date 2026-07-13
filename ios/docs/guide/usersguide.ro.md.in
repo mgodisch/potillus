@@ -1,0 +1,157 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+# Libellus Potionis -- Ghidul utilizatorului
+
+Bun venit la Libellus Potionis, jurnalul personal al consumului tău de alcool!
+Această pagină descrie caracteristicile și funcțiile aplicației.
+
+## Repere
+
+Libellus Potionis este open source. Codul sursă poate fi consultat și verificat
+de oricine. Libellus Potionis respectă confidențialitatea. Nu necesită nicio
+permisiune – nici pentru cameră sau microfon, nici pentru GPS sau rețea.
+Libellus Potionis este sigur: datele tale rămân în stocarea privată a
+aplicației pe dispozitivul tău, protejate de criptarea dispozitivului tău, iar
+accesul la aplicație poate fi restricționat prin Face ID sau Touch ID. Libellus Potionis te
+sprijină să te apropii cu măsură de limitele tale, spunându-ți în orice moment
+dacă „la petite sœur” se încadrează încă în bugetul tău. În plus, aplicația te
+ajută la întâlnirile cu un centru de consiliere în adicții, prezentând la
+cerere întregul tău comportament de consum într-un document PDF clar, de două
+pagini. Libellus Potionis este complet gratuit și fără reclame.
+
+Libellus Potionis necesită iOS 17.0 sau mai nou. Este folosit continuu de
+autor pe un iPhone 16E și este testat în plus pe un emulator de iPhone 17 Pro.
+
+## Ecranul „{{today}}”
+
+Pe acest ecran găsești o listă a băuturilor alcoolice consumate astăzi. Dacă ai
+făcut o greșeală la înregistrare, intrările pot fi editate sau șterse aici. Cu
+butonul plus adaugi alte băuturi.
+
+Deasupra listei de băuturi găsești o prezentare a zilei curente cu următoarele
+informații: cantitatea de alcool deja consumată astăzi (în grame), cantitatea
+deja consumată astăzi raportată la limita ta zilnică și la limita pe 7 zile (în
+grame și sub formă de diagramă cu bare), precum și numărul de până acum al
+zilelor cu consum de alcool din ziua de astăzi și din cele șase zile anterioare
+(fereastră glisantă de șapte zile/săptămână glisantă) raportat la limita ta (ca
+număr și sub formă de diagramă cu bare).
+
+În plus, o insignă marcată cu „Ø” afișează consumul mediu din luna curentă
+(media gramelor de alcool pur pe zi).
+
+## Ecranul „{{calendar}}”
+
+Pe acest ecran găsești calendarul. Zilele în care s-a consumat alcool sunt
+marcate cu un punct albastru (cantitate necritică) sau roșu (limită depășită).
+Când selectezi o zi, băuturile respective sunt afișate și pot fi, la nevoie,
+corectate sau șterse. Este posibilă și adăugarea ulterioară a băuturilor
+consumate.
+
+## Ecranul „{{statistics}}”
+
+Acest ecran afișează analize statistice ale consumului tău de alcool, care pot
+fi selectate pe săptămână, lună sau an. Pentru prelucrarea ulterioară a datelor
+într-un program de calcul tabelar este integrat un export CSV. În plus, este
+disponibil un export PDF, care îți prezintă comportamentul de consum pe două
+pagini, într-un format optimizat pentru centrele de consiliere în adicții.
+
+## Ecranul „{{drinks}}”
+
+Acest ecran conține lista băuturilor disponibile. Aplicația este livrată cu o
+serie de băuturi uzuale pe plan internațional. Acestea pot fi modificate sau
+șterse după dorință. Prin simbolul plus poți defini o băutură nouă. O atingere
+pe o băutură deschide dialogul pentru a o înregistra direct ca fiind consumată.
+
+## Ecranul „{{settings}}”
+
+Meniul de setări este accesibil prin pictograma de meniu (☰) din stânga sus.
+Libellus Potionis permite următoarele configurări:
+
+### {{personal_data}}
+
+În această categorie poți introduce propria greutate corporală pentru a lăsa să
+se calculeze aproximativ concentrația de alcool în sânge după
+[formula lui Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Aceasta este apoi afișată pe ecranul „{{today}}”.
+
+### {{limits}}
+
+În această categorie se definesc limitele care trebuie să se aplice propriului
+consum de alcool. Trebuie introduse: limita zilnică maximă în grame de alcool
+pur, limita maximă pe șapte zile, precum și numărul maxim de zile de consum pe
+săptămână. Toate limitele sunt active simultan. Pe ecranul „{{today}}” sunt
+vizibile, în consecință, trei bare de progres. Cine are nevoie de repere pentru
+valori se poate inspira pe
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+din recomandările aplicabile în diferite țări.
+
+### {{statistics}}
+
+În setările statistice se poate stabili la ce oră începe o nouă zi (astfel
+încât, de exemplu, o băutură la ora 1 noaptea să fie încă numărată la ziua
+precedentă) și – de exemplu pentru un nou început de Anul Nou – de la ce dată
+încolo să fie evaluate datele.
+
+### {{backup_section}}
+
+**Datele tale nu părăsesc niciodată acest dispozitiv de la sine.** Libellus
+Potionis păstrează totul în stocarea privată a aplicației și, în mod deliberat,
+nu participă la **nicio** copie de rezervă automată în cloud și la **niciun**
+transfer între dispozitive. Dacă schimbi telefonul, faci o resetare din fabrică
+sau reinstalezi aplicația, **singura modalitate de a-ți păstra datele este să le
+salvezi singur** — nu există altă cale de recuperare, iar datele neexportate nu
+mai pot fi recuperate ulterior.
+
+O copie de rezervă este un singur fișier JSON care conține toate băuturile tale
+și întregul tău jurnal. Pentru a-ți muta datele pe alt telefon:
+
+1. Pe telefonul **vechi**, deschide **„{{settings}}" → {{backup_section}} →
+   {{backup_export}}** și salvează fișierul JSON într-un loc sigur — de exemplu,
+   propriul tău spațiu de stocare în cloud, un e-mail către tine însuți sau un
+   transfer prin USB.
+2. Instalează Libellus Potionis pe telefonul **nou**.
+3. Deschide **„{{settings}}" → {{backup_section}} → {{backup_import}}** și
+   selectează acel fișier JSON. Alege **{{import_replace}}** pentru a suprascrie
+   tot sau **{{import_merge}}** pentru a-l combina cu intrările deja existente.
+
+Exportă în mod regulat: o copie de rezervă protejează doar datele care existau în
+momentul în care ai creat-o.
+
+### {{security}}
+
+Această categorie protejează accesul la aplicație și îi controlează
+vizibilitatea. Activează {{biometric_lock}} pentru a solicita Face ID sau
+Touch ID de fiecare dată când aplicația este deschisă. Comutatorul
+{{allow_screenshots}} stabilește dacă conținutul aplicației apare în
+comutatorul de aplicații (App Switcher); este dezactivat în mod implicit,
+astfel încât aplicația este ascunsă acolo când o părăsești. iOS nu permite
+unei aplicații să blocheze capturile de ecran sau înregistrările ecranului,
+așa că această setare nu le afectează.
+
+### {{appearance}}
+
+În această categorie pot fi stabilite schema de culori și limba independent de
+setările sistemului.

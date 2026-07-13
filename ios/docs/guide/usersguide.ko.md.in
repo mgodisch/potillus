@@ -1,0 +1,132 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+# Libellus Potionis -- 사용 설명서
+
+Libellus Potionis에 오신 것을 환영합니다. 이 앱은 당신의 음주량을 기록하는 개인용
+기록 도구입니다. 이 페이지에서는 앱의 특징과 기능을 설명합니다.
+
+## 주요 특징
+
+Libellus Potionis는 오픈 소스입니다. 소스 코드는 누구나 열람하고 검증할 수 있습니다.
+Libellus Potionis는 개인정보를 존중합니다. 카메라나 마이크는 물론 GPS나 네트워크에 대한
+어떠한 권한도 필요로 하지 않습니다. Libellus Potionis는 안전합니다. 데이터는 기기의 앱
+비공개 저장소에 보관되고 기기 암호화로 보호되며, 앱 접근은 Face ID 또는 Touch ID로 제한할 수 있습니다.
+Libellus Potionis는 「la petite sœur」가 아직 예산 안에 있는지를 언제든지 알려 주어,
+당신이 자신의 한도까지 절제하며 마실 수 있도록 돕습니다. 또한 이 앱은 중독 상담소 상담
+시, 요청에 따라 당신의 음주 행태 전체를 보기 쉬운 두 쪽짜리 PDF 문서로 정리해 줍니다.
+Libellus Potionis는 완전히 무료이며 광고가 없습니다.
+
+Libellus Potionis는 iOS 17.0 이상을 필요로 합니다. 제작자는 iPhone 16E에서 지속적으로 사용하고 있으며, 추가로 iPhone 17 Pro 에뮬레이터에서도 테스트하고 있습니다.
+
+## "{{today}}" 화면
+
+이 화면에는 당신이 오늘 마신 알코올 음료 목록이 표시됩니다. 입력 중 실수가 있었다면
+여기에서 항목을 편집하거나 삭제할 수 있습니다. 더하기 버튼으로 음료를 추가할 수
+있습니다.
+
+음료 목록 위에는 다음 정보를 담은 오늘의 개요가 표시됩니다. 오늘 이미 섭취한 알코올의
+양(그램), 일일 한도 및 7일 한도 대비 오늘 이미 섭취한 양(그램 및 막대그래프), 그리고
+오늘과 직전 6일(이동 7일 창/이동 주간) 동안의 지금까지의 음주 일수를 한도 대비로 나타낸
+값(숫자 및 막대그래프)입니다.
+
+또한 “Ø”로 표시된 배지가 이번 달의 평균 소비량(하루 평균 순수 알코올 그램 수)을
+보여 줍니다.
+
+## "{{calendar}}" 화면
+
+이 화면에는 달력이 표시됩니다. 알코올을 섭취한 날에는 파란 점(문제없는 양) 또는 빨간
+점(한도 초과)이 표시됩니다. 날짜를 선택하면 해당 날의 음료가 나열되며, 필요하면 수정하
+거나 삭제할 수 있습니다. 나중에 섭취한 음료를 추가하는 것도 가능합니다.
+
+## "{{statistics}}" 화면
+
+이 화면에는 주, 월, 연 단위로 선택할 수 있는 음주량 통계 분석이 표시됩니다. 스프레드시트
+에서 데이터를 추가로 처리할 수 있도록 CSV 내보내기가 내장되어 있습니다. 또한 중독 상담소
+에 최적화된 형식으로 당신의 음주 행태를 두 쪽으로 정리해 주는 PDF 내보내기도 사용할 수
+있습니다.
+
+## "{{drinks}}" 화면
+
+이 화면에는 사용 가능한 음료 목록이 들어 있습니다. 앱에는 국제적으로 널리 쓰이는 음료
+몇 가지가 기본으로 제공됩니다. 이들은 자유롭게 수정하거나 삭제할 수 있습니다. 더하기
+기호로 새 음료를 정의할 수 있습니다. 음료를 탭하면 그 음료를 바로 섭취한 것으로 기록하는
+대화상자가 열립니다.
+
+## "{{settings}}" 화면
+
+설정 메뉴는 왼쪽 위의 메뉴 아이콘(☰)으로 열 수 있습니다. Libellus Potionis는 다음과
+같은 설정을 제공합니다.
+
+### {{personal_data}}
+
+이 항목에서는 [비드마크 공식](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
+에 따라 혈중 알코올 농도를 근사적으로 계산하도록 자신의 체중을 입력할 수 있습니다.
+계산된 값은 "{{today}}" 화면에 표시됩니다.
+
+### {{limits}}
+
+이 항목에서는 자신의 음주에 적용할 한도를 설정합니다. 입력할 항목은 순수 알코올 그램
+단위의 최대 일일 한도, 최대 7일 한도, 그리고 주당 최대 음주 일수입니다. 모든 한도는 동시
+에 적용됩니다. "{{today}}" 화면에는 그에 따라 세 개의 진행 막대가 표시됩니다. 값에 대한
+기준이 필요하다면 여러 나라에서 적용되는 권장치를
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+에서 참고할 수 있습니다.
+
+### {{statistics}}
+
+통계 설정에서는 새로운 하루가 몇 시에 시작되는지(예를 들어 새벽 1시의 음료가 여전히 전날
+로 집계되도록)를 정할 수 있고, 또한 예를 들어 새해 첫날의 재시작을 위해 어느 날짜 이후의
+데이터를 분석할지 정할 수 있습니다.
+
+### {{backup_section}}
+
+**여러분의 데이터는 저절로 이 기기를 벗어나지 않습니다.** Libellus Potionis는
+모든 것을 앱의 비공개 저장소에 보관하며, 의도적으로 어떠한 자동 클라우드
+백업에도, 어떠한 기기 간 전송에도 **참여하지 않습니다**. 휴대폰을 바꾸거나
+공장 초기화를 하거나 앱을 다시 설치하면, **데이터를 지키는 유일한 방법은 직접
+백업하는 것**입니다. 다른 복구 경로는 없으며, 내보내지 않은 데이터는 나중에
+되찾을 수 없습니다.
+
+백업은 모든 음료와 전체 기록이 담긴 하나의 JSON 파일입니다. 데이터를 다른
+휴대폰으로 옮기려면:
+
+1. **기존** 휴대폰에서 **'{{settings}}' → {{backup_section}} →
+   {{backup_export}}**를 열고 JSON 파일을 안전한 곳(예: 본인의 클라우드 저장소,
+   자신에게 보내는 이메일, USB 전송 등)에 저장합니다.
+2. **새** 휴대폰에 Libellus Potionis를 설치합니다.
+3. **'{{settings}}' → {{backup_section}} → {{backup_import}}**를 열고 그 JSON
+   파일을 선택합니다. 모두 덮어쓰려면 **{{import_replace}}**를, 기존 항목과
+   합치려면 **{{import_merge}}**를 선택합니다.
+
+정기적으로 내보내세요. 백업은 만든 시점에 존재하던 데이터만 보호합니다.
+
+### {{security}}
+
+이 항목은 앱에 대한 접근을 보호하고 표시 여부를 제어합니다. {{biometric_lock}}을(를) 켜면 앱을 열 때마다 Face ID 또는 Touch ID가 필요합니다. {{allow_screenshots}} 스위치는 앱 내용이 App Switcher(앱 전환기)에 표시될지 여부를 제어합니다. 기본적으로 꺼져 있어 앱을 벗어나면 그곳에서 숨겨집니다. iOS는 앱이 스크린샷이나 화면 녹화를 차단하도록 허용하지 않으므로 이 설정은 그것들에 영향을 주지 않습니다.
+
+### {{appearance}}
+
+이 항목에서는 색 구성과 언어를 시스템 설정과 독립적으로 지정할 수 있습니다.

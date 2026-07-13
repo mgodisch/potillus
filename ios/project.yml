@@ -105,8 +105,68 @@ targets:
       # this project is regenerated. One usersguide_<tag>.md per language; the app
       # loads the file for its in-app language with an English fallback. Same
       # type: file / buildPhase reasoning as the documents above. For now only the
-      # English guide ships; the translations are added as their templates land.
+      # English guide is the fallback; each language loads its own when present.
       - path: Potillus/Resources/usersguide_en.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_de.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_da.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_nl.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_nb.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_sv.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_es.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_fr.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_it.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_pt.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_pt-BR.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_ro.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_cs.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_pl.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_ru.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_uk.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_el.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_ja.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_ko.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_zh-Hans.md
+        type: file
+        buildPhase: resources
+      - path: Potillus/Resources/usersguide_zh-Hant.md
         type: file
         buildPhase: resources
     dependencies:
