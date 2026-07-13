@@ -99,7 +99,7 @@ struct PotillusApp: App {
                     // The database opens in milliseconds; this is a guard against a
                     // blank window, not a real loading screen.
                     ProgressView()
-                        .task { startup = StartupState.make() }
+                        .task { startup = await StartupState.make(arming: lock) }
 
                 case .ready(let environment):
                     RootView(environment: environment, lock: lock)
@@ -124,7 +124,14 @@ struct PotillusApp: App {
                     AppLockCover(state: lock.state, locale: Loc.locale(for: language)) { await lock.retry() }
                 }
             }
-            .task { await lock.onLaunch() }
+            // NOTE: the cold-start lock prompt is NOT fired here with a bare
+            // `.task { await lock.onLaunch() }`. That call raced the settings
+            // read: it ran while `lock.isEnabled` still held its `false`
+            // default, so the guard in `onLaunch` skipped the prompt and a cold
+            // start opened the diary unlocked (0.83.0 QA round). The prompt now
+            // runs inside `StartupState.make(arming:)`, strictly AFTER the
+            // stored setting has been loaded and strictly BEFORE any content
+            // view exists.
             // Keyed on readiness so the observing task RESTARTS when the
             // environment appears. A plain `.task` fires once, while `startup` is
             // still `.loading`, sees no environment, and never observes the flag —
@@ -165,12 +172,42 @@ enum StartupState {
         return false
     }
 
-    /// Assembles the live environment, converting a throw into a shown message.
+    /// Assembles the live environment, converting a throw into a shown message —
+    /// and completes the app lock's cold start before any content can render.
     ///
     /// A `-screenshotMode` launch takes a different path: an ephemeral, clock-pinned
     /// environment seeded from the demo fixture (see `ScreenshotMode`), never the
     /// on-disk database. The report render is fired alongside it.
-    static func make() -> StartupState {
+    ///
+    /// WHY THE LOCK IS ARMED IN HERE
+    ///   `AppLockModel.onLaunch` prompts only while `isEnabled` is true, and
+    ///   `isEnabled` mirrors a setting inside the encrypted preferences file.
+    ///   Arming "somewhere else, eventually" (the previous shape: a bare
+    ///   `.task { await lock.onLaunch() }` beside RootView's settings
+    ///   observation) let the launch prompt race the settings read and lose —
+    ///   the diary opened without Face ID after every process death. Loading
+    ///   the settings HERE and awaiting `armAndLaunch` BEFORE returning
+    ///   `.ready` closes the race by ordering, not by timing: the content view
+    ///   cannot exist until the prompt has been answered, and while the prompt
+    ///   is up the lock cover overlays the plain ProgressView.
+    @MainActor
+    static func make(arming lock: AppLockModel) async -> StartupState {
+        let state = makeEnvironment()
+        guard case .ready(let environment) = state else { return state }
+
+        let settings = await environment.preferences.load()
+        await lock.armAndLaunch(
+            enabled: settings.biometricEnabled,
+            reason: Loc.string(
+                "Please authenticate", locale: Loc.locale(for: settings.language)
+            )
+        )
+        return state
+    }
+
+    /// Builds the environment alone. Split from [make] so the throwing/branching
+    /// construction stays readable next to the lock choreography above.
+    private static func makeEnvironment() -> StartupState {
         if ScreenshotMode.isActive {
             guard let environment = ScreenshotMode.makeEnvironment() else {
                 return .failed("The screenshot environment could not be built.")

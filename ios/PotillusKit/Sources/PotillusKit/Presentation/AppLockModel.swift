@@ -92,10 +92,44 @@ public final class AppLockModel {
 
     /// Called once when the app becomes active for the first time. Locks if the
     /// setting is on, so a cold start behind an enabled lock shows the cover.
+    ///
+    /// PRECONDITION: `isEnabled` must already reflect the STORED setting. On a
+    /// cold start that value lives in the encrypted preferences and arrives
+    /// asynchronously; calling this before it has been read makes the guard
+    /// below see the `false` default and skip the prompt — the diary would open
+    /// unlocked. Shells therefore go through [armAndLaunch], which takes the
+    /// freshly loaded setting as a parameter and cannot be called too early.
     public func onLaunch() async {
         guard isEnabled else { return }
         state = .locked
         await authenticate()
+    }
+
+    /// Arms the gate from the freshly loaded settings, then runs the cold-start
+    /// prompt. The one entry point a shell should use at launch.
+    ///
+    /// WHY A COMBINED CALL
+    ///   The launch sequence has an ordering hazard: `onLaunch` consults
+    ///   `isEnabled`, and `isEnabled` mirrors a setting that is read from disk
+    ///   asynchronously. A shell that fires `onLaunch` "on appear" races that
+    ///   read — the guard sees the initial `false`, returns, and the app comes
+    ///   up unlocked even though the user switched the lock on (found in the
+    ///   0.83.0 QA round; the model tests armed the flag by hand and so never
+    ///   saw the race). Taking the setting as a PARAMETER removes the hazard by
+    ///   construction: the caller cannot reach this line without having loaded
+    ///   the settings first.
+    ///
+    /// - Parameters:
+    ///   - enabled: The stored `biometricEnabled` setting.
+    ///   - reason: The localized prompt message, resolved by the shell against
+    ///     the stored language (the model cannot localize; see `reason`).
+    public func armAndLaunch(enabled: Bool, reason: String) async {
+        self.reason = reason
+        // Setting `isEnabled` runs `enabledChanged`, which on a false→true flip
+        // deliberately does NOT lock (mid-session arming waits for the next
+        // background return). The cold-start lock is `onLaunch`'s job, below.
+        self.isEnabled = enabled
+        await onLaunch()
     }
 
     /// The app went to the background. Record when, so the return can measure the

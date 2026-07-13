@@ -220,4 +220,33 @@ final class AppLockModelTests: XCTestCase {
         await model.retry()
         XCTAssertEqual(model.state, .unlocked)
     }
+
+    // ── The cold start, through the shell's one entry point ──────────────────
+    //
+    // `onLaunch` alone is a trap: it consults `isEnabled`, which on a real cold
+    // start is still the `false` default until the encrypted settings have been
+    // read. The tests above arm the flag by hand and therefore never see that
+    // race — the 0.83.0 QA round found the shipped shell losing it on every
+    // process death. `armAndLaunch` takes the loaded setting as a parameter, so
+    // the ordering bug cannot be written; these tests pin that contract.
+
+    func testArmAndLaunchPromptsWhenTheStoredSettingIsOn() async {
+        fake.willSucceed = false  // keep the cover up so the lock is observable
+        let model = makeModel()   // isEnabled still holds the false default
+
+        await model.armAndLaunch(enabled: true, reason: "localized prompt")
+
+        XCTAssertEqual(model.state, .locked, "a cold start behind the lock covers the diary")
+        XCTAssertEqual(fake.evaluateCount, 1)
+        XCTAssertEqual(model.reason, "localized prompt", "the shell's localized reason is taken")
+    }
+
+    func testArmAndLaunchStaysQuietWhenTheStoredSettingIsOff() async {
+        let model = makeModel()
+
+        await model.armAndLaunch(enabled: false, reason: "localized prompt")
+
+        XCTAssertEqual(model.state, .unlocked)
+        XCTAssertEqual(fake.evaluateCount, 0, "no lock configured, no prompt")
+    }
 }
