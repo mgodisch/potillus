@@ -76,6 +76,27 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
   include DST transitions (the spring-forward gap and the fall-back repetition)
   and cross-timezone instants, because the same instant is a different logical
   day in different zones.
+- `app-lock.json` — the biometric lock's re-auth threshold: given the monotonic
+  reading recorded on backgrounding and the reading on return, must the prompt
+  reappear? Pins the boundary itself ("exactly at the threshold: prompt", `>=`)
+  and the refusal to trust a backwards reading. One-sided (iOS-only) until the
+  0.83.0 QA round, which is exactly how Android's strict `>` diverged unseen;
+  now asserted by `AppLockVectorTest` on both platforms.
+- `report-chart.json` — the PDF report chart's presentation arithmetic (label
+  picking, bar scaling). The label indices are deliberately computed in 32-bit
+  float, because the Kotlin original truncates differently from Double for some
+  series lengths; the file's `_comment` carries the full story.
+- `report-data.json` — the PDF report's computed dataset, for the slice of
+  `PdfReportData` that does not read the device zone, locale or clock; the
+  file's `_comment` states the scope and why it is not the whole struct.
+- `report-format.json` — the report's number formatting. Every expected string
+  was PRODUCED BY THE JVM (`String.format(locale, …)` on OpenJDK 21), not
+  written by hand, because Kotlin and Swift disagree on half-way rounding and
+  the JVM behaviour is the contract.
+- `template-render.json` — the two-feature template engine that fills
+  `report/report_template.html`: `{{KEY}}` substitution with HTML-escaped
+  values, and `<!-- repeat:NAME -->` row blocks; the trusted template text
+  itself is never escaped.
 
 ## Loading
 

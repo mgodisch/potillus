@@ -143,9 +143,10 @@ From the **repository root** (not from `ios/`):
 
 This does two things in the required order:
 
-1. Regenerates `ios/Version.xcconfig` from the shared `VERSION` file (via
-   `tools/gen-ios-version.py`), so the iOS build number can never drift from
-   the changelog. XcodeGen cannot resolve `project.yml` until this file
+1. Regenerates `ios/Version.xcconfig` from the shared sources of truth (via
+   `tools/gen-ios-version.py`): the top `## vX.Y.Z` entry of `CHANGELOG.md`
+   and the Android `versionCode`, so the iOS build number can never drift
+   from the changelog. XcodeGen cannot resolve `project.yml` until this file
    exists.
 2. Runs `xcodegen generate` inside `ios/`, producing `ios/Potillus.xcodeproj`.
 
