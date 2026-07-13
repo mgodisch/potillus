@@ -40,6 +40,20 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
+## v0.83.0
+
+Bump version to 0.83.0
+
+This opens the 0.83.0 cycle with the version bump only — `versionCode` 93 → 94 and
+the human version 0.82.0 → 0.83.0 — to take the iOS app to the public App Store
+listing via the `ios testing` lane. The App Store export-compliance declaration is
+already in place (`ITSAppUsesNonExemptEncryption` = NO in `ios/project.yml`), so no
+change is needed there. Functional changes and the final, localised release notes
+follow later in the 0.83.0 cycle; until then the Android per-locale `94.txt`
+changelogs are placeholders, and the iOS release notes are unchanged from 0.82.0.
+
+---
+
 ## v0.82.0
 
 Add the native Swift/SwiftUI iOS port

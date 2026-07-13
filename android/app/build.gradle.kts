@@ -181,12 +181,12 @@ android {
         // versionCode: opaque monotonic integer, bumped by at least 1 for every
         // published APK. Android uses it (not versionName) to order updates.
         // versionName: human-readable MAJOR.MINOR.PATCH string.
-        // Keep both in lock-step with the CHANGELOG, the README title and the
-        // proguard-rules.pro header — release-check.sh §1 enforces this.
-        versionCode = 93
+        // Keep both in lock-step with the CHANGELOG and the README title —
+        // release-check.sh §1 enforces this.
+        versionCode = 94
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.82.0"
+        versionName = "0.83.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)
