@@ -76,6 +76,11 @@ struct SettingsScreen: View {
     /// Stateless, so the screen owns one rather than receiving the whole lock model.
     private let biometrics = DeviceBiometricAuthenticator()
 
+    /// Drives the App-lock switch. Kept separate from the stored preference so a
+    /// flip can be gated behind a prompt: the switch moves at once, the preference
+    /// only after the device owner authenticates, and this snaps back if they don't.
+    @State private var appLockArmed = false
+
     init(environment: AppEnvironment) {
         self.environment = environment
         _model = State(initialValue: SettingsModel(preferences: environment.preferences))
@@ -349,6 +354,23 @@ struct SettingsScreen: View {
             }
         )
     }
+
+    /// Prompt, then commit the App-lock change — or snap the switch back.
+    ///
+    /// Required for BOTH arming and disarming, so neither turning the lock on nor
+    /// off happens without the device owner present; Android gates its switch the
+    /// same way (`authenticateForToggle`). On success the preference is written
+    /// through the model like any other setting; on cancel or failure nothing is
+    /// written, and re-reading the unchanged stored value returns the switch to
+    /// where it was.
+    @MainActor
+    private func confirmAppLock(desired: Bool) async {
+        if await biometrics.evaluate(reason: Loc.string("Please authenticate", locale: locale)) {
+            await model.update { $0.biometricEnabled = desired }
+        } else {
+            appLockArmed = model.settings.biometricEnabled
+        }
+    }
 }
 
 // =============================================================================
@@ -362,8 +384,22 @@ extension SettingsScreen {
             if biometrics.canEvaluate() {
                 Toggle(
                     Loc.string("App lock", locale: locale),
-                    isOn: bind(\.biometricEnabled, set: { $0.biometricEnabled = $1 })
+                    isOn: $appLockArmed
                 )
+                .onChange(of: appLockArmed) { _, desired in
+                    // A programmatic sync (below) always leaves `desired` equal to
+                    // the stored value; only a real finger on the switch differs
+                    // from it, and only that asks for a prompt.
+                    guard desired != model.settings.biometricEnabled else { return }
+                    Task { await confirmAppLock(desired: desired) }
+                }
+                .onChange(of: model.settings.biometricEnabled) { _, stored in
+                    // Keep the switch in step with the stored value: the async
+                    // initial load and the snap-back after a cancelled prompt both
+                    // arrive here.
+                    if appLockArmed != stored { appLockArmed = stored }
+                }
+                .onAppear { appLockArmed = model.settings.biometricEnabled }
             } else {
                 // No biometrics enrolled and no passcode set. Offering the toggle
                 // would arm a lock the device cannot open, locking the diary away

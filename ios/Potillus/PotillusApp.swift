@@ -54,8 +54,23 @@ struct PotillusApp: App {
     /// injected now; the tests inject a fake into the same model.
     @State private var lock = AppLockModel(
         authenticator: DeviceBiometricAuthenticator(),
-        uptime: { ProcessInfo.processInfo.systemUptime }
+        uptime: { PotillusApp.continuousUptime() }
     )
+
+    /// A fixed origin for `continuousUptime()`, taken once at process start. Only
+    /// differences between readings matter to the lock, so the origin is arbitrary.
+    private static let uptimeEpoch = ContinuousClock().now
+
+    /// Monotonic seconds that KEEP COUNTING WHILE THE DEVICE SLEEPS — the iOS match
+    /// for Android's `elapsedRealtime`, and the reading AppLock's 30-second re-auth
+    /// window is measured against. `ContinuousClock` is the sleep-inclusive clock;
+    /// `ProcessInfo.systemUptime` (used before) STOPS during sleep, so a phone left
+    /// locked in a pocket could return under the window and skip the prompt.
+    private static func continuousUptime() -> TimeInterval {
+        let elapsed = ContinuousClock().now - uptimeEpoch
+        return Double(elapsed.components.seconds)
+            + Double(elapsed.components.attoseconds) * 1e-18
+    }
 
     @Environment(\.scenePhase) private var scenePhase
 

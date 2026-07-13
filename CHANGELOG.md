@@ -261,6 +261,16 @@ and corrects documentation that the port had outgrown:
   recent-apps overview (and the note that iOS cannot block screenshots), the iOS
   system requirements, and the top-left menu — rewritten for iOS. They are
   best-effort and await native review, exactly like the string translations.
+- **The app lock is harder to switch off, and no longer fooled by a sleeping
+  device.** Two fixes brought over from the Android lock review. First, the
+  App-lock switch now requires Face ID / Touch ID (or the passcode) BOTH to turn
+  the lock on and to turn it off, and a cancelled prompt leaves the setting where
+  it was — previously the switch wrote the preference directly, so anyone holding
+  the unlocked phone could simply disable the lock. This matches Android's
+  `authenticateForToggle`. Second, the 30-second re-auth window is now measured
+  with `ContinuousClock`, which keeps counting while the device sleeps, instead of
+  `ProcessInfo.systemUptime`, which stops; a phone left locked in a pocket past the
+  window now correctly re-prompts on return, matching Android's `elapsedRealtime`.
 
 ---
 

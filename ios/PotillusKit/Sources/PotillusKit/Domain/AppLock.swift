@@ -45,8 +45,11 @@ import Foundation
 //   clock. `Clock` in this kit reads `Date`, which a time-zone change or an NTP
 //   correction can move backwards; a lock timer built on it could be defeated by
 //   changing the device date, or could fire early after a correction. The shell
-//   supplies `ProcessInfo.processInfo.systemUptime`, the iOS counterpart to
-//   Android's `elapsedRealtime`. This type never reads a clock itself; it is
+//   supplies a reading from `ContinuousClock`, which — like Android's
+//   `elapsedRealtime` — KEEPS COUNTING WHILE THE DEVICE SLEEPS. (An earlier build
+//   used `ProcessInfo.processInfo.systemUptime`; that clock STOPS during sleep, so
+//   a phone left locked in a pocket overnight could return under the 30-second
+//   window and skip the prompt.) This type never reads a clock itself; it is
 //   handed two uptime readings and subtracts them.
 // =============================================================================
 
