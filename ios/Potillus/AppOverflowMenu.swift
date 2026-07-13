@@ -90,11 +90,12 @@ struct AppOverflowMenu: ViewModifier {
                         } label: {
                             Label(Loc.string("Copyright", locale: locale), systemImage: "book")
                         }
-                        // "Lock app" appears only while the lock is enabled: a manual
-                        // lock is meaningful only then, and AppLockModel.lockNow()
-                        // refuses otherwise so it can never strand the user behind a
-                        // cover the authenticate/retry path would decline to clear.
-                        if lock?.isEnabled == true {
+                        // "Lock app" appears whenever the device can authenticate,
+                        // matching Android: a manual lock no longer requires auto-lock
+                        // to be armed, and lockNow()/retry() can always clear the cover
+                        // again. Hidden only when there is no biometric and no passcode,
+                        // where a cover would strand the user.
+                        if lock?.deviceCanAuthenticate() == true {
                             Button {
                                 Task { await lock?.lockNow() }
                             } label: {

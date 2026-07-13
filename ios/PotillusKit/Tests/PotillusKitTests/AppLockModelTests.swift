@@ -190,11 +190,34 @@ final class AppLockModelTests: XCTestCase {
         XCTAssertEqual(fake.evaluateCount, 1, "manual lock prompts at once")
     }
 
-    func testLockNowIsANoOpWhenDisabled() async {
+    func testLockNowLocksEvenWithAutoLockOff() async {
+        fake.willSucceed = false  // keep the cover up so the lock is observable
         let model = makeModel()  // isEnabled defaults to false
         await model.lockNow()
 
-        XCTAssertEqual(model.state, .unlocked, "no lock is armed while the feature is off")
+        XCTAssertEqual(model.state, .locked, "manual lock does not need auto-lock armed")
+        XCTAssertEqual(fake.evaluateCount, 1, "manual lock prompts at once")
+    }
+
+    func testLockNowIsANoOpWithoutAnAuthenticator() async {
+        fake.capable = false
+        let model = makeModel()
+        await model.lockNow()
+
+        XCTAssertEqual(model.state, .unlocked, "no cover with nothing to dismiss it")
         XCTAssertEqual(fake.evaluateCount, 0)
+    }
+
+    func testAManualLockCanBeUnlockedWithAutoLockOff() async {
+        let model = makeModel()  // isEnabled defaults to false
+        fake.willSucceed = false
+        await model.lockNow()
+        XCTAssertEqual(model.state, .locked)
+
+        // The retry path must clear the cover even though auto-lock is off, or the
+        // manual lock would strand the user.
+        fake.willSucceed = true
+        await model.retry()
+        XCTAssertEqual(model.state, .unlocked)
     }
 }

@@ -290,6 +290,14 @@ and corrects documentation that the port had outgrown:
   reason is now set from the language setting each time it changes (the same place
   the gate is armed), reusing the "Please authenticate" string, which is exactly
   what Android shows for every biometric prompt.
+- **Manual "Lock app" no longer requires auto-lock to be on.** The overflow menu's
+  lock entry, and `lockNow()`, were tied to the automatic lock being enabled, so a
+  user who had not switched on auto-lock could not blank the screen on demand —
+  unlike Android, which offers it whenever the device can authenticate. The entry
+  now appears, and locks, whenever a biometric or device passcode is available;
+  the unlock path (`retry`, and the reprompt on returning while locked) no longer
+  depends on the auto-lock setting, so a manual lock can always be cleared and
+  never strands the user. It stays hidden when the device has no authenticator.
 
 ---
 

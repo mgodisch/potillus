@@ -108,8 +108,9 @@ public final class AppLockModel {
     public func onForeground() async {
         guard isEnabled, state == .unlocked else {
             // Already locked or authenticating: leave it. A return while the prompt
-            // is up must not start a second prompt.
-            if isEnabled, state == .locked { await authenticate() }
+            // is up must not start a second prompt. A return while locked reprompts
+            // regardless of `isEnabled`, so a manual lock stays openable.
+            if state == .locked { await authenticate() }
             return
         }
         if AppLock.requiresReauth(
@@ -121,8 +122,13 @@ public final class AppLockModel {
     }
 
     /// Retry from the cover's button after a cancel or failure.
+    ///
+    /// Guarded only on being locked, not on `isEnabled`: a manual lock (below) can
+    /// raise the cover while auto-lock is off, and the retry button must still be
+    /// able to dismiss it — otherwise the user would be stranded behind a cover
+    /// with no way through.
     public func retry() async {
-        guard isEnabled, state == .locked else { return }
+        guard state == .locked else { return }
         await authenticate()
     }
 
@@ -130,16 +136,17 @@ public final class AppLockModel {
     /// the automatic lock — which waits for a long-enough background gap — this
     /// locks on the spot and prompts at once.
     ///
-    /// Guarded on `isEnabled`: the menu only offers this entry when the lock is on,
-    /// and manual locking is meaningful only then. Were the lock off, `retry()` and
-    /// `onForeground()` would refuse to re-authenticate (they guard on `isEnabled`
-    /// too), stranding the user behind a cover they could not dismiss — the very
-    /// lock-out the settings toggle's device-capability check exists to prevent.
-    /// (Android offers the entry whenever the device can authenticate; iOS ties it
-    /// to the lock being on, because that is what its authenticate/retry path
-    /// requires.) A no-op when already locked or authenticating.
+    /// Available whenever the device can authenticate, INDEPENDENTLY of the
+    /// auto-lock setting, matching Android's manual lock: a user may want to hide
+    /// the screen for a moment without arming the automatic re-lock. It is a no-op
+    /// when the device has no biometrics and no passcode, because a cover no prompt
+    /// could dismiss would strand the diary — the same lock-out the settings
+    /// toggle's capability check prevents. The unlock path (`retry`, and
+    /// `onForeground` while already locked) no longer depends on `isEnabled`, so a
+    /// manual lock with auto-lock off can always be opened again. A no-op when
+    /// already locked or authenticating.
     public func lockNow() async {
-        guard isEnabled, state == .unlocked else { return }
+        guard state == .unlocked, deviceCanAuthenticate() else { return }
         state = .locked
         await authenticate()
     }
