@@ -384,6 +384,13 @@ and corrects documentation that the port had outgrown:
   through two levels; the value is now computed in a small `grams` helper so the
   interpolation is single-level and the `Text` holds no literal at all. Both were
   format-only; no user-visible behaviour changed.
+- **Fixed a build break in the Statistics trend readout.** Localizing the trend
+  percentage had wrapped its `Loc.number` call across several lines *inside* a
+  string interpolation, which Swift does not allow — a single-line string literal
+  cannot contain a newline in its `\(…)`, so the compiler saw an unterminated
+  literal. The value now goes through a small `trend` formatting helper beside the
+  existing `grams` one, keeping the interpolation on one line and the call site
+  short. No behaviour changed.
 
 ---
 

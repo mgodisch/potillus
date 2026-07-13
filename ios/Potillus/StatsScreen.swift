@@ -187,11 +187,7 @@ struct StatsScreen: View {
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
-                        Text("\(Loc.number(
-                            model.state.trendPercent, fractionDigits: 1,
-                            locale: locale, signed: true
-                        )) %")
-                            .monospacedDigit()
+                        trend(model.state.trendPercent)
                     }
                 }
             }
@@ -367,6 +363,10 @@ extension StatsScreen {
 
     private func grams(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g").monospacedDigit()
+    }
+
+    private func trend(_ value: Double) -> some View {
+        Text("\(Loc.number(value, fractionDigits: 1, locale: locale, signed: true)) %").monospacedDigit()
     }
 
     private func count(_ value: Int) -> some View {
