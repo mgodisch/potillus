@@ -81,33 +81,83 @@ struct DocumentViewerScreen: View {
 
     // ── A deliberately small Markdown pass ───────────────────────────────────
     //
-    // Android renders this document with a full Markdown component. Here the
-    // document is a licence: mostly prose, with `#`/`##`/`###` headings and `---`
-    // rules. A heavyweight parser on 60 KB earns nothing a few line rules do not,
-    // and a licence must never fail to display because a parser choked. So each
-    // line becomes one of four blocks — heading, rule, blank, or paragraph — and
-    // paragraphs keep any inline Markdown via SwiftUI's own `Text(_:)` markdown.
+    // Android renders these documents with a full Markdown component. Here the
+    // documents are the licence and the user guide: prose with `#`/`##`/`###`
+    // headings, `---` rules, and the guide's short lists. A heavyweight parser
+    // on 60 KB earns nothing a few line rules do not, and a licence must never
+    // fail to display because a parser choked. So the text becomes a sequence
+    // of four block kinds — heading, rule, paragraph, or blank-separated list
+    // item — and paragraphs keep any inline Markdown via SwiftUI's own
+    // `Text(_:)` markdown.
+    //
+    // WHY LINES ARE JOINED
+    //   The sources are hard-wrapped at ~79 columns (they are readable Markdown
+    //   files first). The first version of this pass made every SOURCE LINE its
+    //   own block, so each wrapped line rendered as a separate paragraph with a
+    //   10-point gap — the guide showed ragged shreds of sentences, and a list
+    //   item broke apart mid-entry (0.83.0 QA round). Markdown's own rule is
+    //   the fix: consecutive non-blank lines are ONE paragraph, a blank line
+    //   ends it. A line starting a list item (`- `, `* `, or `1. `) also starts
+    //   a new block, and its own wrapped continuation lines join INTO it, so
+    //   the item stays whole.
 
-    private static func parse(_ text: String) -> [Block] {
+    /// Internal, not private: the smoke-test bundle drives it with wrapped
+    /// paragraphs and list items to pin the joining rules above.
+    static func parse(_ text: String) -> [Block] {
         var blocks: [Block] = []
+        // The lines of the paragraph being accumulated, joined on flush. The id
+        // of a block is the index of its FIRST source line — stable across
+        // renders, which is all `Identifiable` needs.
+        var paragraph: [String] = []
+        var paragraphStart = 0
+
+        func flush() {
+            guard !paragraph.isEmpty else { return }
+            blocks.append(
+                Block(id: paragraphStart, kind: .body, text: paragraph.joined(separator: " "))
+            )
+            paragraph = []
+        }
+
         for (index, rawLine) in text.components(separatedBy: "\n").enumerated() {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
-            let id = index
             if line.isEmpty {
-                continue
+                flush()
             } else if line == "---" || line == "***" || line == "___" {
-                blocks.append(Block(id: id, kind: .rule, text: ""))
+                flush()
+                blocks.append(Block(id: index, kind: .rule, text: ""))
             } else if line.hasPrefix("### ") {
-                blocks.append(Block(id: id, kind: .heading3, text: String(line.dropFirst(4))))
+                flush()
+                blocks.append(Block(id: index, kind: .heading3, text: String(line.dropFirst(4))))
             } else if line.hasPrefix("## ") {
-                blocks.append(Block(id: id, kind: .heading2, text: String(line.dropFirst(3))))
+                flush()
+                blocks.append(Block(id: index, kind: .heading2, text: String(line.dropFirst(3))))
             } else if line.hasPrefix("# ") {
-                blocks.append(Block(id: id, kind: .heading1, text: String(line.dropFirst(2))))
+                flush()
+                blocks.append(Block(id: index, kind: .heading1, text: String(line.dropFirst(2))))
+            } else if Self.startsListItem(line) {
+                // A list item is its own paragraph; its wrapped continuation
+                // lines (which do not look like item starts) join into it.
+                flush()
+                paragraph = [line]
+                paragraphStart = index
             } else {
-                blocks.append(Block(id: id, kind: .body, text: line))
+                if paragraph.isEmpty { paragraphStart = index }
+                paragraph.append(line)
             }
         }
+        flush()
         return blocks
+    }
+
+    /// Whether a (trimmed) line opens a Markdown list item: `- `, `* `, `+ `,
+    /// or an ordered `12. `. Kept deliberately literal — the two documents this
+    /// viewer shows use exactly these forms, and a false negative merely joins
+    /// an item into the previous paragraph rather than losing text.
+    static func startsListItem(_ line: String) -> Bool {
+        if line.hasPrefix("- ") || line.hasPrefix("* ") || line.hasPrefix("+ ") { return true }
+        let digits = line.prefix { $0.isNumber }
+        return !digits.isEmpty && line.dropFirst(digits.count).hasPrefix(". ")
     }
 
     struct Block: Identifiable {
