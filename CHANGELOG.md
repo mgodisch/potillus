@@ -481,6 +481,17 @@ and corrects documentation that the port had outgrown:
   `Sendable` epoch — so the method is now `nonisolated`, matching the existing
   `StatsModel.dayCount` pattern. Behaviour is unchanged; the warning is gone.
 
+- **The iOS app now has an app icon.** The port shipped without one: there was no
+  asset catalog in `ios/`, so the build set no `CFBundleIconName` and bundled no
+  icon, and App Store upload validation rejected it (missing 120×120 icon and the
+  `CFBundleIconName` key, error 90713/90022). An `AppIcon` asset catalog is added
+  at `ios/Potillus/Assets.xcassets` with a single 1024×1024 marketing icon (Xcode's
+  actool derives the smaller sizes), and `project.yml` names it via
+  `ASSETCATALOG_COMPILER_APPICON_NAME` so actool writes the key and emits the icon.
+  The artwork is the Android launcher's — the white glass-and-straw on the
+  `#1A1E2B` background — vectorised from the 512×512 Play-Store icon to a crisp,
+  opaque 1024×1024; the vector master is kept at `ios/icon/appicon.svg`.
+
 ---
 
 ## v0.81.0

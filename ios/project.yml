@@ -83,6 +83,16 @@ targets:
   Potillus:
     type: application
     platform: iOS
+    # The app icon lives in Assets.xcassets/AppIcon.appiconset (one 1024x1024
+    # marketing icon; Xcode's actool derives the smaller sizes). Naming that set
+    # here makes actool treat it as THE app icon: it writes the CFBundleIconName
+    # Info.plist key and emits the icon into the bundle. Without it, App Store
+    # upload validation rejects the build ("Missing CFBundleIconName" / no 120x120
+    # icon). The catalog needs no `sources` entry -- it sits under the Potillus/
+    # source path below and is picked up automatically.
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     sources:
       - path: Potillus
       # The PDF template lives at the repository root because BOTH platforms read
