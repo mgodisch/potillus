@@ -42,7 +42,11 @@ struct CalendarScreen: View {
 
     @State private var model: CalendarModel
 
+    /// Kept so the overflow menu's Settings sheet can be built.
+    private let environment: AppEnvironment
+
     init(environment: AppEnvironment) {
+        self.environment = environment
         _model = State(initialValue: CalendarModel(
             entries: environment.entries, preferences: environment.preferences,
             clock: environment.clock
@@ -60,6 +64,7 @@ struct CalendarScreen: View {
                 if model.state.selectedDate != nil { selectedDay }
             }
             .navigationTitle(Loc.string("Calendar", locale: locale))
+            .appOverflowMenu(environment: environment)
             // `start()` loads and then subscribes; a database change in another
             // tab reaches this month without a manual reload.
             .task { await model.start() }

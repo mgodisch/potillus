@@ -222,6 +222,16 @@ and corrects documentation that the port had outgrown:
   the swipe gesture. Both the button and the swipe now open the same
   confirmation dialog ("Really delete …?", with a red Delete and a Cancel),
   mirroring Android's, so a removal is always a deliberate two-step action.
+- **Every screen now carries the shared overflow menu.** Android puts one menu
+  in the top bar of all four main screens; iOS previously had only a lone gear on
+  Today, leaving Settings unreachable from Calendar, Statistics and Drinks. A
+  single `AppOverflowMenu` modifier now adds a native navigation-bar menu to each
+  screen with the same entries Android offers: Settings, Copyright, and — while
+  the app lock is enabled — Lock app, which locks on the spot via the lock's new
+  `lockNow()`. (Android also offers a manual lock whenever the device can
+  authenticate; iOS ties the entry to the lock being enabled, which is what its
+  authenticate/retry path requires and what keeps a manual lock from ever
+  stranding the user.) The Help entry follows once the user guide is bundled.
 
 ---
 

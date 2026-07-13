@@ -177,4 +177,24 @@ final class AppLockModelTests: XCTestCase {
         fake.capable = true
         XCTAssertTrue(model.deviceCanAuthenticate())
     }
+
+    // ── Manual lock (overflow menu "Lock app") ───────────────────────────────
+
+    func testLockNowLocksAndPromptsWhenEnabled() async {
+        fake.willSucceed = false  // keep the cover up so the lock is observable
+        let model = makeModel()
+        model.isEnabled = true
+        await model.lockNow()
+
+        XCTAssertEqual(model.state, .locked)
+        XCTAssertEqual(fake.evaluateCount, 1, "manual lock prompts at once")
+    }
+
+    func testLockNowIsANoOpWhenDisabled() async {
+        let model = makeModel()  // isEnabled defaults to false
+        await model.lockNow()
+
+        XCTAssertEqual(model.state, .unlocked, "no lock is armed while the feature is off")
+        XCTAssertEqual(fake.evaluateCount, 0)
+    }
 }

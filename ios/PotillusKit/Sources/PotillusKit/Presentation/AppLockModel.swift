@@ -121,6 +121,24 @@ public final class AppLockModel {
         await authenticate()
     }
 
+    /// Lock the app on demand, from the overflow menu's "Lock app" entry. Unlike
+    /// the automatic lock — which waits for a long-enough background gap — this
+    /// locks on the spot and prompts at once.
+    ///
+    /// Guarded on `isEnabled`: the menu only offers this entry when the lock is on,
+    /// and manual locking is meaningful only then. Were the lock off, `retry()` and
+    /// `onForeground()` would refuse to re-authenticate (they guard on `isEnabled`
+    /// too), stranding the user behind a cover they could not dismiss — the very
+    /// lock-out the settings toggle's device-capability check exists to prevent.
+    /// (Android offers the entry whenever the device can authenticate; iOS ties it
+    /// to the lock being on, because that is what its authenticate/retry path
+    /// requires.) A no-op when already locked or authenticating.
+    public func lockNow() async {
+        guard isEnabled, state == .unlocked else { return }
+        state = .locked
+        await authenticate()
+    }
+
     // ── The prompt ───────────────────────────────────────────────────────────
 
     private func authenticate() async {

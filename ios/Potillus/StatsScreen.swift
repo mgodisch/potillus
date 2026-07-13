@@ -90,6 +90,7 @@ struct StatsScreen: View {
                 weekdays
             }
             .navigationTitle(Loc.string("Statistics", locale: locale))
+            .appOverflowMenu(environment: environment)
             .toolbar {
                 Menu {
                     Button {

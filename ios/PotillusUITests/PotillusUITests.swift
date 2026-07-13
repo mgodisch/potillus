@@ -105,8 +105,11 @@ final class PotillusUITests: XCTestCase {
         tabBar.buttons.element(boundBy: 3).tap()
         snapshot("04_drinks")
 
-        // 06 — Settings, opened from Today's toolbar, then dismissed with a swipe.
+        // 06 — Settings, opened from Today's overflow menu, then dismissed with a
+        // swipe. Settings moved from a standalone gear into the shared menu, so the
+        // menu is opened first; the Settings entry keeps its "nav.settings" id.
         tabBar.buttons.element(boundBy: 0).tap()
+        app.buttons["nav.menu"].tap()
         app.buttons["nav.settings"].tap()
         snapshot("06_settings")
         app.swipeDown(velocity: .fast)

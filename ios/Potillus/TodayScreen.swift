@@ -49,10 +49,8 @@ struct TodayScreen: View {
     /// Set while the entry sheet is open.
     @State private var isLogging = false
 
-    /// Set while the settings sheet is open.
-    @State private var isConfiguring = false
-
-    /// Kept so the settings sheet can be built; the screen owns its own model.
+    /// Kept so the overflow menu's Settings sheet can be built; the screen owns
+    /// its own model.
     private let environment: AppEnvironment
 
     init(environment: AppEnvironment) {
@@ -73,17 +71,8 @@ struct TodayScreen: View {
                 entriesSection
             }
             .navigationTitle(Loc.string("Today", locale: locale))
+            .appOverflowMenu(environment: environment)
             .toolbar {
-                // The gear, as on Android: settings sit above the tabs, not in
-                // them. Leading, so the primary action keeps the trailing corner.
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isConfiguring = true
-                    } label: {
-                        Label(Loc.string("Settings", locale: locale), systemImage: "gearshape")
-                    }
-                    .accessibilityIdentifier("nav.settings")
-                }
                 // iOS puts the primary action in the toolbar; Android uses a
                 // floating action button. Same action, native placement.
                 ToolbarItem(placement: .topBarTrailing) {
@@ -99,9 +88,6 @@ struct TodayScreen: View {
             .task { model.start() }
             .onDisappear { model.stop() }
             .refreshable { await model.load() }
-            .sheet(isPresented: $isConfiguring) {
-                SettingsScreen(environment: environment)
-            }
             .sheet(isPresented: $isLogging) {
                 EntrySheet(
                     drinks: model.state.drinks,

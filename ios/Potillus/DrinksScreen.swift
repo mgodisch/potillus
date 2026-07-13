@@ -47,7 +47,11 @@ struct DrinksScreen: View {
     @State private var isAdding = false
     @State private var deleting: DrinkDefinition?
 
+    /// Kept so the overflow menu's Settings sheet can be built.
+    private let environment: AppEnvironment
+
     init(environment: AppEnvironment) {
+        self.environment = environment
         _model = State(initialValue: DrinksModel(drinks: environment.drinks))
         _logger = State(initialValue: EntryLogModel(environment: environment))
     }
@@ -67,6 +71,7 @@ struct DrinksScreen: View {
                 }
             }
             .navigationTitle(Loc.string("Drinks", locale: locale))
+            .appOverflowMenu(environment: environment)
             .toolbar {
                 Button {
                     model.clearErrors()

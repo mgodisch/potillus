@@ -128,6 +128,9 @@ struct RootView: View {
         // in-app language wins over the system's. Set here, once, from the observed
         // setting: change the language and the whole tree re-renders in it.
         .environment(\.appLocale, Loc.locale(for: settings.language))
+        // The overflow menu on each screen reads the lock from the environment
+        // (it is @Observable) rather than taking it through four initialisers.
+        .environment(lock)
         .task {
             // The stream yields the current value at once, then after every
             // change, so the theme applies without a restart.
