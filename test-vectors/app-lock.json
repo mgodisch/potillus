@@ -1,11 +1,16 @@
 {
   "_comment": [
-    "Shared golden vectors for the re-auth threshold. Loaded by BOTH suites if the",
-    "Android side adopts them; the arithmetic is identical (elapsedRealtime on",
-    "Android, systemUptime on iOS). All times in SECONDS. thresholdSeconds is 30 on",
-    "both platforms; it is repeated here so a vector is self-contained and a change",
-    "to the constant on one side shows up as a vector mismatch on the other.",
-    "backgroundedAt null means the app never left the foreground this session."
+    "Shared golden vectors for the re-auth threshold. Loaded by BOTH suites:",
+    "AppLockVectorTest.swift drives PotillusKit's AppLock.requiresReauth, and",
+    "AppLockVectorTest.kt drives domain/AppLock.kt. The arithmetic is identical",
+    "down to the boundary — 'exactly at the threshold' prompts (>=) on both",
+    "platforms since the 0.83.0 QA round aligned Android's former strict >.",
+    "The monotonic source is elapsedRealtime on Android and a ContinuousClock",
+    "uptime on iOS; both keep counting while the device sleeps. All times in",
+    "SECONDS. thresholdSeconds is 30 on both platforms; it is repeated here so",
+    "a vector is self-contained and a change to the constant on one side shows",
+    "up as a vector mismatch on the other. backgroundedAt null means the app",
+    "never left the foreground this session."
   ],
   "thresholdSeconds": 30,
   "requiresReauth": [

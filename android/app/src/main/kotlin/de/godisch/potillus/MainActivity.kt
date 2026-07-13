@@ -61,8 +61,8 @@ package de.godisch.potillus
 //   b) Re-auth after inactivity:
 //      `onStop` records `backgroundedAt` (unless it is a config change – that
 //      would incorrectly count a rotation as an inactivity period). `onStart`
-//      checks the elapsed time; if it exceeds REAUTH_THRESHOLD_MS the flag is
-//      cleared and the prompt is shown again.
+//      checks the elapsed time; once it reaches AppLock.REAUTH_THRESHOLD_MS
+//      the flag is cleared and the prompt is shown again.
 //
 // VIEWMODEL FACTORY (MainContent):
 //   Jetpack's ViewModelProvider needs a Factory to create ViewModels that have
@@ -101,6 +101,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.BuildConfig
+import de.godisch.potillus.domain.AppLock
 import de.godisch.potillus.ui.nav.AppNavigation
 import de.godisch.potillus.ui.screen.*
 import de.godisch.potillus.ui.theme.PotillusTheme
@@ -176,12 +177,10 @@ class MainActivity : AppCompatActivity() {
         @Volatile
         private var backgroundedAt = 0L
 
-        /**
-         * Minimum background duration after which re-authentication is required.
-         * 30 seconds is a common default for health and finance apps; long enough
-         * to survive a brief pocket-lock but short enough to deter casual snooping.
-         */
-        private const val REAUTH_THRESHOLD_MS = 30_000L
+        // The 30-second re-auth threshold moved to [AppLock.REAUTH_THRESHOLD_MS]
+        // in the 0.83.0 QA round, so the arithmetic is testable on the JVM
+        // against the shared `test-vectors/app-lock.json` — the file the iOS
+        // suite already asserts.
 
         private const val TAG = "MainActivity"
     }
@@ -454,12 +453,20 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * True when the lock should re-engage because the app has been backgrounded
-     * for longer than [REAUTH_THRESHOLD_MS]. Reads the process-global
+     * for at least [AppLock.REAUTH_THRESHOLD_MS]. Reads the process-global
      * [backgroundedAt]; `backgroundedAt == 0` (not backgrounded / already consumed)
-     * is never stale.
+     * maps to `null` — nothing can have expired then.
+     *
+     * The arithmetic itself lives in [AppLock.requiresReauth] so the JVM suite
+     * can pin it against the shared `app-lock.json` vectors alongside the iOS
+     * suite. The comparison is `>=` — "exactly at the threshold: prompt" — the
+     * boundary the vectors fix; the strict `>` this method used before the
+     * 0.83.0 QA round diverged from iOS by that one millisecond.
      */
-    private fun isReauthDueToInactivity(): Boolean = backgroundedAt > 0L &&
-        SystemClock.elapsedRealtime() - backgroundedAt > REAUTH_THRESHOLD_MS
+    private fun isReauthDueToInactivity(): Boolean = AppLock.requiresReauth(
+        backgroundedAtMillis = backgroundedAt.takeIf { it > 0L },
+        nowMillis = SystemClock.elapsedRealtime()
+    )
 
     /**
      * Manually locks the app — the overflow-menu "Lock app" action (Variant A).
