@@ -143,7 +143,7 @@ struct TodayScreen: View {
             )
 
             LimitBar(
-                caption: Loc.string("7 Days", locale: locale),
+                caption: sevenDayCaption,
                 value: grams(model.state.weeklyTotalGrams),
                 limit: grams(model.state.limitInfo.weeklyLimitGrams),
                 fill: LimitGauge.fillFraction(
@@ -174,6 +174,18 @@ struct TodayScreen: View {
                     todayIsDrinkDay: model.state.totalGrams > 0
                 )
             )
+
+            // The month so far, as grams per day — the same figure the Statistics
+            // month view shows — with an arrow when it differs from the pre-month
+            // baseline. No arrow at `.flat`: no baseline, or no real change.
+            LabeledContent(monthlyAverageCaption) {
+                HStack(spacing: 4) {
+                    Text(perDay(model.state.monthlyAvgPerDay)).monospacedDigit()
+                    if model.state.monthTrend != .flat {
+                        Image(systemName: monthTrendSymbol).foregroundStyle(monthTrendColor)
+                    }
+                }
+            }
 
             // Absent rather than zero: without a body weight, or with nothing
             // alcoholic logged, the app does not know — and must not imply 0.0.
@@ -226,6 +238,67 @@ struct TodayScreen: View {
     /// export's fixed POSIX format.
     private func grams(_ value: Double) -> String {
         "\(Loc.number(value, fractionDigits: 1, locale: locale)) g"
+    }
+}
+
+// Formatting that depends on the in-app locale lives here, off the view body, so
+// the body stays within its length budget. `private` is file scope in Swift, so
+// a same-file extension still sees the view's `locale` and `model`.
+extension TodayScreen {
+
+    /// "Ø <month>" — the average caption. The standalone month name of the logical
+    /// day resolves in the in-app locale (Foundation, no catalogue entry); the
+    /// "Ø %@" wrapper is the catalogue's, shared with Android's `avg_of_month`.
+    private var monthlyAverageCaption: String {
+        Loc.string("Ø %@", monthName(model.state.logicalDate), locale: locale)
+    }
+
+    /// Standalone month name of a `yyyy-MM-dd` date in the in-app locale, or "".
+    /// Standalone is the grammatically correct bare form in cased languages.
+    private func monthName(_ isoDate: String) -> String {
+        let parts = isoDate.split(separator: "-")
+        guard parts.count == 3, let month = Int(parts[1]), (1...12).contains(month) else { return "" }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        let symbols = formatter.standaloneMonthSymbols ?? []
+        guard symbols.count == 12 else { return "" }
+        return symbols[month - 1]
+    }
+
+    /// A per-day gram value with its localized "g/day" unit.
+    private func perDay(_ value: Double) -> String {
+        "\(Loc.number(value, fractionDigits: 1, locale: locale)) \(Loc.string("g/day", locale: locale))"
+    }
+
+    /// The trend arrow's SF Symbol. Only read when the trend is not `.flat`.
+    private var monthTrendSymbol: String {
+        model.state.monthTrend == .down ? "arrow.down.right" : "arrow.up.right"
+    }
+
+    /// Down is the good direction — less alcohol. A rising trend is not a success.
+    private var monthTrendColor: Color {
+        model.state.monthTrend == .down ? .green : .red
+    }
+
+    /// "7 Days (weekStart–logicalDate)" — the trailing window plus its date range.
+    private var sevenDayCaption: String {
+        let base = Loc.string("7 Days", locale: locale)
+        let range = weekRange(model.state.weekStart, model.state.logicalDate)
+        return range.isEmpty ? base : "\(base) (\(range))"
+    }
+
+    /// A localized "start–end" range, day and month only, ordered per locale. The
+    /// dates are logical `yyyy-MM-dd` values parsed in UTC, so the formatter reads
+    /// them in UTC too and cannot shift a day across the device's time zone.
+    private func weekRange(_ start: String, _ end: String) -> String {
+        guard let from = DayResolver.parseDate(start), let to = DayResolver.parseDate(end) else {
+            return ""
+        }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.setLocalizedDateFormatFromTemplate("dM")
+        return "\(formatter.string(from: from))–\(formatter.string(from: to))"
     }
 }
 

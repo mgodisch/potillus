@@ -43,6 +43,9 @@ final class TodayModelTests: XCTestCase {
     /// 2026-01-02, 20:14:00 UTC.
     private let evening: Int64 = 1_767_384_840_000
 
+    /// 2026-01-15, 12:00:00 UTC — a mid-month "today" for the monthly-average tests.
+    private let midJanuary: Int64 = 1_768_478_400_000
+
     override func setUpWithError() throws {
         try super.setUpWithError()
         environment = try AppEnvironment.makeEphemeral()
@@ -361,5 +364,69 @@ final class TodayModelTests: XCTestCase {
             try await Task.sleep(nanoseconds: 5_000_000)
         }
         XCTFail("condition not met within \(timeout) s")
+    }
+
+    // ── The monthly average ──────────────────────────────────────────────────
+
+    /// Writes one entry straight to the repository on a chosen logical day, so a
+    /// test can lay down a month of history. The logical date is explicit, so the
+    /// timestamp only needs to be plausible.
+    @discardableResult
+    private func logDay(_ drink: DrinkDefinition, _ date: String, grams: Double) throws -> Int64 {
+        let noon = try XCTUnwrap(DayResolver.parseDate(date)).addingTimeInterval(12 * 3_600)
+        return try environment.entries.add(
+            ConsumptionEntry(
+                drinkId: drink.id, drinkName: drink.name, volumeMl: drink.volumeMl,
+                alcoholPercent: drink.alcoholPercent, gramsAlcohol: grams,
+                timestampMillis: Int64(noon.timeIntervalSince1970 * 1000), logicalDate: date
+            )
+        )
+    }
+
+    /// The month's grams divided by the days elapsed, 1st through today inclusive.
+    func testTheMonthlyAverageDividesThisMonthByItsElapsedDays() async throws {
+        let pils = try addDrink("Pils")
+        for day in 1...15 { try logDay(pils, String(format: "2026-01-%02d", day), grams: 2.0) }
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        XCTAssertEqual(model.state.logicalDate, "2026-01-15")
+        XCTAssertEqual(model.state.monthlyAvgPerDay, 2.0, accuracy: 1e-9)
+        XCTAssertEqual(model.state.monthTrend, .flat, "no statistics start, so no baseline")
+    }
+
+    /// A month above the pre-month baseline trends up; the baseline is the per-day
+    /// average over the whole earlier period, divided by its own full day count.
+    func testTheMonthlyTrendComparesGramsPerDayAgainstThePreMonthBaseline() async throws {
+        let pils = try addDrink("Pils")
+        // December: 1.0 g/day over all 31 days.
+        for day in 1...31 { try logDay(pils, String(format: "2025-12-%02d", day), grams: 1.0) }
+        // January so far: 2.0 g/day over 15 days.
+        for day in 1...15 { try logDay(pils, String(format: "2026-01-%02d", day), grams: 2.0) }
+        try await environment.preferences.update { $0.statsFromDate = "2025-12-01" }
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        XCTAssertEqual(model.state.monthlyAvgPerDay, 2.0, accuracy: 1e-9)
+        XCTAssertEqual(model.state.monthTrend, .up, "2.0 g/day against the 1.0 December baseline")
+    }
+
+    /// A statistics start date inside the running month clips the average to the
+    /// days from the floor onward, and leaves no baseline to compare against.
+    func testAStatsFloorInsideTheMonthClipsTheAverageAndLeavesNoBaseline() async throws {
+        let pils = try addDrink("Pils")
+        // Heavy days the floor must exclude, then a light stretch that survives it.
+        for day in 1...9 { try logDay(pils, String(format: "2026-01-%02d", day), grams: 10.0) }
+        for day in 10...15 { try logDay(pils, String(format: "2026-01-%02d", day), grams: 2.0) }
+        try await environment.preferences.update { $0.statsFromDate = "2026-01-10" }
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        // Only 2026-01-10…15 count: 12 g over 6 days = 2.0, not (90 + 12) / 15 = 6.8.
+        XCTAssertEqual(model.state.monthlyAvgPerDay, 2.0, accuracy: 1e-9)
+        XCTAssertEqual(model.state.monthTrend, .flat, "a floor inside the month leaves no baseline")
     }
 }

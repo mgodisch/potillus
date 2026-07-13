@@ -40,12 +40,14 @@ import Observation
 //   far the blood-alcohol estimate has decayed. Both take it from a `Clock`. A
 //   test can therefore assert that the day flips at 04:00 without waiting for it.
 //
-// WHAT IS DELIBERATELY ABSENT
-//   `monthlyAvgPerDay`, `monthTrend`, `weeklyRangeLabel` and `currentMonthLabel`
-//   exist in the Android state and are NOT here yet. Each is a formatted, locale-
-//   dependent string or a statistic the Statistics screen owns; they arrive with
-//   localisation. Porting them now would mean inventing a date format before the
-//   String Catalogs exist, and inventing it twice.
+// THE MONTHLY FIGURES, AND WHAT STAYS IN THE VIEW
+//   `monthlyAvgPerDay` and `monthTrend` are computed here, exactly as Android's
+//   `TodayViewModel` does — pure numbers, no locale. The two LABELS Android also
+//   carries in its state, the standalone month name and the weekly date range,
+//   are deliberately NOT here: they are locale-dependent formatting, and the kit
+//   holds no locale. The view formats them from `logicalDate` and `weekStart` in
+//   the in-app locale, so the arithmetic stays testable and the kit stays free of
+//   `DateFormatter` locale choices.
 // =============================================================================
 
 /// Everything the Today screen renders. A value: computing it has no side effects.
@@ -68,6 +70,20 @@ public struct TodayState: Sendable, Equatable {
 
     /// Grams across that same window.
     public var weeklyTotalGrams: Double = 0.0
+
+    /// First day of the trailing 7-day window, `yyyy-MM-dd`. The view formats the
+    /// `weekStart … logicalDate` range in the in-app locale.
+    public var weekStart: String = ""
+
+    /// Average grams of alcohol per day for the current calendar month so far: the
+    /// month's grams divided by the days elapsed (1st … today, inclusive), clipped
+    /// by `statsFromDate`. The Statistics month view shows the same figure.
+    public var monthlyAvgPerDay: Double = 0.0
+
+    /// Direction of `monthlyAvgPerDay` versus the per-day average over the whole
+    /// period from `statsFromDate` up to the day before this month. `.flat` when no
+    /// such baseline exists.
+    public var monthTrend: Trend = .flat
 
     /// The Widmark estimate in per mille, or nil when it cannot be computed.
     ///
@@ -236,6 +252,16 @@ public final class TodayModel {
             next.drinkDaysThisWeek = window.filter { $0.totalGrams > 0.0 }.count
             next.weeklyTotalGrams = window.reduce(0.0) { $0 + $1.totalGrams }
 
+            if let todayDate = DayResolver.parseDate(today) {
+                next.weekStart = DayResolver.formatDate(
+                    DayResolver.addingDays(-(AlcoholCalculator.windowDays - 1), to: todayDate)
+                )
+            }
+
+            let month = try monthlyAverage(today: today, statsFloor: settings.statsFromDate)
+            next.monthlyAvgPerDay = month.average
+            next.monthTrend = month.trend
+
             state = next
             failure = nil
         } catch {
@@ -254,6 +280,41 @@ public final class TodayModel {
         return try entries.dailySummaries(
             from: DayResolver.formatDate(start), to: today
         )
+    }
+
+    /// The current month's grams-per-day average and its trend against the
+    /// pre-month baseline. A faithful port of Android's `TodayViewModel`.
+    ///
+    /// The month's lower bound is the 1st — or a `statsFromDate` that falls INSIDE
+    /// the running month, which then clips both the summed grams and the effective-
+    /// day divisor to the identical span (the v0.81.0 Android QA fix). The baseline
+    /// is the per-day average over `[statsFromDate, last day before this month]`,
+    /// and exists only when the statistics start lies before this month; without it
+    /// `Trend.of` returns `.flat`.
+    private func monthlyAverage(
+        today: String, statsFloor: String
+    ) throws -> (average: Double, trend: Trend) {
+        let monthStr = String(today.prefix(7)) + "-01"
+        let hasBaseline = !statsFloor.isEmpty && statsFloor < monthStr
+        let monthFromStr = (!statsFloor.isEmpty && statsFloor > monthStr) ? statsFloor : monthStr
+        let historyFrom = hasBaseline ? statsFloor : monthFromStr
+
+        let history = try entries.dailySummaries(from: historyFrom, to: today)
+        let curMonth = history.filter { $0.date >= monthFromStr }
+        let days = DayResolver.effectivePeriodDays(
+            from: monthFromStr, today: today,
+            todayIsDrinkDay: curMonth.contains { $0.date == today }
+        )
+        let average = days > 0 ? curMonth.reduce(0.0) { $0 + $1.totalGrams } / Double(days) : 0.0
+
+        var baselineAvg = 0.0
+        if hasBaseline, let monthDate = DayResolver.parseDate(monthStr) {
+            let prevEnd = DayResolver.formatDate(DayResolver.addingDays(-1, to: monthDate))
+            let baselineDays = DayResolver.inclusiveDates(from: statsFloor, to: prevEnd).count
+            let baselineSum = history.filter { $0.date < monthStr }.reduce(0.0) { $0 + $1.totalGrams }
+            baselineAvg = baselineDays > 0 ? baselineSum / Double(baselineDays) : 0.0
+        }
+        return (average, Trend.of(currentAvg: average, prevAvg: baselineAvg))
     }
 
     /// The Widmark estimate, or nil when it would be a guess.

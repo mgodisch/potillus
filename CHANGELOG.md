@@ -414,6 +414,21 @@ and corrects documentation that the port had outgrown:
   surfaced now because earlier builds aborted before reaching this file. No
   behaviour changed.
 
+- **The Today card now shows the month's average, matching Android.** Android's
+  Today screen carries a per-day average for the current month ("Ø <month>:
+  <x> g/day") with an up/down arrow against the pre-month baseline, and a date
+  range on the seven-day figure; iOS had deferred all four until localisation
+  existed. `TodayModel` now computes `monthlyAvgPerDay` and `monthTrend` in the
+  kit — a faithful port of `TodayViewModel`, including the `statsFromDate` floor
+  that clips a mid-month start (the v0.81.0 fix) and the baseline that divides the
+  whole earlier period by its own day count. The two locale-dependent labels stay
+  in the view: the standalone month name and the `weekStart–today` range are
+  formatted from the state in the in-app locale, so the kit holds no
+  `DateFormatter` locale choice. The `g/day` unit and the `Ø %@` caption reuse
+  Android's own translations (`grams_per_day`, `avg_of_month`) in every language.
+  Three `TodayModelTests` cover the divisor, the trend against a previous month,
+  and the mid-month floor.
+
 ---
 
 ## v0.81.0
