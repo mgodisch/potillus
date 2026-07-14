@@ -223,7 +223,7 @@ final class CalendarModelTests: XCTestCase {
         XCTAssertEqual(model.state.totalGramsSelected, 39.8, accuracy: 1e-9)
     }
 
-    func testSelectingTheSameDayTwiceDeselectsIt() async throws {
+    func testSelectingTheSameDayTwiceKeepsItSelected() async throws {
         try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -231,9 +231,11 @@ final class CalendarModelTests: XCTestCase {
         await model.select("2026-01-10")
         await model.select("2026-01-10")
 
-        XCTAssertNil(model.state.selectedDate)
-        XCTAssertTrue(model.state.selectedEntries.isEmpty)
-        XCTAssertEqual(model.state.totalGramsSelected, 0.0, accuracy: 1e-9)
+        // Non-toggling, like Android: a second tap does not deselect. The entries
+        // stay visible instead of flickering away.
+        XCTAssertEqual(model.state.selectedDate, "2026-01-10")
+        XCTAssertFalse(model.state.selectedEntries.isEmpty)
+        XCTAssertEqual(model.state.totalGramsSelected, 19.3, accuracy: 1e-9)
     }
 
     // ── Over-limit marking ───────────────────────────────────────────────────

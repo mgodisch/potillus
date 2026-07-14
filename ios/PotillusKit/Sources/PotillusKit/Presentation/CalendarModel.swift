@@ -281,9 +281,15 @@ public final class CalendarModel {
 
     // ── Selection ────────────────────────────────────────────────────────────
 
-    /// Selects `date`, or deselects when it is already selected.
+    /// Selects `date` (or clears the selection when passed `nil`).
+    ///
+    /// Non-toggling, matching Android's `selectDate`: tapping the already
+    /// selected day KEEPS it selected. iOS used to toggle here — a second tap
+    /// deselected and hid the day's entries — which a platform switcher reads
+    /// as the entries flickering away (0.83.0 UI-parity pass). To clear the
+    /// selection, pass `nil` (the month-change paths already do).
     public func select(_ date: String?) async {
-        state.selectedDate = (date == state.selectedDate) ? nil : date
+        state.selectedDate = date
         do {
             try reloadSelection()
             failure = nil
@@ -295,6 +301,21 @@ public final class CalendarModel {
     public func deleteEntry(_ entry: ConsumptionEntry) async {
         do {
             try entries.delete(entry)
+        } catch {
+            failure = String(describing: error)
+            return
+        }
+        await reloadMonth()
+    }
+
+    /// Applies an edited entry, then reloads the month so both the grid summary
+    /// and the selected-day list reflect the change. The entry keeps its `id`
+    /// and `logicalDate`, so editing volume/percent/time/note updates the row
+    /// in place — the same contract as Android's `updateEntry`, which the
+    /// repository's `update` preserves.
+    public func updateEntry(_ entry: ConsumptionEntry) async {
+        do {
+            try entries.update(entry)
         } catch {
             failure = String(describing: error)
             return

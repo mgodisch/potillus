@@ -59,6 +59,13 @@ struct EntrySheet: View {
     /// Whether the capacity dot uses colour-blind glyphs.
     let useSymbols: Bool
 
+    /// When set, the sheet edits this existing entry instead of logging a new
+    /// one: the fields start prefilled from it and the title changes. The
+    /// `onSave` closure is the same either way — the caller decides whether its
+    /// action adds or updates — so this stays one sheet, as Android keeps one
+    /// `AddEditEntryDialog`.
+    let editing: ConsumptionEntry?
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appLocale) private var locale
 
@@ -74,18 +81,31 @@ struct EntrySheet: View {
         now: Date,
         capacity: DrinkCapacity? = nil,
         useSymbols: Bool = false,
+        editing: ConsumptionEntry? = nil,
         onSave: @escaping (DrinkDefinition, Int, Int64, String) async -> Bool
     ) {
         self.drinks = drinks
         self.preselected = preselected
         self.capacity = capacity
         self.useSymbols = useSymbols
+        self.editing = editing
         self.onSave = onSave
 
         let initial = preselected ?? drinks.first
         _selection = State(initialValue: initial)
-        _volumeText = State(initialValue: initial.map { String($0.volumeMl) } ?? "")
-        _timestamp = State(initialValue: now)
+        // In edit mode the entry's own volume, time and note win over the
+        // drink's defaults; otherwise the preselected drink's serving size seeds
+        // the field and the timestamp is `now`.
+        if let editing {
+            _volumeText = State(initialValue: String(editing.volumeMl))
+            _note = State(initialValue: editing.note)
+            _timestamp = State(initialValue: Date(
+                timeIntervalSince1970: Double(editing.timestampMillis) / 1000.0
+            ))
+        } else {
+            _volumeText = State(initialValue: initial.map { String($0.volumeMl) } ?? "")
+            _timestamp = State(initialValue: now)
+        }
     }
 
     private var volume: Int? { Int(volumeText) }
@@ -153,7 +173,9 @@ struct EntrySheet: View {
                     }
                 }
             }
-            .navigationTitle(Loc.string("Log a drink", locale: locale))
+            .navigationTitle(Loc.string(
+                editing == nil ? "Log a drink" : "Edit Entry", locale: locale
+            ))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

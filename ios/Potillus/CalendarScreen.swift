@@ -45,6 +45,10 @@ struct CalendarScreen: View {
 
     @State private var model: CalendarModel
 
+    /// The entry being edited, if any — drives the edit sheet (UI parity with
+    /// Android's calendar edit action).
+    @State private var editingEntry: ConsumptionEntry?
+
     /// Kept so the overflow menu's Settings sheet can be built.
     private let environment: AppEnvironment
 
@@ -221,6 +225,23 @@ struct CalendarScreen: View {
                             ) ? .red : .secondary
                         )
                 }
+
+                // The daily-limit bar under the selected day, as on Android's
+                // calendar. Only the daily gram limit is meaningful for a single
+                // historical day, so the weekly/drink-day bars are not shown.
+                LimitBar(
+                    caption: Loc.string("Today", locale: locale),
+                    value: "\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g",
+                    limit: "\(Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale)) g",
+                    fill: LimitGauge.fillFraction(
+                        totalGrams: model.state.totalGramsSelected,
+                        limitGrams: model.state.limitInfo.limitGrams
+                    ),
+                    emphasis: LimitGauge.emphasis(
+                        totalGrams: model.state.totalGramsSelected,
+                        limitGrams: model.state.limitInfo.limitGrams
+                    )
+                )
             }
 
             if model.state.selectedEntries.isEmpty {
@@ -228,22 +249,95 @@ struct CalendarScreen: View {
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.selectedEntries, id: \.id) { entry in
-                HStack {
-                    Text(entry.drinkName)
-                    Spacer()
-                    Text("\(Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale)) g")
-                        .monospacedDigit()
-                        .foregroundStyle(.secondary)
-                    Button(role: .destructive) {
-                        Task { await model.deleteEntry(entry) }
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
-                }
+                entryRow(entry)
             }
         }
         .padding()
+        .sheet(item: $editingEntry) { entry in
+            // Editing keeps the entry's own drink: a one-element catalogue built
+            // from the entry, so the sheet shows the name and lets volume, time
+            // and note change — the same scope as Android's calendar edit.
+            EntrySheet(
+                drinks: [drink(from: entry)],
+                preselected: drink(from: entry),
+                now: Date(),
+                editing: entry
+            ) { drink, volume, millis, note in
+                var updated = entry
+                updated.volumeMl = volume
+                updated.timestampMillis = millis
+                updated.note = note
+                updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
+                    volumeMl: volume, alcoholPercent: drink.alcoholPercent
+                )
+                await model.updateEntry(updated)
+                return model.failure == nil
+            }
+        }
+    }
+
+    /// One entry row: name and the full "time · ml · % · g" detail line (plus
+    /// the note when present), an edit pencil, and a delete in the destructive
+    /// red — matching Android's calendar `EntryListItem`. iOS previously showed
+    /// only name and grams with a plain trash and no edit (0.83.0 UI parity).
+    private func entryRow(_ entry: ConsumptionEntry) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.drinkName)
+                Text(entryDetail(entry))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if !entry.note.isEmpty {
+                    Text(entry.note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            Button {
+                editingEntry = entry
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
+            .accessibilityLabel(Loc.string("Edit %@", entry.drinkName, locale: locale))
+
+            Button(role: .destructive) {
+                Task { await model.deleteEntry(entry) }
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.red)
+            .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
+        }
+    }
+
+    /// "HH:mm · <ml> ml · <percent> % · <grams> g" in the in-app locale, the
+    /// same fields Android's row shows. The time uses the device zone (a wall
+    /// clock the user recognises), the numbers the in-app locale.
+    private func entryDetail(_ entry: ConsumptionEntry) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate("Hm")
+        let time = formatter.string(
+            from: Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        )
+        let percent = Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale)
+        let grams = Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale)
+        return "\(time) · \(entry.volumeMl) ml · \(percent) % · \(grams) g"
+    }
+
+    /// The entry's own drink, rebuilt as a single-item catalogue for the edit
+    /// sheet. Editing does not swap the drink, so the id/category are cosmetic.
+    private func drink(from entry: ConsumptionEntry) -> DrinkDefinition {
+        DrinkDefinition(
+            id: entry.drinkId,
+            name: entry.drinkName,
+            volumeMl: entry.volumeMl,
+            alcoholPercent: entry.alcoholPercent
+        )
     }
 }
