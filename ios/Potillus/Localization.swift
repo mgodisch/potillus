@@ -98,6 +98,13 @@ enum Loc {
         String(format: string(key, locale: locale), locale: locale, arg, arg2)
     }
 
+    /// Three interpolated arguments, positional (`%1$…`, `%2$…`, `%3$…`).
+    static func string(
+        _ key: String, _ arg: CVarArg, _ arg2: CVarArg, _ arg3: CVarArg, locale: Locale
+    ) -> String {
+        String(format: string(key, locale: locale), locale: locale, arg, arg2, arg3)
+    }
+
     /// A decimal number in the CHOSEN locale: its decimal separator and grouping,
     /// so a comma-decimal language shows "20,0" where a dot language shows "20.0".
     /// This is for on-SCREEN numbers (grams, BAC, percentages, body weight); it

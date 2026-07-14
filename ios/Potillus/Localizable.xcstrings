@@ -133,133 +133,133 @@
         }
       }
     },
-    "%1$lld ml · %2$@": {
+    "%1$lld ml · %2$@ · ≈ %3$@ g": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld мл · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld мл · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml・%2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld ml · %2$@"
+            "value": "%1$lld ml · %2$@ · ≈ %3$@ g"
           }
         }
       }

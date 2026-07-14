@@ -185,9 +185,25 @@ struct DrinksScreen: View {
 
             VStack(alignment: .leading) {
                 Text(drink.name)
-                Text(Loc.string("%1$lld ml · %2$@", drink.volumeMl, percent(drink.alcoholPercent), locale: locale))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                // "ml · % · ≈ N g" — the grams-per-serving Android shows too, so
+                // the two platforms' drink rows carry the same figure. The
+                // skeleton is punctuation and units only (language-invariant);
+                // the numbers resolve in the in-app locale.
+                Text(Loc.string(
+                    "%1$lld ml · %2$@ · ≈ %3$@ g",
+                    drink.volumeMl,
+                    percent(drink.alcoholPercent),
+                    Loc.number(
+                        AlcoholCalculator.calculateGrams(
+                            volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
+                        ),
+                        fractionDigits: 1,
+                        locale: locale
+                    ),
+                    locale: locale
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
 
             Spacer()
@@ -204,6 +220,10 @@ struct DrinksScreen: View {
             .buttonStyle(.plain)
             .foregroundStyle(.tint)
             .accessibilityLabel(Loc.string("Edit %@", drink.name, locale: locale))
+
+            // A little breathing room so the pencil and trash do not crowd each
+            // other, matching the gap Android's row leaves between them.
+            Spacer().frame(width: 12)
 
             // The trash button mirrors Android's row, which shows a delete
             // affordance without requiring a swipe. It does not delete on the spot:
