@@ -63,7 +63,7 @@ struct DrinksScreen: View {
             List {
                 if model.state.drinks.isEmpty {
                     ContentUnavailableView(
-                        Loc.string("No drinks yet", locale: locale),
+                        Loc.string("No drinks defined yet.", locale: locale),
                         systemImage: "wineglass",
                         description: Text(Loc.string("Add a drink to start logging.", locale: locale))
                     )
@@ -79,7 +79,7 @@ struct DrinksScreen: View {
                     model.clearErrors()
                     isAdding = true
                 } label: {
-                    Label(Loc.string("Add", locale: locale), systemImage: "plus")
+                    Label(Loc.string("Add Drink", locale: locale), systemImage: "plus")
                 }
             }
             .task { model.start(); capacity.start() }
@@ -310,7 +310,7 @@ private struct DrinkEditor: View {
             Form {
                 Section {
                     TextField(Loc.string("Name", locale: locale), text: $name)
-                    TextField(Loc.string("Volume (ml)", locale: locale), text: $volumeText)
+                    TextField(Loc.string("Amount", locale: locale), text: $volumeText)
                         .keyboardType(.numberPad)
                     TextField(Loc.string("Alcohol (%)", locale: locale), text: $percentText)
                         .keyboardType(.decimalPad)
@@ -329,7 +329,7 @@ private struct DrinkEditor: View {
                 }
 
                 if let volume, let percent, canSave {
-                    LabeledContent(Loc.string("Alcohol", locale: locale)) {
+                    LabeledContent(Loc.string("Alcohol Content", locale: locale)) {
                         Text(grams(volumeMl: volume, alcoholPercent: percent))
                             .monospacedDigit()
                     }

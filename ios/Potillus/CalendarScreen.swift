@@ -245,7 +245,7 @@ struct CalendarScreen: View {
             }
 
             if model.state.selectedEntries.isEmpty {
-                Text(Loc.string("Nothing logged on this day.", locale: locale))
+                Text(Loc.string("No entries for this day.", locale: locale))
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.selectedEntries, id: \.id) { entry in

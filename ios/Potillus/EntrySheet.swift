@@ -134,7 +134,7 @@ struct EntrySheet: View {
                         LabeledContent(Loc.string("Drink", locale: locale), value: only.name)
                     }
 
-                    TextField(Loc.string("Volume (ml)", locale: locale), text: $volumeText)
+                    TextField(Loc.string("Amount", locale: locale), text: $volumeText)
                         .keyboardType(.numberPad)
 
                     DatePicker(Loc.string("Time", locale: locale), selection: $timestamp)
@@ -157,7 +157,7 @@ struct EntrySheet: View {
                     let grams = AlcoholCalculator.calculateGrams(
                         volumeMl: volume, alcoholPercent: drink.alcoholPercent
                     )
-                    LabeledContent(Loc.string("Alcohol", locale: locale)) {
+                    LabeledContent(Loc.string("Alcohol Content", locale: locale)) {
                         HStack(spacing: 8) {
                             if let capacity {
                                 // Same dot as the drinks list, recomputed for the

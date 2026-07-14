@@ -195,7 +195,7 @@ struct TodayScreen: View {
             )
 
             LimitBar(
-                caption: Loc.string("Drink days", locale: locale),
+                caption: Loc.string("Drinking Days (last 7 days)", locale: locale),
                 value: "\(model.state.drinkDaysThisWeek)",
                 limit: "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
                 fill: LimitGauge.drinkDaysFillFraction(
@@ -216,7 +216,7 @@ struct TodayScreen: View {
             // Absent rather than zero: without a body weight, or with nothing
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
-                LabeledContent(Loc.string("Estimated BAC", locale: locale)) {
+                LabeledContent(Loc.string("BAC Estimate", locale: locale)) {
                     Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
                 }
             }
@@ -235,7 +235,7 @@ struct TodayScreen: View {
     /// One tap logs the favourite at its own serving size — the shortcut the
     /// whole screen exists for. The sheet is for anything else.
     private var favouritesSection: some View {
-        Section(Loc.string("Favourites", locale: locale)) {
+        Section(Loc.string("Quick Selection Favorites", locale: locale)) {
             ForEach(model.state.favorites, id: \.id) { drink in
                 Button {
                     Task { await model.addEntry(drink: drink, volumeMl: drink.volumeMl) }
