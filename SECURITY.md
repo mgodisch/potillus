@@ -186,14 +186,16 @@ rolling-release model: only the **latest released version** is supported.
 The project's external dependencies are checked periodically — at a minimum
 before each release — for known vulnerabilities. The check is performed with
 [osv-scanner](https://google.github.io/osv-scanner/), a free/libre scanner that
-queries the [OSV](https://osv.dev/) database, run against the CycloneDX SBOM the
-build produces (the `cyclonedxDirectBom` task). Each reported issue is triaged:
-exploitable vulnerabilities are fixed by upgrading (or, where necessary,
-mitigating) the affected dependency, and issues that are not exploitable in this
-app are recorded as such. Because the app performs no network communication and
-requests a minimal permission set, the exposure from dependency vulnerabilities
-is limited, but they are tracked and addressed regardless. This periodic check
-is part of the release checklist in CONTRIBUTING.md §7.
+queries the [OSV](https://osv.dev/) database, run against the CycloneDX SBOM each
+platform's build produces (the `cyclonedxDirectBom` task on Android, and
+`tools/gen-ios-sbom.py` from `Package.resolved` on iOS). Each reported issue is
+triaged: exploitable vulnerabilities are fixed by upgrading (or, where
+necessary, mitigating) the affected dependency, and issues that are not
+exploitable in this app are recorded as such. Because the app performs no
+network communication and requests a minimal permission set, the exposure from
+dependency vulnerabilities is limited, but they are tracked and addressed
+regardless. This periodic check is part of the release checklist in
+CONTRIBUTING.md §7.
 
 The same discipline applies to dependency licenses: every third-party dependency
 must be under a license compatible with the project's GPL-3.0-or-later

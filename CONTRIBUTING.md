@@ -610,9 +610,12 @@ Before tagging a new version:
       signed APK, the AAB and the CycloneDX SBOM and copies all three into the
       git-ignored `releases/` directory under their canonical names
       `de.godisch.potillus_<versionCode>.{apk,aab}` and
-      `de.godisch.potillus_<versionCode>_sbom.json`. It refuses to overwrite a
+      `de.godisch.potillus_<versionCode>_android_sbom.json`. It refuses to overwrite a
       release already staged for this versionCode (clear `releases/` or bump the
-      versionCode first).
+      versionCode first).  The iOS release (`make release-ios`) stages its own
+      CycloneDX SBOM alongside the `.ipa` as
+      `de.godisch.potillus_<versionCode>_ios_sbom.json`, generated from
+      `ios/PotillusKit/Package.resolved` and normalised by the same tool.
 - [ ] Publish the release on Codeberg from the signed tag with
       `make push-codeberg` (after `make release-android`): it verifies the staged
       APK's signer against the fingerprint in SECURITY.md, creates the release for

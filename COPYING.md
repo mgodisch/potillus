@@ -122,7 +122,11 @@ The library below is compiled into the released iOS application and is therefore
 redistributed together with this program.  It is consumed exclusively as a Swift
 Package Manager dependency (declared in `ios/PotillusKit/Package.swift`, with the
 resolved revision pinned in `ios/PotillusKit/Package.resolved`), never as a
-vendored source copy, so it is "de-embedded" via build-depends as required.
+vendored source copy, so it is "de-embedded" via build-depends as required.  As
+on Android, an authoritative machine-readable inventory is generated for every
+release as a CycloneDX Software Bill of Materials — here from `Package.resolved`
+by `tools/gen-ios-sbom.py` (`make ios-sbom`), normalised by the same
+`tools/sbom-normalize.py`.
 
 ### MIT License
 

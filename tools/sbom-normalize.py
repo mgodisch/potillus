@@ -27,17 +27,20 @@ sbom-normalize.py -- make a generated CycloneDX SBOM byte-reproducible.
 
 WHY THIS EXISTS
 ---------------
-The CycloneDX Gradle plugin writes two fields that change on every run even when
-the dependency graph is identical:
+Both platforms produce a CycloneDX SBOM that carries a wall-clock timestamp
+which changes on every run even when the dependency graph is identical. This
+script normalises that timestamp so the SBOM file is stable, and is used by both:
 
-  * ``serialNumber`` -- a random ``urn:uuid:`` value. This is already suppressed
-    at the source by ``includeBomSerialNumber = false`` in the
-    ``cyclonedxDirectBom`` configuration (see ``app/build.gradle.kts``), so this
-    script does not need to touch it.
-  * ``metadata.timestamp`` -- the wall-clock build time. Unlike the CycloneDX
-    *Maven* plugin (which honours ``project.build.outputTimestamp``), the Gradle
-    plugin offers no option to pin or omit this timestamp, so it must be
-    normalised after generation.
+  * Android: the CycloneDX Gradle plugin writes ``metadata.timestamp`` (the
+    build time) and a random ``serialNumber``. The serial number is already
+    suppressed at the source by ``includeBomSerialNumber = false`` in the
+    ``cyclonedxDirectBom`` configuration (see ``app/build.gradle.kts``). Unlike
+    the CycloneDX *Maven* plugin (which honours
+    ``project.build.outputTimestamp``), the Gradle plugin offers no option to pin
+    or omit the timestamp, so it must be normalised after generation.
+  * iOS: ``tools/gen-ios-sbom.py`` writes a fixed placeholder timestamp and no
+    serial number by construction, so for iOS this script simply replaces that
+    placeholder (or drops it) by the same rule below.
 
 This script rewrites ``metadata.timestamp`` deterministically:
 
@@ -50,14 +53,16 @@ This script rewrites ``metadata.timestamp`` deterministically:
 
 Either way the output is identical across repeated builds from the same source,
 which is what "reproducible build" requires. The SBOM is a side artifact and is
-NOT embedded in the APK, so APK reproducibility is unaffected regardless; this
-script only makes the SBOM file itself stable.
+NOT embedded in the app package, so package reproducibility is unaffected
+regardless; this script only makes the SBOM file itself stable.
 
 USAGE
 -----
     python3 tools/sbom-normalize.py <path-to-sbom.json>
 
-Invoked by the ``sbom`` target in ``android/Makefile`` immediately after
+Invoked by the ``sbom`` target in ``android/Makefile`` (after
+``cyclonedxDirectBom``) and by the ``ios-sbom`` target in the root ``Makefile``
+(after ``gen-ios-sbom.py``), immediately after
 ``./gradlew :app:cyclonedxDirectBom``.
 """
 

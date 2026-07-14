@@ -230,7 +230,7 @@ GRADLE_APK    := android/app/build/outputs/apk/release/app-release.apk
 GRADLE_SBOM   := android/app/build/outputs/sbom/libellus-potionis-sbom.json
 STAGED_AAB    := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).aab
 STAGED_APK    := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).apk
-STAGED_SBOM   := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_sbom.json
+STAGED_SBOM   := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_android_sbom.json
 
 # iOS release artifact paths (the counterpart of the Android block above). The
 # Xcode archive and the exported .ipa are BUILD OUTPUTS under ios/build/ (that
@@ -247,6 +247,12 @@ IOS_ARCHIVE      := $(IOS_BUILD_DIR)/Potillus.xcarchive
 IOS_IPA          := $(IOS_BUILD_DIR)/Potillus.ipa
 IOS_EXPORT_PLIST := $(IOS_BUILD_DIR)/ExportOptions.plist
 STAGED_IPA       := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).ipa
+# The iOS SBOM, generated from Package.resolved by tools/gen-ios-sbom.py and
+# normalised by the SAME tools/sbom-normalize.py the Android SBOM uses, then
+# STAGED alongside the IPA under the platform-qualified name that mirrors the
+# Android _android_sbom.json (so releases/ holds one SBOM per platform).
+IOS_SBOM         := $(IOS_BUILD_DIR)/libellus-potionis-ios-sbom.json
+STAGED_IOS_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_ios_sbom.json
 
 # ── release-android ── build the signed release APK, the release AAB and the
 # shared SBOM, then STAGE all three into releases/ under their canonical names
@@ -390,8 +396,24 @@ release-ios: ios-project
 	# short -a but not the long option.
 	mkdir -p "$(RELEASES_DIR)"
 	cp -a "$(IOS_IPA)" "$(STAGED_IPA)"
+	# Generate the iOS SBOM from Package.resolved and normalise it with the same
+	# tool the Android SBOM uses, then stage it beside the .ipa. Analogous to the
+	# Android SBOM, which release-android stages as _android_sbom.json.
+	$(MAKE) ios-sbom
+	cp -a "$(IOS_SBOM)" "$(STAGED_IOS_SBOM)"
 	@echo "release-ios: staged $(STAGED_IPA)"
+	@echo "release-ios: staged $(STAGED_IOS_SBOM)"
 	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"$(STAGED_IPA)\" )"
+
+# ── ios-sbom ── the iOS CycloneDX SBOM, generated from Package.resolved and
+# normalised byte-stably (SOURCE_DATE_EPOCH honoured), mirroring the Android
+# `sbom` flow. Standalone so it can be built and inspected without a full
+# release; release-ios invokes it before staging.
+ios-sbom:
+	mkdir -p "$(IOS_BUILD_DIR)"
+	python3 tools/gen-ios-sbom.py "$(IOS_SBOM)" --version "$(VERSION)"
+	python3 tools/sbom-normalize.py "$(IOS_SBOM)"
+	@echo "ios-sbom: wrote $(IOS_SBOM)"
 
 install: ../downloads/potillus-$(VERSION)-debug.apk
 
@@ -1071,7 +1093,7 @@ push-playstore:
 #
 # The assets are the STAGED files from releases/ (produced by `make release-android`),
 # uploaded under their canonical names releases/<applicationId>_<versionCode>.apk
-# and _<versionCode>_sbom.json (e.g. de.godisch.potillus_92.apk). After each
+# and _<versionCode>_android_sbom.json (e.g. de.godisch.potillus_92.apk). After each
 # upload the published asset is re-downloaded from its public release URL and its
 # sha256 is diffed against the staged file, so a corrupted upload is caught.
 #
@@ -1146,9 +1168,10 @@ push-codeberg:
 		rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
 		echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
 	fi
-	# 3) upload staged APK + SBOM under canonical names, skip already-attached, verify published sha256
+	# 3) upload staged APK + SBOMs under canonical names, skip already-attached, verify published sha256
 	dl_base="https://codeberg.org/$(CODEBERG_REPO)/releases/download/v$(VERSION)"
-	for staged in "$$apk" "$(STAGED_SBOM)"; do
+	ios_sbom=""; test -e "$(STAGED_IOS_SBOM)" && ios_sbom="$(STAGED_IOS_SBOM)"
+	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
 		asset="$$(basename "$$staged")"
 		if printf '%s\n' "$$have_assets" | grep -qxF "$$asset"; then
 			echo "push-codeberg: asset $$asset already attached -- skipping"
@@ -1447,4 +1470,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ui-string-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ui-string-parity ios-sbom ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper

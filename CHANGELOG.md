@@ -230,6 +230,22 @@ two stores' notes need not match).
   platforms) carries the notice regardless of which app is installed; only iOS
   actually ships GRDB and additionally reproduces the licence inline in its
   About screen, still pinned by the `testGrdbLicence*` tests.
+- **The iOS build now produces a CycloneDX SBOM too, and the Android one is
+  renamed for symmetry.** Android's SBOM comes from the first-party CycloneDX
+  Gradle plugin; Swift Package Manager has no first-party equivalent, and the
+  third-party tools would each add a build-time toolchain the project avoids for
+  reproducibility. Since GRDB is the app's one direct dependency, pinned exactly
+  in `Package.resolved`, a small generator (`tools/gen-ios-sbom.py`) emits the
+  same CycloneDX 1.6 JSON format, with the application as the metadata component
+  and GRDB as a library component carrying a `pkg:swift` purl, its commit and its
+  MIT licence. It runs through the same `tools/sbom-normalize.py` as the Android
+  SBOM (timestamp pinned from `SOURCE_DATE_EPOCH` or dropped), so the file is
+  byte-reproducible. A `make ios-sbom` target builds it and `make release-ios`
+  stages it beside the `.ipa` as `<id>_<code>_ios_sbom.json`; the Android staged
+  SBOM is renamed from `_sbom.json` to `_android_sbom.json` so the two platforms'
+  inventories sit side by side, and `push-codeberg` attaches the iOS SBOM as a
+  release asset when it has been staged. COPYING.md, SECURITY.md (osv-scanner)
+  and the best-practices SBOM justification are updated to describe both.
 
 ---
 
