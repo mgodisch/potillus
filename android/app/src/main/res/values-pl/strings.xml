@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Zezwól na zrzuty ekranu</string>
     <string name="allow_screenshots_desc">Zezwól na zrzuty ekranu i nagrania okna aplikacji</string>
     <string name="language">Język</string>
+    <string name="language_system">(Systemowy)</string>
     <string name="export">Eksport danych</string>
     <string name="export_desc">Eksportuj wpisy</string>
     <string name="export_csv">CSV</string>

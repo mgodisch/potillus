@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Επιτροπή στιγμιότυπων</string>
     <string name="allow_screenshots_desc">Να επιτρέπονται στιγμιότυπα και εγγραφές οθόνης του παραθύρου της εφαρμογής</string>
     <string name="language">Γλώσσα</string>
+    <string name="language_system">(Σύστημα)</string>
     <string name="export">Εξαγωγή δεδομένων</string>
     <string name="export_desc">Εξαγωγή εγγραφών</string>
     <string name="export_csv">CSV</string>

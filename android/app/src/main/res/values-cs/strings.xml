@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Povolit snímky obrazovky</string>
     <string name="allow_screenshots_desc">Povolit snímky a nahrávání obrazovky okna aplikace</string>
     <string name="language">Jazyk</string>
+    <string name="language_system">(Systémové)</string>
     <string name="export">Export dat</string>
     <string name="export_desc">Exportovat záznamy</string>
     <string name="export_csv">CSV</string>

@@ -152,6 +152,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">允许截图</string>
     <string name="allow_screenshots_desc">允许对应用窗口进行截图和屏幕录制</string>
     <string name="language">语言</string>
+    <string name="language_system">(系统)</string>
     <string name="export">数据导出</string>
     <string name="export_desc">将记录导出</string>
     <string name="export_csv">CSV</string>

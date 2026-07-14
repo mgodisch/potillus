@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Разрешить скриншоты</string>
     <string name="allow_screenshots_desc">Разрешить снимки экрана и запись окна приложения</string>
     <string name="language">Язык</string>
+    <string name="language_system">(Системная)</string>
     <string name="export">Экспорт данных</string>
     <string name="export_desc">Экспорт записей</string>
     <string name="export_csv">CSV</string>

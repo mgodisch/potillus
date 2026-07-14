@@ -263,6 +263,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots_desc">Permit screenshots and screen recordings of the app window</string>
     <!-- Settings: in-app language selector label. -->
     <string name="language">Language</string>
+    <string name="language_system">(System)</string>
     <!-- Statistics: 'Data Export' block label. -->
     <string name="export">Data Export</string>
     <!-- Statistics export-block description. Keep terse, matching the English 'Export entries'. -->

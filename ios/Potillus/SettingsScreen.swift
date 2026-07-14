@@ -331,6 +331,11 @@ struct SettingsScreen: View {
                 isOn: bind(\.alternativeStatusSymbols, set: { $0.alternativeStatusSymbols = $1 })
             )
             Picker(Loc.string("Language", locale: locale), selection: bind(\.language, set: { $0.language = $1 })) {
+                // The empty tag means "follow the system language" — the app
+                // default. Offered first as "(System)" so a user can return to it
+                // after choosing a fixed language (0.83.0: previously the picker
+                // listed only the fixed languages, with no way back to system).
+                Text(Loc.string("(System)", locale: locale)).tag("")
                 // The autonym: a language picker shows "Deutsch", not "German".
                 // Someone who needs the list cannot necessarily read the current
                 // interface language.

@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Permitir capturas de ecrã</string>
     <string name="allow_screenshots_desc">Permitir capturas e gravações de ecrã da janela da app</string>
     <string name="language">Idioma</string>
+    <string name="language_system">(Sistema)</string>
     <string name="export">Exportação de dados</string>
     <string name="export_desc">Exportar registos</string>
     <string name="export_csv">CSV</string>

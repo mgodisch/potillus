@@ -164,6 +164,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Tillat skjermbilder</string>
     <string name="allow_screenshots_desc">Tillat skjermbilder og skjermopptak av appvinduet</string>
     <string name="language">Språk</string>
+    <string name="language_system">(System)</string>
     <string name="export">Dataeksport</string>
     <string name="export_desc">Eksporter registreringer</string>
     <string name="export_csv">CSV</string>

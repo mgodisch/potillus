@@ -171,6 +171,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Permite capturi de ecran</string>
     <string name="allow_screenshots_desc">Permite capturi de ecran și înregistrări ale ferestrei aplicației</string>
     <string name="language">Limbă</string>
+    <string name="language_system">(Sistem)</string>
     <string name="export">Export de date</string>
     <string name="export_desc">Exportă înregistrările</string>
     <string name="export_csv">CSV</string>

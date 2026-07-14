@@ -162,6 +162,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Дозволити знімки екрана</string>
     <string name="allow_screenshots_desc">Дозволити знімки та записи екрана вікна програми</string>
     <string name="language">Мова</string>
+    <string name="language_system">(Система)</string>
     <string name="export">Експорт даних</string>
     <string name="export_desc">Експортувати записи</string>
     <string name="export_csv">CSV</string>

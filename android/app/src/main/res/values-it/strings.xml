@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Consenti screenshot</string>
     <string name="allow_screenshots_desc">Consenti screenshot e registrazioni schermo della finestra dell\'app</string>
     <string name="language">Lingua</string>
+    <string name="language_system">(Sistema)</string>
     <string name="export">Esportazione dati</string>
     <string name="export_desc">Esporta registrazioni</string>
     <string name="export_csv">CSV</string>

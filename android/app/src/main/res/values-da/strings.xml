@@ -131,6 +131,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Tillad skærmbilleder</string>
     <string name="allow_screenshots_desc">Tillad skærmbilleder og skærmoptagelser af appvinduet</string>
     <string name="language">Sprog</string>
+    <string name="language_system">(System)</string>
     <string name="export">Dataeksport</string>
     <string name="export_desc">Eksporter poster</string>
     <string name="export_csv">CSV</string>

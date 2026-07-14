@@ -169,6 +169,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">スクリーンショットを許可</string>
     <string name="allow_screenshots_desc">アプリウィンドウのスクリーンショットと画面録画を許可する</string>
     <string name="language">言語</string>
+    <string name="language_system">(システム)</string>
     <string name="export">データエクスポート</string>
     <string name="export_desc">記録をエクスポート</string>
     <string name="export_csv">CSV</string>

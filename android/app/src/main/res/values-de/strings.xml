@@ -153,6 +153,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">Screenshots erlauben</string>
     <string name="allow_screenshots_desc">Screenshots und Bildschirmaufnahmen des App-Fensters zulassen</string>
     <string name="language">Sprache</string>
+    <string name="language_system">(System)</string>
     <string name="export">Datenexport</string>
     <string name="export_desc">Einträge exportieren</string>
     <string name="export_csv">CSV</string>

@@ -762,8 +762,13 @@ private fun LanguageDropdown(selected: String, onSelect: (String) -> Unit) {
     // Language list is sourced from SupportedLocales.ALL (de.godisch.potillus.l10n).
     // To add a language: follow the four-step guide in SupportedLocales.kt.
     // Do NOT add entries here directly — the list is now the single source of truth.
-    val languages = SupportedLocales.ALL.map { it.tag to it.autonym }
-    val currentLabel = languages.find { it.first == selected }?.second ?: selected
+    // The empty tag means "follow the system language" — the app default. It is
+    // offered as the first entry, "(System)", so a user can return to it after
+    // choosing a fixed language (0.83.0: previously there was no way back). The
+    // remaining entries come from SupportedLocales.ALL, the single source of truth.
+    val systemLabel = stringResource(R.string.language_system)
+    val languages = listOf("" to systemLabel) + SupportedLocales.ALL.map { it.tag to it.autonym }
+    val currentLabel = languages.find { it.first == selected }?.second ?: systemLabel
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {

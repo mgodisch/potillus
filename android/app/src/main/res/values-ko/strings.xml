@@ -169,6 +169,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="allow_screenshots">스크린샷 허용</string>
     <string name="allow_screenshots_desc">앱 창의 스크린샷 및 화면 녹화 허용</string>
     <string name="language">언어</string>
+    <string name="language_system">(시스템)</string>
     <string name="export">데이터 내보내기</string>
     <string name="export_desc">기록을 내보내기</string>
     <string name="export_csv">CSV</string>
