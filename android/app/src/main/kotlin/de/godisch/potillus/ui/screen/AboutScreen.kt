@@ -37,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,6 +84,7 @@ import de.godisch.potillus.R
  *                        the full copyright/licence document).
  * @param onBack          Invoked when the Up arrow is tapped.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
     onOpenCopyright: () -> Unit = {},
