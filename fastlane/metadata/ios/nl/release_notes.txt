@@ -1,1 +1,19 @@
-Release notes will follow.
+Deze versie vernieuwt het uiterlijk van de app en lost meerdere problemen op.
+
+Betrouwbaarheid
+• De app-vergrendeling treedt nu meteen bij een koude start in werking, zodat je dagboek vanaf de eerste start beschermd is.
+• Schermen bevriezen niet meer bij terugkeer uit de achtergrond en alle weergaven volgen nu correct de huidige datum.
+
+Uiterlijk
+• De schermen Vandaag, Kalender, Dranken, Statistieken en Instellingen zijn herzien zodat lay-out, teksten en kleuren op elkaar aansluiten: dezelfde informatie staat nu op dezelfde plek.
+• Het statistiekscherm toont je kerncijfers in twee overzichtelijke kaarten, markeert dagen boven een limiet rood en abstinente dagen groen, en tekent een groen vinkje voor elke droge dag in de grafiek.
+• De dagweergave in de kalender krijgt een daglimietbalk, uitgebreidere invoerregels en bewerk- en verwijderacties.
+
+Taal en info
+• Je kunt de app-taal nu op “(Systeem)” zetten zodat deze de taal van je apparaat volgt, en op elk moment terugschakelen in Instellingen.
+• Het menu biedt nu een “Info”-scherm met de versie, de licentie van de app en de opensourcecomponenten, met een link naar de volledige licentietekst.
+
+Oplossingen
+• Back-up- en importmeldingen verschijnen nu in de taal van de app.
+• De ingebouwde gids en licentietekst lezen nu als nette alinea’s.
+• De startdatum van de statistieken kan altijd weer worden gewijzigd.

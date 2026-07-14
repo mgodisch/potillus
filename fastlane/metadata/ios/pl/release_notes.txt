@@ -1,1 +1,19 @@
-Release notes will follow.
+Ta wersja odświeża wygląd aplikacji i naprawia kilka problemów.
+
+Niezawodność
+• Blokada aplikacji włącza się teraz natychmiast przy zimnym starcie, dzięki czemu Twój dziennik jest chroniony od pierwszego uruchomienia.
+• Ekrany nie zawieszają się już po powrocie z tła, a wszystkie widoki prawidłowo podążają za bieżącą datą.
+
+Wygląd
+• Ekrany Dziś, Kalendarz, Napoje, Statystyki i Ustawienia przebudowano tak, by układ, teksty i kolory do siebie pasowały — te same informacje są teraz w tym samym miejscu.
+• Ekran statystyk pokazuje kluczowe liczby na dwóch przejrzystych kartach, oznacza dni powyżej limitu na czerwono, a dni abstynencji na zielono, i rysuje zielony znacznik dla każdego dnia bez alkoholu na wykresie.
+• Widok dnia w kalendarzu zyskuje pasek dziennego limitu, bardziej szczegółowe wiersze oraz akcje edycji i usuwania.
+
+Język i informacje
+• Możesz teraz ustawić język aplikacji na „(System)”, aby podążał za językiem urządzenia, i wrócić w dowolnej chwili w Ustawieniach.
+• Menu oferuje teraz ekran „Informacje” z wersją, licencją aplikacji i komponentami open source oraz odnośnikiem do pełnego tekstu licencji.
+
+Poprawki
+• Komunikaty kopii zapasowej i importu pojawiają się teraz w języku aplikacji.
+• Wbudowany przewodnik i tekst licencji są teraz wyświetlane jako czyste akapity.
+• Datę początkową statystyk zawsze można zmienić ponownie.

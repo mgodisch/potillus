@@ -1,1 +1,19 @@
-Release notes will follow.
+Cette version rafraîchit l’apparence de l’application et corrige plusieurs problèmes.
+
+Fiabilité
+• Le verrouillage de l’application s’active désormais immédiatement au démarrage à froid, pour protéger votre journal dès le premier lancement.
+• Les écrans ne se figent plus au retour de l’arrière-plan, et toutes les vues suivent correctement la date du jour.
+
+Apparence
+• Les écrans Aujourd’hui, Calendrier, Boissons, Statistiques et Réglages ont été revus pour harmoniser la disposition, les libellés et les couleurs — les mêmes informations se trouvent au même endroit.
+• L’écran des statistiques présente vos chiffres clés dans deux cartes claires, marque en rouge les jours au-dessus d’une limite et en vert les jours d’abstinence, et dessine une coche verte pour chaque jour sans alcool sur le graphique.
+• La vue du jour dans le calendrier gagne une barre de limite quotidienne, des lignes plus détaillées et des actions de modification et de suppression.
+
+Langue et à propos
+• Vous pouvez désormais régler la langue de l’application sur « (Système) » pour suivre celle de l’appareil, et revenir en arrière à tout moment dans les Réglages.
+• Le menu propose maintenant un écran « À propos » avec la version, la licence de l’application et ses composants open source, et un lien vers le texte complet de la licence.
+
+Corrections
+• Les messages de sauvegarde et d’importation apparaissent désormais dans la langue de l’application.
+• Le guide intégré et le texte de licence s’affichent en paragraphes propres.
+• La date de début des statistiques peut toujours être modifiée à nouveau.

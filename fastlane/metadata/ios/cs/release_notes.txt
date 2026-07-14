@@ -1,1 +1,19 @@
-Release notes will follow.
+Tato verze osvěžuje vzhled aplikace a opravuje několik problémů.
+
+Spolehlivost
+• Zámek aplikace se nyní aktivuje ihned při studeném startu, takež váš deník je chráněn od prvního spuštění.
+• Obrazovky se již nezasekní při návratu z pozadí a všechny pohledy nyní správně sledují aktuální datum.
+
+Vzhled
+• Obrazovky Dnes, Kalendář, Nápoje, Statistiky a Nastavení byly přepracovány tak, aby rozvržení, texty a barvy ladily — stejné informace jsou nyní na stejném místě.
+• Obrazovka statistik zobrazuje klíčové údaje ve dvou přehledných kartách, označuje dny nad limitem červeně a abstinenční dny zeleně a pro každý suchý den vykreslí zelené zaškrtnutí v grafu.
+• Denní zobrazení v kalendáři získává pruh denního limitu, podrobnější řádky a akce úprav a mazání.
+
+Jazyk a o aplikaci
+• Jazyk aplikace nyní můžete nastavit na „(Systém)“, aby sledoval jazyk zařízení, a kdykoli se vrátit zpět v Nastavení.
+• Nabídka nyní obsahuje obrazovku „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text licence.
+
+Opravy
+• Zprávy zálohování a importu se nyní zobrazují v jazyce aplikace.
+• Vestavěný průvodce a text licence se nyní čtou jako čisté odstavce.
+• Počáteční datum statistik lze vždy znovu změnit.

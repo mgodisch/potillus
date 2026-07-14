@@ -1,1 +1,5 @@
-Release notes will follow.
+Novo: pode definir o idioma da aplicação como “(Sistema)” para seguir o do dispositivo e voltar atrás a qualquer momento (Definições → Aparência → Idioma).
+
+A entrada “Copyright” do menu é agora um ecrã “Acerca de” com a versão, a licença da aplicação e os componentes de código aberto, com uma ligação ao texto completo da licença.
+
+Além disso, melhorias internas.

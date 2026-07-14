@@ -261,6 +261,11 @@ two stores' notes need not match).
   `make release-android` and `make release-ios` each gate up front on the full
   per-locale set of required device artifacts, so a build that would ship
   incomplete store assets stops immediately instead of part-way through.
+- **Store release notes are written for this version in every language.** The
+  placeholder "what's new" text is replaced with real notes in all 21 store
+  locales on each platform — the Play changelog (`changelogs/94.txt`, kept within
+  the 500-character store limit) and the App Store `release_notes.txt`. Each
+  platform's notes describe only that platform's own changes.
 
 ---
 

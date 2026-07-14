@@ -1,1 +1,5 @@
-Release notes will follow.
+Nou: poți seta limba aplicației pe „(Sistem)” pentru a urma limba dispozitivului și poți reveni oricând (Setări → Aspect → Limbă).
+
+Intrarea „Copyright” din meniu este acum un ecran „Despre” cu versiunea, licența aplicației și componentele open source, cu un link către textul complet al licenței.
+
+În plus, îmbunătățiri interne.

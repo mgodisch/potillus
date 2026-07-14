@@ -1,1 +1,5 @@
-Release notes will follow.
+Nieuw: stel de app-taal in op “(Systeem)” om de taal van je apparaat te volgen, en schakel altijd terug (Instellingen → Weergave → Taal).
+
+Het menu-item “Copyright” is nu een “Info”-scherm met de versie, de licentie van de app en de opensourcecomponenten, met een link naar de volledige licentietekst.
+
+Daarnaast interne verbeteringen.

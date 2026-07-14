@@ -1,1 +1,19 @@
-Release notes will follow.
+Denne versjonen frisker opp appens utseende og retter flere problemer.
+
+Pålitelighet
+• Applåsen aktiveres nå umiddelbart ved kaldstart, slik at dagboken din er beskyttet helt fra første start.
+• Skjermer fryser ikke lenger når appen kommer tilbake fra bakgrunnen, og alle visninger følger nå riktig dato.
+
+Utseende
+• Skjermene I dag, Kalender, Drikke, Statistikk og Innstillinger er omarbeidet slik at oppsett, tekst og farger samsvarer — den samme informasjonen er nå på samme sted.
+• Statistikkskjermen viser nøkkeltallene dine i to oversiktlige kort, markerer dager over en grense i rødt og avholdsdager i grønt, og tegner et grønt haketegn for hver tørr dag i grafen.
+• Dagsvisningen i kalenderen får en dagsgrenselinje, mer detaljerte rader og handlinger for å redigere og slette.
+
+Språk og om
+• Du kan nå sette appspråket til «(System)» slik at det følger enhetsspråket, og bytte tilbake når som helst i Innstillinger.
+• Menyen tilbyr nå en «Om»-skjerm med versjon, appens lisens og åpen kildekode-komponenter, med lenke til hele lisensteksten.
+
+Rettelser
+• Sikkerhetskopi- og importmeldinger vises nå på appens språk.
+• Den innebygde veiledningen og lisensteksten vises nå som rene avsnitt.
+• Startdatoen for statistikk kan alltid endres på nytt.

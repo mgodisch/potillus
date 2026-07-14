@@ -1,1 +1,19 @@
-Release notes will follow.
+Această versiune împrospătează aspectul aplicației și corectează mai multe probleme.
+
+Fiabilitate
+• Blocarea aplicației se activează acum imediat la pornirea la rece, astfel încât jurnalul tău este protejat de la prima lansare.
+• Ecranele nu mai îngheață la revenirea din fundal, iar toate vizualizările urmăresc corect data curentă.
+
+Aspect
+• Ecranele Astăzi, Calendar, Băuturi, Statistici și Setări au fost refăcute pentru a alinia aspectul, textele și culorile — aceleași informații se află acum în același loc.
+• Ecranul de statistici afișează cifrele cheie în două carduri clare, marchează cu roșu zilele peste o limită și cu verde zilele de abstinență și desenează o bifă verde pentru fiecare zi fără alcool pe grafic.
+• Vizualizarea zilnică din calendar primește o bară de limită zilnică, rânduri mai detaliate și acțiuni de editare și ștergere.
+
+Limbă și despre
+• Poți seta acum limba aplicației pe „(Sistem)” pentru a urma limba dispozitivului și poți reveni oricând din Setări.
+• Meniul oferă acum un ecran „Despre” cu versiunea, licența aplicației și componentele open source, cu un link către textul complet al licenței.
+
+Corectări
+• Mesajele de backup și import apar acum în limba aplicației.
+• Ghidul integrat și textul licenței se citesc acum ca paragrafe curate.
+• Data de început a statisticilor poate fi întotdeauna schimbată din nou.

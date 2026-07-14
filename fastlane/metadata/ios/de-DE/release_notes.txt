@@ -1,1 +1,19 @@
-Release notes will follow.
+Diese Version frischt das Erscheinungsbild der App auf und behebt mehrere Probleme.
+
+Zuverlässigkeit
+• Die App-Sperre greift jetzt sofort beim Kaltstart, sodass dein Tagebuch von der ersten Sekunde an geschützt ist.
+• Bildschirme frieren nicht mehr ein, wenn die App aus dem Hintergrund zurückkehrt, und alle Ansichten folgen nun korrekt dem aktuellen Datum.
+
+Aussehen
+• Die Bildschirme Heute, Kalender, Getränke, Statistik und Einstellungen wurden überarbeitet, damit Layout, Wortlaut und Farben zusammenpassen — dieselben Informationen stehen nun an derselben Stelle.
+• Die Statistik zeigt deine Kennzahlen in zwei übersichtlichen Karten, markiert Tage über einem Limit rot und abstinente Tage grün und zeichnet für jeden trockenen Tag ein grünes Häkchen im Konsumdiagramm.
+• Die Tagesansicht im Kalender erhält einen Tageslimit-Balken, ausführlichere Eintragszeilen sowie Bearbeiten- und Löschen-Aktionen.
+
+Sprache und Info
+• Du kannst die App-Sprache jetzt auf „(System)“ stellen, damit sie der Gerätesprache folgt, und jederzeit in den Einstellungen zurückwechseln.
+• Das Menü bietet jetzt einen „Info“-Bildschirm mit Version, App-Lizenz und Open-Source-Komponenten samt Link zum vollständigen Lizenztext.
+
+Fehlerbehebungen
+• Backup- und Importmeldungen erscheinen jetzt in der Sprache der App.
+• Die In-App-Anleitung und der Lizenztext werden nun als saubere Absätze dargestellt.
+• Das Statistik-Startdatum lässt sich immer wieder ändern.

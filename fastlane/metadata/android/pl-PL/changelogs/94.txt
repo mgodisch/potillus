@@ -1,1 +1,5 @@
-Release notes will follow.
+Nowość: możesz ustawić język aplikacji na „(System)”, aby podążał za językiem urządzenia, i wrócić w dowolnej chwili (Ustawienia → Wygląd → Język).
+
+Pozycja menu „Copyright” to teraz ekran „Informacje” z wersją, licencją aplikacji i komponentami open source oraz odnośnikiem do pełnego tekstu licencji.
+
+Ponadto usprawnienia wewnętrzne.

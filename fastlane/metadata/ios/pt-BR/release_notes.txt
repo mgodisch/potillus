@@ -1,1 +1,19 @@
-Release notes will follow.
+Esta versão renova a aparência do app e corrige vários problemas.
+
+Confiabilidade
+• O bloqueio do app ativa-se agora imediatamente em uma inicialização a frio, protegendo seu diário desde o primeiro início.
+• As telas não travam mais ao voltar do segundo plano e todas as visões seguem corretamente a data atual.
+
+Aparência
+• As telas Hoje, Calendário, Bebidas, Estatísticas e Configurações foram refeitas para unificar o layout, os textos e as cores — a mesma informação está agora no mesmo lugar.
+• A tela de estatísticas mostra seus números principais em dois cartões claros, marca em vermelho os dias acima de um limite e em verde os dias de abstinência, e desenha uma marca verde para cada dia sem álcool no gráfico.
+• A visão diária do calendário ganha uma barra de limite diário, linhas mais detalhadas e ações de editar e excluir.
+
+Idioma e sobre
+• Agora você pode definir o idioma do app como “(Sistema)” para seguir o do dispositivo, e voltar quando quiser nas Configurações.
+• O menu agora oferece uma tela “Sobre” com a versão, a licença do app e seus componentes de código aberto, com link para o texto completo da licença.
+
+Correções
+• As mensagens de backup e importação aparecem agora no idioma do app.
+• O guia integrado e o texto da licença agora são exibidos como parágrafos limpos.
+• A data de início das estatísticas sempre pode ser alterada novamente.

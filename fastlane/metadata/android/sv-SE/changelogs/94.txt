@@ -1,1 +1,5 @@
-Release notes will follow.
+Nytt: du kan ställa in appspråket till ”(System)” så att det följer enhetens språk, och byta tillbaka när som helst (Inställningar → Utseende → Språk).
+
+Menyalternativet ”Copyright” är nu en ”Om”-skärm med version, appens licens och öppen källkod-komponenter, med en länk till hela licenstexten.
+
+Dessutom interna förbättringar.

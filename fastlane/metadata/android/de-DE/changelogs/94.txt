@@ -1,1 +1,5 @@
-Release notes will follow.
+Neu: Du kannst die App-Sprache auf „(System)“ stellen, damit sie der Gerätesprache folgt – und jederzeit zurückwechseln (Einstellungen → Darstellung → Sprache).
+
+Der Menüeintrag „Copyright“ ist jetzt ein „Info“-Bildschirm mit Version, App-Lizenz und Open-Source-Komponenten sowie einem Link zum vollständigen Lizenztext.
+
+Dazu interne Qualitäts- und Release-Verbesserungen.

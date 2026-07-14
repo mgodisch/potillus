@@ -1,1 +1,5 @@
-Release notes will follow.
+New: set the app language to “(System)” to follow your device language, and switch back any time (Settings → Appearance → Language).
+
+The menu’s “Copyright” entry is now an “About” screen showing the version, the app’s licence and its open-source components, with a link to the full licence text.
+
+Plus internal quality and release-tooling improvements.

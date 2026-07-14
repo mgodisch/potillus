@@ -1,1 +1,5 @@
-Release notes will follow.
+Novedad: ahora puedes poner el idioma de la app en “(Sistema)” para seguir el del dispositivo, y volver cuando quieras (Ajustes → Apariencia → Idioma).
+
+La entrada “Copyright” del menú es ahora una pantalla “Acerca de” con la versión, la licencia de la app y sus componentes de código abierto, y un enlace al texto completo de la licencia.
+
+Además, mejoras internas.
