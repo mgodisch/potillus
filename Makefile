@@ -163,7 +163,6 @@ REPORT_PDF_DIR := fastlane/report-pdf
 # ── Preflight helpers ── each expands to a one-line "fail fast with an install
 # hint if a tool is missing" guard. $(1) is the calling target's name, used as
 # the message prefix, so one definition serves every recipe that needs the tool.
-require-device    = adb devices 2>/dev/null | grep -q 'device$$' || { echo "$(1): no device/emulator connected (adb) -- connect one first."; exit 1; }
 require-pdftoppm  = command -v pdftoppm >/dev/null || { echo "$(1): 'pdftoppm' not found — install poppler-utils"; exit 1; }
 require-rsvg      = command -v rsvg-convert >/dev/null 2>&1 || { echo "$(1): 'rsvg-convert' not found — install librsvg2-bin"; exit 1; }
 # Still needed after `screenshots-crop` was dropped: tools/render-feature-graphic.py
@@ -172,6 +171,73 @@ require-rsvg      = command -v rsvg-convert >/dev/null 2>&1 || { echo "$(1): 'rs
 # with a bare ImportError traceback instead of an actionable message.
 require-pillow    = python3 -c 'import PIL' 2>/dev/null || { echo "$(1): Pillow not found — install it (Debian: apt install python3-pil, or: pip install pillow --break-system-packages)"; exit 1; }
 require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): fonttools not found — install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
+
+# ── Store-asset existence gates ───────────────────────────────────────────────
+# The CLASS-1 store assets — the in-app screenshots 01..06 and the report PDFs —
+# need a device or simulator to produce and are NEVER captured automatically (see
+# the device_screenshot_sentinel / report_pdf_sentinel rules further down). These
+# gates let a build assert, up front and for EVERY configured locale, that those
+# assets are already on disk, and fail with an actionable message otherwise. They
+# are used by `android`, `ios`, `release-android` and `release-ios` so none of
+# those reaches for a device mid-build; a missing asset stops the build early and
+# tells the operator which capture command to run.
+#
+# $(1) is the calling target's name (message prefix). Each gate loops over its
+# platform's full locale set and checks every required file with `test -f`.
+
+# Android: 01..06 in-app shots for every store locale. (07/08 and the feature
+# graphics are CLASS-2 — regenerated on demand from the report PDFs — so they are
+# not gated here; their own inputs, the report PDFs, are gated at release time.)
+require-android-screenshots = \
+	missing=""; \
+	for loc in $(SCREENSHOT_LOCALES); do \
+	    for shot in 01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_settings; do \
+	        f="$(META)/$$loc/images/phoneScreenshots/$$shot.png"; \
+	        test -f "$$f" || missing="$$missing $$f"; \
+	    done; \
+	done; \
+	if [ -n "$$missing" ]; then \
+	    echo "$(1): required device screenshots are missing:" >&2; \
+	    for f in $$missing; do echo "    $$f" >&2; done; \
+	    echo "  These are captured on a device and never refreshed automatically." >&2; \
+	    echo "  Capture them first:  make screenshots-android" >&2; \
+	    exit 1; \
+	fi
+
+# Android release additionally needs the CLASS-1 report PDFs (source of 07/08 and
+# the feature graphics) present for every locale.
+require-android-report-pdfs = \
+	missing=""; \
+	for loc in $(SCREENSHOT_LOCALES); do \
+	    f="$(REPORT_PDF_DIR)/potillus_report_$$loc.pdf"; \
+	    test -f "$$f" || missing="$$missing $$f"; \
+	done; \
+	if [ -n "$$missing" ]; then \
+	    echo "$(1): required report PDFs are missing:" >&2; \
+	    for f in $$missing; do echo "    $$f" >&2; done; \
+	    echo "  These are exported from the running app and never refreshed automatically." >&2; \
+	    echo "  Export them first:  make report-pdfs" >&2; \
+	    exit 1; \
+	fi
+
+# iOS: all of 01..08 are captured together by `make screenshots-ios` on the
+# simulator (there is no CLASS-2 iOS derivation and no iOS feature graphic), so
+# the gate checks the whole set for every iOS store locale.
+require-ios-screenshots = \
+	missing=""; \
+	for loc in $(IOS_SCREENSHOT_LOCALES); do \
+	    for shot in 01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_settings 07_report_page_1 08_report_page_2; do \
+	        f="$(IOS_SHOTS)/$$loc/$(IOS_SIM_DEVICE)-$$shot.png"; \
+	        test -f "$$f" || missing="$$missing $$f"; \
+	    done; \
+	done; \
+	if [ -n "$$missing" ]; then \
+	    echo "$(1): required iOS screenshots are missing:" >&2; \
+	    for f in $$missing; do echo "    $$f" >&2; done; \
+	    echo "  These are captured on the simulator and never refreshed automatically." >&2; \
+	    echo "  Capture them first:  make screenshots-ios" >&2; \
+	    exit 1; \
+	fi
 
 # =============================================================================
 # CONVENIENCE & INSTALL
@@ -200,6 +266,7 @@ help:
 # Formerly the default goal, and formerly called `debug`. It was renamed when the
 # repository grew a second platform: `make debug` no longer says which one.
 android:
+	@$(call require-android-screenshots,android)
 	$(MAKE) check-l10n-parity
 	$(MAKE) -C android debug unit-test lint check-guides
 	$(MAKE) feature-graphics-existing-android
@@ -272,6 +339,8 @@ STAGED_IOS_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_ios_sbom.json
 # before re-staging. `cp --archive` preserves mode/timestamps, so the staged copy
 # is the byte-identical artifact the push targets then verify and upload.
 release-android:
+	@$(call require-android-screenshots,release-android)
+	@$(call require-android-report-pdfs,release-android)
 	@for f in "$(STAGED_AAB)" "$(STAGED_APK)" "$(STAGED_SBOM)"; do \
 		if test -e "$$f"; then echo "release-android: staged file '$$f' already exists -- refusing to overwrite a staged release. Remove the releases/ artifacts for this versionCode (or bump versionCode) and re-run." >&2; exit 1; fi; \
 	done
@@ -315,6 +384,8 @@ release-ios: ios-project
 		echo "release-ios: staged file '$(STAGED_IPA)' already exists -- refusing to overwrite a staged release. Remove the releases/ artifact for this versionCode (or bump versionCode) and re-run." >&2; \
 		exit 1; \
 	fi
+	@# CLASS-1 store assets must already be captured (never refreshed here).
+	$(call require-ios-screenshots,release-ios)
 	# Resolve the signing Team ID: the DEVELOPMENT_TEAM environment variable wins,
 	# else read it from ios/signing.properties. The `${VAR:-}` default keeps `-u`
 	# (nounset) happy when the variable is unset, and the file is read ONLY when it
@@ -664,8 +735,27 @@ $(META)/$(1)/images/featureGraphic.png $(META)/$(1)/images/featureGraphic-4K.png
 	@python3 $(FG_RENDERER) $(1)
 endef
 
-# Instantiate all three rules per locale and collect the outputs.
+# report_pdf_sentinel: the per-locale source PDF is a CLASS-1 artifact — exporting
+# it needs the app running on a device/simulator ("Save as PDF"), so it is never
+# produced automatically. Without a rule, a missing PDF is a cryptic
+# "No rule to make target"; this sentinel replaces that with a friendly hard
+# error naming `make report-pdfs`. The recipe only asserts presence: a PDF that
+# exists is up to date and the recipe never fires, so this does not disturb the
+# timestamp-driven regeneration of 07/08 and the feature graphics that depend on
+# it (CLASS-2, rebuilt on demand as long as their CLASS-1 input is present).
+define report_pdf_sentinel
+$(call report_src,$(1)):
+	@test -f "$$@" || { \
+	    echo "screenshots-pdf-android: required report PDF '$$@' is missing." >&2; \
+	    echo "  This is a device/simulator artifact and is never exported automatically." >&2; \
+	    echo "  Export the per-locale report PDFs first:  make report-pdfs" >&2; \
+	    exit 1; \
+	}
+endef
+
+# Instantiate all rules per locale and collect the outputs.
 define potillus_pipeline_rules
+$(call report_pdf_sentinel,$(1))
 $(call report_page_rule,$(1),07,1)
 $(call report_page_rule,$(1),08,2)
 $(call feature_graphic_rule,$(1))
@@ -674,41 +764,35 @@ FEATURE_GRAPHIC_PNGS += $(META)/$(1)/images/featureGraphic.png $(META)/$(1)/imag
 endef
 $(foreach loc,$(SCREENSHOT_LOCALES),$(eval $(call potillus_pipeline_rules,$(loc))))
 
-# Device screenshots (01..06) come from `make screenshots-android` (screengrab on a
-# device) and have no per-file build rule of their own. If any is MISSING when a
-# feature graphic needs it, capture the whole set automatically — screengrab
-# always grabs every locale at once, so a missing shot means the set is
-# incomplete and one full recapture is the correct repair. This triggers ONLY on
-# a truly absent file, never on a merely stale one: staleness of device
-# screenshots is not reliably detectable (the project's long-standing reason for
-# capturing them by hand), but absence is unambiguous. Because `screenshots-android`
-# itself now cascades into `feature-graphics-android` (see that target), the graphics are
-# refreshed as part of the same capture.
+# Device screenshots (01..06) come from `make screenshots-android` (screengrab on
+# a device) and have no per-file build rule of their own. They are CLASS-1
+# artifacts: producing them needs a physical device or emulator, so the build
+# must NEVER capture them automatically. A missing 01..06 is therefore a HARD
+# ERROR, not a trigger — the operator captures the set explicitly with
+# `make screenshots-android` and re-runs. (Staleness of a device screenshot is
+# not reliably detectable — the project's long-standing reason for capturing them
+# by hand — but absence is unambiguous, and absence is all we gate on.)
 #
-# WHY THE MARKER FILE. If this recipe ran `$(MAKE) screenshots-android` directly, Make
-# would fire it once PER missing target — up to 14 full recaptures when a new
-# locale set is empty. Every missing screenshot instead order-only-depends on the
-# single marker $(SCREENSHOTS_CAPTURED_MARKER), whose recipe runs the one capture
-# and is built AT MOST ONCE per `make` invocation; the sentinels then merely
-# assert their file now exists. The marker lives under android/app/build/
-# (already git-ignored, removed by `make clean`), so a later invocation
-# re-checks the tree afresh instead of trusting an earlier run's capture.
-SCREENSHOTS_CAPTURED_MARKER := android/app/build/.screenshots-captured
-
-$(SCREENSHOTS_CAPTURED_MARKER):
-	$(call require-device,screenshots)
-	@echo "feature-graphics-android: device screenshots missing — capturing all locales via 'make screenshots-android'."
-	$(MAKE) screenshots-android
-	@mkdir -p "$(@D)"
-	@touch "$@"
-
-# One sentinel per in-app screenshot kind (01..06): order-only-depend on the
-# marker so the capture runs (once) before the file is needed, then assert the
-# file is really present afterwards — if the capture did not produce it, fail
-# loudly rather than let a downstream renderer read a missing input.
+# HISTORY. This block previously order-only-depended each screenshot on a marker
+# whose recipe ran `make screenshots-android` on demand, so a downstream feature
+# graphic would auto-capture the whole set. That auto-refresh was removed
+# deliberately: device/simulator captures are now always manual, and every build
+# path that needs 01..06 fails loudly when they are absent rather than reaching
+# for a device mid-build.
+#
+# Each sentinel is a real (not order-only) rule with a recipe that only asserts
+# the file's presence. Because the target IS its own output path, Make runs the
+# recipe only when the file is missing; a present file is up to date and the
+# recipe never fires. A missing file runs the recipe, which fails with a friendly
+# message naming the command to run.
 define device_screenshot_sentinel
-$(META)/%/images/phoneScreenshots/$(1).png: | $$(SCREENSHOTS_CAPTURED_MARKER)
-	@test -f "$$@" || { echo "feature-graphics-android: $$@ still missing after 'make screenshots-android' — capture did not produce it." >&2; exit 1; }
+$(META)/%/images/phoneScreenshots/$(1).png:
+	@test -f "$$@" || { \
+	    echo "feature-graphics-android: required device screenshot '$$@' is missing." >&2; \
+	    echo "  This is a device/simulator artifact and is never captured automatically." >&2; \
+	    echo "  Capture the whole set first:  make screenshots-android" >&2; \
+	    exit 1; \
+	}
 endef
 $(foreach shot,01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_settings,$(eval $(call device_screenshot_sentinel,$(shot))))
 
@@ -1295,6 +1379,7 @@ check-ios-static: check-headers check-makefile check-swift-tests check-swift-sym
                   check-ios-guides check-ios-metadata
 
 ios: check-ios-static check-swiftlint ios-project
+	@$(call require-ios-screenshots,ios)
 	# A SUBSHELL, because .ONESHELL runs the whole recipe in one process and a
 	# bare `cd` would leak into every step below it -- xcodebuild would then look
 	# for ios/Potillus.xcodeproj underneath ios/PotillusKit/. The `screenshots-android`

@@ -246,6 +246,21 @@ two stores' notes need not match).
   inventories sit side by side, and `push-codeberg` attaches the iOS SBOM as a
   release asset when it has been staged. COPYING.md, SECURITY.md (osv-scanner)
   and the best-practices SBOM justification are updated to describe both.
+- **Store screenshots and report PDFs are never auto-captured, and builds fail
+  fast when they are missing.** The device screenshots (01..06) and the per-locale
+  report PDFs need a physical device or simulator to produce, so the build must
+  never reach for one on its own. The previous behaviour — a missing screenshot
+  would silently trigger a full `make screenshots-android` capture mid-build — is
+  removed: those artifacts now have hard-fail sentinels that assert presence and,
+  when a file is absent, stop with an actionable message naming the capture
+  command (`make screenshots-android` / `make screenshots-ios` / `make
+  report-pdfs`). The derived artifacts stay dependency-driven: the feature
+  graphics and the rasterised report pages (07/08) are still regenerated on
+  demand from their inputs, but fail cleanly when the underlying device artifact
+  is missing rather than capturing it. Finally, `make android`, `make ios`,
+  `make release-android` and `make release-ios` each gate up front on the full
+  per-locale set of required device artifacts, so a build that would ship
+  incomplete store assets stops immediately instead of part-way through.
 
 ---
 
