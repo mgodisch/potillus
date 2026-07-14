@@ -140,6 +140,32 @@ struct TodayScreen: View {
 
     private var summarySection: some View {
         Section {
+            // Headline pair, mirroring Android's Today card: today's own gram
+            // total on the left, the month-so-far per-day average (with its
+            // trend arrow) on the right. On iOS these used to be missing (the
+            // total entirely) or placed below the bars (the average); the
+            // 0.83.0 UI-parity pass lifts them here so someone who switches
+            // platforms reads the same two numbers in the same place. They are
+            // a `LabeledContent` each so VoiceOver announces caption + value.
+            LabeledContent {
+                headlineValue(grams(model.state.totalGrams))
+            } label: {
+                Text(Loc.string("Today's Total", locale: locale))
+            }
+
+            LabeledContent {
+                HStack(spacing: 4) {
+                    headlineValue(perDay(model.state.monthlyAvgPerDay))
+                    // The arrow only when the month differs from the pre-month
+                    // baseline; `.flat` means no baseline or no real change.
+                    if model.state.monthTrend != .flat {
+                        Image(systemName: monthTrendSymbol).foregroundStyle(monthTrendColor)
+                    }
+                }
+            } label: {
+                Text(monthlyAverageCaption)
+            }
+
             LimitBar(
                 caption: Loc.string("Today", locale: locale),
                 value: grams(model.state.totalGrams),
@@ -187,18 +213,6 @@ struct TodayScreen: View {
                 )
             )
 
-            // The month so far, as grams per day — the same figure the Statistics
-            // month view shows — with an arrow when it differs from the pre-month
-            // baseline. No arrow at `.flat`: no baseline, or no real change.
-            LabeledContent(monthlyAverageCaption) {
-                HStack(spacing: 4) {
-                    Text(perDay(model.state.monthlyAvgPerDay)).monospacedDigit()
-                    if model.state.monthTrend != .flat {
-                        Image(systemName: monthTrendSymbol).foregroundStyle(monthTrendColor)
-                    }
-                }
-            }
-
             // Absent rather than zero: without a body weight, or with nothing
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
@@ -207,6 +221,15 @@ struct TodayScreen: View {
                 }
             }
         }
+    }
+
+    /// A headline figure in the summary pair: the same monospaced-digit,
+    /// title-weight styling for the total and the average so the two read as a
+    /// matched pair, echoing Android's `headlineLarge` figures.
+    private func headlineValue(_ text: String) -> some View {
+        Text(text)
+            .font(.title3)
+            .monospacedDigit()
     }
 
     /// One tap logs the favourite at its own serving size — the shortcut the
@@ -227,9 +250,9 @@ struct TodayScreen: View {
     }
 
     private var entriesSection: some View {
-        Section(Loc.string("Entries", locale: locale)) {
+        Section(Loc.string("Today's Entries", locale: locale)) {
             if model.state.entries.isEmpty {
-                Text(Loc.string("Nothing logged yet.", locale: locale))
+                Text(Loc.string("No entries yet today.\nTap “+” to add an entry.", locale: locale))
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.entries, id: \.id) { entry in
@@ -333,24 +356,40 @@ struct LimitBar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            // Label order mirrors Android's LimitBar: the CONSUMED value sits on
+            // the left, the caption (with its limit) on the right. iOS
+            // previously had the caption on the left and the value on the
+            // right; the 0.83.0 UI-parity pass flips them so the two platforms
+            // read alike. The right group is pinned to one line and allowed to
+            // shrink rather than wrap into the value — the rule Android's
+            // layout hardening settled on for Greek and Russian.
             HStack {
-                Text(caption)
-                Spacer(minLength: 8)
-                Text("\(value) / \(limit)")
+                Text(value)
                     .monospacedDigit()
+                Spacer(minLength: 8)
+                Text("\(caption) · \(limit)")
                     .foregroundStyle(.secondary)
-                    // The label may be long once translated; let it shrink rather
-                    // than wrap into the caption, the defect the Android layout
-                    // hardening fixed for Greek and Russian.
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             .font(.subheadline)
 
-            ProgressView(value: fill)
-                .tint(emphasis.tint)
-                // The bar is decoration; the numbers above already say it.
-                .accessibilityHidden(true)
+            // A thicker track than the default hairline ProgressView, to match
+            // Android's 8dp bar. A capsule of fixed height drawn over a track
+            // capsule gives full control of the thickness that a plain
+            // `ProgressView` does not expose.
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color(.systemFill))
+                    Capsule()
+                        .fill(emphasis.tint)
+                        .frame(width: proxy.size.width * fill)
+                }
+            }
+            .frame(height: 8)
+            // The bar is decoration; the numbers above already say it.
+            .accessibilityHidden(true)
         }
         .padding(.vertical, 2)
     }
