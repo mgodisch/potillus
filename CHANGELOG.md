@@ -58,6 +58,25 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **A REPLACE import now truly replaces the drink catalogue on both platforms.**
+  After a fresh install or a storage reset the app seeds the full built-in preset
+  set; choosing "Replace" when importing a backup then left those presets in
+  place, so they lingered ALONGSIDE the backup's drinks instead of being replaced
+  — a preset the backup did not contain stayed visible. REPLACE now wipes the
+  WHOLE drink catalogue (presets included) before re-inserting the backup, so the
+  catalogue afterwards is exactly the backup's drink list: a drink is present if
+  and only if the backup defines it, and presets the backup carries are recreated
+  verbatim (they are exported with their `isPreset` flag). The log is cleared
+  first, so no entry references a drink when the wipe runs and the entries→drinks
+  foreign key cannot trip. On Android the wipe moved from
+  `DrinkDao.deleteUserCreatedDrinks` (`isPreset = 0`) to a new
+  `DrinkDao.deleteAllDrinks`; on iOS the REPLACE branch in `BackupImporter` drops
+  the `isPreset == false` filter. The narrower "keep the presets" helper is
+  retained on both platforms for callers that want to clear only the user's own
+  drinks. Pinned by an updated iOS importer test and a new Android instrumented
+  test that both assert the catalogue equals the backup exactly; the stale
+  "presets survive a REPLACE" notes in the DAO / repository / screenshot-test
+  comments were corrected to match.
 - **The iOS app lock now engages on a cold start (eleventh QA round).** The
   launch prompt was fired from a bare `.task { lock.onLaunch() }`, which ran
   while `isEnabled` still held its `false` default — the stored setting arrives

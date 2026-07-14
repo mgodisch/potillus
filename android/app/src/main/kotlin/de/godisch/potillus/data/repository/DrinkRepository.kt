@@ -114,11 +114,14 @@ class DrinkRepository(private val dao: DrinkDao) : IDrinkRepository {
     override suspend fun countEntriesForDrink(drinkId: Long): Int = dao.countEntriesByDrinkId(drinkId)
 
     /**
-     * Deletes all user-created (non-preset) drinks.
+     * Deletes all user-created (non-preset) drinks, leaving the built-in
+     * presets (isPreset = true) in place.
      *
-     * Called during a REPLACE backup import to reset the drink catalogue
-     * to the preset-only state before inserting the backup's drinks.
-     * Built-in presets (isPreset = true) are preserved.
+     * NOTE: the REPLACE backup import no longer routes through here — since
+     * v0.83.0 it wipes the WHOLE catalogue via
+     * [de.godisch.potillus.data.db.dao.DrinkDao.deleteAllDrinks] so the result
+     * matches the backup exactly. This narrower "keep the presets" helper is
+     * retained for callers that want to clear only the user's own drinks.
      *
      * IMPORTANT: call [de.godisch.potillus.data.repository.EntryRepository.deleteAll]
      * BEFORE this, otherwise the FK RESTRICT constraint will block the deletion.

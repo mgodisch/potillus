@@ -170,7 +170,10 @@ final class RepositoryTests: XCTestCase {
         )
     }
 
-    /// Presets survive a REPLACE import; user-created drinks do not.
+    /// `deleteUserCreatedDrinks()` removes user drinks but keeps presets. (This
+    /// helper is no longer the REPLACE-import path — since v0.83.0 REPLACE wipes
+    /// the whole catalogue; see `BackupImporterTests`. It stays for callers that
+    /// want to clear only the user's own drinks.)
     func testDeleteUserCreatedDrinksKeepsPresets() async throws {
         try addDrink("Preset", preset: true)
         try addDrink("Mine")

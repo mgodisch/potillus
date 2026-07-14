@@ -272,19 +272,19 @@ class ScreenshotTest {
         fixture = parsed
 
         runBlocking {
-            // 1a) DETERMINISTIC PRESET PREPOPULATION (fixes duplicate drink rows).
+            // 1a) DETERMINISTIC PRESET PREPOPULATION (deterministic start state).
             //     The built-in preset drinks are inserted by Room's PrepopulateCallback
             //     in a coroutine launched on the application scope when the database
             //     file is first created (see AppDatabase.PrepopulateCallback). In a
             //     screenshot run the FIRST database access is the importReplace() below,
-            //     so that async seeding and the import race each other: if
-            //     importReplace() takes its name-deduplication snapshot before the
-            //     presets are in place, it re-inserts every preset under a fresh id AND
-            //     the seeding inserts them again → each preset appears twice on the
-            //     Drinks screen. Touching the drinks Flow here forces the database open
-            //     and suspends until the single preset set has fully landed, so
-            //     importReplace() reliably matches the presets by name and reuses their
-            //     ids instead of duplicating them.
+            //     so that async seeding and the import would otherwise race. Since
+            //     v0.83.0 importReplace() WIPES the whole drink catalogue (presets
+            //     included) before re-inserting the backup's drinks, so a seeded preset
+            //     cannot end up duplicated by the import itself. We still wait for the
+            //     one-time seeding to finish first so the run starts from a fully-open,
+            //     fully-seeded database and the import's result is deterministic; the
+            //     seeding's own countPresets()==0 guard then also sees the imported
+            //     preset-flagged rows and never re-seeds after the import.
             //
             //     The demo fixture intentionally mirrors the preset set, so the backup's
             //     drink count equals the number of presets; we wait until at least that

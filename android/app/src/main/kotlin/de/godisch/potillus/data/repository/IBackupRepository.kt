@@ -60,8 +60,10 @@ interface IBackupRepository {
      * Runs in a single database transaction: either every backup row is
      * inserted, or none are (the database is unchanged on failure).
      *
-     * Preset drinks are preserved; their IDs are reused when a backup drink
-     * shares the same name as a preset.
+     * The drink catalogue afterwards is exactly the backup's drink list: ALL
+     * local drinks are wiped first (presets included), then the backup's drinks
+     * are inserted, each keeping its own `isPreset` flag. A preset the backup
+     * does not contain is therefore dropped — REPLACE is authoritative.
      *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.

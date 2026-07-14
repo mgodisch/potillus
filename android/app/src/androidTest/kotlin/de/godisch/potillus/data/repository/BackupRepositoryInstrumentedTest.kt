@@ -164,4 +164,52 @@ class BackupRepositoryInstrumentedTest {
         assertNotNull("the entry's drinkId must reference an existing drink", relinkedDrink)
         assertEquals("Mojito", relinkedDrink!!.name)
     }
+
+    /**
+     * Regression test (v0.83.0): after a REPLACE import the drink catalogue must
+     * equal the backup's drink list EXACTLY.
+     *
+     * This pins the reported bug: on a fresh install (or after "clear storage")
+     * the pre-population callback seeds the full preset set; importing a backup
+     * with REPLACE then left those presets in place, so they showed up ALONGSIDE
+     * the backup's drinks instead of being replaced. The fix wipes every drink —
+     * presets included — before re-inserting the backup, so:
+     *   - a preset the backup does NOT contain ("Lager" here) is dropped, and
+     *   - a preset the backup DOES contain ("Pils") is recreated with its
+     *     `isPreset` flag intact.
+     */
+    @Test
+    fun importReplace_replacesPresetsToMatchTheBackupExactly() = runBlocking {
+        // ── Local state mimicking a fresh install: two seeded presets. ─────────
+        drinkDao.insert(
+            DrinkEntity(name = "Lager", volumeMl = 500, alcoholPercent = 5.0, isPreset = true, category = "BEER"),
+        )
+        drinkDao.insert(
+            DrinkEntity(name = "Pils", volumeMl = 500, alcoholPercent = 4.8, isPreset = true, category = "BEER"),
+        )
+
+        // ── Backup payload: one of the presets ("Pils") plus one custom drink. ─
+        val backupDrinks = listOf(
+            DrinkDefinition(
+                id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 4.8,
+                isPreset = true, category = DrinkCategory.BEER,
+            ),
+            DrinkDefinition(
+                id = 2, name = "Cider", volumeMl = 330, alcoholPercent = 4.5,
+                isPreset = false, category = DrinkCategory.OTHER,
+            ),
+        )
+
+        repo.importReplace(backupDrinks, backupEntries = emptyList())
+
+        // ── Assert: exactly the backup's drinks remain; "Lager" is gone. ───────
+        val remaining = drinkDao.getAllOnce()
+        assertEquals(
+            "catalogue must equal the backup exactly",
+            setOf("Pils", "Cider"),
+            remaining.map { it.name }.toSet(),
+        )
+        val pils = remaining.first { it.name == "Pils" }
+        assertEquals("a preset in the backup keeps its isPreset flag", true, pils.isPreset)
+    }
 }

@@ -161,13 +161,22 @@ final class BackupImporterTests: XCTestCase {
 
     // ── REPLACE ──────────────────────────────────────────────────────────────
 
-    func testReplaceClearsTheLogAndUserDrinksButKeepsPresets() async throws {
+    /// REPLACE makes the catalogue identical to the backup: the old log and every
+    /// local drink are wiped, including presets. A preset the backup omits ("Preset"
+    /// here) is dropped; a preset the backup carries ("House Lager") is recreated
+    /// with its `isPreset` flag intact. This is the v0.83.0 fix — previously the
+    /// seeded presets lingered alongside the imported drinks.
+    func testReplaceMakesTheCatalogueMatchTheBackupExactly() async throws {
         _ = try drinks.add(DrinkDefinition(name: "Preset", volumeMl: 500, alcoholPercent: 5, isPreset: true))
+        _ = try drinks.add(DrinkDefinition(name: "House Lager", volumeMl: 500, alcoholPercent: 4.8, isPreset: true))
         let mine = try drinks.add(DrinkDefinition(name: "Mine", volumeMl: 500, alcoholPercent: 5))
         _ = try entries.add(entry(drinkId: mine, at: 500))
 
         let file = backup(
-            drinks: [DrinkDefinition(id: 1, name: "Cider", volumeMl: 500, alcoholPercent: 4.5)],
+            drinks: [
+                DrinkDefinition(id: 1, name: "House Lager", volumeMl: 500, alcoholPercent: 4.8, isPreset: true),
+                DrinkDefinition(id: 2, name: "Cider", volumeMl: 330, alcoholPercent: 4.5),
+            ],
             entries: [entry(drinkId: 1, at: 1_000)]
         )
         let stats = try await makeImporter().restore(file, mode: .replace)
@@ -176,7 +185,12 @@ final class BackupImporterTests: XCTestCase {
         XCTAssertEqual(try entries.all().count, 1, "the old entry is gone")
 
         let catalogue = try await firstValue(drinks.observeDrinks())
-        XCTAssertEqual(Set(catalogue.map(\.name)), ["Preset", "Cider"], "presets survive, 'Mine' does not")
+        XCTAssertEqual(
+            Set(catalogue.map(\.name)), ["House Lager", "Cider"],
+            "catalogue equals the backup; 'Preset' and 'Mine' are gone"
+        )
+        let lager = try XCTUnwrap(catalogue.first { $0.name == "House Lager" })
+        XCTAssertTrue(lager.isPreset, "a preset in the backup keeps its isPreset flag")
     }
 
     // ── MERGE ────────────────────────────────────────────────────────────────

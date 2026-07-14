@@ -46,8 +46,10 @@ import GRDB
 //   is remembered. Every entry is then rewritten to point at the local id.
 //
 // THE TWO MODES
-//   REPLACE wipes the log and every user-created drink, then imports. Presets
-//   survive, because an old entry must always be able to resolve its drink.
+//   REPLACE wipes the log and EVERY drink (presets included), then imports, so
+//   the catalogue afterwards is exactly the backup's drink list — a preset the
+//   backup does not carry is dropped. Presets the backup contains are recreated
+//   from it, `isPreset` flag and all.
 //   MERGE keeps what is there and skips entries that already exist, identified by
 //   timestamp plus drink — the natural key. Importing the same file twice must
 //   not double the history.
@@ -62,7 +64,8 @@ import GRDB
 
 /// How an import treats the data already on the device.
 public enum ImportMode: String, Sendable, Equatable {
-    /// Erase the log and user-created drinks first. Presets are kept.
+    /// Erase the log and ALL drinks (presets included) first, so the catalogue
+    /// ends up identical to the backup.
     case replace = "REPLACE"
     /// Keep existing data; skip entries that are already present.
     case merge = "MERGE"
@@ -130,9 +133,16 @@ public struct BackupImporter: Sendable {
         try database.write { db in
             if mode == .replace {
                 _ = try Entry.deleteAll(db)
-                // Presets are never deleted: an entry that survived a REPLACE in
-                // an earlier import may still reference one.
-                _ = try Drink.filter(Column("isPreset") == false).deleteAll(db)
+                // Wipe EVERY drink, presets included. The log was just cleared,
+                // so no entry references any drink and the foreign key cannot
+                // trip. REPLACE means "the catalogue becomes exactly the backup":
+                // a preset the backup does not contain must NOT survive. Keeping
+                // presets here was the reported bug — right after a fresh install
+                // (or a storage reset), where the seeded preset set was still
+                // present, they lingered ALONGSIDE the imported drinks instead of
+                // being replaced. Presets the backup DOES carry are re-inserted
+                // below with their `isPreset` flag intact.
+                _ = try Drink.deleteAll(db)
             }
 
             let idMap = try Self.buildIdMap(db, backupDrinks: backup.drinks)

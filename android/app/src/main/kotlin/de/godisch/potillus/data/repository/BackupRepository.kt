@@ -70,9 +70,11 @@ class BackupRepository(
 ) : IBackupRepository {
 
     /**
-     * REPLACE import: wipes all entries and user-created drinks, then inserts the
-     * backup. Preset drinks are kept and matched by name so backup entries relink
-     * to the existing preset ids. Runs in a single transaction (all-or-nothing).
+     * REPLACE import: wipes all entries and ALL drinks (presets included), then
+     * inserts the backup. The catalogue afterwards is exactly the backup's drink
+     * list — a preset the backup does not contain is dropped, not kept. Backup
+     * drinks carry their own `isPreset` flag, so presets present in the backup are
+     * recreated verbatim. Runs in a single transaction (all-or-nothing).
      *
      * @param backupDrinks  Drinks from the backup file.
      * @param backupEntries Entries from the backup file.
@@ -85,24 +87,23 @@ class BackupRepository(
         var imported = 0
         db.withTransaction {
             entryDao.deleteAll()
-            drinkDao.deleteUserCreatedDrinks()
+            drinkDao.deleteAllDrinks()
 
-            // Build the name → id map INSIDE the transaction, AFTER the
-            // deletes, so it reflects only the rows that actually survive (the
-            // presets). A getAllOnce() one-shot suspend query is transaction-safe
-            // (unlike collecting the getAll() Flow).
+            // Build the name → id map INSIDE the transaction, AFTER the deletes,
+            // so it reflects only the rows that actually survive. After a full
+            // drink wipe nothing survives, so the map starts empty and every
+            // backup drink is inserted fresh below; the read is still kept
+            // post-delete so the two import paths share one ordering discipline
+            // and so a future partial-delete variant stays correct. A
+            // getAllOnce() one-shot suspend query is transaction-safe (unlike
+            // collecting the getAll() Flow).
             //
-            // WHY this ordering matters:
-            //   If the map is captured BEFORE deleteUserCreatedDrinks(), it still
-            //   contains the deleted user drinks. buildIdMap() would then map a
-            //   backup drink whose name equals a just-deleted user drink to that
-            //   drink's OLD (now non-existent) id, instead of re-inserting it. The
-            //   subsequent entry insert would reference a missing parent row and
-            //   trip the entries→drinks FOREIGN KEY (RESTRICT) constraint, rolling
-            //   back the whole import. That scenario is common: re-importing your
-            //   own backup over a database that still holds the matching user
-            //   drinks. Capturing the map post-delete makes such names re-insert
-            //   with a fresh id, so the FK is always satisfied.
+            // WHY read AFTER the delete:
+            //   Capturing the map BEFORE the delete would map a backup drink onto
+            //   a row that no longer exists, and the following entry insert would
+            //   reference a missing parent and trip the entries→drinks FOREIGN KEY
+            //   (RESTRICT), rolling the whole import back. Reading post-delete
+            //   guarantees every mapped id points at a live row.
             val existingByName = drinkDao.getAllOnce().associate { it.name to it.id }
 
             val idMap = buildIdMap(backupDrinks, existingByName)
