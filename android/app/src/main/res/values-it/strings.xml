@@ -209,6 +209,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">Menu</string>
     <string name="help">Aiuto</string>
     <string name="copyright">Copyright</string>
+    <string name="about">Informazioni</string>
     <string name="stats_time_of_day">Orario</string>
     <string name="stats_weekday">Giorno della settimana</string>
     <string name="pdf_kpi_median_day">Mediana al giorno</string>

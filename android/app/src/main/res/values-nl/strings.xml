@@ -207,6 +207,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">Menu</string>
     <string name="help">Help</string>
     <string name="copyright">Copyright</string>
+    <string name="about">Over</string>
     <string name="stats_time_of_day">Tijdstip</string>
     <string name="stats_weekday">Weekdag</string>
     <string name="pdf_kpi_median_day">Mediaan per dag</string>

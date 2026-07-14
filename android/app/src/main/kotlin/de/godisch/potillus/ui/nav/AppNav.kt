@@ -107,10 +107,18 @@ sealed interface Screen {
     @Serializable data object Help : Screen
 
     /**
-     * Copyright viewer ("Copyright"), pushed on top of [Home] from the overflow
-     * menu. Displays the build-time concatenation of `COPYING.md` (the project's
-     * short copyright/licence notice) and the full GPL text from `LICENSE.md`,
-     * bundled as the single raw resource `R.raw.copyright`.
+     * About screen, pushed on top of [Home] from the overflow menu (the entry
+     * that used to open the copyright document directly). Shows the version, the
+     * app's GPL notice and its direct dependencies, and links on to [Copyright]
+     * for the full document.
+     */
+    @Serializable data object About : Screen
+
+    /**
+     * Copyright viewer ("Copyright"), pushed from [About]. Displays the
+     * build-time concatenation of `COPYING.md` (the project's short
+     * copyright/licence notice) and the full GPL text from `LICENSE.md`, bundled
+     * as the single raw resource `R.raw.copyright`.
      */
     @Serializable data object Copyright : Screen
 }
@@ -188,7 +196,7 @@ fun AppNavigation(
                 // opened from.
                 onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
                 onOpenHelp = { navController.navigate(Screen.Help) { launchSingleTop = true } },
-                onOpenCopyright = { navController.navigate(Screen.Copyright) { launchSingleTop = true } },
+                onOpenCopyright = { navController.navigate(Screen.About) { launchSingleTop = true } },
                 onLockApp = onLockApp,
             )
         }
@@ -205,6 +213,12 @@ fun AppNavigation(
                 titleRes = R.string.help,
                 rawRes = R.raw.usersguide,
                 renderAsMarkdown = true,
+                onBack = { navController.navigateUp() },
+            )
+        }
+        composable<Screen.About> {
+            AboutScreen(
+                onOpenCopyright = { navController.navigate(Screen.Copyright) { launchSingleTop = true } },
                 onBack = { navController.navigateUp() },
             )
         }

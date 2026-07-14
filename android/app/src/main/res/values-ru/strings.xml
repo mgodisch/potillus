@@ -211,6 +211,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">Меню</string>
     <string name="help">Справка</string>
     <string name="copyright">Copyright</string>
+    <string name="about">О приложении</string>
     <string name="stats_time_of_day">Время суток</string>
     <string name="stats_weekday">День недели</string>
     <string name="pdf_kpi_median_day">Медиана в день</string>

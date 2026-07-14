@@ -251,6 +251,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">Меню</string>
     <string name="help">Довідка</string>
     <string name="copyright">Copyright</string>
+    <string name="about">Про застосунок</string>
     <string name="stats_time_of_day">Час доби</string>
     <string name="stats_weekday">День тижня</string>
     <string name="pdf_kpi_median_day">Медіана за день</string>

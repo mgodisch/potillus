@@ -141,10 +141,11 @@ fun AppOverflowMenu(
             },
         )
         DropdownMenuItem(
-            text = { Text(stringResource(R.string.copyright)) },
-            // The copyright entry carries the open-book glyph (formerly used by
-            // the help entry); a book reads more naturally as "read the
-            // copyright and licence text" than the previous gavel.
+            text = { Text(stringResource(R.string.about)) },
+            // The about entry carries the open-book glyph (formerly used by the
+            // help entry); a book reads naturally as "read about the app and its
+            // licences". It opens the About screen, which links on to the full
+            // copyright and licence document.
             leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
             onClick = {
                 expanded = false

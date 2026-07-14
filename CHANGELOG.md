@@ -216,6 +216,20 @@ two stores' notes need not match).
   empty string, which `Loc.locale(for:)` already resolves to `.current`, so the
   interface follows the device language live. Choosing a fixed language still
   works exactly as before on both.
+- **"About" replaces "Copyright" in the overflow menu on both platforms.** The
+  menu entry now opens an About screen — app name, version, the app's own GPL
+  notice, and its direct dependencies grouped by licence — with a link on to the
+  full copyright-and-licence document. On iOS the About screen moves out of
+  Settings (where it used to live) into the overflow menu, matching Android's
+  placement; on Android an equivalent About screen is added and the overflow's
+  former "Copyright" entry becomes "About". The licence sentences on the screen
+  are English-only, like the COPYING.md they derive from — licence text is a
+  legal artifact that translation would distort — while the structural labels a
+  user navigates by are localised. COPYING.md now reproduces the full GRDB MIT
+  licence text, so the bundled copyright document (built from COPYING.md on both
+  platforms) carries the notice regardless of which app is installed; only iOS
+  actually ships GRDB and additionally reproduces the licence inline in its
+  About screen, still pinned by the `testGrdbLicence*` tests.
 
 ---
 

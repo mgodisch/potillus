@@ -406,6 +406,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="help">Help</string>
     <!-- Overflow-menu item: opens the GPL/copyright notice; also its title. -->
     <string name="copyright">Copyright</string>
+    <string name="about">About</string>
     <!-- Statistics: title of the time-of-day chart. -->
     <string name="stats_time_of_day">Time of Day</string>
     <!-- Statistics: title of the weekday chart. -->

@@ -134,14 +134,42 @@ vendored source copy, so it is "de-embedded" via build-depends as required.
   system.  It has no transitive dependencies, performs no network access, and
   collects no telemetry.
 
-The MIT License permits redistribution provided the copyright notice and the
-permission notice accompany the software.  This file records the attribution,
-and the iOS application — the only one that ships GRDB — reproduces the full
-licence text verbatim in its about screen (pinned by the `testGrdbLicence*`
-smoke tests).  The Android application does not distribute GRDB and therefore
-carries no MIT obligation; its bundled copyright document shows the attribution
-recorded here.  MIT is compatible with the GNU GPL version 3, so the combined
-work is distributable under the terms stated at the top of this document.
+The MIT License requires that the copyright notice and the permission notice
+accompany the software.  The full licence text is reproduced verbatim below, so
+that the in-app copyright document — generated from this file on **both**
+platforms (`res/raw/copyright.md` on Android, the `copyright` resource on iOS)
+— carries the notice regardless of which app a reader has installed:
+
+```
+Copyright (C) 2015-2025 Gwendal Roué
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+Only the iOS application actually **ships** GRDB, so only it carries the MIT
+redistribution obligation; the iOS about screen additionally reproduces the
+licence text inline (pinned by the `testGrdbLicence*` smoke tests).  The Android
+application does not distribute GRDB and therefore carries no MIT obligation —
+but because both apps build their copyright document from this file, both show
+the attribution and the notice above.  MIT is compatible with the GNU GPL
+version 3, so the combined work is distributable under the terms stated at the
+top of this document.
 
 ## Third-Party Assets
 

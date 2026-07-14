@@ -252,6 +252,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">메뉴</string>
     <string name="help">도움말</string>
     <string name="copyright">Copyright</string>
+    <string name="about">정보</string>
     <string name="stats_time_of_day">시간대</string>
     <string name="stats_weekday">요일</string>
     <string name="pdf_kpi_median_day">일 중앙값</string>

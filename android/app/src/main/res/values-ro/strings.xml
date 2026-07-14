@@ -260,6 +260,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="menu">Meniu</string>
     <string name="help">Ajutor</string>
     <string name="copyright">Copyright</string>
+    <string name="about">Despre</string>
     <string name="stats_time_of_day">Ora zilei</string>
     <string name="stats_weekday">Ziua săptămânii</string>
     <string name="pdf_kpi_median_day">Mediană pe zi</string>
