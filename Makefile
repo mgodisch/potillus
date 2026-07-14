@@ -1186,8 +1186,20 @@ BADGE_URL := https://www.bestpractices.dev/projects/$(BADGE_ID).json
 
 # ── bestpractices-json ── MANUAL, network. Download the badge answers and keep
 # only the answered criteria (<name>_status in Met/Unmet/N/A plus the matching
-# _justification), sorted, so the committed snapshot diffs meaningfully. Review
-# `git diff .bestpractices.json` before committing.
+# _justification), sorted, so the committed snapshot diffs meaningfully. Then
+# regenerate the annotated .bestpractices.jsonc view (below). Review both
+# `git diff .bestpractices.json` and `git diff .bestpractices.jsonc` before
+# committing.
+#
+# ── bestpractices-jsonc ── LOCAL, no network. Annotate .bestpractices.json into
+# .bestpractices.jsonc: a JSONC (JSON-with-comments) sibling in which each
+# criterion is preceded by a `//` comment naming the bestpractices.dev level it
+# lives at (passing/silver/gold for the metal series, level 1/2/3 for the OSPS
+# Baseline), so a reader knows which page to open to find the official text.
+# The .json stays canonical (comment-free, tool-readable); the .jsonc is a
+# generated, read-only view. Levels come from tools/bestpractices-levels.json.
+# Folded into bestpractices-json so the two never drift, and available on its
+# own for when only the map changed.
 # ios-version: regenerates ios/Version.xcconfig from the project's sources of
 # truth (the top CHANGELOG.md entry and the Android versionCode), so the iOS
 # build carries the same version as the Android one. Run before `xcodegen
@@ -1402,8 +1414,20 @@ fix-headers:
 bestpractices-json:
 	# curl is required for the download below; a missing curl aborts here.
 	command -v curl
-	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 -c 'import json,sys; d=json.load(sys.stdin); a={k[:-7] for k,v in d.items() if k.endswith("_status") and str(v).strip() in {"Met","Unmet","N/A"}}; o={k:v for k,v in d.items() if (k.endswith("_status") and k[:-7] in a) or (k.endswith("_justification") and k[:-14] in a)}; json.dump(dict(sorted(o.items())), open(".bestpractices.json","w",encoding="utf-8"), indent=2, ensure_ascii=False); open(".bestpractices.json","a",encoding="utf-8").write(chr(10)); print("bestpractices-json: %d criteria written"%len(a), file=sys.stderr)'
+	curl -fsSL --proto '=https' --tlsv1.2 "$(BADGE_URL)" | python3 tools/filter-bestpractices.py > .bestpractices.json
 	@echo "bestpractices-json: review 'git diff .bestpractices.json' before committing."
+	$(MAKE) bestpractices-jsonc
+
+bestpractices-jsonc:
+	python3 tools/render-bestpractices-jsonc.py
+	@echo "bestpractices-jsonc: review 'git diff .bestpractices.jsonc' before committing."
+
+# check-bestpractices-levels: fail if .bestpractices.json holds a criterion that
+# tools/bestpractices-levels.json cannot place on a badge level (the map has
+# fallen behind the badge site). Skips gracefully when the answers file is
+# absent. Part of the release gate below.
+check-bestpractices-levels:
+	python3 tools/check-bestpractices-levels.py
 
 # =============================================================================
 # HOUSEKEEPING
@@ -1417,4 +1441,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper

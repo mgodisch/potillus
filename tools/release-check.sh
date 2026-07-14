@@ -321,7 +321,7 @@ extract_db_version() {
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 14 — VERSION CONSISTENCY"
+    section "1 / 15 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version
 
@@ -491,7 +491,7 @@ CHANGELOG version must bump versionCode by exactly 1"
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 14 — CHANGELOG ENTRY"
+    section "2 / 15 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 
@@ -548,7 +548,7 @@ check_changelog() {
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 14 — ROOM DATABASE MIGRATIONS"
+    section "3 / 15 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 
@@ -619,7 +619,7 @@ check_room_migrations() {
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 14 — LOCALE CONSISTENCY"
+    section "4 / 15 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 
@@ -824,7 +824,7 @@ es-419 es-ES es-US sw sv-SE ta-IN te-IN th tr-TR uk ur vi zu "
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 14 — SOURCE CODE DOCUMENTATION"
+    section "5 / 15 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     local missing_headers=0 total_kt=0
@@ -968,7 +968,7 @@ PYEOF
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 14 — LOG CALL GUARDS"
+    section "6 / 15 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""
@@ -1022,7 +1022,7 @@ check_log_guards() {
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 14 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 15 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
@@ -1100,7 +1100,7 @@ check_no_german_comments() {
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 14 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 15 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \
@@ -1151,7 +1151,7 @@ check_backup_version() {
 #   no balance check can satisfy, and they are never reformatted anyway).
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 14 — MARKDOWN SYNTAX"
+    section "9 / 15 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then
@@ -1209,7 +1209,7 @@ check_markdown_syntax() {
 #   full_description.txt    ≤ 4000
 #   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
 check_metadata_lengths() {
-    section "10 / 14 — STORE METADATA LENGTH LIMITS"
+    section "10 / 15 — STORE METADATA LENGTH LIMITS"
 
     # python3 is already a prerequisite (see §5); reuse it for correct,
     # locale-independent character counting.
@@ -1285,7 +1285,7 @@ PYEOF
 #   that re-adds the in-APK SBOM task.
 # =============================================================================
 check_reproducible_build_hygiene() {
-    section "11 / 14 — REPRODUCIBLE-BUILD HYGIENE"
+    section "11 / 15 — REPRODUCIBLE-BUILD HYGIENE"
 
     # The in-APK SBOM was wired via a `GenerateSbomAsset` task; its absence is
     # the signal that the SBOM stays out of the APK. (cyclonedxDirectBom, the
@@ -1324,7 +1324,7 @@ check_reproducible_build_hygiene() {
 #   it cannot produce false failures in environments that lack the inputs.
 # =============================================================================
 check_third_party_notices() {
-    section "12 / 14 — THIRD-PARTY NOTICE FILES"
+    section "12 / 15 — THIRD-PARTY NOTICE FILES"
 
     local sbom="app/build/outputs/sbom/libellus-potionis-sbom.json"
     if [[ ! -f "$sbom" ]]; then
@@ -1409,7 +1409,7 @@ PYEND
 #   regress. It skips gracefully (info) where python3 is unavailable and warns
 #   only on a real finding.
 check_accessibility_labels() {
-    section "13 / 14 — ACCESSIBILITY LABELS"
+    section "13 / 15 — ACCESSIBILITY LABELS"
 
     if ! command -v python3 >/dev/null 2>&1; then
         info "python3 not found — skipping accessibility-label check"
@@ -1525,7 +1525,7 @@ PYEND
 #   relies on.
 # =============================================================================
 check_signing_key_fingerprint() {
-    section "14 / 14 — SIGNING-KEY FINGERPRINT"
+    section "14 / 15 — SIGNING-KEY FINGERPRINT"
 
     local security="../SECURITY.md"
     if [[ ! -f "$security" ]]; then
@@ -1571,6 +1571,89 @@ check_signing_key_fingerprint() {
 #   is given, because it launches Gradle and executes the unit-test suite — far
 #   slower than the static checks above, so the on-every-build Makefile `prereq`
 #   path leaves it off. Release and CI runs pass --coverage to enforce the floor.
+# =============================================================================
+# SECTION 15 – BEST-PRACTICES BADGE COMPLETENESS
+# =============================================================================
+# WHY THIS MATTERS:
+#   .bestpractices.json is the committed snapshot of the project's answers to
+#   the OpenSSF Best Practices Badge (metal series: passing/silver/gold) and the
+#   OSPS Baseline (level 1/2/3). `make bestpractices-json` now mirrors the FULL
+#   upstream criteria set — every tracked criterion is present even when it is
+#   unanswered — so the file doubles as a checklist. This gate makes the
+#   checklist binding: it FAILS while any criterion is still unanswered, where
+#   "unanswered" means (per the project decision recorded in this section):
+#     * a status that is not one of Met / Unmet / N/A  (e.g. "?", "0",
+#       "Unknown", empty), OR
+#     * an EMPTY justification — except for the handful of criteria the badge
+#       form gives no rationale field at all, listed under "no_justification"
+#       in tools/bestpractices-levels.json, which are checked for status only.
+#
+# HOW IT WORKS:
+#   The set of tracked criteria and the justification-exempt list both come from
+#   tools/bestpractices-levels.json (the same map that annotates the .jsonc), so
+#   this gate, the renderer and check-bestpractices-levels.py all agree on what
+#   a criterion is. It skips gracefully (info + pass) when either the answers
+#   file or the map is absent, per the project's gate-design rule.
+# =============================================================================
+check_bestpractices_complete() {
+    section "15 / 15 — BEST-PRACTICES BADGE COMPLETENESS"
+
+    local answers="../.bestpractices.json"
+    local levels="../tools/bestpractices-levels.json"
+    if [[ ! -f "$answers" ]]; then
+        info ".bestpractices.json not present — badge completeness check skipped"
+        pass "Badge completeness is answers-file-gated (nothing to verify without it)"
+        return
+    fi
+    if [[ ! -f "$levels" ]]; then
+        info "tools/bestpractices-levels.json not present — check skipped"
+        pass "Badge completeness needs the level map (nothing to verify without it)"
+        return
+    fi
+    if ! command -v python3 >/dev/null 2>&1; then
+        warn "python3 not found — skipping badge completeness check"
+        return
+    fi
+
+    # One "criterion<TAB>reason" line per outstanding criterion; empty on a clean
+    # pass. Guarded by `if` so the python exit status 1 on findings does not abort
+    # under `set -e` (the SECTION 9 pattern).
+    local findings
+    if ! findings=$(python3 - "$answers" "$levels" <<'PYEND'
+import json, sys
+
+answers = json.load(open(sys.argv[1], encoding="utf-8"))
+levels = json.load(open(sys.argv[2], encoding="utf-8"))
+
+tracked = set(levels["metal"]) | set(levels["baseline"])
+no_just = set(levels.get("no_justification", []))
+ANSWERED = {"Met", "Unmet", "N/A"}
+
+out = []
+for criterion in sorted(tracked):
+    status = str(answers.get(f"{criterion}_status", "")).strip()
+    if status not in ANSWERED:
+        out.append(f"{criterion}\tstatus is '{status or '(missing)'}' (need Met/Unmet/N/A)")
+        continue
+    if criterion not in no_just:
+        justification = str(answers.get(f"{criterion}_justification", "")).strip()
+        if not justification:
+            out.append(f"{criterion}\tjustification is empty")
+
+for line in out:
+    print(line)
+sys.exit(1 if out else 0)
+PYEND
+    ); then
+        while IFS=$'\t' read -r criterion reason; do
+            [[ -n "$criterion" ]] || continue
+            fail "Badge criterion $criterion unanswered: $reason"
+        done <<< "$findings"
+    else
+        pass "All tracked badge criteria are answered (status + justification)"
+    fi
+}
+
 check_coverage() {
     section "COVERAGE — Kover verification (opt-in: --coverage)"
 
@@ -1646,6 +1729,7 @@ main() {
     check_third_party_notices
     check_accessibility_labels
     check_signing_key_fingerprint
+    check_bestpractices_complete
     check_coverage
 
     # ── Final summary ─────────────────────────────────────────────────────────

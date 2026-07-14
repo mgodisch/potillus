@@ -161,6 +161,23 @@ two stores' notes need not match).
   scripts that are not in the tree (`build-report-labels.py`,
   `check-report-labels.py`) nor contradicts the report-label catalogue's own
   "hand-maintained" header; the real guard is `check-l10n-parity.py` CHECK 3.
+- **The best-practices badge answers are browsable and complete.** A new
+  `make bestpractices-jsonc` writes `.bestpractices.jsonc`, a generated view of
+  `.bestpractices.json` in which every criterion is preceded by a comment
+  naming the bestpractices.dev level it lives at — `passing`/`silver`/`gold`
+  for the OpenSSF Best Practices Badge (metal) series, `level 1`/`2`/`3` for
+  the OSPS Baseline — so a reader knows which page to open to find the
+  official text. The levels come from a committed, provenance-documented map
+  (`tools/bestpractices-levels.json`) regenerated from the two upstream
+  machine-readable sources, and `.json` stays canonical (comment-free,
+  tool-readable) while the `.jsonc` is the annotated sibling. The download
+  target (`make bestpractices-json`) now mirrors the FULL upstream criteria
+  set through `tools/filter-bestpractices.py` (upstream wins; retired criteria
+  are dropped, so the file follows the current definitions), and two gates
+  keep it honest: `check-bestpractices-levels.py` fails if a criterion has no
+  mapped level, and release-check §15 fails while any criterion is unanswered
+  — status not in Met/Unmet/N/A, or an empty justification — exempting the few
+  criteria the badge form gives no rationale field.
 
 ---
 
