@@ -1386,6 +1386,12 @@ check-l10n-parity:
 check-ios-metadata:
 	python3 tools/check-ios-metadata.py
 
+# check-ui-string-parity: DIAGNOSTIC (not part of release-check). Reports iOS
+# labels that read differently from their Android counterpart -- the drift the
+# key-based l10n parity gate cannot see. Curated map in tools/ui-string-parity.json.
+check-ui-string-parity:
+	python3 tools/check-ui-string-parity.py
+
 # check-swift-tests: catches `await` inside an XCTAssert autoclosure, which the
 # Swift compiler rejects but only after a full build -- and which is easy to
 # re-introduce. A grep is cheaper than a compile, and runs without a Mac.
@@ -1441,4 +1447,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ui-string-parity ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper

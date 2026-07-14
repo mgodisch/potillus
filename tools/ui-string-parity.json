@@ -1,0 +1,29 @@
+{
+  "_comment": [
+    "Curated equivalence map for check-ui-string-parity.py: iOS catalogue key",
+    "-> Android string name, for labels that must read the SAME to the user but",
+    "are (or were) worded differently on the two platforms. A pair whose English",
+    "texts already match is silent; a pair that differs is reported as DRIFT to",
+    "be aligned (normally by changing the iOS key to Android's wording).",
+    "",
+    "This map is hand-maintained: semantic equivalence cannot be guessed. Add a",
+    "pair when a new iOS label corresponds to an Android string under a different",
+    "name; the tool's UNMAPPED list flags iOS labels not yet considered.",
+    "",
+    "Seeded in the 0.83.0 UI-parity pass from the Statistics screen, where the",
+    "two vocabularies diverged most (Android 'Average per Day' vs iOS 'Per day',",
+    "etc.). Entries here are the ALIGNMENT WORK LIST, not yet the aligned state."
+  ],
+  "pairs": {
+    "Total": "total_period",
+    "Per day": "avg_per_day",
+    "Per drink day": "avg_per_drink_day",
+    "Days over limit": "days_over_daily_limit",
+    "Current streak": "current_streak",
+    "Longest streak": "longest_streak",
+    "Dry days in period": "abstinent_days",
+    "By category": "stats_category_breakdown",
+    "By weekday": "stats_weekday",
+    "Time of day": "stats_time_of_day"
+  }
+}
