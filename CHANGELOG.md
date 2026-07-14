@@ -178,6 +178,32 @@ two stores' notes need not match).
   mapped level, and release-check §15 fails while any criterion is unanswered
   — status not in Met/Unmet/N/A, or an empty justification — exempting the few
   criteria the badge form gives no rationale field.
+- **The iOS screens are brought into visual and verbal parity with Android.**
+  A pass over every screen so someone who switches platforms finds the same
+  layout, labels and colours. Today gains the headline pair (today's total and
+  the monthly average with its trend arrow) above thicker limit bars, and its
+  entries header and empty state match Android's wording. The calendar day view
+  gains the daily-limit bar, richer entry rows (time · ml · % · g · note), an
+  edit pencil and a red delete, and a tap on the selected day no longer
+  deselects it. The drinks rows show the grams-per-serving Android shows. The
+  statistics screen is rebuilt into Android's two-card structure — key metrics
+  (totals, averages, the three days-over-limit counts in red/green, abstinent
+  days) then abstinence and trend — with the dry-day check-marks drawn on the
+  consumption chart. Settings adopts Android's section order (Personal · Limits
+  · Statistics · Backup · Security · Appearance), folds the day-change time into
+  Statistics, and — a fix — makes the statistics-start date always editable
+  again (it previously became read-only once "all history" was chosen). Across
+  all these screens the iOS labels now use Android's exact wording so the two
+  platforms share translations, verified by a new advisory tool,
+  `make check-ui-string-parity`, that reports iOS labels drifting from their
+  Android counterpart (the key-based l10n gate cannot see differently-worded
+  equivalents). Two genuine bugs found on the way are fixed: the traffic-light
+  "green" dot rendered in the app's blue accent instead of green, and the
+  German (and other) empty-state translations were silently dropped because the
+  catalogue key had been stored with an escaped rather than a real newline.
+  Platform-idiomatic differences are deliberately kept — the overflow menu and
+  the add button stay in their iOS positions, and the app-lock hint keeps its
+  Face ID / Touch ID wording rather than Android's fingerprint phrasing.
 
 ---
 
