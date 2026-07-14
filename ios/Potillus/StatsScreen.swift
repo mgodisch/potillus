@@ -85,9 +85,9 @@ struct StatsScreen: View {
             List {
                 periodPicker
                 headline
-                if !model.state.chartBuckets.isEmpty { consumptionChart }
                 limits
                 streaks
+                if !model.state.chartBuckets.isEmpty { consumptionChart }
                 if !model.state.categoryBreakdown.isEmpty { categories }
                 timeOfDay
                 weekdays
@@ -228,13 +228,28 @@ struct StatsScreen: View {
     private var consumptionChart: some View {
         Section(Loc.string("Consumption", locale: locale)) {
             Chart(model.state.chartBuckets, id: \.labelDate) { bucket in
-                BarMark(
-                    x: .value("Date", bucket.labelDate),
-                    y: .value("Grams per day", bucket.avgPerDay)
-                )
-                // An abstinent bucket has zero height and would be invisible; the
-                // colour lets it be read as "dry", not "missing".
-                .foregroundStyle(bucket.isAbstinent ? Color.green : Color.accentColor)
+                if bucket.isAbstinent {
+                    // A dry day has zero height, so a bar would be invisible. Android
+                    // draws a small green check-mark at the baseline to say "dry",
+                    // not "missing"; this is the Swift Charts equivalent — a point at
+                    // y = 0 carrying a green checkmark symbol.
+                    PointMark(
+                        x: .value("Date", bucket.labelDate),
+                        y: .value("Grams per day", 0)
+                    )
+                    .symbol {
+                        Image(systemName: "checkmark")
+                            .font(.caption2.bold())
+                            .foregroundStyle(Color.green)
+                    }
+                    .foregroundStyle(Color.green)
+                } else {
+                    BarMark(
+                        x: .value("Date", bucket.labelDate),
+                        y: .value("Grams per day", bucket.avgPerDay)
+                    )
+                    .foregroundStyle(Color.accentColor)
+                }
             }
             .chartXAxis {
                 // Labels only every few buckets: 31 dates do not fit.
@@ -264,10 +279,15 @@ struct StatsScreen: View {
     private var streaks: some View {
         Section(Loc.string("Abstinence", locale: locale)) {
             // Today is excluded from the current streak: the day is not over, and a
-            // drink may still be logged.
-            LabeledContent(Loc.string("Current streak", locale: locale)) { days(model.state.currentStreak) }
+            // drink may still be logged. Green when positive — an achievement to
+            // reflect back — matching Android's green streak/dry-day values.
+            LabeledContent(Loc.string("Current streak", locale: locale)) {
+                daysColored(model.state.currentStreak)
+            }
             LabeledContent(Loc.string("Longest streak", locale: locale)) { days(model.state.longestStreak) }
-            LabeledContent(Loc.string("Dry days in period", locale: locale)) { days(model.state.abstinentDays) }
+            LabeledContent(Loc.string("Dry days in period", locale: locale)) {
+                daysColored(model.state.abstinentDays)
+            }
         }
     }
 
@@ -296,8 +316,19 @@ struct StatsScreen: View {
             .map { CategorySlice(category: $0.key, grams: $0.value) }
             .sorted { $0.grams > $1.grams }
     }
+}
 
-    private var timeOfDay: some View {
+// =============================================================================
+// StatsScreen – the hour and weekday charts
+// =============================================================================
+//
+// Two more chart sections, in an extension for the same length-budget reason as
+// the formatting helpers below (SwiftLint `type_body_length`).
+// =============================================================================
+
+extension StatsScreen {
+
+    fileprivate var timeOfDay: some View {
         Section(Loc.string("Time of day", locale: locale)) {
             Chart(hourPoints) { point in
                 BarMark(
@@ -312,18 +343,18 @@ struct StatsScreen: View {
 
     /// Named rather than a tuple: `Chart` wants `Identifiable`, and a key path
     /// into a tuple element is not something to rely on.
-    private var hourPoints: [HourPoint] {
+    fileprivate var hourPoints: [HourPoint] {
         model.state.hourBucketAverages.enumerated().map { index, average in
             HourPoint(id: index, label: bucketLabel(index), average: average)
         }
     }
 
     /// "00", "03" … "21". The bucket covers three hours starting there.
-    private func bucketLabel(_ index: Int) -> String {
+    fileprivate func bucketLabel(_ index: Int) -> String {
         String(format: "%02d", index * 3)
     }
 
-    private var weekdays: some View {
+    fileprivate var weekdays: some View {
         Section(Loc.string("By weekday", locale: locale)) {
             Chart(weekdayPoints) { point in
                 BarMark(
@@ -338,7 +369,7 @@ struct StatsScreen: View {
 
     /// Columns whose average is nil are DROPPED, not drawn as zero: that weekday
     /// never occurred in the period, which is not the same as a dry weekday.
-    private var weekdayPoints: [WeekdayPoint] {
+    fileprivate var weekdayPoints: [WeekdayPoint] {
         zip(model.state.weekdayOrder, model.state.weekdayAverages)
             .compactMap { iso, average in
                 average.map { WeekdayPoint(id: iso, label: weekdaySymbol(iso), average: $0) }
@@ -366,28 +397,49 @@ extension StatsScreen {
     private func name(_ category: DrinkCategory) -> String {
         Loc.string(category.categoryDisplayKey, locale: locale)
     }
+}
 
-    // ── Formatting ───────────────────────────────────────────────────────────
+// =============================================================================
+// StatsScreen – value formatting
+// =============================================================================
+//
+// The small view-builders that turn a number into its labelled, coloured cell.
+// In an extension (not the main type body) so they do not count against the
+// type's length budget — the split SwiftLint's `type_body_length` asks for.
+// =============================================================================
 
-    private func grams(_ value: Double) -> some View {
+extension StatsScreen {
+
+    fileprivate func grams(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g").monospacedDigit()
     }
 
-    private func trend(_ value: Double) -> some View {
+    fileprivate func trend(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale, signed: true)) %").monospacedDigit()
     }
 
-    private func count(_ value: Int) -> some View {
+    fileprivate func count(_ value: Int) -> some View {
+        // Red when the limit was breached on any day, green when it held — the
+        // same two-colour cue Android's StatRow uses for the days-over rows.
         Text("\(value)")
             .monospacedDigit()
-            .foregroundStyle(value > 0 ? .red : .secondary)
+            .foregroundStyle(value > 0 ? Color.red : Color.green)
     }
 
-    private func days(_ value: Int) -> some View {
+    fileprivate func days(_ value: Int) -> some View {
         // The plural noun is part of the value now, so it agrees with the count in
         // every language: "1 day" / "7 days", "1 Tag" / "7 Tage", the four Polish
         // forms, the single Japanese one. The catalogue inflects; the view only asks.
         Text(Loc.daysPlural(count: value, locale: locale)).monospacedDigit()
+    }
+
+    /// Like `days`, but green when positive — the achievement colour Android
+    /// gives the current streak and the dry-day count. Grey at zero (nothing to
+    /// celebrate yet), never red: a low streak is not a failure state.
+    fileprivate func daysColored(_ value: Int) -> some View {
+        Text(Loc.daysPlural(count: value, locale: locale))
+            .monospacedDigit()
+            .foregroundStyle(value > 0 ? Color.green : Color.secondary)
     }
 }
 
