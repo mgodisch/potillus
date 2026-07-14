@@ -70,8 +70,7 @@ class AppLockVectorTest {
         val cases = VECTORS.getJSONArray("requiresReauth")
         (0 until cases.length()).map { cases.getJSONObject(it) }.forEach { case ->
             val backgroundedAt =
-                if (case.isNull("backgroundedAt")) null
-                else seconds(case.getDouble("backgroundedAt"))
+                if (case.isNull("backgroundedAt")) null else seconds(case.getDouble("backgroundedAt"))
             val actual = AppLock.requiresReauth(
                 backgroundedAtMillis = backgroundedAt,
                 nowMillis = seconds(case.getDouble("now")),
