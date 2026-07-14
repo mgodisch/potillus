@@ -191,12 +191,20 @@ class BackupRepositoryInstrumentedTest {
         // ── Backup payload: one of the presets ("Pils") plus one custom drink. ─
         val backupDrinks = listOf(
             DrinkDefinition(
-                id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 4.8,
-                isPreset = true, category = DrinkCategory.BEER,
+                id = 1,
+                name = "Pils",
+                volumeMl = 500,
+                alcoholPercent = 4.8,
+                isPreset = true,
+                category = DrinkCategory.BEER,
             ),
             DrinkDefinition(
-                id = 2, name = "Cider", volumeMl = 330, alcoholPercent = 4.5,
-                isPreset = false, category = DrinkCategory.OTHER,
+                id = 2,
+                name = "Cider",
+                volumeMl = 330,
+                alcoholPercent = 4.5,
+                isPreset = false,
+                category = DrinkCategory.OTHER,
             ),
         )
 
