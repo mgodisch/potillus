@@ -204,6 +204,18 @@ two stores' notes need not match).
   Platform-idiomatic differences are deliberately kept — the overflow menu and
   the add button stay in their iOS positions, and the app-lock hint keeps its
   Face ID / Touch ID wording rather than Android's fingerprint phrasing.
+- **A "(System)" language option is offered on both platforms.** The data model
+  already treated an empty language tag as "follow the device language" — and
+  that is the default — but neither picker let a user choose it, so once a fixed
+  language had been selected there was no way back to following the system. Both
+  platforms now list "(System)" as the first language entry, mapping to the
+  empty tag. On Android the `LanguageDropdown` prepends the entry and a new
+  `language_system` string is added to every locale; selecting it calls
+  `setApplicationLocales` with an empty locale list, which restores system
+  following. On iOS the `Picker` prepends a `"(System)"` entry tagged with the
+  empty string, which `Loc.locale(for:)` already resolves to `.current`, so the
+  interface follows the device language live. Choosing a fixed language still
+  works exactly as before on both.
 
 ---
 
