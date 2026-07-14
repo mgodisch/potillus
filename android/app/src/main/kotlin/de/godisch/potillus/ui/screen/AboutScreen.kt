@@ -73,6 +73,16 @@ import de.godisch.potillus.R
 //   matching the iOS about screen's split.
 // =============================================================================
 
+/**
+ * The About screen: the app's name and version, its own GPL notice, and its
+ * direct dependencies grouped by licence, with a button into the full combined
+ * copyright/licence document. Reached from the overflow menu (the entry that
+ * used to open the copyright document directly). Twin of the iOS AboutScreen.
+ *
+ * @param onOpenCopyright Invoked when the "Copyright" button is tapped (pushes
+ *                        the full copyright/licence document).
+ * @param onBack          Invoked when the Up arrow is tapped.
+ */
 @Composable
 fun AboutScreen(
     onOpenCopyright: () -> Unit = {},
