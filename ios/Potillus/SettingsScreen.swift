@@ -101,9 +101,6 @@ struct SettingsScreen: View {
                 backupSection
                 securitySection
                 appearanceSection
-                // About stays here for now; UI-20 relocates it to the overflow
-                // menu (as on Android) in a later patch of this cycle.
-                aboutSection
             }
             .navigationTitle(Loc.string("Settings", locale: locale))
             .navigationBarTitleDisplayMode(.inline)
@@ -623,14 +620,6 @@ extension SettingsScreen {
             )
         default:
             return Loc.string("Read error: %@", String(describing: error), locale: locale)
-        }
-    }
-
-    private var aboutSection: some View {
-        Section {
-            NavigationLink(Loc.string("About", locale: locale)) {
-                AboutScreen()
-            }
         }
     }
 }

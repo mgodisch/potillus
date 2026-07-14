@@ -65,7 +65,7 @@ struct AppOverflowMenu: ViewModifier {
 
     @State private var showingSettings = false
     @State private var showingHelp = false
-    @State private var showingCopyright = false
+    @State private var showingAbout = false
 
     func body(content: Content) -> some View {
         content
@@ -86,9 +86,9 @@ struct AppOverflowMenu: ViewModifier {
                             Label(Loc.string("Help", locale: locale), systemImage: "questionmark.circle")
                         }
                         Button {
-                            showingCopyright = true
+                            showingAbout = true
                         } label: {
-                            Label(Loc.string("Copyright", locale: locale), systemImage: "book")
+                            Label(Loc.string("About", locale: locale), systemImage: "info.circle")
                         }
                         // "Lock app" appears whenever the device can authenticate,
                         // matching Android: a manual lock no longer requires auto-lock
@@ -127,22 +127,20 @@ struct AppOverflowMenu: ViewModifier {
                     }
                 }
             }
-            .sheet(isPresented: $showingCopyright) {
-                // Pushed with a back button under Settings > About; in the menu it
-                // is presented on its own, so it carries its own stack and a Done
-                // button to dismiss the sheet.
+            .sheet(isPresented: $showingAbout) {
+                // About is now reached from the overflow menu (as on Android),
+                // not from Settings. It carries its own stack so its "Copyright &
+                // licence" link can push the full document, and a Done button to
+                // dismiss the sheet.
                 NavigationStack {
-                    DocumentViewerScreen(
-                        title: Loc.string("Copyright & licence", locale: locale),
-                        resource: "copyright"
-                    )
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button(Loc.string("Done", locale: locale)) {
-                                showingCopyright = false
+                    AboutScreen()
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button(Loc.string("Done", locale: locale)) {
+                                    showingAbout = false
+                                }
                             }
                         }
-                    }
                 }
             }
     }

@@ -28,7 +28,8 @@ import SwiftUI
 // =============================================================================
 // AboutScreen — the app's name, version, and the licences it must show.
 //
-// Reached from Settings. COPYING.md requires the iOS app to reproduce GRDB's
+// Reached from the overflow menu (as on Android, where the same entry opens the
+// copyright document). COPYING.md requires the iOS app to reproduce GRDB's
 // licence here before release, as Android already does. This shows the app's own
 // GPL notice, the GRDB MIT notice verbatim, and a link into the full combined
 // copyright/GPL document (the same text Android bundles).
