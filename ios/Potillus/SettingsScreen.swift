@@ -89,13 +89,20 @@ struct SettingsScreen: View {
     var body: some View {
         NavigationStack {
             Form {
+                // Section order mirrors Android: Personal · Limits · Statistics
+                // (which now carries the day-change time, as on Android) · Backup ·
+                // Security · Appearance. iOS previously led with Limits and kept
+                // the day-change and body-weight in their own sections; the
+                // 0.83.0 UI-parity pass aligns the grouping and order so a
+                // platform switcher finds each setting in the same place.
+                personalDataSection
                 limitsSection
-                dayChangeSection
-                bodyWeightSection
                 statisticsSection
-                appearanceSection
-                securitySection
                 backupSection
+                securitySection
+                appearanceSection
+                // About stays here for now; UI-20 relocates it to the overflow
+                // menu (as on Android) in a later patch of this cycle.
                 aboutSection
             }
             .navigationTitle(Loc.string("Settings", locale: locale))
@@ -138,12 +145,12 @@ struct SettingsScreen: View {
             // The choice is destructive one way and not the other, so it is made
             // explicitly, after the file is chosen and before anything is written.
             .confirmationDialog(
-                Loc.string("Import backup", locale: locale),
+                Loc.string("Import", locale: locale),
                 isPresented: .constant(pendingImport != nil),
                 presenting: pendingImport
             ) { url in
-                Button(Loc.string("Merge with my data", locale: locale)) { runImport(url, mode: .merge) }
-                Button(Loc.string("Replace my data", locale: locale), role: .destructive) {
+                Button(Loc.string("Merge", locale: locale)) { runImport(url, mode: .merge) }
+                Button(Loc.string("Replace", locale: locale), role: .destructive) {
                     runImport(url, mode: .replace)
                 }
                 Button(Loc.string("Cancel", locale: locale), role: .cancel) { pendingImport = nil }
@@ -163,7 +170,7 @@ struct SettingsScreen: View {
                 Text(summary)
             }
             .alert(
-                Loc.string("Backup failed", locale: locale),
+                Loc.string("Backup failed.", locale: locale),
                 isPresented: .constant(backupFailure != nil),
                 presenting: backupFailure
             ) { _ in
@@ -182,7 +189,7 @@ struct SettingsScreen: View {
                 value: bind(\.dailyLimitGrams, set: { $0.dailyLimitGrams = $1 }),
                 in: SettingsSanitizer.dailyLimitRange, step: 1
             ) {
-                LabeledContent(Loc.string("Daily limit", locale: locale)) {
+                LabeledContent(Loc.string("Daily Limit in Grams", locale: locale)) {
                     Text(measure(model.settings.dailyLimitGrams, fractionDigits: 0, unit: "g")).monospacedDigit()
                 }
             }
@@ -190,7 +197,7 @@ struct SettingsScreen: View {
                 value: bind(\.weeklyLimitGrams, set: { $0.weeklyLimitGrams = $1 }),
                 in: SettingsSanitizer.weeklyLimitRange, step: 5
             ) {
-                LabeledContent(Loc.string("Weekly limit", locale: locale)) {
+                LabeledContent(Loc.string("7-Day Limit in Grams", locale: locale)) {
                     Text(measure(model.settings.weeklyLimitGrams, fractionDigits: 0, unit: "g")).monospacedDigit()
                 }
             }
@@ -198,7 +205,7 @@ struct SettingsScreen: View {
                 value: bind(\.maxDrinkDaysPerWeek, set: { $0.maxDrinkDaysPerWeek = $1 }),
                 in: SettingsSanitizer.drinkDaysRange
             ) {
-                LabeledContent(Loc.string("Drink days per week", locale: locale)) {
+                LabeledContent(Loc.string("Max. Drinking Days/7 Days", locale: locale)) {
                     Text("\(model.settings.maxDrinkDaysPerWeek)").monospacedDigit()
                 }
             }
@@ -206,11 +213,59 @@ struct SettingsScreen: View {
     }
 
     // ── The logical day ──────────────────────────────────────────────────────
+    // The day-change time now lives inside the Statistics section (below),
+    // matching Android, where it is the first row of that section.
 
-    private var dayChangeSection: some View {
+    /// The stored hour and minute, as a `Date` the picker can edit. Only the time
+    /// components are read back, so the date part is irrelevant.
+    private var dayChangeDate: Date {
+        var components = DateComponents()
+        components.hour = model.settings.dayChangeHour
+        components.minute = model.settings.dayChangeMinute
+        return Calendar.current.date(from: components) ?? Date()
+    }
+
+    // ── Body weight ──────────────────────────────────────────────────────────
+
+    private var personalDataSection: some View {
         Section {
+            if model.hasWeight {
+                Stepper(
+                    value: bind(\.weightKg, set: { $0.weightKg = $1 }),
+                    in: SettingsSanitizer.weightRange, step: 0.5
+                ) {
+                    LabeledContent(Loc.string("Body Weight", locale: locale)) {
+                        Text(measure(model.settings.weightKg, fractionDigits: 1, unit: "kg")).monospacedDigit()
+                    }
+                }
+                Button(Loc.string("Clear body weight", locale: locale), role: .destructive) {
+                    Task { await model.clearWeight() }
+                }
+            } else {
+                // Absence is offered as absence, not as 0.0 kg in a stepper.
+                Button(Loc.string("Set body weight", locale: locale)) {
+                    Task { await model.update { $0.weightKg = 75.0 } }
+                }
+            }
+        } header: {
+            Text(Loc.string("Personal Data", locale: locale))
+        } footer: {
+            Text(
+                model.hasWeight
+                    ? "Used only to estimate blood alcohol. It never leaves this device."
+                    : "Without a body weight, no blood-alcohol estimate is shown."
+            )
+        }
+    }
+
+    // ── Statistics floor ─────────────────────────────────────────────────────
+
+    private var statisticsSection: some View {
+        Section {
+            // The day-change time — Android's first Statistics row. An inline
+            // hour/minute picker, iOS-idiomatic (Android opens a dialog).
             DatePicker(
-                Loc.string("Day starts at", locale: locale),
+                Loc.string("New Day Starts At", locale: locale),
                 selection: Binding(
                     get: { dayChangeDate },
                     set: { newValue in
@@ -225,76 +280,37 @@ struct SettingsScreen: View {
                 ),
                 displayedComponents: .hourAndMinute
             )
-        } header: {
-            Text(Loc.string("Day change", locale: locale))
-        } footer: {
-            // The single most confusing setting in the app, if unexplained.
-            Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
-        }
-    }
 
-    /// The stored hour and minute, as a `Date` the picker can edit. Only the time
-    /// components are read back, so the date part is irrelevant.
-    private var dayChangeDate: Date {
-        var components = DateComponents()
-        components.hour = model.settings.dayChangeHour
-        components.minute = model.settings.dayChangeMinute
-        return Calendar.current.date(from: components) ?? Date()
-    }
-
-    // ── Body weight ──────────────────────────────────────────────────────────
-
-    private var bodyWeightSection: some View {
-        Section {
-            if model.hasWeight {
-                Stepper(
-                    value: bind(\.weightKg, set: { $0.weightKg = $1 }),
-                    in: SettingsSanitizer.weightRange, step: 0.5
-                ) {
-                    LabeledContent(Loc.string("Body weight", locale: locale)) {
-                        Text(measure(model.settings.weightKg, fractionDigits: 1, unit: "kg")).monospacedDigit()
+            // The statistics-start date is ALWAYS editable, matching Android's
+            // always-present date row. iOS previously showed it as read-only text
+            // with an "include all history" button, and once history was included
+            // there was no way to pick a date again (0.83.0 bug). The picker is
+            // always shown; when no floor is set it seeds from today, and picking
+            // a date sets the floor. A clear button removes the floor without
+            // hiding the control.
+            DatePicker(
+                Loc.string("Statistics From", locale: locale),
+                selection: Binding(
+                    get: { Self.day(from: model.settings.statsFromDate) ?? Date() },
+                    set: { newValue in
+                        Task { await model.update { $0.statsFromDate = Self.isoDay(from: newValue) } }
                     }
-                }
-                Button(Loc.string("Clear body weight", locale: locale), role: .destructive) {
-                    Task { await model.clearWeight() }
-                }
-            } else {
-                // Absence is offered as absence, not as 0.0 kg in a stepper.
-                Button(Loc.string("Set body weight", locale: locale)) {
-                    Task { await model.update { $0.weightKg = 75.0 } }
-                }
-            }
-        } header: {
-            Text(Loc.string("Personal data", locale: locale))
-        } footer: {
-            Text(
-                model.hasWeight
-                    ? "Used only to estimate blood alcohol. It never leaves this device."
-                    : "Without a body weight, no blood-alcohol estimate is shown."
+                ),
+                displayedComponents: .date
             )
-        }
-    }
-
-    // ── Statistics floor ─────────────────────────────────────────────────────
-
-    private var statisticsSection: some View {
-        Section {
             if model.hasStatsFloor {
-                LabeledContent(Loc.string("Statistics start", locale: locale), value: model.settings.statsFromDate)
                 Button(Loc.string("Include all history", locale: locale), role: .destructive) {
                     Task { await model.clearStatsFromDate() }
                 }
-            } else {
-                Text(Loc.string("Statistics cover the whole history.", locale: locale))
-                    .foregroundStyle(.secondary)
             }
         } header: {
             Text(Loc.string("Statistics", locale: locale))
         } footer: {
-            Text(Loc.string(
-                "Days before this date are ignored in statistics. Entries are not deleted.",
-                locale: locale
-            ))
+            VStack(alignment: .leading, spacing: 4) {
+                // The day-change footnote (kept from the old day-change section).
+                Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
+                Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
+            }
         }
     }
 
@@ -302,13 +318,16 @@ struct SettingsScreen: View {
 
     private var appearanceSection: some View {
         Section(Loc.string("Appearance", locale: locale)) {
-            Picker(Loc.string("Theme", locale: locale), selection: bind(\.themeMode, set: { $0.themeMode = $1 })) {
+            Picker(
+                Loc.string("Color Scheme", locale: locale),
+                selection: bind(\.themeMode, set: { $0.themeMode = $1 })
+            ) {
                 Text(Loc.string("System", locale: locale)).tag(ThemeMode.system)
                 Text(Loc.string("Light", locale: locale)).tag(ThemeMode.day)
                 Text(Loc.string("Dark", locale: locale)).tag(ThemeMode.night)
             }
             Toggle(
-                Loc.string("Alternative status symbols", locale: locale),
+                Loc.string("Alternative Status Symbols", locale: locale),
                 isOn: bind(\.alternativeStatusSymbols, set: { $0.alternativeStatusSymbols = $1 })
             )
             Picker(Loc.string("Language", locale: locale), selection: bind(\.language, set: { $0.language = $1 })) {
@@ -374,6 +393,35 @@ struct SettingsScreen: View {
 }
 
 // =============================================================================
+// SettingsScreen – statistics-start date conversion
+// =============================================================================
+//
+// The statistics-start floor is stored as an ISO `yyyy-MM-dd` string; these
+// convert to and from the `Date` the picker edits. In an extension so they do
+// not count against the type's length budget (SwiftLint `type_body_length`).
+// A fixed POSIX formatter, not a locale-formatted one, so the stored value
+// round-trips regardless of the display locale.
+// =============================================================================
+
+extension SettingsScreen {
+    fileprivate static func isoDay(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+
+    /// Parses an ISO `yyyy-MM-dd` back to a `Date`, or `nil` when empty/invalid.
+    fileprivate static func day(from iso: String) -> Date? {
+        guard !iso.isEmpty else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: iso)
+    }
+}
+
+// =============================================================================
 // Backup section
 // =============================================================================
 
@@ -390,7 +438,7 @@ extension SettingsScreen {
         Section {
             if biometrics.canEvaluate() {
                 Toggle(
-                    Loc.string("App lock", locale: locale),
+                    Loc.string("Biometric Lock", locale: locale),
                     isOn: $appLockArmed
                 )
                 .onChange(of: appLockArmed) { _, desired in
@@ -457,10 +505,10 @@ extension SettingsScreen {
         Section {
             Toggle(Loc.string("Include settings", locale: locale), isOn: $includeSettingsInExport)
 
-            Button(Loc.string("Export backup", locale: locale)) {
+            Button(Loc.string("Export", locale: locale)) {
                 Task { await prepareExport() }
             }
-            Button(Loc.string("Import backup", locale: locale)) {
+            Button(Loc.string("Import", locale: locale)) {
                 isImporting = true
             }
         } header: {
