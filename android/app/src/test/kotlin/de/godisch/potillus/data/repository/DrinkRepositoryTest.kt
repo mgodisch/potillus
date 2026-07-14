@@ -85,6 +85,7 @@ private class FakeDrinkDao : DrinkDao {
     var updated = false
     var deleted = false
     var clearedUserCreated = false
+    var clearedAll = false
 
     private val samples = listOf(
         DrinkEntity(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0, category = "BEER"),
@@ -116,5 +117,9 @@ private class FakeDrinkDao : DrinkDao {
 
     override suspend fun deleteUserCreatedDrinks() {
         clearedUserCreated = true
+    }
+
+    override suspend fun deleteAllDrinks() {
+        clearedAll = true
     }
 }
