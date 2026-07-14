@@ -11673,133 +11673,133 @@
         }
       }
     },
-    "No entries yet today.\\nTap “+” to add an entry.": {
+    "No entries yet today.\nTap “+” to add an entry.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No entries yet today.\\nTap “+” to add an entry."
+            "value": "No entries yet today.\nTap “+” to add an entry."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch keine Einträge heute.\\nTippe auf „+“, um einen Eintrag hinzuzufügen."
+            "value": "Noch keine Einträge heute.\nTippe auf „+“, um einen Eintrag hinzuzufügen."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ingen poster endnu.\\nTryk på + for at tilføje."
+            "value": "Ingen poster endnu.\nTryk på + for at tilføje."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nog geen invoer vandaag.\\nTik op + om een invoer toe te voegen."
+            "value": "Nog geen invoer vandaag.\nTik op + om een invoer toe te voegen."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ingen registreringer i dag ennå.\\nTrykk på + for å legge til en registrering."
+            "value": "Ingen registreringer i dag ennå.\nTrykk på + for å legge til en registrering."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inga poster ännu.\\nTryck på + för att lägga till."
+            "value": "Inga poster ännu.\nTryck på + för att lägga till."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aún no hay entradas hoy.\\nToca + para añadir una entrada."
+            "value": "Aún no hay entradas hoy.\nToca + para añadir una entrada."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aucune entrée aujourd'hui.\\nAppuyez sur + pour ajouter."
+            "value": "Aucune entrée aujourd'hui.\nAppuyez sur + pour ajouter."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nessuna registrazione oggi.\\nTocca + per aggiungere."
+            "value": "Nessuna registrazione oggi.\nTocca + per aggiungere."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sem registos hoje.\\nToque em + para adicionar."
+            "value": "Sem registos hoje.\nToque em + para adicionar."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nenhum registro hoje.\\nToque em + para adicionar."
+            "value": "Nenhum registro hoje.\nToque em + para adicionar."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nicio înregistrare azi.\\nAtingeți + pentru a adăuga."
+            "value": "Nicio înregistrare azi.\nAtingeți + pentru a adăuga."
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zatím žádné záznamy.\\nKlepněte na + pro přidání záznamu."
+            "value": "Zatím žádné záznamy.\nKlepněte na + pro přidání záznamu."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brak wpisów dzisiaj.\\nDotknij +, aby dodać wpis."
+            "value": "Brak wpisów dzisiaj.\nDotknij +, aby dodać wpis."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Записей пока нет.\\nНажмите + для добавления."
+            "value": "Записей пока нет.\nНажмите + для добавления."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Сьогодні ще немає записів.\\nНатисніть + щоб додати запис."
+            "value": "Сьогодні ще немає записів.\nНатисніть + щоб додати запис."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Δεν υπάρχουν εγγραφές ακόμα.\\nΠατήστε + για προσθήκη."
+            "value": "Δεν υπάρχουν εγγραφές ακόμα.\nΠατήστε + για προσθήκη."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "本日の記録はまだありません。\\n＋ をタップして記録を追加してください。"
+            "value": "本日の記録はまだありません。\n＋ をタップして記録を追加してください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "오늘 기록이 없습니다.\\n+ 를 탭하여 기록을 추가하세요."
+            "value": "오늘 기록이 없습니다.\n+ 를 탭하여 기록을 추가하세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天还没有记录。\\n点击 + 添加记录。"
+            "value": "今天还没有记录。\n点击 + 添加记录。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天尚無記錄。\\n點擊 + 新增記錄。"
+            "value": "今天尚無記錄。\n點擊 + 新增記錄。"
           }
         }
       }

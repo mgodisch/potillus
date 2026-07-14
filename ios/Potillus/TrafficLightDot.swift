@@ -63,7 +63,11 @@ struct TrafficLightDot: View {
 
     private var color: Color {
         switch light {
-        case .green: return .accentColor
+        // A traffic light's calm state is GREEN, not the app's blue accent. iOS
+        // mapped `.green` to `.accentColor` (blue), so the "servings remain" dot
+        // read as blue while Android drew it green (successColor). The three
+        // states now match Android's TrafficLightDot: green / amber / red.
+        case .green: return .green
         case .yellow: return .orange
         case .red: return .red
         }

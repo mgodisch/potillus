@@ -187,7 +187,13 @@ def check_missing_keys(catalog):
     keys = set(catalog.keys())
     problems = []
     for literal in sorted(collect_literals()):
-        if literal in keys or literal in PROPER_NOUNS:
+        # The catalogue is keyed by the RUNTIME string: `String(localized:)`
+        # receives the literal with its escapes already resolved (a real
+        # newline, not "\\n"), so unescape before matching or a multi-line key
+        # is never found — the miss that silently dropped the empty-state
+        # translations (0.83.0 UI-parity pass).
+        resolved = swift_unescape(literal)
+        if resolved in keys or literal in keys or literal in PROPER_NOUNS:
             continue
         # A literal carrying an interpolation is stored under a placeholder key
         # (e.g. "%@"); if any placeholder key exists it is covered, so only flag
