@@ -465,7 +465,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun isReauthDueToInactivity(): Boolean = AppLock.requiresReauth(
         backgroundedAtMillis = backgroundedAt.takeIf { it > 0L },
-        nowMillis = SystemClock.elapsedRealtime()
+        nowMillis = SystemClock.elapsedRealtime(),
     )
 
     /**
