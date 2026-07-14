@@ -84,13 +84,12 @@ struct StatsScreen: View {
         NavigationStack {
             List {
                 periodPicker
-                headline
-                limits
-                streaks
+                keyMetrics
+                streaksAndTrend
                 if !model.state.chartBuckets.isEmpty { consumptionChart }
-                if !model.state.categoryBreakdown.isEmpty { categories }
                 timeOfDay
                 weekdays
+                if !model.state.categoryBreakdown.isEmpty { categories }
             }
             .navigationTitle(Loc.string("Statistics", locale: locale))
             .appOverflowMenu(environment: environment)
@@ -181,17 +180,62 @@ struct StatsScreen: View {
 
     // ── Headline figures ─────────────────────────────────────────────────────
 
-    private var headline: some View {
-        Section {
-            LabeledContent(Loc.string("Total", locale: locale)) { grams(model.state.totalGrams) }
-            LabeledContent(Loc.string("Per day", locale: locale)) { grams(model.state.averagePerDay) }
-            // A different question from "per day": how much when I drink at all.
-            LabeledContent(Loc.string("Per drink day", locale: locale)) { grams(model.state.averagePerDrinkDay) }
+    // ── Key metrics (Android's first card) ───────────────────────────────────
+    //
+    // The order and the labels track Android's key-metrics card exactly: the
+    // three averages, then the three "days over" counts (red when breached,
+    // green when held), then the abstinent-day count (green when positive).
+    // iOS used to shorten these ("Total", "Per day") and split the days-over
+    // rows into a separate "Days over limit" section; the 0.83.0 UI-parity pass
+    // adopts Android's wording and grouping so a platform switcher reads one
+    // vocabulary. The period stays in the section header, iOS-idiomatic.
 
+    private var keyMetrics: some View {
+        Section {
+            LabeledContent(Loc.string("Total in Period", locale: locale)) { grams(model.state.totalGrams) }
+            LabeledContent(Loc.string("Average per Day", locale: locale)) { grams(model.state.averagePerDay) }
+            LabeledContent(Loc.string("Average per Drinking Day", locale: locale)) {
+                grams(model.state.averagePerDrinkDay)
+            }
+            LabeledContent(Loc.string("Days Over Daily Limit", locale: locale)) {
+                count(model.state.daysOverDailyLimit)
+            }
+            LabeledContent(Loc.string("Days Over 7-Day Limit", locale: locale)) {
+                count(model.state.daysOverWeeklyLimit)
+            }
+            LabeledContent(Loc.string("Days Over Drinking Days Limit", locale: locale)) {
+                count(model.state.daysOverDrinkDayLimit)
+            }
+            LabeledContent(Loc.string("Abstinent Days", locale: locale)) {
+                // Green when positive, plain at zero — never red: a dry-day count
+                // is an achievement, not a limit breach. `count` is for the
+                // days-over rows (red/green); this needs green/plain.
+                Text("\(model.state.abstinentDays)")
+                    .monospacedDigit()
+                    .foregroundStyle(model.state.abstinentDays > 0 ? Color.green : Color.secondary)
+            }
+        } header: {
+            Text(model.state.from.isEmpty ? "" : "\(model.state.from) – \(model.state.to)")
+        }
+    }
+
+    // ── Abstinence & trend (Android's second card) ───────────────────────────
+
+    private var streaksAndTrend: some View {
+        Section(Loc.string("Abstinence & Trend", locale: locale)) {
+            // Today is excluded from the current streak: the day is not over, and a
+            // drink may still be logged. Green when positive, like Android.
+            LabeledContent(Loc.string("Current Abstinence", locale: locale)) {
+                daysColored(model.state.currentStreak)
+            }
+            LabeledContent(Loc.string("Longest Abstinence", locale: locale)) {
+                days(model.state.longestStreak)
+            }
+            // The trend belongs in this card on Android, not up in the metrics.
             // Hidden, not zeroed: without a previous period there is nothing to
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
-                LabeledContent(Loc.string("Trend", locale: locale)) {
+                LabeledContent(Loc.string("Trend vs. Previous Period", locale: locale)) {
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
@@ -199,8 +243,6 @@ struct StatsScreen: View {
                     }
                 }
             }
-        } header: {
-            Text(model.state.from.isEmpty ? "" : "\(model.state.from) – \(model.state.to)")
         }
     }
 
@@ -260,41 +302,10 @@ struct StatsScreen: View {
         }
     }
 
-    // ── Limits ───────────────────────────────────────────────────────────────
-
-    private var limits: some View {
-        Section(Loc.string("Days over limit", locale: locale)) {
-            LabeledContent(Loc.string("Daily limit", locale: locale)) {
-                count(model.state.daysOverDailyLimit)
-            }
-            LabeledContent(Loc.string("Weekly limit", locale: locale)) {
-                count(model.state.daysOverWeeklyLimit)
-            }
-            LabeledContent(Loc.string("Drink days", locale: locale)) {
-                count(model.state.daysOverDrinkDayLimit)
-            }
-        }
-    }
-
-    private var streaks: some View {
-        Section(Loc.string("Abstinence", locale: locale)) {
-            // Today is excluded from the current streak: the day is not over, and a
-            // drink may still be logged. Green when positive — an achievement to
-            // reflect back — matching Android's green streak/dry-day values.
-            LabeledContent(Loc.string("Current streak", locale: locale)) {
-                daysColored(model.state.currentStreak)
-            }
-            LabeledContent(Loc.string("Longest streak", locale: locale)) { days(model.state.longestStreak) }
-            LabeledContent(Loc.string("Dry days in period", locale: locale)) {
-                daysColored(model.state.abstinentDays)
-            }
-        }
-    }
-
     // ── Breakdowns ───────────────────────────────────────────────────────────
 
     private var categories: some View {
-        Section(Loc.string("By category", locale: locale)) {
+        Section(Loc.string("Categories", locale: locale)) {
             let total = model.state.categoryBreakdown.values.reduce(0, +)
             ForEach(sortedCategories, id: \.category) { entry in
                 let (category, value) = (entry.category, entry.grams)
@@ -329,7 +340,7 @@ struct StatsScreen: View {
 extension StatsScreen {
 
     fileprivate var timeOfDay: some View {
-        Section(Loc.string("Time of day", locale: locale)) {
+        Section(Loc.string("Time of Day", locale: locale)) {
             Chart(hourPoints) { point in
                 BarMark(
                     x: .value("Hour", point.label),
@@ -355,7 +366,7 @@ extension StatsScreen {
     }
 
     fileprivate var weekdays: some View {
-        Section(Loc.string("By weekday", locale: locale)) {
+        Section(Loc.string("Weekday", locale: locale)) {
             Chart(weekdayPoints) { point in
                 BarMark(
                     x: .value("Weekday", point.label),

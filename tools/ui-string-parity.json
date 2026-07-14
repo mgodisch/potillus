@@ -14,16 +14,5 @@
     "two vocabularies diverged most (Android 'Average per Day' vs iOS 'Per day',",
     "etc.). Entries here are the ALIGNMENT WORK LIST, not yet the aligned state."
   ],
-  "pairs": {
-    "Total": "total_period",
-    "Per day": "avg_per_day",
-    "Per drink day": "avg_per_drink_day",
-    "Days over limit": "days_over_daily_limit",
-    "Current streak": "current_streak",
-    "Longest streak": "longest_streak",
-    "Dry days in period": "abstinent_days",
-    "By category": "stats_category_breakdown",
-    "By weekday": "stats_weekday",
-    "Time of day": "stats_time_of_day"
-  }
+  "pairs": {}
 }
