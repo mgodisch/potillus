@@ -26,25 +26,27 @@ PRIVACY.md -- privacy policy for the app store listings
 =============================================================================
 
 WHAT THIS IS
-  The privacy policy required by the Google Play "App content" section (every
-  Play listing must link to a publicly reachable privacy policy URL, regardless
-  of whether the app collects data). It is written to be hosted verbatim as a
-  web page -- see `docs/PLAY_STORE.md`, section "Privacy policy hosting", for the
-  two supported ways to turn this file into a public URL.
 
-  Keep the "Last updated" line and the version/package facts below in sync with
-  the app whenever the privacy-relevant behaviour changes. This document makes
-  NO claim that is not already true of the shipped app; if you ever add a
-  permission, a network call, or any telemetry, this file MUST be revised in the
-  same change, and the Play Data safety form updated accordingly.
+The privacy policy required by the Google Play "App content" section (every
+Play listing must link to a publicly reachable privacy policy URL, regardless
+of whether the app collects data). It is written to be hosted verbatim as a web
+page -- see `docs/PLAY_STORE.md`, section "Privacy policy hosting", for the two
+supported ways to turn this file into a public URL.
+
+Keep the "Last updated" line and the version/package facts below in sync with
+the app whenever the privacy-relevant behaviour changes. This document makes NO
+claim that is not already true of the shipped app; if you ever add a
+permission, a network call, or any telemetry, this file MUST be revised in the
+same change, and the Play Data safety form updated accordingly.
+
 =============================================================================
 -->
 
 # Privacy Policy — Libellus Potionis
 
-- **Last updated:** 2026-07-02
+- **Last updated:** 2026-07-15
 - **Application:** Libellus Potionis (package `de.godisch.potillus`)
-- **Developer:** Martin A. Godisch — <android@godisch.de>
+- **Developer:** Martin A. Godisch — <android@godisch.de> <ios@godisch.de>
 - **Source code:** <https://codeberg.org/godisch/potillus>
 
 ## Summary
@@ -147,4 +149,4 @@ app and to the Google Play Data safety disclosure.
 
 ## Contact
 
-Martin A. Godisch — <android@godisch.de>
+Martin A. Godisch — <android@godisch.de> <ios@godisch.de>

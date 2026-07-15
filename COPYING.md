@@ -10,10 +10,9 @@ the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see
@@ -22,16 +21,16 @@ this program.  If not, see
 ## App Store Distribution Exception
 
 As an additional permission under section 7 of the GNU General Public License,
-version 3, you are allowed to distribute the software through an app store, even
-if that store has restrictive terms and conditions that are incompatible with
-the GPL, provided that the source is also available under the GPL with or
+version 3, you are allowed to distribute the software through an app store,
+even if that store has restrictive terms and conditions that are incompatible
+with the GPL, provided that the source is also available under the GPL with or
 without this permission through a channel without those restrictive terms and
 conditions.
 
-## Third-Party Software (bundled in the release APK)
+## Third-Party Software (bundled in the Android App)
 
 The libraries below are compiled into the released application package (the
-APK) and are therefore redistributed together with this program.  They are
+APK/ABB) and are therefore redistributed together with this program.  They are
 consumed exclusively as Gradle build dependencies (declared in
 `android/gradle/libs.versions.toml`), never as vendored source copies, so each
 is "de-embedded" via build-depends as required.  The authoritative,
@@ -63,9 +62,8 @@ under the Apache License, Version 2.0
   `org.jetbrains.kotlinx:kotlinx-serialization-core`, the
   `org.jetbrains.kotlinx:kotlinx-coroutines` runtime pulled in transitively,
   and the `org.jetbrains:annotations` artifact.
-- **Okio** &mdash; Copyright &copy; Square, Inc.:
-  `com.squareup.okio:okio`, pulled in transitively by
-  `androidx.datastore:datastore-preferences`.
+- **Okio** &mdash; Copyright &copy; Square, Inc.: `com.squareup.okio:okio`,
+  pulled in transitively by `androidx.datastore:datastore-preferences`.
 - **Guava ListenableFuture** &mdash; Copyright &copy; The Guava Authors
   (Google): `com.google.guava:listenablefuture`, pulled in transitively by
   `androidx.concurrent:concurrent-futures`.
@@ -76,32 +74,32 @@ under the Apache License, Version 2.0
 The full Apache-2.0 licence text is kept verbatim in the repository as
 `LICENSE.Apache-2.0.md` and is bundled into the in-app copyright document
 (`res/raw/copyright.md`, generated from COPYING.md + LICENSE.md +
-LICENSE.Apache-2.0.md), satisfying the licence's &sect;4(a) requirement to
-give recipients a copy of the licence.
+LICENSE.Apache-2.0.md), satisfying the licence's &sect;4(a) requirement to give
+recipients a copy of the licence.
 
-Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with
-a dependency.  This is verified automatically at release time by
+Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with a
+dependency.  This is verified automatically at release time by
 `tools/release-check.sh` **Section 12**, which resolves every component in the
 CycloneDX SBOM to its cached artifact and scans it for `META-INF/NOTICE*`
 entries; when it warns about one, copy that `NOTICE` text into this section.
 
 ### GPL-2.0 with the Classpath Exception
 
-`com.android.tools:desugar_jdk_libs` &mdash; Copyright &copy; Oracle and/or
-its affiliates and The Android Open Source Project.  It repackages OpenJDK
+`com.android.tools:desugar_jdk_libs` &mdash; Copyright &copy; Oracle and/or its
+affiliates and The Android Open Source Project.  It repackages OpenJDK
 class-library sources and is licensed under the GNU General Public License,
 version&nbsp;2, **with the OpenJDK "Classpath" linking exception**.  The
 Classpath Exception explicitly permits linking these classes into an
 independent work (this application) without extending GPLv2 to it, and the
 license is compatible with this program's GPL-3.0-or-later distribution.  Only
 the backported `java.time` (and related) classes selected by core-library
-desugaring are included in the APK; see the `desugar-jdk-libs` note in
+desugaring are included in the APK/ABB; see the `desugar-jdk-libs` note in
 `android/gradle/libs.versions.toml`.
 
 ### Build- and test-time dependencies (NOT redistributed)
 
 The following are used only to build or test the app and are **not** compiled
-into the released APK, so they carry no redistribution obligation; they are
+into the released APK/ABB, so they carry no redistribution obligation; they are
 listed here for completeness.  Apache-2.0 unless noted:
 `org.jetbrains.kotlin:kotlin-test`,
 `org.jetbrains.kotlinx:kotlinx-coroutines-test`, `app.cash.turbine:turbine`,
@@ -111,32 +109,33 @@ the AndroidX Test stack (`androidx.test.ext:junit`, `androidx.test:runner`,
 Compose UI-test artifacts (`ui-test-junit4`, `ui-test-manifest`) and
 `tools.fastlane:screengrab`; `junit:junit` 4 (Eclipse Public License 1.0);
 `org.json:json` (the "JSON License"); and the Gradle build plugins — the
-CycloneDX SBOM plugin `org.cyclonedx.bom`, the Kotlin Symbol Processing
-plugin `com.google.devtools.ksp`, the Kover coverage plugin
+CycloneDX SBOM plugin `org.cyclonedx.bom`, the Kotlin Symbol Processing plugin
+`com.google.devtools.ksp`, the Kover coverage plugin
 `org.jetbrains.kotlinx.kover` and the ktlint wrapper plugin
 `org.jlleitschuh.gradle.ktlint` (all Apache-2.0).
 
 ## Third-Party Software (bundled in the iOS application)
 
-The library below is compiled into the released iOS application and is therefore
-redistributed together with this program.  It is consumed exclusively as a Swift
-Package Manager dependency (declared in `ios/PotillusKit/Package.swift`, with the
-resolved revision pinned in `ios/PotillusKit/Package.resolved`), never as a
-vendored source copy, so it is "de-embedded" via build-depends as required.  As
-on Android, an authoritative machine-readable inventory is generated for every
-release as a CycloneDX Software Bill of Materials — here from `Package.resolved`
-by `tools/gen-ios-sbom.py` (`make ios-sbom`), normalised by the same
+The library below is compiled into the released iOS application and is
+therefore redistributed together with this program.  It is consumed exclusively
+as a Swift Package Manager dependency (declared in
+`ios/PotillusKit/Package.swift`, with the resolved revision pinned in
+`ios/PotillusKit/Package.resolved`), never as a vendored source copy, so it is
+"de-embedded" via build-depends as required.  As on Android, an authoritative
+machine-readable inventory is generated for every release as a CycloneDX
+Software Bill of Materials — here from `Package.resolved` by
+`tools/gen-ios-sbom.py` (`make ios-sbom`), normalised by the same
 `tools/sbom-normalize.py`.
 
 ### MIT License
 
-- **GRDB.swift** &mdash; Copyright &copy; 2015&ndash;2025 Gwendal Rou&eacute;,
-  licensed under the MIT License
-  (<[https://github.com/groue/GRDB.swift/blob/master/LICENSE](https://github.com/groue/GRDB.swift/blob/master/LICENSE)>).
-  GRDB is the iOS counterpart to Room: typed records, a schema migrator, and
-  database observation on top of the SQLite that ships with the operating
-  system.  It has no transitive dependencies, performs no network access, and
-  collects no telemetry.
+**GRDB.swift** &mdash; Copyright &copy; 2015&ndash;2025 Gwendal Rou&eacute;,
+licensed under the MIT License
+(<[https://github.com/groue/GRDB.swift/blob/master/LICENSE](https://github.com/groue/GRDB.swift/blob/master/LICENSE)>).
+GRDB is the iOS counterpart to Room: typed records, a schema migrator, and
+database observation on top of the SQLite that ships with the operating system.
+It has no transitive dependencies, performs no network access, and collects no
+telemetry.
 
 The MIT License requires that the copyright notice and the permission notice
 accompany the software.  The full licence text is reproduced verbatim below, so
@@ -147,12 +146,12 @@ platforms (`res/raw/copyright.md` on Android, the `copyright` resource on iOS)
 ```
 Copyright (C) 2015-2025 Gwendal Roué
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
@@ -168,22 +167,22 @@ SOFTWARE.
 
 Only the iOS application actually **ships** GRDB, so only it carries the MIT
 redistribution obligation; the iOS about screen additionally reproduces the
-licence text inline (pinned by the `testGrdbLicence*` smoke tests).  The Android
-application does not distribute GRDB and therefore carries no MIT obligation —
-but because both apps build their copyright document from this file, both show
-the attribution and the notice above.  MIT is compatible with the GNU GPL
-version 3, so the combined work is distributable under the terms stated at the
-top of this document.
+licence text inline (pinned by the `testGrdbLicence*` smoke tests).  The
+Android application does not distribute GRDB and therefore carries no MIT
+obligation — but because both apps build their copyright document from this
+file, both show the attribution and the notice above.  MIT is compatible with
+the GNU GPL version 3, so the combined work is distributable under the terms
+stated at the top of this document.
 
 ## Third-Party Assets
 
 ### GPLv3 logo
 
 The Play-Store feature graphic embeds the GPLv3 "Free as in Freedom" logo
-(`fastlane/gpl-v3-logo.svg`, recoloured white where it appears in the
-graphic), used to advertise that this program is licensed under version 3 of
-the GNU General Public License.  The official GPL, AGPL and LGPL logos and
-their variants are the work of José Obed and are in the public domain.  See
+(`fastlane/gpl-v3-logo.svg`, recoloured white where it appears in the graphic),
+used to advertise that this program is licensed under version 3 of the GNU
+General Public License.  The official GPL, AGPL and LGPL logos and their
+variants are the work of José Obed and are in the public domain.  See
 <[https://www.gnu.org/graphics/license-logos](https://www.gnu.org/graphics/license-logos)>
 for the originals and terms.
 
@@ -191,18 +190,31 @@ for the originals and terms.
 
 The `fdroid/get-it-on-<lang>.svg` files are the official "Get it on F-Droid"
 download badges (one per store-listing language — e.g. `get-it-on-en.svg`,
-`get-it-on-de.svg`, `get-it-on-pt-br.svg`, `get-it-on-zh-cn.svg`), used to
-link to this app's listing in the F-Droid catalogue.  They all come from the
-same source, the F-Droid artwork project
-(<[https://gitlab.com/fdroid/artwork](https://gitlab.com/fdroid/artwork)>,
-also mirrored at
+`get-it-on-de.svg`, `get-it-on-pt-br.svg`, `get-it-on-zh-cn.svg`), used to link
+to this app's listing in the F-Droid catalogue.  They all come from the same
+source, the F-Droid artwork project
+(<[https://gitlab.com/fdroid/artwork](https://gitlab.com/fdroid/artwork)>, also
+mirrored at
 <[https://github.com/f-droid/artwork](https://github.com/f-droid/artwork)>),
-and are licensed under the Creative Commons Attribution-ShareAlike 3.0
-Unported license (CC BY-SA 3.0); see
+and are licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported
+license (CC BY-SA 3.0); see
 <[https://creativecommons.org/licenses/by-sa/3.0/](https://creativecommons.org/licenses/by-sa/3.0/)>
-for the terms.  (F-Droid licenses the badge-generation scripts separately
-under GPL-3.0-or-later; only the badge artwork is bundled here.)  These files
-are repository and store-listing assets and are **not** distributed inside the
+for the terms.  (F-Droid licenses the badge-generation scripts separately under
+GPL-3.0-or-later; only the badge artwork is bundled here.)  These files are
+repository and store-listing assets and are **not** distributed inside the
+application package.
+
+### Device fonts embedded in the sample report PDFs
+
+The pre-rendered sample reports under `fastlane/report-pdf/` (one per
+store-listing language, produced on a real device by the `ReportExportTest`
+flow) embed subsets of the fonts the device's WebView used to render them:
+**Roboto** (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
+<[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>)
+in every file, plus **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
+SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
+licences explicitly permit embedding subsets in documents.  These PDFs are
+repository and store-listing assets and are **not** distributed inside the
 application package.
 
 ### DejaVu Sans (feature-graphic badge text)
@@ -226,12 +238,12 @@ distributed inside the application package.
 
 ### Noto Sans CJK (feature-graphic CJK text)
 
-`tools/fonts/NotoSansCJK/NotoSansCJK-Regular.ttc` supplies the Japanese,
-Korean and Simplified/Traditional Chinese glyphs for the `ja`, `ko`, `zh-CN`
-and `zh-TW` feature-graphic copy (Inter has no CJK glyphs), and — through
+`tools/fonts/NotoSansCJK/NotoSansCJK-Regular.ttc` supplies the Japanese, Korean
+and Simplified/Traditional Chinese glyphs for the `ja`, `ko`, `zh-CN` and
+`zh-TW` feature-graphic copy (Inter has no CJK glyphs), and — through
 fontconfig's per-glyph fallback — the CJK text in the localized "Get it on
-F-Droid" badges. It is the Regular-weight OpenType Collection from the Noto
-CJK project
+F-Droid" badges. It is the Regular-weight OpenType Collection from the Noto CJK
+project
 (<[https://github.com/notofonts/noto-cjk](https://github.com/notofonts/noto-cjk)>,
 `Sans/OTC/NotoSansCJK-Regular.ttc`) and is licensed under the SIL Open Font
 License 1.1 (see the accompanying `LICENSE`; the source and version are
@@ -250,19 +262,6 @@ from it reproducibly via `make rokkitt-bold` (see
 `tools/fonts-src/Rokkitt/README.txt`).  Like the fonts above, these are
 build-time tooling for `render-feature-graphic.py` and are **not** distributed
 inside the application package.
-
-### Device fonts embedded in the sample report PDFs
-
-The pre-rendered sample reports under `fastlane/report-pdf/` (one per
-store-listing language, produced on a real device by the `ReportExportTest`
-flow) embed subsets of the fonts the device's WebView used to render them:
-**Roboto** (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
-<[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>)
-in every file, plus **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
-SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
-licences explicitly permit embedding subsets in documents.  These PDFs are
-repository and store-listing assets and are **not** distributed inside the
-application package.
 
 ## Repository Documentation Under Other Licenses
 

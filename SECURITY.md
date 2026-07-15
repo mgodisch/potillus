@@ -98,7 +98,7 @@ Please report suspected security vulnerabilities **privately**. Do **not** open
 a public issue for a security problem — a public issue would disclose the
 vulnerability before a fix is available.
 
-Send your report by e-mail to **android@godisch.de**.
+Send your report by e-mail to **android@godisch.de** or **ios@godisch.de**.
 
 Because a report may contain sensitive details, please **encrypt it with PGP**
 using the maintainer's public key:
@@ -117,8 +117,9 @@ The same key is also part of the `debian-keyring` package. Before trusting the
 key, verify that the fingerprint printed by `gpg --fingerprint` matches the one
 above.
 
-If you are unable to use PGP, still write to android@godisch.de; the maintainer
-will arrange a secure channel before you share any sensitive details.
+If you are unable to use PGP, still write to android@godisch.de or
+ios@godisch.de; the maintainer will arrange a secure channel before you share
+any sensitive details.
 
 ## What to include
 
@@ -145,12 +146,13 @@ To help triage and reproduce the issue, please include where possible:
 ## Security advisories
 
 When a vulnerability in Libellus Potionis is confirmed and fixed, the project
-publishes an advisory through predictable public channels: the security-relevant
-fix is recorded in the release notes (CHANGELOG.md) and in the corresponding
-Codeberg release. Each advisory states, to the extent possible, the affected
-version(s), how a user can determine whether they are affected, and the
-remediation — updating to the fixed version, which is distributed through
-F-Droid.
+publishes an advisory through predictable public channels: the
+security-relevant fix is recorded in the release notes
+([CHANGELOG.md](CHANGELOG.md)) and in the corresponding Codeberg release. Each
+advisory states, to the extent possible, the affected version(s), how a user
+can determine whether they are affected, and the remediation — updating to the
+fixed version, which is distributed through
+[F-Droid](https://f-droid.org/packages/de.godisch.potillus/).
 
 ## Scope
 
@@ -186,8 +188,8 @@ rolling-release model: only the **latest released version** is supported.
 The project's external dependencies are checked periodically — at a minimum
 before each release — for known vulnerabilities. The check is performed with
 [osv-scanner](https://google.github.io/osv-scanner/), a free/libre scanner that
-queries the [OSV](https://osv.dev/) database, run against the CycloneDX SBOM each
-platform's build produces (the `cyclonedxDirectBom` task on Android, and
+queries the [OSV](https://osv.dev/) database, run against the CycloneDX SBOM
+each platform's build produces (the `cyclonedxDirectBom` task on Android, and
 `tools/gen-ios-sbom.py` from `Package.resolved` on iOS). Each reported issue is
 triaged: exploitable vulnerabilities are fixed by upgrading (or, where
 necessary, mitigating) the affected dependency, and issues that are not
@@ -195,40 +197,42 @@ exploitable in this app are recorded as such. Because the app performs no
 network communication and requests a minimal permission set, the exposure from
 dependency vulnerabilities is limited, but they are tracked and addressed
 regardless. This periodic check is part of the release checklist in
-CONTRIBUTING.md §7.
+[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
 
-The same discipline applies to dependency licenses: every third-party dependency
-must be under a license compatible with the project's GPL-3.0-or-later
-distribution — the licenses actually in use are recorded in COPYING.md — and any
-dependency whose license is not compatible is replaced or removed before a
-release. Together with the vulnerability triage above, this defines the project's
-remediation threshold for software-composition-analysis (SCA) findings.
+The same discipline applies to dependency licenses: every third-party
+dependency must be under a license compatible with the project's
+GPL-3.0-or-later distribution — the licenses actually in use are recorded in
+[COPYING.md](COPYING.md) — and any dependency whose license is not compatible
+is replaced or removed before a release. Together with the vulnerability triage
+above, this defines the project's remediation threshold for
+software-composition-analysis (SCA) findings.
 
 ## Secrets and credentials
 
 The project uses a small, fixed set of secrets, none of which are ever committed
 to version control:
 
-- the **release code-signing keystore** (`android/keystore.properties` and the
-  keystore file it references), used to sign the release artifacts — the Google
-  Play upload bundle and the Codeberg/F-Droid APK;
-- the **Google Play upload credentials** (`fastlane/play-store-credentials.json`),
-  used only by the Fastlane Play-upload lanes (`testing` and `production`); and
-- the maintainer's **OpenPGP signing key**, used to sign release tags and commits.
+- the **release code-signing keystore** and the keystore file it references),
+  used to sign the release artifacts, the Google Play upload bundle and the
+  Codeberg/F-Droid APK;
+- the **App Store upload credentials,** used only by the Fastlane App Store
+  upload lanes; and
+- the **Google Play upload credentials,** used only by the Fastlane Play Store
+  upload lanes; and
+- the maintainer's **OpenPGP signing key**, used to sign release tags and
+  commits.
 
 **Storing.** Secrets are never hard-coded in source and never stored in the
-repository. `android/keystore.properties` and
-`fastlane/play-store-credentials.json` are git-ignored; the committed templates
-(`android/keystore.properties.example` and `fastlane/Appfile`) document their
-structure without any secret values. On a build host the values are supplied
-through those local files or, equivalently, through environment variables
-(`POTILLUS_KEYSTORE_*`, `SUPPLY_JSON_KEY`), so a secret is injected at build time
-rather than persisted in the tree.
+repository. The templates (`android/keystore.properties.example` and
+`fastlane/Appfile`) document their structure without any secret values. On a
+build host the values are supplied through those local files or, equivalently,
+through environment variables (`POTILLUS_KEYSTORE_*`, `SUPPLY_JSON_KEY`), so a
+secret is injected at build time rather than persisted in the tree.
 
 **Accessing.** The project has a single maintainer, who is the only holder of
-these secrets and keeps them solely on trusted local machines; they are not
-shared. Any future collaborator granted release duties would receive only the
-specific credential their task requires.
+these secrets and keeps them solely on trusted and encrypted local machines;
+they are not shared. Any future collaborator granted release duties would
+receive only the specific credential their task requires.
 
 **Rotating.** The Google Play API credential and any injected tokens can be
 rotated at any time by revoking the old credential in the Google Play Console and
