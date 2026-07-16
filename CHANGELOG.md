@@ -285,6 +285,22 @@ two stores' notes need not match).
   locales on each platform — the Play changelog (`changelogs/94.txt`, kept within
   the 500-character store limit) and the App Store `release_notes.txt`. Each
   platform's notes describe only that platform's own changes.
+- **The two unmet SHOULD badge criteria now carry real rationales.** The badge
+  permits a SHOULD criterion to stay unmet as long as the reasoning is
+  documented, and a review of every unmet answer found exactly two in that
+  category: `crypto_algorithm_agility` and `bus_factor`. Both justifications
+  read as deferred promises rather than reasoning, and the crypto one promised a
+  remediation — a versioned blob format — that would not have satisfied the
+  criterion anyway, since the criterion asks for multiple algorithms rather than
+  a migration marker. Both are rewritten to say why the criterion is not met and
+  what mitigates it: for the cipher, that the sole sealed artifact is the
+  preferences blob, that Android's key is generated inside the Keystore and a
+  second algorithm would risk moving it out, that users of a diary do not select
+  ciphers, and that the cross-platform blob framing makes the change risky for no
+  gain; for the bus factor, that a single-maintainer project is forkable Free
+  Software, that F-Droid re-signs from source, and that governance and the
+  contribution process are documented. Both statuses remain `Unmet`. The roadmap
+  entry is corrected to match.
 
 ---
 

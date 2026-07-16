@@ -87,12 +87,18 @@ attainable until each is resolved. They are the most critical open items.
 
 - **Raise the bus factor** (`bus_factor`). Gain a second significant, ongoing
   maintainer — the same underlying need as the continuity arrangement above.
-- **Cryptographic algorithm agility** (`crypto_algorithm_agility`). Give the
-  encrypted-preferences blob a self-describing, versioned format (a version byte
-  authenticated as GCM AAD, with a read-legacy / write-versioned migration) in
-  `KeystoreSecretStore`, so a future algorithm can be selected per record. A
-  security-critical change: requires thorough tests, including an instrumented
-  round-trip, a legacy-blob read, and tamper/downgrade rejection.
+- **Cryptographic algorithm agility** (`crypto_algorithm_agility`). Not planned.
+  Sealing the preferences blob under a second algorithm would buy no practical
+  protection here and would risk moving the key out of the Android Keystore; the
+  full reasoning is recorded in the criterion's justification in
+  `.bestpractices.json`. Note also that the versioned blob format previously
+  sketched here would *not* by itself satisfy the criterion, which asks for
+  multiple algorithms rather than a migration marker. Should a self-describing,
+  versioned blob (a version byte authenticated as GCM AAD, with a read-legacy /
+  write-versioned migration) in `KeystoreSecretStore` be wanted anyway, it should
+  be justified on its own merits as a future migration aid — a security-critical
+  change requiring thorough tests, including an instrumented round-trip, a
+  legacy-blob read, and tamper/downgrade rejection.
 - **Re-visit explicit iOS App Transport Security.** ATS is currently left at its
   strict Xcode default, which is correct: the app makes no network connections at
   all, so there is nothing for an explicit declaration to harden, and the only way
