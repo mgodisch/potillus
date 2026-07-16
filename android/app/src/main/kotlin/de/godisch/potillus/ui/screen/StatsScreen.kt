@@ -65,7 +65,7 @@ import java.time.format.TextStyle
  * @param vm             The [StatsViewModel]; defaults to the Activity-scoped instance.
  * @param onOpenSettings Invoked when the top-bar gear icon is tapped.
  * @param onOpenHelp     Invoked when the overflow-menu Help item is tapped.
- * @param onOpenCopyright Invoked when the overflow-menu Copyright item is tapped.
+ * @param onOpenAbout    Invoked when the overflow-menu About item is tapped.
  * @param onLockApp      Locks the app immediately (overflow-menu "Lock app").
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +74,7 @@ fun StatsScreen(
     vm: StatsViewModel = viewModel(),
     onOpenSettings: () -> Unit = {},
     onOpenHelp: () -> Unit = {},
-    onOpenCopyright: () -> Unit = {},
+    onOpenAbout: () -> Unit = {},
     /** Locks the app immediately (overflow-menu "Lock app"). */
     onLockApp: () -> Unit = {},
 ) {
@@ -149,7 +149,7 @@ fun StatsScreen(
                     AppOverflowMenu(
                         onOpenSettings = onOpenSettings,
                         onOpenHelp = onOpenHelp,
-                        onOpenCopyright = onOpenCopyright,
+                        onOpenAbout = onOpenAbout,
                         onLockApp = onLockApp,
                         tint = MaterialTheme.colorScheme.onPrimary,
                     )

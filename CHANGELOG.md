@@ -58,6 +58,32 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **The overflow menu ends with About, and Help and About share their glyphs
+  across platforms.** The menu now reads Settings, Help, "Lock app", About on
+  both platforms: About is looked up once, not daily, so it yields the prime
+  positions to the three entries that do real work, and it stays last whether or
+  not the conditional "Lock app" entry is present. The two glyphs that had
+  drifted are aligned on the metaphors iOS already used — a question mark in a
+  circle for Help, an "i" in a circle for About. Android had been drawing a
+  MEDICAL CROSS (`Icons.Filled.LocalHospital`) for Help: in an app about
+  drinking, a red-cross shape reads as "medical help", not "user guide". The
+  glyph had inherited that slot when the open book moved from Help to About in
+  the Copyright→About rename; both are now gone, and with them two imports. The
+  FILL stays platform-specific on purpose — Android's other menu entries are
+  filled glyphs, so an outlined circle between them would read as a different
+  weight class, while on iOS the outlined SF Symbols are what sits naturally
+  beside `gearshape` and `lock`. Note `Icons.AutoMirrored.Filled.Help`, not
+  `Icons.Filled.Help`: the latter carries a `@Deprecated` with
+  `ReplaceWith("Icons.AutoMirrored.Filled.Help")` in the pinned
+  material-icons-extended 1.7.8, since a question mark mirrors in right-to-left
+  layouts, and would therefore fail the build. `Icons.Filled.Info` has no
+  auto-mirrored variant and comes from material-icons-core. The menu's callback
+  is renamed `onOpenCopyright` → `onOpenAbout`, which it has actually invoked
+  since the About screen landed; the stale name and its KDoc ("opens the
+  Copyright viewer", "three entries: Settings, Help and Copyright" — there are
+  four) are corrected, and the rename runs through `AppNav` and the four main
+  screens. The `AboutScreen` → copyright-document wiring keeps the old name,
+  because that one does open the document.
 - **A fresh install now fills the iOS drink catalogue.** The Swift port carried
   Room's schema across but not Room's `onCreate` callback, so on iOS — and only
   on iOS — the drinks list came up EMPTY after a first install or a storage

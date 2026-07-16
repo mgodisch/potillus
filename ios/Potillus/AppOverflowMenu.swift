@@ -85,11 +85,6 @@ struct AppOverflowMenu: ViewModifier {
                         } label: {
                             Label(Loc.string("Help", locale: locale), systemImage: "questionmark.circle")
                         }
-                        Button {
-                            showingAbout = true
-                        } label: {
-                            Label(Loc.string("About", locale: locale), systemImage: "info.circle")
-                        }
                         // "Lock app" appears whenever the device can authenticate,
                         // matching Android: a manual lock no longer requires auto-lock
                         // to be armed, and lockNow()/retry() can always clear the cover
@@ -101,6 +96,15 @@ struct AppOverflowMenu: ViewModifier {
                             } label: {
                                 Label(Loc.string("Lock app", locale: locale), systemImage: "lock")
                             }
+                        }
+                        // About LAST, after the conditional "Lock app", as on
+                        // Android: version and licences are looked up once, not
+                        // daily, so the entry yields the prime positions to the
+                        // three that do real work.
+                        Button {
+                            showingAbout = true
+                        } label: {
+                            Label(Loc.string("About", locale: locale), systemImage: "info.circle")
                         }
                     } label: {
                         Label(Loc.string("Menu", locale: locale), systemImage: "line.3.horizontal")

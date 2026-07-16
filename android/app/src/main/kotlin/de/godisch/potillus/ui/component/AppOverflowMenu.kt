@@ -29,8 +29,8 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
@@ -63,16 +63,37 @@ import de.godisch.potillus.R
  * BEHAVIOUR
  *   The button shows a "burger" icon ([Icons.Default.Menu]). Tapping it opens a
  *   [DropdownMenu] (an Android "overflow menu") anchored to the button, with
- *   three entries: Settings, Help and Copyright. Selecting an entry closes the
- *   menu and invokes the matching callback; the actual navigation is the
- *   caller's responsibility (see [de.godisch.potillus.ui.nav.AppNavigation]),
- *   which keeps this component free of any navigation dependency.
+ *   four entries in this order: Settings, Help, "Lock app" and About. Selecting
+ *   an entry closes the menu and invokes the matching callback; the actual
+ *   navigation is the caller's responsibility (see
+ *   [de.godisch.potillus.ui.nav.AppNavigation]), which keeps this component free
+ *   of any navigation dependency.
+ *
+ * WHY ABOUT COMES LAST
+ *   It is the entry a user reaches for least often -- version and licences are
+ *   looked up once, not daily -- so it yields the prime positions to the three
+ *   entries that do real work. iOS orders the same menu identically.
+ *
+ * WHY THESE GLYPHS
+ *   A question mark in a circle for Help and an "i" in a circle for About are
+ *   the conventional pair, and the same metaphors iOS uses (`questionmark.circle`
+ *   and `info.circle`). The FILL differs by platform on purpose: this menu's
+ *   other entries are filled glyphs, so an outlined circle between them would
+ *   read as a different weight class, whereas on iOS the outlined SF Symbols are
+ *   what sits naturally beside `gearshape` and `lock`. Metaphor is shared; fill
+ *   follows each platform's own convention.
+ *
+ *   Note [Icons.AutoMirrored.Filled.Help], not `Icons.Filled.Help`: the latter
+ *   is deprecated in favour of the auto-mirrored set, because a question mark
+ *   mirrors in right-to-left layouts. [Icons.Filled.Info] has no auto-mirrored
+ *   variant -- an "i" in a circle looks the same either way -- and lives in
+ *   material-icons-core rather than -extended.
  *
  * @param onOpenSettings Invoked when the "Settings" entry is chosen.
  * @param onOpenHelp     Invoked when the "Help" entry is chosen (opens the
  *                       in-app user guide viewer).
- * @param onOpenCopyright Invoked when the "Copyright" entry is chosen (opens the
- *                       Copyright viewer: the combined COPYING.md + LICENSE.md).
+ * @param onOpenAbout    Invoked when the "About" entry is chosen (opens the
+ *                       About screen: version, licence and components).
  * @param onLockApp      Invoked when the "Lock app" entry is chosen (manually locks
  *                       the app). The entry is only shown when an authenticator
  *                       (biometric or device credential) is available — otherwise
@@ -85,7 +106,7 @@ import de.godisch.potillus.R
 fun AppOverflowMenu(
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
-    onOpenCopyright: () -> Unit,
+    onOpenAbout: () -> Unit,
     onLockApp: () -> Unit,
     tint: Color = LocalContentColor.current,
 ) {
@@ -130,26 +151,13 @@ fun AppOverflowMenu(
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.help)) },
-            // The help entry uses a medical-cross glyph (the "Red Cross" cross
-            // shape). No explicit `tint` is set, so the icon inherits the menu's
-            // ambient content colour and blends in with the theme — i.e. it is
-            // NOT drawn red, only cross-shaped.
-            leadingIcon = { Icon(Icons.Filled.LocalHospital, contentDescription = null) },
+            // A question mark in a circle. No explicit `tint` is set, so the icon
+            // inherits the menu's ambient content colour and blends in with the
+            // theme.
+            leadingIcon = { Icon(Icons.AutoMirrored.Filled.Help, contentDescription = null) },
             onClick = {
                 expanded = false
                 onOpenHelp()
-            },
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.about)) },
-            // The about entry carries the open-book glyph (formerly used by the
-            // help entry); a book reads naturally as "read about the app and its
-            // licences". It opens the About screen, which links on to the full
-            // copyright and licence document.
-            leadingIcon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
-            onClick = {
-                expanded = false
-                onOpenCopyright()
             },
         )
         // "Lock app" — manual lock (Variant A). Only present when an authenticator
@@ -164,5 +172,18 @@ fun AppOverflowMenu(
                 },
             )
         }
+        // About LAST, after the conditional "Lock app": on a device with no
+        // authenticator the menu simply closes up around the gap, and About is
+        // the final entry either way.
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.about)) },
+            // An "i" in a circle — the conventional glyph for "information about
+            // this app", and the metaphor iOS uses with `info.circle`.
+            leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) },
+            onClick = {
+                expanded = false
+                onOpenAbout()
+            },
+        )
     }
 }

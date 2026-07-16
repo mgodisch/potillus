@@ -196,7 +196,7 @@ fun AppNavigation(
                 // opened from.
                 onOpenSettings = { navController.navigate(Screen.Settings) { launchSingleTop = true } },
                 onOpenHelp = { navController.navigate(Screen.Help) { launchSingleTop = true } },
-                onOpenCopyright = { navController.navigate(Screen.About) { launchSingleTop = true } },
+                onOpenAbout = { navController.navigate(Screen.About) { launchSingleTop = true } },
                 onLockApp = onLockApp,
             )
         }
@@ -262,7 +262,7 @@ private fun MainPagerHost(
     drinksVm: DrinksViewModel,
     onOpenSettings: () -> Unit,
     onOpenHelp: () -> Unit,
-    onOpenCopyright: () -> Unit,
+    onOpenAbout: () -> Unit,
     /** Forwarded to each page's [AppOverflowMenu] for the "Lock app" entry. */
     onLockApp: () -> Unit,
 ) {
@@ -299,10 +299,10 @@ private fun MainPagerHost(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) { page ->
             when (page) {
-                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
-                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
-                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
-                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenCopyright = onOpenCopyright, onLockApp = onLockApp)
+                0 -> TodayScreen(todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenAbout = onOpenAbout, onLockApp = onLockApp)
+                1 -> CalendarScreen(calendarVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenAbout = onOpenAbout, onLockApp = onLockApp)
+                2 -> StatsScreen(statsVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenAbout = onOpenAbout, onLockApp = onLockApp)
+                3 -> DrinksScreen(drinksVm, todayVm, onOpenSettings = onOpenSettings, onOpenHelp = onOpenHelp, onOpenAbout = onOpenAbout, onLockApp = onLockApp)
             }
         }
     }
