@@ -72,10 +72,10 @@ under the Apache License, Version 2.0
   transitively by the AndroidX lifecycle libraries.
 
 The full Apache-2.0 licence text is kept verbatim in the repository as
-`LICENSE.Apache-2.0.md` and is bundled into the in-app copyright document
-(`res/raw/copyright.md`, generated from COPYING.md + LICENSE.md +
-LICENSE.Apache-2.0.md), satisfying the licence's &sect;4(a) requirement to give
-recipients a copy of the licence.
+`LICENSE.Apache-2.0.md` and is bundled into the APK as `res/raw/license_apache2.md`
+(a byte-for-byte copy, made at build time by `tools/render-copyright.py`), which
+the in-app About screen links to — satisfying the licence's &sect;4(a) requirement
+to give recipients a copy of the licence.
 
 Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with a
 dependency.  This is verified automatically at release time by
@@ -95,6 +95,12 @@ license is compatible with this program's GPL-3.0-or-later distribution.  Only
 the backported `java.time` (and related) classes selected by core-library
 desugaring are included in the APK/ABB; see the `desugar-jdk-libs` note in
 `android/gradle/libs.versions.toml`.
+
+The full GPL-2.0 text is kept verbatim in the repository as `LICENSE.GPL-2.0.md`
+and is bundled into the APK as `res/raw/license_gpl2.md`, which the in-app About
+screen links to.  The Classpath Exception is NOT part of that text — it is an
+additional permission granted on top of it — so the About screen states the
+exception itself beside the link.
 
 ### Build- and test-time dependencies (NOT redistributed)
 
@@ -138,10 +144,10 @@ It has no transitive dependencies, performs no network access, and collects no
 telemetry.
 
 The MIT License requires that the copyright notice and the permission notice
-accompany the software.  The full licence text is reproduced verbatim below, so
-that the in-app copyright document — generated from this file on **both**
-platforms (`res/raw/copyright.md` on Android, the `copyright` resource on iOS)
-— carries the notice regardless of which app a reader has installed:
+accompany the software.  The full licence text is reproduced verbatim below, and
+the iOS about screen reproduces it inline (`AppInfo.grdbLicense`, pinned by the
+`testGrdbLicence*` smoke tests) — short enough not to need a window of its own,
+unlike the GPLv3 and Apache-2.0 texts, which the about screens link to:
 
 ```
 Copyright (C) 2015-2025 Gwendal Roué
@@ -166,13 +172,14 @@ SOFTWARE.
 ```
 
 Only the iOS application actually **ships** GRDB, so only it carries the MIT
-redistribution obligation; the iOS about screen additionally reproduces the
-licence text inline (pinned by the `testGrdbLicence*` smoke tests).  The
-Android application does not distribute GRDB and therefore carries no MIT
-obligation — but because both apps build their copyright document from this
-file, both show the attribution and the notice above.  MIT is compatible with
-the GNU GPL version 3, so the combined work is distributable under the terms
-stated at the top of this document.
+redistribution obligation.  The Android application does not distribute GRDB and
+therefore carries no MIT obligation, and since 0.83.0 it no longer shows the
+notice either: each app now bundles exactly the licences it is obliged to
+reproduce, rather than a combined document built from this file on both
+platforms — which had the APK carrying GRDB's MIT notice for a library it does
+not ship, and the iOS app carrying the Apache-2.0 text for libraries it does not
+have.  MIT is compatible with the GNU GPL version 3, so the combined work is
+distributable under the terms stated at the top of this document.
 
 ## Third-Party Assets
 

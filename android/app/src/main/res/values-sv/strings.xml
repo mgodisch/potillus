@@ -206,7 +206,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> dag</string>
     <string name="menu">Meny</string>
     <string name="help">Hjälp</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Om</string>
     <string name="stats_time_of_day">Tid på dygnet</string>
     <string name="stats_weekday">Veckodag</string>

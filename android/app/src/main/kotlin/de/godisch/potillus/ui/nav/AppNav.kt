@@ -107,20 +107,38 @@ sealed interface Screen {
     @Serializable data object Help : Screen
 
     /**
-     * About screen, pushed on top of [Home] from the overflow menu (the entry
-     * that used to open the copyright document directly). Shows the version, the
-     * app's GPL notice and its direct dependencies, and links on to [Copyright]
-     * for the full document.
+     * About screen, pushed on top of [Home] from the overflow menu. Shows the
+     * version, the app's GPL notice and the licences of the components compiled
+     * into the APK, and links on to the three verbatim texts below.
      */
     @Serializable data object About : Screen
 
     /**
-     * Copyright viewer ("Copyright"), pushed from [About]. Displays the
-     * build-time concatenation of `COPYING.md` (the project's short
-     * copyright/licence notice) and the full GPL text from `LICENSE.md`, bundled
-     * as the single raw resource `R.raw.copyright`.
+     * The full GPL-3.0 text (`R.raw.license_gpl3`, a verbatim copy of
+     * `LICENSE.md`), pushed from [About]'s "Licence" chapter.
      */
-    @Serializable data object Copyright : Screen
+    @Serializable data object LicenceGpl3 : Screen
+
+    /**
+     * The full Apache-2.0 text (`R.raw.license_apache2`), pushed from [About]'s
+     * "Open-source components" chapter. Bundled because Apache-2.0 §4(a) requires
+     * giving recipients a copy of the licence for the Apache-licensed runtime
+     * libraries compiled into the APK.
+     */
+    @Serializable data object LicenceApache2 : Screen
+
+    /**
+     * The full GPL-2.0 text (`R.raw.license_gpl2`), pushed from [About]'s
+     * "Open-source components" chapter, for desugar_jdk_libs. The OpenJDK
+     * Classpath Exception that makes it linkable is stated on the About screen
+     * itself, not in this document: it is not part of the GPL-2.0 text.
+     *
+     * WHY THREE OBJECTS AND NOT ONE ROUTE WITH AN ARGUMENT
+     *   A `@Serializable data class Licence(val raw: Int)` would put a resource id
+     *   into the back stack, where it would be restored across a process death
+     *   that may have renumbered R. Three objects keep the route a name.
+     */
+    @Serializable data object LicenceGpl2 : Screen
 }
 
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
@@ -210,7 +228,7 @@ fun AppNavigation(
         composable<Screen.Help> {
             // The user guide is Markdown and locale-resolved (raw/raw-xx).
             DocumentViewerScreen(
-                titleRes = R.string.help,
+                title = stringResource(R.string.help),
                 rawRes = R.raw.usersguide,
                 renderAsMarkdown = true,
                 onBack = { navController.navigateUp() },
@@ -218,20 +236,38 @@ fun AppNavigation(
         }
         composable<Screen.About> {
             AboutScreen(
-                onOpenCopyright = { navController.navigate(Screen.Copyright) { launchSingleTop = true } },
+                onOpenGpl3 = { navController.navigate(Screen.LicenceGpl3) { launchSingleTop = true } },
+                onOpenApache2 = { navController.navigate(Screen.LicenceApache2) { launchSingleTop = true } },
+                onOpenGpl2 = { navController.navigate(Screen.LicenceGpl2) { launchSingleTop = true } },
                 onBack = { navController.navigateUp() },
             )
         }
-        composable<Screen.Copyright> {
-            // The copyright document (COPYING.md + LICENSE.md, joined at build
-            // time into raw/copyright.md) is intentionally NOT locale-qualified:
-            // it always uses the default raw/ copy, so the legal text is shown
-            // verbatim in English regardless of the in-app language. It is
-            // rendered as Markdown because COPYING.md uses Markdown headings and
-            // links; the GPL body below it degrades gracefully as plain prose.
+        // The three licence texts are deliberately NOT locale-qualified: each
+        // resolves to the same default raw/ copy for every in-app language, so the
+        // legal text is shown verbatim in English. Their titles are fixed English
+        // literals for the same reason -- they name legal documents. Rendered as
+        // Markdown because the sources are Markdown; the licence bodies are plain
+        // prose and pass through unchanged.
+        composable<Screen.LicenceGpl3> {
             DocumentViewerScreen(
-                titleRes = R.string.copyright,
-                rawRes = R.raw.copyright,
+                title = "GNU General Public License, version 3",
+                rawRes = R.raw.license_gpl3,
+                renderAsMarkdown = true,
+                onBack = { navController.navigateUp() },
+            )
+        }
+        composable<Screen.LicenceApache2> {
+            DocumentViewerScreen(
+                title = "Apache License, version 2.0",
+                rawRes = R.raw.license_apache2,
+                renderAsMarkdown = true,
+                onBack = { navController.navigateUp() },
+            )
+        }
+        composable<Screen.LicenceGpl2> {
+            DocumentViewerScreen(
+                title = "GNU General Public License, version 2",
+                rawRes = R.raw.license_gpl2,
                 renderAsMarkdown = true,
                 onBack = { navController.navigateUp() },
             )

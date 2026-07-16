@@ -171,6 +171,11 @@ def collect_literals():
     )
     found = set()
     for path in VIEWS:
+        # AboutScreen.swift is English by design and has no catalogue keys at
+        # all; see UNLOCALISED_VIEWS in check-l10n.py for the reasoning. Scanning
+        # it here would report every chapter title as a missing key.
+        if path.name == "AboutScreen.swift":
+            continue
         text = path.read_text(encoding="utf-8")
         for m in call.finditer(text):
             found.add(m.group(1))

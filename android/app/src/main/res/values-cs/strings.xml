@@ -210,7 +210,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> den</string>
     <string name="menu">Nabídka</string>
     <string name="help">Nápověda</string>
-    <string name="copyright">Copyright</string>
     <string name="about">O aplikaci</string>
     <string name="stats_time_of_day">Denní doba</string>
     <string name="stats_weekday">Den v týdnu</string>

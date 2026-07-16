@@ -224,7 +224,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> día</string>
     <string name="menu">Menú</string>
     <string name="help">Ayuda</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Acerca de</string>
     <string name="stats_time_of_day">Hora del día</string>
     <string name="stats_weekday">Día de la semana</string>

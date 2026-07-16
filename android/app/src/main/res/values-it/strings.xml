@@ -208,7 +208,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> giorno</string>
     <string name="menu">Menu</string>
     <string name="help">Aiuto</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Informazioni</string>
     <string name="stats_time_of_day">Orario</string>
     <string name="stats_weekday">Giorno della settimana</string>

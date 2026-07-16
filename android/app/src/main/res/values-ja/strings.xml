@@ -251,7 +251,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> 日</string>
     <string name="menu">メニュー</string>
     <string name="help">ヘルプ</string>
-    <string name="copyright">Copyright</string>
     <string name="about">情報</string>
     <string name="stats_time_of_day">時間帯</string>
     <string name="stats_weekday">曜日</string>

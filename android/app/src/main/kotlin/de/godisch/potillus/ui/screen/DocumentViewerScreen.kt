@@ -25,7 +25,6 @@
 package de.godisch.potillus.ui.screen
 
 import androidx.annotation.RawRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
@@ -59,15 +58,13 @@ import kotlinx.coroutines.withContext
 /**
  * A read-only viewer for a bundled text document held in `res/raw`.
  *
- * It backs both overflow-menu entries added alongside Settings:
- *   - **Help**      → the localized user guide `R.raw.usersguide`, rendered as
- *                     Markdown ([renderAsMarkdown] = true).
- *   - **Copyright** → `R.raw.copyright`, the build-time concatenation of
- *                     `COPYING.md` (the short copyright/licence notice) and
- *                     `LICENSE.md` (the full GPL text), separated by a blank
- *                     line. It is also rendered with [renderAsMarkdown] = true
- *                     so COPYING.md's headings and links display nicely; the
- *                     GPL body is plain prose and renders unchanged.
+ * It backs two kinds of destination:
+ *   - **Help**       → the localized user guide `R.raw.usersguide`, rendered as
+ *                      Markdown ([renderAsMarkdown] = true).
+ *   - **Licences**   → `R.raw.license_gpl3` / `license_apache2` / `license_gpl2`,
+ *                      each a verbatim copy of a project-root licence file,
+ *                      linked from the About screen. Rendered as Markdown too:
+ *                      the texts are plain prose and degrade gracefully.
  *
  * LOCALE RESOLUTION
  *   The text is read from [LocalResources]. Because the app selects a
@@ -76,25 +73,31 @@ import kotlinx.coroutines.withContext
  *   already reflects the chosen language, so `openRawResource(R.raw.usersguide)`
  *   returns the matching `raw-<locale>` variant automatically — and falls back
  *   to the default `raw/` (English) for languages without a translated guide.
- *   The copyright document exists only as the default `raw/copyright.md`, so it
- *   is always shown in its original (English) form, as intended.
+ *   The licence texts exist only as the default `raw/license_*.md`, so they are
+ *   always shown in their original (English) form, as intended: a translated
+ *   licence is not the licence.
  *
  * The content is read with [produceState] on [Dispatchers.IO] and cached for the
  * lifetime of the composition (re-read only when `rawRes` changes). The raw
  * resources are a few kilobytes, but keeping even this small decode off the main
  * thread avoids any disk I/O during composition.
  *
- * @param titleRes        String resource for the top-bar title.
+ * @param title           Top-bar title, ALREADY RESOLVED. A plain String, not a
+ *                        `@StringRes` id, because the two kinds of caller differ:
+ *                        the guide passes a localized `stringResource`, while the
+ *                        licence viewers pass fixed English literals — their
+ *                        titles name legal documents and are not translated. This
+ *                        is also the signature the iOS `DocumentViewerScreen`
+ *                        already has.
  * @param rawRes          Raw resource holding the document text.
- * @param renderAsMarkdown Whether to render via [MarkdownText] (true for both
- *                        the guide and the copyright document) or as plain
+ * @param renderAsMarkdown Whether to render via [MarkdownText] or as plain
  *                        monospaced text.
  * @param onBack          Invoked when the Up arrow is tapped.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentViewerScreen(
-    @StringRes titleRes: Int,
+    title: String,
     @RawRes rawRes: Int,
     renderAsMarkdown: Boolean,
     onBack: () -> Unit = {},
@@ -124,7 +127,7 @@ fun DocumentViewerScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(titleRes)) },
+                title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(

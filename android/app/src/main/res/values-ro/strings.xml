@@ -259,7 +259,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> zi</string>
     <string name="menu">Meniu</string>
     <string name="help">Ajutor</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Despre</string>
     <string name="stats_time_of_day">Ora zilei</string>
     <string name="stats_weekday">Ziua săptămânii</string>

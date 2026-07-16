@@ -206,7 +206,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> ημέρα</string>
     <string name="menu">Μενού</string>
     <string name="help">Βοήθεια</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Σχετικά</string>
     <string name="stats_time_of_day">Ώρα ημέρας</string>
     <string name="stats_weekday">Ημέρα εβδομάδας</string>

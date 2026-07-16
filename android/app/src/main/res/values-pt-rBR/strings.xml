@@ -259,7 +259,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> dia</string>
     <string name="menu">Menu</string>
     <string name="help">Ajuda</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Sobre</string>
     <string name="stats_time_of_day">Horário do dia</string>
     <string name="stats_weekday">Dia da semana</string>

@@ -1323,21 +1323,30 @@ ios-version-check:
 # XcodeGen reads it -- the ordering matters, and getting it wrong is the kind of
 # mistake that only surfaces as a wrong version number in the App Store.
 # `xcodegen` resolves project.yml relative to the working directory, hence the cd.
-ios-project: ios-version ios/Potillus/Resources/copyright.md ios-guides
+ios-project: ios-version ios/Potillus/Resources/license_gpl3.md ios-guides
 	command -v xcodegen
 	cd ios && xcodegen generate
 
-# The combined copyright/licence document the About screen shows, built from the
-# SAME three files Android joins into raw/copyright.md via the SAME renderer, so the
-# two platforms show byte-identical text. Generated (gitignored) rather than checked
-# in, exactly like Version.xcconfig: a copy in the tree would drift from COPYING.md.
-ios/Potillus/Resources/copyright.md: COPYING.md LICENSE.md LICENSE.Apache-2.0.md tools/render-copyright.py
-	python3 tools/render-copyright.py $@ COPYING.md LICENSE.md LICENSE.Apache-2.0.md
+# The verbatim GPLv3 text the About screen's "Licence" chapter links to, copied
+# from the project root through the SAME renderer Android uses for its raw/
+# copies, so the two platforms show byte-identical text. Generated (gitignored)
+# rather than checked in, exactly like Version.xcconfig: a copy in the tree would
+# drift from LICENSE.md.
+#
+# ONE file here, THREE on Android. The iOS app bundles only the GPLv3, because it
+# is the only licence it must reproduce: its single third-party dependency is
+# GRDB, whose MIT text is short enough to sit inline in the About screen (see
+# AppInfo.grdbLicense). Android additionally bundles the Apache-2.0 and GPL-2.0
+# texts for the libraries compiled into the APK. Until 0.83.0 both platforms
+# shipped the same combined document, so each carried licences for the other's
+# dependencies.
+ios/Potillus/Resources/license_gpl3.md: LICENSE.md tools/render-copyright.py
+	python3 tools/render-copyright.py $@ LICENSE.md
 
 # The localized in-app user guides, one per language, generated from the
 # templates under ios/docs/guide/ with the {{token}} labels resolved against the
 # String Catalogue — the iOS counterpart of Android's res/raw-*/usersguide.md.
-# Generated (gitignored) like copyright.md above; the app picks the file for its
+# Generated (gitignored) like license_gpl3.md above; the app picks the file for its
 # in-app language, English as the fallback. Phony because the output set is one
 # file per language rather than one fixed name: the renderer rewrites only the
 # guides whose template or catalogue entry changed, so a rebuild is a near-no-op.

@@ -250,7 +250,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> день</string>
     <string name="menu">Меню</string>
     <string name="help">Довідка</string>
-    <string name="copyright">Copyright</string>
     <string name="about">Про застосунок</string>
     <string name="stats_time_of_day">Час доби</string>
     <string name="stats_weekday">День тижня</string>

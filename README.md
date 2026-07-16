@@ -153,8 +153,8 @@ platforms unchanged.
 
 The application is actively maintained and verified across a Google Pixel 10
 Pro running [GrapheneOS](https://grapheneos.org/) (Android 16), a Fairphone 4
-(Android 15), an iPhone 16e running iOS 26, as well as several Android and
-iPhone emulators.
+(Android 15), an iPhone 16e and an iPhone SE, both running iOS 26, as well as
+several Android and iPhone emulators.
 
 ### Accessibility
 

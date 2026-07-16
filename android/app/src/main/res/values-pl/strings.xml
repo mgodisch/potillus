@@ -210,7 +210,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_col_over_daily">> dzień</string>
     <string name="menu">Menu</string>
     <string name="help">Pomoc</string>
-    <string name="copyright">Copyright</string>
     <string name="about">O aplikacji</string>
     <string name="stats_time_of_day">Pora dnia</string>
     <string name="stats_weekday">Dzień tygodnia</string>

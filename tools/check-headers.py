@@ -109,6 +109,7 @@ EXCLUDED_PATHS = {
     "COPYING.md",
     "LICENSE.md",
     "LICENSE.Apache-2.0.md",
+    "LICENSE.GPL-2.0.md",
     "docs/CODE_OF_CONDUCT.md",
 }
 

@@ -54,7 +54,7 @@ OUTPUT
     ``ios/Potillus/Resources/usersguide_<tag>.md`` (the bare template is English,
     ``usersguide_en.md``), with the licence-comment header stripped so a Markdown
     viewer shows clean text. The outputs are generated (gitignored), exactly like
-    Resources/copyright.md; the running app selects the file for its in-app
+    Resources/license_gpl3.md; the running app selects the file for its in-app
     language, with an English fallback.
 
 USAGE

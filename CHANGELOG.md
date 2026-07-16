@@ -58,6 +58,52 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **The About screen states the licence instead of pointing at it, and each app
+  now bundles only the licences it actually owes.** The screen is rebuilt on both
+  platforms into the same two chapters with the same wording: "Licence", holding
+  the GPL notice every source file carries — as prose, not monospaced — and
+  "Open-source components", listing at COPYING.md's level of detail only what the
+  package REDISTRIBUTES. Each verbatim text is one tap away in its own window.
+  Android links to the GPL-3.0, the Apache-2.0 (required by §4(a) for the
+  AndroidX/Kotlin/Okio/Guava/JSpecify runtime compiled into the APK) and the new
+  GPL-2.0 (for `desugar_jdk_libs`, whose OpenJDK Classpath Exception is stated on
+  the screen because it is NOT part of the GPL-2.0 text); iOS links to the
+  GPL-3.0 and keeps GRDB's MIT text inline, nine sentences being too short to
+  deserve a window. `LICENSE.GPL-2.0.md` is new — the repository shipped no
+  GPL-2.0 text at all, so desugar's licence had nowhere to point — and joins
+  `check-headers`' `EXCLUDED_PATHS`, since a verbatim licence must not carry our
+  own header.
+  THE FOURTH PARAGRAPH IS NOT THE FILE HEADER. The headers end with a POINTER —
+  "any such permissions … are stated in the accompanying COPYING.md file" — which
+  worked only while the app bundled COPYING.md inside the combined copyright
+  document. It no longer does, so the sentence would send a reader to a file that
+  is not on their phone; the App Store Distribution Exception now stands there in
+  full, stated where it is read, which is what section 7 asks for.
+  ONE DOCUMENT PER LICENCE, NOT ONE COMBINED. `raw/copyright.md` and its iOS twin
+  are gone. Both were built from COPYING.md, so the APK carried GRDB's MIT notice
+  for a library it does not ship and the iOS app carried the Apache text for
+  libraries it does not have; `render-copyright.py` keeps its concatenation
+  ability but the build now passes it one input per output, which makes it a
+  verbatim copy with LF endings pinned — still the single generator the Makefile,
+  its `check-guides` verification and the Gradle tasks share. The in-app
+  copyright document is not shown at all any more; COPYING.md stays the
+  exhaustive inventory and travels with the source, which is where the store
+  listing's assets belong: the feature graphic RASTERISES its fonts into a PNG,
+  so no font file is ever redistributed.
+  THE WHOLE SCREEN IS ENGLISH. It was half-and-half before — iOS localised
+  "Licence" and "Open-source components" while Android hard-coded the same words
+  and documented why, so the two platforms answered one question two ways. A
+  translated licence is not the licence, and a screen that switches language
+  halfway down is worse than one that does not switch at all. The overflow-menu
+  entry stays localised ("Über"), because that label is navigation and a user has
+  to recognise it; the screen's own title is "About", the first line of an
+  English document. `AboutScreen.swift` joins `Localization.swift` in
+  `check-l10n`'s new `UNLOCALISED_VIEWS`, and `check-l10n-parity` skips it too.
+  Five orphaned catalogue keys and Android's now-unused `copyright` string (21
+  locales) are gone. Android's `DocumentViewerScreen` takes `title: String`
+  instead of `@StringRes titleRes: Int` — the signature iOS already had — because
+  the guide passes a localized lookup while the licence viewers pass fixed
+  English literals naming legal documents.
 - **The overflow menu ends with About, and Help and About share their glyphs
   across platforms.** The menu now reads Settings, Help, "Lock app", About on
   both platforms: About is looked up once, not daily, so it yields the prime

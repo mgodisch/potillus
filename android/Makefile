@@ -35,7 +35,7 @@ help:
 	@echo "  make unit-test      run JVM unit tests (no device needed)"
 	@echo "  make lint           run ktlint + Android lint (build-breaking)"
 	@echo "  make guides         regenerate the localized user guides"
-	@echo "  make check-guides   verify guides and raw/copyright.md are in sync"
+	@echo "  make check-guides   verify guides and raw/license_*.md are in sync"
 	@echo "  make release-check  run the read-only release-readiness gate"
 	@echo "  make cover-check    release gate + enforce the Kover coverage floor"
 	@echo "  make test-device    run instrumented tests (device/emulator needed)"
@@ -107,7 +107,7 @@ endif
 # moment it reads the rule, and at this line GUIDE_OUTPUTS (defined in guides.d)
 # is still empty, so `$(GUIDE_OUTPUTS)` written here would silently contribute
 # nothing (found in the v0.81.0 QA review with `make -p`).
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar app/src/main/res/raw/copyright.md release-check
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar $(LICENCE_OUTPUTS) release-check
 
 java:
 	# Require Java $(JAVA_VERSION). Print the active version first so a mismatch --
@@ -122,28 +122,54 @@ android: \
 	${ANDROID_HOME}/platforms/android-35 \
 	${ANDROID_HOME}/platforms/android-36
 
-# The in-app "Copyright" viewer shows a single bundled document that is the
-# concatenation of three project-root files:
+# The in-app About screen links to the verbatim licence texts, one bundled
+# document per licence, each a byte-for-byte copy of a project-root file:
 #
-#     COPYING.md            – the short copyright/licence notice (Markdown)
-#     <blank line>
-#     LICENSE.md            – the full, verbatim GNU GPL text
-#     <blank line>
-#     LICENSE.Apache-2.0.md – the full, verbatim Apache-2.0 text; bundled
-#                             because Apache-2.0 §4(a) requires shipping a copy
-#                             of the licence alongside the Apache-licensed
-#                             runtime libraries compiled into the APK (see the
-#                             "Third-Party Software" section of COPYING.md)
+#     raw/license_gpl3.md    ← LICENSE.md            – the app's own licence,
+#                              linked from the About screen's "Licence" chapter
+#     raw/license_apache2.md ← LICENSE.Apache-2.0.md – bundled because Apache-2.0
+#                              §4(a) requires shipping a copy of the licence
+#                              alongside the Apache-licensed runtime libraries
+#                              compiled into the APK (AndroidX, the Kotlin
+#                              runtime, Okio, Guava ListenableFuture, JSpecify)
+#     raw/license_gpl2.md    ← LICENSE.GPL-2.0.md    – bundled for
+#                              desugar_jdk_libs, which is GPL-2.0 with the
+#                              OpenJDK Classpath Exception
 #
-# The result is written to the DEFAULT raw/ (not locale-qualified) so that
-# R.raw.copyright resolves to the same English legal text for every locale: the
-# copyright/licence text is deliberately NOT translated.
+# See the "Third-Party Software (bundled in the Android App)" section of
+# COPYING.md for what each covers.
 #
-# The concatenation is delegated to tools/render-copyright.py so that this rule,
-# its check-guides verification, and the Gradle generateCopyrightDocument task
-# all share one generator (the blocks are joined by a Markdown horizontal rule).
-app/src/main/res/raw/copyright.md: ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md ../tools/render-copyright.py
-	python3 ../tools/render-copyright.py $@ ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md
+# WHY ONE FILE PER LICENCE, AND NOT ONE COMBINED DOCUMENT
+#   Until 0.83.0 these were concatenated into a single raw/copyright.md that the
+#   app showed whole. That document was built from COPYING.md on BOTH platforms,
+#   so the APK carried GRDB's MIT notice for a library it does not ship, and the
+#   iOS app carried the Apache text for libraries it does not have. Splitting the
+#   texts lets each app bundle exactly the licences it is obliged to reproduce,
+#   and lets the About screen link a reader straight to the one they asked for
+#   instead of dropping them at the top of a 47 kB scroll.
+#
+# WHY raw/ AND NOT raw-<locale>/
+#   The DEFAULT raw/ (not locale-qualified), so R.raw.license_* resolves to the
+#   same English legal text for every locale: licence text is deliberately NOT
+#   translated, because a translated licence is not the licence.
+#
+# Each copy is delegated to tools/render-copyright.py rather than `cp`: with a
+# single input the script emits the file verbatim, but it also pins LF line
+# endings on every platform, so this rule, its check-guides verification and the
+# Gradle generateLicenceDocuments tasks can never disagree about the bytes.
+LICENCE_OUTPUTS := \
+	app/src/main/res/raw/license_gpl3.md \
+	app/src/main/res/raw/license_apache2.md \
+	app/src/main/res/raw/license_gpl2.md
+
+app/src/main/res/raw/license_gpl3.md: ../LICENSE.md ../tools/render-copyright.py
+	python3 ../tools/render-copyright.py $@ ../LICENSE.md
+
+app/src/main/res/raw/license_apache2.md: ../LICENSE.Apache-2.0.md ../tools/render-copyright.py
+	python3 ../tools/render-copyright.py $@ ../LICENSE.Apache-2.0.md
+
+app/src/main/res/raw/license_gpl2.md: ../LICENSE.GPL-2.0.md ../tools/render-copyright.py
+	python3 ../tools/render-copyright.py $@ ../LICENSE.GPL-2.0.md
 
 # Regenerate the localized user guides from their templates in docs/guide/,
 # resolving the {{screen-name}} tokens against the matching strings.xml so the
@@ -191,16 +217,21 @@ endif
 guides: $(GUIDE_OUTPUTS)
 
 # CI helper: fail if the committed guides are not in sync with the templates
-# and strings.xml (does not write anything). Also verifies that the generated
-# raw/copyright.md matches the current COPYING.md + LICENSE.md +
-# LICENSE.Apache-2.0.md concatenation (horizontal-rule separated, via
+# and strings.xml (does not write anything). Also verifies that each generated
+# raw/license_*.md still matches its project-root source (via
 # tools/render-copyright.py), by rebuilding it into a temporary file and
 # comparing byte-for-byte.
 check-guides:
 	python3 ../tools/render-guide.py --check
-	tmp=$$(mktemp); python3 ../tools/render-copyright.py "$$tmp" ../COPYING.md ../LICENSE.md ../LICENSE.Apache-2.0.md; \
-	    cmp -s "$$tmp" app/src/main/res/raw/copyright.md; rc=$$?; rm -f "$$tmp"; \
-	    test $$rc -eq 0 || { echo "check-guides: raw/copyright.md is stale — run 'make app/src/main/res/raw/copyright.md'"; exit 1; }
+	set -e; for pair in \
+	    "license_gpl3.md:../LICENSE.md" \
+	    "license_apache2.md:../LICENSE.Apache-2.0.md" \
+	    "license_gpl2.md:../LICENSE.GPL-2.0.md"; do \
+	  out=app/src/main/res/raw/$${pair%%:*}; src=$${pair#*:}; \
+	  tmp=$$(mktemp); python3 ../tools/render-copyright.py "$$tmp" "$$src"; \
+	  cmp -s "$$tmp" "$$out"; rc=$$?; rm -f "$$tmp"; \
+	  test $$rc -eq 0 || { echo "check-guides: $$out is stale — run 'make $$out'"; exit 1; }; \
+	done
 
 # Release gate (tools/release-check.sh, at the repository root; runs from android/).
 # It is a pure read-only check of all release invariants (version consistency,
@@ -333,7 +364,7 @@ clean: prereq
 	./gradlew clean
 
 distclean: clean
-	rm app/src/main/res/raw*/copyright.md
+	rm -f $(LICENCE_OUTPUTS)
 	rm app/src/main/res/raw*/usersguide.md
 	rm -f guides.d
 

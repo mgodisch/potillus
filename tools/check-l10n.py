@@ -65,6 +65,25 @@ CALLS = (
 # match offset in offenders().
 LITERAL = re.compile(CALLS + r'\(\s*"([^"]+)"', re.DOTALL)
 
+# Whole files that are English BY DESIGN, and are therefore not scanned.
+#
+#   Localization.swift  the lookup itself: its literals ARE the keys.
+#   AboutScreen.swift   an English legal document. Its body is the GPL notice and
+#                       the App Store Distribution Exception, verbatim; licence
+#                       text is a legal artifact, and a translated licence is not
+#                       the licence. Once the prose is fixed English, translating
+#                       the headings AROUND it would give a screen that switches
+#                       language halfway down — so the chapter titles ("Licence",
+#                       "Open-source components"), the "Version" row and the
+#                       screen's own navigation title are English too. The
+#                       OVERFLOW-MENU entry that leads there IS localised, in
+#                       AppOverflowMenu.swift, which this linter still scans.
+#                       Android states the same rule in AboutScreen.kt's header.
+UNLOCALISED_VIEWS = {
+    "Localization.swift",
+    "AboutScreen.swift",
+}
+
 ALLOWED_EXACT = {
     "Libellus Potionis",                       # proper noun
     "Libellus Potionis could not start",       # pre-locale failure view (documented)
@@ -97,7 +116,7 @@ def is_pure_interpolation(text):
 def offenders():
     problems = []
     for path in VIEWS:
-        if path.name == "Localization.swift":
+        if path.name in UNLOCALISED_VIEWS:
             continue
         source = path.read_text(encoding="utf-8")
         for match in LITERAL.finditer(source):
