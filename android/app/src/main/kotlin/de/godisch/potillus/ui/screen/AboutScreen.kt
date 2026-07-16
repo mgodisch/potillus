@@ -24,9 +24,6 @@
 
 package de.godisch.potillus.ui.screen
 
-
-package de.godisch.potillus.ui.screen
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets

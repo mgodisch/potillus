@@ -104,6 +104,10 @@ two stores' notes need not match).
   instead of `@StringRes titleRes: Int` — the signature iOS already had — because
   the guide passes a localized lookup while the licence viewers pass fixed
   English literals naming legal documents.
+- **Fixed: the Android About screen declared its package twice.** A slip while
+  the file was rebuilt in the same release, caught by the first Kotlin
+  compilation: none of the release gates parse Kotlin, so the error survived a
+  full green gate run.
 - **The overflow menu ends with About, and Help and About share their glyphs
   across platforms.** The menu now reads Settings, Help, "Lock app", About on
   both platforms: About is looked up once, not daily, so it yields the prime
