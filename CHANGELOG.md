@@ -42,7 +42,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.83.0
 
-Fix iOS cold-start lock and freezes, sync gates
+Fix iOS presets, cold-start lock and freezes
 
 This opens the 0.83.0 cycle with the version bump — `versionCode` 93 → 94 and
 the human version 0.82.0 → 0.83.0 — to take the iOS app to the public App Store
@@ -58,9 +58,38 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **A fresh install now fills the iOS drink catalogue.** The Swift port carried
+  Room's schema across but not Room's `onCreate` callback, so on iOS — and only
+  on iOS — the drinks list came up EMPTY after a first install or a storage
+  reset: nothing to log until the user defined a drink by hand or imported a
+  backup. `AppDatabase.openOrCreate` is the missing counterpart to Android's
+  `PrepopulateCallback`. It probes for the database file BEFORE opening it and,
+  when the file is absent, inserts the same fifteen presets Android's
+  `PRESET_DRINKS` carries — verified name by name, with the same volumes,
+  strengths and categories, stored as the `DrinkCategory` raw strings the rest of
+  the port uses. The seed deliberately does NOT live in the GRDB migrator, which
+  `AppDatabase(inMemory:)` shares with every test and the screenshot run; seeding
+  there would push fifteen rows into every fixture and make "a fresh database is
+  empty" false across the suite. Android draws the same line, attaching its
+  callback in the production builder rather than in the schema, so its own test
+  databases come up empty too. An emptied catalogue on an EXISTING database is
+  left alone: that is a state the user chose — a REPLACE import, or deleting the
+  lot — and a re-seed would undo it at the next launch, which is why the probe
+  asks whether the FILE exists rather than whether the catalogue is empty.
+  Existing installations therefore keep their empty catalogue; the seed is a
+  first-creation event, exactly as on Android. Five new `AppDatabaseSeedTests`
+  pin the contract against a REAL FILE, because the path that was broken is file
+  creation itself — the whole existing suite builds its own fixtures on
+  `AppDatabase(inMemory:)` and so expected an empty fresh database by
+  construction, which is why nothing was red. They assert the fifteen rows and
+  their values, that a reopen adds nothing, that a deliberately emptied catalogue
+  stays empty, and that an in-memory database still comes up empty. The preset
+  catalogue is still not pinned in `test-vectors/`, which is what let the port
+  lose the seed unnoticed; the gap is recorded in the new tests' header.
 - **A REPLACE import now truly replaces the drink catalogue on both platforms.**
   After a fresh install or a storage reset the app seeds the full built-in preset
-  set; choosing "Replace" when importing a backup then left those presets in
+  set (on iOS, only since the fix above); choosing "Replace" when importing a
+  backup then left those presets in
   place, so they lingered ALONGSIDE the backup's drinks instead of being replaced
   — a preset the backup did not contain stayed visible. REPLACE now wipes the
   WHOLE drink catalogue (presets included) before re-inserting the backup, so the

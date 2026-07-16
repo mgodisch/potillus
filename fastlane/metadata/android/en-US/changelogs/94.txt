@@ -1,5 +1,1 @@
-New: set the app language to “(System)” to follow your device language, and switch back any time (Settings → Appearance → Language).
-
-The menu’s “Copyright” entry is now an “About” screen showing the version, the app’s licence and its open-source components, with a link to the full licence text.
-
-Plus internal quality and release-tooling improvements.
+Fixed: importing a backup with "Replace" now really replaces the drink list — the built-in preset drinks are no longer kept alongside the imported ones, so the catalogue afterwards matches the backup exactly. The language list now offers "(System)", so a fixed language can be switched back to following the device language. And the overflow menu's About screen shows the version, the GPL notice and the licences of the app's components.

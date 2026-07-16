@@ -62,8 +62,10 @@ public struct Drink: Codable, Sendable, Equatable, Identifiable {
 
     /// True for the drinks shipped with the app.
     ///
-    /// Presets may be hidden but never deleted, so an old entry can always
-    /// resolve the drink it referenced.
+    /// The flag marks a row's ORIGIN, not an immunity: the user cannot delete a
+    /// preset one by one, but a REPLACE import clears the whole catalogue,
+    /// presets included, after clearing the log — so no entry is ever left
+    /// pointing at a drink that is gone.
     public var isPreset: Bool
 
     /// True when the user pinned this drink to the top of the picker.

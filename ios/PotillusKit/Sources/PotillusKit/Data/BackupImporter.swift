@@ -138,10 +138,11 @@ public struct BackupImporter: Sendable {
                 // trip. REPLACE means "the catalogue becomes exactly the backup":
                 // a preset the backup does not contain must NOT survive. Keeping
                 // presets here was the reported bug — right after a fresh install
-                // (or a storage reset), where the seeded preset set was still
-                // present, they lingered ALONGSIDE the imported drinks instead of
-                // being replaced. Presets the backup DOES carry are re-inserted
-                // below with their `isPreset` flag intact.
+                // (or a storage reset), where the preset set seeded by
+                // `AppDatabase.openOrCreate` was still present, they lingered
+                // ALONGSIDE the imported drinks instead of being replaced.
+                // Presets the backup DOES carry are re-inserted below with their
+                // `isPreset` flag intact.
                 _ = try Drink.deleteAll(db)
             }
 

@@ -93,7 +93,7 @@ public final class AppDatabase: Sendable {
             appropriateFor: nil, create: true
         )
         let dbPath = directory.appendingPathComponent("potillus.sqlite").path
-        let database = try AppDatabase(path: dbPath)
+        let database = try openOrCreate(path: dbPath)
         // Re-assert the device-backup exclusion at every launch. A file write can
         // reset the attribute, so it must be renewed; the stored preference (default:
         // excluded, matching Android's allowBackup="false") is the durable record.
@@ -107,6 +107,67 @@ public final class AppDatabase: Sendable {
         self.path = nil
         writer = try DatabaseQueue()
         try Self.migrator.migrate(writer)
+    }
+
+    // ── Pre-population ───────────────────────────────────────────────────────
+
+    /// Opens the database at `path`, inserting the built-in preset drinks when
+    /// the file did not exist yet.
+    ///
+    /// The iOS counterpart of Android's `AppDatabase.PrepopulateCallback`, which
+    /// Room invokes from `onCreate` — once, when the database file is first
+    /// created. Without this the drinks catalogue was empty after a fresh
+    /// install: the port carried the schema over but not the seed (fixed in
+    /// 0.83.0).
+    ///
+    /// WHY NOT SEED FROM THE MIGRATION
+    ///   A migration step would seem the natural "runs once per database" hook,
+    ///   but `migrator` is shared by `init(inMemory:)`, which every test and the
+    ///   screenshot run use. Seeding there would push fifteen rows into every
+    ///   test fixture and make "a fresh database is empty" false across the
+    ///   suite. Android draws the same line: the callback is attached by the
+    ///   production builder in `getInstance`, not by the schema, so its own
+    ///   test databases come up empty too.
+    ///
+    /// WHY `fileExists` AND NOT "the catalogue is empty"
+    ///   "Empty catalogue" is a legitimate state — a REPLACE import of a backup
+    ///   whose drink list is empty produces it, and so does deleting every
+    ///   user-created drink after a REPLACE has removed the presets. Re-seeding
+    ///   on that condition would resurrect drinks the user deliberately got rid
+    ///   of, at the next launch. The file's absence, by contrast, means exactly
+    ///   one thing: there is no history yet, because this is a first install or
+    ///   a storage reset.
+    ///
+    /// WHY THE `countPresets` GUARD SURVIVES ANYWAY
+    ///   It mirrors the belt-and-braces check in Android's callback. Between the
+    ///   `fileExists` probe and the write, nothing else can have opened this
+    ///   path — the app is single-process and this runs before the composition
+    ///   root hands the database to anything. The guard costs one `COUNT(*)` on
+    ///   an empty table and removes any chance of a double seed should a future
+    ///   caller reach this differently.
+    public static func openOrCreate(path: String) throws -> AppDatabase {
+        let isNewDatabase = !FileManager.default.fileExists(atPath: path)
+        let database = try AppDatabase(path: path)
+        if isNewDatabase {
+            try database.write { db in
+                if try Drink.filter(Column("isPreset") == true).fetchCount(db) == 0 {
+                    try seedPresets(db)
+                }
+            }
+        }
+        return database
+    }
+
+    /// Inserts every entry of `presetDrinks`.
+    ///
+    /// `insert` needs a `var` because `didInsert` writes the assigned row id
+    /// back into the record; the copy is discarded, since nothing here needs the
+    /// ids.
+    private static func seedPresets(_ db: Database) throws {
+        for preset in presetDrinks {
+            var record = preset
+            try record.insert(db)
+        }
     }
 
     /// Runs `updates` inside a write transaction.
@@ -199,3 +260,60 @@ public final class AppDatabase: Sendable {
         return migrator
     }
 }
+
+// =============================================================================
+// Built-in preset drinks
+// =============================================================================
+//
+// WHY OUTSIDE THE TYPE
+//   A `private let` at file scope is visible to this file only, and is not tied
+//   to an instance. Android places its `PRESET_DRINKS` outside `AppDatabase` for
+//   the same reason, with the same comment.
+//
+// WHY THE NAMES ARE ENGLISH AND NOT LOCALISED
+//   A preset is a ROW the user owns from the moment it is created: they can
+//   rename it, restyle it, star it, and it is carried verbatim through the JSON
+//   backup to the other platform. Localising the seed would make a backup's
+//   drink names depend on the language the app happened to be in at install
+//   time, and a rename would then fight the translation. Android seeds the same
+//   English names for the same reason.
+//
+// THIS LIST IS A CROSS-PLATFORM CONTRACT
+//   It must stay byte-for-byte equivalent to `PRESET_DRINKS` in Android's
+//   `AppDatabase.kt`. Nothing enforces that yet — see the note in
+//   `AppDatabaseSeedTests`.
+// =============================================================================
+
+/// The drinks inserted the first time the database is created.
+private let presetDrinks: [Drink] = [
+    Drink(name: "Lager (Pint)", volumeMl: 568, alcoholPercent: 4.5,
+          isPreset: true, category: DrinkCategory.beer.rawValue),
+    Drink(name: "Lager (Standard)", volumeMl: 500, alcoholPercent: 5.0,
+          isPreset: true, category: DrinkCategory.beer.rawValue),
+    Drink(name: "Lager (Small)", volumeMl: 330, alcoholPercent: 5.0,
+          isPreset: true, category: DrinkCategory.beer.rawValue),
+    Drink(name: "Shandy / Radler", volumeMl: 500, alcoholPercent: 2.5,
+          isPreset: true, category: DrinkCategory.beer.rawValue),
+    Drink(name: "White Wine (Small)", volumeMl: 125, alcoholPercent: 12.5,
+          isPreset: true, category: DrinkCategory.wine.rawValue),
+    Drink(name: "White Wine (Regular)", volumeMl: 150, alcoholPercent: 13.0,
+          isPreset: true, category: DrinkCategory.wine.rawValue),
+    Drink(name: "Red Wine (Regular)", volumeMl: 150, alcoholPercent: 13.5,
+          isPreset: true, category: DrinkCategory.wine.rawValue),
+    Drink(name: "Sparkling Wine / Prosecco", volumeMl: 125, alcoholPercent: 11.5,
+          isPreset: true, category: DrinkCategory.wine.rawValue),
+    Drink(name: "Gin & Tonic", volumeMl: 200, alcoholPercent: 10.0,
+          isPreset: true, category: DrinkCategory.longdrink.rawValue),
+    Drink(name: "Cuba Libre", volumeMl: 200, alcoholPercent: 10.0,
+          isPreset: true, category: DrinkCategory.longdrink.rawValue),
+    Drink(name: "Vodka Soda", volumeMl: 200, alcoholPercent: 10.0,
+          isPreset: true, category: DrinkCategory.longdrink.rawValue),
+    Drink(name: "Vodka Shot", volumeMl: 40, alcoholPercent: 40.0,
+          isPreset: true, category: DrinkCategory.spirits.rawValue),
+    Drink(name: "Vodka Shot (International)", volumeMl: 45, alcoholPercent: 40.0,
+          isPreset: true, category: DrinkCategory.spirits.rawValue),
+    Drink(name: "Whiskey (Neat/Rocks)", volumeMl: 45, alcoholPercent: 43.0,
+          isPreset: true, category: DrinkCategory.spirits.rawValue),
+    Drink(name: "Liqueur Shot", volumeMl: 40, alcoholPercent: 35.0,
+          isPreset: true, category: DrinkCategory.liqueur.rawValue),
+]
