@@ -22,13 +22,15 @@
 # apply to it are stated in the accompanying COPYING.md file.
 #
 # =============================================================================
-# Appfile -- shared identity for fastlane's Google Play actions
+# Appfile -- shared identity for fastlane's store actions
 # =============================================================================
 #
 # WHAT THIS IS
-#   fastlane reads the Appfile automatically and uses it to identify the app and
-#   the credentials for the Google Play Developer API. It is consumed by the
-#   `testing` lane in Fastfile (which calls `upload_to_play_store`/`supply`).
+#   fastlane reads the Appfile automatically and uses it to identify the app on
+#   both stores: `package_name` and `json_key_file` below serve the Google Play
+#   Developer API, `app_identifier` at the bottom serves App Store Connect. The
+#   Play values are consumed by the `testing` and `production` lanes of the
+#   Android block in Fastfile (both call `upload_to_play_store`/`supply`).
 #
 # package_name
 #   The applicationId of the RELEASE build (app/build.gradle.kts → applicationId).

@@ -83,6 +83,30 @@ stores' notes still need not match, and do not).
   still pointed at `android/fastlane/metadata/android/…`, the tree's location
   before the v0.73.2 move of fastlane to the repository root.
 
+- **The fastlane files now describe the fastlane files.** Reviewing the upload
+  path for the notes above surfaced three comments that had fallen behind the
+  code they introduce — the same class of finding as the thirteenth round's, in
+  the one corner that round did not read.
+  - `Fastfile`'s head comment opened with "Currently this defines a single lane,
+    `screenshots`" and pointed at `android/Makefile` for the target that invokes
+    it. There are now seven lanes across two platforms, and both screenshot
+    targets live in the top-level `Makefile`. The head comment now names the two
+    platform blocks and their lanes, states the property they share (no lane
+    builds anything) and hands off to the per-lane `desc` text rather than
+    restating it.
+  - `Appfile`'s head comment called itself "shared identity for fastlane's
+    Google Play actions … consumed by the `testing` lane". It carries the iOS
+    `app_identifier` as well, and the Play values are read by `production` no
+    less than by `testing`. The head now says both, and the bottom-of-file iOS
+    comment it grew a companion to is left as it stands: that one was right.
+  - `Fastfile`'s `upload_appstore` claimed "Never overwrite the (manually
+    curated) age rating or pricing" above `force: true` and
+    `precheck_include_in_app_purchases: false`. Neither option does that:
+    `force` skips deliver's HTML-preview confirmation prompt, and the precheck
+    switch turns off an in-app-purchase scan for an app that has none. Each
+    option now carries a comment stating what it actually does; the claim, which
+    described no code, is gone.
+
 - **The repository's claims about itself now match the repository (thirteenth QA
   round).** The thirteenth round found no defect in either app — the gates were
   green, `swift test` ran 408 green, Kover stood at 96.9% line coverage, and the

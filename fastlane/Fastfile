@@ -25,15 +25,24 @@
 # Fastfile -- fastlane lanes for Libellus Potionis
 # =============================================================================
 #
-# Currently this defines a single lane, `screenshots`, that captures the six
-# in-app Play-Store screenshots through Fastlane screengrab (configuration in
-# Screengrabfile). It is intended to be invoked by the `make screenshots-android` target
-# (android/Makefile), which wraps it with Android Demo Mode set-up/tear-down,
-# device-date pinning and PDF-report rendering (screenshots 07/08).
+# This defines the lanes for BOTH platforms, in two blocks that mirror each
+# other. Android (`platform :android`, the default): `screenshots` captures the
+# in-app Play-Store screenshots via screengrab (configuration in Screengrabfile),
+# and `testing` / `production` upload an already-built, signed App Bundle plus the
+# store listing to Google Play. iOS (`platform :ios`): `screenshots` captures the
+# App Store screenshots via snapshot (Snapfile), `alpha` uploads an already-built,
+# signed .ipa to internal TestFlight, and `testing` / `production` upload it plus
+# the App Store listing. NO lane builds anything -- see the per-lane `desc` text
+# and the platform-level comment before the iOS block for the details.
 #
-# Running the lane on its own is possible (`bundle exec fastlane screenshots`),
-# but then the status bar is NOT cleaned and the PDF pages are NOT produced —
-# use `make screenshots-android` for the complete, Play-ready asset set.
+# The screenshot lanes are intended to be invoked by the `make screenshots-android`
+# and `make screenshots-ios` targets (the top-level Makefile), which wrap them with
+# Demo Mode / status-bar set-up and tear-down, device-date pinning and PDF-report
+# rendering (screenshots 07/08).
+#
+# Running a screenshot lane on its own is possible (`bundle exec fastlane
+# screenshots`), but then the status bar is NOT cleaned and the PDF pages are NOT
+# produced -- use the `make` targets for the complete, store-ready asset set.
 # =============================================================================
 
 default_platform(:android)
@@ -251,8 +260,14 @@ platform :ios do
       # by the calling lane; `production` submits, `testing` only uploads.
       submit_for_review: options[:submit],
 
-      # Never overwrite the (manually curated) age rating or pricing.
-      force: true, # skip the HTML-report confirmation prompt (non-interactive)
+      # Skip deliver's interactive confirmation of the generated HTML preview
+      # report, so the lane runs unattended. It does NOT force anything onto the
+      # listing beyond what the skip_* switches above already push.
+      force: true,
+
+      # precheck's in-app-purchase scan needs App Store Connect permissions this
+      # app has no use for: it ships no in-app purchases. Turning the scan off
+      # keeps precheck from failing on a category that cannot apply here.
       precheck_include_in_app_purchases: false
     )
   end
