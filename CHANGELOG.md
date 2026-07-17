@@ -52,13 +52,73 @@ change is needed there. The iOS app icon introduced in 0.82.0 is also enlarged �
 less padding, so the glass matches its on-device Android appearance (Android's
 adaptive-icon mask crops more of the border) — regenerated crisply at 1024×1024
 from the vector master at `ios/icon/appicon.svg`. The cycle then folds in the
-fixes from the eleventh and twelfth QA reviews — the first two to review Android,
-iOS and the cross-platform seam between them as one subject, the twelfth being
-the first to review a 0.83.0 that had already been reviewed once. The final,
+fixes from the eleventh, twelfth and thirteenth QA reviews — the first three to
+review Android, iOS and the cross-platform seam between them as one subject, the
+twelfth being the first to review a 0.83.0 that had already been reviewed once,
+and the thirteenth finding no defect in either app: everything it changed is a
+statement the repository makes about itself. The final,
 localised release notes still follow at release time; until then the Android
 per-locale `94.txt` changelogs and the iOS `release_notes.txt` remain
 independent placeholders (the two stores' notes need not match).
 
+- **The repository's claims about itself now match the repository (thirteenth QA
+  round).** The thirteenth round found no defect in either app — the gates were
+  green, `swift test` ran 408 green, Kover stood at 96.9% line coverage, and the
+  deep passes over crypto, the app-lock boundary, the tickers, the backup caps
+  and the shared vectors turned up nothing to fix. What it found was five places
+  where the tree says something about itself that is no longer true. That is the
+  characteristic yield of a thirteenth pass, and it is the class this cycle has
+  been working through since the twelfth round's `copyright.md` nachlass.
+  - `SettingsModel`'s header still held the block "TWO SETTINGS THIS SCREEN DOES
+    NOT SHOW", promising that `biometricEnabled` and `allowScreenshots` would
+    appear "when LocalAuthentication and the screenshot suppression land". They
+    landed — in this cycle. The rule the block was built on is too good to lose
+    and is now stated as the one that was MET: a switch that flips a flag nothing
+    reads is worse than a missing switch, which is why `SettingsScreen` shows the
+    app-lock switch only where `BiometricAuthenticator.canEvaluate()` is true and
+    puts a line of explanation where the switch would be when it is not.
+  - COPYING.md described the fonts in the sample report PDFs as Roboto "in every
+    file, plus Noto Sans CJK" in the four CJK ones. Measured with `pdffonts`, and
+    again independently against the raw PDF streams: the seventeen Latin-, Greek-
+    and Cyrillic-script files embed only Roboto; the `ja`, `ko`, `zh-CN` and
+    `zh-TW` files embed only Noto Sans CJK — the WebView picks one family per
+    document, it does not mix them. Nothing was unattributed; the claim was too
+    WIDE, not too narrow, which is the rarer way for an inventory that promises
+    completeness to be wrong.
+  - The best-practices self-assessment still answered as an Android-only project
+    in six places. `copyright_per_file` and `license_per_file` enumerate the file
+    classes carrying the header and omitted Swift — while all 112 Swift files
+    carry it and `check-headers.py` has been enforcing `.swift` all along, so the
+    evidence was weaker than the truth. `OSPS-QA-06.02` named only the JVM suites,
+    `OSPS-BR-05.01`/`OSPS-QA-02.01` only the Gradle catalogue and not
+    `Package.resolved`, `OSPS-DO-07.01` called the project "a standard Android
+    Gradle project". Every criterion was and stays Met; only the justifications
+    grew the second platform. No status changed, and the `.jsonc` view follows.
+  - CONTRIBUTING.md said "The `Makefile` is not needed for iOS work at all" —
+    contradicted by `docs/INSTALL-IOS.md`, the document that sentence points at
+    ("The build is driven by the repository's `Makefile`"), by `make ios` itself,
+    and by CONTRIBUTING.md four lines earlier, which tells the reader to run
+    `make check-swift-tests`. It is a survivor from before `make ios` existed, and
+    following it walks a contributor straight past `check-ios-static` and its
+    eleven checks.
+  - `docs/INSTALL-IOS.md` called `gmake ios-version-check` "the release gate". It
+    is not a gate: no target depends on it, and none should — `ios-project`
+    regenerates `Version.xcconfig` before XcodeGen reads it, so in the make path
+    the check is structurally redundant, and wiring it into `check-ios-static`
+    would only add a gate that skips in every tree where the gitignored file is
+    absent. The Makefile's own wording had it right ("suitable for a release
+    gate"); the doc now says the same, and says where the check still earns its
+    keep — by hand, after a version bump, if you drive `xcodebuild` directly.
+- **The German-comment gate reads the tooling too (thirteenth QA round).**
+  `release-check.sh` §7 quotes CONTRIBUTING's "all source code … build files" and
+  scanned Kotlin, three named build scripts and Swift — not the 5,700 lines of
+  Python and shell under `tools/`, which the convention has always covered and no
+  gate ever read. This is the same widening the round before made for
+  `build.gradle.kts`, and this time it is prevention rather than repair: probed
+  first, `tools/` was already clean. The gate was then probed the other way —
+  German planted in a `.py` and in a `.sh`, each made it fire, each removal made
+  it silent — because a gate nobody has watched fire is not evidence. It skips
+  gracefully when `tools/` is absent, like the iOS branch beside it.
 - **Fixed: a fresh clone could not build, and a source tarball broke on its
   second try (twelfth QA round).** Three findings with one root: a gate that
   meets a BUILD PRODUCT and does not know what it is looking at.
