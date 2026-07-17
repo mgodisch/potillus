@@ -64,6 +64,14 @@ final class DrinkCapacityModelTests: XCTestCase {
 
     private var environment: AppEnvironment!
 
+    /// The drink every logged entry points at.
+    ///
+    /// `entries.drinkId` is a FOREIGN KEY, and `makeEphemeral()` opens an EMPTY
+    /// in-memory database — `AppDatabase.openOrCreate` seeds the presets, but
+    /// nothing here goes through it. So the row has to exist before an entry can
+    /// reference it; there is no id 1 to assume.
+    private var drink: DrinkDefinition!
+
     /// 2026-01-02, 20:14:00 UTC — an evening, well inside the logical day that
     /// began at 04:00 on the 2nd.
     private let evening: Int64 = 1_767_384_840_000
@@ -71,6 +79,15 @@ final class DrinkCapacityModelTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         environment = try AppEnvironment.makeEphemeral()
+        drink = try addDrink("Beer")
+    }
+
+    @discardableResult
+    private func addDrink(_ name: String) throws -> DrinkDefinition {
+        let id = try environment.drinks.add(
+            DrinkDefinition(name: name, volumeMl: 500, alcoholPercent: 5.0)
+        )
+        return try XCTUnwrap(try environment.drinks.allOnce().first { $0.id == id })
     }
 
     private func makeModel(clock: any Clock, tickInterval: Duration) -> DrinkCapacityModel {
@@ -91,10 +108,10 @@ final class DrinkCapacityModelTests: XCTestCase {
         let noon = try XCTUnwrap(DayResolver.parseDate(date)).addingTimeInterval(12 * 3_600)
         _ = try environment.entries.add(
             ConsumptionEntry(
-                drinkId: 1,
-                drinkName: "Beer",
-                volumeMl: 500,
-                alcoholPercent: 5.0,
+                drinkId: drink.id,
+                drinkName: drink.name,
+                volumeMl: drink.volumeMl,
+                alcoholPercent: drink.alcoholPercent,
                 gramsAlcohol: grams,
                 timestampMillis: Int64(noon.timeIntervalSince1970 * 1000),
                 logicalDate: date

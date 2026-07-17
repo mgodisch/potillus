@@ -30,7 +30,7 @@ conditions.
 ## Third-Party Software (bundled in the Android App)
 
 The libraries below are compiled into the released application package (the
-APK/ABB) and are therefore redistributed together with this program.  They are
+APK/AAB) and are therefore redistributed together with this program.  They are
 consumed exclusively as Gradle build dependencies (declared in
 `android/gradle/libs.versions.toml`), never as vendored source copies, so each
 is "de-embedded" via build-depends as required.  The authoritative,
@@ -93,7 +93,7 @@ Classpath Exception explicitly permits linking these classes into an
 independent work (this application) without extending GPLv2 to it, and the
 license is compatible with this program's GPL-3.0-or-later distribution.  Only
 the backported `java.time` (and related) classes selected by core-library
-desugaring are included in the APK/ABB; see the `desugar-jdk-libs` note in
+desugaring are included in the APK/AAB; see the `desugar-jdk-libs` note in
 `android/gradle/libs.versions.toml`.
 
 The full GPL-2.0 text is kept verbatim in the repository as `LICENSE.GPL-2.0.md`
@@ -105,10 +105,12 @@ exception itself beside the link.
 ### Build- and test-time dependencies (NOT redistributed)
 
 The following are used only to build or test the app and are **not** compiled
-into the released APK/ABB, so they carry no redistribution obligation; they are
+into the released APK/AAB, so they carry no redistribution obligation; they are
 listed here for completeness.  Apache-2.0 unless noted:
 `org.jetbrains.kotlin:kotlin-test`,
 `org.jetbrains.kotlinx:kotlinx-coroutines-test`, `app.cash.turbine:turbine`,
+`androidx.compose.ui:ui-tooling` (the debug-only Compose inspector; its sibling
+`ui-tooling-preview` IS on the release classpath and is listed above),
 the AndroidX Test stack (`androidx.test.ext:junit`, `androidx.test:runner`,
 `androidx.test.espresso:espresso-core`,
 `androidx.test.uiautomator:uiautomator`), `androidx.room:room-testing`, the
@@ -180,6 +182,23 @@ platforms — which had the APK carrying GRDB's MIT notice for a library it does
 not ship, and the iOS app carrying the Apache-2.0 text for libraries it does not
 have.  MIT is compatible with the GNU GPL version 3, so the combined work is
 distributable under the terms stated at the top of this document.
+
+### Build- and test-time dependencies (NOT redistributed)
+
+The following build the iOS app but are not compiled into it, so they carry no
+redistribution obligation; they are listed here for the same completeness as
+their Android counterparts above.  All MIT:
+
+  * **XcodeGen** &mdash; generates `ios/Potillus.xcodeproj` from
+    `ios/project.yml`, which is why no `.xcodeproj` is tracked
+    (<[https://github.com/yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)>).
+  * **SwiftLint** &mdash; the style gate `make check-swiftlint` pins to version
+    0.65.0 (<[https://github.com/realm/SwiftLint](https://github.com/realm/SwiftLint)>).
+  * **fastlane** &copy; The Fastlane Authors &mdash; drives the store uploads for
+    BOTH platforms (the `ios` lanes here, `supply` and `screengrab` on Android;
+    the `tools.fastlane:screengrab` Gradle artifact is a separate, Apache-2.0
+    library and is listed above)
+    (<[https://github.com/fastlane/fastlane](https://github.com/fastlane/fastlane)>).
 
 ## Third-Party Assets
 

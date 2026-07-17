@@ -59,6 +59,20 @@ localised release notes still follow at release time; until then the Android
 per-locale `94.txt` changelogs and the iOS `release_notes.txt` remain
 independent placeholders (the two stores' notes need not match).
 
+- **The third-party inventory is complete on both sides (twelfth QA round).**
+  Checked against the actual `releaseRuntimeClasspath` rather than the build
+  script: 156 artifacts, and every one of them falls into a copyright-holder
+  family COPYING.md already names — so nothing the APK/AAB ships was
+  unattributed. The list that was short is the one that promises "for
+  completeness": the build- and test-time dependencies. `androidx.compose.ui:ui-tooling`
+  was missing (it is `debugImplementation`, and its presence on the release
+  classpath was tested, not assumed — absent, unlike its sibling
+  `ui-tooling-preview`, which is a real release dependency and was already
+  listed). So were the iOS side's tools, while the Gradle plugins were all
+  there: XcodeGen, SwiftLint and fastlane now have their own subsection under the
+  iOS heading, all MIT, with the note that the `tools.fastlane:screengrab` Gradle
+  artifact is a different, Apache-2.0 thing. And "APK/ABB" was a slip for AAB —
+  the Android App Bundle — three times over.
 - **The Drinks tab's traffic-light dots follow the clock (twelfth QA round).**
   Every figure behind a dot is scoped to TODAY — today's grams, and the seven-day
   window ending today — and nothing fires on the passage of time. So a Drinks tab
@@ -76,7 +90,9 @@ independent placeholders (the two stores' notes need not match).
   which has been ticking since its own review rounds. Four new tests, in a new
   `DrinkCapacityModelTests` — the existing suite drove the VALUE type and never
   the model, which is exactly how the missing ticker stayed green. One rolls the
-  day over by advancing the clock alone.
+  day over by advancing the clock alone. (Those four tests were written against
+  an assumed drink row and died on the FOREIGN KEY before they reached the
+  ticker; they log a real drink now.)
 - **The iOS statistics chart says what its numbers mean (twelfth QA round).**
   Android has drawn a dashed red daily-limit line across that chart since it
   existed, and reddened the bars above it; iOS drew every bar in the accent
