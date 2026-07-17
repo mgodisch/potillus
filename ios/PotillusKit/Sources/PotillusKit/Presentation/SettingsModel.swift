@@ -41,11 +41,16 @@ import Observation
 //   means the invariant holds for the store rather than for the current set of
 //   views, and the store is what survives.
 //
-// TWO SETTINGS THIS SCREEN DOES NOT SHOW
-//   `biometricEnabled` and `allowScreenshots` are stored, ported, and NOT offered.
-//   A switch that flips a flag nothing reads is worse than a missing switch: it
-//   promises a lock that does not exist. They appear when LocalAuthentication and
-//   the screenshot suppression land.
+// TWO SETTINGS THIS SCREEN GATES ON A CAPABILITY
+//   `biometricEnabled` and `allowScreenshots` are stored, ported, and — since
+//   0.83.0 — offered, because the things they promise now exist: `LAContext`
+//   behind `AppLockModel`, and `PrivacyCover` for the app-switcher snapshot.
+//   The rule that held them back still binds: a switch that flips a flag nothing
+//   reads is worse than a missing switch, because it promises a lock that does
+//   not exist. So `SettingsScreen` shows the app-lock switch only when
+//   `BiometricAuthenticator.canEvaluate()` is true, and puts a line of
+//   explanation where the switch would be when it is not — arming a lock the
+//   device cannot open would put the diary away for good.
 // =============================================================================
 
 @MainActor
