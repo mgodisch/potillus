@@ -1277,6 +1277,11 @@ push-playstore:
 #       before the upload. The cost is ordering: with credentials missing you learn
 #       that before guards (1)-(4) report, and with a missing .ipa you pay one
 #       read-only round trip first. Both are cheap; a `-n` that publishes is not.
+#   (6) the LISTING, before it is sent: the reviewer contact exists (it is
+#       git-ignored and set up once per machine, so its absence is a setup step
+#       rather than a bug), and check-ios-metadata and check-ios-screenshots
+#       pass. deliver checks all of this too -- from the far side of the network,
+#       one finding per attempt, after the .ipa has already gone over the wire.
 #
 # The .ipa is a zip, and neither codesign nor plutil reads inside one, so (3) and
 # (4) unpack it into a mktemp directory and inspect the .app there. The staged file
@@ -1329,8 +1334,19 @@ push-appstore: push-appstore-preflight
 	echo "push-appstore: .ipa signed by TeamIdentifier: $$got_team"
 	test "$$got_team" = "$$team" || { echo "push-appstore: staged .ipa is signed by team '$$got_team', expected '$$team' -- it was exported with different credentials than this tree configures." >&2; exit 1; }
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
-	# 5) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
-	#    Guard (5), the App Store Connect pre-flight, already ran as this target's
+	# 5) The listing itself, checked BEFORE it is sent. `make ios` already runs
+	#    check-ios-metadata, but nothing ran it HERE -- which is how this cycle
+	#    spent four upload attempts learning what a gate could have said in a
+	#    second: wrong locale directory names, A4-shaped report screenshots, and
+	#    a reviewer contact still reading PLACEHOLDER. deliver catches all three,
+	#    but only from the far side of the network, one per attempt.
+	@for f in first_name last_name email_address phone_number; do \
+		test -f "fastlane/metadata/ios/review_information/$$f.txt" || { echo "push-appstore: fastlane/metadata/ios/review_information/$$f.txt is missing -- the App Store reviewer contact is git-ignored and set up once per machine: copy the .txt.example files beside it and fill in your own details." >&2; exit 1; }; \
+	done
+	python3 tools/check-ios-metadata.py
+	python3 tools/check-ios-screenshots.py
+	# 6) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
+	#    The App Store Connect pre-flight already ran as this target's
 	#    prerequisite -- see the comment block above for why it lives there.
 	( cd fastlane && bundle exec fastlane ios $(if $(SUBMIT),production,testing) ipa:"$(STAGED_IPA)" )
 

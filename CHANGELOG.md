@@ -156,6 +156,38 @@ receive — follow at release time, once this cycle has taken its final shape.
     written for the Android half, and every one waited for a real upload to
     speak. The iOS side now has the three gates the Android side always had.
 
+- **The App Store reviewer contact was a placeholder, and is now a secret.** The
+  fifth and last defect of the family, and the one the family had been building
+  towards: `review_information/` was excluded from `check-ios-metadata.py` as
+  "not a locale", so it was checked by nothing whatsoever, and reached its first
+  real upload still holding the PLACEHOLDER text it shipped with. Apple rejected
+  two of the four fields — the email had no `@`, the phone no leading `+` and 51
+  bytes where 20 are allowed — and, having no format rule for names, would have
+  passed "PLACEHOLDER: reviewer contact first name" straight to the review team.
+  The failure is what prevented the embarrassment.
+  - The four fields are now git-ignored and set up once per machine from
+    `*.txt.example` templates, the same shape `ios/signing.properties` already
+    has. Apple asks for a person reachable by phone; a public repository should
+    not answer that. The maintainer's name and address are in every file header
+    already, so the phone number is the one genuinely new exposure — but the four
+    are one contact, and splitting them would only invite the next person to
+    commit the rest. `notes.txt` and the two empty demo-credential files stay
+    committed: they state that the app has no login, which is a fact about the
+    app, not about a person.
+  - `check-ios-metadata.py` gained the section that was missing. It checks the
+    two fields Apple checks — email shape, and the phone's leading `+` and
+    20-BYTE limit, measured after encoding, because Apple said bytes — and the
+    two it does not, which is where it earns its keep. Absence is not failure:
+    the files are git-ignored, so a fresh clone legitimately has none and is told
+    so rather than failed. A HALF-filled contact is failure, since no clone
+    arrives at one by itself.
+  - And `push-appstore` now runs the gates. `make ios` had always run
+    `check-ios-metadata`; the upload path never did. That is the whole lesson of
+    this cycle in one line: four attempts, each rejected by a store for something
+    a gate could have said in a second, on a repository that already owned the
+    gate. It now requires the four contact files outright and runs both iOS
+    checks before a byte goes over the wire.
+
 ---
 
 ## v0.83.0

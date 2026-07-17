@@ -131,6 +131,29 @@ Then pick the destination — both take the staged path the build just printed:
   What fastlane does *not* push, and you therefore curate once in App Store
   Connect: the age rating, pricing and availability, and the App Privacy answers.
 
+- **The reviewer contact is set up once per machine, not committed.** Apple wants
+  a person it can phone. That is not something a public repository should answer,
+  so the four files are git-ignored and created from the templates beside them:
+
+  ```sh
+  cd fastlane/metadata/ios/review_information
+  for f in first_name last_name email_address phone_number; do
+      cp "$f.txt.example" "$f.txt"
+  done
+  # then edit each one
+  ```
+
+  The phone number must start with `+` and its country code, and must be at most
+  20 **bytes** — Apple counts bytes, not characters. `push-appstore` refuses to
+  upload without all four, and `make check-ios-metadata` checks their shape,
+  including the two fields Apple does not: a first or last name still reading
+  `PLACEHOLDER` would otherwise go to the review team verbatim.
+
+  `notes.txt` stays committed — it tells the reviewer the app is fully offline
+  and needs no login, which is a fact about the app rather than about a person.
+  `demo_user.txt` and `demo_password.txt` stay committed and empty for the same
+  reason.
+
 ## Internal vs. external TestFlight
 
 The `alpha` lane distributes **internally** (`distribute_external: false`):

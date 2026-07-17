@@ -40,6 +40,22 @@ __pycache__/
 # once and cannot be re-downloaded. Referenced via APP_STORE_CONNECT_API_KEY_*
 # env vars (see fastlane/Fastfile, iOS block).
 /fastlane/AuthKey_*.p8
+# The App Store reviewer contact — a PERSON, reachable by phone, which is what
+# Apple asks for and what a public repository should not answer. deliver reads
+# these four as <key>.txt from fastlane/metadata/ios/review_information/ and
+# sends them to App Store Connect; they are set up once per machine from the
+# .txt.example files beside them, exactly like ios/signing.properties. The
+# maintainer's name and address are already in every file header, so the phone
+# number is the one genuinely new exposure — but the four are one contact, and
+# splitting them would only invite the next person to commit the rest. The
+# directory's notes.txt, demo_user.txt and demo_password.txt stay committed:
+# they say the app has no login, which is true of the app, not of a person.
+# tools/check-ios-metadata.py validates these when present, and push-appstore
+# refuses to upload without them.
+/fastlane/metadata/ios/review_information/first_name.txt
+/fastlane/metadata/ios/review_information/last_name.txt
+/fastlane/metadata/ios/review_information/email_address.txt
+/fastlane/metadata/ios/review_information/phone_number.txt
 # ignore iOS screenshots artifacts
 /fastlane/screenshots/ios/screenshots.html
 

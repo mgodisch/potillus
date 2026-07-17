@@ -64,7 +64,22 @@ WHAT IT CHECKS
        fastlane/screenshots/ios/, whose directories deliver validates in the
        same breath; the Snapfile derives those names from the metadata ones, so
        checking here covers both.
-
+    5. THE REVIEWER CONTACT in review_information/: present, filled in, and in
+       the shape App Store Connect demands.  This directory was excluded from
+       the checks above as "not a locale" and so was checked by nothing at all;
+       it reached its first real upload still holding the PLACEHOLDER text it
+       shipped with.  Apple caught two of the four -- the email had no @, the
+       phone no leading + and 51 bytes where 20 are allowed -- and, having no
+       format rule for names, would have passed "PLACEHOLDER: reviewer contact
+       first name" straight to the review team.  That is the asymmetry this
+       section exists for: it checks the two fields Apple checks, and the two it
+       does not.
+       The four PII files are git-ignored (see .gitignore) and set up per
+       machine from the .txt.example files beside them.  Their ABSENCE is
+       therefore normal in a fresh clone and reported, not failed; what is not
+       normal is a half-filled contact, so if any one of them exists, all four
+       must, and all four must be valid.  push-appstore requires them outright,
+       which is the moment they actually matter.
 GRACEFUL SKIP
     A tree without fastlane/metadata/ios/ (an Android-only source drop) is not
     an error: the check prints an informational line and exits 0, following
@@ -99,6 +114,26 @@ REQUIRED_NON_EMPTY = ("name.txt", "description.txt")
 # Directory entries under BASE that are not locales.
 NOT_A_LOCALE = {"review_information"}
 
+# ── The reviewer contact ─────────────────────────────────────────────────────
+# fastlane's own folder name and file names; deliver reads <key>.txt from here.
+REVIEW_DIR = "review_information"
+
+# The four App Store Connect insists on, and that this repository does not keep:
+# they are git-ignored and copied per machine from the .txt.example files.
+REVIEW_REQUIRED = ("first_name.txt", "last_name.txt", "email_address.txt",
+                   "phone_number.txt")
+
+# App Store Connect's limit on the contact phone, quoted from its own rejection:
+# "Phone number cannot be longer than 20 bytes". BYTES, not characters -- so it
+# is measured after encoding, which is why a '+49 30 ...' with a non-breaking
+# space would fail a length check that counted characters and passed.
+PHONE_MAX_BYTES = 20
+
+# The marker the shipped placeholders carry. Checked case-insensitively and in
+# every file of the directory, including notes.txt and the demo credentials:
+# the point is that nothing here reaches Apple still saying PLACEHOLDER.
+PLACEHOLDER_MARKER = "placeholder"
+
 # The locale directory names App Store Connect accepts, verbatim from deliver's
 # own error message and from the "Available language codes" list in
 # docs.fastlane.tools/actions/upload_to_app_store.  These are STORE locales and
@@ -123,6 +158,109 @@ def listing_text(path):
     with open(path, encoding="utf-8") as handle:
         text = handle.read()
     return text[:-1] if text.endswith("\n") else text
+
+
+def check_review_information():
+    """Problems with the reviewer contact, as a list of strings.
+
+    Returns an empty list both when everything is right and when the contact is
+    simply not set up on this machine -- the caller distinguishes those two by
+    asking `review_configured()`, because "absent" is a normal state worth a
+    line of its own and a failure worth none.
+    """
+    directory = os.path.join(BASE, REVIEW_DIR)
+    if not os.path.isdir(directory):
+        return []
+
+    present = [name for name in REVIEW_REQUIRED
+               if os.path.isfile(os.path.join(directory, name))]
+
+    # None of them: a fresh clone. The files are git-ignored by design, so this
+    # is what every clone looks like before its first setup.
+    if not present:
+        return []
+
+    # Some but not all: a half-filled contact, which no clone arrives at by
+    # itself. deliver would send whatever it found and let Apple judge the rest.
+    missing = [name for name in REVIEW_REQUIRED if name not in present]
+    if missing:
+        return [
+            f"{REVIEW_DIR}/: {', '.join(missing)} missing while "
+            f"{', '.join(present)} exist -- copy the .txt.example file(s) beside "
+            f"them and fill in; a partial contact is not a contact"
+        ]
+
+    problems = []
+
+    # The placeholders that shipped with the repository. Checked across every
+    # file here, not just the four: notes.txt is uploaded too.
+    for name in sorted(os.listdir(directory)):
+        path = os.path.join(directory, name)
+        if not os.path.isfile(path) or not name.endswith(".txt"):
+            continue
+        if PLACEHOLDER_MARKER in listing_text(path).lower():
+            problems.append(
+                f"{REVIEW_DIR}/{name}: still contains placeholder text -- Apple "
+                f"has no format rule for most of these and would pass it to the "
+                f"review team verbatim"
+            )
+
+    def value(name):
+        return listing_text(os.path.join(directory, name)).strip()
+
+    # The two Apple does NOT validate, and therefore the two that need us most.
+    for name in ("first_name.txt", "last_name.txt"):
+        if not value(name):
+            problems.append(f"{REVIEW_DIR}/{name}: empty")
+
+    # The two Apple does validate -- checked here so the answer arrives before
+    # the upload rather than 29 seconds into it.
+    email = value("email_address.txt")
+    # Deliberately not a full RFC 5322 grammar: the aim is to catch a
+    # placeholder or a typo'd address, and a stricter pattern would reject valid
+    # addresses this project has no business rejecting.
+    if email and (email.count("@") != 1 or "." not in email.split("@")[-1]
+                  or " " in email):
+        problems.append(
+            f"{REVIEW_DIR}/email_address.txt: '{email}' is not an email address"
+        )
+
+    phone = value("phone_number.txt")
+    if phone:
+        if not phone.startswith("+"):
+            problems.append(
+                f"{REVIEW_DIR}/phone_number.txt: '{phone}' does not start with "
+                f"'+' -- Apple wants the country code prefixed (e.g. +49 ...)"
+            )
+        encoded = len(phone.encode("utf-8"))
+        if encoded > PHONE_MAX_BYTES:
+            problems.append(
+                f"{REVIEW_DIR}/phone_number.txt: {encoded} bytes exceeds Apple's "
+                f"limit of {PHONE_MAX_BYTES}"
+            )
+
+    # Apple asks for demo credentials only when the app has a login. This one has
+    # none, and notes.txt says so -- but one credential without the other is a
+    # half-answer either way round.
+    demo_user = value("demo_user.txt") if os.path.isfile(
+        os.path.join(directory, "demo_user.txt")) else ""
+    demo_password = value("demo_password.txt") if os.path.isfile(
+        os.path.join(directory, "demo_password.txt")) else ""
+    if bool(demo_user) != bool(demo_password):
+        problems.append(
+            f"{REVIEW_DIR}/: demo_user.txt and demo_password.txt must be either "
+            f"both set or both empty"
+        )
+
+    return problems
+
+
+def review_configured():
+    """True when the reviewer contact exists on this machine at all."""
+    directory = os.path.join(BASE, REVIEW_DIR)
+    return any(
+        os.path.isfile(os.path.join(directory, name)) for name in REVIEW_REQUIRED
+    )
 
 
 def main():
@@ -196,15 +334,24 @@ def main():
                     detail.append("extra: " + ", ".join(extra))
                 problems.append(f"{locale}: file set differs ({'; '.join(detail)})")
 
+    # 5: the reviewer contact.
+    problems.extend(check_review_information())
+
     if problems:
         for problem in problems:
             print(f"check-ios-metadata: {problem}", file=sys.stderr)
         print(f"check-ios-metadata: {len(problems)} problem(s) found", file=sys.stderr)
         return 1
 
+    contact = (
+        "reviewer contact OK"
+        if review_configured()
+        else "reviewer contact not set up on this machine (git-ignored; copy the "
+             "review_information/*.txt.example files before push-appstore)"
+    )
     print(
         f"check-ios-metadata: OK ({len(locales)} locales, all valid; "
-        f"{len(LIMITS)} limits enforced)"
+        f"{len(LIMITS)} limits enforced; {contact})"
     )
     return 0
 
