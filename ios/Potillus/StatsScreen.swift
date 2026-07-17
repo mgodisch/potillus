@@ -82,11 +82,15 @@ struct StatsScreen: View {
 
     var body: some View {
         NavigationStack {
+            // Order follows Android's, section for section. The consumption chart
+            // comes FIRST, right under the period picker: it is the answer to the
+            // question the screen is opened with, and the figures below read as its
+            // footnotes. It had sat fourth here, behind two blocks of numbers.
             List {
                 periodPicker
+                if !model.state.chartBuckets.isEmpty { consumptionChart }
                 keyMetrics
                 streaksAndTrend
-                if !model.state.chartBuckets.isEmpty { consumptionChart }
                 timeOfDay
                 weekdays
                 if !model.state.categoryBreakdown.isEmpty { categories }
@@ -180,7 +184,7 @@ struct StatsScreen: View {
 
     // ── Headline figures ─────────────────────────────────────────────────────
 
-    // ── Key metrics (Android's first card) ───────────────────────────────────
+    // ── Key metrics ──────────────────────────────────────────────────────────
     //
     // The order and the labels track Android's key-metrics card exactly: the
     // three averages, then the three "days over" counts (red when breached,
@@ -307,21 +311,74 @@ struct StatsScreen: View {
     private var categories: some View {
         Section(Loc.string("Categories", locale: locale)) {
             let total = model.state.categoryBreakdown.values.reduce(0, +)
-            ForEach(sortedCategories, id: \.category) { entry in
-                let (category, value) = (entry.category, entry.grams)
-                LabeledContent(name(category)) {
-                    HStack(spacing: 8) {
-                        Text("\(Loc.number(total > 0 ? value / total * 100 : 0, fractionDigits: 0, locale: locale)) %")
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                        grams(value)
+            // Donut and legend in ONE row, which is the single card Android draws.
+            VStack(spacing: 12) {
+                // A ring, not a pie: the hole is what makes proportions readable
+                // without a scale. .ratio(0.62) is Android's geometry (a stroke 38 %
+                // of the radius) restated the way Swift Charts asks for it, and
+                // angularInset gives the hairline gap Android carves out of every
+                // sweep so neighbouring slices stay apart when their shares are
+                // close.
+                Chart(sortedCategories, id: \.category) { slice in
+                    SectorMark(
+                        angle: .value("Grams", slice.grams),
+                        innerRadius: .ratio(0.62),
+                        angularInset: 1
+                    )
+                    .foregroundStyle(CategoryPalette.color(for: slice.category))
+                }
+                // The built-in legend is hidden: the one below carries grams and
+                // percentages too, which Swift Charts' cannot. The arcs themselves
+                // are unlabelled, but every slice is named in that legend, and each
+                // legend item is combined into one accessibility element -- so the
+                // ring is decoration over text, not text replaced by a ring.
+                .chartLegend(.hidden)
+                .frame(height: 160)
+
+                // Two columns, as on Android. The legend is not decoration: it
+                // carries the grams and the percentage the plain list used to show,
+                // which is why the list could go.
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), alignment: .leading),
+                        GridItem(.flexible(), alignment: .leading),
+                    ],
+                    alignment: .leading,
+                    spacing: 6
+                ) {
+                    ForEach(sortedCategories, id: \.category) { slice in
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(CategoryPalette.color(for: slice.category))
+                                .frame(width: 10, height: 10)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(name(slice.category))
+                                    .font(.caption)
+                                    .lineLimit(1)
+                                Text(legendValue(slice.grams, of: total))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(.vertical, 4)
         }
     }
 
-    /// Largest first: the list answers "what do I drink" at a glance.
+    /// One legend line: "12.3 g · 45 %", the pairing Android's legend uses.
+    private func legendValue(_ grams: Double, of total: Double) -> String {
+        let percent = total > 0 ? grams / total * 100 : 0
+        let g = Loc.number(grams, fractionDigits: 1, locale: locale)
+        let p = Loc.number(percent, fractionDigits: 0, locale: locale)
+        return "\(g) g · \(p) %"
+    }
+
+    /// Largest first, so the biggest slice starts at twelve o'clock and the legend
+    /// reads top-down in the order the ring reads clockwise.
     private var sortedCategories: [CategorySlice] {
         model.state.categoryBreakdown
             .map { CategorySlice(category: $0.key, grams: $0.value) }

@@ -125,6 +125,23 @@ two stores' notes need not match).
   `ui/component/Components.kt`. TodayScreen's daily summary and CalendarScreen's
   selected-day panels keep `primaryContainer`: those are meant to stand out, and
   stay accents.
+- **iOS Statistics leads with its chart, and its categories are a donut.** The
+  consumption chart had sat fourth, behind two blocks of numbers; it is the answer
+  the screen is opened for, so it now comes first, right under the period picker,
+  exactly as on Android — where a comment in this file had claimed the key-metrics
+  card was "Android's first card", which it never was. That comment had dressed a
+  divergence up as parity.
+  The categories arrived as a list of rows while Android drew a donut. They are a
+  donut now, with the two-column legend Android puts under its ring: the legend
+  carries the grams and the percentage the rows used to, so nothing is lost by the
+  list going. The six slice colours are NOT restated here — `CategoryPalette` asks
+  PotillusKit's `ReportPalette.color(forCategory:)`, the same function the PDF
+  report asks and the same one the shared `test-vectors/report-chart.json` pins for
+  both platforms, so the ring, the report and Android cannot drift. That palette's
+  docstring has always claimed it "matches the on-screen palette"; until now iOS
+  had no on-screen palette to match. The hex-to-`Color` step lives in the app
+  target because PotillusKit imports no SwiftUI anywhere — being UI-free is what
+  lets it be tested without a host app.
 - **Fixed: a fresh iOS install counted the days before it existed as abstinent.**
   Install on the 16th, open Statistics, and the month view congratulated the user
   for fifteen dry days and drew fifteen green ticks for the 1st to the 15th —
