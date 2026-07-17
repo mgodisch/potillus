@@ -114,6 +114,10 @@ final class PotillusAppTests: XCTestCase {
         XCTAssertEqual(paragraphs.count, 4)
         XCTAssertTrue(paragraphs[0].hasPrefix("Copyright (C)"), "the copyright line stands alone")
         XCTAssertTrue(paragraphs.allSatisfy { !$0.isEmpty }, "no empty paragraph to render")
+        // The About screen's ForEach identifies them by their own text. Two equal
+        // paragraphs would collapse into one row and quietly drop a piece of the
+        // notice we are obliged to reproduce.
+        XCTAssertEqual(Set(paragraphs).count, paragraphs.count, "each paragraph is its own text")
     }
 
     /// The version strips any build suffix, as the report footer does.

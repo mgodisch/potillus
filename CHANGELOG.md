@@ -276,9 +276,11 @@ two stores' notes need not match).
   caller's modifier at the point of use, as `DrinkCategoryIcon` already did, and
   as the file's five other modifier parameters were already declared. Neither was
   caught by the release gates, because none of them parses Kotlin or runs lint.
-  SwiftLint caught two more of the same kind on the other platform: two
-  three-character-minimum identifiers, and a file left without its trailing
-  newline by the edit that split it into an extension. `check-swift-length`
+  SwiftLint caught three more of the same kind on the other platform: two
+  three-character-minimum identifiers, a file left without its trailing newline by
+  the edit that split it into an extension, and a closure whose parameters had been
+  wrapped onto the next line to fit — the wrap being unnecessary once the loop
+  stopped enumerating for an index nothing used. `check-swift-length`
   mirrors SwiftLint's structural rules and nothing else, by design — it says so
   itself — so `identifier_name` and `trailing_newline` were never its to catch.
   And one member of `CalendarState` was documented, commented and used, but never

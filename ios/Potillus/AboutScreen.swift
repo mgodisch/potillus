@@ -161,8 +161,10 @@ struct AboutScreen: View {
                 // the prose above it. The words are untouched: see
                 // AppInfo.grdbLicenseParagraphs.
                 VStack(alignment: .leading, spacing: 10) {
-                    ForEach(Array(AppInfo.grdbLicenseParagraphs.enumerated()), id: \.offset) {
-                        _, paragraph in
+                    // `id: \.self` — the paragraphs are distinct text and a test
+                    // pins that they stay so, which is cheaper to read than
+                    // enumerating for an index nothing uses.
+                    ForEach(AppInfo.grdbLicenseParagraphs, id: \.self) { paragraph in
                         Text(paragraph)
                             .font(.callout)
                             .frame(maxWidth: .infinity, alignment: .leading)
