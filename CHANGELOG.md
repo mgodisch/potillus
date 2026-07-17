@@ -52,12 +52,113 @@ change is needed there. The iOS app icon introduced in 0.82.0 is also enlarged �
 less padding, so the glass matches its on-device Android appearance (Android's
 adaptive-icon mask crops more of the border) — regenerated crisply at 1024×1024
 from the vector master at `ios/icon/appicon.svg`. The cycle then folds in the
-fixes from the eleventh QA review — the first to review Android, iOS and the
-cross-platform seam between them as one subject. The final, localised release
-notes still follow at release time; until then the Android per-locale `94.txt`
-changelogs and the iOS `release_notes.txt` remain independent placeholders (the
-two stores' notes need not match).
+fixes from the eleventh and twelfth QA reviews — the first two to review Android,
+iOS and the cross-platform seam between them as one subject, the twelfth being
+the first to review a 0.83.0 that had already been reviewed once. The final,
+localised release notes still follow at release time; until then the Android
+per-locale `94.txt` changelogs and the iOS `release_notes.txt` remain
+independent placeholders (the two stores' notes need not match).
 
+- **The Drinks tab's traffic-light dots follow the clock (twelfth QA round).**
+  Every figure behind a dot is scoped to TODAY — today's grams, and the seven-day
+  window ending today — and nothing fires on the passage of time. So a Drinks tab
+  left open across the day-change boundary kept colouring its dots against
+  YESTERDAY's consumption, and an app foregrounded onto that tab after a night in
+  a pocket did the same. The dot exists to inform the tap that has not happened
+  yet; it corrected itself on the next log, which is to say after the decision it
+  is there to inform. `DrinkCapacityModel` is the FOURTH iOS model whose state is
+  a function of "now", and the eleventh round — which gave Today, Statistics and
+  Calendar their tickers — did not find it. It has one now: day-keyed like
+  StatsModel's and CalendarModel's, so the two queries rerun only when the
+  logical day actually moved, plus a reload on the scene turning active, because
+  `onAppear` does not fire on foregrounding. Android never had the gap: its
+  DrinksScreen builds the same `DrinkCapacity` from `TodayViewModel`'s state,
+  which has been ticking since its own review rounds. Four new tests, in a new
+  `DrinkCapacityModelTests` — the existing suite drove the VALUE type and never
+  the model, which is exactly how the missing ticker stayed green. One rolls the
+  day over by advancing the clock alone.
+- **The iOS statistics chart says what its numbers mean (twelfth QA round).**
+  Android has drawn a dashed red daily-limit line across that chart since it
+  existed, and reddened the bars above it; iOS drew every bar in the accent
+  colour and no line at all — the screen showed the figures without the one mark
+  that says whether they are good or bad, directly above a card counting days
+  over that same limit. It was not an idiom difference: `StatsState.limitInfo`
+  was already computed and stored, and NOTHING read it, which is the shape of a
+  feature that was ported half way. The app's own PDF report draws the line. The
+  chart now draws it too — `RuleMark` at the limit, dashed, and
+  `AlcoholCalculator.isOverLimit` (not a bare `>`: the totals are summed from a
+  0.1 g grid, and the shared 1e-6 epsilon is what makes the bar redden on exactly
+  the days the count above it counts). Suppressed in the YEAR view, where the
+  buckets are monthly averages and a DAILY limit is not their reference —
+  Android's `showLimitLine = !isYear`, restated. `Color.red`, not Android's
+  hand-tuned hex: this screen already reads the system semantic colours. The
+  chart moved into an extension, because it pushed the view past SwiftLint's
+  `type_body_length`.
+- **Fixed: a restored iPhone silently hid its own history (twelfth QA round).**
+  The first-launch seed that gives a new installation a statistics floor was
+  triggered by `readFromDisk()` returning nil — which means absent, unreadable,
+  wrong key, OR tampered — while its own documentation said, correctly, that only
+  the FILE'S ABSENCE is an honest signal for "this user has never been asked".
+  The gap is reachable: the preferences key is `ThisDeviceOnly`, so restoring a
+  device backup onto a new phone brings `prefs.bin` back without the key that
+  opens it. A user who had opted their log into the device backup then got their
+  whole restored history floored at the RESTORE date — every statistic silently
+  starting today, with nothing on screen to say why. `load()` now probes
+  `fileExists` before reading, which is the signal the documentation always
+  claimed and the same one `AppDatabase.openOrCreate` uses for the preset drinks.
+  A file that exists has been written by this app; whatever went wrong with it,
+  its owner HAS been asked, so the defaults — no floor, the whole history — are
+  the honest answer, and the real settings come back through the JSON backup,
+  which is the supported path. Two tests pin it, including that an unreadable
+  file is not rewritten: the seed persists what it seeds, so seeding there would
+  have destroyed the very bytes a future key recovery would need.
+- **iOS accessibility labels are enforced, not remembered (twelfth QA round).**
+  `release-check.sh` §13 has failed the Android build for an interactive
+  `IconButton` whose icon carries `contentDescription = null` since its own
+  review rounds. The iOS side had no counterpart — the convention held because
+  somebody remembered it. All eleven icon-only buttons were in fact labelled;
+  nothing was watching, and a rule enforced on one platform and remembered on the
+  other is how two platforms drift. `tools/check-ios-a11y.py` is that
+  counterpart: brace-aware like the Android scanner, it isolates each `Button`
+  with its argument list, its closures and its trailing modifier chain (where the
+  label almost always sits) and reports one only when the label is an `Image`,
+  carries no `Text` or `Label`, and no `.accessibilityLabel` is attached. It
+  skips gracefully when `ios/Potillus/` is absent, and is wired into
+  `make check-ios-static`. Probed before being believed: a violation planted in
+  two different files and two different `Button` shapes made it fire, and its
+  removal made it silent again. Decorative images outside a Button are
+  deliberately not checked — they are furniture, not controls, and Android's gate
+  draws the same line.
+- **Documentation and gate corrections (twelfth QA round).** Removing the
+  combined `res/raw/copyright.md` earlier in this cycle left references to it
+  behind in five places, each now describing a file that no longer exists:
+  `DocumentViewerScreen.swift`'s header still called the screen the viewer of
+  COPYING.md-plus-the-GPL (Android's KDoc for the same role had been brought up to
+  date; the iOS twin had not), `PdfReportBuilder` pointed at a Makefile note that
+  had moved, `MarkdownText`'s thematic-break branch justified itself by that
+  document's three concatenated parts, and `release-check.sh` twice listed it
+  among "excluded" verbatim texts — which the markdown check does not exclude so
+  much as never name, since it runs over an explicit file list. The break branch
+  STAYS: no document the app now bundles contains a rule, but
+  `render-copyright.py` keeps its concatenation ability and still joins with
+  exactly that separator, so the day a build passes it two inputs again the seam
+  must not surface as three hyphens. `.gitignore` said the iOS licence copy is
+  generated from COPYING.md; the Makefile says `LICENSE.md`. `render-copyright.py`'s
+  docstring made its "single source of truth" point twice.
+  `check-ui-string-parity` scanned `AboutScreen.swift`, which is fixed English by
+  design, and so reported its "Open-source components" heading as an iOS label
+  drifting from an Android string — an invitation to map a legal heading onto a
+  translation, which is the exact outcome that screen exists to prevent; it now
+  mirrors `check-l10n.py`'s `UNLOCALISED_VIEWS`, and the other five advisory
+  findings are untouched. One "licence" survived this cycle's spelling sweep, in
+  an `AboutScreen.swift` comment. And two claims in the best-practices
+  self-assessment had gone stale: `OSPS-LE-03.02` still offered
+  `res/raw/copyright.md` "shown in-app" as its evidence — the criterion is still
+  met, but by three bundled verbatim licences and an About screen that states the
+  GPL notice and the App Store Distribution Exception in full — and the
+  internationalization answer counted 22 locales where the app ships 21 (20
+  translations plus the English base), the figure `release-check.sh` §4 and
+  `check-ios-metadata` both use.
 - **The English store notes say what this release actually became.** They were
   last written when 0.83.0 was half its present size, and four user-visible things
   had landed since without reaching them: the iOS calendar could not add an entry
