@@ -259,7 +259,13 @@ two stores' notes need not match).
   And one member of `CalendarState` was documented, commented and used, but never
   declared: the edit meant to add it silently matched nothing, and every gate
   passed on a file that could not compile. The Swift compiler was the first thing
-  in the chain able to notice.
+  in the chain able to notice, and it found three more of the same shape in
+  CalendarModelTests, all from one careless edit: a multi-line function signature
+  cut after two lines, a `@discardableResult` separated from the function it
+  qualified, and the orphan then carried forward into the repair. The file was
+  rebuilt from its last good state instead, and diffed against it: every one of the
+  22 existing tests word for word unchanged, the fixtures untouched but for the one
+  argument that had to be added.
 - **The overflow menu ends with About, and Help and About share their glyphs
   across platforms.** The menu now reads Settings, Help, "Lock app", About on
   both platforms: About is looked up once, not daily, so it yields the prime

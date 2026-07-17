@@ -132,8 +132,6 @@ final class CalendarModelTests: XCTestCase {
         XCTAssertEqual(model.state.drinks.map(\.name), ["Pils"])
     }
 
-    @discardableResult
-
     // ── MonthGrid, the pure part ─────────────────────────────────────────────
 
     /// 1 January 2026 is a Thursday.
@@ -399,15 +397,6 @@ final class CalendarModelTests: XCTestCase {
 
         XCTAssertNil(model.state.summaries["2026-01-15"], "a stopped observation still fired")
     }
-
-    ) async throws {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if condition() { return }
-            try await Task.sleep(nanoseconds: 5_000_000)
-        }
-        XCTFail("condition not met within \(timeout) s")
-    }
 }
 
 // Fixtures live in an extension, as in TodayModelTests: SwiftLint's
@@ -425,6 +414,8 @@ extension CalendarModelTests {
             firstDayOfWeekIso: firstDayOfWeekIso
         )
     }
+
+    @discardableResult
     private func addEntry(on date: String, grams: Double, at millis: Int64) throws -> Int64 {
         try environment.entries.add(
             ConsumptionEntry(
@@ -433,8 +424,17 @@ extension CalendarModelTests {
             )
         )
     }
+
     /// Polls the main actor until `condition` holds. The observation is a stream, so
     /// there is no completion to await; a fixed sleep would be flaky.
     private func waitUntil(
         timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return }
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        XCTFail("condition not met within \(timeout) s")
+    }
 }
