@@ -31,7 +31,7 @@ import XCTest
 // DocumentViewerParseTests – the small Markdown pass behind Help and Copyright
 // =============================================================================
 //
-// The guide and the licence are hard-wrapped Markdown files. The viewer's first
+// The guide and the license are hard-wrapped Markdown files. The viewer's first
 // version turned every SOURCE LINE into its own paragraph block, so the screen
 // showed ragged shreds of sentences with a gap after each (0.83.0 QA round).
 // These tests pin the joining rules: consecutive non-blank lines are ONE

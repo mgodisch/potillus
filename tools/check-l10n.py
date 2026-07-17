@@ -69,11 +69,11 @@ LITERAL = re.compile(CALLS + r'\(\s*"([^"]+)"', re.DOTALL)
 #
 #   Localization.swift  the lookup itself: its literals ARE the keys.
 #   AboutScreen.swift   an English legal document. Its body is the GPL notice and
-#                       the App Store Distribution Exception, verbatim; licence
-#                       text is a legal artifact, and a translated licence is not
-#                       the licence. Once the prose is fixed English, translating
+#                       the App Store Distribution Exception, verbatim; license
+#                       text is a legal artifact, and a translated license is not
+#                       the license. Once the prose is fixed English, translating
 #                       the headings AROUND it would give a screen that switches
-#                       language halfway down — so the chapter titles ("Licence",
+#                       language halfway down — so the chapter titles ("License",
 #                       "Open-source components"), the "Version" row and the
 #                       screen's own navigation title are English too. The
 #                       OVERFLOW-MENU entry that leads there IS localised, in

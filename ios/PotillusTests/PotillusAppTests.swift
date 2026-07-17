@@ -74,28 +74,28 @@ final class PotillusAppTests: XCTestCase {
 
     // ── About screen ─────────────────────────────────────────────────────────
     //
-    // COPYING.md requires the GRDB licence to appear in the about screen verbatim.
+    // COPYING.md requires the GRDB license to appear in the about screen verbatim.
     // These guard the text against a well-meaning edit that would quietly break the
-    // one licence obligation the app carries.
+    // one license obligation the app carries.
 
-    func testGrdbLicenceCarriesTheCopyrightLine() {
+    func testGrdbLicenseCarriesTheCopyrightLine() {
         XCTAssertTrue(AppInfo.grdbLicense.hasPrefix("Copyright (C) 2015-2025 Gwendal Roué"))
     }
 
-    func testGrdbLicenceCarriesThePermissionGrant() {
+    func testGrdbLicenseCarriesThePermissionGrant() {
         XCTAssertTrue(
             AppInfo.grdbLicense.contains("Permission is hereby granted, free of charge")
         )
     }
 
-    func testGrdbLicenceCarriesTheWarrantyDisclaimer() {
+    func testGrdbLicenseCarriesTheWarrantyDisclaimer() {
         XCTAssertTrue(AppInfo.grdbLicense.contains(#"THE SOFTWARE IS PROVIDED "AS IS""#))
         XCTAssertTrue(AppInfo.grdbLicense.contains("DEALINGS IN THE SOFTWARE."))
     }
 
-    /// The line continuations that fold the licence into source must not leave
+    /// The line continuations that fold the license into source must not leave
     /// double spaces or broken words: the reproduced text has to read as the original.
-    func testGrdbLicenceHasNoBrokenJoins() {
+    func testGrdbLicenseHasNoBrokenJoins() {
         XCTAssertFalse(AppInfo.grdbLicense.contains("  "))
     }
 

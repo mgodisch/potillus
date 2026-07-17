@@ -117,7 +117,7 @@ ICON_FG = (
 ICON_BG = "#1A1E2B"
 
 # The GPLv3 "Free as in Freedom" license badge (red variant), inlined as a small
-# corner badge. Source/licence are credited in COPYING.md.
+# corner badge. Source/license are credited in COPYING.md.
 GPL_LOGO = REPO_ROOT / "fastlane" / "gpl-v3-logo.svg"
 
 # The per-locale "Get it on F-Droid" badge (fdroid/get-it-on-<lang>.svg), placed

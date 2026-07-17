@@ -228,7 +228,7 @@ final class ReportRendererTests: XCTestCase {
 
     // ── Individual values ────────────────────────────────────────────────────
 
-    func testTheLicenceFooterIsEnglishAndNamesTheSystem() {
+    func testTheLicenseFooterIsEnglishAndNamesTheSystem() {
         let footer = ReportLabels.footer2(appVersion: "0.81.0", systemVersion: "17.4")
         XCTAssertTrue(footer.contains("v0.81.0"))
         XCTAssertTrue(footer.contains("iOS 17.4"))

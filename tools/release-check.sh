@@ -1139,7 +1139,7 @@ check_backup_version() {
 # SECTION 9 – MARKDOWN SYNTAX
 #
 # WHY THIS MATTERS:
-#   The in-app guide/licence viewer renders Markdown with a small, permissive
+#   The in-app guide/license viewer renders Markdown with a small, permissive
 #   in-house renderer.  A stray emphasis marker — an asterisk or underscore
 #   meant literally but left outside an inline-code span — silently becomes
 #   italics/bold there.  Generic Markdown tools do not catch this (renderers

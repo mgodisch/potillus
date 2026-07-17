@@ -53,26 +53,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
+import de.godisch.potillus.ui.component.SectionCard
 
 // =============================================================================
-// AboutScreen — the app's name, version, and the licences it must show.
+// AboutScreen — the app's name, version, and the licenses it must show.
 //
 // Reached from the overflow menu. The twin of the iOS AboutScreen: same
 // chapters, same wording, same order. What differs is the component list, and
 // only because the two packages genuinely contain different libraries.
 //
 // WHY THE WHOLE SCREEN IS ENGLISH, NOT LOCALISED
-//   Licence text is a legal artifact: paraphrasing or machine-translating it
-//   changes its meaning, and a translated licence is not the licence. Once the
-//   licence prose is fixed English, translating the labels AROUND it would give
+//   License text is a legal artifact: paraphrasing or machine-translating it
+//   changes its meaning, and a translated license is not the license. Once the
+//   license prose is fixed English, translating the labels AROUND it would give
 //   a screen that switches language halfway down. So the whole body is fixed
 //   English string literals — the same treatment the codebase gives fixed tokens
 //   like Text("ml"). Only the TITLE IN THE OVERFLOW MENU is localised (R.string
-//   .about, "Über" in German): that label is navigation, not licence text, and a
+//   .about, "Über" in German): that label is navigation, not license text, and a
 //   user has to recognise it to get here. The screen's own top bar then says
 //   "About", in English, because it is the first line of an English document.
 //
-// WHY THE LICENCE CHAPTER IS NOT THE FILE HEADER VERBATIM
+// WHY THE LICENSE CHAPTER IS NOT THE FILE HEADER VERBATIM
 //   The first three paragraphs are exactly the GPL notice every source file
 //   carries. The fourth is not: the file headers end with a POINTER — "any such
 //   permissions ... are stated in the accompanying COPYING.md file" — which made
@@ -91,12 +92,12 @@ import de.godisch.potillus.R
 // =============================================================================
 
 /**
- * The About screen: the app's name and version, its licence stated in full, and
- * the licences of the components compiled into the APK — each linking to its
+ * The About screen: the app's name and version, its license stated in full, and
+ * the licenses of the components compiled into the APK — each linking to its
  * verbatim text. Twin of the iOS AboutScreen.
  *
  * @param onOpenGpl3    Invoked for the "GNU General Public License" link in the
- *                      Licence chapter (pushes `R.raw.license_gpl3`).
+ *                      License chapter (pushes `R.raw.license_gpl3`).
  * @param onOpenApache2 Invoked for the "Apache License 2.0" link (pushes
  *                      `R.raw.license_apache2`).
  * @param onOpenGpl2    Invoked for the "GNU General Public License, version 2"
@@ -162,63 +163,65 @@ fun AboutScreen(
 
             HorizontalDivider()
 
-            SectionHeading("Licence")
-            // Paragraphs one to three: the GPL notice, word for word as every
-            // source file carries it.
-            BodyText(
-                "This program is free software: you can redistribute it and/or " +
-                    "modify it under the terms of the GNU General Public License as " +
-                    "published by the Free Software Foundation, either version 3 of " +
-                    "the License, or (at your option) any later version.",
-            )
-            BodyText(
-                "This program is distributed in the hope that it will be useful, " +
-                    "but WITHOUT ANY WARRANTY; without even the implied warranty of " +
-                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the " +
-                    "GNU General Public License for more details.",
-            )
-            BodyText(
-                "You should have received a copy of the GNU General Public License " +
-                    "along with this program. If not, see https://www.gnu.org/licenses/.",
-            )
-            // Paragraph four: the exception itself, from COPYING.md.
-            BodyText(
-                "As an additional permission under section 7 of the GNU General " +
-                    "Public License, version 3, you are allowed to distribute the " +
-                    "software through an app store, even if that store has " +
-                    "restrictive terms and conditions that are incompatible with the " +
-                    "GPL, provided that the source is also available under the GPL " +
-                    "with or without this permission through a channel without those " +
-                    "restrictive terms and conditions.",
-            )
-            LicenceLink("GNU General Public License", onOpenGpl3)
+            SectionHeading("License")
+            SectionCard {
+                // Paragraphs one to three: the GPL notice, word for word as every
+                // source file carries it.
+                BodyText(
+                    "This program is free software: you can redistribute it and/or " +
+                        "modify it under the terms of the GNU General Public License as " +
+                        "published by the Free Software Foundation, either version 3 of " +
+                        "the License, or (at your option) any later version.",
+                )
+                BodyText(
+                    "This program is distributed in the hope that it will be useful, " +
+                        "but WITHOUT ANY WARRANTY; without even the implied warranty of " +
+                        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the " +
+                        "GNU General Public License for more details.",
+                )
+                BodyText(
+                    "You should have received a copy of the GNU General Public License " +
+                        "along with this program. If not, see https://www.gnu.org/licenses/.",
+                )
+                // Paragraph four: the exception itself, from COPYING.md.
+                BodyText(
+                    "As an additional permission under section 7 of the GNU General " +
+                        "Public License, version 3, you are allowed to distribute the " +
+                        "software through an app store, even if that store has " +
+                        "restrictive terms and conditions that are incompatible with the " +
+                        "GPL, provided that the source is also available under the GPL " +
+                        "with or without this permission through a channel without those " +
+                        "restrictive terms and conditions.",
+                )
+                LicenseLink("GNU General Public License v3", onOpenGpl3)
+            }
 
             HorizontalDivider()
 
             SectionHeading("Open-source components")
-            BodyText(
-                "The libraries below are compiled into this application and are " +
-                    "therefore redistributed with it.",
-            )
-            BodyText(
-                "Under the Apache License 2.0: AndroidX / Jetpack (Copyright © The " +
-                    "Android Open Source Project); the Kotlin standard library and " +
-                    "the kotlinx libraries (Copyright © JetBrains s.r.o. and " +
-                    "contributors); Okio (Copyright © Square, Inc.); Guava " +
-                    "ListenableFuture (Copyright © The Guava Authors); and JSpecify " +
-                    "(Copyright © The JSpecify Authors).",
-            )
-            LicenceLink("Apache License 2.0", onOpenApache2)
-            BodyText(
-                "Under the GNU General Public License, version 2, with the OpenJDK " +
-                    "Classpath Exception: desugar_jdk_libs (Copyright © Oracle and/or " +
-                    "its affiliates and The Android Open Source Project). Only the " +
-                    "backported java.time classes selected by core-library desugaring " +
-                    "are included. The Classpath Exception permits linking these " +
-                    "classes into an independent work without extending the GPLv2 to " +
-                    "it.",
-            )
-            LicenceLink("GNU General Public License, version 2", onOpenGpl2)
+            SectionCard {
+                BodyText(
+                    "Under the Apache License 2.0: AndroidX / Jetpack (Copyright © The " +
+                        "Android Open Source Project); the Kotlin standard library and " +
+                        "the kotlinx libraries (Copyright © JetBrains s.r.o. and " +
+                        "contributors); Okio (Copyright © Square, Inc.); Guava " +
+                        "ListenableFuture (Copyright © The Guava Authors); and JSpecify " +
+                        "(Copyright © The JSpecify Authors).",
+                )
+                LicenseLink("Apache License 2.0", onOpenApache2)
+            }
+            SectionCard {
+                BodyText(
+                    "Under the GNU General Public License, version 2, with the OpenJDK " +
+                        "Classpath Exception: desugar_jdk_libs (Copyright © Oracle and/or " +
+                        "its affiliates and The Android Open Source Project). Only the " +
+                        "backported java.time classes selected by core-library desugaring " +
+                        "are included. The Classpath Exception permits linking these " +
+                        "classes into an independent work without extending the GPLv2 to " +
+                        "it.",
+                )
+                LicenseLink("GNU General Public License v2", onOpenGpl2)
+            }
         }
     }
 }
@@ -234,16 +237,20 @@ private fun SectionHeading(text: String) {
 }
 
 /**
- * One paragraph of the screen's fixed English prose. Body text, NOT monospaced:
- * these are sentences to read, not a code listing.
+ * One paragraph of the screen's fixed English prose.
+ *
+ * Body text, NOT monospaced: these are sentences to read, not a code listing.
+ * And bodyMedium, matching [MarkdownText] — the license viewers this screen
+ * links to render their text at that size, so tapping a link must not appear to
+ * change the typeface.
  */
 @Composable
 private fun BodyText(text: String) {
-    Text(text = text, style = MaterialTheme.typography.bodySmall)
+    Text(text = text, style = MaterialTheme.typography.bodyMedium)
 }
 
 /**
- * A tappable line that opens a verbatim licence text.
+ * A tappable line that opens a verbatim license text.
  *
  * A [TextButton] rather than an inline `AnnotatedString` link: the paragraphs
  * above are fixed literals, and threading a `LinkAnnotation` through them would
@@ -251,7 +258,7 @@ private fun BodyText(text: String) {
  * the document and is a bigger touch target.
  */
 @Composable
-private fun LicenceLink(text: String, onClick: () -> Unit) {
+private fun LicenseLink(text: String, onClick: () -> Unit) {
     TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Text(text)
     }

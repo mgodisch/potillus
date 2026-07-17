@@ -11,9 +11,9 @@ Apparence
 
 Langue et à propos
 • Vous pouvez désormais régler la langue de l’application sur « (Système) » pour suivre celle de l’appareil, et revenir en arrière à tout moment dans les Réglages.
-• Le menu propose maintenant un écran « À propos » avec la version, la licence de l’application et ses composants open source, et un lien vers le texte complet de la licence.
+• Le menu propose maintenant un écran « À propos » avec la version, la license de l’application et ses composants open source, et un lien vers le texte complet de la license.
 
 Corrections
 • Les messages de sauvegarde et d’importation apparaissent désormais dans la langue de l’application.
-• Le guide intégré et le texte de licence s’affichent en paragraphes propres.
+• Le guide intégré et le texte de license s’affichent en paragraphes propres.
 • La date de début des statistiques peut toujours être modifiée à nouveau.

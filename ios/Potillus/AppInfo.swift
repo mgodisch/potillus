@@ -48,12 +48,12 @@ enum AppInfo {
         return String(version.prefix(while: { $0 != "-" }))
     }
 
-    /// GRDB's licence, reproduced verbatim from the project's LICENSE file
+    /// GRDB's license, reproduced verbatim from the project's LICENSE file
     /// (github.com/groue/GRDB.swift). COPYING.md requires the iOS app to show this
     /// in its about screen before release; GRDB is the app's one third-party
     /// dependency, MIT-licensed and compatible with the GPL v3 the app ships under.
     /// The text is stored exactly as published — copyright line, permission grant,
-    /// and warranty disclaimer — because a licence quoted loosely is not the licence.
+    /// and warranty disclaimer — because a license quoted loosely is not the license.
     static let grdbLicense = """
         Copyright (C) 2015-2025 Gwendal Roué
 

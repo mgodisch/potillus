@@ -64,7 +64,7 @@ Swift Package Manager. `ios/PotillusKit/Package.resolved` records the exact
 revision and **is committed on purpose**: a checkout of this repository must
 build the same bytes as the release, the same reason the Android build pins its
 dependency versions. Run `swift package update` deliberately, and review the
-resulting diff. GRDB is recorded in `COPYING.md`; its MIT licence text must be
+resulting diff. GRDB is recorded in `COPYING.md`; its MIT license text must be
 reproduced in the app's about screen before the first App Store submission.
 
 ---
@@ -73,7 +73,7 @@ reproduced in the app's about screen before the first App Store submission.
 
 1. Install **Xcode 26** from the App Store (a multi-gigabyte download).
 2. Launch it once so it finishes installing its components, and accept the
-   licence:
+   license:
 
         sudo xcodebuild -license accept
 

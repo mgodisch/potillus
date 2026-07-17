@@ -61,8 +61,8 @@ import kotlinx.coroutines.withContext
  * It backs two kinds of destination:
  *   - **Help**       → the localized user guide `R.raw.usersguide`, rendered as
  *                      Markdown ([renderAsMarkdown] = true).
- *   - **Licences**   → `R.raw.license_gpl3` / `license_apache2` / `license_gpl2`,
- *                      each a verbatim copy of a project-root licence file,
+ *   - **Licenses**   → `R.raw.license_gpl3` / `license_apache2` / `license_gpl2`,
+ *                      each a verbatim copy of a project-root license file,
  *                      linked from the About screen. Rendered as Markdown too:
  *                      the texts are plain prose and degrade gracefully.
  *
@@ -73,9 +73,9 @@ import kotlinx.coroutines.withContext
  *   already reflects the chosen language, so `openRawResource(R.raw.usersguide)`
  *   returns the matching `raw-<locale>` variant automatically — and falls back
  *   to the default `raw/` (English) for languages without a translated guide.
- *   The licence texts exist only as the default `raw/license_*.md`, so they are
+ *   The license texts exist only as the default `raw/license_*.md`, so they are
  *   always shown in their original (English) form, as intended: a translated
- *   licence is not the licence.
+ *   license is not the license.
  *
  * The content is read with [produceState] on [Dispatchers.IO] and cached for the
  * lifetime of the composition (re-read only when `rawRes` changes). The raw
@@ -85,7 +85,7 @@ import kotlinx.coroutines.withContext
  * @param title           Top-bar title, ALREADY RESOLVED. A plain String, not a
  *                        `@StringRes` id, because the two kinds of caller differ:
  *                        the guide passes a localized `stringResource`, while the
- *                        licence viewers pass fixed English literals — their
+ *                        license viewers pass fixed English literals — their
  *                        titles name legal documents and are not translated. This
  *                        is also the signature the iOS `DocumentViewerScreen`
  *                        already has.

@@ -107,7 +107,7 @@ endif
 # moment it reads the rule, and at this line GUIDE_OUTPUTS (defined in guides.d)
 # is still empty, so `$(GUIDE_OUTPUTS)` written here would silently contribute
 # nothing (found in the v0.81.0 QA review with `make -p`).
-prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar $(LICENCE_OUTPUTS) release-check
+prereq: java android gradlew gradle/wrapper/gradle-wrapper.jar $(LICENSE_OUTPUTS) release-check
 
 java:
 	# Require Java $(JAVA_VERSION). Print the active version first so a mismatch --
@@ -122,13 +122,13 @@ android: \
 	${ANDROID_HOME}/platforms/android-35 \
 	${ANDROID_HOME}/platforms/android-36
 
-# The in-app About screen links to the verbatim licence texts, one bundled
-# document per licence, each a byte-for-byte copy of a project-root file:
+# The in-app About screen links to the verbatim license texts, one bundled
+# document per license, each a byte-for-byte copy of a project-root file:
 #
-#     raw/license_gpl3.md    ← LICENSE.md            – the app's own licence,
-#                              linked from the About screen's "Licence" chapter
+#     raw/license_gpl3.md    ← LICENSE.md            – the app's own license,
+#                              linked from the About screen's "License" chapter
 #     raw/license_apache2.md ← LICENSE.Apache-2.0.md – bundled because Apache-2.0
-#                              §4(a) requires shipping a copy of the licence
+#                              §4(a) requires shipping a copy of the license
 #                              alongside the Apache-licensed runtime libraries
 #                              compiled into the APK (AndroidX, the Kotlin
 #                              runtime, Okio, Guava ListenableFuture, JSpecify)
@@ -139,25 +139,25 @@ android: \
 # See the "Third-Party Software (bundled in the Android App)" section of
 # COPYING.md for what each covers.
 #
-# WHY ONE FILE PER LICENCE, AND NOT ONE COMBINED DOCUMENT
+# WHY ONE FILE PER LICENSE, AND NOT ONE COMBINED DOCUMENT
 #   Until 0.83.0 these were concatenated into a single raw/copyright.md that the
 #   app showed whole. That document was built from COPYING.md on BOTH platforms,
 #   so the APK carried GRDB's MIT notice for a library it does not ship, and the
 #   iOS app carried the Apache text for libraries it does not have. Splitting the
-#   texts lets each app bundle exactly the licences it is obliged to reproduce,
+#   texts lets each app bundle exactly the licenses it is obliged to reproduce,
 #   and lets the About screen link a reader straight to the one they asked for
 #   instead of dropping them at the top of a 47 kB scroll.
 #
 # WHY raw/ AND NOT raw-<locale>/
 #   The DEFAULT raw/ (not locale-qualified), so R.raw.license_* resolves to the
-#   same English legal text for every locale: licence text is deliberately NOT
-#   translated, because a translated licence is not the licence.
+#   same English legal text for every locale: license text is deliberately NOT
+#   translated, because a translated license is not the license.
 #
 # Each copy is delegated to tools/render-copyright.py rather than `cp`: with a
 # single input the script emits the file verbatim, but it also pins LF line
 # endings on every platform, so this rule, its check-guides verification and the
-# Gradle generateLicenceDocuments tasks can never disagree about the bytes.
-LICENCE_OUTPUTS := \
+# Gradle generateLicenseDocuments tasks can never disagree about the bytes.
+LICENSE_OUTPUTS := \
 	app/src/main/res/raw/license_gpl3.md \
 	app/src/main/res/raw/license_apache2.md \
 	app/src/main/res/raw/license_gpl2.md
@@ -364,7 +364,7 @@ clean: prereq
 	./gradlew clean
 
 distclean: clean
-	rm -f $(LICENCE_OUTPUTS)
+	rm -f $(LICENSE_OUTPUTS)
 	rm app/src/main/res/raw*/usersguide.md
 	rm -f guides.d
 

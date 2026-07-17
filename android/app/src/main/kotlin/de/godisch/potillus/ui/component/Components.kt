@@ -36,6 +36,7 @@ package de.godisch.potillus.ui.component
 //
 // FILE ORGANISATION:
 //   Each section contains composables or helpers for one concern:
+//     - Section card               (Settings, About, Stats, Calendar, Drinks)
 //     - Category icon              (DrinkCategory → Material icon)
 //     - Favourites quick bar       (TodayScreen & CalendarScreen)
 //     - Entry list item            (TodayScreen & CalendarScreen)
@@ -79,6 +80,45 @@ import de.godisch.potillus.ui.theme.warningColor
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+
+// ════════════════════════════════════════════════════════════════════════════
+// SECTION CARD
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * The app's neutral grouping card: a surface-coloured [Card] with a 1dp lift and
+ * 16dp of inner padding, holding rows that belong together.
+ *
+ * WHY THIS EXISTS
+ *   Every screen wanted this card and three of them wrote it out by hand
+ *   (SettingsScreen's private `SettingsCard`, DrinksScreen, [EntryListItem]),
+ *   while StatsScreen and CalendarScreen wrote a bare `Card(modifier = ...)` and
+ *   silently got a DIFFERENT one: Material 3's default container colour is not
+ *   `surface`, so those screens' cards did not match the rest of the app. That
+ *   was a forgotten argument, not a decision — the kind of drift a shared
+ *   component prevents by construction.
+ *
+ * WHEN NOT TO USE IT
+ *   For a card meant to STAND OUT — TodayScreen's daily summary,
+ *   CalendarScreen's selected-day panels — which deliberately use
+ *   `primaryContainer`. This one is the quiet default; those are the accents.
+ *
+ * @param modifier Applied to the card. Defaults to full width.
+ * @param content  The card body, laid out in a [Column] with 16dp padding.
+ */
+@Composable
+fun SectionCard(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+    ) {
+        Column(Modifier.padding(16.dp), content = content)
+    }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // CATEGORY ICON
@@ -252,6 +292,9 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
         val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.timestampMillis), ZoneId.systemDefault())
         "%02d:%02d".format(ldt.hour, ldt.minute)
     }
+    // Not [SectionCard]: this row wants 12dp of vertical padding, not the card's
+    // standard 16dp, and it lays its content out as a Row rather than a Column.
+    // Same colours and lift, deliberately.
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

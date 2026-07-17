@@ -11,9 +11,9 @@ Vzhled
 
 Jazyk a o aplikaci
 • Jazyk aplikace nyní můžete nastavit na „(Systém)“, aby sledoval jazyk zařízení, a kdykoli se vrátit zpět v Nastavení.
-• Nabídka nyní obsahuje obrazovku „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text licence.
+• Nabídka nyní obsahuje obrazovku „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text license.
 
 Opravy
 • Zprávy zálohování a importu se nyní zobrazují v jazyce aplikace.
-• Vestavěný průvodce a text licence se nyní čtou jako čisté odstavce.
+• Vestavěný průvodce a text license se nyní čtou jako čisté odstavce.
 • Počáteční datum statistik lze vždy znovu změnit.

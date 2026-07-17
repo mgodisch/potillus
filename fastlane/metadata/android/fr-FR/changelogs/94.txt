@@ -1,5 +1,5 @@
 Nouveau : définissez la langue de l’application sur « (Système) » pour suivre celle de l’appareil, et revenez en arrière à tout moment (Réglages → Apparence → Langue).
 
-L’entrée « Copyright » du menu devient un écran « À propos » avec la version, la licence de l’application et ses composants open source, et un lien vers le texte complet de la licence.
+L’entrée « Copyright » du menu devient un écran « À propos » avec la version, la license de l’application et ses composants open source, et un lien vers le texte complet de la license.
 
 Plus des améliorations internes.

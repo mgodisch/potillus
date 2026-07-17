@@ -45,7 +45,7 @@ WHAT IT EMITS
         passed in), the same projectType Android uses.
       - components: one entry per pin in Package.resolved — for GRDB, a library
         component with a pkg:swift purl, the resolved version, the commit as a
-        source-control reference, and its MIT licence.
+        source-control reference, and its MIT license.
     The timestamp is left to sbom-normalize.py (dropped, or set from
     SOURCE_DATE_EPOCH), exactly as the Android SBOM is normalised, so both are
     byte-reproducible.
@@ -61,11 +61,11 @@ import json
 import sys
 from pathlib import Path
 
-# The licence each known dependency ships under, by Package.resolved identity.
+# The license each known dependency ships under, by Package.resolved identity.
 # GRDB is MIT (recorded in COPYING.md). A pin not listed here still appears in
-# the SBOM, without a licence field, and the generator warns — so a newly added
+# the SBOM, without a license field, and the generator warns — so a newly added
 # dependency cannot slip in silently unlicensed.
-KNOWN_LICENCES = {
+KNOWN_LICENSES = {
     "grdb.swift": "MIT",
 }
 
@@ -107,13 +107,13 @@ def component_for(pin: dict) -> dict:
         component["externalReferences"] = [
             {"type": "vcs", "url": f"{location}@{revision}"},
         ]
-    licence = KNOWN_LICENCES.get(identity)
-    if licence:
-        component["licenses"] = [{"license": {"id": licence}}]
+    license = KNOWN_LICENSES.get(identity)
+    if license:
+        component["licenses"] = [{"license": {"id": license}}]
     else:
         sys.stderr.write(
-            f"gen-ios-sbom.py: warning: no licence recorded for {identity!r}; "
-            "add it to KNOWN_LICENCES and COPYING.md\n"
+            f"gen-ios-sbom.py: warning: no license recorded for {identity!r}; "
+            "add it to KNOWN_LICENSES and COPYING.md\n"
         )
     return component
 

@@ -71,11 +71,11 @@ under the Apache License, Version 2.0
   `org.jspecify:jspecify` (runtime-retention nullness annotations), pulled in
   transitively by the AndroidX lifecycle libraries.
 
-The full Apache-2.0 licence text is kept verbatim in the repository as
+The full Apache-2.0 license text is kept verbatim in the repository as
 `LICENSE.Apache-2.0.md` and is bundled into the APK as `res/raw/license_apache2.md`
 (a byte-for-byte copy, made at build time by `tools/render-copyright.py`), which
-the in-app About screen links to — satisfying the licence's &sect;4(a) requirement
-to give recipients a copy of the licence.
+the in-app About screen links to — satisfying the license's &sect;4(a) requirement
+to give recipients a copy of the license.
 
 Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with a
 dependency.  This is verified automatically at release time by
@@ -144,9 +144,9 @@ It has no transitive dependencies, performs no network access, and collects no
 telemetry.
 
 The MIT License requires that the copyright notice and the permission notice
-accompany the software.  The full licence text is reproduced verbatim below, and
+accompany the software.  The full license text is reproduced verbatim below, and
 the iOS about screen reproduces it inline (`AppInfo.grdbLicense`, pinned by the
-`testGrdbLicence*` smoke tests) — short enough not to need a window of its own,
+`testGrdbLicense*` smoke tests) — short enough not to need a window of its own,
 unlike the GPLv3 and Apache-2.0 texts, which the about screens link to:
 
 ```
@@ -174,7 +174,7 @@ SOFTWARE.
 Only the iOS application actually **ships** GRDB, so only it carries the MIT
 redistribution obligation.  The Android application does not distribute GRDB and
 therefore carries no MIT obligation, and since 0.83.0 it no longer shows the
-notice either: each app now bundles exactly the licences it is obliged to
+notice either: each app now bundles exactly the licenses it is obliged to
 reproduce, rather than a combined document built from this file on both
 platforms — which had the APK carrying GRDB's MIT notice for a library it does
 not ship, and the iOS app carrying the Apache-2.0 text for libraries it does not
@@ -220,7 +220,7 @@ flow) embed subsets of the fonts the device's WebView used to render them:
 <[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>)
 in every file, plus **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
 SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
-licences explicitly permit embedding subsets in documents.  These PDFs are
+licenses explicitly permit embedding subsets in documents.  These PDFs are
 repository and store-listing assets and are **not** distributed inside the
 application package.
 

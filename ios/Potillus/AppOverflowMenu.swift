@@ -98,7 +98,7 @@ struct AppOverflowMenu: ViewModifier {
                             }
                         }
                         // About LAST, after the conditional "Lock app", as on
-                        // Android: version and licences are looked up once, not
+                        // Android: version and licenses are looked up once, not
                         // daily, so the entry yields the prime positions to the
                         // three that do real work.
                         Button {
@@ -134,7 +134,7 @@ struct AppOverflowMenu: ViewModifier {
             .sheet(isPresented: $showingAbout) {
                 // About is now reached from the overflow menu (as on Android),
                 // not from Settings. It carries its own stack so its "Copyright &
-                // licence" link can push the full document, and a Done button to
+                // license" link can push the full document, and a Done button to
                 // dismiss the sheet.
                 NavigationStack {
                     AboutScreen()

@@ -70,7 +70,7 @@ import de.godisch.potillus.R
  *   of any navigation dependency.
  *
  * WHY ABOUT COMES LAST
- *   It is the entry a user reaches for least often -- version and licences are
+ *   It is the entry a user reaches for least often -- version and licenses are
  *   looked up once, not daily -- so it yields the prime positions to the three
  *   entries that do real work. iOS orders the same menu identically.
  *
@@ -93,7 +93,7 @@ import de.godisch.potillus.R
  * @param onOpenHelp     Invoked when the "Help" entry is chosen (opens the
  *                       in-app user guide viewer).
  * @param onOpenAbout    Invoked when the "About" entry is chosen (opens the
- *                       About screen: version, licence and components).
+ *                       About screen: version, license and components).
  * @param onLockApp      Invoked when the "Lock app" entry is chosen (manually locks
  *                       the app). The entry is only shown when an authenticator
  *                       (biometric or device credential) is available — otherwise

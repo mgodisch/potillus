@@ -40,7 +40,7 @@ import Foundation
 // default values, not of the type.
 //
 // Two things here are deliberately NOT translated, on both platforms:
-//   - `footer2`, the licence and warranty notice. Legal boilerplate keeps its
+//   - `footer2`, the license and warranty notice. Legal boilerplate keeps its
 //     original English so its meaning never depends on translation quality; the
 //     GPL's warranty disclaimer in particular is quoted, not paraphrased.
 //   - The category KEYS. Their labels translate; the stored names do not.
@@ -143,7 +143,7 @@ public struct ReportLabels: Sendable {
         }
     }
 
-    /// The licence and warranty notice. English on both platforms, by decision.
+    /// The license and warranty notice. English on both platforms, by decision.
     ///
     /// - Parameters:
     ///   - appVersion: `MAJOR.MINOR.PATCH`, with any build suffix stripped.

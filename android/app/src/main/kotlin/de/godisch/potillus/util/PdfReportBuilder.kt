@@ -197,7 +197,7 @@ object PdfReportBuilder {
         // level so the footer never shows an empty version.
         val androidVersion = Build.VERSION.RELEASE?.takeIf { it.isNotBlank() }
             ?: Build.VERSION.SDK_INT.toString()
-        // DELIBERATELY NOT LOCALIZED: this is the report's licence/warranty
+        // DELIBERATELY NOT LOCALIZED: this is the report's license/warranty
         // notice. Like the bundled COPYING/LICENSE documents (see the Makefile
         // note on raw/copyright.md), legal boilerplate is kept in its original
         // English so its meaning never depends on translation quality; the GPL's

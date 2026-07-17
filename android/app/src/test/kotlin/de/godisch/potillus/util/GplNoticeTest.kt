@@ -44,7 +44,7 @@ class GplNoticeTest {
             lines.first(),
         )
         assertTrue(
-            "header must mention the licence",
+            "header must mention the license",
             lines.any { it.contains("GNU General Public License") },
         )
     }

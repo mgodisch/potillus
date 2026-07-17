@@ -1,5 +1,5 @@
 Novinka: jazyk aplikace můžete nastavit na „(Systém)“, aby sledoval jazyk zařízení, a kdykoli se vrátit zpět (Nastavení → Vzhled → Jazyk).
 
-Položka nabídky „Copyright“ je nyní obrazovka „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text licence.
+Položka nabídky „Copyright“ je nyní obrazovka „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text license.
 
 Navíc interní vylepšení.

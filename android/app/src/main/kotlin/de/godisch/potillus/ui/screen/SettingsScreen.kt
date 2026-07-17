@@ -191,7 +191,7 @@ fun SettingsScreen(
             // ── 1. Personal data (body weight) ──────────────────────
             item { SettingsSectionHeader(stringResource(R.string.personal_data)) }
             item {
-                SettingsCard {
+                SectionCard {
                     // LAYOUT HARDENING (v0.81.0 QA, eighth round): the label carries
                     // the weight so the fixed-size edit button is measured first and
                     // can never be pushed out of the row by a verbose translation.
@@ -213,7 +213,7 @@ fun SettingsScreen(
             // all in force simultaneously; there is no guideline mode or toggle.
             item { SettingsSectionHeader(stringResource(R.string.limits)) }
             item {
-                SettingsCard {
+                SectionCard {
                     // Daily gram limit
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -251,7 +251,7 @@ fun SettingsScreen(
             // ── 3. Statistics (day-change time + stats-start date) ────────────────
             item { SettingsSectionHeader(stringResource(R.string.statistics)) }
             item {
-                SettingsCard {
+                SectionCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.day_starts_at), style = MaterialTheme.typography.bodyMedium)
@@ -266,7 +266,7 @@ fun SettingsScreen(
                 }
             }
             item {
-                SettingsCard {
+                SectionCard {
                     Text(
                         stringResource(R.string.stats_from_desc),
                         style = MaterialTheme.typography.bodySmall,
@@ -298,7 +298,7 @@ fun SettingsScreen(
             // ── 4. Backup (JSON import/export) ─────────────────
             item { SettingsSectionHeader(stringResource(R.string.backup_section)) }
             item {
-                SettingsCard {
+                SectionCard {
                     Text(
                         stringResource(R.string.backup_desc),
                         style = MaterialTheme.typography.bodySmall,
@@ -337,7 +337,7 @@ fun SettingsScreen(
             // ── 5. Security (access lock + screenshots) ──────
             item { SettingsSectionHeader(stringResource(R.string.security)) }
             item {
-                SettingsCard {
+                SectionCard {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.biometric_lock), style = MaterialTheme.typography.bodyMedium)
@@ -366,7 +366,7 @@ fun SettingsScreen(
                 }
             }
             item {
-                SettingsCard {
+                SectionCard {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.allow_screenshots), style = MaterialTheme.typography.bodyMedium)
@@ -386,7 +386,7 @@ fun SettingsScreen(
             // ── 6. Appearance (theme + language) ──────
             item { SettingsSectionHeader(stringResource(R.string.appearance)) }
             item {
-                SettingsCard {
+                SectionCard {
                     Text(stringResource(R.string.theme_mode), style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -407,7 +407,7 @@ fun SettingsScreen(
                 }
             }
             item {
-                SettingsCard {
+                SectionCard {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(stringResource(R.string.alt_status_symbols), style = MaterialTheme.typography.bodyMedium)
@@ -425,7 +425,7 @@ fun SettingsScreen(
                 }
             }
             item {
-                SettingsCard {
+                SectionCard {
                     Text(stringResource(R.string.language), style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.height(8.dp))
                     LanguageDropdown(
@@ -662,17 +662,6 @@ private fun SettingsSectionHeader(title: String) {
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(vertical = 4.dp),
     )
-}
-
-/** Surface-coloured card wrapper that groups related settings rows. @param content The card body. */
-@Composable
-private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(Modifier.padding(16.dp), content = content)
-    }
 }
 
 /**

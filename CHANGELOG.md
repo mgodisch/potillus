@@ -58,6 +58,30 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **"licence" is now "license" everywhere, and the About screen groups each
+  license in a card.** The tree had been spelling it both ways — 159 occurrences
+  of the British form across 40 files, sitting next to the American form the GPL,
+  the Apache licence and every bundled text use themselves. The licenses win:
+  `LICENSE_OUTPUTS`, `generateLicenseDocuments`, `Screen.LicenseGpl3` and the
+  rest follow. Left alone on purpose: this changelog, which is a record of what
+  was written when, and `tools/fonts/Inter/README.txt`, which is someone else's
+  document.
+  The About screen's prose was `bodySmall` while the license viewers it links to
+  render at `bodyMedium`, so tapping a link appeared to change the typeface;
+  both are `bodyMedium` now. The links name the document — "GNU General Public
+  License v3", "Apache License 2.0", "GNU General Public License v2" — and the
+  window titles are short ("GPL 3.0", "GPL 2.0", "Apache License 2.0"), because a
+  top bar truncates and the link already said the long name. Each license now
+  sits in its own [SectionCard], which does the grouping the horizontal rules
+  were going to do. "The libraries below are compiled into this application" is
+  gone from both platforms: the cards say it.
+- **`SectionCard`: one card, instead of five screens guessing.** The app's
+  neutral grouping card — surface-coloured, 1dp lift, 16dp padding — existed
+  three times written out by hand (SettingsScreen's private `SettingsCard`,
+  DrinksScreen, `EntryListItem`). It is now a shared component in
+  `ui/component/Components.kt`. TodayScreen's daily summary and CalendarScreen's
+  selected-day panels keep `primaryContainer`: those are meant to stand out, and
+  stay accents.
 - **Fixed: a fresh iOS install counted the days before it existed as abstinent.**
   Install on the 16th, open Statistics, and the month view congratulated the user
   for fifteen dry days and drew fifteen green ticks for the 1st to the 15th —

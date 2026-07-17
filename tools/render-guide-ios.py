@@ -52,7 +52,7 @@ TOKEN -> LABEL
 OUTPUT
     For a template ``ios/docs/guide/usersguide[.<tag>].md.in`` it writes
     ``ios/Potillus/Resources/usersguide_<tag>.md`` (the bare template is English,
-    ``usersguide_en.md``), with the licence-comment header stripped so a Markdown
+    ``usersguide_en.md``), with the license-comment header stripped so a Markdown
     viewer shows clean text. The outputs are generated (gitignored), exactly like
     Resources/license_gpl3.md; the running app selects the file for its in-app
     language, with an English fallback.
@@ -125,8 +125,8 @@ def tag_for(path):
     return middle[1:] if middle.startswith(".") else "en"
 
 
-def strip_licence_header(text):
-    """Drop the leading <!-- ... --> licence block and the blank line after it."""
+def strip_license_header(text):
+    """Drop the leading <!-- ... --> license block and the blank line after it."""
     if text.startswith("<!--"):
         end = text.index("-->") + len("-->")
         text = text[end:].lstrip("\n")
@@ -136,7 +136,7 @@ def strip_licence_header(text):
 def render(strings, template_path):
     tag = tag_for(template_path)
     with open(template_path, encoding="utf-8") as handle:
-        text = strip_licence_header(handle.read())
+        text = strip_license_header(handle.read())
 
     def replace(match):
         token = match.group(1)

@@ -1327,18 +1327,18 @@ ios-project: ios-version ios/Potillus/Resources/license_gpl3.md ios-guides
 	command -v xcodegen
 	cd ios && xcodegen generate
 
-# The verbatim GPLv3 text the About screen's "Licence" chapter links to, copied
+# The verbatim GPLv3 text the About screen's "License" chapter links to, copied
 # from the project root through the SAME renderer Android uses for its raw/
 # copies, so the two platforms show byte-identical text. Generated (gitignored)
 # rather than checked in, exactly like Version.xcconfig: a copy in the tree would
 # drift from LICENSE.md.
 #
 # ONE file here, THREE on Android. The iOS app bundles only the GPLv3, because it
-# is the only licence it must reproduce: its single third-party dependency is
+# is the only license it must reproduce: its single third-party dependency is
 # GRDB, whose MIT text is short enough to sit inline in the About screen (see
 # AppInfo.grdbLicense). Android additionally bundles the Apache-2.0 and GPL-2.0
 # texts for the libraries compiled into the APK. Until 0.83.0 both platforms
-# shipped the same combined document, so each carried licences for the other's
+# shipped the same combined document, so each carried licenses for the other's
 # dependencies.
 ios/Potillus/Resources/license_gpl3.md: LICENSE.md tools/render-copyright.py
 	python3 tools/render-copyright.py $@ LICENSE.md
@@ -1521,7 +1521,7 @@ check-swift-tests:
 	python3 tools/check-swift-tests.py
 
 # check-headers: verifies that every project-owned file carries the canonical
-# licence header, including the section 7 pointer to the App Store distribution
+# license header, including the section 7 pointer to the App Store distribution
 # exception in COPYING.md. Warnings (a file with no header at all) do not fail;
 # a stale header -- GPL notice present, pointer missing -- does. Run
 # `make fix-headers` to repair those in place.

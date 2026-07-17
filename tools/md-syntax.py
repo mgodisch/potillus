@@ -27,7 +27,7 @@ md-syntax.py -- a small, dependency-free Markdown well-formedness checker for
 the documents shipped with the app.
 
 WHY THIS EXISTS
-    The in-app guide/licence viewer renders Markdown with a small, permissive
+    The in-app guide/license viewer renders Markdown with a small, permissive
     in-house renderer. A stray emphasis marker -- an asterisk or underscore
     meant literally but sitting OUTSIDE an inline-code span -- quietly turns
     into italics/bold there, even where a strict CommonMark parser would leave

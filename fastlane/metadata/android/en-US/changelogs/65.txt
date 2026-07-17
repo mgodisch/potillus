@@ -1,3 +1,3 @@
 The menu entry "License" is now "Copyright" and shows both the copyright notice
-and the full licence text. Added English and German store listings. Various
+and the full license text. Added English and German store listings. Various
 internal build and release-check improvements.

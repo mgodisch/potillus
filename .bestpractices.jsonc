@@ -347,7 +347,7 @@
   // Best Practices Badge (metal) -> gold
   "contributors_unassociated_status": "Unmet",
   // Best Practices Badge (metal) -> gold
-  "copyright_per_file_justification": "Met. Every hand-authored source file carries the project's copyright statement (\"Copyright (c) 2026 Martin A. Godisch\") in a comment header: Kotlin, Gradle Kotlin DSL, Python, shell, ProGuard, all XML resources and the manifest, the Gradle version catalog, and configuration files. The only files without one are generated artifacts (Room schema JSON, fastlane/report.xml, fastlane/README.md), vendored third-party files (the Gradle wrapper), bundled third-party fonts (which carry their own upstream licences), and pure data/metadata/binary assets (store-listing text, F-Droid packaging YAML, PDFs, lockfiles, empty placeholders) — none of which are hand-authored project source.",
+  "copyright_per_file_justification": "Met. Every hand-authored source file carries the project's copyright statement (\"Copyright (c) 2026 Martin A. Godisch\") in a comment header: Kotlin, Gradle Kotlin DSL, Python, shell, ProGuard, all XML resources and the manifest, the Gradle version catalog, and configuration files. The only files without one are generated artifacts (Room schema JSON, fastlane/report.xml, fastlane/README.md), vendored third-party files (the Gradle wrapper), bundled third-party fonts (which carry their own upstream licenses), and pure data/metadata/binary assets (store-listing text, F-Droid packaging YAML, PDFs, lockfiles, empty placeholders) — none of which are hand-authored project source.",
   // Best Practices Badge (metal) -> gold
   "copyright_per_file_status": "Met",
   // Best Practices Badge (metal) -> silver
@@ -559,7 +559,7 @@
   // Best Practices Badge (metal) -> passing
   "license_location_status": "Met",
   // Best Practices Badge (metal) -> gold
-  "license_per_file_justification": "Met. The same header that provides the copyright statement in each hand-authored source file also provides a licence statement — the GNU GPL v3-or-later grant text — which is a fuller form than an SPDX-License-Identifier line. It is present in every Kotlin, Gradle KTS, Python, shell, ProGuard, XML (resources and manifest), version-catalog, and configuration source file. The excluded categories are identical to copyright_per_file: generated files, vendored third-party files, third-party fonts, and pure data/binary assets.",
+  "license_per_file_justification": "Met. The same header that provides the copyright statement in each hand-authored source file also provides a license statement — the GNU GPL v3-or-later grant text — which is a fuller form than an SPDX-License-Identifier line. It is present in every Kotlin, Gradle KTS, Python, shell, ProGuard, XML (resources and manifest), version-catalog, and configuration source file. The excluded categories are identical to copyright_per_file: generated files, vendored third-party files, third-party fonts, and pure data/binary assets.",
   // Best Practices Badge (metal) -> gold
   "license_per_file_status": "Met",
   // Best Practices Badge (metal) -> passing

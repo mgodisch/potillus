@@ -32,7 +32,7 @@ import SwiftUI
 // read-only. The document here is copyright.md — COPYING.md and the full GPL text
 // joined at build time by tools/render-copyright.py, the SAME file Android bundles
 // as raw/copyright.md, so the two platforms show identical text. It is not locale-
-// qualified: a licence is shown in its own language.
+// qualified: a license is shown in its own language.
 // =============================================================================
 
 struct DocumentViewerScreen: View {
@@ -82,9 +82,9 @@ struct DocumentViewerScreen: View {
     // ── A deliberately small Markdown pass ───────────────────────────────────
     //
     // Android renders these documents with a full Markdown component. Here the
-    // documents are the licence and the user guide: prose with `#`/`##`/`###`
+    // documents are the license and the user guide: prose with `#`/`##`/`###`
     // headings, `---` rules, and the guide's short lists. A heavyweight parser
-    // on 60 KB earns nothing a few line rules do not, and a licence must never
+    // on 60 KB earns nothing a few line rules do not, and a license must never
     // fail to display because a parser choked. So the text becomes a sequence
     // of four block kinds — heading, rule, paragraph, or blank-separated list
     // item — and paragraphs keep any inline Markdown via SwiftUI's own
@@ -178,7 +178,7 @@ struct DocumentViewerScreen: View {
                 Divider()
             case .body:
                 // `Text(_:)` parses inline Markdown (links, emphasis) from a plain
-                // String, so licence links stay tappable without a parser.
+                // String, so license links stay tappable without a parser.
                 Text(.init(text)).font(.footnote)
             }
         }

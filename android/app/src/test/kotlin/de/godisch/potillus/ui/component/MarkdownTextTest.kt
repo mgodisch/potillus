@@ -25,7 +25,7 @@
  *
  * UNIT TEST — MarkdownText pure helpers
  *
- * The in-app guide/licence viewer renders Markdown with a tiny in-house
+ * The in-app guide/license viewer renders Markdown with a tiny in-house
  * renderer ([MarkdownText]). Its Compose-facing parts need a UI test, but its
  * parsing logic is pure and is exercised here on the JVM (no device):
  *

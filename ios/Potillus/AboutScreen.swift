@@ -26,7 +26,7 @@
 import SwiftUI
 
 // =============================================================================
-// AboutScreen — the app's name, version, and the licences it must show.
+// AboutScreen — the app's name, version, and the licenses it must show.
 //
 // Reached from the overflow menu. The twin of the Android AboutScreen: same
 // chapters, same wording, same order. What differs is the component list, and
@@ -34,17 +34,17 @@ import SwiftUI
 // ships GRDB and nothing else; the APK ships the AndroidX/Kotlin stack.
 //
 // WHY THE WHOLE SCREEN IS ENGLISH, NOT LOCALISED
-//   Licence text is a legal artifact: paraphrasing or machine-translating it
-//   changes its meaning, and a translated licence is not the licence. Once the
-//   licence prose is fixed English, translating the labels AROUND it would give a
+//   License text is a legal artifact: paraphrasing or machine-translating it
+//   changes its meaning, and a translated license is not the license. Once the
+//   license prose is fixed English, translating the labels AROUND it would give a
 //   screen that switches language halfway down. So the whole body is fixed
 //   English literals, with no `Loc.string` — until 0.83.0 this screen localised
 //   its headings while Android hard-coded the same words, which meant the two
 //   platforms answered the same question differently. Only the OVERFLOW-MENU
 //   entry stays localised ("Über" in German): that label is navigation, not
-//   licence text, and a user has to recognise it to get here.
+//   license text, and a user has to recognise it to get here.
 //
-// WHY THE LICENCE CHAPTER IS NOT THE FILE HEADER VERBATIM
+// WHY THE LICENSE CHAPTER IS NOT THE FILE HEADER VERBATIM
 //   The first three paragraphs are exactly the GPL notice every source file
 //   carries. The fourth is not: the file headers end with a POINTER — "any such
 //   permissions ... are stated in the accompanying COPYING.md file" — which made
@@ -77,7 +77,7 @@ struct AboutScreen: View {
                     .padding(.bottom, 4)
             }
 
-            Section("Licence") {
+            Section("License") {
                 // Paragraphs one to three: the GPL notice, word for word as every
                 // source file carries it.
                 AboutParagraph(
@@ -112,21 +112,15 @@ struct AboutScreen: View {
                     conditions.
                     """
                 )
-                NavigationLink("GNU General Public License") {
+                NavigationLink("GNU General Public License v3") {
                     DocumentViewerScreen(
-                        title: "GNU General Public License, version 3",
+                        title: "GPL 3.0",
                         resource: "license_gpl3"
                     )
                 }
             }
 
             Section("Open-source components") {
-                AboutParagraph(
-                    """
-                    The library below is compiled into this application and is therefore \
-                    redistributed with it.
-                    """
-                )
                 AboutParagraph(
                     """
                     Under the MIT License: GRDB.swift (Copyright © 2015–2025 Gwendal Roué). GRDB \

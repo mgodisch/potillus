@@ -25,7 +25,7 @@
 
 """
 check-headers.py -- verifies that every file the project owns carries the
-canonical licence header, and can repair the ones that do not.
+canonical license header, and can repair the ones that do not.
 
 WHY THIS EXISTS
     The header is two things at once: the GPL-3.0 notice, and -- since the
@@ -47,7 +47,7 @@ WHAT IT CHECKS
        This is a stale header, most often a file created before the exception
        existed, or copied from an older template.
 
-    2. WARNING -- a file has an extension the project normally licences, but
+    2. WARNING -- a file has an extension the project normally licenses, but
        carries no header at all.  Reported separately because the fix is a
        judgement call: some files (generated output, third-party verbatim
        text, strict JSON that cannot hold a comment) legitimately have none.
@@ -100,7 +100,7 @@ POINTER = (
     "apply to it are stated in the accompanying COPYING.md file.",
 )
 
-# A file carrying this is considered to have a licence header at all.
+# A file carrying this is considered to have a license header at all.
 GPL_MARK = "GNU General Public License"
 
 # Verbatim third-party texts and the file that *contains* the exception:
@@ -144,7 +144,7 @@ SKIP_RELATIVE = {
     "fastlane/metadata/android/screenshots.html",  # written by fastlane screengrab
 }
 
-# Extensions the project normally licences.  Used only for the WARNING pass.
+# Extensions the project normally licenses.  Used only for the WARNING pass.
 SOURCE_SUFFIXES = (
     ".kt", ".kts", ".swift", ".java", ".py", ".sh", ".md", ".xml", ".yml",
     ".yaml", ".toml", ".properties", ".pro", ".html", ".in",
@@ -282,7 +282,7 @@ def check_file(path, root, fix):
         return [f"{relative}: header lacks the section 7 pointer"], [], False
 
     if not has_gpl and path.endswith(SOURCE_SUFFIXES):
-        return [], [f"{relative}: no licence header"], False
+        return [], [f"{relative}: no license header"], False
 
     return [], [], False
 
