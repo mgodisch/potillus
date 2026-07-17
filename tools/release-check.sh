@@ -1051,14 +1051,17 @@ check_no_german_comments() {
     pattern=$(printf '%s\n' "${german_words[@]}" | paste -sd'|')
 
     local matches
-    # Scan the Kotlin sources, the Gradle build scripts, and — the convention
-    # covers "all source code … build files" (CONTRIBUTING, "English
-    # everywhere") — the Swift sources of the iOS port. Widened in the 0.83.0
-    # QA round: the German prose this gate exists for sat in build.gradle.kts,
-    # exactly the file class the old *.kt-only filter skipped. The build
-    # scripts are named explicitly (a recursive *.kts glob would descend into
-    # .gradle/ caches), the iOS root is scanned only when present so an
-    # Android-only source drop skips it gracefully, and every grep is
+    # Scan the Kotlin sources, the Gradle build scripts, the Swift sources of the
+    # iOS port, and the Python/shell tooling — the convention covers "all source
+    # code … build files" (CONTRIBUTING, "English everywhere"), and tools/ is
+    # 5,700 lines of it. Widened in the 0.83.0 QA round twice: first for the
+    # German prose that sat in build.gradle.kts, exactly the file class the old
+    # *.kt-only filter skipped; then for tools/, which the convention has always
+    # covered and no gate ever read (the thirteenth round found the scope, not a
+    # violation — tools/ was already clean, and this keeps it that way). The
+    # build scripts are named explicitly (a recursive *.kts glob would descend
+    # into .gradle/ caches), the iOS and tools roots are scanned only when
+    # present so a partial source drop skips them gracefully, and every grep is
     # `|| true`-guarded: "found nothing" is grep exit 1, which `set -e` would
     # otherwise turn into a dead gate — the §10 lesson.
     # We pipe through grep -E twice: first to find comment lines, then to find German.
@@ -1070,6 +1073,9 @@ check_no_german_comments() {
             if [[ -d ../ios ]]; then
                 grep -rn --include='*.swift' --exclude-dir='.build' \
                      --exclude-dir='DerivedData' "//" ../ios || true
+            fi
+            if [[ -d ../tools ]]; then
+                grep -rn --include='*.py' --include='*.sh' "#" ../tools || true
             fi
         } | grep -iE "\b(${pattern})\b" | head -15 || true
     )
