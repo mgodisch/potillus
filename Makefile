@@ -32,9 +32,11 @@
 #                   + debug APK, then refresh existing feature graphics
 #      ios          static checks, regenerate the Xcode project, then the kit's
 #                   tests and a simulator build of the app              [needs a Mac]
-#      check-ios-static   the Mac-free iOS static gates (Swift symbols/tests,
-#                   headers, l10n, l10n-parity, report paper). Run it on the Linux
-#                   release path so a release-check run never leaves iOS unverified
+#      check-ios-static   the Mac-free iOS static gates (Swift symbols/tests/
+#                   length, headers, makefile, l10n, l10n-parity, report paper,
+#                   guides, store metadata, accessibility labels). Run it on the
+#                   Linux release path so a release-check run never leaves iOS
+#                   unverified
 #    Convenience
 #      device-tests on-device instrumentation tests (connectedDebugAndroidTest),
 #                   split out of `android`                        [needs a device]
@@ -1385,7 +1387,7 @@ check-ios-guides:
 # skips gracefully when its inputs are absent, so this is safe in any checkout.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
-                  check-ios-guides check-ios-metadata
+                  check-ios-guides check-ios-metadata check-ios-a11y
 
 ios: check-ios-static check-swiftlint ios-project
 	@$(call require-ios-screenshots,ios)
@@ -1503,6 +1505,16 @@ check-l10n-parity:
 check-ios-metadata:
 	python3 tools/check-ios-metadata.py
 
+# check-ios-a11y: the iOS twin of release-check.sh section 13 (Android's
+# contentDescription check). A Button whose label is only an Image needs an
+# .accessibilityLabel, or VoiceOver announces nothing at all. Brace-aware, like
+# the Android scanner, and it skips gracefully when ios/Potillus/ is absent.
+# Added in the 0.83.0 QA round: the convention held on iOS only because someone
+# remembered it -- a rule enforced on one platform and remembered on the other is
+# how the two drift.
+check-ios-a11y:
+	python3 tools/check-ios-a11y.py
+
 # check-ui-string-parity: DIAGNOSTIC (not part of release-check). Reports iOS
 # labels that read differently from their Android counterpart -- the drift the
 # key-based l10n parity gate cannot see. Curated map in tools/ui-string-parity.json.
@@ -1564,4 +1576,4 @@ distclean:
 	$(MAKE) -C android $@
 	rm -f *.patch *.orig
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ui-string-parity ios-sbom ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ios-a11y check-ui-string-parity ios-sbom ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean distclean check-report-paper
