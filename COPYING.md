@@ -234,12 +234,19 @@ application package.
 
 The pre-rendered sample reports under `fastlane/report-pdf/` (one per
 store-listing language, produced on a real device by the `ReportExportTest`
-flow) embed subsets of the fonts the device's WebView used to render them:
-**Roboto** (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
-<[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>)
-in every file, plus **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
-SIL Open Font License 1.1) in the `ja`, `ko`, `zh-CN` and `zh-TW` files.  Both
-licenses explicitly permit embedding subsets in documents.  These PDFs are
+flow) embed subsets of the fonts the device's WebView used to render them.
+Which font that is depends on the script, and the two cases are exclusive —
+the WebView picks one family per document, it does not mix them:
+
+- The seventeen Latin-, Greek- and Cyrillic-script files embed **Roboto**
+  (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
+  <[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>),
+  as `Roboto-Regular` and `Roboto-Bold`.
+- The `ja`, `ko`, `zh-CN` and `zh-TW` files embed **Noto Sans CJK**
+  (Copyright &copy; Google LLC and Adobe; SIL Open Font License 1.1) — the
+  script-specific faces `NotoSansCJK{jp,kr,sc,tc}-Regular` — and **no Roboto**.
+
+Both licenses explicitly permit embedding subsets in documents.  These PDFs are
 repository and store-listing assets and are **not** distributed inside the
 application package.
 
