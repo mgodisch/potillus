@@ -70,12 +70,15 @@ two stores' notes need not match).
   its, because that rule belongs there — it separates the notice from the link to
   its full text. Android grows the same rule inside each card, above each link,
   and loses the one that sat above "Open-source components", where the heading
-  and the cards already do the separating. iOS's paragraphs were `.footnote`
-  while the "Version" row above them is `.body`, so the screen shrank below its
-  own first line; they inherit the List's default now. GRDB's MIT text loses its
-  `.footnote` and its `.secondary` grey with them: small and grey reads as a
-  disclaimer to skip, and that text is the permission notice the licence obliges
-  us to put in front of a reader.
+  and the cards already do the separating. The card gap is 12dp, matching the gap
+  the enclosing Column puts between the cards, so the rhythm does not change when
+  the eye crosses a card edge; it applies to every child alike, so the rule above
+  each link is held off the last paragraph by the same amount. iOS's paragraphs
+  were `.footnote` while the "Version" row above them is `.body`, so the screen
+  shrank below its own first line; they are `.callout` now, one step down from the
+  label they sit under rather than two. GRDB's MIT text joins them and loses its
+  `.secondary` grey: small and grey reads as a disclaimer to skip, and that text
+  is the permission notice the licence obliges us to put in front of a reader.
 - **"licence" is now "license" everywhere, and the About screen groups each
   license in a card.** The tree had been spelling it both ways — 159 occurrences
   of the British form across 40 files, sitting next to the American form the GPL,

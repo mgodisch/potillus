@@ -144,12 +144,14 @@ struct AboutScreen: View {
                 // notice to accompany the software, so the text is reproduced in
                 // full — as prose, not monospaced: it is sentences to read, not a
                 // code listing. Selectable, so a reader can lift it out verbatim.
-                // Neither .font() nor .foregroundStyle(): body text in the primary
-                // colour, like every other paragraph here. It had been small and
-                // grey, which reads as a disclaimer to skip -- but this text is the
-                // MIT License's permission notice, the thing the licence actually
-                // obliges us to put in front of a reader.
+                // .callout and no .foregroundStyle(): the same size and the same
+                // primary colour as every other paragraph here. It had been
+                // .footnote and .secondary grey, which reads as a disclaimer to
+                // skip -- but this text is the MIT License's permission notice, the
+                // thing the licence actually obliges us to put in front of a
+                // reader.
                 Text(AppInfo.grdbLicense)
+                    .font(.callout)
                     .textSelection(.enabled)
                     .padding(.vertical, 4)
             }
@@ -175,10 +177,13 @@ private struct AboutParagraph: View {
     }
 
     var body: some View {
-        // No .font(): a List row's default IS .body, which is what the "Version"
-        // row above renders at. These paragraphs had been .footnote, so the
-        // screen shrank below its own first line.
+        // .callout: one step below .body, which is what a List row -- and so the
+        // "Version" row above -- renders at. The prose is long and there is a lot
+        // of it, so it reads better a notch down from the label it sits under;
+        // .footnote, where it started, was two steps further and shrank the screen
+        // below its own first line.
         Text(text)
+            .font(.callout)
             .padding(.vertical, 2)
     }
 }

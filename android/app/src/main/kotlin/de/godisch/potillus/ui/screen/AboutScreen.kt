@@ -168,10 +168,14 @@ fun AboutScreen(
             // paragraphs together with NO gap at all -- which reads as tighter
             // than the leading INSIDE a paragraph, so the text looks like one
             // block that occasionally starts a new line. A paragraph break has to
-            // be wider than a line break to be a paragraph break. 8dp on top of
-            // bodyMedium's 20sp line height is the same step StatsScreen's metric
-            // cards use.
-            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // be wider than a line break to be a paragraph break.
+            //
+            // 12dp, matching the gap the enclosing Column puts BETWEEN the cards,
+            // so the rhythm does not change when the eye crosses a card edge. The
+            // value applies to every child alike, so the rule above the link is
+            // held off the last paragraph by the same amount -- one number, not
+            // two to keep in step.
+            SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // Paragraphs one to three: the GPL notice, word for word as every
                 // source file carries it.
                 BodyText(
@@ -205,7 +209,7 @@ fun AboutScreen(
             }
 
             SectionHeading("Open-source components")
-            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
                     "Under the Apache License 2.0: AndroidX / Jetpack (Copyright © The " +
                         "Android Open Source Project); the Kotlin standard library and " +
@@ -217,7 +221,7 @@ fun AboutScreen(
                 HorizontalDivider()
                 LicenseLink("Apache License 2.0", onOpenApache2)
             }
-            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
                     "Under the GNU General Public License, version 2, with the OpenJDK " +
                         "Classpath Exception: desugar_jdk_libs (Copyright © Oracle and/or " +
