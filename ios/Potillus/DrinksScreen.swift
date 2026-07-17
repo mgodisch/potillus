@@ -39,6 +39,7 @@ import SwiftUI
 struct DrinksScreen: View {
 
     @Environment(\.appLocale) private var locale
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var model: DrinksModel
     @State private var logger: EntryLogModel
@@ -84,6 +85,13 @@ struct DrinksScreen: View {
             }
             .task { model.start(); capacity.start() }
             .onDisappear { model.stop(); capacity.stop() }
+            // Reload the capacity snapshot on foregrounding; see TodayScreen for
+            // the full rationale (onAppear does not fire, the ticker only bounds
+            // staleness). `model` needs no counterpart: the catalogue is not a
+            // function of time, it changes only when something writes to it.
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await capacity.load() } }
+            }
             .sheet(isPresented: $isAdding) {
                 DrinkEditor(drink: nil) { name, volume, percent, category in
                     model.add(
