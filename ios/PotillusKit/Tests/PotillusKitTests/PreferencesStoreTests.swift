@@ -65,6 +65,87 @@ final class PreferencesStoreTests: XCTestCase {
         )
     }
 
+    /// A store built the way `makeDefault()` builds the real one: seeding on.
+    ///
+    /// - Parameter millis: The instant the "install" happens at. 1_766_000_000_000
+    ///   is 2025-12-17 UTC; the tests below pin only the parts that do not depend
+    ///   on the machine's time zone.
+    private func makeSeedingStore(millis: Int64) -> PreferencesStore {
+        PreferencesStore(
+            fileURL: fileURL,
+            keyProvider: InMemoryKeyProvider(key: key),
+            seedsStatsFloor: true,
+            clock: FixedClock(millis: millis)
+        )
+    }
+
+    // ── First-launch seeding ─────────────────────────────────────────────────
+    //
+    // Android falls back to the package's firstInstallTime when no start date was
+    // ever stored, so statistics begin at the install date. iOS had copied the
+    // setting but not the default: the floor stayed empty, and the Statistics
+    // screen counted the days of the current period that preceded the install as
+    // abstinent. These pin the fix.
+
+    func testAFirstLaunchSeedsTheStatisticsFloorWithTheInstallDate() async {
+        let expected = DayResolver.resolve(
+            timestampMillis: 1_766_000_000_000, changeHour: 0, changeMinute: 0
+        )
+        let settings = await makeSeedingStore(millis: 1_766_000_000_000).load()
+        XCTAssertEqual(settings.statsFromDate, expected)
+    }
+
+    func testTheSeedIsEverythingElseUntouched() async {
+        let settings = await makeSeedingStore(millis: 1_766_000_000_000).load()
+        var expected = AppSettings()
+        expected.statsFromDate = settings.statsFromDate
+        XCTAssertEqual(settings, expected, "only the floor may differ from the defaults")
+    }
+
+    /// The seed must be WRITTEN, or it would be recomputed as "today" on every
+    /// launch and the floor would follow the user around forever.
+    func testTheSeedIsPersistedAndDoesNotMoveWithTheClock() async {
+        _ = await makeSeedingStore(millis: 1_766_000_000_000).load()
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+
+        // A later launch, a later clock, the same stored date.
+        let firstDate = DayResolver.resolve(
+            timestampMillis: 1_766_000_000_000, changeHour: 0, changeMinute: 0
+        )
+        let reopened = await makeSeedingStore(millis: 1_768_000_000_000).load()
+        XCTAssertEqual(reopened.statsFromDate, firstDate)
+    }
+
+    /// An empty floor is a user's deliberate "cover my whole history"
+    /// (SettingsModel.clearStatsFromDate). Seeding must never undo it.
+    func testClearingTheFloorSurvivesTheNextLaunch() async throws {
+        let store = makeSeedingStore(millis: 1_766_000_000_000)
+        _ = await store.load()
+        try await store.update { $0.statsFromDate = "" }
+
+        let reopened = await makeSeedingStore(millis: 1_768_000_000_000)
+        let settings = await reopened.load()
+        XCTAssertEqual(settings.statsFromDate, "", "a cleared floor must stay cleared")
+    }
+
+    /// An installation that already has a file predates the fix and is left
+    /// alone, exactly as an existing database is not seeded with presets.
+    func testAnExistingInstallationIsNotSeeded() async throws {
+        let existing = makeStore()
+        try await existing.update { $0.dailyLimitGrams = 30.0 }
+
+        let settings = await makeSeedingStore(millis: 1_766_000_000_000).load()
+        XCTAssertEqual(settings.statsFromDate, "")
+        XCTAssertEqual(settings.dailyLimitGrams, 30.0)
+    }
+
+    /// Tests, previews and screenshots build the store directly and must keep
+    /// their pristine defaults.
+    func testAStoreWithoutTheFlagDoesNotSeed() async {
+        let settings = await makeStore().load()
+        XCTAssertEqual(settings.statsFromDate, "")
+    }
+
     // ── Round trip ───────────────────────────────────────────────────────────
 
     func testFirstLaunchYieldsTheCanonicalDefaults() async {

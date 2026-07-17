@@ -58,6 +58,33 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **Fixed: a fresh iOS install counted the days before it existed as abstinent.**
+  Install on the 16th, open Statistics, and the month view congratulated the user
+  for fifteen dry days and drew fifteen green ticks for the 1st to the 15th —
+  days the app had not been installed for. The arithmetic was never wrong; a
+  default was missing. Android's `AppPreferences` falls back to the package's
+  `firstInstallTime` when no start date was ever stored, "so statistics start at
+  the install date until the user picks another"; the Swift port copied the
+  `statsFromDate` setting and the whole apparatus that honours it —
+  `StatsWindows.applyingFloor`, the streak filter, the baseline clipping — but
+  not that fallback, so the floor stayed empty and every period ran from its own
+  start. A brand-new installation now seeds the floor with the install date.
+  IT IS WRITTEN DOWN, not recomputed: iOS has no `firstInstallTime` to derive it
+  from forever, so "today" is only correct on the day it is first asked. And it
+  is triggered by the ABSENCE OF THE PREFERENCES FILE, not by the floor being
+  empty — empty is a meaningful user choice, `SettingsModel.clearStatsFromDate()`
+  writes it to mean "cover my whole history", and seeding on empty would undo
+  that at every launch. Android tells the two apart because its DataStore
+  distinguishes a missing key from a key holding ""; iOS now uses the same signal
+  `AppDatabase.openOrCreate` uses for the preset drinks. As there, an
+  installation that already has a `prefs.bin` is deliberately left alone and
+  keeps no floor until a date is picked in Settings. Only `makeDefault()` seeds;
+  tests, previews and screenshot runs build the store directly and keep their
+  pristine defaults. Android is unchanged: its three-state logic already does all
+  of this, and giving it the same mechanism would have put the distinction that
+  makes clearing work at risk for no visible gain. `AppSettings.statsFromDate`'s
+  documentation claimed empty meant "from the first entry" — it never did, which
+  is precisely the behaviour the bug imitated; it means no lower bound at all.
 - **The About screen states the licence instead of pointing at it, and each app
   now bundles only the licences it actually owes.** The screen is rebuilt on both
   platforms into the same two chapters with the same wording: "Licence", holding

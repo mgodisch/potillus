@@ -81,6 +81,18 @@ public actor PreferencesStore: PreferencesStoring {
     private let fileURL: URL
     private let keyProvider: any SecretKeyProviding
 
+    /// Whether a first launch seeds `statsFromDate` with today's date.
+    ///
+    /// Only `makeDefault()` — the one production path — passes `true`. Tests,
+    /// previews and screenshot runs build the store directly and leave this
+    /// `false`, so they keep starting from a pristine `AppSettings()`. This is
+    /// the same line `AppDatabase` draws between `makeDefault()` and
+    /// `init(inMemory:)` for the preset drinks.
+    private let seedsStatsFloor: Bool
+
+    /// Supplies "now" for the seed. Injectable so a test can pin the date.
+    private let clock: any Clock
+
     /// The in-memory truth. The file is a durable copy of it.
     private var cached: AppSettings?
 
@@ -90,9 +102,19 @@ public actor PreferencesStore: PreferencesStoring {
     /// - Parameters:
     ///   - fileURL: Where the encrypted blob lives.
     ///   - keyProvider: Supplies the AES key; the app passes `KeychainKeyProvider`.
-    public init(fileURL: URL, keyProvider: any SecretKeyProviding) {
+    ///   - seedsStatsFloor: See the property. Defaults to `false`, so only the
+    ///     deliberate caller seeds.
+    ///   - clock: Source of "now" for the seed.
+    public init(
+        fileURL: URL,
+        keyProvider: any SecretKeyProviding,
+        seedsStatsFloor: Bool = false,
+        clock: any Clock = SystemClock()
+    ) {
         self.fileURL = fileURL
         self.keyProvider = keyProvider
+        self.seedsStatsFloor = seedsStatsFloor
+        self.clock = clock
     }
 
     /// The store at the app's default location, `Application Support/prefs.bin`.
@@ -103,7 +125,8 @@ public actor PreferencesStore: PreferencesStoring {
         )
         return PreferencesStore(
             fileURL: directory.appendingPathComponent("prefs.bin"),
-            keyProvider: KeychainKeyProvider()
+            keyProvider: KeychainKeyProvider(),
+            seedsStatsFloor: true
         )
     }
 
@@ -111,8 +134,65 @@ public actor PreferencesStore: PreferencesStoring {
 
     public func load() async -> AppSettings {
         if let cached { return cached }
-        let settings = readFromDisk() ?? AppSettings()
+        if let stored = readFromDisk() {
+            cached = stored
+            return stored
+        }
+        let settings = seedsStatsFloor ? seedOnFirstLaunch() : AppSettings()
         cached = settings
+        return settings
+    }
+
+    /// Builds the settings a brand-new installation starts with: the defaults,
+    /// but with the statistics floor set to today.
+    ///
+    /// WHY THIS EXISTS
+    ///   Android has done this since day one: `AppPreferences` falls back to the
+    ///   package's `firstInstallTime` when no start date was ever stored, "so
+    ///   statistics start at the install date until the user picks another". The
+    ///   Swift port copied the SETTING but not that default, so `statsFromDate`
+    ///   stayed empty, no floor applied, and the Statistics screen counted every
+    ///   day of the current period from the 1st — including the days before the
+    ///   app was installed, which it then reported as abstinent days and drew as
+    ///   green ticks. Install on the 16th, and the 1st to the 15th were fifteen
+    ///   days the user was congratulated for.
+    ///
+    /// WHY WRITE IT DOWN INSTEAD OF COMPUTING IT
+    ///   The date must not move. Android can recompute its default forever
+    ///   because `firstInstallTime` is a fixed fact about the package; iOS has no
+    ///   equivalent, so "today" is only correct on the day it is first asked. It
+    ///   is persisted here, once, and never derived again.
+    ///
+    /// WHY "NO USABLE FILE" AND NOT "statsFromDate IS EMPTY"
+    ///   Empty is a MEANINGFUL user choice: `SettingsModel.clearStatsFromDate()`
+    ///   writes it to mean "cover my whole history". Seeding whenever the value
+    ///   is empty would silently undo that on the next launch. The absence of the
+    ///   file is the only honest signal for "this user has never been asked", and
+    ///   it is the same signal `AppDatabase.openOrCreate` uses to seed the preset
+    ///   drinks. Android draws the same distinction differently: its DataStore
+    ///   tells a missing key from a key holding "".
+    ///
+    /// CONSEQUENCE, DELIBERATE
+    ///   An installation that already has a prefs.bin is NOT seeded, exactly as
+    ///   an existing database is not seeded with presets. Those users keep no
+    ///   floor until they pick a date in Settings.
+    ///
+    /// A failed write is not worth crashing over: the seed is a convenience, not
+    /// a correctness requirement. It is cached for this session either way; if
+    /// the write failed, the next launch seeds again, with that day's date.
+    private func seedOnFirstLaunch() -> AppSettings {
+        var settings = AppSettings()
+        let nowMillis = Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
+        // changeHour/changeMinute 0: the PLAIN calendar day, not the logical one.
+        // A user installing at 02:00 with a 04:00 day-change boundary installed
+        // today, whatever their drinking day says. Android reads the calendar
+        // date of firstInstallTime the same way.
+        settings.statsFromDate = DayResolver.resolve(
+            timestampMillis: nowMillis,
+            changeHour: 0,
+            changeMinute: 0
+        )
+        try? persist(settings)
         return settings
     }
 

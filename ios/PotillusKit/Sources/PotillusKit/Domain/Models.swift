@@ -276,7 +276,13 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var weeklyLimitGrams: Double
     public var maxDrinkDaysPerWeek: Int
 
-    /// Statistics start here, `yyyy-MM-dd`. Empty means "from the first entry".
+    /// Statistics start here, `yyyy-MM-dd`. Empty means NO lower bound at all —
+    /// not "from the first entry": every period still runs from its own start
+    /// (the 1st for a month, January for a year), so days before any data exists
+    /// are counted as ordinary days with no drinks. A brand-new installation is
+    /// therefore seeded with the install date; see `PreferencesStore
+    /// .seedOnFirstLaunch()`. `SettingsModel.clearStatsFromDate()` writes empty
+    /// deliberately, to mean "cover my whole history".
     public var statsFromDate: String
 
     public var biometricEnabled: Bool
