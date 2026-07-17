@@ -198,8 +198,8 @@ object PdfReportBuilder {
         val androidVersion = Build.VERSION.RELEASE?.takeIf { it.isNotBlank() }
             ?: Build.VERSION.SDK_INT.toString()
         // DELIBERATELY NOT LOCALIZED: this is the report's license/warranty
-        // notice. Like the bundled COPYING/LICENSE documents (see the Makefile
-        // note on raw/copyright.md), legal boilerplate is kept in its original
+        // notice. Like the bundled license documents (see the LICENSE_OUTPUTS
+        // note in android/Makefile), legal boilerplate is kept in its original
         // English so its meaning never depends on translation quality; the GPL's
         // warranty disclaimer in particular is quoted, not paraphrased.
         scalars["FOOTER2"] = "Created with Libellus Potionis v$appVersion on Android $androidVersion, " +

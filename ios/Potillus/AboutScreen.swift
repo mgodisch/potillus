@@ -139,7 +139,7 @@ struct AboutScreen: View {
 
             Section("Open-source components") {
                 // Two rows, so the List rules its line between the notice and the
-                // licence it introduces: that separator is wanted here — it marks
+                // license it introduces: that separator is wanted here — it marks
                 // where our words stop and GRDB's begin.
                 AboutParagraph(
                     """

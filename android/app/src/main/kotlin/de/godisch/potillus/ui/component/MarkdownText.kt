@@ -140,13 +140,22 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     }
                 }
                 THEMATIC_BREAK_RE.matches(block.trim()) -> HorizontalDivider(
-                    // A Markdown thematic break (`---`, `***`, `___`). The bundled
-                    // copyright document (res/raw/copyright.md) separates its three
-                    // concatenated parts — COPYING.md, the GPL text and the
-                    // Apache-2.0 text — with a `---` between blank lines (see
-                    // tools/render-copyright.py), so without this branch the seam
-                    // rendered as the literal characters "---". A standalone block
-                    // whose whole content is the break marker becomes a divider.
+                    // A Markdown thematic break (`---`, `***`, `___`): a standalone
+                    // block whose whole content is the break marker becomes a
+                    // divider rather than the literal characters "---".
+                    //
+                    // No document this app currently bundles contains one. The
+                    // branch was written for res/raw/copyright.md, which separated
+                    // its three concatenated parts — COPYING.md, the GPL text and
+                    // the Apache-2.0 text — with a `---` between blank lines; 0.83.0
+                    // replaced that combined document with one verbatim license per
+                    // file, and none of them, nor the guides, has a rule in it. It
+                    // stays because tools/render-copyright.py keeps its
+                    // concatenation ability and still joins with exactly that
+                    // separator: the day a build passes it two inputs again, the
+                    // seam must not surface as three hyphens. A renderer that
+                    // handles a break only while some document happens to contain
+                    // one is a trap, not an economy.
                     modifier = Modifier.padding(vertical = 12.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )

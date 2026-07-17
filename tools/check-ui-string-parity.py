@@ -48,7 +48,8 @@ WHAT IT REPORTS
     2. UNMAPPED: iOS catalogue keys that carry real words and are not yet in the
        map -- so a new screen's labels cannot silently escape the audit. Keys
        that are pure format skeletons ("%1$lld ml"), proper nouns, or already
-       equal to an Android value are not "unmapped" in this sense.
+       equal to an Android value are not "unmapped" in this sense, and the
+       deliberately unlocalised views (UNLOCALISED_VIEWS) are not scanned at all.
     3. STALE: map entries whose iOS key or Android name no longer exists.
 
 THE MAP
@@ -75,7 +76,25 @@ ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "ios" / "Potillus" / "Localizable.xcstrings"
 ANDROID = ROOT / "android" / "app" / "src" / "main" / "res" / "values" / "strings.xml"
 MAP = ROOT / "tools" / "ui-string-parity.json"
-VIEWS = sorted((ROOT / "ios" / "Potillus").glob("*.swift"))
+
+# Views that carry fixed English literals BY DESIGN, and whose literals are
+# therefore not catalogue keys and have no Android counterpart to drift from.
+# The canonical list and the full reasoning live in check-l10n.py
+# (UNLOCALISED_VIEWS); this mirrors it, because a scan that does not skip them
+# reports their prose as "an iOS label not yet in the map" -- which invites
+# someone to map a legal heading onto an Android string and translate it, the
+# exact outcome the About screen exists to prevent (0.83.0 QA round: this gate
+# was reporting AboutScreen's Section("Open-source components")).
+UNLOCALISED_VIEWS = {
+    "Localization.swift",
+    "AboutScreen.swift",
+}
+
+VIEWS = sorted(
+    path
+    for path in (ROOT / "ios" / "Potillus").glob("*.swift")
+    if path.name not in UNLOCALISED_VIEWS
+)
 
 
 def android_strings():

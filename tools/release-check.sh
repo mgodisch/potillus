@@ -130,8 +130,9 @@
 #      tokens (snake_case, glob '*') wrapped in backticks so a stray marker does
 #      not turn into accidental emphasis in the in-app renderer.  CHANGELOG.md
 #      headings must additionally read "## vMAJOR.MINOR.PATCH" in descending
-#      order.  The check lives in tools/md-syntax.py.  The verbatim GPL texts
-#      (LICENSE.md, COPYING.md, generated copyright.md) are excluded.
+#      order.  The check lives in tools/md-syntax.py.  The verbatim license
+#      texts (LICENSE.md, LICENSE.Apache-2.0.md, LICENSE.GPL-2.0.md, COPYING.md)
+#      are not in the checked set at all.
 #
 # HOW TO ADD A NEW CHECK
 #   1. Write a bash function named check_<topic>().
@@ -1146,9 +1147,11 @@ check_backup_version() {
 #   just convert; style linters check layout), so we run a tiny standard-library
 #   checker, tools/md-syntax.py, over the authored docs and the rendered guides.
 #
-#   Excluded on purpose: the verbatim GPL texts LICENSE.md, COPYING.md and the
-#   generated copyright.md (their GNU `quoted' style uses single backticks that
-#   no balance check can satisfy, and they are never reformatted anyway).
+#   Left out on purpose: the verbatim license texts (LICENSE.md,
+#   LICENSE.Apache-2.0.md, LICENSE.GPL-2.0.md) and COPYING.md.  Their GNU
+#   `quoted' style uses single backticks that no balance check can satisfy, and
+#   they are never reformatted anyway.  "Left out" and not "excluded": the check
+#   runs over an explicit file list (see below), so they are simply not named.
 # =============================================================================
 check_markdown_syntax() {
     section "9 / 15 — MARKDOWN SYNTAX"

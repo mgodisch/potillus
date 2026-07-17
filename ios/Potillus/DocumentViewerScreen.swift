@@ -29,10 +29,21 @@ import SwiftUI
 // DocumentViewerScreen — a read-only viewer for a bundled text document.
 //
 // Mirrors Android's DocumentViewerScreen: it shows one bundled document, scrolled,
-// read-only. The document here is copyright.md — COPYING.md and the full GPL text
-// joined at build time by tools/render-copyright.py, the SAME file Android bundles
-// as raw/copyright.md, so the two platforms show identical text. It is not locale-
-// qualified: a license is shown in its own language.
+// read-only. It backs two kinds of destination:
+//   - Help     → the localized user guide `usersguide_<tag>.md`, rendered from
+//                the templates under ios/docs/guide/ at build time.
+//   - License  → `license_gpl3.md`, a verbatim copy of the project-root
+//                LICENSE.md made by tools/render-copyright.py — the SAME
+//                generator that writes Android's res/raw/ copies, so the two
+//                platforms show byte-identical text. Linked from the About
+//                screen's License chapter. Not locale-qualified: a license is
+//                shown in its own language.
+//
+// Until 0.83.0 the licence destination was a single `copyright.md` — COPYING.md
+// and the full GPL text concatenated — and this app carried the Apache-2.0 text
+// for libraries it does not have. Each app now bundles only what it owes;
+// Android additionally bundles license_apache2.md and license_gpl2.md, which is
+// why its viewer takes three license resources where this one takes one.
 // =============================================================================
 
 struct DocumentViewerScreen: View {
