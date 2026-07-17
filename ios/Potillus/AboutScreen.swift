@@ -138,33 +138,37 @@ struct AboutScreen: View {
             }
 
             Section("Open-source components") {
-                // One row, spaced like the License section above — see there for
-                // why. This chapter had kept the old shape: two rows, a system
-                // separator between them, and about 26pt of row insets holding the
-                // notice apart from the licence it introduces. The two chapters are
-                // the same kind of thing and now read the same.
+                // Two rows, so the List rules its line between the notice and the
+                // licence it introduces: that separator is wanted here — it marks
+                // where our words stop and GRDB's begin.
+                AboutParagraph(
+                    """
+                    Under the MIT License: GRDB.swift (Copyright © 2015–2025 Gwendal Roué). GRDB \
+                    is this app's only third-party dependency: typed records, a schema migrator \
+                    and database observation on top of the SQLite that ships with the operating \
+                    system. It has no transitive dependencies, performs no network access and \
+                    collects no telemetry.
+                    """
+                )
+                // The MIT License requires the copyright notice and the permission
+                // notice to accompany the software, so the text is reproduced in
+                // full — as prose, not monospaced: it is sentences to read, not a
+                // code listing. Selectable, so a reader can lift it out verbatim.
+                //
+                // Laid out from its paragraphs rather than as one string, spaced by
+                // the 10pt this screen uses everywhere else. As a single Text its
+                // blank lines were a full line high and it sat visibly looser than
+                // the prose above it. The words are untouched: see
+                // AppInfo.grdbLicenseParagraphs.
                 VStack(alignment: .leading, spacing: 10) {
-                    AboutParagraph(
-                        """
-                        Under the MIT License: GRDB.swift (Copyright © 2015–2025 Gwendal Roué). \
-                        GRDB is this app's only third-party dependency: typed records, a schema \
-                        migrator and database observation on top of the SQLite that ships with \
-                        the operating system. It has no transitive dependencies, performs no \
-                        network access and collects no telemetry.
-                        """
-                    )
-                    // The MIT License requires the copyright notice and the
-                    // permission notice to accompany the software, so the text is
-                    // reproduced in full — as prose, not monospaced: it is
-                    // sentences to read, not a code listing. Selectable, so a
-                    // reader can lift it out verbatim. Body size and the primary
-                    // colour, like every other paragraph here: small and grey reads
-                    // as a disclaimer to skip, and this is the notice the licence
-                    // obliges us to put in front of a reader.
-                    Text(AppInfo.grdbLicense)
-                        .font(.callout)
-                        .textSelection(.enabled)
+                    ForEach(Array(AppInfo.grdbLicenseParagraphs.enumerated()), id: \.offset) {
+                        _, paragraph in
+                        Text(paragraph)
+                            .font(.callout)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
+                .textSelection(.enabled)
                 .padding(.vertical, 4)
             }
         }

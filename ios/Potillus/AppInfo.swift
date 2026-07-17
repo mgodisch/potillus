@@ -75,4 +75,19 @@ enum AppInfo {
         FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER \
         DEALINGS IN THE SOFTWARE.
         """
+
+    /// The same license, cut at its blank lines.
+    ///
+    /// NOT a second copy: this is `grdbLicense` itself, split — the words, the
+    /// order and the punctuation are whatever that constant says, and a test pins
+    /// that rejoining the pieces reproduces it exactly.
+    ///
+    /// It exists because a blank line inside one `Text` is a whole line high, some
+    /// 21pt, while the About screen spaces its own paragraphs by 10. Rendering the
+    /// notice as a single string therefore made it sit looser than the prose above
+    /// it — the same text told in two rhythms. Handing the view the paragraphs lets
+    /// it use its own.
+    static var grdbLicenseParagraphs: [String] {
+        grdbLicense.components(separatedBy: "\n\n")
+    }
 }

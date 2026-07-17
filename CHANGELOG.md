@@ -168,10 +168,15 @@ two stores' notes need not match).
   drank nothing"; a missing section says "this app has no such feature", and a
   reader cannot tell that from a bug. It is unconditional now, like the time-of-day
   and weekday sections. Android hides its card here; that divergence is deliberate.
-  The About screen's MIT chapter still had the old shape the License chapter was
-  fixed out of — two List rows, a separator between them, and row insets holding
-  the notice some 26pt from the licence it introduces. It is one row now, spaced
-  like its neighbour.
+  The About screen's MIT chapter kept its separator — that rule marks where our
+  words stop and GRDB's begin — but the licence below it was one `Text`, and a
+  blank line inside a `Text` is a whole line high. The notice therefore sat visibly
+  looser than the prose above it: the same screen telling the same kind of thing in
+  two rhythms. It is rendered from its paragraphs now, spaced by the 10pt used
+  everywhere else. The text itself is untouched — `grdbLicenseParagraphs` is
+  `grdbLicense` cut at its blank lines, and a test pins that rejoining the pieces
+  reproduces the constant character for character. What is reproduced has to be the
+  license, not a rendering of it.
 - **iOS Statistics leads with its chart, and its categories are a donut.** The
   consumption chart had sat fourth, behind two blocks of numbers; it is the answer
   the screen is opened for, so it now comes first, right under the period picker,

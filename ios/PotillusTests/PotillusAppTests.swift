@@ -99,6 +99,23 @@ final class PotillusAppTests: XCTestCase {
         XCTAssertFalse(AppInfo.grdbLicense.contains("  "))
     }
 
+    /// The About screen renders the notice paragraph by paragraph so it can space
+    /// them like its own prose. That must not cost a single character: what is
+    /// reproduced has to be the license, not a rendering of it.
+    func testGrdbLicenseParagraphsRejoinToTheLicense() {
+        XCTAssertEqual(
+            AppInfo.grdbLicenseParagraphs.joined(separator: "\n\n"),
+            AppInfo.grdbLicense
+        )
+    }
+
+    func testGrdbLicenseSplitsIntoItsFourParagraphs() {
+        let paragraphs = AppInfo.grdbLicenseParagraphs
+        XCTAssertEqual(paragraphs.count, 4)
+        XCTAssertTrue(paragraphs[0].hasPrefix("Copyright (C)"), "the copyright line stands alone")
+        XCTAssertTrue(paragraphs.allSatisfy { !$0.isEmpty }, "no empty paragraph to render")
+    }
+
     /// The version strips any build suffix, as the report footer does.
     func testVersionStripsBuildSuffix() {
         // AppInfo.version reads the bundle; in the test bundle it is well-formed.
