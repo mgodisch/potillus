@@ -188,6 +188,62 @@ receive — follow at release time, once this cycle has taken its final shape.
     gate. It now requires the four contact files outright and runs both iOS
     checks before a byte goes over the wire.
 
+- **The rating answers are now written down, because nothing else writes them
+  down.** Every other part of both listings lives here and has a gate: texts,
+  screenshots, categories, the copyright line. The two age-rating questionnaires
+  do not — they are filled in by hand, in two consoles, and until now the answers
+  and the reasoning existed nowhere. `docs/STORE_RATINGS.md` is that record, and
+  its subject is not the numbers (both consoles show those) but the fact that
+  **the two stores ask different questions and the answers are not
+  transferable**:
+  - Apple asks about CONTENT on a frequency axis — "Infrequent: Users will
+    rarely encounter this content" vs "Frequent: Users will regularly encounter
+    this content". For an app whose Drinks screen ships a catalogue of alcoholic
+    beverages, whose BAC estimate ticks every minute and whose statistics count
+    binge days, "rarely" is not an interpretation but a false statement.
+    `Frequent` → **18+**.
+  - Google asks about PURPOSE, and its section heading gives it away —
+    "Bewerbung oder Verkauf von Produkten oder Aktivitäten mit
+    Altersbeschränkung": is promoting or selling the app's *focus*? It advertises
+    nothing and sells nothing. `No` → **IARC generic 3+**.
+  - Same app, same facts, both true, and the outcomes as far apart as the scales
+    reach. 18+ beside 3+ is not an error waiting to be reconciled, and the file
+    says so in as many words — because the next person to see them side by side
+    will want to "fix" one, and that is the only way this can go wrong.
+  - What neither console has a field for is what the app IS: a harm-reduction
+    tool, full of references to the thing it exists to reduce. Apple sees the
+    references and not the point; Google sees no commerce and not the references.
+    The single place in either process where the purpose can be stated is the
+    reviewer note, so `review_information/notes.txt` now states it — that the app
+    depicts and encourages no drinking, marks every excess red, counts abstinent
+    days, and answers the questionnaire on frequency because that is what it asks.
+  - Also recorded: the target audience (16–17 **and** 18+) is a product decision,
+    independent of both questionnaires — wanting 16-year-olds as users does not
+    make the app's alcohol references rarer. And a consequence worth knowing:
+    Play's "restrict access for minors", which actually removes an app from
+    search and download rather than merely labelling it, requires 18+ to be the
+    ONLY selected group, so selecting 16–17 puts it deliberately out of reach.
+
+- **`check-ios-screenshots` became a target, which it should have been at birth.**
+  It was added earlier this cycle and then invoked only by `python3` from
+  `screenshots-ios` and `push-appstore` — no make target, absent from `.PHONY`,
+  absent from `check-ios-static`, unlike `check-ios-metadata`, which has had all
+  of those for a release. The gap mattered: the shots it guards are COMMITTED, so
+  they can be wrong in a tree nobody is capturing or uploading from, and a gate
+  that only runs at the two ends of the pipeline would never say so. It now sits
+  beside its sibling in `check-ios-static`, which is the list a Mac-free release
+  path runs.
+
+- Also fixed in passing: `PRIVACY.md` still sent the reader to
+  `docs/PLAY_STORE.md` for "the two supported ways to turn this file into a
+  public URL". That document was deleted in v0.79.0, and v0.81.0's cleanup of the
+  references to it caught `fastlane/Fastfile` and `fastlane/README.md` but missed
+  this one — so the pointer had outlived its target by four releases, and the
+  hosting question it deferred was answered nowhere at all. It is answered now,
+  from the tree rather than from a memory: every locale's `privacy_url.txt`
+  points at `PRIVACY.md` in the canonical repository, so the served policy and
+  the committed one are the same file and cannot drift.
+
 ---
 
 ## v0.83.0

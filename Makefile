@@ -34,7 +34,8 @@
 #                   tests and a simulator build of the app              [needs a Mac]
 #      check-ios-static   the Mac-free iOS static gates (Swift symbols/tests/
 #                   length, headers, makefile, l10n, l10n-parity, report paper,
-#                   guides, store metadata, accessibility labels). Run it on the
+#                   guides, store metadata, store screenshots, accessibility
+#                   labels). Run it on the
 #                   Linux release path so a release-check run never leaves iOS
 #                   unverified
 #    Convenience
@@ -1595,7 +1596,8 @@ check-ios-guides:
 # skips gracefully when its inputs are absent, so this is safe in any checkout.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
-                  check-ios-guides check-ios-metadata check-ios-a11y
+                  check-ios-guides check-ios-metadata check-ios-screenshots \
+                  check-ios-a11y
 
 ios: check-ios-static check-swiftlint ios-project
 	@$(call require-ios-screenshots,ios)
@@ -1713,6 +1715,17 @@ check-l10n-parity:
 check-ios-metadata:
 	python3 tools/check-ios-metadata.py
 
+# check-ios-screenshots: the same idea for the assets beside that metadata --
+# App Store Connect takes only real device resolutions where Play takes a range,
+# and deliver only says so mid-upload. See tools/check-ios-screenshots.py.
+#
+# It is listed in check-ios-static beside check-ios-metadata rather than only in
+# screenshots-ios and push-appstore, because the shots it guards are COMMITTED:
+# they can go wrong in a tree nobody is capturing or uploading from, and a gate
+# that only runs at the two ends of the pipeline would not notice.
+check-ios-screenshots:
+	python3 tools/check-ios-screenshots.py
+
 # check-ios-a11y: the iOS twin of release-check.sh section 13 (Android's
 # contentDescription check). A Button whose label is only an Image needs an
 # .accessibilityLabel, or VoiceOver announces nothing at all. Brace-aware, like
@@ -1820,4 +1833,4 @@ distclean-ios: clean-ios
 	rm -f ios/Potillus/Resources/usersguide_*.md     # make ios-guides
 	rm -f ios/PotillusUITests/SnapshotHelper.swift   # make screenshots-ios (vendored)
 
-.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ios-a11y check-ui-string-parity ios-sbom ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-appstore push-appstore-preflight push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean-android distclean-android clean-ios distclean-ios check-report-paper
+.PHONY: help android ios debug device-tests release-android release-ios install check-headers fix-headers check-makefile check-swift-tests check-swift-symbols check-swiftlint check-swift-length check-l10n check-l10n-parity check-ios-metadata check-ios-screenshots check-ios-a11y check-ui-string-parity ios-sbom ios-version ios-version-check ios-project ios-guides check-ios-guides store-assets-android screenshots-android screenshots-ios screenshots-demo-off-android screenshots-pdf-android feature-graphics-android feature-graphics-existing-android _cascade-feature-graphics-android report-pdfs rokkitt-bold tgz push push-playstore push-appstore push-appstore-preflight push-codeberg bestpractices-json bestpractices-jsonc check-bestpractices-levels clean-android distclean-android clean-ios distclean-ios check-report-paper

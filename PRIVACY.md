@@ -29,9 +29,10 @@ WHAT THIS IS
 
 The privacy policy required by the Google Play "App content" section (every
 Play listing must link to a publicly reachable privacy policy URL, regardless
-of whether the app collects data). It is written to be hosted verbatim as a web
-page -- see `docs/PLAY_STORE.md`, section "Privacy policy hosting", for the two
-supported ways to turn this file into a public URL.
+of whether the app collects data), and by App Store Connect for the same
+reason. It is written to be readable as a web page exactly where it lives: the
+`privacy_url.txt` of every store locale points at this file in the canonical
+repository, so the served policy and the committed one cannot drift apart.
 
 Keep the "Last updated" line and the version/package facts below in sync with
 the app whenever the privacy-relevant behaviour changes. This document makes NO
