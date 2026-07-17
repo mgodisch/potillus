@@ -152,6 +152,26 @@ two stores' notes need not match).
   this entry is not; a dot answering the wrong day's question is worse than none.
   "Add Entry" is Android's own string, with its twenty translations carried over
   verbatim rather than written afresh.
+- **Today's entries can be edited, the Categories card stays for an empty period,
+  and the MIT chapter reads like the GPL one.** Three places where iOS had quietly
+  settled for less than the screen beside it.
+  A Today row was a name and a gram figure with a swipe to delete and no way to
+  edit at all — while the calendar's row, showing the same entry, had the time, the
+  volume, the strength, the note, a pencil and a bin. Android draws both screens
+  with the same `EntryListItem` and always has. Today's row is now the calendar's
+  row: today's mistyped entry is the likeliest thing anyone wants to correct, and
+  it was the one entry they could not. The swipe stays beside the buttons — it is
+  the gesture an iOS reader reaches for unprompted, and dropping it to match a
+  screen that never had it would be parity bought with a habit.
+  The Categories card vanished for a period with no drinks in it, because the
+  section was guarded on the breakdown being non-empty. An empty ring says "you
+  drank nothing"; a missing section says "this app has no such feature", and a
+  reader cannot tell that from a bug. It is unconditional now, like the time-of-day
+  and weekday sections. Android hides its card here; that divergence is deliberate.
+  The About screen's MIT chapter still had the old shape the License chapter was
+  fixed out of — two List rows, a separator between them, and row insets holding
+  the notice some 26pt from the licence it introduces. It is one row now, spaced
+  like its neighbour.
 - **iOS Statistics leads with its chart, and its categories are a donut.** The
   consumption chart had sat fourth, behind two blocks of numbers; it is the answer
   the screen is opened for, so it now comes first, right under the period picker,

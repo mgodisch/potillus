@@ -52,6 +52,9 @@ struct TodayScreen: View {
     /// Set while the entry sheet is open.
     @State private var isLogging = false
 
+    /// The entry being edited, if any — drives the edit sheet, as on the calendar.
+    @State private var editingEntry: ConsumptionEntry?
+
     /// Kept so the overflow menu's Settings sheet can be built; the screen owns
     /// its own model.
     private let environment: AppEnvironment
@@ -121,6 +124,28 @@ struct TodayScreen: View {
                     await model.addEntry(
                         drink: drink, volumeMl: volume, timestampMillis: millis, note: note
                     )
+                    return model.failure == nil
+                }
+            }
+            .sheet(item: $editingEntry) { entry in
+                // Editing keeps the entry's own drink: a one-element catalogue built
+                // from the entry, so the sheet shows the name and lets volume, time
+                // and note change. The same scope, and the same code, as the
+                // calendar's edit — this row is not a lesser row for being today's.
+                EntrySheet(
+                    drinks: [drink(from: entry)],
+                    preselected: drink(from: entry),
+                    now: Date(),
+                    editing: entry
+                ) { drink, volume, millis, note in
+                    var updated = entry
+                    updated.volumeMl = volume
+                    updated.timestampMillis = millis
+                    updated.note = note
+                    updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
+                        volumeMl: volume, alcoholPercent: drink.alcoholPercent
+                    )
+                    await model.updateEntry(updated)
                     return model.failure == nil
                 }
             }
@@ -256,10 +281,11 @@ struct TodayScreen: View {
                     .foregroundStyle(.secondary)
             }
             ForEach(model.state.entries, id: \.id) { entry in
-                LabeledContent(entry.drinkName) {
-                    Text(grams(entry.gramsAlcohol)).monospacedDigit()
-                }
+                entryRow(entry)
             }
+            // Kept alongside the buttons: a swipe is the gesture an iOS reader
+            // reaches for without being shown it, and taking it away to match a
+            // screen that never had it would be parity bought with a habit.
             .onDelete { offsets in
                 let doomed = offsets.map { model.state.entries[$0] }
                 Task { for entry in doomed { await model.deleteEntry(entry) } }
@@ -280,6 +306,73 @@ struct TodayScreen: View {
 // the body stays within its length budget. `private` is file scope in Swift, so
 // a same-file extension still sees the view's `locale` and `model`.
 extension TodayScreen {
+
+    /// One entry: the drink, its detail line and its note, then edit and delete.
+    ///
+    /// Built like the calendar's row, because Android draws BOTH screens with the
+    /// same `EntryListItem`. Here the row had been a bare name-and-grams line with
+    /// only a swipe to delete and no way to edit at all: today's mistyped entry is
+    /// the single likeliest thing a user wants to correct, and it was the one entry
+    /// they could not.
+    private func entryRow(_ entry: ConsumptionEntry) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.drinkName)
+                Text(entryDetail(entry))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if !entry.note.isEmpty {
+                    Text(entry.note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            Spacer()
+            Button {
+                editingEntry = entry
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
+            .accessibilityLabel(Loc.string("Edit %@", entry.drinkName, locale: locale))
+
+            Button(role: .destructive) {
+                Task { await model.deleteEntry(entry) }
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.red)
+            .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
+        }
+    }
+
+    /// "HH:mm · <ml> ml · <percent> % · <grams> g" in the in-app locale, the same
+    /// fields the calendar's row shows. The time uses the device zone (a wall clock
+    /// the user recognises), the numbers the in-app locale.
+    private func entryDetail(_ entry: ConsumptionEntry) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let time = formatter.string(
+            from: Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        )
+        let percent = Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale)
+        let grams = Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale)
+        return "\(time) · \(entry.volumeMl) ml · \(percent) % · \(grams) g"
+    }
+
+    /// The entry's own drink, rebuilt as a single-item catalogue for the edit
+    /// sheet. Editing does not swap the drink, so the id/category are cosmetic.
+    private func drink(from entry: ConsumptionEntry) -> DrinkDefinition {
+        DrinkDefinition(
+            id: entry.drinkId,
+            name: entry.drinkName,
+            volumeMl: entry.volumeMl,
+            alcoholPercent: entry.alcoholPercent
+        )
+    }
 
     /// "Ø <month>" — the average caption. The standalone month name of the logical
     /// day resolves in the in-app locale (Foundation, no catalogue entry); the

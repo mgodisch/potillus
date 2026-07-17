@@ -93,7 +93,7 @@ struct StatsScreen: View {
                 streaksAndTrend
                 timeOfDay
                 weekdays
-                if !model.state.categoryBreakdown.isEmpty { categories }
+                categories
             }
             .navigationTitle(Loc.string("Statistics", locale: locale))
             .appOverflowMenu(environment: environment)
@@ -311,7 +311,11 @@ struct StatsScreen: View {
     private var categories: some View {
         Section(Loc.string("Categories", locale: locale)) {
             let total = model.state.categoryBreakdown.values.reduce(0, +)
-            // Donut and legend in ONE row, which is the single card Android draws.
+            // Shown even for a period with nothing in it, like the time-of-day and
+            // weekday sections above: an empty ring is "you drank nothing", a
+            // vanished section is "this app has no such feature". The reader cannot
+            // tell the second from a bug. Android hides its card here; that is the
+            // divergence, and it is deliberate.
             VStack(spacing: 12) {
                 // A ring, not a pie: the hole is what makes proportions readable
                 // without a scale. .ratio(0.62) is Android's geometry (a stroke 38 %
