@@ -118,6 +118,44 @@ receive — follow at release time, once this cycle has taken its final shape.
   as intent. Checking the metadata names covers the screenshot names too, since
   the Snapfile generates the latter from the former.
 
+- **The report screenshots were A4 where the App Store wanted a phone.** Past
+  the locale names, deliver rejected 42 files at once: shots 07..08 are the
+  app's PDF report rasterized by pdftoppm, so at the project's 200 dpi they are
+  1654x2339 — an A4 page, aspect 0.71, beside six simulator shots at the iPhone's
+  own 1206x2622, aspect 0.46. That the six passed unremarked is what identifies
+  the rule: Play's requirement is a RANGE (320..3840 per side, at most 2:1) that
+  an A4 page satisfies comfortably, and the App Store's is an ENUMERATED set of
+  real device resolutions that it does not. The pages had been that shape since
+  they were first rendered; only Play had ever seen them.
+  - `screenshots-ios` gained two steps. Step 4 runs the new
+    `tools/letterbox-ios-report.py`, which scales each page to the canvas WIDTH
+    — the one scale that keeps A4's proportions — and centres it on the app's
+    identity colour `#1A1E2B`, the `ic_launcher_background` of
+    `values/colors.xml` and the `ICON_BG` of `render-feature-graphic.py`. A
+    neutral grey would have read as a letterbox bar, i.e. as something missing;
+    the white page on the app's own dark navy reads as a document on a surface,
+    and holds its edge against the store's chrome in either appearance. The tool
+    takes the canvas size from the locale's own shot 01 rather than a constant:
+    that cannot drift when `IOS_SIM_DEVICE` changes, and cannot be wrong, since
+    01 came out of a simulator at a real device's real resolution. It is
+    idempotent, so a second run over a finished tree changes nothing.
+  - Step 5 is the gate that should have existed: `tools/check-ios-screenshots.py`,
+    the counterpart to `validate-screenshots.py`, which says in its own first
+    line that it is the *Google Play* gate and reads only the Android tree. The
+    new one deliberately does NOT carry Apple's size table. That table is
+    Apple's, it moves with each device generation, and a stale copy here would
+    fail on its own schedule. It checks UNIFORMITY instead — every shot in a
+    locale agrees with the others, every locale agrees with the rest — which
+    needs no table and catches the entire defect, because 01..06 are a valid
+    size by construction and the A4 pages were the things disagreeing with them.
+    Its limit is stated in its own docstring rather than hidden: a wrong
+    `IOS_SIM_DEVICE` would be uniformly wrong and pass.
+  - This is the fourth defect of one family in this cycle, and the family is now
+    named: every one of them lived where this repository's shape meets what
+    fastlane and the stores assume about it, every one was invisible to a gate
+    written for the Android half, and every one waited for a real upload to
+    speak. The iOS side now has the three gates the Android side always had.
+
 ---
 
 ## v0.83.0

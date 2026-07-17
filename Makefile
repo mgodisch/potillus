@@ -876,7 +876,11 @@ store-assets-android:
 #      PotillusUITests target and captures 01..06 into
 #      fastlane/screenshots/ios/<locale>/ (configuration in fastlane/Snapfile), then
 #   3) renders the two trailing report pages 07..08 so the iOS set matches
-#      Android's eight.
+#      Android's eight,
+#   4) letterboxes those pages onto the device canvas, because the App Store
+#      accepts only real device resolutions where Play accepts a range, and
+#   5) validates the finished set with tools/check-ios-screenshots.py, mirroring
+#      how screenshots-android validates its own with validate-screenshots.py.
 #
 # The app writes one PDF report per locale DURING the capture (see
 # ScreenshotMode.swift) into its Documents container as screenshot_report_<loc>.pdf.
@@ -902,6 +906,9 @@ screenshots-ios:
 	command -v bundle >/dev/null 2>&1 || { echo "screenshots-ios: 'bundle' (Ruby Bundler) not found -- install Homebrew Ruby + Bundler, then run 'cd fastlane && bundle install'."; exit 1; }
 	( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "screenshots-ios: fastlane gems are not installed -- run 'cd fastlane && bundle install'."; exit 1; }
 	$(call require-pdftoppm,screenshots-ios)
+	# Step 4 letterboxes the rendered report pages with Pillow, the same
+	# dependency the Android feature graphics already require.
+	$(call require-pillow,screenshots-ios)
 	# 0b) The fastlane SnapshotHelper is git-ignored and vendored once per machine by
 	#     `fastlane snapshot init`. Create it on first run; `snapshot init` also drops
 	#     a sample Snapfile next to it that we do not want (the real one lives in
@@ -936,6 +943,15 @@ screenshots-ios:
 	        echo "screenshots-ios: WARNING no report PDF for $$loc ($$pdf)" >&2
 	    fi
 	done
+	# 4) Fit those A4 pages onto the device canvas. Unlike Play, which takes any
+	#    side in 320..3840 at up to 2:1, the App Store accepts only real device
+	#    resolutions -- so the pages must become exactly as big as 01..06 before
+	#    they can be uploaded. See tools/letterbox-ios-report.py for the why.
+	python3 tools/letterbox-ios-report.py "$(IOS_SHOTS)" "$(IOS_SIM_DEVICE)"
+	# 5) ...and prove it, the way screenshots-android proves its own set with
+	#    validate-screenshots.py. This is the last chance to catch a bad size
+	#    before App Store Connect does.
+	python3 tools/check-ios-screenshots.py
 
 # =============================================================================
 # REPORT PDF EXPORT  (semi-automatic, human-in-the-loop)
