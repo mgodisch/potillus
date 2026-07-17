@@ -83,6 +83,48 @@ stores' notes still need not match, and do not).
   still pointed at `android/fastlane/metadata/android/…`, the tree's location
   before the v0.73.2 move of fastlane to the repository root.
 
+- **`make push-appstore` — the iOS app now publishes through the same door as the
+  Android one.** `push-playstore` guards the Play upload four ways before fastlane
+  sees it; the App Store path had no counterpart at all, so the documented route
+  was a bare `fastlane ios testing`, bypassing every one of them. It now mirrors
+  push-playstore where the platforms agree and diverges only where they genuinely
+  differ.
+  - Same guards: the staged artifact must exist (the target never builds), and the
+    release tag `vX.Y.Z` must exist locally AND on the push remote.
+  - Instead of a signing-key fingerprint pin, two checks that fit what an iOS
+    signature actually is. The `.ipa`'s own `Info.plist` must agree with the tree
+    — `CFBundleIdentifier` = the applicationId, `CFBundleVersion` = the
+    versionCode, `CFBundleShortVersionString` = the CHANGELOG's top version — which
+    catches the everyday mistake the Android side cannot: pushing a stale `.ipa`
+    left in `releases/`. It is a real cross-check, not a tautology, because those
+    values reach the `.ipa` through `gen-ios-version.py` → `Version.xcconfig` →
+    Xcode, not from this Makefile. And the signature must verify and carry OUR
+    `TeamIdentifier`. A certificate-digest pin was considered and rejected: Apple
+    issues that certificate, it rotates yearly, and under this project's automatic
+    signing Xcode mints it at export time — pinning it would schedule an annual
+    false failure while proving less than the Team ID does. `SECURITY.md`'s
+    fingerprint is the Android key and stays that.
+  - `SUBMIT=1` switches from the `ios testing` lane to `ios production`, i.e. adds
+    the review submission. The default does not submit, mirroring how
+    push-playstore's production counterpart stages a draft rather than publishing.
+  - New `preflight` lane + `make push-appstore-preflight`: the App Store Connect
+    counterpart of push-playstore's `validate_play_store_json_key` pre-flight. It
+    authenticates and makes one read-only `app_store_build_number` query, so a bad
+    key or an unreachable app record fails before anything is uploaded. It could
+    not follow the Android shape of a `fastlane run` one-off from the Makefile:
+    the iOS credential is a HASH, and fastlane's CLI takes only primitive types.
+    Hence a lane. It doubles as the closest thing this platform has to
+    `VALIDATE_ONLY=1` — deliver has no validate-only mode.
+  - The pre-flight is a PREREQUISITE, not a `$(MAKE)` call inside the recipe, and
+    that is load-bearing: under `.ONESHELL` the recipe is one script, so a
+    `$(MAKE)` anywhere in it makes the whole script a line containing `$(MAKE)` —
+    which make runs even under `-n`. `make -n push-appstore` would have published.
+  - `docs/RELEASE-IOS.md` routed the reader to the bare fastlane call and did not
+    say that `ios testing` overwrites the live listing; it now names the target,
+    the guards, the `SUBMIT=1` switch and what App Store Connect still curates by
+    hand. The `help` block gained both targets, and `release-ios` now prints the
+    App Store destination next to the TestFlight one it already printed.
+
 - **The fastlane files now describe the fastlane files.** Reviewing the upload
   path for the notes above surfaced three comments that had fallen behind the
   code they introduce — the same class of finding as the thirteenth round's, in

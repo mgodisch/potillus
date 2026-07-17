@@ -44,7 +44,8 @@
 #                       NOT capture screenshots -- run `make screenshots-android`
 #                       first if needed)
 #      release-ios  the signed .ipa, archived, exported and staged into releases/
-#                   (uploads via the fastlane `ios alpha`/`testing` lanes) [Mac]
+#                   (upload with `make push-appstore`, or the fastlane `ios
+#                   alpha` lane for TestFlight)                            [Mac]
 #      install      copy the freshly built debug APK to the local install path
 #    Store assets (Android -> Play Store)
 #      store-assets-android  full set in one go: screenshots + report-pdfs, then
@@ -66,6 +67,12 @@
 #    Publishing (upload already-built artifacts; these targets never build)
 #      push-playstore  upload the release AAB + store metadata to Google Play
 #                      via the fastlane `testing` lane (closed alpha) [AAB + key]
+#      push-appstore   upload the release .ipa + store metadata to App Store
+#                      Connect via the fastlane `ios testing` lane; SUBMIT=1 uses
+#                      the `production` lane, which also submits for Apple
+#                      review                              [Mac + IPA + ASC key]
+#      push-appstore-preflight  check the App Store Connect credentials without
+#                      uploading anything (read-only)                 [ASC key]
 #      push-codeberg   create the Codeberg release for the pushed tag and attach
 #                      the built APK + SBOM                    [tag + APK + SBOM]
 #    OpenSSF badge
@@ -477,6 +484,7 @@ release-ios: ios-project
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IOS_SBOM)"
 	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"$(STAGED_IPA)\" )"
+	@echo "release-ios: upload to the App Store listing with:  make push-appstore"
 
 # ── ios-sbom ── the iOS CycloneDX SBOM, generated from Package.resolved and
 # normalised byte-stably (SOURCE_DATE_EPOCH honoured), mirroring the Android
@@ -1169,6 +1177,144 @@ push-playstore:
 	key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; ( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$$key" ) | grep -q 'Successfully established connection to Google Play Store' || { echo "push-playstore: the Play service-account key at '$$key' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1; }
 	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir)
 	( cd fastlane && bundle exec fastlane testing aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
+
+# ── push-appstore ── the iOS counterpart of push-playstore: upload the STAGED
+# .ipa to App Store Connect via the fastlane `ios testing` lane, which also
+# OVERWRITES the App Store listing (names, subtitles, keywords, descriptions,
+# screenshots and release notes) from fastlane/metadata/ios/. Never builds and
+# never stages -- that is `make release-ios`. Mac-only, like release-ios.
+#
+# SUBMIT=1 switches the target to the `ios production` lane, which performs the
+# SAME upload and additionally submits the build for Apple review. The default is
+# deliberately the non-submitting lane: upload, look at the result in App Store
+# Connect, then submit in a second, explicit step. (This mirrors how
+# push-playstore's `production` counterpart stages a draft rather than going live.)
+#
+# NOTE what `ios testing` is NOT: unlike Play's alpha track, it has no separate
+# audience. The App Store has ONE listing, and this target overwrites it. "testing"
+# here means "not submitted for review", not "not public". There is also no iOS
+# equivalent of VALIDATE_ONLY: deliver has no validate-only mode, so the closest
+# thing to a dry run is `make push-appstore-preflight`, which checks the
+# credentials and touches nothing else.
+#
+# Guards, in order -- (1), (2) and (5) are the same guards push-playstore applies,
+# and the two in between are where the platforms genuinely differ:
+#
+#   (1) the staged .ipa is present (this target never builds or stages it);
+#   (2) the release tag v$(VERSION) exists locally AND on the push remote -- the
+#       same release-hygiene gate push-playstore and push-codeberg apply, so a
+#       build only reaches a store when its exact version is a pushed tag;
+#   (3) the .ipa's OWN Info.plist agrees with this working tree: bundle
+#       identifier, build number and marketing version must equal $(RELEASE_ID),
+#       $(VERSION_CODE) and $(VERSION). This has no Android counterpart and is the
+#       more valuable half of the pair: it catches the everyday mistake of pushing
+#       a stale .ipa left in releases/ from an earlier versionCode. It is a real
+#       cross-check rather than a tautology because the three values enter the .ipa
+#       through a different path than they enter here -- tools/gen-ios-version.py
+#       writes MARKETING_VERSION (from CHANGELOG.md) and CURRENT_PROJECT_VERSION
+#       (from build.gradle.kts's versionCode) into Version.xcconfig at
+#       `make ios-project` time, and Xcode maps those to CFBundleShortVersionString
+#       and CFBundleVersion; if the archive predates a version bump, the values
+#       disagree and this fails.
+#   (4) the .ipa is signed, the signature verifies, and it was signed by OUR team.
+#       This is the analogue of push-playstore's fingerprint pin, but it pins the
+#       TEAM ID, not a certificate digest, and the difference is deliberate. The
+#       Android pin works because the maintainer owns the signing key and its
+#       SHA-256 is published in SECURITY.md for users to verify against. An iOS
+#       distribution certificate is issued BY Apple, rotates roughly yearly, and
+#       under this project's automatic signing is minted by Xcode at export time
+#       (see release-ios's -allowProvisioningUpdates) -- so its digest is neither
+#       chosen by the maintainer nor stable, and pinning it would schedule an
+#       annual false failure while proving little. The Team ID is the stable,
+#       maintainer-owned identity in that signature, and it is already resolved
+#       here exactly as release-ios resolves it (DEVELOPMENT_TEAM, else
+#       ios/signing.properties).
+#   (5) a real PRE-FLIGHT auth check against App Store Connect. This one is a
+#       PREREQUISITE rather than a step inside the recipe, and that is not
+#       cosmetic: under .ONESHELL the whole recipe is a single shell script, so a
+#       `$(MAKE) push-appstore-preflight` inside it would make the ENTIRE script
+#       "a line containing $(MAKE)" -- and make executes those even under `-n`.
+#       `make -n push-appstore` would then really upload. As a prerequisite it
+#       runs in its own recipe, `-n` stays a dry run, and the check still happens
+#       before the upload. The cost is ordering: with credentials missing you learn
+#       that before guards (1)-(4) report, and with a missing .ipa you pay one
+#       read-only round trip first. Both are cheap; a `-n` that publishes is not.
+#
+# The .ipa is a zip, and neither codesign nor plutil reads inside one, so (3) and
+# (4) unpack it into a mktemp directory and inspect the .app there. The staged file
+# itself is never touched, and the temp directory is removed on every exit path via
+# a trap -- including the failure paths, which under `-e` leave the recipe at the
+# failing line.
+#
+# fastlane runs actions from the PROJECT ROOT (it chdirs one level up from
+# fastlane/), so the staged path handed to the lane's ipa: option is
+# repo-root-relative -- exactly $(STAGED_IPA), with no ../ prefix. Same convention
+# as push-playstore's aab:.
+push-appstore: push-appstore-preflight
+	# 1) staged .ipa must exist (never builds/stages)
+	@test -f "$(STAGED_IPA)" || { echo "push-appstore: staged .ipa not found at '$(STAGED_IPA)' -- run 'make release-ios' first (it archives, exports and stages the .ipa). This target does NOT build or stage it." >&2; exit 1; }
+	# 2) release tag must exist locally and on the push remote
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-appstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && make push). This target does NOT create the tag." >&2; exit 1; }
+	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-appstore: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (make push)." >&2; exit 1; }
+	# Resolve the expected Team ID exactly as release-ios does: the environment
+	# wins, else ios/signing.properties. The $${VAR:-} default keeps -u happy and
+	# the file is only read when it exists (sed on a missing file would abort this
+	# .ONESHELL recipe under -e before the friendly message below could print).
+	team="$${DEVELOPMENT_TEAM:-}"
+	if [ -z "$$team" ] && [ -f ios/signing.properties ]; then \
+		team="$$(sed -n 's/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*//p' ios/signing.properties | head -n 1)"; \
+	fi
+	if [ -z "$$team" ] || [ "$$team" = "XXXXXXXXXX" ]; then \
+		echo "push-appstore: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
+		exit 1; \
+	fi
+	# Unpack the staged .ipa so codesign and plutil can see the .app inside. The
+	# trap fires on every exit path, so the temp tree never survives the recipe.
+	work="$$(mktemp -d)"
+	trap 'rm -rf "$$work"' EXIT
+	unzip -q "$(STAGED_IPA)" -d "$$work"
+	app="$$(find "$$work/Payload" -maxdepth 1 -name '*.app' -print -quit)"
+	test -n "$$app" || { echo "push-appstore: no Payload/*.app inside '$(STAGED_IPA)' -- the staged file is not a valid .ipa. Re-run 'make release-ios'." >&2; exit 1; }
+	# 3) the .ipa must describe THIS version of THIS app
+	got_id="$$(plutil -extract CFBundleIdentifier raw -o - -- "$$app/Info.plist")"
+	got_build="$$(plutil -extract CFBundleVersion raw -o - -- "$$app/Info.plist")"
+	got_version="$$(plutil -extract CFBundleShortVersionString raw -o - -- "$$app/Info.plist")"
+	echo "push-appstore: staged .ipa says id=$$got_id version=$$got_version build=$$got_build"
+	test "$$got_id" = "$(RELEASE_ID)" || { echo "push-appstore: staged .ipa has bundle identifier '$$got_id', expected '$(RELEASE_ID)'." >&2; exit 1; }
+	test "$$got_build" = "$(VERSION_CODE)" || { echo "push-appstore: staged .ipa has build number '$$got_build', but this tree is at versionCode $(VERSION_CODE) -- the staged .ipa is from another release. Re-run 'make release-ios' (or remove the stale releases/ artifact)." >&2; exit 1; }
+	test "$$got_version" = "$(VERSION)" || { echo "push-appstore: staged .ipa has marketing version '$$got_version', but this tree is at v$(VERSION) -- the staged .ipa is from another release. Re-run 'make release-ios'." >&2; exit 1; }
+	# 4) the signature must verify, and it must be OUR team's. codesign writes its
+	#    report to stderr, hence the 2>&1; --verbose=4 is what prints TeamIdentifier.
+	codesign --verify --strict "$$app"
+	got_team="$$(codesign -dv --verbose=4 "$$app" 2>&1 | sed -n 's/^TeamIdentifier=//p' | head -n 1)"
+	echo "push-appstore: .ipa signed by TeamIdentifier: $$got_team"
+	test "$$got_team" = "$$team" || { echo "push-appstore: staged .ipa is signed by team '$$got_team', expected '$$team' -- it was exported with different credentials than this tree configures." >&2; exit 1; }
+	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
+	# 5) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
+	#    Guard (5), the App Store Connect pre-flight, already ran as this target's
+	#    prerequisite -- see the comment block above for why it lives there.
+	( cd fastlane && bundle exec fastlane ios $(if $(SUBMIT),production,testing) ipa:"$(STAGED_IPA)" )
+
+# ── push-appstore-preflight ── the credential half of push-appstore, on its own.
+# Runs the fastlane `ios preflight` lane, which authenticates with the App Store
+# Connect API key and performs one READ-ONLY query against the app record. Nothing
+# is uploaded and nothing changes on the store, so this is safe to run at any time
+# -- it is the closest this platform gets to push-playstore's VALIDATE_ONLY dry run
+# (deliver has no validate-only mode; see the note on push-appstore above).
+#
+# The three APP_STORE_CONNECT_API_KEY_* variables are read from the environment by
+# fastlane's own `app_store_connect_api_key` action under its default env names, so
+# they are checked HERE only to turn an unhelpful fastlane error into a legible
+# one. They are SECRETS and are never written to disk by this target.
+push-appstore-preflight:
+	@for v in APP_STORE_CONNECT_API_KEY_KEY_ID APP_STORE_CONNECT_API_KEY_ISSUER_ID APP_STORE_CONNECT_API_KEY_KEY_FILEPATH; do \
+		eval "val=\$${$$v:-}"; \
+		test -n "$$val" || { echo "push-appstore-preflight: $$v is not set -- the App Store Connect API key is injected through the three APP_STORE_CONNECT_API_KEY_* variables (see fastlane/Fastfile, iOS block, and docs/RELEASE-IOS.md)." >&2; exit 1; }; \
+	done
+	@test -f "$$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH" || { echo "push-appstore-preflight: the API key file '$$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH' (APP_STORE_CONNECT_API_KEY_KEY_FILEPATH) does not exist." >&2; exit 1; }
+	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore-preflight: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
+	( cd fastlane && bundle exec fastlane ios preflight )
 
 # ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
 # release tag from the command line instead of the web UI, and attach the release

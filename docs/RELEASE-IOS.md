@@ -106,11 +106,30 @@ Then pick the destination — both take the staged path the build just printed:
   settings. Install it on the device through the TestFlight app.
 
 - **App Store listing + screenshots.** This is a SEPARATE concern from device
-  testing. The existing `ios testing` / `ios production` lanes push the listing
-  texts and the store screenshots from `fastlane/metadata/ios/` and
-  `fastlane/screenshots/ios/` via `upload_to_app_store`; `testing` uploads
-  without submitting for review, `production` submits. They accept the same
-  staged `ipa:` path.
+  testing, and it goes through `make push-appstore` rather than a bare fastlane
+  call:
+
+      make push-appstore            # upload + listing, NOT submitted for review
+      make push-appstore SUBMIT=1   # the same upload, and submit for Apple review
+
+  The target never builds: it uploads the `.ipa` `make release-ios` staged. Before
+  handing it to fastlane it checks that the staged `.ipa` exists, that the release
+  tag `vX.Y.Z` is pushed, that the `.ipa`'s own bundle identifier, build number and
+  marketing version match this working tree, that its signature verifies and
+  carries your Team ID, and that the App Store Connect API key can actually reach
+  the app record. The upload itself is the fastlane `ios testing` lane (or
+  `ios production` with `SUBMIT=1`), which pushes the listing texts and store
+  screenshots from `fastlane/metadata/ios/` and `fastlane/screenshots/ios/`.
+
+  Mind what `ios testing` is *not*: unlike Play's alpha track it has no separate
+  audience. The App Store has one listing and this overwrites it — "testing" means
+  "not submitted for review", not "not public". There is no iOS equivalent of
+  `push-playstore`'s `VALIDATE_ONLY=1`, because `deliver` has no validate-only
+  mode; `make push-appstore-preflight` is the closest thing — it checks the
+  credentials read-only and uploads nothing.
+
+  What fastlane does *not* push, and you therefore curate once in App Store
+  Connect: the age rating, pricing and availability, and the App Privacy answers.
 
 ## Internal vs. external TestFlight
 

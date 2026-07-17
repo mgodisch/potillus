@@ -31,9 +31,10 @@
 # and `testing` / `production` upload an already-built, signed App Bundle plus the
 # store listing to Google Play. iOS (`platform :ios`): `screenshots` captures the
 # App Store screenshots via snapshot (Snapfile), `alpha` uploads an already-built,
-# signed .ipa to internal TestFlight, and `testing` / `production` upload it plus
-# the App Store listing. NO lane builds anything -- see the per-lane `desc` text
-# and the platform-level comment before the iOS block for the details.
+# signed .ipa to internal TestFlight, `testing` / `production` upload it plus the
+# App Store listing, and `preflight` checks the App Store Connect credentials
+# without uploading anything. NO lane builds anything -- see the per-lane `desc`
+# text and the platform-level comment before the iOS block for the details.
 #
 # The screenshot lanes are intended to be invoked by the `make screenshots-android`
 # and `make screenshots-ios` targets (the top-level Makefile), which wrap them with
@@ -193,6 +194,43 @@ platform :ios do
     # tree. Status-bar cleanup and PDF rendering are handled around this by the
     # Makefile, exactly as on Android.
     capture_ios_screenshots
+  end
+
+  # ── preflight ── prove, BEFORE anything is uploaded, that the App Store Connect
+  # API key in the environment actually authenticates AND that this app's record is
+  # reachable with it. The Android counterpart of this guard lives in the Makefile
+  # (`push-playstore` runs `fastlane run validate_play_store_json_key`), because
+  # supply's key is a plain file path and fastlane's CLI takes it as a string. The
+  # iOS credential cannot travel that way: `app_store_connect_api_key` returns a
+  # HASH, and fastlane's `run` CLI supports only primitive types -- "Hashes are not
+  # currently supported" (docs.fastlane.tools). So the check lives HERE, in Ruby,
+  # where the hash is passed directly, and `make push-appstore` calls this lane.
+  #
+  # `app_store_build_number` is a read-only App Store Connect query, which makes it
+  # a cheap, side-effect-free way to exercise the whole path: the key file, the key
+  # ID and issuer ID, the key's role, and the existence of the app record for the
+  # Appfile's app_identifier. Two options keep it from failing on a healthy app:
+  #   live: false            -- query the edit/TestFlight train, not the ready-for-
+  #                             sale one, which does not exist until a first release
+  #                             has actually gone live.
+  #   initial_build_number:0 -- documented as "sets the build number to given value
+  #                             if no build (upload) is in current train", i.e. a
+  #                             brand-new app with no build yet answers 0 instead of
+  #                             erroring. We do not use the number; reaching it IS
+  #                             the check.
+  desc 'Verify the App Store Connect API key authenticates and this app is reachable.'
+  desc 'Read-only: queries the current build number and uploads nothing. Run by'
+  desc '`make push-appstore` before the upload; useful on its own to test credentials.'
+  lane :preflight do
+    api_key = app_store_connect_api_key
+
+    build_number = app_store_build_number(
+      api_key: api_key,
+      live: false,
+      initial_build_number: 0
+    )
+
+    UI.success("preflight: App Store Connect reachable; current build number: #{build_number}")
   end
 
   desc 'Upload the SIGNED .ipa to TestFlight for INTERNAL testing. Unlike the'
