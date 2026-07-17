@@ -152,40 +152,38 @@ fun CalendarScreen(
             if (isYear) {
                 // ── Year view ─────────────────────────────────────────────────
                 item {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(12.dp)) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                IconButton(onClick = { vm.prevPeriod() }) {
-                                    // Accessible name for the icon-only navigation
-                                    // button: without it a screen reader announces
-                                    // just "button" (WCAG 4.1.2 / name-role-value).
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = stringResource(R.string.cd_prev_year),
-                                    )
-                                }
-                                Text(state.currentYear.toString(), style = MaterialTheme.typography.titleMedium)
-                                IconButton(onClick = { vm.nextPeriod() }) {
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.ArrowForward,
-                                        contentDescription = stringResource(R.string.cd_next_year),
-                                    )
-                                }
+                    SectionCard(contentPadding = 12.dp) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            IconButton(onClick = { vm.prevPeriod() }) {
+                                // Accessible name for the icon-only navigation
+                                // button: without it a screen reader announces
+                                // just "button" (WCAG 4.1.2 / name-role-value).
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.cd_prev_year),
+                                )
                             }
-                            Spacer(Modifier.height(8.dp))
-                            YearCalendarView(
-                                year = state.currentYear,
-                                summaries = state.daySummaries,
-                                limitGrams = state.limitInfo.limitGrams,
-                                today = state.today,
-                                onDayClick = { date -> vm.selectDate(date) },
-                                weekStart = state.weekStartDay,
-                            )
+                            Text(state.currentYear.toString(), style = MaterialTheme.typography.titleMedium)
+                            IconButton(onClick = { vm.nextPeriod() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = stringResource(R.string.cd_next_year),
+                                )
+                            }
                         }
+                        Spacer(Modifier.height(8.dp))
+                        YearCalendarView(
+                            year = state.currentYear,
+                            summaries = state.daySummaries,
+                            limitGrams = state.limitInfo.limitGrams,
+                            today = state.today,
+                            onDayClick = { date -> vm.selectDate(date) },
+                            weekStart = state.weekStartDay,
+                        )
                     }
                 }
                 state.selectedDate?.let { date ->
@@ -396,141 +394,139 @@ private fun MonthCalendar(
 ) {
     // Per-app locale for the month header and weekday names (see formattingLocale).
     val locale = LocalContext.current.formattingLocale()
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = onPrevMonth) {
-                    // Accessible name for the icon-only navigation button (see the
-                    // year navigation above; WCAG 4.1.2 name-role-value).
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_prev_month),
-                    )
-                }
+    SectionCard(contentPadding = 12.dp) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onPrevMonth) {
+                // Accessible name for the icon-only navigation button (see the
+                // year navigation above; WCAG 4.1.2 name-role-value).
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_prev_month),
+                )
+            }
+            Text(
+                // monthYearFormatter (NOT a literal "MMMM yyyy"): the label's
+                // field order and month FORM are locale data — CJK is
+                // year-first ("2026年6月") and inflected languages need the
+                // standalone month ("czerwiec 2026"), see l10n/LocaleSupport.kt.
+                currentMonth.format(monthYearFormatter(locale)),
+                style = MaterialTheme.typography.titleMedium,
+                // LAYOUT HARDENING (v0.81.0 QA, eighth round): between two
+                // fixed-size IconButtons an unweighted Text is measured at its
+                // intrinsic width and can claim everything the previous sibling
+                // left over, pushing the "next month" arrow off the row. The
+                // weight bounds it; centring is preserved explicitly because the
+                // weighted child now fills the gap that SpaceBetween used to
+                // create, and a long name (el "Σεπτέμβριος 2026") ellipsizes
+                // instead of displacing a control.
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            IconButton(onClick = onNextMonth) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = stringResource(R.string.cd_next_month),
+                )
+            }
+        }
+        Row(Modifier.fillMaxWidth()) {
+            // Weekday header rotated so column 0 is the configured first day of
+            // the week. weekStart is ISO 1..7; (weekStart - 1 + i) % 7 + 1 walks
+            // the seven weekdays in display order.
+            (0..6).map { i ->
+                DayOfWeek.of((weekStart - 1 + i) % 7 + 1)
+                    .getDisplayName(TextStyle.SHORT, locale).take(2)
+            }.forEach { label ->
                 Text(
-                    // monthYearFormatter (NOT a literal "MMMM yyyy"): the label's
-                    // field order and month FORM are locale data — CJK is
-                    // year-first ("2026年6月") and inflected languages need the
-                    // standalone month ("czerwiec 2026"), see l10n/LocaleSupport.kt.
-                    currentMonth.format(monthYearFormatter(locale)),
-                    style = MaterialTheme.typography.titleMedium,
-                    // LAYOUT HARDENING (v0.81.0 QA, eighth round): between two
-                    // fixed-size IconButtons an unweighted Text is measured at its
-                    // intrinsic width and can claim everything the previous sibling
-                    // left over, pushing the "next month" arrow off the row. The
-                    // weight bounds it; centring is preserved explicitly because the
-                    // weighted child now fills the gap that SpaceBetween used to
-                    // create, and a long name (el "Σεπτέμβριος 2026") ellipsizes
-                    // instead of displacing a control.
+                    label,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                IconButton(onClick = onNextMonth) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = stringResource(R.string.cd_next_month),
-                    )
-                }
             }
+        }
+        val firstDay = currentMonth.atDay(1)
+        val totalDays = currentMonth.lengthOfMonth()
+        val startOffset = (firstDay.dayOfWeek.value - weekStart + 7) % 7
+        val rows = (startOffset + totalDays + 6) / 7
+
+        // Capture composable color before the loop
+        val overLimitColor = errorColor()
+        // Long, localized date used in each day cell's accessibility label
+        // (built once per grid composition rather than per cell).
+        val dayDescFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
+
+        repeat(rows) { row ->
             Row(Modifier.fillMaxWidth()) {
-                // Weekday header rotated so column 0 is the configured first day of
-                // the week. weekStart is ISO 1..7; (weekStart - 1 + i) % 7 + 1 walks
-                // the seven weekdays in display order.
-                (0..6).map { i ->
-                    DayOfWeek.of((weekStart - 1 + i) % 7 + 1)
-                        .getDisplayName(TextStyle.SHORT, locale).take(2)
-                }.forEach { label ->
-                    Text(
-                        label,
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            val firstDay = currentMonth.atDay(1)
-            val totalDays = currentMonth.lengthOfMonth()
-            val startOffset = (firstDay.dayOfWeek.value - weekStart + 7) % 7
-            val rows = (startOffset + totalDays + 6) / 7
-
-            // Capture composable color before the loop
-            val overLimitColor = errorColor()
-            // Long, localized date used in each day cell's accessibility label
-            // (built once per grid composition rather than per cell).
-            val dayDescFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
-
-            repeat(rows) { row ->
-                Row(Modifier.fillMaxWidth()) {
-                    repeat(7) { col ->
-                        val day = row * 7 + col - startOffset + 1
-                        if (day in 1..totalDays) {
-                            val date = DayResolver.formatDate(currentMonth.atDay(day))
-                            val summary = daySummaries[date]
-                            val isSelected = date == selectedDate
-                            // Accessibility label: the under/over-limit state is shown
-                            // on screen by the dot's COLOUR only, so a screen reader
-                            // would otherwise miss it (WCAG 1.4.1 / 1.1.1). Reuse the
-                            // year heat-map's "date, grams, status" caption strings so
-                            // no new locale keys are needed. Empty days stay unlabelled.
-                            val dayDesc: String? = summary?.let { s ->
-                                val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
-                                    R.string.year_calendar_over_limit
-                                } else {
-                                    R.string.year_calendar_under_limit
-                                }
-                                stringResource(
-                                    R.string.year_calendar_day_desc,
-                                    dayDescFmt.format(currentMonth.atDay(day)),
-                                    s.totalGrams.fmt0(locale),
-                                    stringResource(statusRes),
-                                )
+                repeat(7) { col ->
+                    val day = row * 7 + col - startOffset + 1
+                    if (day in 1..totalDays) {
+                        val date = DayResolver.formatDate(currentMonth.atDay(day))
+                        val summary = daySummaries[date]
+                        val isSelected = date == selectedDate
+                        // Accessibility label: the under/over-limit state is shown
+                        // on screen by the dot's COLOUR only, so a screen reader
+                        // would otherwise miss it (WCAG 1.4.1 / 1.1.1). Reuse the
+                        // year heat-map's "date, grams, status" caption strings so
+                        // no new locale keys are needed. Empty days stay unlabelled.
+                        val dayDesc: String? = summary?.let { s ->
+                            val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
+                                R.string.year_calendar_over_limit
+                            } else {
+                                R.string.year_calendar_under_limit
                             }
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f).aspectRatio(1f)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-                                    .then(
-                                        // Rich label for days with data; day-number text
-                                        // remains the name for empty days.
-                                        dayDesc?.let { d -> Modifier.semantics { contentDescription = d } } ?: Modifier,
-                                    )
-                                    // role = Button so assistive tech announces the cell as
-                                    // an actionable control (WCAG 4.1.2 Name, Role, Value).
-                                    .clickable(role = Role.Button) { onSelectDate(date) },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        day.toString(),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                                    )
-                                    if (summary != null) {
-                                        Box(
-                                            Modifier.size(5.dp)
-                                                .clip(MaterialTheme.shapes.extraSmall)
-                                                .background(
-                                                    if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
-                                                        overLimitColor
-                                                    } else {
-                                                        MaterialTheme.colorScheme.primary
-                                                    },
-                                                ),
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            Spacer(Modifier.weight(1f).aspectRatio(1f))
+                            stringResource(
+                                R.string.year_calendar_day_desc,
+                                dayDescFmt.format(currentMonth.atDay(day)),
+                                s.totalGrams.fmt0(locale),
+                                stringResource(statusRes),
+                            )
                         }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f).aspectRatio(1f)
+                                .clip(MaterialTheme.shapes.small)
+                                .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                .then(
+                                    // Rich label for days with data; day-number text
+                                    // remains the name for empty days.
+                                    dayDesc?.let { d -> Modifier.semantics { contentDescription = d } } ?: Modifier,
+                                )
+                                // role = Button so assistive tech announces the cell as
+                                // an actionable control (WCAG 4.1.2 Name, Role, Value).
+                                .clickable(role = Role.Button) { onSelectDate(date) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    day.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                )
+                                if (summary != null) {
+                                    Box(
+                                        Modifier.size(5.dp)
+                                            .clip(MaterialTheme.shapes.extraSmall)
+                                            .background(
+                                                if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
+                                                    overLimitColor
+                                                } else {
+                                                    MaterialTheme.colorScheme.primary
+                                                },
+                                            ),
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Spacer(Modifier.weight(1f).aspectRatio(1f))
                     }
                 }
             }

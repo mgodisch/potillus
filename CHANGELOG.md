@@ -75,6 +75,16 @@ two stores' notes need not match).
   sits in its own [SectionCard], which does the grouping the horizontal rules
   were going to do. "The libraries below are compiled into this application" is
   gone from both platforms: the cards say it.
+- **Fixed: the Statistics and Calendar cards did not match the rest of the app.**
+  Nine cards — seven in StatsScreen, two in CalendarScreen — were written as a
+  bare `Card(modifier = ...)` with no `colors` argument, so they took Material
+  3's default container colour instead of the `surface` that Settings, Drinks and
+  the entry list use. It looked like a design decision and was a forgotten
+  argument. All nine are [SectionCard] now and inherit the right colour by
+  construction; CalendarScreen's two keep their denser 12dp inset and
+  StatsScreen's metric cards their 8dp row spacing, both passed explicitly rather
+  than re-implemented. TodayScreen's daily summary and CalendarScreen's
+  selected-day panels are untouched: `primaryContainer` there is deliberate.
 - **`SectionCard`: one card, instead of five screens guessing.** The app's
   neutral grouping card — surface-coloured, 1dp lift, 16dp padding — existed
   three times written out by hand (SettingsScreen's private `SettingsCard`,

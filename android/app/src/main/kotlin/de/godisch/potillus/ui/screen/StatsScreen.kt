@@ -183,113 +183,107 @@ fun StatsScreen(
 
             // ── Bar chart ─────────────────────────────────────────────────
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        val labelFn: (ChartBucket) -> String = { b ->
-                            val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
-                            when (state.period) {
-                                StatsPeriod.WEEK -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
-                                StatsPeriod.MONTH -> b.labelDate.substring(8) // day-of-month
-                                // YEAR uses one bucket per calendar month, so the
-                                // month name of the bucket's first day is the bar's
-                                // natural label (one label per month).
-                                StatsPeriod.YEAR -> d.month.getDisplayName(TextStyle.SHORT, locale)
-                            }
+                SectionCard {
+                    val labelFn: (ChartBucket) -> String = { b ->
+                        val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
+                        when (state.period) {
+                            StatsPeriod.WEEK -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
+                            StatsPeriod.MONTH -> b.labelDate.substring(8) // day-of-month
+                            // YEAR uses one bucket per calendar month, so the
+                            // month name of the bucket's first day is the bar's
+                            // natural label (one label per month).
+                            StatsPeriod.YEAR -> d.month.getDisplayName(TextStyle.SHORT, locale)
                         }
-                        val isYear = state.period == StatsPeriod.YEAR
-                        AlcoholBarChart(
-                            buckets = state.chartBuckets,
-                            limitGrams = state.limitInfo.limitGrams,
-                            labelFn = labelFn,
-                            // No daily-limit line in the YEAR view: its monthly
-                            // per-day averages are not compared against a daily limit.
-                            showLimitLine = !isYear,
-                            // Print the per-day average above every bar on the sparse
-                            // axes the user asked for: WEEK (the day's grams) and YEAR
-                            // (the month's grams-per-day). The dense ~30-bar MONTH
-                            // view stays unlabelled to avoid clutter.
-                            showBarValues = state.period == StatsPeriod.WEEK || isYear,
-                        )
                     }
+                    val isYear = state.period == StatsPeriod.YEAR
+                    AlcoholBarChart(
+                        buckets = state.chartBuckets,
+                        limitGrams = state.limitInfo.limitGrams,
+                        labelFn = labelFn,
+                        // No daily-limit line in the YEAR view: its monthly
+                        // per-day averages are not compared against a daily limit.
+                        showLimitLine = !isYear,
+                        // Print the per-day average above every bar on the sparse
+                        // axes the user asked for: WEEK (the day's grams) and YEAR
+                        // (the month's grams-per-day). The dense ~30-bar MONTH
+                        // view stays unlabelled to avoid clutter.
+                        showBarValues = state.period == StatsPeriod.WEEK || isYear,
+                    )
                 }
             }
 
             // ── Key metrics ───────────────────────────────────────────────
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        StatRow(stringResource(R.string.total_period), "${state.totalGrams.fmt1(locale)} g")
-                        HorizontalDivider()
-                        StatRow(stringResource(R.string.avg_per_day), "${state.avgPerDay.fmt1(locale)} g")
-                        HorizontalDivider()
-                        StatRow(stringResource(R.string.avg_per_drink_day), "${state.avgPerDrinkDay.fmt1(locale)} g")
-                        HorizontalDivider()
-                        StatRow(
-                            stringResource(R.string.days_over_daily_limit),
-                            state.daysOverDailyLimit.toString(),
-                            // Over-limit statistics share the saturated danger red
-                            // used by delete icons and traffic-light bullets, instead
-                            // of the softer Material `error` colour, so every "over
-                            // limit" cue in the app looks identical.
-                            valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor(),
-                        )
-                        HorizontalDivider()
-                        StatRow(
-                            stringResource(R.string.days_over_weekly_limit),
-                            state.daysOverWeeklyLimit.toString(),
-                            valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor(),
-                        )
-                        HorizontalDivider()
-                        StatRow(
-                            stringResource(R.string.days_over_drink_day_limit),
-                            state.daysOverDrinkDayLimit.toString(),
-                            valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor(),
-                        )
-                        HorizontalDivider()
-                        StatRow(
-                            stringResource(R.string.abstinent_days),
-                            state.abstinentDays.toString(),
-                            valueColor = if (state.abstinentDays > 0) successColor() else MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
+                SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    StatRow(stringResource(R.string.total_period), "${state.totalGrams.fmt1(locale)} g")
+                    HorizontalDivider()
+                    StatRow(stringResource(R.string.avg_per_day), "${state.avgPerDay.fmt1(locale)} g")
+                    HorizontalDivider()
+                    StatRow(stringResource(R.string.avg_per_drink_day), "${state.avgPerDrinkDay.fmt1(locale)} g")
+                    HorizontalDivider()
+                    StatRow(
+                        stringResource(R.string.days_over_daily_limit),
+                        state.daysOverDailyLimit.toString(),
+                        // Over-limit statistics share the saturated danger red
+                        // used by delete icons and traffic-light bullets, instead
+                        // of the softer Material `error` colour, so every "over
+                        // limit" cue in the app looks identical.
+                        valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor(),
+                    )
+                    HorizontalDivider()
+                    StatRow(
+                        stringResource(R.string.days_over_weekly_limit),
+                        state.daysOverWeeklyLimit.toString(),
+                        valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor(),
+                    )
+                    HorizontalDivider()
+                    StatRow(
+                        stringResource(R.string.days_over_drink_day_limit),
+                        state.daysOverDrinkDayLimit.toString(),
+                        valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor(),
+                    )
+                    HorizontalDivider()
+                    StatRow(
+                        stringResource(R.string.abstinent_days),
+                        state.abstinentDays.toString(),
+                        valueColor = if (state.abstinentDays > 0) successColor() else MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
 
             // ── Streaks & trend ───────────────────────────────────────────
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            stringResource(R.string.streak_trend),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        HorizontalDivider()
-                        StatRow(
-                            stringResource(R.string.current_streak),
-                            pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
-                            valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
-                        )
-                        HorizontalDivider()
-                        StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
-                        HorizontalDivider()
-                        val trendText = when (state.trend) {
-                            Trend.UP -> "+${state.trendPercent.fmt0(locale)} % ↑"
-                            Trend.DOWN -> "${state.trendPercent.fmt0(locale)} % ↓"
-                            Trend.FLAT -> "–"
-                        }
-                        StatRow(
-                            stringResource(R.string.trend_vs_prev),
-                            trendText,
-                            valueColor = when (state.trend) {
-                                // A rising per-day average is a "bad" signal, shown in
-                                // the same saturated danger red as the over-limit stats.
-                                Trend.UP -> dangerRedColor()
-                                Trend.DOWN -> successColor()
-                                Trend.FLAT -> MaterialTheme.colorScheme.onSurface
-                            },
-                        )
+                SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        stringResource(R.string.streak_trend),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    HorizontalDivider()
+                    StatRow(
+                        stringResource(R.string.current_streak),
+                        pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
+                        valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
+                    )
+                    HorizontalDivider()
+                    StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
+                    HorizontalDivider()
+                    val trendText = when (state.trend) {
+                        Trend.UP -> "+${state.trendPercent.fmt0(locale)} % ↑"
+                        Trend.DOWN -> "${state.trendPercent.fmt0(locale)} % ↓"
+                        Trend.FLAT -> "–"
                     }
+                    StatRow(
+                        stringResource(R.string.trend_vs_prev),
+                        trendText,
+                        valueColor = when (state.trend) {
+                            // A rising per-day average is a "bad" signal, shown in
+                            // the same saturated danger red as the over-limit stats.
+                            Trend.UP -> dangerRedColor()
+                            Trend.DOWN -> successColor()
+                            Trend.FLAT -> MaterialTheme.colorScheme.onSurface
+                        },
+                    )
                 }
             }
 
@@ -298,22 +292,20 @@ fun StatsScreen(
             // when at least one hour has consumption in the selected period.
             if (state.hourBucketAverages.any { it > 0.0 }) {
                 item {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text(
-                                stringResource(R.string.stats_time_of_day),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            ValueBarChart(
-                                // Eight 3-hour buckets; average grams/day printed above.
-                                values = state.hourBucketAverages,
-                                labelFor = { b -> "${b * 3}\u2013${b * 3 + 3}" },
-                                showValues = true,
-                                chartLabel = stringResource(R.string.stats_time_of_day),
-                            )
-                        }
+                    SectionCard {
+                        Text(
+                            stringResource(R.string.stats_time_of_day),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        ValueBarChart(
+                            // Eight 3-hour buckets; average grams/day printed above.
+                            values = state.hourBucketAverages,
+                            labelFor = { b -> "${b * 3}\u2013${b * 3 + 3}" },
+                            showValues = true,
+                            chartLabel = stringResource(R.string.stats_time_of_day),
+                        )
                     }
                 }
             }
@@ -323,28 +315,26 @@ fun StatsScreen(
             // at least one weekday occurred as a drink day in the period.
             if (state.weekdayAverages.any { it != null }) {
                 item {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text(
-                                stringResource(R.string.stats_weekday),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            // Short weekday names for the axis, in the same rotated
-                            // order as the values (locale's first weekday first).
-                            val weekdayLabels = state.weekdayOrder.map { iso ->
-                                DayOfWeek.of(iso)
-                                    .getDisplayName(TextStyle.SHORT, locale).take(2)
-                            }
-                            ValueBarChart(
-                                // null (weekday never a drink day) → 0.0 ⇒ empty slot.
-                                values = state.weekdayAverages.map { it ?: 0.0 },
-                                labelFor = { i -> weekdayLabels.getOrElse(i) { "" } },
-                                showValues = true,
-                                chartLabel = stringResource(R.string.stats_weekday),
-                            )
+                    SectionCard {
+                        Text(
+                            stringResource(R.string.stats_weekday),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        // Short weekday names for the axis, in the same rotated
+                        // order as the values (locale's first weekday first).
+                        val weekdayLabels = state.weekdayOrder.map { iso ->
+                            DayOfWeek.of(iso)
+                                .getDisplayName(TextStyle.SHORT, locale).take(2)
                         }
+                        ValueBarChart(
+                            // null (weekday never a drink day) → 0.0 ⇒ empty slot.
+                            values = state.weekdayAverages.map { it ?: 0.0 },
+                            labelFor = { i -> weekdayLabels.getOrElse(i) { "" } },
+                            showValues = true,
+                            chartLabel = stringResource(R.string.stats_weekday),
+                        )
                     }
                 }
             }
@@ -352,16 +342,14 @@ fun StatsScreen(
             // ── Category breakdown donut chart ────────────────────────────
             if (state.categoryBreakdown.isNotEmpty()) {
                 item {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text(
-                                stringResource(R.string.stats_category_breakdown),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            CategoryDonutChart(data = state.categoryBreakdown)
-                        }
+                    SectionCard {
+                        Text(
+                            stringResource(R.string.stats_category_breakdown),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        CategoryDonutChart(data = state.categoryBreakdown)
                     }
                 }
             }
@@ -371,27 +359,25 @@ fun StatsScreen(
             // statistics content; a button opens a date-range dialog, then a
             // share sheet once the file has been written.
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(
-                            stringResource(R.string.export),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            stringResource(R.string.export_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = { showCsvRangeDialog = true }, modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.export_csv))
-                            }
-                            OutlinedButton(onClick = { showPdfRangeDialog = true }, modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.export_pdf))
-                            }
+                SectionCard {
+                    Text(
+                        stringResource(R.string.export),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        stringResource(R.string.export_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { showCsvRangeDialog = true }, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.export_csv))
+                        }
+                        OutlinedButton(onClick = { showPdfRangeDialog = true }, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.export_pdf))
                         }
                     }
                 }

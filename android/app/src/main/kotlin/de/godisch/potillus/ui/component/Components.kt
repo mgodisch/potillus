@@ -103,12 +103,19 @@ import java.time.ZoneId
  *   CalendarScreen's selected-day panels — which deliberately use
  *   `primaryContainer`. This one is the quiet default; those are the accents.
  *
- * @param modifier Applied to the card. Defaults to full width.
- * @param content  The card body, laid out in a [Column] with 16dp padding.
+ * @param modifier            Applied to the card. Defaults to full width.
+ * @param contentPadding      Inset around the body. 16dp is the app's standard;
+ *                            CalendarScreen's denser panels pass 12dp.
+ * @param verticalArrangement Spacing between the body's children, forwarded to
+ *                            the [Column]. StatsScreen's multi-row cards pass
+ *                            `Arrangement.spacedBy(8.dp)`.
+ * @param content             The card body.
  */
 @Composable
 fun SectionCard(
     modifier: Modifier = Modifier.fillMaxWidth(),
+    contentPadding: Dp = 16.dp,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
@@ -116,7 +123,11 @@ fun SectionCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(Modifier.padding(16.dp), content = content)
+        Column(
+            modifier = Modifier.padding(contentPadding),
+            verticalArrangement = verticalArrangement,
+            content = content,
+        )
     }
 }
 
