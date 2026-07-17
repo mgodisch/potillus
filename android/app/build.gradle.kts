@@ -183,10 +183,10 @@ android {
         // versionName: human-readable MAJOR.MINOR.PATCH string.
         // Keep both in lock-step with the CHANGELOG and the README title —
         // release-check.sh §1 enforces this.
-        versionCode = 94
+        versionCode = 95
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.83.0"
+        versionName = "0.83.1"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)

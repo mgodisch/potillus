@@ -40,6 +40,59 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
+## v0.83.1
+
+Fix store upload paths for both stores
+
+This opens the 0.83.1 cycle with the version bump — `versionCode` 94 → 95 and the
+human version 0.83.0 → 0.83.1. It exists because publishing v0.83.0 for real
+found two path defects that no gate could have caught: both live in the seam
+between this repository's layout and what fastlane assumes about it, and both only
+speak when a store is actually on the other end. v0.83.0 was tagged and its
+bundle is in the Play alpha track, so its entry below is closed; the corrections
+belong here.
+
+The store notes are still English-only: `changelogs/95.txt` exists for `en-US`,
+and the remaining 20 locales — plus the iOS `release_notes.txt`, which are not
+versionCode-keyed and still describe the 0.83.0 changes the App Store has yet to
+receive — follow at release time, once this cycle has taken its final shape.
+
+- **The Play preflight looked for the key one directory too deep.** `push-playstore`
+  passed `fastlane/play-store-credentials.json` — repo-root-relative, and correct
+  as such — into a `( cd fastlane && bundle exec fastlane run ... )` subshell,
+  which resolved it against `fastlane/` and asked for
+  `<root>/fastlane/fastlane/play-store-credentials.json`. The upload never
+  started. What makes this worth more than a one-character fix is the rule it
+  exposed, which the comment above the target had stated too broadly: a fastlane
+  LANE is chdir'd back to the project root, so `aab:`/`ipa:` may be
+  root-relative — that half was right, and the same run proved it by uploading
+  `releases/…_94.aab` — but a `fastlane run` ONE-OFF gets no such chdir and
+  resolves against the shell's cwd. The Makefile has exactly one `fastlane run`,
+  and it now receives an absolute path: a new `PLAY_JSON_KEY` resolves the
+  Appfile's own default (or `SUPPLY_JSON_KEY`, relative or not) through make's
+  `$(abspath)`, at parse time, from the repository root. `$(abspath)` and not
+  `realpath`, which macOS does not ship without coreutils. The Appfile's relative
+  default stays exactly as it is: it is read by lanes, which run from the root,
+  where it is right.
+- **deliver was never told where the iOS listing lives.** `upload_to_app_store`
+  aborted with "Unsupported directory name(s) for screenshots/metadata in
+  './fastlane/screenshots': ios". The cause was a claim in the Fastfile —
+  "Metadata + screenshots come from fastlane/metadata/ios/ (the default path once
+  platform is ios)" — that is simply untrue: deliver's defaults are
+  `./fastlane/metadata` and `./fastlane/screenshots` and do not consult `platform`
+  at all. Pointed there, it read this repository's platform-qualified `android`
+  and `ios` directories as LOCALE names and rejected them. The listing is
+  platform-qualified on purpose — `fastlane/metadata/ios` beside
+  `fastlane/metadata/android`, which supply and F-Droid share; `Snapfile`'s
+  `output_directory` writes the screenshots to `fastlane/screenshots/ios`;
+  `check-ios-metadata.py` reads `fastlane/metadata/ios` — so the tree is right and
+  the configuration was missing. `metadata_path` and `screenshots_path` are now
+  passed explicitly, and the comment that asserted the opposite is gone. Note that
+  the screenshots error hid an identical one behind it: `metadata` would have
+  failed next, for the same reason.
+
+---
+
 ## v0.83.0
 
 Fix iOS presets, cold-start lock and freezes

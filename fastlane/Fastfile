@@ -157,9 +157,11 @@ end
 #
 # These lanes manage the App Store listing the same way the Android lanes manage
 # the Play listing: the repository is the single source of truth. The listing
-# texts, keywords and release notes live in fastlane/metadata/ios/ and are pushed
-# verbatim on every upload, so the App Store and the Play Store never drift from
-# what is committed here.
+# texts, keywords and release notes live in fastlane/metadata/ios/ and the store
+# screenshots in fastlane/screenshots/ios/; both paths are handed to deliver
+# EXPLICITLY (its defaults ignore the platform), and both are pushed verbatim on
+# every upload, so the App Store and the Play Store never drift from what is
+# committed here.
 #
 # AUTHENTICATION -- App Store Connect API key (.p8), the modern, 2FA-proof method.
 #   `app_store_connect_api_key` reads three values and stores the resulting token
@@ -285,9 +287,22 @@ platform :ios do
       # `ipa:` -- mirroring how the Android lanes take `aab:`.
       ipa: options[:ipa] || 'ios/build/Potillus.ipa',
 
-      # Metadata + screenshots come from fastlane/metadata/ios/ (the default path
-      # once platform is ios). Push them on every upload so the listing matches
-      # the repository -- every skip_* below is false.
+      # WHERE the listing lives. Both of these are REQUIRED, not decoration: this
+      # repository serves two stores, so the trees are platform-qualified
+      # (fastlane/metadata/ios beside fastlane/metadata/android, and likewise for
+      # screenshots). deliver's defaults are NOT platform-aware -- they are
+      # ./fastlane/metadata and ./fastlane/screenshots regardless of `platform`
+      # (docs.fastlane.tools/actions/deliver). Pointed at those, deliver reads the
+      # `android`/`ios` directories as LOCALE names, finds them in neither case on
+      # its list of App Store languages, and aborts with "Unsupported directory
+      # name(s) for screenshots/metadata". The paths are repo-root-relative because
+      # a fastlane LANE runs from the project root (see push-appstore in the
+      # Makefile for the one place where that is not true).
+      metadata_path: 'fastlane/metadata/ios',
+      screenshots_path: 'fastlane/screenshots/ios',
+
+      # Push them on every upload so the listing matches the repository -- every
+      # skip_* below is false.
       skip_metadata: false,
       skip_screenshots: false,
 

@@ -1136,6 +1136,21 @@ push:
 # F-Droid release APK, so both publishing targets pin against this one value.
 SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1 | tr 'A-F' 'a-f')
 
+# The Play service-account key, ABSOLUTE. The path mirrors the Appfile's own
+# default (SUPPLY_JSON_KEY if set, else fastlane/play-store-credentials.json), but
+# $(abspath) resolves it against make's working directory -- the repository root --
+# BEFORE any recipe runs. That matters because the preflight below hands the path
+# to a `fastlane run` one-off inside a `( cd fastlane && ... )` subshell: a lane
+# gets fastlane's chdir back to the project root, a `run` one-off does NOT, so a
+# repo-root-relative path was resolved against fastlane/ and produced
+# <root>/fastlane/fastlane/play-store-credentials.json. Absolute is immune to both.
+# $(abspath) leaves an already-absolute SUPPLY_JSON_KEY untouched, and it is a
+# make builtin -- no realpath, which macOS does not ship without coreutils.
+# NOTE this is the MAKE-side path only. The lane at step 5 gets its key from the
+# Appfile, whose relative default is correct there precisely because lanes DO run
+# from the root.
+PLAY_JSON_KEY := $(abspath $(if $(SUPPLY_JSON_KEY),$(SUPPLY_JSON_KEY),fastlane/play-store-credentials.json))
+
 # ── push-playstore ── upload the STAGED release bundle to Google Play via the
 # fastlane `testing` lane. Never builds or stages (that is `make release-android`); FAILS
 # FAST if the staged AAB is missing. Uploads only the staged bundle so the exact
@@ -1157,9 +1172,12 @@ SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | he
 # explicitly. The remote pick uses `|| true` inside the substitution because,
 # under `.SHELLFLAGS := -eu -o pipefail`, `git rev-parse @{u}` with no upstream
 # would abort the recipe on the assignment before the `${remote:-origin}` fallback
-# runs. fastlane runs actions from the PROJECT ROOT (chdir one level up from
-# fastlane/), so the staged path passed to the lane's aab: option is
-# repo-root-relative -- exactly $(STAGED_AAB), no ../ prefix.
+# runs. A fastlane LANE runs from the PROJECT ROOT (fastlane chdirs one level up
+# out of fastlane/), so the staged path passed to the lane's aab: option is
+# repo-root-relative -- exactly $(STAGED_AAB), no ../ prefix. A `fastlane run`
+# one-off does NOT get that chdir: it resolves paths against the shell's cwd,
+# which the `( cd fastlane && ... )` subshell has already moved into fastlane/.
+# Hence PLAY_JSON_KEY below is made ABSOLUTE and the two forms cannot be confused.
 push-playstore:
 	# 1) staged AAB must exist (never builds/stages)
 	@test -f "$(STAGED_AAB)" || { echo "push-playstore: staged AAB not found at '$(STAGED_AAB)' -- run 'make release-android' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
@@ -1175,10 +1193,10 @@ push-playstore:
 	echo "push-playstore: AAB signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
-	@key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; test -f "$$key" || { echo "push-playstore: Play service-account key not found at '$$key' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
+	@test -f "$(PLAY_JSON_KEY)" || { echo "push-playstore: Play service-account key not found at '$(PLAY_JSON_KEY)' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
 	# 4) pre-flight: prove the key can actually reach the Play API BEFORE uploading
 	#    (the action never raises, so its success line is required explicitly)
-	key="$${SUPPLY_JSON_KEY:-fastlane/play-store-credentials.json}"; ( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$$key" ) | grep -q 'Successfully established connection to Google Play Store' || { echo "push-playstore: the Play service-account key at '$$key' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1; }
+	( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$(PLAY_JSON_KEY)" ) | grep -q 'Successfully established connection to Google Play Store' || { echo "push-playstore: the Play service-account key at '$(PLAY_JSON_KEY)' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1; }
 	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir)
 	( cd fastlane && bundle exec fastlane testing aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
 
