@@ -146,6 +146,55 @@ final class PreferencesStoreTests: XCTestCase {
         XCTAssertEqual(settings.statsFromDate, "")
     }
 
+    /// A PRESENT but unreadable file is not a first launch, and must not seed.
+    ///
+    /// This is the device-restore case, and it is reachable: the key is
+    /// `ThisDeviceOnly`, so restoring a backup onto a new phone brings prefs.bin
+    /// back without the key that opens it. Until the 0.83.0 QA round the seed
+    /// fired on "readFromDisk() returned nil", which this case satisfies — so the
+    /// floor was set to the RESTORE date, and a user who had opted their database
+    /// into the device backup got their whole restored history silently dropped
+    /// out of every statistic. The file's existence is now the signal, so the
+    /// answer here is the plain defaults: no floor, the whole history.
+    func testAnUnreadableFileIsNotAFirstLaunchAndDoesNotSeed() async throws {
+        // An installation writes its settings under one key...
+        let existing = makeStore()
+        try await existing.update { $0.dailyLimitGrams = 30.0 }
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
+
+        // ...and comes back under another: the restored phone, new keychain.
+        let restored = PreferencesStore(
+            fileURL: fileURL,
+            keyProvider: InMemoryKeyProvider(key: SymmetricKey(size: .bits256)),
+            seedsStatsFloor: true,
+            clock: FixedClock(millis: 1_766_000_000_000)
+        )
+        let settings = await restored.load()
+
+        XCTAssertEqual(settings.statsFromDate, "", "a restore must not floor the statistics")
+        XCTAssertEqual(settings, AppSettings(), "an unreadable file yields the canonical defaults")
+    }
+
+    /// The corollary: an unreadable file must not be overwritten by a seed
+    /// either. `seedOnFirstLaunch` persists what it seeds, so seeding here would
+    /// have destroyed the very bytes a future key recovery would need.
+    func testAnUnreadableFileIsLeftOnDisk() async throws {
+        let existing = makeStore()
+        try await existing.update { $0.dailyLimitGrams = 30.0 }
+        let before = try Data(contentsOf: fileURL)
+
+        let restored = PreferencesStore(
+            fileURL: fileURL,
+            keyProvider: InMemoryKeyProvider(key: SymmetricKey(size: .bits256)),
+            seedsStatsFloor: true,
+            clock: FixedClock(millis: 1_766_000_000_000)
+        )
+        _ = await restored.load()
+
+        let after = try Data(contentsOf: fileURL)
+        XCTAssertEqual(before, after, "reading an unreadable file must not rewrite it")
+    }
+
     // ── Round trip ───────────────────────────────────────────────────────────
 
     func testFirstLaunchYieldsTheCanonicalDefaults() async {

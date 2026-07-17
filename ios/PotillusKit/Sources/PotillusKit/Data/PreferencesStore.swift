@@ -134,11 +134,18 @@ public actor PreferencesStore: PreferencesStoring {
 
     public func load() async -> AppSettings {
         if let cached { return cached }
+        // Asked BEFORE the read, because the seed below turns on THIS and not on
+        // whether the read succeeded. `readFromDisk()` returns nil for a whole
+        // family of reasons — absent, unreadable, wrong key, tampered — and only
+        // the first of them means "this user has never been asked". See
+        // `seedOnFirstLaunch()`. It is the same probe `AppDatabase.openOrCreate`
+        // makes before opening the database, for the same reason.
+        let fileExisted = FileManager.default.fileExists(atPath: fileURL.path)
         if let stored = readFromDisk() {
             cached = stored
             return stored
         }
-        let settings = seedsStatsFloor ? seedOnFirstLaunch() : AppSettings()
+        let settings = seedsStatsFloor && !fileExisted ? seedOnFirstLaunch() : AppSettings()
         cached = settings
         return settings
     }
@@ -163,7 +170,7 @@ public actor PreferencesStore: PreferencesStoring {
     ///   equivalent, so "today" is only correct on the day it is first asked. It
     ///   is persisted here, once, and never derived again.
     ///
-    /// WHY "NO USABLE FILE" AND NOT "statsFromDate IS EMPTY"
+    /// WHY THE FILE'S ABSENCE, AND NOT "statsFromDate IS EMPTY"
     ///   Empty is a MEANINGFUL user choice: `SettingsModel.clearStatsFromDate()`
     ///   writes it to mean "cover my whole history". Seeding whenever the value
     ///   is empty would silently undo that on the next launch. The absence of the
@@ -171,6 +178,24 @@ public actor PreferencesStore: PreferencesStoring {
     ///   it is the same signal `AppDatabase.openOrCreate` uses to seed the preset
     ///   drinks. Android draws the same distinction differently: its DataStore
     ///   tells a missing key from a key holding "".
+    ///
+    /// WHY THE FILE'S ABSENCE, AND NOT "THE FILE COULD NOT BE READ"
+    ///   `load()` probes `fileExists` itself rather than treating
+    ///   `readFromDisk() == nil` as "first launch". The two are not the same: a
+    ///   nil read also means unreadable, wrong key, or tampered. The wrong-key
+    ///   case is REAL and reachable — the key is `ThisDeviceOnly`, so restoring a
+    ///   device backup onto a new phone brings this file back without it. Seeding
+    ///   there would set the floor to the RESTORE date; and a user who opted the
+    ///   database into the backup (`BackupExclusion.setIncludesInBackup(true)`,
+    ///   whose marker lives in UserDefaults and is restored too) would find their
+    ///   whole restored history silently dropped out of every statistic, with
+    ///   nothing on screen to say why. A file that exists has been written by this
+    ///   app; whatever went wrong with it, its owner HAS been asked, so the
+    ///   defaults — no floor, the whole history — are the honest answer, and the
+    ///   real settings come back through the JSON backup, which is the supported
+    ///   path (see "KEY LOSS IS A NORMAL EVENT" in the file header).
+    ///   (0.83.0 QA round: the code seeded on the nil read while this very
+    ///   paragraph's predecessor claimed it seeded on the file's absence.)
     ///
     /// CONSEQUENCE, DELIBERATE
     ///   An installation that already has a prefs.bin is NOT seeded, exactly as
