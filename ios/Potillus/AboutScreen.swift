@@ -78,50 +78,57 @@ struct AboutScreen: View {
             }
 
             Section("License") {
-                // Each paragraph is its own List row, and a List draws a separator
-                // between rows -- which put a rule between every sentence of the
-                // notice and chopped one legal text into four. The paragraphs hide
-                // their bottom separator; the FOURTH does not, because that one is
-                // the rule above the link, separating the notice from the way out
-                // to its full text.
+                // The four paragraphs are ONE row, not four.
                 //
-                // Paragraphs one to three: the GPL notice, word for word as every
-                // source file carries it.
-                AboutParagraph(
-                    """
-                    This program is free software: you can redistribute it and/or modify it under \
-                    the terms of the GNU General Public License as published by the Free Software \
-                    Foundation, either version 3 of the License, or (at your option) any later \
-                    version.
-                    """
-                )
-                .listRowSeparator(.hidden, edges: .bottom)
-                AboutParagraph(
-                    """
-                    This program is distributed in the hope that it will be useful, but WITHOUT ANY \
-                    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A \
-                    PARTICULAR PURPOSE. See the GNU General Public License for more details.
-                    """
-                )
-                .listRowSeparator(.hidden, edges: .bottom)
-                AboutParagraph(
-                    """
-                    You should have received a copy of the GNU General Public License along with \
-                    this program. If not, see https://www.gnu.org/licenses/.
-                    """
-                )
-                .listRowSeparator(.hidden, edges: .bottom)
-                // Paragraph four: the exception itself, from COPYING.md.
-                AboutParagraph(
-                    """
-                    As an additional permission under section 7 of the GNU General Public License, \
-                    version 3, you are allowed to distribute the software through an app store, \
-                    even if that store has restrictive terms and conditions that are incompatible \
-                    with the GPL, provided that the source is also available under the GPL with or \
-                    without this permission through a channel without those restrictive terms and \
-                    conditions.
-                    """
-                )
+                // They were four, and a List rules a line between rows, so the
+                // notice arrived chopped into quarters; hiding each separator fixed
+                // the look but left the structure lying. Worse, a row carries its
+                // own vertical insets, so the gap between paragraphs was about 26pt
+                // -- wider than the blank line it was standing in for, and not
+                // reachable from here. One row with an explicit VStack spacing says
+                // what this is (a single legal text) and sets the gap exactly:
+                // wider than the ~5pt leading inside a paragraph, narrower than the
+                // ~21pt of a blank line.
+                //
+                // The rule above the NavigationLink is then the List's own, drawn
+                // between this row and that one -- which is where it belongs.
+                VStack(alignment: .leading, spacing: 10) {
+                    // Paragraphs one to three: the GPL notice, word for word as
+                    // every source file carries it.
+                    AboutParagraph(
+                        """
+                        This program is free software: you can redistribute it and/or modify it \
+                        under the terms of the GNU General Public License as published by the Free \
+                        Software Foundation, either version 3 of the License, or (at your option) \
+                        any later version.
+                        """
+                    )
+                    AboutParagraph(
+                        """
+                        This program is distributed in the hope that it will be useful, but WITHOUT \
+                        ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or \
+                        FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for \
+                        more details.
+                        """
+                    )
+                    AboutParagraph(
+                        """
+                        You should have received a copy of the GNU General Public License along \
+                        with this program. If not, see https://www.gnu.org/licenses/.
+                        """
+                    )
+                    // Paragraph four: the exception itself, from COPYING.md.
+                    AboutParagraph(
+                        """
+                        As an additional permission under section 7 of the GNU General Public \
+                        License, version 3, you are allowed to distribute the software through an \
+                        app store, even if that store has restrictive terms and conditions that are \
+                        incompatible with the GPL, provided that the source is also available under \
+                        the GPL with or without this permission through a channel without those \
+                        restrictive terms and conditions.
+                        """
+                    )
+                }
                 NavigationLink("GNU General Public License v3") {
                     DocumentViewerScreen(
                         title: "GPL 3.0",
@@ -182,8 +189,10 @@ private struct AboutParagraph: View {
         // of it, so it reads better a notch down from the label it sits under;
         // .footnote, where it started, was two steps further and shrank the screen
         // below its own first line.
+        //
+        // No padding of its own: the enclosing VStack owns the gap between
+        // paragraphs, so there is one number to change and not two to keep in step.
         Text(text)
             .font(.callout)
-            .padding(.vertical, 2)
     }
 }

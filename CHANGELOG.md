@@ -73,12 +73,24 @@ two stores' notes need not match).
   and the cards already do the separating. The card gap is 12dp, matching the gap
   the enclosing Column puts between the cards, so the rhythm does not change when
   the eye crosses a card edge; it applies to every child alike, so the rule above
-  each link is held off the last paragraph by the same amount. iOS's paragraphs
-  were `.footnote` while the "Version" row above them is `.body`, so the screen
-  shrank below its own first line; they are `.callout` now, one step down from the
-  label they sit under rather than two. GRDB's MIT text joins them and loses its
-  `.secondary` grey: small and grey reads as a disclaimer to skip, and that text
-  is the permission notice the licence obliges us to put in front of a reader.
+  each link is held off the last paragraph by the same amount, and
+  "Open-source components" gets 12dp more above it than the Column gives every
+  child alike — a heading needs more air above than below to belong to what
+  follows.
+  On iOS the four paragraphs are now ONE row rather than four. They had been four,
+  which is why a List ruled a line between every sentence of the notice; hiding
+  each separator fixed the look but left the structure lying, and a row's own
+  vertical insets held the paragraphs about 26pt apart — wider than the blank line
+  they stood in for, and not reachable from the call site. One row with an explicit
+  `VStack(spacing: 10)` says what this is, a single legal text, and sets the gap
+  exactly: wider than the leading inside a paragraph, narrower than a blank line.
+  The rule above the link is then the List's own, drawn between that row and the
+  link's, which is where it belongs. The paragraphs were `.footnote` while the
+  "Version" row above them is `.body`, so the screen shrank below its own first
+  line; they are `.callout` now, one step down from the label they sit under
+  rather than two. GRDB's MIT text joins them and loses its `.secondary` grey:
+  small and grey reads as a disclaimer to skip, and that text is the permission
+  notice the licence obliges us to put in front of a reader.
 - **"licence" is now "license" everywhere, and the About screen groups each
   license in a card.** The tree had been spelling it both ways — 159 occurrences
   of the British form across 40 files, sitting next to the American form the GPL,

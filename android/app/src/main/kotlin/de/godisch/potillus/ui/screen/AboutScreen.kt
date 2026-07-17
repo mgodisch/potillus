@@ -208,7 +208,7 @@ fun AboutScreen(
                 LicenseLink("GNU General Public License v3", onOpenGpl3)
             }
 
-            SectionHeading("Open-source components")
+            SectionHeading("Open-source components", Modifier.padding(top = 12.dp))
             SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
                     "Under the Apache License 2.0: AndroidX / Jetpack (Copyright © The " +
@@ -238,11 +238,21 @@ fun AboutScreen(
     }
 }
 
-/** A chapter heading, in the app's primary colour. */
+/**
+ * A chapter heading, in the app's primary colour.
+ *
+ * @param text     The heading.
+ * @param modifier Applied to the heading. Chapters after the first pass extra top
+ *                 padding: the enclosing Column spaces every child by 12dp alike,
+ *                 which is right BETWEEN cards but too tight for a new chapter
+ *                 starting under the previous one's card. A heading needs more air
+ *                 above it than below it to belong to what follows.
+ */
 @Composable
-private fun SectionHeading(text: String) {
+private fun SectionHeading(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
+        modifier = modifier,
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
     )
