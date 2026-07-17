@@ -59,6 +59,48 @@ localised release notes still follow at release time; until then the Android
 per-locale `94.txt` changelogs and the iOS `release_notes.txt` remain
 independent placeholders (the two stores' notes need not match).
 
+- **Fixed: a fresh clone could not build, and a source tarball broke on its
+  second try (twelfth QA round).** Three findings with one root: a gate that
+  meets a BUILD PRODUCT and does not know what it is looking at.
+  - `make ios` failed on the FIRST run in any fresh tree — clone or tarball,
+    git or no git. `check-ios-guides` sits in `check-ios-static`, which runs
+    BEFORE the `ios-project` target that renders the guides, and
+    `render-guide-ios.py --check` counted a guide that had never been rendered
+    as "stale". It has drifted from nothing: absent is the normal state of a
+    fresh clone (git tracks no file under `Resources/`, so the directory does
+    not exist) and of the Linux release path, where `make ios` never runs. Both
+    checkers now tell missing from stale — Android's `render-guide.py` had the
+    identical bug, hidden only because `make android` happens to run
+    `check-guides` after the build; standalone it failed the same way. Its
+    "Run `make guides` and commit the result" also lost the "and commit": the
+    guides have been gitignored for a long time.
+  - `check-headers` failed in a source tarball once anything had been built,
+    and `make fix-headers` would have written this project's section 7 pointer
+    INTO the verbatim GPLv3 text. Outside a git checkout the tool walks the
+    tree instead of asking `git ls-files`, and 0.83.0's four generated license
+    copies and 21 iOS guides were not in the walk's skip sets — only the
+    now-deleted `copyright.md` was. `SKIP_DIRS` gained `raw` and `Resources`,
+    which is how the same file already handles `fonts`, `fonts-src` and
+    `metadata`; both directories hold build products exclusively (zero tracked
+    files, measured), and no others by those names exist. `license_gpl2.md`
+    had escaped by luck: the GPLv2 appendix writes "free software; you can
+    redistribute" with a semicolon, so the anchor missed.
+  - `tools/render-copyright.py` is gone. It existed to CONCATENATE COPYING.md
+    and the license texts into the single `copyright.md` this cycle deleted;
+    with one input per output it had one job left that `cp` cannot do — create
+    the output directory — and two it did not need to do: normalise the
+    trailing newline and pin LF. Every input already ends in exactly one LF and
+    holds no CR, so its output and `cp`'s were byte-identical (measured). The
+    Makefile rules are `mkdir -p` plus `cp`; Gradle's three `Exec` tasks are
+    `Copy` tasks; `check-guides` compares the copy against its source directly.
+    The `mkdir -p` is the load-bearing part: git cannot track an empty
+    directory, so `res/raw/` and `ios/Potillus/Resources/` do not exist after a
+    clone and a bare `cp` fails with "No such file or directory".
+  `MarkdownText`'s thematic-break branch outlived its stated reason twice over
+  and now has a durable one: the guides under `docs/guide/*.md.in` are
+  hand-written Markdown, and a `---` is ordinary Markdown their author may reach
+  for. A renderer that handles a construct only while some document happens to
+  contain one is a trap for whoever writes the next document.
 - **The third-party inventory is complete on both sides (twelfth QA round).**
   Checked against the actual `releaseRuntimeClasspath` rather than the build
   script: 156 artifacts, and every one of them falls into a copyright-holder

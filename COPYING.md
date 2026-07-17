@@ -73,7 +73,7 @@ under the Apache License, Version 2.0
 
 The full Apache-2.0 license text is kept verbatim in the repository as
 `LICENSE.Apache-2.0.md` and is bundled into the APK as `res/raw/license_apache2.md`
-(a byte-for-byte copy, made at build time by `tools/render-copyright.py`), which
+(a byte-for-byte copy, made at build time from the project-root file), which
 the in-app About screen links to — satisfying the license's &sect;4(a) requirement
 to give recipients a copy of the license.
 

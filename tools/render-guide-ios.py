@@ -156,13 +156,26 @@ def main():
         return 1
 
     stale = []
+    missing = []
     for template in templates:
         tag, rendered = render(strings, template)
         out_path = os.path.join(OUT, f"usersguide_{tag}.md")
-        current = None
-        if os.path.exists(out_path):
-            with open(out_path, encoding="utf-8") as handle:
-                current = handle.read()
+        if not os.path.exists(out_path):
+            # NOT stale. Nothing has drifted from anything -- the build has simply
+            # not run yet. This is the normal state of a fresh clone (git tracks
+            # no file under Resources/, so the directory does not even exist) and
+            # of the Linux release path, where `make ios` never runs. Calling it
+            # stale made `make ios` fail on its FIRST run in a fresh tree:
+            # check-ios-guides sits in check-ios-static, which runs BEFORE the
+            # ios-project target that renders them.
+            missing.append(os.path.relpath(out_path, ROOT))
+            if not check:
+                os.makedirs(OUT, exist_ok=True)
+                with open(out_path, "w", encoding="utf-8") as handle:
+                    handle.write(rendered)
+            continue
+        with open(out_path, encoding="utf-8") as handle:
+            current = handle.read()
         if current == rendered:
             continue
         stale.append(os.path.relpath(out_path, ROOT))
@@ -171,13 +184,19 @@ def main():
             with open(out_path, "w", encoding="utf-8") as handle:
                 handle.write(rendered)
 
-    if check and stale:
-        print(
-            "render-guide-ios: these guides are stale; run `make ios-guides`:\n  "
-            + "\n  ".join(stale),
-            file=sys.stderr,
-        )
-        return 1
+    if check:
+        if stale:
+            print(
+                "render-guide-ios: these guides are stale; run `make ios-guides`:\n  "
+                + "\n  ".join(stale),
+                file=sys.stderr,
+            )
+            return 1
+        if missing:
+            print(
+                f"render-guide-ios: {len(missing)} guide(s) not rendered yet — "
+                "`make ios-guides` will create them; nothing to check"
+            )
     return 0
 
 

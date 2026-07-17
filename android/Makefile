@@ -153,23 +153,33 @@ android: \
 #   same English legal text for every locale: license text is deliberately NOT
 #   translated, because a translated license is not the license.
 #
-# Each copy is delegated to tools/render-copyright.py rather than `cp`: with a
-# single input the script emits the file verbatim, but it also pins LF line
-# endings on every platform, so this rule, its check-guides verification and the
-# Gradle generateLicenseDocuments tasks can never disagree about the bytes.
+# Each copy is a plain `cp`. Until 0.83.0 a generator (tools/render-copyright.py)
+# stood here, because it also CONCATENATED several inputs into the single
+# combined copyright.md this project used to bundle. Once that document was split
+# into one verbatim license per file, the generator had exactly one job left that
+# `cp` cannot do -- create the output directory -- and two it did not need to do:
+# normalise the trailing newline and pin LF. Every input already ends in exactly
+# one LF and holds no CR, so the generator's output and `cp`'s were byte-identical
+# (measured). The generator is gone; `mkdir -p` covers the one real difference,
+# and res/raw/ needs it, because git cannot track an empty directory and every
+# file in there is generated -- so after a fresh clone the directory does not
+# exist at all.
 LICENSE_OUTPUTS := \
 	app/src/main/res/raw/license_gpl3.md \
 	app/src/main/res/raw/license_apache2.md \
 	app/src/main/res/raw/license_gpl2.md
 
-app/src/main/res/raw/license_gpl3.md: ../LICENSE.md ../tools/render-copyright.py
-	python3 ../tools/render-copyright.py $@ ../LICENSE.md
+app/src/main/res/raw/license_gpl3.md: ../LICENSE.md
+	@mkdir -p $(@D)
+	cp $< $@
 
-app/src/main/res/raw/license_apache2.md: ../LICENSE.Apache-2.0.md ../tools/render-copyright.py
-	python3 ../tools/render-copyright.py $@ ../LICENSE.Apache-2.0.md
+app/src/main/res/raw/license_apache2.md: ../LICENSE.Apache-2.0.md
+	@mkdir -p $(@D)
+	cp $< $@
 
-app/src/main/res/raw/license_gpl2.md: ../LICENSE.GPL-2.0.md ../tools/render-copyright.py
-	python3 ../tools/render-copyright.py $@ ../LICENSE.GPL-2.0.md
+app/src/main/res/raw/license_gpl2.md: ../LICENSE.GPL-2.0.md
+	@mkdir -p $(@D)
+	cp $< $@
 
 # Regenerate the localized user guides from their templates in docs/guide/,
 # resolving the {{screen-name}} tokens against the matching strings.xml so the
@@ -219,8 +229,10 @@ guides: $(GUIDE_OUTPUTS)
 # CI helper: fail if the committed guides are not in sync with the templates
 # and strings.xml (does not write anything). Also verifies that each generated
 # raw/license_*.md still matches its project-root source (via
-# tools/render-copyright.py), by rebuilding it into a temporary file and
-# comparing byte-for-byte.
+# `cp`), by comparing each bundled copy against its source byte-for-byte. A copy
+# that does not exist YET is not stale: nothing has drifted, the build simply has
+# not run. Saying otherwise made this target fail on a fresh clone, where res/raw/
+# does not even exist.
 check-guides:
 	python3 ../tools/render-guide.py --check
 	set -e; for pair in \
@@ -228,9 +240,8 @@ check-guides:
 	    "license_apache2.md:../LICENSE.Apache-2.0.md" \
 	    "license_gpl2.md:../LICENSE.GPL-2.0.md"; do \
 	  out=app/src/main/res/raw/$${pair%%:*}; src=$${pair#*:}; \
-	  tmp=$$(mktemp); python3 ../tools/render-copyright.py "$$tmp" "$$src"; \
-	  cmp -s "$$tmp" "$$out"; rc=$$?; rm -f "$$tmp"; \
-	  test $$rc -eq 0 || { echo "check-guides: $$out is stale — run 'make $$out'"; exit 1; }; \
+	  test -f "$$out" || { echo "check-guides: $$out not built yet — 'make $$out' will create it"; continue; }; \
+	  cmp -s "$$src" "$$out" || { echo "check-guides: $$out is stale — run 'make $$out'"; exit 1; }; \
 	done
 
 # Release gate (tools/release-check.sh, at the repository root; runs from android/).

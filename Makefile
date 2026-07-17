@@ -1329,11 +1329,13 @@ ios-project: ios-version ios/Potillus/Resources/license_gpl3.md ios-guides
 	command -v xcodegen
 	cd ios && xcodegen generate
 
-# The verbatim GPLv3 text the About screen's "License" chapter links to, copied
-# from the project root through the SAME renderer Android uses for its raw/
-# copies, so the two platforms show byte-identical text. Generated (gitignored)
+# The verbatim GPLv3 text the About screen's "License" chapter links to: a plain
+# copy of the project root's LICENSE.md, the same file Android copies into its
+# raw/, so the two platforms show byte-identical text. Generated (gitignored)
 # rather than checked in, exactly like Version.xcconfig: a copy in the tree would
-# drift from LICENSE.md.
+# drift from LICENSE.md. The `mkdir -p` is not decoration -- every file under
+# Resources/ is generated, so git tracks none of them and the directory does not
+# exist at all after a fresh clone.
 #
 # ONE file here, THREE on Android. The iOS app bundles only the GPLv3, because it
 # is the only license it must reproduce: its single third-party dependency is
@@ -1342,8 +1344,9 @@ ios-project: ios-version ios/Potillus/Resources/license_gpl3.md ios-guides
 # texts for the libraries compiled into the APK. Until 0.83.0 both platforms
 # shipped the same combined document, so each carried licenses for the other's
 # dependencies.
-ios/Potillus/Resources/license_gpl3.md: LICENSE.md tools/render-copyright.py
-	python3 tools/render-copyright.py $@ LICENSE.md
+ios/Potillus/Resources/license_gpl3.md: LICENSE.md
+	@mkdir -p $(@D)
+	cp $< $@
 
 # The localized in-app user guides, one per language, generated from the
 # templates under ios/docs/guide/ with the {{token}} labels resolved against the
@@ -1356,7 +1359,12 @@ ios-guides:
 	python3 tools/render-guide-ios.py
 
 # The build-time counterpart: fail if any committed template or catalogue change
-# would leave a rendered guide stale. Part of the Mac-free iOS static gate.
+# would leave a rendered guide stale. Part of the Mac-free iOS static gate, and
+# therefore READ-ONLY -- it must not render, it must judge. A guide that has not
+# been rendered YET is not stale: it is the normal state of a fresh clone, and of
+# the Linux release path, where `make ios` never runs. Conflating the two made
+# `make ios` fail on its FIRST run in a fresh tree, because this gate sits in
+# check-ios-static, which runs BEFORE the ios-project target that renders them.
 check-ios-guides:
 	python3 tools/render-guide-ios.py --check
 

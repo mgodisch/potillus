@@ -268,23 +268,33 @@ def render(template_text: str, strings: dict, label: str) -> str:
     return TOKEN_RE.sub(repl, template_text)
 
 
-def write_if_changed(path: str, content: str, check_only: bool) -> bool:
-    """Write *content* to *path* unless unchanged. Returns True if it differed.
+def write_if_changed(path: str, content: str, check_only: bool) -> str:
+    """Write *content* to *path* unless unchanged.
 
-    In ``check_only`` mode nothing is written; the return value just reports
-    whether the file is stale.
+    Returns ``"current"``, ``"stale"`` (exists and differs) or ``"missing"``.
+
+    STALE AND MISSING ARE NOT THE SAME THING, and --check must not confuse them:
+    a guide that has never been rendered has drifted from nothing. Absent is the
+    normal state of a fresh clone -- git tracks no file under res/raw-<locale>/,
+    so the directories do not even exist -- and `make -C android check-guides` on
+    such a tree used to report all 21 as out of date.
+
+    In ``check_only`` mode nothing is written; the return value only reports.
     """
-    existing = None
-    if os.path.exists(path):
-        with open(path, encoding="utf-8") as fh:
-            existing = fh.read()
+    if not os.path.exists(path):
+        if not check_only:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(content)
+        return "missing"
+    with open(path, encoding="utf-8") as fh:
+        existing = fh.read()
     if existing == content:
-        return False
+        return "current"
     if not check_only:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(content)
-    return True
+    return "stale"
 
 
 def emit_make_deps(langs) -> int:
@@ -336,6 +346,7 @@ def main() -> int:
         return emit_make_deps(langs)
 
     stale = []
+    missing = []
     skipped = 0
     for label, tpl_path, values_dir, raw_dir in langs:
         strings_path = os.path.join(RES, values_dir, "strings.xml")
@@ -357,23 +368,32 @@ def main() -> int:
         strings = load_strings(values_dir)
         rendered = strip_header(render(template_text, strings, label))
 
-        if write_if_changed(out_path, rendered, check_only):
+        outcome = write_if_changed(out_path, rendered, check_only)
+        if outcome == "stale":
             stale.append(os.path.relpath(out_path, ROOT))
+        elif outcome == "missing":
+            missing.append(os.path.relpath(out_path, ROOT))
 
     if check_only:
+        if missing and not stale:
+            print(
+                f"render-guide: {len(missing)} guide(s) not rendered yet — "
+                "`make guides` will create them; nothing to check"
+            )
         if stale:
             sys.stderr.write(
                 "render-guide: the following generated guides are out of date:\n"
                 + "".join(f"  {p}\n" for p in stale)
-                + "Run `make guides` and commit the result.\n"
+                + "Run `make guides`.\n"
             )
             return 1
         print(f"render-guide: all {len(langs)} guides up to date.")
         return 0
 
-    if stale:
-        print(f"render-guide: wrote {len(stale)} file(s):")
-        for p in stale:
+    written = stale + missing
+    if written:
+        print(f"render-guide: wrote {len(written)} file(s):")
+        for p in written:
             print(f"  {p}")
     else:
         print(f"render-guide: nothing to do ({skipped} guides already current).")

@@ -33,9 +33,8 @@ import SwiftUI
 //   - Help     → the localized user guide `usersguide_<tag>.md`, rendered from
 //                the templates under ios/docs/guide/ at build time.
 //   - License  → `license_gpl3.md`, a verbatim copy of the project-root
-//                LICENSE.md made by tools/render-copyright.py — the SAME
-//                generator that writes Android's res/raw/ copies, so the two
-//                platforms show byte-identical text. Linked from the About
+//                LICENSE.md — the same file Android copies into its res/raw/,
+//                so the two platforms show byte-identical text. Linked from the About
 //                screen's License chapter. Not locale-qualified: a license is
 //                shown in its own language.
 //

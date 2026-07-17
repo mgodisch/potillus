@@ -149,13 +149,14 @@ fun MarkdownText(markdown: String, modifier: Modifier = Modifier) {
                     // its three concatenated parts — COPYING.md, the GPL text and
                     // the Apache-2.0 text — with a `---` between blank lines; 0.83.0
                     // replaced that combined document with one verbatim license per
-                    // file, and none of them, nor the guides, has a rule in it. It
-                    // stays because tools/render-copyright.py keeps its
-                    // concatenation ability and still joins with exactly that
-                    // separator: the day a build passes it two inputs again, the
-                    // seam must not surface as three hyphens. A renderer that
-                    // handles a break only while some document happens to contain
-                    // one is a trap, not an economy.
+                    // file, and the generator that did the joining is gone too.
+                    //
+                    // It stays for the reason it should have had all along: the
+                    // guides under docs/guide/*.md.in are HAND-WRITTEN Markdown, and
+                    // a thematic break is ordinary Markdown a guide author may reach
+                    // for at any time. A renderer that handles a construct only
+                    // while some document happens to contain one is a trap for
+                    // whoever writes the next document, not an economy.
                     modifier = Modifier.padding(vertical = 12.dp),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
