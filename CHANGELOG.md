@@ -251,6 +251,11 @@ two stores' notes need not match).
   caller's modifier at the point of use, as `DrinkCategoryIcon` already did, and
   as the file's five other modifier parameters were already declared. Neither was
   caught by the release gates, because none of them parses Kotlin or runs lint.
+  SwiftLint caught two more of the same kind on the other platform: two
+  three-character-minimum identifiers, and a file left without its trailing
+  newline by the edit that split it into an extension. `check-swift-length`
+  mirrors SwiftLint's structural rules and nothing else, by design — it says so
+  itself — so `identifier_name` and `trailing_newline` were never its to catch.
 - **The overflow menu ends with About, and Help and About share their glyphs
   across platforms.** The menu now reads Settings, Help, "Lock app", About on
   both platforms: About is looked up once, not daily, so it yields the prime

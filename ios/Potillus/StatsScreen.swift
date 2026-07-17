@@ -372,9 +372,9 @@ struct StatsScreen: View {
     /// One legend line: "12.3 g · 45 %", the pairing Android's legend uses.
     private func legendValue(_ grams: Double, of total: Double) -> String {
         let percent = total > 0 ? grams / total * 100 : 0
-        let g = Loc.number(grams, fractionDigits: 1, locale: locale)
-        let p = Loc.number(percent, fractionDigits: 0, locale: locale)
-        return "\(g) g · \(p) %"
+        let gramsText = Loc.number(grams, fractionDigits: 1, locale: locale)
+        let percentText = Loc.number(percent, fractionDigits: 0, locale: locale)
+        return "\(gramsText) g · \(percentText) %"
     }
 
     /// Largest first, so the biggest slice starts at twelve o'clock and the legend
