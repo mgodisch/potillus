@@ -66,6 +66,11 @@ public struct CalendarState: Sendable, Equatable {
     /// Their grams, summed.
     public var totalGramsSelected: Double = 0.0
 
+    /// The drink catalogue, for the "+" sheet. Held here rather than fetched when
+    /// the sheet opens, so it is already warm and stays live with the catalogue —
+    /// the same arrangement TodayState has.
+    public var drinks: [DrinkDefinition] = []
+
     public var limitInfo: LimitInfo = AlcoholCalculator.getLimitInfo(AppSettings())
 
     public init() {}
