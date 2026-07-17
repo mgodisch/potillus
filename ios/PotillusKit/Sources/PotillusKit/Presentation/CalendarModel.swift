@@ -79,6 +79,7 @@ public final class CalendarModel {
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol
+    private let drinks: any DrinkRepositoryProtocol
     private let preferences: any PreferencesStoring
     private let clock: any Clock
     private let timeZone: TimeZone
@@ -94,6 +95,7 @@ public final class CalendarModel {
 
     public init(
         entries: any EntryRepositoryProtocol,
+        drinks: any DrinkRepositoryProtocol,
         preferences: any PreferencesStoring,
         clock: any Clock = SystemClock(),
         timeZone: TimeZone = .current,
@@ -101,6 +103,7 @@ public final class CalendarModel {
         tickInterval: Duration = .seconds(60)
     ) {
         self.entries = entries
+        self.drinks = drinks
         self.preferences = preferences
         self.clock = clock
         self.timeZone = timeZone
@@ -123,6 +126,7 @@ public final class CalendarModel {
 
         state.today = today
         state.limitInfo = AlcoholCalculator.getLimitInfo(settings)
+        state.drinks = (try? drinks.allOnce()) ?? []
 
         if state.year == 0 {
             // "2026-01-02" — parsed as integers, not as a date.
@@ -215,6 +219,21 @@ public final class CalendarModel {
                     await self.load()
                 }
             },
+            // The catalogue: the "+" sheet chooses from it, so a drink added or
+            // renamed on the Drinks screen must be there the next time the sheet
+            // opens, without the calendar being left and re-entered. Same
+            // late-element guard as above.
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    for try await catalogue in self.drinks.observeDrinks() {
+                        if Task.isCancelled { break }
+                        self.state.drinks = catalogue
+                    }
+                } catch {
+                    self.failure = String(describing: error)
+                }
+            },
             // The ticker. Day-keyed like StatsModel's (see there): the grid's
             // "today" highlight — and, while the user has not paged away, the
             // shown month — must follow the logical day across the day-change
@@ -296,6 +315,59 @@ public final class CalendarModel {
         } catch {
             failure = String(describing: error)
         }
+    }
+
+    /// Logs a drink on the SELECTED day, timestamped now.
+    ///
+    /// The two are deliberately different facts. The instant is when the user
+    /// typed; the logical date is the day they picked and are recording for. The
+    /// Today screen never needs the distinction — there the day follows from the
+    /// instant — but a calendar exists to book a day that is not today, so it
+    /// hands `EntryLogger` an explicit `logicalDate` rather than letting it derive
+    /// one and land the entry on the wrong day. Android has always drawn this line:
+    /// its `CalendarViewModel.addEntry` passes the selected date to
+    /// `addFromDrinkWithDate`, and its `updateEntry` documents that calendar
+    /// entries "are deliberately assigned to a specific date that may differ from
+    /// the wall-clock date of the timestamp".
+    ///
+    /// The day-change boundary is therefore NOT applied: the user chose a calendar
+    /// square, and a square is not subject to a 4 a.m. rollover.
+    ///
+    /// Does nothing when no day is selected. The "+" only appears once one is, so
+    /// this is a guard against a future caller, not a state the UI can reach.
+    ///
+    /// - Parameters:
+    ///   - drink:           The catalogue drink consumed.
+    ///   - volumeMl:        Serving volume in millilitres.
+    ///   - timestampMillis: The instant, as the sheet returned it — it defaults to
+    ///     the moment of typing and the user may adjust it. Taken from the caller
+    ///     rather than read off `clock` here, exactly as Android's
+    ///     `CalendarViewModel.addEntry` takes it from its dialog.
+    ///   - note:            Optional free text.
+    public func addEntry(
+        drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64, note: String = ""
+    ) async {
+        guard let date = state.selectedDate else { return }
+        // Loaded, not read off `state`: CalendarState carries no settings, unlike
+        // TodayState. They are needed only to satisfy `makeEntry`'s signature here
+        // — the day-change fields it would read are bypassed by `logicalDate`.
+        let settings = await preferences.load()
+        let entry = EntryLogger.makeEntry(
+            drink: drink,
+            volumeMl: volumeMl,
+            timestampMillis: timestampMillis,
+            note: note,
+            settings: settings,
+            timeZone: timeZone,
+            logicalDate: date
+        )
+        do {
+            _ = try entries.add(entry)
+        } catch {
+            failure = String(describing: error)
+            return
+        }
+        await reloadMonth()
     }
 
     public func deleteEntry(_ entry: ConsumptionEntry) async {

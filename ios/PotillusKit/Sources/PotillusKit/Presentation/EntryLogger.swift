@@ -70,13 +70,30 @@ public struct EntryLogger: Sendable {
     /// Assembles an entry from what the user chose plus what follows from it.
     ///
     /// Pure: no I/O, so the derivation can be tested without a database.
+    ///
+    /// - Parameter logicalDate: The day the entry BELONGS TO, `yyyy-MM-dd`. Nil —
+    ///   the default, and what the Today screen passes — derives it from
+    ///   `timestampMillis` through the user's day-change boundary, which is right
+    ///   when the entry is being logged as it happens.
+    ///
+    ///   The Calendar screen passes a date, because there the two genuinely differ:
+    ///   the user picks a day in the past and records a drink they had then, so the
+    ///   TIMESTAMP is the moment of typing while the DAY is the one they chose. The
+    ///   fields exist separately on `ConsumptionEntry` for exactly this, and Android
+    ///   has always used them so — `CalendarViewModel.addEntry` hands the selected
+    ///   date to `entryRepo.addFromDrinkWithDate`, and its `updateEntry` documents
+    ///   that calendar entries "are deliberately assigned to a specific date that
+    ///   may differ from the wall-clock date of the timestamp". iOS could not say
+    ///   that until now: the derivation was unconditional, so an entry booked for
+    ///   the 12th would have landed on today.
     public static func makeEntry(
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Int64,
         note: String,
         settings: AppSettings,
-        timeZone: TimeZone
+        timeZone: TimeZone,
+        logicalDate: String? = nil
     ) -> ConsumptionEntry {
         ConsumptionEntry(
             drinkId: drink.id,
@@ -87,7 +104,7 @@ public struct EntryLogger: Sendable {
                 volumeMl: volumeMl, alcoholPercent: drink.alcoholPercent
             ),
             timestampMillis: timestampMillis,
-            logicalDate: DayResolver.resolve(
+            logicalDate: logicalDate ?? DayResolver.resolve(
                 timestampMillis: timestampMillis,
                 changeHour: settings.dayChangeHour,
                 changeMinute: settings.dayChangeMinute,
@@ -98,9 +115,16 @@ public struct EntryLogger: Sendable {
     }
 
     /// Stores a new entry, defaulting the instant to now.
+    ///
+    /// - Parameter logicalDate: See `makeEntry`. Nil derives the day from the
+    ///   instant; the Calendar screen passes the day the user selected.
     @discardableResult
     public func log(
-        drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64? = nil, note: String = ""
+        drink: DrinkDefinition,
+        volumeMl: Int,
+        timestampMillis: Int64? = nil,
+        note: String = "",
+        logicalDate: String? = nil
     ) async throws -> ConsumptionEntry {
         let settings = await preferences.load()
         let entry = Self.makeEntry(
@@ -109,7 +133,8 @@ public struct EntryLogger: Sendable {
             timestampMillis: timestampMillis ?? nowMillis(),
             note: note,
             settings: settings,
-            timeZone: timeZone
+            timeZone: timeZone,
+            logicalDate: logicalDate
         )
         _ = try entries.add(entry)
         return entry
@@ -143,12 +168,20 @@ public final class EntryLogModel {
     /// Returns whether the entry was stored, so a sheet can stay open on failure.
     @discardableResult
     public func log(
-        drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64? = nil, note: String = ""
+        drink: DrinkDefinition,
+        volumeMl: Int,
+        timestampMillis: Int64? = nil,
+        note: String = "",
+        logicalDate: String? = nil
     ) async -> Bool {
         failure = nil
         do {
             _ = try await logger.log(
-                drink: drink, volumeMl: volumeMl, timestampMillis: timestampMillis, note: note
+                drink: drink,
+                volumeMl: volumeMl,
+                timestampMillis: timestampMillis,
+                note: note,
+                logicalDate: logicalDate
             )
             return true
         } catch {

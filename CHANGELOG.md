@@ -125,6 +125,33 @@ two stores' notes need not match).
   `ui/component/Components.kt`. TodayScreen's daily summary and CalendarScreen's
   selected-day panels keep `primaryContainer`: those are meant to stand out, and
   stay accents.
+- **The iOS calendar can log a drink onto the day you picked.** Android has had a
+  "+" there since the screen existed; iOS had no way to add an entry at all, only
+  to edit one that was already there. The button was the small part. Underneath it,
+  a calendar entry needs two facts that Android has always kept apart and iOS could
+  not express: the TIMESTAMP is the moment of typing, the LOGICAL DATE is the day
+  being recorded, and on a calendar those genuinely differ.
+  `EntryLogger.makeEntry` derived the logical date from the timestamp
+  unconditionally, so an entry booked onto the 12th would have landed on today —
+  silently, and not noticed until the month was reopened. It now takes an optional
+  `logicalDate`; nil keeps the derivation, which is what the Today and Drinks
+  screens want and what every existing caller gets, so nothing else changes.
+  `CalendarModel` gained `addEntry`, which hands it the selected day, and the drink
+  catalogue it needs for the sheet — loaded and observed, so a drink added on the
+  Drinks screen is there without leaving the calendar. This is Android's
+  `CalendarViewModel.addEntry` → `addFromDrinkWithDate` line, restated in Swift:
+  its `updateEntry` documents that calendar entries "are deliberately assigned to a
+  specific date that may differ from the wall-clock date of the timestamp", and
+  now iOS can say that too. The day-change boundary is not applied — a calendar
+  square is not subject to a 4 a.m. rollover — and the timestamp comes from the
+  sheet, defaulting to now, as Android's dialog offers it.
+  The "+" sits at `.primaryAction` and only appears once a day is selected, as
+  Android's floating action button does: without a selection there is no day to
+  book onto. The sheet omits the capacity dot, because every figure feeding it —
+  today's grams, this week's total, this week's drinking days — is about TODAY, and
+  this entry is not; a dot answering the wrong day's question is worse than none.
+  "Add Entry" is Android's own string, with its twenty translations carried over
+  verbatim rather than written afresh.
 - **iOS Statistics leads with its chart, and its categories are a donut.** The
   consumption chart had sat fourth, behind two blocks of numbers; it is the answer
   the screen is opened for, so it now comes first, right under the period picker,

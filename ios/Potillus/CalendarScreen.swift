@@ -49,13 +49,17 @@ struct CalendarScreen: View {
     /// Android's calendar edit action).
     @State private var editingEntry: ConsumptionEntry?
 
+    /// Set while the "+" sheet is open, logging onto the selected day.
+    @State private var isLogging = false
+
     /// Kept so the overflow menu's Settings sheet can be built.
     private let environment: AppEnvironment
 
     init(environment: AppEnvironment) {
         self.environment = environment
         _model = State(initialValue: CalendarModel(
-            entries: environment.entries, preferences: environment.preferences,
+            entries: environment.entries, drinks: environment.drinks,
+            preferences: environment.preferences,
             clock: environment.clock
         ))
     }
@@ -72,6 +76,48 @@ struct CalendarScreen: View {
             }
             .navigationTitle(Loc.string("Calendar", locale: locale))
             .appOverflowMenu(environment: environment)
+            .toolbar {
+                // The counterpart of Android's floating action button, which is
+                // likewise shown only once a day is picked: without a selection
+                // there is no day to book onto, and a "+" that asks "which day?"
+                // after being tapped is a worse question than one that waits to be
+                // asked. `.primaryAction` is where iOS puts this — top trailing,
+                // beside the overflow menu, rather than floating over the grid.
+                if model.state.selectedDate != nil {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            isLogging = true
+                        } label: {
+                            Label(Loc.string("Add Entry", locale: locale), systemImage: "plus")
+                        }
+                        .disabled(model.state.drinks.isEmpty)
+                    }
+                }
+            }
+            .sheet(isPresented: $isLogging) {
+                EntrySheet(
+                    drinks: model.state.drinks,
+                    // No "last used" preselection here: on Today that guesses well
+                    // because the user is logging what they just drank. Recording a
+                    // past day is a different act — the drink is remembered, not
+                    // repeated — so the sheet opens unbiased.
+                    preselected: nil,
+                    // The instant the sheet offers, and Android's dialog too: now.
+                    // What makes the entry land on the CHOSEN day is not this
+                    // timestamp but the logicalDate the model attaches; the two are
+                    // deliberately separate facts.
+                    now: Date()
+                    // capacity: omitted, so the sheet hides the capacity dot. Its
+                    // figures — today's grams, this week's total, this week's
+                    // drinking days — are all about TODAY, and this entry is not.
+                    // A dot answering the wrong day's question is worse than none.
+                ) { drink, volume, millis, note in
+                    await model.addEntry(
+                        drink: drink, volumeMl: volume, timestampMillis: millis, note: note
+                    )
+                    return model.failure == nil
+                }
+            }
             // `start()` loads and then subscribes; a database change in another
             // tab reaches this month without a manual reload.
             .task { await model.start() }
@@ -209,6 +255,22 @@ struct CalendarScreen: View {
     }
 
     // ── Selected day ─────────────────────────────────────────────────────────
+
+}
+
+// ============================================================================
+// CalendarScreen – the selected day
+// ============================================================================
+//
+// Split off because the view outgrew SwiftLint's type_body_length, and this is
+// the seam that was already there: above, the month as a grid of days; here, one
+// day as a list of entries. An extension IN THIS FILE, not a new one -- unlike
+// StatsScreenExport, which had to drop `private` from the members it reaches
+// across the file boundary. Nothing here needs to be visible to anything else,
+// so nothing is.
+// ============================================================================
+
+extension CalendarScreen {
 
     private var selectedDay: some View {
         VStack(alignment: .leading, spacing: 8) {

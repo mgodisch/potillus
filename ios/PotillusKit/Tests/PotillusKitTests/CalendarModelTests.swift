@@ -59,25 +59,80 @@ final class CalendarModelTests: XCTestCase {
         )
     }
 
-    private func makeModel(at millis: Int64, firstDayOfWeekIso: Int = 1) -> CalendarModel {
-        CalendarModel(
-            entries: environment.entries,
-            preferences: environment.preferences,
-            clock: FixedClock(millis: millis),
-            timeZone: utc,
-            firstDayOfWeekIso: firstDayOfWeekIso
+    // ── Logging onto the selected day ────────────────────────────────────────
+    //
+    // The point of these: a calendar entry's TIMESTAMP and its LOGICAL DATE are
+    // different facts. The user is typing now; the day they are recording is the
+    // one they tapped. `EntryLogger` derived the date from the instant
+    // unconditionally until 0.83.0, so an entry booked onto the 12th would have
+    // landed on today -- silently, and only noticed once the month was reopened.
+
+    func testAnEntryIsBookedOntoTheSelectedDayNotToday() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.load()
+        await model.select("2026-01-12")
+
+        let drink = try XCTUnwrap(environment.drinks.allOnce().first)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: midJanuary)
+
+        let stored = try environment.entries.all()
+        XCTAssertEqual(stored.count, 1)
+        XCTAssertEqual(stored[0].logicalDate, "2026-01-12", "the day the user picked")
+        XCTAssertEqual(
+            stored[0].timestampMillis, midJanuary,
+            "the instant the user typed -- deliberately not the selected day"
         )
     }
 
-    @discardableResult
-    private func addEntry(on date: String, grams: Double, at millis: Int64) throws -> Int64 {
-        try environment.entries.add(
-            ConsumptionEntry(
-                drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
-            )
-        )
+    /// The selected day is honoured whatever the day-change boundary says: a
+    /// calendar square is not subject to a 4 a.m. rollover.
+    func testTheDayChangeBoundaryDoesNotMoveACalendarEntry() async throws {
+        try await environment.preferences.update { $0.dayChangeHour = 4 }
+        let model = makeModel(at: midJanuary)
+        await model.load()
+        await model.select("2026-01-12")
+
+        // 02:00 on the 15th: before the boundary, so the derivation this replaces
+        // would have said "the 14th" -- neither today nor the day chosen.
+        let earlyHours = midJanuary - 10 * 3_600_000
+        let drink = try XCTUnwrap(environment.drinks.allOnce().first)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: earlyHours)
+
+        let stored = try environment.entries.all()
+        XCTAssertEqual(stored[0].logicalDate, "2026-01-12")
     }
+
+    func testAddingWithNoSelectionDoesNothing() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.load()
+        await model.select(nil)
+
+        let drink = try XCTUnwrap(environment.drinks.allOnce().first)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: midJanuary)
+
+        XCTAssertTrue(try environment.entries.all().isEmpty)
+    }
+
+    func testTheSelectedDayReflectsTheNewEntryWithoutAReload() async throws {
+        let model = makeModel(at: midJanuary)
+        await model.load()
+        await model.select("2026-01-12")
+
+        let drink = try XCTUnwrap(environment.drinks.allOnce().first)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: midJanuary)
+
+        XCTAssertEqual(model.state.selectedEntries.count, 1)
+        XCTAssertGreaterThan(model.state.totalGramsSelected, 0)
+    }
+
+    /// The "+" sheet chooses from this, so `load()` has to fill it.
+    func testTheCatalogueIsAvailableForTheSheet() async {
+        let model = makeModel(at: midJanuary)
+        await model.load()
+        XCTAssertEqual(model.state.drinks.map(\.name), ["Pils"])
+    }
+
+    @discardableResult
 
     // ── MonthGrid, the pure part ─────────────────────────────────────────────
 
@@ -345,10 +400,6 @@ final class CalendarModelTests: XCTestCase {
         XCTAssertNil(model.state.summaries["2026-01-15"], "a stopped observation still fired")
     }
 
-    /// Polls the main actor until `condition` holds. The observation is a stream, so
-    /// there is no completion to await; a fixed sleep would be flaky.
-    private func waitUntil(
-        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
     ) async throws {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
@@ -357,4 +408,33 @@ final class CalendarModelTests: XCTestCase {
         }
         XCTFail("condition not met within \(timeout) s")
     }
+}
+
+// Fixtures live in an extension, as in TodayModelTests: SwiftLint's
+// `type_body_length` counts only the class body, and a test class should earn
+// its length from tests, not fixtures.
+extension CalendarModelTests {
+
+    private func makeModel(at millis: Int64, firstDayOfWeekIso: Int = 1) -> CalendarModel {
+        CalendarModel(
+            entries: environment.entries,
+            drinks: environment.drinks,
+            preferences: environment.preferences,
+            clock: FixedClock(millis: millis),
+            timeZone: utc,
+            firstDayOfWeekIso: firstDayOfWeekIso
+        )
+    }
+    private func addEntry(on date: String, grams: Double, at millis: Int64) throws -> Int64 {
+        try environment.entries.add(
+            ConsumptionEntry(
+                drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
+                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
+            )
+        )
+    }
+    /// Polls the main actor until `condition` holds. The observation is a stream, so
+    /// there is no completion to await; a fixed sleep would be flaky.
+    private func waitUntil(
+        timeout: TimeInterval = 2.0, _ condition: @MainActor () -> Bool
 }
