@@ -103,7 +103,8 @@ import java.time.ZoneId
  *   CalendarScreen's selected-day panels — which deliberately use
  *   `primaryContainer`. This one is the quiet default; those are the accents.
  *
- * @param modifier            Applied to the card. Defaults to full width.
+ * @param modifier            Applied to the card, on top of the full width it
+ *                            takes by default.
  * @param contentPadding      Inset around the body. 16dp is the app's standard;
  *                            CalendarScreen's denser panels pass 12dp.
  * @param verticalArrangement Spacing between the body's children, forwarded to
@@ -113,13 +114,18 @@ import java.time.ZoneId
  */
 @Composable
 fun SectionCard(
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     contentPadding: Dp = 16.dp,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        modifier = modifier,
+        // `Modifier`, not `Modifier.fillMaxWidth()`, as the default: Compose's
+        // ModifierParameter lint rule requires it, and it is what every other
+        // composable in this file does. The width belongs here instead, chained
+        // onto whatever the caller passed -- the same shape as DrinkCategoryIcon's
+        // `modifier.size(spec.size)`.
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {

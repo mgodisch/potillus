@@ -165,10 +165,15 @@ two stores' notes need not match).
   instead of `@StringRes titleRes: Int` — the signature iOS already had — because
   the guide passes a localized lookup while the licence viewers pass fixed
   English literals naming legal documents.
-- **Fixed: the Android About screen declared its package twice.** A slip while
-  the file was rebuilt in the same release, caught by the first Kotlin
-  compilation: none of the release gates parse Kotlin, so the error survived a
-  full green gate run.
+- **Fixed: the Android About screen declared its package twice, and `SectionCard`
+  defaulted its modifier wrongly.** Two slips while those files were written in
+  this same release, each caught by the first real Android build: the duplicate
+  `package` by the Kotlin compiler, and `modifier: Modifier =
+  Modifier.fillMaxWidth()` by Compose's ModifierParameter lint rule, which
+  requires the default to be plain `Modifier` — the width now chains onto the
+  caller's modifier at the point of use, as `DrinkCategoryIcon` already did, and
+  as the file's five other modifier parameters were already declared. Neither was
+  caught by the release gates, because none of them parses Kotlin or runs lint.
 - **The overflow menu ends with About, and Help and About share their glyphs
   across platforms.** The menu now reads Settings, Help, "Lock app", About on
   both platforms: About is looked up once, not daily, so it yields the prime
