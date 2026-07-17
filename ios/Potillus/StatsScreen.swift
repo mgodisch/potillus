@@ -269,43 +269,6 @@ struct StatsScreen: View {
         }
     }
 
-    // ── Consumption over time ────────────────────────────────────────────────
-
-    private var consumptionChart: some View {
-        Section(Loc.string("Consumption", locale: locale)) {
-            Chart(model.state.chartBuckets, id: \.labelDate) { bucket in
-                if bucket.isAbstinent {
-                    // A dry day has zero height, so a bar would be invisible. Android
-                    // draws a small green check-mark at the baseline to say "dry",
-                    // not "missing"; this is the Swift Charts equivalent — a point at
-                    // y = 0 carrying a green checkmark symbol.
-                    PointMark(
-                        x: .value("Date", bucket.labelDate),
-                        y: .value("Grams per day", 0)
-                    )
-                    .symbol {
-                        Image(systemName: "checkmark")
-                            .font(.caption2.bold())
-                            .foregroundStyle(Color.green)
-                    }
-                    .foregroundStyle(Color.green)
-                } else {
-                    BarMark(
-                        x: .value("Date", bucket.labelDate),
-                        y: .value("Grams per day", bucket.avgPerDay)
-                    )
-                    .foregroundStyle(Color.accentColor)
-                }
-            }
-            .chartXAxis {
-                // Labels only every few buckets: 31 dates do not fit.
-                AxisMarks(values: .automatic(desiredCount: 5))
-            }
-            .chartYAxisLabel(Loc.string("g / day", locale: locale))
-            .frame(height: 180)
-        }
-    }
-
     // ── Breakdowns ───────────────────────────────────────────────────────────
 
     private var categories: some View {
@@ -539,4 +502,105 @@ private struct WeekdayPoint: Identifiable {
 private struct CategorySlice {
     let category: DrinkCategory
     let grams: Double
+}
+
+// =============================================================================
+// StatsScreen – the consumption chart
+// =============================================================================
+//
+// In an extension for the same length-budget reason as the sections below
+// (SwiftLint `type_body_length`): the 0.83.0 QA round gave this chart its
+// daily-limit rule and its over-limit colouring, and that pushed the view's body
+// past the limit. The seam is a real one — this is the one chart the screen is
+// opened for.
+// =============================================================================
+
+extension StatsScreen {
+
+    /// Whether the daily-limit line is meaningful for the period on screen.
+    ///
+    /// The YEAR view's buckets are per-month averages of grams per day, and a
+    /// DAILY limit is not the reference those are read against — so Android passes
+    /// `showLimitLine = false` there (`StatsScreen.kt`: `showLimitLine = !isYear`)
+    /// and reddens no bar either. This mirrors that, including the coupling: the
+    /// line and the reddening are one decision, not two.
+    private var showsLimitLine: Bool { model.state.period != .year }
+
+    /// The colour of one consumption bar.
+    ///
+    /// `isOverLimit` rather than a bare `>`: the totals are summed from a 0.1 g
+    /// grid and float drift puts an exactly-at-limit day either side of a strict
+    /// comparison. The predicate carries the 1e-6 epsilon both platforms share, so
+    /// the bar reddens on exactly the days the days-over-limit count above it
+    /// counts — the alternative is a screen that contradicts itself.
+    private func barColor(for bucket: ChartBucket) -> Color {
+        guard showsLimitLine else { return Color.accentColor }
+        let over = AlcoholCalculator.isOverLimit(
+            totalGrams: bucket.avgPerDay,
+            limitGrams: model.state.limitInfo.limitGrams
+        )
+        // Color.red / Color.green, not Android's hand-tuned hexes: this screen
+        // already reads the system semantic colours (the trend arrow, the
+        // days-over counts, the dry-day ticks). Same meaning, native palette —
+        // the porting stance the rest of the app takes.
+        return over ? Color.red : Color.accentColor
+    }
+
+    fileprivate var consumptionChart: some View {
+        Section(Loc.string("Consumption", locale: locale)) {
+            // `Chart { ForEach ... }` rather than `Chart(data, id:)`: the limit
+            // rule is a mark that belongs to the chart, not to a bucket, so it
+            // has to sit beside the loop rather than inside it.
+            Chart {
+                ForEach(model.state.chartBuckets, id: \.labelDate) { bucket in
+                    if bucket.isAbstinent {
+                        // A dry day has zero height, so a bar would be invisible. Android
+                        // draws a small green check-mark at the baseline to say "dry",
+                        // not "missing"; this is the Swift Charts equivalent — a point at
+                        // y = 0 carrying a green checkmark symbol.
+                        PointMark(
+                            x: .value("Date", bucket.labelDate),
+                            y: .value("Grams per day", 0)
+                        )
+                        .symbol {
+                            Image(systemName: "checkmark")
+                                .font(.caption2.bold())
+                                .foregroundStyle(Color.green)
+                        }
+                        .foregroundStyle(Color.green)
+                    } else {
+                        BarMark(
+                            x: .value("Date", bucket.labelDate),
+                            y: .value("Grams per day", bucket.avgPerDay)
+                        )
+                        .foregroundStyle(barColor(for: bucket))
+                    }
+                }
+                if showsLimitLine {
+                    // The daily limit, as a dashed red rule across the plot area —
+                    // Android has drawn one since the chart existed, and until the
+                    // 0.83.0 QA round iOS drew every bar in the accent colour with
+                    // no reference line at all: the screen showed the numbers but
+                    // not the one line that says what they mean. The state already
+                    // carried `limitInfo`; nothing read it. The app's own PDF report
+                    // draws this line too (`ReportRendererRows`).
+                    //
+                    // The constant-y form spans the plotting area, which is what a
+                    // threshold wants. The label passed to `.value` is what Swift
+                    // Charts speaks to VoiceOver.
+                    RuleMark(
+                        y: .value("Daily limit", model.state.limitInfo.limitGrams)
+                    )
+                    .foregroundStyle(Color.red)
+                    .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 3]))
+                }
+            }
+            .chartXAxis {
+                // Labels only every few buckets: 31 dates do not fit.
+                AxisMarks(values: .automatic(desiredCount: 5))
+            }
+            .chartYAxisLabel(Loc.string("g / day", locale: locale))
+            .frame(height: 180)
+        }
+    }
 }
