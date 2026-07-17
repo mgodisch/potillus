@@ -157,7 +157,10 @@ changes; for a plain build-from-scratch you run it once here.
 entry of `CHANGELOG.md`, and `CURRENT_PROJECT_VERSION`, taken from the Android
 `versionCode`, so the App Store and Play Store builds report the same version and
 the same build number, and neither can drift from the changelog. `gmake
-ios-version-check` verifies the file exists and is current — the release gate.
+ios-version-check` verifies the file exists and is current — suitable for a
+release gate, and worth running by hand after a version bump if you build with
+`xcodebuild` directly rather than through `gmake ios-project`, which regenerates
+the file anyway. No target depends on it.
 The values must **never** be set in `project.yml` directly: a value in `settings`
 overrides an xcconfig and would silently defeat the generator. To confirm the
 values took effect, ask the build system rather than the Xcode UI, where a

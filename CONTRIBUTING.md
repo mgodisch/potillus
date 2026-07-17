@@ -337,12 +337,15 @@ brew install make
 gmake check-headers
 ```
 
-The `Makefile` is not needed for iOS work at all: `xcodegen`, `swift test`, and
-Xcode are invoked directly (see [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md)).
-It also assumes a Linux
+The `Makefile` drives the iOS build too, so on macOS you need `gmake` for it:
+`gmake ios-project` generates `ios/Potillus.xcodeproj`, and `gmake ios` runs the
+full gate — the Mac-free static checks, the kit's `swift test`, SwiftLint and
+`xcodebuild` (see [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md)). The `Makefile`
+also assumes a Linux
 toolchain elsewhere (`rsvg-convert`, `pdftoppm`, screengrab, the F-Droid and
 reproducible-build targets), so the Android release pipeline stays on Linux by
 design.
+
 ---
 
 ## 5. Testing strategy
