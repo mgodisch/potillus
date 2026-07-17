@@ -58,6 +58,20 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **The English store notes say what this release actually became.** They were
+  last written when 0.83.0 was half its present size, and four user-visible things
+  had landed since without reaching them: the iOS calendar could not add an entry
+  at all, today's entries could not be edited, statistics counted the days before
+  the app was installed, and the Statistics screen was reordered and given its
+  donut. Nothing in the notes had become untrue — they were simply short. The
+  App Store note has room and takes all four. The Play note had 62 characters
+  spare, which was not enough for the one thing it lacked, so a clause that
+  restated its own first half ("so the catalogue afterwards matches the backup
+  exactly") gave way to the Statistics and Calendar cards finally matching the rest
+  of the app.
+  The other twenty locales are untouched and drift further: they still carry the
+  older, bulleted draft this release opened with. That was a deliberate call when
+  the notes were first revised and it stands, but the gap is now four items wide.
 - **The About screen's paragraphs now read as paragraphs.** Android's license
   cards laid their prose out with `Arrangement.Top`, so consecutive paragraphs
   butted together with NO gap — tighter than the leading inside a paragraph, which
