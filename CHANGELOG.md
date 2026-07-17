@@ -91,6 +91,33 @@ receive — follow at release time, once this cycle has taken its final shape.
   the screenshots error hid an identical one behind it: `metadata` would have
   failed next, for the same reason.
 
+- **Three iOS store locales were named in the wrong namespace.** With the paths
+  fixed, deliver got far enough to reject the next thing: "Unsupported directory
+  name(s) ... : es, fr, nl". App Store Connect takes `es-ES`/`es-MX`,
+  `fr-FR`/`fr-CA` and `nl-NL`; bare `es`, `fr` and `nl` are not on its list. They
+  are, however, perfectly good Xcode language tags — which is exactly how they
+  got there, and why they read as correct: `ios/Potillus/Localizable.xcstrings`
+  still calls those languages `es`, `fr` and `nl`, and rightly so. The store
+  directories are a different namespace that merely resembles it. All three are
+  renamed, in `fastlane/metadata/ios/` and `fastlane/screenshots/ios/` alike, to
+  the names the Android side has always used: `es-ES`, `fr-FR`, `nl-NL`.
+  `es-MX`/`fr-CA` would have been a reach decision rather than a correction, and
+  the app's own translations are the generic variants. Nothing else needed
+  touching: `Snapfile` derives its `languages` from the metadata directory names
+  and `IOS_SCREENSHOT_LOCALES` derives from the same glob, so both follow;
+  `check-l10n-parity.py`'s language list is catalogue tags, not store locales,
+  and stays as it is.
+- **...and the gate that should have said so, said nothing.** `check-ios-metadata.py`
+  enforced lengths, file-set parity and non-empty essentials, but had no opinion
+  about locale NAMES — the one property deliver checks first and this repository
+  had wrong. It now carries App Store Connect's accepted list and rejects
+  anything outside it, naming the valid locales that share the bad name's
+  language subtag ("did you mean es-ES or es-MX?") without choosing between them.
+  The list deliberately omits deliver's `appleTV`/`iMessage`/`default`
+  pseudo-locales: this app ships none, and admitting them would let a typo pass
+  as intent. Checking the metadata names covers the screenshot names too, since
+  the Snapfile generates the latter from the former.
+
 ---
 
 ## v0.83.0

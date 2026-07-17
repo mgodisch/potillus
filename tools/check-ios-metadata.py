@@ -53,6 +53,17 @@ WHAT IT CHECKS
        copyright.txt, which deliver reads once for all locales.
     3. NON-EMPTY ESSENTIALS: name.txt and description.txt must not be empty in
        any locale -- deliver would push the empty string.
+    4. LOCALE NAMES: every locale directory is one App Store Connect actually
+       accepts.  deliver validates this itself, but only once an upload is
+       already under way -- 0.83.1 lost two upload attempts to it, because the
+       tree had carried `es`, `fr` and `nl` (valid Xcode language tags, and the
+       names the app's own Localizable.xcstrings still uses) where the store
+       wants `es-ES`, `fr-FR` and `nl-NL`.  Nothing before the upload had an
+       opinion, so the names sat there, wrong and quiet, for as long as the app
+       had never shipped to the App Store.  The same list also governs
+       fastlane/screenshots/ios/, whose directories deliver validates in the
+       same breath; the Snapfile derives those names from the metadata ones, so
+       checking here covers both.
 
 GRACEFUL SKIP
     A tree without fastlane/metadata/ios/ (an Android-only source drop) is not
@@ -88,6 +99,24 @@ REQUIRED_NON_EMPTY = ("name.txt", "description.txt")
 # Directory entries under BASE that are not locales.
 NOT_A_LOCALE = {"review_information"}
 
+# The locale directory names App Store Connect accepts, verbatim from deliver's
+# own error message and from the "Available language codes" list in
+# docs.fastlane.tools/actions/upload_to_app_store.  These are STORE locales and
+# are a different namespace from the app's own language tags in
+# ios/Potillus/Localizable.xcstrings -- `es` is a correct catalogue tag and a
+# wrong store directory, which is precisely why this needs checking.  The
+# platform pseudo-locales deliver also accepts (appleTV, iMessage, default) are
+# omitted deliberately: this app ships none of them, and listing them here would
+# let a typo like `imessage` pass as intentional.
+VALID_LOCALES = {
+    "ar-SA", "bn-BD", "ca", "cs", "da", "de-DE", "el", "en-AU", "en-CA",
+    "en-GB", "en-US", "es-ES", "es-MX", "fi", "fr-CA", "fr-FR", "gu-IN", "he",
+    "hi", "hr", "hu", "id", "it", "ja", "kn-IN", "ko", "ml-IN", "mr-IN", "ms",
+    "nl-NL", "no", "or-IN", "pa-IN", "pl", "pt-BR", "pt-PT", "ro", "ru", "sk",
+    "sl-SI", "sv", "ta-IN", "te-IN", "th", "tr", "uk", "ur-PK", "vi",
+    "zh-Hans", "zh-Hant",
+}
+
 
 def listing_text(path):
     """The characters deliver would send: the file minus ONE trailing newline."""
@@ -107,6 +136,22 @@ def main():
         if os.path.isdir(os.path.join(BASE, entry)) and entry not in NOT_A_LOCALE
     )
     problems = []
+
+    # 4: locale directory names. Reported first because a wrong name makes every
+    # other finding for that directory moot -- deliver rejects the whole upload
+    # before it reads a single .txt. The hint lists the valid locales sharing the
+    # bad name's language subtag, which is what a name like `es` is usually one
+    # region suffix away from; where that yields more than one (es-ES/es-MX), the
+    # choice is a reach decision the maintainer makes, not one this gate makes.
+    for locale in locales:
+        if locale in VALID_LOCALES:
+            continue
+        subtag = locale.split("-")[0]
+        near = sorted(v for v in VALID_LOCALES if v.split("-")[0] == subtag)
+        hint = f" -- did you mean {' or '.join(near)}?" if near else ""
+        problems.append(
+            f"{locale}: not a locale App Store Connect accepts{hint}"
+        )
 
     # 1 + 3: limits and required content, per locale.
     file_sets = {}
@@ -158,7 +203,7 @@ def main():
         return 1
 
     print(
-        f"check-ios-metadata: OK ({len(locales)} locales, "
+        f"check-ios-metadata: OK ({len(locales)} locales, all valid; "
         f"{len(LIMITS)} limits enforced)"
     )
     return 0
