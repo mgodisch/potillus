@@ -1,5 +1,1 @@
-Nyt: du kan indstille appens sprog til “(System)”, så det følger enhedens sprog, og skifte tilbage når som helst (Indstillinger → Udseende → Sprog).
-
-Menupunktet “Copyright” er nu en “Om”-skærm med version, appens licens og open source-komponenter samt et link til hele licensteksten.
-
-Derudover interne forbedringer.
+Rettet: import af en backup med "Erstat" erstatter nu virkelig drikkevarelisten – de indbyggede standarddrikke beholdes ikke længere sammen med de importerede. Rettet: kortene Statistik og Kalender har nu samme baggrund som resten af appen. Sproglisten tilbyder nu "(System)", så et fast sprog kan skiftes tilbage til at følge enhedens sprog. Og skærmen "Om" i menuen viser version, GPL-notitsen og licenserne for appens komponenter.

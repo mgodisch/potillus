@@ -1,5 +1,1 @@
-Nou: poți seta limba aplicației pe „(Sistem)” pentru a urma limba dispozitivului și poți reveni oricând (Setări → Aspect → Limbă).
-
-Intrarea „Copyright” din meniu este acum un ecran „Despre” cu versiunea, licența aplicației și componentele open source, cu un link către textul complet al licenței.
-
-În plus, îmbunătățiri interne.
+Remediat: importul unei copii de rezervă cu "Înlocuiește" înlocuiește acum cu adevărat lista de băuturi – băuturile predefinite nu mai rămân alături de cele importate. Remediat: cardurile Statistici și Calendar au acum același fundal ca restul aplicației. Lista de limbi oferă acum "(Sistem)", astfel încât o limbă fixă poate reveni la limba dispozitivului. Iar ecranul "Despre" din meniu afișează versiunea, nota GPL și licențele componentelor aplicației.

@@ -1,5 +1,1 @@
-Nieuw: stel de app-taal in op “(Systeem)” om de taal van je apparaat te volgen, en schakel altijd terug (Instellingen → Weergave → Taal).
-
-Het menu-item “Copyright” is nu een “Info”-scherm met de versie, de licentie van de app en de opensourcecomponenten, met een link naar de volledige licentietekst.
-
-Daarnaast interne verbeteringen.
+Opgelost: het importeren van een back-up met "Vervangen" vervangt nu echt de drankenlijst – de vooraf ingestelde dranken blijven niet langer naast de geïmporteerde staan. Opgelost: de kaarten Statistieken en Kalender hebben nu dezelfde achtergrond als de rest van de app. De talenlijst biedt nu "(Systeem)", zodat een vaste taal weer de taal van het apparaat kan volgen. En het scherm "Over" in het menu toont de versie, de GPL-vermelding en de licenties van de componenten.

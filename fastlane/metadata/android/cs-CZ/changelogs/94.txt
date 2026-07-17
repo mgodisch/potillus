@@ -1,5 +1,1 @@
-Novinka: jazyk aplikace můžete nastavit na „(Systém)“, aby sledoval jazyk zařízení, a kdykoli se vrátit zpět (Nastavení → Vzhled → Jazyk).
-
-Položka nabídky „Copyright“ je nyní obrazovka „O aplikaci“ s verzí, licencí aplikace a komponentami s otevřeným zdrojovým kódem a odkazem na úplný text license.
-
-Navíc interní vylepšení.
+Opraveno: import zálohy s volbou "Nahradit" nyní skutečně nahradí seznam nápojů – předdefinované nápoje už nezůstávají vedle importovaných. Opraveno: karty Statistiky a Kalendář mají nyní stejné pozadí jako zbytek aplikace. Seznam jazyků nyní nabízí "(Systémové)", takže pevně nastavený jazyk lze přepnout zpět na jazyk zařízení. A obrazovka "O aplikaci" v nabídce zobrazuje verzi, upozornění GPL a licence součástí aplikace.

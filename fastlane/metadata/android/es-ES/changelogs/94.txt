@@ -1,5 +1,1 @@
-Novedad: ahora puedes poner el idioma de la app en “(Sistema)” para seguir el del dispositivo, y volver cuando quieras (Ajustes → Apariencia → Idioma).
-
-La entrada “Copyright” del menú es ahora una pantalla “Acerca de” con la versión, la licencia de la app y sus componentes de código abierto, y un enlace al texto completo de la licencia.
-
-Además, mejoras internas.
+Corregido: importar una copia de seguridad con "Reemplazar" ahora reemplaza de verdad la lista de bebidas; las bebidas predefinidas ya no se conservan junto a las importadas. Corregido: las tarjetas de Estadísticas y Calendario tienen ahora el mismo fondo que el resto de la app. La lista de idiomas ofrece ahora "(Sistema)", así un idioma fijo puede volver a seguir el idioma del dispositivo. Y la pantalla "Acerca de" del menú muestra la versión, el aviso GPL y las licencias de los componentes.

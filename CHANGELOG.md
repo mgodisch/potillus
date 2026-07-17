@@ -33,7 +33,7 @@ apply to it are stated in the accompanying COPYING.md file.
      notes. This makes the entry's first line directly reusable as the subject of
      the release commit/tag (git's recommended ≤50-char subject limit). -->
 <!-- RELEASE REMINDER: on every version bump, also add a localized store note
-     android/fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
+     fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt for
      EVERY locale, keeping the set identical across locales. release-check.sh §1
      enforces both that the current versionCode's note exists in each locale and
      that all locales carry the same set of changelog files. -->
@@ -57,9 +57,31 @@ review Android, iOS and the cross-platform seam between them as one subject, the
 twelfth being the first to review a 0.83.0 that had already been reviewed once,
 and the thirteenth finding no defect in either app: everything it changed is a
 statement the repository makes about itself. The final,
-localised release notes still follow at release time; until then the Android
-per-locale `94.txt` changelogs and the iOS `release_notes.txt` remain
-independent placeholders (the two stores' notes need not match).
+localised release notes are now in place: the English Android note and the
+English iOS note are translated into all 20 further store languages (the two
+stores' notes still need not match, and do not).
+
+- **Localised store release notes for both stores.** The English Android note
+  `fastlane/metadata/android/en-US/changelogs/94.txt` and the English iOS note
+  `fastlane/metadata/ios/en-US/release_notes.txt` are translated into the 20
+  further store languages each store lists (Android: `cs-CZ` … `zh-TW`; iOS:
+  `cs` … `zh-Hant`). Terminology is taken from the in-app strings — screen and
+  option names such as Today, Statistics, Calendar, Drinks, Settings, About,
+  "(System)", "Replace", the abstinent-days and daily-limit wording — as found
+  in `android/app/src/main/res/values-*/strings.xml` and
+  `ios/Potillus/Localizable.xcstrings`, so a store note never names a screen
+  differently from the app itself; quotation-mark style follows each locale's
+  existing `full_description.txt`, and the iOS wording avoids addressing the
+  reader directly. Google Play's 500-character limit is counted the way
+  `release-check.sh` §10 counts it (Unicode code points including the trailing
+  newline); the longest notes come in at 498 (`es-ES`) and 494 (`de-DE`), the
+  es-ES and fr-FR drafts having been tightened to fit. The App Store notes stay
+  far below the 4000-character limit (longest: `fr` at 1923). Adding the 20 iOS
+  files also turns `check-ios-metadata.py` green again: its file-set-parity
+  rule had been failing since the en-US `release_notes.txt` arrived alone.
+  Also fixed in passing: the RELEASE REMINDER comment at the top of this file
+  still pointed at `android/fastlane/metadata/android/…`, the tree's location
+  before the v0.73.2 move of fastlane to the repository root.
 
 - **The repository's claims about itself now match the repository (thirteenth QA
   round).** The thirteenth round found no defect in either app — the gates were

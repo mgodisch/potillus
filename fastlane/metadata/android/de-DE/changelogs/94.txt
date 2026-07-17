@@ -1,5 +1,1 @@
-Neu: Du kannst die App-Sprache auf „(System)“ stellen, damit sie der Gerätesprache folgt – und jederzeit zurückwechseln (Einstellungen → Darstellung → Sprache).
-
-Der Menüeintrag „Copyright“ ist jetzt ein „Info“-Bildschirm mit Version, App-Lizenz und Open-Source-Komponenten sowie einem Link zum vollständigen Lizenztext.
-
-Dazu interne Qualitäts- und Release-Verbesserungen.
+Behoben: Der Import einer Sicherung mit „Ersetzen“ ersetzt die Getränkeliste jetzt wirklich – die vordefinierten Getränke bleiben nicht mehr neben den importierten erhalten. Behoben: Die Karten für Statistik und Kalender haben nun denselben Hintergrund wie der Rest der App. Die Sprachliste bietet jetzt „(System)“, sodass eine feste Sprache wieder auf die Gerätesprache zurückgestellt werden kann. Und der Bildschirm „Über“ im Menü zeigt Version, GPL-Hinweis und die Lizenzen der Komponenten.

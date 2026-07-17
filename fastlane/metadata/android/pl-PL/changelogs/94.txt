@@ -1,5 +1,1 @@
-Nowość: możesz ustawić język aplikacji na „(System)”, aby podążał za językiem urządzenia, i wrócić w dowolnej chwili (Ustawienia → Wygląd → Język).
-
-Pozycja menu „Copyright” to teraz ekran „Informacje” z wersją, licencją aplikacji i komponentami open source oraz odnośnikiem do pełnego tekstu licencji.
-
-Ponadto usprawnienia wewnętrzne.
+Naprawiono: import kopii zapasowej z opcją "Zastąp" naprawdę zastępuje teraz listę napojów – wbudowane napoje nie pozostają już obok zaimportowanych. Naprawiono: karty Statystyki i Kalendarz mają teraz to samo tło co reszta aplikacji. Lista języków oferuje teraz "(Systemowy)", dzięki czemu ustawiony na stałe język można przełączyć z powrotem na język urządzenia. A ekran "O aplikacji" w menu pokazuje wersję, notę GPL i licencje komponentów aplikacji.

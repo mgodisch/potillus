@@ -1,5 +1,1 @@
-Nouveau : définissez la langue de l’application sur « (Système) » pour suivre celle de l’appareil, et revenez en arrière à tout moment (Réglages → Apparence → Langue).
-
-L’entrée « Copyright » du menu devient un écran « À propos » avec la version, la license de l’application et ses composants open source, et un lien vers le texte complet de la license.
-
-Plus des améliorations internes.
+Corrigé : l'import d'une sauvegarde avec « Remplacer » remplace désormais vraiment la liste des boissons – les boissons prédéfinies ne restent plus à côté de celles importées. Corrigé : les cartes Statistiques et Calendrier ont désormais le même fond que le reste de l'app. La liste des langues propose désormais « (Système) », et une langue fixe peut ainsi revenir à la langue de l'appareil. Et l'écran « À propos » du menu affiche la version, la mention GPL et les licences des composants.

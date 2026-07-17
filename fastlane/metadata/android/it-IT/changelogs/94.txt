@@ -1,5 +1,1 @@
-Novità: ora puoi impostare la lingua dell’app su “(Sistema)” per seguire quella del dispositivo, e tornare indietro quando vuoi (Impostazioni → Aspetto → Lingua).
-
-La voce “Copyright” del menu è ora una schermata “Informazioni” con versione, licenza dell’app e componenti open source, con un link al testo completo della licenza.
-
-Inoltre, miglioramenti interni.
+Corretto: l'importazione di un backup con "Sostituisci" ora sostituisce davvero l'elenco delle bevande; le bevande predefinite non restano più accanto a quelle importate. Corretto: le schede Statistiche e Calendario hanno ora lo stesso sfondo del resto dell'app. L'elenco delle lingue offre ora "(Sistema)", così una lingua fissa può tornare a seguire la lingua del dispositivo. E la schermata "Informazioni" nel menu mostra la versione, l'avviso GPL e le licenze dei componenti.
