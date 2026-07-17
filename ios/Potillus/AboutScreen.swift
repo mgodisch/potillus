@@ -78,6 +78,13 @@ struct AboutScreen: View {
             }
 
             Section("License") {
+                // Each paragraph is its own List row, and a List draws a separator
+                // between rows -- which put a rule between every sentence of the
+                // notice and chopped one legal text into four. The paragraphs hide
+                // their bottom separator; the FOURTH does not, because that one is
+                // the rule above the link, separating the notice from the way out
+                // to its full text.
+                //
                 // Paragraphs one to three: the GPL notice, word for word as every
                 // source file carries it.
                 AboutParagraph(
@@ -88,6 +95,7 @@ struct AboutScreen: View {
                     version.
                     """
                 )
+                .listRowSeparator(.hidden, edges: .bottom)
                 AboutParagraph(
                     """
                     This program is distributed in the hope that it will be useful, but WITHOUT ANY \
@@ -95,12 +103,14 @@ struct AboutScreen: View {
                     PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     """
                 )
+                .listRowSeparator(.hidden, edges: .bottom)
                 AboutParagraph(
                     """
                     You should have received a copy of the GNU General Public License along with \
                     this program. If not, see https://www.gnu.org/licenses/.
                     """
                 )
+                .listRowSeparator(.hidden, edges: .bottom)
                 // Paragraph four: the exception itself, from COPYING.md.
                 AboutParagraph(
                     """
@@ -134,9 +144,12 @@ struct AboutScreen: View {
                 // notice to accompany the software, so the text is reproduced in
                 // full — as prose, not monospaced: it is sentences to read, not a
                 // code listing. Selectable, so a reader can lift it out verbatim.
+                // Neither .font() nor .foregroundStyle(): body text in the primary
+                // colour, like every other paragraph here. It had been small and
+                // grey, which reads as a disclaimer to skip -- but this text is the
+                // MIT License's permission notice, the thing the licence actually
+                // obliges us to put in front of a reader.
                 Text(AppInfo.grdbLicense)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
                     .textSelection(.enabled)
                     .padding(.vertical, 4)
             }
@@ -162,8 +175,10 @@ private struct AboutParagraph: View {
     }
 
     var body: some View {
+        // No .font(): a List row's default IS .body, which is what the "Version"
+        // row above renders at. These paragraphs had been .footnote, so the
+        // screen shrank below its own first line.
         Text(text)
-            .font(.footnote)
             .padding(.vertical, 2)
     }
 }

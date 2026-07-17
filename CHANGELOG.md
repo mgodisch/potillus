@@ -58,6 +58,24 @@ notes still follow at release time; until then the Android per-locale `94.txt`
 changelogs and the iOS `release_notes.txt` remain independent placeholders (the
 two stores' notes need not match).
 
+- **The About screen's paragraphs now read as paragraphs.** Android's license
+  cards laid their prose out with `Arrangement.Top`, so consecutive paragraphs
+  butted together with NO gap — tighter than the leading inside a paragraph, which
+  made four paragraphs look like one block that occasionally started a new line.
+  A paragraph break has to be wider than a line break to be one; the cards now
+  space their children by 8dp, the step StatsScreen's metric cards already use.
+  iOS had the opposite fault: every paragraph is a List row, and a List rules a
+  line between rows, so the GPL notice arrived chopped into four by three
+  horizontal rules. The paragraphs hide their bottom separator; the fourth keeps
+  its, because that rule belongs there — it separates the notice from the link to
+  its full text. Android grows the same rule inside each card, above each link,
+  and loses the one that sat above "Open-source components", where the heading
+  and the cards already do the separating. iOS's paragraphs were `.footnote`
+  while the "Version" row above them is `.body`, so the screen shrank below its
+  own first line; they inherit the List's default now. GRDB's MIT text loses its
+  `.footnote` and its `.secondary` grey with them: small and grey reads as a
+  disclaimer to skip, and that text is the permission notice the licence obliges
+  us to put in front of a reader.
 - **"licence" is now "license" everywhere, and the About screen groups each
   license in a card.** The tree had been spelling it both ways — 159 occurrences
   of the British form across 40 files, sitting next to the American form the GPL,

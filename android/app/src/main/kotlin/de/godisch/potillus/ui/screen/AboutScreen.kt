@@ -164,7 +164,14 @@ fun AboutScreen(
             HorizontalDivider()
 
             SectionHeading("License")
-            SectionCard {
+            // spacedBy, because SectionCard's default Arrangement.Top butts the
+            // paragraphs together with NO gap at all -- which reads as tighter
+            // than the leading INSIDE a paragraph, so the text looks like one
+            // block that occasionally starts a new line. A paragraph break has to
+            // be wider than a line break to be a paragraph break. 8dp on top of
+            // bodyMedium's 20sp line height is the same step StatsScreen's metric
+            // cards use.
+            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Paragraphs one to three: the GPL notice, word for word as every
                 // source file carries it.
                 BodyText(
@@ -193,13 +200,12 @@ fun AboutScreen(
                         "with or without this permission through a channel without those " +
                         "restrictive terms and conditions.",
                 )
+                HorizontalDivider()
                 LicenseLink("GNU General Public License v3", onOpenGpl3)
             }
 
-            HorizontalDivider()
-
             SectionHeading("Open-source components")
-            SectionCard {
+            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 BodyText(
                     "Under the Apache License 2.0: AndroidX / Jetpack (Copyright © The " +
                         "Android Open Source Project); the Kotlin standard library and " +
@@ -208,9 +214,10 @@ fun AboutScreen(
                         "ListenableFuture (Copyright © The Guava Authors); and JSpecify " +
                         "(Copyright © The JSpecify Authors).",
                 )
+                HorizontalDivider()
                 LicenseLink("Apache License 2.0", onOpenApache2)
             }
-            SectionCard {
+            SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 BodyText(
                     "Under the GNU General Public License, version 2, with the OpenJDK " +
                         "Classpath Exception: desugar_jdk_libs (Copyright © Oracle and/or " +
@@ -220,6 +227,7 @@ fun AboutScreen(
                         "classes into an independent work without extending the GPLv2 to " +
                         "it.",
                 )
+                HorizontalDivider()
                 LicenseLink("GNU General Public License v2", onOpenGpl2)
             }
         }
