@@ -72,8 +72,10 @@ def repository_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Build products and dependencies. Everything else under ios/ is ours.
-SKIPPED_DIRECTORIES = {".build", ".swiftpm", "DerivedData", "Potillus.xcodeproj"}
+# Build products and dependencies. Everything else under ios/ is ours. "build" is
+# the Makefile's IOS_BUILD_DIR, which now holds the release -derivedDataPath and its
+# SwiftPM checkouts.
+SKIPPED_DIRECTORIES = {".build", ".swiftpm", "build", "DerivedData", "Potillus.xcodeproj"}
 
 
 def default_paths(root):

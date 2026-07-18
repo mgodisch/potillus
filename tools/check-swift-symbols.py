@@ -77,7 +77,9 @@ import sys
 # ── Which files to read ──────────────────────────────────────────────────────
 
 # Build products and checked-out dependencies. Everything else under ios/ is ours.
-SKIPPED_DIRECTORIES = {".build", ".swiftpm", "DerivedData", "Potillus.xcodeproj"}
+# "build" is the Makefile's IOS_BUILD_DIR, which holds the release -derivedDataPath
+# (and thus the SwiftPM checkouts of our dependencies) -- never our source to lint.
+SKIPPED_DIRECTORIES = {".build", ".swiftpm", "build", "DerivedData", "Potillus.xcodeproj"}
 
 # The package whose public surface the app is checked against.
 KIT_SOURCES = os.path.join("ios", "PotillusKit", "Sources")

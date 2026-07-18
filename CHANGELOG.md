@@ -355,6 +355,19 @@ match. The fatal-on-mismatch behaviour is unchanged, so a genuine divergence sti
 stops the release. Needs a Mac to confirm it now stages; the diagnosis came from the
 two archives the failed run left on disk.
 
+Stopped the Swift static checks from linting the build directory. Once the release
+build's `-derivedDataPath` moved under `ios/build`, that tree held the SwiftPM checkouts
+of GRDB, and `check-swift-symbols` walked into them and reported ~5,500 "problems" in
+the dependency's own source — a self-inflicted failure with nothing wrong in our code.
+The checkers already skip `.build`, `.swiftpm`, `DerivedData`, and the `.xcodeproj`, but
+not the Makefile's `build` directory, because the default derived-data location used to
+sit elsewhere. `build` is now in the skip set for both `check-swift-symbols` and
+`check-swift-tests` (which shared the gap, though its rule happened not to fire);
+`check-swift-length` reads its roots from `.swiftlint.yml` and was never affected. This
+is why the container checks passed while the Mac run did not: the container has no
+`ios/build` to walk. Verified by reproducing the false positive with a throwaway file
+under `ios/build` and confirming the skip silences it.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
