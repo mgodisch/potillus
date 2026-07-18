@@ -139,6 +139,18 @@ by `check-l10n-parity.py`, not by Xcode's extractor), and it is still compiled i
 the bundle, so only the write-back is suppressed — the runtime is unchanged.
 `make ios-project` must be re-run once so the generated project picks the setting up.
 
+And made the code-signing Team ID survive project regeneration. `ios/project.yml`
+pinned `DEVELOPMENT_TEAM: ""`, and because `xcodegen` rewrites the entire
+`.xcodeproj` on every `make ios-project`, any team chosen by hand in Xcode's
+Signing & Capabilities editor was wiped on the next generate — Xcode then demanded
+a team again on the next device run. The value is now read from the
+`DEVELOPMENT_TEAM` environment variable (`"${DEVELOPMENT_TEAM}"`, which XcodeGen
+expands at generate time), so a per-machine `export DEVELOPMENT_TEAM=…` in the
+login shell is baked in on every regeneration without an account-specific value
+entering the tree. Unset, it expands to empty — the previous behaviour, so clones
+and CI are unaffected. It reuses the same variable `make release-ios` already
+honours, so one export serves both development and release signing.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

@@ -79,7 +79,23 @@ settings:
     # below), derived from CHANGELOG.md and the Android versionCode by
     # `make ios-version`.
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""
+    # The Team ID is read from the DEVELOPMENT_TEAM environment variable at
+    # generate time — XcodeGen expands `${VAR}` in spec strings — rather than
+    # committed here. This is what keeps the team from being lost: `xcodegen`
+    # regenerates the whole .xcodeproj on every `make ios-project`, so a team set
+    # by hand in Xcode's Signing & Capabilities editor is wiped on the next
+    # generate. Baking it in from the environment means it survives every
+    # regeneration without a personal, account-specific value entering the tree.
+    # Set it once per machine — e.g. add `export DEVELOPMENT_TEAM=ABCDE12345` to
+    # ~/.zprofile (read it from Xcode → Settings → Accounts → your team's
+    # 10-character ID, or the Developer portal's Membership details) — then re-run
+    # `make ios-project`. Unset, `${DEVELOPMENT_TEAM}` expands to empty, exactly the
+    # old behaviour, so nothing regresses for a clone that has not set it. This is
+    # the SAME variable `make release-ios` already honours for headless signing
+    # (see ios/signing.properties.example), so one export covers both dev and
+    # release; `make release-ios` still also passes it on the xcodebuild command
+    # line, which wins for that one invocation.
+    DEVELOPMENT_TEAM: "${DEVELOPMENT_TEAM}"
 
 # Version.xcconfig is GENERATED (and git-ignored) by tools/gen-ios-version.py.
 # Run `make ios-version` before `xcodegen generate`, or the project will not
