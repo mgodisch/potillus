@@ -42,7 +42,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.84.0
 
-Move iOS entry delete and edit to edit mode
+Reach iOS parity and harden the release
 
 This version does two things. Its headline is an iOS interaction rework — the
 per-row trash and pencil icons on the Today, Drinks and Calendar screens give way
