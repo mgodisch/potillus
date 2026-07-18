@@ -390,13 +390,19 @@ public enum BackupReader {
     /// round-trips unchanged through an export/re-import. See the scope note at
     /// the top of this file.
     private static func parseSettings(_ object: [String: Any]) -> BackupSettings {
-        BackupSettings(
+        // The limit defaults mirror AppSettings() -- the single source Android's
+        // parser and SettingsSanitizer also use -- so lowering a default in one place
+        // can never leave this reader handing back the old value. (It did: when the
+        // weekly and drink-day defaults dropped to 80/4, these literals still read
+        // 100/5, and a backup with those fields absent restored the old limits.)
+        let defaults = AppSettings()
+        return BackupSettings(
             themeMode: object["themeMode"] as? String ?? "SYSTEM",
             dayChangeHour: intValue(object["dayChangeHour"]) ?? 4,
             dayChangeMinute: intValue(object["dayChangeMinute"]) ?? 0,
-            dailyLimitGrams: doubleValue(object["dailyLimitGrams"]) ?? 20.0,
-            weeklyLimitGrams: doubleValue(object["weeklyLimitGrams"]) ?? 100.0,
-            maxDrinkDaysPerWeek: intValue(object["maxDrinkDaysPerWeek"]) ?? 5,
+            dailyLimitGrams: doubleValue(object["dailyLimitGrams"]) ?? defaults.dailyLimitGrams,
+            weeklyLimitGrams: doubleValue(object["weeklyLimitGrams"]) ?? defaults.weeklyLimitGrams,
+            maxDrinkDaysPerWeek: intValue(object["maxDrinkDaysPerWeek"]) ?? defaults.maxDrinkDaysPerWeek,
             statsFromDate: object["statsFromDate"] as? String ?? "",
             biometricEnabled: object["biometricEnabled"] as? Bool ?? false,
             allowScreenshots: object["allowScreenshots"] as? Bool ?? false,

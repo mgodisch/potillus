@@ -368,6 +368,18 @@ is why the container checks passed while the Mac run did not: the container has 
 `ios/build` to walk. Verified by reproducing the false positive with a throwaway file
 under `ios/build` and confirming the skip silences it.
 
+Fixed the iOS backup reader, which still handed back the pre-lowering limits. The
+default lived in two iOS places — `AppSettings()` and, separately, hardcoded literals
+in `BackupReader.parseSettings` (`?? 100.0`, `?? 5`) that fill in fields a backup omits.
+Lowering the defaults updated the first but not the second, so restoring a backup
+without a `weeklyLimitGrams` or `maxDrinkDaysPerWeek` field brought back 100 g and 5
+days rather than 80 g and 4 days — a real restore bug, caught by the shared-vector
+`SettingsSanitizerTests` once the vector moved to 80/4. The reader now reads those
+defaults from `AppSettings()`, the single source Android's parser and the sanitiser
+already use, so a future change to a default can no longer leave one copy behind.
+Android was never affected (its parser already reads `AppSettings()`). This was latent
+because the container has no Swift toolchain to run XCTest; it surfaced on the Mac.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
