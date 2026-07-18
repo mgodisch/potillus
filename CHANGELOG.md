@@ -119,6 +119,14 @@ to show the same fields while disagreeing on one. Today now shares the calendar'
 formatter setup, and the calendar's own stale `HH:mm` docstring (its code was
 already correct) was corrected to match.
 
+Also silenced a build warning the Swift 6 compiler raised on the test suite:
+`PreferencesStoreTests.testClearingTheFloorSurvivesTheNextLaunch` wrote `await
+makeSeedingStore(...)` on a line that only *constructs* the store — the sibling
+call sites `await` the store's `load()`, which is `async`, but this one has no
+`.load()`, so the `await` covered nothing and drew "no 'async' operations occur
+within 'await' expression". The stray `await` is removed; the `load()` on the next
+line keeps its own.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

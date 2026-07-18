@@ -123,7 +123,7 @@ final class PreferencesStoreTests: XCTestCase {
         _ = await store.load()
         try await store.update { $0.statsFromDate = "" }
 
-        let reopened = await makeSeedingStore(millis: 1_768_000_000_000)
+        let reopened = makeSeedingStore(millis: 1_768_000_000_000)
         let settings = await reopened.load()
         XCTAssertEqual(settings.statsFromDate, "", "a cleared floor must stay cleared")
     }
