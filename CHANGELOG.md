@@ -204,6 +204,26 @@ it, ignores `release_notes.txt` (skipping its length check and excluding it from
 file-set parity), so `make ios` no longer depends on translated App Store release
 notes; `push-appstore-preflight` passes `--release` to enforce them at upload time.
 
+Turned the OpenSSF badge answers into linked prose. Every document a justification
+in `.bestpractices.json` referenced by name — the README, CONTRIBUTING.md, the
+User's Guide, SECURITY.md, COPYING.md, individual source files, the Gradle version
+catalog — is now a Markdown link to its committed copy on Codeberg
+(`https://codeberg.org/godisch/potillus/src/branch/main/<path>`), with any URL
+anchor preserved. Guide references point at the committed `usersguide.md`, not the
+`.md.in` template Codeberg does not render. The explicit URL/citation footers that
+used to trail the prose (`URL:`, `Source:`, `See`, `Reference:`, `Tests:`, em-dash
+and parenthetical citations, `documented at …`) are gone wherever their target is
+now a link, and reworded where it is not; the trailing `[tag]` markers are removed
+throughout, while the inline Gradle table names `[versions]`, `[libraries]` and
+`[plugins]` are kept. External references are linked too — `developercertificate.org`,
+`kotlinlang.org/docs/coding-conventions.html`, the F-Droid listing and
+`bestpractices.dev`. 151 of the 190 justifications changed; the prose is otherwise
+untouched (verified token-by-token). `.bestpractices.jsonc` was regenerated to match.
+Note the one-way mirror: `.bestpractices.json` is a snapshot pulled from
+bestpractices.dev, so `make bestpractices-json` would overwrite these edits — the
+maintainer transcribes them to the site first (a level-grouped criterion list of the
+151 changed answers accompanies this change), and only then re-pulls.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
