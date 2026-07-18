@@ -59,6 +59,11 @@ help:
 	@echo "  make format           auto-format the Kotlin sources (ktlint)"
 	@echo "  make guides           (re)render the localized user guides"
 	@echo "  make check-guides     verify guides + license copies are in sync"
+	@echo "Release (artifacts only; gates + staging live in the root):"
+	@echo "  make release          build the release APK + SBOM"
+	@echo "  make bundle           build the release AAB + SBOM"
+	@echo "  make sbom             generate the CycloneDX SBOM only"
+	@echo "  make cover-check      enforce the Kover coverage floor (koverVerify)"
 	@echo "Housekeeping:"
 	@echo "  make clean            remove the Gradle build output (app/build, build)"
 	@echo "  make distclean        clean + the sources a build generates into the tree"
@@ -253,6 +258,48 @@ format: java gradle-wrapper android
 	./gradlew ktlintFormat
 
 # =============================================================================
+# RELEASE  (build the release artifacts + SBOM; gates/staging live in the root)
+# =============================================================================
+#
+# These build the RELEASE artifacts. The release GATES (invariants, coverage,
+# screenshot/PDF presence) and the staging into releases/ live one level up, in the
+# root's `release-android` (make/release.mk), which calls these. Signed when a
+# release key is configured in the Gradle build, unsigned otherwise.
+
+# The reproducible CycloneDX SBOM for the release runtime. cyclonedxDirectBom writes
+# it deterministically (see the cyclonedxDirectBom block in app/build.gradle.kts);
+# sbom-normalize.py drops the one remaining non-deterministic field, so identical
+# builds produce byte-identical SBOMs.
+SBOM := app/build/outputs/sbom/libellus-potionis-sbom.json
+
+sbom: $(SBOM)
+
+$(SBOM): prereq
+	./gradlew :app:cyclonedxDirectBom
+	python3 ../tools/sbom-normalize.py "$(SBOM)"
+
+# release: the release APK (F-Droid and direct install). bundle: the release AAB
+# (Google Play requires the bundle format for new apps). Both carry the SBOM as a
+# prerequisite so it is produced alongside the artifact.
+release: prereq $(SBOM)
+	./gradlew assembleRelease
+	@echo "Release APK: $$(find app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' | head -1)"
+	@echo "SBOM:        $(SBOM)"
+
+bundle: prereq $(SBOM)
+	./gradlew bundleRelease
+	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"
+	@echo "SBOM:        $(SBOM)"
+
+# cover-check: the Kover coverage gate -- runs the unit tests and enforces the floor
+# configured in app/build.gradle.kts (koverVerify: LINE >= 90 / BRANCH >= 75). Kept
+# a PURE coverage target (just :app:koverVerify, not the whole release-check) so the
+# release path can gate coverage per platform: the iOS counterpart -- an xccov-based
+# `cover-check` in ios/Makefile -- will slot in beside it (see docs/ROADMAP.md).
+cover-check: prereq
+	./gradlew :app:koverVerify
+
+# =============================================================================
 # HOUSEKEEPING
 # =============================================================================
 
@@ -282,4 +329,5 @@ distclean: clean
 	rm -f guides.d
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
-        debug-apk screenshot-apks unit-tests lint format clean distclean
+        debug-apk screenshot-apks unit-tests lint format \
+        sbom release bundle cover-check clean distclean

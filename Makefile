@@ -96,6 +96,10 @@ help:
 	@echo "  make check-makefile   bare-cd check across all makefiles + fragments"
 	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
 	@echo
+	@echo "Release (Android):"
+	@echo "  make release-android  gate, build (AAB+APK+SBOM) and stage into releases/  [device artifacts required]"
+	@echo "  make cover-check      enforce the code-coverage floor (Android Kover today)"
+	@echo
 	@echo "None of these touch releases/ -- staged release artifacts are removed by hand."
 
 # =============================================================================
@@ -152,3 +156,12 @@ include make/store.mk
 # their own fragment; see make/checks.mk. Included here so `make check-static` and
 # the individual `check-*` targets work from the repository root.
 include make/checks.mk
+
+# =============================================================================
+# RELEASE
+# =============================================================================
+# Release staging (gates, artifact build via the platform Makefiles, staging into
+# releases/) lives in its own fragment; see make/release.mk. Included after store
+# and checks because it reuses their locales/paths. `release-ios` and the
+# release-check.sh decomposition are later revisions (see docs/ROADMAP.md).
+include make/release.mk

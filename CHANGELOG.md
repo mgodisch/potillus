@@ -196,7 +196,21 @@ static check in one command. The Mac-only SwiftLint pass stays in ios/Makefile
 (`lint`), and the Android release gate (`tools/release-check.sh`) is wired in a
 later revision; neither is duplicated here.
 
-None of these targets touch `releases/`.
+The Android release path lands in a new fragment, `make/release.mk` (a root
+include). `release-android` gates, builds and stages in order: it asserts the store
+screenshots and report PDFs are present, refuses to overwrite an already-staged
+artifact for the versionCode, runs the read-only invariant gate
+(`tools/release-check.sh --Werror --release`, wired as-is -- its decomposition is
+on the roadmap) and the coverage gate, builds the AAB/APK/SBOM through the Android
+Makefile, then copies them into `releases/` under canonical names. The build
+targets themselves join `android/Makefile`: `release` (assembleRelease), `bundle`
+(bundleRelease), `sbom` (the reproducible CycloneDX SBOM) and `cover-check`
+(`:app:koverVerify`). Coverage is a SEPARATE `cover-check` target -- Android today,
+invoked as its own gate rather than via release-check.sh's `--coverage` flag -- so
+an iOS coverage gate can join it symmetrically (planned on the roadmap).
+
+The store and check targets never touch `releases/`; `release-android` is the sole
+writer of staged artifacts there, and even it refuses to overwrite an existing one.
 
 ### iOS: delete and edit move to the native edit-mode model
 

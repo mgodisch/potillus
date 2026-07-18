@@ -346,11 +346,21 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   reproducible. What Android gets from F-Droid but the App Store cannot provide is
   an *independent* rebuilder; a cross-machine or third-party reproduction check
   would raise this from self-attested to externally verified.
-- **Measure iOS test coverage** (`test_statement_coverage80`,
-  `test_branch_coverage80`). The Swift package suite (`swift test` in
-  `ios/PotillusKit`) runs today, but its code coverage is not yet measured; wire
-  up `swift test --enable-code-coverage` and surface the figure the way Kover
-  does on the JVM side, so the iOS port has a coverage number too.
+- **iOS code-coverage gate** (`test_statement_coverage80`,
+  `test_branch_coverage80`; near-term). The Swift package suite (`swift test` in
+  `ios/PotillusKit`) runs today, but its coverage is neither measured nor enforced.
+  Wire up `swift test --enable-code-coverage`, extract the figure with `xccov`, and
+  enforce a floor as a `cover-check` target in `ios/Makefile` — the iOS counterpart
+  of Android's `:app:koverVerify` — so the release path gates iOS coverage the same
+  way it gates Android's. The build tooling's `cover-check` (in `make/release.mk`)
+  is already structured to take this second platform: today it runs only `make -C
+  android cover-check`, and the iOS line slots in beside it.
+- **Decompose `tools/release-check.sh`** (developer tooling). The Android invariant
+  gate is a ~1800-line shell monolith. It is wired into the release path as-is
+  (`release-android` runs `--Werror --release`), but it should be split into
+  per-check files under `tools/`, each mapping onto the corresponding `check-*`
+  make target, so the checks are individually runnable, testable and documented —
+  the way the Mac-free checks already are in `make/checks.mk`.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.
