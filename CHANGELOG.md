@@ -190,6 +190,20 @@ Compatibility section now states where the app is distributed and that F-Droid
 applies no age rating, and links `docs/STORE_RATINGS.md` for the App Store's 18+
 versus Play's 3+ split on the same app.
 
+Moved the per-locale store release-note check out of the every-build path and into
+the release targets. `make android` failed because `release-check.sh` SECTION 1
+demanded `fastlane/metadata/android/<locale>/changelogs/95.txt` for all 20 store
+locales, but the translated store changelogs are only needed when a release is
+actually cut, not on every build. The script now takes `--release` and defers that
+block (with a green, informational note) unless it is set; the android `release` and
+`bundle` targets set `RELEASE_CHECK_FLAGS := --release`, a target-specific variable
+GNU Make propagates through their `prereq → release-check` prerequisites, so
+`make release-android` still enforces the notes while `make android` no longer does.
+iOS is handled the same way: `check-ios-metadata.py` gained `--release` and, without
+it, ignores `release_notes.txt` (skipping its length check and excluding it from
+file-set parity), so `make ios` no longer depends on translated App Store release
+notes; `push-appstore-preflight` passes `--release` to enforce them at upload time.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

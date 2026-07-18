@@ -264,6 +264,17 @@ def review_configured():
 
 
 def main():
+    # --release enforces the checks that only matter when actually cutting a
+    # release. The per-locale App Store release notes (release_notes.txt) are the
+    # iOS twin of Android's per-versionCode store changelogs (release-check.sh
+    # SECTION 1): their translations are needed at push-appstore time, not on the
+    # on-every-build `make ios` path. So off release mode this gate ignores
+    # release_notes.txt entirely — its length is not checked and it is excluded
+    # from the file-set parity comparison — and push-appstore-preflight passes
+    # --release to enforce it. Deferred, not dropped: the release path still checks.
+    release = "--release" in sys.argv[1:]
+    deferred = () if release else ("release_notes.txt",)
+
     if not os.path.isdir(BASE):
         print("check-ios-metadata: fastlane/metadata/ios/ not present -- skipped")
         return 0
@@ -299,6 +310,7 @@ def main():
             name
             for name in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, name))
+            and name not in deferred
         )
         file_sets[locale] = tuple(files)
         for name in files:

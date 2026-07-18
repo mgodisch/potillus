@@ -257,8 +257,15 @@ check-guides:
 # target: §1 of the script already performs the full version-string consistency
 # and fastlane-changelog coupling check, so a separate Make target would only
 # duplicate it.
+# RELEASE_CHECK_FLAGS is empty on the on-every-build path (debug/unit-test/lint,
+# and thus `make android`), so the per-locale store-changelog check in
+# release-check.sh SECTION 1 is deferred with an informational note. The `release`
+# and `bundle` targets below set it to --release (a target-specific variable, which
+# GNU Make propagates to their `prereq` -> `release-check` prerequisites), so
+# `make release-android` enforces the translated store changelogs.
+RELEASE_CHECK_FLAGS :=
 release-check:
-	bash ../tools/release-check.sh --Werror
+	bash ../tools/release-check.sh --Werror $(RELEASE_CHECK_FLAGS)
 
 # Release gate WITH the Kover coverage floor enforced (:app:koverVerify, LINE >= 90
 # / BRANCH >= 75). Kept separate from `release-check` (and thus from the
@@ -285,6 +292,7 @@ screenshot-apks:
 # app-release-unsigned.apk to app-release.apk, so hard-coding either filename as
 # a Make target would break for the other case. Gradle is itself up-to-date
 # aware, so re-running assembleRelease when nothing changed is a cheap no-op.
+release: RELEASE_CHECK_FLAGS := --release
 release: prereq $(SBOM)
 	./gradlew assembleRelease
 	@echo "Release APK: $$(find app/build/outputs/apk/release -maxdepth 1 -name 'app-release*.apk' | head -1)"
@@ -295,6 +303,7 @@ release: prereq $(SBOM)
 # unsigned otherwise (an unsigned AAB cannot be uploaded to Play, but building it
 # is still useful for inspection). The SBOM is generated alongside, mirroring the
 # `release` target.
+bundle: RELEASE_CHECK_FLAGS := --release
 bundle: prereq $(SBOM)
 	./gradlew bundleRelease
 	@echo "Release AAB: $$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' | head -1)"

@@ -1344,7 +1344,10 @@ push-appstore: push-appstore-preflight
 	@for f in first_name last_name email_address phone_number; do \
 		test -f "fastlane/metadata/ios/review_information/$$f.txt" || { echo "push-appstore: fastlane/metadata/ios/review_information/$$f.txt is missing -- the App Store reviewer contact is git-ignored and set up once per machine: copy the .txt.example files beside it and fill in your own details." >&2; exit 1; }; \
 	done
-	python3 tools/check-ios-metadata.py
+	# --release here (and only here) makes check-ios-metadata enforce the
+	# per-locale release_notes.txt that `make ios` defers: this is the release
+	# path, so the translations must be present now.
+	python3 tools/check-ios-metadata.py --release
 	python3 tools/check-ios-screenshots.py
 	# 6) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
 	#    The App Store Connect pre-flight already ran as this target's

@@ -175,14 +175,23 @@ WERROR=0
 #            is far slower than the static checks; the on-every-build Makefile
 #            `prereq` path therefore leaves it OFF, while release/CI runs enable it.
 COVERAGE=0
+# --release : enforce the checks that only matter when actually cutting a release
+#            — currently the per-locale store changelog notes (SECTION 1). Off by
+#            default so the on-every-build `make android` path does not demand the
+#            translated store release notes, which are only needed at
+#            `make release-android` time. The android/Makefile `release` and
+#            `bundle` targets pass it; `debug`/`unit-test`/`lint` do not.
+RELEASE=0
 for arg in "$@"; do
     case "$arg" in
         --Werror|-Werror|--werror) WERROR=1 ;;
         --coverage) COVERAGE=1 ;;
+        --release) RELEASE=1 ;;
         -h|--help)
-            echo "Usage: tools/release-check.sh [--Werror] [--coverage]"
+            echo "Usage: tools/release-check.sh [--Werror] [--coverage] [--release]"
             echo "  --Werror     treat warnings as errors (non-zero exit on any warning)"
             echo "  --coverage   also run the Kover coverage gate (:app:koverVerify)"
+            echo "  --release    also enforce release-only checks (per-locale store changelogs)"
             exit 0
             ;;
         *)
@@ -429,8 +438,14 @@ CHANGELOG version must bump versionCode by exactly 1"
     # Cross-check: fastlane release notes are coupled to versionCode by filename.
     # If no fastlane tree exists yet this is only advisory (the project may not
     # publish to a store); once a locale directory exists it MUST carry the note
-    # for the current versionCode.
-    if [[ ! -d "$FASTLANE_DIR" ]]; then
+    # for the current versionCode. These translated store changelogs are only
+    # needed when actually cutting a release, so they are enforced under --release
+    # (which `make release-android` passes) and deferred on the every-build path so
+    # `make android` does not demand them. The note keeps the line green rather
+    # than warning, so it survives --Werror.
+    if [[ "$RELEASE" -ne 1 ]]; then
+        pass "fastlane: per-locale store changelogs deferred to 'make release-android' (run with --release to enforce)"
+    elif [[ ! -d "$FASTLANE_DIR" ]]; then
         warn "No fastlane metadata tree at $FASTLANE_DIR — skipping store-changelog check"
     elif [[ -z "$vcode" ]]; then
         warn "versionCode unknown — skipping fastlane changelog check"
