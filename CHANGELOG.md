@@ -327,6 +327,20 @@ calculator and capacity suites (their 100 / 1000 / 5 are chosen for the scenario
 to non-default companions). As before, the JVM and XCTest suites need a build host to
 run.
 
+Updated the shared `test-vectors/backup-settings.json` to the lowered defaults, which
+the previous change missed. Many of its sanitiser cases omit `weeklyLimitGrams` or
+`maxDrinkDaysPerWeek` on the way in and expect the reader to fill in the default; those
+expected values were the old 100 / 5, so once the default became 80 / 4 the sanitiser
+produced 80 / 4 and the vector still demanded 100 / 5. Both platforms load this file —
+the JVM `BackupSettingsVectorTest` and the iOS `SettingsSanitizerTests` — so the same
+one-file fix repairs both; the Android suite was the one observed failing. Only the
+default-fallback expectations (and the reference `defaults` block) moved to 80 / 4; the
+cases that pass an explicit value or exercise a clamp (120, 3500, 1, 7) are unchanged,
+and the other vectors (`alcohol-calculator.json`, `report-data.json`) are untouched
+because their limits are explicit inputs, not defaults. This corrects the earlier note
+that the JSON vectors were all arbitrary and safe to leave: for backup-settings that
+was true only of the explicit cases, not the default-fallback ones.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
