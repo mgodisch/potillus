@@ -263,7 +263,7 @@ final class BackupImporterTests: XCTestCase {
 
         let raw = BackupSettings(
             themeMode: "SYSTEM", dayChangeHour: 4, dayChangeMinute: 0,
-            dailyLimitGrams: 20.0, weeklyLimitGrams: 100.0, maxDrinkDaysPerWeek: 5,
+            dailyLimitGrams: 23.0, weeklyLimitGrams: 137.0, maxDrinkDaysPerWeek: 6,
             statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
             alternativeStatusSymbols: false, language: "", weightKg: 0.0
         )
@@ -279,7 +279,7 @@ final class BackupImporterTests: XCTestCase {
     func testAnImporterWithoutPreferencesIgnoresTheSettingsBlock() async throws {
         let raw = BackupSettings(
             themeMode: "NIGHT", dayChangeHour: 5, dayChangeMinute: 0,
-            dailyLimitGrams: 20.0, weeklyLimitGrams: 100.0, maxDrinkDaysPerWeek: 5,
+            dailyLimitGrams: 23.0, weeklyLimitGrams: 137.0, maxDrinkDaysPerWeek: 6,
             statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
             alternativeStatusSymbols: false, language: "", weightKg: 0.0
         )

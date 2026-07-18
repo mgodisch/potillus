@@ -90,7 +90,7 @@ final class AppEnvironmentTests: XCTestCase {
 
         let settings = BackupSettings(
             themeMode: "NIGHT", dayChangeHour: 4, dayChangeMinute: 0,
-            dailyLimitGrams: 20.0, weeklyLimitGrams: 100.0, maxDrinkDaysPerWeek: 5,
+            dailyLimitGrams: 23.0, weeklyLimitGrams: 137.0, maxDrinkDaysPerWeek: 6,
             statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
             alternativeStatusSymbols: false, language: "", weightKg: 0.0
         )

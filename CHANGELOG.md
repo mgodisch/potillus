@@ -313,6 +313,20 @@ Store screenshots that render the defaults will show the new numbers when next
 regenerated. As the container cannot run the JVM or XCTest suites, run them on a
 build host to confirm.
 
+Tidied the test fixtures that still carried the old default limits, so the change
+raises no questions later. The one test that asserted the defaults now reads them from
+`AppSettings()` instead of repeating literals, so it tracks the single source of truth
+and never needs editing when a default moves; its name lost the baked-in "20-80-4".
+The `DrinkCapacity` preservation fixture and the iOS backup-import filler settings
+moved to values that are obviously not any default (23 / 137 / 6), which both removes
+the stale 100 / 5 and — for the preservation test — makes it clear a default-returning
+bug would be caught. Deliberately left as they are: the golden JSON vectors (frozen
+cross-platform serialization fixtures whose values are arbitrary, not the default, and
+cannot reference anything), and the at-limit and loop-bound scenario values in the
+calculator and capacity suites (their 100 / 1000 / 5 are chosen for the scenario, next
+to non-default companions). As before, the JVM and XCTest suites need a build host to
+run.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

@@ -36,13 +36,16 @@ import org.junit.Test
  */
 class DrinkCapacityTest {
 
+    // Deliberately NON-default limit values (the fresh-install defaults are 20 /
+    // 80 / 4). A preservation test must prove the constructor stores its inputs
+    // rather than returning a default, so the inputs must differ from the default.
     private fun capacity(todayGrams: Double) = DrinkCapacity(
         todayGrams = todayGrams,
-        dailyLimitGrams = 20.0,
+        dailyLimitGrams = 23.0,
         weeklyTotalGrams = 50.0,
-        weeklyLimitGrams = 100.0,
+        weeklyLimitGrams = 137.0,
         drinkDaysThisWeek = 2,
-        maxDrinkDaysPerWeek = 5,
+        maxDrinkDaysPerWeek = 6,
     )
 
     @Test fun `todayIsDrinkDay is true when grams above zero`() {
@@ -56,7 +59,7 @@ class DrinkCapacityTest {
     @Test fun `fields are preserved`() {
         val c = capacity(12.0)
         assertEquals(12.0, c.todayGrams, 0.0)
-        assertEquals(100.0, c.weeklyLimitGrams, 0.0)
-        assertEquals(5, c.maxDrinkDaysPerWeek)
+        assertEquals(137.0, c.weeklyLimitGrams, 0.0)
+        assertEquals(6, c.maxDrinkDaysPerWeek)
     }
 }
