@@ -339,12 +339,13 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see
   below); what remains before submission is App Store tooling — the store
   listing, screenshots, and the export-compliance and privacy declarations.
-- **Reproducible iOS build before the App Store release** (`build_repeatable`).
-  Bring the iOS archive to a deterministic, reproducible build so the `.ipa` can
-  be rebuilt from the tagged source before submission, matching the Android
-  guarantee that F-Droid verifies today. Unlike F-Droid there is no third-party
-  rebuilder for App Store binaries, so this is a self-verified reproducibility
-  target rather than an externally attested one.
+- **Independent iOS reproducibility verification** (`build_repeatable`,
+  `build_reproducible`). `make release-ios` already rebuilds the archive twice on
+  the pinned Xcode and refuses to stage unless the two unsigned `Potillus.app`
+  payloads are byte-for-byte identical, so the iOS build is self-verified
+  reproducible. What Android gets from F-Droid but the App Store cannot provide is
+  an *independent* rebuilder; a cross-machine or third-party reproduction check
+  would raise this from self-attested to externally verified.
 - **Measure iOS test coverage** (`test_statement_coverage80`,
   `test_branch_coverage80`). The Swift package suite (`swift test` in
   `ios/PotillusKit`) runs today, but its code coverage is not yet measured; wire

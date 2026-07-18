@@ -258,6 +258,27 @@ benign tooling noise (the app uses no App Intents) and is left as is. The contai
 Swift checks (symbols, length, test hygiene) stay green; the warnings' removal itself
 needs a Mac/device build to confirm, as the container cannot run `swiftc`.
 
+Made `make release-ios` verify the build is reproducible before it stages. The two
+clean archives an experiment produced were already byte-for-byte identical (Xcode
+26.5, unsigned payload), so the release now enforces that: it builds the archive
+twice — each with its own clean `derivedDataPath` — sets the first aside, and stages
+only when `diff -r` finds the two unsigned `Potillus.app` payloads identical;
+otherwise it prints the diff and aborts with a fatal error, staging nothing. The
+comparison is over the unsigned payload on purpose — the code signature carries a
+signing time and, for ECDSA identities, a random nonce, and Apple re-signs on
+delivery, so the signed `.ipa` is intentionally not byte-stable; both archives are
+therefore built with `CODE_SIGNING_ALLOWED=NO` and the signature is added only at the
+App-Store export of the second (staged) archive. The major Xcode version is now
+pinned hard (`XCODE_VERSION := 26`, checked against `xcodebuild -version`), mirroring
+the android/ Java-21 gate, so "reproducible" is defined against a known toolchain. The
+OpenSSF answers move from roadmap to met: `build_repeatable` and `build_reproducible`
+now state the iOS build is self-verified reproducible (self-attested on a fixed
+toolchain, since — unlike F-Droid on Android — the App Store offers no independent
+rebuilder and re-signs the delivered binary), `OSPS-BR-03.02` is reworded to match,
+and the ROADMAP item is refocused on the residual: an independent, cross-machine
+reproduction check. The recipe change needs a Mac to exercise, as the container has no
+`xcodebuild`; the Makefile and best-practices gates pass here.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

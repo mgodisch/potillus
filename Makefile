@@ -323,8 +323,19 @@ STAGED_SBOM   := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_android_sbom.json
 # project and Version.xcconfig are regenerated before archiving.
 IOS_XCODEPROJ    := ios/Potillus.xcodeproj
 IOS_SCHEME       := Potillus
+# Major Xcode version this project is built and released with (see
+# docs/INSTALL-IOS.md). release-ios enforces it hard — like the android/ Java-21
+# gate — because the toolchain fixes the compiler and SDK, and the reproducible
+# build is defined relative to it. A minor 26.x bump is allowed: the release's own
+# two-build byte-for-byte check (below) is what actually proves reproducibility for
+# whatever exact 26.x is in use, so pinning the minor here would only be brittle.
+XCODE_VERSION    := 26
 IOS_BUILD_DIR    := ios/build
 IOS_ARCHIVE      := $(IOS_BUILD_DIR)/Potillus.xcarchive
+# Throwaway location for the FIRST of release-ios's two archives (the reference the
+# staged second build is compared against). Under ios/build, so it is git-ignored
+# and cleaned up on a successful match; kept on mismatch for inspection.
+IOS_REPRO_DIR    := $(IOS_BUILD_DIR)/repro
 IOS_IPA          := $(IOS_BUILD_DIR)/Potillus.ipa
 IOS_EXPORT_PLIST := $(IOS_BUILD_DIR)/ExportOptions.plist
 STAGED_IPA       := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).ipa
@@ -413,7 +424,15 @@ release-ios: ios-project
 		echo "release-ios: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
 		exit 1; \
 	fi
-	rm -rf "$(IOS_ARCHIVE)" "$(IOS_IPA)"
+	# Enforce the pinned major Xcode version, hard -- like the android/ Java-21 gate.
+	# `xcodebuild -version` prints e.g. "Xcode 26.5" on its first line; a different
+	# major means a different compiler and SDK than this release is defined against.
+	xcode_major="$$(xcodebuild -version | sed -n '1s/^Xcode \([0-9][0-9]*\).*/\1/p')"
+	if [ "$$xcode_major" != "$(XCODE_VERSION)" ]; then \
+		echo "release-ios: Xcode $(XCODE_VERSION).x required, but 'xcodebuild -version' reports '$$(xcodebuild -version | head -n1)'. Select it with xcode-select (see docs/INSTALL-IOS.md)." >&2; \
+		exit 1; \
+	fi
+	rm -rf "$(IOS_ARCHIVE)" "$(IOS_IPA)" "$(IOS_REPRO_DIR)" "$(IOS_BUILD_DIR)/dd"
 	mkdir -p "$(IOS_BUILD_DIR)"
 	# Generate the (git-ignored) ExportOptions.plist carrying the resolved teamID.
 	printf '%s\n' \
@@ -428,27 +447,54 @@ release-ios: ios-project
 		'    <key>manageAppVersionAndBuildNumber</key> <false/>' \
 		'</dict>' \
 		'</plist>' > "$(IOS_EXPORT_PLIST)"
-	# Archive WITHOUT code signing, then sign only at the App-Store export. This
-	# keeps the whole release device-independent. Signing an archive under
-	# automatic signing would provision an iOS App *Development* profile, which
-	# Apple issues only once the team has a REGISTERED DEVICE -- a requirement a
-	# TestFlight/App-Store build should not carry (and one an MDM-managed device may
-	# make impossible). With CODE_SIGNING_ALLOWED=NO the archive needs no profile at
-	# all (this also sidesteps Xcode's attempt to code-sign GRDB's SwiftPM resource
-	# bundle), and the export step below mints the DISTRIBUTION certificate and the
-	# App-Store provisioning profile through -allowProvisioningUpdates -- neither of
-	# which is tied to a device. DEVELOPMENT_TEAM is still passed so any team-scoped
-	# lookup resolves; the ExportOptions.plist carries the same teamID for the
-	# export. errexit aborts the recipe if the archive step fails, so the two
-	# commands stand on their own lines rather than in an && chain.
+	# Build the release archive TWICE and stage only if the two are byte-for-byte
+	# identical -- the iOS analogue of the F-Droid reproducible-build check on Android.
+	# With no third-party rebuilder for App Store binaries, the release proves its own
+	# reproducibility by rebuilding from the same source and diffing the result.
+	#
+	# Both archives are built WITHOUT code signing (CODE_SIGNING_ALLOWED=NO); the
+	# signature is added only at the App-Store export below, so the comparison is over
+	# the reproducible unit: the unsigned .app payload. (A signature embeds a signing
+	# time and, for ECDSA identities, a random nonce, and Apple re-signs on delivery,
+	# so the signed .ipa is intentionally not byte-stable.) CODE_SIGNING_ALLOWED=NO also
+	# needs no provisioning profile (an automatic-signing archive would provision a
+	# *Development* profile, issued only for a REGISTERED DEVICE) and sidesteps signing
+	# GRDB's SwiftPM resource bundle; the export step mints the DISTRIBUTION certificate
+	# through -allowProvisioningUpdates. Each build gets its OWN clean derivedDataPath so
+	# neither reuses incremental state; DEVELOPMENT_TEAM is passed so team-scoped lookups
+	# resolve. The FIRST archive is the throwaway reference; the SECOND is the one
+	# exported and staged. errexit aborts the release if either archive fails.
+	xcodebuild archive \
+		-project "$(IOS_XCODEPROJ)" \
+		-scheme "$(IOS_SCHEME)" \
+		-configuration Release \
+		-destination 'generic/platform=iOS' \
+		-archivePath "$(IOS_REPRO_DIR)/Potillus.xcarchive" \
+		-derivedDataPath "$(IOS_REPRO_DIR)/dd" \
+		DEVELOPMENT_TEAM="$$team" \
+		CODE_SIGNING_ALLOWED=NO
 	xcodebuild archive \
 		-project "$(IOS_XCODEPROJ)" \
 		-scheme "$(IOS_SCHEME)" \
 		-configuration Release \
 		-destination 'generic/platform=iOS' \
 		-archivePath "$(IOS_ARCHIVE)" \
+		-derivedDataPath "$(IOS_BUILD_DIR)/dd" \
 		DEVELOPMENT_TEAM="$$team" \
 		CODE_SIGNING_ALLOWED=NO
+	# Compare the two unsigned .app payloads. `diff -r` is silent and exits 0 when the
+	# trees are identical; any divergent, missing, or extra file is a FATAL
+	# reproducibility failure and the release is NOT staged. On success the throwaway
+	# reference is removed; on mismatch both archives are kept for inspection.
+	repro_app="$(IOS_REPRO_DIR)/Potillus.xcarchive/Products/Applications/$(IOS_SCHEME).app"
+	staged_app="$(IOS_ARCHIVE)/Products/Applications/$(IOS_SCHEME).app"
+	if diff -r "$$repro_app" "$$staged_app"; then \
+		echo "release-ios: reproducible build verified -- the two archives' unsigned $(IOS_SCHEME).app payloads are byte-for-byte identical."; \
+		rm -rf "$(IOS_REPRO_DIR)"; \
+	else \
+		echo "release-ios: FATAL -- the two release archives differ, so the build is not reproducible; refusing to stage. The diff above lists the divergent files; both archives are kept ($(IOS_REPRO_DIR)/ and $(IOS_ARCHIVE)) for inspection." >&2; \
+		exit 1; \
+	fi
 	# Authenticate the export with Apple. -allowProvisioningUpdates needs either a
 	# signed-in Xcode account or an App Store Connect API key passed EXPLICITLY --
 	# xcodebuild does not read the APP_STORE_CONNECT_API_KEY_* variables itself
