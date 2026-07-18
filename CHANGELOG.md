@@ -235,6 +235,17 @@ the IPA's codesign team), pinned against the single fingerprint in SECURITY.md;
 sha256. Each fails fast if an artifact, credential or tag is missing, so a push only
 ever runs against something built explicitly.
 
+Two per-platform umbrellas cap the rebuild. `android` runs the device-free daily
+Android check (`-C android debug-apk unit-tests lint check-guides` plus
+`check-l10n-parity`); `ios` runs the Mac-free `check-ios-static` first, then the
+Mac-only `-C ios lint swift-tests build`. Screenshots, coverage, device tests and
+release stay off the daily run, each on its own target. `device-tests` (the
+on-device connectedDebugAndroidTest, with an `EXCLUDE_SCREENSHOTS` toggle) joins
+`android/Makefile`, driven from the root as `device-tests-android`; its iOS
+counterpart `device-tests-ios` is prepared on the roadmap. `install-debug`
+(renamed from the old `install`) copies the debug APK to `../downloads/` for
+sideloading -- it stages a file, it does not touch a device.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

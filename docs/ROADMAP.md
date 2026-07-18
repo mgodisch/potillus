@@ -361,6 +361,13 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   per-check files under `tools/`, each mapping onto the corresponding `check-*`
   make target, so the checks are individually runnable, testable and documented —
   the way the Mac-free checks already are in `make/checks.mk`.
+- **iOS on-simulator tests** (`device-tests-ios`; developer tooling). The
+  app-target XCTests (`PotillusTests`, `PotillusUITests`) run today only as a side
+  effect of the screenshot capture; no target runs them for their own sake. `make
+  device-tests-android` already runs the Android on-device tests — the iOS
+  counterpart (`xcodebuild test -scheme Potillus -destination 'platform=iOS
+  Simulator,name=$(IOS_SIM_DEVICE)'`, Mac + simulator) should join it so both
+  platforms have a device-test target driven from the root the same way.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.

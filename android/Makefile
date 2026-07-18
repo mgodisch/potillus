@@ -55,6 +55,7 @@ help:
 	@echo "  make debug-apk        build the debug APK"
 	@echo "  make screenshot-apks  build the debug + androidTest APKs"
 	@echo "  make unit-tests       run the JVM unit tests"
+	@echo "  make device-tests     run the on-device instrumentation tests  [device]"
 	@echo "  make lint             run ktlint + Android lint (build-breaking)"
 	@echo "  make format           auto-format the Kotlin sources (ktlint)"
 	@echo "  make guides           (re)render the localized user guides"
@@ -88,6 +89,16 @@ export PATH := $(ANDROID_HOME)/cmdline-tools/latest/bin:$(ANDROID_HOME)/platform
 # Compose builds need a larger heap than a default Gradle invocation.
 GRADLE_OPTS ?= -Xmx2g -Xms512m
 export GRADLE_OPTS
+
+# device-tests runs every connected test by default. `make device-tests
+# EXCLUDE_SCREENSHOTS=1` (or via the root `device-tests-android`) skips the
+# @ScreenshotOnly tests through the -PexcludeScreenshotTests switch (defined in
+# app/build.gradle.kts and read by ScreenshotOnly.kt).
+ifeq ($(EXCLUDE_SCREENSHOTS),1)
+SCREENSHOT_EXCLUDE_FLAG := -PexcludeScreenshotTests
+else
+SCREENSHOT_EXCLUDE_FLAG :=
+endif
 
 # =============================================================================
 # BUILD PREREQUISITES
@@ -244,6 +255,26 @@ screenshot-apks: prereq
 unit-tests: prereq
 	./gradlew testDebugUnitTest
 
+# device-tests: the on-device instrumentation tests (Compose UI / Espresso) via
+# connectedDebugAndroidTest. Needs a CONNECTED device -- it asserts one is attached
+# and wakes it -- so it is kept out of the device-free build layer and out of the
+# `android` umbrella; the root drives it as `device-tests-android`.
+device-tests: prereq
+	# A connected device/emulator (state "device") is required. `set -x` traces the
+	# probe so the adb command is visible at the point it runs; grep aborts here if
+	# none is ready.
+	set -x
+	adb devices
+	adb devices | grep -qw device
+	{ set +x; } 2>/dev/null
+	# Compose UI tests need the host Activity resumed and visible: wake the device,
+	# keep the screen on, and dismiss a non-secure keyguard (a PIN/pattern/password
+	# lock cannot be bypassed by adb -- unlock it by hand).
+	adb shell svc power stayon true
+	adb shell input keyevent KEYCODE_WAKEUP
+	adb shell wm dismiss-keyguard
+	./gradlew connectedDebugAndroidTest $(SCREENSHOT_EXCLUDE_FLAG)
+
 # ktlintCheck enforces the Kotlin style (otherwise only wired into Gradle's
 # `check`); lintDebug runs Android lint. Both are build-breaking here, so a style
 # or lint regression fails the everyday build instead of slipping to release time.
@@ -329,5 +360,5 @@ distclean: clean
 	rm -f guides.d
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
-        debug-apk screenshot-apks unit-tests lint format \
+        debug-apk screenshot-apks unit-tests device-tests lint format \
         sbom release bundle cover-check clean distclean

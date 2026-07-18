@@ -73,6 +73,12 @@ SHELL       := /bin/bash
 help:
 	@echo "Libellus Potionis -- repository build tooling"
 	@echo
+	@echo "Daily (per platform, device-free):"
+	@echo "  make android          build + JVM tests + lint + guides + l10n parity"
+	@echo "  make ios              Mac-free checks + SwiftLint + Swift tests + build  [Mac]"
+	@echo "  make device-tests-android  on-device instrumentation tests  [device]"
+	@echo "  make install-debug    copy the debug APK to ../downloads/ (sideload; not adb)"
+	@echo
 	@echo "Housekeeping:"
 	@echo "  make clean              clear both platforms' build output"
 	@echo "  make distclean          clear build output + generated sources (fresh-clone state)"
@@ -183,3 +189,42 @@ include make/release.mk
 # because it reuses release.mk's staged paths and version, and never builds or signs
 # anything itself.
 include make/publish.mk
+
+# =============================================================================
+# TOP-LEVEL TARGETS  (per-platform umbrellas + dev convenience)
+# =============================================================================
+#
+# The umbrellas tie the layers above into one command per platform. They are
+# DEVICE-FREE (the Android APK build, JVM tests and lint; the iOS build, Swift
+# tests and lint on a Mac): screenshots, coverage, device tests and release each
+# have their own target and stay out of the daily run. Placed after the includes
+# so the fragments' targets and variables (e.g. VERSION) are already defined.
+
+# android: the device-free daily Android check.
+android:
+	$(MAKE) -C android debug-apk unit-tests lint check-guides
+	$(MAKE) check-l10n-parity
+
+# ios: the daily iOS check. The Mac-free static gate runs FIRST (so a Linux CI
+# fails fast on what it can catch), then the Mac-only SwiftLint, PotillusKit tests
+# and app build -- each of which carries its own require-macos guard.
+ios:
+	$(MAKE) check-ios-static
+	$(MAKE) -C ios lint swift-tests build
+
+# device-tests-android: the on-device instrumentation tests (Compose UI / Espresso).
+# Kept out of the umbrella because they need a connected device; delegates to the
+# android `device-tests` target (connectedDebugAndroidTest). The iOS counterpart,
+# device-tests-ios (xcodebuild test on the simulator), is on the roadmap.
+device-tests-android:
+	$(MAKE) -C android device-tests
+
+# install-debug: copy the built debug APK to ../downloads/ under a versioned name,
+# for sideloading. It does NOT install to a device -- it just stages the file
+# OUTSIDE the repo (build the APK first with `make -C android debug-apk`).
+install-debug: ../downloads/potillus-$(VERSION)-debug.apk
+
+../downloads/potillus-$(VERSION)-debug.apk: android/app/build/outputs/apk/debug/app-debug.apk
+	cp $< $@
+
+.PHONY: android ios device-tests-android install-debug
