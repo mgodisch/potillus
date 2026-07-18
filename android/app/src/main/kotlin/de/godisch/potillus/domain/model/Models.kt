@@ -235,8 +235,8 @@ data class DrinkCapacity(
  *   Three independent limits are always active at the same time — there is no
  *   guideline mode (WHO/DHS/custom) and no daily-vs-weekly toggle any more:
  *     - [dailyLimitGrams]     pure-alcohol grams allowed per day (default 20).
- *     - [weeklyLimitGrams]    pure-alcohol grams allowed per gliding 7-day window (default 100).
- *     - [maxDrinkDaysPerWeek] distinct drink days allowed per gliding 7-day window (default 5).
+ *     - [weeklyLimitGrams]    pure-alcohol grams allowed per gliding 7-day window (default 80).
+ *     - [maxDrinkDaysPerWeek] distinct drink days allowed per gliding 7-day window (default 4).
  *
  * @param dailyLimitGrams     Daily pure-alcohol limit in grams.
  * @param weeklyLimitGrams    Pure-alcohol limit in grams for a gliding 7-day window.
@@ -247,8 +247,8 @@ data class AppSettings(
     val dayChangeHour: Int = 4,
     val dayChangeMinute: Int = 0,
     val dailyLimitGrams: Double = 20.0,
-    val weeklyLimitGrams: Double = 100.0,
-    val maxDrinkDaysPerWeek: Int = 5,
+    val weeklyLimitGrams: Double = 80.0,
+    val maxDrinkDaysPerWeek: Int = 4,
     val statsFromDate: String = "",
     val biometricEnabled: Boolean = false,
     /**

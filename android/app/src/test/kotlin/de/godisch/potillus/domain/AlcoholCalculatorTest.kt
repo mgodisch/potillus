@@ -111,11 +111,11 @@ class AlcoholCalculatorTest {
         assertEquals(4, info.maxDrinkDaysPerWeek)
     }
 
-    @Test fun `getLimitInfo defaults are 20-100-5`() {
+    @Test fun `getLimitInfo defaults are 20-80-4`() {
         val info = AlcoholCalculator.getLimitInfo(AppSettings())
         assertEquals(20.0, info.limitGrams, 0.0)
-        assertEquals(100.0, info.weeklyLimitGrams, 0.0)
-        assertEquals(5, info.maxDrinkDaysPerWeek)
+        assertEquals(80.0, info.weeklyLimitGrams, 0.0)
+        assertEquals(4, info.maxDrinkDaysPerWeek)
     }
 
     @Test fun `getLimitInfo clamps maxDrinkDaysPerWeek into 1 to 7`() {

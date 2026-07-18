@@ -295,6 +295,24 @@ pairing is corrected to "3+" (the IARC result; 16–17 is the separate target-au
 answer). No best-practices answer needed a change: only the interface criteria mention
 blood alcohol, as a factual input, not a clinical claim.
 
+Lowered the default consumption limits toward the more cautious end of the
+international guidance. A fresh install now defaults to 80 g of pure alcohol per
+gliding 7-day window (was 100) and at most 4 drink days per week (was 5); the daily
+limit stays at 20 g. The change follows the clear downward trend in national
+recommendations — the WHO's 2023 "no safe amount" position, and Germany's own
+guidance (the DHS), which now emphasises reducing intake rather than naming a
+permissive threshold — and better fits a harm-reduction tool whose purpose is to
+reduce the consumption it tracks. The limits remain fully user-configurable, and the
+in-app guide still links the per-country table for anyone who wants to set their own.
+This is a fresh-install default only: existing users keep whatever they have saved,
+since the value is used solely where no setting exists. The defaults were changed on
+both platforms (`AppSettings` in Kotlin and its iOS twin) with the KDoc and the
+one default-asserting unit test updated to match; the internal `LimitInfo`
+constructor fallback is left at 5, as it is always overridden by the actual setting.
+Store screenshots that render the defaults will show the new numbers when next
+regenerated. As the container cannot run the JVM or XCTest suites, run them on a
+build host to confirm.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
