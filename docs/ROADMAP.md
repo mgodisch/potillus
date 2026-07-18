@@ -355,12 +355,6 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   way it gates Android's. The build tooling's `cover-check` (in `make/release.mk`)
   is already structured to take this second platform: today it runs only `make -C
   android cover-check`, and the iOS line slots in beside it.
-- **Decompose `tools/release-check.sh`** (developer tooling). The Android invariant
-  gate is a ~1800-line shell monolith. It is wired into the release path as-is
-  (`release-android` runs `--Werror --release`), but it should be split into
-  per-check files under `tools/`, each mapping onto the corresponding `check-*`
-  make target, so the checks are individually runnable, testable and documented —
-  the way the Mac-free checks already are in `make/checks.mk`.
 - **iOS on-simulator tests** (`device-tests-ios`; developer tooling). The
   app-target XCTests (`PotillusTests`, `PotillusUITests`) run today only as a side
   effect of the screenshot capture; no target runs them for their own sake. `make

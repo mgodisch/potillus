@@ -256,12 +256,15 @@ targets `bestpractices-json`/`bestpractices-jsonc` (run by hand when the badge
 answers change). The read-only `check-bestpractices-levels` gate is already rebuilt
 in `make/checks.mk`.
 
-The `tools/release-check.sh` monolith is being split up (its decomposition was
-previously deferred). Step one: the shared core -- the colours, counters, the
+The `tools/release-check.sh` monolith is decomposed (its decomposition was
+previously deferred). The shared core -- the colours, counters, the
 `pass`/`fail`/`warn`/`section` output helpers, the file-path constants and the
-`extract_version_*` helpers -- moves into `tools/release-checks/lib.sh`, which the
-runner now sources. The 16 checks and `main()` stay in the runner for now; they
-move to per-check files next. The runner's output is byte-for-byte unchanged.
+`extract_version_*` helpers -- moves into `tools/release-checks/lib.sh`, and each of
+the 16 checks moves verbatim into its own file under `tools/release-checks/`
+(`version-consistency.sh`, `changelog.sh`, ... `coverage.sh`). The runner shrinks to
+a thin script that sources the library and the check files and calls `main()`, which
+runs them in the same order, with the same flags (`--Werror`/`--release`/
+`--coverage`) and the same summary. The output is byte-for-byte unchanged.
 
 ### iOS: delete and edit move to the native edit-mode model
 
