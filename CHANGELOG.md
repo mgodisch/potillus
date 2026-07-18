@@ -177,6 +177,25 @@ report PDFs, then feature graphics last so their inputs are fresh -- replacing t
 old cascade/stamp machinery, which strand independence made unnecessary. The
 grouped target raises the shared Make guard's floor to 4.3 (noted above).
 
+The bare-`cd` checker (`tools/check-makefile.py`) now defaults to every makefile
+the project ships -- the three Makefiles and each `make/*.mk` fragment -- and
+treats a fragment as running under the `.ONESHELL` its includer sets, so `store.mk`
+and any future fragment are actually checked rather than silently skipped for
+lacking a `.ONESHELL` of their own.
+
+Static checks move into their own fragment, `make/checks.mk` (a root include).
+Each `check-*` target wraps one read-only, device-free tool: the repo-wide
+invariants (`check-headers`, `check-makefile`, `check-report-paper`, `check-l10n`,
+`check-l10n-parity`, `check-ui-string-parity`, `check-bestpractices-levels`) and
+the Mac-free iOS static checks (`check-swift-symbols`, `check-swift-length`,
+`check-swift-tests`, `check-ios-metadata`, `check-ios-screenshots`,
+`check-ios-a11y`), plus the writing `fix-headers`. `check-ios-static` bundles the
+Mac-free iOS release gate (invoking ios/Makefile's `check-guides` rather than
+duplicating it), and `check-static` is the broadest device-free gate -- every
+static check in one command. The Mac-only SwiftLint pass stays in ios/Makefile
+(`lint`), and the Android release gate (`tools/release-check.sh`) is wired in a
+later revision; neither is duplicated here.
+
 None of these targets touch `releases/`.
 
 ### iOS: delete and edit move to the native edit-mode model

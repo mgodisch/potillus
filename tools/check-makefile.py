@@ -52,8 +52,15 @@
 #    LAST line of its recipe, or be wrapped in parentheses. Recipes end at target
 #    boundaries -- make starts a fresh shell for each target -- so a trailing `cd`
 #    cannot leak anywhere.
+#
+#  THE SCOPE
+#    With no arguments the check covers every makefile this project ships: the
+#    root, android/ and ios/ Makefiles and each make/*.mk fragment. A fragment is
+#    `include`d by a Makefile that sets .ONESHELL, so it is checked under that
+#    setting even though it declares none itself. Pass explicit paths to override.
 # =============================================================================
 
+import glob
 import os
 import re
 import sys
@@ -68,11 +75,37 @@ def repository_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def check(path):
+def default_makefiles():
+    """Every makefile this project ships: the three per-context Makefiles plus each
+    fragment under make/. Globbing make/*.mk keeps new fragments (e.g. a future
+    publish.mk) covered automatically, so the check never silently misses one."""
+    root = repository_root()
+    named = [
+        os.path.join(root, "Makefile"),
+        os.path.join(root, "android", "Makefile"),
+        os.path.join(root, "ios", "Makefile"),
+    ]
+    fragments = sorted(glob.glob(os.path.join(root, "make", "*.mk")))
+    return [path for path in named + fragments if os.path.isfile(path)]
+
+
+def is_fragment(path):
+    """A make/*.mk fragment is `include`d by a Makefile that declares .ONESHELL, so
+    its recipes run under that setting even though the fragment does not declare it
+    itself. The bare-cd check must therefore apply to it too -- see check()."""
+    parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
+    return parent == "make" and path.endswith(".mk")
+
+
+def check(path, assume_oneshell=False):
     with open(path, encoding="utf-8") as handle:
         lines = handle.read().split("\n")
 
-    if not any(line.startswith(".ONESHELL") for line in lines):
+    # Without .ONESHELL each recipe line runs in its own shell, so a `cd` cannot
+    # leak into the next one. A make/*.mk fragment inherits .ONESHELL from the
+    # Makefile that `include`s it (assume_oneshell), so it is still checked even
+    # though it declares none of its own.
+    if not assume_oneshell and not any(line.startswith(".ONESHELL") for line in lines):
         return []  # each line gets its own shell; a `cd` cannot leak
 
     problems = []
@@ -107,10 +140,10 @@ def check(path):
 
 
 def main(argv):
-    paths = argv or [os.path.join(repository_root(), "Makefile")]
+    paths = argv or default_makefiles()
     problems = []
     for path in paths:
-        problems.extend(check(path))
+        problems.extend(check(path, assume_oneshell=is_fragment(path)))
 
     for message in problems:
         print(f"check-makefile: {message}")

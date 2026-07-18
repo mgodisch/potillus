@@ -90,6 +90,12 @@ help:
 	@echo "Store assets (iOS):"
 	@echo "  make screenshots-ios          capture 01..06 (+ report pages 07/08)  [Mac + Simulator]"
 	@echo
+	@echo "Checks (read-only, device-free, any host):"
+	@echo "  make check-static     every static check in one go (headers, l10n, iOS static, ...)"
+	@echo "  make check-ios-static the Mac-free iOS release gate"
+	@echo "  make check-makefile   bare-cd check across all makefiles + fragments"
+	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
+	@echo
 	@echo "None of these touch releases/ -- staged release artifacts are removed by hand."
 
 # =============================================================================
@@ -138,3 +144,11 @@ distclean-ios:
 # store grows (Android screenshots 01..06, the iOS store assets) it stays in that
 # fragment rather than swelling this file.
 include make/store.mk
+
+# =============================================================================
+# CHECKS
+# =============================================================================
+# Static, device-free checks (headers, l10n, the Mac-free iOS gate, ...) live in
+# their own fragment; see make/checks.mk. Included here so `make check-static` and
+# the individual `check-*` targets work from the repository root.
+include make/checks.mk
