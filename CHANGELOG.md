@@ -212,6 +212,16 @@ an iOS coverage gate can join it symmetrically (planned on the roadmap).
 The store and check targets never touch `releases/`; `release-android` is the sole
 writer of staged artifacts there, and even it refuses to overwrite an existing one.
 
+`release-ios` completes the release layer as the iOS counterpart (Mac only, so it
+opens with a macOS guard). It gates on the captured iOS screenshots and the
+translated store metadata (`check-ios-metadata --release`), resolves the signing
+Team ID (`DEVELOPMENT_TEAM` or `ios/signing.properties`), pins the Xcode major, and
+-- the iOS analogue of Android's F-Droid reproducible-build check -- archives TWICE
+unsigned and stages only if the two `.app` payloads are byte-identical, then signs
+at export and stages the `.ipa` plus the iOS SBOM into `releases/`. `ios-sbom`
+(gen-ios-sbom.py + the shared sbom-normalize.py) is standalone and mirrors the
+Android `sbom`. Neither uploads -- that is the fastlane iOS lanes.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and
