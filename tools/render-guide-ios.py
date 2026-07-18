@@ -157,8 +157,11 @@ def main():
 
     stale = []
     missing = []
+    english = None
     for template in templates:
         tag, rendered = render(strings, template)
+        if tag == "en":
+            english = rendered
         out_path = os.path.join(OUT, f"usersguide_{tag}.md")
         if not os.path.exists(out_path):
             # NOT stale. Nothing has drifted from anything -- the build has simply
@@ -184,11 +187,36 @@ def main():
             with open(out_path, "w", encoding="utf-8") as handle:
                 handle.write(rendered)
 
+    # The committed, human-facing English guide (ios/docs/guide/usersguide.md): a
+    # rendered sibling of usersguide.md.in that Codeberg displays (it renders .md,
+    # not .md.in) and that the OpenSSF badge justifications link to. Unlike the
+    # gitignored app-bundle outputs above, THIS file is committed, so a missing or
+    # stale copy is a hard error under --check -- there is no "fresh clone" excuse,
+    # because git tracks it.
+    doc_path = os.path.join(TPL, "usersguide.md")
+    doc_stale = False
+    if english is not None:
+        exists = os.path.exists(doc_path)
+        current = open(doc_path, encoding="utf-8").read() if exists else None
+        if current != english:
+            doc_stale = True
+            if not check:
+                with open(doc_path, "w", encoding="utf-8") as handle:
+                    handle.write(english)
+
     if check:
         if stale:
             print(
                 "render-guide-ios: these guides are stale; run `make ios-guides`:\n  "
                 + "\n  ".join(stale),
+                file=sys.stderr,
+            )
+            return 1
+        if doc_stale:
+            print(
+                "render-guide-ios: the committed English guide is missing or stale; "
+                "run `make ios-guides`:\n  "
+                + os.path.relpath(doc_path, ROOT),
                 file=sys.stderr,
             )
             return 1

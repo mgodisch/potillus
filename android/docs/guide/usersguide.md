@@ -1,0 +1,128 @@
+# Libellus Potionis -- User's Guide
+
+Welcome to Libellus Potionis, your personal alcohol consumption logger!
+This page describes the features and functions of the app.
+
+## Highlights
+
+Libellus Potionis is open source. The source code can be viewed and verified by
+anyone. Libellus Potionis is privacy-friendly. It requires no
+permissions—neither for the camera or microphone, nor for GPS or network
+access. Libellus Potionis is secure: your data stays in the app's private
+storage on your device, protected by your device's encryption, and access to
+the app can be restricted using a fingerprint. Libellus Potionis supports you
+in pacing yourself up to your limits by letting you know at any time whether
+"la petite sœur" is still within your limit. Additionally, the app supports you
+during appointments with addiction counseling centers by providing a clear,
+two-page PDF report of your complete drinking habits upon request. Libellus
+Potionis is completely free of charge and ad-free.
+
+Libellus Potionis requires Android 11 or higher. It is continuously used by the
+author on a Google Pixel 10 Pro running GrapheneOS (Android 16) and is
+additionally tested on a Fairphone 4 (Android 15) and a virtual Pixel 4
+(Android 11).
+
+## Screen "Today"
+
+On this screen, you will find a list of the alcoholic beverages you consumed
+today. If you made a mistake when logging an entry, you can edit or delete
+entries here. Use the plus button to add more beverages.
+
+Above the beverage list, you will find an overview of the current day with the
+following information: the amount of alcohol already consumed today (in grams),
+the amount of alcohol already consumed today in relation to your daily and
+7-day limits (in grams and as a bar chart), and the number of days with
+alcohol consumption so far for today and the six preceding days (rolling
+seven-day window/rolling week) in relation to your limit (as a number and
+as a bar chart).
+
+In addition, a badge marked "Ø" shows your average consumption for the current
+month (average grams of pure alcohol per day).
+
+## Screen "Calendar"
+
+On this screen, you will find the calendar. Days on which alcohol was consumed
+are marked with a blue dot (non-critical amount) or a red dot (limit
+exceeded). Selecting a day lists the respective beverages, which can then be
+corrected or deleted if necessary. It is also possible to add consumed
+beverages retroactively.
+
+## Screen "Statistics"
+
+This screen shows statistical evaluations of your alcohol consumption,
+selectable by week, month, or year. A CSV export is integrated to process the
+data further in a spreadsheet application. In addition, a PDF export is
+available, which prepares your drinking habits in a two-page layout optimized
+for addiction counseling centers.
+
+## Screen "Drinks"
+
+This screen contains the list of available beverages. The app comes pre-configured
+with a number of internationally common beverages. These can be modified or
+deleted as desired. You can define a new beverage using the plus icon. Tapping a
+beverage opens a dialog to log it directly as consumed.
+
+## Screen "Settings"
+
+The settings menu can be accessed via the menu icon (☰) in the top right corner.
+Libellus Potionis provides the following configuration options:
+
+### Personal Data
+
+In this category, you can enter your body weight to approximate your blood
+alcohol concentration using the
+[Widmark formula](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+This value will then be displayed on the "Today" screen.
+
+### Limits
+
+In this category, you define the limits that apply to your alcohol
+consumption. The required fields are: maximum daily limit in grams of pure
+alcohol, maximum seven-day limit, and maximum drinking days per week. All limits
+are active concurrently. Accordingly, three progress bars are visible on the
+"Today" screen. If you need guidance regarding the values, you can look for
+inspiration from recommendations in various countries on
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country).
+
+### Statistics
+
+The statistical settings allow you to define the time at which a new day begins
+(so that, for example, a drink at 1:00 AM still counts toward the previous
+day) and—for example, for a restart on New Year's Day—the date from which the
+data evaluation should begin.
+
+### Backup
+
+**Your data never leaves this device on its own.** Libellus Potionis keeps
+everything in the app's private storage and deliberately takes part in **no**
+automatic cloud backup and **no** device-to-device transfer. If you switch
+phones, perform a factory reset, or reinstall the app, **the only way to keep
+your data is to back it up yourself** — there is no other recovery path, and
+data that was not exported cannot be retrieved afterwards.
+
+A backup is a single JSON file containing all your drinks and your complete log.
+To move your data to another phone:
+
+1. On the **old** phone, open **"Settings" → Backup →
+   Export** and save the JSON file somewhere safe — for example your
+   own cloud drive, an e-mail to yourself, or a USB transfer.
+2. Install Libellus Potionis on the **new** phone.
+3. Open **"Settings" → Backup → Import** and select
+   that JSON file. Choose **Replace** to overwrite everything, or
+   **Merge** to combine it with any entries already present.
+
+Export regularly: a backup only protects the data that existed at the moment you
+created it.
+
+### Security
+
+This category protects access to the app and controls its visibility. Enable
+Biometric Lock to require a fingerprint or facial recognition each time the
+app is opened. The Allow Screenshots switch controls whether screenshots and
+screen recordings of the app window are permitted; it is off by default, so the
+window is hidden from screenshots and from the recent-apps overview.
+
+### Appearance
+
+In this category, you can set the color theme and the language independently of
+the system settings.

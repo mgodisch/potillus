@@ -374,6 +374,23 @@ def main() -> int:
         elif outcome == "missing":
             missing.append(os.path.relpath(out_path, ROOT))
 
+    # The committed, human-facing English guide (android/docs/guide/usersguide.md):
+    # a rendered sibling of usersguide.md.in that Codeberg renders (.md, not .md.in)
+    # and that the OpenSSF badge justifications link to. Rendered here from the base
+    # English template and the unqualified strings.xml, independently of the mtime
+    # skip above so it is always considered. It is COMMITTED, so --check treats a
+    # missing or stale copy as a hard error (git tracks it; no fresh-clone excuse).
+    doc_path = os.path.join(TPL, "usersguide.md")
+    with open(os.path.join(TPL, "usersguide.md.in"), encoding="utf-8") as fh:
+        english = strip_header(render(fh.read(), load_strings("values"), "en (default)"))
+    doc_stale = False
+    doc_current = open(doc_path, encoding="utf-8").read() if os.path.exists(doc_path) else None
+    if doc_current != english:
+        doc_stale = True
+        if not check_only:
+            with open(doc_path, "w", encoding="utf-8") as fh:
+                fh.write(english)
+
     if check_only:
         if missing and not stale:
             print(
@@ -387,10 +404,17 @@ def main() -> int:
                 + "Run `make guides`.\n"
             )
             return 1
+        if doc_stale:
+            sys.stderr.write(
+                "render-guide: the committed English guide is missing or stale:\n"
+                f"  {os.path.relpath(doc_path, ROOT)}\n"
+                "Run `make guides`.\n"
+            )
+            return 1
         print(f"render-guide: all {len(langs)} guides up to date.")
         return 0
 
-    written = stale + missing
+    written = stale + missing + ([os.path.relpath(doc_path, ROOT)] if doc_stale else [])
     if written:
         print(f"render-guide: wrote {len(written)} file(s):")
         for p in written:

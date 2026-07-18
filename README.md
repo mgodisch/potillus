@@ -151,6 +151,16 @@ in-app language selector works across all supported versions, and the JSON
 backup format is shared with Android, so a backup moves between the two
 platforms unchanged.
 
+Libellus Potionis is distributed through
+[F-Droid](https://f-droid.org/packages/de.godisch.potillus/), which applies no
+age rating. Where the app is offered through the commercial stores, the two
+consoles ask different questions and reach very different age ratings for the
+same app — Apple's App Store at **18+**, Google Play at **3+** — because one
+rates the *content* (a catalogue of alcoholic drinks) and the other the
+*purpose* (a harm-reduction tool that neither sells nor promotes anything). What
+each store asked, what was answered, and why is recorded in
+[`docs/STORE_RATINGS.md`](docs/STORE_RATINGS.md).
+
 The application is actively maintained and verified across a Google Pixel 10
 Pro running [GrapheneOS](https://grapheneos.org/) (Android 16), a Fairphone 4
 (Android 15), an iPhone 16e and an iPhone SE, both running iOS 26, as well as

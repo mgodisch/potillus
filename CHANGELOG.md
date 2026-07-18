@@ -178,6 +178,18 @@ own device canvas (scaled to width, centred on the app's identity colour), so th
 now passes the gate. The letterboxing tool and its Makefile wiring already existed;
 what was missing was running it over the committed shots, which is now done.
 
+Made the English user's guide linkable, and recorded store availability in the
+README. Codeberg renders `.md` but not the `.md.in` templates the guide is authored
+as, so the guide could not be linked from anywhere (the README, the OpenSSF badge
+justifications) as readable prose. Both renderers now also emit the rendered English
+guide as a committed sibling of its template — `android/docs/guide/usersguide.md`
+and `ios/docs/guide/usersguide.md` — and their `--check` mode (already wired into
+`check-guides` and `check-ios-guides`) fails the build if either drifts from the
+template, so the committed copy cannot go stale. Separately, the README's Platform
+Compatibility section now states where the app is distributed and that F-Droid
+applies no age rating, and links `docs/STORE_RATINGS.md` for the App Store's 18+
+versus Play's 3+ split on the same app.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
