@@ -151,6 +151,14 @@ entering the tree. Unset, it expands to empty — the previous behaviour, so clo
 and CI are unaffected. It reuses the same variable `make release-ios` already
 honours, so one export serves both development and release signing.
 
+Updated the English App Store release notes to describe the new edit/delete
+interaction. The pending `en-US/release_notes.txt` still said an entry "can be
+edited or deleted from the row itself" — the 0.83.0 row buttons — which the
+edit-mode/swipe rework above supersedes. It now describes tapping to edit and
+swiping to delete on Today and Calendar, the swipe Edit/Delete on the drink list,
+and the toolbar Edit button. The other locales' release notes are deliberately not
+touched yet (they still trail at 0.83.0 and are pulled through at release time).
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
