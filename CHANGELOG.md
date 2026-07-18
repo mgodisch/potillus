@@ -253,9 +253,15 @@ committed `.ttf` lets everyone render byte-identically without fonttools install
 
 Deliberately deferred (tracked on the roadmap): the OpenSSF badge maintenance
 targets `bestpractices-json`/`bestpractices-jsonc` (run by hand when the badge
-answers change) and the decomposition of the `tools/release-check.sh` monolith,
-which the release path uses as-is for now. The read-only `check-bestpractices-levels`
-gate is already rebuilt in `make/checks.mk`.
+answers change). The read-only `check-bestpractices-levels` gate is already rebuilt
+in `make/checks.mk`.
+
+The `tools/release-check.sh` monolith is being split up (its decomposition was
+previously deferred). Step one: the shared core -- the colours, counters, the
+`pass`/`fail`/`warn`/`section` output helpers, the file-path constants and the
+`extract_version_*` helpers -- moves into `tools/release-checks/lib.sh`, which the
+runner now sources. The 16 checks and `main()` stay in the runner for now; they
+move to per-check files next. The runner's output is byte-for-byte unchanged.
 
 ### iOS: delete and edit move to the native edit-mode model
 
