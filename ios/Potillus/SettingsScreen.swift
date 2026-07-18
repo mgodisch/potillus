@@ -402,11 +402,13 @@ struct SettingsScreen: View {
 // convert to and from the `Date` the picker edits. In an extension so they do
 // not count against the type's length budget (SwiftLint `type_body_length`).
 // A fixed POSIX formatter, not a locale-formatted one, so the stored value
-// round-trips regardless of the display locale.
+// round-trips regardless of the display locale. Both are `nonisolated`: they
+// touch no main-actor state (only a local formatter), and `isoDay(from:)` is
+// called from the settings-mutation closure, which runs off the main actor.
 // =============================================================================
 
 extension SettingsScreen {
-    fileprivate static func isoDay(from date: Date) -> String {
+    nonisolated fileprivate static func isoDay(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
@@ -414,7 +416,7 @@ extension SettingsScreen {
     }
 
     /// Parses an ISO `yyyy-MM-dd` back to a `Date`, or `nil` when empty/invalid.
-    fileprivate static func day(from iso: String) -> Date? {
+    nonisolated fileprivate static func day(from iso: String) -> Date? {
         guard !iso.isEmpty else { return nil }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

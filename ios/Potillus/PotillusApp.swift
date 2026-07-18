@@ -59,7 +59,7 @@ struct PotillusApp: App {
 
     /// A fixed origin for `continuousUptime()`, taken once at process start. Only
     /// differences between readings matter to the lock, so the origin is arbitrary.
-    private static let uptimeEpoch = ContinuousClock().now
+    nonisolated private static let uptimeEpoch = ContinuousClock().now
 
     /// Monotonic seconds that KEEP COUNTING WHILE THE DEVICE SLEEPS — the iOS match
     /// for Android's `elapsedRealtime`, and the reading AppLock's 30-second re-auth
@@ -72,8 +72,10 @@ struct PotillusApp: App {
     /// and therefore `@MainActor`, which would otherwise isolate this static method
     /// to the main actor; but `AppLockModel` stores the `uptime` closure as
     /// `@Sendable` and calls it off the main actor, so the call has to be allowed
-    /// from a nonisolated context. The epoch, a `Sendable` `let`, is already
-    /// readable from here without annotation (SE-0412).
+    /// from a nonisolated context. The epoch is declared `nonisolated` (an
+    /// immutable `Sendable` `let`), so it is readable from this nonisolated
+    /// context; being a static member of the `@MainActor` `App` type, it would
+    /// otherwise be main-actor-isolated and unavailable here.
     nonisolated private static func continuousUptime() -> TimeInterval {
         let elapsed = ContinuousClock().now - uptimeEpoch
         return Double(elapsed.components.seconds)

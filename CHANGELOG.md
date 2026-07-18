@@ -244,6 +244,20 @@ enforced, and the answers say so rather than implying parity. `.bestpractices.js
 was regenerated, and the same one-way-mirror caveat applies (transcribe upstream
 before `make bestpractices-json`).
 
+Cleared the two Swift 6 actor-isolation warnings the iOS release archive emitted.
+`PotillusApp.uptimeEpoch` — an immutable `Sendable let` read from the `nonisolated`
+`continuousUptime()` — was implicitly main-actor-isolated as a static member of the
+`@MainActor` `App` type, so the read warned; it is now declared `nonisolated`, which
+matches its nature and the surrounding comment's stated intent. Likewise
+`SettingsScreen.isoDay(from:)` and `day(from:)` are pure POSIX date/string
+conversions with no main-actor state, but were main-actor-isolated by the enclosing
+`View`; `isoDay(from:)` is called from the settings-mutation closure that runs off the
+main actor, which warned. Both are now `nonisolated`. The only other warning in the
+log — `appintentsmetadataprocessor: No AppIntents.framework dependency found` — is
+benign tooling noise (the app uses no App Intents) and is left as is. The container
+Swift checks (symbols, length, test hygiene) stay green; the warnings' removal itself
+needs a Mac/device build to confirm, as the container cannot run `swiftc`.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
