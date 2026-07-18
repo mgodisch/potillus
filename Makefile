@@ -73,13 +73,22 @@ SHELL       := /bin/bash
 help:
 	@echo "Libellus Potionis -- repository build tooling"
 	@echo
-	@echo "Housekeeping (this revision):"
+	@echo "Housekeeping:"
 	@echo "  make clean              clear both platforms' build output"
 	@echo "  make distclean          clear build output + generated sources (fresh-clone state)"
 	@echo "  make clean-android      Android build output only"
 	@echo "  make distclean-android  Android build output + generated sources"
 	@echo "  make clean-ios          iOS build output only"
 	@echo "  make distclean-ios      iOS build output + generated sources"
+	@echo
+	@echo "Store assets (Android):"
+	@echo "  make screenshots-android      capture the in-app shots 01..06  [device]"
+	@echo "  make report-pdfs-android      export the per-locale report PDFs  [device + manual Save-as-PDF]"
+	@echo "  make screenshots-pdf-android  rasterize report pages 07/08 from the PDFs  [no device]"
+	@echo "  make feature-graphics-android render every locale's feature graphic  [no device]"
+	@echo "  make store-assets-android     the whole set: screenshots + PDFs + feature graphics"
+	@echo "Store assets (iOS):"
+	@echo "  make screenshots-ios          capture 01..06 (+ report pages 07/08)  [Mac + Simulator]"
 	@echo
 	@echo "None of these touch releases/ -- staged release artifacts are removed by hand."
 
@@ -120,3 +129,12 @@ distclean-ios:
 	$(MAKE) -C ios distclean
 
 .PHONY: help clean distclean clean-android distclean-android clean-ios distclean-ios
+
+# =============================================================================
+# STORE ASSETS
+# =============================================================================
+# Device/manual store-asset generation lives in its own fragment; see make/store.mk.
+# Included here so `make report-pdfs-android` works from the repository root. As the
+# store grows (Android screenshots 01..06, the iOS store assets) it stays in that
+# fragment rather than swelling this file.
+include make/store.mk

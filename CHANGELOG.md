@@ -67,12 +67,13 @@ Each revision is meant to be fully functional within its own scope. The
 foundation so far:
 
 - A shared GNU Make version guard (`make/guard.mk`, included by all three
-  Makefiles) aborts with a legible message on GNU Make older than 4.0 (macOS
+  Makefiles) aborts with a legible message on GNU Make older than 4.3 (macOS
   still ships 3.81 as the system `make`). It lives in one file rather than three:
   every Makefile declares `.ONESHELL`/`.SHELLFLAGS` as load-bearing, and a Make
   that predates those (3.82+) does not error but silently ignores them, running
-  recipes without the strict error handling they assume. The guard turns that
-  silent degradation into a loud, single-sourced failure.
+  recipes without the strict error handling they assume; the store fragment also
+  uses grouped targets (`&:`), which need 4.3. The guard turns that silent
+  degradation into a loud, single-sourced failure.
 - `clean`/`distclean` return as an honest aggregate at the root that fans out to
   both platforms. The old root deliberately had no bare `clean`, because it would
   have cleaned Android alone and left the entire iOS tree standing; a real
@@ -135,6 +136,46 @@ Linux release path) instead of dying on a missing xcodebuild/swiftlint deeper in
 recipe. The iOS screenshot capture is deliberately NOT hoisted here: unlike
 Android's device-free APK build, iOS build-and-capture is one simulator operation
 with no separable artifact, and screenshots are a store concern.
+
+Store STRAND B for Android arrives in the first store fragment, `make/store.mk`
+(a root include, not a standalone Makefile). `report-pdfs-android` drives the
+human-in-the-loop per-locale PDF export: it builds and installs the debug +
+androidTest APKs, runs the `-e reportExport`-gated `ReportExportTest` once per
+locale (you tap "Save as PDF", the name is pre-filled), then pulls the files.
+`screenshots-pdf-android` then rasterizes the report pages 07/08 from those PDFs
+with pdftoppm. The 21 committed report PDFs move to `fastlane/report-pdf/android/`
+(the `ios/` sibling is reserved; per project decision iOS report PDFs stay
+transient, produced inside the iOS screenshot run, so there is no
+report-pdfs-ios). A per-locale sentinel makes any consumer of a missing PDF fail
+with a message naming `make report-pdfs-android` instead of a cryptic "No rule to
+make target". The export is explicit-only (device + manual) and, unlike the old
+target, deliberately does NOT cascade the feature graphics -- strand B is
+independent of strand A (01..06).
+
+Store STRAND A -- the in-app screenshots 01..06 -- joins the store fragment:
+`screenshots-android` (Android Demo Mode + screengrab, with a sticky-panel/date
+teardown that runs even on Ctrl-C via an EXIT trap into
+`screenshots-demo-off-android`) and `screenshots-ios` (fastlane snapshot on the
+Simulator; on iOS the same run also renders the transient report pages 07/08, per
+the Option-C decision, so there is no separate iOS report export). Both are
+explicit-only and need a device/simulator you start yourself. Like
+report-pdfs-android, neither cascades the feature graphics any more: strand A is
+independent of strand B, and refreshing the feature graphics is a separate
+explicit step.
+
+The Android feature graphics and the store orchestrator complete the store
+fragment. `feature-graphics-android` renders every locale's 1024x500 Play feature
+graphic (and its committed high-res companion `featureGraphic-4K.png`, which
+README.md links and Codeberg displays per locale) from the caption, `01_today`
+(strand A), `07` (strand B) and the shared inputs -- via a grouped target so one
+renderer call declares both outputs. It is EXPLICIT, never cascaded from the
+producers; a `device_screenshot_sentinel` makes a missing `01_today` fail with a
+message naming `make screenshots-android`. `feature-graphics-existing-android`
+refreshes only the graphics already on disk (for a shared-input change, no
+capture). `store-assets-android` runs the whole set in order -- screenshots,
+report PDFs, then feature graphics last so their inputs are fresh -- replacing the
+old cascade/stamp machinery, which strand independence made unnecessary. The
+grouped target raises the shared Make guard's floor to 4.3 (noted above).
 
 None of these targets touch `releases/`.
 

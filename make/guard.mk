@@ -33,9 +33,9 @@
 #  on encountering them -- it silently IGNORES them and runs each recipe line in
 #  its own shell WITHOUT the `set -euo pipefail` the recipes assume. The recipe
 #  then runs as a weaker program than it is written to be, with no warning. This
-#  project additionally uses grouped targets (`&:`, 4.3+) and $(shell ...) calls
-#  that contain `#` (which 3.81 mis-parses, truncating the call), so it requires
-#  GNU Make 4.x outright.
+#  project additionally uses grouped targets (`&:`), a GNU Make 4.3 feature, and
+#  $(shell ...) calls that contain `#` (which 3.81 mis-parses, truncating the
+#  call), so it requires GNU Make 4.3 or newer outright.
 #
 #  Stating the guard ONCE, here, and including it everywhere means no Makefile can
 #  run in that silent degraded mode, and the rule lives in a single place instead
@@ -45,10 +45,17 @@
 #  than misbehaving further down.
 # =============================================================================
 
-# The major version is the first dot-separated field of $(MAKE_VERSION); abort
-# when it is 0, 1, 2 or 3 (filter-out leaves the empty string for those, and a
-# non-empty number -- so no abort -- for 4 and up).
+# Abort on anything older than 4.3. The major and minor versions are the first two
+# dot-separated fields of $(MAKE_VERSION): reject majors 0-3 outright, then on major
+# 4 reject minors 0-2 (grouped targets need 4.3). The syntax is 3.81-safe
+# (firstword/word/subst/filter-out and `else ifeq` only), so a 3.81 that reads this
+# file via `include` still evaluates the guard and aborts with a legible message.
 make_major := $(firstword $(subst ., ,$(MAKE_VERSION)))
+make_minor := $(word 2,$(subst ., ,$(MAKE_VERSION)))
 ifeq ($(filter-out 0 1 2 3,$(make_major)),)
-$(error This project needs GNU Make 4.0 or newer, but you are running $(MAKE_VERSION). On macOS the system 'make' is 3.81; install a current GNU Make (brew install make) and run 'gmake' instead of 'make'.)
+$(error This project needs GNU Make 4.3 or newer, but you are running $(MAKE_VERSION). On macOS the system 'make' is 3.81; install a current GNU Make (brew install make) and run 'gmake' instead of 'make'.)
+else ifeq ($(make_major),4)
+ifeq ($(filter-out 0 1 2,$(make_minor)),)
+$(error This project needs GNU Make 4.3 or newer (it uses grouped targets '&:'), but you are running $(MAKE_VERSION). Install a current GNU Make (brew install make) and run 'gmake' instead of 'make'.)
+endif
 endif
