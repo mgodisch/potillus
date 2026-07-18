@@ -285,7 +285,7 @@ struct DrinksScreen: View {
                 model.clearErrors()
                 editing = drink
             } label: {
-                Label(Loc.string("Edit %@", drink.name, locale: locale), systemImage: "pencil")
+                Label(Loc.string("Edit", locale: locale), systemImage: "square.and.pencil")
             }
             .tint(.blue)
         }

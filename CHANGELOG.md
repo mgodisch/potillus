@@ -86,8 +86,11 @@ adopts that model:
   editor. On Drinks the row tap is already spoken for (it *logs* the drink, the
   many-times-a-day action), so editing and deleting a drink move to the **trailing
   swipe** — the native place for a row's secondary actions when its tap is taken,
-  Mail being the model: tap opens, swipe acts. The swipe carries a blue Edit and a
-  red Delete; the `EditButton` edit mode still shows the system delete badge, so
+  Mail being the model: tap opens, swipe acts. The swipe carries a blue **Edit**
+  (labelled with the bare verb, not "Edit <name>", and drawn with the system
+  compose glyph `square.and.pencil`) and a red **Delete** (the `trash` glyph on
+  red, exactly as Mail and Reminders draw a swipe delete). The `EditButton` edit
+  mode still shows the system delete badge — the round red "no-entry" control — so
   deletion keeps a visible, swipe-free path as well. The row's raw tap-to-log is
   gated on the edit-mode state so it stands down while the list is being edited.
 - **The Calendar screen was rebuilt from a `ScrollView` onto a `List`.** Swipe,
@@ -98,9 +101,14 @@ adopts that model:
   entries are a second section that carries `.onDelete`. This closes the gap where
   the calendar was the one entry list a user could not swipe.
 
-No new user-facing strings were needed: `Delete`, `Cancel`, `Really delete “%@”?`,
-`Edit %@` and `Delete %@` already exist in all 21 locales, so the change touches no
-translation and trips no locale-parity gate.
+This adds exactly one user-facing string — the bare verb **`Edit`** for the
+Drinks swipe, whose per-locale values are the verb stems already present in the
+existing `Edit %@` key (English "Edit", German "Bearbeiten", and so on for all 21
+locales), so it introduces no new wording, only a shorter form of words the
+catalogue already carried. Everything else the change shows — `Delete`, `Cancel`,
+`Really delete “%@”?` — already existed in every locale. Android has no bare-verb
+`edit` string (only `edit_drink`/`edit_entry`), so the new key has no Android
+counterpart to drift from and the locale-parity gate stays green.
 
 Fixed in passing, a rendering slip the rework sat next to: **the Today row's time
 ignored the in-app locale.** Its detail line hard-coded `HH:mm` while the
