@@ -69,6 +69,18 @@ profile itself. It stages a copy into `releases/` under the canonical
 refuses to overwrite an already-staged release — and prints the exact upload
 commands when it finishes.
 
+Before it archives, `release-ios` refuses to stage unless the App Store release
+notes are translated for *this* version — the iOS twin of `release-android`'s
+changelog gate. iOS release notes are one `release_notes.txt` per locale that
+persists across releases (unlike Android's per-versionCode changelogs, which are
+simply absent for a new version), so a small manifest,
+`fastlane/metadata/ios/release_notes.versions`, records the version each locale is
+translated for. When you translate a locale's `release_notes.txt` for a new
+version, bump its line there; `check-ios-metadata --release` (run by both
+`release-ios` and `push-appstore`) then fails — listing every stale locale — until
+they all equal the top `## vX.Y.Z` in `CHANGELOG.md`. The on-every-build `make ios`
+path defers this check, so day-to-day builds are unaffected.
+
 The export needs to authenticate with the Apple Developer website (to mint the
 distribution certificate and App-Store profile). It uses the same App Store
 Connect API key as the upload: when `APP_STORE_CONNECT_API_KEY_KEY_ID`,

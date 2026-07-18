@@ -380,6 +380,24 @@ already use, so a future change to a default can no longer leave one copy behind
 Android was never affected (its parser already reads `AppSettings()`). This was latent
 because the container has no Swift toolchain to run XCTest; it surfaced on the Mac.
 
+Made `make release-ios` refuse to stage until the App Store release notes are
+translated for the version being cut, matching `make release-android`. Two things
+were missing. First, the `--release` metadata gate ran only at `push-appstore`
+(upload); `release-ios` now runs `check-ios-metadata --release` up front, before the
+two archive builds, so a missing or oversized note fails fast at stage time rather
+than after a full build. Second, and unlike Android — whose per-versionCode
+`changelogs/<code>.txt` are simply absent for a new version and so fail on their own —
+iOS keeps one `release_notes.txt` per locale that survives across releases, so their
+presence proves nothing about whether they were updated. A new manifest,
+`fastlane/metadata/ios/release_notes.versions`, records the version each locale is
+translated for; the `--release` check now fails, naming every stale locale, until all
+of them equal the top `## vX.Y.Z` in `CHANGELOG.md`. It ships reflecting the truth —
+`en-US` at 0.84.0, the other twenty still at 0.83.0 — so `release-ios` now correctly
+stops until those translations are done and their lines bumped. The manifest sits
+outside the locale directories so fastlane never uploads it, and the on-every-build
+`make ios` path defers the check, leaving day-to-day builds untouched. The workflow is
+documented in docs/RELEASE-IOS.md.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

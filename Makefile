@@ -411,6 +411,10 @@ release-ios: ios-project
 	fi
 	@# CLASS-1 store assets must already be captured (never refreshed here).
 	$(call require-ios-screenshots,release-ios)
+	@# Store release notes must be translated for THIS version before staging --
+	@# the iOS twin of release-android's --release changelog gate. Run it fail-fast,
+	@# before the two expensive archive builds; push-appstore re-checks at upload.
+	python3 tools/check-ios-metadata.py --release
 	# Resolve the signing Team ID: the DEVELOPMENT_TEAM environment variable wins,
 	# else read it from ios/signing.properties. The `${VAR:-}` default keeps `-u`
 	# (nounset) happy when the variable is unset, and the file is read ONLY when it

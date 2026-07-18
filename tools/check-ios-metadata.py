@@ -92,11 +92,20 @@ USAGE
 """
 
 import os
+import re
 import sys
 
 # Repository root: the parent of tools/.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = os.path.join(ROOT, "fastlane", "metadata", "ios")
+
+# The manifest recording which version each locale's release_notes.txt is
+# translated for; consulted only under --release. See its own header comment.
+VERSIONS_FILE = os.path.join(BASE, "release_notes.versions")
+
+# The release version, read from the top CHANGELOG entry -- the same source
+# tools/gen-ios-version.py uses for MARKETING_VERSION, so the two never disagree.
+CHANGELOG_VERSION = re.compile(r"^## v(\d+\.\d+\.\d+)")
 
 # App Store Connect's store-listing limits, per file name.
 LIMITS = {
@@ -263,6 +272,40 @@ def review_configured():
     )
 
 
+def changelog_version():
+    """The version of the top `## vX.Y.Z` entry in CHANGELOG.md, or None."""
+    path = os.path.join(ROOT, "CHANGELOG.md")
+    try:
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                match = CHANGELOG_VERSION.match(line)
+                if match:
+                    return match.group(1)
+    except OSError:
+        return None
+    return None
+
+
+def release_notes_versions():
+    """Map of locale -> the version its release_notes.txt is translated for.
+
+    None when the manifest is absent, so the caller can report that as its own
+    problem rather than silently passing.
+    """
+    if not os.path.isfile(VERSIONS_FILE):
+        return None
+    versions = {}
+    with open(VERSIONS_FILE, encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            parts = stripped.split()
+            if len(parts) == 2:
+                versions[parts[0]] = parts[1]
+    return versions
+
+
 def main():
     # --release enforces the checks that only matter when actually cutting a
     # release. The per-locale App Store release notes (release_notes.txt) are the
@@ -345,6 +388,37 @@ def main():
                 if extra:
                     detail.append("extra: " + ", ".join(extra))
                 problems.append(f"{locale}: file set differs ({'; '.join(detail)})")
+
+    # 6: release-notes freshness (release only). iOS release_notes.txt are one
+    # file per locale that survives across releases, so -- unlike Android's
+    # per-versionCode changelogs -- their presence proves nothing about whether
+    # they were updated. release_notes.versions records the version each is
+    # translated for; a laggard still describes an older release.
+    if release:
+        version = changelog_version()
+        stamped = release_notes_versions()
+        if version is None:
+            problems.append(
+                "CHANGELOG.md: no '## vX.Y.Z' entry to read the release version from"
+            )
+        elif stamped is None:
+            problems.append(
+                "release_notes.versions: missing -- it records the version each "
+                "locale's release_notes.txt is translated for (see docs/RELEASE-IOS.md)"
+            )
+        else:
+            for locale in locales:
+                got = stamped.get(locale)
+                if got is None:
+                    problems.append(
+                        f"release_notes.versions: no entry for {locale} -- add "
+                        f"'{locale} {version}' once its release_notes.txt is translated"
+                    )
+                elif got != version:
+                    problems.append(
+                        f"{locale}: release_notes.txt is translated for {got}, not the "
+                        f"{version} release -- update it and bump release_notes.versions"
+                    )
 
     # 5: the reviewer contact.
     problems.extend(check_review_information())

@@ -1,0 +1,38 @@
+# Version each locale's App Store release_notes.txt is translated FOR.
+#
+# release-ios (via `check-ios-metadata --release`) refuses to stage until every
+# locale below equals the current CHANGELOG version. When you translate a
+# locale's release_notes.txt for a new version, bump its line here.
+#
+# WHY THIS FILE EXISTS
+#   Android's store changelogs are per-versionCode (changelogs/<code>.txt), so a
+#   new release simply has none until they are written -- release-android fails on
+#   their absence. iOS App Store release notes are ONE file per locale that
+#   survives across releases, so their mere presence proves nothing about whether
+#   they were updated. This manifest is what lets the gate tell "translated for
+#   this version" from "left over from the last one".
+#
+# Format: one "<locale> <version>" per line; blank lines and #-comments ignored.
+# Kept OUTSIDE the locale directories on purpose, so fastlane deliver -- which
+# reads only the per-locale folders -- never uploads it to App Store Connect.
+cs 0.83.0
+da 0.83.0
+de-DE 0.83.0
+el 0.83.0
+en-US 0.84.0
+es-ES 0.83.0
+fr-FR 0.83.0
+it 0.83.0
+ja 0.83.0
+ko 0.83.0
+nl-NL 0.83.0
+no 0.83.0
+pl 0.83.0
+pt-BR 0.83.0
+pt-PT 0.83.0
+ro 0.83.0
+ru 0.83.0
+sv 0.83.0
+uk 0.83.0
+zh-Hans 0.83.0
+zh-Hant 0.83.0
