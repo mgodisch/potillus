@@ -50,7 +50,9 @@ author on an iPhone 16E and is additionally tested on an iPhone 17 Pro emulator.
 
 On this screen, you will find a list of the alcoholic beverages you consumed
 today. If you made a mistake when logging an entry, you can edit or delete
-entries here. Use the plus button to add more beverages.
+entries here: tap an entry to edit it, or swipe it left to delete it. The Edit
+button in the toolbar reveals a delete control too. Use the plus button to add
+more beverages.
 
 Above the beverage list, you will find an overview of the current day with the
 following information: the amount of alcohol already consumed today (in grams),
@@ -67,9 +69,9 @@ month (average grams of pure alcohol per day).
 
 On this screen, you will find the calendar. Days on which alcohol was consumed
 are marked with a blue dot (non-critical amount) or a red dot (limit
-exceeded). Selecting a day lists the respective beverages, which can then be
-corrected or deleted if necessary. It is also possible to add consumed
-beverages retroactively.
+exceeded). Selecting a day lists the respective beverages; tap an entry to
+correct it, or swipe it left to delete it (the toolbar's Edit button offers the
+same). It is also possible to add consumed beverages retroactively.
 
 ## Screen "{{statistics}}"
 
@@ -82,9 +84,10 @@ for addiction counseling centers.
 ## Screen "{{drinks}}"
 
 This screen contains the list of available beverages. The app comes pre-configured
-with a number of internationally common beverages. These can be modified or
-deleted as desired. You can define a new beverage using the plus icon. Tapping a
-beverage opens a dialog to log it directly as consumed.
+with a number of internationally common beverages. To modify or delete a
+beverage, swipe its row left and choose Edit or Delete. You can define a new
+beverage using the plus icon. Tapping a beverage opens a dialog to log it
+directly as consumed.
 
 ## Screen "{{settings}}"
 

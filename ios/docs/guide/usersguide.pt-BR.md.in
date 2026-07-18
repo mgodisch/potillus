@@ -49,7 +49,7 @@ Pro.
 
 Nesta tela você encontra uma lista das bebidas alcoólicas que consumiu hoje. Se
 cometeu um erro ao registrar uma bebida, pode editar ou excluir os registros
-aqui. Use o botão de mais para adicionar mais bebidas.
+aqui. Use o botão de mais para adicionar mais bebidas. Toque em um registro para editá-lo, ou deslize-o para a esquerda para excluí-lo. O botão “Editar” na barra de ferramentas também mostra um controle para excluir.
 
 Acima da lista de bebidas você encontra uma visão geral do dia atual com as
 seguintes informações: a quantidade de álcool já consumida hoje (em gramas),
@@ -66,7 +66,7 @@ Nesta tela você encontra o calendário. Os dias em que houve consumo de álcool
 marcados com um ponto azul (quantidade não crítica) ou um ponto vermelho (limite
 ultrapassado). Ao selecionar um dia, são exibidas as respectivas bebidas, que
 podem ser corrigidas ou excluídas se necessário. Também é possível adicionar
-bebidas consumidas de forma retroativa.
+bebidas consumidas de forma retroativa. Toque em um registro para corrigi-lo, ou deslize-o para a esquerda para excluí-lo; o botão “Editar” na barra de ferramentas oferece o mesmo.
 
 ## Tela "{{statistics}}"
 
@@ -81,7 +81,7 @@ dependência.
 Esta tela contém a lista de bebidas. O aplicativo vem pré-configurado com um
 conjunto de bebidas comuns no âmbito internacional. Todas podem ser alteradas ou
 excluídas. Você pode definir uma nova bebida pelo ícone de mais. Ao tocar em uma
-bebida, abre-se uma caixa de diálogo para registrá-la como consumida.
+bebida, abre-se uma caixa de diálogo para registrá-la como consumida. Para alterar ou excluir uma bebida, deslize a sua linha para a esquerda e escolha “Editar” ou “Excluir”.
 
 ## Tela "{{settings}}"
 

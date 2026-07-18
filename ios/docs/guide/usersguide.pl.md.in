@@ -48,7 +48,7 @@ bieżąco na iPhonie 16E i dodatkowo testuje na emulatorze iPhone 17 Pro.
 
 Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
 przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
-Użyj przycisku plus, aby dodać kolejne napoje.
+Użyj przycisku plus, aby dodać kolejne napoje. Dotknij wpisu, aby go edytować, albo przesuń go w lewo, aby go usunąć. Przycisk „Edytuj” na pasku narzędzi również udostępnia opcję usuwania.
 
 Nad listą napojów znajdziesz przegląd bieżącego dnia z następującymi
 informacjami: ilość alkoholu już spożytego dzisiaj (w gramach), ta sama ilość w
@@ -65,7 +65,7 @@ Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznac
 niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
 Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby można
 poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
-wsteczną.
+wsteczną. Dotknij wpisu, aby go poprawić, albo przesuń go w lewo, aby go usunąć; przycisk „Edytuj” na pasku narzędzi oferuje to samo.
 
 ## Ekran „{{statistics}}"
 
@@ -80,7 +80,7 @@ uzależnień.
 Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
 skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
 można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
-Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty.
+Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty. Aby zmienić lub usunąć napój, przesuń jego wiersz w lewo i wybierz „Edytuj” lub „Usuń”.
 
 ## Ekran „{{settings}}"
 

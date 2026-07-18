@@ -47,7 +47,7 @@ forfatteren på en iPhone 16E og testes i tillegg på en iPhone 17 Pro-emulator.
 
 På denne skjermen finner du en liste over de alkoholholdige drikkene du har nytt
 i dag. Hvis du gjorde en feil da du registrerte en drikk, kan du redigere eller
-slette oppføringene her. Bruk plussknappen for å legge til flere drikker.
+slette oppføringene her. Bruk plussknappen for å legge til flere drikker. Trykk på en oppføring for å redigere den, eller sveip den mot venstre for å slette den. Knappen «Rediger» på verktøylinjen viser også et slettevalg.
 
 Over drikkelisten finner du en oversikt over den aktuelle dagen med følgende
 informasjon: mengden alkohol som allerede er inntatt i dag (i gram), den samme
@@ -64,7 +64,7 @@ På denne skjermen finner du kalenderen. Dager da det ble inntatt alkohol, er
 merket med en blå prikk (ikke-kritisk mengde) eller en rød prikk (grensen
 overskredet). Når du velger en dag, vises de tilhørende drikkene, som om
 nødvendig kan korrigeres eller slettes. Det er også mulig å legge til inntatte
-drikker i ettertid.
+drikker i ettertid. Trykk på en oppføring for å korrigere den, eller sveip den mot venstre for å slette den; knappen «Rediger» på verktøylinjen gjør det samme.
 
 ## Skjerm "{{statistics}}"
 
@@ -78,7 +78,7 @@ presenterer drikkevanene i et format som egner seg for rusbehandling.
 Denne skjermen inneholder listen over drikker. Appen leveres forhåndskonfigurert
 med et sett internasjonalt vanlige drikker. Alle kan endres eller slettes. Med
 plussikonet kan du definere en ny drikk. Når du trykker på en drikk, åpnes en
-dialog der du kan registrere den som inntatt.
+dialog der du kan registrere den som inntatt. For å endre eller slette en drikk sveiper du raden mot venstre og velger «Rediger» eller «Slett».
 
 ## Skjerm "{{settings}}"
 

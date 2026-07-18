@@ -53,7 +53,7 @@ en continu par l'auteur sur un iPhone 16E et testé en complément sur un
 Sur cet écran, vous trouverez la liste des boissons alcoolisées que vous avez
 consommées aujourd'hui. Si vous avez commis une erreur en enregistrant une
 boisson, vous pouvez modifier ou supprimer les entrées ici. Utilisez le bouton
-plus pour ajouter d'autres boissons.
+plus pour ajouter d'autres boissons. Touchez une entrée pour la modifier, ou balayez-la vers la gauche pour la supprimer. Le bouton « Modifier » de la barre d'outils propose également une option de suppression.
 
 Au-dessus de la liste des boissons, vous trouverez un aperçu de la journée en
 cours avec les informations suivantes : la quantité d'alcool déjà consommée
@@ -72,7 +72,7 @@ Sur cet écran, vous trouverez le calendrier. Les jours où de l'alcool a été
 consommé sont marqués d'un point bleu (quantité non critique) ou d'un point
 rouge (limite dépassée). En sélectionnant un jour, les boissons correspondantes
 s'affichent et peuvent, si nécessaire, être corrigées ou supprimées. Il est
-également possible d'ajouter des boissons consommées a posteriori.
+également possible d'ajouter des boissons consommées a posteriori. Touchez une entrée pour la corriger, ou balayez-la vers la gauche pour la supprimer ; le bouton « Modifier » de la barre d'outils propose la même chose.
 
 ## Écran « {{statistics}} »
 
@@ -88,7 +88,7 @@ Cet écran contient la liste des boissons. L'application est préconfigurée ave
 un ensemble de boissons courantes à l'international. Toutes peuvent être
 modifiées ou supprimées. Vous pouvez définir une nouvelle boisson à l'aide de
 l'icône plus. Un appui sur une boisson ouvre une boîte de dialogue permettant de
-l'enregistrer comme consommée.
+l'enregistrer comme consommée. Pour modifier ou supprimer une boisson, balayez sa ligne vers la gauche et choisissez « Modifier » ou « Supprimer ».
 
 ## Écran « {{settings}} »
 

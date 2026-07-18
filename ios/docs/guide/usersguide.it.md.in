@@ -50,7 +50,7 @@ di iPhone 17 Pro.
 
 In questa schermata trovi l'elenco delle bevande alcoliche consumate oggi. Se
 hai commesso un errore nel registrare una bevanda, qui puoi modificare o
-eliminare le voci. Usa il pulsante più per aggiungere altre bevande.
+eliminare le voci. Usa il pulsante più per aggiungere altre bevande. Tocca una voce per modificarla, oppure scorrila verso sinistra per eliminarla. Anche il pulsante «Modifica» nella barra degli strumenti mostra un comando per eliminare.
 
 Sopra l'elenco delle bevande trovi una panoramica della giornata corrente con le
 seguenti informazioni: la quantità di alcol già consumata oggi (in grammi), la
@@ -68,7 +68,7 @@ In questa schermata trovi il calendario. I giorni in cui è stato consumato alco
 sono contrassegnati da un punto blu (quantità non critica) o da un punto rosso
 (limite superato). Selezionando un giorno vengono mostrate le relative bevande,
 che possono essere corrette o eliminate se necessario. È anche possibile
-aggiungere bevande consumate in modo retroattivo.
+aggiungere bevande consumate in modo retroattivo. Tocca una voce per correggerla, oppure scorrila verso sinistra per eliminarla; il pulsante «Modifica» nella barra degli strumenti offre lo stesso.
 
 ## Schermata "{{statistics}}"
 
@@ -84,7 +84,7 @@ Questa schermata contiene l'elenco delle bevande. L'app è preconfigurata con un
 insieme di bevande diffuse a livello internazionale. Tutte possono essere
 modificate o eliminate. Puoi definire una nuova bevanda tramite l'icona più. Un
 tocco su una bevanda apre una finestra di dialogo per registrarla come
-consumata.
+consumata. Per modificare o eliminare una bevanda, scorri la sua riga verso sinistra e scegli «Modifica» o «Elimina».
 
 ## Schermata "{{settings}}"
 

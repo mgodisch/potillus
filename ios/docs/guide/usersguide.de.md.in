@@ -51,7 +51,7 @@ Pro Emulator getestet.
 Auf diesem Screen findest du eine Liste der von dir heute konsumierten
 alkoholischen Getränke. Sollte dir beim Einbuchen ein Fehler unterlaufen sein,
 so lassen sich die Einträge hier editieren oder löschen. Mit der Plus-Taste
-fügst du weitere Getränke hinzu.
+fügst du weitere Getränke hinzu. Tippe einen Eintrag an, um ihn zu bearbeiten, oder wische ihn nach links, um ihn zu löschen. Die Schaltfläche „Bearbeiten“ in der Symbolleiste bietet ebenfalls eine Löschmöglichkeit.
 
 Über der Getränkeliste findest du eine Übersicht zum aktuellen Tag mit
 folgenden Informationen: die heute bereits konsumierte Menge Alkohol (in
@@ -71,7 +71,7 @@ wurde, sind mit einem blauen (unkritische Menge) oder roten Punkt (Limit
 überschritten) gekennzeichnet. Wenn du einen Tag auswählst, werden die
 jeweiligen Getränke aufgelistet und können bei Bedarf korrigiert oder gelöscht
 werden. Auch das nachträgliche Hinzufügen von konsumierten Getränken ist
-möglich.
+möglich. Tippe einen Eintrag an, um ihn zu korrigieren, oder wische ihn nach links, um ihn zu löschen; die Schaltfläche „Bearbeiten“ in der Symbolleiste bietet dasselbe.
 
 ## Screen "{{statistics}}"
 
@@ -87,7 +87,7 @@ Dieser Screen beinhaltet die Liste der verfügbaren Getränke. Die App wird mit
 einer Anzahl international gebräuchlicher Getränke ausgeliefert. Diese können
 beliebig angepasst oder gelöscht werden. Über das Plus-Symbol kannst du ein
 neues Getränk definieren. Ein Tippen auf ein Getränk öffnet den Dialog, um
-dieses direkt als konsumiert einzubuchen.
+dieses direkt als konsumiert einzubuchen. Um ein Getränk zu ändern oder zu löschen, wische seine Zeile nach links und wähle „Bearbeiten“ oder „Löschen“.
 
 ## Screen "{{settings}}"
 

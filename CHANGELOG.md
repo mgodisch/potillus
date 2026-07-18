@@ -159,6 +159,25 @@ swiping to delete on Today and Calendar, the swipe Edit/Delete on the drink list
 and the toolbar Edit button. The other locales' release notes are deliberately not
 touched yet (they still trail at 0.83.0 and are pulled through at release time).
 
+Updated the in-app user's guide to match the new interaction. The guide had only
+said entries "can be edited or deleted" and named no control — fine while a visible
+trash and pencil sat on every row, misleading once they were gone. It now tells the
+reader to tap an entry to edit it and swipe it to delete it (and that the toolbar's
+Edit button deletes too), and that a drink is edited or deleted by swiping its row.
+The English source (`ios/docs/guide/usersguide.md.in`) and all 20 translations were
+updated together, using each language's own on-screen words for Edit and Delete from
+the catalogue; the non-English wording is machine-quality pending native review, as
+for the rest of those locales.
+
+The iOS report screenshots were letterboxed onto the device canvas. Pages 07–08 in
+all 21 locales had shipped as raw A4 out of `pdftoppm` (1654×2339), which Google
+Play accepts but the App Store — which takes only real device resolutions — rejects,
+and which `check-ios-screenshots.py` (added in the folded 0.83.0 work) fails the
+build over. Running `tools/letterbox-ios-report.py` fits each page onto the locale's
+own device canvas (scaled to width, centred on the app's identity colour), so the set
+now passes the gate. The letterboxing tool and its Makefile wiring already existed;
+what was missing was running it over the committed shots, which is now done.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

@@ -49,7 +49,7 @@ iPhone 17 Pro.
 
 Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
 cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
-aqui. Usa o botão mais para adicionar mais bebidas.
+aqui. Usa o botão mais para adicionar mais bebidas. Toca numa entrada para a editar, ou desliza-a para a esquerda para a eliminar. O botão «Editar» na barra de ferramentas também mostra um controlo para eliminar.
 
 Acima da lista de bebidas encontras uma visão geral do dia atual com as
 seguintes informações: a quantidade de álcool já consumida hoje (em gramas),
@@ -66,7 +66,7 @@ Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
 assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
 (limite ultrapassado). Ao selecionar um dia, são apresentadas as respetivas
 bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
-adicionar bebidas consumidas de forma retroativa.
+adicionar bebidas consumidas de forma retroativa. Toca numa entrada para a corrigir, ou desliza-a para a esquerda para a eliminar; o botão «Editar» na barra de ferramentas oferece o mesmo.
 
 ## Ecrã "{{statistics}}"
 
@@ -81,7 +81,7 @@ em adições.
 Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
 conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
 eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
-bebida, abre-se uma caixa de diálogo para a registar como consumida.
+bebida, abre-se uma caixa de diálogo para a registar como consumida. Para alterar ou eliminar uma bebida, desliza a sua linha para a esquerda e escolhe «Editar» ou «Eliminar».
 
 ## Ecrã "{{settings}}"
 

@@ -49,7 +49,7 @@ Pro-emulator.
 På den här skärmen hittar du en lista över de alkoholhaltiga drycker du har
 njutit av i dag. Om du gjorde ett misstag när du registrerade en dryck kan du
 redigera eller ta bort poster här. Använd plusknappen för att lägga till fler
-drycker.
+drycker. Tryck på en post för att redigera den, eller svep den åt vänster för att ta bort den. Knappen ”Redigera” i verktygsfältet visar också ett borttagningsalternativ.
 
 Ovanför drycklistan hittar du en översikt över den aktuella dagen med följande
 information: mängden alkohol som redan konsumerats i dag (i gram), samma mängd i
@@ -66,7 +66,7 @@ På den här skärmen hittar du kalendern. Dagar då alkohol konsumerades är
 markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
 överskriden). När du väljer en dag visas motsvarande drycker, som vid behov kan
 korrigeras eller tas bort. Det är också möjligt att lägga till konsumerade
-drycker i efterhand.
+drycker i efterhand. Tryck på en post för att korrigera den, eller svep den åt vänster för att ta bort den; knappen ”Redigera” i verktygsfältet gör detsamma.
 
 ## Skärm "{{statistics}}"
 
@@ -80,7 +80,7 @@ dryckesvanorna i ett format som lämpar sig för beroendevård.
 Den här skärmen innehåller listan över drycker. Appen levereras förkonfigurerad
 med en uppsättning internationellt vanliga drycker. Alla kan ändras eller tas
 bort. Du kan definiera en ny dryck med plusikonen. När du trycker på en dryck
-öppnas en dialogruta för att registrera den som konsumerad.
+öppnas en dialogruta för att registrera den som konsumerad. För att ändra eller ta bort en dryck sveper du dess rad åt vänster och väljer ”Redigera” eller ”Radera”.
 
 ## Skärm "{{settings}}"
 

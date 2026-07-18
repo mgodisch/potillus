@@ -47,7 +47,7 @@ na zařízení iPhone 16E a navíc jej testuje na emulátoru iPhone 17 Pro.
 
 Na této obrazovce najdete seznam alkoholických nápojů, které jste si dnes
 dopřáli. Pokud jste při zaznamenávání nápoje udělali chybu, můžete zde záznamy
-upravit nebo odstranit. Tlačítkem plus přidáte další nápoje.
+upravit nebo odstranit. Tlačítkem plus přidáte další nápoje. Klepnutím na záznam jej upravíš, přejetím doleva jej odstraníš. Tlačítko „Upravit“ na panelu nástrojů rovněž nabízí možnost odstranění.
 
 Nad seznamem nápojů najdete přehled aktuálního dne s následujícími informacemi:
 množství alkoholu již dnes zkonzumovaného (v gramech), totéž množství ve vztahu k
@@ -63,7 +63,7 @@ Navíc odznak označený „Ø“ zobrazuje průměrnou spotřebu v aktuálním 
 Na této obrazovce najdete kalendář. Dny, kdy se pil alkohol, jsou označeny modrým
 bodem (nekritické množství) nebo červeným bodem (překročený limit). Po výběru dne
 se zobrazí příslušné nápoje, které lze v případě potřeby opravit nebo odstranit.
-Je také možné zpětně přidat zkonzumované nápoje.
+Je také možné zpětně přidat zkonzumované nápoje. Klepnutím na záznam jej opravíš, přejetím doleva jej odstraníš; tlačítko „Upravit“ na panelu nástrojů nabízí totéž.
 
 ## Obrazovka „{{statistics}}"
 
@@ -77,7 +77,7 @@ který zpracovává pijácké návyky do podoby vhodné pro poradnu pro závislo
 Tato obrazovka obsahuje seznam nápojů. Aplikace se dodává s přednastavenou sadou
 mezinárodně běžných nápojů. Všechny lze upravit nebo odstranit. Pomocí ikony plus
 můžete definovat nový nápoj. Klepnutím na nápoj se otevře dialog pro jeho
-zaznamenání jako zkonzumovaného.
+zaznamenání jako zkonzumovaného. Chceš-li nápoj upravit nebo odstranit, přejeď jeho řádek doleva a zvol „Upravit“ nebo „Smazat“.
 
 ## Obrazovka „{{settings}}"
 

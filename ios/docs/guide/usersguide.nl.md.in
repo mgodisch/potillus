@@ -50,7 +50,7 @@ gebruikt op een iPhone 16E en daarnaast getest op een iPhone 17 Pro-emulator.
 Op dit scherm vind je een lijst met de alcoholische dranken die je vandaag hebt
 genoten. Als je een fout hebt gemaakt bij het registreren van een drankje, kun
 je de items hier bewerken of verwijderen. Gebruik de plusknop om meer dranken
-toe te voegen.
+toe te voegen. Tik op een item om het te bewerken, of veeg het naar links om het te verwijderen. De knop ‘Bewerken’ in de werkbalk toont ook een verwijderoptie.
 
 Boven de drankenlijst vind je een overzicht van de huidige dag met de volgende
 informatie: de hoeveelheid alcohol die vandaag al is genuttigd (in gram),
@@ -67,7 +67,7 @@ Op dit scherm vind je de kalender. Dagen waarop alcohol is gebruikt, zijn
 gemarkeerd met een blauwe stip (niet-kritieke hoeveelheid) of een rode stip
 (limiet overschreden). Wanneer je een dag selecteert, worden de bijbehorende
 dranken weergegeven, die zo nodig kunnen worden gecorrigeerd of verwijderd. Het
-is ook mogelijk om met terugwerkende kracht genuttigde dranken toe te voegen.
+is ook mogelijk om met terugwerkende kracht genuttigde dranken toe te voegen. Tik op een item om het te corrigeren, of veeg het naar links om het te verwijderen; de knop ‘Bewerken’ in de werkbalk doet hetzelfde.
 
 ## Scherm "{{statistics}}"
 
@@ -83,7 +83,7 @@ Dit scherm bevat de lijst met dranken. De app wordt geleverd met een
 voorgeconfigureerde set internationaal gangbare dranken. Deze kunnen allemaal
 worden gewijzigd of verwijderd. Met het pluspictogram kun je een nieuwe drank
 definiëren. Door op een drank te tikken, opent een dialoogvenster om deze als
-genuttigd te registreren.
+genuttigd te registreren. Om een drank te wijzigen of te verwijderen, veeg je de rij naar links en kies je ‘Bewerken’ of ‘Verwijderen’.
 
 ## Scherm "{{settings}}"
 

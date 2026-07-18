@@ -49,7 +49,7 @@ autor pe un iPhone 16E și este testat în plus pe un emulator de iPhone 17 Pro.
 
 Pe acest ecran găsești o listă a băuturilor alcoolice consumate astăzi. Dacă ai
 făcut o greșeală la înregistrare, intrările pot fi editate sau șterse aici. Cu
-butonul plus adaugi alte băuturi.
+butonul plus adaugi alte băuturi. Atinge o intrare pentru a o edita sau glisează-o spre stânga pentru a o șterge. Butonul „Editează” din bara de instrumente afișează și un control pentru ștergere.
 
 Deasupra listei de băuturi găsești o prezentare a zilei curente cu următoarele
 informații: cantitatea de alcool deja consumată astăzi (în grame), cantitatea
@@ -68,7 +68,7 @@ Pe acest ecran găsești calendarul. Zilele în care s-a consumat alcool sunt
 marcate cu un punct albastru (cantitate necritică) sau roșu (limită depășită).
 Când selectezi o zi, băuturile respective sunt afișate și pot fi, la nevoie,
 corectate sau șterse. Este posibilă și adăugarea ulterioară a băuturilor
-consumate.
+consumate. Atinge o intrare pentru a o corecta sau glisează-o spre stânga pentru a o șterge; butonul „Editează” din bara de instrumente oferă același lucru.
 
 ## Ecranul „{{statistics}}”
 
@@ -83,7 +83,7 @@ pagini, într-un format optimizat pentru centrele de consiliere în adicții.
 Acest ecran conține lista băuturilor disponibile. Aplicația este livrată cu o
 serie de băuturi uzuale pe plan internațional. Acestea pot fi modificate sau
 șterse după dorință. Prin simbolul plus poți defini o băutură nouă. O atingere
-pe o băutură deschide dialogul pentru a o înregistra direct ca fiind consumată.
+pe o băutură deschide dialogul pentru a o înregistra direct ca fiind consumată. Pentru a modifica sau șterge o băutură, glisează rândul acesteia spre stânga și alege „Editează” sau „Șterge”.
 
 ## Ecranul „{{settings}}”
 
