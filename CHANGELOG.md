@@ -279,6 +279,22 @@ and the ROADMAP item is refocused on the residual: an independent, cross-machine
 reproduction check. The recipe change needs a Mac to exercise, as the container has no
 `xcodebuild`; the Makefile and best-practices gates pass here.
 
+Reworded `docs/STORE_RATINGS.md` so it reads as a neutral account rather than a note
+to its own author. The rating rationale is the same, but the first- and second-person
+framing is gone — "what we answered" becomes "how it was answered", "Our answer" in the
+table becomes "Answer given", the imperatives ("Do not correct it", "check Google's
+policy", "Answer the questions honestly") become plain statements, and "not ours to
+set" becomes "not the publisher's to set" — so it addresses a store reviewer or a
+puzzled user just as well as the maintainer. The medical/wellness passages were dropped
+to keep the argument simple (the harm-reduction framing stays, as it explains the app's
+purpose); the Google target-audience question is now quoted verbatim with its console
+path, mirroring the other sections; and two stragglers are fixed — the leftover German
+"Schwerpunkt" becomes "focus" now that the IARC question is quoted in English, and the
+"Questionaire" typo becomes "Questionnaire". The header comment's stale "3+ vs 16"
+pairing is corrected to "3+" (the IARC result; 16–17 is the separate target-audience
+answer). No best-practices answer needed a change: only the interface criteria mention
+blood alcohol, as a factual input, not a clinical claim.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
