@@ -51,7 +51,7 @@ OUTPUT
     ios/Version.xcconfig, which ios/project.yml includes.  The file is GENERATED
     and therefore git-ignored: it is reproduced from tracked sources on demand,
     so it can never be committed out of date.  Run it before `xcodegen generate`
-    (see "Building the iOS app" in README.md), or via `make ios-version`.
+    (see "Building the iOS app" in README.md), or via `make -C ios version`.
 
 USAGE
     tools/gen-ios-version.py [--check]
@@ -102,7 +102,7 @@ def render(root):
 //   MARKETING_VERSION       <- top '## vX.Y.Z' entry of CHANGELOG.md
 //   CURRENT_PROJECT_VERSION <- versionCode of android/app/build.gradle.kts
 //
-// Regenerate with `make ios-version` before running `xcodegen generate`.
+// Regenerate with `make -C ios version` before running `xcodegen generate`.
 
 MARKETING_VERSION = {marketing_version(root)}
 CURRENT_PROJECT_VERSION = {project_version(root)}
@@ -119,10 +119,10 @@ def main(argv):
             with open(target, encoding="utf-8") as handle:
                 current = handle.read()
         except OSError:
-            print(f"gen-ios-version: missing {target}; run 'make ios-version'", file=sys.stderr)
+            print(f"gen-ios-version: missing {target}; run 'make -C ios version'", file=sys.stderr)
             return 1
         if current != wanted:
-            print(f"gen-ios-version: {target} is stale; run 'make ios-version'", file=sys.stderr)
+            print(f"gen-ios-version: {target} is stale; run 'make -C ios version'", file=sys.stderr)
             return 1
         print("gen-ios-version: up to date")
         return 0

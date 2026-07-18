@@ -41,13 +41,13 @@ import org.junit.runner.RunWith
 //   (com.android.icu.util.regex), which rejects patterns the JVM accepts.
 //
 //   In v0.61.0–0.61.2 the PLACEHOLDER pattern contained an unescaped `}`. It
-//   compiled fine on the JVM (so unit tests AND `make test` passed) but threw
+//   compiled fine on the JVM (so the unit tests passed) but threw
 //   java.util.regex.PatternSyntaxException inside SimpleTemplate's static
 //   initialiser on-device, which surfaced only as a swallowed "export failed".
 //
 //   This instrumented test runs the real device engine: merely touching
 //   SimpleTemplate triggers its <clinit> (compiling PLACEHOLDER), so an
-//   ICU-incompatible pattern fails here as part of `make test`'s test-device
+//   ICU-incompatible pattern fails here as part of the device tests (`make device-tests-android`)
 //   phase — instead of silently in production.
 // =============================================================================
 

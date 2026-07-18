@@ -39,7 +39,7 @@
 #   composes the graphic DETERMINISTICALLY from three inputs the project already
 #   controls, so it is reproducible and trivially re-localizable:
 #       1. per-locale marketing copy  -> fastlane/.../<locale>/feature-graphic.txt
-#       2. the REAL, current screenshots produced by `make screenshots`
+#       2. the REAL, current screenshots produced by `make screenshots-android`
 #          (01_today.png as the phone, 07_report_page_1.png as the report page)
 #       3. the app's own launcher icon (foreground PNG + adaptive background)
 #

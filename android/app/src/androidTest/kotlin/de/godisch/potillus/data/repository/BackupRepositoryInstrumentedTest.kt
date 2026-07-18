@@ -47,7 +47,7 @@ package de.godisch.potillus.data.repository
 //   map fetch INSIDE the transaction, AFTER the deletes.
 //
 // HOW TO RUN
-//   ./gradlew connectedDebugAndroidTest   (or `make test-device`)
+//   ./gradlew connectedDebugAndroidTest   (or `make device-tests-android`)
 //   Requires a connected device/emulator (API 35+). Not executed in a headless
 //   CI without a device.
 // =============================================================================

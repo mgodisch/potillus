@@ -266,6 +266,23 @@ a thin script that sources the library and the check files and calls `main()`, w
 runs them in the same order, with the same flags (`--Werror`/`--release`/
 `--coverage`) and the same summary. The output is byte-for-byte unchanged.
 
+Finally, a sweep updates the stale `make <target>` references the renames left in
+the tool and androidTest comments and diagnostics to the current names:
+`screenshots` -> `screenshots-android`, `report-pdfs` -> `report-pdfs-android`,
+`screenshots-pdf` -> `screenshots-pdf-android`, `test-device` ->
+`device-tests-android`, and `ios-version`/`ios-guides`/`guides` ->
+`make -C ios version` / `make -C ios guides` / `make -C android guides`. All are in
+comments or diagnostic messages -- none in asserted test strings -- so behavior is
+unchanged.
+
+Housekeeping polish: `.gitignore` is regrouped by theme with uniform section
+headers and its stale `make` references updated (`make release` -> `release-android`,
+`make ios-version`/`ios-project`/`ios-guides` -> the `make -C ios ...` forms), with
+the pattern set left byte-identical so the `tgz` exclude list is unaffected; the
+root Makefile header drops its now-stale in-progress note and per-revision target
+list in favour of a `make help` pointer; and the deferred `bestpractices` roadmap
+item now points at `attic/Makefile`, where the recipes to port still live.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

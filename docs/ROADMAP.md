@@ -366,11 +366,12 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   `bestpractices-jsonc`; developer tooling). The badge-answer sync
   (`bestpractices-json`: pull the answers from bestpractices.dev, keep the answered
   criteria and regenerate the annotated `.bestpractices.jsonc`) and its local
-  annotation half (`bestpractices-jsonc`) still live only in the old Makefile. They
-  are maintenance-only — run by hand when the badge answers change — so they were
-  deliberately deferred out of the build-tooling rebuild; fold them into a small
-  fragment when convenient. The read-only `check-bestpractices-levels` gate is
-  already rebuilt in `make/checks.mk`.
+  annotation half (`bestpractices-jsonc`) still live only in the old root Makefile,
+  preserved verbatim under `attic/Makefile`. They are maintenance-only — run by hand
+  when the badge answers change — so they were deliberately deferred out of the
+  build-tooling rebuild; port the two recipes from `attic/Makefile` into a small
+  fragment when convenient. The read-only `check-bestpractices-levels` gate is already
+  rebuilt in `make/checks.mk`.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.

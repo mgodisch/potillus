@@ -27,7 +27,7 @@
 # =============================================================================
 #
 # WHAT THIS CHECKS
-#   After `make screenshots` has captured the six in-app shots and rendered the
+#   After `make screenshots-android` has captured the six in-app shots and rendered the
 #   two PDF report pages, this script verifies every phone screenshot against
 #   Google Play's published requirements, so a non-conformant asset is caught
 #   locally instead of being rejected on upload.
@@ -41,8 +41,8 @@
 #
 #   MODES (optional leading flag): the eight shots have two producers, each of
 #   which validates only its own half right after generating it —
-#     --in-app   requires 01..06  (`make screenshots`)
-#     --report   requires 07..08  (`make report-pdfs`)
+#     --in-app   requires 01..06  (`make screenshots-android`)
+#     --report   requires 07..08  (`make report-pdfs-android`)
 #     (default)  requires all 8   (full-set validation)
 #   Any other PNG already on disk is still geometry-checked in every mode.
 #
@@ -68,8 +68,8 @@ MAX_SIDE = 3840      # px – Play maximum for any side
 MAX_RATIO = 2.0      # long:short side – Play maximum aspect ratio
 
 # The eight per-locale phone screenshots split by PRODUCER: the in-app shots
-# 01..06 come from `make screenshots` (screengrab on a device); the report pages
-# 07..08 come from `make report-pdfs` (rasterized from the per-locale PDF). Each
+# 01..06 come from `make screenshots-android` (screengrab on a device); the report pages
+# 07..08 come from `make report-pdfs-android` (rasterized from the per-locale PDF). Each
 # producer validates only its own half right after generating it, so a partial
 # set is not spuriously failed; the full eight are checked when both are present.
 IN_APP_SHOTS = (
@@ -172,8 +172,8 @@ def main(argv):
     """Validate every locale passed on the command line; non-zero on any failure.
 
     An optional leading mode flag selects which shot set is REQUIRED:
-      --in-app   only the in-app shots 01..06 (used by `make screenshots`)
-      --report   only the report pages 07..08 (used by `make report-pdfs`)
+      --in-app   only the in-app shots 01..06 (used by `make screenshots-android`)
+      --report   only the report pages 07..08 (used by `make report-pdfs-android`)
       (default)  all eight (used when validating a complete set)
     """
     args = argv[1:]

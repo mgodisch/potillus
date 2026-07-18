@@ -395,20 +395,20 @@ def main() -> int:
         if missing and not stale:
             print(
                 f"render-guide: {len(missing)} guide(s) not rendered yet — "
-                "`make guides` will create them; nothing to check"
+                "`make -C android guides` will create them; nothing to check"
             )
         if stale:
             sys.stderr.write(
                 "render-guide: the following generated guides are out of date:\n"
                 + "".join(f"  {p}\n" for p in stale)
-                + "Run `make guides`.\n"
+                + "Run `make -C android guides`.\n"
             )
             return 1
         if doc_stale:
             sys.stderr.write(
                 "render-guide: the committed English guide is missing or stale:\n"
                 f"  {os.path.relpath(doc_path, ROOT)}\n"
-                "Run `make guides`.\n"
+                "Run `make -C android guides`.\n"
             )
             return 1
         print(f"render-guide: all {len(langs)} guides up to date.")

@@ -42,7 +42,7 @@ package de.godisch.potillus.screenshot
 //
 //   The remaining two assets (07/08) are the two pages of the localized PDF
 //   report; they are NOT screenshots and are rendered from the committed
-//   ../fastlane/report-pdf/potillus_report_<de|en>.pdf files by the `make screenshots`
+//   ../fastlane/report-pdf/potillus_report_<de|en>.pdf files by the `make screenshots-android`
 //   Makefile target AFTER this suite runs (see android/Makefile). The numeric
 //   filename prefixes guarantee the Play console lists all eight assets 1..8 in
 //   lexicographic order.
@@ -134,11 +134,11 @@ package de.godisch.potillus.screenshot
 //   any of the 21 shipped languages.
 //
 // HOW TO RUN
-//   Normally via:   make screenshots         (drives demo mode + both locales)
+//   Normally via:   make screenshots-android         (drives demo mode + both locales)
 //   Directly:       ./gradlew connectedDebugAndroidTest
 //                   (captures in the device's current locale; no demo mode)
 //   This suite is tagged @ScreenshotOnly so it can be excluded on demand — see
-//   ScreenshotOnly.kt and `make test-device EXCLUDE_SCREENSHOTS=1`.
+//   ScreenshotOnly.kt and `make device-tests-android EXCLUDE_SCREENSHOTS=1`.
 // =============================================================================
 
 import android.content.Context

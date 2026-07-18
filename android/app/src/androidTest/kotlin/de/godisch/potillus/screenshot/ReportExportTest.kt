@@ -31,7 +31,7 @@ package de.godisch.potillus.screenshot
 //
 // WHAT THIS PRODUCES
 //   The two report pages that the store pipeline needs (07_report_page_1 /
-//   08_report_page_2) are rasterized by `make screenshots-pdf` from a per-locale
+//   08_report_page_2) are rasterized by `make screenshots-pdf-android` from a per-locale
 //   source PDF `fastlane/report-pdf/potillus_report_<locale>.pdf`. Extracting them
 //   by hand is tedious. This test drives the export ONCE per locale so a human
 //   only has to confirm the system "Save as PDF" dialog — the file name is even
@@ -59,7 +59,7 @@ package de.godisch.potillus.screenshot
 //   androidTest source set.
 //
 // HOW IT IS INVOKED (and why it is inert otherwise)
-//   Only the dedicated `make report-pdfs` target runs it, once per locale:
+//   Only the dedicated `make report-pdfs-android` target runs it, once per locale:
 //
 //       adb shell am instrument -w \
 //         -e class de.godisch.potillus.screenshot.ReportExportTest \
@@ -67,8 +67,8 @@ package de.godisch.potillus.screenshot
 //         de.godisch.potillus.debug.test/androidx.test.runner.AndroidJUnitRunner
 //
 //   Because it needs a human at the device, it must NEVER run in the ordinary
-//   `connectedDebugAndroidTest` / `make test-device` gate or during
-//   `make screenshots` (screengrab selects this whole package). The guard is a
+//   `connectedDebugAndroidTest` / `make device-tests-android` gate or during
+//   `make screenshots-android` (screengrab selects this whole package). The guard is a
 //   single Assume in [setUp]: without `-e reportExport true` the test is SKIPPED
 //   (a JUnit assumption failure, not an error), so no Activity is launched and no
 //   dialog opens. That keeps the exclusion self-contained here — no build.gradle
@@ -134,7 +134,7 @@ class ReportExportTest {
      */
     @Before
     fun setUp() {
-        // GUARD: only the explicit `make report-pdfs` invocation sets this.
+        // GUARD: only the explicit `make report-pdfs-android` invocation sets this.
         assumeTrue(
             "ReportExportTest runs only when invoked with -e reportExport true",
             InstrumentationRegistry.getArguments().getString("reportExport")?.toBoolean() == true,
@@ -183,7 +183,7 @@ class ReportExportTest {
      * (the print dialog needs an Activity context and a foreground window), opens
      * the system "Save as PDF" dialog with a locale-named print job, and then
      * blocks until the human has finished in the dialog and the app is foreground
-     * again — at which point the instrumentation returns and `make report-pdfs`
+     * again — at which point the instrumentation returns and `make report-pdfs-android`
      * advances to the next locale.
      */
     @Test
@@ -243,7 +243,7 @@ class ReportExportTest {
 
     /**
      * The locale tag used BOTH for the file name and for content localization,
-     * taken from the `testLocale` instrumentation argument that `make report-pdfs`
+     * taken from the `testLocale` instrumentation argument that `make report-pdfs-android`
      * passes (one of the store-locale directory names, e.g. "de-DE", "fr",
      * "zh-CN"). screengrab-style callers may spell it "de_DE"; normalize to '-'.
      * Falls back to the device locale if the argument is somehow absent.

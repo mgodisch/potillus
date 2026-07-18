@@ -32,7 +32,7 @@ package de.godisch.potillus.screenshot
 // WHY THIS ANNOTATION EXISTS
 //   The Play-Store screenshot-capture suite (ScreenshotTest) is a *normal*
 //   instrumented test: by project decision it runs as part of the everyday
-//   `connectedDebugAndroidTest` / `make test-device` gate, so a regression in
+//   `connectedDebugAndroidTest` / `make device-tests-android` gate, so a regression in
 //   the capture flow is noticed immediately and not only at release time.
 //
 //   Occasionally, though, you want a fast device-test run WITHOUT the (slower)
@@ -45,11 +45,11 @@ package de.godisch.potillus.screenshot
 //   Gradle property (wired in app/build.gradle.kts defaultConfig):
 //       ./gradlew connectedDebugAndroidTest -PexcludeScreenshotTests
 //   Makefile convenience wrapper:
-//       make test-device EXCLUDE_SCREENSHOTS=1
+//       make device-tests-android EXCLUDE_SCREENSHOTS=1
 //   Raw instrumentation argument (equivalent, for reference):
 //       -e notAnnotation de.godisch.potillus.screenshot.ScreenshotOnly
 //
-//   The `make screenshots` capture flow is unaffected by the switch: the
+//   The `make screenshots-android` capture flow is unaffected by the switch: the
 //   `fastlane screengrab` run selects the screenshot package explicitly
 //   (Screengrabfile `use_tests_in_packages`) rather than relying on this tag.
 //

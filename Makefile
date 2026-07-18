@@ -31,19 +31,14 @@
 #      make -C android <target>     the Android build (Gradle)
 #      make -C ios     <target>     the iOS build (XcodeGen / xcodebuild)
 #
-#  The tooling is being rebuilt one target group at a time. THIS revision defines
-#  the HOUSEKEEPING targets only; the other groups (build, test, store assets,
-#  publishing, checks) are added in later steps. The previous, monolithic Makefile
-#  is preserved verbatim under attic/ as a reference while the rebuild proceeds.
+#  Repository-wide concerns also live in the include fragments under make/ (guard,
+#  store, checks, release, publish). Run `make help` for the full target list: it is
+#  the single source of truth, so this header no longer duplicates it.
 #
-#  TARGETS IN THIS REVISION
-#    help               (default) print this list and do nothing else
-#    clean              build OUTPUT of BOTH platforms (fans out)
-#    distclean          clean + generated sources of BOTH platforms (fans out)
-#    clean-android      Android build output only
-#    distclean-android  Android build output + generated sources
-#    clean-ios          iOS build output only
-#    distclean-ios      iOS build output + generated sources
+#  The previous, monolithic Makefiles are preserved verbatim under attic/ as a
+#  reference. attic/ stays until the last deferred recipe -- the bestpractices-json
+#  / bestpractices-jsonc badge-maintenance targets -- is ported out of it (see
+#  docs/ROADMAP.md).
 # =============================================================================
 
 # =============================================================================

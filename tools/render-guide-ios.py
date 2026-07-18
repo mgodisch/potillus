@@ -207,7 +207,7 @@ def main():
     if check:
         if stale:
             print(
-                "render-guide-ios: these guides are stale; run `make ios-guides`:\n  "
+                "render-guide-ios: these guides are stale; run `make -C ios guides`:\n  "
                 + "\n  ".join(stale),
                 file=sys.stderr,
             )
@@ -215,7 +215,7 @@ def main():
         if doc_stale:
             print(
                 "render-guide-ios: the committed English guide is missing or stale; "
-                "run `make ios-guides`:\n  "
+                "run `make -C ios guides`:\n  "
                 + os.path.relpath(doc_path, ROOT),
                 file=sys.stderr,
             )
@@ -223,7 +223,7 @@ def main():
         if missing:
             print(
                 f"render-guide-ios: {len(missing)} guide(s) not rendered yet — "
-                "`make ios-guides` will create them; nothing to check"
+                "`make -C ios guides` will create them; nothing to check"
             )
     return 0
 
