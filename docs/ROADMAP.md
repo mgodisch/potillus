@@ -368,6 +368,15 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   counterpart (`xcodebuild test -scheme Potillus -destination 'platform=iOS
   Simulator,name=$(IOS_SIM_DEVICE)'`, Mac + simulator) should join it so both
   platforms have a device-test target driven from the root the same way.
+- **Rebuild the OpenSSF badge maintenance targets** (`bestpractices-json`,
+  `bestpractices-jsonc`; developer tooling). The badge-answer sync
+  (`bestpractices-json`: pull the answers from bestpractices.dev, keep the answered
+  criteria and regenerate the annotated `.bestpractices.jsonc`) and its local
+  annotation half (`bestpractices-jsonc`) still live only in the old Makefile. They
+  are maintenance-only — run by hand when the badge answers change — so they were
+  deliberately deferred out of the build-tooling rebuild; fold them into a small
+  fragment when convenient. The read-only `check-bestpractices-levels` gate is
+  already rebuilt in `make/checks.mk`.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.

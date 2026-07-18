@@ -251,6 +251,12 @@ static weight-700 Rokkitt Bold the feature-graphic badge needs from the upstream
 variable font (kept OUTSIDE the reproducibility-scanned `tools/fonts/`), so the
 committed `.ttf` lets everyone render byte-identically without fonttools installed.
 
+Deliberately deferred (tracked on the roadmap): the OpenSSF badge maintenance
+targets `bestpractices-json`/`bestpractices-jsonc` (run by hand when the badge
+answers change) and the decomposition of the `tools/release-check.sh` monolith,
+which the release path uses as-is for now. The read-only `check-bestpractices-levels`
+gate is already rebuilt in `make/checks.mk`.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and
