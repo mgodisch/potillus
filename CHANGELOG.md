@@ -341,6 +341,20 @@ because their limits are explicit inputs, not defaults. This corrects the earlie
 that the JSON vectors were all arbitrary and safe to leave: for backup-settings that
 was true only of the explicit cases, not the default-fallback ones.
 
+Fixed the iOS reproducibility check, which rejected its own honest build. On a real
+Mac the two archives differed — but by exactly the 16-byte Mach-O `LC_UUID` and nothing
+else (a byte diff of 18; `otool -l` showed only the UUID; no path appeared in the
+binary's strings). The cause was the recipe itself: the two builds used two different
+`derivedDataPath`s, and Apple's linker folds the input object files' paths into the
+UUID, so identical code under different intermediate paths gets a different UUID — the
+one thing that then differs. The build is reproducible; the check was comparing two
+things it had made non-identical. Both archives now build into a single shared
+`derivedDataPath`, cleaned before each so they stay independent while using identical
+intermediate paths, which makes the UUID — and thus the whole unsigned payload —
+match. The fatal-on-mismatch behaviour is unchanged, so a genuine divergence still
+stops the release. Needs a Mac to confirm it now stages; the diagnosis came from the
+two archives the failed run left on disk.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

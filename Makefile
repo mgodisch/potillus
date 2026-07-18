@@ -460,19 +460,26 @@ release-ios: ios-project
 	# needs no provisioning profile (an automatic-signing archive would provision a
 	# *Development* profile, issued only for a REGISTERED DEVICE) and sidesteps signing
 	# GRDB's SwiftPM resource bundle; the export step mints the DISTRIBUTION certificate
-	# through -allowProvisioningUpdates. Each build gets its OWN clean derivedDataPath so
-	# neither reuses incremental state; DEVELOPMENT_TEAM is passed so team-scoped lookups
-	# resolve. The FIRST archive is the throwaway reference; the SECOND is the one
-	# exported and staged. errexit aborts the release if either archive fails.
+	# through -allowProvisioningUpdates. Both builds use the SAME derivedDataPath,
+	# cleaned before each: Apple's linker folds the input object files' PATHS into the
+	# Mach-O LC_UUID, so two builds under DIFFERENT derivedDataPaths emit byte-identical
+	# code but a different UUID -- the only bytes that then differ, which this very check
+	# would (and first did) reject. One clean shared path makes the .o paths, and thus
+	# the UUID, identical; the rm below keeps each build clean. DEVELOPMENT_TEAM is passed
+	# so team-scoped lookups resolve. The FIRST archive is the throwaway reference; the
+	# SECOND is the one exported and staged. errexit aborts the release if an archive fails.
 	xcodebuild archive \
 		-project "$(IOS_XCODEPROJ)" \
 		-scheme "$(IOS_SCHEME)" \
 		-configuration Release \
 		-destination 'generic/platform=iOS' \
 		-archivePath "$(IOS_REPRO_DIR)/Potillus.xcarchive" \
-		-derivedDataPath "$(IOS_REPRO_DIR)/dd" \
+		-derivedDataPath "$(IOS_BUILD_DIR)/dd" \
 		DEVELOPMENT_TEAM="$$team" \
 		CODE_SIGNING_ALLOWED=NO
+	# Clean the shared derivedDataPath so build #2 is independent of build #1 yet uses
+	# the identical intermediate paths (see the UUID note above); build into $(IOS_ARCHIVE).
+	rm -rf "$(IOS_BUILD_DIR)/dd"
 	xcodebuild archive \
 		-project "$(IOS_XCODEPROJ)" \
 		-scheme "$(IOS_SCHEME)" \
