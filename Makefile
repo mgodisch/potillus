@@ -103,6 +103,12 @@ help:
 	@echo "  make release-ios      archive, export a signed IPA + SBOM, stage into releases/"
 	@echo "  make ios-sbom         generate the iOS CycloneDX SBOM only"
 	@echo
+	@echo "Publishing (upload already-staged artifacts; never builds or signs):"
+	@echo "  make tgz              build the source release tarball"
+	@echo "  make push-playstore   upload the staged AAB to Google Play  [git tag + signature gated]"
+	@echo "  make push-appstore    upload the staged IPA to the App Store  [Mac; tag + signature gated]"
+	@echo "  make push-codeberg    publish the Codeberg release + verify each asset checksum"
+	@echo
 	@echo "None of these touch releases/ -- staged release artifacts are removed by hand."
 
 # =============================================================================
@@ -168,3 +174,12 @@ include make/checks.mk
 # and checks because it reuses their locales/paths. `release-ios` and the
 # release-check.sh decomposition are later revisions (see docs/ROADMAP.md).
 include make/release.mk
+
+# =============================================================================
+# PUBLISHING
+# =============================================================================
+# Uploading the staged artifacts (Google Play, App Store, Codeberg) and building
+# the source tarball live in their own fragment; see make/publish.mk. Included last
+# because it reuses release.mk's staged paths and version, and never builds or signs
+# anything itself.
+include make/publish.mk

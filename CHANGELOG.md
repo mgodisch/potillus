@@ -222,6 +222,19 @@ at export and stages the `.ipa` plus the iOS SBOM into `releases/`. `ios-sbom`
 (gen-ios-sbom.py + the shared sbom-normalize.py) is standalone and mirrors the
 Android `sbom`. Neither uploads -- that is the fastlane iOS lanes.
 
+Publishing lands in the last fragment, `make/publish.mk` (a root include). These
+targets UPLOAD the already-staged, already-signed artifacts and build the source
+tarball -- they never build or sign. `tgz` derives its exclude set from
+`.gitignore` (so the two cannot drift); `push-playstore` and `push-appstore`
+upload the staged AAB/IPA to their stores,
+each gated on the `v<VERSION>` git tag existing (they never create it) and on the
+artifact carrying the expected signing key (the AAB's jarsigner+keytool SHA-256, or
+the IPA's codesign team), pinned against the single fingerprint in SECURITY.md;
+`push-appstore-preflight` isolates the App Store credential check, and
+`push-codeberg` publishes the Codeberg release and verifies each uploaded asset's
+sha256. Each fails fast if an artifact, credential or tag is missing, so a push only
+ever runs against something built explicitly.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and
