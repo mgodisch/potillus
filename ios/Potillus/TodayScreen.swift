@@ -55,6 +55,14 @@ struct TodayScreen: View {
     /// The entry being edited, if any — drives the edit sheet, as on the calendar.
     @State private var editingEntry: ConsumptionEntry?
 
+    /// The entry a delete gesture is asking to remove, if any. Set by the swipe
+    /// or the edit-mode badge and cleared by the confirmation alert; a delete is
+    /// never performed the instant the gesture fires. This is the parity with
+    /// Android, whose Today screen removes an entry only through an `AlertDialog`
+    /// (`delete_confirm`) — a consumption record is a fact the user cannot
+    /// reconstruct, so it costs a confirmation, not a single stray tap.
+    @State private var pendingDeletion: ConsumptionEntry?
+
     /// Kept so the overflow menu's Settings sheet can be built; the screen owns
     /// its own model.
     private let environment: AppEnvironment
@@ -89,6 +97,17 @@ struct TodayScreen: View {
                     }
                     .disabled(model.state.drinks.isEmpty)
                     .accessibilityIdentifier("nav.addDrink")
+                }
+                // The visible way into deletion, as Apple's own list apps do it:
+                // `EditButton` toggles the list's edit mode, where each row shows a
+                // red delete badge. It replaces the per-row trash icon the row used
+                // to carry — a control Apple's guidance keeps in an edit mode or a
+                // detail view, not stamped on every row. Shown only when there is
+                // something to edit, so it never toggles an empty list.
+                if !model.state.entries.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
+                    }
                 }
             }
             .task { model.start() }
@@ -157,6 +176,30 @@ struct TodayScreen: View {
                 Button(Loc.string("OK", locale: locale), role: .cancel) {}
             } message: { message in
                 Text(message)
+            }
+            // The delete confirmation, shown by both the swipe and the edit-mode
+            // badge. It mirrors Android's Today `AlertDialog`: a red "Delete" and a
+            // "Cancel", naming the drink, so removing a logged entry is always a
+            // two-step, reversible act. Built like the Drinks screen's own delete
+            // alert, down to the `Binding` that clears the pending entry on
+            // dismissal.
+            .alert(
+                Loc.string("Delete", locale: locale),
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { presented in if !presented { pendingDeletion = nil } }
+                ),
+                presenting: pendingDeletion
+            ) { entry in
+                Button(Loc.string("Delete", locale: locale), role: .destructive) {
+                    Task { await model.deleteEntry(entry) }
+                    pendingDeletion = nil
+                }
+                Button(Loc.string("Cancel", locale: locale), role: .cancel) {
+                    pendingDeletion = nil
+                }
+            } message: { entry in
+                Text(Loc.string("Really delete “%@”?", entry.drinkName, locale: locale))
             }
         }
     }
@@ -283,12 +326,15 @@ struct TodayScreen: View {
             ForEach(model.state.entries, id: \.id) { entry in
                 entryRow(entry)
             }
-            // Kept alongside the buttons: a swipe is the gesture an iOS reader
-            // reaches for without being shown it, and taking it away to match a
-            // screen that never had it would be parity bought with a habit.
+            // The swipe and the edit-mode badge both land here. Without a
+            // `List(selection:)` the edit mode deletes one row at a time, so the
+            // set holds a single entry; we take the first and hand it to the
+            // confirmation alert rather than deleting on the spot (see
+            // `pendingDeletion`).
             .onDelete { offsets in
-                let doomed = offsets.map { model.state.entries[$0] }
-                Task { for entry in doomed { await model.deleteEntry(entry) } }
+                if let first = offsets.map({ model.state.entries[$0] }).first {
+                    pendingDeletion = first
+                }
             }
         }
     }
@@ -307,54 +353,51 @@ struct TodayScreen: View {
 // a same-file extension still sees the view's `locale` and `model`.
 extension TodayScreen {
 
-    /// One entry: the drink, its detail line and its note, then edit and delete.
+    /// One entry: the drink, its detail line and its note. The whole row is the
+    /// edit affordance now — tapping it opens the same sheet the pencil used to.
     ///
-    /// Built like the calendar's row, because Android draws BOTH screens with the
-    /// same `EntryListItem`. Here the row had been a bare name-and-grams line with
-    /// only a swipe to delete and no way to edit at all: today's mistyped entry is
-    /// the single likeliest thing a user wants to correct, and it was the one entry
-    /// they could not.
+    /// The row is a `Button`, not an `HStack` with an `.onTapGesture`, on purpose:
+    /// SwiftUI suppresses a row button's action while the list is in edit mode, so
+    /// tapping a row to delete it never also opens the editor. The pencil and trash
+    /// icons the row used to carry are gone — edit is the row tap, delete is the
+    /// swipe or the edit-mode badge — matching how Apple's list apps behave once
+    /// the row's primary tap is spoken for.
     private func entryRow(_ entry: ConsumptionEntry) -> some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(entry.drinkName)
-                Text(entryDetail(entry))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if !entry.note.isEmpty {
-                    Text(entry.note)
+        Button {
+            editingEntry = entry
+        } label: {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.drinkName)
+                    Text(entryDetail(entry))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    if !entry.note.isEmpty {
+                        Text(entry.note)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
+                Spacer()
             }
-            Spacer()
-            Button {
-                editingEntry = entry
-            } label: {
-                Image(systemName: "pencil")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
-            .accessibilityLabel(Loc.string("Edit %@", entry.drinkName, locale: locale))
-
-            Button(role: .destructive) {
-                Task { await model.deleteEntry(entry) }
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.red)
-            .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
-    /// "HH:mm · <ml> ml · <percent> % · <grams> g" in the in-app locale, the same
-    /// fields the calendar's row shows. The time uses the device zone (a wall clock
-    /// the user recognises), the numbers the in-app locale.
+    /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the same
+    /// fields — and now the same time rendering — the calendar's row shows. The
+    /// time uses the device zone (a wall clock the user recognises); its FORMAT
+    /// follows the in-app locale via `setLocalizedDateFormatFromTemplate("Hm")`,
+    /// so a 12-hour locale reads "6:30 PM" and a 24-hour one "18:30". This used to
+    /// be a hard-coded "HH:mm", which showed the same entry as "18:30" here but
+    /// "6:30 PM" on the calendar for a 12-hour locale — the two rows claimed to be
+    /// identical while disagreeing. They now share the calendar's formatter setup.
     private func entryDetail(_ entry: ConsumptionEntry) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate("Hm")
         let time = formatter.string(
             from: Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
         )

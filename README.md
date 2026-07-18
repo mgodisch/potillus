@@ -31,7 +31,7 @@ apply to it are stated in the accompanying COPYING.md file.
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13480/badge)](https://www.bestpractices.dev/projects/13480)
 [![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 
-## About the App (v0.83.1)
+## About the App (v0.84.0)
 
 **Libellus Potionis** is a privacy-first, free, open-source, and ad-free
 alcohol consumption tracker designed to help users monitor, pace, and manage

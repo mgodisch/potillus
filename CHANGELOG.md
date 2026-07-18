@@ -40,22 +40,89 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
-## v0.83.1
+## v0.84.0
 
-Fix store upload paths for both stores
+Move iOS entry delete and edit to edit mode
 
-This opens the 0.83.1 cycle with the version bump — `versionCode` 94 → 95 and the
-human version 0.83.0 → 0.83.1. It exists because publishing v0.83.0 for real
-found two path defects that no gate could have caught: both live in the seam
-between this repository's layout and what fastlane assumes about it, and both only
-speak when a store is actually on the other end. v0.83.0 was tagged and its
-bundle is in the Play alpha track, so its entry below is closed; the corrections
-belong here.
+This version does two things. Its headline is an iOS interaction rework — the
+per-row trash and pencil icons on the Today, Drinks and Calendar screens give way
+to the native edit-mode-and-tap model Apple's own list apps use — and it also
+absorbs the store-path corrections that had been drafted for 0.83.1. **0.83.1 is
+cancelled and was never published**; its `versionCode` 95 was never shipped, so
+0.84.0 inherits it. The human version therefore steps 0.83.0 → 0.84.0 (a minor
+bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
+carried by 0.84.0 — and everything that cycle had prepared is folded in below.
 
-The store notes are still English-only: `changelogs/95.txt` exists for `en-US`,
-and the remaining 20 locales — plus the iOS `release_notes.txt`, which are not
-versionCode-keyed and still describe the 0.83.0 changes the App Store has yet to
-receive — follow at release time, once this cycle has taken its final shape.
+### iOS: delete and edit move to the native edit-mode model
+
+The three iOS screens that list rows — Today's entries, the Drinks catalogue and
+the Calendar's selected-day entries — each carried a small red trash icon (and,
+on the entry rows, an edit pencil) stamped onto every row. That is Android's row
+idiom, imported verbatim. Apple's guidance keeps a row's destructive action in an
+*edit mode* or a detail view rather than on the face of every row, and reserves a
+row's less-frequent actions for a long-press context menu; the
+[Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
+put it plainly for gestures — offer a visible way to perform an action, but let
+edit mode or a context menu carry it, not a permanent per-row button. This change
+adopts that model:
+
+- **Delete is now the toolbar `EditButton` plus swipe, on all three screens.**
+  `EditButton` toggles the list's edit mode, where each row shows the standard red
+  delete badge; a trailing swipe reaches the same place. Both routes are wired
+  through a single `.onDelete`, and the button appears only when the list actually
+  has something to act on. The per-row trash icon is gone from every screen.
+- **Delete is always confirmed now — the parity defect this uncovered.** Android
+  removes a Today or Calendar entry only through an `AlertDialog` (`delete_confirm`);
+  iOS had been deleting those entries the instant the gesture fired, with no
+  confirmation at all — while, inconsistently, it *did* confirm deleting a *drink*
+  (a definition rebuilt in seconds) but not a *consumption entry* (a fact the user
+  cannot reconstruct). Both entry screens now route their delete through the same
+  confirmation the Drinks screen already used (`Really delete “%@”?`, a red
+  `Delete`, a `Cancel`), so no entry is ever removed by a single stray gesture.
+- **Editing moves off the row.** On Today and Calendar, whose rows had no other
+  tap action, the whole row is now the edit affordance — tapping it opens the same
+  sheet the pencil used to, and because the row is a `Button`, SwiftUI suppresses
+  that tap while the list is in edit mode, so a delete-tap never also opens the
+  editor. On Drinks the row tap is already spoken for (it *logs* the drink, the
+  many-times-a-day action), so editing a drink moves to a **long-press context
+  menu** — Apple's place for a row whose primary tap is taken — carrying Edit and
+  Delete. The row's raw tap-to-log is gated on the edit-mode state so it stands
+  down while the list is being edited.
+- **The Calendar screen was rebuilt from a `ScrollView` onto a `List`.** Swipe,
+  the edit-mode badge and `EditButton` live only in a `List`'s `ForEach`, and the
+  calendar had none — its selected-day swipe-to-delete simply did not exist. The
+  month header, weekday row and day grid now ride in a separator-hidden, inset-
+  zeroed section so they keep their edge-to-edge look, and the selected day's
+  entries are a second section that carries `.onDelete`. This closes the gap where
+  the calendar was the one entry list a user could not swipe.
+
+No new user-facing strings were needed: `Delete`, `Cancel`, `Really delete “%@”?`,
+`Edit %@` and `Delete %@` already exist in all 21 locales, so the change touches no
+translation and trips no locale-parity gate.
+
+Fixed in passing, a rendering slip the rework sat next to: **the Today row's time
+ignored the in-app locale.** Its detail line hard-coded `HH:mm` while the
+calendar's identical-looking row used a locale-aware
+`setLocalizedDateFormatFromTemplate("Hm")`, so the very same entry read `18:30` on
+Today but `6:30 PM` on the calendar for a 12-hour locale — two rows that claimed
+to show the same fields while disagreeing on one. Today now shares the calendar's
+formatter setup, and the calendar's own stale `HH:mm` docstring (its code was
+already correct) was corrected to match.
+
+### Folded in from the cancelled 0.83.1: store upload path fixes
+
+The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
+as part of 0.84.0. It exists because publishing v0.83.0 for real found path
+defects that no gate could have caught: they live in the seam between this
+repository's layout and what fastlane assumes about it, and only speak when a
+store is actually on the other end. v0.83.0 was tagged and its bundle is in the
+Play alpha track, so its entry below is closed; the corrections belong here.
+
+The store notes are still English-only: `changelogs/95.txt` exists for `en-US`
+(now describing 0.84.0), and the remaining 20 locales — plus the iOS
+`release_notes.txt`, which are not versionCode-keyed and still describe the 0.83.0
+changes the App Store has yet to receive — follow at release time, once this cycle
+has taken its final shape.
 
 - **The Play preflight looked for the key one directory too deep.** `push-playstore`
   passed `fastlane/play-store-credentials.json` — repo-root-relative, and correct

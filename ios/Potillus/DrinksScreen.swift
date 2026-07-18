@@ -41,6 +41,13 @@ struct DrinksScreen: View {
     @Environment(\.appLocale) private var locale
     @Environment(\.scenePhase) private var scenePhase
 
+    /// Read so the row's tap-to-log can stand down while the list is in edit mode.
+    /// A row is a raw `.onTapGesture` here — it cannot be a `Button`, because it
+    /// already contains one (the favourite star), and SwiftUI does not suppress a
+    /// raw gesture in edit mode the way it suppresses a button. Without this guard,
+    /// tapping a row to delete it would also log the drink.
+    @Environment(\.editMode) private var editMode
+
     @State private var model: DrinksModel
     @State private var logger: EntryLogModel
     @State private var capacity: DrinkCapacityModel
@@ -72,15 +79,40 @@ struct DrinksScreen: View {
                 ForEach(model.state.drinks, id: \.id) { drink in
                     row(drink)
                 }
+                // Both the swipe and the edit-mode badge land here. Without a
+                // `List(selection:)` the edit mode removes one row at a time, so the
+                // set holds a single drink; it opens the same confirmation the
+                // context menu uses (`deleting`), never deleting on the spot. This
+                // replaces the row's own `.swipeActions`, which could not show a
+                // badge in edit mode.
+                .onDelete { offsets in
+                    if let first = offsets.map({ model.state.drinks[$0] }).first {
+                        model.clearErrors()
+                        deleting = first
+                    }
+                }
             }
             .navigationTitle(Loc.string("Drinks", locale: locale))
             .appOverflowMenu(environment: environment)
             .toolbar {
-                Button {
-                    model.clearErrors()
-                    isAdding = true
-                } label: {
-                    Label(Loc.string("Add Drink", locale: locale), systemImage: "plus")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        model.clearErrors()
+                        isAdding = true
+                    } label: {
+                        Label(Loc.string("Add Drink", locale: locale), systemImage: "plus")
+                    }
+                }
+                // The visible delete path, replacing the per-row trash icon:
+                // `EditButton` toggles edit mode, where each row shows a red delete
+                // badge. Editing a drink is reached by a long press (the context
+                // menu below) because the row's tap already logs; deleting stays
+                // visible here so it is not a hidden-only gesture. Shown only when
+                // there is a drink to act on.
+                if !model.state.drinks.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        EditButton()
+                    }
                 }
             }
             .task { model.start(); capacity.start() }
@@ -215,51 +247,39 @@ struct DrinksScreen: View {
             }
 
             Spacer()
-
-            // The pencil, not the row, opens the editor. Tapping a drink LOGS it:
-            // that is the action a user performs many times a day, and editing is
-            // the rare one. Android makes the same split.
-            Button {
-                model.clearErrors()
-                editing = drink
-            } label: {
-                Image(systemName: "pencil")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
-            .accessibilityLabel(Loc.string("Edit %@", drink.name, locale: locale))
-
-            // A little breathing room so the pencil and trash do not crowd each
-            // other, matching the gap Android's row leaves between them.
-            Spacer().frame(width: 12)
-
-            // The trash button mirrors Android's row, which shows a delete
-            // affordance without requiring a swipe. It does not delete on the spot:
-            // it opens the same confirmation the swipe now uses, so a misplaced tap
-            // costs a dialog, not a drink. Drawn in the system red to read as
-            // destructive, matching Android's danger tint.
-            Button {
-                model.clearErrors()
-                deleting = drink
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.red)
-            .accessibilityLabel(Loc.string("Delete %@", drink.name, locale: locale))
         }
         .contentShape(Rectangle())
+        // Tapping a drink LOGS it: the action a user performs many times a day.
+        // Editing is the rare one, so it moves off the row entirely — the pencil
+        // and trash icons the row used to carry are gone. This is the one screen
+        // whose row tap is already spoken for, so its edit affordance cannot be the
+        // row tap (as it is on Today and the calendar); it becomes the long-press
+        // context menu below, the iOS place for a row's less-frequent actions.
         .onTapGesture {
+            // Standing down in edit mode: there the tap belongs to deletion, not
+            // logging (see `editMode`).
+            guard editMode?.wrappedValue.isEditing != true else { return }
             logger.clearFailure()
             logging = drink
         }
         .accessibilityHint(Loc.string("Logs this drink", locale: locale))
-        .swipeActions(edge: .trailing) {
+        // Long press reveals edit and delete — Apple's pattern for a row whose tap
+        // is taken. The labels are name-qualified so VoiceOver reads "Edit Beer",
+        // and delete carries the destructive role for its red styling. Delete opens
+        // the same confirmation the swipe and edit-mode badge use; it does not
+        // delete on the spot.
+        .contextMenu {
+            Button {
+                model.clearErrors()
+                editing = drink
+            } label: {
+                Label(Loc.string("Edit %@", drink.name, locale: locale), systemImage: "pencil")
+            }
             Button(role: .destructive) {
                 model.clearErrors()
                 deleting = drink
             } label: {
-                Label(Loc.string("Delete", locale: locale), systemImage: "trash")
+                Label(Loc.string("Delete %@", drink.name, locale: locale), systemImage: "trash")
             }
         }
     }

@@ -49,6 +49,13 @@ struct CalendarScreen: View {
     /// Android's calendar edit action).
     @State private var editingEntry: ConsumptionEntry?
 
+    /// The entry a delete gesture is asking to remove, if any. Set by the swipe or
+    /// the edit-mode badge, cleared by the confirmation alert; the calendar never
+    /// deleted an entry without a dialog on Android (`delete_confirm`), and now iOS
+    /// does not either. See `pendingDeletion` on the Today screen for the full
+    /// rationale — this is the same guard on the same kind of record.
+    @State private var pendingDeletion: ConsumptionEntry?
+
     /// Set while the "+" sheet is open, logging onto the selected day.
     @State private var isLogging = false
 
@@ -68,12 +75,25 @@ struct CalendarScreen: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                monthHeader
-                weekdayHeader
-                grid
+            // A `List`, not a `ScrollView`: the day's entries need `.onDelete` for
+            // the swipe and the edit-mode badge, and those live only in a List's
+            // `ForEach`. The month — header, weekday row, grid — rides along as a
+            // Section whose separators are hidden and whose insets are zeroed, so it
+            // keeps the edge-to-edge look it had in the ScrollView (each of those
+            // views carries its own `.padding(.horizontal)`).
+            List {
+                Section {
+                    monthHeader
+                    weekdayHeader
+                    grid
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
+
                 if model.state.selectedDate != nil { selectedDay }
             }
+            .listStyle(.plain)
             .navigationTitle(Loc.string("Calendar", locale: locale))
             .appOverflowMenu(environment: environment)
             .toolbar {
@@ -91,6 +111,14 @@ struct CalendarScreen: View {
                             Label(Loc.string("Add Entry", locale: locale), systemImage: "plus")
                         }
                         .disabled(model.state.drinks.isEmpty)
+                    }
+                }
+                // Edit mode for the day's entries, the visible delete path that
+                // replaces the per-row trash icon. Shown only when the selected day
+                // actually has entries to act on.
+                if !model.state.selectedEntries.isEmpty {
+                    ToolbarItem(placement: .primaryAction) {
+                        EditButton()
                     }
                 }
             }
@@ -117,6 +145,50 @@ struct CalendarScreen: View {
                     )
                     return model.failure == nil
                 }
+            }
+            // The edit sheet, moved here from the selected-day block: it now hangs
+            // off the List rather than the VStack that block used to be. Its body is
+            // unchanged — a one-element catalogue built from the entry, the same
+            // scope as Android's calendar edit.
+            .sheet(item: $editingEntry) { entry in
+                EntrySheet(
+                    drinks: [drink(from: entry)],
+                    preselected: drink(from: entry),
+                    now: Date(),
+                    editing: entry
+                ) { drink, volume, millis, note in
+                    var updated = entry
+                    updated.volumeMl = volume
+                    updated.timestampMillis = millis
+                    updated.note = note
+                    updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
+                        volumeMl: volume, alcoholPercent: drink.alcoholPercent
+                    )
+                    await model.updateEntry(updated)
+                    return model.failure == nil
+                }
+            }
+            // The delete confirmation, shown by the swipe and the edit-mode badge
+            // alike. It mirrors Android's calendar `AlertDialog`: a red "Delete" and
+            // a "Cancel", naming the drink, so an entry is never removed by a single
+            // stray gesture. Built like the Today screen's, down to the `Binding`.
+            .alert(
+                Loc.string("Delete", locale: locale),
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { presented in if !presented { pendingDeletion = nil } }
+                ),
+                presenting: pendingDeletion
+            ) { entry in
+                Button(Loc.string("Delete", locale: locale), role: .destructive) {
+                    Task { await model.deleteEntry(entry) }
+                    pendingDeletion = nil
+                }
+                Button(Loc.string("Cancel", locale: locale), role: .cancel) {
+                    pendingDeletion = nil
+                }
+            } message: { entry in
+                Text(Loc.string("Really delete “%@”?", entry.drinkName, locale: locale))
             }
             // `start()` loads and then subscribes; a database change in another
             // tab reaches this month without a manual reload.
@@ -272,114 +344,105 @@ struct CalendarScreen: View {
 
 extension CalendarScreen {
 
+    /// The selected day as List sections: a summary block (date, grams, the daily
+    /// bar) with its separators hidden so it reads as a caption, and a second
+    /// section of the day's entries. The entries carry `.onDelete`, so the swipe
+    /// and the edit-mode badge both reach the confirmation. The edit sheet and the
+    /// delete alert moved to the `body`'s List — this block is now content, not a
+    /// container. A `Group` lets the property hand the List two sections at once.
     private var selectedDay: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let date = model.state.selectedDate {
-                HStack {
-                    Text(date).font(.headline)
-                    Spacer()
-                    Text("\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g")
-                        .monospacedDigit()
-                        .foregroundStyle(
-                            AlcoholCalculator.isOverLimit(
-                                totalGrams: model.state.totalGramsSelected,
-                                limitGrams: model.state.limitInfo.limitGrams
-                            ) ? .red : .secondary
+        Group {
+            Section {
+                if let date = model.state.selectedDate {
+                    HStack {
+                        Text(date).font(.headline)
+                        Spacer()
+                        Text("\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g")
+                            .monospacedDigit()
+                            .foregroundStyle(
+                                AlcoholCalculator.isOverLimit(
+                                    totalGrams: model.state.totalGramsSelected,
+                                    limitGrams: model.state.limitInfo.limitGrams
+                                ) ? .red : .secondary
+                            )
+                    }
+
+                    // The daily-limit bar under the selected day, as on Android's
+                    // calendar. Only the daily gram limit is meaningful for a single
+                    // historical day, so the weekly/drink-day bars are not shown.
+                    LimitBar(
+                        caption: Loc.string("Today", locale: locale),
+                        value: "\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g",
+                        limit: "\(Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale)) g",
+                        fill: LimitGauge.fillFraction(
+                            totalGrams: model.state.totalGramsSelected,
+                            limitGrams: model.state.limitInfo.limitGrams
+                        ),
+                        emphasis: LimitGauge.emphasis(
+                            totalGrams: model.state.totalGramsSelected,
+                            limitGrams: model.state.limitInfo.limitGrams
                         )
-                }
-
-                // The daily-limit bar under the selected day, as on Android's
-                // calendar. Only the daily gram limit is meaningful for a single
-                // historical day, so the weekly/drink-day bars are not shown.
-                LimitBar(
-                    caption: Loc.string("Today", locale: locale),
-                    value: "\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g",
-                    limit: "\(Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale)) g",
-                    fill: LimitGauge.fillFraction(
-                        totalGrams: model.state.totalGramsSelected,
-                        limitGrams: model.state.limitInfo.limitGrams
-                    ),
-                    emphasis: LimitGauge.emphasis(
-                        totalGrams: model.state.totalGramsSelected,
-                        limitGrams: model.state.limitInfo.limitGrams
                     )
-                )
+                }
             }
+            .listRowSeparator(.hidden)
 
-            if model.state.selectedEntries.isEmpty {
-                Text(Loc.string("No entries for this day.", locale: locale))
-                    .foregroundStyle(.secondary)
-            }
-            ForEach(model.state.selectedEntries, id: \.id) { entry in
-                entryRow(entry)
-            }
-        }
-        .padding()
-        .sheet(item: $editingEntry) { entry in
-            // Editing keeps the entry's own drink: a one-element catalogue built
-            // from the entry, so the sheet shows the name and lets volume, time
-            // and note change — the same scope as Android's calendar edit.
-            EntrySheet(
-                drinks: [drink(from: entry)],
-                preselected: drink(from: entry),
-                now: Date(),
-                editing: entry
-            ) { drink, volume, millis, note in
-                var updated = entry
-                updated.volumeMl = volume
-                updated.timestampMillis = millis
-                updated.note = note
-                updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
-                    volumeMl: volume, alcoholPercent: drink.alcoholPercent
-                )
-                await model.updateEntry(updated)
-                return model.failure == nil
+            Section {
+                if model.state.selectedEntries.isEmpty {
+                    Text(Loc.string("No entries for this day.", locale: locale))
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(model.state.selectedEntries, id: \.id) { entry in
+                    entryRow(entry)
+                }
+                // The swipe and the edit-mode badge land here. Without a
+                // `List(selection:)` the edit mode deletes one row at a time, so the
+                // set holds a single entry; it is handed to the confirmation alert
+                // (see `pendingDeletion`), never deleted on the spot.
+                .onDelete { offsets in
+                    if let first = offsets.map({ model.state.selectedEntries[$0] }).first {
+                        pendingDeletion = first
+                    }
+                }
             }
         }
     }
 
-    /// One entry row: name and the full "time · ml · % · g" detail line (plus
-    /// the note when present), an edit pencil, and a delete in the destructive
-    /// red — matching Android's calendar `EntryListItem`. iOS previously showed
-    /// only name and grams with a plain trash and no edit (0.83.0 UI parity).
+    /// One entry row: name and the full "time · ml · % · g" detail line (plus the
+    /// note when present). The whole row is the edit affordance — tapping it opens
+    /// the sheet the pencil used to. Like Today's row it is a `Button`, so SwiftUI
+    /// suppresses the tap while the list is in edit mode and a delete-tap never also
+    /// opens the editor. The pencil and trash icons are gone: edit is the row tap,
+    /// delete is the swipe or the edit-mode badge, matching Today.
     private func entryRow(_ entry: ConsumptionEntry) -> some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(entry.drinkName)
-                Text(entryDetail(entry))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if !entry.note.isEmpty {
-                    Text(entry.note)
+        Button {
+            editingEntry = entry
+        } label: {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.drinkName)
+                    Text(entryDetail(entry))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    if !entry.note.isEmpty {
+                        Text(entry.note)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
+                Spacer()
             }
-            Spacer()
-            Button {
-                editingEntry = entry
-            } label: {
-                Image(systemName: "pencil")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
-            .accessibilityLabel(Loc.string("Edit %@", entry.drinkName, locale: locale))
-
-            Button(role: .destructive) {
-                Task { await model.deleteEntry(entry) }
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.red)
-            .accessibilityLabel(Loc.string("Delete %@", entry.drinkName, locale: locale))
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
-    /// "HH:mm · <ml> ml · <percent> % · <grams> g" in the in-app locale, the
+    /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the
     /// same fields Android's row shows. The time uses the device zone (a wall
-    /// clock the user recognises), the numbers the in-app locale.
+    /// clock the user recognises); its format follows the in-app locale via
+    /// `setLocalizedDateFormatFromTemplate("Hm")` — 12- or 24-hour as the locale
+    /// dictates — the setup the Today row now shares.
     private func entryDetail(_ entry: ConsumptionEntry) -> String {
         let formatter = DateFormatter()
         formatter.locale = locale

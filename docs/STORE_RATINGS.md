@@ -49,7 +49,7 @@ WHEN TO REVISE IT
 
 # Store age ratings and audience
 
-- **Last reviewed:** 2026-07-17 (v0.83.1)
+- **Last reviewed:** 2026-07-17 (v0.84.0)
 - **Application:** Libellus Potionis (`de.godisch.potillus`)
 
 ## The one thing to understand before touching either console
