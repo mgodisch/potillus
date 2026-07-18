@@ -127,6 +127,18 @@ call sites `await` the store's `load()`, which is `async`, but this one has no
 within 'await' expression". The stray `await` is removed; the `load()` on the next
 line keeps its own.
 
+And stopped the build from rewriting the String Catalog. With Xcode's default
+"Use Compiler to Extract Swift Strings" (`SWIFT_EMIT_LOC_STRINGS`) on, a build that
+found anything to update rewrote `ios/Potillus/Localizable.xcstrings` — re-extracting
+the direct `String(localized: "…")` plurals and reformatting every line (Xcode
+writes `"key" : value`; the committed file is stored `"key": value`) — which left a
+spurious one-file change that intermittently blocked `git pull` with "commit your
+changes or stash them". The setting is now pinned to `NO` in `ios/project.yml`: the
+catalog is the committed, manually-maintained source of truth (its parity is guarded
+by `check-l10n-parity.py`, not by Xcode's extractor), and it is still compiled into
+the bundle, so only the write-back is suppressed — the runtime is unchanged.
+`make ios-project` must be re-run once so the generated project picks the setting up.
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping

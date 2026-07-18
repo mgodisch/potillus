@@ -57,6 +57,22 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
+    # Do NOT let the build extract Swift strings back into the String Catalog.
+    # With this at Xcode's default (YES), every build that finds something to
+    # update rewrites ios/Potillus/Localizable.xcstrings — re-extracting the
+    # direct `String(localized: "…")` literals (the plurals in Localization.swift)
+    # and, because Xcode writes `"key" : value` while the committed file is stored
+    # as `"key": value`, reformatting every line. The result is a spurious working-
+    # tree change in a single file that blocks `git pull` intermittently ("commit
+    # your changes or stash them"). The catalog is this project's committed source
+    # of truth (entries are `extractionState: manual`; check-l10n-parity.py is the
+    # gate that a literal has a key, not Xcode's extractor), so the build has no
+    # business owning it. Turning extraction off does not affect the runtime: the
+    # catalog is still COMPILED into the bundle, and String(localized:) reads it —
+    # only the write-back is suppressed. Nothing in Makefile or tools/ relies on
+    # extraction. After changing this, re-run `make ios-project` (xcodegen) so the
+    # setting reaches the generated project.
+    SWIFT_EMIT_LOC_STRINGS: "NO"
     # MARKETING_VERSION and CURRENT_PROJECT_VERSION deliberately do NOT live
     # here: a value in `settings` overrides an xcconfig, which would silently
     # defeat the generator. They come from Version.xcconfig (see configFiles
