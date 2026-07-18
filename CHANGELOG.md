@@ -53,6 +53,43 @@ cancelled and was never published**; its `versionCode` 95 was never shipped, so
 bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
 carried by 0.84.0 — and everything that cycle had prepared is folded in below.
 
+### Build tooling: begin the Makefile rebuild
+
+The two hand-grown Makefiles are being replaced, one target group at a time, by
+a smaller set with a clear division of labour: a thin root `Makefile` that
+delegates to a per-platform `android/Makefile` and a NEW `ios/Makefile` (until
+now iOS had no Makefile of its own — its housekeeping lived in the root as
+`clean-ios`/`distclean-ios`), with repository-wide concerns to follow as
+`make/*.mk` includes. The previous Makefiles are preserved verbatim under
+`attic/` as a reference while the rebuild proceeds.
+
+Each revision is meant to be fully functional within its own scope. The
+foundation so far:
+
+- A shared GNU Make version guard (`make/guard.mk`, included by all three
+  Makefiles) aborts with a legible message on GNU Make older than 4.0 (macOS
+  still ships 3.81 as the system `make`). It lives in one file rather than three:
+  every Makefile declares `.ONESHELL`/`.SHELLFLAGS` as load-bearing, and a Make
+  that predates those (3.82+) does not error but silently ignores them, running
+  recipes without the strict error handling they assume. The guard turns that
+  silent degradation into a loud, single-sourced failure.
+- `clean`/`distclean` return as an honest aggregate at the root that fans out to
+  both platforms. The old root deliberately had no bare `clean`, because it would
+  have cleaned Android alone and left the entire iOS tree standing; a real
+  `ios/Makefile` makes the aggregate truthful.
+- Android `clean` deletes the build output directly (`rm -rf app/build build`)
+  instead of running `./gradlew clean`, so it needs no JVM, SDK or Gradle
+  configuration, works in a tree that cannot yet build, and matches how iOS has
+  always cleaned.
+- `clean`/`distclean` no longer depend on the build-prerequisite gate: the old
+  Android `clean: prereq` ran the whole Java/SDK/Gradle/release-check chain just
+  to tidy up.
+- Android `distclean` uses `rm -f` for the `raw*/usersguide.md` guide glob; the
+  old bare `rm` aborted under `set -e` when the glob matched nothing (a fresh
+  tree that never rendered the guides).
+
+None of these targets touch `releases/`.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and
