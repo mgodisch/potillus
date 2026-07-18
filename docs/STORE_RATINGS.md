@@ -49,7 +49,7 @@ WHEN TO REVISE IT
 
 # Store age ratings and audience
 
-- **Last reviewed:** 2026-07-17 (v0.84.0)
+- **Last reviewed:** 2026-07-18 (v0.84.0)
 - **Application:** Libellus Potionis (`de.godisch.potillus`)
 
 ## The one thing to understand about the two ratings
@@ -65,7 +65,7 @@ to check the other.
 | The axis | how *often* users encounter it | whether promotion/sale is the *focus* |
 | Ignores | why the app exists | what the app contains |
 | Answer given | Frequent | No |
-| Result | **18+** | **IARC generic 3+** |
+| Result | **18+** | **3+** |
 
 Same app, same facts, both answers true, and the outcomes as far apart as the
 scales allow. That is not an error to be reconciled. It is what happens when
@@ -91,7 +91,6 @@ Ratings / Edit → Step 2: Mature Themes
 > who has those turned on will encounter while using your app.
 >
 > - Infrequent: Users will rarely encounter this content in your app.
->
 > - Frequent: Users will regularly encounter this content in your app.
 >
 > **Alcohol, Tobacco, or Drug Use or References**
@@ -159,7 +158,6 @@ Need Attention / Actioned → Content ratings → Questionnaire
 > typically age-restricted such as cigarettes, alcohol, firearms, or gambling?
 >
 > - Yes
->
 > - No
 
 **Answer: No.**
@@ -187,12 +185,16 @@ Need Attention / Actioned → Target audience and content → Target age
 > **What are the target age groups of your app?**
 >
 > Based on your response we'll highlight any actions that you may need to take,
-> and the policies you may need to comply with. Selecting certain target age
-> groups, such as users over the age of 18, may allow additional restrictions to
-> your availability on Google Play. Make sure you review the [Developer Policy
+> and the policies you may need to comply with.
+>
+> Selecting certain target age groups, such as users over the age of 18, may
+> allow additional restrictions to your availability on Google Play.
+>
+> Make sure you review the [Developer Policy
 > Center](https://play.google.com/about/developer-content-policy/) before
-> publishing your app. Apps that don't comply with these policies may be removed
-> from Google Play. [Learn more](https://support.google.com/googleplay/android-developer/answer/9285070#age-groups)
+> publishing your app. Apps that don't comply with these policies may be
+> removed from Google Play. [Learn
+> more](https://support.google.com/googleplay/android-developer/answer/9285070#age-groups)
 >
 > - 5 and under
 > - 6–8
@@ -208,19 +210,18 @@ was designed for and is suitable for each of them. Both are true here: the app
 is built for adults, and a 16-year-old in Germany may legally drink beer and
 wine and has the same reason to track it.
 
-This is a **product decision, and an independent one**. It is not a
-consequence of the rating questionnaire, and it does not bear on Apple's
-frequency answer: targeting 16-year-olds does not make the app's alcohol
-references rarer.
+This is a **product decision, and an independent one**. It is not a consequence
+of the rating questionnaire, and it does not bear on Apple's frequency answer:
+targeting 16-year-olds does not make the app's alcohol references rarer.
 
 **A consequence worth knowing:** Play's "restrict access for minors" feature —
 which actually removes the app from search and download for users Google
-identifies as under 18, rather than merely labelling it — requires "18 and over"
-to be the *only* selected group. Selecting 16–17 as well puts it out of reach,
-deliberately. Google's "restricted content and features" policy, linked from
-the target-audience page, says the feature *must* be enabled for certain apps;
-whether an alcohol tracker is one of them is a question this file does not
-answer, and one worth settling before a Play release.
+identifies as under 18, rather than merely labelling it — requires "18 and
+over" to be the *only* selected group. Selecting 16–17 as well puts it out of
+reach, deliberately. Google's "restricted content and features" policy, linked
+from the target-audience page, says the feature *must* be enabled for certain
+apps; whether an alcohol tracker is one of them is a question this file does
+not answer, and one worth settling before a Play release.
 
 Note also that Google flags 16–17 as an age group that may count as children in
 some regions, and asks whoever targets under-21s to check local law. That is a
