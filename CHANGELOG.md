@@ -246,6 +246,11 @@ counterpart `device-tests-ios` is prepared on the roadmap. `install-debug`
 (renamed from the old `install`) copies the debug APK to `../downloads/` for
 sideloading -- it stages a file, it does not touch a device.
 
+The one-off font bake `rokkitt-bold` joins the store fragment: it instantiates the
+static weight-700 Rokkitt Bold the feature-graphic badge needs from the upstream
+variable font (kept OUTSIDE the reproducibility-scanned `tools/fonts/`), so the
+committed `.ttf` lets everyone render byte-identically without fonttools installed.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

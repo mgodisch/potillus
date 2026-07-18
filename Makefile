@@ -93,6 +93,7 @@ help:
 	@echo "  make screenshots-pdf-android  rasterize report pages 07/08 from the PDFs  [no device]"
 	@echo "  make feature-graphics-android render every locale's feature graphic  [no device]"
 	@echo "  make store-assets-android     the whole set: screenshots + PDFs + feature graphics"
+	@echo "  make rokkitt-bold     bake the static Rokkitt Bold for the badge  [one-off; commit it]"
 	@echo "Store assets (iOS):"
 	@echo "  make screenshots-ios          capture 01..06 (+ report pages 07/08)  [Mac + Simulator]"
 	@echo

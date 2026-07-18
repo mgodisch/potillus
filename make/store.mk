@@ -111,6 +111,9 @@ require-pillow = python3 -c 'import PIL' 2>/dev/null || { echo "$(1): Pillow not
 # rasterize the GPLv3 logo and the F-Droid badges. $(1) is the message prefix.
 require-rsvg = command -v rsvg-convert >/dev/null 2>&1 || { echo "$(1): 'rsvg-convert' not found -- install librsvg2-bin"; exit 1; }
 
+# Pre-flight: fonttools, used only by the one-off rokkitt-bold font bake below.
+require-fonttools = python3 -c 'import fontTools' 2>/dev/null || { echo "$(1): fonttools not found -- install it (Debian: apt install fonttools, or: pip install fonttools --break-system-packages)"; exit 1; }
+
 # ── Per-locale rules, generated for every store locale via $(eval) ────────────
 
 # report_pdf_sentinel: the per-locale source PDF is a DEVICE artifact -- exporting
@@ -480,7 +483,31 @@ store-assets-android:
 	$(MAKE) report-pdfs-android
 	$(MAKE) feature-graphics-android
 
+# =============================================================================
+# FONTS  (one-off; run once and COMMIT the result)
+# =============================================================================
+
+# rokkitt-bold: bake the STATIC Rokkitt Bold used for the "F-Droid" wordmark in the
+# feature-graphic badge from the upstream VARIABLE font under tools/fonts-src/. The
+# renderer pins fontconfig to tools/fonts/ only (for reproducibility), so a
+# resolvable static Bold must live there -- a variable font would let freetype pick
+# the 700 instance version-dependently. The variable source therefore stays OUTSIDE
+# the scanned dir and this target bakes a fixed weight-700 instance INTO
+# tools/fonts/Rokkitt/. Run it ONCE and COMMIT the generated Rokkitt-Bold.ttf;
+# everyone else then renders byte-identically without needing fonttools installed.
+ROKKITT_VF  = tools/fonts-src/Rokkitt/Rokkitt[wght].ttf
+ROKKITT_OUT = tools/fonts/Rokkitt/Rokkitt-Bold.ttf
+
+rokkitt-bold:
+	$(call require-fonttools,rokkitt-bold)
+	@test -f "$(ROKKITT_VF)" || { echo "rokkitt-bold: variable source missing: $(ROKKITT_VF) -- download Rokkitt[wght].ttf (see tools/fonts-src/Rokkitt/README.txt / COPYING.md)"; exit 1; }
+	mkdir -p tools/fonts/Rokkitt
+	python3 -m fontTools.varLib.instancer "$(ROKKITT_VF)" wght=700 --update-name-table --output "$(ROKKITT_OUT)"
+	cp tools/fonts-src/Rokkitt/OFL.txt tools/fonts/Rokkitt/OFL.txt
+	@echo "rokkitt-bold: wrote $(ROKKITT_OUT) -- COMMIT it so the feature-graphic build is deterministic for everyone."
+
 .PHONY: screenshots-pdf-android report-pdfs-android \
         feature-graphics-android feature-graphics-existing-android \
         screenshots-android screenshots-demo-off-android screenshots-ios \
-        store-assets-android
+        store-assets-android \
+        rokkitt-bold
