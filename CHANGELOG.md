@@ -109,6 +109,33 @@ license copies and the localized user guides), then `debug`, `screenshot-apks`,
 - The `help` target sits at the top of the file and is the single source of the
   target list; the header comment no longer repeats it.
 
+The iOS build layer (`ios/Makefile`) mirrors Android and replaces the iOS targets
+that lived in the old root Makefile: `version` (regenerates `Version.xcconfig` from
+the top CHANGELOG entry and the Android versionCode via `gen-ios-version.py`),
+`guides` (renders the localized in-app guides from the String Catalogue via
+`render-guide-ios.py`), the bundled `license_gpl3.md` copy, and `project`
+(`xcodegen generate`, with `version`/`guides`/license as prerequisites so the
+version and sources are current before the `.xcodeproj` freezes project.yml's
+source globs). `version-check` and `check-guides` are read-only. Targets are bare
+like Android's, so the root drives them as `make -C ios project`, and `help` sits
+at the top as the single source of the target list. This unblocks the iOS
+screenshot capture in a later revision. (The two iOS tools still print the old
+`make ios-version` / `make ios-guides` names in their messages; correcting those
+references belongs to the later tools/ cleanup.)
+
+Build-layer parity between the two platforms, with names that say what they build.
+Android's `debug` is renamed `debug-apk` and `unit-test` to `unit-tests`
+(`screenshot-apks` keeps its name: it BUILDS the debug + androidTest APKs the
+screenshot capture installs, it does not capture anything). iOS gains the
+counterparts it was missing: `build` (xcodebuild, Debug), `swift-tests` (the
+PotillusKit unit tests via `swift test`), `lint` (SwiftLint --strict, pinned to
+0.65.0) and `format` (swiftlint --fix). All four need macOS and share a
+`require-macos` prerequisite that fails with a clear message off it (e.g. on the
+Linux release path) instead of dying on a missing xcodebuild/swiftlint deeper in a
+recipe. The iOS screenshot capture is deliberately NOT hoisted here: unlike
+Android's device-free APK build, iOS build-and-capture is one simulator operation
+with no separable artifact, and screenshots are a store concern.
+
 None of these targets touch `releases/`.
 
 ### iOS: delete and edit move to the native edit-mode model

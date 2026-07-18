@@ -52,9 +52,9 @@ help:
 	@echo "Libellus Potionis -- Android build (run from android/)"
 	@echo
 	@echo "Build:"
-	@echo "  make debug            build the debug APK"
+	@echo "  make debug-apk        build the debug APK"
 	@echo "  make screenshot-apks  build the debug + androidTest APKs"
-	@echo "  make unit-test        run the JVM unit tests"
+	@echo "  make unit-tests       run the JVM unit tests"
 	@echo "  make lint             run ktlint + Android lint (build-breaking)"
 	@echo "  make format           auto-format the Kotlin sources (ktlint)"
 	@echo "  make guides           (re)render the localized user guides"
@@ -224,7 +224,7 @@ check-guides:
 # BUILD
 # =============================================================================
 
-debug: app/build/outputs/apk/debug/app-debug.apk
+debug-apk: app/build/outputs/apk/debug/app-debug.apk
 
 app/build/outputs/apk/debug/app-debug.apk: prereq
 	./gradlew assembleDebug
@@ -236,7 +236,7 @@ app/build/outputs/apk/debug/app-debug.apk: prereq
 screenshot-apks: prereq
 	./gradlew assembleDebug assembleDebugAndroidTest
 
-unit-test: prereq
+unit-tests: prereq
 	./gradlew testDebugUnitTest
 
 # ktlintCheck enforces the Kotlin style (otherwise only wired into Gradle's
@@ -282,4 +282,4 @@ distclean: clean
 	rm -f guides.d
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
-        debug screenshot-apks unit-test lint format clean distclean
+        debug-apk screenshot-apks unit-tests lint format clean distclean
