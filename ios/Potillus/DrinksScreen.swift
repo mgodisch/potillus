@@ -79,12 +79,13 @@ struct DrinksScreen: View {
                 ForEach(model.state.drinks, id: \.id) { drink in
                     row(drink)
                 }
-                // Both the swipe and the edit-mode badge land here. Without a
-                // `List(selection:)` the edit mode removes one row at a time, so the
-                // set holds a single drink; it opens the same confirmation the
-                // context menu uses (`deleting`), never deleting on the spot. This
-                // replaces the row's own `.swipeActions`, which could not show a
-                // badge in edit mode.
+                // This drives the delete badge in `EditButton`'s edit mode — the
+                // visible, swipe-free delete path. Without a `List(selection:)` the
+                // edit mode removes one row at a time, so the set holds a single
+                // drink; it opens the same confirmation the swipe's Delete uses
+                // (`deleting`), never deleting on the spot. The trailing swipe adds
+                // its own Delete and Edit alongside (see `row`); the two mechanisms
+                // are complementary, not duplicates.
                 .onDelete { offsets in
                     if let first = offsets.map({ model.state.drinks[$0] }).first {
                         model.clearErrors()
@@ -250,11 +251,11 @@ struct DrinksScreen: View {
         }
         .contentShape(Rectangle())
         // Tapping a drink LOGS it: the action a user performs many times a day.
-        // Editing is the rare one, so it moves off the row entirely — the pencil
-        // and trash icons the row used to carry are gone. This is the one screen
-        // whose row tap is already spoken for, so its edit affordance cannot be the
-        // row tap (as it is on Today and the calendar); it becomes the long-press
-        // context menu below, the iOS place for a row's less-frequent actions.
+        // Editing and deleting are the rare ones, so — this being the one screen
+        // whose row tap is already spoken for — they live in the trailing swipe,
+        // the native place for a row's secondary actions when the tap is taken
+        // (Mail is the model: tap opens, swipe acts). The per-row pencil and trash
+        // icons the row used to carry are gone.
         .onTapGesture {
             // Standing down in edit mode: there the tap belongs to deletion, not
             // logging (see `editMode`).
@@ -263,24 +264,30 @@ struct DrinksScreen: View {
             logging = drink
         }
         .accessibilityHint(Loc.string("Logs this drink", locale: locale))
-        // Long press reveals edit and delete — Apple's pattern for a row whose tap
-        // is taken. The labels are name-qualified so VoiceOver reads "Edit Beer",
-        // and delete carries the destructive role for its red styling. Delete opens
-        // the same confirmation the swipe and edit-mode badge use; it does not
-        // delete on the spot.
-        .contextMenu {
+        // Trailing swipe: Edit (blue) and Delete (red). Both actions live in this
+        // one `.swipeActions` on purpose — putting only one here would let it
+        // replace `.onDelete`'s automatic swipe and drop the other. `.onDelete`
+        // itself stays (below), because it is what still draws the delete badge in
+        // `EditButton`'s edit mode: that is the visible, swipe-free delete path
+        // Apple's accessibility guidance asks for. `allowsFullSwipe` is off so a
+        // long swipe cannot commit a delete past the confirmation — Delete only
+        // opens the same dialog the edit-mode badge and the context of a drink-in-
+        // use share (`deleting`), never removing on the spot. Delete is declared
+        // first so it sits at the row's trailing edge.
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                model.clearErrors()
+                deleting = drink
+            } label: {
+                Label(Loc.string("Delete", locale: locale), systemImage: "trash")
+            }
             Button {
                 model.clearErrors()
                 editing = drink
             } label: {
                 Label(Loc.string("Edit %@", drink.name, locale: locale), systemImage: "pencil")
             }
-            Button(role: .destructive) {
-                model.clearErrors()
-                deleting = drink
-            } label: {
-                Label(Loc.string("Delete %@", drink.name, locale: locale), systemImage: "trash")
-            }
+            .tint(.blue)
         }
     }
 

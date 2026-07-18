@@ -84,10 +84,12 @@ adopts that model:
   sheet the pencil used to, and because the row is a `Button`, SwiftUI suppresses
   that tap while the list is in edit mode, so a delete-tap never also opens the
   editor. On Drinks the row tap is already spoken for (it *logs* the drink, the
-  many-times-a-day action), so editing a drink moves to a **long-press context
-  menu** — Apple's place for a row whose primary tap is taken — carrying Edit and
-  Delete. The row's raw tap-to-log is gated on the edit-mode state so it stands
-  down while the list is being edited.
+  many-times-a-day action), so editing and deleting a drink move to the **trailing
+  swipe** — the native place for a row's secondary actions when its tap is taken,
+  Mail being the model: tap opens, swipe acts. The swipe carries a blue Edit and a
+  red Delete; the `EditButton` edit mode still shows the system delete badge, so
+  deletion keeps a visible, swipe-free path as well. The row's raw tap-to-log is
+  gated on the edit-mode state so it stands down while the list is being edited.
 - **The Calendar screen was rebuilt from a `ScrollView` onto a `List`.** Swipe,
   the edit-mode badge and `EditButton` live only in a `List`'s `ForEach`, and the
   calendar had none — its selected-day swipe-to-delete simply did not exist. The
