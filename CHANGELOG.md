@@ -88,6 +88,27 @@ foundation so far:
   old bare `rm` aborted under `set -e` when the glob matched nothing (a fresh
   tree that never rendered the guides).
 
+The Android build layer (`android/Makefile`) is rebuilt on top of the
+housekeeping: `prereq` (Java 21, the Android SDK, the Gradle wrapper, the bundled
+license copies and the localized user guides), then `debug`, `screenshot-apks`,
+`unit-test`, `lint`, the new `format` and `check-guides`. Choices verified against
+`app/build.gradle.kts`:
+
+- The SDK check requires only `platforms;android-36` (compileSdk = targetSdk = 36);
+  the old check also demanded `android-35`, which appears only in a source comment.
+- `java`, `android` and `gradle-wrapper` fail with actionable messages instead of
+  the cryptic "No rule to make target" the old bare prerequisites produced.
+- `screenshot-apks` and `debug` now depend on `prereq`, so a direct
+  `make -C android screenshot-apks` is self-sufficient.
+- `format` (ktlint auto-format) is new; it needs the toolchain but not the full
+  `prereq`, since you run it to fix the tree, not to gate it.
+- `prereq` holds only what a build consumes: the toolchain plus the compiled-in
+  license and guide resources. The read-only release-readiness gate is deferred to
+  the (later) release slice, so the Android build layer carries no release check --
+  the everyday build gates on `lint` and `check-guides` alone.
+- The `help` target sits at the top of the file and is the single source of the
+  target list; the header comment no longer repeats it.
+
 None of these targets touch `releases/`.
 
 ### iOS: delete and edit move to the native edit-mode model
