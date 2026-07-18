@@ -339,6 +339,17 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Publish on the Apple App Store.** The iOS port is feature-complete (see
   below); what remains before submission is App Store tooling — the store
   listing, screenshots, and the export-compliance and privacy declarations.
+- **Reproducible iOS build before the App Store release** (`build_repeatable`).
+  Bring the iOS archive to a deterministic, reproducible build so the `.ipa` can
+  be rebuilt from the tagged source before submission, matching the Android
+  guarantee that F-Droid verifies today. Unlike F-Droid there is no third-party
+  rebuilder for App Store binaries, so this is a self-verified reproducibility
+  target rather than an externally attested one.
+- **Measure iOS test coverage** (`test_statement_coverage80`,
+  `test_branch_coverage80`). The Swift package suite (`swift test` in
+  `ios/PotillusKit`) runs today, but its code coverage is not yet measured; wire
+  up `swift test --enable-code-coverage` and surface the figure the way Kover
+  does on the JVM side, so the iOS port has a coverage number too.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.

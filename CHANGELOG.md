@@ -224,6 +224,26 @@ bestpractices.dev, so `make bestpractices-json` would overwrite these edits — 
 maintainer transcribes them to the site first (a level-grouped criterion list of the
 151 changed answers accompanies this change), and only then re-pulls.
 
+Gave the OpenSSF badge answers iOS coverage. Wherever a justification described an
+Android-specific mechanism that has a genuine iOS counterpart in this repository, the
+iOS side is now stated too, in the established dual-platform style — versioning
+(`ios/Version.xcconfig` derived from the same CHANGELOG/versionCode), release signing
+(the App Store re-signing model), distribution and updates (the planned App Store
+channel), the XcodeGen/SwiftPM dev setup and build hygiene (generated `.xcodeproj`,
+`Package.resolved`), the SwiftUI architecture and shared backup interface, the
+SwiftLint gate, and the XCTest suite pinned to the shared golden vectors. 43 of the
+190 justifications gained an iOS clause; the Android text is unchanged (each clause is
+appended). Platform-neutral answers (repository, docs, and process criteria) and the
+"not applicable / not met" ones were left untouched. Three areas are stated honestly
+as roadmap goals rather than accomplished facts and are now recorded in
+[docs/ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/docs/ROADMAP.md):
+iOS test-coverage measurement, a reproducible iOS build before the App Store release,
+and the iOS-specific hardening items (an explicit App Transport Security declaration).
+The iOS strictness gate is SwiftLint; Swift compiler warnings-as-errors are not
+enforced, and the answers say so rather than implying parity. `.bestpractices.jsonc`
+was regenerated, and the same one-way-mirror caveat applies (transcribe upstream
+before `make bestpractices-json`).
+
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
 The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
