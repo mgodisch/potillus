@@ -386,6 +386,27 @@ has no Android counterpart to match -- is classed as a skeleton by adding `≈` 
 the no-words set, alongside the `·` and `%` already there. The map stays empty;
 the check now reports clean.
 
+### Build tooling: QA log capture (qa-android, qa-ios)
+
+Two root targets capture one platform's complete device-free QA battery into a
+single reviewable log, in one pass. `qa-android` runs the daily Android steps
+(debug APK, JVM unit tests, ktlint + Android lint, check-guides) plus the Kover
+coverage gate, the repo-wide static checks, the full invariant gate
+(`release-check`) and — via the new read-only `make -C android deps` — the
+release runtime dependency tree, the machine-checkable input for a licensing
+audit (the same `releaseRuntimeClasspath` configuration the SBOM task
+resolves). `qa-ios` runs the Mac-free `check-ios-static` first (so a Linux host
+still contributes everything it can), then SwiftLint, the PotillusKit tests,
+the coverage gate and the Debug build, each behind ios/Makefile's own
+require-macos guard. Every step's output is tee'd into `qa-android.log` /
+`qa-ios.log` at the repository root (covered by `.gitignore`'s `*.log` pattern,
+which also keeps them out of the tgz exclude-derived tarball). Unlike the daily
+umbrellas, a failing step does not abort the run: each step is recorded
+PASS/FAIL and the run continues, so one pass yields the complete red-and-green
+picture; the target still exits non-zero at the end if any step failed. The
+shared shell scaffolding lives once in the root Makefile
+(`QA_PROLOGUE`/`QA_EPILOGUE`).
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

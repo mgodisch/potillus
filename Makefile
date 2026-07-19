@@ -81,6 +81,10 @@ help:
 	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
 	@echo "  make release-check    run the full invariant gate (tools/release-check.sh --Werror)"
 	@echo
+	@echo "QA (one pass, everything logged; a failing step is recorded, not fatal):"
+	@echo "  make qa-android       Android build+tests+lint+coverage+gates+deps -> qa-android.log"
+	@echo "  make qa-ios           iOS static gate+lint+tests+coverage+build -> qa-ios.log  [Mac]"
+	@echo
 	@echo "Store assets (Android):"
 	@echo "  make screenshots-android      capture the in-app shots 01..06  [device]"
 	@echo "  make report-pdfs-android      export the per-locale report PDFs  [device + manual Save-as-PDF]"
@@ -226,3 +230,98 @@ install-debug: ../downloads/potillus-$(VERSION)-debug.apk
 	cp $< $@
 
 .PHONY: android ios device-tests-android install-debug
+
+# =============================================================================
+# QA LOG CAPTURE  (qa-android / qa-ios)
+# =============================================================================
+#
+# The two qa-* targets run one platform's complete device-free QA battery --
+# build, unit tests, lint, the coverage gate, the static/invariant gates and
+# (Android) the release runtime dependency tree -- and tee EVERY step's output
+# into one log file per platform at the repository root (qa-android.log /
+# qa-ios.log). Both names fall under .gitignore's `*.log` pattern, so neither
+# git nor the tgz exclude set (derived from .gitignore) ever picks them up.
+#
+# They differ from the daily umbrellas (`android`, `ios`) in one deliberate
+# way: a failing step does NOT abort the run. A QA review wants the COMPLETE
+# picture from one pass -- a red lint AND a red test AND a green build -- so
+# each step runs through qa_step, which records PASS/FAIL and carries on. CI
+# semantics are preserved at the end: the target exits non-zero if any step
+# failed. The `===== name: ... =====` markers keep the log navigable with a
+# plain text search.
+#
+# QA_PROLOGUE / QA_EPILOGUE hold the shared shell scaffolding ONCE, expanded
+# into both recipes (make splices a multi-line variable into a recipe line by
+# line, and .ONESHELL then feeds all of them to a single bash). `$$` throughout:
+# these are SHELL variables, resolved when the recipe runs, not make variables.
+# The prologue expects `log` to be set by the recipe's first line; it truncates
+# the log and defines qa_step. qa_step runs `"$@" 2>&1 | tee -a` -- with the
+# global `-o pipefail` the `if` sees the STEP's exit status, not tee's -- and
+# appends failing step names to `fail` for the epilogue's summary.
+
+define QA_PROLOGUE
+: > "$$log"
+fail=""
+qa_step() {
+    name="$$1"; shift
+    printf '\n===== %s: %s =====\n' "$$name" "$$*" | tee -a "$$log"
+    if "$$@" 2>&1 | tee -a "$$log"; then
+        printf '===== %s: PASS =====\n' "$$name" | tee -a "$$log"
+    else
+        fail="$$fail $$name"
+        printf '===== %s: FAIL (recorded; the run continues) =====\n' "$$name" | tee -a "$$log"
+    fi
+}
+endef
+
+define QA_EPILOGUE
+printf '\n===== summary =====\n' | tee -a "$$log"
+if [ -n "$$fail" ]; then
+    printf 'FAILED steps:%s\n' "$$fail" | tee -a "$$log"
+    printf 'full output: %s\n' "$$log" | tee -a "$$log"
+    exit 1
+fi
+printf 'all steps passed\n' | tee -a "$$log"
+printf 'full output: %s\n' "$$log" | tee -a "$$log"
+endef
+
+# qa-android: the Android QA battery. It mirrors the daily `android` umbrella
+# step by step (debug APK, JVM unit tests, ktlint + Android lint, check-guides),
+# then adds what a full review needs beyond the daily run: the Kover coverage
+# gate, the repo-wide static checks, the full invariant gate (release-check)
+# and the release runtime dependency tree (`make -C android deps`) -- the
+# licensing-audit input. The environment step records the toolchain first, so
+# the log is self-describing.
+qa-android:
+	@log="qa-android.log"
+	$(QA_PROLOGUE)
+	qa_step environment bash -c 'uname -a; $(MAKE) --version | sed -n 1p; java -version 2>&1; python3 --version'
+	qa_step debug-apk $(MAKE) -C android debug-apk
+	qa_step unit-tests $(MAKE) -C android unit-tests
+	qa_step lint $(MAKE) -C android lint
+	qa_step cover-check $(MAKE) -C android cover-check
+	qa_step check-guides $(MAKE) -C android check-guides
+	qa_step check-static $(MAKE) check-static
+	qa_step release-check $(MAKE) release-check
+	qa_step deps $(MAKE) -C android deps
+	$(QA_EPILOGUE)
+
+# qa-ios: the iOS QA battery. The Mac-free static gate runs FIRST, so even a
+# Linux host contributes everything it can catch; the SwiftLint, unit-test,
+# coverage and build steps then each carry ios/Makefile's own require-macos
+# guard, so off macOS they are recorded as FAIL with that guard's message
+# instead of aborting the log run. Run it on a Mac for the full picture. The
+# environment probes are individually guarded (`|| echo not found`): an absent
+# tool is itself a QA datum, not a reason to lose the rest of the step.
+qa-ios:
+	@log="qa-ios.log"
+	$(QA_PROLOGUE)
+	qa_step environment bash -c 'uname -a; sw_vers 2>/dev/null || true; xcodebuild -version 2>/dev/null || echo "xcodebuild: not found"; swift --version 2>/dev/null || echo "swift: not found"; swiftlint version 2>/dev/null || echo "swiftlint: not found"; command -v xcodegen || echo "xcodegen: not found"; python3 --version'
+	qa_step check-ios-static $(MAKE) check-ios-static
+	qa_step lint $(MAKE) -C ios lint
+	qa_step swift-tests $(MAKE) -C ios swift-tests
+	qa_step cover-check $(MAKE) -C ios cover-check
+	qa_step build $(MAKE) -C ios build
+	$(QA_EPILOGUE)
+
+.PHONY: qa-android qa-ios

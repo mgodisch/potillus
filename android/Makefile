@@ -58,6 +58,7 @@ help:
 	@echo "  make device-tests     run the on-device instrumentation tests  [device]"
 	@echo "  make lint             run ktlint + Android lint (build-breaking)"
 	@echo "  make format           auto-format the Kotlin sources (ktlint)"
+	@echo "  make deps             print the release runtime dependency tree (read-only)"
 	@echo "User guides:"
 	@echo "  make guides           (re)render the localized user guides"
 	@echo "  make check-guides     verify guides + license copies are in sync"
@@ -290,6 +291,15 @@ lint: prereq
 format: java gradle-wrapper android
 	./gradlew ktlintFormat
 
+# deps: print the release runtime dependency tree -- the artifacts Gradle compiles
+# into the release APK, transitives included. Read-only; nothing is built. This is
+# the machine-checkable input for a licensing/QA audit: what COPYING.md's runtime
+# inventory and the CycloneDX SBOM must agree with. releaseRuntimeClasspath is the
+# same configuration the SBOM task resolves (see the cyclonedxDirectBom block in
+# app/build.gradle.kts). Driven by the root's `qa-android`; useful standalone too.
+deps: prereq
+	./gradlew :app:dependencies --configuration releaseRuntimeClasspath
+
 # =============================================================================
 # RELEASE  (build the release artifacts + SBOM; gates/staging live in the root)
 # =============================================================================
@@ -362,5 +372,5 @@ distclean: clean
 	rm -f guides.d
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
-        debug-apk screenshot-apks unit-tests device-tests lint format \
+        debug-apk screenshot-apks unit-tests device-tests lint format deps \
         sbom release bundle cover-check clean distclean
