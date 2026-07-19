@@ -69,7 +69,9 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from potillus_repo import repo_root
+
+ROOT = str(repo_root())
 TPL = os.path.join(ROOT, "ios", "docs", "guide")
 OUT = os.path.join(ROOT, "ios", "Potillus", "Resources")
 CATALOG = os.path.join(ROOT, "ios", "Potillus", "Localizable.xcstrings")

@@ -66,87 +66,35 @@
 #   2  Invalid command-line option.
 #
 # CHECKS PERFORMED
-#   The script is organised into eight sections that mirror the project's
-#   known release-time error categories (documented in CONTRIBUTING.md §6):
+#   This runner sources a shared library and one file per check, then calls them
+#   in a fixed order (see main() at the bottom). Each check lives in its own file
+#   under tools/release-checks/ and is documented there at teaching depth -- that
+#   file, not this header, is the single source of truth for what a check does:
 #
-#   1. VERSION CONSISTENCY
-#      The versionName in build.gradle.kts, the top CHANGELOG.md entry, the
-#      README.md title line must all carry the same version string.
-#      versionCode must be ≥ 1 and must
-#      be a plain integer (no alphabetic suffix).  Fastlane store changelogs are coupled
-#      to versionCode by filename; every listing locale must carry the CURRENT
-#      versionCode note, while the FULL per-versionCode history need only stay in
-#      sync across the history-bearing locales (HISTORY_LOCALES: en-US, de-DE).
-#
-#   2. CHANGELOG
-#      The top-most ## vX.Y.Z entry must match versionName and must have at
-#      least one non-empty body line below it (not just a heading with nothing
-#      after it).
-#
-#   3. ROOM DATABASE MIGRATIONS
-#      When the @Database version constant in AppDatabase.kt is N, there must
-#      be a MIGRATION_(N-1)_N object declared in the same file, and both the
-#      schemas/(N-1).json and schemas/N.json files must exist on disk.
-#
-#   4. LOCALE CONSISTENCY (three-way sync)
-#      a. Every values-<qualifier>/strings.xml directory must correspond to an
-#         entry in SupportedLocales.ALL (and vice-versa, except "en").
-#      b. Every tag in SupportedLocales.ALL must appear in locale_config.xml
-#         (and vice-versa).
-#      c. Every translated strings.xml must contain exactly as many <string>
-#         elements as the base locale (values/strings.xml).  A mismatch means
-#         the LocaleSyncTest would also fail.
-#
-#   5. SOURCE CODE DOCUMENTATION
-#      a. Every Kotlin source file must start with the GPL-3.0 file header
-#         (the "vim: set et ts=4" block).
-#      b. Every public or internal top-level function and every @Composable
-#         function must have a KDoc block immediately preceding it.  Private
-#         functions are excluded.
-#
-#   6. LOG CALL GUARDS
-#      All android.util.Log.* calls in the main source set must be wrapped in
-#      an if (BuildConfig.DEBUG) { … } block. Log calls in the test source set
-#      are exempt.
-#
-#   7. GERMAN LANGUAGE IN SOURCE CODE
-#      Source code comments and KDoc must be written in English (CONTRIBUTING.md
-#      §3).  This check scans for a curated list of common German words that
-#      would not normally appear in English code.  False positives from German
-#      *strings* inside translation files are excluded automatically because
-#      translation files live under res/values-*/strings.xml, not under
-#      src/main/kotlin/.
-#
-#   8. BACKUP FORMAT VERSION CONSISTENCY
-#      When BackupManager.BACKUP_VERSION is incremented, the version-1 →
-#      version-N migration notes in the KDoc comment above it must be updated.
-#      This check is heuristic: it verifies that the version constant matches
-#      the highest version number mentioned in the adjacent KDoc block.
-#
-#   9. MARKDOWN SYNTAX
-#      The authored Markdown docs (CHANGELOG.md, README.md, CONTRIBUTING.md,
-#      PRIVACY.md) and
-#      the per-language guides rendered from *.md.in into res/raw*/ must be well
-#      formed: inline-code backticks and '*' emphasis balanced, and code-looking
-#      tokens (snake_case, glob '*') wrapped in backticks so a stray marker does
-#      not turn into accidental emphasis in the in-app renderer.  CHANGELOG.md
-#      headings must additionally read "## vMAJOR.MINOR.PATCH" in descending
-#      order.  The check lives in tools/md-syntax.py.  The verbatim license
-#      texts (LICENSE.md, LICENSE.Apache-2.0.md, LICENSE.GPL-2.0.md, COPYING.md)
-#      are not in the checked set at all.
+#     lib.sh                        colours, counters, output helpers, file-path
+#                                   constants and the extract_version_* helpers
+#     version-consistency.sh        versionName / CHANGELOG / README agree;
+#                                   versionCode integer; store-changelog coupling
+#     changelog.sh                  top ## vX.Y.Z entry matches and has a body
+#     room-migrations.sh            @Database N has MIGRATION_(N-1)_N + schemas
+#     locale-consistency.sh         values-* ↔ SupportedLocales ↔ locale_config
+#     documentation.sh              GPL header + KDoc on every Kotlin declaration
+#     log-guards.sh                 Log.* wrapped in if (BuildConfig.DEBUG)
+#     no-german-comments.sh         comments/KDoc are English (CONTRIBUTING §3)
+#     backup-version.sh             BACKUP_VERSION matches its KDoc migration notes
+#     markdown-syntax.sh            authored docs + rendered guides are well-formed
+#     metadata-lengths.sh           store metadata within per-file length limits
+#     reproducible-build-hygiene.sh F-Droid reproducible-build invariants
+#     third-party-notices.sh        SBOM-driven NOTICE/licence reproduction
+#     accessibility-labels.sh       contentDescription discipline
+#     signing-key-fingerprint.sh    the SECURITY.md fingerprint is single-sourced
+#     bestpractices-complete.sh     the OpenSSF/OSPS self-assessment is complete
+#     coverage.sh                   the opt-in Kover coverage gate (--coverage)
 #
 # HOW TO ADD A NEW CHECK
-#   1. Write a bash function named check_<topic>().
-#   2. Call fail "description" for hard failures (blocks the release).
-#   3. Call warn "description" for advisory failures (documented issue, safe
-#      to override).
-#   4. Call pass "description" when the check succeeds.
-#   5. Add the function call in the main() section at the bottom.
-#
-# TEACHING NOTES
-#   The script is written as a teaching artefact.  Each section header
-#   explains *why* that invariant matters (not just *what* is checked).
-#   Bash idioms are commented inline where they might be unfamiliar.
+#   1. Add tools/release-checks/<topic>.sh defining one check_<topic>() function
+#      (copy a sibling's header; call pass/warn/fail from lib.sh).
+#   2. Add <topic> to the source loop below and check_<topic> to main().
 # =============================================================================
 
 # ── Strict mode ───────────────────────────────────────────────────────────────
@@ -193,8 +141,6 @@ for arg in "$@"; do
             ;;
     esac
 done
-
-# Output helpers – each increments the relevant counter and prints a
 
 # ── Locate the repo root ──────────────────────────────────────────────────────
 # $BASH_SOURCE[0] is the path to this script.

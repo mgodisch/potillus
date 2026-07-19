@@ -85,6 +85,7 @@ USAGE
 import os
 import subprocess
 import sys
+from potillus_repo import repo_root
 
 # The anchor: the last line of the standard GPL notice.  The pointer is
 # inserted directly after it.
@@ -146,13 +147,17 @@ SKIP_RELATIVE = {
 # Extensions the project normally licenses.  Used only for the WARNING pass.
 SOURCE_SUFFIXES = (
     ".kt", ".kts", ".swift", ".java", ".py", ".sh", ".md", ".xml", ".yml",
-    ".yaml", ".toml", ".properties", ".pro", ".html", ".in",
+    ".yaml", ".toml", ".properties", ".pro", ".html", ".in", ".mk",
 )
 
-
-def repository_root():
-    """The directory above tools/, i.e. the repository root."""
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Extensionless source files the project licenses, matched by basename since
+# they carry no suffix for SOURCE_SUFFIXES to catch.  The Makefile rebuild split
+# the build across a root Makefile, per-platform Makefiles and make/*.mk
+# fragments (the .mk ones are covered above); every one carries the header, so
+# the warning pass must see them too.
+SOURCE_BASENAMES = (
+    "Makefile",
+)
 
 
 def git_tracked_files(root):
@@ -280,7 +285,10 @@ def check_file(path, root, fix):
             return [], [], True
         return [f"{relative}: header lacks the section 7 pointer"], [], False
 
-    if not has_gpl and path.endswith(SOURCE_SUFFIXES):
+    if not has_gpl and (
+        path.endswith(SOURCE_SUFFIXES)
+        or os.path.basename(path) in SOURCE_BASENAMES
+    ):
         return [], [f"{relative}: no license header"], False
 
     return [], [], False
@@ -288,8 +296,8 @@ def check_file(path, root, fix):
 
 def main(argv):
     fix = "--fix" in argv
-    paths = [a for a in argv if a != "--fix"] or [repository_root()]
-    root = repository_root()
+    paths = [a for a in argv if a != "--fix"] or [str(repo_root())]
+    root = str(repo_root())
 
     errors, warnings, repaired = [], [], 0
     for path in iter_files(paths, root):

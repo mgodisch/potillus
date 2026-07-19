@@ -73,6 +73,7 @@
 import os
 import re
 import sys
+from potillus_repo import repo_root
 
 # ── Which files to read ──────────────────────────────────────────────────────
 
@@ -392,12 +393,8 @@ def check_binding_paths(paths):
     return problems
 
 
-def repository_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
 def main(argv):
-    root = repository_root()
+    root = str(repo_root())
     paths = argv or swift_files(root)
     if not paths:
         return 0

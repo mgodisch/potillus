@@ -50,15 +50,12 @@
 import os
 import re
 import sys
+from potillus_repo import repo_root
 
 TEMPLATE = "report/report_template.html"
 PRINTER = "ios/Potillus/ReportPdfPrinter.swift"
 
 A4_HEIGHT_MM = 297
-
-
-def repository_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def read(path):
@@ -109,7 +106,7 @@ def printer_zeroes_formatter_insets(swift):
 
 
 def main():
-    root = repository_root()
+    root = str(repo_root())
     problems = []
 
     css = read(os.path.join(root, TEMPLATE))

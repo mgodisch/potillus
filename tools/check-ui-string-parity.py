@@ -70,9 +70,9 @@ import html
 import json
 import re
 import sys
-from pathlib import Path
+from potillus_repo import repo_root
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = repo_root()
 CATALOG = ROOT / "ios" / "Potillus" / "Localizable.xcstrings"
 ANDROID = ROOT / "android" / "app" / "src" / "main" / "res" / "values" / "strings.xml"
 MAP = ROOT / "tools" / "ui-string-parity.json"

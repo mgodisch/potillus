@@ -64,24 +64,18 @@ import os
 import re
 import sys
 
-CHANGELOG_VERSION = re.compile(r"^## v(\d+\.\d+\.\d+)")
+from potillus_repo import changelog_marketing_version, repo_root
+
 VERSION_CODE = re.compile(r"versionCode\s*=\s*(\d+)")
-
-
-def repository_root():
-    """The directory above tools/, i.e. the repository root."""
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def marketing_version(root):
     """The top `## vX.Y.Z` entry of CHANGELOG.md."""
-    path = os.path.join(root, "CHANGELOG.md")
-    with open(path, encoding="utf-8") as handle:
-        for line in handle:
-            match = CHANGELOG_VERSION.match(line)
-            if match:
-                return match.group(1)
-    raise SystemExit(f"gen-ios-version: no '## vX.Y.Z' heading found in {path}")
+    version = changelog_marketing_version(root)
+    if version is None:
+        path = os.path.join(root, "CHANGELOG.md")
+        raise SystemExit(f"gen-ios-version: no '## vX.Y.Z' heading found in {path}")
+    return version
 
 
 def project_version(root):
@@ -110,7 +104,7 @@ CURRENT_PROJECT_VERSION = {project_version(root)}
 
 
 def main(argv):
-    root = repository_root()
+    root = str(repo_root())
     target = os.path.join(root, "ios", "Version.xcconfig")
     wanted = render(root)
 

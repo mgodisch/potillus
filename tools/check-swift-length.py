@@ -61,13 +61,13 @@
 
 import re
 import sys
-from pathlib import Path
+from potillus_repo import repo_root
 
 # SwiftLint's built-in default for type_body_length's warning threshold. Not in
 # .swiftlint.yml, so it is named here; read from the yml if ever added there.
 DEFAULT_TYPE_BODY_LIMIT = 250
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = repo_root()
 IOS = ROOT / "ios"
 CONFIG = IOS / ".swiftlint.yml"
 

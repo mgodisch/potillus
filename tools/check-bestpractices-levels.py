@@ -54,7 +54,9 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from potillus_repo import repo_root
+
+ROOT = str(repo_root())
 ANSWERS_PATH = os.path.join(ROOT, ".bestpractices.json")
 LEVELS_PATH = os.path.join(ROOT, "tools", "bestpractices-levels.json")
 

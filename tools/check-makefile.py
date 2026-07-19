@@ -64,6 +64,7 @@ import glob
 import os
 import re
 import sys
+from potillus_repo import repo_root
 
 # `@` suppresses echo, `-` ignores errors; neither changes what the line does.
 PREFIXES = "@-+"
@@ -71,15 +72,11 @@ PREFIXES = "@-+"
 BARE_CD = re.compile(r"^cd\s")
 
 
-def repository_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
 def default_makefiles():
     """Every makefile this project ships: the three per-context Makefiles plus each
     fragment under make/. Globbing make/*.mk keeps new fragments (e.g. a future
     publish.mk) covered automatically, so the check never silently misses one."""
-    root = repository_root()
+    root = str(repo_root())
     named = [
         os.path.join(root, "Makefile"),
         os.path.join(root, "android", "Makefile"),

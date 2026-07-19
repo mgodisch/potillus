@@ -77,6 +77,7 @@ USAGE
 import os
 import re
 import sys
+from potillus_repo import repo_root
 
 # `Button` as a word, so `AppButtonStyle` or a comment's "Button" do not match.
 BUTTON = re.compile(r"\bButton\b")
@@ -85,11 +86,6 @@ IMAGE = re.compile(r"\bImage\s*\(")
 TEXT = re.compile(r"\bText\s*\(")
 LABEL_VIEW = re.compile(r"\bLabel\s*\(")
 A11Y = re.compile(r"\.accessibilityLabel\s*\(")
-
-
-def repository_root():
-    """The directory above tools/, i.e. the repository root."""
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def match_delim(text, start, open_ch, close_ch):
@@ -195,7 +191,7 @@ def offenders(path):
 
 
 def main(argv):
-    root = repository_root()
+    root = str(repo_root())
     paths = argv[1:]
     if not paths:
         views = os.path.join(root, "ios", "Potillus")

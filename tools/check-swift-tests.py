@@ -58,6 +58,7 @@ USAGE
 import os
 import re
 import sys
+from potillus_repo import repo_root
 
 # `XCTAssertEqual(await x, y)` and `XCTUnwrap(await x)`, but not a line that
 # merely mentions await in a trailing comment.
@@ -66,10 +67,6 @@ OFFENDER = re.compile(r"\b(XCTAssert\w*|XCTUnwrap)\s*\(.*\bawait\b")
 # A comment on the line would be a false positive; strip it first. Crude, but a
 # `//` inside a Swift string literal in a test assertion is vanishingly rare.
 COMMENT = re.compile(r"//.*$")
-
-
-def repository_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Build products and dependencies. Everything else under ios/ is ours. "build" is
@@ -116,7 +113,7 @@ def check_file(path, root):
 
 
 def main(argv):
-    root = repository_root()
+    root = str(repo_root())
     paths = argv or default_paths(root)
 
     problems = []

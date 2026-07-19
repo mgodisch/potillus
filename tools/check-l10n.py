@@ -47,7 +47,9 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from potillus_repo import repo_root
+
+ROOT = repo_root()
 VIEWS = sorted((ROOT / "ios" / "Potillus").glob("*.swift"))
 
 CALLS = (

@@ -95,8 +95,10 @@ import os
 import re
 import sys
 
+from potillus_repo import CHANGELOG_VERSION_RE, repo_root
+
 # Repository root: the parent of tools/.
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = str(repo_root())
 BASE = os.path.join(ROOT, "fastlane", "metadata", "ios")
 
 # The manifest recording which version each locale's release_notes.txt is
@@ -105,8 +107,6 @@ VERSIONS_FILE = os.path.join(BASE, "release_notes.versions")
 
 # The release version, read from the top CHANGELOG entry -- the same source
 # tools/gen-ios-version.py uses for MARKETING_VERSION, so the two never disagree.
-CHANGELOG_VERSION = re.compile(r"^## v(\d+\.\d+\.\d+)")
-
 # App Store Connect's store-listing limits, per file name.
 LIMITS = {
     "name.txt": 30,
@@ -278,7 +278,7 @@ def changelog_version():
     try:
         with open(path, encoding="utf-8") as handle:
             for line in handle:
-                match = CHANGELOG_VERSION.match(line)
+                match = CHANGELOG_VERSION_RE.match(line)
                 if match:
                     return match.group(1)
     except OSError:

@@ -79,8 +79,10 @@ import os
 import struct
 import sys
 
+from potillus_repo import repo_root
+
 # Repository root: the parent of tools/.
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = str(repo_root())
 BASE = os.path.join(ROOT, "fastlane", "screenshots", "ios")
 
 # The first eight bytes of every PNG, per the PNG specification.

@@ -333,6 +333,35 @@ held the bulk of the kit's previously-uncovered lines (its word-for-word
 correctness stays the job of tools/check-l10n-parity.py). iOS branch-coverage
 parity and UI/instrumented coverage on both platforms are on the roadmap.
 
+### Build tooling: tighten the tools/ helpers
+
+A follow-on tidy of the tools/ tree, on top of the Makefile rebuild above. No
+behaviour changes: every touched checker and generator produces byte-for-byte
+identical output, verified against a pre-change capture.
+
+- A shared `tools/potillus_repo.py` -- the Python counterpart of
+  `tools/release-checks/lib.sh` -- now holds the two facts each tool had copied by
+  hand: where the repository root is (fifteen tools carried their own one-line
+  `repository_root()` or `ROOT = ...` in three interchangeable idioms) and how the
+  marketing version is read from CHANGELOG.md's top `## vX.Y.Z` entry (two tools
+  had the same regex written out). Sixteen tools now import the shared helpers;
+  `render-guide.py` keeps its own root on purpose (it anchors at android/, not the
+  repository root).
+- `tools/release-check.sh`'s header shed the stale per-check catalogue it inherited
+  from the pre-decomposition monolith (it still listed nine categories; there are
+  sixteen check files, each self-documented under `tools/release-checks/`). The
+  header now points at those files instead of duplicating -- and drifting from --
+  them. The runner's behaviour and output are unchanged.
+- `tools/check-headers.py` now covers the Makefiles and `make/*.mk` fragments the
+  rebuild introduced -- previously an unscanned file class -- by adding `.mk` and
+  the extensionless `Makefile` basename to its licence-header pass. All eight
+  build files already carry the header, so the tree stays green; a header-less new
+  fragment is now caught.
+- The roadmap gains a near-term hygiene item: split the 6,600-line CHANGELOG into
+  a live file plus a `docs/CHANGELOG-archive.md`, retuning the three gates that
+  bind the file's structure (the descending-heading check, and the two that read
+  the top entry) rather than breaking them.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and
