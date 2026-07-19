@@ -347,9 +347,10 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   an *independent* rebuilder; a cross-machine or third-party reproduction check
   would raise this from self-attested to externally verified.
 - **iOS branch coverage (parity with Android).** The new iOS `cover-check` enforces
-  a LINE floor (`test_statement_coverage80`, silver) over PotillusKit, mirroring
-  Android's Kover. It is line-only: Android's Kover also enforces `BRANCH >= 75`, but
-  the `swift test`/llvm-cov path yields no branch data (the branch column comes back
+  a LINE floor of 90 (matching Android's Kover LINE bound -- the gold
+  `test_statement_coverage90` level) over PotillusKit, which measures ~94.8%. It is
+  line-only: Android's Kover also enforces `BRANCH >= 75`, but the
+  `swift test`/llvm-cov path yields no branch data (the branch column comes back
   empty). Closing that parity gap -- toward the gold `test_branch_coverage80` on both
   ports -- needs a toolchain path that emits Swift branch coverage.
 - **UI / instrumented-test coverage on both platforms** (developer tooling). The

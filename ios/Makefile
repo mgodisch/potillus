@@ -79,11 +79,12 @@ SWIFTLINT_VERSION := 0.65.0
 
 # The line-coverage floor the iOS coverage gate (cover-check) enforces over
 # PotillusKit's OWN sources -- the iOS counterpart of Android's Kover LINE bound.
-# Set to the OpenSSF silver target (test_statement_coverage80). Treat it as a
-# ratchet: raise it as coverage grows, never lower it. Branch coverage is a
-# gold-tier goal and is not measurable from this swift-test path -- see
-# docs/ROADMAP.md. `?=` so a spot-check can probe another value without editing.
-IOS_COVERAGE_MIN_LINE ?= 80
+# Set to 90 to match that bound (the gold test_statement_coverage90 level);
+# PotillusKit measures ~94.8%, so there is headroom. Treat it as a ratchet: raise
+# it as coverage grows, never lower it. Branch coverage is a gold-tier goal and is
+# not measurable from this swift-test path -- see docs/ROADMAP.md. `?=` so a
+# spot-check can probe another value without editing.
+IOS_COVERAGE_MIN_LINE ?= 90
 
 # =============================================================================
 # PROJECT GENERATION (the iOS counterpart of Android's build prerequisites)

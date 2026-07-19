@@ -302,9 +302,10 @@ test --enable-code-coverage`, command line, no simulator) and enforces a LINE fl
 over the kit's own sources via a new `tools/check-ios-coverage.py`, which filters to
 `/Sources/PotillusKit/` exactly as Kover filters its class set. The root
 `cover-check` now fans out to both platforms and `release-ios` runs the gate before
-archiving, mirroring `release-android`. The floor is the OpenSSF silver target
-(`IOS_COVERAGE_MIN_LINE = 80`, `test_statement_coverage80`) and line-only: branch
-coverage is a gold-tier goal not obtainable from this `swift test`/llvm-cov path.
+archiving, mirroring `release-android`. The floor matches Android's Kover LINE bound
+(`IOS_COVERAGE_MIN_LINE = 90`, the gold `test_statement_coverage90` level; PotillusKit
+measures ~94.8%) and is line-only: branch coverage is a gold-tier goal not obtainable
+from this `swift test`/llvm-cov path.
  A new per-language test, `ReportLabelsCatalogTests`, reaches the floor: it
 builds `ReportLabels(language:)` for every shipping language and asserts no report
 string is empty, exercising `ReportLabelsCatalog.swift` -- the one file that had
