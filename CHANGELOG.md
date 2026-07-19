@@ -362,6 +362,30 @@ identical output, verified against a pre-change capture.
   bind the file's structure (the descending-heading check, and the two that read
   the top entry) rather than breaking them.
 
+### Build tooling: match UI-string parity by wording, not by formatting
+
+`tools/check-ui-string-parity.py` compared the iOS catalogue label against the
+Android string with raw string equality, so a label that read the SAME on both
+platforms was still reported whenever its FORMATTING differed -- iOS spells an
+argument `%@`/`%lld`, Android spells the same argument `%1$s`/`%1$d`, and the two
+sources also escape curly quotes and the newline differently. Five in-parity
+labels (the delete-confirmation, the read-error, the monthly-average badge, the
+drink detail line and the empty-state text) sat on the advisory UNMAPPED list for
+this reason alone, none of them an actual wording difference.
+
+The check now NORMALIZES both sides before comparing: every format specifier
+collapses to a single sentinel (the checker verifies wording, not specifier
+syntax -- other checks cover that), `\uXXXX` escapes and a literal `\n` are
+resolved to their characters. Word order, punctuation and every real character
+stay significant, so a genuine wording divergence still surfaces -- verified both
+ways: changing an Android wording re-lists its label, and a mis-aimed map entry
+still reports DRIFT. The empty-state label's intentional line break (present and
+correct on both platforms) is preserved; only its representation is normalized.
+One label -- the units-only drink detail line `%1$lld ml · %2$@ · ≈ %3$@ g`, which
+has no Android counterpart to match -- is classed as a skeleton by adding `≈` to
+the no-words set, alongside the `·` and `%` already there. The map stays empty;
+the check now reports clean.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

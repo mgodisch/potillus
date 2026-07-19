@@ -140,12 +140,49 @@ def used_label_keys():
 
 def is_skeleton(text):
     """A literal that is only placeholders/units/punctuation carries no words."""
-    return re.fullmatch(r"[%@\d$lld /·.,\\()a-zA-Z_ø]*", text) is not None
+    return re.fullmatch(r"[%@\d$lld /·.,\\()≈a-zA-Z_ø]*", text) is not None
+
+
+# A printf/String Catalog format specifier: an optional positional "N$", optional
+# flags/width/precision/length, then a conversion. Matches %@, %d, %lld, %1$s,
+# %2$@, %1$.1f and the like -- but NOT a bare "%" that is not a conversion (e.g.
+# "50% done", where a space follows), because a conversion letter must follow
+# immediately. The space printf flag is deliberately excluded from the flag set:
+# it never appears in these UI strings, and allowing it would let "% done" match
+# as "space-flag + d", swallowing a real word.
+_SPECIFIER = re.compile(
+    r"%(?:\d+\$)?[-+0#]*\d*(?:\.\d+)?(?:hh|h|ll|l|q|L|z|j|t)?[@diouxXeEfgGaAcspn%]"
+)
+
+
+def normalize(text):
+    """Collapse the representation differences that are NOT wording differences,
+    so a label reads equal across platforms when only its FORMATTING differs.
+
+    Three sources of spurious inequality are folded out, and nothing else -- word
+    order, punctuation and every actual character stay significant, so a genuine
+    wording divergence still shows:
+
+      * format specifiers -> a single '%' sentinel. iOS spells an argument '%@' /
+        '%lld', Android spells the same argument '%1$s' / '%1$d'; this checker
+        verifies WORDING, not specifier syntax (other checks cover that), so the
+        specifier's exact form is not a wording difference.
+      * '\\uXXXX' escapes -> the character. android_strings() resolves HTML
+        entities and \\n but leaves \\u201c ("curly quote") literal; the iOS JSON
+        is already decoded, so this evens the two sides.
+      * a literal backslash-n -> a real newline, matching android_strings()'s own
+        \\n handling (the intentional line break in the empty-state label).
+    """
+    text = re.sub(
+        r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m.group(1), 16)), text
+    )
+    text = text.replace("\\n", "\n")
+    return _SPECIFIER.sub("%", text)
 
 
 def main():
     android = android_strings()
-    android_values = set(android.values())
+    android_values = {normalize(v) for v in android.values()}
     catalog = catalog_source_values()
     pairs = json.loads(MAP.read_text(encoding="utf-8"))["pairs"] if MAP.exists() else {}
 
@@ -160,13 +197,18 @@ def main():
             continue
         ios_text = catalog[ios_key]
         android_text = android[android_name]
-        if ios_text != android_text:
+        if normalize(ios_text) != normalize(android_text):
             drift.append((ios_key, ios_text, android_name, android_text))
 
     mapped_keys = set(pairs.keys())
     unmapped = []
     for key in sorted(used_label_keys()):
-        if key in mapped_keys or key in catalog and catalog[key] in android_values:
+        # The catalogue is keyed by the English source string, so the key IS the
+        # label's English. A used key can differ from its catalogue form only in
+        # representation (a source-literal "\n" vs the catalogue's real newline),
+        # so normalize the key itself and ask whether that wording exists on
+        # Android -- if it does, the label is in parity and needs no map entry.
+        if key in mapped_keys or normalize(key) in android_values:
             continue
         if is_skeleton(key) or "\\(" in key:
             continue
