@@ -26,7 +26,7 @@
 # =============================================================================
 #
 # Installs fastlane (which provides the `screengrab` / `capture_android_
-# screenshots` action used by `make screenshots`). Run once on a fresh checkout:
+# screenshots` action used by `make screenshots-android`). Run once on a fresh checkout:
 #
 #     cd fastlane && bundle install
 #

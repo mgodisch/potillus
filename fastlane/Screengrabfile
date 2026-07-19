@@ -27,7 +27,7 @@
 #
 # This file is consumed by the `capture_android_screenshots` (alias `screengrab`)
 # action invoked from the `screenshots` lane in Fastfile. It is itself driven by
-# the `make screenshots` target (android/Makefile), which sets up Android Demo
+# the `make screenshots-android` target (android/Makefile), which sets up Android Demo
 # Mode and the device date BEFORE calling fastlane and tears Demo Mode down
 # afterwards, then renders the two PDF report pages as screenshots 07/08.
 #
@@ -50,7 +50,7 @@ app_apk_path('android/app/build/outputs/apk/debug/app-debug.apk')
 tests_apk_path('android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk')
 
 # Capture only the dedicated screenshot suite, not the whole instrumented test
-# set. This is also why the @ScreenshotOnly opt-out (used by `make test-device
+# set. This is also why the @ScreenshotOnly opt-out (used by `make device-tests-android
 # EXCLUDE_SCREENSHOTS=1`) never interferes with capturing.
 use_tests_in_packages(['de.godisch.potillus.screenshot'])
 
@@ -77,8 +77,8 @@ locales(
 # EVERY *.png in each phoneScreenshots/ directory and deletes them all
 # (screengrab/runner.rb: `Dir.glob('**/<device_type>/*.png')` -> `File.delete`),
 # with no name filter — so it removes the committed report pages 07/08 too, not
-# just the in-app shots 01..06 it is about to recapture. Since `make screenshots`
-# now owns only 01..06 (07/08 belong to `make report-pdfs`, rendered from the
+# just the in-app shots 01..06 it is about to recapture. Since `make screenshots-android`
+# now owns only 01..06 (07/08 belong to `make report-pdfs-android`, rendered from the
 # per-locale PDFs), letting screengrab clear here would delete the committed 07/08
 # and they would not be regenerated in the same run — leaving the store listings
 # with two missing screenshots. Instead the `screenshots` recipe deletes exactly
@@ -95,7 +95,7 @@ output_directory('fastlane/metadata/android')
 # ScreenshotTest re-seeds the demo database on every run, so this is safe.
 reinstall_app(true)
 
-# Fail the lane (and therefore `make screenshots`) if any instrumentation test
+# Fail the lane (and therefore `make screenshots-android`) if any instrumentation test
 # fails, instead of silently producing an incomplete screenshot set.
 exit_on_test_failure(true)
 

@@ -35,8 +35,8 @@
 #   JVM-unit-testable scope), and :app:koverXmlReport so the actual measured
 #   figures can be shown next to the enforced floors. Skipped unless --coverage
 #   is given, because it launches Gradle and executes the unit-test suite — far
-#   slower than the static checks above, so the on-every-build Makefile `prereq`
-#   path leaves it off. Release and CI runs pass --coverage to enforce the floor.
+#   slower than the static checks above, so a plain `make release-check` leaves it
+#   off. Release and CI runs pass --coverage to enforce the floor.
 # =============================================================================
 # SECTION 15 – BEST-PRACTICES BADGE COMPLETENESS
 # =============================================================================

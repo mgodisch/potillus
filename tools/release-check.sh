@@ -45,9 +45,10 @@
 #   The script self-anchors to android/ (it lives in tools/ at the repo root and
 #   cd's into the sibling android/ directory), so it can also be invoked from
 #   anywhere, e.g. `bash tools/release-check.sh`.
-#   It additionally runs automatically on every build: the android/Makefile
-#   `prereq` target invokes it (with --Werror) via the `release-check` target,
-#   so a failing invariant — or, under --Werror, any warning — aborts the build.
+#   It is NOT a per-build gate: the everyday build gates on lint and check-guides
+#   alone. Run this invariant gate during development with `make release-check`
+#   (which passes --Werror); `make release-android` runs it with --release before an
+#   artifact is staged.
 #
 # OPTIONS
 #   --Werror   Treat warnings as errors: exit non-zero if any warning is
@@ -55,8 +56,8 @@
 #   --coverage Additionally run the Kover coverage gate (:app:koverVerify),
 #              which hard-fails if LINE < 90 or BRANCH < 75 over the
 #              JVM-unit-testable scope. Opt-in because it runs Gradle and the
-#              unit-test suite (slow); the on-every-build Makefile prereq path
-#              leaves it off, release/CI runs enable it.
+#              unit-test suite (slow); `make release-check` leaves it off, and
+#              release/CI runs enable it.
 #
 # EXIT CODES
 #   0  All checks passed (warnings allowed unless --Werror is given).
@@ -160,20 +161,19 @@ PASSES=0
 # --Werror : treat warnings as errors. Without it, warnings are advisory and the
 #            script exits 0 as long as there are no hard failures. With it, ANY
 #            warning flips the final exit code to non-zero, so a warning can never
-#            slip silently into a build. The Makefile `release-check` target
-#            passes --Werror, making the on-every-build gate reject warnings too.
+#            slip silently past the gate. The Makefile `release-check` target
+#            passes --Werror; `release-android` runs the gate with --release.
 WERROR=0
 # --coverage : additionally run the Kover coverage gate (./gradlew :app:koverVerify).
 #            Opt-in because it launches Gradle and runs the unit-test suite, which
-#            is far slower than the static checks; the on-every-build Makefile
-#            `prereq` path therefore leaves it OFF, while release/CI runs enable it.
+#            is far slower than the static checks; `make release-check` therefore leaves
+#            it OFF, while release/CI runs enable it.
 COVERAGE=0
 # --release : enforce the checks that only matter when actually cutting a release
 #            — currently the per-locale store changelog notes (SECTION 1). Off by
-#            default so the on-every-build `make android` path does not demand the
-#            translated store release notes, which are only needed at
-#            `make release-android` time. The android/Makefile `release` and
-#            `bundle` targets pass it; `debug`/`unit-test`/`lint` do not.
+#            default so a plain `make release-check` does not demand the translated store
+#            release notes, which are only needed at `make release-android` time,
+#            which passes --release.
 RELEASE=0
 for arg in "$@"; do
     case "$arg" in

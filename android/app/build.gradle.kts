@@ -223,7 +223,7 @@ android {
         // ─────────────────────────────────────────────────────────────────────
         //   The Play-Store screenshot-capture suite (ScreenshotTest, tagged with
         //   the @de.godisch.potillus.screenshot.ScreenshotOnly annotation) runs as
-        //   part of the ordinary `connectedDebugAndroidTest` / `make test-device`
+        //   part of the ordinary `connectedDebugAndroidTest` / `make device-tests-android`
         //   run by DEFAULT — the project deliberately does NOT hide it, so a broken
         //   capture flow is caught by the normal test gate.
         //
@@ -234,11 +234,11 @@ android {
         //
         //   The android/Makefile surfaces the same switch ergonomically as:
         //
-        //       make test-device EXCLUDE_SCREENSHOTS=1
+        //       make device-tests-android EXCLUDE_SCREENSHOTS=1
         //
         //   When the property is present, the JUnit `notAnnotation` instrumentation
         //   argument is registered so AndroidX Test skips every test annotated with
-        //   @ScreenshotOnly. The `make screenshots` flow is unaffected: screengrab
+        //   @ScreenshotOnly. The `make screenshots-android` flow is unaffected: screengrab
         //   targets the screenshot package directly (Screengrabfile
         //   `use_tests_in_packages`) instead of relying on this annotation.
         if (project.hasProperty("excludeScreenshotTests")) {

@@ -265,17 +265,30 @@ the 16 checks moves verbatim into its own file under `tools/release-checks/`
 (`version-consistency.sh`, `changelog.sh`, ... `coverage.sh`). The runner shrinks to
 a thin script that sources the library and the check files and calls `main()`, which
 runs them in the same order, with the same flags (`--Werror`/`--release`/
-`--coverage`) and the same summary. The output is byte-for-byte unchanged.
+`--coverage`) and the same summary. The output is byte-for-byte unchanged. A slim
+`release-check` target rejoins `make/checks.mk` (it runs `tools/release-check.sh
+--Werror`), giving the invariant gate a convenient everyday form again -- the gate
+had been reachable only through `release-android` since it left `prereq`. The
+script's own header comments, which still described it as running on every build
+via a `prereq`/`release-check` path, are corrected to match: the everyday build
+gates on lint and check-guides alone; the invariants run via `make release-check`
+and, with `--release`, inside `release-android`.
 
 Finally, a sweep updates the stale `make <target>` references the renames left in
-comments, docs and diagnostics -- across the tools, the androidTest sources, the
-install/contributing docs and the decomposed release-check scripts -- to the current
+comments, docs and diagnostics -- across every tracked text file a full
+`git ls-files` scan turned up -- the tools, the androidTest sources, the
+install/contributing docs, the decomposed release-check scripts, the Xcode project
+spec, a main-source comment, `COPYING.md`, the Gradle build script's comments, the
+fastlane config comments and the OpenSSF badge justifications -- to the current
 names: `screenshots` -> `screenshots-android`, `report-pdfs` -> `report-pdfs-android`,
 `screenshots-pdf` -> `screenshots-pdf-android`, `test-device` ->
-`device-tests-android`, `debug` -> `make -C android debug-apk`, and
-`ios-version`/`ios-guides`/`ios-project`/`guides` -> the `make -C ios ...` /
-`make -C android guides` forms. All are in comments, docs or diagnostic messages --
-none in asserted test strings -- so behavior is unchanged.
+`device-tests-android`, `debug` -> `make -C android debug-apk`, `check-swiftlint` ->
+`make -C ios lint`, `unit-test` -> `make -C android unit-tests`, the removed `test`
+aggregate -> `unit-tests` + `device-tests-android`, and `ios-version`/`ios-guides`/`ios-project`/`guides` -> the
+`make -C ios ...` / `make -C android guides` forms. All are in comments, docs or
+diagnostic messages -- none in asserted test strings -- so behavior is unchanged. One
+copy-paste typo is corrected in passing: `ReportLabelsCatalog.swift`'s header carried
+`<android@godisch.de>` where every other file uses `<martin@godisch.de>`.
 
 Housekeeping polish: `.gitignore` is regrouped by theme with uniform section
 headers and its stale `make` references updated (`make release` -> `release-android`,
@@ -291,10 +304,17 @@ housekeeping moved LAST; iOS: project generation BEFORE build/test/lint (you
 generate, then build); Android: build & test, then user guides, then release --
 and each help ends with a pointer to its `docs/INSTALL-*.md`, which become the
 extended walkthrough of the build-path targets and gain a matching back-reference.
-Syncing the two surfaced a wrong claim, now fixed: INSTALL-ANDROID said `make
-install-debug` was equivalent to `adb install` run from `android/`; it is a root
-target that copies the APK to `../downloads/` for sideloading and never touches a
-device.
+Syncing the two corrected a stale reference: INSTALL-ANDROID's `make install-debug`
+had correctly described the OLD `android/Makefile` `install-debug`, which ran `adb
+install -r` to a connected device. That device-install target is dropped in the
+rebuild -- install a debug APK with the raw `adb install` shown in INSTALL-ANDROID
+§6 -- and the name `install-debug` is reused for the root target that stages the APK
+into `../downloads/` for sideloading, which the doc now describes. Also removed in
+the rebuild: the root `push` (`git push && git push --tags`; the commands survive in
+the `push-*` targets' messages) and the Android `test` aggregate (`unit-tests`,
+`lint` and `device-tests` remain as separate targets); and the Android Makefile's
+default goal is now `help` rather than `debug`, so a bare `make` in `android/` prints
+the target list instead of building.
 
 The symmetric `cover-check` scaffolding gains its second platform. A new
 `cover-check` in `ios/Makefile` runs the PotillusKit suite with coverage (`swift

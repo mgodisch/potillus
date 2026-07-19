@@ -79,6 +79,7 @@ help:
 	@echo "  make check-ios-static the Mac-free iOS release gate"
 	@echo "  make check-makefile   bare-cd check across all makefiles + fragments"
 	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
+	@echo "  make release-check    run the full invariant gate (tools/release-check.sh --Werror)"
 	@echo
 	@echo "Store assets (Android):"
 	@echo "  make screenshots-android      capture the in-app shots 01..06  [device]"

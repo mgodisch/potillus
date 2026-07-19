@@ -137,6 +137,17 @@ check-ios-static: check-headers check-makefile check-swift-tests check-swift-sym
                   check-ios-metadata check-ios-screenshots check-ios-a11y
 	$(MAKE) -C ios check-guides
 
+# release-check: the full read-only invariant gate (tools/release-check.sh) run in
+# one shot -- the Android counterpart of the per-check tools above: version
+# consistency, changelog, room migrations, locale/doc sync, log guards, headers,
+# backup version, markdown, metadata lengths, reproducible-build hygiene, third-party
+# notices, a11y labels and the signing-key fingerprint. `--Werror` turns warnings
+# into errors. It is NOT a per-build gate (the everyday build gates on lint and
+# check-guides alone); run it here during development, and `release-android` runs it
+# with --release before an artifact is staged.
+release-check:
+	bash tools/release-check.sh --Werror
+
 # check-static: every device-free check in one go -- check-ios-static plus the two
 # repo-wide checks it does not include (the UI-literal allow-list and the OpenSSF
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
@@ -146,4 +157,4 @@ check-static: check-ios-static check-ui-string-parity check-bestpractices-levels
 .PHONY: check-headers check-makefile check-report-paper check-l10n check-l10n-parity \
         check-ui-string-parity check-bestpractices-levels check-swift-symbols \
         check-swift-length check-swift-tests check-ios-metadata check-ios-screenshots \
-        check-ios-a11y fix-headers check-ios-static check-static
+        check-ios-a11y fix-headers release-check check-ios-static check-static

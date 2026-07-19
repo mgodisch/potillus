@@ -58,7 +58,7 @@ tool belongs to before installing anything.
 | Tool | Version | Why it is needed | Installed how |
 |------|---------|------------------|---------------|
 | **JDK** | **21** (LTS) | Gradle and the Kotlin/Java compiler run on the JVM. The build pins Java 21 (`JAVA_VERSION := 21` in `android/Makefile`; `sourceCompatibility`/`targetCompatibility = VERSION_21` in `app/build.gradle.kts`). | `apt` |
-| **Android SDK** | platform-tools, build-tools, `platforms;android-35`, `platforms;android-36` | The compiled bytecode is linked against a platform (`compileSdk = 36`) and packaged with `build-tools`; `platform-tools` provides `adb`. | `sdkmanager` (manual) |
+| **Android SDK** | platform-tools, build-tools, `platforms;android-36` | The compiled bytecode is linked against a platform (`compileSdk = 36`) and packaged with `build-tools`; `platform-tools` provides `adb`. | `sdkmanager` (manual) |
 | **Gradle** | **9.6.1** | The build system. You do **not** install it: the repository ships a *Gradle wrapper* (`./gradlew`) that downloads exactly the pinned version on first use. | automatic |
 | **Android Gradle Plugin / Kotlin** | AGP **9.2.0**, Kotlin **2.4.0** | The plugins that turn Kotlin into an APK. Declared in `android/gradle/libs.versions.toml`; Gradle fetches them from Maven Central on the first build. | automatic |
 | **git, unzip, curl** | any | Clone the source; unpack the SDK command-line tools; download them. | `apt` |
@@ -127,11 +127,10 @@ directory too high.
     export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
 
 Now install the exact components the build requires and accept the licenses.
-The four component families below are the ones `android/Makefile` verifies are
-present before it will build:
+Together with the cmdline-tools installed above, the three below are the four
+component families `android/Makefile` verifies before it will build:
 
     sdkmanager "platform-tools" \
-               "platforms;android-35" \
                "platforms;android-36" \
                "build-tools;36.0.0"
 

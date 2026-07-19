@@ -192,7 +192,7 @@ their Android counterparts above.  All MIT:
   * **XcodeGen** &mdash; generates `ios/Potillus.xcodeproj` from
     `ios/project.yml`, which is why no `.xcodeproj` is tracked
     (<[https://github.com/yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)>).
-  * **SwiftLint** &mdash; the style gate `make check-swiftlint` pins to version
+  * **SwiftLint** &mdash; the style gate `make -C ios lint` pins to version
     0.65.0 (<[https://github.com/realm/SwiftLint](https://github.com/realm/SwiftLint)>).
   * **fastlane** &copy; The Fastlane Authors &mdash; drives the store uploads for
     BOTH platforms (the `ios` lanes here, `supply` and `screengrab` on Android;

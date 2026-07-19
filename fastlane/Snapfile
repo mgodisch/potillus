@@ -30,7 +30,7 @@
 # block. It is the iOS counterpart to Screengrabfile, and is likewise intended
 # to be driven by a Makefile target (`make -C ios screenshots`) that pins the
 # simulator date and renders the two PDF-report pages as screenshots 07/08,
-# mirroring the Android `make screenshots` flow.
+# mirroring the Android `make screenshots-android` flow.
 #
 # UNLIKE Android, iOS screenshots are produced by a UI-TEST target running in the
 # iOS Simulator: snapshot builds the scheme's UI-test bundle, launches the app in

@@ -96,7 +96,7 @@ object DayResolver {
      * that every date-relative surface renders from one reproducible logical day.
      * Because Today, Calendar, Statistics and the PDF report all derive "today"
      * exclusively through [today], pinning this single field pins the perspective
-     * of the whole app at once. That is what lets `make screenshots` capture from
+     * of the whole app at once. That is what lets `make screenshots-android` capture from
      * a fixed date on ANY device — including a locked production phone, where the
      * Makefile's `adb shell date` pin is silently rejected and the device keeps
      * its real date. The capture suite sets it in its `@Before` and clears it in
