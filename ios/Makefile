@@ -59,6 +59,7 @@ help:
 	@echo "Build / test / lint (need macOS):"
 	@echo "  make build         compile the app (xcodebuild, Debug)"
 	@echo "  make swift-tests   run the PotillusKit unit tests (swift test)"
+	@echo "  make cover-check   enforce the PotillusKit line-coverage floor ($(IOS_COVERAGE_MIN_LINE)%)"
 	@echo "  make lint          run SwiftLint (--strict, pinned $(SWIFTLINT_VERSION))"
 	@echo "  make format        auto-format the Swift sources (swiftlint --fix)"
 	@echo "Housekeeping:"
@@ -75,6 +76,14 @@ help:
 # green on one version can be red on the next. The Kotlin side gets this via the
 # Gradle ktlint plugin; Swift has no such mechanism, so the version is checked here.
 SWIFTLINT_VERSION := 0.65.0
+
+# The line-coverage floor the iOS coverage gate (cover-check) enforces over
+# PotillusKit's OWN sources -- the iOS counterpart of Android's Kover LINE bound.
+# Set to the OpenSSF silver target (test_statement_coverage80). Treat it as a
+# ratchet: raise it as coverage grows, never lower it. Branch coverage is a
+# gold-tier goal and is not measurable from this swift-test path -- see
+# docs/ROADMAP.md. `?=` so a spot-check can probe another value without editing.
+IOS_COVERAGE_MIN_LINE ?= 80
 
 # =============================================================================
 # PROJECT GENERATION (the iOS counterpart of Android's build prerequisites)
@@ -181,6 +190,21 @@ swift-tests: require-macos
 	@command -v swift >/dev/null 2>&1 || { echo "swift-tests: 'swift' not found -- install the Swift/Xcode toolchain." >&2; exit 1; }
 	( cd PotillusKit && swift test )
 
+# cover-check: the iOS coverage gate -- the counterpart of Android's :app:koverVerify.
+# It runs the PotillusKit suite with coverage (command-line, NO simulator) and
+# enforces the LINE floor (IOS_COVERAGE_MIN_LINE) over the kit's own sources via
+# tools/check-ios-coverage.py, which filters to /Sources/PotillusKit/ exactly as the
+# manual measurement does. Line-only -- branch coverage is a gold-tier goal not
+# available from this swift-test/llvm-cov path (see docs/ROADMAP.md). Kept a PURE
+# coverage target so the root `cover-check` gates both platforms symmetrically.
+cover-check: require-macos
+	@command -v swift >/dev/null 2>&1 || { echo "cover-check: 'swift' not found -- install the Swift/Xcode toolchain." >&2; exit 1; }
+	( cd PotillusKit && \
+	    swift test --enable-code-coverage && \
+	    python3 ../../tools/check-ios-coverage.py \
+	        "$$(swift test --enable-code-coverage --show-codecov-path)" \
+	        --min-line $(IOS_COVERAGE_MIN_LINE) )
+
 # swiftlint-check: assert swiftlint is present AND is the pinned version, so a
 # newer swiftlint with changed rules cannot silently pass or fail the lint below.
 swiftlint-check:
@@ -227,5 +251,5 @@ distclean: clean
 	rm -f Potillus/Resources/usersguide_*.md
 	rm -f PotillusUITests/SnapshotHelper.swift
 
-.PHONY: help require-macos swiftlint-check version version-check project guides \
+.PHONY: help require-macos swiftlint-check version version-check project guides cover-check \
         check-guides build swift-tests lint format clean distclean

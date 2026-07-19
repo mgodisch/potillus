@@ -346,15 +346,23 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   reproducible. What Android gets from F-Droid but the App Store cannot provide is
   an *independent* rebuilder; a cross-machine or third-party reproduction check
   would raise this from self-attested to externally verified.
-- **iOS code-coverage gate** (`test_statement_coverage80`,
-  `test_branch_coverage80`; near-term). The Swift package suite (`swift test` in
-  `ios/PotillusKit`) runs today, but its coverage is neither measured nor enforced.
-  Wire up `swift test --enable-code-coverage`, extract the figure with `xccov`, and
-  enforce a floor as a `cover-check` target in `ios/Makefile` — the iOS counterpart
-  of Android's `:app:koverVerify` — so the release path gates iOS coverage the same
-  way it gates Android's. The build tooling's `cover-check` (in `make/release.mk`)
-  is already structured to take this second platform: today it runs only `make -C
-  android cover-check`, and the iOS line slots in beside it.
+- **iOS branch coverage (parity with Android).** The new iOS `cover-check` enforces
+  a LINE floor (`test_statement_coverage80`, silver) over PotillusKit, mirroring
+  Android's Kover. It is line-only: Android's Kover also enforces `BRANCH >= 75`, but
+  the `swift test`/llvm-cov path yields no branch data (the branch column comes back
+  empty). Closing that parity gap -- toward the gold `test_branch_coverage80` on both
+  ports -- needs a toolchain path that emits Swift branch coverage.
+- **UI / instrumented-test coverage on both platforms** (developer tooling). The
+  coverage gates measure UNIT-test coverage only: Android's Kover over the JVM unit
+  tests (the Compose UI layer and framework entry points are deliberately excluded),
+  and the iOS `cover-check` over PotillusKit via `swift test`. Neither measures the
+  UI/instrumented layer. Enriching both symmetrically -- Android via Kover's
+  `androidTest`/instrumented-coverage integration (un-excluding the UI classes;
+  device-bound) and iOS via `xcodebuild test -enableCodeCoverage` + `xccov`
+  (simulator-bound) -- would give a "coverage incl. UI" figure on each. It is a
+  larger, device-bound change on both sides and buys nothing for the OpenSSF badge
+  (silver is line-only and already met; branch is unobtainable from these paths), so
+  it is deferred rather than folded into the unit-coverage gates.
 - **iOS on-simulator tests** (`device-tests-ios`; developer tooling). The
   app-target XCTests (`PotillusTests`, `PotillusUITests`) run today only as a side
   effect of the screenshot capture; no target runs them for their own sake. `make

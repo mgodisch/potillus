@@ -296,6 +296,22 @@ install-debug` was equivalent to `adb install` run from `android/`; it is a root
 target that copies the APK to `../downloads/` for sideloading and never touches a
 device.
 
+The symmetric `cover-check` scaffolding gains its second platform. A new
+`cover-check` in `ios/Makefile` runs the PotillusKit suite with coverage (`swift
+test --enable-code-coverage`, command line, no simulator) and enforces a LINE floor
+over the kit's own sources via a new `tools/check-ios-coverage.py`, which filters to
+`/Sources/PotillusKit/` exactly as Kover filters its class set. The root
+`cover-check` now fans out to both platforms and `release-ios` runs the gate before
+archiving, mirroring `release-android`. The floor is the OpenSSF silver target
+(`IOS_COVERAGE_MIN_LINE = 80`, `test_statement_coverage80`) and line-only: branch
+coverage is a gold-tier goal not obtainable from this `swift test`/llvm-cov path.
+ A new per-language test, `ReportLabelsCatalogTests`, reaches the floor: it
+builds `ReportLabels(language:)` for every shipping language and asserts no report
+string is empty, exercising `ReportLabelsCatalog.swift` -- the one file that had
+held the bulk of the kit's previously-uncovered lines (its word-for-word
+correctness stays the job of tools/check-l10n-parity.py). iOS branch-coverage
+parity and UI/instrumented coverage on both platforms are on the roadmap.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

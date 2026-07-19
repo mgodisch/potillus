@@ -92,7 +92,7 @@ help:
 	@echo
 	@echo "Release (Android):"
 	@echo "  make release-android  gate, build (AAB+APK+SBOM) and stage into releases/  [device artifacts required]"
-	@echo "  make cover-check      enforce the code-coverage floor (Android Kover today)"
+	@echo "  make cover-check      enforce the code-coverage floor (Android Kover + iOS PotillusKit)"
 	@echo "Release (iOS, Mac only):"
 	@echo "  make release-ios      archive, export a signed IPA + SBOM, stage into releases/"
 	@echo "  make ios-sbom         generate the iOS CycloneDX SBOM only"

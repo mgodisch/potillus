@@ -126,13 +126,14 @@ require-ios-screenshots = \
 # COVERAGE GATE
 # =============================================================================
 
-# cover-check: the coverage gate, one target per platform. Today it runs Android's
-# Kover floor (:app:koverVerify, in android/Makefile). The iOS xccov floor will join
-# here as `$(MAKE) -C ios cover-check` once that target exists -- see docs/ROADMAP.md.
-# Kept separate from release-check.sh (rather than its --coverage flag) precisely so
-# the iOS side can be added symmetrically.
+# cover-check: the coverage gate, one target per platform -- Android's Kover LINE
+# floor (:app:koverVerify) and the iOS line floor (swift test coverage over
+# PotillusKit, in ios/Makefile). Kept separate from release-check.sh (rather than its
+# --coverage flag) so the two platforms are gated symmetrically. Line-only on both;
+# branch coverage and UI/instrumented coverage are roadmap goals (see docs/ROADMAP.md).
 cover-check:
 	$(MAKE) -C android cover-check
+	$(MAKE) -C ios cover-check
 
 # =============================================================================
 # ANDROID RELEASE
@@ -255,6 +256,9 @@ release-ios:
 	# the UUID, identical; the rm below keeps each build clean. DEVELOPMENT_TEAM is passed
 	# so team-scoped lookups resolve. The FIRST archive is the throwaway reference; the
 	# SECOND is the one exported and staged. errexit aborts the release if an archive fails.
+	# Coverage gate, the iOS counterpart of release-android's cover-check: fail
+	# before the expensive archive if PotillusKit line coverage is below the floor.
+	$(MAKE) -C ios cover-check
 	# (Re)generate the Xcode project from project.yml before archiving (was the
 	# `ios-project` prerequisite in the old root Makefile).
 	$(MAKE) -C ios project
