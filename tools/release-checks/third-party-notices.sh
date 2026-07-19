@@ -48,7 +48,7 @@
 #   gate that also runs `make sbom` — that warning correctly blocks the release
 #   until the NOTICE is dealt with.
 #
-#   Without the SBOM (the routine `make debug` gate), or without a populated
+#   Without the SBOM (the routine `make -C android debug-apk` gate), or without a populated
 #   Gradle cache, the check reports itself as SKIPPED via info() and passes:
 #   it can only ever act on the authoritative inventory, never on guesses, so
 #   it cannot produce false failures in environments that lack the inputs.

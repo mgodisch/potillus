@@ -41,6 +41,13 @@ on purpose.
 
 that you can install on any Android 11 (API 30) or newer device or emulator.
 
+**Relation to `make help`.** This guide is the extended companion to the
+Makefile's `make help`: it walks the build-path targets (`make -C android
+debug-apk`, `make install-debug`) in order, with the *why* behind each. `make
+help`, run from the repository root, is the one-line index of every target
+(build, checks, store assets, release, publishing); the release and publishing
+groups are deliberately out of scope here.
+
 ---
 
 ## 1. Why these tools, and nothing else
@@ -161,9 +168,9 @@ The project is driven by `make`. On Debian the system `make` **is** GNU Make,
 so plain `make` works (only macOS needs a separate `gmake`).
 
     cd android
-    make debug
+    make -C android debug-apk
 
-`make debug` does three things in order, and understanding them turns a failed
+`make -C android debug-apk` does three things in order, and understanding them turns a failed
 build into an obvious fix:
 
 1. **Prerequisite check** (`prereq`): it verifies `java -version` is 21 and
@@ -188,7 +195,7 @@ When it finishes you have:
 
 The first build is slow because of the one-time downloads; later builds reuse
 the Gradle daemon and caches. If Gradle runs out of memory on a small machine,
-raise its heap: `make debug GRADLE_OPTS="-Xmx4g"`.
+raise its heap: `make -C android debug-apk GRADLE_OPTS="-Xmx4g"`.
 
 ---
 
@@ -200,7 +207,8 @@ one of the following.
 **On a physical phone** (Developer options → USB debugging enabled):
 
     adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-    # or, equivalently, from the android/ directory:  make install-debug
+    # (from the repo root, `make install-debug` instead copies that APK to
+    #  ../downloads/ for manual sideloading -- it does NOT install to a device)
 
 **On an emulator**, create one from the SDK you already have:
 

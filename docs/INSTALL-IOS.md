@@ -40,6 +40,12 @@ purpose.
 **What you will have at the end.** The app compiled in the `Debug`
 configuration and running in an iPhone Simulator.
 
+**Relation to `gmake help`.** Like its Android sibling, this guide is the
+extended companion to the iOS Makefile's help: it walks the build-path targets
+(`gmake -C ios project`, then the Simulator build and `gmake ios`) in order, with
+the *why* behind each. `gmake help` (run in `ios/`) is the one-line index of
+every iOS target; project generation comes first there too, matching §5 below.
+
 ---
 
 ## 1. Why these tools, and nothing else
@@ -139,7 +145,7 @@ Inside `ios/`, the source is split in two, plus a generator spec:
 
 From the **repository root** (not from `ios/`):
 
-    gmake ios-project
+    gmake -C ios project
 
 This does two things in the required order:
 
@@ -150,7 +156,7 @@ This does two things in the required order:
    exists.
 2. Runs `xcodegen generate` inside `ios/`, producing `ios/Potillus.xcodeproj`.
 
-You must re-run `gmake ios-project` whenever `project.yml` or the version
+You must re-run `gmake -C ios project` whenever `project.yml` or the version
 changes; for a plain build-from-scratch you run it once here.
 
 `Version.xcconfig` carries `MARKETING_VERSION`, taken from the top `## vX.Y.Z`
@@ -159,7 +165,7 @@ entry of `CHANGELOG.md`, and `CURRENT_PROJECT_VERSION`, taken from the Android
 the same build number, and neither can drift from the changelog. `gmake
 ios-version-check` verifies the file exists and is current — suitable for a
 release gate, and worth running by hand after a version bump if you build with
-`xcodebuild` directly rather than through `gmake ios-project`, which regenerates
+`xcodebuild` directly rather than through `gmake -C ios project`, which regenerates
 the file anyway. No target depends on it.
 The values must **never** be set in `project.yml` directly: a value in `settings`
 overrides an xcconfig and would silently defeat the generator. To confirm the
@@ -264,7 +270,7 @@ unpaid signing, not a project setting.
   Point it at the full Xcode once:
   `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
 - **XcodeGen cannot resolve the config / `Version.xcconfig` missing.** Run
-  `gmake ios-version` (or the whole `gmake ios-project`) before
+  `gmake -C ios version` (or the whole `gmake -C ios project`) before
   `xcodegen generate`.
 - **`Unable to resolve module dependency: 'GRDB'`.** You built with `-sdk
   iphonesimulator` instead of a `-destination`. Use the exact command in §6.

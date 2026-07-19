@@ -51,13 +51,14 @@ SHELL       := /bin/bash
 help:
 	@echo "Libellus Potionis -- Android build (run from android/)"
 	@echo
-	@echo "Build:"
+	@echo "Build & test:"
 	@echo "  make debug-apk        build the debug APK"
 	@echo "  make screenshot-apks  build the debug + androidTest APKs"
 	@echo "  make unit-tests       run the JVM unit tests"
 	@echo "  make device-tests     run the on-device instrumentation tests  [device]"
 	@echo "  make lint             run ktlint + Android lint (build-breaking)"
 	@echo "  make format           auto-format the Kotlin sources (ktlint)"
+	@echo "User guides:"
 	@echo "  make guides           (re)render the localized user guides"
 	@echo "  make check-guides     verify guides + license copies are in sync"
 	@echo "Release (artifacts only; gates + staging live in the root):"
@@ -70,6 +71,7 @@ help:
 	@echo "  make distclean        clean + the sources a build generates into the tree"
 	@echo
 	@echo "Override the SDK path:  make ANDROID_HOME=/path/to/android-sdk"
+	@echo "Full first-build walkthrough: ../docs/INSTALL-ANDROID.md"
 
 # =============================================================================
 # CONFIGURATION

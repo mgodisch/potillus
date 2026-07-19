@@ -50,20 +50,22 @@ SHELL       := /bin/bash
 help:
 	@echo "Libellus Potionis -- iOS build (run from ios/)"
 	@echo
-	@echo "Build / test / lint (need macOS):"
-	@echo "  make build         compile the app (xcodebuild, Debug)"
-	@echo "  make swift-tests   run the PotillusKit unit tests (swift test)"
-	@echo "  make lint          run SwiftLint (--strict, pinned $(SWIFTLINT_VERSION))"
-	@echo "  make format        auto-format the Swift sources (swiftlint --fix)"
-	@echo "Project generation:"
+	@echo "Project generation (do this first):"
 	@echo "  make project       generate the Xcode project (xcodegen) [needs xcodegen]"
 	@echo "  make version       regenerate Version.xcconfig from CHANGELOG + versionCode"
 	@echo "  make version-check verify Version.xcconfig is current (read-only)"
 	@echo "  make guides        (re)render the localized user guides"
 	@echo "  make check-guides  verify the rendered guides are in sync (read-only)"
+	@echo "Build / test / lint (need macOS):"
+	@echo "  make build         compile the app (xcodebuild, Debug)"
+	@echo "  make swift-tests   run the PotillusKit unit tests (swift test)"
+	@echo "  make lint          run SwiftLint (--strict, pinned $(SWIFTLINT_VERSION))"
+	@echo "  make format        auto-format the Swift sources (swiftlint --fix)"
 	@echo "Housekeeping:"
 	@echo "  make clean         remove the Xcode/SwiftPM build output"
 	@echo "  make distclean     clean + the sources a build generates into the tree"
+	@echo
+	@echo "Full first-build walkthrough: ../docs/INSTALL-IOS.md"
 
 # =============================================================================
 # CONFIGURATION

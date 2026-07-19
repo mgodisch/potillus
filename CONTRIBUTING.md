@@ -338,7 +338,7 @@ gmake check-headers
 ```
 
 The `Makefile` drives the iOS build too, so on macOS you need `gmake` for it:
-`gmake ios-project` generates `ios/Potillus.xcodeproj`, and `gmake ios` runs the
+`gmake -C ios project` generates `ios/Potillus.xcodeproj`, and `gmake ios` runs the
 full gate — the Mac-free static checks, the kit's `swift test`, SwiftLint and
 `xcodebuild` (see [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md)). The `Makefile`
 also assumes a Linux

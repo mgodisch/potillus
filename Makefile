@@ -74,13 +74,11 @@ help:
 	@echo "  make device-tests-android  on-device instrumentation tests  [device]"
 	@echo "  make install-debug    copy the debug APK to ../downloads/ (sideload; not adb)"
 	@echo
-	@echo "Housekeeping:"
-	@echo "  make clean              clear both platforms' build output"
-	@echo "  make distclean          clear build output + generated sources (fresh-clone state)"
-	@echo "  make clean-android      Android build output only"
-	@echo "  make distclean-android  Android build output + generated sources"
-	@echo "  make clean-ios          iOS build output only"
-	@echo "  make distclean-ios      iOS build output + generated sources"
+	@echo "Checks (read-only, device-free, any host):"
+	@echo "  make check-static     every static check in one go (headers, l10n, iOS static, ...)"
+	@echo "  make check-ios-static the Mac-free iOS release gate"
+	@echo "  make check-makefile   bare-cd check across all makefiles + fragments"
+	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
 	@echo
 	@echo "Store assets (Android):"
 	@echo "  make screenshots-android      capture the in-app shots 01..06  [device]"
@@ -91,12 +89,6 @@ help:
 	@echo "  make rokkitt-bold     bake the static Rokkitt Bold for the badge  [one-off; commit it]"
 	@echo "Store assets (iOS):"
 	@echo "  make screenshots-ios          capture 01..06 (+ report pages 07/08)  [Mac + Simulator]"
-	@echo
-	@echo "Checks (read-only, device-free, any host):"
-	@echo "  make check-static     every static check in one go (headers, l10n, iOS static, ...)"
-	@echo "  make check-ios-static the Mac-free iOS release gate"
-	@echo "  make check-makefile   bare-cd check across all makefiles + fragments"
-	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
 	@echo
 	@echo "Release (Android):"
 	@echo "  make release-android  gate, build (AAB+APK+SBOM) and stage into releases/  [device artifacts required]"
@@ -110,8 +102,17 @@ help:
 	@echo "  make push-playstore   upload the staged AAB to Google Play  [git tag + signature gated]"
 	@echo "  make push-appstore    upload the staged IPA to the App Store  [Mac; tag + signature gated]"
 	@echo "  make push-codeberg    publish the Codeberg release + verify each asset checksum"
+	@echo "  (none of these touch releases/ -- staged artifacts are removed by hand)"
 	@echo
-	@echo "None of these touch releases/ -- staged release artifacts are removed by hand."
+	@echo "Housekeeping:"
+	@echo "  make clean              clear both platforms' build output"
+	@echo "  make distclean          clear build output + generated sources (fresh-clone state)"
+	@echo "  make clean-android      Android build output only"
+	@echo "  make distclean-android  Android build output + generated sources"
+	@echo "  make clean-ios          iOS build output only"
+	@echo "  make distclean-ios      iOS build output + generated sources"
+	@echo
+	@echo "Full first-build walkthrough: docs/INSTALL-ANDROID.md, docs/INSTALL-IOS.md"
 
 # =============================================================================
 # HOUSEKEEPING

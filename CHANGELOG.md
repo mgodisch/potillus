@@ -53,18 +53,19 @@ cancelled and was never published**; its `versionCode` 95 was never shipped, so
 bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
 carried by 0.84.0 — and everything that cycle had prepared is folded in below.
 
-### Build tooling: begin the Makefile rebuild
+### Build tooling: rebuild the Makefiles
 
-The two hand-grown Makefiles are being replaced, one target group at a time, by
+The two hand-grown Makefiles have been replaced, one target group at a time, by
 a smaller set with a clear division of labour: a thin root `Makefile` that
 delegates to a per-platform `android/Makefile` and a NEW `ios/Makefile` (until
 now iOS had no Makefile of its own — its housekeeping lived in the root as
-`clean-ios`/`distclean-ios`), with repository-wide concerns to follow as
-`make/*.mk` includes. The previous Makefiles are preserved verbatim under
-`attic/` as a reference while the rebuild proceeds.
+`clean-ios`/`distclean-ios`), with repository-wide concerns in `make/*.mk`
+includes. The previous Makefiles are preserved verbatim under `attic/` as a
+reference; it stays until the last deferred recipe is ported out of it (see
+docs/ROADMAP.md).
 
-Each revision is meant to be fully functional within its own scope. The
-foundation so far:
+Each revision is fully functional within its own scope. What the rebuild
+delivers:
 
 - A shared GNU Make version guard (`make/guard.mk`, included by all three
   Makefiles) aborts with a legible message on GNU Make older than 4.3 (macOS
@@ -267,13 +268,14 @@ runs them in the same order, with the same flags (`--Werror`/`--release`/
 `--coverage`) and the same summary. The output is byte-for-byte unchanged.
 
 Finally, a sweep updates the stale `make <target>` references the renames left in
-the tool and androidTest comments and diagnostics to the current names:
-`screenshots` -> `screenshots-android`, `report-pdfs` -> `report-pdfs-android`,
+comments, docs and diagnostics -- across the tools, the androidTest sources, the
+install/contributing docs and the decomposed release-check scripts -- to the current
+names: `screenshots` -> `screenshots-android`, `report-pdfs` -> `report-pdfs-android`,
 `screenshots-pdf` -> `screenshots-pdf-android`, `test-device` ->
-`device-tests-android`, and `ios-version`/`ios-guides`/`guides` ->
-`make -C ios version` / `make -C ios guides` / `make -C android guides`. All are in
-comments or diagnostic messages -- none in asserted test strings -- so behavior is
-unchanged.
+`device-tests-android`, `debug` -> `make -C android debug-apk`, and
+`ios-version`/`ios-guides`/`ios-project`/`guides` -> the `make -C ios ...` /
+`make -C android guides` forms. All are in comments, docs or diagnostic messages --
+none in asserted test strings -- so behavior is unchanged.
 
 Housekeeping polish: `.gitignore` is regrouped by theme with uniform section
 headers and its stale `make` references updated (`make release` -> `release-android`,
@@ -282,6 +284,17 @@ the pattern set left byte-identical so the `tgz` exclude list is unaffected; the
 root Makefile header drops its now-stale in-progress note and per-revision target
 list in favour of a `make help` pointer; and the deferred `bestpractices` roadmap
 item now points at `attic/Makefile`, where the recipes to port still live.
+
+Finally, the three Makefiles' `make help` output is reordered into a build-up
+sequence -- root: daily -> checks -> store assets -> release -> publishing, with
+housekeeping moved LAST; iOS: project generation BEFORE build/test/lint (you
+generate, then build); Android: build & test, then user guides, then release --
+and each help ends with a pointer to its `docs/INSTALL-*.md`, which become the
+extended walkthrough of the build-path targets and gain a matching back-reference.
+Syncing the two surfaced a wrong claim, now fixed: INSTALL-ANDROID said `make
+install-debug` was equivalent to `adb install` run from `android/`; it is a root
+target that copies the APK to `../downloads/` for sideloading and never touches a
+device.
 
 ### iOS: delete and edit move to the native edit-mode model
 
