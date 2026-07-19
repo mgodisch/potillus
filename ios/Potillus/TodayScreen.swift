@@ -173,7 +173,11 @@ struct TodayScreen: View {
                 isPresented: .constant(model.failure != nil),
                 presenting: model.failure
             ) { _ in
-                Button(Loc.string("OK", locale: locale), role: .cancel) {}
+                // OK acknowledges AND clears: `failure` is `private(set)`, so
+                // without this call the alert's still-true `isPresented` binding
+                // could re-present it until the next successful load. Mirrors
+                // the Drinks and Settings screens' OK buttons.
+                Button(Loc.string("OK", locale: locale), role: .cancel) { model.clearFailure() }
             } message: { message in
                 Text(message)
             }

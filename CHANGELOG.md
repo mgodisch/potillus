@@ -407,6 +407,24 @@ picture; the target still exits non-zero at the end if any step failed. The
 shared shell scaffolding lives once in the root Makefile
 (`QA_PROLOGUE`/`QA_EPILOGUE`).
 
+### QA round (0.84.0): review findings and fixes
+
+A full nine-dimension review of both apps and the seam (the fourth round of its
+kind) ran against this unreleased version; its findings are folded in here.
+
+- **The Today screen's error alert could not be acknowledged (iOS).**
+  `TodayModel.failure` is `private(set)` and — alone among the models — had no
+  clear method, while the screen's OK button did nothing. Acknowledging the
+  alert therefore changed nothing: the flag, and with it the alert's
+  `isPresented` binding, stayed set until the next *successful* load, which for
+  a persistent failure never comes (and a still-true binding can re-present the
+  alert). Every sibling already pairs its failure with a clear method wired to
+  OK (`EntryLogger.clearFailure`, `SettingsModel.clearFailure`,
+  `DrinksModel.clearErrors`); `TodayModel.clearFailure()` now closes the gap,
+  the OK button calls it, and a new kit test
+  (`testAFailureCanBeAcknowledgedAndCleared`, driving a real foreign-key
+  violation through the model) pins the behaviour.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The three iOS screens that list rows — Today's entries, the Drinks catalogue and

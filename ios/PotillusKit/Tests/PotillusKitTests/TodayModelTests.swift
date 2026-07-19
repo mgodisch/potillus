@@ -283,6 +283,27 @@ final class TodayModelTests: XCTestCase {
         XCTAssertNil(model.failure)
     }
 
+    /// A failed write surfaces its reason, and the error alert's OK button can
+    /// actually CLEAR it. `failure` is `private(set)`, so before `clearFailure()`
+    /// existed the alert acknowledged nothing: the flag — and with it the alert's
+    /// `isPresented` binding — stayed set until the next successful load
+    /// (0.84.0 QA round). The failing write is a real one: a drink that was never
+    /// stored violates the entries → drinks foreign key (ON DELETE RESTRICT, see
+    /// `test-vectors/db-schema.json`), which GRDB enforces, so the insert throws.
+    func testAFailureCanBeAcknowledgedAndCleared() async throws {
+        let model = makeModel(at: evening)
+        await model.load()
+
+        let ghost = DrinkDefinition(id: 9_999, name: "Ghost", volumeMl: 500, alcoholPercent: 4.9)
+        await model.addEntry(drink: ghost, volumeMl: 500)
+
+        XCTAssertNotNil(model.failure, "a foreign-key violation must be surfaced, not swallowed")
+        XCTAssertTrue(model.state.entries.isEmpty, "the failed write must not leave a row behind")
+
+        model.clearFailure()
+        XCTAssertNil(model.failure, "OK on the error alert clears the surfaced failure")
+    }
+
     // ── Observation ──────────────────────────────────────────────────────────
     //
     // The Today screen was the last snapshot model. These prove it now reacts to a

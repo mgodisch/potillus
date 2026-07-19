@@ -405,6 +405,16 @@ public final class TodayModel {
         await perform { try self.entries.update(entry) }
     }
 
+    /// Clears the surfaced failure — the OK button of the screen's error alert.
+    ///
+    /// Without this, `failure` (being `private(set)`) could only be reset by the
+    /// NEXT SUCCESSFUL load, so acknowledging the alert changed nothing and the
+    /// still-true `isPresented` binding could re-present it. Every sibling model
+    /// already pairs its `failure` with a clear method wired to OK
+    /// (`EntryLogger.clearFailure`, `SettingsModel.clearFailure`,
+    /// `DrinksModel.clearErrors`); this closes the one gap (0.84.0 QA round).
+    public func clearFailure() { failure = nil }
+
     /// Runs a write, then reloads. A failed write leaves the state untouched and
     /// surfaces the reason rather than pretending the entry was saved.
     private func perform(_ write: @escaping () throws -> Void) async {
