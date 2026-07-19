@@ -51,7 +51,7 @@
       "expected": true
     },
     {
-      "description": "a backwards reading is not trusted to unlock",
+      "description": "a backwards reading counts as no elapsed time: no prompt",
       "backgroundedAt": 1000.0,
       "now": 990.0,
       "expected": false

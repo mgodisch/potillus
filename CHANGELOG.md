@@ -424,6 +424,18 @@ kind) ran against this unreleased version; its findings are folded in here.
   the OK button calls it, and a new kit test
   (`testAFailureCanBeAcknowledgedAndCleared`, driving a real foreign-key
   violation through the model) pins the behaviour.
+- **The app-lock's backwards-reading documentation said the opposite of what
+  the code does (both platforms + vector).** A negative uptime gap returns
+  `false` — no prompt, the already-unlocked session continues — yet the KDocs
+  spoke of a reading "not trusted to unlock" and "neither should unlock
+  anything", and the vector case was described as "a backwards reading is not
+  trusted to unlock": fail-closed words over fail-open code. The behaviour is
+  deliberate, cross-platform-identical and vector-pinned (a backwards monotonic
+  reading is unreachable without a compromised process, which this in-process
+  gate cannot defend against anyway), so the *words* were fixed, not the code:
+  both KDocs and the vector case's `description` now state the actual outcome
+  and the reasoning. No behavioural change; the vector's inputs and `expected`
+  values are untouched.
 
 ### iOS: delete and edit move to the native edit-mode model
 

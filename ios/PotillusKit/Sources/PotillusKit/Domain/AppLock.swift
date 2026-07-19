@@ -101,8 +101,13 @@ public enum AppLock {
     /// Two uptime readings, one subtraction, no clock. A `nil` background time
     /// means the app has not been backgrounded since it unlocked, so nothing has
     /// expired. A negative gap — which a monotonic source should never produce —
-    /// is treated as "no time passed" rather than trusted, because the only way to
-    /// get one is a bug or a tampered reading, and neither should unlock anything.
+    /// is treated as "no time passed": NO prompt, the already-unlocked session
+    /// simply continues. That is a deliberate, vector-pinned choice, not a
+    /// safety valve: the arithmetic of `>=` would reach the same `false` for any
+    /// negative value, and the only way to obtain a backwards reading at all is
+    /// a bug or a compromised process — a boundary this in-process gate cannot
+    /// defend anyway. The explicit guard exists to make that reasoning visible,
+    /// not to change the outcome.
     public static func requiresReauth(
         backgroundedAtUptime: TimeInterval?,
         nowUptime: TimeInterval

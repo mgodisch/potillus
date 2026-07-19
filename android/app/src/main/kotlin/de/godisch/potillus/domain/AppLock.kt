@@ -74,10 +74,14 @@ object AppLock {
      * @param nowMillis The monotonic reading on return.
      * @return `true` when the gap MEETS OR EXCEEDS the threshold (`>=`, the
      *         boundary the vectors pin). A negative gap — which a monotonic
-     *         source should never produce — is treated as "no time passed"
-     *         rather than trusted, mirroring the Swift port: the only way to
-     *         get one is a bug or a tampered reading, and neither should
-     *         unlock anything.
+     *         source should never produce — is treated as "no time passed":
+     *         NO prompt, the already-unlocked session simply continues. That is
+     *         a deliberate, vector-pinned choice mirroring the Swift port, not
+     *         a safety valve: `>=` would reach the same `false` for any
+     *         negative value, and the only way to obtain a backwards reading is
+     *         a bug or a compromised process — a boundary this in-process gate
+     *         cannot defend anyway. The explicit guard makes that reasoning
+     *         visible; it does not change the outcome.
      */
     fun requiresReauth(backgroundedAtMillis: Long?, nowMillis: Long): Boolean {
         if (backgroundedAtMillis == null) return false
