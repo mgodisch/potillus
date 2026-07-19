@@ -43,7 +43,7 @@
 # WHY THIS MATTERS:
 #   .bestpractices.json is the committed snapshot of the project's answers to
 #   the OpenSSF Best Practices Badge (metal series: passing/silver/gold) and the
-#   OSPS Baseline (level 1/2/3). `make bestpractices-json` now mirrors the FULL
+#   OSPS Baseline (level 1/2/3). filter-bestpractices.py mirrors the FULL
 #   upstream criteria set — every tracked criterion is present even when it is
 #   unanswered — so the file doubles as a checklist. This gate makes the
 #   checklist binding: it FAILS while any criterion is still unanswered, where

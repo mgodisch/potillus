@@ -207,10 +207,11 @@ practice.
   `docs/ROADMAP.md`, `assurance_case` -> `docs/ASSURANCE_CASE.md`.
 - Keep a version-controlled snapshot of the badge answers (metal series passing,
   silver, gold, plus OSPS Baseline Level 1) in `.bestpractices.json` (repository
-  root). This is a one-way mirror site -> repo: the maintainer edits answers on
-  bestpractices.dev, and `make bestpractices-json` pulls them back into the file
-  from the site's own JSON export (no credentials; review `git diff` before
-  committing). The reverse direction is unavailable here — bestpractices.dev's
+  root), the maintained source of truth. `make bestpractices` downloads the
+  current bestpractices.dev export and reports, grouped by level, which committed
+  answers the site does not yet match, so the maintainer knows what to enter
+  upstream (no credentials; the working tree is not touched). The reverse
+  direction is unavailable here — bestpractices.dev's
   automation does not ingest a `.bestpractices.json` committed to a Codeberg
   repository (its repository analysis targets GitHub/GitLab), and the URL-based
   automation-proposal path is impractical because the server rejects the long URLs
@@ -287,19 +288,6 @@ second active participant in the project.
   coverage counts as dynamic analysis). The related passing `test_most` and the
   silver/gold statement-coverage criteria (`test_statement_coverage80`,
   `test_statement_coverage90`) are already met.
-- **More run-time assertions checked during testing**
-  (`dynamic_analysis_enable_assertions`, gold SHOULD; non-blocking). This
-  criterion targets fault detection during dynamic analysis (testing) before
-  deployment — explicitly not production. Today the code uses always-on Kotlin
-  preconditions (`require`, `check`, `error`) in a few critical places; these are
-  checked whenever the code runs, including under the test suite, but they are
-  not "many". Kotlin's compile-time null-safety and exhaustive typing already
-  enforce many invariants statically, reducing the need. To satisfy this SHOULD,
-  add invariant assertions in the JVM-testable domain and data layers using
-  Kotlin `assert()`: Gradle's unit-test task runs with assertions enabled
-  (`-ea`) by default, so they are verified during dynamic analysis, while ART
-  leaves them disabled in release builds — the "on for testing, off in
-  production" split the criterion recommends.
 
 ## Longer-term direction (~12 months)
 
@@ -386,16 +374,6 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   counterpart (`xcodebuild test -scheme Potillus -destination 'platform=iOS
   Simulator,name=$(IOS_SIM_DEVICE)'`, Mac + simulator) should join it so both
   platforms have a device-test target driven from the root the same way.
-- **Rebuild the OpenSSF badge maintenance targets** (`bestpractices-json`,
-  `bestpractices-jsonc`; developer tooling). The badge-answer sync
-  (`bestpractices-json`: pull the answers from bestpractices.dev, keep the answered
-  criteria and regenerate the annotated `.bestpractices.jsonc`) and its local
-  annotation half (`bestpractices-jsonc`) still live only in the old root Makefile,
-  preserved verbatim under `attic/Makefile`. They are maintenance-only — run by hand
-  when the badge answers change — so they were deliberately deferred out of the
-  build-tooling rebuild; port the two recipes from `attic/Makefile` into a small
-  fragment when convenient. The read-only `check-bestpractices-levels` gate is already
-  rebuilt in `make/checks.mk`.
 - **iPad / universal app.** The iOS layouts are written adaptively, so a
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.

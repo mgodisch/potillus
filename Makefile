@@ -32,13 +32,9 @@
 #      make -C ios     <target>     the iOS build (XcodeGen / xcodebuild)
 #
 #  Repository-wide concerns also live in the include fragments under make/ (guard,
-#  store, checks, release, publish). Run `make help` for the full target list: it is
-#  the single source of truth, so this header no longer duplicates it.
-#
-#  The previous, monolithic Makefiles are preserved verbatim under attic/ as a
-#  reference. attic/ stays until the last deferred recipe -- the bestpractices-json
-#  / bestpractices-jsonc badge-maintenance targets -- is ported out of it (see
-#  docs/ROADMAP.md).
+#  store, checks, release, publish, bestpractices). Run `make help` for the full
+#  target list: it is the single source of truth, so this header no longer
+#  duplicates it.
 # =============================================================================
 
 # =============================================================================
@@ -109,6 +105,9 @@ help:
 	@echo "  make push-codeberg    publish the Codeberg release + verify each asset checksum"
 	@echo "  (none of these touch releases/ -- staged artifacts are removed by hand)"
 	@echo
+	@echo "OpenSSF badge (maintenance; network, run by hand):"
+	@echo "  make bestpractices    write bestpractices-upstream.html: section links + copy buttons for the differing answers"
+	@echo
 	@echo "Housekeeping:"
 	@echo "  make clean              clear both platforms' build output"
 	@echo "  make distclean          clear build output + generated sources (fresh-clone state)"
@@ -173,6 +172,16 @@ include make/store.mk
 # their own fragment; see make/checks.mk. Included here so `make check-static` and
 # the individual `check-*` targets work from the repository root.
 include make/checks.mk
+
+# =============================================================================
+# OPENSSF BADGE MAINTENANCE
+# =============================================================================
+# The one manual, network target that reports which committed badge answers still
+# differ from bestpractices.dev lives in its own fragment; see make/bestpractices.mk.
+# Its read-only, level-consistency sibling check-bestpractices-levels is a static
+# check and stays in make/checks.mk. Included here so `make bestpractices` works
+# from the repository root.
+include make/bestpractices.mk
 
 # =============================================================================
 # RELEASE

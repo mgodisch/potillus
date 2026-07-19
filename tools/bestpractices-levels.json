@@ -1,9 +1,10 @@
 {
   "_comment": [
-    "Criterion -> badge level, used to annotate .bestpractices.json into a",
-    "browsable .bestpractices.jsonc ('make bestpractices-jsonc'), and to define",
-    "the COMPLETE set of criteria the badge tracks so release-check can demand",
-    "every one be answered.",
+    "Criterion -> badge level. It defines the COMPLETE set of criteria the badge",
+    "tracks (filter-bestpractices.py mirrors it, so release-check can demand every",
+    "one be answered) and the level each criterion sits at, which",
+    "diff-bestpractices.py uses to group its upstream-sync report ('make",
+    "bestpractices').",
     "",
     "TWO criteria series live on the badge site and both appear in the answers:",
     "  * Metal series (OpenSSF Best Practices Badge) -- the lower_snake_case",

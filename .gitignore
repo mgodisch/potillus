@@ -19,6 +19,8 @@ __pycache__/
 # Report PDFs rendered at the repo root, and a local scratch directory.
 /*.pdf
 /short
+# `make bestpractices` writes this pre-filled-edit-links page for manual upstream sync.
+/bestpractices-upstream.html
 # Android Gradle/Kotlin caches, build trees and the rendered-guides intermediate.
 /android/.gradle
 /android/.kotlin

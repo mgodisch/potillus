@@ -27,11 +27,11 @@
 check-bestpractices-levels.py -- keep the level map in step with the answers.
 
 WHY
-    render-bestpractices-jsonc.py annotates every criterion in
-    .bestpractices.json with a badge level looked up in
+    filter-bestpractices.py and diff-bestpractices.py both look up every
+    criterion in .bestpractices.json against the badge level map in
     tools/bestpractices-levels.json. If the badge site ever adds a criterion
-    that ends up in the answers file but not in the map, the render would fail
-    at generation time -- but only if someone remembers to regenerate. This
+    that ends up in the answers file but not in the map, those tools would
+    misplace or drop it -- but only if someone happens to run them. This
     gate makes the coupling a first-class release check: it FAILS whenever the
     answers file contains a criterion the map cannot place, pointing at the map
     as the thing to update (from the upstream sources named in its _comment).
