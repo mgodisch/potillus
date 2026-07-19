@@ -436,6 +436,11 @@ kind) ran against this unreleased version; its findings are folded in here.
   both KDocs and the vector case's `description` now state the actual outcome
   and the reasoning. No behavioural change; the vector's inputs and `expected`
   values are untouched.
+- **Editorial:** two references inside this very entry still said
+  `make ios-project`, the pre-rebuild target name this entry's own sweep
+  retired everywhere else; both now read `make -C ios project`. (Older
+  entries keep their historical names by design; only the unreleased entry is
+  held to the current ones.)
 
 ### iOS: delete and edit move to the native edit-mode model
 
@@ -521,11 +526,11 @@ changes or stash them". The setting is now pinned to `NO` in `ios/project.yml`: 
 catalog is the committed, manually-maintained source of truth (its parity is guarded
 by `check-l10n-parity.py`, not by Xcode's extractor), and it is still compiled into
 the bundle, so only the write-back is suppressed — the runtime is unchanged.
-`make ios-project` must be re-run once so the generated project picks the setting up.
+`make -C ios project` must be re-run once so the generated project picks the setting up.
 
 And made the code-signing Team ID survive project regeneration. `ios/project.yml`
 pinned `DEVELOPMENT_TEAM: ""`, and because `xcodegen` rewrites the entire
-`.xcodeproj` on every `make ios-project`, any team chosen by hand in Xcode's
+`.xcodeproj` on every `make -C ios project`, any team chosen by hand in Xcode's
 Signing & Capabilities editor was wiped on the next generate — Xcode then demanded
 a team again on the next device run. The value is now read from the
 `DEVELOPMENT_TEAM` environment variable (`"${DEVELOPMENT_TEAM}"`, which XcodeGen
