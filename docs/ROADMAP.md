@@ -64,24 +64,37 @@ attainable until each is resolved. They are the most critical open items.
   arrangement in `docs/GOVERNANCE.md`. F-Droid distribution helps (its
   reproducible-build re-signing removes the private-key hand-off) but is not
   itself a successor.
-- **Continuous integration** (`automated_integration_testing`). Add a Woodpecker
-  pipeline (`.woodpecker.yml`) on Codeberg that runs the automated test suite on
-  each push and reports success/failure. `./gradlew testDebugUnitTest` plus
-  `lintDebug` and `ktlintCheck` is sufficient; instrumented tests need an
-  emulator and are optional. The iOS side has no CI runner yet; once the pipeline
-  exists it should also run the Swift package suite (`swift test` in
-  `ios/PotillusKit`) and the container-runnable `tools/` checks, so the Swift
-  toolchain is covered too. Requires enabling Woodpecker for the repository.
-  Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
-  gold) and `static_analysis_often`, and is the natural home for the periodic
-  `osv-scanner` run (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
-  When added, the pipeline should be configured to satisfy the CI-conditional OSPS
-  Baseline controls that are answered N/A today for want of any CI, across Level 1
-  and Level 2: sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
-  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`), run
-  with least-privilege default permissions (`OSPS-AC-04.01`), and run the test
-  suite and any status checks in the pipeline before merge (`OSPS-QA-06.01`,
-  `OSPS-QA-03.01`).
+- **Continuous integration** (`automated_integration_testing`). A Woodpecker
+  pipeline (`.woodpecker.yml`) is in the repository. To be a good guest on
+  Codeberg's shared runners it is deliberately narrow: CHECKS ONLY (no build),
+  and it runs ONLY on pull requests targeting `main` rather than on every push.
+  It executes the two device-free gates that already pass in the QA log —
+  `tools/release-check.sh --Werror` and `make check-static` — which together
+  cover the shared invariants plus the iOS static checks reproduced in Python
+  (Swift symbol/length/test linting, l10n parity, store-metadata limits, ...),
+  so the Swift toolchain is covered without a Mac. A full Android build
+  (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs the SDK
+  and an emulator; an iOS build needs macOS + Xcode and cannot run on Codeberg's
+  Linux runners at all — so building stays local / pre-release, and running the
+  unit-test suites in CI is a possible later widening (it would need an
+  SDK-bearing image and, for `swift test`, a Linux Swift toolchain). Enabling
+  Woodpecker for the repository, and adding a branch-protection rule so a PR to
+  `main` can only merge on a green run, are one-time Codeberg web-UI steps
+  outside the repository. Also satisfies `test_continuous_integration`
+  (SUGGESTED at passing, a MUST at gold) and `static_analysis_often`, and is the
+  natural home for the periodic `osv-scanner` run (see
+  [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
+  The CI-conditional OSPS Baseline controls that are answered N/A today for want
+  of any CI — sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
+  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
+  run with least-privilege default permissions (`OSPS-AC-04.01`), and run the
+  test suite and any status checks in the pipeline before merge
+  (`OSPS-QA-06.01`, `OSPS-QA-03.01`) — are all met by this read-only,
+  secret-free, PR-gating pipeline in principle, but their `.bestpractices.json`
+  answers are intentionally NOT flipped from N/A until the pipeline has been
+  observed green on Codeberg: claiming a control the runner has not yet
+  exercised would be exactly the kind of unverified assertion these files exist
+  to avoid.
 
 ## Recommended, not blocking (SHOULD)
 
@@ -234,13 +247,14 @@ policy violations — plus establishing a VEX feed:
   release asset alongside the SBOM. Most valuable once a scan surfaces a
   vulnerability that does not affect the app.
 - **Automated, blocking policy gates in CI** (`OSPS-VM-05.03`, and strengthening
-  `OSPS-VM-06.02`). Wire the existing checks into the Woodpecker CI pipeline noted
-  above so every change is evaluated automatically and blocked on violation: run
-  osv-scanner against the SBOM to gate on vulnerable or malicious dependencies
-  (`OSPS-VM-05.03`, today only a manual pre-release step), and run Android Lint as a
-  required check (`OSPS-VM-06.02` is already enforced locally by the `abortOnError`
-  build gate, but CI would enforce it on every change rather than only at build
-  time). Both depend on introducing the CI pipeline.
+  `OSPS-VM-06.02`). Widen the Woodpecker CI pipeline noted above (which today runs
+  only the device-free checks) so every change is also evaluated against these
+  gates and blocked on violation: run osv-scanner against the SBOM to gate on
+  vulnerable or malicious dependencies (`OSPS-VM-05.03`, today only a manual
+  pre-release step), and run Android Lint as a required check (`OSPS-VM-06.02` is
+  already enforced locally by the `abortOnError` build gate, but CI would enforce
+  it on every change rather than only at build time). The Lint gate needs the
+  pipeline to gain an SDK-bearing image, since it is a build-time check.
 
 ## Working toward the OpenSSF gold badge
 

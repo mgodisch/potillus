@@ -409,6 +409,39 @@ picture; the target still exits non-zero at the end if any step failed. The
 shared shell scaffolding lives once in the root Makefile
 (`QA_PROLOGUE`/`QA_EPILOGUE`).
 
+### Build tooling: a Woodpecker CI pipeline (checks, PRs to main only)
+
+A `.woodpecker.yml` brings the device-free checks to Codeberg's CI
+([Woodpecker](https://woodpecker-ci.org)). It is deliberately the smallest
+useful gate, to be a good guest on shared runners:
+
+- **Checks, never a build.** Two steps run the same read-only gates that pass in
+  the QA log — `tools/release-check.sh --Werror` and `make check-static`. The
+  latter is what lets a Linux runner cover the iOS static checks (Swift
+  symbol/length/test linting, l10n parity, store-metadata limits) that are
+  reproduced in Python precisely so no Mac is needed. A real Android build needs
+  the SDK and an emulator; an iOS build needs macOS + Xcode and cannot run on a
+  Linux runner at all — so building stays local / pre-release.
+- **Pull requests targeting `main` only.** A workflow-global
+  `when: [event: pull_request, branch: main]` means an ordinary push to any
+  branch triggers nothing, and the run happens at the one moment that matters:
+  code asking to enter `main`. (For a `pull_request` event the branch filter
+  matches the PR's target, per the Woodpecker docs.)
+- **Least privilege.** One small `debian:trixie-slim` image (Python 3 is in the
+  base; `make`, `git` and `file` are the only additions), no secrets, no
+  privileged mode, read-only checks. `git config --global --add safe.directory
+  "$PWD"` clears the "dubious ownership" refusal a differently-owned CI checkout
+  otherwise triggers.
+
+Two one-time Codeberg web-UI steps stay with the maintainer: enabling Woodpecker
+for the repository, and a branch-protection rule so a PR to `main` can only
+merge on a green run. The OSPS Baseline controls this pipeline answers
+(`OSPS-BR-01.01`, `OSPS-BR-01.03`, `OSPS-AC-04.01`, `OSPS-QA-06.01`,
+`OSPS-QA-03.01`) are recorded in `docs/ROADMAP.md` but are intentionally left at
+their N/A answers in `.bestpractices.json` until the pipeline is observed green
+on Codeberg — flipping them before the runner has exercised them would assert a
+control that has not yet run.
+
 ### Build tooling: replace the badge-answer pull with a diff report
 
 The badge-answer sync recipe that still lived only in `attic/Makefile` -- the last
