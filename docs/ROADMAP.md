@@ -84,17 +84,17 @@ attainable until each is resolved. They are the most critical open items.
   (SUGGESTED at passing, a MUST at gold) and `static_analysis_often`, and is the
   natural home for the periodic `osv-scanner` run (see
   [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
-  The CI-conditional OSPS Baseline controls that are answered N/A today for want
-  of any CI — sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
+  The CI-conditional OSPS Baseline controls that were answered N/A for want of
+  any CI — sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
   untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
-  run with least-privilege default permissions (`OSPS-AC-04.01`), and run the
-  test suite and any status checks in the pipeline before merge
-  (`OSPS-QA-06.01`, `OSPS-QA-03.01`) — are all met by this read-only,
-  secret-free, PR-gating pipeline in principle, but their `.bestpractices.json`
-  answers are intentionally NOT flipped from N/A until the pipeline has been
-  observed green on Codeberg: claiming a control the runner has not yet
-  exercised would be exactly the kind of unverified assertion these files exist
-  to avoid.
+  run with least-privilege default permissions (`OSPS-AC-04.01`), and run
+  status checks before merge (`OSPS-QA-03.01`) — are now answered Met in
+  `.bestpractices.json`: the pipeline has run green on Codeberg, and branch
+  protection on main requires its check to pass before a merge. `OSPS-QA-06.01`
+  (a test SUITE running inside CI) stays N/A on purpose: this pipeline runs the
+  device-free checks only, not the unit-test suites (which need the Android SDK
+  and, for `swift test`, a Linux Swift toolchain), so claiming a CI test run
+  would assert something that does not happen — that widening is tracked above.
 
 ## Recommended, not blocking (SHOULD)
 

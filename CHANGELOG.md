@@ -436,12 +436,18 @@ useful gate, to be a good guest on shared runners:
 
 Two one-time Codeberg web-UI steps stay with the maintainer: enabling Woodpecker
 for the repository, and a branch-protection rule so a PR to `main` can only
-merge on a green run. The OSPS Baseline controls this pipeline answers
-(`OSPS-BR-01.01`, `OSPS-BR-01.03`, `OSPS-AC-04.01`, `OSPS-QA-06.01`,
-`OSPS-QA-03.01`) are recorded in `docs/ROADMAP.md` but are intentionally left at
-their N/A answers in `.bestpractices.json` until the pipeline is observed green
-on Codeberg — flipping them before the runner has exercised them would assert a
-control that has not yet run.
+merge on a green run. With the pipeline running green on Codeberg and that
+branch-protection rule in place, four CI-conditional OSPS Baseline controls
+move from N/A to Met in `.bestpractices.json` — untrusted-input validation
+(`OSPS-BR-01.01`), no privileged credentials for untrusted snapshots
+(`OSPS-BR-01.03`), least-privilege defaults (`OSPS-AC-04.01`), and
+status-checks-before-merge (`OSPS-QA-03.01`). `OSPS-QA-06.01` (a test SUITE
+running inside CI) stays N/A on purpose: this pipeline runs the device-free
+checks only, not the unit-test suites, which need the Android SDK and a Linux
+Swift toolchain — a run that does not happen is not claimed. The
+`docs/INSTALL-IOS.md` note that `gmake ios` is "what CI-style verification
+uses" is clarified to say it is the fuller LOCAL Mac gate, since the Codeberg
+pipeline runs only the device-free subset.
 
 ### Build tooling: replace the badge-answer pull with a diff report
 
