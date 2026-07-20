@@ -78,6 +78,8 @@ package de.godisch.potillus.l10n
 //   path of the app module directory, or adjust RES_DIR below.
 // =============================================================================
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import java.io.File
@@ -516,6 +518,49 @@ class LocaleSyncTest {
                 }
             }
             fail(msg.trimEnd())
+        }
+    }
+
+    /**
+     * [SupportedLocales.canonicalTag] is the single acceptance point for a
+     * restored `language` value (`BackupManager.parseBackupJson`). It must be
+     * case-insensitive, return the catalogue's OWN casing, and degrade an
+     * unknown tag to `""` (follow the system) — mirroring the assertions the
+     * iOS suite makes on its `canonicalTag` in `SettingsSanitizerTests`. The
+     * shared `backup-settings.json` vectors drive the same rules through the
+     * whole restore chain; this pins the helper in isolation.
+     */
+    @Test
+    fun `canonicalTag is case-insensitive and canonicalising`() {
+        assertEquals("de", SupportedLocales.canonicalTag("DE"))
+        assertEquals("pt-BR", SupportedLocales.canonicalTag("pt-br"))
+        assertEquals("", SupportedLocales.canonicalTag("xx"))
+        assertEquals("", SupportedLocales.canonicalTag(""))
+    }
+
+    /**
+     * Migration: the script tags the iOS app stores for Chinese (`zh-Hans` /
+     * `zh-Hant`, the String-Catalog spelling it exports into the shared backup
+     * format) must resolve to the region tags THIS catalogue ships, so an iOS
+     * backup keeps its Chinese language choice on an Android restore instead
+     * of silently dropping to System (v0.84.0 QA fix). The mirror-image
+     * migration (`zh-CN` → `zh-Hans`) lives in the iOS `SupportedLocales` and
+     * is pinned by its own suite.
+     */
+    @Test
+    fun `canonicalTag migrates the sibling platform's Chinese spellings`() {
+        assertEquals("zh-CN", SupportedLocales.canonicalTag("zh-Hans"))
+        assertEquals("zh-TW", SupportedLocales.canonicalTag("zh-Hant"))
+        assertEquals("migration is case-insensitive", "zh-CN", SupportedLocales.canonicalTag("ZH-hans"))
+        assertEquals("the interchange spelling still passes through", "zh-CN", SupportedLocales.canonicalTag("zh-CN"))
+        // Every migration target must be a tag the catalogue actually ships —
+        // a map entry pointing at a retired tag would turn the migration into
+        // a silent drop-to-System again.
+        SupportedLocales.MIGRATED_TAGS.values.forEach { target ->
+            assertTrue(
+                "MIGRATED_TAGS target '$target' is not in SupportedLocales.ALL",
+                SupportedLocales.TAGS.contains(target),
+            )
         }
     }
 }

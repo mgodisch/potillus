@@ -163,7 +163,17 @@ final class SettingsSanitizerTests: XCTestCase {
                 actual.alternativeStatusSymbols, expected.alternativeStatusSymbols,
                 "alternativeStatusSymbols: \(label)"
             )
-            XCTAssertEqual(actual.language, expected.language, "language: \(label)")
+            // The vector writes language expectations in the INTERCHANGE spelling
+            // (the Android catalogue, e.g. `zh-CN`); this suite maps each one
+            // through the same migration the app applies when restoring an
+            // Android backup (`canonicalTag`, `zh-CN` → `zh-Hans`) — the exact
+            // precedent `testLocaleCatalogueMatchesAndroid` set for `localeTags`.
+            // For every non-Chinese tag the mapping is the identity, so the older
+            // cases assert exactly what they always did.
+            XCTAssertEqual(
+                actual.language, SupportedLocales.canonicalTag(expected.language),
+                "language: \(label)"
+            )
             XCTAssertEqual(actual.weightKg, expected.weightKg, accuracy: 1e-9, "weightKg: \(label)")
         }
     }

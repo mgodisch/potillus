@@ -635,17 +635,23 @@ object BackupManager {
         // language: must be one of the app's shipped locales or the "" (follow
         // system) sentinel. The picker only ever stores exact tags from
         // [de.godisch.potillus.l10n.SupportedLocales], so any other value can
-        // only come from a hand-edited or foreign file. Accepting it verbatim
-        // used to persist an arbitrary tag AND apply it via
+        // only come from a hand-edited file — or from the iOS app, whose
+        // backups spell Chinese by script (`zh-Hans`/`zh-Hant`) where this
+        // catalogue uses the region tags (`zh-CN`/`zh-TW`). Accepting a tag
+        // verbatim used to persist an arbitrary value AND apply it via
         // AppCompatDelegate.setApplicationLocales on a REPLACE restore, leaving
         // the resources on the English fallback while the Settings picker held
-        // an unknown value (v0.81.0 QA fix). The lookup is case-insensitive and
-        // returns the registry's CANONICAL casing; anything unknown degrades to
-        // "" — follow the system language — matching this function's
-        // degrade-to-default contract for every other field. (The former
-        // length cap is subsumed: registry tags are all short.)
-        val rawLanguage = obj.optString("language", def.language)
-        val language = SupportedLocales.TAGS.firstOrNull { it.equals(rawLanguage, ignoreCase = true) } ?: ""
+        // an unknown value (v0.81.0 QA fix). [SupportedLocales.canonicalTag]
+        // therefore first migrates a sibling-platform spelling onto this
+        // catalogue's tag (`zh-Hans` → `zh-CN`; v0.84.0 QA fix — before that,
+        // an iOS backup's Chinese choice silently dropped to System here),
+        // then matches case-insensitively and returns the registry's CANONICAL
+        // casing; anything unknown degrades to "" — follow the system language
+        // — matching this function's degrade-to-default contract for every
+        // other field. (The former length cap is subsumed: registry tags are
+        // all short.) The zh cases in `test-vectors/backup-settings.json` pin
+        // this on both platforms.
+        val language = SupportedLocales.canonicalTag(obj.optString("language", def.language))
 
         return AppSettings(
             themeMode = theme,

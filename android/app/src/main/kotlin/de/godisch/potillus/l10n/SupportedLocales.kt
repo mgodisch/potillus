@@ -152,4 +152,54 @@ object SupportedLocales {
      * Used by [LocaleSyncTest] and the locale_config validator.
      */
     val TAGS: Set<String> = ALL.map { it.tag }.toSet()
+
+    /**
+     * Language tags that other writers of the shared backup format use for a
+     * language THIS catalogue spells differently.
+     *
+     * The one divergence today is Chinese: iOS String Catalogs key Chinese by
+     * SCRIPT (`zh-Hans` / `zh-Hant`), so the iOS app stores — and therefore
+     * exports into its backups — the script tags, while this catalogue uses the
+     * REGION tags (`zh-CN` / `zh-TW`) that Android's `values-zh-rCN/` resource
+     * qualifiers are built from. Without this map, restoring an iOS backup with
+     * `"language": "zh-Hans"` on Android silently degraded the explicit language
+     * choice to `""` (follow the system) — found in the v0.84.0 QA round. The
+     * map is the mirror image of `migratedTags` in the iOS
+     * `SupportedLocales.swift`, which rewrites `zh-CN` → `zh-Hans` for the
+     * opposite restore direction.
+     *
+     * Internal (not private) so [LocaleSyncTest] can assert that every key maps
+     * onto a tag the catalogue actually ships.
+     */
+    internal val MIGRATED_TAGS: Map<String, String> = mapOf(
+        "zh-Hans" to "zh-CN",
+        "zh-Hant" to "zh-TW",
+    )
+
+    /**
+     * Normalises a raw language tag to this catalogue's canonical spelling, or
+     * `""` (the "follow the system language" sentinel) for anything unknown.
+     *
+     * Two steps, in this order — the same order as the iOS `canonicalTag`:
+     *  1. MIGRATION: a sibling-platform spelling from [MIGRATED_TAGS] is
+     *     rewritten to this catalogue's tag first (`zh-Hans` → `zh-CN`), so an
+     *     iOS backup restores its Chinese language choice instead of dropping
+     *     to System.
+     *  2. CANONICALISATION: the (possibly migrated) tag is matched against
+     *     [ALL] case-insensitively, and the CATALOGUE's own casing is returned
+     *     (`"DE"` → `"de"`, `"pt-br"` → `"pt-BR"`).
+     *
+     * An unknown tag becomes `""` rather than an error, so a backup written by
+     * a newer app version that added a language restores gracefully — the same
+     * degrade-to-default contract every other settings field follows in
+     * [de.godisch.potillus.util.BackupManager.parseBackupJson].
+     *
+     * @param raw The tag as found in a backup file or stored preference.
+     * @return The canonical tag from [ALL], or `""` when unsupported.
+     */
+    fun canonicalTag(raw: String): String {
+        val migrated = MIGRATED_TAGS.entries
+            .firstOrNull { it.key.equals(raw, ignoreCase = true) }?.value ?: raw
+        return ALL.firstOrNull { it.tag.equals(migrated, ignoreCase = true) }?.tag ?: ""
+    }
 }

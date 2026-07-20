@@ -560,7 +560,10 @@ real host to confirm; no app code changes and no answer status changes.
 ### QA round (0.84.0): review findings and fixes
 
 A full nine-dimension review of both apps and the seam (the fourth round of its
-kind) ran against this unreleased version; its findings are folded in here.
+kind) ran against this unreleased version; a fifth full round followed against
+the release candidate — including a Python re-execution of 185 shared-vector
+cases against the Swift ports' semantics, all matching — and the findings of
+both rounds are folded in here.
 
 - **The Today screen's error alert could not be acknowledged (iOS).**
   `TodayModel.failure` is `private(set)` and — alone among the models — had no
@@ -586,6 +589,24 @@ kind) ran against this unreleased version; its findings are folded in here.
   both KDocs and the vector case's `description` now state the actual outcome
   and the reasoning. No behavioural change; the vector's inputs and `expected`
   values are untouched.
+- **A Chinese language choice did not survive an iOS → Android backup restore
+  (Android + vector).** iOS keys Chinese by script (`zh-Hans`/`zh-Hant`, the
+  String-Catalog spelling) and exports that tag into the shared backup format,
+  while Android's import matched the restored `language` only against its own
+  region tags (`zh-CN`/`zh-TW`) — so a backup written on iOS restored with the
+  explicit choice silently degraded to "follow the system". The reverse
+  direction already worked (iOS migrates `zh-CN` → `zh-Hans` in its
+  `canonicalTag`). Android's `SupportedLocales` now carries the mirror-image
+  migration (`MIGRATED_TAGS`: `zh-Hans` → `zh-CN`, `zh-Hant` → `zh-TW`) behind
+  a new `canonicalTag(raw)` — migration first, then the case-insensitive
+  catalogue match — and `BackupManager.parseBackupJson` routes the restored
+  tag through it. Three new `sanitize` cases in
+  `test-vectors/backup-settings.json` pin the migration on BOTH platforms
+  (expected values stay in the interchange spelling; the iOS suite now maps
+  each language expectation through its `canonicalTag`, the same precedent its
+  locale-catalogue test set), and `LocaleSyncTest` gains focused
+  `canonicalTag` tests mirroring the iOS suite's, including a guard that every
+  migration target is a tag the catalogue actually ships.
 - **Editorial:** two references inside this very entry still said
   `make ios-project`, the pre-rebuild target name this entry's own sweep
   retired everywhere else; both now read `make -C ios project`. (Older

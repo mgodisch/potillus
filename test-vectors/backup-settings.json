@@ -9,7 +9,12 @@
     "statsFromDate is kept only when it round-trips through the canonical yyyy-MM-dd",
     "formatter; anything else becomes blank rather than mis-bucketing statistics.",
     "language is matched case-insensitively against the locale catalogue and",
-    "canonicalised to the catalogue's own spelling."
+    "canonicalised to the catalogue's own spelling. Expected 'language' values",
+    "are written in the INTERCHANGE spelling (the Android catalogue, e.g.",
+    "zh-CN); the iOS suite maps each expectation through its canonicalTag,",
+    "which rewrites zh-CN to the zh-Hans script tag its String Catalogs use.",
+    "Both platforms also ACCEPT the sibling's spelling on import (each side's",
+    "canonicalTag migration), which the zh-Hans/zh-Hant cases below pin."
   ],
   "defaults": {
     "themeMode": "SYSTEM",
@@ -535,6 +540,66 @@
         "allowScreenshots": false,
         "alternativeStatusSymbols": false,
         "language": "",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "the sibling platform's zh-Hans spelling restores as Simplified Chinese",
+      "input": {
+        "language": "zh-Hans"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 80.0,
+        "maxDrinkDaysPerWeek": 4,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "zh-CN",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "the sibling platform's zh-Hant spelling restores as Traditional Chinese",
+      "input": {
+        "language": "zh-Hant"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 80.0,
+        "maxDrinkDaysPerWeek": 4,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "zh-TW",
+        "weightKg": 0.0
+      }
+    },
+    {
+      "description": "the interchange zh-CN spelling is accepted as before",
+      "input": {
+        "language": "zh-CN"
+      },
+      "expected": {
+        "themeMode": "SYSTEM",
+        "dayChangeHour": 4,
+        "dayChangeMinute": 0,
+        "dailyLimitGrams": 20.0,
+        "weeklyLimitGrams": 80.0,
+        "maxDrinkDaysPerWeek": 4,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "allowScreenshots": false,
+        "alternativeStatusSymbols": false,
+        "language": "zh-CN",
         "weightKg": 0.0
       }
     }
