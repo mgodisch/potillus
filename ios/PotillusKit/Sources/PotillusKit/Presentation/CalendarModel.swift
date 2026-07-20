@@ -81,6 +81,8 @@ public struct CalendarState: Sendable, Equatable {
 public final class CalendarModel {
 
     public private(set) var state = CalendarState()
+    /// Set when a load failed. Never swallowed; deliberately technical body —
+    /// see the content policy on `TodayModel.failure`.
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol

@@ -25,15 +25,16 @@
 
 /// Namespace for the shared Potillus domain and data layer.
 ///
-/// This is a scaffold. The ported domain logic — `AlcoholCalculator`,
-/// `DayResolver`, chart bucketing, the GRDB-backed SQLite layer, and the JSON
-/// backup reader/writer — will live in this package so it can be unit tested
-/// with `swift test`, mirroring the Android `domain/` and `data/` layers.
+/// The ported domain logic — `AlcoholCalculator`, `DayResolver`, the chart
+/// bucketing, the GRDB-backed SQLite layer, and the JSON backup reader/writer —
+/// lives in this package so it can be unit tested with `swift test`, mirroring
+/// the Android `domain/` and `data/` layers. (The scaffold-era wording that
+/// described this as still-to-be-ported was refreshed in the v0.84.0 QA round.)
 public enum PotillusKit {
 
-    /// A short identifier for the scaffolded kit. Replaced once real domain
-    /// APIs are ported.
+    /// A short identifier for the kit, asserted non-empty by the package and
+    /// app smoke tests as a minimal "the module links and runs" probe.
     public static func about() -> String {
-        "PotillusKit scaffold — domain logic to be ported here"
+        "PotillusKit — the shared Potillus domain and data layer"
     }
 }

@@ -59,7 +59,9 @@ public final class SettingsModel {
 
     public private(set) var settings = AppSettings()
 
-    /// Set when a write failed — a Keychain refusal, a full disk. Never swallowed.
+    /// Set when a write failed — a Keychain refusal, a full disk. Never
+    /// swallowed; deliberately technical body — see the content policy on
+    /// `TodayModel.failure`.
     public private(set) var failure: String?
 
     private let preferences: any PreferencesStoring

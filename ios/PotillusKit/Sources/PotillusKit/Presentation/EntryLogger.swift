@@ -147,7 +147,8 @@ public struct EntryLogger: Sendable {
 @Observable
 public final class EntryLogModel {
 
-    /// Set when the last write failed. Never swallowed.
+    /// Set when the last write failed. Never swallowed; deliberately technical
+    /// body — see the content policy on `TodayModel.failure`.
     public private(set) var failure: String?
 
     private let logger: EntryLogger

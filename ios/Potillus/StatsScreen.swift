@@ -63,6 +63,9 @@ struct StatsScreen: View {
     @State var exportedPdf: PdfDocument?
     @State var isExportingPdf = false
     @State var isBuildingPdf = false
+    /// Foreseeable export failures carry a localized message (see
+    /// `StatsScreenExport`); everything else keeps the raw error description per
+    /// the content policy on `TodayModel.failure`.
     @State var exportFailure: String?
 
     /// Non-nil while the range sheet is up; carries what the range is for.

@@ -119,6 +119,20 @@ public final class TodayModel {
 
     /// Set when a load or a write failed. The view shows it; nothing is silently
     /// swallowed.
+    ///
+    /// CONTENT POLICY (canonical for every model's `failure`): the alert
+    /// presenting this localizes its TITLE and buttons; the BODY is the raw
+    /// `String(describing:)` of the error, deliberately technical and English.
+    /// These are unforeseeable diagnostics — a database refusal mid-observation,
+    /// a full disk — whose whole value is being quoted verbatim into a bug
+    /// report, the same stance the startup-failure view documents in
+    /// `PotillusApp` and `describeBackupFailure` documents for its fallback
+    /// case. Failures the user can actually act on (the backup import/export
+    /// cases) are instead mapped onto localized strings in
+    /// `SettingsScreen.describeBackupFailure` — mirroring how Android maps its
+    /// `ImportError` cases onto string resources while leaving its own raw
+    /// diagnostics technical. The sibling models' `failure` fields reference
+    /// this comment rather than repeating it.
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol

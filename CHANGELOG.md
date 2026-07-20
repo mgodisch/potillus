@@ -607,11 +607,25 @@ both rounds are folded in here.
   locale-catalogue test set), and `LocaleSyncTest` gains focused
   `canonicalTag` tests mirroring the iOS suite's, including a guard that every
   migration target is a tag the catalogue actually ships.
+- **The technical-error-body stance is now documented where readers look
+  (iOS, comments only).** The models' `failure` alerts deliberately pair a
+  localized title with the raw, English `String(describing:)` diagnostic —
+  but the rationale was written down only beside `describeBackupFailure` in
+  `SettingsScreen`, so each of the model-side assignment sites read like an
+  L10N oversight (and nearly produced a false finding in this very round).
+  The policy now lives canonically on `TodayModel.failure`; the five sibling
+  models' `failure` fields and the Stats screen's `exportFailure` reference
+  it with one-liners. No behavioural or string change.
 - **Editorial:** two references inside this very entry still said
   `make ios-project`, the pre-rebuild target name this entry's own sweep
   retired everywhere else; both now read `make -C ios project`. (Older
   entries keep their historical names by design; only the unreleased entry is
-  held to the current ones.)
+  held to the current ones.) Additionally, `PotillusKit.swift` still carried
+  its scaffold-era doc ("domain logic to be ported here" / "Replaced once real
+  domain APIs are ported") beside a kit that has long since held the ported
+  domain and data layers; the namespace doc and the `about()` identifier
+  string now describe the kit as it is (its smoke tests assert only
+  non-emptiness, so no test changes).
 
 ### iOS: delete and edit move to the native edit-mode model
 

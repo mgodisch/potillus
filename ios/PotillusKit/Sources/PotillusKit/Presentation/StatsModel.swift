@@ -97,6 +97,8 @@ public struct StatsState: Sendable, Equatable {
 public final class StatsModel {
 
     public private(set) var state = StatsState()
+    /// Set when a load failed. Never swallowed; deliberately technical body —
+    /// see the content policy on `TodayModel.failure`.
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol

@@ -74,7 +74,8 @@ public final class DrinksModel {
     /// Set when a delete was refused because entries reference the drink.
     public private(set) var deleteBlocked: DeleteBlocked?
 
-    /// Anything else that went wrong. Never swallowed.
+    /// Anything else that went wrong. Never swallowed; deliberately technical
+    /// body — see the content policy on `TodayModel.failure`.
     public private(set) var failure: String?
 
     private let drinks: any DrinkRepositoryProtocol
