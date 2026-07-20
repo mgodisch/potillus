@@ -485,6 +485,11 @@ that ask specifically for in-pipeline TEST or LINT execution
 need the heavy SDK/Xcode toolchain the pipeline deliberately avoids — and
 `OSPS-VM-04.02` stays Unmet for want of a standardised VEX feed, though the
 osv-scanner.toml triage is its substance. The scans reach the network (osv.dev).
+`docs/ROADMAP.md` is reconciled with this end state: the entries that described
+CI and the SCA gate as still-to-come are updated to the shipped reality, and the
+remaining test-and-lint-in-CI work — the one heavier step, needing an SDK-bearing
+image and a Linux Swift toolchain — is recorded as its own explicitly deferred
+item so it does not drop from view.
 
 ### Build tooling: replace the badge-answer pull with a diff report
 

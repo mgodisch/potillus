@@ -65,36 +65,36 @@ attainable until each is resolved. They are the most critical open items.
   reproducible-build re-signing removes the private-key hand-off) but is not
   itself a successor.
 - **Continuous integration** (`automated_integration_testing`). A Woodpecker
-  pipeline (`.woodpecker.yml`) is in the repository. To be a good guest on
-  Codeberg's shared runners it is deliberately narrow: CHECKS ONLY (no build),
-  and it runs ONLY on pull requests targeting `main` rather than on every push.
-  It executes the two device-free gates that already pass in the QA log —
-  `tools/release-check.sh --Werror` and `make check-static` — which together
-  cover the shared invariants plus the iOS static checks reproduced in Python
-  (Swift symbol/length/test linting, l10n parity, store-metadata limits, ...),
-  so the Swift toolchain is covered without a Mac. A full Android build
-  (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs the SDK
-  and an emulator; an iOS build needs macOS + Xcode and cannot run on Codeberg's
-  Linux runners at all — so building stays local / pre-release, and running the
-  unit-test suites in CI is a possible later widening (it would need an
-  SDK-bearing image and, for `swift test`, a Linux Swift toolchain). Enabling
-  Woodpecker for the repository, and adding a branch-protection rule so a PR to
-  `main` can only merge on a green run, are one-time Codeberg web-UI steps
-  outside the repository. Also satisfies `test_continuous_integration`
-  (SUGGESTED at passing, a MUST at gold) and `static_analysis_often`, and is the
-  natural home for the periodic `osv-scanner` run (see
-  [../SECURITY.md](../SECURITY.md), "Dependency monitoring").
+  pipeline (`.woodpecker.yml`) is in the repository and running green on
+  Codeberg. To be a good guest on Codeberg's shared runners it is deliberately
+  narrow: no build, and it runs ONLY on pull requests targeting `main` rather
+  than on every push. It executes the two device-free gates that pass in the QA
+  log — `tools/release-check.sh --Werror` and `make check-static` — which
+  together cover the shared invariants plus the iOS static checks reproduced in
+  Python (Swift symbol/length/test linting, l10n parity, store-metadata limits,
+  ...), so the Swift toolchain is covered without a Mac, plus a `dependency-scan`
+  step that runs osv-scanner over the committed lockfiles on every change (see
+  the security work below and [../SECURITY.md](../SECURITY.md), "Dependency
+  monitoring"). A full Android build (`lintDebug`, `./gradlew testDebugUnitTest`,
+  instrumented tests) needs the SDK and an emulator; an iOS build needs macOS +
+  Xcode and cannot run on Codeberg's Linux runners at all — so building, and
+  running the unit-test/lint suites in CI, stays out of this pipeline and is
+  tracked as its own heavier item below ("Run the test and lint suites in CI").
+  Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
+  gold, though the in-CI test run it prefers is the heavier item below) and
+  contributes to `static_analysis_often`.
   The CI-conditional OSPS Baseline controls that were answered N/A for want of
   any CI — sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
   untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
   run with least-privilege default permissions (`OSPS-AC-04.01`), and run
   status checks before merge (`OSPS-QA-03.01`) — are now answered Met in
   `.bestpractices.json`: the pipeline has run green on Codeberg, and branch
-  protection on main requires its check to pass before a merge. `OSPS-QA-06.01`
+  protection on main requires its checks to pass before a merge. `OSPS-QA-06.01`
   (a test SUITE running inside CI) stays N/A on purpose: this pipeline runs the
   device-free checks only, not the unit-test suites (which need the Android SDK
   and, for `swift test`, a Linux Swift toolchain), so claiming a CI test run
-  would assert something that does not happen — that widening is tracked above.
+  would assert something that does not happen — that widening is the heavier
+  item below.
 
 ## Recommended, not blocking (SHOULD)
 
@@ -246,15 +246,25 @@ policy violations — plus establishing a VEX feed:
   non-exploitability justifications of known vulnerabilities, and publish it as a
   release asset alongside the SBOM. Most valuable once a scan surfaces a
   vulnerability that does not affect the app.
-- **Automated, blocking policy gates in CI** (`OSPS-VM-05.03`, and strengthening
-  `OSPS-VM-06.02`). Widen the Woodpecker CI pipeline noted above (which today runs
-  only the device-free checks) so every change is also evaluated against these
-  gates and blocked on violation: run osv-scanner against the SBOM to gate on
-  vulnerable or malicious dependencies (`OSPS-VM-05.03`, today only a manual
-  pre-release step), and run Android Lint as a required check (`OSPS-VM-06.02` is
-  already enforced locally by the `abortOnError` build gate, but CI would enforce
-  it on every change rather than only at build time). The Lint gate needs the
-  pipeline to gain an SDK-bearing image, since it is a build-time check.
+- **Run the test and lint suites in CI (the "heavy" pipeline widening)**
+  (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
+  `automated_integration_testing`, `static_analysis_often`). The current
+  pipeline runs the device-free checks and a lockfile SCA scan, all on a small
+  `python:3-slim` image. The remaining CI-conditional criteria ask specifically
+  for the TEST and LINT suites to run in the pipeline: `./gradlew
+  testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
+  `abortOnError` build gate today, but CI would enforce it on every change), and
+  ideally `swift test` for the Swift package. All of these are build-time steps:
+  they need the pipeline to gain a heavier, SDK-bearing image (several hundred MB
+  vs. ~45 MB today) and real build time on Codeberg's donated runners, and the
+  Swift suite additionally needs a Linux Swift toolchain. This is deliberately
+  deferred, not forgotten: it is the single largest resource-cost step left, and
+  is weighed against the "good guest on shared runners" principle that shaped the
+  current pipeline. If added, pin the SDK image to a version matching the local
+  toolchain (as the CI osv-scanner is pinned to the maintainer's local version)
+  to avoid CI-vs-local drift. Instrumented (on-device) tests would need an
+  emulator and stay out of scope. Until then these criteria remain Unmet/N/A
+  with that rationale recorded in `.bestpractices.json`.
 
 ## Working toward the OpenSSF gold badge
 
