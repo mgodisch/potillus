@@ -25,11 +25,11 @@
 # =============================================================================
 
 # =============================================================================
-#  release-check.sh – Potillus release readiness checker
+#  release-check.sh – Libellus Potionis release readiness checker
 # =============================================================================
 #
 # PURPOSE
-#   Verifies all invariants that must hold before a new Potillus release is
+#   Verifies all invariants that must hold before a new Libellus Potionis release is
 #   tagged. Run this script after completing all code changes and before
 #   calling `git tag`. The static checks are pure and read-only: they never
 #   modify any file. The opt-in coverage gate (--coverage) additionally runs
@@ -198,7 +198,7 @@ done
 main() {
     echo ""
     echo -e "${BOLD}╔══════════════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}║   Potillus – Release Readiness Check             ║${NC}"
+    echo -e "${BOLD}║   Libellus Potionis – Release Readiness Check    ║${NC}"
     echo -e "${BOLD}╚══════════════════════════════════════════════════╝${NC}"
     echo ""
     info "Working directory: $(pwd)"

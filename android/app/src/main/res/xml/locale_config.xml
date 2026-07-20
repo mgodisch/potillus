@@ -26,7 +26,7 @@ apply to it are stated in the accompanying COPYING.md file.
 -->
 <!--
     Every locale listed here appears in Android's per-app language picker
-    (Settings → Apps → Potillus → Language, API 33+) and in the in-app language
+    (Settings → Apps → Libellus Potionis → Language, API 33+) and in the in-app language
     selector driven by AppCompatDelegate.setApplicationLocales().
 
     Rules:

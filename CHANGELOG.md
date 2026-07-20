@@ -517,6 +517,20 @@ keys and assignments, file paths, and API, task, and manifest-attribute names â€
 wrapped in backticks so they render as code where the answers are shown as Markdown;
 product and tool names, bare version numbers, and prose are left as-is.
 
+### Docs: use the product name, not the internal codename
+
+A few developer-facing docs and comments referred to the project by its internal
+codename ("Potillus") where they meant the product, whose user-facing name is
+"Libellus Potionis". Those prose mentions -- in `docs/ROADMAP.md`, the WCAG scope
+note, the `release-check.sh` banner and header, the demo-backup fixture comment, and
+the `locale_config.xml` and guide-renderer comments -- now read "Libellus Potionis"
+(the user-visible surfaces -- app name, UI strings, store listing -- already did).
+The codename survives only where it is a real technical identifier (the
+`de.godisch.potillus` Android package; the `PotillusKit`/`Potillus` Swift module,
+target, scheme, and paths; the `potillus_repo` helper) and in the historical release
+notes that recorded the original rename; changing those would break builds or rewrite
+history.
+
 ### QA round (0.84.0): review findings and fixes
 
 A full nine-dimension review of both apps and the seam (the fourth round of its

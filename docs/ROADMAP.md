@@ -111,7 +111,7 @@ attainable until each is resolved. They are the most critical open items.
 
 ## Accessibility
 
-**Conformance status — no WCAG level is claimed.** Potillus follows accessibility
+**Conformance status — no WCAG level is claimed.** Libellus Potionis follows accessibility
 best practices but does **not** claim conformance to any WCAG 2.2 level, and it
 uses **none** of the W3C WCAG conformance logos. The reasons are deliberate and
 honest:
@@ -124,7 +124,7 @@ honest:
   out regardless; and at least one **Level A** item (the on-screen chart's text
   alternative) is unresolved, so even Level A is not cleanly established.
 - The W3C logos are **web-page scoped** (WCAG = *Web Content* Accessibility
-  Guidelines; a logo covers "a single page"). Potillus is a native mobile app;
+  Guidelines; a logo covers "a single page"). Libellus Potionis is a native mobile app;
   the per-page conformance model does not map onto it. (WCAG could be applied via
   WCAG2ICT as a written claim, but that is not a W3C logo.)
 

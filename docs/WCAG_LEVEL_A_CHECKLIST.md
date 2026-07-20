@@ -33,7 +33,7 @@ it as such (not an independent audit). A Level-A *conformance claim* requires th
 evaluation — which is what this protocol is. Automated checks alone are not
 sufficient (per W3C).
 
-Scope note: Potillus is a native, offline Android app with no media, no timers,
+Scope note: Libellus Potionis is a native, offline Android app with no media, no timers,
 no hyperlinks, and no login. Several Level-A SC are therefore **N/A** and marked
 below; do not claim them, just record them as not applicable with the reason.
 

@@ -48,7 +48,7 @@ is therefore picked up automatically -- no edit to this script needed.
 
 LANGUAGE PARITY GUARD
 ---------------------
-The two independent sources of truth for "which languages does Potillus ship"
+The two independent sources of truth for "which languages does Libellus Potionis ship"
 are these guide templates and the ``values-<q>/strings.xml`` resource
 directories. They MUST describe exactly the same set of languages (both
 counting the unqualified base, ``values`` / ``usersguide.md.in``, as English
