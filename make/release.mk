@@ -122,6 +122,35 @@ require-ios-screenshots = \
 	    exit 1; \
 	fi
 
+# osv-scan-sbom: the release-time Software Composition Analysis gate. $(1) is the
+# calling target (for the error message), $(2) is the CycloneDX SBOM to scan.
+#
+# WHY HERE AND NOT IN CI: the check runs against the SBOM each platform's build
+# produces, and producing that SBOM needs the full toolchain (the Android SDK /
+# Gradle, or Xcode via Package.resolved) — exactly what the deliberately small
+# Codeberg CI pipeline does NOT carry, to stay a light guest on shared runners
+# (see docs/ROADMAP.md and .woodpecker.yml). Wiring the scan into staging, where
+# the SBOM already exists, gates every release against the OSV database over the
+# COMPLETE transitive dependency set — stronger than a manifest-only CI scan —
+# at zero CI cost. A release cannot be staged while osv-scanner reports an
+# unresolved finding.
+#
+# osv-scanner exits 0 when nothing is found and 1 when it reports vulnerabilities
+# (its documented contract), so a bare invocation under this recipe's errexit is
+# already a hard gate. `--config=osv-scanner.toml` applies the project's triage:
+# a finding assessed as non-exploitable in this app (SECURITY.md, "Dependency
+# monitoring") is recorded there with its reason and ignored, so a known but
+# harmless transitive advisory does not block a release — the documented policy,
+# made machine-enforced. Network access to osv.dev is required; the scan is the
+# one release step that reaches the network.
+osv-scan-sbom = \
+	command -v osv-scanner >/dev/null 2>&1 || { \
+	    echo "$(1): 'osv-scanner' not found -- install it (https://google.github.io/osv-scanner/installation/, e.g. 'go install github.com/google/osv-scanner/cmd/osv-scanner@v2') so the release SCA gate can run." >&2; \
+	    exit 1; \
+	}; \
+	echo "$(1): scanning $(2) against the OSV database (osv-scanner)…"; \
+	osv-scanner scan source --config=osv-scanner.toml --sbom="$(2)"
+
 # =============================================================================
 # COVERAGE GATE
 # =============================================================================
@@ -155,6 +184,9 @@ release-android:
 	bash tools/release-check.sh --Werror --release
 	$(MAKE) -C android cover-check
 	$(MAKE) -C android release bundle
+	@# SCA gate: scan the freshly built CycloneDX SBOM against OSV before anything
+	@# is staged. A finding fails the release here (see the osv-scan-sbom macro).
+	@$(call osv-scan-sbom,release-android,$(GRADLE_SBOM))
 	mkdir -p "$(RELEASES_DIR)"
 	cp --archive "$(GRADLE_AAB)"  "$(STAGED_AAB)"
 	cp --archive "$(GRADLE_APK)"  "$(STAGED_APK)"
@@ -332,6 +364,9 @@ release-ios:
 	# tool the Android SBOM uses, then stage it beside the .ipa. Analogous to the
 	# Android SBOM, which release-android stages as _android_sbom.json.
 	$(MAKE) ios-sbom
+	@# SCA gate: scan the iOS SBOM against OSV before staging it, mirroring the
+	@# Android gate in release-android. A finding fails the release here.
+	@$(call osv-scan-sbom,release-ios,$(IOS_SBOM))
 	cp -a "$(IOS_SBOM)" "$(STAGED_IOS_SBOM)"
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IOS_SBOM)"

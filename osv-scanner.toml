@@ -1,0 +1,50 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# osv-scanner configuration (https://google.github.io/osv-scanner/configuration/).
+#
+# The release SCA gate (`osv-scan-sbom` in make/release.mk) runs osv-scanner
+# against each platform's CycloneDX SBOM during staging and fails the release on
+# any reported vulnerability. This file is the machine-readable form of the
+# triage policy documented in SECURITY.md ("Dependency monitoring"): a finding
+# that has been assessed and found NON-EXPLOITABLE in this app may be recorded
+# here so it no longer blocks a release, while a finding that is not listed here
+# still stops the release.
+#
+# The list starts EMPTY: no advisory is ignored by default, so every finding
+# blocks a release until it is either fixed (by upgrading the dependency) or
+# consciously recorded below with a reason. Each entry is auditable in the diff
+# that adds it.
+#
+# To ignore an assessed-harmless advisory, add a block like:
+#
+#   [[IgnoredVulns]]
+#   id = "GHSA-xxxx-xxxx-xxxx"   # or the OSV / CVE id
+#   # ignoreUntil = 2026-12-31   # optional: auto-expire the exception
+#   reason = "Why this advisory does not affect Libellus Potionis — e.g. the
+#             vulnerable code path is never reached because the app performs no
+#             network I/O. Mirror the assessment kept in SECURITY.md."
+#
+# No advisories are currently ignored.

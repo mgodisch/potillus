@@ -449,6 +449,34 @@ Swift toolchain — a run that does not happen is not claimed. The
 uses" is clarified to say it is the fuller LOCAL Mac gate, since the Codeberg
 pipeline runs only the device-free subset.
 
+### Security: enforce osv-scanner as a release-staging gate
+
+Dependency vulnerability scanning was a manual release-checklist step; it is now
+a hard gate in release staging. A new `osv-scan-sbom` macro in
+`make/release.mk`, invoked by both `release-android` and `release-ios`, runs
+`osv-scanner` against the CycloneDX SBOM each build produces — after the SBOM is
+generated, before it is staged — so a release cannot be staged while a finding
+is unresolved. Because the scan runs where the SBOM already exists, it covers
+the COMPLETE transitive dependency set at no CI cost; this is deliberately the
+staging path rather than CI, since producing the SBOM needs the full Android
+SDK / Xcode toolchain that the light Codeberg pipeline does not carry. Triage is
+machine-enforced through a new `osv-scanner.toml` (starts empty; a finding
+assessed non-exploitable per SECURITY.md is recorded there with its reason and
+its OSV id, so a known-harmless transitive advisory does not block a release
+while an un-triaged one does). `SECURITY.md` and the `CONTRIBUTING.md` release
+checklist are updated to describe the check as enforced rather than manual, and
+the relevant `.bestpractices.json` dependency-management answers
+(`OSPS-VM-05.01`/`05.02`, `dependency_monitoring`) now rest on an enforced gate.
+The scan reaches the network (osv.dev); it is the one release step that does.
+
+The CI-conditional criteria that ask specifically for in-pipeline test, lint or
+per-change SCA execution (`OSPS-VM-05.03`, `OSPS-VM-04.02`, `OSPS-QA-06.01`,
+`test_continuous_integration`, `automated_integration_testing`,
+`static_analysis_often`) keep their N/A or Unmet answers, with justifications
+strengthened to explain the enforced staging scan and why the pipeline runs no
+builds (the SDK/Xcode weight would make it a poor guest on Codeberg's shared
+runners).
+
 ### Build tooling: replace the badge-answer pull with a diff report
 
 The badge-answer sync recipe that still lived only in `attic/Makefile` -- the last
