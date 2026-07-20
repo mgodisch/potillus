@@ -52,13 +52,17 @@ when:
   - event: pull_request
     branch: main
 
-# One small, predictable base image for both steps. Debian slim ships Python 3
-# and the coreutils/grep the checks rely on; `make`, `git` and `file` are the
-# only additions. `git` matters for more than the clone: the checks discover
+# One small, predictable base image for both steps. The official `python:3-slim`
+# image (Debian slim underneath) ships the Python 3 interpreter the checks run
+# on — every tool imports only the standard library plus the repo's own
+# `potillus_repo`, so no pip step is ever needed. `make`, `git` and `file` are
+# the only additions. `git` matters for more than the clone: the checks discover
 # tracked files via `git ls-files`, and release-check reads the changelog/tag
-# state through git.
+# state through git. The tag is intentionally unpinned (`3`, not `3.13`): the
+# checks are stdlib-only and version-agnostic, so tracking the current Python 3
+# keeps the runner cache-friendly without a pin to maintain.
 variables:
-  - &base_image 'debian:trixie-slim'
+  - &base_image 'python:3-slim'
 
 steps:
   - name: release-check

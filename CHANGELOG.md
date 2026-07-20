@@ -427,9 +427,10 @@ useful gate, to be a good guest on shared runners:
   branch triggers nothing, and the run happens at the one moment that matters:
   code asking to enter `main`. (For a `pull_request` event the branch filter
   matches the PR's target, per the Woodpecker docs.)
-- **Least privilege.** One small `debian:trixie-slim` image (Python 3 is in the
-  base; `make`, `git` and `file` are the only additions), no secrets, no
-  privileged mode, read-only checks. `git config --global --add safe.directory
+- **Least privilege.** One small `python:3-slim` image (the interpreter the
+  checks run on is in the image — every tool is standard-library-only, so there
+  is no pip step; `make`, `git` and `file` are the only additions), no secrets,
+  no privileged mode, read-only checks. `git config --global --add safe.directory
   "$PWD"` clears the "dubious ownership" refusal a differently-owned CI checkout
   otherwise triggers.
 
