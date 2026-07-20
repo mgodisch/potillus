@@ -131,7 +131,8 @@ and the iOS about screen reproduces it inline (`AppInfo.grdbLicense`, pinned by
 the `testGrdbLicense*` smoke tests) — short enough not to need a window of its
 own, unlike the GPLv3 and Apache-2.0 texts, which the about screens link to:
 
-``` Copyright (C) 2015-2025 Gwendal Roué
+```
+Copyright (C) 2015-2025 Gwendal Roué
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -149,7 +150,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. ```
+SOFTWARE.
+```
 
 Only the iOS application actually **ships** GRDB, so only it carries the MIT
 redistribution obligation.  The Android application does not distribute GRDB
