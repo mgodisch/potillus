@@ -162,8 +162,8 @@ gradle-wrapper:
 # The in-app About screen links to verbatim license texts, one bundled document
 # per license, each a byte-for-byte copy of a project-root file (a plain `cp`):
 #   raw/license_gpl3.md    <- LICENSE.md            (the app's own license)
-#   raw/license_apache2.md <- licenses/LICENSE.Apache-2.0.md (Apache-2.0 libraries in the APK)
-#   raw/license_gpl2.md    <- licenses/LICENSE.GPL-2.0.md    (desugar_jdk_libs, GPL-2.0+CE)
+#   raw/license_apache2.md <- LICENSES/Apache-2.0.txt (Apache-2.0 libraries in the APK)
+#   raw/license_gpl2.md    <- docs/LICENSE.GPL-2.0.md (desugar_jdk_libs, GPL-2.0+CE)
 # res/raw/ is not tracked (every file in it is generated), so a fresh clone lacks
 # the directory -- hence the `mkdir -p` before each copy.
 LICENSE_OUTPUTS := \
@@ -175,11 +175,11 @@ app/src/main/res/raw/license_gpl3.md: ../LICENSE.md
 	@mkdir -p $(@D)
 	cp $< $@
 
-app/src/main/res/raw/license_apache2.md: ../licenses/LICENSE.Apache-2.0.md
+app/src/main/res/raw/license_apache2.md: ../LICENSES/Apache-2.0.txt
 	@mkdir -p $(@D)
 	cp $< $@
 
-app/src/main/res/raw/license_gpl2.md: ../licenses/LICENSE.GPL-2.0.md
+app/src/main/res/raw/license_gpl2.md: ../docs/LICENSE.GPL-2.0.md
 	@mkdir -p $(@D)
 	cp $< $@
 
@@ -228,8 +228,8 @@ check-guides:
 	python3 ../tools/render-guide.py --check
 	for pair in \
 	    "license_gpl3.md:../LICENSE.md" \
-	    "license_apache2.md:../licenses/LICENSE.Apache-2.0.md" \
-	    "license_gpl2.md:../licenses/LICENSE.GPL-2.0.md"; do
+	    "license_apache2.md:../LICENSES/Apache-2.0.txt" \
+	    "license_gpl2.md:../docs/LICENSE.GPL-2.0.md"; do
 	    out="app/src/main/res/raw/$${pair%%:*}"
 	    src="$${pair#*:}"
 	    if [ ! -f "$$out" ]; then
@@ -293,7 +293,7 @@ format: java gradle-wrapper android
 
 # deps: print the release runtime dependency tree -- the artifacts Gradle compiles
 # into the release APK, transitives included. Read-only; nothing is built. This is
-# the machine-checkable input for a licensing/QA audit: what licenses/NOTICES.md's runtime
+# the machine-checkable input for a licensing/QA audit: what docs/NOTICES.md's runtime
 # inventory and the CycloneDX SBOM must agree with. releaseRuntimeClasspath is the
 # same configuration the SBOM task resolves (see the cyclonedxDirectBom block in
 # app/build.gradle.kts). Driven by the root's `qa-android`; useful standalone too.

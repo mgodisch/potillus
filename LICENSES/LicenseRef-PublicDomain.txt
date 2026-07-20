@@ -1,0 +1,17 @@
+LicenseRef-PublicDomain
+=======================
+
+This is not a license but a dedication to the public domain.
+
+It is used for third-party assets bundled in this repository whose authors have
+released them into the public domain, and for which therefore no license text
+exists. REUSE (https://reuse.software) still requires every file to carry a
+license identifier and every referenced identifier to have a text in LICENSES/;
+this file satisfies that requirement for such public-domain assets.
+
+Assets covered by this identifier in this repository:
+
+  * fastlane/gpl-v3-logo.svg
+    The official GPLv3 "Free as in Freedom" logo, the work of Jose Obed. The
+    GPL, AGPL and LGPL license logos and their variants are in the public
+    domain. Source and terms: https://www.gnu.org/graphics/license-logos

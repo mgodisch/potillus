@@ -298,8 +298,8 @@ file's language — `/* ... */` for Kotlin/Swift, `//` for Gradle Kotlin scripts
 wording and line breaks stay identical everywhere. New files, including the iOS
 Swift sources, reproduce this header verbatim.
 
-Verbatim third-party texts (`LICENSE.md`, `COPYING.md`, `licenses/LICENSE.Apache-2.0.md`,
-`licenses/LICENSE.GPL-2.0.md`, `licenses/NOTICES.md`, `docs/CODE_OF_CONDUCT.md`), binary assets, and strict-JSON files (which cannot hold a
+Verbatim third-party texts (`LICENSE.md`, `COPYING.md`, the license texts under
+`LICENSES/`, `docs/LICENSE.GPL-2.0.md`, `docs/NOTICES.md`, `docs/CODE_OF_CONDUCT.md`), binary assets, and strict-JSON files (which cannot hold a
 comment) do not carry it. `release-check.sh` verifies every Kotlin file contains
 the GPL notice.
 

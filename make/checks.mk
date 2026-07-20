@@ -85,6 +85,15 @@ check-bestpractices-levels:
 check-vex:
 	python3 tools/check-vex.py
 
+# check-reuse: the tree is REUSE-compliant -- every file carries an SPDX license
+# and copyright, every referenced license text is in LICENSES/, and none is left
+# unused. Deliberately kept OUT of check-static: it needs the external `reuse`
+# tool, which the pip-free CI image does not carry (mirroring the Mac-only
+# SwiftLint pass in ios/Makefile). Run it locally / before a release; the
+# api.reuse.software badge is the server-side backstop. See tools/check-reuse.py.
+check-reuse:
+	python3 tools/check-reuse.py
+
 # =============================================================================
 # iOS STATIC CHECKS (Mac-free; reproduce on Linux what the Mac would catch)
 # =============================================================================
@@ -161,6 +170,7 @@ release-check:
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex
 
 .PHONY: check-headers check-makefile check-report-paper check-l10n check-l10n-parity \
-        check-ui-string-parity check-bestpractices-levels check-vex check-swift-symbols \
-        check-swift-length check-swift-tests check-ios-metadata check-ios-screenshots \
-        check-ios-a11y fix-headers release-check check-ios-static check-static
+        check-ui-string-parity check-bestpractices-levels check-vex check-reuse \
+        check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \
+        check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \
+        check-static

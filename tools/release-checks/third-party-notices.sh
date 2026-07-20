@@ -32,7 +32,7 @@
 # =============================================================================
 # WHY THIS MATTERS:
 #   Apache-2.0 §4(d) requires reproducing any NOTICE text that a redistributed
-#   dependency ships. licenses/NOTICES.md documents the policy ("whenever a newly added
+#   dependency ships. docs/NOTICES.md documents the policy ("whenever a newly added
 #   dependency carries NOTICE text, copy it into this section"); this check
 #   AUTOMATES the confirmation step that used to be a manual release-process
 #   note.
@@ -43,7 +43,7 @@
 #   SBOM file exists, this check resolves each listed component to its cached
 #   artifact under the Gradle module cache and scans the archive for
 #   META-INF/NOTICE* entries. Any hit is reported as a WARNING naming the
-#   artifact, prompting the human step licenses/NOTICES.md prescribes (copy the NOTICE
+#   artifact, prompting the human step docs/NOTICES.md prescribes (copy the NOTICE
 #   text into the Apache-2.0 section). Under --Werror — i.e. in the release
 #   gate that also runs `make sbom` — that warning correctly blocks the release
 #   until the NOTICE is dealt with.
@@ -106,14 +106,14 @@ for comp in components:
             continue
 PYEND
     ); then
-        warn "NOTICE scan failed to run — verify manually (see licenses/NOTICES.md, Apache-2.0 section)"
+        warn "NOTICE scan failed to run — verify manually (see docs/NOTICES.md, Apache-2.0 section)"
         return
     fi
 
     if [[ -n "$findings" ]]; then
         while IFS=$'	' read -r coordinate entry; do
             [[ -n "$coordinate" ]] || continue
-            warn "NOTICE file in shipped dependency $coordinate ($entry) — copy its text into licenses/NOTICES.md §Apache-2.0 (per §4(d))"
+            warn "NOTICE file in shipped dependency $coordinate ($entry) — copy its text into docs/NOTICES.md §Apache-2.0 (per §4(d))"
         done <<< "$findings"
     else
         pass "No META-INF/NOTICE files in any shipped dependency (SBOM-verified)"

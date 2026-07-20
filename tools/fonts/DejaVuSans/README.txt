@@ -23,4 +23,4 @@ SOURCE (download and extract these two files into this directory)
     dejavu-fonts-ttf-2.37/LICENSE             ->  LICENSE
 
   The DejaVu Fonts license is a permissive, free font license (derived from the
-  Bitstream Vera and Arev font licenses). See licenses/NOTICES.md.
+  Bitstream Vera and Arev font licenses). See docs/NOTICES.md.

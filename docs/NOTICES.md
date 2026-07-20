@@ -2,9 +2,11 @@
 
 This file collects the copyright notices and license references for the
 third-party software, assets, and documentation bundled with or used to build
-the project. The verbatim third-party license texts referenced below sit beside
-this file in `licenses/`; the project's own license and copyright notice are in
-the repository root (`LICENSE.md` and `COPYING.md`).
+the project. The verbatim third-party license texts referenced below live in the
+repository's `LICENSES/` directory (the machine-readable REUSE license store),
+except the GPL-2.0 text, which sits beside this file as
+`docs/LICENSE.GPL-2.0.md` (see below); the project's own license and copyright
+notice are in the repository root (`LICENSE.md` and `COPYING.md`).
 
 ## Third-Party Software (bundled in the Android App)
 
@@ -51,9 +53,9 @@ under the Apache License, Version 2.0
   transitively by the AndroidX lifecycle libraries.
 
 The full Apache-2.0 license text is kept verbatim in the repository as
-`licenses/LICENSE.Apache-2.0.md` and is bundled into the APK as
-`res/raw/license_apache2.md` (a byte-for-byte copy, made at build time from the
-project-root file), which the in-app About screen links to — satisfying the
+`LICENSES/Apache-2.0.txt` and is bundled into the APK as
+`res/raw/license_apache2.md` (a byte-for-byte copy, made at build time from that
+canonical file), which the in-app About screen links to — satisfying the
 license's &sect;4(a) requirement to give recipients a copy of the license.
 
 Apache-2.0 &sect;4(d) requires reproducing any `NOTICE` text distributed with a
@@ -76,7 +78,7 @@ desugaring are included in the APK/AAB; see the `desugar-jdk-libs` note in
 `android/gradle/libs.versions.toml`.
 
 The full GPL-2.0 text is kept verbatim in the repository as
-`licenses/LICENSE.GPL-2.0.md` and is bundled into the APK as
+`docs/LICENSE.GPL-2.0.md` and is bundled into the APK as
 `res/raw/license_gpl2.md`, which the in-app About screen links to.  The
 Classpath Exception is NOT part of that text — it is an additional permission
 granted on top of it — so the About screen states the exception itself beside

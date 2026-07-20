@@ -29,6 +29,8 @@ conditions.
 
 ## Third-Party Software, Assets, and Documentation
 
-Copyright notices and the verbatim license texts for the third-party software,
-assets, and documentation bundled with or used to build this project are collected
-under [licenses/](licenses/) — start at [licenses/NOTICES.md](licenses/NOTICES.md).
+The verbatim license texts for the third-party software, assets, and
+documentation bundled with or used to build this project are collected under
+[LICENSES/](LICENSES/) (the machine-readable REUSE license store); their
+copyright notices and the mapping to each dependency start at
+[docs/NOTICES.md](docs/NOTICES.md).

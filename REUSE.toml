@@ -1,0 +1,178 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#  REUSE.toml -- machine-readable copyright and licensing metadata
+# =============================================================================
+#
+#  WHAT THIS FILE IS
+#      REUSE (https://reuse.software) is an FSFE specification that asks every
+#      file in a repository to declare, machine-readably, (a) who holds its
+#      copyright and (b) under which license it is released. The canonical way
+#      is a short SPDX header in each file; but this project already carries a
+#      *prose* GPL header on every source file (enforced by
+#      tools/check-headers.py), and its hundreds of binary assets (PNGs, fonts,
+#      PDFs) cannot hold a header at all. Rather than add a second, redundant
+#      machine header to every file, we declare the same facts ONCE here, in a
+#      single central REUSE.toml, using path globs. The prose headers stay as
+#      they are; this file is what `reuse lint` reads.
+#
+#  HOW PRECEDENCE WORKS  (the one rule you must know to edit this safely)
+#      When several [[annotations]] blocks match the same file, the LAST
+#      matching block wins. So the ordering below is deliberate and load-
+#      bearing: a broad catch-all comes FIRST and paints the entire tree with
+#      the project's own license, and each later block OVERRIDES that catch-all
+#      for the specific third-party assets vendored into the repository. If you
+#      add a new third-party asset, add its block BELOW the catch-all (order
+#      among the specific blocks does not matter, as they do not overlap).
+#
+#  WHAT LIVES WHERE
+#      * LICENSES/<SPDX-id>.txt   -- the verbatim text of every license USED by
+#                                    a file in this repository. REUSE fails if a
+#                                    referenced license has no text here, and
+#                                    ALSO fails if a text here is used by no
+#                                    file ("unused license"). Keep the two in
+#                                    lock-step with the identifiers below.
+#      * docs/NOTICES.md          -- the human-readable third-party notices,
+#                                    including dependencies that are only
+#                                    *bundled at build time* (e.g. the Android
+#                                    APK's transitive libraries). Those are NOT
+#                                    files in this repository, so they are NOT
+#                                    annotated here and their license texts do
+#                                    NOT belong in LICENSES/ (they would count
+#                                    as "unused" and break the lint).
+#
+#  VERIFY
+#      `make check-reuse`  (runs `reuse lint`) must stay green. See
+#      tools/check-reuse.py for why that gate is a local/pre-release check and
+#      not part of the device-free CI aggregate.
+# =============================================================================
+
+version = 1
+
+# ── Catch-all: the project's own work ────────────────────────────────────────
+# Everything in the tree is the project's own GPL-3.0-or-later code and assets
+# UNLESS a more specific block below overrides it. The App Store distribution
+# exception (an ADDITIONAL permission under GPLv3 section 7) is not part of this
+# SPDX identifier -- a recipient always has at least the plain GPL-3.0-or-later
+# rights -- and remains documented in COPYING.md, exactly as before.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Martin A. Godisch <martin@godisch.de>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# ── Gradle wrapper (vendored build tool) ─────────────────────────────────────
+# The Gradle wrapper scripts and jar are shipped verbatim from the Gradle
+# project under the Apache License 2.0; the copyright line is taken from the
+# wrapper's own header (android/gradlew).
+[[annotations]]
+path = [
+  "android/gradlew",
+  "android/gradlew.bat",
+  "android/gradle/wrapper/gradle-wrapper.jar",
+  "android/gradle/wrapper/gradle-wrapper.properties",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2015-2021 the original authors"
+SPDX-License-Identifier = "Apache-2.0"
+
+# ── GPLv3 "Free as in Freedom" logo (public domain) ──────────────────────────
+# The official GPL/AGPL/LGPL license logos are the work of Jose Obed and are in
+# the public domain; see LICENSES/LicenseRef-PublicDomain.txt and
+# https://www.gnu.org/graphics/license-logos.
+[[annotations]]
+path = "fastlane/gpl-v3-logo.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "José Obed"
+SPDX-License-Identifier = "LicenseRef-PublicDomain"
+
+# ── "Get it on F-Droid" download badges ──────────────────────────────────────
+# One localized badge per store-listing language, taken verbatim from the
+# F-Droid artwork project under CC BY-SA 3.0. (F-Droid licenses the badge
+# *generator* separately under GPL-3.0-or-later; only the artwork is vendored.)
+[[annotations]]
+path = "fdroid/get-it-on-*.svg"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "F-Droid artwork project (https://gitlab.com/fdroid/artwork)"
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+# ── Vendored fonts (build-time tooling for the feature graphic / reports) ─────
+# DejaVu Sans: the DejaVu Fonts license, derived from the Bitstream Vera and
+# Arev font licenses (SPDX: Bitstream-Vera). DejaVu's own changes are public
+# domain; the two upstream copyright holders are named here.
+[[annotations]]
+path = "tools/fonts/DejaVuSans/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = [
+  "2003 Bitstream, Inc.",
+  "2006 Tavmjong Bah",
+]
+SPDX-License-Identifier = "Bitstream-Vera"
+
+# Inter: SIL Open Font License 1.1 (see tools/fonts/Inter/OFL.txt).
+[[annotations]]
+path = "tools/fonts/Inter/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2020 The Inter Project Authors (https://github.com/rsms/inter)"
+SPDX-License-Identifier = "OFL-1.1"
+
+# Noto Sans CJK: SIL Open Font License 1.1. The copyright line is the one
+# embedded in the font's own name table; NOTICES records Google LLC as the
+# project sponsor alongside Adobe.
+[[annotations]]
+path = "tools/fonts/NotoSansCJK/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = [
+  "2014-2021 Adobe (http://www.adobe.com/)",
+  "Google LLC",
+]
+SPDX-License-Identifier = "OFL-1.1"
+
+# Rokkitt: SIL Open Font License 1.1, both the checked-in variable source and
+# the reproducibly-instanced static Bold the renderer uses.
+[[annotations]]
+path = [
+  "tools/fonts/Rokkitt/**",
+  "tools/fonts-src/Rokkitt/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 The Rokkit Project Authors (https://github.com/googlefonts/RokkittFont)"
+SPDX-License-Identifier = "OFL-1.1"
+
+# ── Third-party documents reproduced under their own license ─────────────────
+# Code of Conduct: the Contributor Covenant 2.1, under CC BY 4.0.
+[[annotations]]
+path = "docs/CODE_OF_CONDUCT.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "the Contributor Covenant authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# NOTE on the GPL-2.0 text: docs/LICENSE.GPL-2.0.md is the verbatim license of
+# a build-time-bundled Android dependency ("GPL-2.0 with the Classpath
+# Exception"), kept as a companion to docs/NOTICES.md. It needs no annotation
+# here and no entry in LICENSES/: REUSE recognizes any `LICENSE*`-named file as
+# a license text and skips it, and putting the text in LICENSES/ would make it
+# an "unused license" (no repository *source* file is under GPL-2.0), which
+# fails the lint. The dependency and its classpath exception are documented in
+# prose in docs/NOTICES.md.

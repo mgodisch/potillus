@@ -642,19 +642,59 @@ reproduce this -- it is specifically Gitaly's Go detector.)
 
 To fix it without renaming the deeply-referenced `COPYING.md` (its section-7 pointer sits
 in every source header), `COPYING.md` is slimmed to the copyright, the GPL-3.0 grant, and
-the App Store distribution exception, and its third-party attribution sections move into a
-new `licenses/NOTICES.md`. The two verbatim third-party texts move beside it:
-`LICENSE.Apache-2.0.md` and `LICENSE.GPL-2.0.md` become `licenses/LICENSE.Apache-2.0.md`
-and `licenses/LICENSE.GPL-2.0.md`. `go-license-detector` does not treat `NOTICES.md` as a
-license file, so the only root license text it now matches is `LICENSE.md` (GPL-3.0) -- and
-the detector reports GPL-3.0. References follow the moved files: the Android license-document
+the App Store distribution exception, and its third-party attribution sections move into
+`docs/NOTICES.md`. The verbatim third-party license texts live in the machine-readable REUSE
+`LICENSES/` store (see "Compliance: adopt REUSE licensing metadata" below); the sole
+exception is the GPL-2.0 text of the build-bundled `desugar_jdk_libs` dependency, which sits
+beside the notices as `docs/LICENSE.GPL-2.0.md`. `go-license-detector` does not treat
+`NOTICES.md` as a license file, and the SPDX-named texts under `LICENSES/` are not root-level
+license files either, so the only root license text it matches is `LICENSE.md` (GPL-3.0) --
+and the detector reports GPL-3.0. References follow the files: the Android license-document
 bundling (`android/Makefile`, `build.gradle.kts`), the `check-headers` exclusions, the §12
 third-party-NOTICE release check, and the docs and badge answers that pointed at `COPYING.md`
-for dependency information now point at `licenses/NOTICES.md`.
+for dependency information now point at `docs/NOTICES.md`.
 
-Validated with `go-license-detector` itself (GPL-3.0 ranks first) and the full gate suite. The
-Android build's license-document copy step changes its source paths, so it wants a build on a
-real host to confirm; no app code changes and no answer status changes.
+Validated with `go-license-detector` (GPL-3.0 ranks first among the root license files) and
+the full gate suite; the new `LICENSES/` subdirectory adds no root license file, but the
+repository-license display wants a look on Codeberg to confirm. The Android build's
+license-document copy step changes its source paths, so it wants a build on a real host to
+confirm; no app code changes and no answer status changes.
+
+### Compliance: adopt REUSE licensing metadata
+
+The repository now follows the FSFE REUSE specification (https://reuse.software): every file
+declares, machine-readably, its copyright holder and SPDX license. Rather than add a second
+machine header to every source file -- each already carries the project's prose GPL header,
+and the hundreds of binary assets cannot hold one -- the facts are declared once, centrally,
+in a top-level `REUSE.toml`. A broad catch-all paints the whole tree `GPL-3.0-or-later` (the
+project's own work), and per-path blocks override it for the vendored third-party assets: the
+Gradle wrapper (`Apache-2.0`), the feature-graphic and report fonts (`OFL-1.1` for Inter,
+Noto Sans CJK and Rokkitt; `Bitstream-Vera` for DejaVu Sans), the localized "Get it on
+F-Droid" badges (`CC-BY-SA-3.0`), the public-domain GPLv3 logo (a `LicenseRef-PublicDomain`
+custom identifier) and the Contributor Covenant code of conduct (`CC-BY-4.0`). The App Store
+distribution exception is a GPLv3 section-7 additional permission, not a separate SPDX
+license, so it stays documented in `COPYING.md` and is part of no identifier.
+
+The verbatim license texts REUSE requires live in a new `LICENSES/` directory, taken from the
+canonical SPDX sources. These canonical texts REPLACE the project's former bespoke copies:
+the Android About-screen license documents (`res/raw/license_apache2.md`, `license_gpl2.md`)
+are now copied at build time from `LICENSES/Apache-2.0.txt` and `docs/LICENSE.GPL-2.0.md`
+rather than from hand-maintained Markdown, so there is a single canonical source per license.
+The GPL-2.0 text of the build-bundled `desugar_jdk_libs` dependency stays under `docs/`, not
+`LICENSES/`: no repository source file is under GPL-2.0, so a `LICENSES/` copy would be an
+"unused license" that fails the lint.
+
+Compliance is enforced by `make check-reuse` (`tools/check-reuse.py`, a thin wrapper over
+`reuse lint`) and advertised by a REUSE badge in `README.md`. The gate is kept OUT of the
+device-free CI aggregate (`make check-static`) on purpose: `reuse` is a third-party pip
+package, and the Woodpecker pipeline's `python:3-slim` image is deliberately pip-free -- just
+as the Mac-only SwiftLint pass is kept out of the Linux CI. It is a local / pre-release check,
+with the server-side `api.reuse.software` badge as an independent backstop.
+
+Validated with `reuse lint` (compliant with REUSE 3.3; 1343/1343 files carry both copyright
+and license). The About screen renders these `res/raw/*.md` documents as Markdown and the
+canonical texts are plain text with numbered clauses, so their on-screen formatting wants a
+look on a real device; no app code changes.
 
 ### QA round (0.84.0): review findings and fixes
 

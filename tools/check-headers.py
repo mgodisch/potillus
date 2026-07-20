@@ -109,9 +109,8 @@ GPL_MARK = "GNU General Public License"
 EXCLUDED_PATHS = {
     "COPYING.md",
     "LICENSE.md",
-    "licenses/LICENSE.Apache-2.0.md",
-    "licenses/LICENSE.GPL-2.0.md",
-    "licenses/NOTICES.md",
+    "docs/LICENSE.GPL-2.0.md",
+    "docs/NOTICES.md",
     "docs/CODE_OF_CONDUCT.md",
 }
 
@@ -127,6 +126,7 @@ SKIP_SUFFIXES = (
 SKIP_DIRS = {
     ".git", "build", ".gradle", "node_modules", "DerivedData", ".build",
     "fonts", "fonts-src", "metadata", "raw", "Resources",
+    "LICENSES",  # the REUSE license store -- canonical SPDX texts, not our sources
 }
 
 # Generated or third-party files that live in the tree but are not ours to
@@ -215,6 +215,12 @@ def is_skipped(path, root):
     """True when the file is deliberately outside the header convention."""
     relative = os.path.relpath(path, root)
     if relative in EXCLUDED_PATHS or relative in SKIP_RELATIVE:
+        return True
+    # The REUSE license store holds canonical third-party SPDX texts, never our
+    # sources. git_tracked_files() bypasses SKIP_DIRS (that guards only the
+    # non-git walk), so exclude the whole directory here, by path prefix -- else
+    # LICENSES/GPL-3.0-or-later.txt trips the "GPL notice without §7 pointer" rule.
+    if relative == "LICENSES" or relative.startswith("LICENSES" + os.sep):
         return True
     if os.path.basename(path) in SKIP_BASENAMES:
         return True
