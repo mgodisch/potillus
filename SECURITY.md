@@ -185,27 +185,29 @@ rolling-release model: only the **latest released version** is supported.
 
 ## Dependency monitoring
 
-The project's external dependencies are checked for known vulnerabilities
-before every release — enforced at staging, not left to a periodic reminder.
-The check is performed with
-[osv-scanner](https://google.github.io/osv-scanner/), a free/libre scanner that
-queries the [OSV](https://osv.dev/) database, run against the CycloneDX SBOM
-each platform's build produces (the `cyclonedxDirectBom` task on Android, and
-`tools/gen-ios-sbom.py` from `Package.resolved` on iOS). This scan is not merely
-a checklist step: it is wired into release staging as a hard gate (the
-`osv-scan-sbom` macro invoked by `release-android` and `release-ios` in
-`make/release.mk`), so a release cannot be staged while a finding is
-unresolved — the scan runs against the complete transitive dependency set the
-SBOM captures. Each reported issue is triaged: exploitable vulnerabilities are
-fixed by upgrading (or, where necessary, mitigating) the affected dependency,
-and issues that are not exploitable in this app are recorded as such — both in
-prose here and, so the gate honours that assessment, as a documented exception
-in [osv-scanner.toml](osv-scanner.toml) (which starts empty; every entry carries
-its reason). Because the app performs no network communication and requests a
-minimal permission set, the exposure from dependency vulnerabilities is limited,
-but they are tracked and addressed regardless. This check is part of the release
-checklist in [CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist)
-§7.
+The project's external dependencies are checked for known vulnerabilities on
+two levels, both enforced rather than left to a periodic reminder. Every pull
+request to `main` runs osv-scanner as a required CI check
+([.woodpecker.yml](.woodpecker.yml), the `dependency-scan` step): a
+`scan source` over the lockfiles committed in the tree
+(`fastlane/Gemfile.lock`, `ios/PotillusKit/Package.resolved`) with no build, so
+a vulnerable dependency blocks the merge. Then, before every release, the same
+scanner runs again over the CycloneDX SBOM each platform's build produces (the
+`cyclonedxDirectBom` task on Android, and `tools/gen-ios-sbom.py` from
+`Package.resolved` on iOS) — this is the `osv-scan-sbom` gate in
+`make/release.mk`, invoked by `release-android` and `release-ios`, and it covers
+the COMPLETE transitive graph the SBOM captures (including the Android app graph
+that a lockfile-only source scan cannot see without Gradle). A release cannot be
+staged while a finding is unresolved. Each reported issue is triaged: exploitable
+vulnerabilities are fixed by upgrading (or, where necessary, mitigating) the
+affected dependency, and issues that are not exploitable in this app are recorded
+as such — both in prose here and, so both gates honour that assessment, as a
+documented exception in [osv-scanner.toml](osv-scanner.toml) (which starts empty;
+every entry carries its reason). Because the app performs no network
+communication and requests a minimal permission set, the exposure from dependency
+vulnerabilities is limited, but they are tracked and addressed regardless. This
+check is part of the release checklist in
+[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
 
 The same discipline applies to dependency licenses: every third-party
 dependency must be under a license compatible with the project's

@@ -415,13 +415,16 @@ A `.woodpecker.yml` brings the device-free checks to Codeberg's CI
 ([Woodpecker](https://woodpecker-ci.org)). It is deliberately the smallest
 useful gate, to be a good guest on shared runners:
 
-- **Checks, never a build.** Two steps run the same read-only gates that pass in
-  the QA log — `tools/release-check.sh --Werror` and `make check-static`. The
-  latter is what lets a Linux runner cover the iOS static checks (Swift
-  symbol/length/test linting, l10n parity, store-metadata limits) that are
-  reproduced in Python precisely so no Mac is needed. A real Android build needs
-  the SDK and an emulator; an iOS build needs macOS + Xcode and cannot run on a
-  Linux runner at all — so building stays local / pre-release.
+- **Checks and an SCA scan, never a build.** Two steps run the same read-only
+  gates that pass in the QA log — `tools/release-check.sh --Werror` and
+  `make check-static`. The latter is what lets a Linux runner cover the iOS
+  static checks (Swift symbol/length/test linting, l10n parity, store-metadata
+  limits) that are reproduced in Python precisely so no Mac is needed. A third
+  step, `dependency-scan`, runs osv-scanner over the committed lockfiles on
+  every pull request and fails on a finding, so a vulnerable dependency blocks
+  the merge (see the security entry below). A real Android build needs the SDK
+  and an emulator; an iOS build needs macOS + Xcode and cannot run on a Linux
+  runner at all — so building stays local / pre-release.
 - **Pull requests targeting `main` only.** A workflow-global
   `when: [event: pull_request, branch: main]` means an ordinary push to any
   branch triggers nothing, and the run happens at the one moment that matters:
@@ -449,33 +452,39 @@ Swift toolchain — a run that does not happen is not claimed. The
 uses" is clarified to say it is the fuller LOCAL Mac gate, since the Codeberg
 pipeline runs only the device-free subset.
 
-### Security: enforce osv-scanner as a release-staging gate
+### Security: enforce osv-scanner on every change and at release
 
 Dependency vulnerability scanning was a manual release-checklist step; it is now
-a hard gate in release staging. A new `osv-scan-sbom` macro in
-`make/release.mk`, invoked by both `release-android` and `release-ios`, runs
-`osv-scanner` against the CycloneDX SBOM each build produces — after the SBOM is
-generated, before it is staged — so a release cannot be staged while a finding
-is unresolved. Because the scan runs where the SBOM already exists, it covers
-the COMPLETE transitive dependency set at no CI cost; this is deliberately the
-staging path rather than CI, since producing the SBOM needs the full Android
-SDK / Xcode toolchain that the light Codeberg pipeline does not carry. Triage is
-machine-enforced through a new `osv-scanner.toml` (starts empty; a finding
-assessed non-exploitable per SECURITY.md is recorded there with its reason and
-its OSV id, so a known-harmless transitive advisory does not block a release
-while an un-triaged one does). `SECURITY.md` and the `CONTRIBUTING.md` release
-checklist are updated to describe the check as enforced rather than manual, and
-the relevant `.bestpractices.json` dependency-management answers
-(`OSPS-VM-05.01`/`05.02`, `dependency_monitoring`) now rest on an enforced gate.
-The scan reaches the network (osv.dev); it is the one release step that does.
+enforced on two levels. Per change: the Woodpecker CI pipeline gains a
+`dependency-scan` step that runs `osv-scanner scan source` over the committed
+lockfiles (`fastlane/Gemfile.lock`, `ios/PotillusKit/Package.resolved`) on every
+pull request to `main` — no build, so it stays light on shared runners — and a
+finding fails the step, so with branch protection a vulnerable dependency blocks
+the merge. Before each release: a new `osv-scan-sbom` macro in `make/release.mk`,
+invoked by both `release-android` and `release-ios`, runs the scanner over the
+CycloneDX SBOM each build produces — after the SBOM is generated, before it is
+staged — so a release cannot be staged while a finding is unresolved. The two
+layers are complementary: the per-change scan is broad and fast but sees only
+the lockfiles, while the staging scan covers the COMPLETE transitive graph the
+SBOM captures (including the Android app graph a lockfile-only scan cannot see
+without Gradle). Triage is machine-enforced through a new `osv-scanner.toml`
+(starts empty; a finding assessed non-exploitable per SECURITY.md is recorded
+there with its reason and its OSV id, so a known-harmless transitive advisory
+does not block while an un-triaged one does), and the CI scanner is pinned to a
+specific upstream release matching the maintainer's local version so the two
+scans do not drift. `SECURITY.md` and the `CONTRIBUTING.md` release checklist
+describe the check as enforced rather than manual.
 
-The CI-conditional criteria that ask specifically for in-pipeline test, lint or
-per-change SCA execution (`OSPS-VM-05.03`, `OSPS-VM-04.02`, `OSPS-QA-06.01`,
-`test_continuous_integration`, `automated_integration_testing`,
-`static_analysis_often`) keep their N/A or Unmet answers, with justifications
-strengthened to explain the enforced staging scan and why the pipeline runs no
-builds (the SDK/Xcode weight would make it a poor guest on Codeberg's shared
-runners).
+With per-change SCA now blocking merges, `OSPS-VM-05.03` ("all changes
+automatically evaluated against a documented policy … and blocked on violation")
+moves to Met, joining the dependency-management answers that already rested on
+this discipline (`OSPS-VM-05.01`/`05.02`, `dependency_monitoring`). The criteria
+that ask specifically for in-pipeline TEST or LINT execution
+(`test_continuous_integration`, `automated_integration_testing`,
+`static_analysis_often`, `OSPS-QA-06.01`) keep their Unmet/N/A answers — those
+need the heavy SDK/Xcode toolchain the pipeline deliberately avoids — and
+`OSPS-VM-04.02` stays Unmet for want of a standardised VEX feed, though the
+osv-scanner.toml triage is its substance. The scans reach the network (osv.dev).
 
 ### Build tooling: replace the badge-answer pull with a diff report
 

@@ -149,7 +149,7 @@ osv-scan-sbom = \
 	    exit 1; \
 	}; \
 	echo "$(1): scanning $(2) against the OSV database (osv-scanner)…"; \
-	osv-scanner scan source --config=osv-scanner.toml --sbom="$(2)"
+	osv-scanner scan source --config=osv-scanner.toml -L "$(2)"
 
 # =============================================================================
 # COVERAGE GATE
