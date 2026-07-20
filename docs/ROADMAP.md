@@ -236,16 +236,21 @@ practice.
 Baseline Levels 1 and 2 are complete. The remaining Level 3 gaps are largely the
 same structural constraints as the gold tier — a non-author human reviewer
 (`OSPS-QA-07.01`, cf. `two_person_review`) and CI-based automated blocking of
-policy violations — plus establishing a VEX feed:
+policy violations:
 
-- **Publish a VEX feed** (`OSPS-VM-04.02`). The project already scans dependencies
-  with osv-scanner against the CycloneDX SBOM and triages non-exploitable findings
-  (see [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). To satisfy this
-  Baseline Level 3 criterion, formalize that triage into a machine-readable VEX
-  document (OpenVEX or CycloneDX VEX) recording the exploitability status and
-  non-exploitability justifications of known vulnerabilities, and publish it as a
-  release asset alongside the SBOM. Most valuable once a scan surfaces a
-  vulnerability that does not affect the app.
+- **Unify VEX with the scanner, and publish it as a feed** (strengthens
+  `OSPS-VM-04.02`, already Met). The project records non-exploitable advisories
+  in a machine-readable VEX document, [../openvex.json](../openvex.json)
+  (OpenVEX), kept in step with the scanner's `osv-scanner.toml` triage by
+  `tools/check-vex.py` (see [../SECURITY.md](../SECURITY.md), "Dependency
+  monitoring"). Two improvements remain, both blocked on upstream rather than on
+  effort here. First, osv-scanner does not yet consume VEX (support is announced
+  but unreleased); once it does, the VEX document can drive suppression directly
+  and the parallel `osv-scanner.toml` ignores — and `check-vex.py` — can be
+  retired, removing the double bookkeeping. Second, the in-repo document could be
+  published as a release asset (a VEX "feed") alongside the SBOM, so downstream
+  consumers can fetch it. Neither is pressing while the dependency set is clean
+  and the VEX document therefore empty.
 - **Run the test and lint suites in CI (the "heavy" pipeline widening)**
   (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
   `automated_integration_testing`, `static_analysis_often`). The current

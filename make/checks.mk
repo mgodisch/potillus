@@ -79,6 +79,12 @@ check-ui-string-parity:
 check-bestpractices-levels:
 	python3 tools/check-bestpractices-levels.py
 
+# check-vex: every advisory ignored in osv-scanner.toml has a matching statement
+# in openvex.json, so the scanner's triage is always also recorded in the VEX
+# document (OSPS-VM-04.02). Passes trivially while both are empty.
+check-vex:
+	python3 tools/check-vex.py
+
 # =============================================================================
 # iOS STATIC CHECKS (Mac-free; reproduce on Linux what the Mac would catch)
 # =============================================================================
@@ -152,9 +158,9 @@ release-check:
 # repo-wide checks it does not include (the UI-literal allow-list and the OpenSSF
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
-check-static: check-ios-static check-ui-string-parity check-bestpractices-levels
+check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex
 
 .PHONY: check-headers check-makefile check-report-paper check-l10n check-l10n-parity \
-        check-ui-string-parity check-bestpractices-levels check-swift-symbols \
+        check-ui-string-parity check-bestpractices-levels check-vex check-swift-symbols \
         check-swift-length check-swift-tests check-ios-metadata check-ios-screenshots \
         check-ios-a11y fix-headers release-check check-ios-static check-static

@@ -47,4 +47,9 @@
 #             vulnerable code path is never reached because the app performs no
 #             network I/O. Mirror the assessment kept in SECURITY.md."
 #
+# When you add an ignore here, add a matching `not_affected` statement to
+# openvex.json (the machine-readable VEX record for OSPS-VM-04.02); the
+# tools/check-vex.py gate (part of `make check-static`) FAILS if an ignore here
+# has no matching VEX statement, so the two cannot drift.
+#
 # No advisories are currently ignored.

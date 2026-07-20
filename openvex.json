@@ -1,0 +1,9 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://codeberg.org/godisch/potillus/openvex",
+  "author": "Martin A. Godisch <martin@godisch.de>",
+  "role": "Document Creator",
+  "timestamp": "2026-07-20T00:00:00Z",
+  "version": 1,
+  "statements": []
+}

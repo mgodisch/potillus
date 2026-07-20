@@ -201,12 +201,19 @@ that a lockfile-only source scan cannot see without Gradle). A release cannot be
 staged while a finding is unresolved. Each reported issue is triaged: exploitable
 vulnerabilities are fixed by upgrading (or, where necessary, mitigating) the
 affected dependency, and issues that are not exploitable in this app are recorded
-as such — both in prose here and, so both gates honour that assessment, as a
-documented exception in [osv-scanner.toml](osv-scanner.toml) (which starts empty;
-every entry carries its reason). Because the app performs no network
-communication and requests a minimal permission set, the exposure from dependency
-vulnerabilities is limited, but they are tracked and addressed regardless. This
-check is part of the release checklist in
+as such — in prose here, as a documented exception in
+[osv-scanner.toml](osv-scanner.toml) so both gates honour the assessment (which
+starts empty; every entry carries its reason), and, in standardised
+machine-readable form, as a `not_affected` statement in the VEX document
+[openvex.json](openvex.json) (OpenVEX). The VEX document is the artifact a
+downstream consumer or a VEX-aware scanner reads; the `osv-scanner.toml` ignore
+is what actually unblocks the gate, because osv-scanner does not yet consume VEX.
+So the two do not drift, a check ([tools/check-vex.py](tools/check-vex.py), part
+of `make check-static`) fails the build if an advisory is ignored in
+`osv-scanner.toml` without a matching VEX statement. Because the app performs no
+network communication and requests a minimal permission set, the exposure from
+dependency vulnerabilities is limited, but they are tracked and addressed
+regardless. This check is part of the release checklist in
 [CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
 
 The same discipline applies to dependency licenses: every third-party

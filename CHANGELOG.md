@@ -452,6 +452,23 @@ Swift toolchain — a run that does not happen is not claimed. The
 uses" is clarified to say it is the fuller LOCAL Mac gate, since the Codeberg
 pipeline runs only the device-free subset.
 
+### Security: record non-exploitable advisories as VEX
+
+Non-exploitable dependency advisories were triaged in prose and in
+`osv-scanner.toml`, but not in a standardised machine-readable form; the OSPS
+Baseline (`OSPS-VM-04.02`) asks for a VEX document. A minimal OpenVEX document,
+`openvex.json`, now provides it — empty of statements while the dependency set
+is clean, and the place a `not_affected` statement (with a machine-readable
+justification and the affected PURL) is recorded when an advisory is triaged.
+Because osv-scanner does not yet consume VEX, the same triage still lives in
+`osv-scanner.toml` as the gate mechanism; to stop the two from drifting, a new
+`tools/check-vex.py` (wired into `make check-static`) fails the build if an
+advisory is ignored in `osv-scanner.toml` without a matching VEX statement.
+`SECURITY.md`, the `osv-scanner.toml` header and `.bestpractices.json`
+(`OSPS-VM-04.02` now Met) describe the two-layer arrangement, and `docs/ROADMAP.md`
+records what still depends on upstream: unifying the two once osv-scanner consumes
+VEX, and publishing the document as a release-asset feed.
+
 ### Security: enforce osv-scanner on every change and at release
 
 Dependency vulnerability scanning was a manual release-checklist step; it is now
