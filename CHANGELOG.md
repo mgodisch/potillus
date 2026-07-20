@@ -531,6 +531,32 @@ target, scheme, and paths; the `potillus_repo` helper) and in the historical rel
 notes that recorded the original rename; changing those would break builds or rewrite
 history.
 
+### Licensing: keep third-party notices out of the license detector's way
+
+GitLab (and Codeberg) detect the repository license with Gitaly's `go-license-detector`,
+which scans every root file named like a license (`LICENSE*`, `COPYING*`, `COPYRIGHT*`)
+and reports each license it finds inside. `COPYING.md` -- a `COPYING`-named file that also
+listed the bundled third-party components and their licenses -- matched Apache-2.0, CC-BY
+and MIT at 100%, out-ranking the project's own GPL-3.0 (99%, from `LICENSE.md`), so GitLab
+displayed "Apache-2.0" for the repository. (Ruby `licensee`, which GitHub uses, does not
+reproduce this -- it is specifically Gitaly's Go detector.)
+
+To fix it without renaming the deeply-referenced `COPYING.md` (its section-7 pointer sits
+in every source header), `COPYING.md` is slimmed to the copyright, the GPL-3.0 grant, and
+the App Store distribution exception, and its third-party attribution sections move into a
+new `licenses/NOTICES.md`. The two verbatim third-party texts move beside it:
+`LICENSE.Apache-2.0.md` and `LICENSE.GPL-2.0.md` become `licenses/LICENSE.Apache-2.0.md`
+and `licenses/LICENSE.GPL-2.0.md`. `go-license-detector` does not treat `NOTICES.md` as a
+license file, so the only root license text it now matches is `LICENSE.md` (GPL-3.0) -- and
+the detector reports GPL-3.0. References follow the moved files: the Android license-document
+bundling (`android/Makefile`, `build.gradle.kts`), the `check-headers` exclusions, the §12
+third-party-NOTICE release check, and the docs and badge answers that pointed at `COPYING.md`
+for dependency information now point at `licenses/NOTICES.md`.
+
+Validated with `go-license-detector` itself (GPL-3.0 ranks first) and the full gate suite. The
+Android build's license-document copy step changes its source paths, so it wants a build on a
+real host to confirm; no app code changes and no answer status changes.
+
 ### QA round (0.84.0): review findings and fixes
 
 A full nine-dimension review of both apps and the seam (the fourth round of its

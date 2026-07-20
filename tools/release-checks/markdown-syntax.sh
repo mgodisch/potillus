@@ -39,7 +39,7 @@
 #   checker, tools/md-syntax.py, over the authored docs and the rendered guides.
 #
 #   Left out on purpose: the verbatim license texts (LICENSE.md,
-#   LICENSE.Apache-2.0.md, LICENSE.GPL-2.0.md) and COPYING.md.  Their GNU
+#   licenses/LICENSE.Apache-2.0.md, licenses/LICENSE.GPL-2.0.md) and COPYING.md.  Their GNU
 #   `quoted' style uses single backticks that no balance check can satisfy, and
 #   they are never reformatted anyway.  "Left out" and not "excluded": the check
 #   runs over an explicit file list (see below), so they are simply not named.

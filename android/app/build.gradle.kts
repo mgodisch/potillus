@@ -460,7 +460,7 @@ android {
             // coroutines' dual-licensed tooling heritage) — and the Apache-2.0
             // license text itself IS delivered to users through the in-app
             // About screen, which links to res/raw/license_apache2.md (a verbatim
-            // copy of LICENSE.Apache-2.0.md; see generateLicenseDocuments below).
+            // copy of licenses/LICENSE.Apache-2.0.md; see generateLicenseDocuments below).
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
 
@@ -698,12 +698,12 @@ val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
 //   license_gpl2.md    required for desugar_jdk_libs (GPL-2.0 with the OpenJDK
 //                      Classpath Exception)
 //
-// See COPYING.md, "Third-Party Software (bundled in the Android App)".
+// See licenses/NOTICES.md, "Third-Party Software (bundled in the Android App)".
 // Declares inputs/outputs so Gradle can skip each when nothing changed.
 val licenseDocuments = listOf(
     Triple("license_gpl3", "LICENSE.md", "the app's own GPL-3.0-or-later text"),
-    Triple("license_apache2", "LICENSE.Apache-2.0.md", "the Apache-2.0 text"),
-    Triple("license_gpl2", "LICENSE.GPL-2.0.md", "the GPL-2.0 text"),
+    Triple("license_apache2", "licenses/LICENSE.Apache-2.0.md", "the Apache-2.0 text"),
+    Triple("license_gpl2", "licenses/LICENSE.GPL-2.0.md", "the GPL-2.0 text"),
 )
 
 val generateLicenseDocuments = licenseDocuments.map { (name, source, what) ->

@@ -113,7 +113,7 @@ def component_for(pin: dict) -> dict:
     else:
         sys.stderr.write(
             f"gen-ios-sbom.py: warning: no license recorded for {identity!r}; "
-            "add it to KNOWN_LICENSES and COPYING.md\n"
+            "add it to KNOWN_LICENSES and licenses/NOTICES.md\n"
         )
     return component
 

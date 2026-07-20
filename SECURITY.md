@@ -202,7 +202,7 @@ regardless. This periodic check is part of the release checklist in
 The same discipline applies to dependency licenses: every third-party
 dependency must be under a license compatible with the project's
 GPL-3.0-or-later distribution — the licenses actually in use are recorded in
-[COPYING.md](COPYING.md) — and any dependency whose license is not compatible
+[licenses/NOTICES.md](licenses/NOTICES.md) — and any dependency whose license is not compatible
 is replaced or removed before a release. Together with the vulnerability triage
 above, this defines the project's remediation threshold for
 software-composition-analysis (SCA) findings.

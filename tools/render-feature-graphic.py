@@ -1030,7 +1030,7 @@ def main(argv: list[str]) -> int:
         print(
             "render-feature-graphic: refusing to render -- fontconfig would "
             "silently substitute another family. For Rokkitt-Bold.ttf run "
-            "`make rokkitt-bold` once and commit the result (see COPYING.md); "
+            "`make rokkitt-bold` once and commit the result (see licenses/NOTICES.md); "
             "the other faces are committed under tools/fonts/.",
             file=sys.stderr,
         )

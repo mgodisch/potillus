@@ -500,7 +500,7 @@ ROKKITT_OUT = tools/fonts/Rokkitt/Rokkitt-Bold.ttf
 
 rokkitt-bold:
 	$(call require-fonttools,rokkitt-bold)
-	@test -f "$(ROKKITT_VF)" || { echo "rokkitt-bold: variable source missing: $(ROKKITT_VF) -- download Rokkitt[wght].ttf (see tools/fonts-src/Rokkitt/README.txt / COPYING.md)"; exit 1; }
+	@test -f "$(ROKKITT_VF)" || { echo "rokkitt-bold: variable source missing: $(ROKKITT_VF) -- download Rokkitt[wght].ttf (see tools/fonts-src/Rokkitt/README.txt / licenses/NOTICES.md)"; exit 1; }
 	mkdir -p tools/fonts/Rokkitt
 	python3 -m fontTools.varLib.instancer "$(ROKKITT_VF)" wght=700 --update-name-table --output "$(ROKKITT_OUT)"
 	cp tools/fonts-src/Rokkitt/OFL.txt tools/fonts/Rokkitt/OFL.txt

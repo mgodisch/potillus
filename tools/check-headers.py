@@ -109,8 +109,9 @@ GPL_MARK = "GNU General Public License"
 EXCLUDED_PATHS = {
     "COPYING.md",
     "LICENSE.md",
-    "LICENSE.Apache-2.0.md",
-    "LICENSE.GPL-2.0.md",
+    "licenses/LICENSE.Apache-2.0.md",
+    "licenses/LICENSE.GPL-2.0.md",
+    "licenses/NOTICES.md",
     "docs/CODE_OF_CONDUCT.md",
 }
 
