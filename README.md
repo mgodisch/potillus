@@ -28,9 +28,10 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis - Privacy-Friendly Alcohol Tracker
 
-[![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13480/badge)](https://www.bestpractices.dev/projects/13480)
+[![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 [![REUSE status](https://api.reuse.software/badge/codeberg.org/godisch/potillus)](https://api.reuse.software/info/codeberg.org/godisch/potillus)
+[![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
 
 ## About the App (v0.84.0)
 

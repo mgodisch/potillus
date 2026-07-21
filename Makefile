@@ -77,6 +77,7 @@ help:
 	@echo "  make fix-headers      rewrite missing/wrong license headers (the one writing check)"
 	@echo "  make release-check    run the full invariant gate (tools/release-check.sh --Werror)"
 	@echo "  make check-reuse      REUSE/SPDX licensing lint (needs the external 'reuse' tool)"
+	@echo "  make check-trackers   Exodus report still shows 0 trackers (needs network)"
 	@echo
 	@echo "QA (one pass, everything logged; a failing step is recorded, not fatal):"
 	@echo "  make qa-android       Android build+tests+lint+coverage+gates+deps -> qa-android.log"

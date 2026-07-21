@@ -650,6 +650,19 @@ badge earned against a mirror would understate the project's actual security
 posture, so it is deliberately not linked -- the reasoning is recorded in the
 roadmap.
 
+### Privacy: add an Exodus badge and tracker check
+
+The README now carries an "εxodus 0 trackers" badge linking to the app's Exodus
+Privacy report. Exodus statically audits the shipped APK for known third-party
+trackers, independently confirming what the app already promises -- zero trackers
+and no network access. Because the badge value is static, `tools/check-trackers.sh`
+(run via `make check-trackers`) guards it: it fetches the report and passes only
+while the tracker count is still zero, fails with the count if a tracker ever
+appears, and reports a distinct "verify manually" outcome if the report cannot be
+read (so a network hiccup is never mistaken for a clean result). The check makes a
+live request to a third party, so -- like `check-reuse` -- it is deliberately kept
+out of `check-static` and the offline release gate; run it before a release.
+
 ### Licensing: keep third-party notices out of the license detector's way
 
 GitLab (and Codeberg) detect the repository license with Gitaly's `go-license-detector`,

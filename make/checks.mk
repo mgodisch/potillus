@@ -94,6 +94,14 @@ check-vex:
 check-reuse:
 	python3 tools/check-reuse.py
 
+# check-trackers: the published Exodus Privacy report for de.godisch.potillus
+# still lists zero trackers, keeping the static "εxodus 0 trackers" README badge
+# honest. Network-dependent (a live third-party HTTP request) and therefore kept
+# OUT of check-static and the offline release gate -- run it locally before a
+# release, the same way check-reuse is. See tools/check-trackers.sh.
+check-trackers:
+	bash tools/check-trackers.sh
+
 # =============================================================================
 # iOS STATIC CHECKS (Mac-free; reproduce on Linux what the Mac would catch)
 # =============================================================================
@@ -170,7 +178,7 @@ release-check:
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex
 
 .PHONY: check-headers check-makefile check-report-paper check-l10n check-l10n-parity \
-        check-ui-string-parity check-bestpractices-levels check-vex check-reuse \
+        check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
         check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \
         check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \
         check-static
