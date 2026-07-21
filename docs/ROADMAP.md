@@ -231,6 +231,36 @@ practice.
   the full answer set produces. (Baseline Level 2 is complete; Level 3 is in
   progress — see "Working toward OpenSSF Baseline Level 3" below.)
 
+## OpenSSF Scorecard badge (currently not implementable)
+
+The OpenSSF Scorecard badge is **not pursued while Codeberg is the canonical
+forge**, because it cannot be earned honestly for this project's topology.
+Scorecard analyses a single repository on GitHub or GitLab -- there is no Codeberg
+backend -- and its badge is fed only by a GitHub Actions or GitLab CI job that
+publishes a signed result through that forge's OIDC token. Here the canonical
+repository is on Codeberg; the GitHub and GitLab repositories are read-only push
+mirrors on which no development, review, CI, or release activity takes place.
+
+A trial run against the GitHub mirror scored 5.2/10, and the shortfall is almost
+entirely a **measurement artifact of the mirror topology**, not a security
+weakness. The substantive checks are already maximal -- Dangerous-Workflow,
+Token-Permissions, Vulnerabilities, Security-Policy, Pinned-Dependencies and
+License each scored 10, Binary-Artifacts 9. The low checks are the host-dependent
+ones that measure activity which, by design, happens on Codeberg rather than the
+mirror: Code-Review, CI-Tests, Contributors, Branch-Protection and
+Signed-Releases. These cannot be raised without relocating development onto the
+mirror, which would misrepresent where the project actually lives; and the
+CII-Best-Practices check reads 0 only because the project's badge (project 13480)
+is registered under the canonical Codeberg URL while Scorecard queries the GitHub
+URL, so "fixing" it would mean re-pointing the canonical registration at a mirror.
+This is the same forge limitation already noted under "Badge administration"
+above, where bestpractices.dev's repository analysis also targets GitHub/GitLab
+rather than Codeberg.
+
+Publishing such a badge would understate a project whose real security posture is
+strong, so it is deliberately not linked. Should the canonical forge gain native
+Scorecard support, or the project's topology change, this can be revisited.
+
 ## Working toward OpenSSF Baseline Level 3
 
 Baseline Levels 1 and 2 are complete. The remaining Level 3 gaps are largely the
