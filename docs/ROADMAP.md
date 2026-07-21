@@ -447,6 +447,21 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   the full Xcode build stays the real syntax gate, so this only shortens the
   edit→Linux→Mac round-trip for typo-class errors and adds code to maintain.
 
+## User suggestions
+
+Ideas raised by testers and QA reports, recorded here for consideration. Being
+listed here is not a commitment to implement -- it is a place to keep external
+input so it is not lost.
+
+- **Search and category filtering for the drink library.** The library is a long
+  scrolling list; a search field plus category and Favorites filters would speed
+  up both entry creation and library maintenance. (QA report #4294, S-01.)
+- **Optional standard-drink equivalent for gram totals.** Grams stay the primary
+  unit, but an optional standard-drink equivalent could be shown alongside them,
+  with a short note on the regional definition in use, so users can interpret a
+  total without losing the app's precise gram-based calculation. (QA report #4294,
+  S-02.)
+
 ## Explicitly out of scope (what the project will not do)
 
 These non-goals follow directly from the project's privacy-first philosophy and

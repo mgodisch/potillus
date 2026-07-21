@@ -639,6 +639,14 @@ so a reader who arrives via a mirror can still find the authoritative source. Th
 mirrors are downstream only -- bug reports and contributions continue to go to the
 canonical Codeberg repository.
 
+### Docs: record tester suggestions in the roadmap
+
+`docs/ROADMAP.md` gains a "User suggestions" section that keeps ideas raised by
+testers and QA reports without implying a commitment to implement them. The first
+two entries come from QA report #4294: search and category filtering for the drink
+library, and an optional standard-drink equivalent shown alongside the primary
+gram totals.
+
 ### Docs: record why OpenSSF Scorecard is not pursued
 
 `docs/ROADMAP.md` now explains, with justification, why the OpenSSF Scorecard
