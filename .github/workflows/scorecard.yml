@@ -1,0 +1,102 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# OpenSSF Scorecard analysis (https://scorecard.dev).
+#
+# WHERE THIS RUNS.  The canonical repository lives on Codeberg, but Scorecard
+# only evaluates repositories hosted on GitHub or GitLab, and the badge is fed
+# exclusively by a workflow that publishes a *signed* result to the OpenSSF API
+# using a GitHub OIDC token.  Neither Codeberg (no such API namespace, no OIDC
+# issuer the API trusts) nor a GitLab-CI self-run can produce that badge.  This
+# file therefore targets the read-only GitHub push mirror at
+# github.com/mgodisch/potillus.  It is kept in the canonical tree so it mirrors
+# to GitHub automatically; Codeberg's own Woodpecker CI ignores `.github/`.
+#
+# HOW IT WORKS.
+#   * Triggers: on every push to the default branch (`main`) and once a week, so
+#     the published score never goes stale even without new commits.  Scorecard
+#     only supports the default branch.
+#   * `ossf/scorecard-action` computes the score, and `publish_results: true`
+#     sends the signed result to the OpenSSF API -- this is what enables the
+#     badge.  It requires the `id-token: write` permission (GitHub OIDC).
+#   * The SARIF result is also kept as a build artifact and uploaded to the
+#     repository's code-scanning dashboard (`security-events: write`).
+#   * Every third-party action is pinned by full commit SHA, with the human-readable
+#     version in a trailing comment -- this is itself a Scorecard best practice
+#     (the Pinned-Dependencies check).
+#
+# The README badge is deliberately NOT added yet; it will be linked in a later
+# change once the first run has actually published a score.
+#
+# =============================================================================
+
+name: Scorecard analysis workflow
+
+on:
+  push:
+    # Only the default branch is supported by Scorecard.
+    branches:
+      - main
+  schedule:
+    # Weekly, Saturdays at 01:30 UTC.
+    - cron: '30 1 * * 6'
+
+# Least privilege by default; the job below widens only what it needs.
+permissions: read-all
+
+jobs:
+  analysis:
+    name: Scorecard analysis
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload the SARIF result to the code-scanning dashboard.
+      security-events: write
+      # Needed for the GitHub OIDC token when publish_results is true.
+      id-token: write
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: "Run analysis"
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          # Publishes the signed result to the OpenSSF API; required for the badge.
+          publish_results: true
+
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: SARIF file
+          path: results.sarif
+          retention-days: 5
+
+      - name: "Upload to code-scanning"
+        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
+        with:
+          sarif_file: results.sarif

@@ -639,6 +639,21 @@ so a reader who arrives via a mirror can still find the authoritative source. Th
 mirrors are downstream only -- bug reports and contributions continue to go to the
 canonical Codeberg repository.
 
+### Security: add an OpenSSF Scorecard workflow
+
+`.github/workflows/scorecard.yml` runs the OpenSSF Scorecard analysis on the
+GitHub push mirror (`github.com/mgodisch/potillus`) -- the only place it can run.
+Scorecard evaluates GitHub or GitLab repositories, and result publishing (and
+therefore the badge) is driven by a GitHub Actions workflow that signs the result
+with a GitHub OIDC token; neither Codeberg nor a GitLab-CI self-run can produce
+it. The workflow triggers on pushes to `main` and weekly, runs the pinned
+`ossf/scorecard-action`, and sets `publish_results: true` so the signed result is
+published to the OpenSSF API. The SARIF result is also kept as an artifact and
+uploaded to the code-scanning dashboard, and every action is pinned by commit SHA.
+The file lives in the canonical tree so it mirrors to GitHub; Codeberg's own
+Woodpecker CI ignores `.github/`. The Scorecard badge will be linked in the README
+once the first run has published a score.
+
 ### Licensing: keep third-party notices out of the license detector's way
 
 GitLab (and Codeberg) detect the repository license with Gitaly's `go-license-detector`,
