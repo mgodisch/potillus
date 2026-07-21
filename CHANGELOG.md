@@ -630,13 +630,14 @@ target, scheme, and paths; the `potillus_repo` helper) and in the historical rel
 notes that recorded the original rename; changing those would break builds or rewrite
 history.
 
-### Docs: note the GitLab push mirror
+### Docs: note the GitLab and GitHub mirrors
 
-The canonical repository is on Codeberg; a read-only push mirror is maintained at
-`gitlab.com/godisch/potillus`. The License section of `README.md` now names the
-mirror alongside the canonical Codeberg URL, so a reader who arrives via the mirror
-can still find the authoritative source. The mirror is downstream only -- bug
-reports and contributions continue to go to the canonical Codeberg repository.
+The canonical repository is on Codeberg; read-only push mirrors are maintained at
+`gitlab.com/godisch/potillus` and `github.com/mgodisch/potillus`. The License
+section of `README.md` now names both mirrors alongside the canonical Codeberg URL,
+so a reader who arrives via a mirror can still find the authoritative source. The
+mirrors are downstream only -- bug reports and contributions continue to go to the
+canonical Codeberg repository.
 
 ### Licensing: keep third-party notices out of the license detector's way
 

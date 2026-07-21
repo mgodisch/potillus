@@ -264,8 +264,9 @@ Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright
 &copy; 2026 Martin A. Godisch <[martin@godisch.de](mailto:martin@godisch.de)>
 
 The source code can be found at the [canonical repository at
-codeberg.org](https://codeberg.org/godisch/potillus/). A read-only push mirror
-is available at [gitlab.com](https://gitlab.com/godisch/potillus).
+codeberg.org](https://codeberg.org/godisch/potillus/). Read-only push mirrors
+are available at [gitlab.com](https://gitlab.com/godisch/potillus) and
+[github.com](https://github.com/mgodisch/potillus).
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
