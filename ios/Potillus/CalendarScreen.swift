@@ -59,6 +59,11 @@ struct CalendarScreen: View {
     /// Set while the "+" sheet is open, logging onto the selected day.
     @State private var isLogging = false
 
+    /// The day list's edit mode, owned here and injected into the List so the
+    /// localized `EditToggleButton` can drive it (see that file: the stock
+    /// `EditButton` titles itself in the SYSTEM language, not the app's).
+    @State private var editMode: EditMode = .inactive
+
     /// Kept so the overflow menu's Settings sheet can be built.
     private let environment: AppEnvironment
 
@@ -115,12 +120,23 @@ struct CalendarScreen: View {
                 }
                 // Edit mode for the day's entries, the visible delete path that
                 // replaces the per-row trash icon. Shown only when the selected day
-                // actually has entries to act on.
+                // actually has entries to act on; localized via EditToggleButton
+                // (0.84.0 QA round).
                 if !model.state.selectedEntries.isEmpty {
                     ToolbarItem(placement: .primaryAction) {
-                        EditButton()
+                        EditToggleButton(editMode: $editMode, locale: locale)
                     }
                 }
+            }
+            // Feed the List the edit mode the toggle drives (see
+            // EditToggleButton) — and leave edit mode whenever the day's entry
+            // list empties, which here happens not only on the last delete but
+            // also when the user taps a different, empty day: the toggle is
+            // hidden then, and a stale `.active` would badge the next day's rows
+            // with no Done button in sight.
+            .environment(\.editMode, $editMode)
+            .onChange(of: model.state.selectedEntries.isEmpty) { _, empty in
+                if empty { editMode = .inactive }
             }
             .sheet(isPresented: $isLogging) {
                 EntrySheet(

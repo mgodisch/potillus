@@ -63,6 +63,11 @@ struct TodayScreen: View {
     /// reconstruct, so it costs a confirmation, not a single stray tap.
     @State private var pendingDeletion: ConsumptionEntry?
 
+    /// The list's edit mode, owned here and injected into the List so the
+    /// localized `EditToggleButton` can drive it (see that file: the stock
+    /// `EditButton` titles itself in the SYSTEM language, not the app's).
+    @State private var editMode: EditMode = .inactive
+
     /// Kept so the overflow menu's Settings sheet can be built; the screen owns
     /// its own model.
     private let environment: AppEnvironment
@@ -99,16 +104,25 @@ struct TodayScreen: View {
                     .accessibilityIdentifier("nav.addDrink")
                 }
                 // The visible way into deletion, as Apple's own list apps do it:
-                // `EditButton` toggles the list's edit mode, where each row shows a
-                // red delete badge. It replaces the per-row trash icon the row used
-                // to carry — a control Apple's guidance keeps in an edit mode or a
-                // detail view, not stamped on every row. Shown only when there is
-                // something to edit, so it never toggles an empty list.
+                // the edit toggle puts the list into edit mode, where each row
+                // shows a red delete badge. It replaces the per-row trash icon the
+                // row used to carry — a control Apple's guidance keeps in an edit
+                // mode or a detail view, not stamped on every row. Shown only when
+                // there is something to edit, so it never toggles an empty list;
+                // localized via EditToggleButton (0.84.0 QA round).
                 if !model.state.entries.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        EditButton()
+                        EditToggleButton(editMode: $editMode, locale: locale)
                     }
                 }
+            }
+            // Feed the List the edit mode the toggle drives (see
+            // EditToggleButton) — and leave edit mode when the last entry goes:
+            // the toggle is hidden then, so a stale `.active` would greet the
+            // NEXT entry with an unexplained delete badge and no Done button.
+            .environment(\.editMode, $editMode)
+            .onChange(of: model.state.entries.isEmpty) { _, empty in
+                if empty { editMode = .inactive }
             }
             .task { model.start() }
             .onDisappear { model.stop() }

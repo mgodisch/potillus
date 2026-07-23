@@ -41,12 +41,19 @@ struct DrinksScreen: View {
     @Environment(\.appLocale) private var locale
     @Environment(\.scenePhase) private var scenePhase
 
-    /// Read so the row's tap-to-log can stand down while the list is in edit mode.
-    /// A row is a raw `.onTapGesture` here — it cannot be a `Button`, because it
-    /// already contains one (the favourite star), and SwiftUI does not suppress a
-    /// raw gesture in edit mode the way it suppresses a button. Without this guard,
-    /// tapping a row to delete it would also log the drink.
-    @Environment(\.editMode) private var editMode
+    /// The list's edit mode, owned here and injected into the List so the
+    /// localized `EditToggleButton` can drive it (see that file: the stock
+    /// `EditButton` titles itself in the SYSTEM language, not the app's).
+    ///
+    /// Also read by the row's tap-to-log guard, which stands down while the list
+    /// is in edit mode. A row is a raw `.onTapGesture` here — it cannot be a
+    /// `Button`, because it already contains one (the favourite star), and
+    /// SwiftUI does not suppress a raw gesture in edit mode the way it
+    /// suppresses a button. Without the guard, tapping a row to delete it would
+    /// also log the drink. Owning the state (rather than reading the
+    /// `\.editMode` environment, as before the 0.84.0 QA round) makes the guard
+    /// read the very value the List obeys.
+    @State private var editMode: EditMode = .inactive
 
     @State private var model: DrinksModel
     @State private var logger: EntryLogModel
@@ -112,9 +119,17 @@ struct DrinksScreen: View {
                 // there is a drink to act on.
                 if !model.state.drinks.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        EditButton()
+                        EditToggleButton(editMode: $editMode, locale: locale)
                     }
                 }
+            }
+            // Feed the List the edit mode the toggle drives (see
+            // EditToggleButton) — and leave edit mode when the last drink goes:
+            // the toggle is hidden then, so a stale `.active` would greet the
+            // NEXT drink with an unexplained delete badge and no Done button.
+            .environment(\.editMode, $editMode)
+            .onChange(of: model.state.drinks.isEmpty) { _, empty in
+                if empty { editMode = .inactive }
             }
             .task { model.start(); capacity.start() }
             .onDisappear { model.stop(); capacity.stop() }
@@ -259,7 +274,7 @@ struct DrinksScreen: View {
         .onTapGesture {
             // Standing down in edit mode: there the tap belongs to deletion, not
             // logging (see `editMode`).
-            guard editMode?.wrappedValue.isEditing != true else { return }
+            guard !editMode.isEditing else { return }
             logger.clearFailure()
             logging = drink
         }
