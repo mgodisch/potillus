@@ -175,7 +175,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Drikkens navn må ikke være tomt.</string>
     <string name="drink_validation_name_too_long">Drikkens navn er for langt (maks. 100 tegn).</string>
-    <string name="drink_validation_volume_range">Volumen skal være mellem 1 ml og 10 000 ml.</string>
+    <string name="drink_validation_volume_range">Volumen skal være mellem 1 ml og 5 000 ml.</string>
     <string name="drink_validation_alcohol_range" formatted="false">Alkoholindholdet skal være mellem 0 % og 100 %.</string>
     <string name="drink_validation_alcohol_invalid">Alkoholindholdet er ikke et gyldigt tal.</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

@@ -247,11 +247,16 @@ struct SettingsScreen: View {
         } header: {
             Text(Loc.string("Personal Data", locale: locale))
         } footer: {
-            Text(
+            // Through Loc, like every user-facing string: the bare ternary of
+            // literals this used to be bypassed the in-app language entirely and
+            // had no catalogue keys, so the privacy sentence — of all sentences —
+            // read English in every non-English language (0.84.0 QA round).
+            Text(Loc.string(
                 model.hasWeight
                     ? "Used only to estimate blood alcohol. It never leaves this device."
-                    : "Without a body weight, no blood-alcohol estimate is shown."
-            )
+                    : "Without a body weight, no blood-alcohol estimate is shown.",
+                locale: locale
+            ))
         }
     }
 
@@ -518,15 +523,19 @@ extension SettingsScreen {
         } header: {
             Text(Loc.string("Backup", locale: locale))
         } footer: {
-            // The one sentence that makes the feature trustworthy, and true.
-            Text(
+            // The one sentence that makes the feature trustworthy, and true —
+            // and, since the 0.84.0 QA round, in the user's language: the
+            // concatenated literals this used to be were plain `String`s, so
+            // they bypassed the in-app language AND had no catalogue keys.
+            Text(Loc.string(
                 includeSettingsInExport
                     ? "A JSON file containing your drinks, your log, and your settings"
                         + " — including your body weight. It never leaves this device"
                         + " unless you send it somewhere."
                     : "A JSON file containing your drinks and your log. Your settings,"
-                        + " including your body weight, are left out."
-            )
+                        + " including your body weight, are left out.",
+                locale: locale
+            ))
         }
     }
 

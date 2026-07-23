@@ -219,7 +219,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Назва напою не може бути порожньою.</string>
     <string name="drink_validation_name_too_long">Назва напою занадто довга (макс. 100 символів).</string>
-    <string name="drink_validation_volume_range">Кількість повинна бути від 1 мл до 10 000 мл.</string>
+    <string name="drink_validation_volume_range">Кількість повинна бути від 1 мл до 5 000 мл.</string>
     <string name="drink_validation_alcohol_range" formatted="false">Вміст алкоголю повинен бути від 0% до 100%.</string>
     <string name="drink_validation_alcohol_invalid">Вміст алкоголю не є допустимим числом.</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

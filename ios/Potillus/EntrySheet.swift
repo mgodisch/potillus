@@ -142,13 +142,20 @@ struct EntrySheet: View {
                     TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
                 } footer: {
                     if let volume, !DrinkValidator.volumeMlRange.contains(volume) {
-                        // Interpolated, not typed: a message that names a bound
-                        // it does not read is a message that will one day lie.
-                        Text(
-                            Loc.string("The volume must be between ", locale: locale)
-                            + "\(DrinkValidator.volumeMlRange.lowerBound) and "
-                            + "\(DrinkValidator.volumeMlRange.upperBound) ml."
-                        )
+                        // The whole sentence is ONE catalogue key, verbatim equal
+                        // to Android's `drink_validation_volume_range`, so the
+                        // parity gate holds the two platforms to the same words.
+                        // The earlier form appended the numbers to a translated
+                        // fragment — "Das Volumen muss liegen zwischen 1 and
+                        // 5000 ml." — leaving the glue words English in every
+                        // language (0.84.0 QA round). The price of the verbatim
+                        // key is a literal bound in prose: when
+                        // `DrinkValidator.volumeMlRange` moves, this string must
+                        // move with it, on both platforms.
+                        Text(Loc.string(
+                            "The amount must be between 1 ml and 5,000 ml.",
+                            locale: locale
+                        ))
                             .foregroundStyle(.red)
                     }
                 }

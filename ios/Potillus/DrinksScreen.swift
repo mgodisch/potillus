@@ -387,7 +387,11 @@ private struct DrinkEditor: View {
                     }
                 }
             }
-            .navigationTitle(drink == nil ? "New drink" : "Edit drink")
+            // Through Loc, like every user-facing string: the bare ternary of
+            // literals this used to be rendered English in all twenty non-English
+            // languages (0.84.0 QA round). The keys are Android's `add_drink` /
+            // `edit_drink`, so the parity gate keeps the wording in step.
+            .navigationTitle(Loc.string(drink == nil ? "Add Drink" : "Edit Drink", locale: locale))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -415,17 +419,28 @@ private struct DrinkEditor: View {
         return "\(Loc.number(value, fractionDigits: 1, locale: locale)) g"
     }
 
+    /// The user-facing sentence for a rejected field, in the in-app language.
+    ///
+    /// Every message is a catalogue key equal to its Android string
+    /// (`drink_validation_*`), so the parity gate holds the two platforms to the
+    /// same words in every language. These used to be raw English literals,
+    /// which put English into the footer of all twenty non-English languages
+    /// (0.84.0 QA round). The volume sentence carries its bound in prose — the
+    /// price of the verbatim key; see the same note in EntrySheet.
     private func message(for violation: DrinkValidator.Violation) -> String {
         switch (violation.field, violation.reason) {
-        case (.name, .blank): return "The name cannot be empty."
-        case (.name, .tooLong): return "The name is too long."
+        case (.name, .blank):
+            return Loc.string("The name of the drink must not be empty.", locale: locale)
+        case (.name, .tooLong):
+            return Loc.string("The drink name is too long (max. 100 characters).", locale: locale)
         case (.volumeMl, _):
-            // Interpolated, not typed: see EntrySheet.
-            return "The volume must be between \(DrinkValidator.volumeMlRange.lowerBound) "
-                + "and \(DrinkValidator.volumeMlRange.upperBound) ml."
-        case (.alcoholPercent, .notFinite): return "The alcohol content is not a number."
-        case (.alcoholPercent, _): return "The alcohol content must be between 0 and 100 %."
-        default: return "Please check your input."
+            return Loc.string("The amount must be between 1 ml and 5,000 ml.", locale: locale)
+        case (.alcoholPercent, .notFinite):
+            return Loc.string("The alcohol content is not a valid number.", locale: locale)
+        case (.alcoholPercent, _):
+            return Loc.string("The alcohol content must be between 0 % and 100 %.", locale: locale)
+        default:
+            return Loc.string("Please check your input.", locale: locale)
         }
     }
 }

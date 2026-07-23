@@ -220,7 +220,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">飲み物の名前を入力してください。</string>
     <string name="drink_validation_name_too_long">飲み物の名前が長すぎます（最大 100 文字）。</string>
-    <string name="drink_validation_volume_range">量は 1 ml から 10,000 ml の間で入力してください。</string>
+    <string name="drink_validation_volume_range">量は 1 ml から 5,000 ml の間で入力してください。</string>
     <string name="drink_validation_alcohol_range" formatted="false">アルコール度数は 0% から 100% の間で入力してください。</string>
     <string name="drink_validation_alcohol_invalid">アルコール度数が有効な数値ではありません。</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

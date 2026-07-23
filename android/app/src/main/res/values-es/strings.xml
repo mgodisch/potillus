@@ -193,7 +193,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">El nombre de la bebida no puede estar vacío.</string>
     <string name="drink_validation_name_too_long">El nombre de la bebida es demasiado largo (máx. 100 caracteres).</string>
-    <string name="drink_validation_volume_range">El volumen debe estar entre 1 ml y 10 000 ml.</string>
+    <string name="drink_validation_volume_range">El volumen debe estar entre 1 ml y 5 000 ml.</string>
     <string name="drink_validation_alcohol_range" formatted="false">El contenido de alcohol debe estar entre 0 % y 100 %.</string>
     <string name="drink_validation_alcohol_invalid">El contenido de alcohol no es un número válido.</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

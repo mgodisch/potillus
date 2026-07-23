@@ -5766,6 +5766,137 @@
         }
       }
     },
+    "Edit Drink": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Drink"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getränk bearbeiten"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rediger drik"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drank bewerken"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rediger drikk"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redigera dryck"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar bebida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifier la boisson"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica bevanda"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar bebida"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar bebida"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editează băutură"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upravit nápoj"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edytuj napój"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Редактировать напиток"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Редагувати напій"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επεξεργασία ποτού"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物を編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑饮品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編輯飲品"
+          }
+        }
+      }
+    },
     "Dry days in period": {
       "extractionState": "manual",
       "localizations": {
@@ -13507,6 +13638,530 @@
         }
       }
     },
+    "Used only to estimate blood alcohol. It never leaves this device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Used only to estimate blood alcohol. It never leaves this device."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird nur zur Schätzung des Blutalkohols verwendet. Verlässt dieses Gerät nie."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bruges kun til at estimere promillen. Forlader aldrig denne enhed."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wordt alleen gebruikt om het bloedalcoholgehalte te schatten. Verlaat dit apparaat nooit."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brukes bare til å anslå promillen. Forlater aldri denne enheten."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Används endast för att uppskatta promillehalten. Lämnar aldrig den här enheten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se usa solo para estimar el alcohol en sangre. Nunca sale de este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisé uniquement pour estimer l'alcoolémie. Ne quitte jamais cet appareil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usato solo per stimare il tasso alcolemico. Non lascia mai questo dispositivo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usado apenas para estimar a alcoolemia. Nunca sai deste dispositivo."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usado apenas para estimar o álcool no sangue. Nunca sai deste dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folosit doar pentru estimarea alcoolemiei. Nu părăsește niciodată acest dispozitiv."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Používá se pouze k odhadu alkoholu v krvi. Nikdy neopustí toto zařízení."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Używane wyłącznie do szacowania alkoholu we krwi. Nigdy nie opuszcza tego urządzenia."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Используется только для оценки содержания алкоголя в крови. Никогда не покидает это устройство."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Використовується лише для оцінки вмісту алкоголю в крові. Ніколи не залишає цей пристрій."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Χρησιμοποιείται μόνο για την εκτίμηση του αλκοόλ στο αίμα. Δεν φεύγει ποτέ από αυτήν τη συσκευή."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "血中アルコール濃度の推定にのみ使用されます。この端末から外に出ることはありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "혈중 알코올 농도 추정에만 사용됩니다. 이 기기 밖으로 나가지 않습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅用于估算血液酒精浓度。绝不会离开此设备。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅用於估算血液酒精濃度。絕不會離開此裝置。"
+          }
+        }
+      }
+    },
+    "Without a body weight, no blood-alcohol estimate is shown.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Without a body weight, no blood-alcohol estimate is shown."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ohne Körpergewicht wird keine Blutalkohol-Schätzung angezeigt."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uden en kropsvægt vises der intet promilleestimat."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zonder lichaamsgewicht wordt er geen schatting van het bloedalcoholgehalte getoond."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uten en kroppsvekt vises det ikke noe promilleanslag."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utan en kroppsvikt visas ingen promilleuppskattning."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin un peso corporal no se muestra ninguna estimación del alcohol en sangre."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sans poids corporel, aucune estimation de l'alcoolémie n'est affichée."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senza un peso corporeo non viene mostrata alcuna stima del tasso alcolemico."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem um peso corporal, não é apresentada nenhuma estimativa de alcoolemia."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem um peso corporal, nenhuma estimativa de álcool no sangue é exibida."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fără o greutate corporală nu se afișează nicio estimare a alcoolemiei."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bez tělesné hmotnosti se odhad alkoholu v krvi nezobrazuje."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bez masy ciała szacunek alkoholu we krwi nie jest wyświetlany."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без массы тела оценка содержания алкоголя в крови не отображается."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без маси тіла оцінка вмісту алкоголю в крові не відображається."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Χωρίς σωματικό βάρος δεν εμφανίζεται εκτίμηση του αλκοόλ στο αίμα."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重が未設定の場合、血中アルコール濃度の推定は表示されません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "체중이 없으면 혈중 알코올 추정치가 표시되지 않습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未设置体重时，不会显示血液酒精浓度估算。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未設定體重時，不會顯示血液酒精濃度估算。"
+          }
+        }
+      }
+    },
+    "A JSON file containing your drinks, your log, and your settings — including your body weight. It never leaves this device unless you send it somewhere.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A JSON file containing your drinks, your log, and your settings — including your body weight. It never leaves this device unless you send it somewhere."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine JSON-Datei mit deinen Getränken, deinem Logbuch und deinen Einstellungen — einschließlich deines Körpergewichts. Sie verlässt dieses Gerät nie, es sei denn, du verschickst sie."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med dine drikke, din log og dine indstillinger — inklusive din kropsvægt. Den forlader aldrig denne enhed, medmindre du selv sender den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een JSON-bestand met je drankjes, je logboek en je instellingen — inclusief je lichaamsgewicht. Het verlaat dit apparaat nooit, tenzij je het zelf verstuurt."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med drinkene dine, loggen din og innstillingene dine — inkludert kroppsvekten din. Den forlater aldri denne enheten, med mindre du selv sender den."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med dina drycker, din logg och dina inställningar — inklusive din kroppsvikt. Den lämnar aldrig den här enheten om du inte själv skickar den."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un archivo JSON con tus bebidas, tu registro y tus ajustes — incluido tu peso corporal. Nunca sale de este dispositivo, a menos que tú lo envíes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l'envoyez quelque part."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un file JSON con le tue bevande, il tuo registro e le tue impostazioni — incluso il tuo peso corporeo. Non lascia mai questo dispositivo, a meno che non sia tu a inviarlo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um ficheiro JSON com as suas bebidas, o seu registo e as suas definições — incluindo o seu peso corporal. Nunca sai deste dispositivo, a menos que o envie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um arquivo JSON com suas bebidas, seu registro e suas configurações — incluindo seu peso corporal. Ele nunca sai deste dispositivo, a menos que você o envie."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un fișier JSON cu băuturile tale, jurnalul tău și setările tale — inclusiv greutatea ta corporală. Nu părăsește niciodată acest dispozitiv decât dacă îl trimiți tu."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soubor JSON s vašimi nápoji, deníkem a nastavením — včetně vaší tělesné hmotnosti. Nikdy neopustí toto zařízení, pokud jej sami neodešlete."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plik JSON zawierający Twoje napoje, dziennik i ustawienia — łącznie z masą ciała. Nigdy nie opuszcza tego urządzenia, chyba że sam go wyślesz."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файл JSON с вашими напитками, журналом и настройками — включая массу тела. Он никогда не покидает это устройство, если вы сами его не отправите."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файл JSON з вашими напоями, журналом і налаштуваннями — включно з масою тіла. Він ніколи не залишає цей пристрій, якщо ви самі його не надішлете."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα αρχείο JSON με τα ποτά σας, το ημερολόγιό σας και τις ρυθμίσεις σας — συμπεριλαμβανομένου του σωματικού σας βάρους. Δεν φεύγει ποτέ από αυτήν τη συσκευή, εκτός αν το στείλετε εσείς."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物、記録、設定（体重を含む）を含む JSON ファイルです。自分で送信しない限り、この端末から外に出ることはありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료, 기록, 설정(체중 포함)이 담긴 JSON 파일입니다. 직접 보내지 않는 한 이 기기 밖으로 나가지 않습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个包含你的饮品、记录和设置（含体重）的 JSON 文件。除非你自己发送，否则绝不会离开此设备。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一個包含你的飲品、記錄和設定（含體重）的 JSON 檔案。除非你自行傳送，否則絕不會離開此裝置。"
+          }
+        }
+      }
+    },
+    "A JSON file containing your drinks and your log. Your settings, including your body weight, are left out.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A JSON file containing your drinks and your log. Your settings, including your body weight, are left out."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine JSON-Datei mit deinen Getränken und deinem Logbuch. Deine Einstellungen, einschließlich deines Körpergewichts, bleiben außen vor."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med dine drikke og din log. Dine indstillinger, inklusive din kropsvægt, udelades."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een JSON-bestand met je drankjes en je logboek. Je instellingen, inclusief je lichaamsgewicht, blijven erbuiten."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med drinkene dine og loggen din. Innstillingene dine, inkludert kroppsvekten din, utelates."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En JSON-fil med dina drycker och din logg. Dina inställningar, inklusive din kroppsvikt, utelämnas."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un archivo JSON con tus bebidas y tu registro. Tus ajustes, incluido tu peso corporal, quedan fuera."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un fichier JSON contenant vos boissons et votre journal. Vos réglages, y compris votre poids corporel, ne sont pas inclus."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un file JSON con le tue bevande e il tuo registro. Le tue impostazioni, incluso il tuo peso corporeo, restano escluse."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um ficheiro JSON com as suas bebidas e o seu registo. As suas definições, incluindo o seu peso corporal, ficam de fora."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um arquivo JSON com suas bebidas e seu registro. Suas configurações, incluindo seu peso corporal, ficam de fora."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un fișier JSON cu băuturile tale și jurnalul tău. Setările tale, inclusiv greutatea corporală, rămân excluse."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soubor JSON s vašimi nápoji a deníkem. Vaše nastavení, včetně tělesné hmotnosti, zůstává stranou."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plik JSON zawierający Twoje napoje i dziennik. Twoje ustawienia, łącznie z masą ciała, są pomijane."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файл JSON с вашими напитками и журналом. Ваши настройки, включая массу тела, не включаются."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файл JSON з вашими напоями та журналом. Ваші налаштування, включно з масою тіла, не включаються."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα αρχείο JSON με τα ποτά σας και το ημερολόγιό σας. Οι ρυθμίσεις σας, συμπεριλαμβανομένου του σωματικού σας βάρους, δεν περιλαμβάνονται."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物と記録を含む JSON ファイルです。体重を含む設定は含まれません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료와 기록이 담긴 JSON 파일입니다. 체중을 포함한 설정은 제외됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个包含你的饮品和记录的 JSON 文件。你的设置（含体重）不包含在内。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一個包含你的飲品和記錄的 JSON 檔案。你的設定（含體重）不包含在內。"
+          }
+        }
+      }
+    },
     "Save": {
       "extractionState": "manual",
       "localizations": {
@@ -15078,133 +15733,788 @@
         }
       }
     },
-    "The volume must be between ": {
+    "The name of the drink must not be empty.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The volume must be between "
+            "value": "The name of the drink must not be empty."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Volumen muss liegen zwischen "
+            "value": "Der Name des Getränks darf nicht leer sein."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mængden skal være mellem "
+            "value": "Drikkens navn må ikke være tomt."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Het volume moet liggen tussen "
+            "value": "De naam van het drankje mag niet leeg zijn."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volumet må være mellom "
+            "value": "Drikknavnet kan ikke være tomt."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volymen måste vara mellan "
+            "value": "Dryckens namn får inte vara tomt."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El volumen debe estar entre "
+            "value": "El nombre de la bebida no puede estar vacío."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le volume doit être compris entre "
+            "value": "Le nom de la boisson ne doit pas être vide."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Il volume deve essere compreso tra "
+            "value": "Il nome della bevanda non può essere vuoto."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "O volume deve estar entre "
+            "value": "O nome da bebida não pode estar vazio."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O volume deve estar entre "
+            "value": "O nome da bebida não pode estar vazio."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volumul trebuie să fie între "
+            "value": "Numele băuturii nu poate fi gol."
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Objem musí být mezi "
+            "value": "Název nápoje nesmí být prázdný."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Objętość musi wynosić od "
+            "value": "Nazwa napoju nie może być pusta."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Объём должен быть от "
+            "value": "Название напитка не может быть пустым."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Об’єм має бути від "
+            "value": "Назва напою не може бути порожньою."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ο όγκος πρέπει να είναι μεταξύ "
+            "value": "Το όνομα του ποτού δεν μπορεί να είναι κενό."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "容量は次の範囲でなければなりません: "
+            "value": "飲み物の名前を入力してください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "용량은 다음 범위여야 합니다: "
+            "value": "음료 이름을 입력해 주세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "容量必须介于 "
+            "value": "饮品名称不能为空。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "容量必須介於 "
+            "value": "飲品名稱不能為空白。"
+          }
+        }
+      }
+    },
+    "The drink name is too long (max. 100 characters).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The drink name is too long (max. 100 characters)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Getränkename ist zu lang (max. 100 Zeichen)."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikkens navn er for langt (maks. 100 tegn)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De naam van het drankje is te lang (max. 100 tekens)."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drikknavnet er for langt (maks. 100 tegn)."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dryckens namn är för långt (max. 100 tecken)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre de la bebida es demasiado largo (máx. 100 caracteres)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom de la boisson est trop long (max. 100 caractères)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome della bevanda è troppo lungo (max. 100 caratteri)."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome da bebida é demasiado longo (máx. 100 caracteres)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome da bebida é muito longo (máx. 100 caracteres)."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numele băuturii este prea lung (max. 100 de caractere)."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Název nápoje je příliš dlouhý (max. 100 znaků)."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nazwa napoju jest zbyt długa (maks. 100 znaków)."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Название напитка слишком длинное (макс. 100 символов)."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Назва напою занадто довга (макс. 100 символів)."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το όνομα του ποτού είναι πολύ μακρύ (μέγ. 100 χαρακτήρες)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲み物の名前が長すぎます（最大 100 文字）。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음료 이름이 너무 깁니다 (최대 100자)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "饮品名称过长（最多 100 个字符）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "飲品名稱過長（最多 100 個字元）。"
+          }
+        }
+      }
+    },
+    "The amount must be between 1 ml and 5,000 ml.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The amount must be between 1 ml and 5,000 ml."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Menge muss zwischen 1 ml und 5.000 ml liegen."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen skal være mellem 1 ml og 5 000 ml."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het volume moet tussen 1 ml en 5 000 ml liggen."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengden må være mellom 1 ml og 5 000 ml."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volymen måste vara mellan 1 ml och 5 000 ml."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El volumen debe estar entre 1 ml y 5 000 ml."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le volume doit être compris entre 1 ml et 5 000 ml."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il volume deve essere compreso tra 1 ml e 5 000 ml."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O volume deve estar entre 1 ml e 5 000 ml."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A quantidade deve estar entre 1 ml e 5.000 ml."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumul trebuie să fie între 1 ml și 5 000 ml."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Objem musí být mezi 1 ml a 5 000 ml."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Objętość musi wynosić od 1 ml do 5 000 ml."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Объём должен быть от 1 мл до 5 000 мл."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кількість повинна бути від 1 мл до 5 000 мл."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η ποσότητα πρέπει να είναι μεταξύ 1 ml και 5 000 ml."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "量は 1 ml から 5,000 ml の間で入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "양은 1 ml에서 5,000 ml 사이여야 합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数量必须在 1 毫升到 5,000 毫升之间。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "份量必須在 1 毫升至 5,000 毫升之間。"
+          }
+        }
+      }
+    },
+    "The alcohol content must be between 0 % and 100 %.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The alcohol content must be between 0 % and 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Alkoholgehalt muss zwischen 0 % und 100 % liegen."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholindholdet skal være mellem 0 % og 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het alcoholgehalte moet tussen 0 % en 100 % liggen."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholinnholdet må være mellom 0 % og 100 %."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholhalten måste vara mellan 0 % och 100 %."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El contenido de alcohol debe estar entre 0 % y 100 %."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La teneur en alcool doit être comprise entre 0 % et 100 %."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il contenuto alcolico deve essere compreso tra 0 % e 100 %."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teor alcoólico deve estar entre 0 % e 100 %."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teor alcoólico deve estar entre 0% e 100%."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conținutul de alcool trebuie să fie între 0 % și 100 %."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsah alkoholu musí být mezi 0 % a 100 %."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zawartość alkoholu musi wynosić od 0 % do 100 %."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Содержание алкоголя должно быть от 0 % до 100 %."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вміст алкоголю повинен бути від 0% до 100%."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η περιεκτικότητα αλκοόλ πρέπει να είναι μεταξύ 0 % και 100 %."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルコール度数は 0% から 100% の間で入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알코올 함량은 0%에서 100% 사이여야 합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精含量必须在 0% 到 100% 之间。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精濃度必須在 0% 至 100% 之間。"
+          }
+        }
+      }
+    },
+    "The alcohol content is not a valid number.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The alcohol content is not a valid number."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Alkoholgehalt ist keine gültige Zahl."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholindholdet er ikke et gyldigt tal."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het alcoholgehalte is geen geldig getal."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholinnholdet er ikke et gyldig tall."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkoholhalten är inte ett giltigt tal."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El contenido de alcohol no es un número válido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La teneur en alcool n'est pas un nombre valide."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il contenuto alcolico non è un numero valido."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teor alcoólico não é um número válido."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teor alcoólico não é um número válido."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conținutul de alcool nu este un număr valid."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obsah alkoholu není platné číslo."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zawartość alkoholu nie jest prawidłową liczbą."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Содержание алкоголя не является допустимым числом."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вміст алкоголю не є допустимим числом."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η περιεκτικότητα αλκοόλ δεν είναι έγκυρος αριθμός."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルコール度数が有効な数値ではありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알코올 함량이 유효한 숫자가 아닙니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精含量不是有效数字。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "酒精濃度非有效數字。"
+          }
+        }
+      }
+    },
+    "Please check your input.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please check your input."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitte überprüfe deine Eingabe."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollér din indtastning."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer je invoer."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontroller inntastingen din."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollera din inmatning."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Por favor, comprueba tu entrada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veuillez vérifier votre saisie."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlla i dati inseriti."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique os dados introduzidos."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique os dados inseridos."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifică datele introduse."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zkontrolujte prosím zadání."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprawdź wprowadzone dane."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверьте введённые данные."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевірте введені дані."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ελέγξτε τα στοιχεία που εισαγάγατε."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力内容を確認してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "입력 내용을 확인해 주세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请检查输入内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請檢查輸入內容。"
           }
         }
       }

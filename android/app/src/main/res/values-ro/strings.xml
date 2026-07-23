@@ -225,7 +225,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Numele băuturii nu poate fi gol.</string>
     <string name="drink_validation_name_too_long">Numele băuturii este prea lung (max. 100 de caractere).</string>
-    <string name="drink_validation_volume_range">Volumul trebuie să fie între 1 ml și 10 000 ml.</string>
+    <string name="drink_validation_volume_range">Volumul trebuie să fie între 1 ml și 5 000 ml.</string>
     <string name="drink_validation_alcohol_range" formatted="false">Conținutul de alcool trebuie să fie între 0 % și 100 %.</string>
     <string name="drink_validation_alcohol_invalid">Conținutul de alcool nu este un număr valid.</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

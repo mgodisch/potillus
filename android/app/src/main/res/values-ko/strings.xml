@@ -220,7 +220,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">음료 이름을 입력해 주세요.</string>
     <string name="drink_validation_name_too_long">음료 이름이 너무 깁니다 (최대 100자).</string>
-    <string name="drink_validation_volume_range">양은 1 ml에서 10,000 ml 사이여야 합니다.</string>
+    <string name="drink_validation_volume_range">양은 1 ml에서 5,000 ml 사이여야 합니다.</string>
     <string name="drink_validation_alcohol_range" formatted="false">알코올 함량은 0%에서 100% 사이여야 합니다.</string>
     <string name="drink_validation_alcohol_invalid">알코올 함량이 유효한 숫자가 아닙니다.</string>
     <string name="day_change_time_value">%1$02d:%2$02d</string>

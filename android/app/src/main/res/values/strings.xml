@@ -349,7 +349,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Add/Edit Drink form validation message. -->
     <string name="drink_validation_name_blank">The name of the drink must not be empty.</string>
     <string name="drink_validation_name_too_long">The drink name is too long (max. 100 characters).</string>
-    <string name="drink_validation_volume_range">The amount must be between 1 ml and 10,000 ml.</string>
+    <string name="drink_validation_volume_range">The amount must be between 1 ml and 5,000 ml.</string>
     <!-- Add/Edit Drink validation. formatted="false" because it contains literal % signs. -->
     <string name="drink_validation_alcohol_range" formatted="false">The alcohol content must be between 0 % and 100 %.</string>
     <string name="drink_validation_alcohol_invalid">The alcohol content is not a valid number.</string>
