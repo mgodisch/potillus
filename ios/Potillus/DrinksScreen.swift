@@ -111,12 +111,14 @@ struct DrinksScreen: View {
                         Label(Loc.string("Add Drink", locale: locale), systemImage: "plus")
                     }
                 }
-                // The visible delete path, replacing the per-row trash icon:
-                // `EditButton` toggles edit mode, where each row shows a red delete
-                // badge. Editing a drink is reached by a long press (the context
-                // menu below) because the row's tap already logs; deleting stays
-                // visible here so it is not a hidden-only gesture. Shown only when
-                // there is a drink to act on.
+                // The visible delete path, replacing the per-row trash icon: the
+                // edit toggle puts the list into edit mode, where each row shows a
+                // red delete badge. Editing a drink is reached by the trailing
+                // swipe's Edit action (see `row`) because the row's tap already
+                // logs; deleting stays visible here so it is not a hidden-only
+                // gesture. Shown only when there is a drink to act on. (An earlier
+                // revision of this comment claimed a long-press context menu; none
+                // was ever built — corrected in the 0.84.0 QA round.)
                 if !model.state.drinks.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
                         EditToggleButton(editMode: $editMode, locale: locale)

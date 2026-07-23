@@ -42,10 +42,13 @@ import SwiftUI
 //   its two destinations and their presentation state in one line.
 //
 // PRESENTATION, NOT PORT
-//   The entries match Android (Settings, Copyright, Lock app — Help is added in a
-//   later step, once the user guide is bundled). The FORM is native: a SwiftUI
-//   `Menu` in the navigation bar, not a Material dropdown. Same choices, native
-//   idiom — the rule the rest of this port follows.
+//   The entries match Android (Settings, Help, Lock app, About). The FORM is
+//   native: a SwiftUI `Menu` behind the ellipsis "More" affordance at the
+//   trailing edge of the navigation bar — where Photos, Files and Notes put
+//   theirs — not a Material dropdown. Same choices, native idiom — the rule the
+//   rest of this port follows. (Until the 0.84.0 QA round the menu wore
+//   Android's hamburger at the LEADING edge; iOS has no hamburger convention,
+//   so it was the one Android-ism left in the navigation.)
 // =============================================================================
 
 struct AppOverflowMenu: ViewModifier {
@@ -70,9 +73,12 @@ struct AppOverflowMenu: ViewModifier {
     func body(content: Content) -> some View {
         content
             .toolbar {
-                // Leading, where Android's burger sits and where Today's gear used
-                // to sit, so the primary action keeps the trailing corner.
-                ToolbarItem(placement: .topBarLeading) {
+                // Trailing, as iOS's own apps place their More menus. The
+                // screen's primary action ("+") and its edit toggle declare their
+                // own trailing items; SwiftUI orders items from separate toolbar
+                // blocks itself, so the exact neighbour order is the platform's
+                // call — confirm it looks right on a device after changes here.
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
                             showingSettings = true
@@ -107,7 +113,10 @@ struct AppOverflowMenu: ViewModifier {
                             Label(Loc.string("About", locale: locale), systemImage: "info.circle")
                         }
                     } label: {
-                        Label(Loc.string("Menu", locale: locale), systemImage: "line.3.horizontal")
+                        // ellipsis.circle is the platform's "More" glyph; the
+                        // label keeps the catalogue's translated "Menu", which
+                        // says what opens without needing a 22nd translation run.
+                        Label(Loc.string("Menu", locale: locale), systemImage: "ellipsis.circle")
                     }
                     .accessibilityIdentifier("nav.menu")
                 }
