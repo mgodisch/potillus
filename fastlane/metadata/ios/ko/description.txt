@@ -21,4 +21,4 @@ Libellus Potionis는 절대적인 데이터 주권과 엄격한 데이터 최소
 
 오픈 소스
 
-Libellus Potionis는 GNU General Public License v3(또는 이후 버전)에 따라 배포되는 자유 소프트웨어입니다. 소스 코드는 교과서 수준으로 문서화되어 있으며 표준 저장소에서 받을 수 있습니다: https://codeberg.org/godisch/potillus/
+Libellus Potionis는 GNU General Public License v3(또는 이후 버전)에 따라 배포되는 자유 소프트웨어입니다. 소스 코드는 교과서 수준으로 문서화되어 있으며 표준 저장소에서 받을 수 있습니다: https://gitlab.com/godisch/potillus/

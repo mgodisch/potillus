@@ -31,7 +31,7 @@ apply to it are stated in the accompanying COPYING.md file.
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13480/badge)](https://www.bestpractices.dev/projects/13480)
 [![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 [![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
-[![REUSE status](https://api.reuse.software/badge/codeberg.org/godisch/potillus)](https://api.reuse.software/info/codeberg.org/godisch/potillus)
+[![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
 
 ## About the App (v0.84.0)
 
@@ -96,7 +96,7 @@ The in-app User's Guide explains every screen and feature in full.
 
 Feedback, bug reports, and enhancement requests are welcome. The preferred
 channel is the issue tracker of the canonical repository at
-[Codeberg](https://codeberg.org/godisch/potillus/issues); if you would rather
+[GitLab](https://gitlab.com/godisch/potillus/-/issues); if you would rather
 not use the tracker, you may instead write to
 [android@godisch.de](mailto:android@godisch.de).
 
@@ -104,16 +104,16 @@ Code and documentation contributions are welcome too. The contribution
 process — how changes are proposed and reviewed, together with the
 architecture, coding, testing, and release conventions a change must follow —
 is documented in
-[CONTRIBUTING.md](https://codeberg.org/godisch/potillus/src/branch/main/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://gitlab.com/godisch/potillus/-/blob/main/CONTRIBUTING.md).
 
 All participants are expected to follow the project's
-[Code of Conduct](https://codeberg.org/godisch/potillus/src/branch/main/docs/CODE_OF_CONDUCT.md).
+[Code of Conduct](https://gitlab.com/godisch/potillus/-/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 
 To report a security vulnerability, please do **not** open a public issue.
 Instead, follow the private, PGP-encrypted reporting process described in
-[SECURITY.md](https://codeberg.org/godisch/potillus/src/branch/main/SECURITY.md).
+[SECURITY.md](https://gitlab.com/godisch/potillus/-/blob/main/SECURITY.md).
 
 ## Technical Aspects
 
@@ -131,7 +131,7 @@ extraction leaks.
 
 The app's full privacy policy — detailing exactly what is stored on the device
 and confirming that nothing is ever transmitted — is available in
-[PRIVACY.md](https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md).
+[PRIVACY.md](https://gitlab.com/godisch/potillus/-/blob/main/PRIVACY.md).
 
 ### Platform Compatibility
 
@@ -252,12 +252,21 @@ verifying the application's integrity.
 ## Roadmap
 
 The project's intended direction and its explicit non-goals are described in
-[ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/docs/ROADMAP.md).
+[ROADMAP.md](https://gitlab.com/godisch/potillus/-/blob/main/docs/ROADMAP.md).
+
+## AI Involvement
+
+This project was developed with assistance from Anthropic's Claude across
+implementation, documentation, and tooling. This statement is for transparency:
+all changes are reviewed and maintained under the same test suites and quality
+standards as human-written code. As with any open-source software provided under
+the GPLv3, the code is provided "as is", and users remain responsible for
+evaluating its suitability for their own use.
 
 ## Changes
 
 Changes are documented in
-[CHANGELOG.md](https://codeberg.org/godisch/potillus/src/branch/main/CHANGELOG.md).
+[CHANGELOG.md](https://gitlab.com/godisch/potillus/-/blob/main/CHANGELOG.md).
 
 ## License
 
@@ -265,9 +274,8 @@ Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright
 &copy; 2026 Martin A. Godisch <[martin@godisch.de](mailto:martin@godisch.de)>
 
 The source code can be found at the [canonical repository at
-codeberg.org](https://codeberg.org/godisch/potillus/). Read-only push mirrors
-are available at [gitlab.com](https://gitlab.com/godisch/potillus) and
-[github.com](https://github.com/mgodisch/potillus).
+gitlab.com](https://gitlab.com/godisch/potillus/). A read-only push mirror is
+available at [github.com](https://github.com/mgodisch/potillus).
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

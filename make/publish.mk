@@ -32,7 +32,7 @@
 #  against something you produced explicitly. They pin the release signing key
 #  (read from SECURITY.md) and require the v<VERSION> git tag to already exist --
 #  they never create it. `push` pushes commits + tags; the store pushes upload the
-#  staged AAB/IPA; push-codeberg publishes the release and verifies each asset's
+#  staged AAB/IPA; push-gitlab publishes the release and verifies each asset's
 #  sha256. Uploading is the last, deliberate step.
 # =============================================================================
 
@@ -102,7 +102,7 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 # `tr` mirrors the normalization the push targets apply to the MEASURED
 # fingerprint, so the comparison stays case-insensitive end to end even if an
 # uppercase pin ever slips past the gate. The same key signs
-# the Play upload bundle (its role as the Play upload key) and the Codeberg/
+# the Play upload bundle (its role as the Play upload key) and the GitLab/
 # F-Droid release APK, so both publishing targets pin against this one value.
 SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | head -1 | tr 'A-F' 'a-f')
 
@@ -127,7 +127,7 @@ PLAY_JSON_KEY := $(abspath $(if $(SUPPLY_JSON_KEY),$(SUPPLY_JSON_KEY),fastlane/p
 # verified bytes reach Play.
 #
 # Guards, in order: (1) staged AAB present; (2) release tag v$(VERSION) exists
-# locally AND on the push remote -- a RELEASE-HYGIENE gate mirroring push-codeberg
+# locally AND on the push remote -- a RELEASE-HYGIENE gate mirroring push-gitlab
 # (Play itself has no notion of git tags), so a build only reaches Play when its
 # exact version is a reproducible, pushed tag; (3) the AAB is signed with the
 # EXPECTED key. For (3): jarsigner -verify prints "jar verified." for a signed
@@ -194,7 +194,7 @@ push-playstore:
 #
 #   (1) the staged .ipa is present (this target never builds or stages it);
 #   (2) the release tag v$(VERSION) exists locally AND on the push remote -- the
-#       same release-hygiene gate push-playstore and push-codeberg apply, so a
+#       same release-hygiene gate push-playstore and push-gitlab apply, so a
 #       build only reaches a store when its exact version is a pushed tag;
 #   (3) the .ipa's OWN Info.plist agrees with this working tree: bundle
 #       identifier, build number and marketing version must equal $(RELEASE_ID),
@@ -327,101 +327,184 @@ push-appstore-preflight:
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore-preflight: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
 	( cd fastlane && bundle exec fastlane ios preflight )
 
-# ── push-codeberg ── create a Codeberg (Forgejo) release for the ALREADY-PUSHED
-# release tag from the command line instead of the web UI, and attach the release
-# APK + SBOM. It uses the Forgejo REST API (Gitea-compatible): one GET looks the
-# release up by tag, one POST creates it when absent, then the assets are
-# uploaded. Title is "Libellus Potionis vX.Y.Z" and the body is the en-US Play
-# release notes for this versionCode.
+# ── push-gitlab ── create a GitLab release for the ALREADY-PUSHED release tag
+# from the command line instead of the web UI, and publish the release APK + SBOMs
+# as its assets.
+#
+# WHY THIS IS A TWO-STEP UPLOAD. A GitLab release does not STORE files: its
+# assets are LINKS. The bytes therefore have to live somewhere first, and the
+# project's own generic package registry is that somewhere:
+#
+#   1. PUT each staged file to
+#      .../projects/$(GITLAB_PROJECT_ID)/packages/generic/releases/v$(VERSION)/<asset>
+#   2. attach it to the release as an asset link whose `direct_asset_path` is
+#      "/<asset>", which is what makes GitLab serve it under the PERMANENT,
+#      namespace-relative URL
+#      https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)/downloads/<asset>
+#
+# That permanent form is not cosmetic: it is the URL shape the F-Droid recipe's
+# `Binaries:` field interpolates per version (see fdroid/de.godisch.potillus.yml),
+# so it must keep working unchanged from release to release. The registry URL
+# underneath carries a numeric project id and is an implementation detail.
 #
 # The assets are the STAGED files from releases/ (produced by `make release-android`),
-# uploaded under their canonical names releases/<applicationId>_<versionCode>.apk
-# and _<versionCode>_android_sbom.json (e.g. de.godisch.potillus_92.apk). After each
-# upload the published asset is re-downloaded from its public release URL and its
-# sha256 is diffed against the staged file, so a corrupted upload is caught.
+# published under their canonical names de.godisch.potillus_<versionCode>.apk and
+# _<versionCode>_{android,ios}_sbom.json. After each upload the published asset is
+# re-downloaded from its permanent release URL and its sha256 is diffed against
+# the staged file, so a corrupted upload is caught.
 #
-# SAFE TO RE-RUN: a previous invocation may have created the release and then
-# died on an asset upload (network). The recipe therefore REUSES an existing
-# release for the tag instead of failing on Forgejo's duplicate-release 409, and
-# it skips any asset that is already attached — so a rerun completes exactly the
-# missing steps and never duplicates anything. (The download check runs only for
-# assets uploaded in the same run.)
+# NAME vs. IDENTITY. A link carries a human-readable `name` shown on the release
+# page ("Android Package Kit", not de.godisch.potillus_95.apk) and a `url`. Only
+# the URL identifies the artifact: GitLab requires BOTH to be unique within a
+# release, but the name is display text a maintainer may reword at any time,
+# while the URL is derived from the file name and the version and is therefore
+# reproducible from the staged file alone. Recognition below is consequently by
+# URL. Doing it by name would break the moment a link is renamed in the web UI --
+# the target would not recognise the existing link, would try to add a second one
+# for the same file, and would fail on the URL uniqueness constraint. The display
+# names come from $(GITLAB_ASSET_LABELS) below.
+#
+# SAFE TO RE-RUN: a previous invocation may have uploaded some files and then
+# died (network). Every step is therefore idempotent -- a package file whose
+# published sha256 already matches the staged file is left alone, an existing
+# release for the tag is REUSED instead of failing on GitLab's duplicate-release
+# 409, and an asset link whose URL is already attached is not added twice. It is
+# also SELF-HEALING for the one case that cannot be fixed by re-running a naive
+# version: a link created without `direct_asset_path` (the web UI offers no such
+# field) resolves its permanent URL to the registry URL instead of the
+# /-/releases/.../downloads/ form, which would leave the F-Droid `Binaries:` URL
+# dead. Such a link is PATCHED in place rather than reported.
 #
 # Like push-playstore, this never builds and never stages: `make release-android`
 # builds and stages the artifacts. It FAILS FAST if the tag, the staged APK, the
-# staged SBOM, the release notes, curl/python3 or the Codeberg token file are
+# staged SBOM, the release notes, curl/python3 or the GitLab token file are
 # missing. Build+stage first (`make release-android`) and push the tag first
 # (`git tag -s vX.Y.Z ... && git push && git push --tags`); this only publishes.
 #
-# The Codeberg access token is READ FROM $(CODEBERG_TOKEN_FILE) (Settings ->
-# Applications, repository read+write scope). That file is a SECRET, git-ignored
-# and never committed -- mirroring the Play service-account key. The recipe's
-# commands are echoed (so you can see what runs), but that does NOT leak the
-# token: it lives in a SHELL variable -- written $$token in the recipe, i.e. the
-# shell's own $token -- read from the file at run time. make expands its own
-# make-variables when it echoes a line, but never shell-variables, so the echo
-# shows the literal "$token" and never the token VALUE. The token also never
-# appears on a curl COMMAND LINE (which any local process could read from
-# /proc/<pid>/cmdline while curl runs): it is written into a mode-0600 temp file
-# and passed with curl's `-H @file` form (curl >= 7.55; Debian stable qualifies),
-# removed again by an EXIT trap.
-CODEBERG_API  := https://codeberg.org/api/v1
-CODEBERG_REPO := godisch/potillus
-CODEBERG_TOKEN_FILE := fastlane/codeberg-credentials.txt
+# The GitLab access token is READ FROM $(GITLAB_TOKEN_FILE) (Settings ->
+# Access tokens, `api` scope -- `read_api` is not enough, the target writes).
+# That file is a SECRET, git-ignored and never committed -- mirroring the Play
+# service-account key. The recipe's commands are echoed (so you can see what
+# runs), but that does NOT leak the token: it lives in a SHELL variable --
+# written $$token in the recipe, i.e. the shell's own $token -- read from the
+# file at run time. make expands its own make-variables when it echoes a line,
+# but never shell-variables, so the echo shows the literal "$token" and never the
+# token VALUE. The token also never appears on a curl COMMAND LINE (which any
+# local process could read from /proc/<pid>/cmdline while curl runs): it is
+# written into a mode-0600 temp file and passed with curl's `-H @file` form
+# (curl >= 7.55; Debian stable qualifies), removed again by an EXIT trap.
+GITLAB_API        := https://gitlab.com/api/v4
+GITLAB_REPO       := godisch/potillus
+# Numeric project id: the REST API addresses a project by id (or by URL-encoded
+# path); the id is stable across renames, which the path is not. Shown on the
+# project's overview page and in Settings -> General.
+GITLAB_PROJECT_ID := 84607593
+# Generic-package NAME the release artifacts are filed under; the package VERSION
+# is the release tag, so each release gets its own package.
+GITLAB_PACKAGE    := releases
+# Display names for the release-page asset links, as "<suffix>=<label>" pairs.
+# The suffix is matched against the END of the staged file name, so the version
+# code in the middle of the name does not have to be spelled out here. A file
+# matching no suffix keeps its bare file name as the label -- a new artifact type
+# therefore still publishes correctly, it is only labelled less prettily until it
+# is added here. These are DISPLAY TEXT only; the link URL is what identifies the
+# artifact (see the note above).
+GITLAB_ASSET_LABELS := \
+	.apk=Android\ Package\ Kit \
+	_android_sbom.json=Android\ Software\ Bill\ of\ Materials \
+	_ios_sbom.json=iOS\ Software\ Bill\ of\ Materials
+GITLAB_TOKEN_FILE := fastlane/gitlab-credentials.txt
 # (VERSION_CODE and the staged/Gradle artifact paths are defined in the "Release
 # staging" section above -- the staged files, not the raw Gradle outputs, are
 # what this uploads.)
-push-codeberg:
-	# require curl + python3 (Codeberg REST + JSON encoding)
+push-gitlab:
+	# require curl + python3 (GitLab REST + JSON encoding)
 	command -v curl
 	command -v python3
-	@test -f "$(CODEBERG_TOKEN_FILE)" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' not found -- create it containing your Codeberg access token (Settings > Applications, repository read+write scope). It is git-ignored." >&2; exit 1; }
-	token="$$(tr -d '[:space:]' < "$(CODEBERG_TOKEN_FILE)")"
-	@test -n "$$token" || { echo "push-codeberg: token file '$(CODEBERG_TOKEN_FILE)' is empty." >&2; exit 1; }
+	@test -f "$(GITLAB_TOKEN_FILE)" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' not found -- create it containing your GitLab personal or project access token (Settings > Access tokens, 'api' scope). It is git-ignored." >&2; exit 1; }
+	token="$$(tr -d '[:space:]' < "$(GITLAB_TOKEN_FILE)")"
+	@test -n "$$token" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' is empty." >&2; exit 1; }
 	# token -> mode-0600 header file (never on argv); removed by the EXIT trap
 	hdr="$$(mktemp)"
 	trap 'rm -f "$$hdr"' EXIT
-	printf 'Authorization: token %s\n' "$$token" > "$$hdr"
+	printf 'PRIVATE-TOKEN: %s\n' "$$token" > "$$hdr"
 	# release tag must exist locally and on the push remote (server resolves the release against it)
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-gitlab: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-codeberg: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-gitlab: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
-	@test -f "$$notes" || { echo "push-codeberg: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
+	@test -f "$$notes" || { echo "push-gitlab: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
 	# staged, signed APK must exist (canonical name = proof a key was used; never builds/stages)
 	apk="$(STAGED_APK)"
-	@test -f "$(STAGED_APK)" || { echo "push-codeberg: staged APK not found at '$(STAGED_APK)' -- run 'make release-android' first (it builds and stages the APK). This target does NOT build or stage it." >&2; exit 1; }
+	@test -f "$(STAGED_APK)" || { echo "push-gitlab: staged APK not found at '$(STAGED_APK)' -- run 'make release-android' first (it builds and stages the APK). This target does NOT build or stage it." >&2; exit 1; }
 	# verify APK signature and pin its signer SHA-256 to SECURITY.md (apksigner from PATH, else ANDROID_HOME build-tools)
 	aps="$${APKSIGNER:-$$(command -v apksigner || ls -1 "$${ANDROID_HOME:-$$HOME/android-sdk}"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)}"
 	"$$aps" verify "$$apk"
 	got="$$("$$aps" verify --print-certs "$$apk" | grep -oiE 'SHA-?256 digest:[[:space:]]*[0-9a-f]{64}' | grep -oiE '[0-9a-f]{64}' | tr 'A-F' 'a-f' | sort -u)"
-	echo "push-codeberg: APK signer certificate SHA-256: $$got"
+	echo "push-gitlab: APK signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
-	@test -f "$(STAGED_SBOM)" || { echo "push-codeberg: staged SBOM not found at '$(STAGED_SBOM)' -- run 'make release-android' first (it builds and stages the SBOM). This target does NOT build or stage it." >&2; exit 1; }
-	# 1) look the release up by tag and REUSE it if present (rerun-safe; 404 body = not created yet)
-	release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/tags/v$(VERSION)" || true)"
-	rel_id="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("id",""))' 2>/dev/null || true)"
-	have_assets="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join(a.get("name","") for a in d.get("assets") or []))' 2>/dev/null || true)"
-	if [ -n "$$rel_id" ]; then
-		echo "push-codeberg: release for tag v$(VERSION) already exists (id $$rel_id) -- reusing it"
-	else
-		# 2) create the release for the existing tag (body = JSON-encoded en-US notes)
-		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
-		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","body":%s,"draft":false,"prerelease":false}' "$(VERSION)" "$(VERSION)" "$$body")"
-		rel_id="$$(curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
-		echo "push-codeberg: created release 'Libellus Potionis v$(VERSION)' (id $$rel_id)"
-	fi
-	# 3) upload staged APK + SBOMs under canonical names, skip already-attached, verify published sha256
-	dl_base="https://codeberg.org/$(CODEBERG_REPO)/releases/download/v$(VERSION)"
+	@test -f "$(STAGED_SBOM)" || { echo "push-gitlab: staged SBOM not found at '$(STAGED_SBOM)' -- run 'make release-android' first (it builds and stages the SBOM). This target does NOT build or stage it." >&2; exit 1; }
+	# 1) upload the staged files into the generic package registry (skip byte-identical re-uploads)
+	pkg_base="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/packages/generic/$(GITLAB_PACKAGE)/v$(VERSION)"
 	ios_sbom=""; test -e "$(STAGED_IOS_SBOM)" && ios_sbom="$(STAGED_IOS_SBOM)"
 	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
 		asset="$$(basename "$$staged")"
-		if printf '%s\n' "$$have_assets" | grep -qxF "$$asset"; then
-			echo "push-codeberg: asset $$asset already attached -- skipping"
+		want="$$(sha256sum "$$staged" | cut -d' ' -f1)"
+		# an interrupted earlier run may already have stored this exact file
+		have="$$(curl -sSL --proto '=https' --tlsv1.2 -H @"$$hdr" "$$pkg_base/$$asset" 2>/dev/null | sha256sum | cut -d' ' -f1 || true)"
+		if [ "$$have" = "$$want" ]; then
+			echo "push-gitlab: package file $$asset already uploaded -- skipping"
 			continue
 		fi
-		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -F "attachment=@$$staged" "$(CODEBERG_API)/repos/$(CODEBERG_REPO)/releases/$$rel_id/assets?name=$$asset" >/dev/null
-		echo "push-codeberg: attached $$asset"
+		curl -fsS --proto '=https' --tlsv1.2 -H @"$$hdr" --upload-file "$$staged" "$$pkg_base/$$asset" >/dev/null
+		echo "push-gitlab: uploaded $$asset to the package registry"
+	done
+	# 2) create the release for the existing tag and REUSE it if present (rerun-safe)
+	rel_api="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/releases"
+	release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$$rel_api/v$(VERSION)" || true)"
+	have_tag="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("tag_name",""))' 2>/dev/null || true)"
+	if [ -n "$$have_tag" ]; then
+		echo "push-gitlab: release for tag v$(VERSION) already exists -- reusing it"
+	else
+		# body = JSON-encoded en-US Play release notes for this versionCode
+		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
+		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","description":%s}' "$(VERSION)" "$(VERSION)" "$$body")"
+		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$$rel_api" >/dev/null
+		echo "push-gitlab: created release 'Libellus Potionis v$(VERSION)'"
+		release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$$rel_api/v$(VERSION)")"
+	fi
+	# Existing links as "<url> <id> <direct_asset_url>" lines -- keyed by URL, the
+	# artifact's identity; the id is what a PATCH below addresses.
+	have_links="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join("%s %s %s" % (l.get("url",""), l.get("id",""), l.get("direct_asset_url","")) for l in (d.get("assets") or {}).get("links") or []))' 2>/dev/null || true)"
+	# 3) attach each package file as an asset link, then verify the PUBLISHED bytes
+	dl_base="https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)/downloads"
+	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
+		asset="$$(basename "$$staged")"
+		pkg_url="$$pkg_base/$$asset"
+		want_dl="$$dl_base/$$asset"
+		# display label: longest-suffix match against GITLAB_ASSET_LABELS, else the file name
+		label="$$asset"
+		for pair in $(GITLAB_ASSET_LABELS); do
+			case "$$asset" in *"$${pair%%=*}") label="$${pair#*=}";; esac
+		done
+		existing="$$(printf '%s\n' "$$have_links" | awk -v u="$$pkg_url" '$$1 == u { print $$2, $$3; exit }')"
+		if [ -z "$$existing" ]; then
+			# direct_asset_path MUST start with '/'; it is what yields $$want_dl
+			link="$$(python3 -c 'import json,sys; print(json.dumps({"name":sys.argv[1],"url":sys.argv[2],"direct_asset_path":"/"+sys.argv[3]}))' "$$label" "$$pkg_url" "$$asset")"
+			curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$link" "$$rel_api/v$(VERSION)/assets/links" >/dev/null
+			echo "push-gitlab: attached $$asset as '$$label'"
+		else
+			link_id="$${existing%% *}"; got_dl_url="$${existing##* }"
+			if [ "$$got_dl_url" = "$$want_dl" ]; then
+				echo "push-gitlab: asset link for $$asset already attached -- skipping"
+			else
+				# link exists but lacks direct_asset_path (e.g. created in the web UI),
+				# so its permanent URL is wrong and the F-Droid Binaries: URL would 404
+				patch="$$(python3 -c 'import json,sys; print(json.dumps({"direct_asset_path":"/"+sys.argv[1]}))' "$$asset")"
+				curl -fsS --proto '=https' --tlsv1.2 -X PUT -H @"$$hdr" -H "Content-Type: application/json" -d "$$patch" "$$rel_api/v$(VERSION)/assets/links/$$link_id" >/dev/null
+				echo "push-gitlab: repaired direct_asset_path of the existing link for $$asset"
+			fi
+		fi
 		# download the published asset and diff its sha256 against the staged file (one 2s retry for endpoint lag)
 		want="$$(sha256sum "$$staged" | cut -d' ' -f1)"
 		got_dl=""
@@ -430,9 +513,9 @@ push-codeberg:
 			[ "$$got_dl" = "$$want" ] && break
 			sleep 2
 		done
-		test "$$got_dl" = "$$want" || { echo "push-codeberg: sha256 mismatch for published asset $$asset (staged $$want, downloaded $$got_dl) -- the upload is corrupt; re-run after deleting the asset on Codeberg." >&2; exit 1; }
-		echo "push-codeberg: verified $$asset sha256 $$want"
+		test "$$got_dl" = "$$want" || { echo "push-gitlab: sha256 mismatch for published asset $$asset at $$want_dl (staged $$want, downloaded $$got_dl) -- the upload is corrupt; re-run after deleting the package file and the asset link on GitLab." >&2; exit 1; }
+		echo "push-gitlab: verified $$asset sha256 $$want"
 	done
-	echo "push-codeberg: done -> https://codeberg.org/$(CODEBERG_REPO)/releases/tag/v$(VERSION)"
+	echo "push-gitlab: done -> https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)"
 
-.PHONY: tgz push-playstore push-appstore push-appstore-preflight push-codeberg
+.PHONY: tgz push-playstore push-appstore push-appstore-preflight push-gitlab

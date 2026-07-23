@@ -21,4 +21,4 @@ A aplicação funciona no iPhone com iOS 17 e posterior. Um seletor de idioma pr
 
 CÓDIGO ABERTO
 
-Libellus Potionis é software livre publicado sob a GNU General Public License v3 (ou posterior). O código-fonte está documentado a um nível de manual e está disponível no repositório canónico: https://codeberg.org/godisch/potillus/
+Libellus Potionis é software livre publicado sob a GNU General Public License v3 (ou posterior). O código-fonte está documentado a um nível de manual e está disponível no repositório canónico: https://gitlab.com/godisch/potillus/

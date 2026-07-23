@@ -21,4 +21,4 @@ Aplicația rulează pe Android 11 (API 30) și versiuni mai noi. Un selector de 
 
 SURSĂ DESCHISĂ
 
-Libellus Potionis este software liber, lansat sub licența GNU General Public License v3 (sau ulterioară). Codul sursă este documentat la nivel de manual și este disponibil în depozitul canonic: https://codeberg.org/godisch/potillus/
+Libellus Potionis este software liber, lansat sub licența GNU General Public License v3 (sau ulterioară). Codul sursă este documentat la nivel de manual și este disponibil în depozitul canonic: https://gitlab.com/godisch/potillus/

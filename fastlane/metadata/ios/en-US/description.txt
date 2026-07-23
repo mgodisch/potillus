@@ -21,4 +21,4 @@ The app runs on iPhone with iOS 17 and newer. A fully independent in-app languag
 
 OPEN SOURCE
 
-Libellus Potionis is free software released under the GNU General Public License v3 (or later). The source code is documented to a textbook standard and is available at the canonical repository: https://codeberg.org/godisch/potillus/
+Libellus Potionis is free software released under the GNU General Public License v3 (or later). The source code is documented to a textbook standard and is available at the canonical repository: https://gitlab.com/godisch/potillus/

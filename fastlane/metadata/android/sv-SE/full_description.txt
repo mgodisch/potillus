@@ -21,4 +21,4 @@ Appen körs på Android 11 (API 30) och senare. En helt fristående språkvälja
 
 ÖPPEN KÄLLKOD
 
-Libellus Potionis är fri programvara som ges ut under GNU General Public License v3 (eller senare). Källkoden är dokumenterad på lärobokssnivå och finns i det kanoniska kodförrådet: https://codeberg.org/godisch/potillus/
+Libellus Potionis är fri programvara som ges ut under GNU General Public License v3 (eller senare). Källkoden är dokumenterad på lärobokssnivå och finns i det kanoniska kodförrådet: https://gitlab.com/godisch/potillus/

@@ -57,8 +57,8 @@ check_markdown_syntax() {
     # into res/raw*/ earlier in the build. Guides are added only if present, so
     # a standalone run before `make guides` simply checks the authored docs.
     # PRIVACY.md is included because it is hosted verbatim as the store listing's
-    # privacy-policy page (see docs/PLAY_STORE.md), so a stray emphasis marker
-    # would misrender on the public page just as it would in the in-app guides.
+    # privacy-policy page, so a stray emphasis marker would misrender on the
+    # public page just as it would in the in-app guides.
     local files=("$CHANGELOG" "$README" "$CONTRIBUTING" "$PRIVACY")
     local g
     for g in app/src/main/res/raw*/usersguide.md; do

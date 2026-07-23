@@ -21,4 +21,4 @@ Aplikacja działa na iPhonie z iOS 17 i nowszym. W pełni niezależny, wbudowany
 
 OTWARTE ŹRÓDŁO
 
-Libellus Potionis to wolne oprogramowanie wydane na licencji GNU General Public License v3 (lub nowszej). Kod źródłowy jest udokumentowany na poziomie podręcznikowym i dostępny w kanonicznym repozytorium: https://codeberg.org/godisch/potillus/
+Libellus Potionis to wolne oprogramowanie wydane na licencji GNU General Public License v3 (lub nowszej). Kod źródłowy jest udokumentowany na poziomie podręcznikowym i dostępny w kanonicznym repozytorium: https://gitlab.com/godisch/potillus/

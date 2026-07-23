@@ -38,13 +38,14 @@ WHAT IT CHECKS
 
 WHY IT IS A LOCAL / PRE-RELEASE GATE, NOT PART OF check-static
     `reuse` is a third-party Python package, not part of the standard library.
-    The device-free CI aggregate (make check-static, run by the Woodpecker
-    pipeline on a plain `python:3-slim` image) is deliberately kept free of any
-    pip install step, so it must not depend on `reuse` being present. This gate
+    The device-free aggregate (make check-static, written to run on a plain
+    `python:3-slim` image once the GitLab pipeline exists) is deliberately kept
+    free of any pip install step, so it must not depend on `reuse` being
+    present. This gate
     is therefore run locally and before a release -- exactly like the Mac-only
     SwiftLint pass (ios/Makefile `lint`), which is likewise a real external tool
-    kept out of the Linux CI. Two independent backstops keep a regression from
-    slipping through anyway: a maintainer runs `make check-reuse` before
+    kept out of the Linux aggregate. Two independent backstops keep a regression
+    from slipping through anyway: a maintainer runs `make check-reuse` before
     tagging, and the public REUSE badge (api.reuse.software) re-evaluates the
     canonical repository server-side and would turn red on a lapse.
 

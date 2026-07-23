@@ -375,7 +375,7 @@ def main() -> int:
             missing.append(os.path.relpath(out_path, ROOT))
 
     # The committed, human-facing English guide (android/docs/guide/usersguide.md):
-    # a rendered sibling of usersguide.md.in that Codeberg renders (.md, not .md.in)
+    # a rendered sibling of usersguide.md.in that GitLab renders (.md, not .md.in)
     # and that the OpenSSF badge justifications link to. Rendered here from the base
     # English template and the unqualified strings.xml, independently of the mtime
     # skip above so it is always considered. It is COMMITTED, so --check treats a

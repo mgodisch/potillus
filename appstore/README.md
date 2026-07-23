@@ -67,7 +67,7 @@ build the AAB). Produce a signed `.ipa` first, either from Xcode
 (*Product → Archive → Distribute App*) or from the command line, and place it at
 `ios/build/Potillus.ipa` (the path the `upload_appstore` lane expects).
 
-Reproducibility note: as with the Codeberg/F-Droid Android artifacts, the build
+Reproducibility note: as with the GitLab/F-Droid Android artifacts, the build
 is reproducible **up to the point of upload** — the archive you sign locally is
 the artifact you ship. Apple then re-signs the binary on ingestion, so the bytes
 Apple distributes are not bit-identical to your local archive; this is the same

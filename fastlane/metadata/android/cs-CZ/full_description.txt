@@ -21,4 +21,4 @@ Aplikace běží na Androidu 11 (API 30) a novějším. Plně nezávislý výbě
 
 OTEVŘENÝ ZDROJOVÝ KÓD
 
-Libellus Potionis je svobodný software vydaný pod licencí GNU General Public License v3 (nebo novější). Zdrojový kód je zdokumentován na učebnicové úrovni a je dostupný v kanonickém repozitáři: https://codeberg.org/godisch/potillus/
+Libellus Potionis je svobodný software vydaný pod licencí GNU General Public License v3 (nebo novější). Zdrojový kód je zdokumentován na učebnicové úrovni a je dostupný v kanonickém repozitáři: https://gitlab.com/godisch/potillus/

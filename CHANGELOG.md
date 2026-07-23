@@ -44,12 +44,12 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Reach iOS parity and harden the release
 
-This version does three things. Its headline is an iOS interaction rework — the
+This version does four things. Its headline is an iOS interaction rework — the
 per-row trash and pencil icons on the Today, Drinks and Calendar screens give way
-to the native edit-mode-and-tap model Apple's own list apps use — it absorbs the
-store-path corrections that had been drafted for 0.83.1, and it folds in the
-fixes of a full two-platform QA round (the closing "Quality-assurance round"
-section). **0.83.1 is
+to the native edit-mode-and-tap model Apple's own list apps use — it moves the
+canonical repository to GitLab, it absorbs the store-path corrections that had
+been drafted for 0.83.1, and it folds in the fixes of a full two-platform QA
+round (the closing "Quality-assurance round" section). **0.83.1 is
 cancelled and was never published**; its `versionCode` 95 was never shipped, so
 0.84.0 inherits it. The human version therefore steps 0.83.0 → 0.84.0 (a minor
 bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
@@ -170,7 +170,7 @@ explicit step.
 The Android feature graphics and the store orchestrator complete the store
 fragment. `feature-graphics-android` renders every locale's 1024x500 Play feature
 graphic (and its committed high-res companion `featureGraphic-4K.png`, which
-README.md links and Codeberg displays per locale) from the caption, `01_today`
+README.md links and the forge displays per locale) from the caption, `01_today`
 (strand A), `07` (strand B) and the shared inputs -- via a grouped target so one
 renderer call declares both outputs. It is EXPLICIT, never cascaded from the
 producers; a `device_screenshot_sentinel` makes a missing `01_today` fail with a
@@ -235,7 +235,7 @@ each gated on the `v<VERSION>` git tag existing (they never create it) and on th
 artifact carrying the expected signing key (the AAB's jarsigner+keytool SHA-256, or
 the IPA's codesign team), pinned against the single fingerprint in SECURITY.md;
 `push-appstore-preflight` isolates the App Store credential check, and
-`push-codeberg` publishes the Codeberg release and verifies each uploaded asset's
+`push-gitlab` publishes the GitLab release and verifies each uploaded asset's
 sha256. Each fails fast if an artifact, credential or tag is missing, so a push only
 ever runs against something built explicitly.
 
@@ -413,49 +413,6 @@ picture; the target still exits non-zero at the end if any step failed. The
 shared shell scaffolding lives once in the root Makefile
 (`QA_PROLOGUE`/`QA_EPILOGUE`).
 
-### Build tooling: a Woodpecker CI pipeline (checks, PRs to main only)
-
-A `.woodpecker.yml` brings the device-free checks to Codeberg's CI
-([Woodpecker](https://woodpecker-ci.org)). It is deliberately the smallest
-useful gate, to be a good guest on shared runners:
-
-- **Checks and an SCA scan, never a build.** Two steps run the same read-only
-  gates that pass in the QA log — `tools/release-check.sh --Werror` and
-  `make check-static`. The latter is what lets a Linux runner cover the iOS
-  static checks (Swift symbol/length/test linting, l10n parity, store-metadata
-  limits) that are reproduced in Python precisely so no Mac is needed. A third
-  step, `dependency-scan`, runs osv-scanner over the committed lockfiles on
-  every pull request and fails on a finding, so a vulnerable dependency blocks
-  the merge (see the security entry below). A real Android build needs the SDK
-  and an emulator; an iOS build needs macOS + Xcode and cannot run on a Linux
-  runner at all — so building stays local / pre-release.
-- **Pull requests targeting `main` only.** A workflow-global
-  `when: [event: pull_request, branch: main]` means an ordinary push to any
-  branch triggers nothing, and the run happens at the one moment that matters:
-  code asking to enter `main`. (For a `pull_request` event the branch filter
-  matches the PR's target, per the Woodpecker docs.)
-- **Least privilege.** One small `python:3-slim` image (the interpreter the
-  checks run on is in the image — every tool is standard-library-only, so there
-  is no pip step; `make`, `git` and `file` are the only additions), no secrets,
-  no privileged mode, read-only checks. `git config --global --add safe.directory
-  "$PWD"` clears the "dubious ownership" refusal a differently-owned CI checkout
-  otherwise triggers.
-
-Two one-time Codeberg web-UI steps stay with the maintainer: enabling Woodpecker
-for the repository, and a branch-protection rule so a PR to `main` can only
-merge on a green run. With the pipeline running green on Codeberg and that
-branch-protection rule in place, four CI-conditional OSPS Baseline controls
-move from N/A to Met in `.bestpractices.json` — untrusted-input validation
-(`OSPS-BR-01.01`), no privileged credentials for untrusted snapshots
-(`OSPS-BR-01.03`), least-privilege defaults (`OSPS-AC-04.01`), and
-status-checks-before-merge (`OSPS-QA-03.01`). `OSPS-QA-06.01` (a test SUITE
-running inside CI) stays N/A on purpose: this pipeline runs the device-free
-checks only, not the unit-test suites, which need the Android SDK and a Linux
-Swift toolchain — a run that does not happen is not claimed. The
-`docs/INSTALL-IOS.md` note that `gmake ios` is "what CI-style verification
-uses" is clarified to say it is the fuller LOCAL Mac gate, since the Codeberg
-pipeline runs only the device-free subset.
-
 ### Security: record non-exploitable advisories as VEX
 
 Non-exploitable dependency advisories were triaged in prose and in
@@ -473,45 +430,30 @@ advisory is ignored in `osv-scanner.toml` without a matching VEX statement.
 records what still depends on upstream: unifying the two once osv-scanner consumes
 VEX, and publishing the document as a release-asset feed.
 
-### Security: enforce osv-scanner on every change and at release
+### Security: enforce osv-scanner at release
 
 Dependency vulnerability scanning was a manual release-checklist step; it is now
-enforced on two levels. Per change: the Woodpecker CI pipeline gains a
-`dependency-scan` step that runs `osv-scanner scan source` over the committed
-lockfiles (`fastlane/Gemfile.lock`, `ios/PotillusKit/Package.resolved`) on every
-pull request to `main` — no build, so it stays light on shared runners — and a
-finding fails the step, so with branch protection a vulnerable dependency blocks
-the merge. Before each release: a new `osv-scan-sbom` macro in `make/release.mk`,
-invoked by both `release-android` and `release-ios`, runs the scanner over the
-CycloneDX SBOM each build produces — after the SBOM is generated, before it is
-staged — so a release cannot be staged while a finding is unresolved. The two
-layers are complementary: the per-change scan is broad and fast but sees only
-the lockfiles, while the staging scan covers the COMPLETE transitive graph the
-SBOM captures (including the Android app graph a lockfile-only scan cannot see
-without Gradle). Triage is machine-enforced through a new `osv-scanner.toml`
-(starts empty; a finding assessed non-exploitable per SECURITY.md is recorded
-there with its reason and its OSV id, so a known-harmless transitive advisory
-does not block while an un-triaged one does), and the CI scanner is pinned to a
-specific upstream release matching the maintainer's local version so the two
-scans do not drift. `SECURITY.md` and the `CONTRIBUTING.md` release checklist
+enforced by the build. A new `osv-scan-sbom` macro in `make/release.mk`, invoked
+by both `release-android` and `release-ios`, runs the scanner over the CycloneDX
+SBOM each build produces — after the SBOM is generated, before it is staged — so
+a release cannot be staged while a finding is unresolved. Scanning the SBOM
+rather than the lockfiles covers the COMPLETE transitive graph (including the
+Android app graph a lockfile-only scan cannot see without Gradle). Triage is
+machine-enforced through a new `osv-scanner.toml` (starts empty; a finding
+assessed non-exploitable per SECURITY.md is recorded there with its reason and
+its OSV id, so a known-harmless transitive advisory does not block while an
+un-triaged one does). `SECURITY.md` and the `CONTRIBUTING.md` release checklist
 describe the check as enforced rather than manual.
 
-With per-change SCA now blocking merges, `OSPS-VM-05.03` ("all changes
-automatically evaluated against a documented policy … and blocked on violation")
-moves to Met, joining the dependency-management answers that already rested on
-this discipline (`OSPS-VM-05.01`/`05.02`, `dependency_monitoring`). The criteria
-that ask specifically for in-pipeline TEST or LINT execution
-(`test_continuous_integration`, `automated_integration_testing`,
-`static_analysis_often`, `OSPS-QA-06.01`) keep their Unmet/N/A answers — those
-need the heavy SDK/Xcode toolchain the pipeline deliberately avoids — and
-`OSPS-VM-04.02` is Met by the OpenVEX layer this cycle also adds
-(`openvex.json`, described above, standardises what the osv-scanner.toml triage
-records). The scans reach the network (osv.dev).
-`docs/ROADMAP.md` is reconciled with this end state: the entries that described
-CI and the SCA gate as still-to-come are updated to the shipped reality, and the
-remaining test-and-lint-in-CI work — the one heavier step, needing an SDK-bearing
-image and a Linux Swift toolchain — is recorded as its own explicitly deferred
-item so it does not drop from view.
+A second, per-change `scan source` over the committed lockfiles ran in CI for
+part of this cycle; it went with the pipeline when the repository moved to GitLab
+(see "Infrastructure" below), so `OSPS-VM-05.03` ("all changes automatically
+evaluated against a documented policy … and blocked on violation") stands at
+Unmet until the GitLab pipeline restores it. The dependency-management answers
+that rest on the release gate alone (`OSPS-VM-05.01`/`05.02`,
+`dependency_monitoring`) are Met, and `OSPS-VM-04.02` is Met by the OpenVEX layer
+this cycle also adds (`openvex.json`, described above, standardises what the
+osv-scanner.toml triage records). The scans reach the network (osv.dev).
 
 ### Build tooling: replace the badge-answer pull with a diff report
 
@@ -598,8 +540,8 @@ branch, via `koverVerify`.
 The gold tier likewise needed no status change: its per-file copyright and license
 headers are enforced by `check-headers.py` (wired into `make check-ios-static`), and
 `build_reproducible`, the 2FA policy in `docs/GOVERNANCE.md`, and the reasons behind
-the unmet gold criteria (single maintainer, branch coverage below the 80% gold bar,
-repo-host headers set by Codeberg) all check out. `test_statement_coverage90` gains
+the unmet gold criteria (single maintainer, branch coverage below the 80% gold bar)
+all check out. `test_statement_coverage90` gains
 the same floor detail as `test_statement_coverage80`; both now attribute the 75%
 branch floor to the Kover (Android) path and describe the iOS floor as line-only,
 since the swift/llvm-cov path produces no branch data.
@@ -635,14 +577,13 @@ target, scheme, and paths; the `potillus_repo` helper) and in the historical rel
 notes that recorded the original rename; changing those would break builds or rewrite
 history.
 
-### Docs: note the GitLab and GitHub mirrors
+### Docs: note the GitHub mirror
 
-The canonical repository is on Codeberg; read-only push mirrors are maintained at
-`gitlab.com/godisch/potillus` and `github.com/mgodisch/potillus`. The License
-section of `README.md` now names both mirrors alongside the canonical Codeberg URL,
-so a reader who arrives via a mirror can still find the authoritative source. The
-mirrors are downstream only -- bug reports and contributions continue to go to the
-canonical Codeberg repository.
+A read-only push mirror is maintained at `github.com/mgodisch/potillus`. The
+License section of `README.md` names it alongside the canonical URL, so a reader
+who arrives via the mirror can still find the authoritative source. The mirror is
+downstream only -- bug reports and contributions go to the canonical
+repository.
 
 ### Docs: record tester suggestions in the roadmap
 
@@ -652,16 +593,17 @@ two entries come from QA report #4294: search and category filtering for the dri
 library, and an optional standard-drink equivalent shown alongside the primary
 gram totals.
 
-### Docs: record why OpenSSF Scorecard is not pursued
+### Docs: record what OpenSSF Scorecard now needs
 
-`docs/ROADMAP.md` now explains, with justification, why the OpenSSF Scorecard
-badge is not pursued while Codeberg is the canonical forge. Scorecard evaluates a
-GitHub or GitLab repository and its badge is fed by a workflow on that forge; the
-canonical repository is on Codeberg, and the GitHub and GitLab repositories are
-read-only mirrors on which no development, review, CI, or release takes place. A
-badge earned against a mirror would understate the project's actual security
-posture, so it is deliberately not linked -- the reasoning is recorded in the
-roadmap.
+Scorecard evaluates a GitHub or GitLab repository and its badge is fed by a CI
+job on that forge. That ruled the badge out while the canonical repository lived
+elsewhere and the GitHub/GitLab repositories were read-only mirrors carrying no
+development, review, CI or release activity; measuring one of those mirrors would
+have understated the project's actual posture. With the canonical repository now
+on GitLab that objection is gone, and `docs/ROADMAP.md` records the two
+prerequisites that remain: a CI pipeline to publish the result, and re-pointing
+the bestpractices.dev registration (project 13480) at the GitLab URL so the
+CII-Best-Practices check stops reading zero.
 
 ### Privacy: add an Exodus badge and tracker check
 
@@ -678,7 +620,7 @@ out of `check-static` and the offline release gate; run it before a release.
 
 ### Licensing: keep third-party notices out of the license detector's way
 
-GitLab (and Codeberg) detect the repository license with Gitaly's `go-license-detector`,
+GitLab detects the repository license with Gitaly's `go-license-detector`,
 which scans every root file named like a license (`LICENSE*`, `COPYING*`, `COPYRIGHT*`)
 and reports each license it finds inside. `COPYING.md` -- a `COPYING`-named file that also
 listed the bundled third-party components and their licenses -- matched Apache-2.0, CC-BY
@@ -702,7 +644,7 @@ for dependency information now point at `docs/NOTICES.md`.
 
 Validated with `go-license-detector` (GPL-3.0 ranks first among the root license files) and
 the full gate suite; the new `LICENSES/` subdirectory adds no root license file, but the
-repository-license display wants a look on Codeberg to confirm. The Android build's
+repository-license display wants a look on the forge to confirm. The Android build's
 license-document copy step changes its source paths, so it wants a build on a real host to
 confirm; no app code changes and no answer status changes.
 
@@ -732,15 +674,67 @@ The GPL-2.0 text of the build-bundled `desugar_jdk_libs` dependency stays under 
 
 Compliance is enforced by `make check-reuse` (`tools/check-reuse.py`, a thin wrapper over
 `reuse lint`) and advertised by a REUSE badge in `README.md`. The gate is kept OUT of the
-device-free CI aggregate (`make check-static`) on purpose: `reuse` is a third-party pip
-package, and the Woodpecker pipeline's `python:3-slim` image is deliberately pip-free -- just
-as the Mac-only SwiftLint pass is kept out of the Linux CI. It is a local / pre-release check,
+device-free aggregate (`make check-static`) on purpose: `reuse` is a third-party pip
+package, and the small `python:3-slim` image that aggregate is written for is deliberately
+pip-free -- just as the Mac-only SwiftLint pass is kept out of it. It is a local / pre-release check,
 with the server-side `api.reuse.software` badge as an independent backstop.
 
 Validated with `reuse lint` (compliant with REUSE 3.3; 1343/1343 files carry both copyright
 and license). The About screen renders these `res/raw/*.md` documents as Markdown and the
 canonical texts are plain text with numbered clauses, so their on-screen formatting wants a
 look on a real device; no app code changes.
+
+### Infrastructure: move the canonical repository to GitLab
+
+The canonical repository moved from `codeberg.org/godisch/potillus` to
+`gitlab.com/godisch/potillus`. Codeberg is retired, not kept as a mirror; the
+GitHub mirror stays. Every reference in the tree follows — documentation, the
+OpenSSF badge answers, the F-Droid recipe, the fastlane store metadata for both
+platforms and the REUSE badge — including the path shapes, since GitLab addresses
+blobs, issues, tags and releases differently from Forgejo. The published CHANGELOG
+history is left untouched: its links describe where things were at the time.
+
+`push-codeberg` becomes `push-gitlab` and is rebuilt for GitLab's release model.
+A GitLab release does not store files, only links to them, so each staged artifact
+is first uploaded into the project's generic package registry and then attached as
+an asset link whose `direct_asset_path` yields the permanent URL
+`…/-/releases/v<VERSION>/downloads/<asset>` — the shape the F-Droid recipe's
+`Binaries:` field interpolates per version. Links carry a readable label on the
+release page ("Android Package Kit" rather than the bare file name, from the new
+`GITLAB_ASSET_LABELS` map), but are recognised by URL, not by that label: GitLab
+requires both to be unique per release, and only the URL is reproducible from the
+staged file, so renaming a link in the web UI cannot make the target attach a
+duplicate. A link that lacks `direct_asset_path` — the web UI offers no such field,
+and without it the F-Droid URL 404s — is patched in place rather than reported.
+The other guarantees are unchanged: the signer is pinned against SECURITY.md, the
+tag must already exist locally and on the remote, nothing is built or staged, every
+published asset is re-downloaded and checksum-matched, and the whole target is safe
+to re-run after a partial failure. The token moves to
+`fastlane/gitlab-credentials.txt` (git-ignored).
+
+CI is gone for now: `.woodpecker.yml` was Codeberg-specific and is deleted rather
+than ported, so the project temporarily has no pipeline at all. Building the
+GitLab CI replacement is the first item of `docs/ROADMAP.md`. The affected badge
+answers are corrected downward rather than left standing: `OSPS-AC-04.01`,
+`OSPS-BR-01.01` and `OSPS-BR-01.03` return to N/A (their precondition, operating a
+pipeline, no longer holds), while `OSPS-QA-03.01` and `OSPS-VM-05.03` go to Unmet.
+`OSPS-QA-03.01` sits at OSPS Baseline Level 2, so that level is no longer complete
+— it holds exactly one unmet control and the CI pipeline restores it on its own.
+
+Two things improve. `hardened_site` (gold) moves to Met: GitLab sends all four
+hardening headers the criterion asks for, which the previous host did not. And the
+OpenSSF Scorecard badge, ruled out because Scorecard has no backend for the old
+forge and the GitHub/GitLab repositories were inactive mirrors, is now reachable in
+principle; the roadmap records the two prerequisites that remain.
+
+Forge mechanics are restated honestly rather than transposed. GitLab's free plan
+has no push rule that rejects unsigned commits, so the commit-signing requirement
+is documented as a project policy enforced at review — `CONTRIBUTING.md` and
+`SECURITY.md` no longer claim the forge rejects the push. Protection of `main`
+still holds server-side through "Allowed to push and merge: No one", and the
+member model replaces the Forgejo collaborator wording in `docs/GOVERNANCE.md`.
+Contribution documentation switches from "pull request" to "merge request"
+throughout.
 
 ### QA round (0.84.0): review findings and fixes
 
@@ -940,7 +934,7 @@ now passes the gate. The letterboxing tool and its Makefile wiring already exist
 what was missing was running it over the committed shots, which is now done.
 
 Made the English user's guide linkable, and recorded store availability in the
-README. Codeberg renders `.md` but not the `.md.in` templates the guide is authored
+README. The forge renders `.md` but not the `.md.in` templates the guide is authored
 as, so the guide could not be linked from anywhere (the README, the OpenSSF badge
 justifications) as readable prose. Both renderers now also emit the rendered English
 guide as a committed sibling of its template — `android/docs/guide/usersguide.md`
@@ -968,10 +962,10 @@ notes; `push-appstore-preflight` passes `--release` to enforce them at upload ti
 Turned the OpenSSF badge answers into linked prose. Every document a justification
 in `.bestpractices.json` referenced by name — the README, CONTRIBUTING.md, the
 User's Guide, SECURITY.md, COPYING.md, individual source files, the Gradle version
-catalog — is now a Markdown link to its committed copy on Codeberg
-(`https://codeberg.org/godisch/potillus/src/branch/main/<path>`), with any URL
+catalog — is now a Markdown link to its committed copy on the canonical forge
+(`https://gitlab.com/godisch/potillus/-/blob/main/<path>`), with any URL
 anchor preserved. Guide references point at the committed `usersguide.md`, not the
-`.md.in` template Codeberg does not render. The explicit URL/citation footers that
+`.md.in` template the forge does not render. The explicit URL/citation footers that
 used to trail the prose (`URL:`, `Source:`, `See`, `Reference:`, `Tests:`, em-dash
 and parenthetical citations, `documented at …`) are gone wherever their target is
 now a link, and reworded where it is not; the trailing `[tag]` markers are removed
@@ -999,7 +993,7 @@ SwiftLint gate, and the XCTest suite pinned to the shared golden vectors. 43 of 
 appended). Platform-neutral answers (repository, docs, and process criteria) and the
 "not applicable / not met" ones were left untouched. Three areas are stated honestly
 as roadmap goals rather than accomplished facts and are now recorded in
-[docs/ROADMAP.md](https://codeberg.org/godisch/potillus/src/branch/main/docs/ROADMAP.md):
+[docs/ROADMAP.md](https://gitlab.com/godisch/potillus/-/blob/main/docs/ROADMAP.md):
 iOS test-coverage measurement, a reproducible iOS build before the App Store release,
 and the iOS-specific hardening items (an explicit App Transport Security declaration).
 The iOS strictness gate is SwiftLint; Swift compiler warnings-as-errors are not

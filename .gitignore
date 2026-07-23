@@ -57,7 +57,7 @@ __pycache__/
 # ── Staged release artifacts ─────────────────────────────────────────────────
 # `make release-android` copies the signed AAB/APK and the SBOM here under their
 # canonical <applicationId>_<versionCode>.<ext> names; push-playstore /
-# push-codeberg upload from here. Build outputs, never source.
+# push-gitlab upload from here. Build outputs, never source.
 /releases
 
 # ── Secrets -- NEVER commit ──────────────────────────────────────────────────
@@ -67,7 +67,7 @@ __pycache__/
 /android/keystore.properties
 /ios/signing.properties
 /fastlane/play-store-credentials.json
-/fastlane/codeberg-credentials.txt
+/fastlane/gitlab-credentials.txt
 # App Store Connect API key (.p8) for the iOS deliver lanes: it downloads once and
 # cannot be re-downloaded. Read via the APP_STORE_CONNECT_API_KEY_* env vars (see
 # fastlane/Fastfile, iOS block).

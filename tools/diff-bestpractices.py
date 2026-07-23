@@ -30,7 +30,7 @@ WHY THIS EXISTS
     The project's OpenSSF badge answers live in two places: the committed
     .bestpractices.json (the maintainer's SOURCE OF TRUTH, edited by hand) and
     the live bestpractices.dev form (what the badge site actually publishes).
-    bestpractices.dev cannot ingest a file from a Codeberg-hosted repository, so
+    bestpractices.dev does not ingest the committed file, so
     keeping the two in step is a manual transcription: the maintainer edits the
     committed file, then copies each changed answer into the web form.
 

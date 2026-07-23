@@ -66,14 +66,14 @@ participation in the project is expected to follow our
 [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 1. **Open an issue first.** Before writing code, describe the bug or proposed
-   enhancement in the [Codeberg issue
-   tracker](https://codeberg.org/godisch/potillus/issues). This lets the
+   enhancement in the [GitLab issue
+   tracker](https://gitlab.com/godisch/potillus/-/issues). This lets the
    maintainer confirm the change fits the project's scope and privacy-first
    philosophy (Section 1) before anyone invests effort. Small, obvious fixes
    (typos, an off-by-one in a comment) may skip this step.
-2. **Submit the change as a pull request** against the `main` branch of the
-   [canonical repository](https://codeberg.org/godisch/potillus). If you cannot
-   use Codeberg, a plain patch or `git format-patch` series sent to
+2. **Submit the change as a merge request** against the `main` branch of the
+   [canonical repository](https://gitlab.com/godisch/potillus). If you cannot
+   use GitLab, a plain patch or `git format-patch` series sent to
    [android@godisch.de](mailto:android@godisch.de) is accepted as an
    alternative.
 3. **Meet the acceptance requirements.** Every change must follow the
@@ -83,7 +83,7 @@ participation in the project is expected to follow our
    (Section 6). In particular, per the mandatory test policy in Section 5, major
    new functionality MUST include automated tests covering it in the same change.
    `./gradlew test` must pass and `tools/release-check.sh` must stay green.
-4. **Review and merge.** The maintainer reviews every pull request and is the
+4. **Review and merge.** The maintainer reviews every merge request and is the
    sole merger. Expect review comments; a change is merged only once it builds,
    its tests pass, and it upholds the documented conventions. There is no
    separate CI service — the maintainer runs the build and the release gate
@@ -95,7 +95,7 @@ participation in the project is expected to follow our
 New or casual contributors are welcome to start with small, self-contained tasks
 that need no deep familiarity with the codebase. Issues suitable for a first
 contribution are marked in the [issue
-tracker](https://codeberg.org/godisch/potillus/issues) with the `good first
+tracker](https://gitlab.com/godisch/potillus/-/issues) with the `good first
 issue` label; filter by that label to find current ones. Small tasks that fit
 this project especially well include:
 
@@ -154,18 +154,22 @@ chmod +x .git/hooks/prepare-commit-msg
 
 Sign-off is a plain text line certifying agreement with the DCO; it is **not** a
 cryptographic signature and requires no key — only that your Git `user.name` and
-`user.email` are configured. Pull requests whose commits are not signed off may
+`user.email` are configured. Merge requests whose commits are not signed off may
 be asked to add the sign-off before they are merged.
 
 ### Commit signing and merge workflow
 
 Beyond the DCO sign-off (a plain-text line), the repository requires every commit
-to carry a **cryptographic signature**. Branch protection on Codeberg rejects
-pushes that contain unsigned or unverifiable commits on every branch except
-`main`; `main` itself is merged **fast-forward-only**, so the already-signed
-commits flow onto it unchanged (rather than the forge creating an unsigned merge
-commit). Enable signing locally and register the matching **public** key with
-your Codeberg account, so the forge can verify the signature:
+to carry a **cryptographic signature**. This is a documented project policy,
+enforced by the maintainer at review: unlike the Forgejo branch protection the
+project used before the move to GitLab, GitLab offers server-side rejection of
+unsigned commits only through push rules, which its free plan does not include.
+What the forge still does is *display* the verification status, so an unsigned or
+unverifiable commit is visible at a glance and will not be merged. `main` is
+merged **fast-forward-only**, so the already-signed commits flow onto it
+unchanged (rather than the forge creating an unsigned merge commit). Enable
+signing locally and register the matching **public** key with your GitLab
+account, so the forge can verify the signature:
 
 ```sh
 git config commit.gpgSign true
@@ -174,10 +178,10 @@ git config user.signingKey <your-key-id>
 
 For SSH signing instead of GPG, set `git config gpg.format ssh` and point
 `user.signingKey` at your public-key file. If the public key is not on your
-Codeberg account, the commit counts as *unverifiable* and the push is rejected.
+GitLab account, the commit counts as *unverifiable* and will not be merged.
 
 Because merges are fast-forward-only, the branch must sit directly on top of the
-current `main`. Rebase before opening or updating a pull request; with
+current `main`. Rebase before opening or updating a merge request; with
 `commit.gpgSign` set, the rebased commits are re-signed automatically:
 
 ```sh
@@ -190,7 +194,7 @@ git push --force-with-lease
 
 Every change is reviewed before it is merged. Because the project currently has a
 single maintainer, the maintainer is the reviewer and the sole merger; external
-contributions are reviewed as pull requests (or emailed patch series). Until a
+contributions are reviewed as merge requests (or emailed patch series). Until a
 continuous-integration service is in place, the reviewer runs the full build, the
 test suite, and the release gate locally as part of each review.
 
@@ -425,7 +429,7 @@ are reached.
 > or be subtly wrong, and the store keywords in particular are a best-effort
 > guess at what people actually search for in each market. If you are fluent in
 > any non-German language we ship, reviewing even one screen's worth of strings
-> is a valuable, self-contained contribution: open an issue or pull request (see
+> is a valuable, self-contained contribution: open an issue or merge request (see
 > Section 2) with the language and the improved wording. No build setup is
 > required to propose better text. The paths to every translatable file are
 > below.
@@ -452,7 +456,7 @@ complete.
 locales are machine-generated** and shipped as-is without native-speaker review.
 They are therefore likely to contain awkward or incorrect phrasing.
 Native-speaker corrections are very much appreciated — please open an issue or a
-pull request (see Section 2) with the language and the improved string(s).
+merge request (see Section 2) with the language and the improved string(s).
 
 **Rules:**
 1. Add every new string key to **all** locale files at the same time (the base
@@ -623,13 +627,14 @@ Before tagging a new version:
       CycloneDX SBOM alongside the `.ipa` as
       `de.godisch.potillus_<versionCode>_ios_sbom.json`, generated from
       `ios/PotillusKit/Package.resolved` and normalised by the same tool.
-- [ ] Publish the release on Codeberg from the signed tag with
-      `make push-codeberg` (after `make release-android`): it verifies the staged
-      APK's signer against the fingerprint in SECURITY.md, creates the release for
-      the pushed tag over the Forgejo API, attaches the staged APK and SBOM as
-      assets, and re-downloads each to confirm its sha256 matches the staged file
-      — so every released version is accompanied by its software bill of materials
-      and the published bytes are verified. The target is safe to re-run after a
+- [ ] Publish the release on GitLab from the signed tag with
+      `make push-gitlab` (after `make release-android`): it verifies the staged
+      APK's signer against the fingerprint in SECURITY.md, uploads the staged APK
+      and SBOM into the project's generic package registry, creates the release
+      for the pushed tag over the GitLab API with a permanent asset link per file,
+      and re-downloads each to confirm its sha256 matches the staged file — so
+      every released version is accompanied by its software bill of materials and
+      the published bytes are verified. The target is safe to re-run after a
       partial failure.
 - [ ] Upload the release to Google Play with `make push-playstore` (closed-testing
       alpha track; it verifies the staged AAB's signature and signer first and

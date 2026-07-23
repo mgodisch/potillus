@@ -148,7 +148,7 @@ To help triage and reproduce the issue, please include where possible:
 When a vulnerability in Libellus Potionis is confirmed and fixed, the project
 publishes an advisory through predictable public channels: the
 security-relevant fix is recorded in the release notes
-([CHANGELOG.md](CHANGELOG.md)) and in the corresponding Codeberg release. Each
+([CHANGELOG.md](CHANGELOG.md)) and in the corresponding GitLab release. Each
 advisory states, to the extent possible, the affected version(s), how a user
 can determine whether they are affected, and the remediation — updating to the
 fixed version, which is distributed through
@@ -180,19 +180,18 @@ rolling-release model: only the **latest released version** is supported.
   will be announced in the repository (README), after which no further updates —
   security or otherwise — will be provided.
 - **Obtaining support.** Bug reports and questions go to the
-  [Codeberg issue tracker](https://codeberg.org/godisch/potillus/issues); suspected
+  [GitLab issue tracker](https://gitlab.com/godisch/potillus/-/issues); suspected
   vulnerabilities follow the process in "Reporting a vulnerability" above.
 
 ## Dependency monitoring
 
-The project's external dependencies are checked for known vulnerabilities on
-two levels, both enforced rather than left to a periodic reminder. Every pull
-request to `main` runs osv-scanner as a required CI check
-([.woodpecker.yml](.woodpecker.yml), the `dependency-scan` step): a
-`scan source` over the lockfiles committed in the tree
-(`fastlane/Gemfile.lock`, `ios/PotillusKit/Package.resolved`) with no build, so
-a vulnerable dependency blocks the merge. Then, before every release, the same
-scanner runs again over the CycloneDX SBOM each platform's build produces (the
+The project's external dependencies are checked for known vulnerabilities
+before every release, enforced at staging rather than left to a periodic
+reminder. (A second, per-merge-request `scan source` over the committed lockfiles
+ran as a required CI check until the move to GitLab; the pipeline is not yet
+rebuilt there, so the release gate below is currently the only enforced level.
+See [docs/ROADMAP.md](docs/ROADMAP.md).) Before every release, osv-scanner runs
+over the CycloneDX SBOM each platform's build produces (the
 `cyclonedxDirectBom` task on Android, and `tools/gen-ios-sbom.py` from
 `Package.resolved` on iOS) — this is the `osv-scan-sbom` gate in
 `make/release.mk`, invoked by `release-android` and `release-ios`, and it covers
@@ -231,7 +230,7 @@ to version control:
 
 - the **release code-signing keystore** and the keystore file it references),
   used to sign the release artifacts, the Google Play upload bundle and the
-  Codeberg/F-Droid APK;
+  GitLab/F-Droid APK;
 - the **App Store upload credentials,** used only by the Fastlane App Store
   upload lanes; and
 - the **Google Play upload credentials,** used only by the Fastlane Play Store
@@ -264,10 +263,10 @@ replaced before the next release.
 
 ## Verifying releases
 
-Releases are cryptographically signed. The Codeberg release APK and the F-Droid
+Releases are cryptographically signed. The GitLab release APK and the F-Droid
 build are signed with the maintainer's own Android app-signing key (fingerprint
 below); that private key is held only by the maintainer and is never stored on
-Codeberg, F-Droid, or any other distribution site. On Google Play the maintainer
+GitLab, F-Droid, or any other distribution site. On Google Play the maintainer
 signs the uploaded App Bundle with the same private key in its role as the Play
 upload key and likewise holds it alone, while Google holds the separate
 app-signing key under Play App Signing and re-signs the artifact delivered to
@@ -294,7 +293,7 @@ You can verify a downloaded or installed release in any of these ways:
   ```
 
   This fingerprint identifies the maintainer's app-signing key, which signs the
-  F-Droid and Codeberg release APKs. An APK delivered by Google Play is re-signed
+  F-Droid and GitLab release APKs. An APK delivered by Google Play is re-signed
   by Google under Play App Signing and therefore reports a different signer
   certificate; verify a Play build against the app-signing certificate shown in
   the Play Console instead.
@@ -311,6 +310,7 @@ You can verify a downloaded or installed release in any of these ways:
   importing the key you can verify a tag with `git tag -v vX.Y.Z`.
 
 - **By auditing commit signatures.** All commits are cryptographically signed —
-  branch protection rejects unsigned or unverifiable commits — so you can check
-  the authorship of the entire history with `git log --show-signature`. Codeberg
-  also marks each verified commit as *Verified* in its web interface.
+  a documented project policy, enforced by the maintainer at review — so you
+  can check the authorship of the entire history with
+  `git log --show-signature`. GitLab also marks each verified commit as
+  *Verified* in its web interface.

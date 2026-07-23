@@ -104,7 +104,7 @@ help:
 	@echo "  make tgz              build the source release tarball"
 	@echo "  make push-playstore   upload the staged AAB to Google Play  [git tag + signature gated]"
 	@echo "  make push-appstore    upload the staged IPA to the App Store  [Mac; tag + signature gated]"
-	@echo "  make push-codeberg    publish the Codeberg release + verify each asset checksum"
+	@echo "  make push-gitlab      publish the GitLab release + verify each asset checksum"
 	@echo "  (none of these touch releases/ -- staged artifacts are removed by hand)"
 	@echo
 	@echo "OpenSSF badge (maintenance; network, run by hand):"
@@ -197,7 +197,7 @@ include make/release.mk
 # =============================================================================
 # PUBLISHING
 # =============================================================================
-# Uploading the staged artifacts (Google Play, App Store, Codeberg) and building
+# Uploading the staged artifacts (Google Play, App Store, GitLab) and building
 # the source tarball live in their own fragment; see make/publish.mk. Included last
 # because it reuses release.mk's staged paths and version, and never builds or signs
 # anything itself.

@@ -190,7 +190,7 @@ def main():
                 handle.write(rendered)
 
     # The committed, human-facing English guide (ios/docs/guide/usersguide.md): a
-    # rendered sibling of usersguide.md.in that Codeberg displays (it renders .md,
+    # rendered sibling of usersguide.md.in that GitLab displays (it renders .md,
     # not .md.in) and that the OpenSSF badge justifications link to. Unlike the
     # gitignored app-bundle outputs above, THIS file is committed, so a missing or
     # stale copy is a hard error under --check -- there is no "fresh clone" excuse,

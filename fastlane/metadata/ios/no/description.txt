@@ -21,4 +21,4 @@ Appen kjører på iPhone med iOS 17 og nyere. En helt uavhengig språkvelger i a
 
 ÅPEN KILDEKODE
 
-Libellus Potionis er fri programvare utgitt under GNU General Public License v3 (eller senere). Kildekoden er dokumentert etter lærebokstandard og er tilgjengelig i det kanoniske kodelageret: https://codeberg.org/godisch/potillus/
+Libellus Potionis er fri programvare utgitt under GNU General Public License v3 (eller senere). Kildekoden er dokumentert etter lærebokstandard og er tilgjengelig i det kanoniske kodelageret: https://gitlab.com/godisch/potillus/

@@ -21,4 +21,4 @@ L'application fonctionne sous Android 11 (API 30) et versions ultérieures. Un s
 
 OPEN SOURCE
 
-Libellus Potionis est un logiciel libre publié sous la GNU General Public License v3 (ou ultérieure). Le code source est documenté selon un standard pédagogique et est disponible dans le dépôt canonique : https://codeberg.org/godisch/potillus/
+Libellus Potionis est un logiciel libre publié sous la GNU General Public License v3 (ou ultérieure). Le code source est documenté selon un standard pédagogique et est disponible dans le dépôt canonique : https://gitlab.com/godisch/potillus/

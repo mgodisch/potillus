@@ -127,12 +127,12 @@ require-ios-screenshots = \
 #
 # WHY HERE AND NOT IN CI: the check runs against the SBOM each platform's build
 # produces, and producing that SBOM needs the full toolchain (the Android SDK /
-# Gradle, or Xcode via Package.resolved) — exactly what the deliberately small
-# Codeberg CI pipeline does NOT carry, to stay a light guest on shared runners
-# (see docs/ROADMAP.md and .woodpecker.yml). Wiring the scan into staging, where
-# the SBOM already exists, gates every release against the OSV database over the
-# COMPLETE transitive dependency set — stronger than a manifest-only CI scan —
-# at zero CI cost. A release cannot be staged while osv-scanner reports an
+# Gradle, or Xcode via Package.resolved) — far more than a lightweight CI job is
+# meant to carry (see docs/ROADMAP.md; the project currently has no CI pipeline
+# at all, the GitLab one being still to build). Wiring the scan into staging,
+# where the SBOM already exists, gates every release against the OSV database
+# over the COMPLETE transitive dependency set — stronger than a manifest-only CI
+# scan — at zero CI cost. A release cannot be staged while osv-scanner reports an
 # unresolved finding.
 #
 # osv-scanner exits 0 when nothing is found and 1 when it reports vulnerabilities

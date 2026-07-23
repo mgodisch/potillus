@@ -45,12 +45,12 @@ additional long-term maintainers join; any such change will be recorded here.
 ## How decisions are made
 
 - **Proposals and discussion** happen in the open, in the
-  [Codeberg issue tracker](https://codeberg.org/godisch/potillus/issues) and in
-  pull requests. Anyone may open an issue, comment, or propose a change.
+  [GitLab issue tracker](https://gitlab.com/godisch/potillus/-/issues) and in
+  merge requests. Anyone may open an issue, comment, or propose a change.
 - **Decisions** are made by the maintainer. For contributions, the acceptance
   criteria and review process are documented in
   [CONTRIBUTING.md](../CONTRIBUTING.md) (Section 2, "Submitting changes"): the
-  maintainer reviews every pull request and is the sole merger.
+  maintainer reviews every merge request and is the sole merger.
 - **Disputes** are resolved by the maintainer. As with any free-software
   project, anyone who disagrees with the project's direction is free to fork it
   under its GPL-3.0-or-later license.
@@ -73,19 +73,20 @@ on no formal ongoing role beyond the individual contributions they submit.
 
 Anyone granted write (push) access to the canonical repository — currently only
 the maintainer — MUST have two-factor authentication (2FA) enabled on their
-Codeberg account, using a cryptographic method (a TOTP authenticator app or a
+GitLab account, using a cryptographic method (a TOTP authenticator app or a
 hardware security key), not SMS. The forge offers no per-project 2FA enforcement
-setting, so this is a documented project policy: write access will not be granted
-to, or retained by, an account without such 2FA. This protects the integrity of
-the central repository against account takeover.
+setting on the plan the project uses, so this is a documented project policy:
+write access will not be granted to, or retained by, an account without such
+2FA. This protects the integrity of the central repository against account
+takeover.
 
 Escalated permissions to sensitive resources — write/merge access to the
 canonical repository, and access to release secrets or credentials — are granted
 only after the maintainer has reviewed and approved the individual. Review
 considers the contributor's track record in the project (contributions accepted
-through the normal pull-request review process), a justifiable lineage of
+through the normal merge-request review process), a justifiable lineage of
 identity, and the 2FA requirement above. Permissions are granted at the lowest
 level needed for the person's role and escalated only as further need is
 demonstrated, and revoked when no longer needed. Until such a grant, all
-contributions are submitted as pull requests and merged only by the maintainer,
+contributions are submitted as merge requests and merged only by the maintainer,
 so no contributor holds escalated permissions without this review.

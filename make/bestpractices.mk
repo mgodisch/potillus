@@ -32,8 +32,9 @@
 #
 #  The project's OpenSSF badge answers live on bestpractices.dev; the committed
 #  .bestpractices.json is the maintainer's source of truth for them. Because
-#  bestpractices.dev cannot ingest a file from a Codeberg-hosted repository,
-#  keeping the site in step with the committed answers is a manual transcription.
+#  bestpractices.dev does not ingest the committed file (its repository analysis
+#  reads the site's own answers, not a file in the tree), keeping the site in step
+#  with the committed answers is a manual transcription.
 #
 #  `make bestpractices` supports exactly that: it downloads the current site
 #  export, reduces it to the tracked shape with the SAME filter that produced the

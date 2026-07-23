@@ -31,7 +31,7 @@
 # SECTION 14 – SIGNING-KEY FINGERPRINT (SECURITY.md ↔ release tooling)
 # =============================================================================
 # WHY THIS MATTERS:
-#   The publishing targets `push-playstore` and `push-codeberg` pin the release
+#   The publishing targets `push-playstore` and `push-gitlab` pin the release
 #   signer to the SHA-256 fingerprint recorded in SECURITY.md ("Verifying
 #   releases"), extracting it with `grep -oiE '\b[0-9a-f]{64}\b' | head -1`. That
 #   extraction is only well-defined when SECURITY.md carries EXACTLY ONE such
@@ -76,7 +76,7 @@ check_signing_key_fingerprint() {
     elif [[ "$count" -eq 1 ]]; then
         fail "SECURITY.md's signing-key fingerprint is not lowercase — canonicalize it (tr 'A-F' 'a-f'); apksigner prints lowercase and users compare byte-for-byte"
     elif [[ "$count" -eq 0 ]]; then
-        fail "SECURITY.md has no 64-hex signing-key fingerprint — push-playstore/push-codeberg cannot pin the signer (see the 'Verifying releases' section)"
+        fail "SECURITY.md has no 64-hex signing-key fingerprint — push-playstore/push-gitlab cannot pin the signer (see the 'Verifying releases' section)"
     else
         fail "SECURITY.md has $count 64-hex tokens; the release tooling's 'head -1' pin is ambiguous — keep exactly one canonical signing-key fingerprint"
     fi

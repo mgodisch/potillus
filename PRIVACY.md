@@ -48,7 +48,7 @@ same change, and the Play Data safety form updated accordingly.
 - **Last updated:** 2026-07-15
 - **Application:** Libellus Potionis (package `de.godisch.potillus`)
 - **Developer:** Martin A. Godisch — <android@godisch.de> <ios@godisch.de>
-- **Source code:** <https://codeberg.org/godisch/potillus>
+- **Source code:** <https://gitlab.com/godisch/potillus>
 
 ## Summary
 

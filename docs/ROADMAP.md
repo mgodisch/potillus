@@ -64,37 +64,39 @@ attainable until each is resolved. They are the most critical open items.
   arrangement in `docs/GOVERNANCE.md`. F-Droid distribution helps (its
   reproducible-build re-signing removes the private-key hand-off) but is not
   itself a successor.
-- **Continuous integration** (`automated_integration_testing`). A Woodpecker
-  pipeline (`.woodpecker.yml`) is in the repository and running green on
-  Codeberg. To be a good guest on Codeberg's shared runners it is deliberately
-  narrow: no build, and it runs ONLY on pull requests targeting `main` rather
-  than on every push. It executes the two device-free gates that pass in the QA
-  log — `tools/release-check.sh --Werror` and `make check-static` — which
-  together cover the shared invariants plus the iOS static checks reproduced in
-  Python (Swift symbol/length/test linting, l10n parity, store-metadata limits,
-  ...), so the Swift toolchain is covered without a Mac, plus a `dependency-scan`
-  step that runs osv-scanner over the committed lockfiles on every change (see
-  the security work below and [../SECURITY.md](../SECURITY.md), "Dependency
-  monitoring"). A full Android build (`lintDebug`, `./gradlew testDebugUnitTest`,
-  instrumented tests) needs the SDK and an emulator; an iOS build needs macOS +
-  Xcode and cannot run on Codeberg's Linux runners at all — so building, and
-  running the unit-test/lint suites in CI, stays out of this pipeline and is
-  tracked as its own heavier item below ("Run the test and lint suites in CI").
-  Also satisfies `test_continuous_integration` (SUGGESTED at passing, a MUST at
-  gold, though the in-CI test run it prefers is the heavier item below) and
+- **Continuous integration** (`automated_integration_testing`). **This is the
+  project's first open item.** The Woodpecker pipeline the project ran while
+  hosted on Codeberg was retired with the move to GitLab, so there is currently
+  no CI at all; a GitLab CI pipeline (`.gitlab-ci.yml`) has to be built to
+  replace it. The replacement should start where the old one stood — device-free
+  only, no build — and execute the two gates that pass in the QA log,
+  `tools/release-check.sh --Werror` and `make check-static`, which together cover
+  the shared invariants plus the iOS static checks reproduced in Python (Swift
+  symbol/length/test linting, l10n parity, store-metadata limits, ...), so the
+  Swift toolchain is covered without a Mac; plus a `dependency-scan` job running
+  osv-scanner over the committed lockfiles on every change (see the security work
+  below and [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). It should
+  run on merge requests targeting `main` and be wired in as a *required* merge
+  check, which is what the badge answers depend on. A full Android build
+  (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs the SDK
+  and an emulator; an iOS build needs macOS + Xcode and cannot run on a hosted
+  Linux runner at all — so building, and running the unit-test/lint suites in CI,
+  stays out of this first pipeline and remains its own heavier item below ("Run
+  the test and lint suites in CI"). Restoring CI also settles
+  `test_continuous_integration` (SUGGESTED at passing, a MUST at gold) and
   contributes to `static_analysis_often`.
-  The CI-conditional OSPS Baseline controls that were answered N/A for want of
-  any CI — sanitize and validate untrusted inputs (`OSPS-BR-01.01`), deny
-  untrusted code snapshots access to privileged credentials (`OSPS-BR-01.03`),
-  run with least-privilege default permissions (`OSPS-AC-04.01`), and run
-  status checks before merge (`OSPS-QA-03.01`) — are now answered Met in
-  `.bestpractices.json`: the pipeline has run green on Codeberg, and branch
-  protection on main requires its checks to pass before a merge. `OSPS-QA-06.01`
-  (a test SUITE running inside CI) stays N/A on purpose: this pipeline runs the
-  device-free checks only, not the unit-test suites (which need the Android SDK
-  and, for `swift test`, a Linux Swift toolchain), so claiming a CI test run
-  would assert something that does not happen — that widening is the heavier
-  item below.
+  Until it exists, the CI-conditional criteria are answered honestly as unmet or
+  N/A in `.bestpractices.json`: sanitize and validate untrusted inputs
+  (`OSPS-BR-01.01`), deny untrusted code snapshots access to privileged
+  credentials (`OSPS-BR-01.03`) and least-privilege default permissions
+  (`OSPS-AC-04.01`) are N/A for want of any pipeline, while status checks before
+  merge (`OSPS-QA-03.01`) and automated per-change dependency-policy enforcement
+  (`OSPS-VM-05.03`) are Unmet — they *were* Met on the old pipeline and the
+  GitLab one is what restores them. `OSPS-QA-06.01` (a test SUITE running inside
+  CI) stays N/A on purpose: even the restored pipeline runs the device-free
+  checks only, not the unit-test suites (which need the Android SDK and, for
+  `swift test`, a Linux Swift toolchain), so claiming a CI test run would assert
+  something that does not happen — that widening is the heavier item below.
 
 ## Recommended, not blocking (SHOULD)
 
@@ -224,46 +226,57 @@ practice.
   current bestpractices.dev export and reports, grouped by level, which committed
   answers the site does not yet match, so the maintainer knows what to enter
   upstream (no credentials; the working tree is not touched). The reverse
-  direction is unavailable here — bestpractices.dev's
-  automation does not ingest a `.bestpractices.json` committed to a Codeberg
-  repository (its repository analysis targets GitHub/GitLab), and the URL-based
-  automation-proposal path is impractical because the server rejects the long URLs
-  the full answer set produces. (Baseline Level 2 is complete; Level 3 is in
-  progress — see "Working toward OpenSSF Baseline Level 3" below.)
+  direction is unavailable here — bestpractices.dev has no path that reads a
+  committed answer file back into the site, and the URL-based automation-proposal
+  path is impractical because the server rejects the long URLs the full answer set
+  produces. (Its repository analysis targets GitHub and GitLab, so with the move
+  to GitLab that analysis at least now sees the canonical repository rather than a
+  mirror.) (Baseline Level 1 is complete; Level 2 lost a single control with the
+  retirement of CI and returns with it; Level 3 is in progress — see "Working
+  toward OpenSSF Baseline Level 3" below.)
 
-## OpenSSF Scorecard badge (currently not implementable)
+## OpenSSF Scorecard badge (newly in reach, pending CI)
 
-The OpenSSF Scorecard badge is **not pursued while Codeberg is the canonical
-forge**, because it cannot be earned honestly for this project's topology.
-Scorecard analyses a single repository on GitHub or GitLab -- there is no Codeberg
-backend -- and its badge is fed only by a GitHub Actions or GitLab CI job that
-publishes a signed result through that forge's OIDC token. Here the canonical
-repository is on Codeberg; the GitHub and GitLab repositories are read-only push
-mirrors on which no development, review, CI, or release activity takes place.
+The move of the canonical repository to GitLab removed the reason this badge was
+previously ruled out. Scorecard analyses a single repository on GitHub or GitLab,
+and its badge is fed by a CI job that publishes a signed result through the
+forge's OIDC token. That was impossible while the canonical repository lived on a
+forge Scorecard has no backend for and the GitHub/GitLab repositories were
+read-only mirrors carrying no development, review, CI or release activity. Now
+the canonical repository *is* one Scorecard can analyse, so the measurement would
+for the first time look at where the project actually lives.
 
-A trial run against the GitHub mirror scored 5.2/10, and the shortfall is almost
-entirely a **measurement artifact of the mirror topology**, not a security
-weakness. The substantive checks are already maximal -- Dangerous-Workflow,
-Token-Permissions, Vulnerabilities, Security-Policy, Pinned-Dependencies and
-License each scored 10, Binary-Artifacts 9. The low checks are the host-dependent
-ones that measure activity which, by design, happens on Codeberg rather than the
-mirror: Code-Review, CI-Tests, Contributors, Branch-Protection and
-Signed-Releases. These cannot be raised without relocating development onto the
-mirror, which would misrepresent where the project actually lives; and the
-CII-Best-Practices check reads 0 only because the project's badge (project 13480)
-is registered under the canonical Codeberg URL while Scorecard queries the GitHub
-URL, so "fixing" it would mean re-pointing the canonical registration at a mirror.
-This is the same forge limitation already noted under "Badge administration"
-above, where bestpractices.dev's repository analysis also targets GitHub/GitLab
-rather than Codeberg.
+The earlier trial run against the GitHub mirror scored 5.2/10, and that shortfall
+was almost entirely a **measurement artifact of the mirror topology**, not a
+security weakness. The substantive checks were already maximal --
+Dangerous-Workflow, Token-Permissions, Vulnerabilities, Security-Policy,
+Pinned-Dependencies and License each scored 10, Binary-Artifacts 9. The low checks
+were the host-dependent ones -- Code-Review, CI-Tests, Contributors,
+Branch-Protection and Signed-Releases -- which measured a mirror on which nothing
+happens; pointed at gitlab.com/godisch/potillus they measure real activity
+instead. Two prerequisites remain before the badge can be pursued honestly:
 
-Publishing such a badge would understate a project whose real security posture is
-strong, so it is deliberately not linked. Should the canonical forge gain native
-Scorecard support, or the project's topology change, this can be revisited.
+1. **CI.** Scorecard's badge publication needs a pipeline, and CI-Tests scores
+   what that pipeline runs. This waits on the first roadmap item above.
+2. **Badge re-registration.** The CII-Best-Practices check reads the project's
+   bestpractices.dev entry (project 13480), which is registered under the old
+   canonical URL; it has to be re-pointed at the GitLab repository.
+
+Until both are done the badge is not linked, because publishing a score that
+understates the project's real posture would be worse than publishing none.
 
 ## Working toward OpenSSF Baseline Level 3
 
-Baseline Levels 1 and 2 are complete. The remaining Level 3 gaps are largely the
+Baseline Level 1 is complete. Level 2 was complete until the move to GitLab
+retired the CI pipeline: it now holds exactly one unmet control, `OSPS-QA-03.01`
+(automated status checks before merge), which asks for nothing this project does
+not already do by hand. Building the GitLab CI pipeline and wiring it in as a
+required merge check — the first item of this roadmap — restores Level 2 on its
+own, with no other change to the project. (`OSPS-AC-04.01`, also Level 2, went
+from Met to N/A in the same step; for a control conditional on operating a
+pipeline that is an answer, not a gap.)
+
+The remaining Level 3 gaps are largely the
 same structural constraints as the gold tier — a non-author human reviewer
 (`OSPS-QA-07.01`, cf. `two_person_review`) and CI-based automated blocking of
 policy violations:
@@ -283,15 +296,16 @@ policy violations:
   and the VEX document therefore empty.
 - **Run the test and lint suites in CI (the "heavy" pipeline widening)**
   (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
-  `automated_integration_testing`, `static_analysis_often`). The current
-  pipeline runs the device-free checks and a lockfile SCA scan, all on a small
-  `python:3-slim` image. The remaining CI-conditional criteria ask specifically
+  `automated_integration_testing`, `static_analysis_often`). The pipeline to be
+  rebuilt on GitLab (first roadmap item) runs the device-free checks and a
+  lockfile SCA scan, all on a small `python:3-slim` image. The remaining
+  CI-conditional criteria ask specifically
   for the TEST and LINT suites to run in the pipeline: `./gradlew
   testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
   `abortOnError` build gate today, but CI would enforce it on every change), and
   ideally `swift test` for the Swift package. All of these are build-time steps:
   they need the pipeline to gain a heavier, SDK-bearing image (several hundred MB
-  vs. ~45 MB today) and real build time on Codeberg's donated runners, and the
+  vs. ~45 MB) and real build time on shared runners, and the
   Swift suite additionally needs a Linux Swift toolchain. This is deliberately
   deferred, not forgotten: it is the single largest resource-cost step left, and
   is weighed against the "good guest on shared runners" principle that shaped the
@@ -323,17 +337,6 @@ second active participant in the project.
   documented (CONTRIBUTING.md, "Code review requirements"), but with a single
   author-reviewer no change is reviewed by a second person. Resolved by the same
   step as the two items above — a second, independent maintainer who can review.
-- **Hardened site headers** (`hardened_site`, gold MUST). The criterion requires
-  the repository and download sites to send all four key hardening headers:
-  Content-Security-Policy, HTTP Strict-Transport-Security, X-Content-Type-Options
-  (`nosniff`), and X-Frame-Options — with no exemption for static sites. The
-  download site (F-Droid) sends all four. The repository host (Codeberg) sends
-  strong HSTS and X-Frame-Options but not CSP or `nosniff`; those headers are
-  controlled by Codeberg, not the project, so they cannot be set from the
-  repository. Remediation options: ask Codeberg to emit the missing headers (at
-  least `X-Content-Type-Options: nosniff`), or host/mirror the repository on a
-  platform known to satisfy this criterion (GitHub and GitLab are listed as
-  compliant). Revisit once Codeberg's header set changes.
 - **Branch coverage >= 80%** (`test_branch_coverage80`, gold MUST; also unlocks
   `dynamic_analysis`). *Priority 2 — deliberately not forced.* Kover is fully
   integrated and enforced: statement coverage is ~97% and branch coverage ~80%,

@@ -1,1 +1,1 @@
-https://codeberg.org/godisch/potillus
+https://gitlab.com/godisch/potillus

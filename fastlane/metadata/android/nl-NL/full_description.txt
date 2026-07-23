@@ -21,4 +21,4 @@ De app draait op Android 11 (API 30) en nieuwer. Een volledig onafhankelijke taa
 
 OPEN SOURCE
 
-Libellus Potionis is vrije software, uitgebracht onder de GNU General Public License v3 (of later). De broncode is op leerboekniveau gedocumenteerd en beschikbaar in de canonieke repository: https://codeberg.org/godisch/potillus/
+Libellus Potionis is vrije software, uitgebracht onder de GNU General Public License v3 (of later). De broncode is op leerboekniveau gedocumenteerd en beschikbaar in de canonieke repository: https://gitlab.com/godisch/potillus/

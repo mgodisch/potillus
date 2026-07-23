@@ -165,7 +165,7 @@ $(foreach shot,01_today 02_calendar 03_statistics 04_drinks 05_add_drink 06_sett
 # A GROUPED target (&:, GNU Make 4.3+) so the SINGLE renderer call declares BOTH
 # outputs it writes: featureGraphic.png and its high-res companion
 # featureGraphic-4K.png. The 4K file is not uploaded to Play, but it IS committed
-# and consumed -- README.md links it and Codeberg renders it, per locale for the
+# and consumed -- README.md links it and GitLab renders it, per locale for the
 # translated READMEs -- so make must track and rebuild it too, not treat it as a
 # throwaway. (This grouped target is why ../make/guard.mk requires 4.3.)
 define feature_graphic_rule

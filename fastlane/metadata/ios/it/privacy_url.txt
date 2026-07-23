@@ -1,1 +1,1 @@
-https://codeberg.org/godisch/potillus/src/branch/main/PRIVACY.md
+https://gitlab.com/godisch/potillus/-/blob/main/PRIVACY.md
