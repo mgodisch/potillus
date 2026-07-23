@@ -722,15 +722,17 @@ A `workflow:` rule restricts it to merge requests targeting `main`, so an
 ordinary push creates no pipeline at all; `main` is protected against direct
 pushes, so there is no second path in that would need a trigger.
 
-The badge answers are NOT revised on the strength of the file existing. A
-pipeline that runs without blocking is advisory, and the criteria ask for
-enforcement, which lives in a project setting rather than the repository
-(*Merge requests > "Pipelines must succeed"*). Until that is enabled and a green
-run exists to point at, the post-migration values stand: `OSPS-AC-04.01`,
-`OSPS-BR-01.01` and `OSPS-BR-01.03` at N/A (their precondition, operating a
-pipeline, did not hold when they were answered), `OSPS-QA-03.01` and
-`OSPS-VM-05.03` at Unmet. `OSPS-QA-03.01` sits at OSPS Baseline Level 2, so that
-level is not complete until the setting is turned on.
+The gate is enforced, not advisory: *Merge requests > "Pipelines must succeed"*
+is enabled, so a red pipeline blocks the merge. With that and a green run to
+point at, the CI-conditional badge answers are Met again — `OSPS-QA-03.01`,
+`OSPS-VM-05.03`, `OSPS-AC-04.01`, `OSPS-AC-04.02`, `OSPS-BR-01.01` and
+`OSPS-BR-01.03` — which restores **OSPS Baseline Level 2**, whose sole gap had
+been `OSPS-QA-03.01`. `OSPS-BR-01.04` stays N/A by construction: it is
+conditional on a pipeline accepting collaborator input, and this one has no
+manual trigger, no inputs and no user-supplied variables. `OSPS-QA-06.01`,
+`automated_integration_testing` and `static_analysis_often` stay unmet on
+purpose — the test suites and the two real linters need an SDK-bearing image and
+a Mac, which is the roadmap's separate, heavier item.
 
 Two things improve. `hardened_site` (gold) moves to Met: GitLab sends all four
 hardening headers the criterion asks for, which the previous host did not. And the

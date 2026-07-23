@@ -84,18 +84,28 @@ attainable until each is resolved. They are the most critical open items.
   item below ("Run the test and lint suites in CI"). CI also settles
   `test_continuous_integration` (SUGGESTED at passing, a MUST at gold) and
   contributes to `static_analysis_often`.
-  **What is still open is the second half of the gate.** A pipeline that runs
-  but does not block is advisory, and the criteria below ask for enforcement:
-  the project setting *Merge requests > "Pipelines must succeed"* has to be
-  enabled, and the pipeline has to have been observed green, before the
-  CI-conditional answers in `.bestpractices.json` may be revised. Until then
-  they stand at their post-migration values: sanitize and validate untrusted
-  inputs (`OSPS-BR-01.01`), deny untrusted code snapshots access to privileged
-  credentials (`OSPS-BR-01.03`) and least-privilege default permissions
-  (`OSPS-AC-04.01`) at N/A, status checks before merge (`OSPS-QA-03.01`) and
-  automated per-change dependency-policy enforcement (`OSPS-VM-05.03`) at Unmet.
-  `OSPS-QA-03.01` is the single control keeping OSPS Baseline Level 2 from being
-  complete, so that checkbox is what restores the level. `OSPS-QA-06.01` (a test SUITE running inside
+  The gate is enforced, not advisory: *Merge requests > "Pipelines must
+  succeed"* is enabled, so a red pipeline blocks the merge. With that in place
+  the CI-conditional answers in `.bestpractices.json` are Met again — sanitize
+  and validate untrusted inputs (`OSPS-BR-01.01`), deny untrusted code snapshots
+  access to privileged credentials (`OSPS-BR-01.03`), least-privilege default
+  permissions and job permissions (`OSPS-AC-04.01`, `OSPS-AC-04.02`), status
+  checks before merge (`OSPS-QA-03.01`) and automated per-change
+  dependency-policy enforcement (`OSPS-VM-05.03`). `OSPS-QA-03.01` was the
+  single control keeping OSPS Baseline Level 2 incomplete, so **Level 2 is
+  complete again**. `OSPS-BR-01.04` stays N/A on purpose: it is conditional on a
+  pipeline that accepts collaborator input, and this one has no manual trigger,
+  no inputs and no user-supplied variables.
+  Two criteria stay unmet by design rather than by omission. `OSPS-QA-06.01`
+  (a test SUITE inside CI) and `automated_integration_testing` wait on the
+  heavier item below, and `static_analysis_often` is left unmet on both its
+  counts: the analysis is tied to merge requests rather than every commit, and
+  the two real linters (`./gradlew lintDebug`, SwiftLint) need an SDK-bearing
+  image and a Mac runner. Running on every push to a working branch was
+  considered and rejected — `main` is closed to direct pushes, so the merge
+  request is the only way in and therefore the only place the gate has to sit;
+  scanning half-finished intermediate commits would spend compute minutes on
+  states the author already knows are unfinished. `OSPS-QA-06.01` (a test SUITE running inside
   CI) stays N/A on purpose: even the restored pipeline runs the device-free
   checks only, not the unit-test suites (which need the Android SDK and, for
   `swift test`, a Linux Swift toolchain), so claiming a CI test run would assert
@@ -259,10 +269,10 @@ Branch-Protection and Signed-Releases -- which measured a mirror on which nothin
 happens; pointed at gitlab.com/godisch/potillus they measure real activity
 instead. Two prerequisites remain before the badge can be pursued honestly:
 
-1. **CI.** The pipeline now exists (first roadmap item above), but Scorecard's
-   badge publication needs a job of its own that runs the analysis and pushes
-   the signed result, and CI-Tests scores what the pipeline actually runs — for
-   now the device-free checks only.
+1. **CI.** The pipeline exists and is enforced (first roadmap item above), but
+   Scorecard's badge publication needs a job of its own that runs the analysis
+   and pushes the signed result, and CI-Tests scores what the pipeline actually
+   runs — for now the device-free checks only.
 2. **Badge re-registration.** The CII-Best-Practices check reads the project's
    bestpractices.dev entry (project 13480), which is registered under the old
    canonical URL; it has to be re-pointed at the GitLab repository.
@@ -272,17 +282,14 @@ understates the project's real posture would be worse than publishing none.
 
 ## Working toward OpenSSF Baseline Level 3
 
-Baseline Level 1 is complete. Level 2 was complete until the move to GitLab
-retired the CI pipeline: it now holds exactly one unmet control, `OSPS-QA-03.01`
-(automated status checks before merge). The pipeline that satisfies it is back
-(first roadmap item), so what is left is one project setting — *Merge requests >
-"Pipelines must succeed"* — plus one green run to point at. Enabling it restores
-Level 2 on its own, with no other change to the project. (`OSPS-AC-04.01`, also Level 2, went
-from Met to N/A in the same step; for a control conditional on operating a
-pipeline that is an answer, not a gap.)
+Baseline Levels 1 and 2 are complete. Level 2 briefly lost `OSPS-QA-03.01`
+(automated status checks before merge) when the move to GitLab retired the old CI
+pipeline, and regained it with the GitLab pipeline and the *Merge requests >
+"Pipelines must succeed"* setting (first roadmap item); `OSPS-AC-04.01` made the
+same round trip.
 
-The remaining Level 3 gaps are largely the
-same structural constraints as the gold tier — a non-author human reviewer
+The remaining Level 3 gaps are largely the same structural constraints as the
+gold tier — a non-author human reviewer
 (`OSPS-QA-07.01`, cf. `two_person_review`) and CI-based automated blocking of
 policy violations:
 

@@ -190,8 +190,9 @@ two levels, both automated rather than left to a periodic reminder. Every merge
 request to `main` runs osv-scanner as a CI job
 ([.gitlab-ci.yml](.gitlab-ci.yml), the `dependency-scan` job): a `scan source`
 over the lockfiles committed in the tree (`fastlane/Gemfile.lock`,
-`ios/PotillusKit/Package.resolved`) with no build, so a vulnerable dependency
-surfaces before the merge. Then, before every release, osv-scanner runs again
+`ios/PotillusKit/Package.resolved`) with no build. The job is a required check
+("Pipelines must succeed" is enabled on merge requests), so a vulnerable
+dependency blocks the merge. Then, before every release, osv-scanner runs again
 over the CycloneDX SBOM each platform's build produces (the
 `cyclonedxDirectBom` task on Android, and `tools/gen-ios-sbom.py` from
 `Package.resolved` on iOS) — this is the `osv-scan-sbom` gate in
