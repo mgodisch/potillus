@@ -326,8 +326,14 @@ private struct DrinkEditor: View {
     }
 
     /// The parsed fields, nil while the text is not a number.
+    ///
+    /// The percent goes through `DrinkValidator.parseDecimal`, which accepts a
+    /// comma as well as a dot: the decimal keyboard below offers only the
+    /// LOCALE's separator key, and on the comma-decimal locales `Double("4,9")`
+    /// is nil — before the 0.84.0 QA round that made every fractional ABV
+    /// unenterable there, with the Save button greyed out and no message.
     private var volume: Int? { Int(volumeText) }
-    private var percent: Double? { Double(percentText) }
+    private var percent: Double? { DrinkValidator.parseDecimal(percentText) }
 
     /// The validator decides, not this view.
     private var violation: DrinkValidator.Violation? {
@@ -357,7 +363,18 @@ private struct DrinkEditor: View {
                 } footer: {
                     // Names the offending field, rather than greying out Save in
                     // silence. Empty input is not an error yet — only a start.
-                    if let violation, !name.isEmpty || !volumeText.isEmpty {
+                    //
+                    // The first branch exists because an unparseable percent
+                    // never REACHES the validator (`percent` is nil, so
+                    // `violation` is nil too): without it, typing "4,9,9" would
+                    // grey out Save with no words at all — the silent-lie
+                    // failure mode this editor's header forbids.
+                    if percent == nil && !percentText.isEmpty {
+                        Text(message(for: DrinkValidator.Violation(
+                            field: .alcoholPercent, reason: .notFinite
+                        )))
+                            .foregroundStyle(.red)
+                    } else if let violation, !name.isEmpty || !volumeText.isEmpty {
                         Text(message(for: violation))
                             .foregroundStyle(.red)
                     }

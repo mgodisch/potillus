@@ -157,4 +157,25 @@ public enum DrinkValidator {
     public static func canonicalName(_ name: String) -> String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    /// Parses a user-typed decimal, accepting both `.` and `,` as the separator.
+    ///
+    /// `Double.init(String)` understands only the dot form, but iOS's decimal
+    /// keyboard offers exactly ONE separator key — the LOCALE's. On the
+    /// comma-decimal locales this app ships (de, fr, es, it, ru, …) that key
+    /// types a comma, so `Double("4,9")` was nil, the Save button greyed out,
+    /// and a fractional alcohol content simply could not be entered (0.84.0 QA
+    /// round). Normalising the comma to a dot before the standard parse accepts
+    /// both spellings.
+    ///
+    /// Deliberately NOT a `NumberFormatter` parse bound to one locale: grouping
+    /// separators never occur in the short fields this serves (an ABV), and a
+    /// locale-bound formatter would reject the OTHER separator — the dot a
+    /// value seeded from storage displays (`String(4.9)`), or a pasted comma.
+    /// Accepting both is the lenient choice, and it stays honest: a text with
+    /// more than one separator ("1,2.3") normalises to "1.2.3", which `Double`
+    /// still rejects.
+    public static func parseDecimal(_ text: String) -> Double? {
+        Double(text.replacingOccurrences(of: ",", with: "."))
+    }
 }

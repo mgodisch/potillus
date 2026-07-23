@@ -193,4 +193,22 @@ final class DrinkValidatorTests: XCTestCase {
     func testCanonicalNameIsWhatGetsStored() {
         XCTAssertEqual(DrinkValidator.canonicalName("  Pils  "), "Pils")
     }
+
+    /// `parseDecimal` accepts both separators — the fix for the decimal
+    /// keyboard of the comma-decimal locales, which offers only a comma key
+    /// (0.84.0 QA round). The dot form must keep working, because a value
+    /// seeded from storage renders with a dot (`String(4.9)`).
+    func testParseDecimalAcceptsBothSeparators() {
+        XCTAssertEqual(DrinkValidator.parseDecimal("4.9"), 4.9)
+        XCTAssertEqual(DrinkValidator.parseDecimal("4,9"), 4.9)
+        XCTAssertEqual(DrinkValidator.parseDecimal("40"), 40.0)
+    }
+
+    /// Junk stays junk: the comma normalisation must not make garbage
+    /// parseable, and a double separator is garbage.
+    func testParseDecimalRejectsNonNumbers() {
+        XCTAssertNil(DrinkValidator.parseDecimal(""))
+        XCTAssertNil(DrinkValidator.parseDecimal("abc"))
+        XCTAssertNil(DrinkValidator.parseDecimal("1,2.3"))
+    }
 }
