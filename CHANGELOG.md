@@ -44,10 +44,12 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Reach iOS parity and harden the release
 
-This version does two things. Its headline is an iOS interaction rework — the
+This version does three things. Its headline is an iOS interaction rework — the
 per-row trash and pencil icons on the Today, Drinks and Calendar screens give way
-to the native edit-mode-and-tap model Apple's own list apps use — and it also
-absorbs the store-path corrections that had been drafted for 0.83.1. **0.83.1 is
+to the native edit-mode-and-tap model Apple's own list apps use — it absorbs the
+store-path corrections that had been drafted for 0.83.1, and it folds in the
+fixes of a full two-platform QA round (the closing "Quality-assurance round"
+section). **0.83.1 is
 cancelled and was never published**; its `versionCode` 95 was never shipped, so
 0.84.0 inherits it. The human version therefore steps 0.83.0 → 0.84.0 (a minor
 bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
@@ -253,10 +255,12 @@ static weight-700 Rokkitt Bold the feature-graphic badge needs from the upstream
 variable font (kept OUTSIDE the reproducibility-scanned `tools/fonts/`), so the
 committed `.ttf` lets everyone render byte-identically without fonttools installed.
 
-Deliberately deferred (tracked on the roadmap): the OpenSSF badge maintenance
-targets `bestpractices-json`/`bestpractices-jsonc` (run by hand when the badge
-answers change). The read-only `check-bestpractices-levels` gate is already rebuilt
-in `make/checks.mk`.
+Not ported: the OpenSSF badge maintenance targets
+`bestpractices-json`/`bestpractices-jsonc` (formerly run by hand when the badge
+answers changed). They are superseded rather than re-created by the badge-tooling
+change below, which retires the pull-and-overwrite recipes in favour of the
+read-only `make bestpractices` diff report. The read-only
+`check-bestpractices-levels` gate is already rebuilt in `make/checks.mk`.
 
 The `tools/release-check.sh` monolith is decomposed (its decomposition was
 previously deferred). The shared core -- the colours, counters, the
@@ -500,8 +504,9 @@ that ask specifically for in-pipeline TEST or LINT execution
 (`test_continuous_integration`, `automated_integration_testing`,
 `static_analysis_often`, `OSPS-QA-06.01`) keep their Unmet/N/A answers — those
 need the heavy SDK/Xcode toolchain the pipeline deliberately avoids — and
-`OSPS-VM-04.02` stays Unmet for want of a standardised VEX feed, though the
-osv-scanner.toml triage is its substance. The scans reach the network (osv.dev).
+`OSPS-VM-04.02` is Met by the OpenVEX layer this cycle also adds
+(`openvex.json`, described above, standardises what the osv-scanner.toml triage
+records). The scans reach the network (osv.dev).
 `docs/ROADMAP.md` is reconciled with this end state: the entries that described
 CI and the SCA gate as still-to-come are updated to the shipped reality, and the
 remaining test-and-lint-in-CI work — the one heavier step, needing an SDK-bearing
@@ -820,8 +825,10 @@ put it plainly for gestures — offer a visible way to perform an action, but le
 edit mode or a context menu carry it, not a permanent per-row button. This change
 adopts that model:
 
-- **Delete is now the toolbar `EditButton` plus swipe, on all three screens.**
-  `EditButton` toggles the list's edit mode, where each row shows the standard red
+- **Delete is now the toolbar edit toggle plus swipe, on all three screens.**
+  The toggle (since the QA round below an in-app-localized `EditToggleButton`
+  rather than the system `EditButton`, whose title follows the system language)
+  puts the list into edit mode, where each row shows the standard red
   delete badge; a trailing swipe reaches the same place. Both routes are wired
   through a single `.onDelete`, and the button appears only when the list actually
   has something to act on. The per-row trash icon is gone from every screen.
@@ -973,10 +980,12 @@ throughout, while the inline Gradle table names `[versions]`, `[libraries]` and
 `kotlinlang.org/docs/coding-conventions.html`, the F-Droid listing and
 `bestpractices.dev`. 151 of the 190 justifications changed; the prose is otherwise
 untouched (verified token-by-token). `.bestpractices.jsonc` was regenerated to match.
-Note the one-way mirror: `.bestpractices.json` is a snapshot pulled from
-bestpractices.dev, so `make bestpractices-json` would overwrite these edits — the
-maintainer transcribes them to the site first (a level-grouped criterion list of the
-151 changed answers accompanies this change), and only then re-pulls.
+Note the one-way mirror: `.bestpractices.json` mirrors bestpractices.dev, which
+knows nothing of edits made here — the maintainer transcribes them to the site (a
+level-grouped criterion list of the 151 changed answers accompanies this change),
+and the read-only `make bestpractices` report below then confirms the two are back
+in step. (The overwrite hazard this note used to warn about is gone: the old
+`make bestpractices-json` re-pull is retired by the badge-tooling change below.)
 
 Gave the OpenSSF badge answers iOS coverage. Wherever a justification described an
 Android-specific mechanism that has a genuine iOS counterpart in this repository, the
@@ -995,8 +1004,9 @@ iOS test-coverage measurement, a reproducible iOS build before the App Store rel
 and the iOS-specific hardening items (an explicit App Transport Security declaration).
 The iOS strictness gate is SwiftLint; Swift compiler warnings-as-errors are not
 enforced, and the answers say so rather than implying parity. `.bestpractices.jsonc`
-was regenerated, and the same one-way-mirror caveat applies (transcribe upstream
-before `make bestpractices-json`).
+was regenerated, and the same one-way-mirror duty applies: transcribe the changed
+answers upstream, then let the read-only `make bestpractices` report confirm the
+transcription (the old `make bestpractices-json` re-pull is retired below).
 
 Cleared the two Swift 6 actor-isolation warnings the iOS release archive emitted.
 `PotillusApp.uptimeEpoch` — an immutable `Sendable let` read from the `nonisolated`
@@ -1355,6 +1365,65 @@ has taken its final shape.
   the committed one are the same file and cannot drift.
 
 ---
+
+### Quality-assurance round (both platforms)
+
+A full nine-dimension QA pass over Android, iOS and the shared seam closed this
+cycle; its fixes are folded in here rather than into a new version:
+
+- **The drink editor accepts comma decimals (iOS).** The percent field parsed
+  only the dot form while the decimal keyboard offers exactly the locale's
+  separator key, so a fractional ABV could not be typed at all on the
+  comma-decimal locales; `DrinkValidator.parseDecimal` now accepts both
+  spellings (pinned by tests), and an unparseable percent names itself in the
+  footer instead of silently greying out Save.
+- **The drink editor and the Settings footers speak the user's language (iOS).**
+  The editor's title, its six validation messages and the two Settings footers
+  were raw English literals without catalogue keys. They now route through
+  `Loc`: six keys are copied verbatim from Android's
+  `add_drink`/`edit_drink`/`drink_validation_*` strings — so the parity gate
+  holds the platforms to the same words from now on — and five new keys are
+  translated into all 21 languages. The EntrySheet volume message became one
+  whole-sentence key, replacing a translated fragment glued to an English
+  "and … ml.".
+- **The volume message tells the truth (both platforms).** All 21 Android
+  `drink_validation_volume_range` strings claimed 1–10,000 ml while the
+  validator enforces 1–5,000 (the shared vector's bound) — a leftover of the
+  pre-0.81.0 domain bound. The strings now name 5,000 in each locale's own
+  number format, and the new iOS key carries the identical text.
+- **The edit toggle is in-app-localized (iOS).** The system `EditButton` titles
+  itself in the SYSTEM language; Today, Calendar and Drinks now use
+  `EditToggleButton`, a `Loc`-titled toggle driving screen-owned edit-mode state
+  that is injected into the List (and read directly by the Drinks tap-guard).
+  Edit mode ends by itself when the visible list empties.
+- **The overflow menu wears iOS's More idiom.** `ellipsis.circle` at the
+  trailing edge replaces the leading hamburger — the last Android-ism in the
+  navigation. The committed iOS screenshots still show the old placement;
+  recapture (`make screenshots-ios`) before the next store submission.
+- **Dirty sheets resist accidental swipes (iOS).** EntrySheet and the drink
+  editor set `interactiveDismissDisabled` while they hold unsaved input; Cancel
+  and Save still dismiss programmatically.
+- **The lock cover shows the device's real unlock glyph (iOS).** faceid,
+  touchid or a plain lock, probed via `LAContext.biometryType`, instead of a
+  hard-coded Face ID symbol on every device.
+- **Two l10n gates lost their blind spots (tools).** `check-l10n-parity`'s
+  skeleton filter carried `a-zA-Z` in its character class, so every pure-word
+  literal counted as "no words"; and neither it nor `check-l10n` collected
+  ternary or `+`-concatenated first arguments — the two holes through which the
+  unkeyed editor strings passed. Both are fixed and probed with planted
+  violations in every newly covered shape; `check-l10n`'s dead `NEUTRAL` regex
+  is removed, and the en dash joined the neutral joiners.
+- **Documentation truth sweep.** `docs/INSTALL-IOS.md` recommends
+  `gmake -C ios version-check` (the root `ios-version-check` is gone);
+  `tools/render-guide-ios.py` names the current `check-guides` and
+  `make -C ios project` targets; AboutScreen and AppInfo point at
+  `docs/NOTICES.md` for the MIT text (the slimmed COPYING.md no longer carries
+  it); TodayScreen's header no longer calls its strings "English literals for
+  now"; and DrinksScreen no longer claims a long-press context menu that was
+  never built. Five OpenSSF badge answers were rewritten to their end state
+  (the CI "Update:" sandwiches merged into one truthful text each; all statuses
+  unchanged) — one-way mirror: transcribe them to bestpractices.dev, then
+  `make bestpractices` confirms the transcription.
 
 ## v0.83.0
 
