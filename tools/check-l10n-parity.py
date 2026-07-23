@@ -161,13 +161,36 @@ def catalog_value(entry, tag):
     return loc["stringUnit"]["value"]
 
 
+# The UI call names whose first string argument is a catalogue key.
+UI_CALLS = (
+    r'(?:Text|Label|Button|Toggle|navigationTitle|Section'
+    r'|ContentUnavailableView|accessibilityLabel|Picker|TextField|DatePicker'
+    r'|Stepper|LabeledContent|Loc\.string)'
+)
+
+# One string literal, or several joined with `+` — the runtime key is the join.
+QUOTED_CONCAT = r'"[^"]*"(?:\s*\+\s*"[^"]*")*'
+
+
+def _join_concat(fragment):
+    """The runtime string of a `"…" + "…"` sequence: the quoted parts, joined."""
+    return "".join(re.findall(r'"([^"]*)"', fragment))
+
+
 def collect_literals():
-    """Every UI string literal in the views, by the same call shapes the app uses."""
-    call = re.compile(
-        r'(?:Text|Label|Button|Toggle|navigationTitle|Section'
-        r'|ContentUnavailableView|accessibilityLabel|Picker|TextField|DatePicker'
-        r'|Stepper|LabeledContent|Loc\.string)'
-        r'\(\s*"([^"]+)"'
+    """Every UI string literal in the views, by the same call shapes the app uses.
+
+    Two shapes are collected. The plain one — a (possibly concatenated) literal
+    as the first argument — and the TERNARY one, `call(cond ? "A" : "B" …)`,
+    whose two branches are each a key at runtime. The ternary shape used to be
+    invisible to this scan (the regex demanded a quote right after the paren),
+    which is how the drink editor's unkeyed ternary title slipped past CHECK 1
+    (0.84.0 QA round).
+    """
+    call = re.compile(UI_CALLS + r'\(\s*(' + QUOTED_CONCAT + r')')
+    ternary = re.compile(
+        UI_CALLS + r'\(\s*[^"()?]*?\?\s*(' + QUOTED_CONCAT + r')\s*:\s*('
+        + QUOTED_CONCAT + r')'
     )
     found = set()
     for path in VIEWS:
@@ -178,13 +201,38 @@ def collect_literals():
             continue
         text = path.read_text(encoding="utf-8")
         for m in call.finditer(text):
-            found.add(m.group(1))
+            found.add(_join_concat(m.group(1)))
+        for m in ternary.finditer(text):
+            for branch in (m.group(1), m.group(2)):
+                joined = _join_concat(branch)
+                if joined:  # `cond ? "" : "…"` — an empty branch is no key
+                    found.add(joined)
     return found
 
 
+# A printf-style specifier as the catalogue spells them: %@, %lld, %1$@, %2$lld …
+SPECIFIER = re.compile(r'%\d*\$?(?:lld|[@dsf])')
+
+# Unit tokens that read the same in every shipped language, so a skeleton made
+# of specifiers and these carries no words (mirrors check-l10n's NEUTRAL_UNITS).
+NEUTRAL_UNITS = ("ml", "g", "%", "‰", "≈")
+
+
 def is_interpolation_only(literal):
-    """A literal that is nothing but an interpolation/number carries no words."""
-    return re.fullmatch(r'[%@\d$lld /·.\\()a-zA-Z_]*', literal) is not None
+    """A literal that is nothing but specifiers, numbers and units — no words.
+
+    Strip the specifiers, then the unit tokens, then require that only digits
+    and skeleton punctuation remain. The earlier one-regex version had `a-zA-Z`
+    inside its character class — put there for the `lld` and unit letters — which
+    made EVERY pure-word literal count as "no words" and reduced this filter to
+    flagging only literals with punctuation outside the class; that is how the
+    drink editor's unkeyed English sentences passed CHECK 1 unseen (0.84.0 QA
+    round).
+    """
+    remainder = SPECIFIER.sub('', literal)
+    for unit in NEUTRAL_UNITS:
+        remainder = remainder.replace(unit, '')
+    return re.fullmatch(r'[\d\s/·.,()\\+–-]*', remainder) is not None
 
 
 def check_missing_keys(catalog):

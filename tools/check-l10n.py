@@ -67,6 +67,23 @@ CALLS = (
 # match offset in offenders().
 LITERAL = re.compile(CALLS + r'\(\s*"([^"]+)"', re.DOTALL)
 
+# The TERNARY shape, `call(cond ? "A" : "B" …)`: both branches are user-facing
+# strings at runtime, but the quote sits after the condition, so LITERAL cannot
+# see them — the hole through which the drink editor's raw ternary title slipped
+# (0.84.0 QA round). Branches may be `+`-concatenations; the runtime string is
+# the join. `Loc.string(cond ? "A" : "B", …)` matches too and is then excused by
+# the same Loc-window check LITERAL's matches go through.
+QUOTED_CONCAT = r'"[^"]*"(?:\s*\+\s*"[^"]*")*'
+TERNARY = re.compile(
+    CALLS + r'\(\s*[^"()?]*?\?\s*(' + QUOTED_CONCAT + r')\s*:\s*('
+    + QUOTED_CONCAT + r')'
+)
+
+
+def join_concat(fragment):
+    """The runtime string of a `"…" + "…"` sequence: the quoted parts, joined."""
+    return "".join(re.findall(r'"([^"]*)"', fragment))
+
 # Whole files that are English BY DESIGN, and are therefore not scanned.
 #
 #   Localization.swift  the lookup itself: its literals ARE the keys.
@@ -92,9 +109,11 @@ ALLOWED_EXACT = {
     "Libellus Potionis is locked",             # cover, localised via Loc elsewhere
     "GRDB.swift",                              # proper noun: the dependency's name
 }
-# Pure interpolation or number+unit: no words to translate.
-NEUTRAL = re.compile(r"^[%\d\$@lld /·.\\()a-z_A-Z]*$")
-
+# (An unused `NEUTRAL` one-regex variant of is_pure_interpolation was removed in
+# the 0.84.0 QA round: its character class contained `a-zA-Z`, so it classified
+# every pure-word literal as neutral. Nothing consulted it — the live filter is
+# is_pure_interpolation below — but a future caller would have inherited the
+# hole.)
 
 # Units that carry no translation: they are the same token in every language this
 # app ships. A string that is only interpolation plus these is language-neutral.
@@ -112,7 +131,10 @@ def is_pure_interpolation(text):
     stripped = re.sub(r"\\\((?:[^()]|\([^()]*\))*\)", "", text)
     for unit in NEUTRAL_UNITS:
         stripped = stripped.replace(unit, "")
-    return re.fullmatch(r"[\d %lld@\$/·.\s]*", stripped) is not None
+    # The en dash joins two interpolated dates ("from – to"); like the middle
+    # dot it is a language-neutral joiner, not a word (0.84.0 QA round, found
+    # when the ternary scan first saw that literal).
+    return re.fullmatch(r"[\d %lld@\$/·.\s–]*", stripped) is not None
 
 
 def offenders():
@@ -137,6 +159,24 @@ def offenders():
             problems.append(
                 f"{path.name}:{line}: raw literal {literal!r} — route it through Loc.string"
             )
+        # The ternary shape: same excusals, applied to each branch's runtime
+        # string. A `Loc.string(cond ? … : …)` match is excused by the window
+        # check — here the call NAME itself is the window's "Loc.string(".
+        for match in TERNARY.finditer(source):
+            start = match.start()
+            if "Loc.string(" in source[max(0, start - 12):start + 30]:
+                continue
+            for fragment in (match.group(1), match.group(2)):
+                literal = join_concat(fragment)
+                if not literal or literal in ALLOWED_EXACT:
+                    continue
+                if is_pure_interpolation(literal):
+                    continue
+                line = source.count("\n", 0, start) + 1
+                problems.append(
+                    f"{path.name}:{line}: raw literal {literal!r} in a ternary — "
+                    "route it through Loc.string"
+                )
     return problems
 
 
