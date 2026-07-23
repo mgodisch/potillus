@@ -310,22 +310,54 @@ policy violations:
   (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
   `automated_integration_testing`, `static_analysis_often`). The GitLab pipeline
   (first roadmap item) runs the device-free checks and a lockfile SCA scan, all
-  on a small `python:3-slim` image. The remaining
-  CI-conditional criteria ask specifically
-  for the TEST and LINT suites to run in the pipeline: `./gradlew
+  on a small `python:3-slim` image. The remaining CI-conditional criteria ask
+  specifically for the TEST and LINT suites to run in the pipeline: `./gradlew
   testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
   `abortOnError` build gate today, but CI would enforce it on every change), and
-  ideally `swift test` for the Swift package. All of these are build-time steps:
-  they need the pipeline to gain a heavier, SDK-bearing image (several hundred MB
-  vs. ~45 MB) and real build time on shared runners, and the
-  Swift suite additionally needs a Linux Swift toolchain. This is deliberately
-  deferred, not forgotten: it is the single largest resource-cost step left, and
-  is weighed against the "good guest on shared runners" principle that shaped the
-  current pipeline. If added, pin the SDK image to a version matching the local
-  toolchain (as the CI osv-scanner is pinned to the maintainer's local version)
-  to avoid CI-vs-local drift. Instrumented (on-device) tests would need an
-  emulator and stay out of scope. Until then these criteria remain Unmet/N/A
-  with that rationale recorded in `.bestpractices.json`.
+  ideally `swift test` for the Swift package.
+  The premise this item was written under has changed with the move to GitLab,
+  and the reasoning is worth restating rather than inheriting. The old pipeline
+  was shaped by the principle of being a good guest on DONATED infrastructure;
+  GitLab's instance runners are a metered allowance instead, so the question is
+  no longer whether a heavy image is an imposition but whether it fits the
+  monthly compute quota (Settings > Usage Quotas). That reframes the cost from a
+  matter of courtesy into an arithmetic one.
+  What that opens up, in rising order of cost:
+  1. **A scheduled pipeline** (Build > Pipeline schedules, available on the free
+     plan) would run the existing checks nightly. That alone settles the "on
+     every commit or at least daily" half of `static_analysis_often` without
+     touching the merge-request rule or adding a single megabyte.
+  2. **An Android SDK image** would carry `./gradlew testDebugUnitTest`,
+     `lintDebug` and the Kover coverage run. Worth being precise where the
+     earlier wording was not: UNIT tests need the SDK but NOT an emulator, so
+     this is a container job, not a virtualisation problem. It is what would move
+     `OSPS-QA-06.01` off N/A, settle `automated_integration_testing`, supply the
+     linter half of `static_analysis_often`, and produce the branch-coverage
+     figure `test_branch_coverage80` is measured against. Pin the image to a
+     version matching the local toolchain (as the CI osv-scanner is pinned to the
+     maintainer's local version) to avoid CI-vs-local drift.
+  3. **`make check-reuse` as its own job.** Its exclusion from `check-static` is
+     self-imposed — the aggregate is kept pip-free so the small image needs no
+     install step (see tools/check-reuse.py). A separate job may `pip install
+     reuse`, which would turn the REUSE gate from local-plus-badge into an
+     enforced per-merge-request check.
+  What stays out of reach, and why, so it is not re-investigated:
+  * **The Swift suite cannot run on Linux.** PotillusKit declares macOS as a
+     platform precisely so `swift test` needs no simulator, but its sources
+     import `CryptoKit` and `Security`, both Apple-only. A Linux Swift toolchain
+     image is therefore not enough; it would take porting the crypto layer to
+     swift-crypto, which is a change to shipping code and not worth making for a
+     CI convenience. The iOS half stays locally verified.
+  * **Instrumented (on-device) tests** need an emulator and thus nested
+     virtualisation, which instance runners do not offer. This also keeps
+     `dynamic_analysis` out of reach by that route; the Kover branch-coverage
+     path remains its more likely remedy.
+  Note what none of this buys: no badge TIER changes. Baseline Level 3 hangs on
+  `OSPS-QA-07.01` alone (a reviewer who is not the author), and silver and gold
+  hang on `access_continuity`, `bus_factor`, `two_person_review` and
+  `contributors_unassociated`. Those are people, not pipelines. The widening is
+  worth doing for the tighter net it gives the maintainer, and for the three
+  individual criteria named above — not as a route to the next tier.
 
 ## Working toward the OpenSSF gold badge
 

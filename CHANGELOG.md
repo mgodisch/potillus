@@ -732,7 +732,13 @@ conditional on a pipeline accepting collaborator input, and this one has no
 manual trigger, no inputs and no user-supplied variables. `OSPS-QA-06.01`,
 `automated_integration_testing` and `static_analysis_often` stay unmet on
 purpose — the test suites and the two real linters need an SDK-bearing image and
-a Mac, which is the roadmap's separate, heavier item.
+a Mac, which is the roadmap's separate, heavier item. That item is rewritten in
+the same step: the move replaced donated infrastructure with a metered quota, so
+its cost is now arithmetic rather than etiquette, and it names what this makes
+reachable (a nightly schedule, an SDK image for the Android unit tests and Lint,
+REUSE as its own job) against what it does not (the Swift suite, which imports
+Apple-only CryptoKit and Security and so cannot run on Linux; instrumented tests,
+which need an emulator) — and that no badge tier follows from any of it.
 
 Two things improve. `hardened_site` (gold) moves to Met: GitLab sends all four
 hardening headers the criterion asks for, which the previous host did not. And the
