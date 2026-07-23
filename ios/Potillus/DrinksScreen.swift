@@ -342,6 +342,16 @@ private struct DrinkEditor: View {
         _category = State(initialValue: drink?.category ?? .other)
     }
 
+    /// Whether any field differs from what `init` seeded — the guard for the
+    /// swipe-to-dismiss below. Each comparison mirrors one seeding line above;
+    /// keep the two in step.
+    private var isDirty: Bool {
+        name != (drink?.name ?? "")
+            || volumeText != (drink.map { String($0.volumeMl) } ?? "")
+            || percentText != (drink.map { String($0.alcoholPercent) } ?? "")
+            || category != (drink?.category ?? .other)
+    }
+
     /// The parsed fields, nil while the text is not a number.
     ///
     /// The percent goes through `DrinkValidator.parseDecimal`, which accepts a
@@ -423,6 +433,12 @@ private struct DrinkEditor: View {
                 }
             }
         }
+        // A half-typed drink must not vanish under an accidental swipe: with
+        // unsaved input, only the explicit Cancel and Save leave the sheet.
+        // Apple's own compose sheets guard the same way, and the modifier does
+        // not touch programmatic dismissal, so both buttons keep working
+        // (0.84.0 QA round).
+        .interactiveDismissDisabled(isDirty)
     }
 
     /// The pure-alcohol grams for the live volume/percent, in the in-app locale.

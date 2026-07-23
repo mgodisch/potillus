@@ -41,6 +41,15 @@ struct AppLockCover: View {
 
     let state: AppLockState
     let locale: Locale
+
+    /// The SF Symbol of the unlock mechanism this device actually offers —
+    /// "faceid", "touchid" or "lock" — supplied by the caller (the
+    /// LocalAuthentication probe lives in DeviceBiometricAuthenticator) so this
+    /// view stays a plain wall that a preview or test can build without a
+    /// sensor. It used to be a hard-coded "faceid", which put a Face ID glyph
+    /// in front of Touch-ID and passcode-only users (0.84.0 QA round).
+    let unlockSymbol: String
+
     let onUnlock: () async -> Void
 
     var body: some View {
@@ -60,7 +69,7 @@ struct AppLockCover: View {
                     Button {
                         Task { await onUnlock() }
                     } label: {
-                        Label(Loc.string("Unlock", locale: locale), systemImage: "faceid")
+                        Label(Loc.string("Unlock", locale: locale), systemImage: unlockSymbol)
                     }
                     .buttonStyle(.borderedProminent)
                 } else {

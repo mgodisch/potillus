@@ -57,6 +57,26 @@ struct DeviceBiometricAuthenticator: BiometricAuthenticator {
         LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
     }
 
+    /// The SF Symbol matching the device's actual unlock mechanism.
+    ///
+    /// The lock cover used to hard-code "faceid", which showed a Face ID glyph
+    /// on Touch-ID and passcode-only devices (0.84.0 QA round). `biometryType`
+    /// is populated only after `canEvaluatePolicy` has run on the SAME context —
+    /// a documented quirk — so the availability probe doubles as the setter
+    /// here. A passcode-only device (`.none`) gets the plain lock, and so does
+    /// any biometry this switch does not know (`.opticID` is visionOS-only
+    /// today; the plain `default` absorbs it and any future case, so an unknown
+    /// mechanism degrades to the neutral lock rather than a wrong glyph).
+    func unlockSymbolName() -> String {
+        let context = LAContext()
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+        switch context.biometryType {
+        case .faceID: return "faceid"
+        case .touchID: return "touchid"
+        default: return "lock"
+        }
+    }
+
     func evaluate(reason: String) async -> Bool {
         let context = LAContext()
         do {

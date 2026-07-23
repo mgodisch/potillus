@@ -123,7 +123,16 @@ struct PotillusApp: App {
                     PrivacyCover(locale: Loc.locale(for: language))
                 }
                 if lock.state != .unlocked {
-                    AppLockCover(state: lock.state, locale: Loc.locale(for: language)) { await lock.retry() }
+                    // The glyph is probed per render of the locked branch, so it
+                    // tracks enrolment changes (Face ID disabled overnight, a
+                    // passcode dropped) instead of freezing at launch. The probe
+                    // is one `canEvaluatePolicy` on a throwaway context — cheap,
+                    // and this branch only exists while the cover is up.
+                    AppLockCover(
+                        state: lock.state,
+                        locale: Loc.locale(for: language),
+                        unlockSymbol: DeviceBiometricAuthenticator().unlockSymbolName()
+                    ) { await lock.retry() }
                 }
             }
             // NOTE: the cold-start lock prompt is NOT fired here with a bare

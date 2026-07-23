@@ -75,6 +75,12 @@ struct EntrySheet: View {
     @State private var timestamp: Date
     @State private var isSaving = false
 
+    /// What `timestamp` was seeded with — `now`, or the edited entry's time —
+    /// kept so `isDirty` can tell a touched date wheel from an untouched one
+    /// (the other seeds are recomputable from the stored lets; `now` is not
+    /// stored, so its value is remembered here).
+    private let initialTimestamp: Date
+
     init(
         drinks: [DrinkDefinition],
         preselected: DrinkDefinition?,
@@ -99,13 +105,25 @@ struct EntrySheet: View {
         if let editing {
             _volumeText = State(initialValue: String(editing.volumeMl))
             _note = State(initialValue: editing.note)
-            _timestamp = State(initialValue: Date(
+            initialTimestamp = Date(
                 timeIntervalSince1970: Double(editing.timestampMillis) / 1000.0
-            ))
+            )
         } else {
             _volumeText = State(initialValue: initial.map { String($0.volumeMl) } ?? "")
-            _timestamp = State(initialValue: now)
+            initialTimestamp = now
         }
+        _timestamp = State(initialValue: initialTimestamp)
+    }
+
+    /// Whether any field differs from what `init` seeded — the guard for the
+    /// swipe-to-dismiss below. Each comparison mirrors one seeding line above;
+    /// keep the two in step.
+    private var isDirty: Bool {
+        selection != (preselected ?? drinks.first)
+            || volumeText != (editing.map { String($0.volumeMl) }
+                ?? (preselected ?? drinks.first).map { String($0.volumeMl) } ?? "")
+            || note != (editing?.note ?? "")
+            || timestamp != initialTimestamp
     }
 
     private var volume: Int? { Int(volumeText) }
@@ -194,6 +212,12 @@ struct EntrySheet: View {
                 }
             }
         }
+        // A half-typed entry must not vanish under an accidental swipe: with
+        // unsaved input, only the explicit Cancel and Save leave the sheet.
+        // Apple's own compose sheets guard the same way, and the modifier does
+        // not touch programmatic dismissal, so both buttons keep working
+        // (0.84.0 QA round).
+        .interactiveDismissDisabled(isDirty)
     }
 
     private func save() {
