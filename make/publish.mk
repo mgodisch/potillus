@@ -353,6 +353,22 @@ push-appstore-preflight:
 # re-downloaded from its permanent release URL and its sha256 is diffed against
 # the staged file, so a corrupted upload is caught.
 #
+# DETACHED SIGNATURES. Each artifact is also published with an ASCII-armoured
+# OpenPGP signature beside it (<asset>.asc). The APK already carries an Android
+# signature INSIDE it, but that one lives in the APK signing block and is
+# invisible to anything looking at the release page; a detached .asc lets anyone
+# verify the published bytes with gpg and nothing else. It matters more still for
+# the SBOMs, which carry no internal signature at all. The key is the one
+# SECURITY.md publishes for encrypted reports and the one the release tags are
+# signed with, and it is distributed through the Debian keyserver (the maintainer
+# is a Debian Developer) -- so a verifier need not trust a project-specific key
+# handed out by the project itself; there is a path through the Debian web of
+# trust:
+#
+#     gpg --keyserver hkps://keyring.debian.org:443 --recv-keys $(GPG_SIGNING_KEY)
+#     gpg --verify de.godisch.potillus_<versionCode>.apk.asc \
+#                  de.godisch.potillus_<versionCode>.apk
+#
 # NAME vs. IDENTITY. A link carries a human-readable `name` shown on the release
 # page ("Android Package Kit", not de.godisch.potillus_95.apk) and a `url`. Only
 # the URL identifies the artifact: GitLab requires BOTH to be unique within a
@@ -409,18 +425,34 @@ GITLAB_PACKAGE    := releases
 # therefore still publishes correctly, it is only labelled less prettily until it
 # is added here. These are DISPLAY TEXT only; the link URL is what identifies the
 # artifact (see the note above).
+#
+# ORDER MATTERS: the match takes the LAST pair whose suffix fits, so the ".asc"
+# entries must come after their base entries -- ".apk" also matches
+# "....apk.asc", and without the later, longer pair a signature would inherit the
+# artifact's own label and collide with it (GitLab requires link names to be
+# unique within a release).
 GITLAB_ASSET_LABELS := \
 	.apk=Android\ Package\ Kit \
 	_android_sbom.json=Android\ Software\ Bill\ of\ Materials \
-	_ios_sbom.json=iOS\ Software\ Bill\ of\ Materials
+	_ios_sbom.json=iOS\ Software\ Bill\ of\ Materials \
+	.apk.asc=Android\ Package\ Kit\ OpenPGP\ Signature \
+	_android_sbom.json.asc=Android\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature \
+	_ios_sbom.json.asc=iOS\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature
+# OpenPGP key the release artifacts are signed with, pinned to a full 40-hex-digit
+# fingerprint rather than a short id (short ids are forgeable) -- the same key
+# SECURITY.md publishes for encrypted vulnerability reports and the one the
+# release tags are signed with. Overridable without editing the recipe, for a
+# maintainer succession: make push-gitlab GPG_SIGNING_KEY=<fingerprint>
+GPG_SIGNING_KEY   := 1842323B4FCF9B90995FA17FA350B991F05A4857
 GITLAB_TOKEN_FILE := fastlane/gitlab-credentials.txt
 # (VERSION_CODE and the staged/Gradle artifact paths are defined in the "Release
 # staging" section above -- the staged files, not the raw Gradle outputs, are
 # what this uploads.)
 push-gitlab:
-	# require curl + python3 (GitLab REST + JSON encoding)
+	# require curl + python3 (GitLab REST + JSON encoding) and gpg (detached signatures)
 	command -v curl
 	command -v python3
+	command -v gpg
 	@test -f "$(GITLAB_TOKEN_FILE)" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' not found -- create it containing your GitLab personal or project access token (Settings > Access tokens, 'api' scope). It is git-ignored." >&2; exit 1; }
 	token="$$(tr -d '[:space:]' < "$(GITLAB_TOKEN_FILE)")"
 	@test -n "$$token" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' is empty." >&2; exit 1; }
@@ -444,10 +476,33 @@ push-gitlab:
 	echo "push-gitlab: APK signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@test -f "$(STAGED_SBOM)" || { echo "push-gitlab: staged SBOM not found at '$(STAGED_SBOM)' -- run 'make release-android' first (it builds and stages the SBOM). This target does NOT build or stage it." >&2; exit 1; }
+	# 0) sign each artifact with a detached, ASCII-armoured OpenPGP signature.
+	# The secret key must be available; a passphrase prompt is fine here, which is
+	# why --batch is deliberately NOT used. A signature left behind by an
+	# interrupted earlier run is re-VERIFIED rather than trusted on sight and
+	# rather than remade, so a rerun neither prompts again nor keeps a stale file.
+	ios_sbom=""; test -e "$(STAGED_IOS_SBOM)" && ios_sbom="$(STAGED_IOS_SBOM)"
+	@gpg --list-secret-keys "$(GPG_SIGNING_KEY)" >/dev/null 2>&1 || { echo "push-gitlab: no secret OpenPGP key for $(GPG_SIGNING_KEY) -- that is the key SECURITY.md publishes and the one the release tags are signed with. Override with 'make push-gitlab GPG_SIGNING_KEY=<fingerprint>' if the project's key has changed." >&2; exit 1; }
+	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
+		if [ -f "$$staged.asc" ] && gpg --verify "$$staged.asc" "$$staged" >/dev/null 2>&1; then
+			echo "push-gitlab: $$(basename "$$staged").asc already present and valid -- keeping it"
+			continue
+		fi
+		rm -f "$$staged.asc"
+		gpg --local-user "$(GPG_SIGNING_KEY)" --armor --detach-sign --output "$$staged.asc" "$$staged"
+		gpg --verify "$$staged.asc" "$$staged"
+		echo "push-gitlab: signed $$(basename "$$staged")"
+	done
+	# Publication list: each artifact immediately followed by its signature, so the
+	# release page lists them as pairs rather than three files then three signatures
+	# (GitLab renders asset links in the order they are attached).
+	publish=""
+	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
+		publish="$$publish $$staged $$staged.asc"
+	done
 	# 1) upload the staged files into the generic package registry (skip byte-identical re-uploads)
 	pkg_base="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/packages/generic/$(GITLAB_PACKAGE)/v$(VERSION)"
-	ios_sbom=""; test -e "$(STAGED_IOS_SBOM)" && ios_sbom="$(STAGED_IOS_SBOM)"
-	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
+	for staged in $$publish; do
 		asset="$$(basename "$$staged")"
 		want="$$(sha256sum "$$staged" | cut -d' ' -f1)"
 		# an interrupted earlier run may already have stored this exact file
@@ -478,7 +533,7 @@ push-gitlab:
 	have_links="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join("%s %s %s" % (l.get("url",""), l.get("id",""), l.get("direct_asset_url","")) for l in (d.get("assets") or {}).get("links") or []))' 2>/dev/null || true)"
 	# 3) attach each package file as an asset link, then verify the PUBLISHED bytes
 	dl_base="https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)/downloads"
-	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
+	for staged in $$publish; do
 		asset="$$(basename "$$staged")"
 		pkg_url="$$pkg_base/$$asset"
 		want_dl="$$dl_base/$$asset"

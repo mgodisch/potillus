@@ -629,13 +629,16 @@ Before tagging a new version:
       `ios/PotillusKit/Package.resolved` and normalised by the same tool.
 - [ ] Publish the release on GitLab from the signed tag with
       `make push-gitlab` (after `make release-android`): it verifies the staged
-      APK's signer against the fingerprint in SECURITY.md, uploads the staged APK
-      and SBOM into the project's generic package registry, creates the release
-      for the pushed tag over the GitLab API with a permanent asset link per file,
-      and re-downloads each to confirm its sha256 matches the staged file — so
-      every released version is accompanied by its software bill of materials and
-      the published bytes are verified. The target is safe to re-run after a
-      partial failure.
+      APK's signer against the fingerprint in SECURITY.md, makes a detached
+      OpenPGP signature for each artifact with the maintainer's key, uploads the
+      staged APK, the SBOMs and the signatures into the project's generic package
+      registry, creates the release for the pushed tag over the GitLab API with a
+      permanent asset link per file, and re-downloads each to confirm its sha256
+      matches the staged file — so every released version is accompanied by its
+      software bill of materials, every published file by a signature anyone can
+      check, and the published bytes are verified. The signing key is the one in
+      SECURITY.md; you will be prompted for its passphrase. The target is safe to
+      re-run after a partial failure.
 - [ ] Upload the release to Google Play with `make push-playstore` (closed-testing
       alpha track; it verifies the staged AAB's signature and signer first and
       never builds or stages). Exercise credentials and metadata beforehand with

@@ -712,6 +712,19 @@ published asset is re-downloaded and checksum-matched, and the whole target is s
 to re-run after a partial failure. The token moves to
 `fastlane/gitlab-credentials.txt` (git-ignored).
 
+Every published file also gets a detached, ASCII-armoured OpenPGP signature
+beside it (`<asset>.asc`), made with the maintainer's key — the one SECURITY.md
+already publishes for encrypted reports and the one the release tags carry. The
+APK's Android signature lives in the APK signing block and is invisible to anyone
+looking at a release page; the SBOMs had no signature at all. A verifier can now
+check the published bytes with `gpg --verify` alone, and because the key is in
+the Debian keyring, reach it through the Debian web of trust rather than trusting
+a key the project hands out itself. SECURITY.md documents the new route.
+Separately, the CI dependency scan no longer trusts its downloaded scanner: the
+binary is verified against a committed sha256 before it is made executable, since
+a version tag alone does not pin a release asset and this job decides whether a
+merge may proceed.
+
 CI moves forge with everything else. `.woodpecker.yml` was Codeberg-specific and
 is deleted rather than ported; a new `.gitlab-ci.yml` takes its place with the
 same deliberately narrow scope — checks only, never a build, on a plain

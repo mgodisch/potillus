@@ -127,14 +127,26 @@ dependency-scan:
     # does need TLS roots and a downloader.
     - apt-get update -qq
     - apt-get install -y --no-install-recommends ca-certificates wget
-  script:
+  variables:
     # Pinned to a specific release rather than `latest`, so the scanner version
     # that gates a merge is reproducible and does not drift under us (the same
     # discipline the pinned tool versions elsewhere follow), and matches the
-    # version the maintainer runs locally for the staging SBOM scan. The
-    # official, prebuilt Linux binary from the upstream release page.
-    - wget -qO /usr/local/bin/osv-scanner https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
-    - chmod +x /usr/local/bin/osv-scanner
+    # version the maintainer runs locally for the staging SBOM scan.
+    OSV_SCANNER_VERSION: "2.4.0"
+    # sha256 of the official prebuilt linux/amd64 binary for that version.
+    # A version tag alone is NOT a pin: a release asset can be replaced upstream
+    # without the tag changing, and this job decides whether a merge may proceed,
+    # so it must not run whatever the URL happens to serve today. Re-derive with
+    #   curl -fsSL <the URL below> | sha256sum
+    # when bumping OSV_SCANNER_VERSION, and cross-check against the checksums
+    # upstream publishes for the release before committing the new value.
+    OSV_SCANNER_SHA256: "15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0"
+  script:
+    - wget -qO /tmp/osv-scanner "https://github.com/google/osv-scanner/releases/download/v$OSV_SCANNER_VERSION/osv-scanner_linux_amd64"
+    # Verify BEFORE making it executable, so a mismatched binary is never in a
+    # state where a later line could accidentally run it.
+    - echo "$OSV_SCANNER_SHA256  /tmp/osv-scanner" | sha256sum -c -
+    - install -m 0755 /tmp/osv-scanner /usr/local/bin/osv-scanner
     # `scan source -r .` finds the lockfiles itself and honours osv-scanner.toml
     # (the triage allowlist). Exit 1 on a finding fails the job by design.
     - osv-scanner scan source -r --config=osv-scanner.toml .

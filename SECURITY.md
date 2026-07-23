@@ -265,10 +265,13 @@ replaced before the next release.
 
 ## Verifying releases
 
-Releases are cryptographically signed. The GitLab release APK and the F-Droid
-build are signed with the maintainer's own Android app-signing key (fingerprint
-below); that private key is held only by the maintainer and is never stored on
-GitLab, F-Droid, or any other distribution site. On Google Play the maintainer
+Releases are cryptographically signed, in two independent ways. The GitLab
+release APK and the F-Droid build are signed with the maintainer's own Android
+app-signing key (fingerprint below); that private key is held only by the
+maintainer and is never stored on GitLab, F-Droid, or any other distribution
+site. Independently of that, every file published on a GitLab release — the APK
+and both SBOMs — carries a detached OpenPGP signature made with the maintainer's
+OpenPGP key, the same one this document publishes for encrypted reports. On Google Play the maintainer
 signs the uploaded App Bundle with the same private key in its role as the Play
 upload key and likewise holds it alone, while Google holds the separate
 app-signing key under Play App Signing and re-signs the artifact delivered to
@@ -280,6 +283,19 @@ You can verify a downloaded or installed release in any of these ways:
   installation and on every update. This project's F-Droid metadata pins the
   allowed signing key (`AllowedAPKSigningKeys`), so an APK signed with any other
   key is rejected.
+
+- **Manually, by OpenPGP signature.** Every file on a GitLab release page has an
+  `.asc` beside it. Fetch the maintainer's key from the Debian keyserver (see
+  "Reporting a vulnerability" above for the fingerprint), then:
+
+  ```sh
+  gpg --verify de.godisch.potillus_<versionCode>.apk.asc \
+               de.godisch.potillus_<versionCode>.apk
+  ```
+
+  This verifies the exact bytes published, and needs no Android tooling. Because
+  the key is in the Debian keyring, you can reach it through the Debian web of
+  trust rather than having to trust a key this project hands out itself.
 
 - **Manually, by certificate fingerprint.** Run:
 
