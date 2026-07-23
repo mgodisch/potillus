@@ -49,8 +49,9 @@ enum AppInfo {
     }
 
     /// GRDB's license, reproduced verbatim from the project's LICENSE file
-    /// (github.com/groue/GRDB.swift). COPYING.md requires the iOS app to show this
-    /// in its about screen before release; GRDB is the app's one third-party
+    /// (github.com/groue/GRDB.swift). docs/NOTICES.md records that the iOS about
+    /// screen reproduces this inline (and pins it with the testGrdbLicense smoke
+    /// tests); GRDB is the app's one third-party
     /// dependency, MIT-licensed and compatible with the GPL v3 the app ships under.
     /// The text is stored exactly as published — copyright line, permission grant,
     /// and warranty disclaimer — because a license quoted loosely is not the license.

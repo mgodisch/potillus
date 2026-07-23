@@ -55,8 +55,9 @@ import SwiftUI
 //   read, which is what GPL section 7 asks for.
 //
 // WHY MIT IS INLINE AND GPLv3 IS A LINK
-//   The MIT text is nine sentences and COPYING.md already reproduces it whole, so
-//   a reader loses nothing by meeting it here. The GPLv3 is 35 kB; it gets a
+//   The MIT text is nine sentences and docs/NOTICES.md reproduces it whole (the
+//   slimmed COPYING.md points there rather than carrying license texts itself),
+//   so a reader loses nothing by meeting it here. The GPLv3 is 35 kB; it gets a
 //   window of its own. Android draws the same line for the Apache text.
 // =============================================================================
 

@@ -34,8 +34,9 @@ import SwiftUI
 // under test. This file decides where things sit, and nothing else. If a
 // calculation appears here, it belongs somewhere else.
 //
-// Strings are English literals for now; they become String Catalog keys when the
-// 21 locales are ported.
+// Every user-facing string goes through `Loc` against the committed String
+// Catalog (21 languages); see Localization.swift for why the environment locale
+// alone is not enough.
 // =============================================================================
 
 struct TodayScreen: View {

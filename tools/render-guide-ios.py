@@ -171,8 +171,8 @@ def main():
             # no file under Resources/, so the directory does not even exist) and
             # of the Linux release path, where `make ios` never runs. Calling it
             # stale made `make ios` fail on its FIRST run in a fresh tree:
-            # check-ios-guides sits in check-ios-static, which runs BEFORE the
-            # ios-project target that renders them.
+            # `check-guides` (via the root `check-ios-static`) runs BEFORE the
+            # `make -C ios project` target that renders them.
             missing.append(os.path.relpath(out_path, ROOT))
             if not check:
                 os.makedirs(OUT, exist_ok=True)

@@ -162,8 +162,8 @@ changes; for a plain build-from-scratch you run it once here.
 `Version.xcconfig` carries `MARKETING_VERSION`, taken from the top `## vX.Y.Z`
 entry of `CHANGELOG.md`, and `CURRENT_PROJECT_VERSION`, taken from the Android
 `versionCode`, so the App Store and Play Store builds report the same version and
-the same build number, and neither can drift from the changelog. `gmake
-ios-version-check` verifies the file exists and is current — suitable for a
+the same build number, and neither can drift from the changelog. `gmake -C ios
+version-check` verifies the file exists and is current — suitable for a
 release gate, and worth running by hand after a version bump if you build with
 `xcodebuild` directly rather than through `gmake -C ios project`, which regenerates
 the file anyway. No target depends on it.
