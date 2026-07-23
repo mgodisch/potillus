@@ -235,9 +235,10 @@ scheme with ⌘U in Xcode, or on the command line:
 
 This runs the container-side checks, the kit's `swift test`, SwiftLint
 (**0.65.0** required), regenerates the project, and does the Simulator build
-above. It is the full local verification a contributor runs on a Mac; no CI pipeline
-can substitute for it, since a hosted Linux runner has no Mac and can only ever
-run the device-free subset. It is not needed just to run the app.
+above. It is the full local verification a contributor runs on a Mac; the GitLab
+CI pipeline deliberately runs only the device-free subset (a hosted Linux runner
+has no Mac), so this local gate is stricter. It is not needed just to run the
+app.
 
 ---
 

@@ -64,35 +64,38 @@ attainable until each is resolved. They are the most critical open items.
   arrangement in `docs/GOVERNANCE.md`. F-Droid distribution helps (its
   reproducible-build re-signing removes the private-key hand-off) but is not
   itself a successor.
-- **Continuous integration** (`automated_integration_testing`). **This is the
-  project's first open item.** The Woodpecker pipeline the project ran while
-  hosted on Codeberg was retired with the move to GitLab, so there is currently
-  no CI at all; a GitLab CI pipeline (`.gitlab-ci.yml`) has to be built to
-  replace it. The replacement should start where the old one stood — device-free
-  only, no build — and execute the two gates that pass in the QA log,
-  `tools/release-check.sh --Werror` and `make check-static`, which together cover
-  the shared invariants plus the iOS static checks reproduced in Python (Swift
-  symbol/length/test linting, l10n parity, store-metadata limits, ...), so the
-  Swift toolchain is covered without a Mac; plus a `dependency-scan` job running
-  osv-scanner over the committed lockfiles on every change (see the security work
-  below and [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). It should
-  run on merge requests targeting `main` and be wired in as a *required* merge
-  check, which is what the badge answers depend on. A full Android build
-  (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs the SDK
-  and an emulator; an iOS build needs macOS + Xcode and cannot run on a hosted
-  Linux runner at all — so building, and running the unit-test/lint suites in CI,
-  stays out of this first pipeline and remains its own heavier item below ("Run
-  the test and lint suites in CI"). Restoring CI also settles
+- **Continuous integration** (`automated_integration_testing`). A GitLab CI
+  pipeline (`.gitlab-ci.yml`) now replaces the Woodpecker pipeline the project
+  ran while hosted on Codeberg. It stands where the old one stood — device-free
+  only, no build — and runs three jobs on a plain `python:3-slim` image: the two
+  gates that pass in the QA log, `tools/release-check.sh --Werror` and
+  `make check-static`, which together cover the shared invariants plus the iOS
+  static checks reproduced in Python (Swift symbol/length/test linting, l10n
+  parity, store-metadata limits, ...), so the Swift toolchain is covered without
+  a Mac; plus a `dependency-scan` job running osv-scanner over the committed
+  lockfiles on every change (see the security work below and
+  [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). A workflow rule
+  restricts it to merge requests targeting `main`; `main` is protected against
+  direct pushes, so no second path into it needs its own trigger. A full Android
+  build (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs
+  the SDK and an emulator; an iOS build needs macOS + Xcode and cannot run on a
+  hosted Linux runner at all — so building, and running the unit-test/lint
+  suites in CI, stays out of this first pipeline and remains its own heavier
+  item below ("Run the test and lint suites in CI"). CI also settles
   `test_continuous_integration` (SUGGESTED at passing, a MUST at gold) and
   contributes to `static_analysis_often`.
-  Until it exists, the CI-conditional criteria are answered honestly as unmet or
-  N/A in `.bestpractices.json`: sanitize and validate untrusted inputs
-  (`OSPS-BR-01.01`), deny untrusted code snapshots access to privileged
+  **What is still open is the second half of the gate.** A pipeline that runs
+  but does not block is advisory, and the criteria below ask for enforcement:
+  the project setting *Merge requests > "Pipelines must succeed"* has to be
+  enabled, and the pipeline has to have been observed green, before the
+  CI-conditional answers in `.bestpractices.json` may be revised. Until then
+  they stand at their post-migration values: sanitize and validate untrusted
+  inputs (`OSPS-BR-01.01`), deny untrusted code snapshots access to privileged
   credentials (`OSPS-BR-01.03`) and least-privilege default permissions
-  (`OSPS-AC-04.01`) are N/A for want of any pipeline, while status checks before
-  merge (`OSPS-QA-03.01`) and automated per-change dependency-policy enforcement
-  (`OSPS-VM-05.03`) are Unmet — they *were* Met on the old pipeline and the
-  GitLab one is what restores them. `OSPS-QA-06.01` (a test SUITE running inside
+  (`OSPS-AC-04.01`) at N/A, status checks before merge (`OSPS-QA-03.01`) and
+  automated per-change dependency-policy enforcement (`OSPS-VM-05.03`) at Unmet.
+  `OSPS-QA-03.01` is the single control keeping OSPS Baseline Level 2 from being
+  complete, so that checkbox is what restores the level. `OSPS-QA-06.01` (a test SUITE running inside
   CI) stays N/A on purpose: even the restored pipeline runs the device-free
   checks only, not the unit-test suites (which need the Android SDK and, for
   `swift test`, a Linux Swift toolchain), so claiming a CI test run would assert
@@ -256,8 +259,10 @@ Branch-Protection and Signed-Releases -- which measured a mirror on which nothin
 happens; pointed at gitlab.com/godisch/potillus they measure real activity
 instead. Two prerequisites remain before the badge can be pursued honestly:
 
-1. **CI.** Scorecard's badge publication needs a pipeline, and CI-Tests scores
-   what that pipeline runs. This waits on the first roadmap item above.
+1. **CI.** The pipeline now exists (first roadmap item above), but Scorecard's
+   badge publication needs a job of its own that runs the analysis and pushes
+   the signed result, and CI-Tests scores what the pipeline actually runs — for
+   now the device-free checks only.
 2. **Badge re-registration.** The CII-Best-Practices check reads the project's
    bestpractices.dev entry (project 13480), which is registered under the old
    canonical URL; it has to be re-pointed at the GitLab repository.
@@ -269,10 +274,10 @@ understates the project's real posture would be worse than publishing none.
 
 Baseline Level 1 is complete. Level 2 was complete until the move to GitLab
 retired the CI pipeline: it now holds exactly one unmet control, `OSPS-QA-03.01`
-(automated status checks before merge), which asks for nothing this project does
-not already do by hand. Building the GitLab CI pipeline and wiring it in as a
-required merge check — the first item of this roadmap — restores Level 2 on its
-own, with no other change to the project. (`OSPS-AC-04.01`, also Level 2, went
+(automated status checks before merge). The pipeline that satisfies it is back
+(first roadmap item), so what is left is one project setting — *Merge requests >
+"Pipelines must succeed"* — plus one green run to point at. Enabling it restores
+Level 2 on its own, with no other change to the project. (`OSPS-AC-04.01`, also Level 2, went
 from Met to N/A in the same step; for a control conditional on operating a
 pipeline that is an answer, not a gap.)
 
@@ -296,9 +301,9 @@ policy violations:
   and the VEX document therefore empty.
 - **Run the test and lint suites in CI (the "heavy" pipeline widening)**
   (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
-  `automated_integration_testing`, `static_analysis_often`). The pipeline to be
-  rebuilt on GitLab (first roadmap item) runs the device-free checks and a
-  lockfile SCA scan, all on a small `python:3-slim` image. The remaining
+  `automated_integration_testing`, `static_analysis_often`). The GitLab pipeline
+  (first roadmap item) runs the device-free checks and a lockfile SCA scan, all
+  on a small `python:3-slim` image. The remaining
   CI-conditional criteria ask specifically
   for the TEST and LINT suites to run in the pipeline: `./gradlew
   testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the

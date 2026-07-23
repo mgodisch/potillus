@@ -1,0 +1,140 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# GitLab CI pipeline (https://docs.gitlab.com/ci/). Successor to the Woodpecker
+# pipeline the project ran while hosted on Codeberg; same scope, same checks,
+# translated to GitLab's syntax.
+#
+# SCOPE — deliberately narrow:
+#   * CHECKS ONLY, never a build. The device-free `tools/` checks reproduce on
+#     plain Linux what a Mac or the Android SDK would otherwise be needed for
+#     (Swift symbol/length/test linting as Python, l10n parity, store-metadata
+#     limits, license headers, backup-format invariants, ...). A real Android
+#     build (`lintDebug`, instrumented tests) needs the SDK and an emulator; an
+#     iOS build needs macOS + Xcode and cannot run on a Linux runner at all.
+#     Both stay local / pre-release, exactly as docs/ROADMAP.md records.
+#   * MERGE REQUESTS TARGETING main ONLY, enforced by the `workflow:` block
+#     below. The gate runs at the one moment that matters — code asking to enter
+#     main — and not on every commit. `main` itself is a protected branch that
+#     no one may push to directly, so there is no second path into it that would
+#     need its own trigger.
+#
+# The three jobs below are the same read-only gates that pass in the project's
+# own QA log (`tools/release-check.sh`, `make check-static`, and the SCA scan);
+# they only read and judge, write nothing, and need no secrets — which is what
+# lets this pipeline satisfy the least-privilege OSPS controls recorded in
+# docs/ROADMAP.md.
+#
+# THIS FILE IS ONLY HALF THE GATE. A pipeline that runs but does not BLOCK is
+# advisory, and OSPS-QA-03.01 asks for enforcement. The other half is a project
+# setting that cannot live in the repository:
+#
+#     Settings > Merge requests > "Pipelines must succeed"
+#
+# Without that checkbox a red pipeline still permits a merge.
+
+# Workflow-global gate: if no rule matches, no pipeline is created at all —
+# nothing is cloned and no runner time is spent. This is the direct equivalent
+# of the retired pipeline's workflow-level `when:` clause.
+#
+# CI_MERGE_REQUEST_TARGET_BRANCH_NAME is only defined for merge_request_event
+# pipelines, so the first condition is what makes the second meaningful; an
+# ordinary push to any branch matches nothing and triggers nothing.
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+
+# One small, predictable base image for every job. The official `python:3-slim`
+# image (Debian slim underneath) ships the Python 3 interpreter the checks run
+# on — every tool imports only the standard library plus the repo's own
+# `potillus_repo`, so no pip step is ever needed. `make`, `git` and `file` are
+# the only additions. `git` matters for more than the clone: the checks discover
+# tracked files via `git ls-files`, and release-check reads the changelog/tag
+# state through git. The tag is intentionally unpinned (`3`, not `3.13`): the
+# checks are stdlib-only and version-agnostic, so tracking the current Python 3
+# keeps the runner cache-friendly without a pin to maintain.
+#
+# The `before_script` runs ahead of every job's `script`, so the three jobs below
+# state only what actually distinguishes them.
+default:
+  image: python:3-slim
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends make git file
+    # The runner clones as a different uid than the one that later runs the
+    # commands; git refuses to operate on a "dubious ownership" tree until the
+    # checkout is marked safe. `$PWD` is the cloned workspace (every job's
+    # default working directory) — shell-native, so it needs no CI variable.
+    # Harmless and standard for CI containers.
+    - git config --global --add safe.directory "$PWD"
+
+# A single stage: the three checks are independent and none consumes another's
+# output, so they run in parallel and a merge request gets all three verdicts at
+# once rather than stopping at the first failure.
+stages:
+  - check
+
+# The repository-wide release gate, in its strict mode: --Werror turns every
+# warning into an error, so a merge request cannot introduce a finding that a
+# release would later have to clear.
+release-check:
+  stage: check
+  script:
+    - bash tools/release-check.sh --Werror
+
+# The device-free static battery: check-ios-static (Swift symbol/length/test
+# linting reproduced in Python, so the Swift side is covered without a Mac),
+# UI-string parity, the bestpractices level map, and the VEX document.
+static-checks:
+  stage: check
+  script:
+    - make check-static
+
+# Software Composition Analysis on every merge request to main. This scans the
+# lockfiles committed in the tree (fastlane/Gemfile.lock and
+# ios/PotillusKit/Package.resolved) with osv-scanner's source scan — no SDK, no
+# build, so it stays light. It is the per-change counterpart to the
+# release-staging SCA gate, which additionally scans the FULL transitive SBOM
+# each build produces (the Android app graph a source scan cannot see without
+# Gradle); see make/release.mk and SECURITY.md. A finding fails this job, and
+# with "Pipelines must succeed" enabled a vulnerable dependency blocks the merge.
+dependency-scan:
+  stage: check
+  before_script:
+    # Replaces the default before_script: this job needs no make/git/file, but
+    # does need TLS roots and a downloader.
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends ca-certificates wget
+  script:
+    # Pinned to a specific release rather than `latest`, so the scanner version
+    # that gates a merge is reproducible and does not drift under us (the same
+    # discipline the pinned tool versions elsewhere follow), and matches the
+    # version the maintainer runs locally for the staging SBOM scan. The
+    # official, prebuilt Linux binary from the upstream release page.
+    - wget -qO /usr/local/bin/osv-scanner https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
+    - chmod +x /usr/local/bin/osv-scanner
+    # `scan source -r .` finds the lockfiles itself and honours osv-scanner.toml
+    # (the triage allowlist). Exit 1 on a finding fails the job by design.
+    - osv-scanner scan source -r --config=osv-scanner.toml .

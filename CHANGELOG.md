@@ -712,14 +712,25 @@ published asset is re-downloaded and checksum-matched, and the whole target is s
 to re-run after a partial failure. The token moves to
 `fastlane/gitlab-credentials.txt` (git-ignored).
 
-CI is gone for now: `.woodpecker.yml` was Codeberg-specific and is deleted rather
-than ported, so the project temporarily has no pipeline at all. Building the
-GitLab CI replacement is the first item of `docs/ROADMAP.md`. The affected badge
-answers are corrected downward rather than left standing: `OSPS-AC-04.01`,
-`OSPS-BR-01.01` and `OSPS-BR-01.03` return to N/A (their precondition, operating a
-pipeline, no longer holds), while `OSPS-QA-03.01` and `OSPS-VM-05.03` go to Unmet.
-`OSPS-QA-03.01` sits at OSPS Baseline Level 2, so that level is no longer complete
-— it holds exactly one unmet control and the CI pipeline restores it on its own.
+CI moves forge with everything else. `.woodpecker.yml` was Codeberg-specific and
+is deleted rather than ported; a new `.gitlab-ci.yml` takes its place with the
+same deliberately narrow scope — checks only, never a build, on a plain
+`python:3-slim` image with no pip step. Three jobs run in parallel:
+`tools/release-check.sh --Werror`, `make check-static`, and a `dependency-scan`
+running osv-scanner (pinned to v2.4.0, as locally) over the committed lockfiles.
+A `workflow:` rule restricts it to merge requests targeting `main`, so an
+ordinary push creates no pipeline at all; `main` is protected against direct
+pushes, so there is no second path in that would need a trigger.
+
+The badge answers are NOT revised on the strength of the file existing. A
+pipeline that runs without blocking is advisory, and the criteria ask for
+enforcement, which lives in a project setting rather than the repository
+(*Merge requests > "Pipelines must succeed"*). Until that is enabled and a green
+run exists to point at, the post-migration values stand: `OSPS-AC-04.01`,
+`OSPS-BR-01.01` and `OSPS-BR-01.03` at N/A (their precondition, operating a
+pipeline, did not hold when they were answered), `OSPS-QA-03.01` and
+`OSPS-VM-05.03` at Unmet. `OSPS-QA-03.01` sits at OSPS Baseline Level 2, so that
+level is not complete until the setting is turned on.
 
 Two things improve. `hardened_site` (gold) moves to Met: GitLab sends all four
 hardening headers the criterion asks for, which the previous host did not. And the
