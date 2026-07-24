@@ -127,11 +127,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: zizmorcore/zizmor-action@6599ee8b7a49aef6a770f63d261d214911a7ce02 # v0.6.0
+      - uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
         with:
           # The action's default is `latest`, which would silently change what
           # runs from one day to the next -- the exact drift the SHA pins above
           # exist to prevent. Pin the tool as well as the action wrapping it.
+          #
+          # THESE TWO PINS ARE COUPLED. The action does not fetch an arbitrary
+          # version: it ships a table of version-to-image-digest pairs and refuses
+          # anything absent from it, with the message "Unknown version: X". So a
+          # zizmor release is only usable here once an action release has shipped
+          # its digest -- v0.6.0 stopped at 1.27.0, and reaching 1.28.0 required
+          # moving the action to v0.6.1. When raising `version`, check
+          # support/versions in the action tag being used, and raise the action
+          # first if necessary.
           version: 1.28.0
           # `pedantic` reports findings a `regular` run leaves out. With a
           # handful of workflow files maintained by one person, the extra noise
