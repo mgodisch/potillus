@@ -32,9 +32,6 @@ apply to it are stated in the accompanying COPYING.md file.
 [![OpenSSF Baseline](https://www.bestpractices.dev/projects/13480/baseline)](https://www.bestpractices.dev/projects/13480)
 [![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
-[![Android checks](https://github.com/mgodisch/potillus/actions/workflows/android.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/android.yml)
-[![iOS checks](https://github.com/mgodisch/potillus/actions/workflows/ios.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/ios.yml)
-[![CodeQL](https://github.com/mgodisch/potillus/actions/workflows/codeql.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/codeql.yml)
 
 The last three badges report supplementary checks that run on the project's
 read-only GitHub mirror, because they need machines the canonical GitLab
