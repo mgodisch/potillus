@@ -33,13 +33,6 @@ apply to it are stated in the accompanying COPYING.md file.
 [![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
 
-The last three badges report supplementary checks that run on the project's
-read-only GitHub mirror, because they need machines the canonical GitLab
-pipeline does not have — an Android SDK, an emulator, macOS. They are additions,
-not the gate: the merge-blocking pipeline is
-[.gitlab-ci.yml](.gitlab-ci.yml). See
-[docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md).
-
 ## About the App (v0.84.0)
 
 **Libellus Potionis** is a privacy-first, free, open-source, and ad-free
