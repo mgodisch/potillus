@@ -1,0 +1,171 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# Android: build the app, lint it, run the JVM unit tests.
+#
+# WHY THIS RUNS ON THE MIRROR AND NOT ON GITLAB
+#   The GitLab pipeline (.gitlab-ci.yml) is deliberately device-free: it runs the
+#   `tools/` checks that reproduce on a plain Linux container what would otherwise
+#   need an SDK, and it never builds. A real Android build needs the SDK, an
+#   accepted license set and several minutes of runner time -- which the free
+#   GitLab tier meters and a public GitHub repository does not. So the Android
+#   build lives here, on the mirror, as an ADDITION to the canonical pipeline and
+#   never as a replacement for it: this workflow cannot block a merge request on
+#   GitLab, and the checks it runs are the ones a release would run anyway.
+#
+# IT RUNS THE MAKEFILE, NOT ITS OWN GRADLE INVOCATIONS
+#   Every step below calls a target of android/Makefile rather than spelling out
+#   `./gradlew ...`. The Makefile is where the toolchain assertions, the generated
+#   sources (bundled license copies, localized guides) and the task names already
+#   live; duplicating them here would create a second definition of "build the
+#   Android app" that could drift from the one the maintainer runs locally. If a
+#   target changes, this workflow follows for free.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.
+
+name: android
+
+# Every branch is mirrored, so this fires while a merge request is still open on
+# GitLab -- which is the only way the result can be useful before a merge rather
+# than after it. Branch refs only: a mirrored release tag starts nothing.
+on:
+  push:
+    branches: ['**']
+
+permissions:
+  contents: read
+
+# A mirror updates by force-push; a rebased topic branch can arrive repeatedly
+# within a minute. Cancel the superseded run rather than paying for a verdict on
+# a commit that no longer exists.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # One job, not three. Each of lint, tests and coverage needs the same JDK,
+    # the same SDK and the same warmed Gradle cache; splitting them would pay for
+    # that setup three times to save nothing, since they are fast once it exists.
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      # Android Lint's findings are uploaded as SARIF to the repository's
+      # Security tab, which is a write to the code-scanning API. It is the only
+      # elevated scope this job holds, and nothing else in the job uses it.
+      security-events: write
+
+    steps:
+      # Pinned to a commit SHA, like every action in this directory -- a tag can
+      # be re-pointed by its author, a SHA cannot. The trailing comment names the
+      # release the SHA belongs to; it is documentation, not configuration.
+      #
+      # persist-credentials: false leaves no usable token in .git/config for the
+      # rest of the job. Nothing here pushes, and a checkout that cannot write is
+      # one less thing a compromised build step could abuse.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Java 21, matching JAVA_VERSION in android/Makefile and
+      # compileOptions.sourceCompatibility / compilerOptions.jvmTarget in
+      # android/app/build.gradle.kts. The Makefile's `java` prerequisite asserts
+      # the major version and fails loudly on a mismatch, so a drifting runner
+      # image is reported rather than silently compiled against.
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # The SDK components android/Makefile's `android` prerequisite asserts, in
+      # the same versions docs/INSTALL-ANDROID.md tells a human to install:
+      # compileSdk = 36 needs platforms;android-36, packaging needs build-tools,
+      # and platform-tools carries adb. The action sets ANDROID_HOME and
+      # ANDROID_SDK_ROOT; the Makefile declares ANDROID_HOME with `?=`, so the
+      # environment wins and no path has to be passed in.
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-36
+            build-tools;36.0.0
+
+      # Caches the Gradle user home (wrapper distribution, dependency jars,
+      # build cache) between runs. By default the action only WRITES the cache
+      # from the repository's default branch and reads it elsewhere, which is
+      # what keeps a topic branch from poisoning the shared cache.
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # ktlint + Android Lint. Both gates are already strict in the build script
+      # (abortOnError and warningsAsErrors are on), so this step fails on a
+      # warning, exactly as a local `make lint` does.
+      - name: Lint (ktlint + Android Lint)
+        run: make -C android lint
+
+      # Upload the SARIF report even when the previous step failed -- especially
+      # then, since a failing lint run is precisely the one whose findings are
+      # worth reading in the Security tab instead of in a job log.
+      #
+      # `hashFiles` returns an empty string when nothing matches, which is how
+      # this distinguishes "lint ran and found things" from "lint never got to
+      # run because ktlint failed first". Uploading a missing file would fail the
+      # step and mask the real error.
+      #
+      # The path is Android Lint's default output for the debug variant
+      # (`lint-results-<variant>.sarif` under the module's build/reports/), and
+      # the project is single-module (settings.gradle.kts includes only :app), so
+      # there is exactly one file and no merging step is needed.
+      - name: Upload lint findings to code scanning
+        if: always() && hashFiles('android/app/build/reports/lint-results-debug.sarif') != ''
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          sarif_file: android/app/build/reports/lint-results-debug.sarif
+          category: android-lint
+
+      # The JVM unit tests (testDebugUnitTest). The on-device instrumentation
+      # tests are NOT run here: they need an emulator, and adding one is a
+      # separate, much heavier step that is deliberately left for later.
+      - name: Unit tests
+        run: make -C android unit-tests
+
+      # The Kover coverage floor, the same gate a release has to pass.
+      - name: Coverage floor
+        run: make -C android cover-check
+
+      # The human-readable reports, kept for the cases where the SARIF summary is
+      # not enough -- a failed test's HTML output, the lint report with its
+      # explanations. Retained briefly: this is debugging material for a run
+      # someone is looking at now, not an archive.
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-reports
+          path: |
+            android/app/build/reports/
+          retention-days: 7
+          if-no-files-found: ignore

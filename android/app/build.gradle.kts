@@ -565,6 +565,15 @@ android {
         //   advisory, added to `disable` with a documented rationale.
         abortOnError = true
         warningsAsErrors = true
+        // Additionally write the report in SARIF (the OASIS interchange format
+        // static-analysis tools agree on). This costs nothing locally -- one
+        // extra file next to the HTML and XML reports lint already writes -- and
+        // is what lets the GitHub mirror's `android` workflow hand the findings
+        // to code scanning instead of leaving them in a job log. Without a
+        // `sarifOutput` path lint uses its default,
+        // build/reports/lint-results-<variant>.sarif, which is the path
+        // .github/workflows/android.yml reads.
+        sarifReport = true
         // Each id below is opted out for the stated reason; re-enable any of them
         // if the project's policy changes.
         disable += setOf(

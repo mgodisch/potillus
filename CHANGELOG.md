@@ -577,6 +577,21 @@ target, scheme, and paths; the `potillus_repo` helper) and in the historical rel
 notes that recorded the original rename; changing those would break builds or rewrite
 history.
 
+### Infrastructure: run supplementary checks on the GitHub mirror
+
+The mirror at `github.com/mgodisch/potillus` now runs two GitHub Actions
+workflows: an Android job (`make -C android lint`, `unit-tests`, `cover-check`,
+with the Android Lint findings uploaded to code scanning as SARIF — hence the new
+`sarifReport` in `app/build.gradle.kts`) and a meta job that lints the workflows
+themselves with actionlint and zizmor. They run on a push to any branch, so a
+merge request under review on GitLab gets the result while it is still open. They
+are additions to the canonical pipeline, never a replacement: they cannot block a
+merge, they hold no secrets, and every action is pinned to a commit SHA under
+`contents: read`. Private vulnerability reporting, Dependabot alerts (without its
+unusable pull requests) and secret scanning are enabled alongside them.
+`docs/MIRROR-CHECKS.md` is the new reference; `SECURITY.md`, `CONTRIBUTING.md`,
+`README.md` and the roadmap point at it.
+
 ### Docs: note the GitHub mirror
 
 A read-only push mirror is maintained at `github.com/mgodisch/potillus`. The

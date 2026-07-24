@@ -121,6 +121,13 @@ If you are unable to use PGP, still write to android@godisch.de or
 ios@godisch.de; the maintainer will arrange a secure channel before you share
 any sensitive details.
 
+As an alternative to e-mail, a report may also be filed through **private
+vulnerability reporting** on the project's GitHub mirror
+(<https://github.com/mgodisch/potillus/security/advisories/new>). That form is
+confidential — it is not a public issue — and it reaches the same maintainer. It
+is offered because it needs no PGP setup on the reporter's side; the e-mail
+route above remains the primary one.
+
 ## What to include
 
 To help triage and reproduce the issue, please include where possible:
@@ -216,6 +223,16 @@ network communication and requests a minimal permission set, the exposure from
 dependency vulnerabilities is limited, but they are tracked and addressed
 regardless. This check is part of the release checklist in
 [CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
+
+Alongside these two gates there is a third, advisory source: **Dependabot
+alerts** are enabled on the GitHub mirror, so the GitHub Advisory Database is
+consulted in addition to the OSV data osv-scanner uses. An alert is a
+notification only — it gates nothing, and Dependabot's version-update pull
+requests are deliberately disabled, since a pull request on a force-pushed
+mirror cannot be merged. Anything it reports is triaged exactly like an
+osv-scanner finding, in `osv-scanner.toml` and `openvex.json` on the canonical
+repository. See [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md) for the mirror's
+scope and its limits.
 
 The same discipline applies to dependency licenses: every third-party
 dependency must be under a license compatible with the project's

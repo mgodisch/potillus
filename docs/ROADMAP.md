@@ -280,6 +280,28 @@ instead. Two prerequisites remain before the badge can be pursued honestly:
 Until both are done the badge is not linked, because publishing a score that
 understates the project's real posture would be worse than publishing none.
 
+The GitHub mirror now carries supplementary GitHub Actions checks (an Android
+build with lint and unit tests, plus `actionlint`/`zizmor` over the workflows
+themselves — see [MIRROR-CHECKS.md](MIRROR-CHECKS.md)). This does **not** change
+the conclusion above: Scorecard must still be pointed at GitLab, where the
+development, review and release activity actually is. The mirror workflows are
+relevant to the badge in one narrow way only — they are the surface
+Dangerous-Workflow and Token-Permissions measure, which is why every action is
+SHA-pinned and every file declares `contents: read`. Two follow-ups remain open
+there:
+
+- **Extend the mirror checks to iOS.** A macOS runner would, for the first time,
+  build the iOS app and run its XCTest suite outside the maintainer's own Mac,
+  and would replace the Python reimplementations in `tools/check-swift-*.py`
+  with real SwiftLint for the duration of that run (the reimplementations stay:
+  they are what keeps the Swift side covered on the canonical, Linux-only
+  pipeline).
+- **Decide on dependency submission.** Dependabot cannot see the Android
+  dependency graph without a submitted graph, and submitting one needs
+  `contents: write` on the mirror. The write scope has been declined for now;
+  the consequence is that Dependabot's coverage there is limited to the
+  committed lockfiles, which the GitLab scan already covers.
+
 ## Working toward OpenSSF Baseline Level 3
 
 Baseline Levels 1 and 2 are complete. Level 2 briefly lost `OSPS-QA-03.01`

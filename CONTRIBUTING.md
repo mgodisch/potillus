@@ -85,10 +85,12 @@ participation in the project is expected to follow our
    `./gradlew test` must pass and `tools/release-check.sh` must stay green.
 4. **Review and merge.** The maintainer reviews every merge request and is the
    sole merger. Expect review comments; a change is merged only once it builds,
-   its tests pass, and it upholds the documented conventions. There is no
-   separate CI service — the maintainer runs the build and the release gate
-   locally as part of the review. The project's decision-making model and roles
-   are described in [GOVERNANCE.md](docs/GOVERNANCE.md).
+   its tests pass, and it upholds the documented conventions. A merge request
+   must pass the CI pipeline ([.gitlab-ci.yml](.gitlab-ci.yml)), which is a
+   required check; the parts CI cannot cover — the device-bound builds and
+   tests — the maintainer runs locally as part of the review. The project's
+   decision-making model and roles are described in
+   [GOVERNANCE.md](docs/GOVERNANCE.md).
 
 ### Good first issues
 
@@ -194,9 +196,14 @@ git push --force-with-lease
 
 Every change is reviewed before it is merged. Because the project currently has a
 single maintainer, the maintainer is the reviewer and the sole merger; external
-contributions are reviewed as merge requests (or emailed patch series). Until a
-continuous-integration service is in place, the reviewer runs the full build, the
-test suite, and the release gate locally as part of each review.
+contributions are reviewed as merge requests (or emailed patch series). Automated
+checks run before a merge — the GitLab pipeline ([.gitlab-ci.yml](.gitlab-ci.yml))
+is a required check, and the GitHub mirror adds an Android build, lint and unit
+tests that the canonical pipeline does not carry (see
+[docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md); those are advisory and cannot
+block a merge). What no runner covers — the on-device instrumentation tests, the
+iOS build, and the release gate in full — the reviewer runs locally as part of
+each review.
 
 A change is reviewed against this checklist — the same requirements a contributor
 is expected to have met (Section 2, step 3):

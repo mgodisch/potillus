@@ -1,0 +1,128 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# Meta-check: lint the workflows in this directory.
+#
+# WHY THIS EXISTS AND WHY IT COMES FIRST
+#   Everything under .github/workflows/ runs on GitHub's infrastructure with a
+#   token attached, which makes these files the most security-sensitive YAML in
+#   the repository -- more so than .gitlab-ci.yml, whose jobs hold no secrets and
+#   never write. Two OpenSSF Scorecard checks measure exactly this surface
+#   (Token-Permissions and Dangerous-Workflow), and both currently score 10
+#   because the project had no workflows at all. Introducing workflows without a
+#   guard would be the one change that could lower them, so the guard is
+#   introduced in the same step as the first workflow.
+#
+#   Two independent tools, because they answer different questions:
+#     * actionlint -- is this valid workflow YAML? Unknown keys, bad `runs-on`
+#       labels, broken `${{ }}` expressions, shellcheck over every `run:` block.
+#       Catches the mistakes that would otherwise be discovered by a failed run.
+#     * zizmor -- is this workflow SAFE? Template injection through untrusted
+#       `${{ github.* }}` context, over-broad permissions, unpinned actions,
+#       credential leaks. This is the Dangerous-Workflow class of finding.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- what this workflow is part of, what it deliberately
+#   does not do, and the repository settings it assumes.
+
+name: meta
+
+# Every branch is mirrored from GitLab, so a push here is a push to any branch of
+# the canonical repository -- including the topic branch of an open merge
+# request. That is the moment the feedback is worth something. Tag pushes are
+# NOT matched: `branches: ['**']` covers branch refs only, so a release tag
+# arriving through the mirror starts nothing.
+on:
+  push:
+    branches: ['**']
+
+# Least privilege, declared once at the top so no job can silently inherit more.
+# `contents: read` is the minimum a checkout needs; the zizmor job adds the one
+# extra scope it needs, at job level, where it is visible.
+permissions:
+  contents: read
+
+# Force-push is how a mirror updates, and a rebased branch can arrive several
+# times in a minute. Without this, each arrival would queue another full run and
+# the results would report on commits nobody is looking at any more. Grouping per
+# workflow and ref, cancelling the older run, keeps only the newest answer.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Syntax and shell correctness of the workflow files.
+  # ---------------------------------------------------------------------------
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to a full commit SHA rather than a tag throughout this
+      # directory. A tag is a movable pointer the action's author can re-point at
+      # any time; a SHA cannot be changed without changing the SHA. This is what
+      # Scorecard's Pinned-Dependencies check asks for, and it is the same
+      # discipline the project already applies to its Gradle and SwiftPM
+      # dependencies. The `# vX.Y.Z` comment records which release the SHA is, so
+      # a human can still read the file -- it has no effect on what runs.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # actionlint ships no first-party GitHub Action, so it is run from its
+      # official container image, pinned by digest for the same reason SHAs are
+      # used above. The image bundles shellcheck, so `run:` blocks are checked
+      # too. A container action mounts the workspace and runs in it, so actionlint
+      # finds .github/workflows/ without being told where to look.
+      - uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 # 1.7.12
+        with:
+          args: -color
+
+  # ---------------------------------------------------------------------------
+  # Security audit of the workflow files.
+  # ---------------------------------------------------------------------------
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # zizmor reports its findings as SARIF into the repository's Security tab
+      # (its `advanced-security` input, on by default) rather than only into a
+      # job log that scrolls away. Writing there needs this scope, and this job
+      # is the only one in this file that gets it.
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: zizmorcore/zizmor-action@6599ee8b7a49aef6a770f63d261d214911a7ce02 # v0.6.0
+        with:
+          # The action's default is `latest`, which would silently change what
+          # runs from one day to the next -- the exact drift the SHA pins above
+          # exist to prevent. Pin the tool as well as the action wrapping it.
+          version: 1.28.0
+          # `pedantic` reports findings a `regular` run leaves out. With a
+          # handful of workflow files maintained by one person, the extra noise
+          # is affordable and the extra coverage is the point.
+          persona: pedantic
