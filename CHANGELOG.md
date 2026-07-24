@@ -597,7 +597,25 @@ checks stay — they are what covers the Swift side on the Linux-only canonical
 pipeline. Private vulnerability reporting, Dependabot alerts (without its
 unusable pull requests) and secret scanning are enabled alongside them.
 `docs/MIRROR-CHECKS.md` is the new reference; `SECURITY.md`, `CONTRIBUTING.md`,
-`README.md` and the roadmap point at it.
+`README.md` and the roadmap point at it. A `mirror-checks` job in
+`.gitlab-ci.yml` reports the mirror's verdict for the commit under review into
+the merge request -- without a token, since the mirror is public, and
+`allow_failure`, since it informs rather than gates.
+
+### OpenSSF: record what the new checks actually settle
+
+Two CII Best Practices criteria move to Met in `.bestpractices.json`:
+`static_analysis_often` (ktlint, Android Lint and real SwiftLint per change,
+CodeQL weekly) and `automated_integration_testing` (unit, instrumentation and
+PotillusKit suites per change). Both ask whether a practice is carried out, not
+whether it blocks a merge -- a distinction `docs/ROADMAP.md` previously blurred
+and now spells out, together with why the enforcement-shaped controls
+(`OSPS-QA-03.01`, `OSPS-QA-06.01`) are untouched by an advisory mirror.
+`test_branch_coverage80` stays Unmet but is now within reach. CodeQL is recorded
+as machine evidence in `docs/ASSURANCE_CASE.md` and named in `SECURITY.md`
+alongside osv-scanner and Dependabot. New: `security-insights.yml`, the OpenSSF
+machine-readable security statement (schema v2.2.0), pointing at the documents
+that already carry each fact.
 
 ### Docs: note the GitHub mirror
 

@@ -1,0 +1,200 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# OpenSSF Security Insights (https://security-insights.openssf.org/), schema
+# v2.2.0. A machine-readable statement of things a project must assert about
+# itself -- the gap between SECURITY.md, which a human reads, and an SBOM, which
+# a machine reads but which says nothing about process.
+#
+# EVERYTHING HERE IS A POINTER, NOT A SECOND SOURCE OF TRUTH. Each value restates
+# something already documented elsewhere in this repository (SECURITY.md,
+# GOVERNANCE.md, docs/MIRROR-CHECKS.md, .bestpractices.json). If any of those
+# change, this file has to follow -- which is what `header.last-reviewed` is for.
+# Nothing may be asserted here that is not true and demonstrable there.
+#
+# Validate with `cue vet` against the schema published with the specification's
+# latest release; see the Get Started guide on the site above.
+
+header:
+  schema-version: 2.0.0
+  last-updated: '2026-07-24'
+  last-reviewed: '2026-07-24'
+  # The canonical location of this file, so a reader who found it inside a
+  # release artifact or on the mirror can get back to the authoritative copy.
+  url: https://gitlab.com/godisch/potillus/-/raw/main/security-insights.yml
+  comment: |
+    The canonical repository is gitlab.com/godisch/potillus. The GitHub
+    repository is a read-only push mirror; it carries no development, but it does
+    run supplementary quality and security checks that the canonical pipeline
+    cannot (an Android SDK build, an emulator suite, a macOS build, CodeQL). See
+    docs/MIRROR-CHECKS.md.
+
+project:
+  name: Libellus Potionis
+  homepage: https://gitlab.com/godisch/potillus
+  roadmap: https://gitlab.com/godisch/potillus/-/blob/main/docs/ROADMAP.md
+  administrators:
+    - name: Martin A. Godisch
+      email: martin@godisch.de
+      primary: true
+  repositories:
+    - name: potillus
+      url: https://gitlab.com/godisch/potillus
+      comment: |
+        The canonical repository: both apps (Android and iOS), the shared
+        documentation, and the release tooling.
+  documentation:
+    code-of-conduct: https://gitlab.com/godisch/potillus/-/blob/main/docs/CODE_OF_CONDUCT.md
+    release-process: https://gitlab.com/godisch/potillus/-/blob/main/docs/RELEASE-IOS.md
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    policy: https://gitlab.com/godisch/potillus/-/blob/main/SECURITY.md
+    contact:
+      name: Martin A. Godisch
+      email: android@godisch.de
+      primary: true
+    comment: |
+      Report by email to android@godisch.de or ios@godisch.de, PGP-encrypted if
+      possible; the key and fingerprint are in SECURITY.md. Alternatively, use
+      private vulnerability reporting on the GitHub mirror at
+      https://github.com/mgodisch/potillus/security/advisories/new -- confidential,
+      and reaching the same maintainer. Do not open a public issue.
+
+repository:
+  url: https://gitlab.com/godisch/potillus
+  # repostatus.org vocabulary: actively developed, usable, changes expected.
+  status: active
+  accepts-change-request: true
+  # Automated change requests are NOT accepted. This is a deliberate policy, not
+  # an omission: Dependabot's version-update pull requests are disabled on the
+  # mirror because a pull request against a force-pushed mirror can never be
+  # merged, and the canonical repository takes changes through merge requests
+  # opened by people.
+  accepts-automated-change-request: false
+  core-team:
+    - name: Martin A. Godisch
+      email: martin@godisch.de
+      primary: true
+  documentation:
+    contributing-guide: https://gitlab.com/godisch/potillus/-/blob/main/CONTRIBUTING.md
+    governance: https://gitlab.com/godisch/potillus/-/blob/main/docs/GOVERNANCE.md
+    review-policy: https://gitlab.com/godisch/potillus/-/blob/main/CONTRIBUTING.md
+    security-policy: https://gitlab.com/godisch/potillus/-/blob/main/SECURITY.md
+    dependency-management-policy: https://gitlab.com/godisch/potillus/-/blob/main/SECURITY.md
+  license:
+    url: https://gitlab.com/godisch/potillus/-/blob/main/LICENSES/GPL-3.0-or-later.txt
+    expression: GPL-3.0-or-later
+  security:
+    assessments:
+      self:
+        name: Assurance case and security review record
+        evidence: https://gitlab.com/godisch/potillus/-/blob/main/docs/ASSURANCE_CASE.md
+        date: '2026-07-24'
+        comment: |
+          A written assurance case: security requirements, threat model, trust
+          boundaries, the argument that secure design principles were applied and
+          that the common implementation weakness classes relevant to a local,
+          offline mobile app are countered, and a review record. Residual risks
+          are stated explicitly rather than claimed to be mitigated. No
+          third-party assessment has been commissioned.
+    champions:
+      - name: Martin A. Godisch
+        email: martin@godisch.de
+        primary: true
+    tools:
+      - name: osv-scanner
+        type: SCA
+        version: 2.4.0
+        rulesets:
+          - default
+        integration:
+          # Not scheduled; runs per change and per release.
+          adhoc: false
+          ci: true
+          release: true
+        comment: |
+          Scans the committed lockfiles on every merge request to main
+          (.gitlab-ci.yml), pinned by version and by the checksum of the release
+          binary. The release gate additionally scans the full transitive SBOM
+          each build produces, which a source scan cannot see for the Android
+          dependency graph without Gradle. Findings are triaged in
+          osv-scanner.toml and openvex.json.
+      - name: CodeQL
+        type: SAST
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+        comment: |
+          Analyses Kotlin/Java and Swift on the GitHub mirror, weekly and on every
+          change to main (.github/workflows/codeql.yml), in `manual` build mode
+          because neither language supports database construction without a real
+          build. Advisory: it does not gate a merge. Findings are triaged in
+          GitHub code scanning and substantiated ones recorded in
+          docs/ASSURANCE_CASE.md.
+      - name: Android Lint
+        type: SAST
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: true
+        comment: |
+          Configured as a build gate (abortOnError, warningsAsErrors in
+          android/app/build.gradle.kts), so no release can be produced while it
+          reports anything. Runs per change on the mirror, which uploads its
+          findings to GitHub code scanning as SARIF.
+      - name: SwiftLint
+        type: SAST
+        version: 0.65.0
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: true
+        comment: |
+          Run in --strict mode at a pinned version, so a warning fails the build.
+          Runs per change on the macOS runner of the mirror; the canonical
+          Linux-only pipeline covers the same ground with Python
+          reimplementations (tools/check-swift-*.py).
+      - name: zizmor
+        type: SAST
+        version: 1.28.0
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        comment: |
+          Audits the GitHub Actions workflow files themselves -- template
+          injection, over-broad permissions, unpinned actions -- in the
+          `pedantic` persona, alongside actionlint
+          (.github/workflows/meta.yml).

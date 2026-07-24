@@ -150,3 +150,100 @@ dependency-scan:
     # `scan source -r .` finds the lockfiles itself and honours osv-scanner.toml
     # (the triage allowlist). Exit 1 on a finding fails the job by design.
     - osv-scanner scan source -r --config=osv-scanner.toml .
+
+# Reports the GitHub mirror's verdict for THIS commit into the merge request.
+#
+# WHY THIS EXISTS
+#   The mirror runs the checks this pipeline cannot (an Android build with lint
+#   and unit tests, an iOS build on macOS, the emulator suite, CodeQL — see
+#   docs/MIRROR-CHECKS.md). Their results live on GitHub, which means a reviewer
+#   has to remember to go and look. This job brings the answer to where the
+#   decision is made.
+#
+# WHY IT CANNOT BLOCK, AND WHY THAT IS FINE
+#   `allow_failure: true`: a red or missing mirror result must never fail this
+#   pipeline. Two reasons. GitLab's external status checks are an Ultimate
+#   feature, so this is a report and not a gate however it is written. And the
+#   mirror is asynchronous — a push reaches GitHub within about five minutes and
+#   the macOS build takes far longer, so at the moment this job runs the answer
+#   is routinely "not finished yet". Failing on that would train reviewers to
+#   ignore the job, which is worse than no job at all.
+#
+# WHY THERE IS NO TOKEN
+#   The mirror is a public repository, and the check-runs endpoint is readable
+#   without authentication. This pipeline deliberately holds no credentials —
+#   that property is what several of the least-privilege OSPS answers in
+#   .bestpractices.json rest on — and one convenience report is not worth
+#   spending it. The cost is GitHub's unauthenticated rate limit (60 requests per
+#   hour per source address, shared across GitLab's runner fleet), so a 403 is an
+#   expected outcome and is reported as "unknown", not as a failure.
+#
+# Implemented in Python rather than curl+jq: the base image already has the
+# interpreter, the standard library covers HTTP and JSON, and no package needs
+# installing — the same reasoning the tools/ checks follow.
+mirror-checks:
+  stage: check
+  allow_failure: true
+  before_script:
+    # Replaces the default before_script: no make, git or file needed here, but
+    # TLS roots are, since the job talks to api.github.com.
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends ca-certificates
+  variables:
+    GITHUB_MIRROR_REPO: mgodisch/potillus
+  script:
+    - |
+      python3 - <<'PY'
+      import json, os, sys, urllib.error, urllib.request
+
+      # In a plain merge-request pipeline CI_COMMIT_SHA is the source branch head,
+      # which is the commit the mirror carries. In a merged-results pipeline it is
+      # a synthetic merge commit that exists only on GitLab, and
+      # CI_MERGE_REQUEST_SOURCE_BRANCH_SHA holds the real one; preferring it when
+      # present keeps this correct under either setting.
+      sha = (os.environ.get("CI_MERGE_REQUEST_SOURCE_BRANCH_SHA")
+             or os.environ["CI_COMMIT_SHA"])
+      repo = os.environ["GITHUB_MIRROR_REPO"]
+      url = f"https://api.github.com/repos/{repo}/commits/{sha}/check-runs"
+
+      req = urllib.request.Request(url, headers={
+          "Accept": "application/vnd.github+json",
+          "User-Agent": "potillus-ci",
+      })
+      try:
+          with urllib.request.urlopen(req, timeout=30) as resp:
+              data = json.load(resp)
+      except urllib.error.HTTPError as exc:
+          # 403 is the rate limit, 404 means the commit has not been mirrored yet.
+          # Neither says anything about the code, so neither is reported as bad.
+          print(f"Mirror status unknown (HTTP {exc.code}) for {sha[:12]}.")
+          sys.exit(0)
+      except OSError as exc:
+          print(f"Mirror status unknown (network error: {exc}) for {sha[:12]}.")
+          sys.exit(0)
+
+      runs = data.get("check_runs", [])
+      if not runs:
+          print(f"No mirror checks for {sha[:12]} yet — the push may still be "
+                f"propagating, or the workflows did not apply to this change.")
+          sys.exit(0)
+
+      print(f"GitHub mirror checks for {sha[:12]}:")
+      bad = []
+      for run in sorted(runs, key=lambda r: r.get("name") or ""):
+          name = run.get("name") or "?"
+          status = run.get("status") or "?"
+          conclusion = run.get("conclusion") or "(pending)"
+          print(f"  {name:24s} {status:12s} {conclusion}")
+          if conclusion in ("failure", "timed_out", "action_required"):
+              bad.append(name)
+
+      print()
+      print(f"See https://github.com/{repo}/commit/{sha}/checks")
+      if bad:
+          # Exits non-zero so the job is visibly amber in the merge request, but
+          # allow_failure keeps the pipeline green: this is information for the
+          # reviewer, not a verdict on the change.
+          print(f"Failing on the mirror: {', '.join(bad)}")
+          sys.exit(1)
+      PY

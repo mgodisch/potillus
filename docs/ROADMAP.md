@@ -308,13 +308,31 @@ there:
 CodeQL also runs there now, over Kotlin and Swift, weekly and on `main`. It adds
 a class of analysis the project had on neither platform: data flow across
 functions and files, rather than the per-file reasoning ktlint, Android Lint,
-SwiftLint and the `tools/` scripts do. Note carefully what this does **not**
-settle. `static_analysis_often` and `OSPS-QA-06.01` are judged on the pipeline
-that actually gates a change, and that remains the GitLab one; an advisory
-analysis on a mirror does not make a criterion Met, and claiming otherwise would
-be exactly the kind of overstatement the badge answers are meant to avoid. The
-items above — a scheduled pipeline, an SDK-bearing image — are still the path to
-those criteria.
+SwiftLint and the `tools/` scripts do.
+
+Two different questions have to be kept apart here, and an earlier version of
+this section ran them together.
+
+*Does a criterion ask whether a check GATES a change?* Then the mirror does not
+help. `OSPS-QA-03.01` and `OSPS-QA-06.01` are about enforcement, and enforcement
+lives in the GitLab pipeline together with *Merge requests > "Pipelines must
+succeed"*. A workflow that cannot block a merge cannot satisfy them, and the
+items above — a scheduled pipeline, an SDK-bearing image — remain the path.
+
+*Or does it ask whether a PRACTICE is carried out?* Then the mirror settles it,
+because the practice is now real regardless of where the machine stands. Two CII
+Best Practices criteria fall in this group and have moved to Met in
+`.bestpractices.json`:
+
+- **`static_analysis_often`** — ktlint, Android Lint and real SwiftLint run on
+  every push to every branch, CodeQL weekly and on `main`. Both halves of the
+  criterion's wording are now answered.
+- **`automated_integration_testing`** — the JVM unit tests, the Android
+  instrumentation suite and the PotillusKit suite all run per change.
+
+`test_branch_coverage80` stays Unmet but is, for the first time, within reach:
+Kover would have to report branch coverage in addition to line coverage, and the
+figure would then be produced automatically on every run rather than by hand.
 
 ## Working toward OpenSSF Baseline Level 3
 

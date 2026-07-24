@@ -34,6 +34,14 @@ apply to it are stated in the accompanying COPYING.md file.
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
 [![Android checks](https://github.com/mgodisch/potillus/actions/workflows/android.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/android.yml)
 [![iOS checks](https://github.com/mgodisch/potillus/actions/workflows/ios.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/ios.yml)
+[![CodeQL](https://github.com/mgodisch/potillus/actions/workflows/codeql.yml/badge.svg)](https://github.com/mgodisch/potillus/actions/workflows/codeql.yml)
+
+The last three badges report supplementary checks that run on the project's
+read-only GitHub mirror, because they need machines the canonical GitLab
+pipeline does not have — an Android SDK, an emulator, macOS. They are additions,
+not the gate: the merge-blocking pipeline is
+[.gitlab-ci.yml](.gitlab-ci.yml). See
+[docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md).
 
 ## About the App (v0.84.0)
 

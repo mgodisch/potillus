@@ -217,3 +217,16 @@ compromised device, forensic access to an unlocked device, active screen capture
 on iOS, and exported files) are documented rather than claimed to be mitigated;
 and no unresolved high-severity issues are known. This record is updated whenever
 a further review is performed.
+
+Since 2026-07, the manual argument above is complemented by a machine one.
+CodeQL analyses both languages — Kotlin/Java and Swift — weekly and on every
+change to `main`, on the project's GitHub mirror, where the builds each language
+needs can actually run (see [MIRROR-CHECKS.md](MIRROR-CHECKS.md)). This is a
+different kind of evidence from everything else cited in this document: the
+`tools/` checks, ktlint, Android Lint and SwiftLint all reason about one file at
+a time, whereas CodeQL reasons about data flow across functions and files, which
+is the level at which the weakness classes in the section above would actually
+manifest. Its findings are triaged in GitHub's code-scanning view, and anything
+substantiated is recorded here as part of the next review. The analysis is
+advisory and does not gate a merge; the enforcing gate remains the GitLab
+pipeline.

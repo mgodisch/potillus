@@ -234,6 +234,14 @@ osv-scanner finding, in `osv-scanner.toml` and `openvex.json` on the canonical
 repository. See [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md) for the mirror's
 scope and its limits.
 
+Dependency scanning answers what the project *consumes*; the project's own code
+is analysed separately by **CodeQL**, over both Kotlin and Swift, weekly and on
+every change to `main`. Unlike the linters, which judge a file at a time, CodeQL
+follows data flow across functions and files. It too runs on the mirror, it too
+is advisory, and its findings are triaged in GitHub's code-scanning view;
+substantiated ones are recorded in
+[docs/ASSURANCE_CASE.md](docs/ASSURANCE_CASE.md).
+
 The same discipline applies to dependency licenses: every third-party
 dependency must be under a license compatible with the project's
 GPL-3.0-or-later distribution — the licenses actually in use are recorded in
