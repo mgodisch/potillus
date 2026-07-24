@@ -118,7 +118,39 @@ jobs:
             platforms;android-36
             build-tools;36.0.0
 
+      # CACHING IS DISABLED HERE, DELIBERATELY, and this is the one setting in
+      # this file that must not be "optimized" back.
+      #
+      # CodeQL builds its database by OBSERVING the compiler. A cached build
+      # produces no compiler invocations: Gradle reports the tasks as UP-TO-DATE
+      # or FROM-CACHE, the extractor sees nothing, and `database finalize` aborts
+      # with "CodeQL detected code written in Java/Kotlin but this run didn't
+      # build any of it". GitHub's troubleshooting guide lists exactly this as a
+      # cause and names Gradle as the likely culprit.
+      #
+      # It is not hypothetical here: the android workflow runs on the same commit
+      # and populates the Gradle build cache with compileDebugKotlin's output, so
+      # without this line the CodeQL job restores that cache and compiles nothing.
+      # The cost is a cold build on a weekly job, which is the right trade.
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-disabled: true
+
+      # Belt and braces alongside the disabled cache, addressing the second
+      # documented way a build can escape observation:
+      #   * daemon off -- compilation inside a long-lived daemon process that the
+      #     tracer did not start can go unseen. A daemon is pointless in a
+      #     single-build job anyway.
+      #   * build cache off -- the action's cache is not the only one; this
+      #     refuses any local build-cache hit as well.
+      #   * Kotlin incremental compilation off -- it exists to skip recompiling
+      #     unchanged sources, which is precisely what must not happen here.
+      # These are set as system properties so the Makefile target stays untouched
+      # and the local build keeps its own defaults.
+      - name: Force a fully-observable build
+        run: |
+          echo 'GRADLE_OPTS=-Dorg.gradle.daemon=false -Dorg.gradle.caching=false -Dkotlin.incremental=false' \
+            >> "$GITHUB_ENV"
 
       # init must come BEFORE the build: it installs the extractor and arranges
       # for the compiler invocations that follow to be observed. A build that ran
