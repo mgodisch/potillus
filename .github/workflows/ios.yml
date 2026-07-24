@@ -1,0 +1,160 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# iOS: generate the project, lint it, compile it, run PotillusKit's tests.
+#
+# WHY THIS IS THE MOST VALUABLE THING ON THE MIRROR
+#   Until now the iOS side had no machine other than the maintainer's own Mac.
+#   The canonical GitLab pipeline runs on Linux, where xcodebuild does not exist,
+#   which is why the project reimplemented parts of the Swift review in Python
+#   (tools/check-swift-symbols.py, check-swift-length.py, check-swift-tests.py) --
+#   a deliberate approximation of what SwiftLint and a compiler would say. A
+#   macOS runner replaces the approximation with the real thing for the duration
+#   of this job: real SwiftLint at the pinned version, a real compile, the real
+#   test suite. The Python checks stay exactly as they are; they are what keeps
+#   the Swift side covered on the canonical pipeline, where none of this can run.
+#
+# STILL NOT A GATE
+#   Like every workflow here, this cannot block a merge request on GitLab. It
+#   holds no signing identity and produces no shippable artifact
+#   (CODE_SIGNING_ALLOWED=NO comes from the Makefile's own build recipe).
+#   Releases stay where docs/RELEASE-IOS.md puts them.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.
+
+name: ios
+
+on:
+  push:
+    branches: ['**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # Named explicitly rather than `macos-latest`. The floating label was moved to
+    # macos-26 in June 2026 and will move again; naming the image means an Xcode
+    # generation changes under this workflow only when this line changes.
+    # macos-26 ships Xcode 26.x, which is the version docs/INSTALL-IOS.md tells a
+    # human to install, so runner and workstation agree.
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # macOS ships GNU Make 3.81, and make/guard.mk refuses anything below 4.3
+      # (the Makefiles use grouped targets, `&:`). Homebrew installs the current
+      # GNU Make as `gmake` and leaves the system `make` alone -- which is why
+      # every make invocation below is written `gmake`, exactly as
+      # docs/INSTALL-IOS.md instructs a human on the same platform.
+      #
+      # XcodeGen generates ios/Potillus.xcodeproj from ios/project.yml; the
+      # project file is not committed, so nothing can be built without it. It is
+      # installed from Homebrew at whatever version is current, matching
+      # docs/INSTALL-IOS.md, which requires only "any recent" XcodeGen -- unlike
+      # SwiftLint below, its output is a project file the build then validates,
+      # not a set of rules that silently changes what passes.
+      - name: Install GNU Make and XcodeGen
+        run: brew install make xcodegen
+
+      # SwiftLint is PINNED to the version ios/Makefile records
+      # (SWIFTLINT_VERSION), because its rule set changes between releases and a
+      # tree that is green on one version can be red on the next. Homebrew would
+      # install whatever is current, which the Makefile's own `swiftlint-check`
+      # would then reject -- correctly. So the pinned release is fetched
+      # directly, and its archive is verified against a checksum recorded here
+      # before anything is unpacked: a download that cannot be verified is not
+      # run. The archive holds a single universal binary, so no install step
+      # beyond unzipping is needed; $RUNNER_TEMP keeps it out of the workspace,
+      # and GITHUB_PATH puts it on PATH for the later steps.
+      - name: Install the pinned SwiftLint
+        env:
+          SWIFTLINT_VERSION: 0.65.0
+          SWIFTLINT_SHA256: d6cb0aa7a2f5f1ef306fc9e37bcb54dc9a26facc8f7784ac0c3dd3eccf5c6ba6
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl -fsSL -o portable_swiftlint.zip \
+            "https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}/portable_swiftlint.zip"
+          echo "${SWIFTLINT_SHA256}  portable_swiftlint.zip" | shasum -a 256 -c -
+          mkdir -p swiftlint-bin
+          unzip -q -o portable_swiftlint.zip -d swiftlint-bin
+          chmod +x swiftlint-bin/swiftlint
+          echo "$RUNNER_TEMP/swiftlint-bin" >> "$GITHUB_PATH"
+
+      # SwiftPM resolves and compiles GRDB from source, which dominates the
+      # runtime of the test steps. The cache key is the resolved-version file, so
+      # a dependency change invalidates it automatically and nothing stale can be
+      # restored across an upgrade.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ios/PotillusKit/.build
+          key: swiftpm-${{ runner.os }}-${{ hashFiles('ios/PotillusKit/Package.resolved') }}
+          restore-keys: |
+            swiftpm-${{ runner.os }}-
+
+      # Recorded in the log so a future failure can be read against the exact
+      # toolchain that produced it -- the one thing about a hosted runner that
+      # changes without this repository changing.
+      - name: Toolchain versions
+        run: |
+          xcodebuild -version
+          swift --version
+          swiftlint version
+          gmake --version | head -n 1
+
+      # SwiftLint in --strict mode. First because it is the fastest of the four
+      # and its findings are the cheapest to act on. The Makefile's
+      # `swiftlint-check` prerequisite asserts the pinned version here, so a
+      # mistake in the install step above surfaces as a named error rather than
+      # as mysteriously different lint results.
+      - name: Lint (SwiftLint, strict)
+        run: gmake -C ios lint
+
+      # Compile the app in Debug. `build` depends on `project`, so this also
+      # regenerates Version.xcconfig from CHANGELOG.md plus the Android
+      # versionCode, copies the bundled GPLv3 text, renders the localized guides
+      # and runs `xcodegen generate` -- the same sequence a first local build
+      # performs.
+      - name: Build (xcodebuild, Debug)
+        run: gmake -C ios build
+
+      # The PotillusKit suite plus the line-coverage floor. `cover-check` runs the
+      # very same tests as `swift-tests`, only instrumented, so running both would
+      # execute the suite twice for no additional information; the gate is the
+      # more informative of the two and is what a release has to pass.
+      #
+      # The app-target XCTests and the XCUITests are NOT run here: they need a
+      # booted simulator, which is a separate and much slower step.
+      - name: PotillusKit tests and coverage floor
+        run: gmake -C ios cover-check

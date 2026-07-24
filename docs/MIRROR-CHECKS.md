@@ -50,12 +50,22 @@ Two GitHub features also have no GitLab equivalent on this project's plan, and
 they are used for the same reason: code scanning (a durable, deduplicated view of
 static-analysis findings, fed by SARIF) and private vulnerability reporting.
 
+One consequence is worth stating plainly. The Swift checks in `tools/`
+(`check-swift-symbols.py`, `check-swift-length.py`, `check-swift-tests.py`)
+exist because the canonical pipeline cannot run SwiftLint or a Swift compiler;
+they approximate both in Python. The macOS runner now runs the real tools
+alongside them. The Python checks are **not** retired by this: they are what
+covers the Swift side on the canonical, blocking pipeline, while the macOS run
+is advisory. The two are complementary, and a disagreement between them is worth
+investigating rather than resolving by deleting one.
+
 ## What runs
 
 | Workflow | What it does | Where it could not run |
 | --- | --- | --- |
 | [`meta.yml`](../.github/workflows/meta.yml) | `actionlint` (workflow syntax and shell correctness) and `zizmor` (workflow security: template injection, over-broad permissions, unpinned actions) | Nowhere else — it lints GitHub workflow files, which only exist here |
 | [`android.yml`](../.github/workflows/android.yml) | `make -C android lint`, `unit-tests`, `cover-check`; the Android Lint findings go to code scanning as SARIF | GitLab, in practice: the SDK build exceeds what the free tier's metered minutes make sensible |
+| [`ios.yml`](../.github/workflows/ios.yml) | `gmake -C ios lint` (real SwiftLint at the pinned version), `build` (XcodeGen + xcodebuild), `cover-check` (PotillusKit suite + coverage floor) | GitLab, absolutely: xcodebuild needs macOS, and the canonical pipeline is Linux-only |
 
 Both run on a push to **any** branch, so a topic branch under review on GitLab
 gets its verdict while the merge request is still open. Neither runs on tags.
@@ -72,8 +82,9 @@ gets its verdict while the merge request is still open. Neither runs on tags.
   restricted to `contents: read` apart from the one scope needed to write
   findings into the Security tab.
 - **They do not replace the local pre-release work.** The on-device
-  instrumentation tests, the reproducible-build checks and the store staging
-  remain where [CONTRIBUTING.md](../CONTRIBUTING.md) §7 puts them.
+  instrumentation tests, the app-target XCTests and XCUITests that need a booted
+  simulator, the reproducible-build checks and the store staging remain where
+  [CONTRIBUTING.md](../CONTRIBUTING.md) §7 puts them.
 
 ## Conventions these workflows follow
 
@@ -88,8 +99,15 @@ gets its verdict while the merge request is still open. Neither runs on tags.
 - **`concurrency` with `cancel-in-progress`.** A mirror updates by force-push, so
   a rebased branch can arrive several times a minute; only the newest run is
   worth paying for.
-- **The workflows call `make`,** never their own `./gradlew` lines, so the
-  definition of "build the Android app" stays in `android/Makefile` alone.
+- **The workflows call `make`,** never their own `./gradlew` or `xcodebuild`
+  lines, so the definition of "build the app" stays in `android/Makefile` and
+  `ios/Makefile` alone. On macOS that means `gmake`: the system `make` is 3.81
+  and `make/guard.mk` requires 4.3 or newer.
+- **Runner images are named, not floated.** `macos-26` rather than
+  `macos-latest`, so an Xcode generation changes under the project only when the
+  workflow changes. SwiftLint is fetched at the version `ios/Makefile` pins and
+  verified against a recorded checksum before it is unpacked, because its rules
+  differ between releases.
 
 ## Repository settings this assumes
 

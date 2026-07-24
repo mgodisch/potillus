@@ -290,12 +290,15 @@ Dangerous-Workflow and Token-Permissions measure, which is why every action is
 SHA-pinned and every file declares `contents: read`. Two follow-ups remain open
 there:
 
-- **Extend the mirror checks to iOS.** A macOS runner would, for the first time,
-  build the iOS app and run its XCTest suite outside the maintainer's own Mac,
-  and would replace the Python reimplementations in `tools/check-swift-*.py`
-  with real SwiftLint for the duration of that run (the reimplementations stay:
-  they are what keeps the Swift side covered on the canonical, Linux-only
-  pipeline).
+- **The mirror checks now cover iOS too.** A macOS runner builds the app with
+  XcodeGen and xcodebuild, runs the PotillusKit suite with its coverage floor,
+  and runs real SwiftLint at the pinned version — the first time any of this
+  happens outside the maintainer's own Mac. The Python reimplementations in
+  `tools/check-swift-*.py` stay: they are what covers the Swift side on the
+  canonical, Linux-only pipeline, which is the blocking one. What remains
+  uncovered anywhere but locally are the tests that need a booted simulator (the
+  app-target XCTests and the XCUITests) and their Android counterpart, the
+  instrumentation tests.
 - **Decide on dependency submission.** Dependabot cannot see the Android
   dependency graph without a submitted graph, and submitting one needs
   `contents: write` on the mirror. The write scope has been declined for now;

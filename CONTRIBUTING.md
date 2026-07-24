@@ -198,11 +198,11 @@ Every change is reviewed before it is merged. Because the project currently has 
 single maintainer, the maintainer is the reviewer and the sole merger; external
 contributions are reviewed as merge requests (or emailed patch series). Automated
 checks run before a merge — the GitLab pipeline ([.gitlab-ci.yml](.gitlab-ci.yml))
-is a required check, and the GitHub mirror adds an Android build, lint and unit
-tests that the canonical pipeline does not carry (see
+is a required check, and the GitHub mirror adds an Android and an iOS build with
+their lint and test suites, which the canonical pipeline does not carry (see
 [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md); those are advisory and cannot
-block a merge). What no runner covers — the on-device instrumentation tests, the
-iOS build, and the release gate in full — the reviewer runs locally as part of
+block a merge). What no runner covers — the tests that need a device or a booted
+simulator, and the release gate in full — the reviewer runs locally as part of
 each review.
 
 A change is reviewed against this checklist — the same requirements a contributor
