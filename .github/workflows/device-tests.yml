@@ -1,0 +1,148 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# Android: the on-device instrumentation tests, on an emulator.
+#
+# WHY THIS IS SEPARATE FROM android.yml
+#   Everything in android.yml finishes in a few minutes on a plain container.
+#   This does not: it boots a full Android system image and drives the app
+#   through Compose UI and Espresso tests. Keeping it in its own file lets it
+#   have its own trigger and its own cancellation group, so a slow emulator run
+#   never delays the fast feedback from lint and the unit tests.
+#
+# WHAT IT CLOSES
+#   `make -C android device-tests` was, until now, a target only the maintainer
+#   could run, on hardware only the maintainer had. That made the Compose UI
+#   suite the least-exercised part of the project's test strategy -- run before a
+#   release, not before a merge. It now runs per change, on the same command.
+#
+# WHY IT SKIPS THE SCREENSHOT TESTS
+#   EXCLUDE_SCREENSHOTS=1 passes -PexcludeScreenshotTests, which drops the
+#   @ScreenshotOnly tests. Those exist to PRODUCE the store screenshots through
+#   fastlane screengrab, in specific locales and on a specific device profile;
+#   they assert nothing and their output is not wanted here. This is the same
+#   switch the root Makefile offers for the same reason.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.
+
+name: device-tests
+
+on:
+  push:
+    branches: ['**']
+    # Emulator time is the most expensive thing this repository asks for, and a
+    # change to a translation, a document or the iOS side cannot affect the
+    # result. The path filter keeps the run for the changes that can.
+    paths:
+      - 'android/**'
+      - '.github/workflows/device-tests.yml'
+  # Weekly, so the suite is exercised even through a stretch of iOS-only or
+  # documentation-only work, and so a break caused by a changed runner image is
+  # found on a quiet Sunday rather than under a release.
+  schedule:
+    - cron: '43 4 * * 0'
+  # Lets the maintainer start a run by hand from the Actions tab -- useful when a
+  # failure needs a re-run without an empty commit.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  connected:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-36
+            build-tools;36.0.0
+
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # Without hardware virtualisation the emulator falls back to software
+      # emulation and becomes too slow to be useful. The runner has KVM, but its
+      # device node is not world-accessible by default; this udev rule opens it
+      # for the job's user. It is the standard incantation for this runner image
+      # and affects nothing outside the ephemeral VM.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # API 36 matches compileSdk and targetSdk in app/build.gradle.kts, so the
+      # tests run against the platform behaviour the app is built and optimised
+      # for (minSdk is 30, so anything from 30 up would run -- 36 is the level
+      # that would surface a behavioural change first).
+      #
+      # target: default, not google_apis -- the app uses no Play services, and
+      # the plain AOSP image is the smaller and faster download. arch: x86_64 is
+      # the only choice at this API level; the 32-bit x86 images the action
+      # defaults to stop well below it.
+      #
+      # The script is the project's own Makefile target, unchanged. It performs
+      # its own `adb devices` probe and wakes the device before handing over to
+      # connectedDebugAndroidTest, which is exactly what is wanted on a
+      # freshly-booted emulator.
+      - name: Instrumentation tests
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 36
+          target: default
+          arch: x86_64
+          disable-animations: true
+          script: make -C android device-tests EXCLUDE_SCREENSHOTS=1
+
+      # A failed UI test is close to unreadable from the console output alone;
+      # the HTML report names the failing case and keeps the stack trace. Kept
+      # only for the run someone is currently looking at.
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-device-test-reports
+          path: |
+            android/app/build/reports/androidTests/
+            android/app/build/outputs/androidTest-results/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -66,10 +66,16 @@ investigating rather than resolving by deleting one.
 | [`meta.yml`](../.github/workflows/meta.yml) | `actionlint` (workflow syntax and shell correctness) and `zizmor` (workflow security: template injection, over-broad permissions, unpinned actions) | Nowhere else — it lints GitHub workflow files, which only exist here |
 | [`android.yml`](../.github/workflows/android.yml) | `make -C android lint`, `unit-tests`, `cover-check`; the Android Lint findings go to code scanning as SARIF | GitLab, in practice: the SDK build exceeds what the free tier's metered minutes make sensible |
 | [`ios.yml`](../.github/workflows/ios.yml) | `gmake -C ios lint` (real SwiftLint at the pinned version), `build` (XcodeGen + xcodebuild), `cover-check` (PotillusKit suite + coverage floor) | GitLab, absolutely: xcodebuild needs macOS, and the canonical pipeline is Linux-only |
+| [`device-tests.yml`](../.github/workflows/device-tests.yml) | `make -C android device-tests EXCLUDE_SCREENSHOTS=1` on an API 36 emulator — the Compose UI and Espresso suite | GitLab: needs KVM and a system image, well past what the free tier's runners provide |
 | [`codeql.yml`](../.github/workflows/codeql.yml) | CodeQL over Kotlin and Swift — data-flow analysis across functions and files, not the per-file reasoning every other check here does | GitLab: SAST of this depth is a paid-tier feature there |
 
 Both run on a push to **any** branch, so a topic branch under review on GitLab
 gets its verdict while the merge request is still open. Neither runs on tags.
+
+`device-tests.yml` runs per branch too, but only when something under `android/`
+changed, and additionally on a weekly schedule and on demand. Emulator time is
+the most expensive thing here, and a translation or an iOS change cannot alter
+the result.
 
 `codeql.yml` is the exception: it runs on `main` and weekly, not per branch. It
 is expensive — a full build per language on two runner platforms — and its
@@ -88,10 +94,10 @@ finding.
   anything, or publishes. The mirror holds no secrets, and every workflow is
   restricted to `contents: read` apart from the one scope needed to write
   findings into the Security tab.
-- **They do not replace the local pre-release work.** The on-device
-  instrumentation tests, the app-target XCTests and XCUITests that need a booted
-  simulator, the reproducible-build checks and the store staging remain where
-  [CONTRIBUTING.md](../CONTRIBUTING.md) §7 puts them.
+- **They do not replace the local pre-release work.** The app-target XCTests and
+  XCUITests that need a booted iOS simulator, the reproducible-build checks and
+  the store staging remain where [CONTRIBUTING.md](../CONTRIBUTING.md) §7 puts
+  them. The Android instrumentation tests no longer belong to that list.
 
 ## Conventions these workflows follow
 

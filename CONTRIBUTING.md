@@ -201,7 +201,7 @@ checks run before a merge — the GitLab pipeline ([.gitlab-ci.yml](.gitlab-ci.y
 is a required check, and the GitHub mirror adds an Android and an iOS build with
 their lint and test suites, which the canonical pipeline does not carry (see
 [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md); those are advisory and cannot
-block a merge). What no runner covers — the tests that need a device or a booted
+block a merge). What no runner covers — the iOS tests that need a booted
 simulator, and the release gate in full — the reviewer runs locally as part of
 each review.
 
