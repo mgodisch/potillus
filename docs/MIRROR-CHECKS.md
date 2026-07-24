@@ -66,9 +66,16 @@ investigating rather than resolving by deleting one.
 | [`meta.yml`](../.github/workflows/meta.yml) | `actionlint` (workflow syntax and shell correctness) and `zizmor` (workflow security: template injection, over-broad permissions, unpinned actions) | Nowhere else — it lints GitHub workflow files, which only exist here |
 | [`android.yml`](../.github/workflows/android.yml) | `make -C android lint`, `unit-tests`, `cover-check`; the Android Lint findings go to code scanning as SARIF | GitLab, in practice: the SDK build exceeds what the free tier's metered minutes make sensible |
 | [`ios.yml`](../.github/workflows/ios.yml) | `gmake -C ios lint` (real SwiftLint at the pinned version), `build` (XcodeGen + xcodebuild), `cover-check` (PotillusKit suite + coverage floor) | GitLab, absolutely: xcodebuild needs macOS, and the canonical pipeline is Linux-only |
+| [`codeql.yml`](../.github/workflows/codeql.yml) | CodeQL over Kotlin and Swift — data-flow analysis across functions and files, not the per-file reasoning every other check here does | GitLab: SAST of this depth is a paid-tier feature there |
 
 Both run on a push to **any** branch, so a topic branch under review on GitLab
 gets its verdict while the merge request is still open. Neither runs on tags.
+
+`codeql.yml` is the exception: it runs on `main` and weekly, not per branch. It
+is expensive — a full build per language on two runner platforms — and its
+findings are research rather than build breaks. The weekly run earns its keep on
+its own: GitHub updates the query packs, so unchanged code can acquire a new
+finding.
 
 ## What these checks are NOT
 

@@ -1,0 +1,173 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# CodeQL: semantic static analysis of the Kotlin and the Swift sources.
+#
+# WHAT THIS ADDS THAT THE PROJECT DID NOT HAVE
+#   Every static check the project runs so far is a LINTER: ktlint, Android Lint,
+#   SwiftLint and the tools/ scripts all reason about one file, or one
+#   declaration, at a time. CodeQL reasons about the program -- it builds a
+#   database of the compiled code and answers queries over data flow across
+#   functions and files ("does anything reachable from user input end up in this
+#   sink"). That class of question has had no answer in this repository, on
+#   either platform, and there is no equivalent on the canonical pipeline: GitLab
+#   offers SAST of this depth only on paid tiers.
+#
+# WHY IT DOES NOT RUN ON EVERY BRANCH
+#   Unlike the android and ios workflows, this one runs on `main` and on a weekly
+#   schedule. Two reasons. It is expensive -- each language needs a full build
+#   plus database construction and query evaluation, on two runner platforms. And
+#   its findings are not the kind a commit is waiting on: a data-flow finding is
+#   a piece of research, not a build break. The weekly run matters independently
+#   of any commit, because the query packs are updated by GitHub; a code base
+#   that has not changed can still acquire a new finding.
+#
+# WHY BOTH LANGUAGES USE `manual` BUILD MODE
+#   CodeQL's cheap `none` mode -- build a database straight from the sources -- is
+#   not supported for Kotlin or for Swift; both extractors observe a real
+#   compiler. `autobuild` would guess at the build, which for a project whose
+#   builds need generated sources (Version.xcconfig, the localized guides, the
+#   bundled licence texts) is a guess that fails. `manual` lets the existing
+#   Makefile targets do exactly what they do locally, with CodeQL observing.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.
+
+name: codeql
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Sundays, 04:17 UTC. An odd minute on purpose: the whole-hour slots are the
+    # busiest on shared infrastructure, and nothing here is time-critical.
+    - cron: '17 4 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Kotlin (and any Java) -- the Android app.
+  # ---------------------------------------------------------------------------
+  kotlin:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      # Writing the analysis results into the repository's Security tab.
+      security-events: write
+      # The CodeQL action reads workflow run metadata to attach its results to
+      # the right run. Read-only.
+      actions: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The same toolchain the android workflow sets up, for the same reasons --
+      # see .github/workflows/android.yml, where each choice is explained. The
+      # build below is a real Gradle build, so it needs a real SDK.
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-36
+            build-tools;36.0.0
+
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # init must come BEFORE the build: it installs the extractor and arranges
+      # for the compiler invocations that follow to be observed. A build that ran
+      # earlier in the job would be invisible to it.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          languages: java-kotlin
+          build-mode: manual
+
+      # The debug APK, via the Makefile, so the generated sources (bundled
+      # licence copies, localized guides) are materialized exactly as they are
+      # locally. `debug-apk` rather than `lint`, because CodeQL needs compiled
+      # output, not a report.
+      - name: Build (Android debug APK)
+        run: make -C android debug-apk
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          category: /language:java-kotlin
+
+  # ---------------------------------------------------------------------------
+  # Swift -- the iOS app and PotillusKit.
+  # ---------------------------------------------------------------------------
+  swift:
+    # Swift extraction needs the Xcode toolchain, so this half cannot share the
+    # Linux runner above. The image is named rather than floated, for the reason
+    # given in .github/workflows/ios.yml.
+    runs-on: macos-26
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # GNU Make 4.3+ (the system make is 3.81) and XcodeGen, which generates the
+      # uncommitted Potillus.xcodeproj. SwiftLint is NOT installed here: this
+      # workflow compiles, it does not lint, and `gmake -C ios build` does not
+      # depend on it.
+      - name: Install GNU Make and XcodeGen
+        run: brew install make xcodegen
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          languages: swift
+          build-mode: manual
+
+      # `build` also regenerates Version.xcconfig, renders the guides and runs
+      # xcodegen, so CodeQL sees the same project a local build produces.
+      - name: Build (xcodebuild, Debug)
+        run: gmake -C ios build
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        with:
+          category: /language:swift

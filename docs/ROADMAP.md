@@ -305,6 +305,17 @@ there:
   the consequence is that Dependabot's coverage there is limited to the
   committed lockfiles, which the GitLab scan already covers.
 
+CodeQL also runs there now, over Kotlin and Swift, weekly and on `main`. It adds
+a class of analysis the project had on neither platform: data flow across
+functions and files, rather than the per-file reasoning ktlint, Android Lint,
+SwiftLint and the `tools/` scripts do. Note carefully what this does **not**
+settle. `static_analysis_often` and `OSPS-QA-06.01` are judged on the pipeline
+that actually gates a change, and that remains the GitLab one; an advisory
+analysis on a mirror does not make a criterion Met, and claiming otherwise would
+be exactly the kind of overstatement the badge answers are meant to avoid. The
+items above — a scheduled pipeline, an SDK-bearing image — are still the path to
+those criteria.
+
 ## Working toward OpenSSF Baseline Level 3
 
 Baseline Levels 1 and 2 are complete. Level 2 briefly lost `OSPS-QA-03.01`
