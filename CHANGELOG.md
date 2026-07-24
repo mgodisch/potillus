@@ -588,8 +588,9 @@ real compile and the PotillusKit suite run outside the maintainer's own Mac), th
 Android instrumentation suite on an API 36 emulator, a CodeQL job covering Kotlin
 and Swift, and a meta job that lints the workflows themselves with actionlint and
 zizmor. The first three run per branch, so a merge request under review on GitLab
-gets the result while it is still open; CodeQL runs on `main` and weekly, being
-far more expensive and not the kind of finding a commit waits on. They are
+gets the result while it is still open; CodeQL runs on `main` when the source
+trees change, plus weekly and on demand, being far more expensive and not the
+kind of finding a commit waits on. They are
 additions to the canonical pipeline, never a replacement: they cannot block a
 merge, they hold no secrets or signing identity, and every action is pinned to a
 commit SHA under `contents: read`. The Python reimplementations of the Swift

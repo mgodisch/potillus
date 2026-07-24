@@ -71,10 +71,28 @@ run-name: "codeql · ${{ github.event.head_commit.message || github.ref_name }}"
 on:
   push:
     branches: [main]
+    # A run costs about 40 minutes -- two full builds under CodeQL's tracer, on
+    # two runner platforms -- and most changes reaching main cannot affect the
+    # result at all: translations, store metadata, documentation, the CHANGELOG.
+    # Restricting the trigger to the two source trees keeps the analysis on every
+    # change that could possibly matter and skips the ones that cannot.
+    #
+    # `schedule` and `workflow_dispatch` below are NOT subject to this filter,
+    # which is what keeps the weekly run unconditional -- and that run is the
+    # safety net here: GitHub updates the query packs, so unchanged code can
+    # acquire a new finding, and a documentation-only stretch never leaves the
+    # analysis older than seven days.
+    paths:
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/codeql.yml'
   schedule:
     # Sundays, 04:17 UTC. An odd minute on purpose: the whole-hour slots are the
     # busiest on shared infrastructure, and nothing here is time-critical.
     - cron: '17 4 * * 0'
+  # On demand, for the case where a finding needs re-checking after a triage
+  # decision without waiting a week or inventing a commit.
+  workflow_dispatch:
 
 permissions:
   contents: read

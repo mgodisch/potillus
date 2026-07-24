@@ -77,11 +77,14 @@ changed, and additionally on a weekly schedule and on demand. Emulator time is
 the most expensive thing here, and a translation or an iOS change cannot alter
 the result.
 
-`codeql.yml` is the exception: it runs on `main` and weekly, not per branch. It
-is expensive — a full build per language on two runner platforms — and its
-findings are research rather than build breaks. The weekly run earns its keep on
-its own: GitHub updates the query packs, so unchanged code can acquire a new
-finding.
+`codeql.yml` is the exception: it runs on `main` only, and only when something
+under `android/` or `ios/` changed, plus weekly and on demand. A run is about
+forty minutes — two full builds under CodeQL's tracer, on two runner platforms —
+and its findings are research rather than build breaks, so paying that for a
+translation or a documentation change buys nothing. The weekly run is the safety
+net and ignores the path filter: GitHub updates the query packs, so unchanged
+code can acquire a new finding, and no stretch of non-source work leaves the
+analysis older than seven days.
 
 ## What these checks are NOT
 
