@@ -48,6 +48,17 @@
 
 name: android
 
+# The title GitHub shows for a run. Without this it defaults to the HEAD
+# commit's message, which makes every workflow triggered by the same push look
+# identical in the Actions list -- five entries, one heading. Prefixing the
+# workflow name restores the distinction while keeping the commit message, which
+# is what one actually wants to read.
+#
+# `github.event.head_commit` exists only for push events; on a schedule or a
+# manual dispatch it is null, and an empty run-name would leave the run
+# unlabelled. The fallback names the branch instead.
+run-name: "android · ${{ github.event.head_commit.message || github.ref_name }}"
+
 # Every branch is mirrored, so this fires while a merge request is still open on
 # GitLab -- which is the only way the result can be useful before a merge rather
 # than after it. Branch refs only: a mirrored release tag starts nothing.

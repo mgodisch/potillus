@@ -49,6 +49,17 @@
 
 name: meta
 
+# The title GitHub shows for a run. Without this it defaults to the HEAD
+# commit's message, which makes every workflow triggered by the same push look
+# identical in the Actions list -- five entries, one heading. Prefixing the
+# workflow name restores the distinction while keeping the commit message, which
+# is what one actually wants to read.
+#
+# `github.event.head_commit` exists only for push events; on a schedule or a
+# manual dispatch it is null, and an empty run-name would leave the run
+# unlabelled. The fallback names the branch instead.
+run-name: "meta · ${{ github.event.head_commit.message || github.ref_name }}"
+
 # Every branch is mirrored from GitLab, so a push here is a push to any branch of
 # the canonical repository -- including the topic branch of an open merge
 # request. That is the moment the feedback is worth something. Tag pushes are
