@@ -156,8 +156,16 @@ public final class DrinkCapacityModel {
             Task { [weak self] in
                 guard let self else { return }
                 while !Task.isCancelled {
-                    try? await Task.sleep(for: self.tickInterval)
-                    if Task.isCancelled { break }
+                    // A cancelled sleep throws `CancellationError`, which ends the
+                    // loop. Catching it here — rather than swallowing it with `try?`
+                    // and relying on the checks below — is what makes `stop()` take
+                    // effect before the reload: `currentDay()` and `load()` each
+                    // suspend on their own `await`s, none of which re-check
+                    // cancellation, so a tick that got past a mid-loop
+                    // `Task.isCancelled` would still run `load()` to completion and
+                    // write a post-teardown snapshot (see `stop()`).
+                    do { try await Task.sleep(for: self.tickInterval) }
+                    catch { break }
                     if await self.currentDay() != self.loadedDay { await self.load() }
                 }
             }

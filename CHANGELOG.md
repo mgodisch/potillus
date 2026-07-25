@@ -261,6 +261,12 @@ A Chinese language choice did not survive an iOS → Android backup restore: the
 importer matched the stored tag case-sensitively, so `zh-Hans` fell back to the
 system language. The comparison is now case-insensitive.
 
+The four clock-derived models (`DrinkCapacityModel`, `TodayModel`,
+`StatsModel`, `CalendarModel`) could write a snapshot after `stop()`: their
+ticker swallowed the sleep's cancellation with `try?` and ran one more reload.
+It now breaks on cancellation. `DrinkCapacityModelTests` proves it by moving
+the day boundary after `stop()`.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The per-row trash and pencil icons on Today, Drinks and Calendar give way to

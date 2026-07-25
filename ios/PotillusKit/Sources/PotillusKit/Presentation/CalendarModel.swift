@@ -251,8 +251,13 @@ public final class CalendarModel {
             Task { [weak self] in
                 guard let self else { return }
                 while !Task.isCancelled {
-                    try? await Task.sleep(for: self.tickInterval)
-                    if Task.isCancelled { break }
+                    // A cancelled sleep throws `CancellationError`; catching it to
+                    // break ends the task at once. Swallowing it with `try?` would
+                    // let a tick that `stop()` cancelled fall through to the
+                    // `preferences.load()` and `load()` awaits below, none of which
+                    // re-check cancellation, and write a snapshot after teardown.
+                    do { try await Task.sleep(for: self.tickInterval) }
+                    catch { break }
                     let settings = await self.preferences.load()
                     let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
                     let today = DayResolver.resolve(

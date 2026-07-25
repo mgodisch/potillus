@@ -192,6 +192,17 @@ final class DrinkCapacityModelTests: XCTestCase {
     /// `stop()` must silence the ticker: a model whose view has gone still holds
     /// a `Task` that would otherwise wake every minute for a screen nobody is
     /// looking at, and — worse — write state after teardown.
+    ///
+    /// The test is deliberately ADVERSARIAL rather than a wall-clock race. It does
+    /// not merely stop the model and sleep once, hoping the ticker was quick to
+    /// die; it stops the model and then MOVES THE BOUNDARY a live ticker reacts to,
+    /// so a ticker that survived `stop()` is guaranteed to overwrite the snapshot,
+    /// not merely likely to. The snapshot is 30 g on the 2nd; a ticker still
+    /// running would roll into the dry 3rd and drive `todayGrams` to 0. To make
+    /// "still running" the failing outcome rather than a matter of timing, the
+    /// tick interval is short and the wait after `stop()` spans many intervals:
+    /// a broken `stop()` fails reliably, and a correct one has every opportunity
+    /// to and does not. The value stays 30 g only if the ticker is truly stopped.
     func testStopSilencesTheTicker() async throws {
         try logDay("2026-01-02", grams: 30.0)
 
@@ -201,9 +212,15 @@ final class DrinkCapacityModelTests: XCTestCase {
         try await waitUntil { model.capacity.todayGrams == 30.0 }
         model.stop()
 
-        // A day boundary crossed AFTER stop() must not move the snapshot.
+        // Cross into the dry 3rd (past the 04:00 change hour) AFTER stop(). A live
+        // ticker would see the new day and clear the snapshot; a stopped one leaves
+        // it at 30 g. The wait spans about forty of the 5 ms tick intervals, so a
+        // ticker that survived `stop()` has every chance to fire — the failure is
+        // then a real defect, not a slow runner losing a one-tick race.
         clock.millis = 1_767_416_400_000
-        try await Task.sleep(nanoseconds: 60_000_000)
+        try await Task.sleep(nanoseconds: 200_000_000)
+
+        // A stopped ticker never reloaded, so the pre-stop snapshot stands.
         XCTAssertEqual(model.capacity.todayGrams, 30.0, accuracy: 1e-9)
     }
 

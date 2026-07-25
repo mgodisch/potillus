@@ -242,10 +242,13 @@ public final class TodayModel {
             Task { [weak self] in
                 guard let self else { return }
                 while !Task.isCancelled {
-                    // A cancellation during the sleep throws; `try?` turns that
-                    // into a normal wakeup and the loop condition ends the task.
-                    try? await Task.sleep(for: self.tickInterval)
-                    if Task.isCancelled { break }
+                    // A cancelled sleep throws `CancellationError`; catching it to
+                    // break ends the task at once. Swallowing it with `try?` would
+                    // let a tick that `stop()` cancelled run `load()` to completion
+                    // first — `load()` suspends on `await`s that do not re-check
+                    // cancellation — and write a snapshot after teardown.
+                    do { try await Task.sleep(for: self.tickInterval) }
+                    catch { break }
                     await self.load()
                 }
             }
