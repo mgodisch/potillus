@@ -81,8 +81,22 @@ public struct CalendarState: Sendable, Equatable {
 public final class CalendarModel {
 
     public private(set) var state = CalendarState()
-    /// Set when a load failed. Never swallowed; deliberately technical body —
-    /// see the content policy on `TodayModel.failure`.
+    /// Set when a load or a write failed. Recorded, but NOT PRESENTED: no view
+    /// renders this value, and `CalendarScreen` reads it only as a success
+    /// predicate (`model.failure == nil`) after an edit. A failed load therefore
+    /// leaves the grid on its last good snapshot without telling the user.
+    ///
+    /// This is the honest description of the current behaviour, corrected in the
+    /// 0.84.0 QA round: the comment used to claim the value was "never swallowed"
+    /// and point at the content policy on `TodayModel.failure`, whose first line
+    /// says "The view shows it" — true for Today, not here. Whether the three
+    /// unpresented surfaces (this one, `StatsModel.failure`, `DrinksModel.failure`)
+    /// should raise an alert like Today's is a product decision tracked in
+    /// docs/ROADMAP.md, and one that belongs to BOTH platforms: Android surfaces
+    /// no load failure on these screens either.
+    ///
+    /// If it ever is presented, the content policy on `TodayModel.failure` applies
+    /// to its body — the raw `String(describing:)` is deliberate there.
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol

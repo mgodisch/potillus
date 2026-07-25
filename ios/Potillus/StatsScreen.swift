@@ -63,9 +63,11 @@ struct StatsScreen: View {
     @State var exportedPdf: PdfDocument?
     @State var isExportingPdf = false
     @State var isBuildingPdf = false
-    /// Foreseeable export failures carry a localized message (see
-    /// `StatsScreenExport`); everything else keeps the raw error description per
-    /// the content policy on `TodayModel.failure`.
+    /// Foreseeable export failures carry a localized message of their own (an
+    /// empty period, an unreadable window — see `StatsScreenExport`); everything
+    /// else goes through `describeExportFailure`, which wraps the technical
+    /// description in a localized frame. Both are shown by the alert below, whose
+    /// title was localized all along.
     @State var exportFailure: String?
 
     /// Non-nil while the range sheet is up; carries what the range is for.
@@ -144,7 +146,7 @@ struct StatsScreen: View {
                 defaultFilename: CsvExporter.suggestedFileName()
             ) { result in
                 if case .failure(let error) = result {
-                    exportFailure = String(describing: error)
+                    exportFailure = describeExportFailure(error)
                 }
             }
             .fileExporter(
@@ -154,7 +156,7 @@ struct StatsScreen: View {
                 defaultFilename: ReportJob.fileName(date: Date())
             ) { result in
                 if case .failure(let error) = result {
-                    exportFailure = String(describing: error)
+                    exportFailure = describeExportFailure(error)
                 }
             }
             .alert(

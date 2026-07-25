@@ -154,7 +154,7 @@ apply to it are stated in the accompanying COPYING.md file.
          sub-strings. Screen-reader only; never shown on screen. -->
     <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Sem registos para exportar.</string>
-    <string name="export_failed">A exportação falhou.</string>
+    <string name="export_error">Erro de exportação: %1$s</string>
     <string name="backup_failed">A cópia de segurança falhou.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d registo importado.</item>

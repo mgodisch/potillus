@@ -62,16 +62,16 @@ def pct(unit):
             total = missed + covered
             return f"{100.0 * covered / total:.1f}%" if total else "n/a"
     return "n/a"
-print(f"LINE = {pct('LINE')} >= 90, BRANCH = {pct('BRANCH')} >= 75")
+print(f"LINE = {pct('LINE')} >= 90, BRANCH = {pct('BRANCH')} >= 80")
 PYEND
 )"
         fi
         if [[ -n "$figures" ]]; then
             pass "Coverage floors met ($figures; see app/build.gradle.kts)"
         else
-            pass "Coverage floors met (LINE >= 90, BRANCH >= 75; see app/build.gradle.kts)"
+            pass "Coverage floors met (LINE >= 90, BRANCH >= 80; see app/build.gradle.kts)"
         fi
     else
-        fail "koverVerify failed — coverage dropped below the enforced floor (LINE 90 / BRANCH 75)"
+        fail "koverVerify failed — coverage dropped below the enforced floor (LINE 90 / BRANCH 80)"
     fi
 }

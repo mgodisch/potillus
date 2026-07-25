@@ -195,7 +195,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Немає записів для експорту.</string>
-    <string name="export_failed">Помилка експорту.</string>
+    <string name="export_error">Помилка експорту: %1$s</string>
     <string name="backup_failed">Помилка резервного копіювання.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d запис імпортовано.</item>

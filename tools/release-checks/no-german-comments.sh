@@ -51,8 +51,13 @@ check_no_german_comments() {
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
-    # Words are case-sensitive: capitalised entries match German nouns (which
-    # are always capitalised), lowercase entries match verb/modal forms.
+    # The list is WRITTEN in the natural case of each word — capitalised entries
+    # are German nouns, which are always capitalised; lowercase entries are verb
+    # and modal forms. The match itself is case-INSENSITIVE (`grep -iE` below),
+    # so the casing here is documentation, not a filter. That is deliberate: a
+    # noun that slipped in lowercase is still caught. Until the 0.84.0 QA round
+    # this comment claimed the matching was case-sensitive, which the `-i` flag
+    # had never made true.
     local german_words=(
         # Unambiguous German nouns / technical terms (capitalised)
         "Methode" "Klasse" "Funktion" "Eigenschaft" "Rückgabe"
@@ -82,9 +87,13 @@ check_no_german_comments() {
     # German prose that sat in build.gradle.kts, exactly the file class the old
     # *.kt-only filter skipped; then for tools/, which the convention has always
     # covered and no gate ever read (the thirteenth round found the scope, not a
-    # violation — tools/ was already clean, and this keeps it that way). The
-    # build scripts are named explicitly (a recursive *.kts glob would descend
-    # into .gradle/ caches), the iOS and tools roots are scanned only when
+    # violation — tools/ was already clean, and this keeps it that way). Widened
+    # again in the 0.84.0 QA round for the MAKE layer: tools/check-headers.py had
+    # just gained `.mk` and the `Makefile` basename, so the build files count as
+    # sources the project owns, while this gate still could not see them. That
+    # round found the scope, not a violation either — the Makefiles were clean.
+    # The build scripts are named explicitly (a recursive *.kts glob would descend
+    # into .gradle/ caches), the iOS, tools and make roots are scanned only when
     # present so a partial source drop skips them gracefully, and every grep is
     # `|| true`-guarded: "found nothing" is grep exit 1, which `set -e` would
     # otherwise turn into a dead gate — the §10 lesson.
@@ -94,6 +103,11 @@ check_no_german_comments() {
             grep -rn --include='*.kt' "//\|^\s*\*" "$SOURCE_ROOT" || true
             grep -n "//" build.gradle.kts settings.gradle.kts app/build.gradle.kts \
                 2>/dev/null || true
+            grep -n "#" Makefile 2>/dev/null || true
+            grep -n "#" ../Makefile ../ios/Makefile 2>/dev/null || true
+            if [[ -d ../make ]]; then
+                grep -rn --include='*.mk' "#" ../make || true
+            fi
             if [[ -d ../ios ]]; then
                 grep -rn --include='*.swift' --exclude-dir='.build' \
                      --exclude-dir='DerivedData' "//" ../ios || true

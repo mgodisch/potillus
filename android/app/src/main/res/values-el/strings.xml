@@ -154,7 +154,7 @@ apply to it are stated in the accompanying COPYING.md file.
          sub-strings. Screen-reader only; never shown on screen. -->
     <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Δεν υπάρχουν εγγραφές για εξαγωγή.</string>
-    <string name="export_failed">Η εξαγωγή απέτυχε.</string>
+    <string name="export_error">Σφάλμα εξαγωγής: %1$s</string>
     <string name="backup_failed">Το αντίγραφο ασφαλείας απέτυχε.</string>
     <plurals name="import_success_replace">
         <item quantity="one">Εισήχθη %1$d εγγραφή.</item>

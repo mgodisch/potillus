@@ -204,7 +204,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">沒有可匯出的記錄。</string>
-    <string name="export_failed">匯出失敗。</string>
+    <string name="export_error">匯出錯誤：%1$s</string>
     <string name="backup_failed">備份失敗。</string>
     <plurals name="import_success_replace">
         <item quantity="other">已匯入 %1$d 筆記錄。</item>

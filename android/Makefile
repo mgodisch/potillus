@@ -335,7 +335,7 @@ bundle: prereq $(SBOM)
 	@echo "SBOM:        $(SBOM)"
 
 # cover-check: the Kover coverage gate -- runs the unit tests and enforces the floor
-# configured in app/build.gradle.kts (koverVerify: LINE >= 90 / BRANCH >= 75). Kept
+# configured in app/build.gradle.kts (koverVerify: LINE >= 90 / BRANCH >= 80). Kept
 # a PURE coverage target (just :app:koverVerify, not the whole release-check) so the
 # release path can gate coverage per platform: the iOS counterpart -- an xccov-based
 # `cover-check` in ios/Makefile -- will slot in beside it (see docs/ROADMAP.md).

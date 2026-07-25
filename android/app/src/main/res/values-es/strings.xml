@@ -170,7 +170,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">No hay entradas que exportar.</string>
-    <string name="export_failed">Error al exportar.</string>
+    <string name="export_error">Error de exportación: %1$s</string>
     <string name="backup_failed">Error en la copia de seguridad.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d entrada importada.</item>

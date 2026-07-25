@@ -315,8 +315,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Export and backup messages -->
     <!-- Export status: nothing to export. -->
     <string name="export_no_entries">No entries available.</string>
-    <!-- Export status: export failed. -->
-    <string name="export_failed">Export failed.</string>
+    <!-- Export status: export failed, with the technical reason. %1$s = error-detail text. -->
+    <string name="export_error">Export error: %1$s</string>
     <!-- Backup status: backup failed. -->
     <string name="backup_failed">Backup failed.</string>
     <!-- Import success (replace mode). %1$d = number of imported entries. -->

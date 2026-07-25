@@ -74,8 +74,11 @@ public final class DrinksModel {
     /// Set when a delete was refused because entries reference the drink.
     public private(set) var deleteBlocked: DeleteBlocked?
 
-    /// Anything else that went wrong. Never swallowed; deliberately technical
-    /// body — see the content policy on `TodayModel.failure`.
+    /// Anything else that went wrong. Recorded, but NOT PRESENTED: `DrinksScreen`
+    /// renders `deleteBlocked` (above) and the logger's own `failure`, never this
+    /// one, so a failed catalogue load leaves the list on its last good snapshot
+    /// without telling the user. See `CalendarModel.failure` for the full note on
+    /// the three unpresented surfaces (0.84.0 QA round).
     public private(set) var failure: String?
 
     private let drinks: any DrinkRepositoryProtocol

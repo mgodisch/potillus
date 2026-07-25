@@ -97,8 +97,11 @@ public struct StatsState: Sendable, Equatable {
 public final class StatsModel {
 
     public private(set) var state = StatsState()
-    /// Set when a load failed. Never swallowed; deliberately technical body —
-    /// see the content policy on `TodayModel.failure`.
+    /// Set when a load failed. Recorded, but NOT PRESENTED: no view renders it,
+    /// so a failed load leaves the statistics on their last good snapshot without
+    /// telling the user. `StatsScreen`'s own `exportFailure` is a separate,
+    /// view-local value and IS shown. See `CalendarModel.failure` for the full
+    /// note on the three unpresented surfaces (0.84.0 QA round).
     public private(set) var failure: String?
 
     private let entries: any EntryRepositoryProtocol

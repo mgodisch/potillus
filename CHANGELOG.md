@@ -269,6 +269,21 @@ once the task was cancelled. The ticker now breaks on cancellation, and each
 reload re-checks it before writing. `DrinkCapacityModelTests` proves it by
 moving the day boundary after `stop()`.
 
+A failed export now names its reason: `CsvExporter.export` returns a `Result`
+instead of a bare `null`, `exportPdf` keeps the throwable it discarded, and
+`export_failed` gives way to `export_error`, which carries the detail. On iOS
+the statistics screen's four raw dumps go through `describeExportFailure`, so
+the alert body follows the in-app language as its title already did.
+
+Branch coverage was measured instead of quoted: 80.69%. `test_branch_coverage80`
+and `dynamic_analysis` move to Met, the `koverVerify` floor rises to 80.
+
+Four self-descriptions were false and now match the code: the coverage
+comment's enforcement path, the German-comment gate's "case-sensitive" matching
+and its blindness to the Makefiles, and the "never swallowed" doc on three
+`failure` fields no view shows. The `Potillus` target's two `settings` keys are
+one block.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The per-row trash and pencil icons on Today, Drinks and Calendar give way to

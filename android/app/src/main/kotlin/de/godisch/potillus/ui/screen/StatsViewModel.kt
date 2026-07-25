@@ -222,14 +222,19 @@ class StatsViewModel(
             val exportContext = appContext.perAppLocalizedContext()
             // CSV building + MediaStore writes are blocking I/O, so they
             // must not run on the Main dispatcher.
-            val result = withContext(Dispatchers.IO) {
+            val outcome = withContext(Dispatchers.IO) {
                 CsvExporter.export(exportContext, entries, drinks)
             }
-            _exportStatus.value = if (result != null) {
-                _shareTarget.value = result
-                ExportStatus.Done(result.fileName)
+            val written = outcome.getOrNull()
+            _exportStatus.value = if (written != null) {
+                _shareTarget.value = written
+                ExportStatus.Done(written.fileName)
             } else {
-                ExportStatus.Err(str(R.string.export_failed))
+                // The reason, not just the fact: `export` now carries WHY it failed
+                // (0.84.0 QA round). The detail stays technical and English by
+                // design — it exists to be quoted into a bug report — while the
+                // sentence around it follows the in-app language.
+                ExportStatus.Err(str(R.string.export_error, "${outcome.exceptionOrNull()}"))
             }
         }
     }
@@ -260,14 +265,19 @@ class StatsViewModel(
             // `to` (the user-chosen inclusive range end) is forwarded so a report
             // over a HISTORICAL range anchors its abstinence streaks at the period
             // end instead of the real today (v0.81.0 QA fix; see PdfReportData).
-            val html = withContext(Dispatchers.Default) {
+            val rendered = withContext(Dispatchers.Default) {
                 runCatching { PdfReportBuilder.buildHtml(reportContext, entries, drinks, settings, periodEnd = to) }
-                    .getOrNull()
             }
+            val html = rendered.getOrNull()
             if (html != null) {
                 _printRequest.value = PdfPrintRequest(html, jobName)
             } else {
-                _exportStatus.value = ExportStatus.Err(str(R.string.export_failed))
+                // The throwable used to be discarded by `.getOrNull()` on the
+                // runCatching itself, so the screen could only say THAT the report
+                // failed (0.84.0 QA round). It is kept now and shown inside the
+                // localized `export_error` frame, technical detail and all.
+                _exportStatus.value =
+                    ExportStatus.Err(str(R.string.export_error, "${rendered.exceptionOrNull()}"))
             }
         }
     }

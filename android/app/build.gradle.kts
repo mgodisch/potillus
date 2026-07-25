@@ -1083,16 +1083,29 @@ kover {
         // (test_branch_coverage80, still a roadmap goal):
         //   • LINE   >= 90  locks in the achieved gold statement coverage
         //                   (test_statement_coverage90, and silver _80).
-        //   • BRANCH >= 75  guards the current branch coverage (~80%) against
-        //                   regression without demanding the gold 80% here.
-        // Enforced at release time by `tools/release-check.sh --coverage`
-        // (and, going forward, by the CI pipeline).
+        //   • BRANCH >= 80  locks in the achieved gold branch coverage
+        //                   (test_branch_coverage80). Raised from 75 in the
+        //                   0.84.0 QA round, when the figure was MEASURED for the
+        //                   first time instead of quoted: `koverXmlReport` counts
+        //                   489 of 606 branches, 80.69%. Kover had been measuring
+        //                   branches all along — it could not have enforced a
+        //                   BRANCH bound otherwise — but no run printed the
+        //                   number, so `.bestpractices.json` and docs/ROADMAP.md
+        //                   both carried it as an open goal. Headroom is thin by
+        //                   design: four covered branches lost, or five uncovered
+        //                   ones added, take the figure under 80.
+        // Enforced by `release-android` and `release-ios`, which call the
+        // per-platform `cover-check` before they build, and by the GitHub mirror's
+        // android/ios workflows on every push (visible there, but a mirror cannot
+        // block a merge). `tools/release-check.sh --coverage` runs the same gate
+        // and additionally prints the two figures. The canonical GitLab pipeline
+        // deliberately stays build-free and does NOT run it; see docs/ROADMAP.md.
         verify {
             rule {
                 minBound(90, CoverageUnit.LINE)
             }
             rule {
-                minBound(75, CoverageUnit.BRANCH)
+                minBound(80, CoverageUnit.BRANCH)
             }
         }
     }

@@ -82,16 +82,28 @@ object CsvExporter {
      * @param entries  All consumption entries in chronological order.
      * @param drinks   Full drink catalogue (used to look up the category name
      *                 for each entry's [ConsumptionEntry.drinkId]).
-     * @return [ExportResult] with filename and MediaStore URI on success,
-     *                 `null` on any I/O error (the incomplete MediaStore entry is
-     *                 deleted so no corrupt file remains in Downloads).
+     * @return A [Result] carrying the [ExportResult] (filename and MediaStore URI)
+     *                 on success, or the failure's cause on any I/O error. The
+     *                 incomplete MediaStore entry is deleted first, so no corrupt
+     *                 file remains in Downloads either way.
+     *
+     * WHY A [Result] AND NOT A NULLABLE (0.84.0 QA round):
+     *   The three failure paths below used to collapse into a bare `null`, so the
+     *   caller could report THAT the export failed but never WHY — the screen
+     *   showed a bare "Export failed." and the user was left without a clue. Two
+     *   of the three paths are not exceptions at all (a ContentResolver
+     *   that declines), so there was nothing to catch further up; the reason has
+     *   to be constructed here, where it is known. The message text is
+     *   deliberately technical and English: like the iOS port's model-level
+     *   failures, its whole value is being quotable into a bug report, and
+     *   [StatsViewModel] wraps it in the localized `export_error` frame.
      */
     @AndroidIoBound
     fun export(
         context: Context,
         entries: List<ConsumptionEntry>,
         drinks: List<DrinkDefinition>,
-    ): ExportResult? {
+    ): Result<ExportResult> {
         val fileName = "libellus_potionis_export_${FILE_FMT.format(Instant.now())}.csv"
 
         // Resolve the localised column headers from string resources here (the
@@ -118,7 +130,9 @@ object CsvExporter {
         }
         val resolver = context.contentResolver
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-            ?: return null // MediaStore declined to create the entry
+            ?: return Result.failure( // MediaStore declined to create the entry
+                IOException("MediaStore declined to create the Downloads entry"),
+            )
 
         return try {
             // A null stream is a FAILURE, not a success with no content — see the
@@ -126,18 +140,22 @@ object CsvExporter {
             // reported a successful export while an EMPTY .csv sat in Downloads.
             val out = resolver.openOutputStream(uri) ?: run {
                 resolver.delete(uri, null, null)
-                return null
+                return Result.failure(
+                    IOException("The Downloads entry provided no output stream"),
+                )
             }
             out.use { stream ->
                 // Prepend UTF-8 BOM so Excel detects the encoding automatically
                 stream.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
                 stream.write(csv.toByteArray(Charsets.UTF_8))
             }
-            ExportResult(fileName, uri, "text/csv")
+            Result.success(ExportResult(fileName, uri, "text/csv"))
         } catch (e: IOException) {
             // Clean up the orphaned MediaStore entry so Downloads is not polluted
             resolver.delete(uri, null, null)
-            null
+            // `e` is REPORTED now, not swallowed: it is the one failure path that
+            // carries a real system message, and the screen shows it.
+            Result.failure(e)
         }
     }
 

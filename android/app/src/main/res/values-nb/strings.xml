@@ -197,7 +197,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Ingen registreringer å eksportere.</string>
-    <string name="export_failed">Eksport mislyktes.</string>
+    <string name="export_error">Eksportfeil: %1$s</string>
     <string name="backup_failed">Sikkerhetskopiering mislyktes.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d registrering importert.</item>

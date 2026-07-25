@@ -31,7 +31,7 @@
 #  OPT-IN — CODE COVERAGE (Kover)
 # =============================================================================
 #   Runs the build-breaking Kover verification (:app:koverVerify), whose bounds
-#   are declared in app/build.gradle.kts (LINE >= 90, BRANCH >= 75 over the
+#   are declared in app/build.gradle.kts (LINE >= 90, BRANCH >= 80 over the
 #   JVM-unit-testable scope), and :app:koverXmlReport so the actual measured
 #   figures can be shown next to the enforced floors. Skipped unless --coverage
 #   is given, because it launches Gradle and executes the unit-test suite — far

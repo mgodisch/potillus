@@ -206,7 +206,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Nenhum registro para exportar.</string>
-    <string name="export_failed">Falha na exportação.</string>
+    <string name="export_error">Erro de exportação: %1$s</string>
     <string name="backup_failed">Falha no backup.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d registro importado.</item>

@@ -154,7 +154,7 @@ apply to it are stated in the accompanying COPYING.md file.
          sub-strings. Screen-reader only; never shown on screen. -->
     <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Geen invoer om te exporteren.</string>
-    <string name="export_failed">Export mislukt.</string>
+    <string name="export_error">Exportfout: %1$s</string>
     <string name="backup_failed">Back-up mislukt.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d invoer geïmporteerd.</item>

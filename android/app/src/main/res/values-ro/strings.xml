@@ -203,7 +203,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export / import status messages -->
     <string name="export_no_entries">Nu există înregistrări de exportat.</string>
-    <string name="export_failed">Exportul a eșuat.</string>
+    <string name="export_error">Eroare de export: %1$s</string>
     <string name="backup_failed">Copia de rezervă a eșuat.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d înregistrare importată.</item>

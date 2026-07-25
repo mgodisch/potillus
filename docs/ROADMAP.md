@@ -330,9 +330,13 @@ Best Practices criteria fall in this group and have moved to Met in
 - **`automated_integration_testing`** — the JVM unit tests, the Android
   instrumentation suite and the PotillusKit suite all run per change.
 
-`test_branch_coverage80` stays Unmet but is, for the first time, within reach:
-Kover would have to report branch coverage in addition to line coverage, and the
-figure would then be produced automatically on every run rather than by hand.
+`test_branch_coverage80` moved to Met in the 0.84.0 QA round, and the premise
+this paragraph used to carry — that Kover would first have to report branch
+coverage — was wrong: it had been measuring branches all along, which is what
+let `koverVerify` enforce a BRANCH bound. Only the FIGURE was never printed by
+any run, so it survived here and in `.bestpractices.json` as a quoted "~80%"
+that no one had checked. `koverXmlReport` puts it at 489 of 606 branches,
+80.69%, and the enforced floor was raised from 75 to 80 to match.
 
 ## Working toward OpenSSF Baseline Level 3
 
@@ -435,19 +439,19 @@ second active participant in the project.
   documented (CONTRIBUTING.md, "Code review requirements"), but with a single
   author-reviewer no change is reviewed by a second person. Resolved by the same
   step as the two items above — a second, independent maintainer who can review.
-- **Branch coverage >= 80%** (`test_branch_coverage80`, gold MUST; also unlocks
-  `dynamic_analysis`). *Priority 2 — deliberately not forced.* Kover is fully
-  integrated and enforced: statement coverage is ~97% and branch coverage ~80%,
-  with a build-breaking floor (`koverVerify`: LINE >= 90 / BRANCH >= 75) wired
-  into the release gate (`make cover-check`). Reaching the gold threshold needs
-  branch coverage at or above 80%; the last few percent of branches sit in
-  Android-/Compose-adjacent code (ViewModel `StateFlow` assembly, resource-bound
-  error mapping) that is awkward to exercise from JVM unit tests. Closing the gap
-  — via targeted tests or a small refactor that makes that logic pure — also
-  satisfies the gold `dynamic_analysis` criterion (an automated suite at that
-  coverage counts as dynamic analysis). The related passing `test_most` and the
-  silver/gold statement-coverage criteria (`test_statement_coverage80`,
-  `test_statement_coverage90`) are already met.
+- **Raise the branch-coverage floor further** (follow-up to
+  `test_branch_coverage80`, which is Met). Kover is fully integrated and
+  enforced: statement coverage is ~97% and branch coverage 80.69% (489 of 606
+  branches), with a build-breaking floor (`koverVerify`: LINE >= 90 /
+  BRANCH >= 80) wired into the release gate (`make cover-check`). The gold
+  threshold is cleared, but only by 0.69 points: four covered branches lost, or
+  five uncovered ones added, take it under 80 and turn the gate red. The
+  branches still uncovered sit in Android-/Compose-adjacent code (ViewModel
+  `StateFlow` assembly, resource-bound error mapping) that is awkward to
+  exercise from JVM unit tests; targeted tests, or a small refactor that makes
+  that logic pure, would buy the headroom back. The related passing `test_most`
+  and the silver/gold statement-coverage criteria
+  (`test_statement_coverage80`, `test_statement_coverage90`) are met as well.
 
 ## Longer-term direction (~12 months)
 
@@ -512,7 +516,7 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **iOS branch coverage (parity with Android).** The new iOS `cover-check` enforces
   a LINE floor of 90 (matching Android's Kover LINE bound -- the gold
   `test_statement_coverage90` level) over PotillusKit, which measures ~94.8%. It is
-  line-only: Android's Kover also enforces `BRANCH >= 75`, but the
+  line-only: Android's Kover also enforces `BRANCH >= 80`, but the
   `swift test`/llvm-cov path yields no branch data (the branch column comes back
   empty). Closing that parity gap -- toward the gold `test_branch_coverage80` on both
   ports -- needs a toolchain path that emits Swift branch coverage.

@@ -126,7 +126,7 @@ extension StatsScreen {
             exportedCsv = CsvDocument(data: CsvExporter.fileData(csv: csv))
             isExporting = true
         } catch {
-            exportFailure = String(describing: error)
+            exportFailure = describeExportFailure(error)
         }
     }
 
@@ -191,7 +191,33 @@ extension StatsScreen {
             exportedPdf = PdfDocument(data: try await ReportPdfPrinter().pdfData(html: html))
             isExportingPdf = true
         } catch {
-            exportFailure = String(describing: error)
+            exportFailure = describeExportFailure(error)
         }
+    }
+
+    /// The user-facing text for an export that could not be completed.
+    ///
+    /// The alert's TITLE is localized ("Export failed"); before the 0.84.0 QA round
+    /// its BODY was the bare `String(describing: error)`, so every one of the twenty
+    /// non-English languages showed an English Swift error dump under a translated
+    /// heading. `SettingsScreen.describeBackupFailure` already solved the same
+    /// problem for the backup pickers, and Android answers the same event with the
+    /// localized `export_failed`; this is that shape, for the export side.
+    ///
+    /// The technical detail is KEPT, not dropped: it rides inside the localized
+    /// frame exactly as `describeBackupFailure`'s `default` case does with
+    /// "Read error: %@". That honours the content policy on `TodayModel.failure` —
+    /// an unforeseeable diagnostic stays quotable into a bug report — while the
+    /// sentence around it follows the in-app language.
+    ///
+    /// The FORESEEABLE export failures do not come through here at all: an empty
+    /// period and an unreadable statistics window are mapped to their own sentences
+    /// at the call sites above.
+    ///
+    /// - Parameter error: The failure thrown by the exporter or returned by the
+    ///   system file picker.
+    /// - Returns: A localized sentence carrying the technical description.
+    func describeExportFailure(_ error: Error) -> String {
+        Loc.string("Export error: %@", String(describing: error), locale: locale)
     }
 }

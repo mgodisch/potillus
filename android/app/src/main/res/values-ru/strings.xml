@@ -154,7 +154,7 @@ apply to it are stated in the accompanying COPYING.md file.
          sub-strings. Screen-reader only; never shown on screen. -->
     <string name="year_calendar_day_desc">%1$s, %2$s g, %3$s</string>
     <string name="export_no_entries">Нет записей для экспорта.</string>
-    <string name="export_failed">Экспорт не удался.</string>
+    <string name="export_error">Ошибка экспорта: %1$s</string>
     <string name="backup_failed">Резервное копирование не удалось.</string>
     <plurals name="import_success_replace">
         <item quantity="one">Импортировано %1$d запись.</item>

@@ -202,7 +202,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">エクスポートする記録がありません。</string>
-    <string name="export_failed">エクスポートに失敗しました。</string>
+    <string name="export_error">エクスポートエラー：%1$s</string>
     <string name="backup_failed">バックアップに失敗しました。</string>
     <plurals name="import_success_replace">
         <item quantity="other">%1$d 件の記録をインポートしました。</item>

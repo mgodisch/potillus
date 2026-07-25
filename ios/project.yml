@@ -115,16 +115,6 @@ targets:
   Potillus:
     type: application
     platform: iOS
-    # The app icon lives in Assets.xcassets/AppIcon.appiconset (one 1024x1024
-    # marketing icon; Xcode's actool derives the smaller sizes). Naming that set
-    # here makes actool treat it as THE app icon: it writes the CFBundleIconName
-    # Info.plist key and emits the icon into the bundle. Without it, App Store
-    # upload validation rejects the build ("Missing CFBundleIconName" / no 120x120
-    # icon). The catalog needs no `sources` entry -- it sits under the Potillus/
-    # source path below and is picked up automatically.
-    settings:
-      base:
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     sources:
       - path: Potillus
       # The PDF template lives at the repository root because BOTH platforms read
@@ -217,10 +207,26 @@ targets:
     dependencies:
       - package: PotillusKit
         product: PotillusKit
+    # ONE `settings:` key per target, deliberately. YAML forbids duplicate keys in
+    # a mapping, and this target carried two: an `ASSETCATALOG_COMPILER_APPICON_NAME`
+    # block above `sources:` and this one below `dependencies:`. XcodeGen's parser
+    # merges them rather than letting the last win -- verified from a real build
+    # log, where actool is invoked with `--app-icon AppIcon` -- so nothing was
+    # broken. But the outcome rested on parser behaviour that the YAML spec does
+    # not promise and a Yams upgrade could change; the merge was done by hand in
+    # the 0.84.0 QA round so it no longer depends on it.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: de.godisch.potillus
         TARGETED_DEVICE_FAMILY: "1"
+        # The app icon lives in Assets.xcassets/AppIcon.appiconset (one 1024x1024
+        # marketing icon; Xcode's actool derives the smaller sizes). Naming that set
+        # here makes actool treat it as THE app icon: it writes the CFBundleIconName
+        # Info.plist key and emits the icon into the bundle. Without it, App Store
+        # upload validation rejects the build ("Missing CFBundleIconName" / no 120x120
+        # icon). The catalog needs no `sources` entry -- it sits under the Potillus/
+        # source path above and is picked up automatically.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: "YES"
         INFOPLIST_KEY_CFBundleDisplayName: "Libellus Potionis"
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"

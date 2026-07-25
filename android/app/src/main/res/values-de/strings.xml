@@ -186,7 +186,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Export and backup messages -->
     <string name="export_no_entries">Keine Einträge vorhanden.</string>
-    <string name="export_failed">Export fehlgeschlagen.</string>
+    <string name="export_error">Exportfehler: %1$s</string>
     <string name="backup_failed">Backup fehlgeschlagen.</string>
     <plurals name="import_success_replace">
         <item quantity="one">%1$d Eintrag importiert.</item>
