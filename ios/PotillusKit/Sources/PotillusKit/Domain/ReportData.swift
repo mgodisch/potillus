@@ -152,7 +152,17 @@ public struct ReportData: Sendable, Equatable {
     ///   - today: The current logical day. Passed in rather than read from a clock,
     ///     so the figures are reproducible in a test and in a screenshot.
     ///   - timeZone: The zone whose wall clock decides the hour-of-day bucket.
-    ///   - locale: Decides which weekday a week starts on.
+    ///   - locale: Decides which weekday a week starts on. The default is the
+    ///     DEVICE locale on purpose, and callers are expected to leave it there:
+    ///     the app has no configurable week start, so the column order of the
+    ///     weekday profile follows the region the phone is set to (Monday-first
+    ///     in most of Europe, Sunday-first in the US), not the in-app language.
+    ///     The report's labels and number formatting do follow the in-app
+    ///     language — `ReportRenderer.Context` takes that locale separately —
+    ///     so the two are deliberately different sources, not an oversight at
+    ///     the call site. Android splits them the same way: `PdfReportData`
+    ///     calls `DayResolver.firstDayOfWeekIso()` with no argument while its
+    ///     labels come from the per-app localized context.
     /// - Returns: `nil` if `entries` is empty.
     public static func make(
         entries: [ConsumptionEntry],

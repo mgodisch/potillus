@@ -1000,7 +1000,7 @@ tasks.cyclonedxDirectBom {
 //
 // This block configures reporting, filtering AND the build-breaking
 // verification thresholds: the `verify { }` rules below enforce ≥ 90 % LINE and
-// ≥ 75 % BRANCH coverage of the filtered class set whenever `:app:koverVerify`
+// ≥ 80 % BRANCH coverage of the filtered class set whenever `:app:koverVerify`
 // runs — locally, via `make cover-check`, and in the release gate's opt-in
 // coverage mode (`tools/release-check.sh --coverage`). The thresholds are a
 // ratchet against regressions, not a target to chase: raise them as real
@@ -1097,8 +1097,9 @@ kover {
         // ── Coverage verification (task: koverVerify) ──────────────────────
         // Build-breaking regression floors over the JVM-unit-testable scope
         // defined by the report filters above (verification shares them).
-        // These are guard rails, not the OpenSSF gold branch threshold
-        // (test_branch_coverage80, still a roadmap goal):
+        // These are guard rails that hold the OpenSSF gold thresholds
+        // (test_statement_coverage90 and test_branch_coverage80, both Met) in
+        // place rather than restating them:
         //   • LINE   >= 90  locks in the achieved gold statement coverage
         //                   (test_statement_coverage90, and silver _80).
         //   • BRANCH >= 80  locks in the achieved gold branch coverage

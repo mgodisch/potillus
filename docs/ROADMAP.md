@@ -551,6 +551,31 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   where the code is written, one machine and several steps earlier. Low priority:
   the full Xcode build stays the real syntax gate, so this only shortens the
   edit→Linux→Mac round-trip for typo-class errors and adds code to maintain.
+- **Surface load failures on Calendar, Statistics and Drinks.** On iOS the
+  `failure` field of `CalendarModel`, `StatsModel` and `DrinksModel` is recorded
+  and never rendered: a failed load leaves the screen on its last good snapshot
+  without telling the user, and `CalendarScreen` reads the field only as a
+  success predicate after an edit. Today is the exception and shows the shape a
+  fix would take — an alert whose OK button calls `clearFailure()`. Android
+  arrives at the same user-visible outcome from the other direction:
+  `CalendarViewModel` and `StatsViewModel` carry no failure field at all, so
+  there is nothing to show. Whether these screens should gain Today's alert is a
+  product decision, and it belongs to both ports at once; adding it on one side
+  only is exactly the drift the shared vectors exist to prevent. Low priority
+  because every one of these reads runs against a database that has already
+  opened successfully, which makes the realistic trigger narrow — but the KDoc
+  on `CalendarModel.failure` points here, so the decision is recorded rather
+  than implied.
+- **Gradle 10 readiness (build tooling).** Configuring `:app` under Gradle 9.6
+  raises four deprecation warnings for passing a `Project` object as a dependency
+  notation, the form Gradle 10 will reject. None of them originates in this
+  repository's build scripts. Gradle's problems report
+  (`android/build/reports/problems/problems-report.html`, written by any build)
+  attributes one to the Kover plugin — which the 0.9.9 upgrade in this cycle
+  settles — and three to AGP's own `com.android.internal.application`. Nothing
+  here can silence those three, and no AGP release is known to have addressed
+  them yet; re-read the problems report when raising AGP, and again before
+  moving the wrapper to Gradle 10.
 
 ## User suggestions
 

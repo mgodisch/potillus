@@ -160,6 +160,11 @@ extension StatsScreen {
             // window; asking a clock again could straddle the day-change hour and
             // give the report a different today than the screen behind it.
             let settings = await environment.preferences.load()
+            // `locale` and `timeZone` are left at their defaults deliberately:
+            // both describe the DEVICE, not the in-app language. See the
+            // parameter documentation on `ReportData.make` — the weekday
+            // column order follows the phone's region, while the labels below
+            // follow `settings.language`.
             guard let data = ReportData.make(
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),

@@ -346,6 +346,14 @@ definitions, `ios/project.yml`, the SwiftLint, REUSE and osv-scanner configs and
 the F-Droid metadata. It scans every file class `tools/check-headers.py` claims
 as project-owned.
 
+The repository's statements about itself match it: the Kover block names the
+80 % branch bound it enforces and records `test_statement_coverage90` and
+`test_branch_coverage80` as Met; `ReportData.make` documents that its `locale`
+default is the device region rather than the in-app language, the split Android
+already spells out; and `docs/ROADMAP.md` carries the two open items the code
+points at — the unpresented load failures on Calendar, Statistics and Drinks,
+and the AGP dependency notation Gradle 10 will reject.
+
 ## v0.83.0
 
 Fix iOS presets, cold-start lock and freezes
