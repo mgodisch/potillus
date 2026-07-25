@@ -164,12 +164,21 @@ gradle-wrapper:
 #   raw/license_gpl3.md    <- LICENSE.md            (the app's own license)
 #   raw/license_apache2.md <- LICENSES/Apache-2.0.txt (Apache-2.0 libraries in the APK)
 #   raw/license_gpl2.md    <- docs/LICENSE.GPL-2.0.md (desugar_jdk_libs, GPL-2.0+CE)
+#   raw/license_bsd3.md    <- docs/LICENSE.BSD-3-Clause.md
+#                             (desugar_jdk_libs_configuration, BSD-3-Clause)
 # res/raw/ is not tracked (every file in it is generated), so a fresh clone lacks
 # the directory -- hence the `mkdir -p` before each copy.
+#
+# This list and the `licenseDocuments` list in app/build.gradle.kts name the same
+# four documents, and check-guides below compares each copy against its source.
+# A document added on one side only is the failure this arrangement invites: the
+# Gradle path would still build a correct APK while the make path and the
+# byte-for-byte check stayed blind to it.
 LICENSE_OUTPUTS := \
 	app/src/main/res/raw/license_gpl3.md \
 	app/src/main/res/raw/license_apache2.md \
-	app/src/main/res/raw/license_gpl2.md
+	app/src/main/res/raw/license_gpl2.md \
+	app/src/main/res/raw/license_bsd3.md
 
 app/src/main/res/raw/license_gpl3.md: ../LICENSE.md
 	@mkdir -p $(@D)
@@ -180,6 +189,10 @@ app/src/main/res/raw/license_apache2.md: ../LICENSES/Apache-2.0.txt
 	cp $< $@
 
 app/src/main/res/raw/license_gpl2.md: ../docs/LICENSE.GPL-2.0.md
+	@mkdir -p $(@D)
+	cp $< $@
+
+app/src/main/res/raw/license_bsd3.md: ../docs/LICENSE.BSD-3-Clause.md
 	@mkdir -p $(@D)
 	cp $< $@
 
@@ -229,7 +242,8 @@ check-guides:
 	for pair in \
 	    "license_gpl3.md:../LICENSE.md" \
 	    "license_apache2.md:../LICENSES/Apache-2.0.txt" \
-	    "license_gpl2.md:../docs/LICENSE.GPL-2.0.md"; do
+	    "license_gpl2.md:../docs/LICENSE.GPL-2.0.md" \
+	    "license_bsd3.md:../docs/LICENSE.BSD-3-Clause.md"; do
 	    out="app/src/main/res/raw/$${pair%%:*}"
 	    src="$${pair#*:}"
 	    if [ ! -f "$$out" ]; then

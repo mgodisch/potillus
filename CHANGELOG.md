@@ -334,6 +334,12 @@ swipe dismissal, and the lock cover shows the device's real unlock glyph.
 Kover is at 0.9.9. It counts classes in `com.android.*` packages toward the
 coverage figure and uses the dependency notation Gradle 10 requires.
 
+All four bundled license texts are covered by the same three mechanisms: the
+`android/Makefile` copy rules, the `licenseDocuments` list in
+`app/build.gradle.kts`, and the `check-guides` comparison against the
+repository-root source. `tools/check-headers.py` exempts
+`docs/LICENSE.BSD-3-Clause.md` as it does the other verbatim third-party texts.
+
 ## v0.83.0
 
 Fix iOS presets, cold-start lock and freezes

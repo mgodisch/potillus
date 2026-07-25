@@ -706,6 +706,9 @@ val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
 //                      runtime libraries compiled into the APK
 //   license_gpl2.md    required for desugar_jdk_libs (GPL-2.0 with the OpenJDK
 //                      Classpath Exception)
+//   license_bsd3.md    required by BSD-3-Clause §2 for
+//                      desugar_jdk_libs_configuration, whose runtime classes D8
+//                      dexes into the APK
 //
 // See docs/NOTICES.md, "Third-Party Software (bundled in the Android App)".
 // Declares inputs/outputs so Gradle can skip each when nothing changed.

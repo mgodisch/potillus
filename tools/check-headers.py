@@ -110,6 +110,7 @@ EXCLUDED_PATHS = {
     "COPYING.md",
     "LICENSE.md",
     "docs/LICENSE.GPL-2.0.md",
+    "docs/LICENSE.BSD-3-Clause.md",
     "docs/NOTICES.md",
     "docs/CODE_OF_CONDUCT.md",
 }
