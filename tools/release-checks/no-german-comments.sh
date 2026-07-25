@@ -92,6 +92,12 @@ check_no_german_comments() {
     # just gained `.mk` and the `Makefile` basename, so the build files count as
     # sources the project owns, while this gate still could not see them. That
     # round found the scope, not a violation either — the Makefiles were clean.
+    # Widened once more for the declarative build and configuration files —
+    # the version catalog, gradle.properties, the ProGuard rules, the CI
+    # definitions, project.yml, the SwiftLint and REUSE and osv-scanner configs,
+    # the F-Droid metadata. check-headers.py had long counted .yml, .toml,
+    # .properties and .pro as project-owned sources; those eighteen files were
+    # simply the last class no comment-language gate read. Clean as well.
     # The build scripts are named explicitly (a recursive *.kts glob would descend
     # into .gradle/ caches), the iOS, tools and make roots are scanned only when
     # present so a partial source drop skips them gracefully, and every grep is
@@ -114,6 +120,28 @@ check_no_german_comments() {
             fi
             if [[ -d ../tools ]]; then
                 grep -rn --include='*.py' --include='*.sh' "#" ../tools || true
+            fi
+            # The declarative build and configuration files. check-headers.py
+            # already counts these suffixes as project-owned sources and demands
+            # a license header in each, so the English-everywhere convention
+            # covers them too; this gate could not see them. Named as explicit
+            # roots rather than a tree-wide glob, for the same reason the .kts
+            # scripts are: a recursive walk would descend into build/ and
+            # .gradle/ caches. Absent roots are skipped, so a partial source drop
+            # does not fail here.
+            grep -n "#" gradle/libs.versions.toml gradle.properties \
+                app/proguard-rules.pro 2>/dev/null || true
+            grep -n "#" ../.gitlab-ci.yml ../security-insights.yml \
+                ../REUSE.toml ../osv-scanner.toml 2>/dev/null || true
+            if [[ -d ../.github/workflows ]]; then
+                grep -rn --include='*.yml' "#" ../.github/workflows || true
+            fi
+            if [[ -d ../ios ]]; then
+                grep -n "#" ../ios/project.yml ../ios/.swiftlint.yml \
+                    2>/dev/null || true
+            fi
+            if [[ -d ../fdroid ]]; then
+                grep -rn --include='*.yml' "#" ../fdroid || true
             fi
         } | grep -iE "\b(${pattern})\b" | head -15 || true
     )

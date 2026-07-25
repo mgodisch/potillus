@@ -340,6 +340,12 @@ All four bundled license texts are covered by the same three mechanisms: the
 repository-root source. `tools/check-headers.py` exempts
 `docs/LICENSE.BSD-3-Clause.md` as it does the other verbatim third-party texts.
 
+The comment-language gate reads the declarative build and configuration files
+too: the version catalog, `gradle.properties`, the ProGuard rules, the CI
+definitions, `ios/project.yml`, the SwiftLint, REUSE and osv-scanner configs and
+the F-Droid metadata. It scans every file class `tools/check-headers.py` claims
+as project-owned.
+
 ## v0.83.0
 
 Fix iOS presets, cold-start lock and freezes
