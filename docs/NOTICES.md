@@ -84,6 +84,30 @@ Classpath Exception is NOT part of that text — it is an additional permission
 granted on top of it — so the About screen states the exception itself beside
 the link.
 
+### BSD 3-Clause
+
+`com.android.tools:desugar_jdk_libs_configuration` &mdash; Copyright &copy; 2016,
+the R8 project authors.  It is pulled in transitively by
+`desugar_jdk_libs` above and is the second half of core-library desugaring:
+besides `META-INF/desugar/d8/desugar.json`, the rewriting recipe D8 reads at
+build time, the artifact carries CONVERSION CLASSES (`java.time.TimeConversions`,
+`java.util.OptionalConversions`, `java.nio.file.FileApiFlips` and their
+siblings) that execute on the device whenever a desugared type meets a platform
+API.  They are therefore redistributed, and BSD-3-Clause &sect;2 asks that the
+copyright notice, the conditions and the disclaimer accompany a binary
+distribution.
+
+The full BSD-3-Clause text is kept verbatim in the repository as
+`docs/LICENSE.BSD-3-Clause.md` and is bundled into the APK as
+`res/raw/license_bsd3.md`, which the in-app About screen links to.  The license
+is one-way compatible with this program's GPL-3.0-or-later distribution.
+
+This obligation went unnoticed until the 0.84.0 QA round, because the artifact
+reaches the app through the `coreLibraryDesugaring` configuration rather than
+the release runtime classpath, and the CycloneDX SBOM resolved only the latter
+&mdash; so the component appeared in no inventory this document is checked
+against.
+
 ### Build- and test-time dependencies (NOT redistributed)
 
 The following are used only to build or test the app and are **not** compiled

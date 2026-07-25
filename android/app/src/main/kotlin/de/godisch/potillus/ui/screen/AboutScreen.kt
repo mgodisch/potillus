@@ -110,6 +110,7 @@ fun AboutScreen(
     onOpenGpl3: () -> Unit = {},
     onOpenApache2: () -> Unit = {},
     onOpenGpl2: () -> Unit = {},
+    onOpenBsd3: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
     Scaffold(
@@ -233,6 +234,18 @@ fun AboutScreen(
                 )
                 HorizontalDivider()
                 LicenseLink("GNU General Public License v2", onOpenGpl2)
+            }
+            SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                BodyText(
+                    "Under the BSD 3-Clause License: " +
+                        "desugar_jdk_libs_configuration (Copyright © 2016, the R8 " +
+                        "project authors). It ships beside desugar_jdk_libs above: " +
+                        "besides the rewriting recipe D8 reads at build time, it " +
+                        "carries the conversion classes that run on the device " +
+                        "whenever desugared types meet a platform API.",
+                )
+                HorizontalDivider()
+                LicenseLink("BSD 3-Clause License", onOpenBsd3)
             }
         }
     }

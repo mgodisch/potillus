@@ -168,11 +168,12 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "the Contributor Covenant authors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
-# NOTE on the GPL-2.0 text: docs/LICENSE.GPL-2.0.md is the verbatim license of
-# a build-time-bundled Android dependency ("GPL-2.0 with the Classpath
-# Exception"), kept as a companion to docs/NOTICES.md. It needs no annotation
-# here and no entry in LICENSES/: REUSE recognizes any `LICENSE*`-named file as
-# a license text and skips it, and putting the text in LICENSES/ would make it
-# an "unused license" (no repository *source* file is under GPL-2.0), which
-# fails the lint. The dependency and its classpath exception are documented in
-# prose in docs/NOTICES.md.
+# NOTE on the bundled third-party license texts: docs/LICENSE.GPL-2.0.md and
+# docs/LICENSE.BSD-3-Clause.md are the verbatim licenses of Android dependencies
+# that ship in the APK ("GPL-2.0 with the Classpath Exception" and BSD-3-Clause,
+# both from core-library desugaring), kept as companions to docs/NOTICES.md.
+# They need no annotation here and no entry in LICENSES/: REUSE recognizes any
+# `LICENSE*`-named file as a license text and skips it, and putting the texts in
+# LICENSES/ would make them "unused licenses" (no repository *source* file is
+# under either), which fails the lint. The dependencies, the classpath exception
+# and the BSD attribution duty are documented in prose in docs/NOTICES.md.

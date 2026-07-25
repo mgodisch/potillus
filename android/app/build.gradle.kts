@@ -713,6 +713,7 @@ val licenseDocuments = listOf(
     Triple("license_gpl3", "LICENSE.md", "the app's own GPL-3.0-or-later text"),
     Triple("license_apache2", "LICENSES/Apache-2.0.txt", "the Apache-2.0 text"),
     Triple("license_gpl2", "docs/LICENSE.GPL-2.0.md", "the GPL-2.0 text"),
+    Triple("license_bsd3", "docs/LICENSE.BSD-3-Clause.md", "the BSD-3-Clause text"),
 )
 
 val generateLicenseDocuments = licenseDocuments.map { (name, source, what) ->

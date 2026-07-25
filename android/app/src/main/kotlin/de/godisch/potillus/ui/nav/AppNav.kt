@@ -133,12 +133,19 @@ sealed interface Screen {
      * Classpath Exception that makes it linkable is stated on the About screen
      * itself, not in this document: it is not part of the GPL-2.0 text.
      *
-     * WHY THREE OBJECTS AND NOT ONE ROUTE WITH AN ARGUMENT
+     * WHY FOUR OBJECTS AND NOT ONE ROUTE WITH AN ARGUMENT
      *   A `@Serializable data class License(val raw: Int)` would put a resource id
      *   into the back stack, where it would be restored across a process death
-     *   that may have renumbered R. Three objects keep the route a name.
+     *   that may have renumbered R. Four objects keep the route a name.
      */
     @Serializable data object LicenseGpl2 : Screen
+
+    /**
+     * The full BSD-3-Clause text (`R.raw.license_bsd3`), pushed from [About]'s
+     * third-party link. It covers `desugar_jdk_libs_configuration`, whose
+     * conversion classes core-library desugaring links into the app.
+     */
+    @Serializable data object LicenseBsd3 : Screen
 }
 
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
@@ -239,6 +246,7 @@ fun AppNavigation(
                 onOpenGpl3 = { navController.navigate(Screen.LicenseGpl3) { launchSingleTop = true } },
                 onOpenApache2 = { navController.navigate(Screen.LicenseApache2) { launchSingleTop = true } },
                 onOpenGpl2 = { navController.navigate(Screen.LicenseGpl2) { launchSingleTop = true } },
+                onOpenBsd3 = { navController.navigate(Screen.LicenseBsd3) { launchSingleTop = true } },
                 onBack = { navController.navigateUp() },
             )
         }
@@ -271,6 +279,14 @@ fun AppNavigation(
             DocumentViewerScreen(
                 title = "GPL 2.0",
                 rawRes = R.raw.license_gpl2,
+                renderAsMarkdown = true,
+                onBack = { navController.navigateUp() },
+            )
+        }
+        composable<Screen.LicenseBsd3> {
+            DocumentViewerScreen(
+                title = "BSD 3-Clause",
+                rawRes = R.raw.license_bsd3,
                 renderAsMarkdown = true,
                 onBack = { navController.navigateUp() },
             )

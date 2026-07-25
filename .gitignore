@@ -45,6 +45,7 @@ __pycache__/
 /android/app/src/main/res/raw/license_gpl3.md
 /android/app/src/main/res/raw/license_apache2.md
 /android/app/src/main/res/raw/license_gpl2.md
+/android/app/src/main/res/raw/license_bsd3.md
 /android/app/src/main/res/raw*/usersguide.md
 # iOS: version xcconfig (`make -C ios version`), the xcodeproj (`make -C ios
 # project`, xcodegen), the license copy and user guides (`make -C ios project` /

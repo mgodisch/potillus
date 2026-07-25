@@ -269,27 +269,20 @@ once the task was cancelled. The ticker now breaks on cancellation, and each
 reload re-checks it before writing. `DrinkCapacityModelTests` proves it by
 moving the day boundary after `stop()`.
 
-A failed export now names its reason: `CsvExporter.export` returns a `Result`
-instead of a bare `null`, `exportPdf` keeps the throwable it discarded, and
-`export_failed` gives way to `export_error`, which carries the detail. On iOS
-the statistics screen's four raw dumps go through `describeExportFailure`, so
-the alert body follows the in-app language as its title already did.
+A failed export names its reason now, on both platforms.
+
+The SBOM resolves `coreLibraryDesugaring` too, which reaches the APK off the
+runtime classpath. That surfaced `desugar_jdk_libs_configuration`, whose
+BSD-3-Clause notice no document named; its text is bundled and linked from
+About.
 
 Branch coverage was measured instead of quoted: 80.69%. `test_branch_coverage80`
 and `dynamic_analysis` move to Met, the `koverVerify` floor rises to 80.
 
-Four self-descriptions were false and now match the code: the coverage
-comment's enforcement path, the German-comment gate's "case-sensitive" matching
-and its blindness to the Makefiles, and the "never swallowed" doc on three
-`failure` fields no view shows. The `Potillus` target's two `settings` keys are
-one block.
-
-The SBOM missed what core library desugaring ships. `desugar_jdk_libs` is
-declared through its own configuration, never reaches `releaseRuntimeClasspath`
-and was therefore absent from an inventory two release gates read — the OSV scan
-and the `META-INF/NOTICE` scan — while D8/R8 dexes it into the APK.
-`cyclonedxDirectBom` now resolves `coreLibraryDesugaring` alongside the runtime
-classpath.
+Five things the repository said about itself were false and now match it: the
+coverage comment's enforcement path, the comment gate's "case-sensitive"
+matching and its blindness to the Makefiles, the "never swallowed" doc on three
+`failure` fields no view shows, and a duplicate `settings` key in `project.yml`.
 
 ### iOS: delete and edit move to the native edit-mode model
 
