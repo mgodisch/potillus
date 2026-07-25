@@ -1,0 +1,202 @@
+# vim: set et ts=2:
+# =============================================================================
+# Libellus Potionis - Privacy-Friendly Alcohol Tracker
+# Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+# =============================================================================
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# In addition, as permitted by section 7 of the GNU General Public License,
+# this program may carry additional permissions; any such permissions that
+# apply to it are stated in the accompanying COPYING.md file.
+#
+# =============================================================================
+#
+# QA logs: run each platform's complete device-free QA battery on demand and
+# leave the whole transcript in the job log, where `gh run view --log` reaches
+# it.
+#
+# WHY A SEPARATE WORKFLOW AND NOT MORE STEPS IN android.yml / ios.yml
+#   Those two are push gates: they fire on every branch, name each check as its
+#   own step, and abort at the first red one, which is what a gate should do.
+#   The `qa-*` targets are built for the opposite purpose -- a failing step is
+#   recorded and the run carries on, so ONE pass yields the whole picture (see
+#   the QA LOG CAPTURE section of the root Makefile). Folding that into the push
+#   gates would trade their per-step verdicts in the Actions list for a single
+#   opaque step, and would spend an Android build plus a macOS run on every
+#   push to every branch. So the battery lives here, on manual dispatch only.
+#
+# WHY NOTHING IS UPLOADED AS AN ARTIFACT
+#   `qa_step` pipes every line through `tee`, so the transcript that reaches
+#   qa-android.log / qa-ios.log reaches stdout as well and is already in the job
+#   log -- no upload step is needed to read it afterwards. The job log costs a
+#   per-line prefix (workflow name, step name, timestamp) that the file does not
+#   carry, which matters for a byte-comparison against a local run and not for
+#   reading; the `===== name: ... =====` markers stay searchable either way. Add
+#   an `actions/upload-artifact` step here if that ever stops being the trade
+#   worth making.
+#
+# WHY NO SARIF UPLOAD
+#   `make qa-android` runs Android Lint and therefore writes the same SARIF
+#   report android.yml uploads. It is deliberately NOT uploaded a second time:
+#   two workflows writing the same code-scanning category overwrite each other's
+#   results. Leaving it out is also what keeps this file at `contents: read`
+#   with no elevated scope anywhere in it.
+#
+# SEE ALSO
+#   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.
+
+name: qa-logs
+
+# The title GitHub shows for a run. The sibling workflows put the head commit's
+# message here and fall back to the branch; this one names the branch outright,
+# because `github.event.head_commit` exists only for push events and this
+# workflow has no push trigger at all -- the fallback would be the only arm that
+# ever evaluated. Naming the branch also says the useful thing about a manual
+# run: which ref it was dispatched on.
+run-name: "qa-logs · ${{ github.ref_name }}"
+
+# Manual only. The battery is minutes of Android build plus a macOS run, and its
+# value is in being asked for deliberately (before a release, during a QA round)
+# rather than on every push -- the per-push verdicts are android.yml's and
+# ios.yml's job.
+#
+# A workflow_dispatch trigger is offered in the Actions tab only for the copy of
+# this file on the DEFAULT branch; use `gh workflow run qa-logs.yml --ref
+# <branch>` to run it from any other one.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# cancel-in-progress is FALSE here, unlike in the push-triggered workflows. There
+# it is right: a mirror updates by force-push, and a verdict on a commit that no
+# longer exists is not worth paying for. Nothing analogous can reach this
+# workflow -- it has no push trigger, so the only run that can ever land in the
+# same concurrency group is a second dispatch on the same ref. That is someone
+# asking for the battery again, not a newer commit superseding an older verdict,
+# and cancelling the first run would discard the log that was the point of
+# starting it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# The two jobs are independent and run in parallel: neither platform's battery
+# consumes the other's output, and one runner going red should not withhold the
+# other's log.
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Every step below mirrors android.yml, down to the pinned SHAs -- same
+      # JDK, same SDK components, same Gradle cache -- because `make qa-android`
+      # runs a superset of what that workflow runs and therefore needs at least
+      # the same environment. Where the two files agree, they must keep agreeing;
+      # a change to the setup there belongs here too.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-36
+            build-tools;36.0.0
+
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # The whole battery in one step: environment probe, debug APK, JVM unit
+      # tests, ktlint + Android Lint, the Kover floor, check-guides, the repo-wide
+      # static checks, the release-check invariant gate and the release runtime
+      # dependency tree. The target itself decides what runs and in which order;
+      # this workflow deliberately knows none of it.
+      #
+      # The step goes red exactly when the target does -- qa-android's epilogue
+      # exits non-zero if any recorded step failed -- so a glance at the Actions
+      # list still answers "was anything wrong?" without opening the log.
+      #
+      # `make`, not `./gradlew`: the runner uses the same entry point the
+      # maintainer types locally, so the two cannot drift.
+      - name: QA battery (qa-android)
+        run: make qa-android
+
+  ios:
+    # macos-26 for the same reason ios.yml names it: the image ships the Xcode
+    # generation docs/INSTALL-IOS.md tells a human to install, and a floating
+    # label would move that under the project without the project changing.
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # GNU Make because the system one is 3.81 and make/guard.mk requires 4.3;
+      # XcodeGen because ios/Potillus.xcodeproj is generated, not committed, and
+      # the build step inside the battery cannot run without it.
+      - name: Install GNU Make and XcodeGen
+        run: brew install make xcodegen
+
+      # The SwiftLint version ios/Makefile pins, fetched directly and verified
+      # against a recorded checksum before it is unpacked -- Homebrew would
+      # install whatever is current, and the Makefile's `swiftlint-check`
+      # prerequisite would then reject it, correctly, because the rule set
+      # differs between releases. Kept identical to ios.yml, including the
+      # version and digest: two files claiming different pinned versions of the
+      # same tool would be a defect in itself.
+      - name: Install the pinned SwiftLint
+        env:
+          SWIFTLINT_VERSION: 0.65.0
+          SWIFTLINT_SHA256: d6cb0aa7a2f5f1ef306fc9e37bcb54dc9a26facc8f7784ac0c3dd3eccf5c6ba6
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl -fsSL -o portable_swiftlint.zip \
+            "https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}/portable_swiftlint.zip"
+          echo "${SWIFTLINT_SHA256}  portable_swiftlint.zip" | shasum -a 256 -c -
+          mkdir -p swiftlint-bin
+          unzip -q -o portable_swiftlint.zip -d swiftlint-bin
+          chmod +x swiftlint-bin/swiftlint
+          echo "$RUNNER_TEMP/swiftlint-bin" >> "$GITHUB_PATH"
+
+      # SwiftPM compiles GRDB from source, which dominates the test steps. Keyed
+      # on the resolved-version file, so an upgrade invalidates the cache instead
+      # of restoring something stale across it.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ios/PotillusKit/.build
+          key: swiftpm-${{ runner.os }}-${{ hashFiles('ios/PotillusKit/Package.resolved') }}
+          restore-keys: |
+            swiftpm-${{ runner.os }}-
+
+      # `gmake`, not `make`: the recipes pass $(MAKE) down to every sub-make, so
+      # naming the Homebrew binary once here is what keeps the whole tree on a
+      # Make new enough for make/guard.mk.
+      #
+      # Note that this runs MORE than ios.yml does, and knowingly so: the battery
+      # includes `swift-tests` as well as `cover-check`, which exercise the same
+      # PotillusKit suite twice (once plain, once instrumented). ios.yml drops
+      # the first because a push gate has no use for the duplicate; a QA log
+      # records both because a plain run and an instrumented one can disagree,
+      # and knowing that is the point of reading the log.
+      - name: QA battery (qa-ios)
+        run: gmake qa-ios

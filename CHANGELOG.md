@@ -160,13 +160,14 @@ and in the historical release notes.
 
 ### Infrastructure: run supplementary checks on the GitHub mirror
 
-The mirror runs five GitHub Actions workflows: an Android job, an iOS job on a
+The mirror runs six GitHub Actions workflows: an Android job, an iOS job on a
 macOS runner (the first time real SwiftLint, a real compile and the PotillusKit
 suite run outside the maintainer's own Mac), the instrumentation suite on an
-emulator, a CodeQL job, and a meta job that lints the workflows. They are
-additions to the canonical pipeline, never a replacement: they cannot block a
-merge, they hold no secrets, and every action is pinned to a commit SHA.
-`docs/MIRROR-CHECKS.md` is the reference.
+emulator, a CodeQL job, a meta job that lints the workflows, and — on manual
+dispatch only — both `qa-*` batteries in one pass, whose transcript stays in the
+job log for `gh run view --log`. They are additions to the canonical pipeline,
+never a replacement: they cannot block a merge, they hold no secrets, and every
+action is pinned to a commit SHA. `docs/MIRROR-CHECKS.md` is the reference.
 
 ### OpenSSF: record what the new checks actually settle
 

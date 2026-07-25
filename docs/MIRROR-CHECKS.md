@@ -68,9 +68,11 @@ investigating rather than resolving by deleting one.
 | [`ios.yml`](../.github/workflows/ios.yml) | `gmake -C ios lint` (real SwiftLint at the pinned version), `build` (XcodeGen + xcodebuild), `cover-check` (PotillusKit suite + coverage floor) | GitLab, absolutely: xcodebuild needs macOS, and the canonical pipeline is Linux-only |
 | [`device-tests.yml`](../.github/workflows/device-tests.yml) | `make -C android device-tests EXCLUDE_SCREENSHOTS=1` on an API 36 emulator — the Compose UI and Espresso suite | GitLab: needs KVM and a system image, well past what the free tier's runners provide |
 | [`codeql.yml`](../.github/workflows/codeql.yml) | CodeQL over Kotlin and Swift — data-flow analysis across functions and files, not the per-file reasoning every other check here does | GitLab: SAST of this depth is a paid-tier feature there |
+| [`qa-logs.yml`](../.github/workflows/qa-logs.yml) | `make qa-android` and `gmake qa-ios` — each platform's whole device-free QA battery in one pass, with the transcript left in the job log | GitLab: it is the Android and the iOS run above, and then some |
 
-Both run on a push to **any** branch, so a topic branch under review on GitLab
-gets its verdict while the merge request is still open. Neither runs on tags.
+`meta.yml`, `android.yml` and `ios.yml` run on a push to **any** branch, so a
+topic branch under review on GitLab gets its verdict while the merge request is
+still open. None of them runs on tags.
 
 `device-tests.yml` runs per branch too, but only when something under `android/`
 changed, and additionally on a weekly schedule and on demand. Emulator time is
@@ -85,6 +87,16 @@ translation or a documentation change buys nothing. The weekly run is the safety
 net and ignores the path filter: GitHub updates the query packs, so unchanged
 code can acquire a new finding, and no stretch of non-source work leaves the
 analysis older than seven days.
+
+`qa-logs.yml` has no automatic trigger at all: it is dispatched by hand, from
+the workflow's own page in the Actions tab or with `gh workflow run
+qa-logs.yml`, when a QA round or a release wants the complete picture rather
+than a verdict. What distinguishes it from `android.yml` and `ios.yml` is not
+only its larger scope but its failure behaviour — the `qa-*` targets record a
+failing step and carry on, so one dispatch yields every finding instead of
+stopping at the first. The transcript is read afterwards with `gh run view
+--log`; nothing is uploaded as an artifact, because `qa_step` tees every line to
+stdout on its way into the log file and the job log therefore already holds it.
 
 ## What these checks are NOT
 
@@ -114,7 +126,10 @@ analysis older than seven days.
   any additional scope is declared on the single job that needs it.
 - **`concurrency` with `cancel-in-progress`.** A mirror updates by force-push, so
   a rebased branch can arrive several times a minute; only the newest run is
-  worth paying for.
+  worth paying for. `qa-logs.yml` is the exception and sets it to `false`:
+  without a push trigger, the only run that can collide with it is a second
+  dispatch on the same ref, which is a second request for the battery rather
+  than a newer verdict superseding an older one.
 - **The workflows call `make`,** never their own `./gradlew` or `xcodebuild`
   lines, so the definition of "build the app" stays in `android/Makefile` and
   `ios/Makefile` alone. On macOS that means `gmake`: the system `make` is 3.81
