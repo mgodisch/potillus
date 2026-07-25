@@ -216,7 +216,18 @@ ktlint                  = "14.2.0"    # org.jlleitschuh.gradle.ktlint
 # 0.9.x releases produced an empty report on AGP 9 (the total report had no test
 # tasks / build variants attached — kotlinx-kover issue #785). Applied in
 # app/build.gradle.kts.
-kover                   = "0.9.8"     # org.jetbrains.kotlinx.kover
+#
+# 0.9.9 raises that floor for two reasons, both from its own release notes:
+#   - It stops passing the Project object as a dependency notation (issue #818).
+#     Gradle 9.6 deprecates that form and Gradle 10 will reject it, so under
+#     0.9.8 every configuration of :app emitted a deprecation warning that no
+#     build script of ours caused and none could silence.
+#   - It stops reporting 0% coverage for classes in com.android.* packages
+#     (issue #810), which changes WHICH classes the figure is computed over.
+#     The koverVerify bounds in app/build.gradle.kts are a ratchet with thin
+#     headroom, so the two figures are re-measured after a version change here
+#     rather than assumed to be stable.
+kover                   = "0.9.9"     # org.jetbrains.kotlinx.kover
 
 [libraries]
 # ── AndroidX base ─────────────────────────────────────────────────────────────

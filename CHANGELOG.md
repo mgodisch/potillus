@@ -329,6 +329,11 @@ and their iOS counterparts named 10,000 ml where the validator enforces 5,000.
 The overflow menu wears the iOS More idiom, dirty sheets resist an accidental
 swipe dismissal, and the lock cover shows the device's real unlock glyph.
 
+### Quality-assurance round (repository and build tooling)
+
+Kover is at 0.9.9. It counts classes in `com.android.*` packages toward the
+coverage figure and uses the dependency notation Gradle 10 requires.
+
 ## v0.83.0
 
 Fix iOS presets, cold-start lock and freezes
