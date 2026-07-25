@@ -26,22 +26,22 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis -- Ghidul utilizatorului
 
-Bun venit la Libellus Potionis, jurnalul personal al consumului tău de alcool!
-Această pagină descrie caracteristicile și funcțiile aplicației.
+Această pagină descrie caracteristicile și funcțiile aplicației Libellus
+Potionis, jurnalul personal al consumului tău de alcool.
 
-## Repere
+## Prezentare generală
 
-Libellus Potionis este open source. Codul sursă poate fi consultat și verificat
-de oricine. Libellus Potionis respectă confidențialitatea. Nu necesită nicio
-permisiune – nici pentru cameră sau microfon, nici pentru GPS sau rețea.
-Libellus Potionis este sigur: datele tale rămân în stocarea privată a
-aplicației pe dispozitivul tău, protejate de criptarea dispozitivului tău, iar
-accesul la aplicație poate fi restricționat prin amprentă. Libellus Potionis te
-sprijină să te apropii cu măsură de limitele tale, spunându-ți în orice moment
-dacă „la petite sœur” se încadrează încă în bugetul tău. În plus, aplicația te
-ajută la întâlnirile cu un centru de consiliere în adicții, prezentând la
-cerere întregul tău comportament de consum într-un document PDF clar, de două
-pagini. Libellus Potionis este complet gratuit și fără reclame.
+Libellus Potionis este open source: codul sursă poate fi consultat și verificat
+de oricine. Aplicația nu necesită nicio permisiune – nici pentru cameră sau
+microfon, nici pentru GPS sau rețea. Datele tale rămân în stocarea privată a
+aplicației pe dispozitivul tău, protejate de criptarea dispozitivului, iar
+accesul la aplicație poate fi restricționat prin amprentă.
+
+Aplicația îți spune în orice moment dacă „la petite sœur” se încadrează încă în
+bugetul tău, ca să te poți apropia cu măsură de limitele tale. Pentru
+întâlnirile cu un centru de consiliere în adicții, întocmește la cerere un
+document PDF de două pagini despre comportamentul tău de consum. Este gratuită
+și fără reclame.
 
 Libellus Potionis necesită Android 11 sau mai nou. Este folosit continuu de
 autor pe un Google Pixel 10 Pro cu GrapheneOS (Android 16) și este testat în
@@ -121,26 +121,26 @@ precedentă) și – de exemplu pentru un nou început de Anul Nou – de la ce 
 
 **Datele tale nu părăsesc niciodată acest dispozitiv de la sine.** Libellus
 Potionis păstrează totul în stocarea privată a aplicației și, în mod deliberat,
-nu participă la **nicio** copie de rezervă automată în cloud și la **niciun**
-transfer între dispozitive. Dacă schimbi telefonul, faci o resetare din fabrică
-sau reinstalezi aplicația, **singura modalitate de a-ți păstra datele este să le
+nu participă la nicio copie de rezervă automată în cloud și la niciun transfer
+între dispozitive. Dacă schimbi telefonul, faci o resetare din fabrică sau
+reinstalezi aplicația, **singura modalitate de a-ți păstra datele este să le
 salvezi singur** — nu există altă cale de recuperare, iar datele neexportate nu
 mai pot fi recuperate ulterior.
 
 O copie de rezervă este un singur fișier JSON care conține toate băuturile tale
 și întregul tău jurnal. Pentru a-ți muta datele pe alt telefon:
 
-1. Pe telefonul **vechi**, deschide **„{{settings}}" → {{backup_section}} →
-   {{backup_export}}** și salvează fișierul JSON într-un loc sigur — de exemplu,
+1. Pe telefonul vechi, deschide „{{settings}}" → {{backup_section}} →
+   {{backup_export}} și salvează fișierul JSON într-un loc sigur — de exemplu,
    propriul tău spațiu de stocare în cloud, un e-mail către tine însuți sau un
    transfer prin USB.
-2. Instalează Libellus Potionis pe telefonul **nou**.
-3. Deschide **„{{settings}}" → {{backup_section}} → {{backup_import}}** și
-   selectează acel fișier JSON. Alege **{{import_replace}}** pentru a suprascrie
-   tot sau **{{import_merge}}** pentru a-l combina cu intrările deja existente.
+2. Instalează Libellus Potionis pe telefonul nou.
+3. Deschide „{{settings}}" → {{backup_section}} → {{backup_import}} și
+   selectează acel fișier JSON. Alege {{import_replace}} pentru a suprascrie
+   tot sau {{import_merge}} pentru a-l combina cu intrările deja existente.
 
-Exportă în mod regulat: o copie de rezervă protejează doar datele care existau în
-momentul în care ai creat-o.
+Exportă în mod regulat: o copie de rezervă protejează doar datele care existau
+în momentul în care ai creat-o.
 
 ### {{security}}
 

@@ -37,8 +37,6 @@ Scope note: Libellus Potionis is a native, offline Android app with no media, no
 no hyperlinks, and no login. Several Level-A SC are therefore **N/A** and marked
 below; do not claim them, just record them as not applicable with the reason.
 
----
-
 ## 0. Setup (do once)
 
 - [ ] Build a **release-style debug** build and install on a physical phone.
@@ -56,8 +54,6 @@ Record for each SC: **Pass / Fail / N/A** + a note. Screens to cover: Today,
 Drinks, Calendar (month grid), Calendar (year heat-map), Statistics (charts),
 Settings, the add/edit-entry dialog, the date/time pickers, the document/help
 viewer, the PDF export flow.
-
----
 
 ## 1. Perceivable
 
@@ -149,16 +145,12 @@ viewer, the PDF export flow.
     "Alternative Status Symbols" switch and the others.
   - (Note: **4.1.1 Parsing was removed in WCAG 2.2** — do not test it.)
 
----
-
 ## 5. Explicitly N/A for this app (record, do not claim)
 
 1.2.1–1.2.3 (audio/video), 1.4.2 (audio control), 2.1.4 (char shortcuts),
 2.2.1–2.2.2 (timing/moving — no timeouts or auto-updating content), 2.3.1 (three
 flashes — no flashing), 2.5.4 (motion), and web-scoped items (2.4.1 bypass
 blocks). For each: reason = "native offline app, feature not present".
-
----
 
 ## 6. Open items already known (decide during this pass)
 
@@ -171,8 +163,6 @@ blocks). For each: reason = "native offline app, feature not present".
    needed, a one-line `clearAndSetSemantics` fix.
 3. **1.3.1 headings** — verify section headers expose the `heading()` role;
    likely a small addition if not.
-
----
 
 ## 7. Sign-off
 

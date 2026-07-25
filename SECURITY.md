@@ -133,8 +133,8 @@ route above remains the primary one.
 To help triage and reproduce the issue, please include where possible:
 
 - a description of the vulnerability and its potential impact;
-- the app version (shown in the app, or the `versionName`) and the Android
-  version and device model;
+- the app version (shown in the app, or the `versionName`), the operating
+  system version and the device model;
 - step-by-step instructions or a proof of concept to reproduce it;
 - any relevant logs, stack traces, or screenshots.
 
@@ -255,15 +255,14 @@ software-composition-analysis (SCA) findings.
 The project uses a small, fixed set of secrets, none of which are ever committed
 to version control:
 
-- the **release code-signing keystore** and the keystore file it references),
-  used to sign the release artifacts, the Google Play upload bundle and the
-  GitLab/F-Droid APK;
-- the **App Store upload credentials,** used only by the Fastlane App Store
+- the release code-signing credentials (`android/keystore.properties` and the
+  keystore file it references), used to sign the release artifacts, the Google
+  Play upload bundle and the GitLab/F-Droid APK;
+- the App Store upload credentials, used only by the Fastlane App Store upload
+  lanes;
+- the Google Play upload credentials, used only by the Fastlane Play Store
   upload lanes; and
-- the **Google Play upload credentials,** used only by the Fastlane Play Store
-  upload lanes; and
-- the maintainer's **OpenPGP signing key**, used to sign release tags and
-  commits.
+- the maintainer's OpenPGP signing key, used to sign release tags and commits.
 
 **Storing.** Secrets are never hard-coded in source and never stored in the
 repository. The templates (`android/keystore.properties.example` and
@@ -296,11 +295,11 @@ app-signing key (fingerprint below); that private key is held only by the
 maintainer and is never stored on GitLab, F-Droid, or any other distribution
 site. Independently of that, every file published on a GitLab release — the APK
 and both SBOMs — carries a detached OpenPGP signature made with the maintainer's
-OpenPGP key, the same one this document publishes for encrypted reports. On Google Play the maintainer
-signs the uploaded App Bundle with the same private key in its role as the Play
-upload key and likewise holds it alone, while Google holds the separate
-app-signing key under Play App Signing and re-signs the artifact delivered to
-Play users. The build is reproducible.
+OpenPGP key, the same one this document publishes for encrypted reports. On
+Google Play the maintainer signs the uploaded App Bundle with the same private
+key in its role as the Play upload key and likewise holds it alone, while
+Google holds the separate app-signing key under Play App Signing and re-signs
+the artifact delivered to Play users. The build is reproducible.
 
 You can verify a downloaded or installed release in any of these ways:
 

@@ -9,6 +9,7 @@
 
 # ── Editor & OS scratch files ────────────────────────────────────────────────
 .*.swp
+*.diff
 *.log
 *.orig
 *.pyc

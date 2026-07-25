@@ -26,22 +26,22 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis -- Guida utente
 
-Benvenuto in Libellus Potionis, il diario personale del tuo consumo di alcol!
-Questa pagina descrive le caratteristiche e le funzioni dell'app.
+Questa pagina descrive le caratteristiche e le funzioni di Libellus Potionis,
+il diario personale del tuo consumo di alcol.
 
-## In evidenza
+## Panoramica
 
-Libellus Potionis è open source. Il codice sorgente può essere consultato e
-verificato da chiunque. Libellus Potionis rispetta la privacy. Non richiede
-alcun permesso: né per la fotocamera o il microfono, né per il GPS o l'accesso
-alla rete. Libellus Potionis è sicuro: i tuoi dati restano nell'archivio
-privato dell'app sul tuo dispositivo, protetti dalla cifratura del tuo
-dispositivo e l'accesso all'app può essere limitato tramite impronta digitale.
-Libellus Potionis ti aiuta a dosarti fino al tuo limite indicandoti in ogni
-momento se «la petite sœur» rientra ancora nel tuo budget. Libellus Potionis ti
-sostiene nel percorso presso il servizio per le dipendenze fornendo, su
-richiesta, un report PDF completo di due pagine sulle tue abitudini di consumo.
-Libellus Potionis è gratuito e senza pubblicità.
+Libellus Potionis è open source: il codice sorgente può essere consultato e
+verificato da chiunque. L'app non richiede alcun permesso: né per la fotocamera
+o il microfono, né per il GPS o l'accesso alla rete. I tuoi dati restano
+nell'archivio privato dell'app sul tuo dispositivo, protetti dalla cifratura
+del dispositivo, e l'accesso all'app può essere limitato tramite impronta
+digitale.
+
+L'app ti indica in ogni momento se «la petite sœur» rientra ancora nel tuo
+budget, così puoi dosarti fino al tuo limite. Per un appuntamento al servizio
+per le dipendenze produce, su richiesta, un report PDF di due pagine sulle tue
+abitudini di consumo. È gratuita e senza pubblicità.
 
 Libellus Potionis richiede Android 11 o versioni successive. L'autore lo utilizza
 con continuità su un Google Pixel 10 Pro con GrapheneOS e lo collauda inoltre su
@@ -117,22 +117,22 @@ la data a partire dalla quale deve iniziare l'analisi dei dati.
 
 **I tuoi dati non lasciano mai questo dispositivo da soli.** Libellus Potionis
 conserva tutto nell'archivio privato dell'app e deliberatamente non partecipa a
-**nessun** backup automatico sul cloud né a **nessun** trasferimento da
-dispositivo a dispositivo. Se cambi telefono, esegui un ripristino dei dati di
-fabbrica o reinstalli l'app, **l'unico modo per conservare i tuoi dati è
-salvarli tu stesso**: non esiste altra via di recupero e i dati non esportati
-non possono essere recuperati in seguito.
+nessun backup automatico sul cloud né a nessun trasferimento da dispositivo a
+dispositivo. Se cambi telefono, esegui un ripristino dei dati di fabbrica o
+reinstalli l'app, **l'unico modo per conservare i tuoi dati è salvarli tu
+stesso**: non esiste altra via di recupero e i dati non esportati non possono
+essere recuperati in seguito.
 
 Un backup è un singolo file JSON che contiene tutte le tue bevande e l'intero
 registro. Per spostare i tuoi dati su un altro telefono:
 
-1. Sul telefono **vecchio**, apri **«{{settings}}» → {{backup_section}} →
-   {{backup_export}}** e salva il file JSON in un luogo sicuro, ad esempio il tuo
+1. Sul telefono vecchio, apri «{{settings}}» → {{backup_section}} →
+   {{backup_export}} e salva il file JSON in un luogo sicuro, ad esempio il tuo
    spazio cloud, un'e-mail a te stesso o un trasferimento via USB.
-2. Installa Libellus Potionis sul telefono **nuovo**.
-3. Apri **«{{settings}}» → {{backup_section}} → {{backup_import}}** e seleziona
-   quel file JSON. Scegli **{{import_replace}}** per sovrascrivere tutto oppure
-   **{{import_merge}}** per combinarlo con le voci già presenti.
+2. Installa Libellus Potionis sul telefono nuovo.
+3. Apri «{{settings}}» → {{backup_section}} → {{backup_import}} e seleziona
+   quel file JSON. Scegli {{import_replace}} per sovrascrivere tutto oppure
+   {{import_merge}} per combinarlo con le voci già presenti.
 
 Esporta regolarmente: un backup protegge solo i dati che esistevano nel momento
 in cui lo hai creato.

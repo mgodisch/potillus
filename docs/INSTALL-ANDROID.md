@@ -48,8 +48,6 @@ help`, run from the repository root, is the one-line index of every target
 (build, checks, store assets, release, publishing); the release and publishing
 groups are deliberately out of scope here.
 
----
-
 ## 1. Why these tools, and nothing else
 
 An Android build has three moving parts, and it helps to know which one each
@@ -77,8 +75,6 @@ Two things are deliberately **not** on the list:
 `minSdk = 30` (Android 11) is the oldest device the APK will run on;
 `targetSdk = 36` (Android 16) is the behaviour level it is optimised for.
 
----
-
 ## 2. Install the system packages
 
 Everything except the Android SDK comes from Debian's own repositories, so a
@@ -97,8 +93,6 @@ version:
 If your Debian release does not carry `openjdk-21-jdk`, install a standalone
 Temurin/Adoptium **21** JDK instead and make sure it is the `java` on your
 `PATH`; the build only checks that the major version is 21, not its vendor.
-
----
 
 ## 3. Install the Android SDK command-line tools
 
@@ -149,8 +143,6 @@ add these to `~/.profile` (or `~/.bashrc`):
 > `ANDROID_HOME` export at all — you can pass the path to every build with
 > `make ANDROID_HOME=/path/to/android-sdk ...`.
 
----
-
 ## 4. Get the source
 
     git clone <repository-url> potillus
@@ -158,8 +150,6 @@ add these to `~/.profile` (or `~/.bashrc`):
 
 The repository holds both platforms side by side (`android/` and `ios/`); the
 Android build lives under `android/`.
-
----
 
 ## 5. Build the debug APK
 
@@ -196,8 +186,6 @@ The first build is slow because of the one-time downloads; later builds reuse
 the Gradle daemon and caches. If Gradle runs out of memory on a small machine,
 raise its heap: `make -C android debug-apk GRADLE_OPTS="-Xmx4g"`.
 
----
-
 ## 6. (Optional) Run it
 
 You do not need a device to have built the APK, but to *see* the app you need
@@ -215,8 +203,6 @@ one of the following.
     avdmanager create avd -n potillus -k "system-images;android-36;google_apis;x86_64"
     emulator -avd potillus &
     adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-
----
 
 ## 7. Troubleshooting
 

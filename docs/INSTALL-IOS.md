@@ -46,8 +46,6 @@ extended companion to the iOS Makefile's help: it walks the build-path targets
 the *why* behind each. `gmake help` (run in `ios/`) is the one-line index of
 every iOS target; project generation comes first there too, matching §5 below.
 
----
-
 ## 1. Why these tools, and nothing else
 
 | Tool | Version | Why it is needed | Installed how |
@@ -73,8 +71,6 @@ dependency versions. Run `swift package update` deliberately, and review the
 resulting diff. GRDB is recorded in `COPYING.md`; its MIT license text must be
 reproduced in the app's about screen before the first App Store submission.
 
----
-
 ## 2. Install Xcode and the Command Line Tools
 
 1. Install **Xcode 26** from the App Store (a multi-gigabyte download).
@@ -97,8 +93,6 @@ reproduced in the app's about screen before the first App Store submission.
 `git` and `python3` come with the tools installed above; no separate step is
 needed for them.
 
----
-
 ## 3. Install Homebrew and the two Mac-side tools
 
 If you do not already have Homebrew:
@@ -118,8 +112,6 @@ untouched). Every `make` command in this guide is therefore written as
 > **0.65.0**, and the gate refuses a different one because lint rules change
 > between releases.
 
----
-
 ## 4. Get the source
 
     git clone <repository-url> potillus
@@ -138,8 +130,6 @@ Inside `ios/`, the source is split in two, plus a generator spec:
 - `ios/Potillus/` — the SwiftUI app shell that depends on `PotillusKit`.
 - `ios/project.yml` — the XcodeGen spec; `Potillus.xcodeproj` is generated from
   it and is git-ignored.
-
----
 
 ## 5. Generate the Xcode project
 
@@ -174,8 +164,6 @@ generated project shows the unexpanded `$(MARKETING_VERSION)` placeholder:
 
     cd ios && xcodebuild -project Potillus.xcodeproj -target Potillus \
         -showBuildSettings 2>/dev/null | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION'
-
----
 
 ## 6. Build and run in the Simulator (primary path)
 
@@ -240,8 +228,6 @@ CI pipeline deliberately runs only the device-free subset (a hosted Linux runner
 has no Mac), so this local gate is stricter. It is not needed just to run the
 app.
 
----
-
 ## 7. (Optional) Run on a physical iPhone
 
 The Simulator needs no Apple account; a real device does, because iOS only runs
@@ -261,8 +247,6 @@ Program membership for a debug install.
 Note that free personal-team signing produces builds that expire after a few
 days and must be re-installed from Xcode; that is an Apple limitation of
 unpaid signing, not a project setting.
-
----
 
 ## 8. Troubleshooting
 

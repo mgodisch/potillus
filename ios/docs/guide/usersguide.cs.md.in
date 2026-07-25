@@ -25,20 +25,21 @@ apply to it are stated in the accompanying COPYING.md file.
 -->
 # Libellus Potionis -- Uživatelská příručka
 
-Vítejte v Libellus Potionis, osobním deníku vaší spotřeby alkoholu! Tato stránka
-popisuje vlastnosti a funkce aplikace.
+Tato stránka popisuje vlastnosti a funkce aplikace Libellus Potionis, osobního
+deníku vaší spotřeby alkoholu.
 
-## Hlavní přednosti
+## Přehled
 
-Libellus Potionis je open source. Zdrojový kód si může prohlédnout a ověřit
-kdokoli. Libellus Potionis je šetrný k soukromí. Nevyžaduje žádná oprávnění, ani
-ke kameře či mikrofonu, ani k GPS nebo přístupu k síti. Libellus Potionis je
-bezpečný: vaše data zůstávají v soukromém úložišti aplikace na vašem zařízení,
-chráněná šifrováním vašeho zařízení a přístup k aplikaci lze omezit pomocí Face ID nebo Touch ID. Libellus Potionis vám pomáhá dávkovat se až k vašemu limitu tím, že vám
-kdykoli prozradí, zda se „la petite sœur" ještě vejde do vašeho rozpočtu.
-Libellus Potionis vás podporuje při léčbě závislosti tím, že na požádání poskytne
-podrobnou dvoustránkovou zprávu PDF o vašich pijáckých návycích. Libellus
-Potionis je zdarma a bez reklam.
+Libellus Potionis je open source: zdrojový kód si může prohlédnout a ověřit
+kdokoli. Aplikace nevyžaduje žádná oprávnění – ani ke kameře či mikrofonu, ani
+k GPS nebo k síti. Vaše data zůstávají v soukromém úložišti aplikace na vašem
+zařízení, chráněná šifrováním zařízení, a přístup k aplikaci lze omezit pomocí
+Face ID nebo Touch ID.
+
+Aplikace vám kdykoli prozradí, zda se „la petite sœur“ ještě vejde do vašeho
+rozpočtu, takže se můžete dávkovat až ke svému limitu. Pro schůzky v poradně
+pro závislosti na požádání vytvoří dvoustránkovou zprávu PDF o vašich pijáckých
+návycích. Je zdarma a bez reklam.
 
 Libellus Potionis vyžaduje iOS 17.0 nebo novější. Autor jej průběžně používá
 na zařízení iPhone 16E a navíc jej testuje na emulátoru iPhone 17 Pro.
@@ -81,7 +82,7 @@ zaznamenání jako zkonzumovaného. Chceš-li nápoj upravit nebo odstranit, př
 
 ## Obrazovka „{{settings}}"
 
-Nabídka nastavení je dostupná přes ikonu nabídky (☰) vlevo nahoře. Libellus
+Nabídka nastavení je dostupná přes tlačítko Více (…) vpravo nahoře. Libellus
 Potionis nabízí následující možnosti konfigurace:
 
 ### {{personal_data}}
@@ -106,26 +107,26 @@ předsevzetí — datum, od kterého se mají data vyhodnocovat.
 ### {{backup_section}}
 
 **Tvoje data nikdy neopustí toto zařízení sama od sebe.** Libellus Potionis
-uchovává vše v soukromém úložišti aplikace a záměrně se neúčastní **žádného**
-automatického zálohování do cloudu ani **žádného** přenosu mezi zařízeními. Pokud
+uchovává vše v soukromém úložišti aplikace a záměrně se neúčastní žádného
+automatického zálohování do cloudu ani žádného přenosu mezi zařízeními. Pokud
 změníš telefon, provedeš obnovení do továrního nastavení nebo aplikaci
-přeinstaluješ, **jediným způsobem, jak si data zachovat, je sám si je zálohovat**
-— jiná cesta k obnovení neexistuje a data, která nebyla exportována, už později
-nelze získat zpět.
+přeinstaluješ, **jediným způsobem, jak si data zachovat, je sám si je
+zálohovat** — jiná cesta k obnovení neexistuje a data, která nebyla
+exportována, už později nelze získat zpět.
 
 Záloha je jediný soubor JSON obsahující všechny tvé nápoje a celý tvůj záznam.
 Přenos dat do jiného telefonu:
 
-1. Na **starém** telefonu otevři **„{{settings}}" → {{backup_section}} →
-   {{backup_export}}** a ulož soubor JSON na bezpečné místo — například do
+1. Na starém telefonu otevři „{{settings}}" → {{backup_section}} →
+   {{backup_export}} a ulož soubor JSON na bezpečné místo — například do
    vlastního cloudového úložiště, do e-mailu sobě samému nebo přes přenos USB.
-2. Nainstaluj Libellus Potionis na **nový** telefon.
-3. Otevři **„{{settings}}" → {{backup_section}} → {{backup_import}}** a vyber
-   tento soubor JSON. Zvol **{{import_replace}}** pro přepsání všeho, nebo
-   **{{import_merge}}** pro sloučení se záznamy, které už existují.
+2. Nainstaluj Libellus Potionis na nový telefon.
+3. Otevři „{{settings}}" → {{backup_section}} → {{backup_import}} a vyber tento
+   soubor JSON. Zvol {{import_replace}} pro přepsání všeho, nebo
+   {{import_merge}} pro sloučení se záznamy, které už existují.
 
-Exportuj pravidelně: záloha chrání pouze data, která existovala v okamžiku jejího
-vytvoření.
+Exportuj pravidelně: záloha chrání pouze data, která existovala v okamžiku
+jejího vytvoření.
 
 ### {{security}}
 

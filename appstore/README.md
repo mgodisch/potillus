@@ -109,8 +109,9 @@ A few listing answers are console-side (not repository files):
   network requests and collects nothing off-device).
 - Export compliance: the app uses only standard platform cryptography
   (`ITSAppUsesNonExemptEncryption` is already set to `NO` in `ios/project.yml`).
-- Age rating: answer Apple's questionnaire (the app concerns alcohol, so expect a
-  17+ rating).
+- Age rating: answer Apple's questionnaire. The alcohol-frequency question is
+  answered `Frequent`, which yields 18+; the reasoning is in
+  [`docs/STORE_RATINGS.md`](../docs/STORE_RATINGS.md).
 
 ## Store metadata and translations
 

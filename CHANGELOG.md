@@ -44,1453 +44,260 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Reach iOS parity and harden the release
 
-This version does four things. Its headline is an iOS interaction rework — the
-per-row trash and pencil icons on the Today, Drinks and Calendar screens give way
-to the native edit-mode-and-tap model Apple's own list apps use — it moves the
-canonical repository to GitLab, it absorbs the store-path corrections that had
-been drafted for 0.83.1, and it folds in the fixes of a full two-platform QA
-round (the closing "Quality-assurance round" section). **0.83.1 is
-cancelled and was never published**; its `versionCode` 95 was never shipped, so
-0.84.0 inherits it. The human version therefore steps 0.83.0 → 0.84.0 (a minor
-bump), while `versionCode` is 95 — the 94 → 95 step the 0.83.1 cycle made, now
-carried by 0.84.0 — and everything that cycle had prepared is folded in below.
+This version reworks the iOS interaction model to match Apple's own list apps,
+moves the canonical repository to GitLab, absorbs the store-path corrections
+drafted for 0.83.1, folds in a two-platform QA round, and revises the project's
+own texts.
 
 ### Build tooling: rebuild the Makefiles
 
-The two hand-grown Makefiles have been replaced, one target group at a time, by
-a smaller set with a clear division of labour: a thin root `Makefile` that
-delegates to a per-platform `android/Makefile` and a NEW `ios/Makefile` (until
-now iOS had no Makefile of its own — its housekeeping lived in the root as
-`clean-ios`/`distclean-ios`), with repository-wide concerns in `make/*.mk`
-includes. The previous Makefiles were preserved verbatim under `attic/` as a
-reference during the rebuild; with their last deferred recipe now superseded
-(see "Build tooling: replace the badge-answer pull with a diff report" below),
-`attic/` has been removed.
+The two hand-grown Makefiles are replaced by a thin root `Makefile` that
+delegates to `android/Makefile` and a new `ios/Makefile`, with repository-wide
+concerns in `make/*.mk` includes. `attic/`, the verbatim copy of the old
+Makefiles, is removed.
 
-Each revision is fully functional within its own scope. What the rebuild
-delivers:
+The two build layers are now symmetric: iOS gains the build, test, lint,
+format, version and guide targets it lacked, behind a `require-macos` guard
+that fails with a clear message on the Linux release path. `clean` and
+`distclean` are an honest aggregate again and need neither a JVM nor an SDK.
 
-- A shared GNU Make version guard (`make/guard.mk`, included by all three
-  Makefiles) aborts with a legible message on GNU Make older than 4.3 (macOS
-  still ships 3.81 as the system `make`). It lives in one file rather than three:
-  every Makefile declares `.ONESHELL`/`.SHELLFLAGS` as load-bearing, and a Make
-  that predates those (3.82+) does not error but silently ignores them, running
-  recipes without the strict error handling they assume; the store fragment also
-  uses grouped targets (`&:`), which need 4.3. The guard turns that silent
-  degradation into a loud, single-sourced failure.
-- `clean`/`distclean` return as an honest aggregate at the root that fans out to
-  both platforms. The old root deliberately had no bare `clean`, because it would
-  have cleaned Android alone and left the entire iOS tree standing; a real
-  `ios/Makefile` makes the aggregate truthful.
-- Android `clean` deletes the build output directly (`rm -rf app/build build`)
-  instead of running `./gradlew clean`, so it needs no JVM, SDK or Gradle
-  configuration, works in a tree that cannot yet build, and matches how iOS has
-  always cleaned.
-- `clean`/`distclean` no longer depend on the build-prerequisite gate: the old
-  Android `clean: prereq` ran the whole Java/SDK/Gradle/release-check chain just
-  to tidy up.
-- Android `distclean` uses `rm -f` for the `raw*/usersguide.md` guide glob; the
-  old bare `rm` aborted under `set -e` when the glob matched nothing (a fresh
-  tree that never rendered the guides).
+Store assets split into two independent strands, the in-app screenshots and the
+per-locale report PDFs, and `feature-graphics-android` renders the Play
+graphics from both explicitly rather than by cascade.
 
-The Android build layer (`android/Makefile`) is rebuilt on top of the
-housekeeping: `prereq` (Java 21, the Android SDK, the Gradle wrapper, the bundled
-license copies and the localized user guides), then `debug`, `screenshot-apks`,
-`unit-test`, `lint`, the new `format` and `check-guides`. Choices verified against
-`app/build.gradle.kts`:
+`release-android` and `release-ios` are the sole writers of `releases/` and
+refuse to overwrite a staged artifact; `release-ios` archives twice unsigned
+and stages only if the two payloads are byte-identical, the iOS analogue of the
+F-Droid reproducibility check. The `publish.mk` targets upload what is already
+staged and never build or sign, each gated on the `v<VERSION>` tag and the
+expected signing key. `cover-check` reaches both platforms, with a 90% line
+floor over PotillusKit.
 
-- The SDK check requires only `platforms;android-36` (compileSdk = targetSdk = 36);
-  the old check also demanded `android-35`, which appears only in a source comment.
-- `java`, `android` and `gradle-wrapper` fail with actionable messages instead of
-  the cryptic "No rule to make target" the old bare prerequisites produced.
-- `screenshot-apks` and `debug` now depend on `prereq`, so a direct
-  `make -C android screenshot-apks` is self-sufficient.
-- `format` (ktlint auto-format) is new; it needs the toolchain but not the full
-  `prereq`, since you run it to fix the tree, not to gate it.
-- `prereq` holds only what a build consumes: the toolchain plus the compiled-in
-  license and guide resources. The read-only release-readiness gate is deferred to
-  the (later) release slice, so the Android build layer carries no release check --
-  the everyday build gates on `lint` and `check-guides` alone.
-- The `help` target sits at the top of the file and is the single source of the
-  target list; the header comment no longer repeats it.
-
-The iOS build layer (`ios/Makefile`) mirrors Android and replaces the iOS targets
-that lived in the old root Makefile: `version` (regenerates `Version.xcconfig` from
-the top CHANGELOG entry and the Android versionCode via `gen-ios-version.py`),
-`guides` (renders the localized in-app guides from the String Catalogue via
-`render-guide-ios.py`), the bundled `license_gpl3.md` copy, and `project`
-(`xcodegen generate`, with `version`/`guides`/license as prerequisites so the
-version and sources are current before the `.xcodeproj` freezes project.yml's
-source globs). `version-check` and `check-guides` are read-only. Targets are bare
-like Android's, so the root drives them as `make -C ios project`, and `help` sits
-at the top as the single source of the target list. This unblocks the iOS
-screenshot capture in a later revision. (The two iOS tools still print the old
-`make ios-version` / `make ios-guides` names in their messages; correcting those
-references belongs to the later tools/ cleanup.)
-
-Build-layer parity between the two platforms, with names that say what they build.
-Android's `debug` is renamed `debug-apk` and `unit-test` to `unit-tests`
-(`screenshot-apks` keeps its name: it BUILDS the debug + androidTest APKs the
-screenshot capture installs, it does not capture anything). iOS gains the
-counterparts it was missing: `build` (xcodebuild, Debug), `swift-tests` (the
-PotillusKit unit tests via `swift test`), `lint` (SwiftLint --strict, pinned to
-0.65.0) and `format` (swiftlint --fix). All four need macOS and share a
-`require-macos` prerequisite that fails with a clear message off it (e.g. on the
-Linux release path) instead of dying on a missing xcodebuild/swiftlint deeper in a
-recipe. The iOS screenshot capture is deliberately NOT hoisted here: unlike
-Android's device-free APK build, iOS build-and-capture is one simulator operation
-with no separable artifact, and screenshots are a store concern.
-
-Store STRAND B for Android arrives in the first store fragment, `make/store.mk`
-(a root include, not a standalone Makefile). `report-pdfs-android` drives the
-human-in-the-loop per-locale PDF export: it builds and installs the debug +
-androidTest APKs, runs the `-e reportExport`-gated `ReportExportTest` once per
-locale (you tap "Save as PDF", the name is pre-filled), then pulls the files.
-`screenshots-pdf-android` then rasterizes the report pages 07/08 from those PDFs
-with pdftoppm. The 21 committed report PDFs move to `fastlane/report-pdf/android/`
-(the `ios/` sibling is reserved; per project decision iOS report PDFs stay
-transient, produced inside the iOS screenshot run, so there is no
-report-pdfs-ios). A per-locale sentinel makes any consumer of a missing PDF fail
-with a message naming `make report-pdfs-android` instead of a cryptic "No rule to
-make target". The export is explicit-only (device + manual) and, unlike the old
-target, deliberately does NOT cascade the feature graphics -- strand B is
-independent of strand A (01..06).
-
-Store STRAND A -- the in-app screenshots 01..06 -- joins the store fragment:
-`screenshots-android` (Android Demo Mode + screengrab, with a sticky-panel/date
-teardown that runs even on Ctrl-C via an EXIT trap into
-`screenshots-demo-off-android`) and `screenshots-ios` (fastlane snapshot on the
-Simulator; on iOS the same run also renders the transient report pages 07/08, per
-the Option-C decision, so there is no separate iOS report export). Both are
-explicit-only and need a device/simulator you start yourself. Like
-report-pdfs-android, neither cascades the feature graphics any more: strand A is
-independent of strand B, and refreshing the feature graphics is a separate
-explicit step.
-
-The Android feature graphics and the store orchestrator complete the store
-fragment. `feature-graphics-android` renders every locale's 1024x500 Play feature
-graphic (and its committed high-res companion `featureGraphic-4K.png`, which
-README.md links and the forge displays per locale) from the caption, `01_today`
-(strand A), `07` (strand B) and the shared inputs -- via a grouped target so one
-renderer call declares both outputs. It is EXPLICIT, never cascaded from the
-producers; a `device_screenshot_sentinel` makes a missing `01_today` fail with a
-message naming `make screenshots-android`. `feature-graphics-existing-android`
-refreshes only the graphics already on disk (for a shared-input change, no
-capture). `store-assets-android` runs the whole set in order -- screenshots,
-report PDFs, then feature graphics last so their inputs are fresh -- replacing the
-old cascade/stamp machinery, which strand independence made unnecessary. The
-grouped target raises the shared Make guard's floor to 4.3 (noted above).
-
-The bare-`cd` checker (`tools/check-makefile.py`) now defaults to every makefile
-the project ships -- the three Makefiles and each `make/*.mk` fragment -- and
-treats a fragment as running under the `.ONESHELL` its includer sets, so `store.mk`
-and any future fragment are actually checked rather than silently skipped for
-lacking a `.ONESHELL` of their own.
-
-Static checks move into their own fragment, `make/checks.mk` (a root include).
-Each `check-*` target wraps one read-only, device-free tool: the repo-wide
-invariants (`check-headers`, `check-makefile`, `check-report-paper`, `check-l10n`,
-`check-l10n-parity`, `check-ui-string-parity`, `check-bestpractices-levels`) and
-the Mac-free iOS static checks (`check-swift-symbols`, `check-swift-length`,
-`check-swift-tests`, `check-ios-metadata`, `check-ios-screenshots`,
-`check-ios-a11y`), plus the writing `fix-headers`. `check-ios-static` bundles the
-Mac-free iOS release gate (invoking ios/Makefile's `check-guides` rather than
-duplicating it), and `check-static` is the broadest device-free gate -- every
-static check in one command. The Mac-only SwiftLint pass stays in ios/Makefile
-(`lint`), and the Android release gate (`tools/release-check.sh`) is wired in a
-later revision; neither is duplicated here.
-
-The Android release path lands in a new fragment, `make/release.mk` (a root
-include). `release-android` gates, builds and stages in order: it asserts the store
-screenshots and report PDFs are present, refuses to overwrite an already-staged
-artifact for the versionCode, runs the read-only invariant gate
-(`tools/release-check.sh --Werror --release`, wired as-is -- its decomposition is
-on the roadmap) and the coverage gate, builds the AAB/APK/SBOM through the Android
-Makefile, then copies them into `releases/` under canonical names. The build
-targets themselves join `android/Makefile`: `release` (assembleRelease), `bundle`
-(bundleRelease), `sbom` (the reproducible CycloneDX SBOM) and `cover-check`
-(`:app:koverVerify`). Coverage is a SEPARATE `cover-check` target -- Android today,
-invoked as its own gate rather than via release-check.sh's `--coverage` flag -- so
-an iOS coverage gate can join it symmetrically (planned on the roadmap).
-
-The store and check targets never touch `releases/`; `release-android` is the sole
-writer of staged artifacts there, and even it refuses to overwrite an existing one.
-
-`release-ios` completes the release layer as the iOS counterpart (Mac only, so it
-opens with a macOS guard). It gates on the captured iOS screenshots and the
-translated store metadata (`check-ios-metadata --release`), resolves the signing
-Team ID (`DEVELOPMENT_TEAM` or `ios/signing.properties`), pins the Xcode major, and
--- the iOS analogue of Android's F-Droid reproducible-build check -- archives TWICE
-unsigned and stages only if the two `.app` payloads are byte-identical, then signs
-at export and stages the `.ipa` plus the iOS SBOM into `releases/`. `ios-sbom`
-(gen-ios-sbom.py + the shared sbom-normalize.py) is standalone and mirrors the
-Android `sbom`. Neither uploads -- that is the fastlane iOS lanes.
-
-Publishing lands in the last fragment, `make/publish.mk` (a root include). These
-targets UPLOAD the already-staged, already-signed artifacts and build the source
-tarball -- they never build or sign. `tgz` derives its exclude set from
-`.gitignore` (so the two cannot drift); `push-playstore` and `push-appstore`
-upload the staged AAB/IPA to their stores,
-each gated on the `v<VERSION>` git tag existing (they never create it) and on the
-artifact carrying the expected signing key (the AAB's jarsigner+keytool SHA-256, or
-the IPA's codesign team), pinned against the single fingerprint in SECURITY.md;
-`push-appstore-preflight` isolates the App Store credential check, and
-`push-gitlab` publishes the GitLab release and verifies each uploaded asset's
-sha256. Each fails fast if an artifact, credential or tag is missing, so a push only
-ever runs against something built explicitly.
-
-Two per-platform umbrellas cap the rebuild. `android` runs the device-free daily
-Android check (`-C android debug-apk unit-tests lint check-guides` plus
-`check-l10n-parity`); `ios` runs the Mac-free `check-ios-static` first, then the
-Mac-only `-C ios lint swift-tests build`. Screenshots, coverage, device tests and
-release stay off the daily run, each on its own target. `device-tests` (the
-on-device connectedDebugAndroidTest, with an `EXCLUDE_SCREENSHOTS` toggle) joins
-`android/Makefile`, driven from the root as `device-tests-android`; its iOS
-counterpart `device-tests-ios` is prepared on the roadmap. `install-debug`
-(renamed from the old `install`) copies the debug APK to `../downloads/` for
-sideloading -- it stages a file, it does not touch a device.
-
-The one-off font bake `rokkitt-bold` joins the store fragment: it instantiates the
-static weight-700 Rokkitt Bold the feature-graphic badge needs from the upstream
-variable font (kept OUTSIDE the reproducibility-scanned `tools/fonts/`), so the
-committed `.ttf` lets everyone render byte-identically without fonttools installed.
-
-Not ported: the OpenSSF badge maintenance targets
-`bestpractices-json`/`bestpractices-jsonc` (formerly run by hand when the badge
-answers changed). They are superseded rather than re-created by the badge-tooling
-change below, which retires the pull-and-overwrite recipes in favour of the
-read-only `make bestpractices` diff report. The read-only
-`check-bestpractices-levels` gate is already rebuilt in `make/checks.mk`.
-
-The `tools/release-check.sh` monolith is decomposed (its decomposition was
-previously deferred). The shared core -- the colours, counters, the
-`pass`/`fail`/`warn`/`section` output helpers, the file-path constants and the
-`extract_version_*` helpers -- moves into `tools/release-checks/lib.sh`, and each of
-the 16 checks moves verbatim into its own file under `tools/release-checks/`
-(`version-consistency.sh`, `changelog.sh`, ... `coverage.sh`). The runner shrinks to
-a thin script that sources the library and the check files and calls `main()`, which
-runs them in the same order, with the same flags (`--Werror`/`--release`/
-`--coverage`) and the same summary. The output is byte-for-byte unchanged. A slim
-`release-check` target rejoins `make/checks.mk` (it runs `tools/release-check.sh
---Werror`), giving the invariant gate a convenient everyday form again -- the gate
-had been reachable only through `release-android` since it left `prereq`. The
-script's own header comments, which still described it as running on every build
-via a `prereq`/`release-check` path, are corrected to match: the everyday build
-gates on lint and check-guides alone; the invariants run via `make release-check`
-and, with `--release`, inside `release-android`.
-
-Finally, a sweep updates the stale `make <target>` references the renames left in
-comments, docs and diagnostics -- across every tracked text file a full
-`git ls-files` scan turned up -- the tools, the androidTest sources, the
-install/contributing docs, the decomposed release-check scripts, the Xcode project
-spec, a main-source comment, `COPYING.md`, the Gradle build script's comments, the
-fastlane config comments and the OpenSSF badge justifications -- to the current
-names: `screenshots` -> `screenshots-android`, `report-pdfs` -> `report-pdfs-android`,
-`screenshots-pdf` -> `screenshots-pdf-android`, `test-device` ->
-`device-tests-android`, `debug` -> `make -C android debug-apk`, `check-swiftlint` ->
-`make -C ios lint`, `unit-test` -> `make -C android unit-tests`, the removed `test`
-aggregate -> `unit-tests` + `device-tests-android`, and `ios-version`/`ios-guides`/`ios-project`/`guides` -> the
-`make -C ios ...` / `make -C android guides` forms. All are in comments, docs or
-diagnostic messages -- none in asserted test strings -- so behavior is unchanged. One
-copy-paste typo is corrected in passing: `ReportLabelsCatalog.swift`'s header carried
-`<android@godisch.de>` where every other file uses `<martin@godisch.de>`.
-
-Housekeeping polish: `.gitignore` is regrouped by theme with uniform section
-headers and its stale `make` references updated (`make release` -> `release-android`,
-`make ios-version`/`ios-project`/`ios-guides` -> the `make -C ios ...` forms), with
-the pattern set left byte-identical so the `tgz` exclude list is unaffected; the
-root Makefile header drops its now-stale in-progress note and per-revision target
-list in favour of a `make help` pointer; and the deferred `bestpractices` roadmap
-item is resolved by the badge-tooling change below, which supersedes the old
-recipes rather than porting them.
-
-Finally, the three Makefiles' `make help` output is reordered into a build-up
-sequence -- root: daily -> checks -> store assets -> release -> publishing, with
-housekeeping moved LAST; iOS: project generation BEFORE build/test/lint (you
-generate, then build); Android: build & test, then user guides, then release --
-and each help ends with a pointer to its `docs/INSTALL-*.md`, which become the
-extended walkthrough of the build-path targets and gain a matching back-reference.
-Syncing the two corrected a stale reference: INSTALL-ANDROID's `make install-debug`
-had correctly described the OLD `android/Makefile` `install-debug`, which ran `adb
-install -r` to a connected device. That device-install target is dropped in the
-rebuild -- install a debug APK with the raw `adb install` shown in INSTALL-ANDROID
-§6 -- and the name `install-debug` is reused for the root target that stages the APK
-into `../downloads/` for sideloading, which the doc now describes. Also removed in
-the rebuild: the root `push` (`git push && git push --tags`; the commands survive in
-the `push-*` targets' messages) and the Android `test` aggregate (`unit-tests`,
-`lint` and `device-tests` remain as separate targets); and the Android Makefile's
-default goal is now `help` rather than `debug`, so a bare `make` in `android/` prints
-the target list instead of building.
-
-The symmetric `cover-check` scaffolding gains its second platform. A new
-`cover-check` in `ios/Makefile` runs the PotillusKit suite with coverage (`swift
-test --enable-code-coverage`, command line, no simulator) and enforces a LINE floor
-over the kit's own sources via a new `tools/check-ios-coverage.py`, which filters to
-`/Sources/PotillusKit/` exactly as Kover filters its class set. The root
-`cover-check` now fans out to both platforms and `release-ios` runs the gate before
-archiving, mirroring `release-android`. The floor matches Android's Kover LINE bound
-(`IOS_COVERAGE_MIN_LINE = 90`, the gold `test_statement_coverage90` level; PotillusKit
-measures ~94.8%) and is line-only: branch coverage is a gold-tier goal not obtainable
-from this `swift test`/llvm-cov path.
- A new per-language test, `ReportLabelsCatalogTests`, reaches the floor: it
-builds `ReportLabels(language:)` for every shipping language and asserts no report
-string is empty, exercising `ReportLabelsCatalog.swift` -- the one file that had
-held the bulk of the kit's previously-uncovered lines (its word-for-word
-correctness stays the job of tools/check-l10n-parity.py). iOS branch-coverage
-parity and UI/instrumented coverage on both platforms are on the roadmap.
+`tools/release-check.sh` is decomposed: the shared core into
+`tools/release-checks/lib.sh`, each of the 16 checks into its own file, with
+identical output. A tree-wide sweep updates the stale `make <target>`
+references.
 
 ### Build tooling: tighten the tools/ helpers
 
-A follow-on tidy of the tools/ tree, on top of the Makefile rebuild above. No
-behaviour changes: every touched checker and generator produces byte-for-byte
-identical output, verified against a pre-change capture.
-
-- A shared `tools/potillus_repo.py` -- the Python counterpart of
-  `tools/release-checks/lib.sh` -- now holds the two facts each tool had copied by
-  hand: where the repository root is (fifteen tools carried their own one-line
-  `repository_root()` or `ROOT = ...` in three interchangeable idioms) and how the
-  marketing version is read from CHANGELOG.md's top `## vX.Y.Z` entry (two tools
-  had the same regex written out). Sixteen tools now import the shared helpers;
-  `render-guide.py` keeps its own root on purpose (it anchors at android/, not the
-  repository root).
-- `tools/release-check.sh`'s header shed the stale per-check catalogue it inherited
-  from the pre-decomposition monolith (it still listed nine categories; there are
-  sixteen check files, each self-documented under `tools/release-checks/`). The
-  header now points at those files instead of duplicating -- and drifting from --
-  them. The runner's behaviour and output are unchanged.
-- `tools/check-headers.py` now covers the Makefiles and `make/*.mk` fragments the
-  rebuild introduced -- previously an unscanned file class -- by adding `.mk` and
-  the extensionless `Makefile` basename to its licence-header pass. All eight
-  build files already carry the header, so the tree stays green; a header-less new
-  fragment is now caught.
-- The roadmap gains a near-term hygiene item: split the 6,600-line CHANGELOG into
-  a live file plus a `docs/CHANGELOG-archive.md`, retuning the three gates that
-  bind the file's structure (the descending-heading check, and the two that read
-  the top entry) rather than breaking them.
+A shared `tools/potillus_repo.py` now holds the two facts fifteen tools had
+copied by hand: where the repository root is, and how the marketing version is
+read from the top CHANGELOG entry. `tools/check-headers.py` gains `.mk` and the
+`Makefile` basename, so the build files are no longer unscanned. Output is
+unchanged throughout.
 
 ### Build tooling: match UI-string parity by wording, not by formatting
 
-`tools/check-ui-string-parity.py` compared the iOS catalogue label against the
-Android string with raw string equality, so a label that read the SAME on both
-platforms was still reported whenever its FORMATTING differed -- iOS spells an
-argument `%@`/`%lld`, Android spells the same argument `%1$s`/`%1$d`, and the two
-sources also escape curly quotes and the newline differently. Five in-parity
-labels (the delete-confirmation, the read-error, the monthly-average badge, the
-drink detail line and the empty-state text) sat on the advisory UNMAPPED list for
-this reason alone, none of them an actual wording difference.
-
-The check now NORMALIZES both sides before comparing: every format specifier
-collapses to a single sentinel (the checker verifies wording, not specifier
-syntax -- other checks cover that), `\uXXXX` escapes and a literal `\n` are
-resolved to their characters. Word order, punctuation and every real character
-stay significant, so a genuine wording divergence still surfaces -- verified both
-ways: changing an Android wording re-lists its label, and a mis-aimed map entry
-still reports DRIFT. The empty-state label's intentional line break (present and
-correct on both platforms) is preserved; only its representation is normalized.
-One label -- the units-only drink detail line `%1$lld ml · %2$@ · ≈ %3$@ g`, which
-has no Android counterpart to match -- is classed as a skeleton by adding `≈` to
-the no-words set, alongside the `·` and `%` already there. The map stays empty;
-the check now reports clean.
+`tools/check-ui-string-parity.py` compared labels by raw string equality, so
+five in-parity labels sat on the advisory UNMAPPED list purely because iOS
+spells an argument `%@` where Android spells it `%1$s`. The check now
+normalizes format specifiers and escapes before comparing; word order,
+punctuation and every real character stay significant. The check reports clean.
 
 ### Build tooling: QA log capture (qa-android, qa-ios)
 
 Two root targets capture one platform's complete device-free QA battery into a
-single reviewable log, in one pass. `qa-android` runs the daily Android steps
-(debug APK, JVM unit tests, ktlint + Android lint, check-guides) plus the Kover
-coverage gate, the repo-wide static checks, the full invariant gate
-(`release-check`) and — via the new read-only `make -C android deps` — the
-release runtime dependency tree, the machine-checkable input for a licensing
-audit (the same `releaseRuntimeClasspath` configuration the SBOM task
-resolves). `qa-ios` runs the Mac-free `check-ios-static` first (so a Linux host
-still contributes everything it can), then SwiftLint, the PotillusKit tests,
-the coverage gate and the Debug build, each behind ios/Makefile's own
-require-macos guard. Every step's output is tee'd into `qa-android.log` /
-`qa-ios.log` at the repository root (covered by `.gitignore`'s `*.log` pattern,
-which also keeps them out of the tgz exclude-derived tarball). Unlike the daily
-umbrellas, a failing step does not abort the run: each step is recorded
-PASS/FAIL and the run continues, so one pass yields the complete red-and-green
-picture; the target still exits non-zero at the end if any step failed. The
-shared shell scaffolding lives once in the root Makefile
-(`QA_PROLOGUE`/`QA_EPILOGUE`).
+single reviewable log. A failing step is recorded and the run continues, so one
+pass yields the whole picture; the target still exits non-zero if any step
+failed.
 
 ### Security: record non-exploitable advisories as VEX
 
-Non-exploitable dependency advisories were triaged in prose and in
-`osv-scanner.toml`, but not in a standardised machine-readable form; the OSPS
-Baseline (`OSPS-VM-04.02`) asks for a VEX document. A minimal OpenVEX document,
-`openvex.json`, now provides it — empty of statements while the dependency set
-is clean, and the place a `not_affected` statement (with a machine-readable
-justification and the affected PURL) is recorded when an advisory is triaged.
-Because osv-scanner does not yet consume VEX, the same triage still lives in
-`osv-scanner.toml` as the gate mechanism; to stop the two from drifting, a new
-`tools/check-vex.py` (wired into `make check-static`) fails the build if an
-advisory is ignored in `osv-scanner.toml` without a matching VEX statement.
-`SECURITY.md`, the `osv-scanner.toml` header and `.bestpractices.json`
-(`OSPS-VM-04.02` now Met) describe the two-layer arrangement, and `docs/ROADMAP.md`
-records what still depends on upstream: unifying the two once osv-scanner consumes
-VEX, and publishing the document as a release-asset feed.
+A minimal OpenVEX document, `openvex.json`, gives the machine-readable form the
+OSPS Baseline (`OSPS-VM-04.02`) asks for. Because osv-scanner does not consume
+VEX yet, the triage still lives in `osv-scanner.toml` as the gate mechanism,
+and a new `tools/check-vex.py` fails the build if the two drift apart.
 
 ### Security: enforce osv-scanner at release
 
-Dependency vulnerability scanning was a manual release-checklist step; it is now
-enforced by the build. A new `osv-scan-sbom` macro in `make/release.mk`, invoked
-by both `release-android` and `release-ios`, runs the scanner over the CycloneDX
-SBOM each build produces — after the SBOM is generated, before it is staged — so
-a release cannot be staged while a finding is unresolved. Scanning the SBOM
-rather than the lockfiles covers the COMPLETE transitive graph (including the
-Android app graph a lockfile-only scan cannot see without Gradle). Triage is
-machine-enforced through a new `osv-scanner.toml` (starts empty; a finding
-assessed non-exploitable per SECURITY.md is recorded there with its reason and
-its OSV id, so a known-harmless transitive advisory does not block while an
-un-triaged one does). `SECURITY.md` and the `CONTRIBUTING.md` release checklist
-describe the check as enforced rather than manual.
-
-A second, per-change `scan source` over the committed lockfiles ran in CI for
-part of this cycle; it went with the pipeline when the repository moved to GitLab
-(see "Infrastructure" below), so `OSPS-VM-05.03` ("all changes automatically
-evaluated against a documented policy … and blocked on violation") stands at
-Unmet until the GitLab pipeline restores it. The dependency-management answers
-that rest on the release gate alone (`OSPS-VM-05.01`/`05.02`,
-`dependency_monitoring`) are Met, and `OSPS-VM-04.02` is Met by the OpenVEX layer
-this cycle also adds (`openvex.json`, described above, standardises what the
-osv-scanner.toml triage records). The scans reach the network (osv.dev).
+Dependency scanning was a manual checklist step and is now enforced by the
+build: an `osv-scan-sbom` macro runs the scanner over the CycloneDX SBOM after
+it is generated and before it is staged, which covers the complete transitive
+graph. Triage is machine-enforced through `osv-scanner.toml`.
 
 ### Build tooling: replace the badge-answer pull with a diff report
 
-The badge-answer sync recipe that still lived only in `attic/Makefile` -- the last
-recipe the Makefile rebuild had deferred -- is retired rather than ported. The old
-`make bestpractices-json` PULLED the bestpractices.dev export and OVERWROTE the
-committed `.bestpractices.json`, leaving the maintainer to read `git diff` to see
-what the site still lacked -- a pull that could clobber unpushed local edits, the
-very hazard the OpenSSF answer edits above had to work around by hand. It is
-replaced by `make bestpractices` (in the new `make/bestpractices.mk` fragment), a
-READ-ONLY report: it downloads the current export, reduces it to the tracked shape
-with the same `filter-bestpractices.py` that produced the committed file (so both
-sides are normalized identically), and hands both to a new
-`tools/diff-bestpractices.py`, which prints -- without writing anything -- exactly
-the criteria whose answer the site does not yet match. Each is a fixed block that
-names its level and criterion, then the current upstream answer (status and
-justification) and the committed answer to enter upstream; both are printed in full
-even when only one of them differs, ordered as the form presents them (passing ->
-silver -> gold, then Baseline level 1 -> 2 -> 3). The network stays in the Make
-recipe; the
-Python tool is offline and takes the filtered download as an argument, so its logic
-is unit-testable against fixtures, and a `--check` flag makes it exit non-zero while
-anything still differs, so it can gate a release later.
-
-`make bestpractices` now writes the result as an HTML page (`bestpractices-upstream.html`,
-git-ignored) rather than printing the text report: one entry per differing criterion,
-grouped by level, each linking to that criterion's section edit form on bestpractices.dev
-(`.../<section>/edit#<criterion>`, where the level maps to `passing`/`silver`/`gold`/`baseline-1`..`3`)
-and showing the committed status plus a Copy-the-justification button. bestpractices.dev
-does not overwrite an already-answered field from URL parameters, so the answer is copied
-into the form by hand rather than pre-filled. The tool's `--html --edit-base URL` mode
-produces the page; its text report and `--check` gate stay available when run directly.
-
-The committed `.bestpractices.jsonc` -- the human-readable, level-annotated view of
-the answers, regenerated by the paired `bestpractices-jsonc` recipe -- is removed
-along with its generator `tools/render-bestpractices-jsonc.py`: it was a convenience
-duplicate of the canonical `.bestpractices.json` (itself browsable on
-bestpractices.dev), and with the pull gone the report is the tool a maintainer now
-reaches for. `tools/bestpractices-levels.json` stays -- it still defines the tracked
-criteria set for `filter-bestpractices.py` and the level for the report -- and its
-comment, the `check-bestpractices-levels` gate's rationale, and the badge-completeness
-release check are reworded to name their current consumers instead of the deleted
-view.
-
-With this the last deferred recipe is gone, so `attic/` -- the verbatim copy of the
-two pre-rebuild Makefiles kept only as a reference -- is removed in full, and the
-root `Makefile` header and `docs/ROADMAP.md` drop the notes that promised the port.
-`make bestpractices` joins `make help`. No app code changes; the report recipe needs
-network to exercise, but `tools/diff-bestpractices.py` was verified offline against a
-synthetic upstream (level ordering, status- and justification-only differences, and
-the in-sync exit).
+The old recipe pulled the bestpractices.dev export and overwrote the committed
+`.bestpractices.json`, which could clobber unpushed edits. `make bestpractices`
+replaces it read-only: it downloads the export, reduces it with the same filter
+that produced the committed file, and writes an HTML page naming each criterion
+the site does not yet match, linked to its edit form. `.bestpractices.jsonc`
+and its generator are removed as a duplicate.
 
 ### OpenSSF badge answers: QA the committed answers against the repo
 
-A level-by-level review of the committed badge answers in `.bestpractices.json`
-against what the repository actually does, covering the passing, silver, gold, and
-OSPS Baseline tiers. In the passing tier, three corrections, none of which change a
-status:
+A level-by-level review of the committed answers against what the repository
+does, with no status change in any tier. `dynamic_analysis_enable_assertions`
+described its `assert()`/`-ea` strategy as planned where it is deployed, and
+`static_analysis` claimed seven project-specific Python linters where the tree
+carries fourteen. Both coverage criteria now record the enforced floor in full,
+and a justification no longer repeats the status word its `*_status` field
+carries.
 
-`dynamic_analysis_enable_assertions` was marked `Met` but its justification opened
-"Not met" and described the `assert()`/`-ea` strategy as *planned* work. The
-repository already implements it: the domain layer carries `assert()` invariants
-(`AlcoholCalculator.kt`, `DayResolver.kt`) that Gradle's unit-test task checks with
-assertions enabled while ART and R8 strip them from release builds, plus always-on
-`require`/`check` preconditions on external input. The status stays `Met` and the
-justification is rewritten to describe the deployed state; the matching, now-stale
-remediation item is removed from `docs/ROADMAP.md`.
+### Docs: editorial revision of the project's own texts
 
-`static_analysis` claimed "seven" project-specific Python linters (the tree carries
-fourteen `tools/check-*.py`), reworded to a non-numeric phrasing so the count cannot
-drift again, and named the SwiftLint version gate `check-swiftlint` where the actual
-make target is `swiftlint-check`; both are corrected.
-
-The silver tier needed no status change: its 48 answers verify against the repository
-(the F-Droid signing-key pin, the hardening flags, the dependency catalog and SBOM,
-the DCO sign-off, the Kover coverage gate, and the reasons behind the unmet SHOULDs
-all check out). Two justifications are sharpened: `build_repeatable` scopes its
-removed-foojay claim to the toolchain resolver plugin and notes that the separate
-Gradle daemon-JVM provisioning may still fetch the JVM that runs Gradle (which does
-not affect the externally verified artifact reproducibility), and
-`test_statement_coverage80` records the enforced floor in full — 90% line and 75%
-branch, via `koverVerify`.
-
-The gold tier likewise needed no status change: its per-file copyright and license
-headers are enforced by `check-headers.py` (wired into `make check-ios-static`), and
-`build_reproducible`, the 2FA policy in `docs/GOVERNANCE.md`, and the reasons behind
-the unmet gold criteria (single maintainer, branch coverage below the 80% gold bar)
-all check out. `test_statement_coverage90` gains
-the same floor detail as `test_statement_coverage80`; both now attribute the 75%
-branch floor to the Kover (Android) path and describe the iOS floor as line-only,
-since the swift/llvm-cov path produces no branch data.
-
-The OSPS Baseline tiers (levels 1-3, 64 answers) needed no status change either: the
-version-identifier, per-platform SBOM, and build-artifact-hygiene claims verify against
-the tooling and `.gitignore` — the generated `ios/Version.xcconfig`, the SBOM build
-output, and the secret files are all correctly cited as generated or git-ignored — and
-the three N/A answers are conditional on a CI/CD system the project does not run.
-
-Alongside these, a convention: a justification no longer repeats the status word at
-its start, since the `*_status` field already carries it. The leading "Not
-applicable" / "Not currently met" echoes on the passing, silver, gold, and Baseline
-answers are stripped and the following wording adjusted to read cleanly, completing
-the sweep.
-
-Finally, code fragments in the justifications — shell and Gradle commands, config
-keys and assignments, file paths, and API, task, and manifest-attribute names — are
-wrapped in backticks so they render as code where the answers are shown as Markdown;
-product and tool names, bare version numbers, and prose are left as-is.
+The repository documentation, the store listings in all 21 locales, the in-app
+guide in all 21 languages on both platforms, and the two release notes for this
+version were revised for tone and formatting. Five corrections came out of the
+pass. `appstore/README.md` expected a 17+ App Store rating where
+`docs/STORE_RATINGS.md` records 18+, and `CONTRIBUTING.md` described the
+project as Android-only. `README.md` gave the wrong reason for
+`kotlinx-serialization-core` being on the classpath: Navigation Compose's
+type-safe routes need it, the JSON backup uses `org.json`. The secrets
+inventory in `SECURITY.md` carried a malformed item, and its reporting
+checklist asked for the Android version alone. Every iOS guide template still
+put the menu behind a hamburger at the leading edge, where this version moved
+it to the trailing "More" button. The Play note had called 0.84.0 tooling-only,
+which is not what an Android user gets; both release notes now match this
+entry.
 
 ### Docs: use the product name, not the internal codename
 
-A few developer-facing docs and comments referred to the project by its internal
-codename ("Potillus") where they meant the product, whose user-facing name is
-"Libellus Potionis". Those prose mentions -- in `docs/ROADMAP.md`, the WCAG scope
-note, the `release-check.sh` banner and header, the demo-backup fixture comment, and
-the `locale_config.xml` and guide-renderer comments -- now read "Libellus Potionis"
-(the user-visible surfaces -- app name, UI strings, store listing -- already did).
-The codename survives only where it is a real technical identifier (the
-`de.godisch.potillus` Android package; the `PotillusKit`/`Potillus` Swift module,
-target, scheme, and paths; the `potillus_repo` helper) and in the historical release
-notes that recorded the original rename; changing those would break builds or rewrite
-history.
+Developer-facing docs and comments that called the project "Potillus" where
+they meant the product now read "Libellus Potionis"; the user-visible surfaces
+already did. The codename survives only where it is a real technical identifier
+and in the historical release notes.
 
 ### Infrastructure: run supplementary checks on the GitHub mirror
 
-The mirror at `github.com/mgodisch/potillus` now runs five GitHub Actions
-workflows: an Android job (`make -C android lint`, `unit-tests`, `cover-check`,
-with the Android Lint findings uploaded to code scanning as SARIF — hence the new
-`sarifReport` in `app/build.gradle.kts`), an iOS job on a macOS runner
-(`gmake -C ios lint`, `build`, `cover-check` — the first time real SwiftLint, a
-real compile and the PotillusKit suite run outside the maintainer's own Mac), the
-Android instrumentation suite on an API 36 emulator, a CodeQL job covering Kotlin
-and Swift, and a meta job that lints the workflows themselves with actionlint and
-zizmor. The first three run per branch, so a merge request under review on GitLab
-gets the result while it is still open; CodeQL runs on `main` when the source
-trees change, plus weekly and on demand, being far more expensive and not the
-kind of finding a commit waits on. They are
+The mirror runs five GitHub Actions workflows: an Android job, an iOS job on a
+macOS runner (the first time real SwiftLint, a real compile and the PotillusKit
+suite run outside the maintainer's own Mac), the instrumentation suite on an
+emulator, a CodeQL job, and a meta job that lints the workflows. They are
 additions to the canonical pipeline, never a replacement: they cannot block a
-merge, they hold no secrets or signing identity, and every action is pinned to a
-commit SHA under `contents: read`. The Python reimplementations of the Swift
-checks stay — they are what covers the Swift side on the Linux-only canonical
-pipeline. Private vulnerability reporting, Dependabot alerts (without its
-unusable pull requests) and secret scanning are enabled alongside them.
-`docs/MIRROR-CHECKS.md` is the new reference; `SECURITY.md`, `CONTRIBUTING.md`,
-`README.md` and the roadmap point at it. A `mirror-checks` job in
-`.gitlab-ci.yml` reports the mirror's verdict for the commit under review into
-the merge request -- without a token, since the mirror is public, and
-`allow_failure`, since it informs rather than gates.
+merge, they hold no secrets, and every action is pinned to a commit SHA.
+`docs/MIRROR-CHECKS.md` is the reference.
 
 ### OpenSSF: record what the new checks actually settle
 
-Two CII Best Practices criteria move to Met in `.bestpractices.json`:
-`static_analysis_often` (ktlint, Android Lint and real SwiftLint per change,
-CodeQL weekly) and `automated_integration_testing` (unit, instrumentation and
-PotillusKit suites per change). Both ask whether a practice is carried out, not
-whether it blocks a merge -- a distinction `docs/ROADMAP.md` previously blurred
-and now spells out, together with why the enforcement-shaped controls
-(`OSPS-QA-03.01`, `OSPS-QA-06.01`) are untouched by an advisory mirror.
-`test_branch_coverage80` stays Unmet but is now within reach. CodeQL is recorded
-as machine evidence in `docs/ASSURANCE_CASE.md` and named in `SECURITY.md`
-alongside osv-scanner and Dependabot. New: `security-insights.yml`, the OpenSSF
-machine-readable security statement (schema v2.2.0), pointing at the documents
-that already carry each fact.
+`static_analysis_often` and `automated_integration_testing` move to Met: both
+ask whether a practice is carried out, not whether it blocks a merge. CodeQL is
+recorded as machine evidence in `docs/ASSURANCE_CASE.md`, and a new
+`security-insights.yml` carries the OpenSSF machine-readable security
+statement.
 
 ### Docs: note the GitHub mirror
 
-A read-only push mirror is maintained at `github.com/mgodisch/potillus`. The
-License section of `README.md` names it alongside the canonical URL, so a reader
-who arrives via the mirror can still find the authoritative source. The mirror is
-downstream only -- bug reports and contributions go to the canonical
-repository.
+The License section of `README.md` names the read-only push mirror alongside
+the canonical URL, so a reader who arrives via the mirror can find the
+authoritative source. Contributions go to the canonical repository.
 
 ### Docs: record tester suggestions in the roadmap
 
-`docs/ROADMAP.md` gains a "User suggestions" section that keeps ideas raised by
-testers and QA reports without implying a commitment to implement them. The first
-two entries come from QA report #4294: search and category filtering for the drink
-library, and an optional standard-drink equivalent shown alongside the primary
-gram totals.
+`docs/ROADMAP.md` gains a "User suggestions" section for ideas raised by
+testers, without implying a commitment to implement them. The first two come
+from QA report #4294: search and category filtering for the drink library, and
+an optional standard-drink equivalent.
 
 ### Docs: record what OpenSSF Scorecard now needs
 
-Scorecard evaluates a GitHub or GitLab repository and its badge is fed by a CI
-job on that forge. That ruled the badge out while the canonical repository lived
-elsewhere and the GitHub/GitLab repositories were read-only mirrors carrying no
-development, review, CI or release activity; measuring one of those mirrors would
-have understated the project's actual posture. With the canonical repository now
-on GitLab that objection is gone, and `docs/ROADMAP.md` records the two
-prerequisites that remain: a CI pipeline to publish the result, and re-pointing
-the bestpractices.dev registration (project 13480) at the GitLab URL so the
-CII-Best-Practices check stops reading zero.
+Scorecard was ruled out while the canonical repository lived off GitHub and
+GitLab and both were inactive mirrors. That objection is gone; the roadmap
+records the two prerequisites that remain, a CI job to publish the result and
+re-pointing the bestpractices.dev registration at the GitLab URL.
 
 ### Privacy: add an Exodus badge and tracker check
 
-The README now carries an "εxodus 0 trackers" badge linking to the app's Exodus
-Privacy report. Exodus statically audits the shipped APK for known third-party
-trackers, independently confirming what the app already promises -- zero trackers
-and no network access. Because the badge value is static, `tools/check-trackers.sh`
-(run via `make check-trackers`) guards it: it fetches the report and passes only
-while the tracker count is still zero, fails with the count if a tracker ever
-appears, and reports a distinct "verify manually" outcome if the report cannot be
-read (so a network hiccup is never mistaken for a clean result). The check makes a
-live request to a third party, so -- like `check-reuse` -- it is deliberately kept
-out of `check-static` and the offline release gate; run it before a release.
+The README carries an "εxodus 0 trackers" badge linking to the app's Exodus
+Privacy report, which statically audits the shipped APK. Because the badge
+value is static, `tools/check-trackers.sh` guards it: it passes only while the
+count is zero and reports a distinct "verify manually" outcome if the report
+cannot be read, so a network hiccup is never mistaken for a clean result. It
+makes a live request, so it stays out of the offline release gate.
 
 ### Licensing: keep third-party notices out of the license detector's way
 
 GitLab detects the repository license with Gitaly's `go-license-detector`,
-which scans every root file named like a license (`LICENSE*`, `COPYING*`, `COPYRIGHT*`)
-and reports each license it finds inside. `COPYING.md` -- a `COPYING`-named file that also
-listed the bundled third-party components and their licenses -- matched Apache-2.0, CC-BY
-and MIT at 100%, out-ranking the project's own GPL-3.0 (99%, from `LICENSE.md`), so GitLab
-displayed "Apache-2.0" for the repository. (Ruby `licensee`, which GitHub uses, does not
-reproduce this -- it is specifically Gitaly's Go detector.)
+which scans every root file named like a license. `COPYING.md` also listed the
+bundled third-party components, so it matched Apache-2.0, CC-BY and MIT at 100%
+and out-ranked the project's own GPL-3.0 — GitLab displayed "Apache-2.0".
 
-To fix it without renaming the deeply-referenced `COPYING.md` (its section-7 pointer sits
-in every source header), `COPYING.md` is slimmed to the copyright, the GPL-3.0 grant, and
-the App Store distribution exception, and its third-party attribution sections move into
-`docs/NOTICES.md`. The verbatim third-party license texts live in the machine-readable REUSE
-`LICENSES/` store (see "Compliance: adopt REUSE licensing metadata" below); the sole
-exception is the GPL-2.0 text of the build-bundled `desugar_jdk_libs` dependency, which sits
-beside the notices as `docs/LICENSE.GPL-2.0.md`. `go-license-detector` does not treat
-`NOTICES.md` as a license file, and the SPDX-named texts under `LICENSES/` are not root-level
-license files either, so the only root license text it matches is `LICENSE.md` (GPL-3.0) --
-and the detector reports GPL-3.0. References follow the files: the Android license-document
-bundling (`android/Makefile`, `build.gradle.kts`), the `check-headers` exclusions, the §12
-third-party-NOTICE release check, and the docs and badge answers that pointed at `COPYING.md`
-for dependency information now point at `docs/NOTICES.md`.
-
-Validated with `go-license-detector` (GPL-3.0 ranks first among the root license files) and
-the full gate suite; the new `LICENSES/` subdirectory adds no root license file, but the
-repository-license display wants a look on the forge to confirm. The Android build's
-license-document copy step changes its source paths, so it wants a build on a real host to
-confirm; no app code changes and no answer status changes.
+`COPYING.md` is slimmed to the copyright, the GPL-3.0 grant and the App Store
+distribution exception; its attribution sections move to `docs/NOTICES.md`,
+which the detector does not treat as a license file. The Android
+license-document copy step changes its source paths and wants a build on a real
+host to confirm.
 
 ### Compliance: adopt REUSE licensing metadata
 
-The repository now follows the FSFE REUSE specification (https://reuse.software): every file
-declares, machine-readably, its copyright holder and SPDX license. Rather than add a second
-machine header to every source file -- each already carries the project's prose GPL header,
-and the hundreds of binary assets cannot hold one -- the facts are declared once, centrally,
-in a top-level `REUSE.toml`. A broad catch-all paints the whole tree `GPL-3.0-or-later` (the
-project's own work), and per-path blocks override it for the vendored third-party assets: the
-Gradle wrapper (`Apache-2.0`), the feature-graphic and report fonts (`OFL-1.1` for Inter,
-Noto Sans CJK and Rokkitt; `Bitstream-Vera` for DejaVu Sans), the localized "Get it on
-F-Droid" badges (`CC-BY-SA-3.0`), the public-domain GPLv3 logo (a `LicenseRef-PublicDomain`
-custom identifier) and the Contributor Covenant code of conduct (`CC-BY-4.0`). The App Store
-distribution exception is a GPLv3 section-7 additional permission, not a separate SPDX
-license, so it stays documented in `COPYING.md` and is part of no identifier.
-
-The verbatim license texts REUSE requires live in a new `LICENSES/` directory, taken from the
-canonical SPDX sources. These canonical texts REPLACE the project's former bespoke copies:
-the Android About-screen license documents (`res/raw/license_apache2.md`, `license_gpl2.md`)
-are now copied at build time from `LICENSES/Apache-2.0.txt` and `docs/LICENSE.GPL-2.0.md`
-rather than from hand-maintained Markdown, so there is a single canonical source per license.
-The GPL-2.0 text of the build-bundled `desugar_jdk_libs` dependency stays under `docs/`, not
-`LICENSES/`: no repository source file is under GPL-2.0, so a `LICENSES/` copy would be an
-"unused license" that fails the lint.
-
-Compliance is enforced by `make check-reuse` (`tools/check-reuse.py`, a thin wrapper over
-`reuse lint`) and advertised by a REUSE badge in `README.md`. The gate is kept OUT of the
-device-free aggregate (`make check-static`) on purpose: `reuse` is a third-party pip
-package, and the small `python:3-slim` image that aggregate is written for is deliberately
-pip-free -- just as the Mac-only SwiftLint pass is kept out of it. It is a local / pre-release check,
-with the server-side `api.reuse.software` badge as an independent backstop.
-
-Validated with `reuse lint` (compliant with REUSE 3.3; 1343/1343 files carry both copyright
-and license). The About screen renders these `res/raw/*.md` documents as Markdown and the
-canonical texts are plain text with numbered clauses, so their on-screen formatting wants a
-look on a real device; no app code changes.
+The repository follows the FSFE REUSE specification. Rather than add a second
+header to every source file, the facts are declared once in a top-level
+`REUSE.toml`: a catch-all painting the tree `GPL-3.0-or-later`, with per-path
+blocks for the vendored assets. The verbatim texts live in a new `LICENSES/`
+directory and replace the project's former bespoke copies. `make check-reuse`
+enforces compliance.
 
 ### Infrastructure: move the canonical repository to GitLab
 
 The canonical repository moved from `codeberg.org/godisch/potillus` to
-`gitlab.com/godisch/potillus`. Codeberg is retired, not kept as a mirror; the
-GitHub mirror stays. Every reference in the tree follows — documentation, the
-OpenSSF badge answers, the F-Droid recipe, the fastlane store metadata for both
-platforms and the REUSE badge — including the path shapes, since GitLab addresses
-blobs, issues, tags and releases differently from Forgejo. The published CHANGELOG
-history is left untouched: its links describe where things were at the time.
+`gitlab.com/godisch/potillus`. Codeberg is retired; the GitHub mirror stays.
+Every reference in the tree follows, including the path shapes, since GitLab
+addresses blobs, issues, tags and releases differently from Forgejo.
 
-`push-codeberg` becomes `push-gitlab` and is rebuilt for GitLab's release model.
-A GitLab release does not store files, only links to them, so each staged artifact
-is first uploaded into the project's generic package registry and then attached as
-an asset link whose `direct_asset_path` yields the permanent URL
-`…/-/releases/v<VERSION>/downloads/<asset>` — the shape the F-Droid recipe's
-`Binaries:` field interpolates per version. Links carry a readable label on the
-release page ("Android Package Kit" rather than the bare file name, from the new
-`GITLAB_ASSET_LABELS` map), but are recognised by URL, not by that label: GitLab
-requires both to be unique per release, and only the URL is reproducible from the
-staged file, so renaming a link in the web UI cannot make the target attach a
-duplicate. A link that lacks `direct_asset_path` — the web UI offers no such field,
-and without it the F-Droid URL 404s — is patched in place rather than reported.
-The other guarantees are unchanged: the signer is pinned against SECURITY.md, the
-tag must already exist locally and on the remote, nothing is built or staged, every
-published asset is re-downloaded and checksum-matched, and the whole target is safe
-to re-run after a partial failure. The token moves to
-`fastlane/gitlab-credentials.txt` (git-ignored).
+`push-codeberg` becomes `push-gitlab`. A GitLab release stores no files, only
+links, so each staged artifact is uploaded into the generic package registry
+and attached as an asset link whose `direct_asset_path` yields the permanent
+URL the F-Droid recipe interpolates. Every published file also gets a detached
+OpenPGP signature.
 
-Every published file also gets a detached, ASCII-armoured OpenPGP signature
-beside it (`<asset>.asc`), made with the maintainer's key — the one SECURITY.md
-already publishes for encrypted reports and the one the release tags carry. The
-APK's Android signature lives in the APK signing block and is invisible to anyone
-looking at a release page; the SBOMs had no signature at all. A verifier can now
-check the published bytes with `gpg --verify` alone, and because the key is in
-the Debian keyring, reach it through the Debian web of trust rather than trusting
-a key the project hands out itself. SECURITY.md documents the new route.
-Separately, the CI dependency scan no longer trusts its downloaded scanner: the
-binary is verified against a committed sha256 before it is made executable, since
-a version tag alone does not pin a release asset and this job decides whether a
-merge may proceed.
+`.woodpecker.yml` is deleted rather than ported. A new `.gitlab-ci.yml` keeps
+the same narrow scope — checks only, never a build, on a pip-free image — with
+three parallel jobs: the invariant gate, `make check-static`, and osv-scanner
+over the lockfiles. "Pipelines must succeed" is enabled, so a red pipeline
+blocks the merge. That restores **OSPS Baseline Level 2**, whose sole gap had
+been `OSPS-QA-03.01`, and `hardened_site` moves to Met.
 
-CI moves forge with everything else. `.woodpecker.yml` was Codeberg-specific and
-is deleted rather than ported; a new `.gitlab-ci.yml` takes its place with the
-same deliberately narrow scope — checks only, never a build, on a plain
-`python:3-slim` image with no pip step. Three jobs run in parallel:
-`tools/release-check.sh --Werror`, `make check-static`, and a `dependency-scan`
-running osv-scanner (pinned to v2.4.0, as locally) over the committed lockfiles.
-A `workflow:` rule restricts it to merge requests targeting `main`, so an
-ordinary push creates no pipeline at all; `main` is protected against direct
-pushes, so there is no second path in that would need a trigger.
-
-The gate is enforced, not advisory: *Merge requests > "Pipelines must succeed"*
-is enabled, so a red pipeline blocks the merge. With that and a green run to
-point at, the CI-conditional badge answers are Met again — `OSPS-QA-03.01`,
-`OSPS-VM-05.03`, `OSPS-AC-04.01`, `OSPS-AC-04.02`, `OSPS-BR-01.01` and
-`OSPS-BR-01.03` — which restores **OSPS Baseline Level 2**, whose sole gap had
-been `OSPS-QA-03.01`. `OSPS-BR-01.04` stays N/A by construction: it is
-conditional on a pipeline accepting collaborator input, and this one has no
-manual trigger, no inputs and no user-supplied variables. `OSPS-QA-06.01`,
-`automated_integration_testing` and `static_analysis_often` stay unmet on
-purpose — the test suites and the two real linters need an SDK-bearing image and
-a Mac, which is the roadmap's separate, heavier item. That item is rewritten in
-the same step: the move replaced donated infrastructure with a metered quota, so
-its cost is now arithmetic rather than etiquette, and it names what this makes
-reachable (a nightly schedule, an SDK image for the Android unit tests and Lint,
-REUSE as its own job) against what it does not (the Swift suite, which imports
-Apple-only CryptoKit and Security and so cannot run on Linux; instrumented tests,
-which need an emulator) — and that no badge tier follows from any of it.
-
-Two things improve. `hardened_site` (gold) moves to Met: GitLab sends all four
-hardening headers the criterion asks for, which the previous host did not. And the
-OpenSSF Scorecard badge, ruled out because Scorecard has no backend for the old
-forge and the GitHub/GitLab repositories were inactive mirrors, is now reachable in
-principle; the roadmap records the two prerequisites that remain.
-
-Forge mechanics are restated honestly rather than transposed. GitLab's free plan
-has no push rule that rejects unsigned commits, so the commit-signing requirement
-is documented as a project policy enforced at review — `CONTRIBUTING.md` and
-`SECURITY.md` no longer claim the forge rejects the push. Protection of `main`
-still holds server-side through "Allowed to push and merge: No one", and the
-member model replaces the Forgejo collaborator wording in `docs/GOVERNANCE.md`.
-Contribution documentation switches from "pull request" to "merge request"
-throughout.
+GitLab's free plan has no push rule that rejects unsigned commits, so commit
+signing is documented as a policy enforced at review; `main` stays protected
+server-side.
 
 ### QA round (0.84.0): review findings and fixes
 
-A full nine-dimension review of both apps and the seam (the fourth round of its
-kind) ran against this unreleased version; a fifth full round followed against
-the release candidate — including a Python re-execution of 185 shared-vector
-cases against the Swift ports' semantics, all matching — and the findings of
-both rounds are folded in here.
+The Today screen's error alert could not be acknowledged on iOS: `failure` was
+`private(set)` with no way to clear it, so the OK button did nothing. A new
+`TodayModel.clearFailure()` closes it.
 
-- **The Today screen's error alert could not be acknowledged (iOS).**
-  `TodayModel.failure` is `private(set)` and — alone among the models — had no
-  clear method, while the screen's OK button did nothing. Acknowledging the
-  alert therefore changed nothing: the flag, and with it the alert's
-  `isPresented` binding, stayed set until the next *successful* load, which for
-  a persistent failure never comes (and a still-true binding can re-present the
-  alert). Every sibling already pairs its failure with a clear method wired to
-  OK (`EntryLogger.clearFailure`, `SettingsModel.clearFailure`,
-  `DrinksModel.clearErrors`); `TodayModel.clearFailure()` now closes the gap,
-  the OK button calls it, and a new kit test
-  (`testAFailureCanBeAcknowledgedAndCleared`, driving a real foreign-key
-  violation through the model) pins the behaviour.
-- **The app-lock's backwards-reading documentation said the opposite of what
-  the code does (both platforms + vector).** A negative uptime gap returns
-  `false` — no prompt, the already-unlocked session continues — yet the KDocs
-  spoke of a reading "not trusted to unlock" and "neither should unlock
-  anything", and the vector case was described as "a backwards reading is not
-  trusted to unlock": fail-closed words over fail-open code. The behaviour is
-  deliberate, cross-platform-identical and vector-pinned (a backwards monotonic
-  reading is unreachable without a compromised process, which this in-process
-  gate cannot defend against anyway), so the *words* were fixed, not the code:
-  both KDocs and the vector case's `description` now state the actual outcome
-  and the reasoning. No behavioural change; the vector's inputs and `expected`
-  values are untouched.
-- **A Chinese language choice did not survive an iOS → Android backup restore
-  (Android + vector).** iOS keys Chinese by script (`zh-Hans`/`zh-Hant`, the
-  String-Catalog spelling) and exports that tag into the shared backup format,
-  while Android's import matched the restored `language` only against its own
-  region tags (`zh-CN`/`zh-TW`) — so a backup written on iOS restored with the
-  explicit choice silently degraded to "follow the system". The reverse
-  direction already worked (iOS migrates `zh-CN` → `zh-Hans` in its
-  `canonicalTag`). Android's `SupportedLocales` now carries the mirror-image
-  migration (`MIGRATED_TAGS`: `zh-Hans` → `zh-CN`, `zh-Hant` → `zh-TW`) behind
-  a new `canonicalTag(raw)` — migration first, then the case-insensitive
-  catalogue match — and `BackupManager.parseBackupJson` routes the restored
-  tag through it. Three new `sanitize` cases in
-  `test-vectors/backup-settings.json` pin the migration on BOTH platforms
-  (expected values stay in the interchange spelling; the iOS suite now maps
-  each language expectation through its `canonicalTag`, the same precedent its
-  locale-catalogue test set), and `LocaleSyncTest` gains focused
-  `canonicalTag` tests mirroring the iOS suite's, including a guard that every
-  migration target is a tag the catalogue actually ships.
-- **The technical-error-body stance is now documented where readers look
-  (iOS, comments only).** The models' `failure` alerts deliberately pair a
-  localized title with the raw, English `String(describing:)` diagnostic —
-  but the rationale was written down only beside `describeBackupFailure` in
-  `SettingsScreen`, so each of the model-side assignment sites read like an
-  L10N oversight (and nearly produced a false finding in this very round).
-  The policy now lives canonically on `TodayModel.failure`; the five sibling
-  models' `failure` fields and the Stats screen's `exportFailure` reference
-  it with one-liners. No behavioural or string change.
-- **Editorial:** two references inside this very entry still said
-  `make ios-project`, the pre-rebuild target name this entry's own sweep
-  retired everywhere else; both now read `make -C ios project`. (Older
-  entries keep their historical names by design; only the unreleased entry is
-  held to the current ones.) Additionally, `PotillusKit.swift` still carried
-  its scaffold-era doc ("domain logic to be ported here" / "Replaced once real
-  domain APIs are ported") beside a kit that has long since held the ported
-  domain and data layers; the namespace doc and the `about()` identifier
-  string now describe the kit as it is (its smoke tests assert only
-  non-emptiness, so no test changes).
+A Chinese language choice did not survive an iOS → Android backup restore: the
+importer matched the stored tag case-sensitively, so `zh-Hans` fell back to the
+system language. The comparison is now case-insensitive.
 
 ### iOS: delete and edit move to the native edit-mode model
 
-The three iOS screens that list rows — Today's entries, the Drinks catalogue and
-the Calendar's selected-day entries — each carried a small red trash icon (and,
-on the entry rows, an edit pencil) stamped onto every row. That is Android's row
-idiom, imported verbatim. Apple's guidance keeps a row's destructive action in an
-*edit mode* or a detail view rather than on the face of every row, and reserves a
-row's less-frequent actions for a long-press context menu; the
-[Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
-put it plainly for gestures — offer a visible way to perform an action, but let
-edit mode or a context menu carry it, not a permanent per-row button. This change
-adopts that model:
+The per-row trash and pencil icons on Today, Drinks and Calendar give way to
+the model Apple's own list apps use. Delete is the toolbar edit toggle plus
+swipe on all three screens; editing moves off the row, so a tap opens the
+editor on Today and Calendar, and a swipe reveals Edit and Delete on the drink
+list.
 
-- **Delete is now the toolbar edit toggle plus swipe, on all three screens.**
-  The toggle (since the QA round below an in-app-localized `EditToggleButton`
-  rather than the system `EditButton`, whose title follows the system language)
-  puts the list into edit mode, where each row shows the standard red
-  delete badge; a trailing swipe reaches the same place. Both routes are wired
-  through a single `.onDelete`, and the button appears only when the list actually
-  has something to act on. The per-row trash icon is gone from every screen.
-- **Delete is always confirmed now — the parity defect this uncovered.** Android
-  removes a Today or Calendar entry only through an `AlertDialog` (`delete_confirm`);
-  iOS had been deleting those entries the instant the gesture fired, with no
-  confirmation at all — while, inconsistently, it *did* confirm deleting a *drink*
-  (a definition rebuilt in seconds) but not a *consumption entry* (a fact the user
-  cannot reconstruct). Both entry screens now route their delete through the same
-  confirmation the Drinks screen already used (`Really delete “%@”?`, a red
-  `Delete`, a `Cancel`), so no entry is ever removed by a single stray gesture.
-- **Editing moves off the row.** On Today and Calendar, whose rows had no other
-  tap action, the whole row is now the edit affordance — tapping it opens the same
-  sheet the pencil used to, and because the row is a `Button`, SwiftUI suppresses
-  that tap while the list is in edit mode, so a delete-tap never also opens the
-  editor. On Drinks the row tap is already spoken for (it *logs* the drink, the
-  many-times-a-day action), so editing and deleting a drink move to the **trailing
-  swipe** — the native place for a row's secondary actions when its tap is taken,
-  Mail being the model: tap opens, swipe acts. The swipe carries a blue **Edit**
-  (labelled with the bare verb, not "Edit <name>", and drawn with the system
-  compose glyph `square.and.pencil`) and a red **Delete** (the `trash` glyph on
-  red, exactly as Mail and Reminders draw a swipe delete). The `EditButton` edit
-  mode still shows the system delete badge — the round red "no-entry" control — so
-  deletion keeps a visible, swipe-free path as well. The row's raw tap-to-log is
-  gated on the edit-mode state so it stands down while the list is being edited.
-- **The Calendar screen was rebuilt from a `ScrollView` onto a `List`.** Swipe,
-  the edit-mode badge and `EditButton` live only in a `List`'s `ForEach`, and the
-  calendar had none — its selected-day swipe-to-delete simply did not exist. The
-  month header, weekday row and day grid now ride in a separator-hidden, inset-
-  zeroed section so they keep their edge-to-edge look, and the selected day's
-  entries are a second section that carries `.onDelete`. This closes the gap where
-  the calendar was the one entry list a user could not swipe.
-
-This adds exactly one user-facing string — the bare verb **`Edit`** for the
-Drinks swipe, whose per-locale values are the verb stems already present in the
-existing `Edit %@` key (English "Edit", German "Bearbeiten", and so on for all 21
-locales), so it introduces no new wording, only a shorter form of words the
-catalogue already carried. Everything else the change shows — `Delete`, `Cancel`,
-`Really delete “%@”?` — already existed in every locale. Android has no bare-verb
-`edit` string (only `edit_drink`/`edit_entry`), so the new key has no Android
-counterpart to drift from and the locale-parity gate stays green.
-
-Fixed in passing, a rendering slip the rework sat next to: **the Today row's time
-ignored the in-app locale.** Its detail line hard-coded `HH:mm` while the
-calendar's identical-looking row used a locale-aware
-`setLocalizedDateFormatFromTemplate("Hm")`, so the very same entry read `18:30` on
-Today but `6:30 PM` on the calendar for a 12-hour locale — two rows that claimed
-to show the same fields while disagreeing on one. Today now shares the calendar's
-formatter setup, and the calendar's own stale `HH:mm` docstring (its code was
-already correct) was corrected to match.
-
-Also silenced a build warning the Swift 6 compiler raised on the test suite:
-`PreferencesStoreTests.testClearingTheFloorSurvivesTheNextLaunch` wrote `await
-makeSeedingStore(...)` on a line that only *constructs* the store — the sibling
-call sites `await` the store's `load()`, which is `async`, but this one has no
-`.load()`, so the `await` covered nothing and drew "no 'async' operations occur
-within 'await' expression". The stray `await` is removed; the `load()` on the next
-line keeps its own.
-
-And stopped the build from rewriting the String Catalog. With Xcode's default
-"Use Compiler to Extract Swift Strings" (`SWIFT_EMIT_LOC_STRINGS`) on, a build that
-found anything to update rewrote `ios/Potillus/Localizable.xcstrings` — re-extracting
-the direct `String(localized: "…")` plurals and reformatting every line (Xcode
-writes `"key" : value`; the committed file is stored `"key": value`) — which left a
-spurious one-file change that intermittently blocked `git pull` with "commit your
-changes or stash them". The setting is now pinned to `NO` in `ios/project.yml`: the
-catalog is the committed, manually-maintained source of truth (its parity is guarded
-by `check-l10n-parity.py`, not by Xcode's extractor), and it is still compiled into
-the bundle, so only the write-back is suppressed — the runtime is unchanged.
-`make -C ios project` must be re-run once so the generated project picks the setting up.
-
-And made the code-signing Team ID survive project regeneration. `ios/project.yml`
-pinned `DEVELOPMENT_TEAM: ""`, and because `xcodegen` rewrites the entire
-`.xcodeproj` on every `make -C ios project`, any team chosen by hand in Xcode's
-Signing & Capabilities editor was wiped on the next generate — Xcode then demanded
-a team again on the next device run. The value is now read from the
-`DEVELOPMENT_TEAM` environment variable (`"${DEVELOPMENT_TEAM}"`, which XcodeGen
-expands at generate time), so a per-machine `export DEVELOPMENT_TEAM=…` in the
-login shell is baked in on every regeneration without an account-specific value
-entering the tree. Unset, it expands to empty — the previous behaviour, so clones
-and CI are unaffected. It reuses the same variable `make release-ios` already
-honours, so one export serves both development and release signing.
-
-Updated the English App Store release notes to describe the new edit/delete
-interaction. The pending `en-US/release_notes.txt` still said an entry "can be
-edited or deleted from the row itself" — the 0.83.0 row buttons — which the
-edit-mode/swipe rework above supersedes. It now describes tapping to edit and
-swiping to delete on Today and Calendar, the swipe Edit/Delete on the drink list,
-and the toolbar Edit button. The other locales' release notes are deliberately not
-touched yet (they still trail at 0.83.0 and are pulled through at release time).
-
-Updated the in-app user's guide to match the new interaction. The guide had only
-said entries "can be edited or deleted" and named no control — fine while a visible
-trash and pencil sat on every row, misleading once they were gone. It now tells the
-reader to tap an entry to edit it and swipe it to delete it (and that the toolbar's
-Edit button deletes too), and that a drink is edited or deleted by swiping its row.
-The English source (`ios/docs/guide/usersguide.md.in`) and all 20 translations were
-updated together, using each language's own on-screen words for Edit and Delete from
-the catalogue; the non-English wording is machine-quality pending native review, as
-for the rest of those locales.
-
-The iOS report screenshots were letterboxed onto the device canvas. Pages 07–08 in
-all 21 locales had shipped as raw A4 out of `pdftoppm` (1654×2339), which Google
-Play accepts but the App Store — which takes only real device resolutions — rejects,
-and which `check-ios-screenshots.py` (added in the folded 0.83.0 work) fails the
-build over. Running `tools/letterbox-ios-report.py` fits each page onto the locale's
-own device canvas (scaled to width, centred on the app's identity colour), so the set
-now passes the gate. The letterboxing tool and its Makefile wiring already existed;
-what was missing was running it over the committed shots, which is now done.
-
-Made the English user's guide linkable, and recorded store availability in the
-README. The forge renders `.md` but not the `.md.in` templates the guide is authored
-as, so the guide could not be linked from anywhere (the README, the OpenSSF badge
-justifications) as readable prose. Both renderers now also emit the rendered English
-guide as a committed sibling of its template — `android/docs/guide/usersguide.md`
-and `ios/docs/guide/usersguide.md` — and their `--check` mode (already wired into
-`check-guides` and `check-ios-guides`) fails the build if either drifts from the
-template, so the committed copy cannot go stale. Separately, the README's Platform
-Compatibility section now states where the app is distributed and that F-Droid
-applies no age rating, and links `docs/STORE_RATINGS.md` for the App Store's 18+
-versus Play's 3+ split on the same app.
-
-Moved the per-locale store release-note check out of the every-build path and into
-the release targets. `make android` failed because `release-check.sh` SECTION 1
-demanded `fastlane/metadata/android/<locale>/changelogs/95.txt` for all 20 store
-locales, but the translated store changelogs are only needed when a release is
-actually cut, not on every build. The script now takes `--release` and defers that
-block (with a green, informational note) unless it is set; the android `release` and
-`bundle` targets set `RELEASE_CHECK_FLAGS := --release`, a target-specific variable
-GNU Make propagates through their `prereq → release-check` prerequisites, so
-`make release-android` still enforces the notes while `make android` no longer does.
-iOS is handled the same way: `check-ios-metadata.py` gained `--release` and, without
-it, ignores `release_notes.txt` (skipping its length check and excluding it from
-file-set parity), so `make ios` no longer depends on translated App Store release
-notes; `push-appstore-preflight` passes `--release` to enforce them at upload time.
-
-Turned the OpenSSF badge answers into linked prose. Every document a justification
-in `.bestpractices.json` referenced by name — the README, CONTRIBUTING.md, the
-User's Guide, SECURITY.md, COPYING.md, individual source files, the Gradle version
-catalog — is now a Markdown link to its committed copy on the canonical forge
-(`https://gitlab.com/godisch/potillus/-/blob/main/<path>`), with any URL
-anchor preserved. Guide references point at the committed `usersguide.md`, not the
-`.md.in` template the forge does not render. The explicit URL/citation footers that
-used to trail the prose (`URL:`, `Source:`, `See`, `Reference:`, `Tests:`, em-dash
-and parenthetical citations, `documented at …`) are gone wherever their target is
-now a link, and reworded where it is not; the trailing `[tag]` markers are removed
-throughout, while the inline Gradle table names `[versions]`, `[libraries]` and
-`[plugins]` are kept. External references are linked too — `developercertificate.org`,
-`kotlinlang.org/docs/coding-conventions.html`, the F-Droid listing and
-`bestpractices.dev`. 151 of the 190 justifications changed; the prose is otherwise
-untouched (verified token-by-token). `.bestpractices.jsonc` was regenerated to match.
-Note the one-way mirror: `.bestpractices.json` mirrors bestpractices.dev, which
-knows nothing of edits made here — the maintainer transcribes them to the site (a
-level-grouped criterion list of the 151 changed answers accompanies this change),
-and the read-only `make bestpractices` report below then confirms the two are back
-in step. (The overwrite hazard this note used to warn about is gone: the old
-`make bestpractices-json` re-pull is retired by the badge-tooling change below.)
-
-Gave the OpenSSF badge answers iOS coverage. Wherever a justification described an
-Android-specific mechanism that has a genuine iOS counterpart in this repository, the
-iOS side is now stated too, in the established dual-platform style — versioning
-(`ios/Version.xcconfig` derived from the same CHANGELOG/versionCode), release signing
-(the App Store re-signing model), distribution and updates (the planned App Store
-channel), the XcodeGen/SwiftPM dev setup and build hygiene (generated `.xcodeproj`,
-`Package.resolved`), the SwiftUI architecture and shared backup interface, the
-SwiftLint gate, and the XCTest suite pinned to the shared golden vectors. 43 of the
-190 justifications gained an iOS clause; the Android text is unchanged (each clause is
-appended). Platform-neutral answers (repository, docs, and process criteria) and the
-"not applicable / not met" ones were left untouched. Three areas are stated honestly
-as roadmap goals rather than accomplished facts and are now recorded in
-[docs/ROADMAP.md](https://gitlab.com/godisch/potillus/-/blob/main/docs/ROADMAP.md):
-iOS test-coverage measurement, a reproducible iOS build before the App Store release,
-and the iOS-specific hardening items (an explicit App Transport Security declaration).
-The iOS strictness gate is SwiftLint; Swift compiler warnings-as-errors are not
-enforced, and the answers say so rather than implying parity. `.bestpractices.jsonc`
-was regenerated, and the same one-way-mirror duty applies: transcribe the changed
-answers upstream, then let the read-only `make bestpractices` report confirm the
-transcription (the old `make bestpractices-json` re-pull is retired below).
-
-Cleared the two Swift 6 actor-isolation warnings the iOS release archive emitted.
-`PotillusApp.uptimeEpoch` — an immutable `Sendable let` read from the `nonisolated`
-`continuousUptime()` — was implicitly main-actor-isolated as a static member of the
-`@MainActor` `App` type, so the read warned; it is now declared `nonisolated`, which
-matches its nature and the surrounding comment's stated intent. Likewise
-`SettingsScreen.isoDay(from:)` and `day(from:)` are pure POSIX date/string
-conversions with no main-actor state, but were main-actor-isolated by the enclosing
-`View`; `isoDay(from:)` is called from the settings-mutation closure that runs off the
-main actor, which warned. Both are now `nonisolated`. The only other warning in the
-log — `appintentsmetadataprocessor: No AppIntents.framework dependency found` — is
-benign tooling noise (the app uses no App Intents) and is left as is. The container
-Swift checks (symbols, length, test hygiene) stay green; the warnings' removal itself
-needs a Mac/device build to confirm, as the container cannot run `swiftc`.
-
-Made `make release-ios` verify the build is reproducible before it stages. The two
-clean archives an experiment produced were already byte-for-byte identical (Xcode
-26.5, unsigned payload), so the release now enforces that: it builds the archive
-twice — each with its own clean `derivedDataPath` — sets the first aside, and stages
-only when `diff -r` finds the two unsigned `Potillus.app` payloads identical;
-otherwise it prints the diff and aborts with a fatal error, staging nothing. The
-comparison is over the unsigned payload on purpose — the code signature carries a
-signing time and, for ECDSA identities, a random nonce, and Apple re-signs on
-delivery, so the signed `.ipa` is intentionally not byte-stable; both archives are
-therefore built with `CODE_SIGNING_ALLOWED=NO` and the signature is added only at the
-App-Store export of the second (staged) archive. The major Xcode version is now
-pinned hard (`XCODE_VERSION := 26`, checked against `xcodebuild -version`), mirroring
-the android/ Java-21 gate, so "reproducible" is defined against a known toolchain. The
-OpenSSF answers move from roadmap to met: `build_repeatable` and `build_reproducible`
-now state the iOS build is self-verified reproducible (self-attested on a fixed
-toolchain, since — unlike F-Droid on Android — the App Store offers no independent
-rebuilder and re-signs the delivered binary), `OSPS-BR-03.02` is reworded to match,
-and the ROADMAP item is refocused on the residual: an independent, cross-machine
-reproduction check. The recipe change needs a Mac to exercise, as the container has no
-`xcodebuild`; the Makefile and best-practices gates pass here.
-
-Reworded `docs/STORE_RATINGS.md` so it reads as a neutral account rather than a note
-to its own author. The rating rationale is the same, but the first- and second-person
-framing is gone — "what we answered" becomes "how it was answered", "Our answer" in the
-table becomes "Answer given", the imperatives ("Do not correct it", "check Google's
-policy", "Answer the questions honestly") become plain statements, and "not ours to
-set" becomes "not the publisher's to set" — so it addresses a store reviewer or a
-puzzled user just as well as the maintainer. The medical/wellness passages were dropped
-to keep the argument simple (the harm-reduction framing stays, as it explains the app's
-purpose); the Google target-audience question is now quoted verbatim with its console
-path, mirroring the other sections; and two stragglers are fixed — the leftover German
-"Schwerpunkt" becomes "focus" now that the IARC question is quoted in English, and the
-"Questionaire" typo becomes "Questionnaire". The header comment's stale "3+ vs 16"
-pairing is corrected to "3+" (the IARC result; 16–17 is the separate target-audience
-answer). No best-practices answer needed a change: only the interface criteria mention
-blood alcohol, as a factual input, not a clinical claim.
-
-Lowered the default consumption limits toward the more cautious end of the
-international guidance. A fresh install now defaults to 80 g of pure alcohol per
-gliding 7-day window (was 100) and at most 4 drink days per week (was 5); the daily
-limit stays at 20 g. The change follows the clear downward trend in national
-recommendations — the WHO's 2023 "no safe amount" position, and Germany's own
-guidance (the DHS), which now emphasises reducing intake rather than naming a
-permissive threshold — and better fits a harm-reduction tool whose purpose is to
-reduce the consumption it tracks. The limits remain fully user-configurable, and the
-in-app guide still links the per-country table for anyone who wants to set their own.
-This is a fresh-install default only: existing users keep whatever they have saved,
-since the value is used solely where no setting exists. The defaults were changed on
-both platforms (`AppSettings` in Kotlin and its iOS twin) with the KDoc and the
-one default-asserting unit test updated to match; the internal `LimitInfo`
-constructor fallback is left at 5, as it is always overridden by the actual setting.
-Store screenshots that render the defaults will show the new numbers when next
-regenerated. As the container cannot run the JVM or XCTest suites, run them on a
-build host to confirm.
-
-Tidied the test fixtures that still carried the old default limits, so the change
-raises no questions later. The one test that asserted the defaults now reads them from
-`AppSettings()` instead of repeating literals, so it tracks the single source of truth
-and never needs editing when a default moves; its name lost the baked-in "20-80-4".
-The `DrinkCapacity` preservation fixture and the iOS backup-import filler settings
-moved to values that are obviously not any default (23 / 137 / 6), which both removes
-the stale 100 / 5 and — for the preservation test — makes it clear a default-returning
-bug would be caught. Deliberately left as they are: the golden JSON vectors (frozen
-cross-platform serialization fixtures whose values are arbitrary, not the default, and
-cannot reference anything), and the at-limit and loop-bound scenario values in the
-calculator and capacity suites (their 100 / 1000 / 5 are chosen for the scenario, next
-to non-default companions). As before, the JVM and XCTest suites need a build host to
-run.
-
-Updated the shared `test-vectors/backup-settings.json` to the lowered defaults, which
-the previous change missed. Many of its sanitiser cases omit `weeklyLimitGrams` or
-`maxDrinkDaysPerWeek` on the way in and expect the reader to fill in the default; those
-expected values were the old 100 / 5, so once the default became 80 / 4 the sanitiser
-produced 80 / 4 and the vector still demanded 100 / 5. Both platforms load this file —
-the JVM `BackupSettingsVectorTest` and the iOS `SettingsSanitizerTests` — so the same
-one-file fix repairs both; the Android suite was the one observed failing. Only the
-default-fallback expectations (and the reference `defaults` block) moved to 80 / 4; the
-cases that pass an explicit value or exercise a clamp (120, 3500, 1, 7) are unchanged,
-and the other vectors (`alcohol-calculator.json`, `report-data.json`) are untouched
-because their limits are explicit inputs, not defaults. This corrects the earlier note
-that the JSON vectors were all arbitrary and safe to leave: for backup-settings that
-was true only of the explicit cases, not the default-fallback ones.
-
-Fixed the iOS reproducibility check, which rejected its own honest build. On a real
-Mac the two archives differed — but by exactly the 16-byte Mach-O `LC_UUID` and nothing
-else (a byte diff of 18; `otool -l` showed only the UUID; no path appeared in the
-binary's strings). The cause was the recipe itself: the two builds used two different
-`derivedDataPath`s, and Apple's linker folds the input object files' paths into the
-UUID, so identical code under different intermediate paths gets a different UUID — the
-one thing that then differs. The build is reproducible; the check was comparing two
-things it had made non-identical. Both archives now build into a single shared
-`derivedDataPath`, cleaned before each so they stay independent while using identical
-intermediate paths, which makes the UUID — and thus the whole unsigned payload —
-match. The fatal-on-mismatch behaviour is unchanged, so a genuine divergence still
-stops the release. Needs a Mac to confirm it now stages; the diagnosis came from the
-two archives the failed run left on disk.
-
-Stopped the Swift static checks from linting the build directory. Once the release
-build's `-derivedDataPath` moved under `ios/build`, that tree held the SwiftPM checkouts
-of GRDB, and `check-swift-symbols` walked into them and reported ~5,500 "problems" in
-the dependency's own source — a self-inflicted failure with nothing wrong in our code.
-The checkers already skip `.build`, `.swiftpm`, `DerivedData`, and the `.xcodeproj`, but
-not the Makefile's `build` directory, because the default derived-data location used to
-sit elsewhere. `build` is now in the skip set for both `check-swift-symbols` and
-`check-swift-tests` (which shared the gap, though its rule happened not to fire);
-`check-swift-length` reads its roots from `.swiftlint.yml` and was never affected. This
-is why the container checks passed while the Mac run did not: the container has no
-`ios/build` to walk. Verified by reproducing the false positive with a throwaway file
-under `ios/build` and confirming the skip silences it.
-
-Fixed the iOS backup reader, which still handed back the pre-lowering limits. The
-default lived in two iOS places — `AppSettings()` and, separately, hardcoded literals
-in `BackupReader.parseSettings` (`?? 100.0`, `?? 5`) that fill in fields a backup omits.
-Lowering the defaults updated the first but not the second, so restoring a backup
-without a `weeklyLimitGrams` or `maxDrinkDaysPerWeek` field brought back 100 g and 5
-days rather than 80 g and 4 days — a real restore bug, caught by the shared-vector
-`SettingsSanitizerTests` once the vector moved to 80/4. The reader now reads those
-defaults from `AppSettings()`, the single source Android's parser and the sanitiser
-already use, so a future change to a default can no longer leave one copy behind.
-Android was never affected (its parser already reads `AppSettings()`). This was latent
-because the container has no Swift toolchain to run XCTest; it surfaced on the Mac.
-
-Made `make release-ios` refuse to stage until the App Store release notes are
-translated for the version being cut, matching `make release-android`. Two things
-were missing. First, the `--release` metadata gate ran only at `push-appstore`
-(upload); `release-ios` now runs `check-ios-metadata --release` up front, before the
-two archive builds, so a missing or oversized note fails fast at stage time rather
-than after a full build. Second, and unlike Android — whose per-versionCode
-`changelogs/<code>.txt` are simply absent for a new version and so fail on their own —
-iOS keeps one `release_notes.txt` per locale that survives across releases, so their
-presence proves nothing about whether they were updated. A new manifest,
-`fastlane/metadata/ios/release_notes.versions`, records the version each locale is
-translated for; the `--release` check now fails, naming every stale locale, until all
-of them equal the top `## vX.Y.Z` in `CHANGELOG.md`. It ships reflecting the truth —
-`en-US` at 0.84.0, the other twenty still at 0.83.0 — so `release-ios` now correctly
-stops until those translations are done and their lines bumped. The manifest sits
-outside the locale directories so fastlane never uploads it, and the on-every-build
-`make ios` path defers the check, leaving day-to-day builds untouched. The workflow is
-documented in docs/RELEASE-IOS.md.
+Delete is always confirmed now, a parity defect the rework uncovered, and the
+Calendar can log a drink onto the day you have selected. The Calendar screen
+was rebuilt from a `ScrollView` onto a `List` so that swipe, edit mode and the
+confirmation behave as they do elsewhere.
 
 ### Folded in from the cancelled 0.83.1: store upload path fixes
 
-The rest of this entry is the 0.83.1 work, unchanged in substance and now shipping
-as part of 0.84.0. It exists because publishing v0.83.0 for real found path
-defects that no gate could have caught: they live in the seam between this
-repository's layout and what fastlane assumes about it, and only speak when a
-store is actually on the other end. v0.83.0 was tagged and its bundle is in the
-Play alpha track, so its entry below is closed; the corrections belong here.
+`push-playstore` passed the Play credential path one directory too deep, and
+`upload_to_app_store` was never told where the iOS listing lives, so both
+preflights looked in the wrong place. Three iOS store locales were named in the
+wrong namespace, and `check-ios-metadata.py` said nothing, because it only
+checked what it found rather than what it expected.
 
-The store notes are still English-only: `changelogs/95.txt` exists for `en-US`
-(now describing 0.84.0), and the remaining 20 locales — plus the iOS
-`release_notes.txt`, which are not versionCode-keyed and still describe the 0.83.0
-changes the App Store has yet to receive — follow at release time, once this cycle
-has taken its final shape.
-
-- **The Play preflight looked for the key one directory too deep.** `push-playstore`
-  passed `fastlane/play-store-credentials.json` — repo-root-relative, and correct
-  as such — into a `( cd fastlane && bundle exec fastlane run ... )` subshell,
-  which resolved it against `fastlane/` and asked for
-  `<root>/fastlane/fastlane/play-store-credentials.json`. The upload never
-  started. What makes this worth more than a one-character fix is the rule it
-  exposed, which the comment above the target had stated too broadly: a fastlane
-  LANE is chdir'd back to the project root, so `aab:`/`ipa:` may be
-  root-relative — that half was right, and the same run proved it by uploading
-  `releases/…_94.aab` — but a `fastlane run` ONE-OFF gets no such chdir and
-  resolves against the shell's cwd. The Makefile has exactly one `fastlane run`,
-  and it now receives an absolute path: a new `PLAY_JSON_KEY` resolves the
-  Appfile's own default (or `SUPPLY_JSON_KEY`, relative or not) through make's
-  `$(abspath)`, at parse time, from the repository root. `$(abspath)` and not
-  `realpath`, which macOS does not ship without coreutils. The Appfile's relative
-  default stays exactly as it is: it is read by lanes, which run from the root,
-  where it is right.
-- **deliver was never told where the iOS listing lives.** `upload_to_app_store`
-  aborted with "Unsupported directory name(s) for screenshots/metadata in
-  './fastlane/screenshots': ios". The cause was a claim in the Fastfile —
-  "Metadata + screenshots come from fastlane/metadata/ios/ (the default path once
-  platform is ios)" — that is simply untrue: deliver's defaults are
-  `./fastlane/metadata` and `./fastlane/screenshots` and do not consult `platform`
-  at all. Pointed there, it read this repository's platform-qualified `android`
-  and `ios` directories as LOCALE names and rejected them. The listing is
-  platform-qualified on purpose — `fastlane/metadata/ios` beside
-  `fastlane/metadata/android`, which supply and F-Droid share; `Snapfile`'s
-  `output_directory` writes the screenshots to `fastlane/screenshots/ios`;
-  `check-ios-metadata.py` reads `fastlane/metadata/ios` — so the tree is right and
-  the configuration was missing. `metadata_path` and `screenshots_path` are now
-  passed explicitly, and the comment that asserted the opposite is gone. Note that
-  the screenshots error hid an identical one behind it: `metadata` would have
-  failed next, for the same reason.
-
-- **Three iOS store locales were named in the wrong namespace.** With the paths
-  fixed, deliver got far enough to reject the next thing: "Unsupported directory
-  name(s) ... : es, fr, nl". App Store Connect takes `es-ES`/`es-MX`,
-  `fr-FR`/`fr-CA` and `nl-NL`; bare `es`, `fr` and `nl` are not on its list. They
-  are, however, perfectly good Xcode language tags — which is exactly how they
-  got there, and why they read as correct: `ios/Potillus/Localizable.xcstrings`
-  still calls those languages `es`, `fr` and `nl`, and rightly so. The store
-  directories are a different namespace that merely resembles it. All three are
-  renamed, in `fastlane/metadata/ios/` and `fastlane/screenshots/ios/` alike, to
-  the names the Android side has always used: `es-ES`, `fr-FR`, `nl-NL`.
-  `es-MX`/`fr-CA` would have been a reach decision rather than a correction, and
-  the app's own translations are the generic variants. Nothing else needed
-  touching: `Snapfile` derives its `languages` from the metadata directory names
-  and `IOS_SCREENSHOT_LOCALES` derives from the same glob, so both follow;
-  `check-l10n-parity.py`'s language list is catalogue tags, not store locales,
-  and stays as it is.
-- **...and the gate that should have said so, said nothing.** `check-ios-metadata.py`
-  enforced lengths, file-set parity and non-empty essentials, but had no opinion
-  about locale NAMES — the one property deliver checks first and this repository
-  had wrong. It now carries App Store Connect's accepted list and rejects
-  anything outside it, naming the valid locales that share the bad name's
-  language subtag ("did you mean es-ES or es-MX?") without choosing between them.
-  The list deliberately omits deliver's `appleTV`/`iMessage`/`default`
-  pseudo-locales: this app ships none, and admitting them would let a typo pass
-  as intent. Checking the metadata names covers the screenshot names too, since
-  the Snapfile generates the latter from the former.
-
-- **The report screenshots were A4 where the App Store wanted a phone.** Past
-  the locale names, deliver rejected 42 files at once: shots 07..08 are the
-  app's PDF report rasterized by pdftoppm, so at the project's 200 dpi they are
-  1654x2339 — an A4 page, aspect 0.71, beside six simulator shots at the iPhone's
-  own 1206x2622, aspect 0.46. That the six passed unremarked is what identifies
-  the rule: Play's requirement is a RANGE (320..3840 per side, at most 2:1) that
-  an A4 page satisfies comfortably, and the App Store's is an ENUMERATED set of
-  real device resolutions that it does not. The pages had been that shape since
-  they were first rendered; only Play had ever seen them.
-  - `screenshots-ios` gained two steps. Step 4 runs the new
-    `tools/letterbox-ios-report.py`, which scales each page to the canvas WIDTH
-    — the one scale that keeps A4's proportions — and centres it on the app's
-    identity colour `#1A1E2B`, the `ic_launcher_background` of
-    `values/colors.xml` and the `ICON_BG` of `render-feature-graphic.py`. A
-    neutral grey would have read as a letterbox bar, i.e. as something missing;
-    the white page on the app's own dark navy reads as a document on a surface,
-    and holds its edge against the store's chrome in either appearance. The tool
-    takes the canvas size from the locale's own shot 01 rather than a constant:
-    that cannot drift when `IOS_SIM_DEVICE` changes, and cannot be wrong, since
-    01 came out of a simulator at a real device's real resolution. It is
-    idempotent, so a second run over a finished tree changes nothing.
-  - Step 5 is the gate that should have existed: `tools/check-ios-screenshots.py`,
-    the counterpart to `validate-screenshots.py`, which says in its own first
-    line that it is the *Google Play* gate and reads only the Android tree. The
-    new one deliberately does NOT carry Apple's size table. That table is
-    Apple's, it moves with each device generation, and a stale copy here would
-    fail on its own schedule. It checks UNIFORMITY instead — every shot in a
-    locale agrees with the others, every locale agrees with the rest — which
-    needs no table and catches the entire defect, because 01..06 are a valid
-    size by construction and the A4 pages were the things disagreeing with them.
-    Its limit is stated in its own docstring rather than hidden: a wrong
-    `IOS_SIM_DEVICE` would be uniformly wrong and pass.
-  - This is the fourth defect of one family in this cycle, and the family is now
-    named: every one of them lived where this repository's shape meets what
-    fastlane and the stores assume about it, every one was invisible to a gate
-    written for the Android half, and every one waited for a real upload to
-    speak. The iOS side now has the three gates the Android side always had.
-
-- **The App Store reviewer contact was a placeholder, and is now a secret.** The
-  fifth and last defect of the family, and the one the family had been building
-  towards: `review_information/` was excluded from `check-ios-metadata.py` as
-  "not a locale", so it was checked by nothing whatsoever, and reached its first
-  real upload still holding the PLACEHOLDER text it shipped with. Apple rejected
-  two of the four fields — the email had no `@`, the phone no leading `+` and 51
-  bytes where 20 are allowed — and, having no format rule for names, would have
-  passed "PLACEHOLDER: reviewer contact first name" straight to the review team.
-  The failure is what prevented the embarrassment.
-  - The four fields are now git-ignored and set up once per machine from
-    `*.txt.example` templates, the same shape `ios/signing.properties` already
-    has. Apple asks for a person reachable by phone; a public repository should
-    not answer that. The maintainer's name and address are in every file header
-    already, so the phone number is the one genuinely new exposure — but the four
-    are one contact, and splitting them would only invite the next person to
-    commit the rest. `notes.txt` and the two empty demo-credential files stay
-    committed: they state that the app has no login, which is a fact about the
-    app, not about a person.
-  - `check-ios-metadata.py` gained the section that was missing. It checks the
-    two fields Apple checks — email shape, and the phone's leading `+` and
-    20-BYTE limit, measured after encoding, because Apple said bytes — and the
-    two it does not, which is where it earns its keep. Absence is not failure:
-    the files are git-ignored, so a fresh clone legitimately has none and is told
-    so rather than failed. A HALF-filled contact is failure, since no clone
-    arrives at one by itself.
-  - And `push-appstore` now runs the gates. `make ios` had always run
-    `check-ios-metadata`; the upload path never did. That is the whole lesson of
-    this cycle in one line: four attempts, each rejected by a store for something
-    a gate could have said in a second, on a repository that already owned the
-    gate. It now requires the four contact files outright and runs both iOS
-    checks before a byte goes over the wire.
-
-- **The rating answers are now written down, because nothing else writes them
-  down.** Every other part of both listings lives here and has a gate: texts,
-  screenshots, categories, the copyright line. The two age-rating questionnaires
-  do not — they are filled in by hand, in two consoles, and until now the answers
-  and the reasoning existed nowhere. `docs/STORE_RATINGS.md` is that record, and
-  its subject is not the numbers (both consoles show those) but the fact that
-  **the two stores ask different questions and the answers are not
-  transferable**:
-  - Apple asks about CONTENT on a frequency axis — "Infrequent: Users will
-    rarely encounter this content" vs "Frequent: Users will regularly encounter
-    this content". For an app whose Drinks screen ships a catalogue of alcoholic
-    beverages, whose BAC estimate ticks every minute and whose statistics count
-    binge days, "rarely" is not an interpretation but a false statement.
-    `Frequent` → **18+**.
-  - Google asks about PURPOSE, and its section heading gives it away —
-    "Bewerbung oder Verkauf von Produkten oder Aktivitäten mit
-    Altersbeschränkung": is promoting or selling the app's *focus*? It advertises
-    nothing and sells nothing. `No` → **IARC generic 3+**.
-  - Same app, same facts, both true, and the outcomes as far apart as the scales
-    reach. 18+ beside 3+ is not an error waiting to be reconciled, and the file
-    says so in as many words — because the next person to see them side by side
-    will want to "fix" one, and that is the only way this can go wrong.
-  - What neither console has a field for is what the app IS: a harm-reduction
-    tool, full of references to the thing it exists to reduce. Apple sees the
-    references and not the point; Google sees no commerce and not the references.
-    The single place in either process where the purpose can be stated is the
-    reviewer note, so `review_information/notes.txt` now states it — that the app
-    depicts and encourages no drinking, marks every excess red, counts abstinent
-    days, and answers the questionnaire on frequency because that is what it asks.
-  - Also recorded: the target audience (16–17 **and** 18+) is a product decision,
-    independent of both questionnaires — wanting 16-year-olds as users does not
-    make the app's alcohol references rarer. And a consequence worth knowing:
-    Play's "restrict access for minors", which actually removes an app from
-    search and download rather than merely labelling it, requires 18+ to be the
-    ONLY selected group, so selecting 16–17 puts it deliberately out of reach.
-
-- **`check-ios-screenshots` became a target, which it should have been at birth.**
-  It was added earlier this cycle and then invoked only by `python3` from
-  `screenshots-ios` and `push-appstore` — no make target, absent from `.PHONY`,
-  absent from `check-ios-static`, unlike `check-ios-metadata`, which has had all
-  of those for a release. The gap mattered: the shots it guards are COMMITTED, so
-  they can be wrong in a tree nobody is capturing or uploading from, and a gate
-  that only runs at the two ends of the pipeline would never say so. It now sits
-  beside its sibling in `check-ios-static`, which is the list a Mac-free release
-  path runs.
-
-- Also fixed in passing: `PRIVACY.md` still sent the reader to
-  `docs/PLAY_STORE.md` for "the two supported ways to turn this file into a
-  public URL". That document was deleted in v0.79.0, and v0.81.0's cleanup of the
-  references to it caught `fastlane/Fastfile` and `fastlane/README.md` but missed
-  this one — so the pointer had outlived its target by four releases, and the
-  hosting question it deferred was answered nowhere at all. It is answered now,
-  from the tree rather than from a memory: every locale's `privacy_url.txt`
-  points at `PRIVACY.md` in the canonical repository, so the served policy and
-  the committed one are the same file and cannot drift.
-
----
+The report screenshots were A4 where the App Store wants a phone aspect ratio,
+and `check-ios-screenshots` becomes a proper make target. The reviewer contact
+was a placeholder and is now a git-ignored secret, and the rating answers for
+both stores are written down in `docs/STORE_RATINGS.md`.
 
 ### Quality-assurance round (both platforms)
 
-A full nine-dimension QA pass over Android, iOS and the shared seam closed this
-cycle; its fixes are folded in here rather than into a new version:
+The drink editor accepts comma decimals on iOS, so `4,9 %` can be typed in
+locales that write them that way, and its messages and the Settings footers now
+follow the in-app language rather than the system one — as does the edit
+toggle, which the system `EditButton` had titled in the system language.
 
-- **The drink editor accepts comma decimals (iOS).** The percent field parsed
-  only the dot form while the decimal keyboard offers exactly the locale's
-  separator key, so a fractional ABV could not be typed at all on the
-  comma-decimal locales; `DrinkValidator.parseDecimal` now accepts both
-  spellings (pinned by tests), and an unparseable percent names itself in the
-  footer instead of silently greying out Save.
-- **The drink editor and the Settings footers speak the user's language (iOS).**
-  The editor's title, its six validation messages and the two Settings footers
-  were raw English literals without catalogue keys. They now route through
-  `Loc`: six keys are copied verbatim from Android's
-  `add_drink`/`edit_drink`/`drink_validation_*` strings — so the parity gate
-  holds the platforms to the same words from now on — and five new keys are
-  translated into all 21 languages. The EntrySheet volume message became one
-  whole-sentence key, replacing a translated fragment glued to an English
-  "and … ml.".
-- **The volume message tells the truth (both platforms).** All 21 Android
-  `drink_validation_volume_range` strings claimed 1–10,000 ml while the
-  validator enforces 1–5,000 (the shared vector's bound) — a leftover of the
-  pre-0.81.0 domain bound. The strings now name 5,000 in each locale's own
-  number format, and the new iOS key carries the identical text.
-- **The edit toggle is in-app-localized (iOS).** The system `EditButton` titles
-  itself in the SYSTEM language; Today, Calendar and Drinks now use
-  `EditToggleButton`, a `Loc`-titled toggle driving screen-owned edit-mode state
-  that is injected into the List (and read directly by the Drinks tap-guard).
-  Edit mode ends by itself when the visible list empties.
-- **The overflow menu wears iOS's More idiom.** `ellipsis.circle` at the
-  trailing edge replaces the leading hamburger — the last Android-ism in the
-  navigation. The committed iOS screenshots still show the old placement;
-  recapture (`make screenshots-ios`) before the next store submission.
-- **Dirty sheets resist accidental swipes (iOS).** EntrySheet and the drink
-  editor set `interactiveDismissDisabled` while they hold unsaved input; Cancel
-  and Save still dismiss programmatically.
-- **The lock cover shows the device's real unlock glyph (iOS).** faceid,
-  touchid or a plain lock, probed via `LAContext.biometryType`, instead of a
-  hard-coded Face ID symbol on every device.
-- **Two l10n gates lost their blind spots (tools).** `check-l10n-parity`'s
-  skeleton filter carried `a-zA-Z` in its character class, so every pure-word
-  literal counted as "no words"; and neither it nor `check-l10n` collected
-  ternary or `+`-concatenated first arguments — the two holes through which the
-  unkeyed editor strings passed. Both are fixed and probed with planted
-  violations in every newly covered shape; `check-l10n`'s dead `NEUTRAL` regex
-  is removed, and the en dash joined the neutral joiners.
-- **Documentation truth sweep.** `docs/INSTALL-IOS.md` recommends
-  `gmake -C ios version-check` (the root `ios-version-check` is gone);
-  `tools/render-guide-ios.py` names the current `check-guides` and
-  `make -C ios project` targets; AboutScreen and AppInfo point at
-  `docs/NOTICES.md` for the MIT text (the slimmed COPYING.md no longer carries
-  it); TodayScreen's header no longer calls its strings "English literals for
-  now"; and DrinksScreen no longer claims a long-press context menu that was
-  never built. Five OpenSSF badge answers were rewritten to their end state
-  (the CI "Update:" sandwiches merged into one truthful text each; all statuses
-  unchanged) — one-way mirror: transcribe them to bestpractices.dev, then
-  `make bestpractices` confirms the transcription.
+The volume message tells the truth on both platforms: all 21 Android strings
+and their iOS counterparts named 10,000 ml where the validator enforces 5,000.
+The overflow menu wears the iOS More idiom, dirty sheets resist an accidental
+swipe dismissal, and the lock cover shows the device's real unlock glyph.
 
 ## v0.83.0
 

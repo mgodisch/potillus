@@ -25,24 +25,23 @@ apply to it are stated in the accompanying COPYING.md file.
 -->
 # Libellus Potionis -- Guide de l'utilisateur
 
-Bienvenue dans Libellus Potionis, le journal personnel de votre consommation
-d'alcool ! Cette page décrit les caractéristiques et les fonctions de
-l'application.
+Cette page décrit les caractéristiques et les fonctions de Libellus Potionis,
+le journal personnel de votre consommation d'alcool.
 
-## Points forts
+## Aperçu
 
-Libellus Potionis est open source. Le code source peut être consulté et vérifié
-par tout le monde. Libellus Potionis respecte la vie privée. Il ne requiert
-aucune autorisation, ni pour l'appareil photo ou le microphone, ni pour le GPS
-ou l'accès au réseau. Libellus Potionis est sûr : vos données restent dans le
-stockage privé de l'application sur votre appareil, protégées par le
-chiffrement de votre appareil, et l'accès à l'application peut être restreint à
-l'aide de Face ID ou Touch ID. Libellus Potionis vous aide à doser votre
-consommation jusqu'à votre limite en vous indiquant à tout moment si « la
-petite sœur » tient encore dans votre budget. Libellus Potionis vous accompagne
-dans votre suivi en addictologie en fournissant, sur demande, un rapport PDF
-complet de deux pages sur vos habitudes de consommation. Libellus Potionis est
-gratuit et sans publicité.
+Libellus Potionis est open source : le code source peut être consulté et
+vérifié par tout le monde. L'application ne requiert aucune autorisation, ni
+pour l'appareil photo ou le microphone, ni pour le GPS ou l'accès au réseau.
+Vos données restent dans le stockage privé de l'application sur votre appareil,
+protégées par le chiffrement de l'appareil, et l'accès à l'application peut
+être restreint à l'aide de Face ID ou Touch ID.
+
+L'application vous indique à tout moment si « la petite sœur » tient encore
+dans votre budget, ce qui vous permet de doser votre consommation jusqu'à votre
+limite. Pour un rendez-vous en addictologie, elle produit sur demande un
+rapport PDF de deux pages sur vos habitudes de consommation. Elle est gratuite
+et sans publicité.
 
 Libellus Potionis nécessite iOS 17.0 ou une version ultérieure. Il est utilisé
 en continu par l'auteur sur un iPhone 16E et testé en complément sur un
@@ -92,7 +91,7 @@ l'enregistrer comme consommée. Pour modifier ou supprimer une boisson, balayez 
 
 ## Écran « {{settings}} »
 
-Le menu des paramètres est accessible via l'icône de menu (☰) en haut à gauche. Libellus Potionis propose les options de configuration
+Le menu des paramètres est accessible via le bouton Plus (…) en haut à droite. Libellus Potionis propose les options de configuration
 suivantes :
 
 ### {{personal_data}}
@@ -119,26 +118,27 @@ la date à partir de laquelle l'analyse des données doit débuter.
 
 ### {{backup_section}}
 
-**Vos données ne quittent jamais cet appareil d'elles-mêmes.** Libellus Potionis
-conserve tout dans le stockage privé de l'application et ne participe
-délibérément à **aucune** sauvegarde automatique dans le cloud ni à **aucun**
-transfert d'appareil à appareil. Si vous changez de téléphone, effectuez une
+**Vos données ne quittent jamais cet appareil d'elles-mêmes.** Libellus
+Potionis conserve tout dans le stockage privé de l'application et ne participe
+délibérément à aucune sauvegarde automatique dans le cloud ni à aucun transfert
+d'appareil à appareil. Si vous changez de téléphone, effectuez une
 réinitialisation d'usine ou réinstallez l'application, **le seul moyen de
 conserver vos données est de les sauvegarder vous-même** — il n'existe aucune
 autre voie de récupération, et les données non exportées ne peuvent pas être
 récupérées par la suite.
 
 Une sauvegarde est un unique fichier JSON contenant toutes vos boissons et la
-totalité de votre journal. Pour transférer vos données vers un autre téléphone :
+totalité de votre journal. Pour transférer vos données vers un autre téléphone
+:
 
-1. Sur l'**ancien** téléphone, ouvrez **« {{settings}} » → {{backup_section}} →
-   {{backup_export}}** et enregistrez le fichier JSON en lieu sûr — par exemple
+1. Sur l'ancien téléphone, ouvrez « {{settings}} » → {{backup_section}} →
+   {{backup_export}} et enregistrez le fichier JSON en lieu sûr — par exemple
    votre propre espace cloud, un e-mail que vous vous envoyez ou un transfert
    USB.
-2. Installez Libellus Potionis sur le **nouveau** téléphone.
-3. Ouvrez **« {{settings}} » → {{backup_section}} → {{backup_import}}** et
-   sélectionnez ce fichier JSON. Choisissez **{{import_replace}}** pour tout
-   remplacer, ou **{{import_merge}}** pour le combiner avec les entrées déjà
+2. Installez Libellus Potionis sur le nouveau téléphone.
+3. Ouvrez « {{settings}} » → {{backup_section}} → {{backup_import}} et
+   sélectionnez ce fichier JSON. Choisissez {{import_replace}} pour tout
+   remplacer, ou {{import_merge}} pour le combiner avec les entrées déjà
    présentes.
 
 Exportez régulièrement : une sauvegarde ne protège que les données existant au

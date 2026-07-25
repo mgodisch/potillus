@@ -25,17 +25,17 @@ apply to it are stated in the accompanying COPYING.md file.
 -->
 # Libellus Potionis -- 用户指南
 
-欢迎使用 Libellus Potionis，你的个人饮酒记录工具！本页介绍该应用的特性与功能。
+本页介绍你的个人饮酒记录工具 Libellus Potionis 的特性与功能。
 
-## 主要特性
+## 概览
 
-Libellus Potionis 是开源软件。任何人都可以查看并验证其源代码。Libellus Potionis 注重隐
-私。它不需要任何权限——无论是摄像头、麦克风，还是 GPS 或网络。Libellus Potionis 很安全：
-你的数据保存在设备上应用的私有存储中，受设备加密保护，并且可以用 Face ID 或 Touch ID 来限制对应用的访
-问。Libellus Potionis 通过随时告诉你「la petite sœur」是否仍在你的额度之内，帮助你有节制
-地接近自己的上限。此外，在与成瘾咨询机构会面时，应用还可以应你的要求，把你的全部饮酒情况
-整理成一份清晰的两页 PDF 文档。Libellus Potionis 完全免费且无广
-告。
+Libellus Potionis 是开源软件：任何人都可以查看并验证其源代码。它不需要任何权限
+——无论是摄像头、麦克风，还是 GPS 或网络。你的数据保存在设备上应用的私有存储中，
+受设备加密保护，并且可以用Face ID 或 Touch ID来限制对应用的访问。
+
+应用随时告诉你「la petite sœur」是否仍在你的额度之内，帮助你有节制地接近自己的
+上限。在与成瘾咨询机构会面时，它可应你的要求把你的饮酒情况整理成一份两页的 PDF
+文档。应用免费且无广告。
 
 Libellus Potionis 需要 iOS 17.0 或更高版本。作者在 iPhone 16E 上持续使用它，并另外在 iPhone 17 Pro 模拟器上进行测试。
 
@@ -69,7 +69,7 @@ Libellus Potionis 需要 iOS 17.0 或更高版本。作者在 iPhone 16E 上持�
 
 ## “{{settings}}”界面
 
-设置菜单可通过左上角的菜单图标（☰）打开。Libellus Potionis 支持以下配置：
+设置菜单可通过右上角的“更多”按钮（…）打开。Libellus Potionis 支持以下配置：
 
 ### {{personal_data}}
 
@@ -93,18 +93,18 @@ Libellus Potionis 需要 iOS 17.0 或更高版本。作者在 iPhone 16E 上持�
 ### {{backup_section}}
 
 **你的数据绝不会自行离开本设备。** Libellus Potionis 将一切都保存在应用的私有
-存储中，并刻意**不**参与任何自动云备份，也**不**参与任何设备间传输。如果你更换
+存储中，并刻意不参与任何自动云备份，也不参与任何设备间传输。如果你更换
 手机、恢复出厂设置或重新安装应用，**保留数据的唯一方法就是自己备份**——没有
 其他恢复途径，未导出的数据事后将无法找回。
 
 备份是一个 JSON 文件，包含你所有的饮品和完整记录。要将数据迁移到另一部手机：
 
-1. 在**旧**手机上，打开 **“{{settings}}” → {{backup_section}} →
-   {{backup_export}}**，并将该 JSON 文件保存到安全的位置——例如你自己的云盘、
+1. 在旧手机上，打开 “{{settings}}” → {{backup_section}} →
+   {{backup_export}}，并将该 JSON 文件保存到安全的位置——例如你自己的云盘、
    发给自己的电子邮件，或通过 USB 传输。
-2. 在**新**手机上安装 Libellus Potionis。
-3. 打开 **“{{settings}}” → {{backup_section}} → {{backup_import}}**，并选择该
-   JSON 文件。选择 **{{import_replace}}** 以覆盖全部，或选择 **{{import_merge}}**
+2. 在新手机上安装 Libellus Potionis。
+3. 打开 “{{settings}}” → {{backup_section}} → {{backup_import}}，并选择该
+   JSON 文件。选择 {{import_replace}} 以覆盖全部，或选择 {{import_merge}}
    以与现有条目合并。
 
 请定期导出：备份只能保护创建那一刻已存在的数据。

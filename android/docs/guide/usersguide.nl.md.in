@@ -26,22 +26,21 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis -- Gebruikershandleiding
 
-Welkom bij Libellus Potionis, het persoonlijke logboek voor je alcoholgebruik!
-Deze pagina beschrijft de kenmerken en functies van de app.
+Deze pagina beschrijft de kenmerken en functies van Libellus Potionis, het
+persoonlijke logboek voor je alcoholgebruik.
 
-## Hoogtepunten
+## Overzicht
 
-Libellus Potionis is open source. De broncode kan door iedereen worden bekeken
-en geverifieerd. Libellus Potionis is privacyvriendelijk. Het vereist geen
-toestemmingen, niet voor de camera of microfoon en niet voor gps of
-netwerktoegang. Libellus Potionis is veilig: je gegevens blijven in de
-privéopslag van de app op je apparaat, beschermd door de versleuteling van je
-apparaat en de toegang tot de app kan met een vingerafdruk worden beperkt.
-Libellus Potionis helpt je om gedoseerd tot aan je limiet te gaan door je op elk
-moment te laten weten of "la petite sœur" nog binnen je budget past. Libellus
-Potionis ondersteunt je bij je verslavingszorg door op verzoek een volledig
-PDF-rapport van twee pagina's over je drinkgewoonten te leveren. Libellus
-Potionis is gratis en advertentievrij.
+Libellus Potionis is open source: de broncode kan door iedereen worden bekeken
+en geverifieerd. De app vereist geen toestemmingen, niet voor de camera of
+microfoon en niet voor gps of netwerktoegang. Je gegevens blijven in de
+privéopslag van de app op je apparaat, beschermd door de versleuteling van het
+apparaat, en de toegang tot de app kan met een vingerafdruk worden beperkt.
+
+De app laat je op elk moment weten of "la petite sœur" nog binnen je budget
+past, zodat je gedoseerd tot aan je limiet kunt gaan. Voor een afspraak in de
+verslavingszorg levert ze op verzoek een PDF-rapport van twee pagina's over je
+drinkgewoonten. Ze is gratis en advertentievrij.
 
 Libellus Potionis vereist Android 11 of hoger. Het wordt door de auteur continu
 gebruikt op een Google Pixel 10 Pro met GrapheneOS en daarnaast getest op een
@@ -116,9 +115,9 @@ worden geëvalueerd.
 ### {{backup_section}}
 
 **Je gegevens verlaten dit apparaat nooit uit zichzelf.** Libellus Potionis
-bewaart alles in de privéopslag van de app en doet bewust **niet** mee aan
-automatische cloudback-ups en **niet** aan overdracht tussen apparaten. Als je
-van telefoon wisselt, de fabrieksinstellingen herstelt of de app opnieuw
+bewaart alles in de privéopslag van de app en doet bewust niet mee aan
+automatische cloudback-ups en niet aan overdracht tussen apparaten. Als je van
+telefoon wisselt, de fabrieksinstellingen herstelt of de app opnieuw
 installeert, is **de enige manier om je gegevens te behouden ze zelf veilig te
 stellen** — er is geen andere manier van herstel, en gegevens die niet zijn
 geëxporteerd kunnen daarna niet worden teruggehaald.
@@ -126,13 +125,14 @@ geëxporteerd kunnen daarna niet worden teruggehaald.
 Een back-up is één JSON-bestand met al je drankjes en je volledige logboek. Zo
 verplaats je je gegevens naar een andere telefoon:
 
-1. Open op de **oude** telefoon **'{{settings}}' → {{backup_section}} →
-   {{backup_export}}** en sla het JSON-bestand op een veilige plek op — bijvoorbeeld
-   je eigen cloudopslag, een e-mail aan jezelf of een usb-overdracht.
-2. Installeer Libellus Potionis op de **nieuwe** telefoon.
-3. Open **'{{settings}}' → {{backup_section}} → {{backup_import}}** en selecteer
-   dat JSON-bestand. Kies **{{import_replace}}** om alles te overschrijven, of
-   **{{import_merge}}** om het samen te voegen met reeds aanwezige items.
+1. Open op de oude telefoon '{{settings}}' → {{backup_section}} →
+   {{backup_export}} en sla het JSON-bestand op een veilige plek op —
+   bijvoorbeeld je eigen cloudopslag, een e-mail aan jezelf of een
+   usb-overdracht.
+2. Installeer Libellus Potionis op de nieuwe telefoon.
+3. Open '{{settings}}' → {{backup_section}} → {{backup_import}} en selecteer
+   dat JSON-bestand. Kies {{import_replace}} om alles te overschrijven, of
+   {{import_merge}} om het samen te voegen met reeds aanwezige items.
 
 Exporteer regelmatig: een back-up beschermt alleen de gegevens die bestonden op
 het moment dat je hem maakte.

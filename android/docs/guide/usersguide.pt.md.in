@@ -26,22 +26,22 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis -- Manual do utilizador
 
-Bem-vindo ao Libellus Potionis, o registo pessoal do teu consumo de álcool! Esta
-página descreve as características e funções da aplicação.
+Esta página descreve as características e funções do Libellus Potionis, o
+registo pessoal do teu consumo de álcool.
 
-## Destaques
+## Visão geral
 
-O Libellus Potionis é de código aberto. O código-fonte pode ser consultado e
-verificado por qualquer pessoa. O Libellus Potionis respeita a privacidade. Não
-requer quaisquer permissões: nem para a câmara ou o microfone, nem para o GPS ou
-o acesso à rede. O Libellus Potionis é seguro: os teus dados permanecem no
-armazenamento privado da aplicação no teu dispositivo, protegidos pela cifragem
-do teu dispositivo e o acesso à aplicação pode ser restringido através da
-impressão digital. O Libellus Potionis ajuda-te a dosear-te até ao teu limite,
-indicando a qualquer momento se «la petite sœur» ainda cabe no teu orçamento. O
-Libellus Potionis apoia-te no acompanhamento em consultas de adições,
-fornecendo, a pedido, um relatório PDF completo de duas páginas sobre os teus
-hábitos de consumo. O Libellus Potionis é gratuito e sem publicidade.
+O Libellus Potionis é de código aberto: o código-fonte pode ser consultado e
+verificado por qualquer pessoa. A aplicação não requer quaisquer permissões:
+nem para a câmara ou o microfone, nem para o GPS ou o acesso à rede. Os teus
+dados permanecem no armazenamento privado da aplicação no teu dispositivo,
+protegidos pela cifragem do dispositivo, e o acesso à aplicação pode ser
+restringido através de impressão digital.
+
+A aplicação indica a qualquer momento se «la petite sœur» ainda cabe no teu
+orçamento, para que te possas dosear até ao teu limite. Para uma consulta de
+adições, produz a pedido um relatório PDF de duas páginas sobre os teus hábitos
+de consumo. É gratuita e sem publicidade.
 
 O Libellus Potionis requer o Android 11 ou superior. É utilizado de forma
 contínua pelo autor num Google Pixel 10 Pro com GrapheneOS e testado
@@ -115,27 +115,28 @@ análise dos dados deve começar.
 
 **Os teus dados nunca saem deste dispositivo por si só.** O Libellus Potionis
 mantém tudo no armazenamento privado da aplicação e, deliberadamente, não
-participa em **nenhuma** cópia de segurança automática na nuvem nem em **nenhuma**
-transferência entre dispositivos. Se mudares de telemóvel, fizeres uma reposição
-de fábrica ou reinstalares a aplicação, **a única forma de manter os teus dados é
-fazeres tu próprio uma cópia de segurança** — não existe outra via de
-recuperação, e os dados que não foram exportados não podem ser recuperados
+participa em nenhuma cópia de segurança automática na nuvem nem em nenhuma
+transferência entre dispositivos. Se mudares de telemóvel, fizeres uma
+reposição de fábrica ou reinstalares a aplicação, **a única forma de manter os
+teus dados é fazeres tu próprio uma cópia de segurança** — não existe outra via
+de recuperação, e os dados que não foram exportados não podem ser recuperados
 depois.
 
-Uma cópia de segurança é um único ficheiro JSON que contém todas as tuas bebidas
-e o teu registo completo. Para mover os teus dados para outro telemóvel:
+Uma cópia de segurança é um único ficheiro JSON que contém todas as tuas
+bebidas e o teu registo completo. Para mover os teus dados para outro
+telemóvel:
 
-1. No telemóvel **antigo**, abre **«{{settings}}» → {{backup_section}} →
-   {{backup_export}}** e guarda o ficheiro JSON num local seguro — por exemplo, o
+1. No telemóvel antigo, abre «{{settings}}» → {{backup_section}} →
+   {{backup_export}} e guarda o ficheiro JSON num local seguro — por exemplo, o
    teu próprio armazenamento na nuvem, um e-mail para ti mesmo ou uma
    transferência por USB.
-2. Instala o Libellus Potionis no telemóvel **novo**.
-3. Abre **«{{settings}}» → {{backup_section}} → {{backup_import}}** e seleciona
-   esse ficheiro JSON. Escolhe **{{import_replace}}** para substituir tudo ou
-   **{{import_merge}}** para o combinar com as entradas já existentes.
+2. Instala o Libellus Potionis no telemóvel novo.
+3. Abre «{{settings}}» → {{backup_section}} → {{backup_import}} e seleciona
+   esse ficheiro JSON. Escolhe {{import_replace}} para substituir tudo ou
+   {{import_merge}} para o combinar com as entradas já existentes.
 
-Exporta regularmente: uma cópia de segurança só protege os dados que existiam no
-momento em que a criaste.
+Exporta regularmente: uma cópia de segurança só protege os dados que existiam
+no momento em que a criaste.
 
 ### {{security}}
 

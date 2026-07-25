@@ -25,21 +25,21 @@ apply to it are stated in the accompanying COPYING.md file.
 -->
 # Libellus Potionis -- Brugervejledning
 
-Velkommen til Libellus Potionis, den personlige logbog over dit alkoholforbrug!
-Denne side beskriver appens egenskaber og funktioner.
+Denne side beskriver egenskaberne og funktionerne i Libellus Potionis, den
+personlige logbog over dit alkoholforbrug.
 
-## Højdepunkter
+## Overblik
 
-Libellus Potionis er open source. Kildekoden kan ses og verificeres af enhver.
-Libellus Potionis er privatlivsvenlig. Den kræver ingen tilladelser, hverken til
-kamera eller mikrofon eller til GPS eller netværksadgang. Libellus Potionis er
-sikker: dine data forbliver i appens private lager på din enhed, beskyttet af
-din enheds kryptering, og adgangen til appen kan begrænses med Face ID eller Touch ID.
-Libellus Potionis hjælper dig med at dosere dig op til din grænse ved til enhver
-tid at fortælle dig, om "la petite sœur" stadig er inden for dit budget.
-Libellus Potionis støtter dig i din misbrugsbehandling ved på anmodning at
-levere en omfattende, tosidet PDF-rapport over dine drikkevaner. Libellus
-Potionis er gratis og reklamefri.
+Libellus Potionis er open source: kildekoden kan ses og verificeres af enhver.
+Appen kræver ingen tilladelser, hverken til kamera eller mikrofon eller til GPS
+eller netværksadgang. Dine data forbliver i appens private lager på din enhed,
+beskyttet af enhedens kryptering, og adgangen til appen kan begrænses med Face
+ID eller Touch ID.
+
+Appen fortæller dig til enhver tid, om "la petite sœur" stadig er inden for dit
+budget, så du kan dosere dig op til din grænse. Til aftaler i
+misbrugsbehandlingen leverer den på anmodning en tosidet PDF-rapport over dine
+drikkevaner. Den er gratis og reklamefri.
 
 Libellus Potionis kræver iOS 17.0 eller nyere. Den bruges løbende af
 forfatteren på en iPhone 16E og testes desuden på en iPhone 17 Pro-emulator.
@@ -84,7 +84,7 @@ dialog, hvor du kan registrere den som indtaget. For at ændre eller slette en d
 
 ## Skærm "{{settings}}"
 
-Indstillingsmenuen er tilgængelig via menuikonet (☰) øverst til venstre. Libellus
+Indstillingsmenuen er tilgængelig via Mere-knappen (…) øverst til højre. Libellus
 Potionis tilbyder følgende konfigurationsmuligheder:
 
 ### {{personal_data}}
@@ -111,23 +111,23 @@ begynde.
 ### {{backup_section}}
 
 **Dine data forlader aldrig denne enhed af sig selv.** Libellus Potionis gemmer
-alt i appens private lager og deltager bevidst **ikke** i nogen automatisk
-sky-sikkerhedskopiering og **ikke** i nogen overførsel mellem enheder. Hvis du
+alt i appens private lager og deltager bevidst ikke i nogen automatisk
+sky-sikkerhedskopiering og ikke i nogen overførsel mellem enheder. Hvis du
 skifter telefon, udfører en fabriksnulstilling eller geninstallerer appen, er
 **den eneste måde at beholde dine data på at sikkerhedskopiere dem selv** — der
-er ingen anden vej til gendannelse, og data, der ikke blev eksporteret, kan ikke
-hentes bagefter.
+er ingen anden vej til gendannelse, og data, der ikke blev eksporteret, kan
+ikke hentes bagefter.
 
-En sikkerhedskopi er en enkelt JSON-fil, der indeholder alle dine drikkevarer og
-hele din log. Sådan flytter du dine data til en anden telefon:
+En sikkerhedskopi er en enkelt JSON-fil, der indeholder alle dine drikkevarer
+og hele din log. Sådan flytter du dine data til en anden telefon:
 
-1. På den **gamle** telefon skal du åbne **"{{settings}}" → {{backup_section}} →
-   {{backup_export}}** og gemme JSON-filen et sikkert sted — for eksempel dit
+1. På den gamle telefon skal du åbne "{{settings}}" → {{backup_section}} →
+   {{backup_export}} og gemme JSON-filen et sikkert sted — for eksempel dit
    eget skylager, en e-mail til dig selv eller en USB-overførsel.
-2. Installer Libellus Potionis på den **nye** telefon.
-3. Åbn **"{{settings}}" → {{backup_section}} → {{backup_import}}** og vælg den
-   JSON-fil. Vælg **{{import_replace}}** for at overskrive alt, eller
-   **{{import_merge}}** for at kombinere den med poster, der allerede findes.
+2. Installer Libellus Potionis på den nye telefon.
+3. Åbn "{{settings}}" → {{backup_section}} → {{backup_import}} og vælg den
+   JSON-fil. Vælg {{import_replace}} for at overskrive alt, eller
+   {{import_merge}} for at kombinere den med poster, der allerede findes.
 
 Eksportér regelmæssigt: en sikkerhedskopi beskytter kun de data, der fandtes i
 det øjeblik, du oprettede den.

@@ -26,21 +26,21 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Libellus Potionis -- Användarguide
 
-Välkommen till Libellus Potionis, den personliga loggboken för din
-alkoholkonsumtion! Den här sidan beskriver appens egenskaper och funktioner.
+Den här sidan beskriver egenskaperna och funktionerna i Libellus Potionis, den
+personliga loggboken för din alkoholkonsumtion.
 
-## Höjdpunkter
+## Översikt
 
-Libellus Potionis är öppen källkod. Källkoden kan granskas och verifieras av vem
-som helst. Libellus Potionis är integritetsvänlig. Den kräver inga behörigheter,
-varken till kamera eller mikrofon, eller till GPS eller nätverksåtkomst. Libellus
-Potionis är säker: dina data stannar i appens privata lagring på din enhet,
-skyddade av enhetens kryptering och åtkomsten till appen kan begränsas med ett
-fingeravtryck. Libellus Potionis hjälper dig att dosera dig upp till din gräns
-genom att när som helst tala om för dig om "la petite sœur" fortfarande ryms inom
-din budget. Libellus Potionis stöder dig i din beroendevård genom att på begäran
-tillhandahålla en omfattande, tvåsidig PDF-rapport över dina dryckesvanor.
-Libellus Potionis är gratis och reklamfri.
+Libellus Potionis är öppen källkod: källkoden kan granskas och verifieras av
+vem som helst. Appen kräver inga behörigheter, varken till kamera eller
+mikrofon, eller till GPS eller nätverksåtkomst. Dina data stannar i appens
+privata lagring på din enhet, skyddade av enhetens kryptering, och åtkomsten
+till appen kan begränsas med ett fingeravtryck.
+
+Appen talar när som helst om för dig om "la petite sœur" fortfarande ryms inom
+din budget, så att du kan dosera dig upp till din gräns. Till besök i
+beroendevården tar den på begäran fram en tvåsidig PDF-rapport över dina
+dryckesvanor. Den är gratis och reklamfri.
 
 Libellus Potionis kräver Android 11 eller senare. Den används kontinuerligt av
 upphovspersonen på en Google Pixel 10 Pro med GrapheneOS och testas dessutom på
@@ -113,8 +113,8 @@ ska börja.
 ### {{backup_section}}
 
 **Dina data lämnar aldrig den här enheten av sig själva.** Libellus Potionis
-sparar allt i appens privata lagring och deltar medvetet **inte** i någon
-automatisk molnsäkerhetskopiering och **inte** i någon överföring mellan enheter.
+sparar allt i appens privata lagring och deltar medvetet inte i någon
+automatisk molnsäkerhetskopiering och inte i någon överföring mellan enheter.
 Om du byter telefon, gör en fabriksåterställning eller installerar om appen är
 **det enda sättet att behålla dina data att själv säkerhetskopiera dem** — det
 finns ingen annan återställningsväg, och data som inte exporterats går inte att
@@ -123,14 +123,14 @@ få tillbaka efteråt.
 En säkerhetskopia är en enda JSON-fil som innehåller alla dina drycker och hela
 din logg. Så här flyttar du dina data till en annan telefon:
 
-1. På den **gamla** telefonen öppnar du **"{{settings}}" → {{backup_section}} →
-   {{backup_export}}** och sparar JSON-filen på ett säkert ställe — till exempel
+1. På den gamla telefonen öppnar du "{{settings}}" → {{backup_section}} →
+   {{backup_export}} och sparar JSON-filen på ett säkert ställe — till exempel
    din egen molnlagring, ett e-postmeddelande till dig själv eller en
    USB-överföring.
-2. Installera Libellus Potionis på den **nya** telefonen.
-3. Öppna **"{{settings}}" → {{backup_section}} → {{backup_import}}** och välj den
-   JSON-filen. Välj **{{import_replace}}** för att skriva över allt, eller
-   **{{import_merge}}** för att kombinera den med poster som redan finns.
+2. Installera Libellus Potionis på den nya telefonen.
+3. Öppna "{{settings}}" → {{backup_section}} → {{backup_import}} och välj den
+   JSON-filen. Välj {{import_replace}} för att skriva över allt, eller
+   {{import_merge}} för att kombinera den med poster som redan finns.
 
 Exportera regelbundet: en säkerhetskopia skyddar bara de data som fanns i det
 ögonblick då du skapade den.

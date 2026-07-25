@@ -26,11 +26,9 @@ apply to it are stated in the accompanying COPYING.md file.
 
 # Contributing to Libellus Potionis
 
-Libellus Potionis is a personal Android alcohol tracker and a **teaching
-project**. The goal of every change is to keep the code readable, well-tested,
-and well-documented for developers learning Android development.
-
----
+Libellus Potionis is a personal alcohol tracker for Android and iOS, and a
+teaching project. The goal of every change is to keep the code readable,
+well-tested and well-documented for developers learning either platform.
 
 ## Table of Contents
 
@@ -43,8 +41,6 @@ and well-documented for developers learning Android development.
 7. [Versioning & release checklist](#7-versioning--release-checklist)
 8. [Data persistence — schema freeze rules](#8-data-persistence--schema-freeze-rules)
 
----
-
 ## 1. Project philosophy
 
 | Principle | Rationale |
@@ -54,8 +50,6 @@ and well-documented for developers learning Android development.
 | **Minimal dependencies** | Every library must justify its presence. Prefer AndroidX stable releases over alpha/beta. |
 | **Documented code** | Comments explain *why*, not *what*. Every public function has a KDoc. |
 | **English everywhere** | All source code, KDoc, test comments, build files, and documentation are in English. String resources (UI strings) are the only exception – they must be in the target language of each locale. |
-
----
 
 ## 2. Submitting changes
 
@@ -103,8 +97,8 @@ this project especially well include:
 
 - **Translation review.** English and German are hand-authored; the other
   locales are machine-generated (see Section 6). Reviewing and correcting the
-  strings for a language you speak natively is a valuable, self-contained
-  contribution.
+  strings for a language you speak natively is a self-contained contribution
+  that needs no build setup.
 - **Documentation.** Clarifying or correcting the README, this guide, or the
   in-app user guide.
 - **Test cases.** Adding tests for existing behaviour that is not yet covered.
@@ -232,8 +226,6 @@ MUST be judged a worthwhile improvement free of known defects that would argue
 against its inclusion. Changes that do not yet meet these requirements receive
 review comments and are merged only once resolved.
 
----
-
 ## 3. Architecture rules
 
 ```
@@ -257,8 +249,6 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
   `SettingsViewModel` extends `AndroidViewModel` specifically to call
   `Application.getString()` for localised status messages. All other ViewModels
   must remain context-free.
-
----
 
 ## 4. Coding conventions
 
@@ -357,8 +347,6 @@ toolchain elsewhere (`rsvg-convert`, `pdftoppm`, screengrab, the F-Droid and
 reproducible-build targets), so the Android release pipeline stays on Linux by
 design.
 
----
-
 ## 5. Testing strategy
 
 The project ships two test source sets. Unit tests run on the JVM without an
@@ -424,8 +412,6 @@ targets are statement coverage >= 80% (silver) and >= 90% (gold), plus branch
 coverage >= 80% (gold); build-breaking enforcement is added once those targets
 are reached.
 
----
-
 ## 6. Translation workflow
 
 > **🌍 Native speakers wanted — this is the easiest way to help.**
@@ -436,7 +422,7 @@ are reached.
 > or be subtly wrong, and the store keywords in particular are a best-effort
 > guess at what people actually search for in each market. If you are fluent in
 > any non-German language we ship, reviewing even one screen's worth of strings
-> is a valuable, self-contained contribution: open an issue or merge request (see
+> is a self-contained contribution: open an issue or merge request (see
 > Section 2) with the language and the improved wording. No build setup is
 > required to propose better text. The paths to every translatable file are
 > below.
@@ -585,8 +571,6 @@ best-effort guess — real App Store search terms are market-specific and are
 exactly the kind of thing a native speaker should refine. Corrections are
 welcome through the same issue/PR path as the in-app strings.
 
----
-
 ## 7. Versioning & release checklist
 
 **Versioning.** The version string is three-part `MAJOR.MINOR.PATCH`. Routine
@@ -679,8 +663,6 @@ editing the version by hand — this refreshes both the URL and the checksum:
 
 The official `-bin.zip` checksum is published at
 <https://gradle.org/release-checksums/>.
-
----
 
 ## 8. Data persistence — schema freeze rules
 
