@@ -213,8 +213,7 @@ public final class StatsModel {
                     // let a tick that `stop()` cancelled fall through to the
                     // `preferences.load()` and `load()` awaits below, none of which
                     // re-check cancellation, and write a snapshot after teardown.
-                    do { try await Task.sleep(for: self.tickInterval) }
-                    catch { break }
+                    do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     let settings = await self.preferences.load()
                     let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
                     let today = DayResolver.resolve(

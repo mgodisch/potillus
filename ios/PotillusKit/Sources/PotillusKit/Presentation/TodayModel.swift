@@ -247,8 +247,7 @@ public final class TodayModel {
                     // let a tick that `stop()` cancelled run `load()` to completion
                     // first — `load()` suspends on `await`s that do not re-check
                     // cancellation — and write a snapshot after teardown.
-                    do { try await Task.sleep(for: self.tickInterval) }
-                    catch { break }
+                    do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     await self.load()
                 }
             }

@@ -164,8 +164,7 @@ public final class DrinkCapacityModel {
                     // cancellation, so a tick that got past a mid-loop
                     // `Task.isCancelled` would still run `load()` to completion and
                     // write a post-teardown snapshot (see `stop()`).
-                    do { try await Task.sleep(for: self.tickInterval) }
-                    catch { break }
+                    do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     if await self.currentDay() != self.loadedDay { await self.load() }
                 }
             }
