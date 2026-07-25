@@ -209,10 +209,10 @@ public final class StatsModel {
                 guard let self else { return }
                 while !Task.isCancelled {
                     // A cancelled sleep throws `CancellationError`; catching it to
-                    // break ends the task at once. Swallowing it with `try?` would
-                    // let a tick that `stop()` cancelled fall through to the
-                    // `preferences.load()` and `load()` awaits below, none of which
-                    // re-check cancellation, and write a snapshot after teardown.
+                    // break ends the task at once. The reload it guards is backed
+                    // by a second check: `reload()` re-checks cancellation before
+                    // it writes, since a tick cancelled after the sleep returned
+                    // would otherwise run to completion and write after teardown.
                     do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     let settings = await self.preferences.load()
                     let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
@@ -347,6 +347,12 @@ public final class StatsModel {
         )
         next.limitInfo = limitInfo
 
+        // Bail out before publishing if the task was cancelled during the awaits
+        // above. `stop()` cancels the ticker, but cancellation is cooperative: a
+        // reload already suspended past its last check runs to completion unless
+        // it re-checks here, and would publish state for a screen that is gone
+        // (see `stop()` and the ticker).
+        if Task.isCancelled { return }
         state = next
     }
 

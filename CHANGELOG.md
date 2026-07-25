@@ -263,9 +263,10 @@ system language. The comparison is now case-insensitive.
 
 The four clock-derived models (`DrinkCapacityModel`, `TodayModel`,
 `StatsModel`, `CalendarModel`) could write a snapshot after `stop()`: their
-ticker swallowed the sleep's cancellation with `try?` and ran one more reload.
-It now breaks on cancellation. `DrinkCapacityModelTests` proves it by moving
-the day boundary after `stop()`.
+ticker swallowed the sleep's cancellation, and its reload published state even
+once the task was cancelled. The ticker now breaks on cancellation, and each
+reload re-checks it before writing. `DrinkCapacityModelTests` proves it by
+moving the day boundary after `stop()`.
 
 ### iOS: delete and edit move to the native edit-mode model
 

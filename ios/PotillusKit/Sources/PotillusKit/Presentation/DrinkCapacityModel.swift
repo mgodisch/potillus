@@ -157,13 +157,11 @@ public final class DrinkCapacityModel {
                 guard let self else { return }
                 while !Task.isCancelled {
                     // A cancelled sleep throws `CancellationError`, which ends the
-                    // loop. Catching it here — rather than swallowing it with `try?`
-                    // and relying on the checks below — is what makes `stop()` take
-                    // effect before the reload: `currentDay()` and `load()` each
-                    // suspend on their own `await`s, none of which re-check
-                    // cancellation, so a tick that got past a mid-loop
-                    // `Task.isCancelled` would still run `load()` to completion and
-                    // write a post-teardown snapshot (see `stop()`).
+                    // loop. The reload it guards is a second line of defence:
+                    // `load()` re-checks cancellation before it writes, since a
+                    // tick cancelled AFTER the sleep returned would otherwise run
+                    // `currentDay()` and `load()` to completion and publish a
+                    // post-teardown snapshot (see `load()` and `stop()`).
                     do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     if await self.currentDay() != self.loadedDay { await self.load() }
                 }
@@ -183,6 +181,12 @@ public final class DrinkCapacityModel {
         let settings = await preferences.load()
         let today = await currentDay()
         let limits = AlcoholCalculator.getLimitInfo(settings)
+        // Bail out before writing if the task was cancelled during the awaits
+        // above. `stop()` cancels the ticker, but cancellation is cooperative:
+        // a reload already suspended past its last `Task.isCancelled` check runs
+        // to completion unless it re-checks here, and would then publish a
+        // snapshot for a screen that is gone (see `stop()` and the ticker).
+        if Task.isCancelled { return }
         do {
             let todaysEntries = try entries.inRange(from: today, to: today)
             let todayGrams = todaysEntries.reduce(0.0) { $0 + $1.gramsAlcohol }
