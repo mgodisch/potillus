@@ -284,6 +284,13 @@ and its blindness to the Makefiles, and the "never swallowed" doc on three
 `failure` fields no view shows. The `Potillus` target's two `settings` keys are
 one block.
 
+The SBOM missed what core library desugaring ships. `desugar_jdk_libs` is
+declared through its own configuration, never reaches `releaseRuntimeClasspath`
+and was therefore absent from an inventory two release gates read — the OSV scan
+and the `META-INF/NOTICE` scan — while D8/R8 dexes it into the APK.
+`cyclonedxDirectBom` now resolves `coreLibraryDesugaring` alongside the runtime
+classpath.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The per-row trash and pencil icons on Today, Drinks and Calendar give way to

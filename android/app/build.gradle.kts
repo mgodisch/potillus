@@ -919,9 +919,24 @@ dependencies {
 // ANDROID SCOPING (important): left to discover configurations on its own, the
 // plugin fails on Android projects with "cannot choose between the following
 // variants of project :app" — Android exposes many build-type/test variants and
-// the resolver cannot pick one. Naming a single, already-resolved configuration
-// (releaseRuntimeClasspath) removes the ambiguity and yields precisely the
-// components shipped in the release build.
+// the resolver cannot pick one. Naming concrete, resolvable configurations
+// removes the ambiguity.
+//
+// WHICH configurations, and why TWO (0.84.0 QA round): the release runtime
+// classpath alone is NOT what ships. Core library desugaring is declared through
+// the separate `coreLibraryDesugaring` configuration, so `desugar_jdk_libs` never
+// appears on `releaseRuntimeClasspath` — while D8/R8 dexes it INTO the APK. The
+// SBOM therefore listed 156 uniformly Apache-2.0 components and omitted the one
+// GPL-2.0-with-Classpath-Exception component docs/NOTICES.md devotes a section
+// to. Two consumers were reading that incomplete inventory: the release-time OSV
+// scan (`osv-scan-sbom`) and the SBOM-gated META-INF/NOTICE scan in
+// tools/release-check.sh §12. The configuration resolves (verified with
+// `./gradlew :app:dependencies --configuration coreLibraryDesugaring`) and
+// carries `desugar_jdk_libs` plus its transitive `desugar_jdk_libs_configuration`.
+//
+// The rule this leaves behind: an SBOM scoped to one configuration is a claim
+// about that configuration, not about the APK. Before trusting it, check the
+// dependency BLOCKS for anything that ships through a configuration of its own.
 tasks.cyclonedxDirectBom {
     // metadata.component — the application this SBOM describes.
     projectType = Component.Type.APPLICATION
@@ -934,11 +949,10 @@ tasks.cyclonedxDirectBom {
     // Pin to CycloneDX 1.6 (the latest stable schema version).
     schemaVersion = Version.VERSION_16
 
-    // Resolve ONLY the release runtime classpath (see ANDROID SCOPING above) so
-    // the SBOM mirrors what is actually packaged in app-release. Because this is
-    // a single concrete, resolvable configuration, no skipConfigs filtering of
-    // the debug/test classpaths is needed.
-    includeConfigs = listOf("releaseRuntimeClasspath")
+    // The two configurations whose contents reach the release APK (see ANDROID
+    // SCOPING above). Both are concrete and resolvable, so no skipConfigs
+    // filtering of the debug/test classpaths is needed.
+    includeConfigs = listOf("releaseRuntimeClasspath", "coreLibraryDesugaring")
 
     // ── Reproducible builds ───────────────────────────────────────────────────
     // The random urn:uuid serial number is the main run-to-run churn; disable
