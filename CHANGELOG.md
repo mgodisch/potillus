@@ -228,6 +228,13 @@ blocks for the vendored assets. The verbatim texts live in a new `LICENSES/`
 directory and replace the project's former bespoke copies. `make check-reuse`
 enforces compliance.
 
+### Store assets: drop the F-Droid badge
+
+The feature graphic carries no store badge, and the GPLv3 logo sits in its
+bottom-left corner. The badge artwork, the DejaVu Sans and Rokkitt faces it was
+set in, the `rokkitt-bold` target and the now unreferenced `Bitstream-Vera` and
+`CC-BY-SA-3.0` license texts are gone.
+
 ### Infrastructure: move the canonical repository to GitLab
 
 The canonical repository moved from `codeberg.org/godisch/potillus` to

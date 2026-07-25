@@ -92,20 +92,16 @@ FONT_DIR = TOOLS_DIR / "fonts"
 # _require_bundled_fonts). fontconfig NEVER fails on a missing family -- it
 # silently substitutes the closest match among the fonts it can see -- so a
 # missing bundled face would not abort the render but quietly set its text in
-# the wrong typeface (found in the v0.81.0 QA review: the statically instanced
-# Rokkitt Bold was absent from the tree, and the "F-Droid" wordmark of every
-# badge would have been substituted without any warning). Listing the exact
-# files here and checking them UP FRONT turns that silent degradation into a
-# loud, actionable failure. Keep this list in sync with the families the SVG
-# markup requests: Inter (headline/body copy), DejaVu Sans ("GET IT ON"),
-# Rokkitt Bold ("F-Droid" wordmark; committed after `make rokkitt-bold`), and
-# Noto Sans CJK (ja/ko/zh copy and badge text).
+# the wrong typeface (found in the v0.81.0 QA review, when a bundled face was
+# absent from the tree and its text would have been substituted without any
+# warning). Listing the exact files here and checking them UP FRONT turns that
+# silent degradation into a loud, actionable failure. Keep this list in sync
+# with the families the SVG markup requests: Inter (headline/body copy) and
+# Noto Sans CJK (ja/ko/zh copy).
 REQUIRED_FONT_FILES = (
     FONT_DIR / "Inter" / "Inter-Regular.ttf",
     FONT_DIR / "Inter" / "Inter-SemiBold.ttf",
     FONT_DIR / "Inter" / "Inter-Bold.ttf",
-    FONT_DIR / "DejaVuSans" / "DejaVuSans.ttf",
-    FONT_DIR / "Rokkitt" / "Rokkitt-Bold.ttf",
     FONT_DIR / "NotoSansCJK" / "NotoSansCJK-Regular.ttc",
 )
 META_DIR = REPO_ROOT / "fastlane" / "metadata" / "android"
@@ -119,13 +115,6 @@ ICON_BG = "#1A1E2B"
 # The GPLv3 "Free as in Freedom" license badge (red variant), inlined as a small
 # corner badge. Source/license are credited in COPYING.md.
 GPL_LOGO = REPO_ROOT / "fastlane" / "gpl-v3-logo.svg"
-
-# The per-locale "Get it on F-Droid" badge (fdroid/get-it-on-<lang>.svg), placed
-# to the right of the GPL logo. Its lettering is LIVE <text> -- "GET IT ON" in
-# DejaVu Sans and "F-Droid" in Rokkitt Bold -- so those two families must be
-# resolvable by the pinned fontconfig; they are bundled under tools/fonts/
-# alongside Inter (see COPYING.md and `make rokkitt-bold`).
-BADGE_DIR = REPO_ROOT / "fdroid"
 
 # ── Canvas (Google Play feature-graphic spec) ────────────────────────────────
 W, H = 1024, 500
@@ -280,8 +269,8 @@ def _svg_box_and_inner(path: Path) -> tuple[float, float, str]:
     """Parse an SVG file into its coordinate box and inner markup.
 
     Returns ``(box_width, box_height, inner)`` where the box comes from the root
-    ``viewBox`` if present, else from the root ``width``/``height`` (the F-Droid
-    badge exports carry only width/height, no viewBox -- both paths are handled).
+    ``viewBox`` if present, else from the root ``width``/``height`` (an export
+    carrying only width/height and no viewBox is handled as well).
     ``inner`` is everything between the root ``<svg …>`` tag and its closing
     ``</svg>``. Callers re-wrap ``inner`` in a nested ``<svg>`` with their own
     placement box, so the artwork keeps its aspect ratio and is drawn in the SAME
@@ -304,74 +293,6 @@ def _svg_box_and_inner(path: Path) -> tuple[float, float, str]:
     return vb_w, vb_h, inner
 
 
-def _svg_ink_bbox(path: Path) -> tuple[float, float, float, float]:
-    """Return the VISIBLE ink bounding box (min_x, min_y, width, height) of an SVG.
-
-    The F-Droid badge exports sit on a 646x250 canvas with a wide TRANSPARENT
-    margin (~43 px per side); scaling by the canvas would therefore render the
-    visible badge much shorter than a logo scaled the same way. Cropping the
-    nested <svg>'s viewBox to this ink box lets the badge be matched to the GPL
-    logo by VISIBLE height instead of by canvas height.
-
-    The box is computed from the BACKGROUND shapes (<rect>/<circle>/<ellipse>)
-    with their nested transforms applied. That is exactly right for the badge: the
-    rounded-rectangle background bounds the whole button, and the wordmark (<text>)
-    and robot (<path>) sit inside it -- so paths and text are deliberately ignored,
-    which keeps this free of a fragile path-data parser. Only affine
-    translate/scale/matrix transforms occur in these assets, so no rotation
-    handling is needed. If an asset carries no such background shape, the function
-    falls back to the full canvas box.
-    """
-
-    def mul(m, n):
-        a, b, c, d, e, f = m
-        A, B, C, D, E, F = n
-        return (a * A + c * B, b * A + d * B, a * C + c * D, b * C + d * D,
-                a * E + c * F + e, b * E + d * F + f)
-
-    def parse(s):
-        m = (1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
-        for name, args in re.findall(r"(\w+)\s*\(([^)]*)\)", s or ""):
-            v = [float(t) for t in re.split(r"[\s,]+", args.strip()) if t]
-            if name == "translate":
-                m = mul(m, (1, 0, 0, 1, v[0], v[1] if len(v) > 1 else 0))
-            elif name == "scale":
-                m = mul(m, (v[0], 0, 0, v[1] if len(v) > 1 else v[0], 0, 0))
-            elif name == "matrix":
-                m = mul(m, tuple(v))
-        return m
-
-    box = [float("inf"), float("inf"), float("-inf"), float("-inf")]
-
-    def add(m, x, y):
-        a, b, c, d, e, f = m
-        px, py = a * x + c * y + e, b * x + d * y + f
-        box[0] = min(box[0], px); box[1] = min(box[1], py)
-        box[2] = max(box[2], px); box[3] = max(box[3], py)
-
-    def walk(el, m):
-        t = el.get("transform")
-        cur = mul(m, parse(t)) if t else m
-        tag = el.tag.split("}")[-1]
-        if tag == "rect":
-            x = float(el.get("x", 0)); y = float(el.get("y", 0))
-            w = float(el.get("width", 0)); h = float(el.get("height", 0))
-            add(cur, x, y); add(cur, x + w, y + h)
-        elif tag in ("circle", "ellipse"):
-            cx = float(el.get("cx", 0)); cy = float(el.get("cy", 0))
-            rx = float(el.get("r", el.get("rx", 0)))
-            ry = float(el.get("r", el.get("ry", 0)))
-            add(cur, cx - rx, cy - ry); add(cur, cx + rx, cy + ry)
-        for child in el:
-            walk(child, cur)
-
-    walk(ET.parse(path).getroot(), (1.0, 0.0, 0.0, 1.0, 0.0, 0.0))
-    if box[0] == float("inf"):          # no background shape found -> full canvas
-        vb_w, vb_h, _ = _svg_box_and_inner(path)
-        return 0.0, 0.0, vb_w, vb_h
-    return box[0], box[1], box[2] - box[0], box[3] - box[1]
-
-
 def _logo_nested(x: float, y: float, width: float, color: str = "#ffffff") -> str:
     """Inline the GPLv3 logo (fastlane/gpl-v3-logo.svg) as a nested <svg>.
 
@@ -388,72 +309,6 @@ def _logo_nested(x: float, y: float, width: float, color: str = "#ffffff") -> st
         f'<svg x="{x:.1f}" y="{y:.1f}" width="{width:.1f}" height="{height:.1f}" '
         f'viewBox="0 0 {vb_w:g} {vb_h:g}">{inner}</svg>'
     )
-
-
-def _badge_nested(path: Path, x: float, y: float, height: float) -> str:
-    """Inline a 'Get it on F-Droid' badge as a nested <svg>, scaled to `height`.
-
-    Unlike the GPL logo the badge is embedded with its ORIGINAL colours -- F-Droid
-    brand artwork must not be recoloured -- so `inner` is emitted verbatim.
-
-    `height` is the target VISIBLE height (so the badge matches the GPL logo, which
-    fills its own canvas). The badge canvas, by contrast, carries a wide
-    transparent margin, so we crop the nested viewBox to the badge's INK box
-    (_svg_ink_bbox) and scale THAT to `height`; the width then follows from the
-    ink aspect ratio. Cropping via the viewBox costs nothing -- the same rsvg pass
-    just maps the ink box, not the padded canvas, into the placement rectangle.
-
-    The badge's live <text> ("GET IT ON" in DejaVu Sans, "F-Droid" in Rokkitt
-    Bold) resolves against the pinned bundled fonts under tools/fonts/. Its
-    internal `xlink:href`/`id` references (a gradient `<defs>` entry) stay valid
-    because the outer document declares the xlink namespace and each graphic
-    embeds exactly one badge, so those ids cannot collide.
-    """
-    _, _, inner = _svg_box_and_inner(path)
-    vx, vy, vw, vh = _svg_ink_bbox(path)
-    width = height * vw / vh
-    return (
-        f'<svg x="{x:.1f}" y="{y:.1f}" width="{width:.1f}" height="{height:.1f}" '
-        f'viewBox="{vx:g} {vy:g} {vw:g} {vh:g}">{inner}</svg>'
-    )
-
-
-def _badge_for_locale(locale: str) -> Path:
-    """Return the 'Get it on F-Droid' badge SVG matching `locale`'s language.
-
-    The badge files are named ``fdroid/get-it-on-<tag>.svg``, where ``<tag>`` is
-    the language subtag in lower case, keeping (and lower-casing) any region:
-    ``pt-BR`` -> ``pt-br``, ``zh-CN`` -> ``zh-cn``. To pick one, we try the most
-    specific name first and fall back to progressively broader ones, ending at
-    the English badge -- so a locale that ships no badge of its own (e.g.
-    ``no-NO``, ``uk``) still renders a valid, if English, badge instead of
-    raising::
-
-        de-DE -> get-it-on-de-de.svg?  (no)  -> get-it-on-de.svg   (yes)
-        en-US -> get-it-on-en-us.svg?  (no)  -> get-it-on-en.svg   (yes)
-        pt-BR -> get-it-on-pt-br.svg   (yes)
-        cs-CZ -> get-it-on-cs-cz.svg?  (no)  -> get-it-on-cs.svg   (yes)
-        zh-CN -> get-it-on-zh-cn.svg   (yes)
-        no-NO -> get-it-on-no-no.svg? get-it-on-no.svg?  (no) -> get-it-on-en.svg
-
-    This language-first fallback is what lets the store-locale directories use
-    Google Play's region-qualified codes (``cs-CZ``, ``ja-JP``, … — see the
-    v0.79.0 store-locale migration) while the badge artwork keeps its upstream
-    bare-language file names: every renamed locale still resolves to the same
-    badge as before.
-    """
-    tag = locale.lower()
-    candidates = [tag]                          # full tag, e.g. "pt-br", "de-de"
-    if "-" in tag:
-        candidates.append(tag.split("-", 1)[0])  # bare language, e.g. "de", "pt"
-    candidates.append("en")                     # ultimate fallback (always present)
-    for cand in candidates:
-        path = BADGE_DIR / f"get-it-on-{cand}.svg"
-        if path.is_file():
-            return path
-    # Unreachable in practice: the English badge is always bundled. Returning it
-    # explicitly keeps the function total (it never returns None).
-    return BADGE_DIR / "get-it-on-en.svg"
 
 
 # The Noto Sans CJK families (bundled under tools/fonts/NotoSansCJK/) used as the
@@ -682,7 +537,7 @@ def _render_phone_png(today_png: Path, w: int, h: int, r: int, bezel: int) -> by
     return buf.getvalue()
 
 
-def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path,
+def _build_svg(copy: Copy, today_png: Path, report_png: Path,
                cjk_family: str | None = None) -> str:
     """Assemble the full SVG document string for one locale.
 
@@ -787,32 +642,21 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path,
         )
         y += tag_lh * len(lines) + 18  # paragraph gap
 
-    # Bottom corners: the "Get it on F-Droid" badge (original colours) in the
-    # bottom-LEFT and the GPLv3 "Free as in Freedom" logo (recoloured WHITE) in
-    # the bottom-RIGHT, each inset by EQUAL bottom + side margins (48 px) so the
-    # two corners mirror one another. Both share the same bottom baseline and the
-    # same VISIBLE height.
+    # Bottom-LEFT corner: the GPLv3 "Free as in Freedom" logo (recoloured WHITE),
+    # inset by EQUAL bottom and side margins (48 px). It is the only corner mark;
+    # the copy column above it ends well clear of the baseline.
     #
-    # logo_w drives that shared height (the badge is matched to the logo's visible
-    # height). It is kept at 96 -- the reduced size introduced earlier -- so the
-    # pair renders a little smaller than the logo's native 112. NOTE: the original
-    # phone-clearance reason for the reduction no longer strictly applies now that
-    # the WIDE badge sits bottom-LEFT (clear of the phone) and the NARROW logo sits
-    # bottom-RIGHT (its left edge x≈880 clears the phone body + soft shadow ≈823 by
-    # ~57 px); the reduced size is retained by choice and may be raised to 112.
+    # logo_w is kept at 96 rather than the logo's native 112 -- the reduced size
+    # introduced earlier, retained by choice. The bottom-left corner is clear of
+    # the phone and of the tilted report "paper", both of which sit in the right
+    # half, so the logo is drawn HERE in normal order and needs no z-order
+    # correction.
     margin = 48.0
     logo_w = 96.0
     logo_h = logo_w * 358.0 / 720.0
     baseline_y = H - margin - logo_h
-    # F-Droid badge, bottom-LEFT (x = margin): original brand colours, cropped to
-    # its ink box and scaled to the shared visible height (see _badge_nested). The
-    # bottom-left corner is clear of the phone and the PDF "paper", so it is drawn
-    # here in normal order.
-    parts.append(_badge_nested(badge_svg, margin, baseline_y, logo_h))
+    parts.append(_logo_nested(margin, baseline_y, logo_w, color="#ffffff"))
 
-    # The GPLv3 logo mirrors this into the bottom-RIGHT corner, but it is appended
-    # LATER -- after the report "paper" -- so it sits IN FRONT of the tilted PDF
-    # screenshot instead of behind it. See the report/phone block below.
     # ── Centre column: four feature bullets ──────────────────────────────────
     # The boxes are wide enough that their RIGHT edge (bx+bw) tucks behind the
     # phone (drawn afterwards), as in the reference; the label column is capped
@@ -872,14 +716,6 @@ def _build_svg(copy: Copy, today_png: Path, report_png: Path, badge_svg: Path,
         f'</g>'
     )
 
-    # GPLv3 logo (bottom-right corner): drawn HERE, AFTER the report "paper", so it
-    # OVERLAPS/covers the tilted PDF screenshot instead of being hidden behind it.
-    # Recoloured WHITE and right-anchored at the mirrored 48 px margin, sharing the
-    # bottom baseline and visible height with the bottom-left badge. Its left edge
-    # (x≈880) clears the phone + soft shadow (≈823), so being placed before the
-    # phone below is fine — they do not overlap.
-    parts.append(_logo_nested(W - margin - logo_w, baseline_y, logo_w, color="#ffffff"))
-
     # Right-side depth edge: a thin perspective band along the phone's NEAR (right)
     # edge, giving it visible thickness (the front face is otherwise flat). It is
     # tapered (shorter at the back) and drawn just before the phone so the front
@@ -918,7 +754,7 @@ def _render_png(svg: str, out_png: Path, scale: int = 1) -> None:
     The output is `scale` x the Play feature-graphic size, i.e.
     (1024*scale) x (500*scale) px. The viewBox is unchanged, so the whole graphic
     is simply rasterised at a higher pixel density: vector elements (text, the
-    badge and its fonts, the logo, shapes) stay razor-sharp, and the embedded
+    logo, shapes) stay razor-sharp, and the embedded
     screenshots -- heavily downscaled even at scale=4 -- stay crisp too.
 
     Determinism hinges on the font: librsvg resolves font families through
@@ -972,12 +808,11 @@ def render_locale(locale: str) -> tuple[Path, Path]:
     shots = loc_dir / "images" / "phoneScreenshots"
     today_png = shots / "01_today.png"
     report_png = shots / "07_report_page_1.png"
-    badge_svg = _badge_for_locale(locale)
     cjk_family = _cjk_family_for_locale(locale)
-    for p in (today_png, report_png, ICON_FG, badge_svg):
+    for p in (today_png, report_png, ICON_FG):
         if not p.is_file():
             raise FileNotFoundError(f"required input missing: {p}")
-    svg = _build_svg(copy, today_png, report_png, badge_svg, cjk_family)
+    svg = _build_svg(copy, today_png, report_png, cjk_family)
     images = loc_dir / "images"
     out_png = images / "featureGraphic.png"
     _render_png(svg, out_png)                       # 1024x500, uploaded to Play
@@ -1029,9 +864,8 @@ def main(argv: list[str]) -> int:
             )
         print(
             "render-feature-graphic: refusing to render -- fontconfig would "
-            "silently substitute another family. For Rokkitt-Bold.ttf run "
-            "`make rokkitt-bold` once and commit the result (see docs/NOTICES.md); "
-            "the other faces are committed under tools/fonts/.",
+            "silently substitute another family. All required faces are "
+            "committed under tools/fonts/ (see docs/NOTICES.md).",
             file=sys.stderr,
         )
         return 1
@@ -1051,7 +885,7 @@ def main(argv: list[str]) -> int:
         copy = Copy.load(loc_dir / "feature-graphic.txt")
         shots = loc_dir / "images" / "phoneScreenshots"
         svg = _build_svg(copy, shots / "01_today.png", shots / "07_report_page_1.png",
-                         _badge_for_locale(loc), _cjk_family_for_locale(loc))
+                         _cjk_family_for_locale(loc))
         Path(args.svg_only).write_text(svg, encoding="utf-8")
         print(f"wrote SVG for {loc} -> {args.svg_only}")
         return 0

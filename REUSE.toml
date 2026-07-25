@@ -107,29 +107,7 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "José Obed"
 SPDX-License-Identifier = "LicenseRef-PublicDomain"
 
-# ── "Get it on F-Droid" download badges ──────────────────────────────────────
-# One localized badge per store-listing language, taken verbatim from the
-# F-Droid artwork project under CC BY-SA 3.0. (F-Droid licenses the badge
-# *generator* separately under GPL-3.0-or-later; only the artwork is vendored.)
-[[annotations]]
-path = "fdroid/get-it-on-*.svg"
-precedence = "aggregate"
-SPDX-FileCopyrightText = "F-Droid artwork project (https://gitlab.com/fdroid/artwork)"
-SPDX-License-Identifier = "CC-BY-SA-3.0"
-
 # ── Vendored fonts (build-time tooling for the feature graphic / reports) ─────
-# DejaVu Sans: the DejaVu Fonts license, derived from the Bitstream Vera and
-# Arev font licenses (SPDX: Bitstream-Vera). DejaVu's own changes are public
-# domain; the two upstream copyright holders are named here.
-[[annotations]]
-path = "tools/fonts/DejaVuSans/**"
-precedence = "aggregate"
-SPDX-FileCopyrightText = [
-  "2003 Bitstream, Inc.",
-  "2006 Tavmjong Bah",
-]
-SPDX-License-Identifier = "Bitstream-Vera"
-
 # Inter: SIL Open Font License 1.1 (see tools/fonts/Inter/OFL.txt).
 [[annotations]]
 path = "tools/fonts/Inter/**"
@@ -147,17 +125,6 @@ SPDX-FileCopyrightText = [
   "2014-2021 Adobe (http://www.adobe.com/)",
   "Google LLC",
 ]
-SPDX-License-Identifier = "OFL-1.1"
-
-# Rokkitt: SIL Open Font License 1.1, both the checked-in variable source and
-# the reproducibly-instanced static Bold the renderer uses.
-[[annotations]]
-path = [
-  "tools/fonts/Rokkitt/**",
-  "tools/fonts-src/Rokkitt/**",
-]
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2016 The Rokkit Project Authors (https://github.com/googlefonts/RokkittFont)"
 SPDX-License-Identifier = "OFL-1.1"
 
 # ── Third-party documents reproduced under their own license ─────────────────
