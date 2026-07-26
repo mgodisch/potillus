@@ -107,6 +107,10 @@ struct SettingsScreen: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Loc.string("Done", locale: locale)) { dismiss() }
+                        // A stable handle for the screenshot run, which has to close
+                        // this sheet in 21 languages. Not a label: VoiceOver reads the
+                        // button's own text, which is what it should read.
+                        .accessibilityIdentifier("nav.settingsDone")
                 }
             }
             .task { model.start() }

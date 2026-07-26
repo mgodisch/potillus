@@ -105,17 +105,38 @@ final class PotillusUITests: XCTestCase {
         tabBar.buttons.element(boundBy: 3).tap()
         snapshot("04_drinks")
 
-        // 06 — Settings, opened from Today's overflow menu, then dismissed with a
-        // swipe. Settings moved from a standalone gear into the shared menu, so the
-        // menu is opened first; the Settings entry keeps its "nav.settings" id.
+        // 06 — Settings, opened from Today's overflow menu, then dismissed with its
+        // own Done button. Settings moved from a standalone gear into the shared
+        // menu, so the menu is opened first; the Settings entry keeps its
+        // "nav.settings" id.
         tabBar.buttons.element(boundBy: 0).tap()
         app.buttons["nav.menu"].tap()
         app.buttons["nav.settings"].tap()
         snapshot("06_settings")
-        app.swipeDown(velocity: .fast)
+
+        // Dismissed by tapping Done, not by swiping. `app.swipeDown` gestures on the
+        // application element, i.e. the middle of the screen, where the Settings
+        // sheet has a scrollable Form: the swipe scrolled that Form and left the
+        // sheet up. The Today toolbar button stays in the accessibility tree behind
+        // a presented sheet, so the following tap resolved, landed on the sheet, and
+        // the run shipped a picture of Settings labelled "add drink".
+        let settingsDone = app.buttons["nav.settingsDone"]
+        XCTAssertTrue(settingsDone.waitForExistence(timeout: 10), "Settings had no Done button")
+        settingsDone.tap()
 
         // 05 — Add a drink. Shot last, so no dismissal is needed afterwards.
-        app.buttons["nav.addDrink"].tap()
+        //
+        // Both waits are assertions, not conveniences. Without the first, the tap
+        // races the sheet's dismissal animation; without the second, the frame is of
+        // Today with the sheet still rising. Both produced a wrong screenshot that
+        // no gate could see, because a wrong picture is still a picture. A failed
+        // wait now stops the run (Snapfile: stop_after_first_error).
+        let addDrink = app.buttons["nav.addDrink"]
+        XCTAssertTrue(addDrink.waitForExistence(timeout: 10), "Today never came back")
+        addDrink.tap()
+
+        let entrySheet = app.otherElements["sheet.entry"]
+        XCTAssertTrue(entrySheet.waitForExistence(timeout: 10), "the log-a-drink sheet never appeared")
         snapshot("05_add_drink")
     }
 

@@ -202,6 +202,10 @@ struct EntrySheet: View {
                 editing == nil ? "Log a drink" : "Edit Entry", locale: locale
             ))
             .navigationBarTitleDisplayMode(.inline)
+            // The screenshot run waits for this before it shoots, so the frame is
+            // never of the presenting screen mid-animation. On the Form, not the
+            // title: a localized title is not addressable across 21 languages.
+            .accessibilityIdentifier("sheet.entry")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Loc.string("Cancel", locale: locale)) { dismiss() }

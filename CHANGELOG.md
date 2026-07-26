@@ -191,6 +191,8 @@ every language they ship.
 Neither `fastlane` README is kept. CONTRIBUTING.md §6.2 carries the store-metadata
 conventions and points at `docs/RELEASE-IOS.md`.
 
+The App Store screenshot of the log-a-drink sheet shows that sheet.
+
 Comment corrections: the `SettingsSanitizer` ranges' visibility note names the
 four the settings screen reads, and the vector mirrors in `TestVectors.swift`
 each carry their own file's description.
