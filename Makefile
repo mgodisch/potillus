@@ -246,11 +246,12 @@ install-debug: ../downloads/potillus-$(VERSION)-debug.apk
 # =============================================================================
 #
 # The two qa-* targets run one platform's complete device-free QA battery --
-# build, unit tests, lint, the coverage gate, the static/invariant gates and
-# (Android) the release runtime dependency tree -- and tee EVERY step's output
-# into one log file per platform at the repository root (qa-android.log /
-# qa-ios.log). Both names fall under .gitignore's `*.log` pattern, so neither
-# git nor the tgz exclude set (derived from .gitignore) ever picks them up.
+# build, unit tests, lint, the coverage gate, the static/invariant gates, the
+# CycloneDX SBOM and (Android) the release runtime dependency tree -- and tee
+# EVERY step's output into one log file per platform at the repository root
+# (qa-android.log / qa-ios.log). Both names fall under .gitignore's `*.log`
+# pattern, so neither git nor the tgz exclude set (derived from .gitignore)
+# ever picks them up.
 #
 # They differ from the daily umbrellas (`android`, `ios`) in one deliberate
 # way: a failing step does NOT abort the run. A QA review wants the COMPLETE
@@ -312,6 +313,16 @@ endef
 # docs/ROADMAP.md are re-measurable from one run. Both are REPORTING steps: they
 # record and never fail the battery over what they find. The iOS side needs no
 # counterpart -- tools/check-ios-coverage.py already prints its percentage.
+#
+# `sbom` runs BEFORE the gates, and the position is the point. release-check
+# SECTION 12 scans the dependencies' META-INF/NOTICE files and is gated on the
+# SBOM naming which dependencies those are; with no SBOM in the tree it reports
+# "SBOM not present" and skips, so the battery was carrying a check that never
+# ran. Generating the document first is what makes that section do its work
+# here. `sbom-inventory` then prints what the document holds -- one line per
+# component with its version and license -- because the file itself is
+# git-ignored build output that never reaches a reviewer, while the log does.
+# It is a REPORTING step like the two above.
 qa-android:
 	@log="qa-android.log"
 	$(QA_PROLOGUE)
@@ -323,6 +334,8 @@ qa-android:
 	qa_step cover-check $(MAKE) -C android cover-check
 	qa_step coverage-figures $(MAKE) -C android cover-figures
 	qa_step check-guides $(MAKE) -C android check-guides
+	qa_step sbom $(MAKE) -C android sbom
+	qa_step sbom-inventory python3 tools/sbom-inventory.py $(GRADLE_SBOM)
 	qa_step check-static $(MAKE) check-static
 	qa_step release-check $(MAKE) release-check
 	qa_step deps $(MAKE) -C android deps
@@ -335,11 +348,20 @@ qa-android:
 # instead of aborting the log run. Run it on a Mac for the full picture. The
 # environment probes are individually guarded (`|| echo not found`): an absent
 # tool is itself a QA datum, not a reason to lose the rest of the step.
+#
+# `ios-sbom` and `sbom-inventory` sit in that Mac-free opening group on
+# purpose: the iOS SBOM is generated from Package.resolved by Python alone, so
+# a Linux host produces the same document a Mac does and the inventory reaches
+# the log either way. The Android battery's SECTION 12 argument has no twin
+# here -- release-check is Android's gate and runs in qa-android -- so on this
+# side the pair is purely the reporting one.
 qa-ios:
 	@log="qa-ios.log"
 	$(QA_PROLOGUE)
 	qa_step environment bash -c 'uname -a; sw_vers 2>/dev/null || true; xcodebuild -version 2>/dev/null || echo "xcodebuild: not found"; swift --version 2>/dev/null || echo "swift: not found"; swiftlint version 2>/dev/null || echo "swiftlint: not found"; command -v xcodegen || echo "xcodegen: not found"; python3 --version'
 	qa_step check-ios-static $(MAKE) check-ios-static
+	qa_step ios-sbom $(MAKE) ios-sbom
+	qa_step sbom-inventory python3 tools/sbom-inventory.py $(IOS_SBOM)
 	qa_step lint $(MAKE) -C ios lint
 	qa_step swift-tests $(MAKE) -C ios swift-tests
 	qa_step cover-check $(MAKE) -C ios cover-check

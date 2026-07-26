@@ -101,6 +101,11 @@ single reviewable log. A failing step is recorded and the run continues, so one
 pass yields the whole picture; the target still exits non-zero if any step
 failed.
 
+Both batteries generate their platform's CycloneDX SBOM and print its inventory
+into the log through a new `tools/sbom-inventory.py`, one line per component
+with its version and license. On Android the document is in place before
+`release-check`, so its third-party notice scan runs.
+
 ### Security: record non-exploitable advisories as VEX
 
 A minimal OpenVEX document, `openvex.json`, gives the machine-readable form the
