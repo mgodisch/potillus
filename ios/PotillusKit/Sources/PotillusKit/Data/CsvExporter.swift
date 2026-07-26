@@ -181,13 +181,27 @@ public enum CsvExporter {
     /// CR and LF are tested independently rather than only LF, so a lone CR — an
     /// old-Mac line ending pasted into a note, which never carries an
     /// accompanying LF — cannot slip through unquoted and split the record.
+    ///
+    /// BOTH STEPS WORK ON SCALARS, for the reason `formulaTriggers` gives:
+    ///   * The membership tests read `unicodeScalars`. `value.contains("\r")` and
+    ///     `value.contains("\n")` are BOTH false for a field whose only line
+    ///     break is a Windows one, because CR+LF is a single grapheme cluster
+    ///     and `String.contains` compares clusters. Such a field shipped
+    ///     unquoted and split the record.
+    ///   * The doubling passes `.literal`, which compares scalar by scalar the
+    ///     way Kotlin's UTF-16 `replace` does. Without it a quote that carries a
+    ///     following combining mark is one cluster too, so the search misses it
+    ///     and the field would be wrapped WITHOUT its inner quote doubled — the
+    ///     malformed record the wrapping exists to prevent.
     private static func rfc4180Quote(_ value: String) -> String {
-        let needsQuoting = value.contains(",")
-            || value.contains("\"")
-            || value.contains("\n")
-            || value.contains("\r")
+        let scalars = value.unicodeScalars
+        let needsQuoting = scalars.contains(",")
+            || scalars.contains("\"")
+            || scalars.contains("\n")
+            || scalars.contains("\r")
         guard needsQuoting else { return value }
-        return "\"" + value.replacingOccurrences(of: "\"", with: "\"\"") + "\""
+        let doubled = value.replacingOccurrences(of: "\"", with: "\"\"", options: .literal)
+        return "\"" + doubled + "\""
     }
 
     /// `HH:mm` in the given zone.

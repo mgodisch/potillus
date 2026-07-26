@@ -160,8 +160,9 @@ cover shows the device's real unlock glyph.
 
 A Chinese language choice survives an iOS → Android restore. The volume message
 names 5,000 ml on both platforms, the limit the validator enforces. A failed
-export names its reason. The iOS CSV export prefixes its formula guard onto a
-field that begins with a Windows line ending, as the Android one does.
+export names its reason. The iOS CSV export escapes a field that begins with a
+Windows line ending, and doubles a quote that carries a combining mark, as the
+Android one does.
 
 The four clock-derived models break their ticker on cancellation and re-check it
 before writing, so none publishes a snapshot after `stop()`. `ReportFormatting`'s

@@ -77,6 +77,11 @@
       "expected": "\"'\r\n=1+1\""
     },
     {
+      "description": "a quote is doubled even when a combining mark follows it",
+      "input": "say \"\u0301 now",
+      "expected": "\"say \"\"\u0301 now\""
+    },
+    {
       "description": "hyperlink attack is neutralised",
       "input": "=HYPERLINK(\"http://evil\",\"click\")",
       "expected": "\"'=HYPERLINK(\"\"http://evil\"\",\"\"click\"\")\""
