@@ -439,3 +439,38 @@ struct DayPluralVectors: Decodable {
         let expected: String
     }
 }
+
+/// `month-rollup.json` — the monthly table's cap.
+struct MonthRollupVectors: Decodable {
+    let keep: Int
+    let cases: [Case]
+
+    struct Case: Decodable {
+        let description: String
+        let months: [Row]
+        let expected: [Row]
+    }
+
+    /// A `MonthStat` as the vector spells it.
+    struct Row: Decodable {
+        let monthKey: String
+        let drinkDays: Int
+        let totalGrams: Double
+        let avgPerCalendarDay: Double
+        let daysOverDailyLimit: Int
+        let effectiveDays: Int
+        let rollupFromKey: String?
+
+        var asMonthStat: MonthStat {
+            MonthStat(
+                monthKey: monthKey,
+                drinkDays: drinkDays,
+                totalGrams: totalGrams,
+                avgPerCalendarDay: avgPerCalendarDay,
+                daysOverDailyLimit: daysOverDailyLimit,
+                effectiveDays: effectiveDays,
+                rollupFromKey: rollupFromKey
+            )
+        }
+    }
+}

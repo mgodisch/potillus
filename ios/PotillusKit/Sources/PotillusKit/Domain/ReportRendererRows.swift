@@ -117,7 +117,13 @@ extension ReportRenderer {
         data.months.map { month in
             let over = month.daysOverDailyLimit
             return [
-                "M_MONTH": monthAndYear(month.monthKey, locale: context.locale),
+                // A summary row prints the span it stands for, from the same month
+                // formatter both ends already use — no label of its own to
+                // translate.
+                "M_MONTH": month.rollupFromKey.map { from in
+                    "\(monthAndYear(from, locale: context.locale)) – "
+                        + monthAndYear(month.monthKey, locale: context.locale)
+                } ?? monthAndYear(month.monthKey, locale: context.locale),
                 "M_DRINK_DAYS": "\(month.drinkDays)",
                 "M_TOTAL": one(month.totalGrams, context.locale),
                 "M_AVG": one(month.avgPerCalendarDay, context.locale),

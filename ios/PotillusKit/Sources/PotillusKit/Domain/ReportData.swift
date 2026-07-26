@@ -55,19 +55,87 @@ public struct MonthStat: Sendable, Equatable {
     /// Grams divided by the month's days INSIDE the period — see `make`.
     public let avgPerCalendarDay: Double
     public let daysOverDailyLimit: Int
+    /// This month's calendar days INSIDE the period — the divisor behind
+    /// `avgPerCalendarDay`. Carried rather than recomputed because `MonthRollup`
+    /// needs it: a summary row's average is the summed grams over the summed days,
+    /// and averaging the averages of a 31-day and a 3-day month is not that.
+    public let effectiveDays: Int
+    /// For a summary row, the FIRST month it stands for; `nil` for a single month.
+    ///
+    /// The report prints the row as a span, `"Jan 2025 – Jun 2025"`, from this and
+    /// `monthKey`. No new label: both ends go through the month formatter the
+    /// report already carries.
+    public let rollupFromKey: String?
 
     public init(
         monthKey: String,
         drinkDays: Int,
         totalGrams: Double,
         avgPerCalendarDay: Double,
-        daysOverDailyLimit: Int
+        daysOverDailyLimit: Int,
+        effectiveDays: Int,
+        rollupFromKey: String? = nil
     ) {
         self.monthKey = monthKey
         self.drinkDays = drinkDays
         self.totalGrams = totalGrams
         self.avgPerCalendarDay = avgPerCalendarDay
         self.daysOverDailyLimit = daysOverDailyLimit
+        self.effectiveDays = effectiveDays
+        self.rollupFromKey = rollupFromKey
+    }
+}
+
+/// Caps the monthly table, so a report over a long period still fits its sheet.
+///
+/// WHY A CAP AT ALL
+///   Sheet one holds the header, the key figures, the trend chart and this table,
+///   and the table was the only part with no upper bound: one row per calendar
+///   month, for however long the period ran. Sheet one has room for roughly eight
+///   more rows than the six a half-year report shows, so a two-year report ran off
+///   the page — and a report that outgrew its sheets lost the last one entirely,
+///   which is what `ReportPdfPrinter`'s completeness check now refuses to ship.
+///
+/// WHAT IT DOES
+///   Keeps the most recent `keeping` months in full and folds everything older
+///   into one summary row at the top. Nothing is dropped: the summary carries the
+///   summed drink days, grams and over-limit days, and an average weighted by the
+///   days each month contributed.
+///
+/// WHY NOT WHEN IT WOULD SAVE NOTHING
+///   Folding a single month into a summary row costs a row and buys none, and it
+///   turns a real month into a span of one. With `keeping` + 1 months or fewer the
+///   table is returned unchanged.
+public enum MonthRollup {
+
+    /// Months shown in full. Six is a half year, which is what a reader scans.
+    public static let keep = 6
+
+    /// Returns `months` with everything older than the last `keeping` folded into
+    /// a single leading summary row.
+    ///
+    /// - Parameters:
+    ///   - months: Ascending by month, as `ReportData.make` produces them.
+    ///   - keeping: How many months stay in full. Returned unchanged when there are
+    ///     `keeping` + 1 or fewer, where a summary would fold one month into a span
+    ///     of one and cost a row to do it.
+    /// - Returns: At most `keeping` + 1 rows, still ascending, the summary first.
+    public static func capped(_ months: [MonthStat], keeping: Int = keep) -> [MonthStat] {
+        guard months.count > keeping + 1 else { return months }
+        let rolled = months.dropLast(keeping)
+        let grams = rolled.reduce(0.0) { $0 + $1.totalGrams }
+        let days = rolled.reduce(0) { $0 + $1.effectiveDays }
+        guard let first = rolled.first, let last = rolled.last else { return months }
+        let summary = MonthStat(
+            monthKey: last.monthKey,
+            drinkDays: rolled.reduce(0) { $0 + $1.drinkDays },
+            totalGrams: grams,
+            avgPerCalendarDay: days > 0 ? grams / Double(days) : 0,
+            daysOverDailyLimit: rolled.reduce(0) { $0 + $1.daysOverDailyLimit },
+            effectiveDays: days,
+            rollupFromKey: first.monthKey
+        )
+        return [summary] + months.suffix(keeping)
     }
 }
 
@@ -219,11 +287,13 @@ public struct ReportData: Sendable, Equatable {
             )
         }.count
 
-        let months = monthStats(
-            daySummaries: daySummaries,
-            firstDate: firstDate,
-            lastDate: lastDate,
-            dailyLimitGrams: limitInfo.limitGrams
+        let months = MonthRollup.capped(
+            monthStats(
+                daySummaries: daySummaries,
+                firstDate: firstDate,
+                lastDate: lastDate,
+                dailyLimitGrams: limitInfo.limitGrams
+            )
         )
 
         // ── Per-day totals over EVERY calendar day, abstinent days as zeros ──
@@ -370,7 +440,8 @@ public struct ReportData: Sendable, Equatable {
                 drinkDays: days.count,
                 totalGrams: grams,
                 avgPerCalendarDay: grams / Double(effectiveDays),
-                daysOverDailyLimit: over
+                daysOverDailyLimit: over,
+                effectiveDays: effectiveDays
             )
         }
     }

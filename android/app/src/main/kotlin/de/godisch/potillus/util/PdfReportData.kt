@@ -77,7 +77,77 @@ data class MonthStat(
     val totalGrams: Double,
     val avgPerCalendarDay: Double,
     val daysOverDailyLimit: Int,
+    /**
+     * This month's calendar days INSIDE the reporting period — the divisor behind
+     * [avgPerCalendarDay]. Carried rather than recomputed because [MonthRollup]
+     * needs it: a summary row's average is the summed grams over the summed days,
+     * and averaging the averages of a 31-day and a 3-day month is not that.
+     */
+    val effectiveDays: Int,
+    /**
+     * For a summary row, the FIRST month it stands for; `null` for a single month.
+     *
+     * The report prints the row as a span, `"Jan 2025 – Jun 2025"`, from this and
+     * [monthKey]. No new label: both ends go through the month formatter the
+     * report already carries.
+     */
+    val rollupFromKey: String? = null,
 )
+
+/**
+ * Caps the monthly table, so a report over a long period still fits its sheet.
+ *
+ * WHY A CAP AT ALL
+ *   Sheet one holds the header, the key figures, the trend chart and this table,
+ *   and the table was the only part with no upper bound: one row per calendar
+ *   month, for however long the period ran. Sheet one has room for roughly eight
+ *   more rows than the six a half-year report shows, so a two-year report ran off
+ *   the page — and on iOS a report that outgrew its sheets lost the last one
+ *   entirely (see ReportPdfPrinter's completeness check).
+ *
+ * WHAT IT DOES
+ *   Keeps the most recent [keeping] months in full and folds everything older
+ *   into one summary row at the top. Nothing is dropped: the summary carries the
+ *   summed drink days, grams and over-limit days, and an average weighted by the
+ *   days each month contributed.
+ *
+ * WHY NOT WHEN IT WOULD SAVE NOTHING
+ *   Folding a single month into a summary row costs a row and buys none, and it
+ *   turns a real month into a span of one. With [keeping] + 1 months or fewer the
+ *   table is returned unchanged.
+ */
+object MonthRollup {
+
+    /** Months shown in full. Six is a half year, which is what a reader scans. */
+    const val KEEP = 6
+
+    /**
+     * Returns [months] with everything older than the last [keeping] folded into a
+     * single leading summary row.
+     *
+     * @param months Ascending by month, as [PdfReportData.from] produces them.
+     * @param keeping How many months stay in full. Returned unchanged when there
+     *        are [keeping] + 1 or fewer, where a summary would fold one month into
+     *        a span of one and cost a row to do it.
+     * @return At most [keeping] + 1 rows, still ascending, the summary first.
+     */
+    fun capped(months: List<MonthStat>, keeping: Int = KEEP): List<MonthStat> {
+        if (months.size <= keeping + 1) return months
+        val rolled = months.dropLast(keeping)
+        val grams = rolled.sumOf { it.totalGrams }
+        val days = rolled.sumOf { it.effectiveDays }
+        val summary = MonthStat(
+            monthKey = rolled.last().monthKey,
+            drinkDays = rolled.sumOf { it.drinkDays },
+            totalGrams = grams,
+            avgPerCalendarDay = if (days > 0) grams / days else 0.0,
+            daysOverDailyLimit = rolled.sumOf { it.daysOverDailyLimit },
+            effectiveDays = days,
+            rollupFromKey = rolled.first().monthKey,
+        )
+        return listOf(summary) + months.takeLast(keeping)
+    }
+}
 
 /**
  * One category's contribution to total consumption.
@@ -268,8 +338,10 @@ data class PdfReportData(
                         totalGrams = mGrams,
                         avgPerCalendarDay = mGrams / effDays,
                         daysOverDailyLimit = mOver,
+                        effectiveDays = effDays,
                     )
                 }
+                .let { MonthRollup.capped(it) }
 
             // ── Category breakdown (descending by grams). Grouped by enum name; an
             //    unknown / missing drink falls back to OTHER, as before.

@@ -1,0 +1,736 @@
+{
+  "_comment": [
+    "month-rollup.json - the monthly table's cap.",
+    "",
+    "Sheet one of the report has room for a bounded number of table rows, and the",
+    "monthly table was the only part with no bound. MonthRollup keeps the most",
+    "recent six months in full and folds everything older into one summary row.",
+    "",
+    "The summary's average is the summed grams over the summed effectiveDays, NOT",
+    "the mean of the monthly averages: a 31-day month and a 3-day month do not",
+    "weigh the same. That is the case a reimplementation gets wrong, and the",
+    "seven- and eight-month cases are where the cap starts to bite.",
+    "",
+    "Both suites load this file: Android MonthRollup.capped, iOS the same name."
+  ],
+  "keep": 6,
+  "cases": [
+    {
+      "description": "a short period is untouched",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        }
+      ]
+    },
+    {
+      "description": "exactly the kept count is untouched",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        }
+      ]
+    },
+    {
+      "description": "one month more than the kept count is untouched: a summary of one buys nothing",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        }
+      ]
+    },
+    {
+      "description": "the first month folds into a summary",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-08",
+          "drinkDays": 18,
+          "totalGrams": 180.0,
+          "avgPerCalendarDay": 5.806452,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 23,
+          "totalGrams": 230.0,
+          "avgPerCalendarDay": 3.898305,
+          "daysOverDailyLimit": 3,
+          "effectiveDays": 59,
+          "rollupFromKey": "2025-01"
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-08",
+          "drinkDays": 18,
+          "totalGrams": 180.0,
+          "avgPerCalendarDay": 5.806452,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        }
+      ]
+    },
+    {
+      "description": "nine months fold into a summary",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 110.0,
+          "avgPerCalendarDay": 3.548387,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 120.0,
+          "avgPerCalendarDay": 4.285714,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-08",
+          "drinkDays": 18,
+          "totalGrams": 180.0,
+          "avgPerCalendarDay": 5.806452,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-09",
+          "drinkDays": 19,
+          "totalGrams": 190.0,
+          "avgPerCalendarDay": 6.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-10",
+          "drinkDays": 20,
+          "totalGrams": 200.0,
+          "avgPerCalendarDay": 6.451613,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-11",
+          "drinkDays": 21,
+          "totalGrams": 210.0,
+          "avgPerCalendarDay": 7.0,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-12",
+          "drinkDays": 22,
+          "totalGrams": 220.0,
+          "avgPerCalendarDay": 7.096774,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2026-01",
+          "drinkDays": 23,
+          "totalGrams": 230.0,
+          "avgPerCalendarDay": 7.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2026-02",
+          "drinkDays": 24,
+          "totalGrams": 240.0,
+          "avgPerCalendarDay": 8.0,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2026-03",
+          "drinkDays": 25,
+          "totalGrams": 250.0,
+          "avgPerCalendarDay": 8.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-09",
+          "drinkDays": 135,
+          "totalGrams": 1350.0,
+          "avgPerCalendarDay": 4.945055,
+          "daysOverDailyLimit": 9,
+          "effectiveDays": 273,
+          "rollupFromKey": "2025-01"
+        },
+        {
+          "monthKey": "2025-10",
+          "drinkDays": 20,
+          "totalGrams": 200.0,
+          "avgPerCalendarDay": 6.451613,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-11",
+          "drinkDays": 21,
+          "totalGrams": 210.0,
+          "avgPerCalendarDay": 7.0,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-12",
+          "drinkDays": 22,
+          "totalGrams": 220.0,
+          "avgPerCalendarDay": 7.096774,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2026-01",
+          "drinkDays": 23,
+          "totalGrams": 230.0,
+          "avgPerCalendarDay": 7.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2026-02",
+          "drinkDays": 24,
+          "totalGrams": 240.0,
+          "avgPerCalendarDay": 8.0,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2026-03",
+          "drinkDays": 25,
+          "totalGrams": 250.0,
+          "avgPerCalendarDay": 8.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        }
+      ]
+    },
+    {
+      "description": "a summary over months without grams averages zero, not a division by zero",
+      "months": [
+        {
+          "monthKey": "2025-01",
+          "drinkDays": 11,
+          "totalGrams": 0.0,
+          "avgPerCalendarDay": 0.0,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 12,
+          "totalGrams": 0.0,
+          "avgPerCalendarDay": 0.0,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 28
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-08",
+          "drinkDays": 18,
+          "totalGrams": 180.0,
+          "avgPerCalendarDay": 5.806452,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        }
+      ],
+      "expected": [
+        {
+          "monthKey": "2025-02",
+          "drinkDays": 23,
+          "totalGrams": 0.0,
+          "avgPerCalendarDay": 0.0,
+          "daysOverDailyLimit": 3,
+          "effectiveDays": 59,
+          "rollupFromKey": "2025-01"
+        },
+        {
+          "monthKey": "2025-03",
+          "drinkDays": 13,
+          "totalGrams": 130.0,
+          "avgPerCalendarDay": 4.193548,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-04",
+          "drinkDays": 14,
+          "totalGrams": 140.0,
+          "avgPerCalendarDay": 4.666667,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-05",
+          "drinkDays": 15,
+          "totalGrams": 150.0,
+          "avgPerCalendarDay": 4.83871,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-06",
+          "drinkDays": 16,
+          "totalGrams": 160.0,
+          "avgPerCalendarDay": 5.333333,
+          "daysOverDailyLimit": 0,
+          "effectiveDays": 30
+        },
+        {
+          "monthKey": "2025-07",
+          "drinkDays": 17,
+          "totalGrams": 170.0,
+          "avgPerCalendarDay": 5.483871,
+          "daysOverDailyLimit": 1,
+          "effectiveDays": 31
+        },
+        {
+          "monthKey": "2025-08",
+          "drinkDays": 18,
+          "totalGrams": 180.0,
+          "avgPerCalendarDay": 5.806452,
+          "daysOverDailyLimit": 2,
+          "effectiveDays": 31
+        }
+      ]
+    }
+  ]
+}

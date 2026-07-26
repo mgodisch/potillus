@@ -156,6 +156,8 @@ platforms, and revises the project's own texts.
   `plural-days.json`.
 - `tools/check-report-pdfs.py` holds every committed sample report to two pages.
 - The Gradle and Makefile references name the screenshot fixture.
+- The report's monthly table shows the six most recent months and folds anything
+  older into one summary row.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

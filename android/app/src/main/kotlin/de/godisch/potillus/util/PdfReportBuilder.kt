@@ -284,7 +284,12 @@ object PdfReportBuilder {
         scalars["COL_OVER_DAILY"] = context.getString(R.string.pdf_col_over_daily)
         repeats["MONTHS"] = d.months.map { m ->
             mapOf(
-                "M_MONTH" to LocalDate.parse("${m.monthKey}-01").format(monthFmt),
+                // A summary row prints the span it stands for, from the same month
+                // formatter both ends already use — no label of its own to translate.
+                "M_MONTH" to m.rollupFromKey?.let { from ->
+                    "${LocalDate.parse("$from-01").format(monthFmt)} – " +
+                        LocalDate.parse("${m.monthKey}-01").format(monthFmt)
+                } ?: LocalDate.parse("${m.monthKey}-01").format(monthFmt),
                 "M_DRINK_DAYS" to "${m.drinkDays}",
                 "M_TOTAL" to m.totalGrams.fmt1(),
                 "M_AVG" to m.avgPerCalendarDay.fmt1(),

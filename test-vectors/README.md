@@ -89,6 +89,10 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
   `StatsViewModel`, out of reach of a JVM test. `invalidToday` holds only inputs
   both platforms unambiguously reject; the file's `_comment` says which case was
   left out and why.
+- `month-rollup.json` — the monthly table's cap: the six most recent months in
+  full, everything older folded into one summary row whose average is weighted
+  by the days each month contributed. The seven- and eight-month cases are
+  where the cap starts to bite.
 - `plural-days.json` — the report's day counts in all 21 languages: the forms
   come from Android's `<plurals name="days">`, the category each count selects
   from CLDR. Counts 11 to 14 and 21 to 25 are in the list because that is where
