@@ -46,7 +46,7 @@ Reach iOS parity and harden the release
 
 This version reworks the iOS interaction model to match Apple's own list apps,
 moves the canonical repository to GitLab, absorbs the store-path corrections
-drafted for 0.83.1, folds in four quality-assurance rounds covering both
+drafted for 0.83.1, folds in five quality-assurance rounds covering both
 platforms, and revises the project's own texts.
 
 ### Added
@@ -130,9 +130,14 @@ platforms, and revises the project's own texts.
   reading `chartBuckets`.
 - Kover is at 0.9.9, counting `com.android.*` classes and using the dependency
   notation Gradle 10 requires.
-- Branch coverage is 81.05 % against a `koverVerify` floor of 80, and
+- Branch coverage clears a `koverVerify` floor of 80, and
   `test_statement_coverage90`, `test_branch_coverage80` and `dynamic_analysis` are
-  Met.
+  Met. The documents outside `android/app/build.gradle.kts` name the floor and
+  `make -C android cover-figures` in place of a figure.
+- The iOS export-compliance comment names the sealed preferences blob, the
+  Keychain key it uses and the unencrypted database.
+- The user's guide count in `.bestpractices.json` reads 21 languages.
+- `stats-window.json` carries one description of `invalidToday`.
 - `release-check.sh` §5 reads all three Kotlin source sets.
 - The comment-language gate reads the declarative build and configuration files,
   reaching every class `tools/check-headers.py` owns except `.md`, `.xml` and

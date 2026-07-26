@@ -339,8 +339,11 @@ this paragraph used to carry — that Kover would first have to report branch
 coverage — was wrong: it had been measuring branches all along, which is what
 let `koverVerify` enforce a BRANCH bound. Only the FIGURE was never printed by
 any run, so it survived here and in `.bestpractices.json` as a quoted "~80%"
-that no one had checked. `koverXmlReport` puts it at 492 of 607 branches,
-81.05%, and the enforced floor was raised from 75 to 80 to match.
+that no one had checked. `koverXmlReport` put it above 80, and the enforced
+floor was raised from 75 to 80 to match. The figure itself is not repeated
+here: a number in prose is a measurement with no run behind it the moment the
+next test lands, which is how the "~80%" above came about.
+`make -C android cover-figures` prints the current one.
 
 ## Working toward OpenSSF Baseline Level 3
 
@@ -445,11 +448,12 @@ second active participant in the project.
   step as the two items above — a second, independent maintainer who can review.
 - **Raise the branch-coverage floor further** (follow-up to
   `test_branch_coverage80`, which is Met). Kover is fully integrated and
-  enforced: statement coverage is ~97% and branch coverage 81.05% (492 of 607
-  branches), with a build-breaking floor (`koverVerify`: LINE >= 90 /
-  BRANCH >= 80) wired into the release gate (`make cover-check`). The gold
-  threshold is cleared, but only by 1.05 points: seven covered branches lost, or
-  nine uncovered ones added, take it under 80 and turn the gate red. The
+  enforced: both statement and branch coverage clear their build-breaking floors
+  (`koverVerify`: LINE >= 90 / BRANCH >= 80), wired into the release gate
+  (`make cover-check`); `make -C android cover-figures` prints what each
+  currently measures. The gold threshold is cleared by about a point, so a
+  single-digit number of covered branches lost — or of uncovered ones added —
+  takes it under 80 and turns the gate red. The
   branches still uncovered sit in Android-/Compose-adjacent code (ViewModel
   `StateFlow` assembly, resource-bound error mapping) that is awkward to
   exercise from JVM unit tests; targeted tests, or a small refactor that makes

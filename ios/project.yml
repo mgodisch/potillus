@@ -242,14 +242,29 @@ targets:
         # the String Catalog Xcode consults for generated-Info.plist keys (0.83.0
         # QA round: without it, all twenty non-English languages saw English here).
         INFOPLIST_KEY_NSFaceIDUsageDescription: "Unlock Libellus Potionis with Face ID."
-        # Export-compliance declaration. The app is fully offline and uses only the
-        # encryption built into the operating system — the Keychain (Security
-        # framework) for the app-lock secret, and SQLite for the database. It ships
-        # no proprietary cryptography and makes no network calls, so it uses no
-        # NON-exempt encryption; the honest, binding answer is "NO". Setting it here
-        # answers App Store Connect's prompt once for every build and unblocks a
-        # TestFlight build from "Missing Compliance". A regulatory declaration, not a
-        # UI shortcut — correct because the app genuinely has no non-exempt crypto.
+        # Export-compliance declaration. What the app actually encrypts, and with
+        # what, decides this answer, so both are named exactly:
+        #   • ONE artifact is encrypted at rest — the preferences blob — sealed
+        #     with AES-256-GCM through Apple's CryptoKit (`AES.GCM.seal` in
+        #     PotillusKit's PreferencesStore).
+        #   • The symmetric key for that seal is held in the Keychain (Security
+        #     framework), `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
+        #     SecretKeyProviding is the only file that touches it.
+        #   • The app lock has NO secret of its own: it is a `LAContext`
+        #     evaluation, not a stored credential.
+        #   • The GRDB/SQLite database is NOT encrypted. It is protected by the
+        #     app sandbox and iOS Data Protection, which is a platform guarantee
+        #     rather than cryptography this app performs. (SQLCipher was dropped
+        #     in v0.73.0; `.bestpractices.json`, `crypto_algorithm_agility`,
+        #     records that decision.)
+        # All of it is standard encryption provided by the operating system, the
+        # app ships no proprietary cryptography, and it makes no network calls,
+        # so it uses no NON-exempt encryption and the honest, binding answer is
+        # "NO". Setting it here answers App Store Connect's prompt once for every
+        # build and unblocks a TestFlight build from "Missing Compliance". This is
+        # a regulatory declaration, not a UI shortcut: if the set of encrypted
+        # artifacts above ever grows, re-examine the answer BEFORE shipping rather
+        # than leaving this comment describing an older app.
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: "NO"
 
   PotillusTests:

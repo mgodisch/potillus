@@ -1123,13 +1123,18 @@ kover {
         //                   (test_branch_coverage80). Raised from 75 in the
         //                   0.84.0 QA round, when the figure was MEASURED for the
         //                   first time instead of quoted: `koverXmlReport` counts
-        //                   492 of 607 branches, 81.05%. Kover had been measuring
+        //                   504 of 621 branches, 81.16%. Kover had been measuring
         //                   branches all along — it could not have enforced a
         //                   BRANCH bound otherwise — but no run printed the
         //                   number, so `.bestpractices.json` and docs/ROADMAP.md
         //                   both carried it as an open goal. Headroom is thin by
-        //                   design: seven covered branches lost, or nine
+        //                   design: eight covered branches lost, or ten
         //                   uncovered ones added, take the figure under 80.
+        //                   A figure quoted in prose goes stale the next time a
+        //                   test lands; `make -C android cover-figures` prints
+        //                   the current one, which is why the documents outside
+        //                   this file now name the floor and that command
+        //                   instead of a number.
         // Enforced by `release-android` and `release-ios`, which call the
         // per-platform `cover-check` before they build, and by the GitHub mirror's
         // android/ios workflows on every push (visible there, but a mirror cannot
