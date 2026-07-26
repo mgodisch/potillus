@@ -23,6 +23,7 @@
 //
 // =============================================================================
 
+import PDFKit
 import PotillusKit
 import UIKit
 import WebKit
@@ -60,11 +61,14 @@ final class ReportPdfPrinter: NSObject {
     enum Failure: Error, LocalizedError {
         case webViewFailed(String)
         case emptyDocument
+        case truncated(pages: Int)
 
         var errorDescription: String? {
             switch self {
             case .webViewFailed(let reason): return "The report could not be laid out: \(reason)"
             case .emptyDocument: return "The report came out empty."
+            case .truncated(let pages):
+                return "The report was cut short at \(pages) page(s); its last sheet is missing."
             }
         }
     }
@@ -225,7 +229,48 @@ final class ReportPdfPrinter: NSObject {
         guard output.length > 0, ReportJob.isWellFormed(output as Data) else {
             throw Failure.emptyDocument
         }
-        return output as Data
+
+        let data = output as Data
+        try verifyLastSheetReachedThePaper(data)
+        return data
+    }
+
+    /// Throws unless the document's last page carries the report's footer.
+    ///
+    /// WHAT THIS CATCHES
+    ///   `numberOfPages` is the formatter's own count, and the loop above trusts it.
+    ///   When it under-reports, the pages beyond it are never drawn and the file is
+    ///   simply short — structurally perfect, `%%EOF` and all, with a whole sheet
+    ///   missing. That shipped: the Russian screenshot report came out as two pages
+    ///   whose second page held nothing but a stray disclaimer, while the German one
+    ///   was complete. Sheet one had overflowed by a line, everything moved down a
+    ///   page, and the last page fell off the end. Nothing said so — not the printer,
+    ///   not `isWellFormed`, not the screenshot recipe, which rasterised the empty
+    ///   page and shipped it to the App Store in nine languages.
+    ///
+    ///   A reader who exports a report in one of those languages loses the drink
+    ///   categories, the time-of-day pattern, the weekday profile and the risk block,
+    ///   silently. That is the reason this check exists at all: not the screenshots,
+    ///   but the export.
+    ///
+    /// WHY THE FOOTER
+    ///   It is the last element of the last sheet and it is English in every
+    ///   language, so one substring settles the question for all 21. A page count
+    ///   would not: the failure produced exactly the page count the renderer
+    ///   expected, and a report over a long period may legitimately need more pages.
+    ///
+    /// WHY IT READS THE OUTPUT
+    ///   The bug is a disagreement between what the renderer measured and what it
+    ///   drew. Only the drawn document can settle that, so this asks the bytes that
+    ///   are about to be handed out, not the renderer that produced them.
+    private func verifyLastSheetReachedThePaper(_ data: Data) throws {
+        guard let document = PDFDocument(data: data), document.pageCount > 0 else {
+            throw Failure.emptyDocument
+        }
+        let last = document.page(at: document.pageCount - 1)?.string ?? ""
+        guard last.contains(ReportLabels.footerMarker) else {
+            throw Failure.truncated(pages: document.pageCount)
+        }
     }
 }
 

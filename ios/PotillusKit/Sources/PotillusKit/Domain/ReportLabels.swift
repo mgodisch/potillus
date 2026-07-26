@@ -149,7 +149,19 @@ public struct ReportLabels: Sendable {
     ///   - appVersion: `MAJOR.MINOR.PATCH`, with any build suffix stripped.
     ///   - systemVersion: The user-facing iOS version, e.g. `"17.4"`.
     public static func footer2(appVersion: String, systemVersion: String) -> String {
-        "Created with Libellus Potionis v\(appVersion) on iOS \(systemVersion), "
+        "\(footerMarker) v\(appVersion) on iOS \(systemVersion), "
             + "free software under the GNU GPL v3, WITHOUT ANY WARRANTY."
     }
+
+    /// The opening words of [footer2], and the printer's proof that the last sheet
+    /// reached the paper.
+    ///
+    /// The footer is the last thing on the last sheet, so a document whose final
+    /// page does not carry these words is missing its final page. `ReportPdfPrinter`
+    /// looks for exactly this string; it is declared here, beside the only code that
+    /// writes it, so the two cannot drift into a check that always passes.
+    ///
+    /// English on both platforms by the same decision as [footer2], which is what
+    /// makes it usable as a marker in all 21 languages.
+    public static let footerMarker = "Created with Libellus Potionis"
 }

@@ -198,6 +198,8 @@ Merging a backup on iOS leaves the local settings alone, as on Android.
 A fresh Android install starts at 80 g per week over four drink days. Every
 first-run default now reads from `AppSettings`.
 
+The iOS report export refuses to hand out a document whose last sheet is missing.
+
 Comment corrections: the `SettingsSanitizer` ranges' visibility note names the
 four the settings screen reads, and the vector mirrors in `TestVectors.swift`
 each carry their own file's description.

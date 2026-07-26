@@ -81,4 +81,27 @@ final class ReportJobTests: XCTestCase {
         )
         XCTAssertLessThan(earlier, later)
     }
+
+    // ── The footer marker ────────────────────────────────────────────────────
+    //
+    // ReportPdfPrinter proves a document is complete by looking for this string on
+    // its last page. A marker the footer does not actually contain would be a check
+    // that fails on every good report; a footer that stopped containing it would be
+    // a check that passes on every broken one. Both are one edit away, so the two
+    // are asserted against each other here.
+
+    func testTheFooterCarriesTheMarkerThePrinterLooksFor() {
+        let footer = ReportLabels.footer2(appVersion: "0.84.0", systemVersion: "26.5")
+        XCTAssertTrue(
+            footer.contains(ReportLabels.footerMarker),
+            "the printer's completeness check would never find its marker"
+        )
+    }
+
+    func testTheMarkerIsLanguageIndependent() {
+        XCTAssertEqual(
+            ReportLabels.footerMarker, "Created with Libellus Potionis",
+            "the footer is English in all 21 languages, which is what makes it usable as a marker"
+        )
+    }
 }
