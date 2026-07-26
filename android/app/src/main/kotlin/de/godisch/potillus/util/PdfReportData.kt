@@ -38,10 +38,10 @@ import de.godisch.potillus.domain.model.LimitInfo
 import de.godisch.potillus.domain.model.LimitViolations
 import java.time.Instant
 import java.time.LocalDate
-import java.util.Locale
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 // =============================================================================
 // PdfReportData – the report's numbers, computed with NO Android dependencies
