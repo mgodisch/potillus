@@ -511,6 +511,9 @@ object BackupManager {
                 val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
                 // ── Guard 4: logicalDate – full calendar-semantic validation ─────
+                // Since the 0.84.0 review DayResolver.parseDate performs the same
+                // round-trip, so this is belt over braces. It stays because it names
+                // the offending value in the error the importer shows the reader.
                 // logicalDate is used in all SQL WHERE and ORDER BY clauses as a
                 // plain String comparison (ISO-8601 lexicographic order = chronological
                 // order). An arbitrary string injected here would silently corrupt

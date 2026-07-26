@@ -27,9 +27,14 @@
     "",
     "invalidToday covers three ways a date can fail: not a date at all, a day the",
     "calendar does not have, and a spelling that is not canonical. Both platforms",
-    "reject all three - Kotlin because LocalDate.parse throws, iOS because",
     "DayResolver.parseDate formats its result back and demands the original string",
-    "rather than resting on DateFormatter's leniency."
+    "",
+    "invalidToday covers three ways a date can fail: not a date at all, a day the",
+    "calendar does not have, and a spelling that is not canonical. Neither platform",
+    "rejects the middle one on its own - java.time resolves SMART and clamps",
+    "2026-02-30 to the 28th, and Foundation's leniency is a framework detail. Both",
+    "DayResolver.parseDate implementations therefore format their result back and",
+    "demand the original string."
   ],
   "window": [
     {

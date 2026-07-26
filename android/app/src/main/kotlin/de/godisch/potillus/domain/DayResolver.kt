@@ -31,6 +31,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.temporal.WeekFields
 import java.util.Locale
 
@@ -130,8 +131,31 @@ object DayResolver {
      */
     fun today(changeHour: Int, changeMinute: Int): String = resolve(clock().millis(), changeHour, changeMinute)
 
-    /** Parses a "YYYY-MM-DD" string into a [LocalDate]. */
-    fun parseDate(dateStr: String): LocalDate = LocalDate.parse(dateStr, DATE_FORMATTER)
+    /**
+     * Parses a canonical `"YYYY-MM-DD"` date.
+     *
+     * STRICT BY ROUND TRIP, NOT BY RESOLVER STYLE
+     *   [DATE_FORMATTER] resolves SMART, which CLAMPS a day the month does not
+     *   have instead of refusing it: `"2026-02-30"` comes back as 28 February and
+     *   `"2026-04-31"` as 30 April, silently. Only structurally wrong input —
+     *   `"2026-1-1"`, `"2026-13-01"` — throws.
+     *
+     *   Switching the formatter to STRICT is not the fix: STRICT reads `yyyy` as a
+     *   year-of-era and then wants an era to go with it. Formatting the result back
+     *   and demanding the original string is the fix, and it is what
+     *   [BackupManager] already did at its own gate before this was here.
+     *
+     * @throws DateTimeParseException When [dateStr] is not a date, or not the
+     *         canonical spelling of a day that exists. iOS `DayResolver.parseDate`
+     *         returns nil on the same inputs.
+     */
+    fun parseDate(dateStr: String): LocalDate {
+        val parsed = LocalDate.parse(dateStr, DATE_FORMATTER)
+        if (formatDate(parsed) != dateStr) {
+            throw DateTimeParseException("Not a canonical calendar date: $dateStr", dateStr, 0)
+        }
+        return parsed
+    }
 
     /** Formats a [LocalDate] as "YYYY-MM-DD". */
     fun formatDate(date: LocalDate): String = date.format(DATE_FORMATTER)

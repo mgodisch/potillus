@@ -191,9 +191,11 @@ public enum DayResolver {
     ///   What `DateFormatter` does with a day its calendar does not have —
     ///   `"2026-02-30"` — is a framework detail: it may refuse it, clamp it to the
     ///   month's last day, or carry it into the next month. This file should not
-    ///   rest on which. Kotlin's `LocalDate.parse` throws on that input, so a
-    ///   hand-edited backup would otherwise mean one logical date on Android and
-    ///   another on iOS.
+    ///   rest on which. Kotlin does not settle it either: `DateTimeFormatter`
+    ///   resolves SMART and CLAMPS such a day — `"2026-02-30"` comes back as 28
+    ///   February — so both sides needed this, and both sides now do it. A
+    ///   hand-edited backup would otherwise mean one logical date here and a
+    ///   different one there, with neither complaining.
     ///
     ///   Formatting the result back and demanding the original string settles it
     ///   here: a date survives only if it is the canonical spelling of a day that
