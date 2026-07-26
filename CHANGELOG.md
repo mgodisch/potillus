@@ -152,6 +152,8 @@ platforms, and revises the project's own texts.
   and entries.
 - The report's weekday columns follow the report's locale on both platforms.
 - The report's day counts carry each language's own plural form.
+- `PluralDaysInstrumentedTest` holds Android's plural resolution to
+  `plural-days.json`.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

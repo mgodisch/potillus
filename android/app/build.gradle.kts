@@ -540,7 +540,7 @@ android {
             //   fixture (it lives next to the report PDFs and the store metadata),
             //   so instead of duplicating it under app/src/androidTest/assets we
             //   COPY it into a generated androidTest assets directory at build
-            //   time (see the `copyDemoBackupFixture` task below) and expose that
+            //   time (see the `copyInstrumentationFixtures` task below) and expose that
             //   directory here. The test then opens "demo-backup.json" through the
             //   instrumentation AssetManager while the repository keeps exactly one
             //   copy of the data.
@@ -669,17 +669,21 @@ kotlin {
 // The copy is made a dependency of the androidTest asset-merge task so it always
 // runs before the test APK is packaged. `configureEach` covers whatever the
 // concrete merge task is named for the test build type (mergeDebugAndroidTestAssets).
-val copyDemoBackupFixture = tasks.register<Copy>("copyDemoBackupFixture") {
-    description = "Copy the demo fixtures into the androidTest assets for the screenshot suite."
-    // Both files: the screenshot suite reads screenshot-fixture.json (format 3,
-    // with the settings block), and demo-backup.json stays available as the
-    // format-2 fixture. tools/check-fixture-parity.py holds their data equal.
+val copyInstrumentationFixtures = tasks.register<Copy>("copyInstrumentationFixtures") {
+    description = "Copy the shared fixtures the instrumented suite reads into its assets."
+    // The screenshot suite reads screenshot-fixture.json (format 3, with the
+    // settings block); demo-backup.json stays available as the format-2 fixture
+    // and tools/check-fixture-parity.py holds their data equal.
     from(rootProject.file("../fastlane/screenshot-fixture.json"))
     from(rootProject.file("../fastlane/demo-backup.json"))
+    // plural-days.json is not a screenshot asset. It is here because deciding
+    // which plural form a count takes needs android.content.res, so the test that
+    // holds the iOS port to Android's own resolution has to run on a device.
+    from(rootProject.file("../test-vectors/plural-days.json"))
     into(layout.buildDirectory.dir("generated/screenshotAssets"))
 }
 tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
-    dependsOn(copyDemoBackupFixture)
+    dependsOn(copyInstrumentationFixtures)
 }
 
 // ── Generated guide & copyright resources (build prerequisites) ────────────────
