@@ -321,7 +321,10 @@ reintroduce the ties-to-even rounding the rest of the function avoids. The
 `dataPoints` field is gone from both platforms' statistics state; the chart
 reads `chartBuckets`. `COPYING.md` says where a third-party license text sits:
 under `LICENSES/` when a file of this repository is released under it, beside
-`docs/NOTICES.md` when none is.
+`docs/NOTICES.md` when none is. `docs/ROADMAP.md`'s accessibility section
+matches the code and `docs/WCAG_LEVEL_A_CHECKLIST.md`: the drawn charts carry
+their text alternative and the two custom clickable surfaces their button role,
+leaving the two contrast gaps, target size and focus visibility.
 
 ### iOS: delete and edit move to the native edit-mode model
 

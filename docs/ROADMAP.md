@@ -149,8 +149,11 @@ honest:
   states explicitly that no automated/tool check suffices. No such evaluation
   has been performed here.
 - There are **verified unmet Level AA criteria** (listed below), so AA/AAA are
-  out regardless; and at least one **Level A** item (the on-screen chart's text
-  alternative) is unresolved, so even Level A is not cleanly established.
+  out regardless. The Level A criteria have no open implementation item — see
+  [WCAG_LEVEL_A_CHECKLIST.md](WCAG_LEVEL_A_CHECKLIST.md) — but that checklist's
+  on-device pass with TalkBack has not been walked, and a static reading of the
+  source is not the human evaluation a claim needs. Level A therefore stays
+  unclaimed as well.
 - The W3C logos are **web-page scoped** (WCAG = *Web Content* Accessibility
   Guidelines; a logo covers "a single page"). Libellus Potionis is a native mobile app;
   the per-page conformance model does not map onto it. (WCAG could be applied via
@@ -161,7 +164,10 @@ screen-reader (TalkBack) names on **all** interactive controls — including, si
 the sixth QA review, the calendar month/year navigation arrows, the
 drink-category icon, and every year heat-map day cell that carries data
 (`year_calendar_day_desc`); a per-app language selector with RTL support;
-`sp`-based text that honours the system font-scale (WCAG 1.4.4); and an
+a one-line summary on each of the three drawn charts (`chart_desc_daily_avg`,
+`chart_desc_value_bars`, `chart_desc_categories`, translated into all 21
+languages); `sp`-based text that honours the system font-scale (WCAG 1.4.4);
+and an
 under/over-limit palette that is **blue vs. red — not a red/green pair** — so it
 is colour-blind distinguishable.
 
@@ -182,15 +188,13 @@ concrete, measured gaps are:
 - **Target size (2.5.8, AA — new in 2.2).** The 10 dp heat-map day cells are
   below the 24 px minimum; a ≥ 24 dp (ideally 48 dp) touch target should wrap the
   10 dp visual. (Standard Material `IconButton`s already meet this.)
-- **Chart text alternative (1.1.1, A).** The on-screen bar/donut chart is a bare
-  `Canvas` with no `semantics`, so a screen reader gets nothing from it; it needs
-  a summary or per-bar semantics. (This is the Level-A blocker above.)
-- **Focus visibility / role (2.4.7 AA, 4.1.2 A).** The four custom
-  `clickable` heat-map/chart surfaces need a visible focus indicator and an
-  explicit `role = Button`.
+- **Focus visibility (2.4.7, AA).** The two custom `clickable` surfaces — the
+  year heat-map day cell and the month cell — need a visible focus indicator.
+  They already carry `role = Role.Button`, so 4.1.2 is not part of this item.
 
-Each new user-facing string (e.g. a chart summary) triggers `LocaleSyncTest`
-across all locales, so these are i18n-touching changes, not one-liners.
+None of the four remaining gaps introduces a user-facing string, so none of
+them triggers `LocaleSyncTest` across all locales — unlike the chart summaries,
+which did.
 
 A lightweight regression guard exists in the meantime: `tools/release-check.sh`
 §13 fails the build if any `Icon` inside an `IconButton` is left with
@@ -208,9 +212,9 @@ traffic-light dot, for instance, carry explicit accessibility labels — but no
 structured VoiceOver evaluation has been recorded for it, and the checklist does
 not yet cover it. Future accessibility work therefore includes an iOS/VoiceOver
 counterpart to that protocol: walk the same success criteria on-device with
-VoiceOver, record the iOS-specific findings (the Compose-specific heat-map and
-`Canvas`-chart gaps above do not transfer verbatim — the iOS chart and calendar
-are separate implementations that must be assessed on their own terms), and
+VoiceOver, record the iOS-specific findings (the Compose-specific heat-map gaps above do not
+transfer verbatim — the iOS chart and calendar are separate implementations that
+must be assessed on their own terms), and
 extend or fork the checklist so each platform's self-assessment is tracked
 separately. Like the Android assessment, this is a manual on-device effort no
 sandbox check can replace.
