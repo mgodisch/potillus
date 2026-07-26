@@ -199,20 +199,10 @@ extension EnvironmentValues {
     }
 }
 
-extension View {
-    /// A `Text` whose content is resolved against the chosen locale at render time.
-    /// The `@Environment(\.appLocale)` read means it updates when the language does.
-    func localizedText(_ key: String) -> some View {
-        modifier(LocalizedTextModifier(key: key))
-    }
-}
-
-private struct LocalizedTextModifier: ViewModifier {
-    let key: String
-    @Environment(\.appLocale) private var locale
-
-    func body(content: Content) -> some View {
-        // content is ignored; the modifier exists to inject the environment read.
-        Text(Loc.string(key, locale: locale))
-    }
-}
+// `View.localizedText(_:)` and its `LocalizedTextModifier` were removed in the
+// 0.84.0 QA review: nothing in the app target, in PotillusKit or in any of the
+// three test targets ever called them. Every screen reads `\.appLocale` into a
+// local and passes it to `Loc.string` directly, which is the pattern the header
+// above describes, so the modifier had no place to fit. It was also shaped
+// wrongly for a modifier — it discarded the `content` it was applied to and
+// returned a fresh `Text` — so reviving it would mean rewriting it anyway.

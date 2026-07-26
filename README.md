@@ -220,11 +220,15 @@ explains why the code is written the way it is: the trade-offs considered, the
 failure modes guarded against, the platform quirks worked around. Inline
 comments accompany the non-obvious lines and leave the obvious ones alone.
 
-A read-only release gate (`tools/release-check.sh`) scans the tree on every
-build and flags missing file headers or undocumented public functions, so the
-documentation cannot rot silently as the code changes. The same gate enforces
-version consistency across the release artifacts and rejects non-English prose
-in the source.
+A read-only release gate (`tools/release-check.sh`) scans the tree and flags
+missing file headers or undocumented public functions, so the documentation
+cannot rot silently as the code changes. The same gate enforces version
+consistency across the release artifacts and rejects non-English prose in the
+source. It runs as its own CI job on every pipeline, in the `make qa-android`
+battery, and again with `--release` before a release artifact is staged. The
+daily `make android` run deliberately leaves it out — that one builds the APK
+and gates on the unit tests, lint, `check-guides` and the l10n parity check — so
+the full invariant gate never sits in an edit-compile-run loop.
 
 ### Changes
 

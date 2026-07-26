@@ -90,10 +90,19 @@ import javax.crypto.spec.GCMParameterSpec
  * THREADING
  * ────────────────────────────────────────────────────────────────────────────
  * [seal] and [open] are plain, synchronous, CPU-bound functions. They do NOT
- * switch dispatchers themselves — the caller decides (e.g. AppPreferences wraps
- * them in `withContext(Dispatchers.Default)`; AppDatabase calls them once during
- * cold start). Keystore key lookup/creation is internally serialised by the
- * platform, so concurrent first-use is safe.
+ * switch dispatchers themselves — the caller decides; AppPreferences, the sole
+ * user, wraps them in `withContext(Dispatchers.Default)`.
+ *
+ * Concurrent FIRST use is safe here, but not because the platform makes it so:
+ * [getOrCreateKey] is a `containsAlias` followed by a `generateKey`, two separate
+ * Keystore operations with no atomic check-and-create between them, and a second
+ * generation under the same alias would replace the first key and leave anything
+ * already sealed under it unreadable. What rules that out is the CALLER. Both
+ * entry points are reached only from the DataStore serializer's `readFrom` and
+ * `writeTo`, and DataStore runs those under a single writer, so two threads
+ * cannot arrive at the check together. A second consumer must either share this
+ * instance behind the same guarantee or bring its own mutual exclusion; it may
+ * not simply construct another store on the same alias.
  *
  * @param keyAlias The Android Keystore alias under which this store's AES-256-GCM
  *                 key is generated and looked up. Use a DISTINCT alias per secret
@@ -117,9 +126,9 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * @return The original plaintext.
      * @throws java.security.GeneralSecurityException if [blob] is malformed, was
      *         tampered with (GCM tag mismatch), or the Keystore key is missing
-     *         (e.g. after a factory reset). Callers decide how to react — e.g.
-     *         AppPreferences maps this to a DataStore CorruptionException and
-     *         resets the file; AppDatabase treats it as an unrecoverable DB.
+     *         (e.g. after a factory reset). Callers decide how to react;
+     *         AppPreferences maps this to a DataStore CorruptionException so the
+     *         `ReplaceFileCorruptionHandler` resets the file to its defaults.
      */
     fun open(blob: ByteArray): ByteArray = openWithKey(getOrCreateKey(), blob)
 

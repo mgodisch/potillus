@@ -391,10 +391,16 @@ clean:
 # removing it loses nothing. `rm -f` (not a bare `rm`) is deliberate for the guide
 # glob: raw*/usersguide.md matches nothing in a tree that never rendered the
 # guides, and a bare `rm` on the then-unexpanded pattern would abort under `set -e`.
+#
+# The license copies are removed through $(LICENSE_OUTPUTS), the same variable the
+# copy rules above are generated from, rather than through a second hand-written
+# list. A hand-written list is what this target had, and it went stale the moment
+# a fourth document was added: it kept naming three while the build produced four,
+# so `distclean` left one file behind and the tree did not return to its
+# fresh-clone state. Referencing the variable means a document added to the build
+# is removed here without anyone remembering to.
 distclean: clean
-	rm -f app/src/main/res/raw/license_gpl3.md
-	rm -f app/src/main/res/raw/license_apache2.md
-	rm -f app/src/main/res/raw/license_gpl2.md
+	rm -f $(LICENSE_OUTPUTS)
 	rm -f app/src/main/res/raw*/usersguide.md
 	rm -f guides.d
 

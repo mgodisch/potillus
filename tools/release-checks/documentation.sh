@@ -56,6 +56,13 @@ check_documentation() {
     section "5 / 15 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
+    #
+    # All three Kotlin source sets, not two. The instrumented set was the one this
+    # check could not see: it walked main and test, so ten of the tree's Kotlin
+    # files were held to the header convention only by tools/check-headers.py,
+    # which walks everything. Nothing was ever wrong in them — the count in the
+    # PASS line simply did not mean what it said. `find` ignores a missing path
+    # under 2>/dev/null, so a partial source drop without androidTest still runs.
     local missing_headers=0 total_kt=0
 
     while IFS= read -r kt_file; do
@@ -64,7 +71,8 @@ check_documentation() {
             fail "Missing GPL header: $kt_file"
             missing_headers=$(( missing_headers + 1 ))
         fi
-    done < <(find "$SOURCE_ROOT" "app/src/test" -name '*.kt' 2>/dev/null | sort)
+    done < <(find "$SOURCE_ROOT" "app/src/test" "app/src/androidTest" \
+                  -name '*.kt' 2>/dev/null | sort)
 
     if [[ "$missing_headers" -eq 0 ]]; then
         pass "All $total_kt Kotlin files have GPL-3.0 file headers"
