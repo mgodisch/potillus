@@ -154,6 +154,7 @@ platforms, and revises the project's own texts.
 - The report's day counts carry each language's own plural form.
 - `PluralDaysInstrumentedTest` holds Android's plural resolution to
   `plural-days.json`.
+- `tools/check-report-pdfs.py` holds every committed sample report to two pages.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

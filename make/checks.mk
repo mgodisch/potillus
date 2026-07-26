@@ -69,6 +69,13 @@ check-report-labels:
 check-fixture-parity:
 	python3 tools/check-fixture-parity.py
 
+# check-report-pdfs: fail if a committed sample report is not two pages. The
+# report is designed as two sheets and the screenshot recipe rasterizes page one
+# and page two of it; a report that grew past the page silently dropped its second
+# sheet and shipped a blank screenshot in nine locales.
+check-report-pdfs:
+	python3 tools/check-report-pdfs.py
+
 # check-l10n: fail if a view holds a user-facing string literal not routed through
 # `Loc.string` -- such a literal would show in the system language, defeating the
 # in-app language picker in that one spot.
@@ -189,9 +196,10 @@ release-check:
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
-              check-report-labels check-fixture-parity
+              check-report-labels check-fixture-parity \
+              check-report-pdfs
 
-.PHONY: check-headers check-makefile check-report-paper check-report-labels \
+.PHONY: check-headers check-makefile check-report-paper check-report-labels check-report-pdfs \
         check-fixture-parity check-l10n \
         check-l10n-parity \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
