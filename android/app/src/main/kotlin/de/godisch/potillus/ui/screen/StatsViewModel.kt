@@ -114,7 +114,10 @@ data class StatsUiState(
      * arrow/colour; see [Trend].
      */
     val trend: Trend = Trend.FLAT,
-    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
+    // Derived from AppSettings, not restated: this seed is what the screen shows
+    // for the instant before the first real emission, and a literal here drifted
+    // from the shipped defaults once already (0.84.0 QA round).
+    val limitInfo: LimitInfo = AlcoholCalculator.getLimitInfo(AppSettings()),
     /** Grams of alcohol consumed per category in the selected period. */
     val categoryBreakdown: Map<DrinkCategory, Double> = emptyMap(),
     /** Pure-alcohol grams per hour-of-day bucket (index 0..23) for the time-of-day chart. */

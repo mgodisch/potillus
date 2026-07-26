@@ -74,7 +74,10 @@ import java.util.Locale
 data class TodayUiState(
     val entries: List<ConsumptionEntry> = emptyList(),
     val totalGrams: Double = 0.0,
-    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
+    // Derived from AppSettings, not restated: this seed is what the screen shows
+    // for the instant before the first real emission, and a literal here drifted
+    // from the shipped defaults once already (0.84.0 QA round).
+    val limitInfo: LimitInfo = AlcoholCalculator.getLimitInfo(AppSettings()),
     /** Number of distinct days in the trailing 7-day window with ≥1 entry (today included if applicable). */
     val drinkDaysThisWeek: Int = 0,
     val weeklyTotalGrams: Double = 0.0,

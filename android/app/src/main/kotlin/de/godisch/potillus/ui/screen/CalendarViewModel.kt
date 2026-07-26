@@ -90,7 +90,10 @@ data class CalendarUiState(
     val selectedDate: String? = null,
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
     val totalGramsSelected: Double = 0.0,
-    val limitInfo: LimitInfo = LimitInfo(20.0, 100.0, 5),
+    // Derived from AppSettings, not restated: this seed is what the screen shows
+    // for the instant before the first real emission, and a literal here drifted
+    // from the shipped defaults once already (0.84.0 QA round).
+    val limitInfo: LimitInfo = AlcoholCalculator.getLimitInfo(AppSettings()),
     /**
      * First weekday for month-grid alignment (ISO 1 = Monday … 7 = Sunday).
      * Derived from the device locale via [DayResolver.firstDayOfWeekIso] — the app

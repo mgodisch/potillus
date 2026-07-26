@@ -180,7 +180,8 @@ enum class ThemeMode { SYSTEM, DAY, NIGHT }
 data class LimitInfo(
     val limitGrams: Double,
     val weeklyLimitGrams: Double,
-    val maxDrinkDaysPerWeek: Int = 5,
+    /** Defaults to what a fresh install carries, so the value lives in one place. */
+    val maxDrinkDaysPerWeek: Int = AppSettings().maxDrinkDaysPerWeek,
 )
 
 /**

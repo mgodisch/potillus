@@ -240,6 +240,48 @@ private class EncryptedPreferencesSerializer(
 internal fun recoverIoAsEmpty(source: Flow<Preferences>): Flow<Preferences> = source.catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
 
 /**
+ * Reads a raw DataStore snapshot as [AppSettings], filling absent keys with the
+ * defaults declared on [AppSettings] itself.
+ *
+ * DERIVED, NOT REPEATED. Every fallback below reads its value from one
+ * [AppSettings] instance rather than restating a literal. The previous version
+ * restated them, the two lists drifted, and for two fields the app shipped
+ * defaults no one had chosen: a fresh install got 100 g/week and 5 drink days
+ * while `AppSettings` declared 80 and 4. The KDoc above `settingsFlow` claimed
+ * the two matched the whole time. A literal here cannot diverge from the data
+ * class because there is no literal here.
+ *
+ * A NEW FIELD CANNOT REINTRODUCE THE BUG. `defaultsAreTheDataClassDefaults` in
+ * AppPreferencesDefaultsTest asserts that an EMPTY snapshot maps to
+ * `AppSettings()` as a whole value, so any field added with a hand-written
+ * fallback fails that test the moment it disagrees.
+ *
+ * @param installDate The one deliberate exception, see [AppSettings.statsFromDate]:
+ *        a fresh install counts statistics from its install date rather than from
+ *        the data class's empty-string sentinel. Passed in because the date comes
+ *        from the package manager, which this pure function must not reach for.
+ */
+internal fun Preferences.toAppSettings(installDate: String): AppSettings {
+    val defaults = AppSettings()
+    return AppSettings(
+        themeMode = runCatching { ThemeMode.valueOf(this[AppPreferences.KEY_THEME] ?: "") }
+            .getOrDefault(defaults.themeMode),
+        dayChangeHour = this[AppPreferences.KEY_DAY_HOUR] ?: defaults.dayChangeHour,
+        dayChangeMinute = this[AppPreferences.KEY_DAY_MINUTE] ?: defaults.dayChangeMinute,
+        dailyLimitGrams = this[AppPreferences.KEY_DAILY_LIMIT] ?: defaults.dailyLimitGrams,
+        weeklyLimitGrams = this[AppPreferences.KEY_WEEKLY_LIMIT] ?: defaults.weeklyLimitGrams,
+        maxDrinkDaysPerWeek = this[AppPreferences.KEY_MAX_DRINK_DAYS] ?: defaults.maxDrinkDaysPerWeek,
+        biometricEnabled = this[AppPreferences.KEY_BIOMETRIC] ?: defaults.biometricEnabled,
+        allowScreenshots = this[AppPreferences.KEY_ALLOW_SCREENSHOTS] ?: defaults.allowScreenshots,
+        alternativeStatusSymbols = this[AppPreferences.KEY_ALT_STATUS_SYMBOLS]
+            ?: defaults.alternativeStatusSymbols,
+        language = this[AppPreferences.KEY_LANGUAGE] ?: defaults.language,
+        weightKg = this[AppPreferences.KEY_WEIGHT_KG] ?: defaults.weightKg,
+        statsFromDate = this[AppPreferences.KEY_STATS_FROM] ?: installDate,
+    )
+}
+
+/**
  * Reads and writes all user preferences via an encrypted Jetpack DataStore.
  *
  * Exposes a single [settingsFlow] that combines all keys into an [AppSettings]
@@ -354,37 +396,19 @@ class AppPreferences(private val context: Context) : IAppPreferences {
      * converts the raw [androidx.datastore.preferences.core.Preferences] map
      * into a typed [AppSettings] object.
      *
-     * Default values (the `?:` fallbacks) are used the first time the app runs,
-     * before any key has been written to DataStore. They match the defaults in
-     * [AppSettings] to keep the initial state consistent. The one deliberate
-     * exception is [AppSettings.statsFromDate], which falls back to the computed
-     * [installDate] (a smarter default than the data class's empty-string sentinel)
-     * so statistics start at the install date until the user picks another.
-     *
-     * [runCatching] is used for enum deserialization: if a future code change
-     * removes an enum constant that was previously stored, parsing fails
-     * silently and the default is used, rather than crashing the app.
+     * The mapping itself is [toAppSettings], a pure function so the first-run
+     * defaults can be asserted from a plain JVM test. Absent keys take their value
+     * from [AppSettings] rather than from a literal restated here; the one
+     * deliberate exception is [AppSettings.statsFromDate], which falls back to the
+     * computed [installDate] so statistics start at the install date until the user
+     * picks another.
      *
      * A transient read [IOException] is recovered to [emptyPreferences] by
      * [recoverIoAsEmpty] (see its KDoc), so a momentary read fault degrades to
      * the documented defaults instead of crashing every collector.
      */
-    override val settingsFlow: Flow<AppSettings> = recoverIoAsEmpty(dataStore.data).map { prefs ->
-        AppSettings(
-            themeMode = runCatching { ThemeMode.valueOf(prefs[KEY_THEME] ?: "") }.getOrDefault(ThemeMode.SYSTEM),
-            dayChangeHour = prefs[KEY_DAY_HOUR] ?: 4,
-            dayChangeMinute = prefs[KEY_DAY_MINUTE] ?: 0,
-            dailyLimitGrams = prefs[KEY_DAILY_LIMIT] ?: 20.0,
-            weeklyLimitGrams = prefs[KEY_WEEKLY_LIMIT] ?: 100.0,
-            maxDrinkDaysPerWeek = prefs[KEY_MAX_DRINK_DAYS] ?: 5,
-            biometricEnabled = prefs[KEY_BIOMETRIC] ?: false,
-            allowScreenshots = prefs[KEY_ALLOW_SCREENSHOTS] ?: false,
-            alternativeStatusSymbols = prefs[KEY_ALT_STATUS_SYMBOLS] ?: false,
-            language = prefs[KEY_LANGUAGE] ?: "",
-            weightKg = prefs[KEY_WEIGHT_KG] ?: 0.0,
-            statsFromDate = prefs[KEY_STATS_FROM] ?: installDate,
-        )
-    }
+    override val settingsFlow: Flow<AppSettings> =
+        recoverIoAsEmpty(dataStore.data).map { it.toAppSettings(installDate) }
 
     // ── Write functions ───────────────────────────────────────────────────────
     // Each function calls save{} which wraps DataStore's edit{} for a single key.
