@@ -283,13 +283,17 @@ object PdfReportBuilder {
         scalars["COL_AVG_G_DAY"] = context.getString(R.string.pdf_col_avg_g_day)
         scalars["COL_OVER_DAILY"] = context.getString(R.string.pdf_col_over_daily)
         repeats["MONTHS"] = d.months.map { m ->
+            // A summary row prints the span it stands for, from the same month
+            // formatter both ends already use — no label of its own to translate.
+            // Built before the map rather than inline: `to` binds tighter than the
+            // elvis operator, so `"K" to a ?: b` is `("K" to a) ?: b` and the pair
+            // becomes the left operand of an elvis it was never meant to reach.
+            val monthLabel = LocalDate.parse("${m.monthKey}-01").format(monthFmt)
+            val label = m.rollupFromKey
+                ?.let { "${LocalDate.parse("$it-01").format(monthFmt)} – $monthLabel" }
+                ?: monthLabel
             mapOf(
-                // A summary row prints the span it stands for, from the same month
-                // formatter both ends already use — no label of its own to translate.
-                "M_MONTH" to m.rollupFromKey?.let { from ->
-                    "${LocalDate.parse("$from-01").format(monthFmt)} – " +
-                        LocalDate.parse("${m.monthKey}-01").format(monthFmt)
-                } ?: LocalDate.parse("${m.monthKey}-01").format(monthFmt),
+                "M_MONTH" to label,
                 "M_DRINK_DAYS" to "${m.drinkDays}",
                 "M_TOTAL" to m.totalGrams.fmt1(),
                 "M_AVG" to m.avgPerCalendarDay.fmt1(),
