@@ -205,4 +205,34 @@ final class DayResolverTests: XCTestCase {
             DayResolver.computeLongestAbstinence(sortedDates: [], today: "", statsFrom: ""), 0
         )
     }
+
+    // ── parseDate is strict ──────────────────────────────────────────────────
+    //
+    // Kotlin's LocalDate.parse throws on a day the calendar does not have and on a
+    // spelling that is not canonical. This side reproduces both by formatting its
+    // result back and demanding the original string, rather than resting on
+    // DateFormatter's leniency — which is a framework detail, not a contract.
+
+    func testADayTheCalendarDoesNotHaveIsRejected() {
+        XCTAssertNil(DayResolver.parseDate("2026-02-30"))
+        XCTAssertNil(DayResolver.parseDate("2025-02-29"), "2025 is not a leap year")
+        XCTAssertNil(DayResolver.parseDate("2026-13-01"))
+        XCTAssertNil(DayResolver.parseDate("2026-04-31"))
+    }
+
+    func testALeapDayThatExistsIsAccepted() {
+        XCTAssertNotNil(DayResolver.parseDate("2024-02-29"), "2024 is a leap year")
+    }
+
+    func testANonCanonicalSpellingIsRejected() {
+        XCTAssertNil(DayResolver.parseDate("2026-1-1"))
+        XCTAssertNil(DayResolver.parseDate("26-01-01"))
+    }
+
+    func testACanonicalDateRoundTrips() {
+        for text in ["2026-01-01", "2026-06-29", "2024-02-29", "2026-12-31"] {
+            let parsed = DayResolver.parseDate(text)
+            XCTAssertEqual(parsed.map(DayResolver.formatDate), text)
+        }
+    }
 }

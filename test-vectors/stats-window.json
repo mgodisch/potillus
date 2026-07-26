@@ -24,10 +24,12 @@
     "because yyyy-MM-dd sorts chronologically.",
     "",
     "invalidToday holds only inputs BOTH platforms unambiguously reject. A",
-    "non-existent calendar day (2026-02-30) is deliberately absent: java.time",
-    "throws on it, while Foundation's DateFormatter may roll it over to March 2",
-    "depending on its leniency, and that could not be settled without a Mac. Adding",
-    "the case is a follow-up for whoever can run the Swift suite."
+    "",
+    "invalidToday covers three ways a date can fail: not a date at all, a day the",
+    "calendar does not have, and a spelling that is not canonical. Both platforms",
+    "reject all three - Kotlin because LocalDate.parse throws, iOS because",
+    "DayResolver.parseDate formats its result back and demands the original string",
+    "rather than resting on DateFormatter's leniency."
   ],
   "window": [
     {
@@ -121,6 +123,16 @@
       "description": "An empty date yields no window",
       "period": "WEEK",
       "today": ""
+    },
+    {
+      "description": "A day the calendar does not have yields no window",
+      "period": "YEAR",
+      "today": "2026-02-30"
+    },
+    {
+      "description": "A non-canonical spelling yields no window",
+      "period": "MONTH",
+      "today": "2026-1-1"
     }
   ],
   "adjacency": {

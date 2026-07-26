@@ -366,6 +366,11 @@ public enum BackupReader {
         // we also require a parse -> format round-trip to reproduce the input
         // exactly, which rejects any clamped or non-canonical date — mirroring
         // Android's BackupManager Guard 4.
+        //
+        // `DayResolver.parseDate` performs the same round trip since the 0.84.0
+        // review, so this one is now belt over braces. It stays because it is what
+        // turns a rejected date into `malformedDate(logicalDate)` — the reader
+        // learns WHICH date the file was wrong about, which a bare nil cannot say.
         guard let parsedDate = DayResolver.parseDate(logicalDate),
               DayResolver.formatDate(parsedDate) == logicalDate else {
             throw BackupError.malformedDate(logicalDate)

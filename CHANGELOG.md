@@ -158,6 +158,8 @@ platforms, and revises the project's own texts.
 - The Gradle and Makefile references name the screenshot fixture.
 - The report's monthly table shows the six most recent months and folds anything
   older into one summary row.
+- Both platforms read a logical date only in its canonical spelling, for a day
+  that exists.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

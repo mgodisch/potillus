@@ -185,8 +185,26 @@ public enum DayResolver {
         return sundayBased == 1 ? 7 : sundayBased - 1    // 1 = Monday … 7 = Sunday
     }
 
+    /// A `yyyy-MM-dd` logical date, or `nil` when the string is not one.
+    ///
+    /// STRICT BY ROUND TRIP, NOT BY LENIENCY
+    ///   What `DateFormatter` does with a day its calendar does not have —
+    ///   `"2026-02-30"` — is a framework detail: it may refuse it, clamp it to the
+    ///   month's last day, or carry it into the next month. This file should not
+    ///   rest on which. Kotlin's `LocalDate.parse` throws on that input, so a
+    ///   hand-edited backup would otherwise mean one logical date on Android and
+    ///   another on iOS.
+    ///
+    ///   Formatting the result back and demanding the original string settles it
+    ///   here: a date survives only if it is the canonical spelling of a day that
+    ///   exists. `SettingsSanitizer` already applies the same round trip to
+    ///   `statsFromDate`; this puts it where every caller gets it.
+    ///
+    ///   The same rule rejects `"2026-1-1"`, which `DateTimeFormatter` with
+    ///   `"yyyy-MM-dd"` also rejects — two digits mean two digits on both sides.
     public static func parseDate(_ dateString: String) -> Date? {
         guard let parsed = dateFormatter.date(from: dateString) else { return nil }
+        guard dateFormatter.string(from: parsed) == dateString else { return nil }
         // The formatter yields midnight UTC; re-anchor at noon so later day
         // arithmetic cannot be nudged across a boundary.
         return utcCalendar.date(byAdding: .hour, value: 12, to: parsed)
