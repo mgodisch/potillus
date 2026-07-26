@@ -193,6 +193,8 @@ conventions and points at `docs/RELEASE-IOS.md`.
 
 The App Store screenshot of the log-a-drink sheet shows that sheet.
 
+Merging a backup on iOS leaves the local settings alone, as on Android.
+
 Comment corrections: the `SettingsSanitizer` ranges' visibility note names the
 four the settings screen reads, and the vector mirrors in `TestVectors.swift`
 each carry their own file's description.

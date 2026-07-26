@@ -274,6 +274,30 @@ final class BackupImporterTests: XCTestCase {
         XCTAssertFalse(stored.biometricEnabled)
     }
 
+    /// A MERGE must not touch the local settings. Nothing asserted this until the
+    /// 0.84.0 review, which is how the two platforms diverged unseen: Android has
+    /// always ignored a merged backup's settings, this side applied them.
+    func testMergeLeavesTheLocalSettingsAlone() async throws {
+        try await preferences.update { $0.weightKg = 70.0; $0.dailyLimitGrams = 20.0 }
+
+        let raw = BackupSettings(
+            themeMode: "NIGHT", dayChangeHour: 6, dayChangeMinute: 30,
+            dailyLimitGrams: 99.0, weeklyLimitGrams: 400.0, maxDrinkDaysPerWeek: 7,
+            statsFromDate: "2026-01-01", biometricEnabled: true, allowScreenshots: true,
+            alternativeStatusSymbols: true, language: "fr", weightKg: 55.0
+        )
+        try await makeImporter().restore(
+            backup(drinks: [], entries: [], settings: raw), mode: .merge
+        )
+
+        let stored = await preferences.load()
+        XCTAssertEqual(stored.weightKg, 70.0, accuracy: 1e-9, "a merge must not restyle the user")
+        XCTAssertEqual(
+            stored.dailyLimitGrams, 20.0, accuracy: 1e-9,
+            "the daily limit decides what the app says about the user's drinking"
+        )
+    }
+
     /// An importer without a preferences store imports data only, and does not
     /// fail on a backup that carries settings.
     func testAnImporterWithoutPreferencesIgnoresTheSettingsBlock() async throws {

@@ -118,12 +118,22 @@ public struct BackupImporter: Sendable {
     /// Data first, in one transaction; settings after. Restoring a backup that
     /// carries no settings block leaves the local preferences untouched.
     ///
+    /// Settings follow the MODE, and only `.replace` applies them. `.merge` means
+    /// "add this history to mine", and someone merging a friend's or an old export
+    /// does not thereby ask for their daily limit, day-change time, theme and
+    /// language to be overwritten — least of all the limits, which decide what the
+    /// app then tells them about their drinking. Android states this contract in
+    /// `BackupManager.kt` and has always honoured it; this side applied the block in
+    /// both modes until the 0.84.0 review.
+    ///
     /// Named `restore` rather than `import`: the latter is a Swift keyword, and a
     /// call site full of backticks reads worse than a synonym.
     @discardableResult
     public func restore(_ backup: BackupFile, mode: ImportMode) async throws -> ImportStats {
         let stats = try importData(backup, mode: mode)
-        try await applySettings(backup)
+        if mode == .replace {
+            try await applySettings(backup)
+        }
         return stats
     }
 
@@ -219,6 +229,8 @@ public struct BackupImporter: Sendable {
     // ── Settings ─────────────────────────────────────────────────────────────
 
     /// Sanitises and stores the backup's settings, if it has any.
+    ///
+    /// Called only for `.replace`; see `restore(_:mode:)` for why.
     ///
     /// A backup is user-editable JSON, so every value passes through
     /// `SettingsSanitizer` before it can influence the alcohol maths. `replace`
