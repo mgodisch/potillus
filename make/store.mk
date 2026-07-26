@@ -475,8 +475,8 @@ screenshots-ios:
 # additionally needs you to tap "Save as PDF". Run the three separately instead when
 # you only want part of the set rebuilt.
 store-assets-android:
-	$(MAKE) screenshots-android
 	$(MAKE) report-pdfs-android
+	$(MAKE) screenshots-android
 	$(MAKE) feature-graphics-android
 
 .PHONY: screenshots-pdf-android report-pdfs-android \
