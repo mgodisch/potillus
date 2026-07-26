@@ -62,6 +62,13 @@ check-report-paper:
 check-report-labels:
 	python3 tools/check-report-labels.py
 
+# check-fixture-parity: fail if the two demo fixtures stop holding the same demo
+# data. demo-backup.json is the format-2 interoperability fixture, and
+# screenshot-fixture.json the format-3 export the screenshot runs read; both must
+# describe one set of drinks and entries.
+check-fixture-parity:
+	python3 tools/check-fixture-parity.py
+
 # check-l10n: fail if a view holds a user-facing string literal not routed through
 # `Loc.string` -- such a literal would show in the system language, defeating the
 # in-app language picker in that one spot.
@@ -182,9 +189,10 @@ release-check:
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
-              check-report-labels
+              check-report-labels check-fixture-parity
 
-.PHONY: check-headers check-makefile check-report-paper check-report-labels check-l10n \
+.PHONY: check-headers check-makefile check-report-paper check-report-labels \
+        check-fixture-parity check-l10n \
         check-l10n-parity \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
         check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \

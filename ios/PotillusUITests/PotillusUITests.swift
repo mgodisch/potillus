@@ -59,7 +59,7 @@ final class PotillusUITests: XCTestCase {
         setupSnapshot(app)
 
         app.launchArguments += ["-screenshotMode"]
-        if let url = Bundle(for: type(of: self)).url(forResource: "demo-backup", withExtension: "json"),
+        if let url = Bundle(for: type(of: self)).url(forResource: "screenshot-fixture", withExtension: "json"),
            let json = try? String(contentsOf: url, encoding: .utf8) {
             app.launchEnvironment["SCREENSHOT_FIXTURE_JSON"] = json
         }

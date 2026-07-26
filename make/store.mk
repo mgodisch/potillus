@@ -63,7 +63,7 @@ INSTR := de.godisch.potillus.debug.test/androidx.test.runner.AndroidJUnitRunner
 
 # ── In-app screenshot capture, Android (strand A) ────────────────────────────
 # The capture pins its perspective in-app (ScreenshotClock/DayResolver) to match
-# SCREENSHOT_DATE; the demo fixture (fastlane/demo-backup.json) covers 2026-01-01
+# SCREENSHOT_DATE; the demo fixture (fastlane/screenshot-fixture.json) covers 2026-01-01
 # ..2026-06-30, so the pinned "today" has meaningful content.
 SCREENSHOT_DATE    := 2026-06-30
 # Force an exactly-2:1 panel so every capture satisfies Play's aspect rule with no
@@ -73,7 +73,7 @@ SCREENSHOT_DENSITY := 640
 SCREENSHOT_CLOCK   := 1000
 # The in-app clock pin (must agree with SCREENSHOT_DATE) and the demo fixture.
 SCREENSHOT_PIN_KT  := android/app/src/androidTest/kotlin/de/godisch/potillus/screenshot/ScreenshotClock.kt
-DEMO_BACKUP_JSON   := fastlane/demo-backup.json
+DEMO_BACKUP_JSON   := fastlane/screenshot-fixture.json
 
 # ── In-app screenshot capture, iOS (strand A) ────────────────────────────────
 # IOS_SIM_DEVICE must match fastlane/Snapfile: it names both the simulator to query

@@ -280,8 +280,9 @@ targets:
       - path: PotillusUITests
       # The demo fixture the screenshot run seeds the store from — shared with the
       # Android screengrab flow. It rides into the UI-test bundle so the test can
-      # hand it to the app in SCREENSHOT_FIXTURE_JSON.
-      - path: ../fastlane/demo-backup.json
+      # hand it to the app in SCREENSHOT_FIXTURE_JSON. Format 3, so it carries the
+      # settings block the report reads its limits from.
+      - path: ../fastlane/screenshot-fixture.json
         type: file
         buildPhase: resources
     dependencies:

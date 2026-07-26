@@ -263,7 +263,7 @@ class ScreenshotTest {
         //    instrumentation context (NOT the target context). It is seeded into the
         //    real Room database in step 1b below, so the running app shows it.
         val json = InstrumentationRegistry.getInstrumentation()
-            .context.assets.open(DEMO_BACKUP_ASSET)
+            .context.assets.open(SCREENSHOT_FIXTURE_ASSET)
             .bufferedReader()
             .use { it.readText() }
 
@@ -297,19 +297,38 @@ class ScreenshotTest {
             //     (which reads the same Room database) shows it.
             app.backupRepository.importReplace(parsed.drinks, parsed.entries)
 
+            // Apply the fixture's settings. Until 0.84.0 the fixture carried none
+            // and this step did not exist, so the report and the screens showed
+            // whatever the device's store happened to hold - on a reused emulator
+            // 100 g per week over 5 drink days, against the 80 and 4 a fresh
+            // install carries.
+            val settings = checkNotNull(parsed.settings) {
+                "$SCREENSHOT_FIXTURE_ASSET carries no settings block"
+            }
+            with(app.appPreferences) {
+                setTheme(settings.themeMode)
+                setDayChangeTime(settings.dayChangeHour, settings.dayChangeMinute)
+                setDailyLimit(settings.dailyLimitGrams)
+                setWeeklyLimit(settings.weeklyLimitGrams)
+                setMaxDrinkDaysPerWeek(settings.maxDrinkDaysPerWeek)
+                setStatsFromDate(settings.statsFromDate)
+                setBiometric(settings.biometricEnabled)
+                setAlternativeStatusSymbols(settings.alternativeStatusSymbols)
+                setLanguage(settings.language)
+                setWeightKg(settings.weightKg)
+            }
+
             // 2) Clear FLAG_SECURE for the run so the full-screen capture is not black.
+            //    NOT from the fixture: the capture needs it cleared whatever the
+            //    fixture says.
             app.appPreferences.setAllowScreenshots(true)
 
-            // 3) RESET THE STATISTICS START FLOOR (fixes the one-bar statistics chart).
-            //    AppSettings.statsFromDate defaults to the APK's install date when unset
-            //    (AppPreferences.installDate). screengrab reinstalls the app per locale,
-            //    so that default is the capture day; the demo backup carries no settings,
-            //    so the floor stays there. StatsViewModel clamps the period start to this
-            //    floor, collapsing e.g. the "Month" window to the single capture day —
-            //    exactly the lone last-day bar seen on 03_statistics while the Calendar
-            //    (which does not clamp) still shows the whole month. Clearing the floor
-            //    lets the statistics period span the full demo history again.
-            app.appPreferences.setStatsFromDate("")
+            // 3) The statistics start floor comes from the fixture (2026-01-01, a day
+            //    before the first entry). It used to be cleared here: screengrab
+            //    reinstalls per locale, AppSettings.statsFromDate defaults to the
+            //    install date, and a fixture without settings left that default in
+            //    place - which clamped the statistics period to the capture day and
+            //    produced the lone last-day bar on 03_statistics.
 
             // 4) PIN THE STORED LANGUAGE PREFERENCE to the language screengrab asked
             //    for. This also makes PotillusApp.applyLanguageOnFirstLaunch a no-op
@@ -680,6 +699,6 @@ class ScreenshotTest {
 
     private companion object {
         /** Demo fixture file name inside the (generated) androidTest assets. */
-        const val DEMO_BACKUP_ASSET = "demo-backup.json"
+        const val SCREENSHOT_FIXTURE_ASSET = "screenshot-fixture.json"
     }
 }

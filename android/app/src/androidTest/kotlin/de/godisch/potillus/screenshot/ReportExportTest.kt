@@ -150,7 +150,7 @@ class ReportExportTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val json = InstrumentationRegistry.getInstrumentation()
-            .context.assets.open(DEMO_BACKUP_ASSET)
+            .context.assets.open(SCREENSHOT_FIXTURE_ASSET)
             .bufferedReader()
             .use { it.readText() }
         val parsed = BackupManager.parseBackupJson(json)
@@ -164,6 +164,31 @@ class ReportExportTest {
                 app.drinkRepository.drinks.first { it.size >= parsed.drinks.size }
             }
             app.backupRepository.importReplace(parsed.drinks, parsed.entries)
+
+            // Apply the fixture's settings. Until 0.84.0 the fixture carried none
+            // and this step did not exist, so the report and the screens showed
+            // whatever the device's store happened to hold - on a reused emulator
+            // 100 g per week over 5 drink days, against the 80 and 4 a fresh
+            // install carries.
+            val settings = checkNotNull(parsed.settings) {
+                "$SCREENSHOT_FIXTURE_ASSET carries no settings block"
+            }
+            with(app.appPreferences) {
+                setTheme(settings.themeMode)
+                setDayChangeTime(settings.dayChangeHour, settings.dayChangeMinute)
+                setDailyLimit(settings.dailyLimitGrams)
+                setWeeklyLimit(settings.weeklyLimitGrams)
+                setMaxDrinkDaysPerWeek(settings.maxDrinkDaysPerWeek)
+                setStatsFromDate(settings.statsFromDate)
+                setBiometric(settings.biometricEnabled)
+                setAlternativeStatusSymbols(settings.alternativeStatusSymbols)
+                setLanguage(settings.language)
+                setWeightKg(settings.weightKg)
+            }
+
+            // Last, and NOT from the fixture: the capture needs FLAG_SECURE cleared
+            // whatever the fixture says, and the fixture's own value would otherwise
+            // decide it.
             app.appPreferences.setAllowScreenshots(true)
         }
     }
@@ -280,7 +305,7 @@ class ReportExportTest {
 
     private companion object {
         /** Demo fixture file name inside the (generated) androidTest assets. */
-        const val DEMO_BACKUP_ASSET = "demo-backup.json"
+        const val SCREENSHOT_FIXTURE_ASSET = "screenshot-fixture.json"
 
         /** Wide date window so getInRange returns the ENTIRE demo history. */
         const val RANGE_FROM = "0001-01-01"

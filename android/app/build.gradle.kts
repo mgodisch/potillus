@@ -670,7 +670,11 @@ kotlin {
 // runs before the test APK is packaged. `configureEach` covers whatever the
 // concrete merge task is named for the test build type (mergeDebugAndroidTestAssets).
 val copyDemoBackupFixture = tasks.register<Copy>("copyDemoBackupFixture") {
-    description = "Copy ../fastlane/demo-backup.json into the androidTest assets for the screenshot suite."
+    description = "Copy the demo fixtures into the androidTest assets for the screenshot suite."
+    // Both files: the screenshot suite reads screenshot-fixture.json (format 3,
+    // with the settings block), and demo-backup.json stays available as the
+    // format-2 fixture. tools/check-fixture-parity.py holds their data equal.
+    from(rootProject.file("../fastlane/screenshot-fixture.json"))
     from(rootProject.file("../fastlane/demo-backup.json"))
     into(layout.buildDirectory.dir("generated/screenshotAssets"))
 }

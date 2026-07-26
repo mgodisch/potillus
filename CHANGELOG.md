@@ -146,6 +146,10 @@ platforms, and revises the project's own texts.
   language.
 - `tools/check-report-labels.py` measures each KPI label against the tile width
   the template defines.
+- Both screenshot runs seed their settings from `fastlane/screenshot-fixture.json`,
+  a format-3 export of the demo data.
+- `tools/check-fixture-parity.py` holds the two demo fixtures to one set of drinks
+  and entries.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at
