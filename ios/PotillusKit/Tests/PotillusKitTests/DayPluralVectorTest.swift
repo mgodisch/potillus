@@ -104,10 +104,20 @@ final class DayPluralVectorTest: XCTestCase {
         XCTAssertEqual(DayPlural.category(11, language: "pl"), .many)
     }
 
-    /// French counts zero as singular, and is the only shipped language that does.
-    func testFrenchCountsZeroAsSingular() {
-        XCTAssertEqual(DayPlural.category(0, language: "fr"), .one)
-        XCTAssertEqual(DayPlural.category(0, language: "de"), .other)
+    /// French and both Portuguese variants count zero as singular; the other
+    /// eighteen do not.
+    ///
+    /// Portuguese was missing from this list until Android's own resolution
+    /// contradicted the vectors — `getQuantityString` read "0 dia" out of
+    /// `values-pt` while `DayPlural` said "0 dias". A real Portuguese word in the
+    /// right place, which is why the instrumented test exists.
+    func testZeroIsSingularInFrenchAndPortuguese() {
+        for language in ["fr", "pt", "pt-BR"] {
+            XCTAssertEqual(DayPlural.category(0, language: language), .one, language)
+        }
+        for language in ["de", "es", "it", "en"] {
+            XCTAssertEqual(DayPlural.category(0, language: language), .other, language)
+        }
     }
 
     /// A language the catalogue does not know falls back to the English rule

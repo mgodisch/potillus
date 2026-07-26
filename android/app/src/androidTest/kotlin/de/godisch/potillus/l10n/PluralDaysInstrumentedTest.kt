@@ -33,6 +33,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.godisch.potillus.R
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -95,9 +96,18 @@ class PluralDaysInstrumentedTest {
         return app.localizedContextFor(LocaleListCompat.forLanguageTags(tag))
     }
 
+    /**
+     * Every language, every count, collected rather than asserted one at a time.
+     *
+     * `assertEquals` throws on the first mismatch, so a run reported one wrong word
+     * and hid the rest — the first version of this test found `pt` at 0 and said
+     * nothing about the twenty languages after it. Gathering every mismatch means
+     * one run settles the whole file.
+     */
     @Test
     fun everyLanguageResolvesTheVectorsWord() {
         val cases = vectors().getJSONObject("cases")
+        val mismatches = mutableListOf<String>()
         var checked = 0
         for (tag in cases.keys()) {
             val resources = contextFor(tag).resources
@@ -105,11 +115,11 @@ class PluralDaysInstrumentedTest {
             for (i in 0 until list.length()) {
                 val case = list.getJSONObject(i)
                 val count = case.getInt("count")
-                assertEquals(
-                    "$tag at $count",
-                    case.getString("expected"),
-                    resources.getQuantityString(R.plurals.days, count, count),
-                )
+                val expected = case.getString("expected")
+                val actual = resources.getQuantityString(R.plurals.days, count, count)
+                if (actual != expected) {
+                    mismatches += "$tag at $count: expected \"$expected\", Android says \"$actual\""
+                }
                 checked++
             }
         }
@@ -117,5 +127,10 @@ class PluralDaysInstrumentedTest {
         // test green, which is the one outcome this must not have.
         assertEquals("every language in the vectors must have been exercised", 21, cases.length())
         assertEquals("21 languages times 17 counts", 21 * 17, checked)
+        assertTrue(
+            "${'$'}{mismatches.size} of $checked day counts disagree with Android's own " +
+                "resolution:\n" + mismatches.joinToString("\n"),
+            mismatches.isEmpty(),
+        )
     }
 }

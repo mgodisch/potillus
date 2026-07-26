@@ -117,8 +117,11 @@ public enum DayPlural {
         case "ja", "ko", "zh-Hans", "zh-Hant":
             return .other
 
-        case "fr":
-            // Zero is singular in French.
+        case "fr", "pt", "pt-BR":
+            // Zero is singular here: "0 jour", "0 dia". CLDR writes it as
+            // `one: i = 0..1`, and Android's own resolution said so before this
+            // code did — PluralDaysInstrumentedTest read "0 dia" out of
+            // values-pt while the vectors still expected "0 dias".
             return days <= 1 ? .one : .other
 
         case "ro":

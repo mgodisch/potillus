@@ -3,8 +3,10 @@
     "plural-days.json - the report's day counts, in every shipping language.",
     "",
     "The strings are Android's <plurals name=\"days\"> verbatim, with %1$d filled in.",
-    "The category each count selects follows CLDR: fr counts 0 as singular, ro adds",
     "few for 0 and 2..19, cs few for 2..4, and pl, ru and uk pick one, few or many",
+    "The category each count selects follows CLDR: fr, pt and pt-BR count 0 as",
+    "singular, ro adds few for 0 and 2..19, cs few for 2..4, and pl, ru and uk pick",
+    "one, few or many from the last one and two digits.",
     "from the last one and two digits. Counts 11..14 and 21..25 are in the list",
     "because that is where those rules part company.",
     "",
@@ -1169,8 +1171,8 @@
     "pt": [
       {
         "count": 0,
-        "category": "other",
-        "expected": "0 dias"
+        "category": "one",
+        "expected": "0 dia"
       },
       {
         "count": 1,
@@ -1256,8 +1258,8 @@
     "pt-BR": [
       {
         "count": 0,
-        "category": "other",
-        "expected": "0 dias"
+        "category": "one",
+        "expected": "0 dia"
       },
       {
         "count": 1,
