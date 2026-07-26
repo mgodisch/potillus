@@ -226,21 +226,21 @@ for the originals and terms.
 
 The pre-rendered sample reports under `fastlane/report-pdf/` (one per
 store-listing language, produced on a real device by the `ReportExportTest`
-flow) embed subsets of the fonts the device's WebView used to render them.
-Which font that is depends on the script, and the two cases are exclusive — the
-WebView picks one family per document, it does not mix them:
+flow) are written by the device's print stack from what its WebView rendered.
+The template names no typeface — it asks for `sans-serif` — so the device
+chooses, and what reaches the file depends on the script:
 
 - The seventeen Latin-, Greek- and Cyrillic-script files embed **Roboto**
   (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
   <[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>),
   as `Roboto-Regular` and `Roboto-Bold`.
-- The `ja`, `ko`, `zh-CN` and `zh-TW` files embed **no font program at all**.
-  Where the text is CJK, the WebView falls back to writing Type 3 fonts — glyph
-  drawing procedures held in the page itself, with no `FontFile` stream and no
-  embedded typeface — so what these four documents carry are outlines of
-  characters set in **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
-  SIL Open Font License 1.1) rather than a subset of the face.  They carry **no
-  Roboto** either.
+- The `ja`, `ko`, `zh-CN` and `zh-TW` files embed **no font program at all**,
+  and **no Roboto**.  Their text is written as Type 3 fonts — glyph drawing
+  procedures held in the page itself — whose descriptors name the
+  script-specific faces `NotoSansCJK{jp,kr,sc,tc}-Regular` (Copyright &copy;
+  Google LLC and Adobe; SIL Open Font License 1.1) but carry no `FontFile`
+  stream.  What these four documents hold are therefore outlines of characters
+  set in **Noto Sans CJK**, not a subset of the face.
 
 The Roboto license explicitly permits embedding subsets in documents, and the
 Type 3 case does not redistribute a font at all — an outline drawn into a
