@@ -70,23 +70,38 @@ final class DayPluralVectorTest: XCTestCase {
         }
     }
 
-    /// The teens, called out on their own. 11 to 14 end in 1 to 4 and take
-    /// neither of the forms those digits otherwise select, in Polish, Russian and
-    /// Ukrainian alike. This is the case a rule written as `n % 10 == 1` gets
-    /// wrong, and it would read as a real word.
+    /// The teens, called out on their own. 12 ends in 2 and does not take the form
+    /// 22 takes, in Polish, Russian and Ukrainian alike — this is the case a rule
+    /// written as `count % 10` alone gets wrong, and it would read as a real word.
     func testTheTeensDoNotFollowTheirLastDigit() {
         for language in ["pl", "ru", "uk"] {
-            XCTAssertNotEqual(
-                DayPlural.category(11, language: language),
-                DayPlural.category(21, language: language),
-                "\(language): 11 must not take the form 21 takes"
-            )
             XCTAssertNotEqual(
                 DayPlural.category(12, language: language),
                 DayPlural.category(22, language: language),
                 "\(language): 12 must not take the form 22 takes"
             )
         }
+    }
+
+    /// Where Polish parts company with Russian and Ukrainian.
+    ///
+    /// Russian and Ukrainian give 21, 31 and 41 the singular — "21 день", one day
+    /// — while Polish reserves its singular for the number one and nothing else.
+    /// An earlier version of this file asserted that 11 and 21 differ in all three,
+    /// which is true of two of them; Polish gives both the same form, and the shared
+    /// vectors said so all along.
+    func testPolishReservesTheSingularForOne() {
+        for language in ["ru", "uk"] {
+            XCTAssertEqual(DayPlural.category(21, language: language), .one, language)
+            XCTAssertNotEqual(
+                DayPlural.category(11, language: language),
+                DayPlural.category(21, language: language),
+                "\(language): 11 must not take the form 21 takes"
+            )
+        }
+        XCTAssertEqual(DayPlural.category(1, language: "pl"), .one)
+        XCTAssertEqual(DayPlural.category(21, language: "pl"), .many, "only one is one in Polish")
+        XCTAssertEqual(DayPlural.category(11, language: "pl"), .many)
     }
 
     /// French counts zero as singular, and is the only shipped language that does.
