@@ -288,7 +288,8 @@ class StatsViewModelTest {
         vm.uiState.test {
             // Settled state, not the seed (see note in the over-limit-day test).
             val state = awaitComputed()
-            assertEquals(1, state.dataPoints.size) // today counted as a drink day
+            // One drink day, read off a field the screen actually renders.
+            assertEquals(1, state.chartBuckets.count { !it.isAbstinent })
             // drinkDays == 1, so the effective period is abstinentDays + 1 (today).
             val effectivePeriodDays = state.abstinentDays + 1
             assertEquals(24.0 / effectivePeriodDays, state.avgPerDay, 0.001)

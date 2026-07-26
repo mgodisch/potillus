@@ -316,6 +316,13 @@ coverage comment's enforcement path, the comment gate's "case-sensitive"
 matching and its blindness to the Makefiles, the "never swallowed" doc on three
 `failure` fields no view shows, and a duplicate `settings` key in `project.yml`.
 
+`ReportFormatting`'s fallback formats the settled decimal, so it cannot
+reintroduce the ties-to-even rounding the rest of the function avoids. The
+`dataPoints` field is gone from both platforms' statistics state; the chart
+reads `chartBuckets`. `COPYING.md` says where a third-party license text sits:
+under `LICENSES/` when a file of this repository is released under it, beside
+`docs/NOTICES.md` when none is.
+
 ### iOS: delete and edit move to the native edit-mode model
 
 The per-row trash and pencil icons on Today, Drinks and Calendar give way to
@@ -367,9 +374,10 @@ repository-root source. `tools/check-headers.py` exempts
 
 The comment-language gate reads the declarative build and configuration files
 too: the version catalog, `gradle.properties`, the ProGuard rules, the CI
-definitions, `ios/project.yml`, the SwiftLint, REUSE and osv-scanner configs and
-the F-Droid metadata. It scans every file class `tools/check-headers.py` claims
-as project-owned.
+definitions, `ios/project.yml`, the SwiftLint, REUSE and osv-scanner configs,
+the report template and the daemon JVM properties. It reaches every file class
+`tools/check-headers.py` claims as project-owned except `.md`, `.xml` and
+`.in`, whose content is the translations themselves.
 
 The repository's statements about itself match it: the Kover block names the
 80 % branch bound it enforces and records `test_statement_coverage90` and

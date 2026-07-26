@@ -87,7 +87,6 @@ data class StatsUiState(
     // identifying the not-yet-computed seed; a diverging default here would make
     // the seed look like a computed value.
     val period: StatsPeriod = StatsPeriod.MONTH,
-    val dataPoints: List<DaySummary> = emptyList(),
     /** Gap-free, time-axis bucket series for the consumption chart (incl. abstinent buckets). */
     val chartBuckets: List<ChartBucket> = emptyList(),
     /** Bucket width of [chartBuckets]: DAILY for WEEK/MONTH, MONTHLY for YEAR. */
@@ -505,7 +504,6 @@ class StatsViewModel(
 
             StatsUiState(
                 period = period,
-                dataPoints = current,
                 chartBuckets = chartBuckets,
                 chartGranularity = chartGranularity,
                 totalGrams = totalGrams,

@@ -151,6 +151,17 @@ check_no_german_comments() {
                 grep -n "#" ../ios/project.yml ../ios/.swiftlint.yml \
                     2>/dev/null || true
             fi
+            # The last two file classes check-headers.py owns that a `#`- or
+            # `//`-comment scan can reach. The report template is HTML, so its
+            # comments open with `<!--`; the daemon JVM properties file uses `#`
+            # like every other .properties file above. The remaining classes in
+            # check-headers.py's suffix list -- .md, .xml, .in -- are deliberately
+            # NOT scanned: their content is the translations themselves, so German
+            # in values-de/strings.xml or usersguide.de.md.in is correct.
+            # -H, not just -n: grep omits the file name when given a single
+            # file, and a warning that names no file is not actionable.
+            grep -Hn "<!--" ../report/report_template.html 2>/dev/null || true
+            grep -Hn "#" gradle/gradle-daemon-jvm.properties 2>/dev/null || true
         } | grep -iE "\b(${pattern})\b" | head -15 || true
     )
 

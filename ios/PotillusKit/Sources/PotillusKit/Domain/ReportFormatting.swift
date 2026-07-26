@@ -95,6 +95,12 @@ public enum ReportFormatting {
 
         // The number is already settled; this only chooses the decimal mark.
         let number = NSDecimalNumber(decimal: rounded)
-        return formatter.string(from: number) ?? String(format: "%.\(fractionDigits)f", value)
+        // The fallback formats the SETTLED number, never the raw `value`. Handing
+        // `value` to `String(format:)` would reintroduce exactly the ties-to-even
+        // rounding this function exists to avoid (12.35 -> "12.3", 20.5 -> "20"),
+        // on a path chosen precisely when nothing else is available to catch it.
+        // Re-rounding an already-rounded number to the same digits cannot move it.
+        return formatter.string(from: number)
+            ?? String(format: "%.\(fractionDigits)f", number.doubleValue)
     }
 }

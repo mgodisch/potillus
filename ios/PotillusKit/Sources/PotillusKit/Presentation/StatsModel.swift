@@ -48,9 +48,6 @@ public struct StatsState: Sendable, Equatable {
     public var from: String = ""
     public var to: String = ""
 
-    /// Per-day totals across the period, chronologically.
-    public var dataPoints: [DaySummary] = []
-
     /// The chart's bars, already bucketed.
     public var chartBuckets: [ChartBucket] = []
     public var chartGranularity: ChartGranularity = .daily
@@ -312,7 +309,6 @@ public final class StatsModel {
         next.from = window.from
         next.to = window.to
         next.today = today
-        next.dataPoints = summaries
         next.chartGranularity = granularity
         next.chartBuckets = ChartBucketing.bucketize(
             summaries: summaries, from: window.from, to: window.to,

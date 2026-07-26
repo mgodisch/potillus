@@ -30,7 +30,10 @@ conditions.
 ## Third-Party Software, Assets, and Documentation
 
 The verbatim license texts for the third-party software, assets, and
-documentation bundled with or used to build this project are collected under
-[LICENSES/](LICENSES/) (the machine-readable REUSE license store); their
-copyright notices and the mapping to each dependency start at
+documentation bundled with or used to build this project sit under
+[LICENSES/](LICENSES/) (the machine-readable REUSE license store) wherever a
+file of this repository is itself released under that license, and beside
+[docs/NOTICES.md](docs/NOTICES.md) as `docs/LICENSE.<SPDX-ID>.md` where none is
+— a license the repository does not use would make `reuse lint` report it as
+unused. Their copyright notices and the mapping to each dependency start at
 [docs/NOTICES.md](docs/NOTICES.md).
