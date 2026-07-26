@@ -129,7 +129,9 @@ public struct ReportLabels: Sendable {
     /// have up to six, which is why the localised initialiser will replace the
     /// whole closure rather than pass a flag: `Days.formatted` and Android's
     /// `R.plurals.days` both take the count and decide for themselves.
-    public var days: @Sendable (Int) -> String = { $0 == 1 ? "1 day" : "\($0) days" }
+    public var days: @Sendable (Int) -> String = {
+        DayPlural.format($0, language: "en", forms: DayForms(one: "%1$d day", other: "%1$d days"))
+    }
 
     /// The reader-facing name of a stored category key.
     public var category: @Sendable (String) -> String = { name in

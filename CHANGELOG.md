@@ -151,6 +151,7 @@ platforms, and revises the project's own texts.
 - `tools/check-fixture-parity.py` holds the two demo fixtures to one set of drinks
   and entries.
 - The report's weekday columns follow the report's locale on both platforms.
+- The report's day counts carry each language's own plural form.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

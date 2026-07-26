@@ -1,0 +1,1866 @@
+{
+  "_comment": [
+    "plural-days.json - the report's day counts, in every shipping language.",
+    "",
+    "The strings are Android's <plurals name=\"days\"> verbatim, with %1$d filled in.",
+    "The category each count selects follows CLDR: fr counts 0 as singular, ro adds",
+    "few for 0 and 2..19, cs few for 2..4, and pl, ru and uk pick one, few or many",
+    "from the last one and two digits. Counts 11..14 and 21..25 are in the list",
+    "because that is where those rules part company.",
+    "",
+    "Android resolves these through getQuantityString and is the authority; iOS",
+    "reproduces the selection in DayPlural. Until the 0.84.0 review the iOS report",
+    "printed the English forms in every language - a German report read \"8 days\".",
+    "",
+    "Both suites load this file. A rule written down wrong on one platform shows up",
+    "as a mismatch on the other rather than as a plausible-looking wrong word."
+  ],
+  "counts": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    11,
+    12,
+    14,
+    21,
+    22,
+    25,
+    100,
+    101,
+    111
+  ],
+  "cases": {
+    "cs": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dní"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 den"
+      },
+      {
+        "count": 2,
+        "category": "few",
+        "expected": "2 dny"
+      },
+      {
+        "count": 3,
+        "category": "few",
+        "expected": "3 dny"
+      },
+      {
+        "count": 4,
+        "category": "few",
+        "expected": "4 dny"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dní"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dní"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dní"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dní"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dní"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dní"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dní"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dní"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dní"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dní"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dní"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dní"
+      }
+    ],
+    "da": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dage"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dag"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dage"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dage"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dage"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dage"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dage"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dage"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dage"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dage"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dage"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dage"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dage"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dage"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dage"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dage"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dage"
+      }
+    ],
+    "de": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 Tage"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 Tag"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 Tage"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 Tage"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 Tage"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 Tage"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 Tage"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 Tage"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 Tage"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 Tage"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 Tage"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 Tage"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 Tage"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 Tage"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 Tage"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 Tage"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 Tage"
+      }
+    ],
+    "el": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 ημέρες"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 ημέρα"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 ημέρες"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 ημέρες"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 ημέρες"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 ημέρες"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 ημέρες"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 ημέρες"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 ημέρες"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 ημέρες"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 ημέρες"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 ημέρες"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 ημέρες"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 ημέρες"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 ημέρες"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 ημέρες"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 ημέρες"
+      }
+    ],
+    "en": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 days"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 day"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 days"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 days"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 days"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 days"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 days"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 days"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 days"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 days"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 days"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 days"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 days"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 days"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 days"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 days"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 days"
+      }
+    ],
+    "es": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 días"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 día"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 días"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 días"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 días"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 días"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 días"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 días"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 días"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 días"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 días"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 días"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 días"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 días"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 días"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 días"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 días"
+      }
+    ],
+    "fr": [
+      {
+        "count": 0,
+        "category": "one",
+        "expected": "0 jour"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 jour"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 jours"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 jours"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 jours"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 jours"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 jours"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 jours"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 jours"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 jours"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 jours"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 jours"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 jours"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 jours"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 jours"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 jours"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 jours"
+      }
+    ],
+    "it": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 giorni"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 giorno"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 giorni"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 giorni"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 giorni"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 giorni"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 giorni"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 giorni"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 giorni"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 giorni"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 giorni"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 giorni"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 giorni"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 giorni"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 giorni"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 giorni"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 giorni"
+      }
+    ],
+    "ja": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0日"
+      },
+      {
+        "count": 1,
+        "category": "other",
+        "expected": "1日"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2日"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3日"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4日"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5日"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7日"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8日"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11日"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12日"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14日"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21日"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22日"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25日"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100日"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101日"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111日"
+      }
+    ],
+    "ko": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0일"
+      },
+      {
+        "count": 1,
+        "category": "other",
+        "expected": "1일"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2일"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3일"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4일"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5일"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7일"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8일"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11일"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12일"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14일"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21일"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22일"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25일"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100일"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101일"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111일"
+      }
+    ],
+    "nb": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dager"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dag"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dager"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dager"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dager"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dager"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dager"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dager"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dager"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dager"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dager"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dager"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dager"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dager"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dager"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dager"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dager"
+      }
+    ],
+    "nl": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dagen"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dag"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dagen"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dagen"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dagen"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dagen"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dagen"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dagen"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dagen"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dagen"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dagen"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dagen"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dagen"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dagen"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dagen"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dagen"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dagen"
+      }
+    ],
+    "pl": [
+      {
+        "count": 0,
+        "category": "many",
+        "expected": "0 dni"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dzień"
+      },
+      {
+        "count": 2,
+        "category": "few",
+        "expected": "2 dni"
+      },
+      {
+        "count": 3,
+        "category": "few",
+        "expected": "3 dni"
+      },
+      {
+        "count": 4,
+        "category": "few",
+        "expected": "4 dni"
+      },
+      {
+        "count": 5,
+        "category": "many",
+        "expected": "5 dni"
+      },
+      {
+        "count": 7,
+        "category": "many",
+        "expected": "7 dni"
+      },
+      {
+        "count": 8,
+        "category": "many",
+        "expected": "8 dni"
+      },
+      {
+        "count": 11,
+        "category": "many",
+        "expected": "11 dni"
+      },
+      {
+        "count": 12,
+        "category": "many",
+        "expected": "12 dni"
+      },
+      {
+        "count": 14,
+        "category": "many",
+        "expected": "14 dni"
+      },
+      {
+        "count": 21,
+        "category": "many",
+        "expected": "21 dni"
+      },
+      {
+        "count": 22,
+        "category": "few",
+        "expected": "22 dni"
+      },
+      {
+        "count": 25,
+        "category": "many",
+        "expected": "25 dni"
+      },
+      {
+        "count": 100,
+        "category": "many",
+        "expected": "100 dni"
+      },
+      {
+        "count": 101,
+        "category": "many",
+        "expected": "101 dni"
+      },
+      {
+        "count": 111,
+        "category": "many",
+        "expected": "111 dni"
+      }
+    ],
+    "pt": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dias"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dia"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dias"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dias"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dias"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dias"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dias"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dias"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dias"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dias"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dias"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dias"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dias"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dias"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dias"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dias"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dias"
+      }
+    ],
+    "pt-BR": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dias"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dia"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dias"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dias"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dias"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dias"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dias"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dias"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dias"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dias"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dias"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dias"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dias"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dias"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dias"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dias"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dias"
+      }
+    ],
+    "ro": [
+      {
+        "count": 0,
+        "category": "few",
+        "expected": "0 zile"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 zi"
+      },
+      {
+        "count": 2,
+        "category": "few",
+        "expected": "2 zile"
+      },
+      {
+        "count": 3,
+        "category": "few",
+        "expected": "3 zile"
+      },
+      {
+        "count": 4,
+        "category": "few",
+        "expected": "4 zile"
+      },
+      {
+        "count": 5,
+        "category": "few",
+        "expected": "5 zile"
+      },
+      {
+        "count": 7,
+        "category": "few",
+        "expected": "7 zile"
+      },
+      {
+        "count": 8,
+        "category": "few",
+        "expected": "8 zile"
+      },
+      {
+        "count": 11,
+        "category": "few",
+        "expected": "11 zile"
+      },
+      {
+        "count": 12,
+        "category": "few",
+        "expected": "12 zile"
+      },
+      {
+        "count": 14,
+        "category": "few",
+        "expected": "14 zile"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 de zile"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 de zile"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 de zile"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 de zile"
+      },
+      {
+        "count": 101,
+        "category": "few",
+        "expected": "101 zile"
+      },
+      {
+        "count": 111,
+        "category": "few",
+        "expected": "111 zile"
+      }
+    ],
+    "ru": [
+      {
+        "count": 0,
+        "category": "many",
+        "expected": "0 дней"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 день"
+      },
+      {
+        "count": 2,
+        "category": "few",
+        "expected": "2 дня"
+      },
+      {
+        "count": 3,
+        "category": "few",
+        "expected": "3 дня"
+      },
+      {
+        "count": 4,
+        "category": "few",
+        "expected": "4 дня"
+      },
+      {
+        "count": 5,
+        "category": "many",
+        "expected": "5 дней"
+      },
+      {
+        "count": 7,
+        "category": "many",
+        "expected": "7 дней"
+      },
+      {
+        "count": 8,
+        "category": "many",
+        "expected": "8 дней"
+      },
+      {
+        "count": 11,
+        "category": "many",
+        "expected": "11 дней"
+      },
+      {
+        "count": 12,
+        "category": "many",
+        "expected": "12 дней"
+      },
+      {
+        "count": 14,
+        "category": "many",
+        "expected": "14 дней"
+      },
+      {
+        "count": 21,
+        "category": "one",
+        "expected": "21 день"
+      },
+      {
+        "count": 22,
+        "category": "few",
+        "expected": "22 дня"
+      },
+      {
+        "count": 25,
+        "category": "many",
+        "expected": "25 дней"
+      },
+      {
+        "count": 100,
+        "category": "many",
+        "expected": "100 дней"
+      },
+      {
+        "count": 101,
+        "category": "one",
+        "expected": "101 день"
+      },
+      {
+        "count": 111,
+        "category": "many",
+        "expected": "111 дней"
+      }
+    ],
+    "sv": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0 dagar"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 dag"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2 dagar"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3 dagar"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4 dagar"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5 dagar"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7 dagar"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8 dagar"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11 dagar"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12 dagar"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14 dagar"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21 dagar"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22 dagar"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25 dagar"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100 dagar"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101 dagar"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111 dagar"
+      }
+    ],
+    "uk": [
+      {
+        "count": 0,
+        "category": "many",
+        "expected": "0 днів"
+      },
+      {
+        "count": 1,
+        "category": "one",
+        "expected": "1 день"
+      },
+      {
+        "count": 2,
+        "category": "few",
+        "expected": "2 дні"
+      },
+      {
+        "count": 3,
+        "category": "few",
+        "expected": "3 дні"
+      },
+      {
+        "count": 4,
+        "category": "few",
+        "expected": "4 дні"
+      },
+      {
+        "count": 5,
+        "category": "many",
+        "expected": "5 днів"
+      },
+      {
+        "count": 7,
+        "category": "many",
+        "expected": "7 днів"
+      },
+      {
+        "count": 8,
+        "category": "many",
+        "expected": "8 днів"
+      },
+      {
+        "count": 11,
+        "category": "many",
+        "expected": "11 днів"
+      },
+      {
+        "count": 12,
+        "category": "many",
+        "expected": "12 днів"
+      },
+      {
+        "count": 14,
+        "category": "many",
+        "expected": "14 днів"
+      },
+      {
+        "count": 21,
+        "category": "one",
+        "expected": "21 день"
+      },
+      {
+        "count": 22,
+        "category": "few",
+        "expected": "22 дні"
+      },
+      {
+        "count": 25,
+        "category": "many",
+        "expected": "25 днів"
+      },
+      {
+        "count": 100,
+        "category": "many",
+        "expected": "100 днів"
+      },
+      {
+        "count": 101,
+        "category": "one",
+        "expected": "101 день"
+      },
+      {
+        "count": 111,
+        "category": "many",
+        "expected": "111 днів"
+      }
+    ],
+    "zh-Hans": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0天"
+      },
+      {
+        "count": 1,
+        "category": "other",
+        "expected": "1天"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2天"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3天"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4天"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5天"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7天"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8天"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11天"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12天"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14天"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21天"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22天"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25天"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100天"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101天"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111天"
+      }
+    ],
+    "zh-Hant": [
+      {
+        "count": 0,
+        "category": "other",
+        "expected": "0天"
+      },
+      {
+        "count": 1,
+        "category": "other",
+        "expected": "1天"
+      },
+      {
+        "count": 2,
+        "category": "other",
+        "expected": "2天"
+      },
+      {
+        "count": 3,
+        "category": "other",
+        "expected": "3天"
+      },
+      {
+        "count": 4,
+        "category": "other",
+        "expected": "4天"
+      },
+      {
+        "count": 5,
+        "category": "other",
+        "expected": "5天"
+      },
+      {
+        "count": 7,
+        "category": "other",
+        "expected": "7天"
+      },
+      {
+        "count": 8,
+        "category": "other",
+        "expected": "8天"
+      },
+      {
+        "count": 11,
+        "category": "other",
+        "expected": "11天"
+      },
+      {
+        "count": 12,
+        "category": "other",
+        "expected": "12天"
+      },
+      {
+        "count": 14,
+        "category": "other",
+        "expected": "14天"
+      },
+      {
+        "count": 21,
+        "category": "other",
+        "expected": "21天"
+      },
+      {
+        "count": 22,
+        "category": "other",
+        "expected": "22天"
+      },
+      {
+        "count": 25,
+        "category": "other",
+        "expected": "25天"
+      },
+      {
+        "count": 100,
+        "category": "other",
+        "expected": "100天"
+      },
+      {
+        "count": 101,
+        "category": "other",
+        "expected": "101天"
+      },
+      {
+        "count": 111,
+        "category": "other",
+        "expected": "111天"
+      }
+    ]
+  }
+}

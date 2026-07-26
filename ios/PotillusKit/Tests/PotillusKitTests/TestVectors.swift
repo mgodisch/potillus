@@ -423,3 +423,19 @@ struct StatsWindowVectors: Decodable {
         let todays: [String]
     }
 }
+
+/// `plural-days.json` — the report's day counts in every shipping language.
+///
+/// The words are Android's `<plurals name="days">`; the category each count picks
+/// is CLDR. Keyed by the bare language tag the catalogue uses.
+struct DayPluralVectors: Decodable {
+    let counts: [Int]
+    let cases: [String: [Case]]
+
+    struct Case: Decodable {
+        let count: Int
+        /// `"one"`, `"few"`, `"many"` or `"other"`.
+        let category: String
+        let expected: String
+    }
+}

@@ -89,6 +89,10 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
   `StatsViewModel`, out of reach of a JVM test. `invalidToday` holds only inputs
   both platforms unambiguously reject; the file's `_comment` says which case was
   left out and why.
+- `plural-days.json` — the report's day counts in all 21 languages: the forms
+  come from Android's `<plurals name="days">`, the category each count selects
+  from CLDR. Counts 11 to 14 and 21 to 25 are in the list because that is where
+  the Polish, Russian and Ukrainian rules part company with their last digit.
 - `report-chart.json` — the PDF report chart's presentation arithmetic (label
   picking, bar scaling). The label indices are deliberately computed in 32-bit
   float, because the Kotlin original truncates differently from Double for some

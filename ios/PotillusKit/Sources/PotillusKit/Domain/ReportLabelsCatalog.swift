@@ -122,6 +122,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md pro Trinktag"
         self.kpiDrinkDays = "Trinktage"
         self.kpiAbstinentDays = "Abstinenztage"
+        self.days = { DayPlural.format($0, language: "de", forms: DayForms(one: "%1$d Tag", other: "%1$d Tage")) }
         self.kpiMaxPerDay = "Max. pro Tag"
         self.kpiMaxPer7Days = "Max. pro 7 Tage"
         self.kpiAvgDrinkDaysPerMonth = "Ø Trinktage/Monat"
@@ -177,6 +178,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md pr. drikkedag"
         self.kpiDrinkDays = "Drikkedage"
         self.kpiAbstinentDays = "Afholdsdage"
+        self.days = { DayPlural.format($0, language: "da", forms: DayForms(one: "%1$d dag", other: "%1$d dage")) }
         self.kpiMaxPerDay = "Maks. pr. dag"
         self.kpiMaxPer7Days = "Maks. pr. 7 dage"
         self.kpiAvgDrinkDaysPerMonth = "Ø drikkedage/måned"
@@ -232,6 +234,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md per drinkdag"
         self.kpiDrinkDays = "Drinkdagen"
         self.kpiAbstinentDays = "Onthoudingsdagen"
+        self.days = { DayPlural.format($0, language: "nl", forms: DayForms(one: "%1$d dag", other: "%1$d dagen")) }
         self.kpiMaxPerDay = "Max. per dag"
         self.kpiMaxPer7Days = "Max. per 7 dagen"
         self.kpiAvgDrinkDaysPerMonth = "Ø drinkdagen/maand"
@@ -287,6 +290,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md per drikkedag"
         self.kpiDrinkDays = "Drikkdager"
         self.kpiAbstinentDays = "Avholdsdager"
+        self.days = { DayPlural.format($0, language: "nb", forms: DayForms(one: "%1$d dag", other: "%1$d dager")) }
         self.kpiMaxPerDay = "Maks. per dag"
         self.kpiMaxPer7Days = "Maks. per 7 dager"
         self.kpiAvgDrinkDaysPerMonth = "Ø drikkdager/måned"
@@ -342,6 +346,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md per drickdag"
         self.kpiDrinkDays = "Drickdagar"
         self.kpiAbstinentDays = "Nyktra dagar"
+        self.days = { DayPlural.format($0, language: "sv", forms: DayForms(one: "%1$d dag", other: "%1$d dagar")) }
         self.kpiMaxPerDay = "Max per dag"
         self.kpiMaxPer7Days = "Max per 7 dagar"
         self.kpiAvgDrinkDaysPerMonth = "Ø drickdagar/månad"
@@ -397,6 +402,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md por día de consumo"
         self.kpiDrinkDays = "Días de consumo"
         self.kpiAbstinentDays = "Días de abstinencia"
+        self.days = { DayPlural.format($0, language: "es", forms: DayForms(one: "%1$d día", other: "%1$d días")) }
         self.kpiMaxPerDay = "Máx. por día"
         self.kpiMaxPer7Days = "Máx. en 7 días"
         self.kpiAvgDrinkDaysPerMonth = "Ø días de consumo/mes"
@@ -452,6 +458,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md par jour de conso."
         self.kpiDrinkDays = "Jours de conso."
         self.kpiAbstinentDays = "Jours d'abstinence"
+        self.days = { DayPlural.format($0, language: "fr", forms: DayForms(one: "%1$d jour", other: "%1$d jours")) }
         self.kpiMaxPerDay = "Max. par jour"
         self.kpiMaxPer7Days = "Max. sur 7 jours"
         self.kpiAvgDrinkDaysPerMonth = "Ø jours de conso./mois"
@@ -507,6 +514,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md per giorno di consumo"
         self.kpiDrinkDays = "Giorni di consumo"
         self.kpiAbstinentDays = "Giorni di astinenza"
+        self.days = { DayPlural.format($0, language: "it", forms: DayForms(one: "%1$d giorno", other: "%1$d giorni")) }
         self.kpiMaxPerDay = "Max al giorno"
         self.kpiMaxPer7Days = "Max su 7 giorni"
         self.kpiAvgDrinkDaysPerMonth = "Ø giorni di consumo/mese"
@@ -562,6 +570,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md por dia de consumo"
         self.kpiDrinkDays = "Dias de consumo"
         self.kpiAbstinentDays = "Dias de abstinência"
+        self.days = { DayPlural.format($0, language: "pt", forms: DayForms(one: "%1$d dia", other: "%1$d dias")) }
         self.kpiMaxPerDay = "Máx. por dia"
         self.kpiMaxPer7Days = "Máx. em 7 dias"
         self.kpiAvgDrinkDaysPerMonth = "Ø dias de consumo/mês"
@@ -617,6 +626,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md por dia de consumo"
         self.kpiDrinkDays = "Dias de consumo"
         self.kpiAbstinentDays = "Dias de abstinência"
+        self.days = { DayPlural.format($0, language: "pt-BR", forms: DayForms(one: "%1$d dia", other: "%1$d dias")) }
         self.kpiMaxPerDay = "Máx. por dia"
         self.kpiMaxPer7Days = "Máx. em 7 dias"
         self.kpiAvgDrinkDaysPerMonth = "Ø dias de consumo/mês"
@@ -672,6 +682,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md pe zi de băut"
         self.kpiDrinkDays = "Zile de băut"
         self.kpiAbstinentDays = "Zile de abstinență"
+        self.days = { DayPlural.format($0, language: "ro", forms: DayForms(one: "%1$d zi", few: "%1$d zile", other: "%1$d de zile")) }
         self.kpiMaxPerDay = "Max. pe zi"
         self.kpiMaxPer7Days = "Max. în 7 zile"
         self.kpiAvgDrinkDaysPerMonth = "Ø zile de băut/lună"
@@ -727,6 +738,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md za den pití"
         self.kpiDrinkDays = "Dny pití"
         self.kpiAbstinentDays = "Dny abstinence"
+        self.days = { DayPlural.format($0, language: "cs", forms: DayForms(one: "%1$d den", few: "%1$d dny", many: "%1$d dne", other: "%1$d dní")) }
         self.kpiMaxPerDay = "Max. za den"
         self.kpiMaxPer7Days = "Max. za 7 dní"
         self.kpiAvgDrinkDaysPerMonth = "Ø dny pití/měs."
@@ -782,6 +794,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md w dzień spożycia"
         self.kpiDrinkDays = "Dni spożycia"
         self.kpiAbstinentDays = "Dni abstynencji"
+        self.days = { DayPlural.format($0, language: "pl", forms: DayForms(one: "%1$d dzień", few: "%1$d dni", many: "%1$d dni", other: "%1$d dnia")) }
         self.kpiMaxPerDay = "Maks. dziennie"
         self.kpiMaxPer7Days = "Maks. w 7 dni"
         self.kpiAvgDrinkDaysPerMonth = "Ø dni spożycia/mies."
@@ -837,6 +850,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md в день потребления"
         self.kpiDrinkDays = "Дней с алкоголем"
         self.kpiAbstinentDays = "Дней без алкоголя"
+        self.days = { DayPlural.format($0, language: "ru", forms: DayForms(one: "%1$d день", many: "%1$d дней", other: "%1$d дня")) }
         self.kpiMaxPerDay = "Макс. в день"
         self.kpiMaxPer7Days = "Макс. за 7 дней"
         self.kpiAvgDrinkDaysPerMonth = "Ø дней с алкоголем/мес."
@@ -892,6 +906,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md за день вживання"
         self.kpiDrinkDays = "Дні вживання"
         self.kpiAbstinentDays = "Дні утримання"
+        self.days = { DayPlural.format($0, language: "uk", forms: DayForms(one: "%1$d день", few: "%1$d дні", many: "%1$d днів", other: "%1$d дня")) }
         self.kpiMaxPerDay = "Макс. за день"
         self.kpiMaxPer7Days = "Макс. за 7 днів"
         self.kpiAvgDrinkDaysPerMonth = "Ø дні вживання/міс."
@@ -947,6 +962,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "Md ανά ημέρα κατανάλωσης"
         self.kpiDrinkDays = "Ημέρες κατανάλωσης"
         self.kpiAbstinentDays = "Ημέρες αποχής"
+        self.days = { DayPlural.format($0, language: "el", forms: DayForms(one: "%1$d ημέρα", other: "%1$d ημέρες")) }
         self.kpiMaxPerDay = "Μέγ. ανά ημέρα"
         self.kpiMaxPer7Days = "Μέγ. σε 7 ημέρες"
         self.kpiAvgDrinkDaysPerMonth = "Ø ημέρες κατανάλωσης/μήνα"
@@ -1000,6 +1016,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "飲酒日中央値"
         self.kpiDrinkDays = "飲酒日数"
         self.kpiAbstinentDays = "断酒日数"
+        self.days = { DayPlural.format($0, language: "ja", forms: DayForms(other: "%1$d日")) }
         self.kpiMaxPerDay = "1日最大"
         self.kpiMaxPer7Days = "7日間最大"
         self.kpiAvgDrinkDaysPerMonth = "平均 飲酒日数／月"
@@ -1053,6 +1070,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "음주일 중앙값"
         self.kpiDrinkDays = "음주일 수"
         self.kpiAbstinentDays = "금주일 수"
+        self.days = { DayPlural.format($0, language: "ko", forms: DayForms(other: "%1$d일")) }
         self.kpiMaxPerDay = "일 최대"
         self.kpiMaxPer7Days = "7일 최대"
         self.kpiAvgDrinkDaysPerMonth = "평균 음주일 수/월"
@@ -1106,6 +1124,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "每饮酒日中位数"
         self.kpiDrinkDays = "饮酒天数"
         self.kpiAbstinentDays = "戒酒天数"
+        self.days = { DayPlural.format($0, language: "zh-Hans", forms: DayForms(other: "%1$d天")) }
         self.kpiMaxPerDay = "每日最大"
         self.kpiMaxPer7Days = "7天最大"
         self.kpiAvgDrinkDaysPerMonth = "平均饮酒天数/月"
@@ -1159,6 +1178,7 @@ extension ReportLabels {
         self.kpiMedianPerDrinkDay = "飲酒日中位數"
         self.kpiDrinkDays = "飲酒日數"
         self.kpiAbstinentDays = "戒酒日數"
+        self.days = { DayPlural.format($0, language: "zh-Hant", forms: DayForms(other: "%1$d天")) }
         self.kpiMaxPerDay = "每日最大"
         self.kpiMaxPer7Days = "7天最大"
         self.kpiAvgDrinkDaysPerMonth = "平均飲酒日數/月"
