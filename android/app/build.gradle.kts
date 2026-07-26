@@ -534,16 +534,17 @@ android {
             // assets — only the DSL changed.
             assets.directories += "$projectDir/schemas"
 
-            // SCREENSHOT DEMO-DATA FIXTURE (single source of truth):
-            //   ScreenshotTest seeds the app database from the Play-Store demo
-            //   data in ../fastlane/demo-backup.json. That file is the canonical
-            //   fixture (it lives next to the report PDFs and the store metadata),
-            //   so instead of duplicating it under app/src/androidTest/assets we
-            //   COPY it into a generated androidTest assets directory at build
-            //   time (see the `copyInstrumentationFixtures` task below) and expose that
-            //   directory here. The test then opens "demo-backup.json" through the
-            //   instrumentation AssetManager while the repository keeps exactly one
-            //   copy of the data.
+            // SHARED FIXTURES FOR THE INSTRUMENTED SUITE (single source of truth):
+            //   ScreenshotTest and ReportExportTest seed the app database from
+            //   ../fastlane/screenshot-fixture.json, and PluralDaysInstrumentedTest
+            //   reads ../test-vectors/plural-days.json. Those files are canonical
+            //   where they live — beside the report PDFs and the store metadata, and
+            //   beside the other shared vectors — so instead of duplicating them
+            //   under app/src/androidTest/assets we COPY them into a generated
+            //   androidTest assets directory at build time (see the
+            //   `copyInstrumentationFixtures` task below) and expose that directory
+            //   here. The tests then open them by name through the instrumentation
+            //   AssetManager while the repository keeps exactly one copy of each.
             assets.directories +=
                 layout.buildDirectory.dir("generated/screenshotAssets").get().asFile.path
         }
@@ -652,19 +653,19 @@ kotlin {
     }
 }
 
-// ── 2c. Screenshot demo-data fixture wiring ───────────────────────────────────
-// The screenshot suite (app/src/androidTest/.../screenshot/ScreenshotTest.kt)
-// seeds the app database from the canonical Play-Store demo data file
-// ../fastlane/demo-backup.json. To avoid keeping a second copy of that JSON under
-// the androidTest source set, this task copies the single source-of-truth file
-// into a generated androidTest assets directory that is registered on the
-// androidTest source set in the `sourceSets { }` block above.
+// ── 2c. Instrumented-suite fixture wiring ─────────────────────────────────────
+// The instrumented suite reads three files that live outside the androidTest
+// source set: the screenshot fixture, the format-2 backup beside it, and the
+// shared plural vectors. To avoid keeping second copies of them, this task copies
+// the single source-of-truth files into a generated androidTest assets directory
+// that is registered on the androidTest source set in the `sourceSets { }` block
+// above.
 //
 // `rootProject.file("../fastlane/...")`: this is a single-module Gradle build
 // whose root project IS the android/ directory (see settings.gradle.kts). The
 // fastlane tree now lives at the repository root (a sibling of android/, so that
 // F-Droid auto-discovers the store metadata), hence the `../fastlane` prefix —
-// the path resolves to <repo>/fastlane/demo-backup.json.
+// the paths resolve to <repo>/fastlane/... and <repo>/test-vectors/... .
 //
 // The copy is made a dependency of the androidTest asset-merge task so it always
 // runs before the test APK is packaged. `configureEach` covers whatever the

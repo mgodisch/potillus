@@ -155,6 +155,7 @@ platforms, and revises the project's own texts.
 - `PluralDaysInstrumentedTest` holds Android's plural resolution to
   `plural-days.json`.
 - `tools/check-report-pdfs.py` holds every committed sample report to two pages.
+- The Gradle and Makefile references name the screenshot fixture.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at

@@ -73,7 +73,7 @@ SCREENSHOT_DENSITY := 640
 SCREENSHOT_CLOCK   := 1000
 # The in-app clock pin (must agree with SCREENSHOT_DATE) and the demo fixture.
 SCREENSHOT_PIN_KT  := android/app/src/androidTest/kotlin/de/godisch/potillus/screenshot/ScreenshotClock.kt
-DEMO_BACKUP_JSON   := fastlane/screenshot-fixture.json
+SCREENSHOT_FIXTURE := fastlane/screenshot-fixture.json
 
 # ── In-app screenshot capture, iOS (strand A) ────────────────────────────────
 # IOS_SIM_DEVICE must match fastlane/Snapfile: it names both the simulator to query
@@ -310,7 +310,7 @@ screenshots-android:
 	# matching the quoted token, so this recipe's double-quotes stay balanced (an odd
 	# count throws off editor syntax highlighting).
 	pin_kt="$$(sed -n 's/.*SCREENSHOT_DATE[^0-9]*\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1/p' "$(SCREENSHOT_PIN_KT)" | head -n1)"
-	last_entry="$$(grep -oE '"logicalDate"[[:space:]]*:[[:space:]]*"[0-9]{4}-[0-9]{2}-[0-9]{2}"' "$(DEMO_BACKUP_JSON)" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | sort | tail -n1)"
+	last_entry="$$(grep -oE '"logicalDate"[[:space:]]*:[[:space:]]*"[0-9]{4}-[0-9]{2}-[0-9]{2}"' "$(SCREENSHOT_FIXTURE)" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | sort | tail -n1)"
 	newest="$$(printf '%s\n%s\n' "$$last_entry" "$(SCREENSHOT_DATE)" | sort | tail -n1)"
 	if [ "$$pin_kt" != "$(SCREENSHOT_DATE)" ]; then
 		echo "screenshots-android: capture-date pins disagree -- Makefile SCREENSHOT_DATE='$(SCREENSHOT_DATE)' vs ScreenshotClock.SCREENSHOT_DATE='$$pin_kt'. Align the two and re-run."
