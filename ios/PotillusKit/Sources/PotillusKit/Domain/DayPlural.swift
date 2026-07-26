@@ -112,37 +112,37 @@ public enum DayPlural {
     ///     `"pt-BR"`, `"zh-Hans"`. Anything unknown falls to the English rule,
     ///     which is what an unlocalised report would have used anyway.
     public static func category(_ count: Int, language: String) -> PluralCategory {
-        let n = abs(count)
+        let days = abs(count)
         switch language {
         case "ja", "ko", "zh-Hans", "zh-Hant":
             return .other
 
         case "fr":
             // Zero is singular in French.
-            return n <= 1 ? .one : .other
+            return days <= 1 ? .one : .other
 
         case "ro":
-            if n == 1 { return .one }
-            if n == 0 || (1...19).contains(n % 100) { return .few }
+            if days == 1 { return .one }
+            if days == 0 || (1...19).contains(days % 100) { return .few }
             return .other
 
         case "cs":
-            if n == 1 { return .one }
-            if (2...4).contains(n) { return .few }
+            if days == 1 { return .one }
+            if (2...4).contains(days) { return .few }
             return .other
 
         case "pl":
-            if n == 1 { return .one }
-            if (2...4).contains(n % 10) && !(12...14).contains(n % 100) { return .few }
+            if days == 1 { return .one }
+            if (2...4).contains(days % 10) && !(12...14).contains(days % 100) { return .few }
             return .many
 
         case "ru", "uk":
-            if n % 10 == 1 && n % 100 != 11 { return .one }
-            if (2...4).contains(n % 10) && !(12...14).contains(n % 100) { return .few }
+            if days % 10 == 1 && days % 100 != 11 { return .one }
+            if (2...4).contains(days % 10) && !(12...14).contains(days % 100) { return .few }
             return .many
 
         default:
-            return n == 1 ? .one : .other
+            return days == 1 ? .one : .other
         }
     }
 
