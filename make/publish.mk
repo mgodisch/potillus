@@ -343,7 +343,8 @@ push-appstore-preflight:
 #      https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)/downloads/<asset>
 #
 # That permanent form is not cosmetic: it is the URL shape the F-Droid recipe's
-# `Binaries:` field interpolates per version (see fdroid/de.godisch.potillus.yml),
+# `Binaries:` field interpolates per version -- the recipe lives in F-Droid's own
+# fdroiddata repository, as metadata/de.godisch.potillus.yml --
 # so it must keep working unchanged from release to release. The registry URL
 # underneath carries a numeric project id and is an implementation detail.
 #

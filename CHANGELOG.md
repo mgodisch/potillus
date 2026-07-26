@@ -240,6 +240,13 @@ bottom-left corner. The badge artwork, the DejaVu Sans and Rokkitt faces it was
 set in, the `rokkitt-bold` target and the now unreferenced `Bitstream-Vera` and
 `CC-BY-SA-3.0` license texts are gone.
 
+The `fdroid/` directory goes with them: the reference build recipe was a static
+copy of what F-Droid maintains, and the three best-practices justifications that
+cited it now link to `metadata/de.godisch.potillus.yml` in fdroiddata. The
+`publish.mk` note on the `Binaries:` URL shape says where the recipe lives, and
+the recipe's entries in `tools/check-headers.py` and the comment-language gate
+are removed.
+
 ### Infrastructure: move the canonical repository to GitLab
 
 The canonical repository moved from `codeberg.org/godisch/potillus` to

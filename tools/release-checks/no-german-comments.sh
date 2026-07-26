@@ -151,9 +151,6 @@ check_no_german_comments() {
                 grep -n "#" ../ios/project.yml ../ios/.swiftlint.yml \
                     2>/dev/null || true
             fi
-            if [[ -d ../fdroid ]]; then
-                grep -rn --include='*.yml' "#" ../fdroid || true
-            fi
         } | grep -iE "\b(${pattern})\b" | head -15 || true
     )
 
