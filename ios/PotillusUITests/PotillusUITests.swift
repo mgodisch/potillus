@@ -135,7 +135,11 @@ final class PotillusUITests: XCTestCase {
         XCTAssertTrue(addDrink.waitForExistence(timeout: 10), "Today never came back")
         addDrink.tap()
 
-        let entrySheet = app.otherElements["sheet.entry"]
+        // The sheet's own Cancel button, not the Form: `app.otherElements` did not
+        // match an identifier put on the Form, and the run failed here with five of
+        // six screens captured. A button is a button whatever SwiftUI renders the
+        // container as, and this one exists only while the sheet is up.
+        let entrySheet = app.buttons["sheet.entryCancel"]
         XCTAssertTrue(entrySheet.waitForExistence(timeout: 10), "the log-a-drink sheet never appeared")
         snapshot("05_add_drink")
     }

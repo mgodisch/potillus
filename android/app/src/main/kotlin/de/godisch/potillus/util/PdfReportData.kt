@@ -38,6 +38,7 @@ import de.godisch.potillus.domain.model.LimitInfo
 import de.godisch.potillus.domain.model.LimitViolations
 import java.time.Instant
 import java.time.LocalDate
+import java.util.Locale
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -200,6 +201,7 @@ data class PdfReportData(
             drinks: List<DrinkDefinition>,
             settings: AppSettings,
             periodEnd: String? = null,
+            locale: Locale = Locale.getDefault(),
         ): PdfReportData {
             val drinkMap = drinks.associateBy { it.id }
 
@@ -331,10 +333,15 @@ data class PdfReportData(
                 }
 
             // ── Weekday profile, rotated to start at the locale's first weekday.
-            //    The app no longer has a configurable week start, so the column order
-            //    follows the device locale (Mon-first in most of Europe, Sun-first in
-            //    the US, etc.) via DayResolver.firstDayOfWeekIso().
-            val ws = DayResolver.firstDayOfWeekIso()
+            //    The app has no configurable week start, so the column order follows
+            //    the REPORT's locale (Mon-first in most of Europe, Sun-first in the
+            //    US) — the same locale PdfReportBuilder uses for the column NAMES.
+            //    Reading the device default here instead put Sunday-first columns
+            //    under Greek and Russian headings in the 0.84.0 store assets, and
+            //    would do the same for anyone whose device language differs from the
+            //    language they picked in the app. iOS passes its report locale the
+            //    same way (ReportData.swift: `firstDayOfWeekIso(locale: locale)`).
+            val ws = DayResolver.firstDayOfWeekIso(locale)
             val weekdayOrder = (0..6).map { i -> (ws - 1 + i) % 7 + 1 } // ISO 1..7
             val dayTotals = Array(7) { mutableListOf<Double>() }
             byDate.forEach { (dateStr, es) ->

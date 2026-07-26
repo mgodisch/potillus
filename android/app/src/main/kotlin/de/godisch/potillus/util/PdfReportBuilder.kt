@@ -129,14 +129,18 @@ object PdfReportBuilder {
         settings: AppSettings,
         periodEnd: String? = null,
     ): String {
-        val d = PdfReportData.from(entries, drinks, settings, periodEnd)
-
         // Locale for all value formatting in this report. We take it from the
         // Context (which already reflects the per-app language, exactly like the
         // string resources resolved below) rather than from Locale.getDefault(),
         // so the formatted dates/months agree with their localized labels. The
         // two locale-sensitive formatters are built here, once per report.
+        //
+        // Declared before the data: PdfReportData.from needs it too, for the week
+        // start that orders the weekday columns whose NAMES are resolved from this
+        // same locale further down.
         val locale = context.formattingLocale()
+
+        val d = PdfReportData.from(entries, drinks, settings, periodEnd, locale)
         val dateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
         // monthYearFormatter (NOT a literal "MMM yyyy"): CJK reports need the
         // year-first order ("2026年6月") and inflected languages the standalone

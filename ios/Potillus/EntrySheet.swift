@@ -202,13 +202,17 @@ struct EntrySheet: View {
                 editing == nil ? "Log a drink" : "Edit Entry", locale: locale
             ))
             .navigationBarTitleDisplayMode(.inline)
-            // The screenshot run waits for this before it shoots, so the frame is
-            // never of the presenting screen mid-animation. On the Form, not the
-            // title: a localized title is not addressable across 21 languages.
-            .accessibilityIdentifier("sheet.entry")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(Loc.string("Cancel", locale: locale)) { dismiss() }
+                        // The screenshot run waits for this before it shoots, so the
+                        // frame is never of the presenting screen mid-animation. On
+                        // the button rather than on the Form: an identifier on the
+                        // Form did not surface in the element tree, and a button is
+                        // addressable whatever SwiftUI renders the container as. The
+                        // title would be the natural anchor and is not usable — it is
+                        // localized into 21 languages.
+                        .accessibilityIdentifier("sheet.entryCancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(Loc.string("Save", locale: locale)) { save() }
