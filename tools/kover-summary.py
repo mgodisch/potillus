@@ -51,10 +51,14 @@ WHAT IT READS
     Gradle layout change costs an argument rather than an edit here.
 
 WHAT IT PRINTS
-    One line per metric found, e.g.
+    One line per metric found, in this shape:
 
-        kover-summary: LINE   coverage 96.98% (5203/5364 instructions covered)
-        kover-summary: BRANCH coverage 80.69% (489/606 branches covered)
+        kover-summary: LINE   coverage <pct>% (<covered>/<total> lines covered)
+        kover-summary: BRANCH coverage <pct>% (<covered>/<total> branches covered)
+
+    Written as placeholders on purpose. Real figures here read as the project's
+    current coverage and go stale the next time a test lands; the numbers belong
+    in .bestpractices.json and docs/ROADMAP.md, where something checks them.
 
     plus, when the floors are readable from app/build.gradle.kts, the bound each
     metric is verified against, so the headroom is visible at a glance.
