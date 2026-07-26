@@ -1,0 +1,3 @@
+Pełny przegląd przyniósł kilka poprawek. Komunikat o ilości w edytorze napojów podaje teraz prawdziwy limit 5000 ml zamiast 10 000 ml. Wybór języka chińskiego zapisany w kopii zapasowej utworzonej na iPhonie przetrwa import. Nowa instalacja zaczyna od 80 g tygodniowo przez cztery dni.
+
+Raport PDF zachowuje sześć ostatnich miesięcy i podsumowuje starsze, jego kolumny dni idą za językiem raportu, a liczby dni używają liczby mnogiej każdego języka.

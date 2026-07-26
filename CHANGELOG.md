@@ -135,7 +135,7 @@ platforms, and revises the project's own texts.
   Met. The documents outside `android/app/build.gradle.kts` name the floor and
   `make -C android cover-figures` in place of a figure.
 - Each store's release notes name the report changes and the platform's own
-  fixes, and nothing from the sibling platform.
+  fixes in all 21 languages, and nothing from the sibling platform.
 - The iOS export-compliance comment names the sealed preferences blob, the
   Keychain key it uses and the unencrypted database.
 - The user's guide count in `.bestpractices.json` reads 21 languages.

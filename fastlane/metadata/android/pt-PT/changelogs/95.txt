@@ -1,0 +1,3 @@
+Uma revisão completa deu origem a várias correções. O editor de bebidas indica agora o limite real de quantidade, 5000 ml. Uma escolha de idioma chinês guardada numa cópia de segurança criada num iPhone sobrevive à importação. Uma instalação nova começa com 80 g por semana em quatro dias de consumo.
+
+O relatório PDF mantém os seis meses mais recentes e resume os anteriores, as colunas de dias seguem o idioma do relatório e as contagens de dias usam o plural correto.

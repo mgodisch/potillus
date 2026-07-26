@@ -1,0 +1,3 @@
+Eine vollständige Überprüfung brachte mehrere Korrekturen. Die Meldung im Getränkeeditor nennt jetzt die tatsächliche Mengengrenze von 5.000 ml. Eine chinesische Sprachwahl aus einer auf einem iPhone erstellten Sicherung übersteht den Import. Eine Neuinstallation startet mit 80 g pro Woche über vier Trinktage.
+
+Der PDF-Bericht behält die sechs jüngsten Monate und fasst Ältere zusammen, seine Wochentagsspalten folgen der Sprache des Berichts, und Tagesangaben verwenden die richtige Pluralform.
