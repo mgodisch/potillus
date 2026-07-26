@@ -198,4 +198,22 @@ final class ReportChartTests: XCTestCase {
             ReportChart.minimumVisibleBar, accuracy: Self.epsilon
         )
     }
+
+    // ── abbreviateWeekday ────────────────────────────────────────────────────
+    //
+    // The unit of the two-character cut, not the CLDR names themselves: those come
+    // from the platform and differ by OS version, so the vectors feed the function
+    // fixed strings instead. The combining-accent and surrogate-pair cases are the
+    // ones where Swift's default grapheme-cluster `prefix(2)` would disagree with
+    // Android's UTF-16 `take(2)`.
+
+    func testAbbreviateWeekdayMatchesTheVectors() {
+        for testCase in vectors.abbreviateWeekday {
+            XCTAssertEqual(
+                ReportRenderer.abbreviateWeekday(testCase.symbol),
+                testCase.expected,
+                testCase.description
+            )
+        }
+    }
 }

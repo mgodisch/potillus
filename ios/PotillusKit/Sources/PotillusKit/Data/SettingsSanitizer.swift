@@ -61,6 +61,12 @@ public enum SettingsSanitizer {
     // will accept. A view that carried its own copy of "1...500" would eventually
     // offer a value the sanitizer then silently clamps — the same divergence that
     // let Android's drink dialog and view model disagree until v0.81.0.
+    // That reasoning covers `drinkDaysRange`, `dailyLimitRange`, `weeklyLimitRange`
+    // and `weightRange`, which `SettingsScreen` reads. It does NOT cover
+    // `hourRange` and `minuteRange`: the day-change time comes from a
+    // `DatePicker(displayedComponents: .hourAndMinute)`, which cannot produce an
+    // hour outside 0…23 or a minute outside 0…59 in the first place. Those two are
+    // public for symmetry within this block and are used by `sanitize` alone.
 
     /// Hour of the day the logical day rolls over.
     public static let hourRange = 0...23

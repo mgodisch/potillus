@@ -419,8 +419,9 @@ object PdfReportBuilder {
             }
             repeats["WDLABELS"] = d.weekdayOrder.map { iso ->
                 mapOf(
-                    "WD_NAME" to DayOfWeek.of(iso)
-                        .getDisplayName(TextStyle.SHORT, locale).take(2),
+                    "WD_NAME" to abbreviateWeekday(
+                        DayOfWeek.of(iso).getDisplayName(TextStyle.SHORT, locale),
+                    ),
                 )
             }
         }
@@ -486,6 +487,19 @@ object PdfReportBuilder {
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
     internal fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
+
+    /**
+     * Truncates a weekday name to its first two UTF-16 code units.
+     *
+     * Two, because the column is narrow and seven of them must fit. `take(2)` on a
+     * Kotlin String counts UTF-16 code units; Swift's `prefix(2)` counts grapheme
+     * clusters, so `ReportRenderer.abbreviateWeekday` spells the UTF-16 rule out
+     * rather than taking its own default. For every language this app ships the two
+     * rules agree — checked over all 21 in the 0.84.0 QA round — so this is not a
+     * live difference; it is a unit that was chosen implicitly on both sides and is
+     * now chosen on purpose, and pinned by `test-vectors/report-chart.json`.
+     */
+    internal fun abbreviateWeekday(symbol: String): String = symbol.take(2)
 
     /**
      * Indices of the buckets that should carry an x-axis label. For a short

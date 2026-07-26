@@ -46,6 +46,14 @@
 # produced -- use the `make` targets for the complete, store-ready asset set.
 # =============================================================================
 
+# fastlane regenerates fastlane/README.md after every run, from the `desc` lines
+# below. That file is not kept: it restated a fraction of what those `desc` blocks
+# already say, drifted out of date between runs, and needed an exemption from the
+# GPL-header gate. The lanes are documented by the `desc` blocks below and by
+# docs/RELEASE-IOS.md; `bundle exec fastlane lanes` lists them on demand, and
+# `bundle exec fastlane docs` still writes the file for anyone who wants it.
+skip_docs
+
 default_platform(:android)
 
 platform :android do

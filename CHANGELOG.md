@@ -46,7 +46,7 @@ Reach iOS parity and harden the release
 
 This version reworks the iOS interaction model to match Apple's own list apps,
 moves the canonical repository to GitLab, absorbs the store-path corrections
-drafted for 0.83.1, folds in three quality-assurance rounds covering both
+drafted for 0.83.1, folds in four quality-assurance rounds covering both
 platforms, and revises the project's own texts.
 
 ### iOS: delete and edit follow the native edit-mode model
@@ -152,7 +152,7 @@ the recipe lives in fdroiddata as `metadata/de.godisch.potillus.yml`.
 
 ### Quality assurance
 
-Three rounds across both platforms. On iOS the Today screen's error alert can be
+Four rounds across both platforms. On iOS the Today screen's error alert can be
 acknowledged, the drink editor accepts comma decimals, and its messages, the
 Settings footers and the edit toggle follow the in-app language. The overflow
 menu wears the More idiom, dirty sheets resist a swipe dismissal, and the lock
@@ -170,7 +170,7 @@ fallback formats the settled decimal, and the `dataPoints` field is gone from
 both platforms' statistics state, the chart reading `chartBuckets`.
 
 Kover is at 0.9.9, counting `com.android.*` classes and using the dependency
-notation Gradle 10 requires. Branch coverage is 80.69 %, the `koverVerify` floor
+notation Gradle 10 requires. Branch coverage is 81.05 %, the `koverVerify` floor
 80, and `test_statement_coverage90`, `test_branch_coverage80` and
 `dynamic_analysis` are Met.
 `release-check.sh` §5 reads all three Kotlin source sets, and the
@@ -180,6 +180,20 @@ reaching every class `tools/check-headers.py` owns except `.md`, `.xml` and
 
 The unused `View.localizedText(_:)` and its modifier are gone from
 `ios/Potillus/Localization.swift`.
+
+`StatsWindows` derives the statistics period, its baseline and the
+statistics-start floor on both platforms, pinned by `stats-window.json`;
+`StatsPeriod` sits beside it in the Kotlin domain package. Both reports cut the
+weekday label to two UTF-16 code units through `abbreviateWeekday`, pinned by
+`report-chart.json`. `check-l10n.py` holds every key of both String Catalogs to
+every language they ship.
+
+Neither `fastlane` README is kept. CONTRIBUTING.md §6.2 carries the store-metadata
+conventions and points at `docs/RELEASE-IOS.md`.
+
+Comment corrections: the `SettingsSanitizer` ranges' visibility note names the
+four the settings screen reads, and the vector mirrors in `TestVectors.swift`
+each carry their own file's description.
 
 ### Folded in from the cancelled 0.83.1: store upload paths
 

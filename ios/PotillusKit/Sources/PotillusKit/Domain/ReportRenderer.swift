@@ -234,13 +234,29 @@ public enum ReportRenderer {
 
     /// The first two characters of the locale's short weekday name.
     ///
-    /// Two, because the column is narrow and seven of them must fit. Android takes
-    /// the same two.
+    /// Two, because the column is narrow and seven of them must fit.
     static func shortWeekday(iso: Int, locale: Locale) -> String {
         let formatter = self.formatter(locale: locale)
         // `shortWeekdaySymbols` is Sunday-first; ISO counts Monday as 1, so ISO 7
         // (Sunday) wraps to index 0.
         guard let symbols = formatter.shortWeekdaySymbols, symbols.count == 7 else { return "" }
-        return String(symbols[iso % 7].prefix(2))
+        return abbreviateWeekday(symbols[iso % 7])
+    }
+
+    /// Truncates a weekday name to its first two UTF-16 code units.
+    ///
+    /// UTF-16 rather than the Swift default of grapheme clusters, because Android
+    /// truncates with `String.take(2)`, which counts UTF-16 code units, and the two
+    /// reports must print the same label. For every language this app ships the two
+    /// rules agree — checked over all 21 in the 0.84.0 QA round — so this is not a
+    /// live difference; it is a unit that was chosen implicitly and is now chosen on
+    /// purpose, and pinned by `test-vectors/report-chart.json`.
+    ///
+    /// Splitting a surrogate pair produces an unpaired half. That is what Android
+    /// does today, so this does it too: the platforms agreeing matters more here
+    /// than either one being individually prettier, and a weekday abbreviation
+    /// outside the Basic Multilingual Plane does not exist in CLDR.
+    static func abbreviateWeekday(_ symbol: String) -> String {
+        String(decoding: symbol.utf16.prefix(2), as: UTF16.self)
     }
 }

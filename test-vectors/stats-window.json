@@ -1,0 +1,209 @@
+{
+  "_comment": [
+    "stats-window.json - which days a statistics period covers.",
+    "",
+    "Loaded by BOTH suites:",
+    "  Android  app/src/test/kotlin/.../domain/StatsWindowVectorTest.kt",
+    "  iOS      ios/PotillusKit/Tests/PotillusKitTests/StatsWindowTests.swift",
+    "",
+    "The arithmetic is duplicated by necessity - java.time on one side,",
+    "Foundation Calendar on the other - so every boundary below is a place the",
+    "two could drift apart: the day a month begins, the day the previous period",
+    "ends, the leap day, and the user's statistics-start floor.",
+    "",
+    "Until the 0.84.0 review these cases existed only as Swift unit tests, and",
+    "the Kotlin derivation sat inline in StatsViewModel where a JVM test could",
+    "not reach it. The expected values were computed independently of both",
+    "implementations, not read back from either.",
+    "",
+    "hasBaseline is previousFrom <= previousTo. False means there is no",
+    "comparable history, NOT that the baseline was zero grams - a distinction",
+    "the floor cases below exist to pin.",
+    "",
+    "The floor is compared as a STRING on both platforms, which works only",
+    "because yyyy-MM-dd sorts chronologically.",
+    "",
+    "invalidToday holds only inputs BOTH platforms unambiguously reject. A",
+    "non-existent calendar day (2026-02-30) is deliberately absent: java.time",
+    "throws on it, while Foundation's DateFormatter may roll it over to March 2",
+    "depending on its leniency, and that could not be settled without a Mac. Adding",
+    "the case is a follow-up for whoever can run the Swift suite."
+  ],
+  "window": [
+    {
+      "description": "The week is a rolling window of seven days ending today",
+      "period": "WEEK",
+      "today": "2026-01-15",
+      "from": "2026-01-09",
+      "to": "2026-01-15",
+      "previousFrom": "2026-01-02",
+      "previousTo": "2026-01-08",
+      "hasBaseline": true
+    },
+    {
+      "description": "The month runs from the first and compares against the whole previous month",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2025-12-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "The year runs from January first",
+      "period": "YEAR",
+      "today": "2026-01-15",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2025-01-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "On the first of a month the period is a single day",
+      "period": "MONTH",
+      "today": "2026-03-01",
+      "from": "2026-03-01",
+      "to": "2026-03-01",
+      "previousFrom": "2026-02-01",
+      "previousTo": "2026-02-28",
+      "hasBaseline": true
+    },
+    {
+      "description": "The leap day is included in the previous month",
+      "period": "MONTH",
+      "today": "2024-03-15",
+      "from": "2024-03-01",
+      "to": "2024-03-15",
+      "previousFrom": "2024-02-01",
+      "previousTo": "2024-02-29",
+      "hasBaseline": true
+    },
+    {
+      "description": "On January first the year is one day and the previous is whole",
+      "period": "YEAR",
+      "today": "2026-01-01",
+      "from": "2026-01-01",
+      "to": "2026-01-01",
+      "previousFrom": "2025-01-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "A 31-day previous month keeps all 31 days",
+      "period": "MONTH",
+      "today": "2026-02-10",
+      "from": "2026-02-01",
+      "to": "2026-02-10",
+      "previousFrom": "2026-01-01",
+      "previousTo": "2026-01-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "A week window spans a year boundary",
+      "period": "WEEK",
+      "today": "2026-01-03",
+      "from": "2025-12-28",
+      "to": "2026-01-03",
+      "previousFrom": "2025-12-21",
+      "previousTo": "2025-12-27",
+      "hasBaseline": true
+    }
+  ],
+  "invalidToday": [
+    {
+      "description": "A malformed date yields no window",
+      "period": "MONTH",
+      "today": "not-a-date"
+    },
+    {
+      "description": "An empty date yields no window",
+      "period": "WEEK",
+      "today": ""
+    }
+  ],
+  "adjacency": {
+    "_comment": "previousTo is always the day before from, for every period and day.",
+    "periods": [
+      "WEEK",
+      "MONTH",
+      "YEAR"
+    ],
+    "todays": [
+      "2026-01-01",
+      "2026-01-15",
+      "2026-03-01",
+      "2024-02-29",
+      "2026-12-31"
+    ]
+  },
+  "applyingFloor": [
+    {
+      "description": "No floor changes nothing",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "floor": "",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2025-12-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "A floor before both windows changes nothing",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "floor": "2025-11-01",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2025-12-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "A floor inside the previous period shortens the baseline",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "floor": "2025-12-15",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2025-12-15",
+      "previousTo": "2025-12-31",
+      "hasBaseline": true
+    },
+    {
+      "description": "A floor inside the current period leaves no baseline",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "floor": "2026-01-10",
+      "from": "2026-01-10",
+      "to": "2026-01-15",
+      "previousFrom": "2026-01-10",
+      "previousTo": "2025-12-31",
+      "hasBaseline": false
+    },
+    {
+      "description": "The floor is applied by string comparison",
+      "period": "WEEK",
+      "today": "2026-01-15",
+      "floor": "2026-01-12",
+      "from": "2026-01-12",
+      "to": "2026-01-15",
+      "previousFrom": "2026-01-12",
+      "previousTo": "2026-01-08",
+      "hasBaseline": false
+    },
+    {
+      "description": "A floor on the current period's first day leaves the current window untouched but still removes the baseline",
+      "period": "MONTH",
+      "today": "2026-01-15",
+      "floor": "2026-01-01",
+      "from": "2026-01-01",
+      "to": "2026-01-15",
+      "previousFrom": "2026-01-01",
+      "previousTo": "2025-12-31",
+      "hasBaseline": false
+    }
+  ]
+}

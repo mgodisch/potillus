@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.StatsPeriod
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0

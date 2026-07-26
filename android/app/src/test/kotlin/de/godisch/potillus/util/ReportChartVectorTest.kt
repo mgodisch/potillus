@@ -95,6 +95,24 @@ class ReportChartVectorTest {
      * them. If this test ever fails, someone widened the Float and the iOS report
      * now draws a different axis than this one.
      */
+    // ── abbreviateWeekday ────────────────────────────────────────────────────
+    //
+    // The unit of the two-character cut, not the CLDR names themselves: those come
+    // from the platform and differ by OS version, so the vectors feed the function
+    // fixed strings instead. The combining-accent and surrogate-pair cases are the
+    // ones where a grapheme-based cut would disagree.
+
+    @Test
+    fun `abbreviateWeekday matches the shared vectors`() {
+        VECTORS.getJSONArray("abbreviateWeekday").objects().forEach { case ->
+            assertEquals(
+                case.getString("description"),
+                case.getString("expected"),
+                PdfReportBuilder.abbreviateWeekday(case.getString("symbol")),
+            )
+        }
+    }
+
     @Test
     fun `the step is a Float and it matters`() {
         assertEquals(

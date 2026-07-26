@@ -49,6 +49,7 @@ import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.StatsPeriod
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry

@@ -548,16 +548,22 @@ title, short/long description, keywords and release notes that appear on the
 Play Store and App Store product pages. These are **not** covered by the parity
 check and follow each store's own format:
 
-- **Play Store** — `fastlane/metadata/android/<locale>/`: `title.txt`,
-  `short_description.txt` (≤80 chars), `full_description.txt`, and
-  `changelogs/<versionCode>.txt`. Read by `fastlane supply` (`make push-playstore`)
-  and by F-Droid.
+- **Play Store** — `fastlane/metadata/android/<locale>/`: `title.txt` (≤30 chars),
+  `short_description.txt` (≤80), `full_description.txt` (≤4000), and
+  `changelogs/<versionCode>.txt` (≤500, F-Droid's limit). Read by
+  `fastlane supply` (`make push-playstore`) and by F-Droid, which accept the same
+  BCP-47 locale folders, so one tree serves both. A release note is named after the
+  integer `versionCode` in `android/app/build.gradle.kts`; `tools/release-check.sh`
+  §1 fails the build when one is missing for the current code. Titles and
+  descriptions carry no version number, so a release does not touch them. Adding a
+  language means a new locale folder with those four files; `images/` is optional
+  and falls back to `en-US`.
 - **App Store** — `fastlane/metadata/ios/<locale>/`: `name.txt` (≤30),
   `subtitle.txt` (≤30), `keywords.txt` (≤100, comma-separated, **no spaces**),
   `description.txt` (≤4000), `release_notes.txt`, plus the support/marketing/
   privacy URLs. Global files (`copyright.txt`, `primary_category.txt`,
   `secondary_category.txt`, `review_information/`) sit at the top of that tree.
-  Read by `fastlane deliver` (see [`appstore/README.md`](appstore/README.md)).
+  Read by `fastlane deliver` (see [`docs/RELEASE-IOS.md`](docs/RELEASE-IOS.md)).
   Locale codes follow App Store Connect, which differs from Android in a few
   cases (`no`, `zh-Hans`, `zh-Hant`, `pt-PT`, `pt-BR`).
 

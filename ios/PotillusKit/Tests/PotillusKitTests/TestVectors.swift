@@ -92,10 +92,7 @@ enum TestVectors {
 // Decodable mirrors of the JSON vector schema
 // =============================================================================
 
-/// Root of `test-vectors/alcohol-calculator.json`.
-/// `report-format.json` — how the report prints a number.
-///
-/// Every expected string was produced by the JVM, not typed by hand.
+/// `app-lock.json` — when returning to the app must prompt for re-authentication.
 struct AppLockVectors: Decodable {
     let thresholdSeconds: Double
     let requiresReauth: [Case]
@@ -109,6 +106,9 @@ struct AppLockVectors: Decodable {
     }
 }
 
+/// `report-format.json` — how the report prints a number.
+///
+/// Every expected string was produced by the JVM, not typed by hand.
 struct ReportFormatVectors: Decodable {
     let cases: [Case]
 
@@ -130,6 +130,16 @@ struct ReportChartVectors: Decodable {
     let barHeight: [BarCase]
     let categoryColor: [ColorCase]
     let donut: [DonutCase]
+    let abbreviateWeekday: [AbbreviateCase]
+
+    /// One weekday-name truncation. `symbol` is the locale's short weekday name
+    /// as the platform's date formatter produced it; `expected` is its first two
+    /// UTF-16 code units.
+    struct AbbreviateCase: Decodable {
+        let description: String
+        let symbol: String
+        let expected: String
+    }
 
     struct PercentCase: Decodable {
         let description: String
@@ -251,6 +261,7 @@ struct TemplateVectors: Decodable {
     }
 }
 
+/// Root of `test-vectors/alcohol-calculator.json`.
 struct AlcoholCalculatorVectors: Decodable {
     let constants: Constants
     let calculateGrams: [GramsCase]
@@ -367,5 +378,48 @@ struct AlcoholCalculatorVectors: Decodable {
                 return "Malformed [date, grams] pair in vector case: \(caseName)"
             }
         }
+    }
+}
+
+/// `stats-window.json` — which days a statistics period covers.
+///
+/// The window arithmetic is duplicated by necessity — `java.time` on Android,
+/// Foundation's `Calendar` here — so this file is what holds the two to the same
+/// boundaries. Added in the 0.84.0 review, when these cases existed only as Swift
+/// unit tests and the Kotlin derivation sat inline in its ViewModel.
+struct StatsWindowVectors: Decodable {
+    let window: [Case]
+    let invalidToday: [InvalidCase]
+    let adjacency: Adjacency
+    let applyingFloor: [Case]
+
+    /// One expected window. `floor` is present only in `applyingFloor` cases.
+    struct Case: Decodable {
+        let description: String
+        /// `"WEEK"`, `"MONTH"` or `"YEAR"` — the `StatsPeriod` raw values.
+        let period: String
+        let today: String
+        let floor: String?
+        let from: String
+        let to: String
+        let previousFrom: String
+        let previousTo: String
+        /// `previousFrom <= previousTo`. False means there is no comparable
+        /// history, not that the baseline was zero.
+        let hasBaseline: Bool
+    }
+
+    struct InvalidCase: Decodable {
+        let description: String
+        let period: String
+        let today: String
+    }
+
+    /// The periods and days over which `previousTo` must be the day before
+    /// `from`. Held as two lists rather than a case list because the assertion is
+    /// the same for every combination.
+    struct Adjacency: Decodable {
+        let periods: [String]
+        let todays: [String]
     }
 }

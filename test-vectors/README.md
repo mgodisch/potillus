@@ -82,6 +82,13 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
   and the refusal to trust a backwards reading. One-sided (iOS-only) until the
   0.83.0 QA round, which is exactly how Android's strict `>` diverged unseen;
   now asserted by `AppLockVectorTest` on both platforms.
+- `stats-window.json` — which days a statistics period covers: the three periods,
+  the adjacent equal-length baseline, and the statistics-start floor raised over
+  both. Added in the 0.84.0 QA round, when the cases existed only as iOS unit
+  tests around `StatsWindow.swift` while Kotlin derived the same windows inline in
+  `StatsViewModel`, out of reach of a JVM test. `invalidToday` holds only inputs
+  both platforms unambiguously reject; the file's `_comment` says which case was
+  left out and why.
 - `report-chart.json` — the PDF report chart's presentation arithmetic (label
   picking, bar scaling). The label indices are deliberately computed in 32-bit
   float, because the Kotlin original truncates differently from Double for some

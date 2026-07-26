@@ -5,12 +5,19 @@
     "",
     "labelIndices IS COMPUTED IN 32-BIT FLOAT, and that is not an accident of the",
     "Kotlin source: `((n - 1).toFloat() / (target - 1))` truncates differently from",
-    "the same expression in Double for 16 of the first 400 series lengths. n = 32 \u2014",
-    "a month of daily buckets \u2014 is one of them. Swift therefore uses Float too, and",
+    "the same expression in Double for 16 of the first 400 series lengths. n = 32 —",
+    "a month of daily buckets — is one of them. Swift therefore uses Float too, and",
     "these vectors would catch it if either side stopped.",
     "",
     "Colours must match: the same drinking would otherwise print in different",
-    "colours on the two platforms."
+    "colours on the two platforms.",
+    "",
+    "abbreviateWeekday pins the UNIT of the two-character weekday cut, added in",
+    "the 0.84.0 QA round. Kotlin's String.take(2) counts UTF-16 code units;",
+    "Swift's String.prefix(2) counts grapheme clusters. For all 21 shipped",
+    "languages the two agree, so nothing visible changed - but the combining-accent",
+    "and surrogate-pair cases below are where they part, and they are the reason",
+    "the Swift side now spells UTF-16 out instead of taking its default."
   ],
   "pct": [
     {
@@ -286,6 +293,63 @@
           "offset": "25.00"
         }
       ]
+    }
+  ],
+  "abbreviateWeekday": [
+    {
+      "description": "ASCII shorter than the cut is returned whole",
+      "symbol": "M",
+      "expected": "M"
+    },
+    {
+      "description": "An empty symbol stays empty",
+      "symbol": "",
+      "expected": ""
+    },
+    {
+      "description": "A two-letter Latin abbreviation is unchanged",
+      "symbol": "Mo",
+      "expected": "Mo"
+    },
+    {
+      "description": "A longer Latin abbreviation is cut to two",
+      "symbol": "Mon",
+      "expected": "Mo"
+    },
+    {
+      "description": "A precomposed accent counts as one unit",
+      "symbol": "út",
+      "expected": "út"
+    },
+    {
+      "description": "A combining accent counts as two units, unlike a grapheme cut",
+      "symbol": "út",
+      "expected": "ú"
+    },
+    {
+      "description": "A single CJK ideograph is returned whole",
+      "symbol": "月",
+      "expected": "月"
+    },
+    {
+      "description": "A Hangul syllable is returned whole",
+      "symbol": "일",
+      "expected": "일"
+    },
+    {
+      "description": "A Greek abbreviation is cut after two letters",
+      "symbol": "Δευ",
+      "expected": "Δε"
+    },
+    {
+      "description": "A Cyrillic two-letter abbreviation is unchanged",
+      "symbol": "пн",
+      "expected": "пн"
+    },
+    {
+      "description": "A surrogate pair is one symbol of two units and survives the cut",
+      "symbol": "😀x",
+      "expected": "😀"
     }
   ]
 }

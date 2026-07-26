@@ -55,6 +55,8 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartBucketing
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.StatsPeriod
+import de.godisch.potillus.domain.StatsWindows
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.perAppLocalizedContext
@@ -77,7 +79,9 @@ import java.time.ZoneId
 // STATS
 // ════════════════════════════════════════════════════════════════════════════
 
-enum class StatsPeriod { WEEK, MONTH, YEAR }
+// StatsPeriod moved to de.godisch.potillus.domain in the 0.84.0 QA round: the
+// window arithmetic in StatsWindows is what gives the three values meaning, and a
+// domain object may not depend on the UI layer. Imported above.
 
 @Immutable
 data class StatsUiState(
@@ -344,50 +348,37 @@ class StatsViewModel(
         )
     }.distinctUntilChanged().flatMapLatest { params ->
         val (period, settings, allDates, today) = params
-        val todayDate = DayResolver.parseDate(today)
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         val fmt = DayResolver.DATE_FORMATTER
 
-        val (from, to, prevFrom, prevTo) = when (period) {
-            StatsPeriod.WEEK -> {
-                // Rolling 7-day window ending today (inclusive): today + previous 6 days.
-                // The previous window is the seven days immediately before it, so the
-                // trend percentage compares two adjacent, equal-length 7-day spans.
-                val from = todayDate.minusDays(6)
-                val pf = from.minusDays(7)
-                arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
-            }
-            StatsPeriod.MONTH -> {
-                val from = todayDate.withDayOfMonth(1)
-                val pf = from.minusMonths(1)
-                arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
-            }
-            StatsPeriod.YEAR -> {
-                val from = todayDate.withDayOfYear(1)
-                val pf = from.minusYears(1)
-                arrayOf(from.format(fmt), today, pf.format(fmt), from.minusDays(1).format(fmt))
-            }
-        }
-
-        // Apply the global statistics start date as a lower bound.
+        // The period's days, the adjacent baseline, and the user's statistics-start
+        // floor raised over both. All of it lives in StatsWindows — see
+        // domain/StatsWindow.kt for the three periods, the equal-length rule and
+        // what the floor does — and is pinned against the iOS port by
+        // test-vectors/stats-window.json.
+        //
+        // The null branch is unreachable in practice: `today` comes from
+        // DayResolver.today(), which formats a LocalDate. Seeding the not-yet-
+        // computed state rather than throwing keeps an impossible input from
+        // taking the screen down.
         val statsFloor = settings.statsFromDate
-        val effectiveFrom = if (statsFloor.isNotEmpty() && statsFloor > from) statsFloor else from
+        val window = StatsWindows.window(period, today)?.let {
+            StatsWindows.applyingFloor(it, statsFloor)
+        } ?: return@flatMapLatest flowOf(StatsUiState(period = period))
+
+        val to = window.to
+        val prevTo = window.previousTo
+        val effectiveFrom = window.from
         val streakDates = if (statsFloor.isNotEmpty()) allDates.filter { it >= statsFloor } else allDates
 
-        // The PREVIOUS-period baseline honours the same lower bound (v0.81.0 QA
-        // fix). Before this, only the current period was clipped, so the trend
-        // arrow/percentage compared against days the user had excluded via the
-        // "Statistics From" date — contradicting that setting's documented
-        // contract ("Entries before this date are ignored in all statistics",
-        // see R.string.stats_from_desc). Clipping may leave the previous window
-        // partially covered (fewer baseline days) or entirely before the floor:
-        //  - partially: the baseline average is taken over the remaining days
-        //    (effectivePrevFrom..prevTo), keeping the per-day comparison fair;
-        //  - entirely (floor > prevTo): there is no comparable baseline at all.
-        //    The query range is then inverted, Room returns no rows, prevDays
-        //    computes ≤ 0, and the trend degrades to FLAT / 0 % exactly like the
-        //    no-history case — the behaviour the Today card's baseline already had.
-        val effectivePrevFrom = if (statsFloor.isNotEmpty() && statsFloor > prevFrom) statsFloor else prevFrom
+        // The clipped baseline start (v0.81.0 QA fix): before it, only the current
+        // period was clipped, so the trend compared against days the user had
+        // excluded — contradicting the setting's documented contract ("Entries
+        // before this date are ignored in all statistics", R.string.stats_from_desc).
+        // When the floor lies past prevTo the range is inverted, Room returns no
+        // rows, prevDays computes ≤ 0, and the trend degrades to FLAT / 0 % exactly
+        // like the no-history case. `window.hasBaseline` names that condition.
+        val effectivePrevFrom = window.previousFrom
 
         combine(
             entryRepo.getDailySummaries(effectiveFrom, to),

@@ -218,6 +218,61 @@ def plural_placeholder_problems():
     return problems
 
 
+def catalogue_completeness_problems():
+    """Every key of every String Catalog must carry every language that catalogue
+    ships.
+
+    WHY BOTH CATALOGUES
+        The app has two: `Localizable.xcstrings` for the UI, and
+        `InfoPlist.xcstrings` for the strings iOS itself renders — the Face ID
+        usage description above all, which appears in a system permission dialog.
+        Until the 0.84.0 QA round no gate read the second one. Its content was in
+        fact complete; nothing was watching, which is how the first one drifted
+        would have gone unseen too. `check-l10n-parity.py` cannot cover the gap:
+        it compares against Android's `strings.xml`, and an Info.plist usage
+        description has no Android counterpart to compare with.
+
+    WHAT COUNTS AS COMPLETE
+        The expected set of languages is the union over ALL catalogues, not over
+        each one separately, and no hard-coded list — so adding a language cannot
+        leave this check behind. The union must be global because `InfoPlist`
+        carries a single key: taken per catalogue, dropping a language from that one
+        key would also drop it from the expectation, and the check would pass on the
+        very file class it was added for. That is not hypothetical — it is what the
+        first version of this function did, and the probe caught it.
+
+        A key marked `shouldTranslate: false` is a language-invariant technical
+        string and is skipped: that is a deliberate Xcode mechanism, not a gap.
+
+    A missing catalogue is not a failure: a partial source drop skips it, like the
+    other iOS arms of this tool.
+    """
+    import json
+    catalogues = {}
+    for relative in ("Localizable.xcstrings", "InfoPlist.xcstrings"):
+        path = ROOT / "ios" / "Potillus" / relative
+        if path.exists():
+            catalogues[relative] = json.loads(path.read_text(encoding="utf-8"))["strings"]
+
+    languages = set()
+    for strings in catalogues.values():
+        for entry in strings.values():
+            languages |= set(entry.get("localizations", {}).keys())
+
+    problems = []
+    for relative, strings in catalogues.items():
+        for key, entry in sorted(strings.items()):
+            if entry.get("shouldTranslate") is False:
+                continue
+            missing = languages - set(entry.get("localizations", {}).keys())
+            if missing:
+                problems.append(
+                    f"{relative}: {key!r} is missing "
+                    f"{', '.join(sorted(missing))}"
+                )
+    return problems
+
+
 def main():
     found = offenders()
     for line in found:
@@ -225,10 +280,14 @@ def main():
     plural_problems = plural_placeholder_problems()
     for line in plural_problems:
         print(f"check-l10n: {line}", file=sys.stderr)
-    total = len(found) + len(plural_problems)
+    completeness_problems = catalogue_completeness_problems()
+    for line in completeness_problems:
+        print(f"check-l10n: {line}", file=sys.stderr)
+    total = len(found) + len(plural_problems) + len(completeness_problems)
     if total:
         print(f"check-l10n: {len(found)} unlocalised literal(s), "
-              f"{len(plural_problems)} plural placeholder problem(s)", file=sys.stderr)
+              f"{len(plural_problems)} plural placeholder problem(s), "
+              f"{len(completeness_problems)} incomplete key(s)", file=sys.stderr)
         return 1
     return 0
 

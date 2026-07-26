@@ -339,8 +339,8 @@ this paragraph used to carry — that Kover would first have to report branch
 coverage — was wrong: it had been measuring branches all along, which is what
 let `koverVerify` enforce a BRANCH bound. Only the FIGURE was never printed by
 any run, so it survived here and in `.bestpractices.json` as a quoted "~80%"
-that no one had checked. `koverXmlReport` puts it at 489 of 606 branches,
-80.69%, and the enforced floor was raised from 75 to 80 to match.
+that no one had checked. `koverXmlReport` puts it at 492 of 607 branches,
+81.05%, and the enforced floor was raised from 75 to 80 to match.
 
 ## Working toward OpenSSF Baseline Level 3
 
@@ -445,11 +445,11 @@ second active participant in the project.
   step as the two items above — a second, independent maintainer who can review.
 - **Raise the branch-coverage floor further** (follow-up to
   `test_branch_coverage80`, which is Met). Kover is fully integrated and
-  enforced: statement coverage is ~97% and branch coverage 80.69% (489 of 606
+  enforced: statement coverage is ~97% and branch coverage 81.05% (492 of 607
   branches), with a build-breaking floor (`koverVerify`: LINE >= 90 /
   BRANCH >= 80) wired into the release gate (`make cover-check`). The gold
-  threshold is cleared, but only by 0.69 points: four covered branches lost, or
-  five uncovered ones added, take it under 80 and turn the gate red. The
+  threshold is cleared, but only by 1.05 points: seven covered branches lost, or
+  nine uncovered ones added, take it under 80 and turn the gate red. The
   branches still uncovered sit in Android-/Compose-adjacent code (ViewModel
   `StateFlow` assembly, resource-bound error mapping) that is awkward to
   exercise from JVM unit tests; targeted tests, or a small refactor that makes
