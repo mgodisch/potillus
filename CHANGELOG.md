@@ -46,7 +46,7 @@ Reach iOS parity and harden the release
 
 This version reworks the iOS interaction model to match Apple's own list apps,
 moves the canonical repository to GitLab, absorbs the store-path corrections
-drafted for 0.83.1, folds in two quality-assurance rounds covering both
+drafted for 0.83.1, folds in three quality-assurance rounds covering both
 platforms, and revises the project's own texts.
 
 ### iOS: delete and edit follow the native edit-mode model
@@ -152,7 +152,7 @@ the recipe lives in fdroiddata as `metadata/de.godisch.potillus.yml`.
 
 ### Quality assurance
 
-Two rounds across both platforms. On iOS the Today screen's error alert can be
+Three rounds across both platforms. On iOS the Today screen's error alert can be
 acknowledged, the drink editor accepts comma decimals, and its messages, the
 Settings footers and the edit toggle follow the in-app language. The overflow
 menu wears the More idiom, dirty sheets resist a swipe dismissal, and the lock
@@ -160,7 +160,8 @@ cover shows the device's real unlock glyph.
 
 A Chinese language choice survives an iOS → Android restore. The volume message
 names 5,000 ml on both platforms, the limit the validator enforces. A failed
-export names its reason.
+export names its reason. The iOS CSV export prefixes its formula guard onto a
+field that begins with a Windows line ending, as the Android one does.
 
 The four clock-derived models break their ticker on cancellation and re-check it
 before writing, so none publishes a snapshot after `stop()`. `ReportFormatting`'s

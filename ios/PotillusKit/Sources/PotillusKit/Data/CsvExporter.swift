@@ -71,13 +71,24 @@ import Foundation
 
 public enum CsvExporter {
 
-    /// Characters that make a spreadsheet treat a cell as a FORMULA rather than
-    /// as text.
+    /// Scalars that make a spreadsheet treat a cell as a FORMULA rather than as
+    /// text.
     ///
     /// TAB (0x09) and CR (0x0D) are included because some importers strip a
     /// leading TAB or CR and then re-evaluate the next character, so "\t=1+1"
     /// can still become a formula.
-    private static let formulaTriggers: Set<Character> = ["=", "+", "-", "@", "\t", "\r"]
+    ///
+    /// WHY `Unicode.Scalar` AND NOT `Character`
+    ///   A `Character` is a grapheme cluster, and CR+LF is ONE of them: for a
+    ///   value beginning "\r\n", `raw.first` is the two-scalar cluster, which
+    ///   matches neither "\r" nor "\n" in a `Set<Character>`. The guard then let
+    ///   a Windows line ending carry an unneutralised formula past it, while
+    ///   Kotlin — whose `raw[0]` is a UTF-16 code unit, so plainly CR — guarded.
+    ///   Kotlin is the authority for this format, the same way it is for the
+    ///   name length in `DrinkValidator`, so the comparison is taken one scalar
+    ///   at a time. `test-vectors/csv-export.json` pins the CRLF case for both
+    ///   platforms.
+    private static let formulaTriggers: Set<Unicode.Scalar> = ["=", "+", "-", "@", "\t", "\r"]
 
     /// Assembles the full CSV document: one header row, then one row per entry.
     ///
@@ -153,10 +164,14 @@ public enum CsvExporter {
         rfc4180Quote(neutralizeFormula(raw))
     }
 
-    /// Prepends a single quote when the first character could trigger formula
-    /// evaluation. An empty string has no first character and is returned as is.
+    /// Prepends a single quote when the first scalar could trigger formula
+    /// evaluation. An empty string has no first scalar and is returned as is.
+    ///
+    /// Reads `unicodeScalars.first`, not `first`: see `formulaTriggers` for why
+    /// the grapheme-cluster view is the wrong one here.
     private static func neutralizeFormula(_ raw: String) -> String {
-        guard let first = raw.first, formulaTriggers.contains(first) else { return raw }
+        guard let first = raw.unicodeScalars.first,
+              formulaTriggers.contains(first) else { return raw }
         return "'" + raw
     }
 

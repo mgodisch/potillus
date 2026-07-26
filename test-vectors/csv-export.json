@@ -72,6 +72,11 @@
       "expected": "\"'\r=1+1\""
     },
     {
+      "description": "a leading CRLF is a trigger too, one grapheme or two",
+      "input": "\r\n=1+1",
+      "expected": "\"'\r\n=1+1\""
+    },
+    {
       "description": "hyperlink attack is neutralised",
       "input": "=HYPERLINK(\"http://evil\",\"click\")",
       "expected": "\"'=HYPERLINK(\"\"http://evil\"\",\"\"click\"\")\""
