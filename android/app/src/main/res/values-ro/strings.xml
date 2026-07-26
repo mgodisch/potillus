@@ -115,7 +115,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Greutate corporală</string>
     <string name="pdf_kpi_total">Alcool total</string>
     <string name="pdf_kpi_avg_day">Medie pe zi</string>
-    <string name="pdf_kpi_avg_drink_day">Medie pe zi de băut</string>
+    <string name="pdf_kpi_avg_drink_day">Ø pe zi de băut</string>
     <string name="pdf_kpi_drink_days">Zile de băut</string>
     <string name="pdf_kpi_abstinent_days">Zile de abstinență</string>
     <string name="pdf_kpi_binge">Zile binge (>%1$s g)</string>
@@ -263,9 +263,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Ora zilei</string>
     <string name="stats_weekday">Ziua săptămânii</string>
     <string name="pdf_kpi_median_day">Mediană pe zi</string>
-    <string name="pdf_kpi_median_drink_day">Mediană pe zi de băut</string>
-    <string name="pdf_kpi_avg_drink_days_month">Medie zile de băut/lună</string>
-    <string name="pdf_kpi_median_drink_days_month">Mediană zile de băut/lună</string>
+    <string name="pdf_kpi_median_drink_day">Md pe zi de băut</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø zile de băut/lună</string>
+    <string name="pdf_kpi_median_drink_days_month">Md zile de băut/lună</string>
     <string name="pdf_kpi_max_day">Max. pe zi</string>
     <string name="pdf_kpi_max_7days">Max. în 7 zile</string>
     <string name="lock_app">Blochează aplicația</string>

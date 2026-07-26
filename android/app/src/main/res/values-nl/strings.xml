@@ -81,7 +81,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Lichaamsgewicht</string>
     <string name="pdf_kpi_total">Totaal alcohol</string>
     <string name="pdf_kpi_avg_day">Gem. per dag</string>
-    <string name="pdf_kpi_avg_drink_day">Gem. per drinkdag</string>
+    <string name="pdf_kpi_avg_drink_day">Ø per drinkdag</string>
     <string name="pdf_kpi_drink_days">Drinkdagen</string>
     <string name="pdf_kpi_abstinent_days">Onthoudingsdagen</string>
     <string name="pdf_kpi_binge">Bingedagen (>%1$s g)</string>
@@ -210,9 +210,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Tijdstip</string>
     <string name="stats_weekday">Weekdag</string>
     <string name="pdf_kpi_median_day">Mediaan per dag</string>
-    <string name="pdf_kpi_median_drink_day">Mediaan per drinkdag</string>
-    <string name="pdf_kpi_avg_drink_days_month">Gem. drinkdagen/maand</string>
-    <string name="pdf_kpi_median_drink_days_month">Mediaan drinkdagen/maand</string>
+    <string name="pdf_kpi_median_drink_day">Md per drinkdag</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø drinkdagen/maand</string>
+    <string name="pdf_kpi_median_drink_days_month">Md drinkdagen/maand</string>
     <string name="pdf_kpi_max_day">Max. per dag</string>
     <string name="pdf_kpi_max_7days">Max. per 7 dagen</string>
     <string name="lock_app">App vergrendelen</string>

@@ -106,7 +106,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Вага тіла</string>
     <string name="pdf_kpi_total">Загальний алкоголь</string>
     <string name="pdf_kpi_avg_day">Сер. за день</string>
-    <string name="pdf_kpi_avg_drink_day">Сер. за день вживання</string>
+    <string name="pdf_kpi_avg_drink_day">Ø за день вживання</string>
     <string name="pdf_kpi_drink_days">Дні вживання</string>
     <string name="pdf_kpi_abstinent_days">Дні утримання</string>
     <string name="pdf_kpi_binge">Дні надмірного вживання (>%1$s г)</string>
@@ -254,9 +254,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Час доби</string>
     <string name="stats_weekday">День тижня</string>
     <string name="pdf_kpi_median_day">Медіана за день</string>
-    <string name="pdf_kpi_median_drink_day">Медіана за день вживання</string>
-    <string name="pdf_kpi_avg_drink_days_month">Сер. дні вживання/міс.</string>
-    <string name="pdf_kpi_median_drink_days_month">Медіана дні вживання/міс.</string>
+    <string name="pdf_kpi_median_drink_day">Md за день вживання</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø дні вживання/міс.</string>
+    <string name="pdf_kpi_median_drink_days_month">Md дні вживання/міс.</string>
     <string name="pdf_kpi_max_day">Макс. за день</string>
     <string name="pdf_kpi_max_7days">Макс. за 7 днів</string>
     <string name="lock_app">Заблокувати застосунок</string>

@@ -56,6 +56,12 @@ check-makefile:
 check-report-paper:
 	python3 tools/check-report-paper.py
 
+# check-report-labels: fail if a KPI label needs more room than its tile offers.
+# A wrapped label makes its whole grid row taller, and four rows of that pushed
+# sheet one of the report past the page in Greek, Russian and Italian.
+check-report-labels:
+	python3 tools/check-report-labels.py
+
 # check-l10n: fail if a view holds a user-facing string literal not routed through
 # `Loc.string` -- such a literal would show in the system language, defeating the
 # in-app language picker in that one spot.
@@ -175,9 +181,11 @@ release-check:
 # repo-wide checks it does not include (the UI-literal allow-list and the OpenSSF
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
-check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex
+check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
+              check-report-labels
 
-.PHONY: check-headers check-makefile check-report-paper check-l10n check-l10n-parity \
+.PHONY: check-headers check-makefile check-report-paper check-report-labels check-l10n \
+        check-l10n-parity \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
         check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \
         check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \

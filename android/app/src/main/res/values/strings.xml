@@ -413,11 +413,11 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- PDF KPI: median per day. -->
     <string name="pdf_kpi_median_day">Median per day</string>
     <!-- PDF KPI: median per drinking day. -->
-    <string name="pdf_kpi_median_drink_day">Median per drinking day</string>
+    <string name="pdf_kpi_median_drink_day">Md per drinking day</string>
     <!-- PDF KPI: Ø drinking days per month. -->
     <string name="pdf_kpi_avg_drink_days_month">Ø drinking days/month</string>
     <!-- PDF KPI: median drinking days per month. -->
-    <string name="pdf_kpi_median_drink_days_month">Median drinking days/month</string>
+    <string name="pdf_kpi_median_drink_days_month">Md drinking days/month</string>
     <!-- PDF KPI: maximum in a single day. -->
     <string name="pdf_kpi_max_day">Max per day</string>
     <!-- PDF KPI: maximum in any 7 days. -->

@@ -80,13 +80,13 @@ public struct ReportLabels: Sendable {
     public var kpiAvgPerDay = "Ø per day"
     public var kpiAvgPerDrinkDay = "Ø per drinking day"
     public var kpiMedianPerDay = "Median per day"
-    public var kpiMedianPerDrinkDay = "Median per drinking day"
+    public var kpiMedianPerDrinkDay = "Md per drinking day"
     public var kpiDrinkDays = "Drinking days"
     public var kpiAbstinentDays = "Abstinent days"
     public var kpiMaxPerDay = "Max per day"
     public var kpiMaxPer7Days = "Max per 7 days"
     public var kpiAvgDrinkDaysPerMonth = "Ø drinking days/month"
-    public var kpiMedianDrinkDaysPerMonth = "Median drinking days/month"
+    public var kpiMedianDrinkDaysPerMonth = "Md drinking days/month"
 
     // ── Monthly table ────────────────────────────────────────────────────────
     public var columnMonth = "Month"

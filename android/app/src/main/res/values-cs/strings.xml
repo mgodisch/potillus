@@ -81,7 +81,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Tělesná hmotnost</string>
     <string name="pdf_kpi_total">Celkový alkohol</string>
     <string name="pdf_kpi_avg_day">Prům. za den</string>
-    <string name="pdf_kpi_avg_drink_day">Prům. za den pití</string>
+    <string name="pdf_kpi_avg_drink_day">Ø za den pití</string>
     <string name="pdf_kpi_drink_days">Dny pití</string>
     <string name="pdf_kpi_abstinent_days">Dny abstinence</string>
     <string name="pdf_kpi_binge">Dny binge (>%1$s g)</string>
@@ -214,9 +214,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Denní doba</string>
     <string name="stats_weekday">Den v týdnu</string>
     <string name="pdf_kpi_median_day">Medián za den</string>
-    <string name="pdf_kpi_median_drink_day">Medián za den pití</string>
-    <string name="pdf_kpi_avg_drink_days_month">Prům. dny pití/měs.</string>
-    <string name="pdf_kpi_median_drink_days_month">Medián dny pití/měs.</string>
+    <string name="pdf_kpi_median_drink_day">Md za den pití</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø dny pití/měs.</string>
+    <string name="pdf_kpi_median_drink_days_month">Md dny pití/měs.</string>
     <string name="pdf_kpi_max_day">Max. za den</string>
     <string name="pdf_kpi_max_7days">Max. za 7 dní</string>
     <string name="lock_app">Zamknout aplikaci</string>

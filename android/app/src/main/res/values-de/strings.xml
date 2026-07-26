@@ -241,9 +241,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Tageszeit</string>
     <string name="stats_weekday">Wochentag</string>
     <string name="pdf_kpi_median_day">Median pro Tag</string>
-    <string name="pdf_kpi_median_drink_day">Median pro Trinktag</string>
+    <string name="pdf_kpi_median_drink_day">Md pro Trinktag</string>
     <string name="pdf_kpi_avg_drink_days_month">Ø Trinktage/Monat</string>
-    <string name="pdf_kpi_median_drink_days_month">Median Trinktage/Monat</string>
+    <string name="pdf_kpi_median_drink_days_month">Md Trinktage/Monat</string>
     <string name="pdf_kpi_max_day">Max. pro Tag</string>
     <string name="pdf_kpi_max_7days">Max. pro 7 Tage</string>
     <string name="lock_app">App sperren</string>

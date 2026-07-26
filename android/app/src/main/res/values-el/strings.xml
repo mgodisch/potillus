@@ -81,7 +81,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Σωματικό βάρος</string>
     <string name="pdf_kpi_total">Συνολική αλκοόλη</string>
     <string name="pdf_kpi_avg_day">Μέσος ανά ημέρα</string>
-    <string name="pdf_kpi_avg_drink_day">Μέσος ανά ημέρα κατανάλωσης</string>
+    <string name="pdf_kpi_avg_drink_day">Ø ανά ημέρα κατανάλωσης</string>
     <string name="pdf_kpi_drink_days">Ημέρες κατανάλωσης</string>
     <string name="pdf_kpi_abstinent_days">Ημέρες αποχής</string>
     <string name="pdf_kpi_binge">Ημέρες binge (>%1$s g)</string>
@@ -210,9 +210,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Ώρα ημέρας</string>
     <string name="stats_weekday">Ημέρα εβδομάδας</string>
     <string name="pdf_kpi_median_day">Διάμεσος ανά ημέρα</string>
-    <string name="pdf_kpi_median_drink_day">Διάμεσος ανά ημέρα κατανάλωσης</string>
-    <string name="pdf_kpi_avg_drink_days_month">Μέσος ημέρες κατανάλωσης/μήνα</string>
-    <string name="pdf_kpi_median_drink_days_month">Διάμεσος ημέρες κατανάλωσης/μήνα</string>
+    <string name="pdf_kpi_median_drink_day">Md ανά ημέρα κατανάλωσης</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø ημέρες κατανάλωσης/μήνα</string>
+    <string name="pdf_kpi_median_drink_days_month">Md ημέρες κατανάλωσης/μήνα</string>
     <string name="pdf_kpi_max_day">Μέγ. ανά ημέρα</string>
     <string name="pdf_kpi_max_7days">Μέγ. σε 7 ημέρες</string>
     <string name="lock_app">Κλείδωμα εφαρμογής</string>

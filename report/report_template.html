@@ -126,14 +126,21 @@ apply to it are stated in the accompanying COPYING.md file.
     .meta .v { color: #141414; font-weight: bold; width: 30%; }
 
     /* ---- KPI grid (4 tiles per row) --------------------------------------- */
-    .kpis { display: flex; flex-wrap: wrap; gap: 4pt; }
+    /* The gap, the horizontal padding and the label size together decide how
+       much room a label has: (527pt type area - 3 gaps) / 4 - 2 * padding. At
+       4pt/6pt/7.5pt that was 116.8pt, and five labels across Greek, Russian and
+       Italian needed a second line, which grew the block by 35pt in those
+       languages and pushed sheet one past the page. At 2pt/4pt/6.8pt it is
+       122.2pt and the widest label measures 117pt. tools/check-report-labels.py
+       holds that relation; change one of the three and it recomputes. */
+    .kpis { display: flex; flex-wrap: wrap; gap: 2pt; }
     .kpi {
         flex: 1 1 22%; min-width: 22%;
         background: #f5f7fc; border: .5px solid #dcdcdc;
-        padding: 5pt 6pt; border-radius: 1pt;
+        padding: 5pt 4pt; border-radius: 1pt;
     }
     .kpi .val { color: #1e50a0; font-size: 14pt; font-weight: bold; }
-    .kpi .lab { color: #646464; font-size: 7.5pt; margin-top: 2pt; }
+    .kpi .lab { color: #646464; font-size: 6.8pt; margin-top: 2pt; }
     .kpi.warn { background: #fff0f0; }
     .kpi.warn .val { color: #c83232; }
 

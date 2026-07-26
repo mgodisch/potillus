@@ -81,7 +81,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Masa ciała</string>
     <string name="pdf_kpi_total">Łączny alkohol</string>
     <string name="pdf_kpi_avg_day">Śr. dziennie</string>
-    <string name="pdf_kpi_avg_drink_day">Śr. w dzień spożycia</string>
+    <string name="pdf_kpi_avg_drink_day">Ø w dzień spożycia</string>
     <string name="pdf_kpi_drink_days">Dni spożycia</string>
     <string name="pdf_kpi_abstinent_days">Dni abstynencji</string>
     <string name="pdf_kpi_binge">Dni binge (>%1$s g)</string>
@@ -214,9 +214,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Pora dnia</string>
     <string name="stats_weekday">Dzień tygodnia</string>
     <string name="pdf_kpi_median_day">Mediana dziennie</string>
-    <string name="pdf_kpi_median_drink_day">Mediana w dzień spożycia</string>
-    <string name="pdf_kpi_avg_drink_days_month">Śr. dni spożycia/mies.</string>
-    <string name="pdf_kpi_median_drink_days_month">Mediana dni spożycia/mies.</string>
+    <string name="pdf_kpi_median_drink_day">Md w dzień spożycia</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø dni spożycia/mies.</string>
+    <string name="pdf_kpi_median_drink_days_month">Md dni spożycia/mies.</string>
     <string name="pdf_kpi_max_day">Maks. dziennie</string>
     <string name="pdf_kpi_max_7days">Maks. w 7 dni</string>
     <string name="lock_app">Zablokuj aplikację</string>

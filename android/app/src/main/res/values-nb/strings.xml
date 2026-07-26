@@ -108,7 +108,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Kroppsvekt</string>
     <string name="pdf_kpi_total">Total alkohol</string>
     <string name="pdf_kpi_avg_day">Gj.snitt per dag</string>
-    <string name="pdf_kpi_avg_drink_day">Gj.snitt per drikkedag</string>
+    <string name="pdf_kpi_avg_drink_day">Ø per drikkedag</string>
     <string name="pdf_kpi_drink_days">Drikkdager</string>
     <string name="pdf_kpi_abstinent_days">Avholdsdager</string>
     <string name="pdf_kpi_binge">Binge-dager (>%1$s g)</string>
@@ -252,9 +252,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Tid på dagen</string>
     <string name="stats_weekday">Ukedag</string>
     <string name="pdf_kpi_median_day">Median per dag</string>
-    <string name="pdf_kpi_median_drink_day">Median per drikkedag</string>
-    <string name="pdf_kpi_avg_drink_days_month">Gj.snitt drikkdager/måned</string>
-    <string name="pdf_kpi_median_drink_days_month">Median drikkdager/måned</string>
+    <string name="pdf_kpi_median_drink_day">Md per drikkedag</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø drikkdager/måned</string>
+    <string name="pdf_kpi_median_drink_days_month">Md drikkdager/måned</string>
     <string name="pdf_kpi_max_day">Maks. per dag</string>
     <string name="pdf_kpi_max_7days">Maks. per 7 dager</string>
     <string name="lock_app">Lås appen</string>

@@ -142,6 +142,10 @@ platforms, and revises the project's own texts.
 - `StatsPeriod` sits in the Kotlin domain package.
 - Both reports cut the weekday label to two UTF-16 code units through
   `abbreviateWeekday`.
+- The report's KPI labels read Ø and Md and fit their tile on one line in every
+  language.
+- `tools/check-report-labels.py` measures each KPI label against the tile width
+  the template defines.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
 - CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at
