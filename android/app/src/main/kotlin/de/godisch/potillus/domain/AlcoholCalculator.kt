@@ -110,7 +110,8 @@ object AlcoholCalculator {
      *
      * WHY here (not a generic TimeConstants file)?
      *   Every caller that uses this constant does so as part of an alcohol-related
-     *   elapsed-time calculation (BAC decay, sober-by estimate). Keeping it in
+     *   elapsed-time calculation (the BAC decay in TodayViewModel; the sober-by
+     *   estimate it once also served was removed in v0.78.0). Keeping it in
      *   [AlcoholCalculator] makes the dependency explicit and keeps the constant
      *   close to the formulas it serves.
      */

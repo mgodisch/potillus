@@ -67,6 +67,7 @@ help:
 	@echo "  make bundle           build the release AAB + SBOM"
 	@echo "  make sbom             generate the CycloneDX SBOM only"
 	@echo "  make cover-check      enforce the Kover coverage floor (koverVerify)"
+	@echo "  make cover-figures    print the measured line/branch coverage"
 	@echo "Housekeeping:"
 	@echo "  make clean            remove the Gradle build output (app/build, build)"
 	@echo "  make distclean        clean + the sources a build generates into the tree"
@@ -356,6 +357,18 @@ bundle: prereq $(SBOM)
 cover-check: prereq
 	./gradlew :app:koverVerify
 
+# cover-figures: PRINT the measured coverage instead of only gating on it.
+# koverVerify answers pass/fail and prints no number; koverLog prints LINE only.
+# The XML report is the one artifact that carries the BRANCH counters too, so
+# this target generates it and hands it to tools/kover-summary.py. Kept separate
+# from cover-check because the two answer different questions -- "does it clear
+# the floor?" belongs on the release path, "what is the figure?" in the QA log
+# (see the qa-android battery in the root Makefile), where the percentages the
+# project quotes about itself are supposed to be reproducible.
+cover-figures: prereq
+	./gradlew :app:koverXmlReport
+	python3 ../tools/kover-summary.py
+
 # =============================================================================
 # HOUSEKEEPING
 # =============================================================================
@@ -387,4 +400,4 @@ distclean: clean
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
         debug-apk screenshot-apks unit-tests device-tests lint format deps \
-        sbom release bundle cover-check clean distclean
+        sbom release bundle cover-check cover-figures clean distclean

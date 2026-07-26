@@ -63,18 +63,21 @@ import androidx.compose.ui.graphics.luminance
 
 // ── Shared foundation colour ──────────────────────────────────────────────────
 
-/** RAL 5004 Schwarzblau – the core brand colour used as the base for both themes. */
-val Schwarzblau = Color(0xFF1A1E2B)
-
-/** Slightly lighter variant used for elevated surfaces in the Nacht theme. */
-val SchwarzblauHell = Color(0xFF2D3448)
-
-/** Darker variant used as the Nacht theme's canvas background. */
+/**
+ * RAL 5004 Schwarzblau, darkened – the Nacht theme's canvas.
+ *
+ * The one brand constant the themes below actually read. Two siblings stood
+ * here until the v0.84.0 QA review: `Schwarzblau` (#1A1E2B), which only ever
+ * appears as `ic_launcher_background` in res/values/colors.xml where a Kotlin
+ * constant cannot reach, and `SchwarzblauHell` (#2D3448), which no theme used
+ * at all. Both were removed rather than kept as documentation of a link that
+ * did not exist; the launcher keeps its own hex value, as it must.
+ */
 val SchwarzblauDunkel = Color(0xFF0D1018)
 
 // ── THEME "NACHT" (Dark) ──────────────────────────────────────────────────────
 
-val NachtBackground = Color(0xFF0D1018) // near-black canvas
+val NachtBackground = SchwarzblauDunkel // near-black canvas
 val NachtSurface = Color(0xFF1E2538) // card / sheet surface
 val NachtSurfaceVariant = Color(0xFF252D45) // progress track, chip background
 val NachtOutline = Color(0xFF2A3050) // dividers, borders

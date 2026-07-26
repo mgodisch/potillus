@@ -41,11 +41,13 @@ their drinking habits entirely offline. It requires no invasive device
 permissions—no camera, microphone, or location access—and completely operates
 without network connectivity.
 
-It runs on both **Android** and **iOS**. The two are separate native apps in
-this one repository — Kotlin/Jetpack Compose for Android, Swift/SwiftUI for iOS —
-that share the same design, the same feature set, and a common JSON backup format,
-so a backup exported on one platform imports on the other. Their behaviour is kept
-in lock-step by a shared set of golden test vectors.
+It runs on both **Android** and **iOS**, and is available on
+[F-Droid](https://f-droid.org/packages/de.godisch.potillus). The two are
+separate native apps in this one repository — Kotlin/Jetpack Compose for
+Android, Swift/SwiftUI for iOS — that share the same design, the same feature
+set, and a common JSON backup format, so a backup exported on one platform
+imports on the other. Their behaviour is kept in lock-step by a shared set of
+golden test vectors.
 
 ### Key Features
 
@@ -65,8 +67,7 @@ in lock-step by a shared set of golden test vectors.
     toward the preceding evening, and an evaluation start date for a clean
     restart.
 
-A User's Guide is available inside the app, which can be installed from
-[F-Droid](https://f-droid.org/packages/de.godisch.potillus).
+A User's Guide is available inside the app.
 
 ## Quick start
 

@@ -259,6 +259,19 @@ GitLab's free plan has no push rule that rejects unsigned commits, so commit
 signing is documented as a policy enforced at review; `main` stays protected
 server-side.
 
+### QA round (0.84.0): log figures and documentation fixes
+
+`make qa-android` records the plugin behind each Gradle deprecation and the
+measured line and branch coverage; `make -C android cover-figures` prints the
+coverage figures alone. The comment-language gate reads the Kotlin test sources.
+
+`docs/NOTICES.md` describes the four CJK sample reports as Type 3 glyph
+outlines rather than an embedded font subset, and names the two transitively
+bundled `kotlin-parcelize` artifacts. Five `.bestpractices.json` answers
+describe both platforms. `Color.kt` keeps the one brand constant
+`NachtBackground` reads, the `MILLIS_PER_HOUR` KDoc names its one caller, and
+`app/build.gradle.kts` states that `report/` is an asset root.
+
 ### QA round (0.84.0): review findings and fixes
 
 The Today screen's error alert could not be acknowledged on iOS: `failure` was

@@ -107,6 +107,17 @@ check_no_german_comments() {
     matches=$(
         {
             grep -rn --include='*.kt' "//\|^\s*\*" "$SOURCE_ROOT" || true
+            # The Kotlin TEST sources. They were the last file class this gate
+            # could not see, while its Swift arm -- which walks ../ios wholesale
+            # -- had been reading PotillusKitTests, PotillusTests and
+            # PotillusUITests all along: 69 Kotlin files held to a convention
+            # that 42 Swift files were already checked against. Both roots are
+            # guarded, so a partial source drop skips them, like the ios, tools
+            # and make arms below.
+            for kotlin_tests in app/src/test app/src/androidTest; do
+                [[ -d "$kotlin_tests" ]] || continue
+                grep -rn --include='*.kt' "//\|^\s*\*" "$kotlin_tests" || true
+            done
             grep -n "//" build.gradle.kts settings.gradle.kts app/build.gradle.kts \
                 2>/dev/null || true
             grep -n "#" Makefile 2>/dev/null || true

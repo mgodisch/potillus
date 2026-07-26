@@ -42,7 +42,10 @@ under the Apache License, Version 2.0
   JetBrains s.r.o. and contributors: the Kotlin standard library,
   `org.jetbrains.kotlinx:kotlinx-serialization-core`, the
   `org.jetbrains.kotlinx:kotlinx-coroutines` runtime pulled in transitively,
-  and the `org.jetbrains:annotations` artifact.
+  the `org.jetbrains:annotations` artifact, and
+  `org.jetbrains.kotlin:kotlin-parcelize-runtime` with its own
+  `org.jetbrains.kotlin:kotlin-android-extensions-runtime`, both pulled in
+  transitively by `androidx.datastore:datastore-core-android`.
 - **Okio** &mdash; Copyright &copy; Square, Inc.: `com.squareup.okio:okio`,
   pulled in transitively by `androidx.datastore:datastore-preferences`.
 - **Guava ListenableFuture** &mdash; Copyright &copy; The Guava Authors
@@ -231,13 +234,19 @@ WebView picks one family per document, it does not mix them:
   (Copyright &copy; The Roboto Project Authors; Apache License 2.0,
   <[https://github.com/googlefonts/roboto-classic](https://github.com/googlefonts/roboto-classic)>),
   as `Roboto-Regular` and `Roboto-Bold`.
-- The `ja`, `ko`, `zh-CN` and `zh-TW` files embed **Noto Sans CJK** (Copyright
-  &copy; Google LLC and Adobe; SIL Open Font License 1.1) — the script-specific
-  faces `NotoSansCJK{jp,kr,sc,tc}-Regular` — and **no Roboto**.
+- The `ja`, `ko`, `zh-CN` and `zh-TW` files embed **no font program at all**.
+  Where the text is CJK, the WebView falls back to writing Type 3 fonts — glyph
+  drawing procedures held in the page itself, with no `FontFile` stream and no
+  embedded typeface — so what these four documents carry are outlines of
+  characters set in **Noto Sans CJK** (Copyright &copy; Google LLC and Adobe;
+  SIL Open Font License 1.1) rather than a subset of the face.  They carry **no
+  Roboto** either.
 
-Both licenses explicitly permit embedding subsets in documents.  These PDFs are
-repository and store-listing assets and are **not** distributed inside the
-application package.
+The Roboto license explicitly permits embedding subsets in documents, and the
+Type 3 case does not redistribute a font at all — an outline drawn into a
+document is not the typeface.  All of these PDFs are repository and
+store-listing assets and are **not** distributed inside the application
+package.
 
 ### Inter font (build tooling only)
 

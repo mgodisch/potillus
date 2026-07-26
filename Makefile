@@ -302,14 +302,26 @@ endef
 # and the release runtime dependency tree (`make -C android deps`) -- the
 # licensing-audit input. The environment step records the toolchain first, so
 # the log is self-describing.
+#
+# Two steps exist to put a NUMBER in the log where the console gives none.
+# `problems-report` attributes each Gradle deprecation to the plugin that
+# causes it, which the console strips and deduplicates away; it runs directly
+# after the build that writes the report. `coverage-figures` prints the
+# measured line and branch percentages, which koverVerify's pass/fail does not,
+# so the figures the project quotes about itself in .bestpractices.json and
+# docs/ROADMAP.md are re-measurable from one run. Both are REPORTING steps: they
+# record and never fail the battery over what they find. The iOS side needs no
+# counterpart -- tools/check-ios-coverage.py already prints its percentage.
 qa-android:
 	@log="qa-android.log"
 	$(QA_PROLOGUE)
 	qa_step environment bash -c 'uname -a; $(MAKE) --version | sed -n 1p; java -version 2>&1; python3 --version'
 	qa_step debug-apk $(MAKE) -C android debug-apk
+	qa_step problems-report python3 tools/problems-report.py
 	qa_step unit-tests $(MAKE) -C android unit-tests
 	qa_step lint $(MAKE) -C android lint
 	qa_step cover-check $(MAKE) -C android cover-check
+	qa_step coverage-figures $(MAKE) -C android cover-figures
 	qa_step check-guides $(MAKE) -C android check-guides
 	qa_step check-static $(MAKE) check-static
 	qa_step release-check $(MAKE) release-check

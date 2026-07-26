@@ -513,6 +513,14 @@ android {
         //   unchanged: the merged asset root still contains report_template.html,
         //   so `context.assets.open("report_template.html")` needs no edit.
         //
+        //   THE DIRECTORY IS AN ASSET ROOT, NOT A FOLDER. Every file placed in
+        //   report/ is packaged into the APK by this line, which is why it holds
+        //   exactly one file and must keep holding only what the app is meant to
+        //   ship. Shared artifacts the app does NOT bundle -- the golden vectors,
+        //   say -- belong in test-vectors/ instead. iOS takes the file singly
+        //   (`../report/report_template.html` in ios/project.yml), so the
+        //   asymmetry is deliberate: one file, two bundling mechanisms.
+        //
         //   $projectDir is android/app, so the repository root is two levels up.
         getByName("main") {
             assets.directories += "$projectDir/../../report"
