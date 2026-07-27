@@ -282,7 +282,7 @@ release-ios:
 		team="$$(sed -n 's/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*//p' ios/signing.properties | head -n 1)"; \
 	fi
 	if [ -z "$$team" ] || [ "$$team" = "XXXXXXXXXX" ]; then \
-		echo "release-ios: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
+		echo "release-ios: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see CONTRIBUTING.md §7)." >&2; \
 		exit 1; \
 	fi
 	# Enforce the pinned major Xcode version, hard -- like the android/ Java-21 gate.

@@ -564,7 +564,7 @@ check and follow each store's own format:
   `description.txt` (≤4000), `release_notes.txt`, plus the support/marketing/
   privacy URLs. Global files (`copyright.txt`, `primary_category.txt`,
   `secondary_category.txt`, `review_information/`) sit at the top of that tree.
-  Read by `fastlane deliver` (see [`docs/RELEASE-IOS.md`](docs/RELEASE-IOS.md)).
+  Read by `fastlane deliver` (the `make push-appstore-*` targets).
   Locale codes follow App Store Connect, which differs from Android in a few
   cases (`no`, `zh-Hans`, `zh-Hant`, `pt-PT`, `pt-BR`).
 
@@ -583,9 +583,8 @@ welcome through the same issue/PR path as the in-app strings.
 **Versioning.** The version string is three-part `MAJOR.MINOR.PATCH`. Routine
 changes (fixes, small improvements) bump the PATCH component; larger feature sets
 bump MINOR. `versionCode` in `build.gradle.kts` increases by at least 1 every
-release. `versionName`, the top `CHANGELOG.md` entry, the `README.md` title and
-the `proguard-rules.pro` header must always carry the same string — `release-check.sh`
-§1 enforces this.
+release. `versionName`, the top `CHANGELOG.md` entry and the `README.md` title
+must always carry the same string — `release-check.sh` §1 enforces this.
 
 **Changelog.** `CHANGELOG.md` is forward-only: it begins at the published baseline
 and records what changes from there. It is deliberately *not* the home of design

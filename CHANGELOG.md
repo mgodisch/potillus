@@ -101,6 +101,7 @@ platforms, and revises the project's own texts.
   the version `.gitlab-ci.yml` pins.
 - Four store targets, `push-{playstore,appstore}-{testing,production}`, for Play
   open testing, Play production, TestFlight and the App Store listing.
+- `VALIDATE_ONLY=1` on the Play targets, a dry run against the Play API.
 - Every store upload stops short of review: Play releases arrive as drafts,
   TestFlight builds reach no tester group, App Store versions await submission.
 - The iOS TestFlight lane is `testing`, uploading without tester distribution.
@@ -181,8 +182,9 @@ platforms, and revises the project's own texts.
   that exists.
 - `check-l10n.py` holds every key of both String Catalogs to every language they
   ship.
-- CONTRIBUTING.md §6.2 carries the store-metadata conventions and points at
-  `docs/RELEASE-IOS.md`.
+- CONTRIBUTING.md §6.2 carries the store-metadata conventions.
+- The fastlane and make files point at CONTRIBUTING.md §7 for the release path.
+- CONTRIBUTING.md §7 names the three places that carry the version string.
 - Merging a backup on iOS leaves the local settings alone, as on Android.
 - A fresh Android install starts at 80 g per week over four drink days, every
   first-run default reading from `AppSettings`.

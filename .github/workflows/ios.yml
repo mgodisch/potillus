@@ -40,7 +40,7 @@
 #   Like every workflow here, this cannot block a merge request on GitLab. It
 #   holds no signing identity and produces no shippable artifact
 #   (CODE_SIGNING_ALLOWED=NO comes from the Makefile's own build recipe).
-#   Releases stay where docs/RELEASE-IOS.md puts them.
+#   Releases stay where CONTRIBUTING.md §7 puts them.
 #
 # SEE ALSO
 #   docs/MIRROR-CHECKS.md -- scope, limits, and the repository settings assumed.

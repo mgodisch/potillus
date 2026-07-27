@@ -404,7 +404,7 @@ def main():
         elif stamped is None:
             problems.append(
                 "release_notes.versions: missing -- it records the version each "
-                "locale's release_notes.txt is translated for (see docs/RELEASE-IOS.md)"
+                "locale's release_notes.txt is translated for (see CONTRIBUTING.md §6.2)"
             )
         else:
             for locale in locales:

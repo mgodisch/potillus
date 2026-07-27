@@ -67,7 +67,7 @@ project:
         documentation, and the release tooling.
   documentation:
     code-of-conduct: https://gitlab.com/godisch/potillus/-/blob/main/docs/CODE_OF_CONDUCT.md
-    release-process: https://gitlab.com/godisch/potillus/-/blob/main/docs/RELEASE-IOS.md
+    release-process: https://gitlab.com/godisch/potillus/-/blob/main/CONTRIBUTING.md#7-versioning--release-checklist
   vulnerability-reporting:
     reports-accepted: true
     bug-bounty-available: false

@@ -102,6 +102,17 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 # validates the upload against the Play API without changing anything on Google
 # Play (supply's validate_only). Use it to exercise credentials and metadata
 # safely.
+#
+# WHICH VALUES COUNT. The switch is decided by $(filter ...) against a fixed list
+# rather than by whether VALIDATE_ONLY is set to anything at all. A bare
+# $(if $(VALIDATE_ONLY),...) reads VALIDATE_ONLY=0 and VALIDATE_ONLY=false as a
+# request for the dry run -- the one reading under which a maintainer who spells
+# out "no dry run" gets no upload and a success report for it. An unrecognised
+# value is therefore neither ignored nor guessed at: the target below stops and
+# says so, because both possible guesses are wrong in a way the caller cannot see
+# from the output.
+PLAY_VALIDATE_ONLY := $(filter 1 true yes,$(VALIDATE_ONLY))
+
 # Expected release signing-key fingerprint (SHA-256 of the DER signing
 # certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
 # "Verifying releases" section rather than duplicated here, so the pin and the
@@ -170,6 +181,10 @@ PLAY_JSON_KEY := $(abspath $(if $(SUPPLY_JSON_KEY),$(SUPPLY_JSON_KEY),fastlane/p
 push-playstore-testing:    PLAY_LANE := testing
 push-playstore-production: PLAY_LANE := production
 push-playstore-testing push-playstore-production:
+	# 0) VALIDATE_ONLY, if given at all, must be a value this target recognises.
+	#    First, because a typo here decides between a dry run and a real upload,
+	#    and that is the one thing the caller must not learn from the outcome.
+	@test -n "$(PLAY_VALIDATE_ONLY)" || test -z "$(VALIDATE_ONLY)" || { echo "$@: VALIDATE_ONLY='$(VALIDATE_ONLY)' is not a value this target recognises -- pass VALIDATE_ONLY=1 (or true, or yes) for the non-publishing dry run, and leave it unset to upload." >&2; exit 1; }
 	# 1) staged AAB must exist (never builds/stages)
 	@test -f "$(STAGED_AAB)" || { echo "$@: staged AAB not found at '$(STAGED_AAB)' -- run 'make release-android' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
 	# 2) release tag must exist locally and on the push remote
@@ -198,8 +213,13 @@ push-playstore-testing push-playstore-production:
 	*"Successfully established connection to Google Play Store"*) ;; \
 	*) echo "$$out" >&2; echo "$@: the Play service-account key at '$(PLAY_JSON_KEY)' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1;; \
 	esac
-	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir)
-	( cd fastlane && bundle exec fastlane $(PLAY_LANE) aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
+	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir).
+	#    The PLATFORM is named explicitly, as on the App Store side. Both platforms
+	#    define lanes called `testing` and `production`, and what keeps this line
+	#    pointed at the Android pair is `default_platform(:android)` in the Fastfile
+	#    -- a setting several lines of a different file away, whose removal would
+	#    silently send a Play upload into the iOS lane. Naming it costs one word.
+	( cd fastlane && bundle exec fastlane android $(PLAY_LANE) aab:"$(STAGED_AAB)" $(if $(PLAY_VALIDATE_ONLY),validate_only:true) )
 
 # ── the two App Store targets ── the iOS counterpart of the Play pair: upload the
 # STAGED .ipa to App Store Connect via the fastlane lane named in IOS_LANE. Never
@@ -311,11 +331,17 @@ push-appstore-testing push-appstore-production: push-appstore-preflight
 		team="$$(awk 'seen == 0 && sub(/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*/, "") { print; seen = 1 }' ios/signing.properties)"; \
 	fi
 	if [ -z "$$team" ] || [ "$$team" = "XXXXXXXXXX" ]; then \
-		echo "$@: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
+		echo "$@: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see CONTRIBUTING.md §7)." >&2; \
 		exit 1; \
 	fi
 	# Unpack the staged .ipa so codesign and plutil can see the .app inside. The
 	# trap fires on every exit path, so the temp tree never survives the recipe.
+	# `unzip` is required rather than assumed: it is the one tool in this recipe
+	# that macOS could be without (the others, codesign and plutil, ship with the
+	# developer tools this target already presumes), and without the check its
+	# absence arrives as a bare "command not found" in the middle of a signature
+	# check, which reads like a broken .ipa rather than a missing package.
+	@command -v unzip >/dev/null || { echo "$@: 'unzip' not found -- it is what opens the staged .ipa so the identity and signature checks below can read the .app inside." >&2; exit 1; }
 	work="$$(mktemp -d)"
 	trap 'rm -rf "$$work"' EXIT
 	unzip -q "$(STAGED_IPA)" -d "$$work"
@@ -375,7 +401,7 @@ push-appstore-testing push-appstore-production: push-appstore-preflight
 push-appstore-preflight:
 	@for v in APP_STORE_CONNECT_API_KEY_KEY_ID APP_STORE_CONNECT_API_KEY_ISSUER_ID APP_STORE_CONNECT_API_KEY_KEY_FILEPATH; do \
 		eval "val=\$${$$v:-}"; \
-		test -n "$$val" || { echo "push-appstore-preflight: $$v is not set -- the App Store Connect API key is injected through the three APP_STORE_CONNECT_API_KEY_* variables (see fastlane/Fastfile, iOS block, and docs/RELEASE-IOS.md)." >&2; exit 1; }; \
+		test -n "$$val" || { echo "push-appstore-preflight: $$v is not set -- the App Store Connect API key is injected through the three APP_STORE_CONNECT_API_KEY_* variables (see fastlane/Fastfile, iOS block, and CONTRIBUTING.md §7)." >&2; exit 1; }; \
 	done
 	@test -f "$$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH" || { echo "push-appstore-preflight: the API key file '$$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH' (APP_STORE_CONNECT_API_KEY_KEY_FILEPATH) does not exist." >&2; exit 1; }
 	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore-preflight: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }

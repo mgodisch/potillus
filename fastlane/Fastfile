@@ -58,7 +58,7 @@
 # below. That file is not kept: it restated a fraction of what those `desc` blocks
 # already say, drifted out of date between runs, and needed an exemption from the
 # GPL-header gate. The lanes are documented by the `desc` blocks below and by
-# docs/RELEASE-IOS.md; `bundle exec fastlane lanes` lists them on demand, and
+# CONTRIBUTING.md §7; `bundle exec fastlane lanes` lists them on demand, and
 # `bundle exec fastlane docs` still writes the file for anyone who wants it.
 skip_docs
 
@@ -222,13 +222,12 @@ platform :ios do
   # API key in the environment actually authenticates AND that this app's record is
   # reachable with it. The Android counterpart of this guard lives in the Makefile
   # (the `push-playstore-*` targets run `fastlane run validate_play_store_json_key`),
-# because
-  # supply's key is a plain file path and fastlane's CLI takes it as a string. The
-  # iOS credential cannot travel that way: `app_store_connect_api_key` returns a
-  # HASH, and fastlane's `run` CLI supports only primitive types -- "Hashes are not
-  # currently supported" (docs.fastlane.tools). So the check lives HERE, in Ruby,
-  # where the hash is passed directly, and both `push-appstore-*` targets call this
-# lane.
+  # because supply's key is a plain file path and fastlane's CLI takes it as a
+  # string. The iOS credential cannot travel that way: `app_store_connect_api_key`
+  # returns a HASH, and fastlane's `run` CLI supports only primitive types -- "Hashes
+  # are not currently supported" (docs.fastlane.tools). So the check lives HERE, in
+  # Ruby, where the hash is passed directly, and both `push-appstore-*` targets call
+  # this lane.
   #
   # `app_store_build_number` is a read-only App Store Connect query, which makes it
   # a cheap, side-effect-free way to exercise the whole path: the key file, the key
@@ -291,7 +290,7 @@ platform :ios do
       # distribution there is no "what to test" note to set either; the group's
       # testers see the one entered beside that decision. The Beta App Review
       # contact and beta app description are curated once in App Store Connect
-      # (see docs/RELEASE-IOS.md).
+      # (see CONTRIBUTING.md §7).
       distribute_external: false,
 
       # WAIT for processing rather than returning the moment the upload finishes.
