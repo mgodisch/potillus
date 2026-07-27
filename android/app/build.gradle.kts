@@ -503,8 +503,8 @@ android {
     //   fails with "Cannot find the schema file in the assets folder".
     sourceSets {
         // THE REPORT TEMPLATE LIVES ABOVE BOTH PLATFORMS.
-        //   report/report_template.html is read by Android's PdfReportBuilder and,
-        //   once the port lands, by the iOS report renderer. It defines the PDF's
+        //   report/report_template.html is read by Android's PdfReportBuilder and
+        //   by the iOS report renderer. It defines the PDF's
         //   layout: its placeholders and repeat blocks are the contract between
         //   the two. Keeping one copy means a layout fix is made once, and the
         //   two platforms cannot silently drift apart.

@@ -54,6 +54,12 @@ Edit drinks from the list's edit mode
 - The `api` scope and the Maintainer role required of the GitLab token.
 - A TestFlight upload reaches the internal testers without a further act.
 - Play's native-debug-symbols warning stays unanswered, with the reason.
+- The export dialog offers the visible period when no start date is set.
+- The build script's report-template note names the iOS renderer.
+
+### Fixed
+
+- The gram-limit bars turn red only past the limit, on iOS as on Android.
 
 ---
 
