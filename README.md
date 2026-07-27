@@ -35,54 +35,58 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## About the App (v0.85.0)
 
-**Libellus Potionis** is a privacy-first, free, open-source, and ad-free
-alcohol consumption tracker designed to help users monitor, pace, and manage
-their drinking habits entirely offline. It requires no invasive device
-permissions—no camera, microphone, or location access—and completely operates
-without network connectivity.
+**Libellus Potionis** is a privacy-first, open-source, free and ad-free alcohol
+consumption tracker designed to help users monitor, pace, and manage their
+drinking habits entirely offline. It requires no invasive device permissions—no
+camera, microphone, or location access—and operates completely without network
+connectivity.
 
 It runs on both **Android** and **iOS**, and is available on
-[F-Droid](https://f-droid.org/packages/de.godisch.potillus). The two are
-separate native apps in this one repository — Kotlin/Jetpack Compose for
-Android, Swift/SwiftUI for iOS — that share the same design, the same feature
-set, and a common JSON backup format, so a backup exported on one platform
-imports on the other. Their behaviour is kept in lock-step by a shared set of
-golden test vectors.
+[F-Droid](https://f-droid.org/packages/de.godisch.potillus), on [Google Play
+(Beta)](https://play.google.com/store/apps/details?id=de.godisch.potillus), and
+on the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK). Libellus
+Potionis consists of two separate native apps in this one repository —
+Kotlin/Jetpack Compose for Android, Swift/SwiftUI for iOS — that share the same
+design, the same feature set, and a common JSON backup format, so a backup
+exported on one platform imports on the other. Their behaviour is kept in
+lock-step by a shared set of golden test vectors.
 
-### Key Features
+## Key Features
 
 *   Logging: predefine custom beverages or use internationally common presets.
     Log drinks instantly or retroactively with precise timestamp corrections.
-*   Concurrent limits: set three boundaries at once — a daily limit in grams of
+*   Concurrent limits: set three boundaries at once: a daily limit in grams of
     pure alcohol, a rolling 7-day limit in grams, and a maximum number of
-    drinking days per week. Each has its own progress bar.
+    drinking days per week. Each limit has its own progress bar.
 *   Blood alcohol concentration (BAC): enter your body weight to get a live
     estimate from the Widmark formula.
 *   Counseling reports: generate a two-page PDF report of your consumption for
     a counseling appointment.
 *   Data portability: export the dataset as a CSV file for external processing
-    (e.g. in LibreOffice Calc), or create JSON backups to move data between
-    devices.
+    (e.g. in [LibreOffice](https://www.libreoffice.org/) Calc), or create JSON
+    backups to move data between devices.
 *   Adjustments: set your own "day start" time, so that late-night drinks count
     toward the preceding evening, and an evaluation start date for a clean
     restart.
 
-A User's Guide is available inside the app.
-
 ## Quick start
 
 1. Install Libellus Potionis from
-   [F-Droid](https://f-droid.org/packages/de.godisch.potillus).
-2. Log your first drink. Open the app; on the Today screen, tap the plus button
-   and pick a common preset, or define your own beverage. It is logged
-   instantly, and you can correct the timestamp for a drink you had earlier.
+   [F-Droid](https://f-droid.org/packages/de.godisch.potillus), [Google Play
+   (Beta)](https://play.google.com/store/apps/details?id=de.godisch.potillus),
+   or from the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK).
+2. Log your first drink. Open the app: on the Today screen, tap the plus button
+   and pick a beverage. It is logged instantly, and on the Calendar screen you
+   can correct and add drinks you had earlier.
 3. See where you stand. The Today screen shows the grams of pure alcohol you
    have consumed today, your progress toward the daily and rolling 7-day limits
    as bars, and your drinking-days count for the week.
-4. Optional: personalize. In Settings you can set the daily, weekly and
+4. Optional: Edit the presets or define your own beverages on the drinks
+   screen.
+5. Optional: Personalize. In Settings you can set the daily, weekly and
    drinking-days limits, enter your body weight for a live blood-alcohol (BAC)
    estimate, and enable the fingerprint lock.
-5. Optional: export. Generate a two-page PDF report for a counseling
+6. Optional: Export. Generate a two-page PDF report for a counseling
    appointment, export a CSV for a spreadsheet, or create a JSON backup to move
    your data to another device.
 
@@ -92,28 +96,20 @@ The in-app User's Guide describes every screen.
 
 Feedback, bug reports, and enhancement requests are welcome. The preferred
 channel is the issue tracker of the canonical repository at
-[GitLab](https://gitlab.com/godisch/potillus/-/issues); if you would rather
-not use the tracker, you may instead write to
-[android@godisch.de](mailto:android@godisch.de).
+[GitLab](https://gitlab.com/godisch/potillus/-/issues); if you would rather not
+use the tracker, you may instead write to
+[android@godisch.de](mailto:android@godisch.de) or
+[ios@godisch.de](mailto:ios@godisch.de). To report a security vulnerability,
+please do **not** open a public issue. Instead, follow the private,
+PGP-encrypted reporting process described in [SECURITY.md](SECURITY.md).
 
-Code and documentation contributions are welcome too. The contribution
-process — how changes are proposed and reviewed, together with the
-architecture, coding, testing, and release conventions a change must follow —
-is documented in
-[CONTRIBUTING.md](https://gitlab.com/godisch/potillus/-/blob/main/CONTRIBUTING.md).
+Code and documentation contributions are welcome too. The contribution process
+— how changes are proposed and reviewed, together with the architecture,
+coding, testing, and release conventions a change must follow — is documented
+in [CONTRIBUTING.md](CONTRIBUTING.md). All participants are expected to follow
+the project's [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
-All participants are expected to follow the project's
-[Code of Conduct](https://gitlab.com/godisch/potillus/-/blob/main/docs/CODE_OF_CONDUCT.md).
-
-## Security
-
-To report a security vulnerability, please do **not** open a public issue.
-Instead, follow the private, PGP-encrypted reporting process described in
-[SECURITY.md](https://gitlab.com/godisch/potillus/-/blob/main/SECURITY.md).
-
-## Technical Aspects
-
-### Privacy & Security Architecture
+## Privacy & Security Architecture
 
 The app stores only what you enter. On Android it holds no network permission,
 so it is incapable of network access; on iOS, where there is no equivalent
@@ -126,18 +122,19 @@ synchronization.
 
 The app's full privacy policy — detailing exactly what is stored on the device
 and confirming that nothing is ever transmitted — is available in
-[PRIVACY.md](https://gitlab.com/godisch/potillus/-/blob/main/PRIVACY.md).
+[PRIVACY.md](PRIVACY.md).
 
-### Platform Compatibility
+## Platform Compatibility
 
 The app runs on **Android 11 (API 30) and newer** and on **iOS 17 and newer**.
 
 Android API 30 is a deliberate floor: it is the lowest level at which the app
 can save CSV, PDF, and backup files to the public `Downloads` folder via
 `MediaStore` *without* requesting any runtime storage permissions, which keeps
-the minimal-permission profile intact. The system-level per-app language picker
-is restricted to API 33+, so the app carries its own language selector, which
-works on every supported version.
+the minimal-permission profile intact. The hardware floor that follows is e.g.
+Google Pixel 5 or Samsung Galaxy S21 and later. The system-level per-app
+language picker requires API 33+, so the app carries its own language selector,
+which works on every supported version.
 
 iOS 17 is a deliberate floor as well: it is where the SwiftUI Observation
 framework and String Catalog localisation the app relies on became available,
@@ -152,8 +149,8 @@ age rating. Where the app is offered through the commercial stores, the two
 consoles ask different questions and reach very different age ratings for the
 same app — Apple's App Store at **18+**, Google Play at **3+** — because one
 rates the *content* (a catalogue of alcoholic drinks) and the other the
-*purpose* (a harm-reduction tool that neither sells nor promotes anything). What
-each store asked, what was answered, and why is recorded in
+*purpose* (a harm-reduction tool that neither sells nor promotes anything).
+What each store asked, what was answered, and why is recorded in
 [`docs/STORE_RATINGS.md`](docs/STORE_RATINGS.md).
 
 The app is tested on a Google Pixel 10 Pro running
@@ -161,7 +158,7 @@ The app is tested on a Google Pixel 10 Pro running
 an iPhone 16e and an iPhone SE (3rd generation), both running iOS 26, and on
 Android and iPhone emulators.
 
-### Accessibility
+## Accessibility
 
 Libellus Potionis follows Android accessibility best practices: every
 interactive control carries a screen-reader (TalkBack) name — including the
@@ -172,24 +169,26 @@ blue vs. red (not a red/green pair) so it is colour-blind distinguishable. A
 release-check gate (§13) keeps interactive icons from silently losing their
 labels.
 
-On iOS the same principles apply through the platform's own facilities: controls
-carry VoiceOver labels, text scales with Dynamic Type, the layout mirrors for
-right-to-left languages, and the same blue-vs-red limit palette is used.
+On iOS the same principles apply through the platform's own facilities:
+controls carry VoiceOver labels, text scales with Dynamic Type, the layout
+mirrors for right-to-left languages, and the same blue-vs-red limit palette is
+used.
 
 **No formal WCAG conformance level is claimed and no W3C conformance logo is
-used**, because a conformance claim requires meeting *all* criteria of a level
-under a thorough human evaluation (which has not been done), there are known
-open Level AA items, and the W3C logos are scoped to web pages rather than a
-native app. The concrete, measured accessibility gaps and the path toward WCAG
-2.2 Level AA are tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility).
+used**, because a conformance claim requires meeting all criteria of a level
+under a thorough human evaluation, which has not yet been performed.
+Additionally, there are known open Level AA items, and W3C logos are scoped to
+web pages rather than native apps. The concrete, measured accessibility gaps
+and the path toward WCAG 2.2 Level AA are tracked in
+[`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility).
 
-### Build Infrastructure & Tooling
+## Build Infrastructure & Tooling
 
 To build the app from source, follow the step-by-step guides that take a blank
 operating system to a runnable debug build:
-[docs/INSTALL-ANDROID.md](docs/INSTALL-ANDROID.md) (debug APK from a fresh Debian GNU/Linux
-install) and [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md) (debug build in the iPhone Simulator
-from a fresh macOS install).
+[docs/INSTALL-ANDROID.md](docs/INSTALL-ANDROID.md) (debug APK from a fresh
+Debian GNU/Linux install) and [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md) (debug
+build in the iPhone Simulator from a fresh macOS install).
 
 The Android build runs on the current Android Gradle Plugin, Gradle and Kotlin
 compiler line. Annotation processing goes through KSP, which Room uses to
@@ -207,12 +206,13 @@ deprecated crypto wrapper. Core library desugaring makes the `java.time` API
 behave the same down to API 30, independently of the device's ART module
 revision. Tests use the Jetpack test libraries and Turbine.
 
-The exact, pinned versions are deliberately left out of this document so it does
-not drift on every dependency bump; they live in the Gradle build files —
-`android/gradle/libs.versions.toml` and the module `build.gradle.kts` — which are
+The exact, pinned versions are deliberately left out of this document so it
+does not drift on every dependency bump; they live in the Gradle build files —
+[`android/gradle/libs.versions.toml`](android/gradle/libs.versions.toml) and
+the module [`android/build.gradle.kts`](android/build.gradle.kts) — which are
 the single source of truth.
 
-### Source Code Documentation
+## Source Code Documentation
 
 The source code is written to be read. Every file opens with a header stating
 its purpose, and every public type and function carries a doc comment that
@@ -225,20 +225,16 @@ missing file headers or undocumented public functions, so the documentation
 cannot rot silently as the code changes. The same gate enforces version
 consistency across the release artifacts and rejects non-English prose in the
 source. It runs as its own CI job on every pipeline, in the `make qa-android`
-battery, and again with `--release` before a release artifact is staged. The
-daily `make android` run deliberately leaves it out — that one builds the APK
-and gates on the unit tests, lint, `check-guides` and the l10n parity check — so
-the full invariant gate never sits in an edit-compile-run loop.
+and `make qa-ios` batteries, and again with `--release` before a release
+artifact is staged. The daily `make android` and `make ios` runs deliberately
+leave it out — these build the APK/IPA and run the unit tests, lint,
+`check-guides` and the l10n parity check — so the full invariant gate never
+sits in an edit-compile-run loop.
 
-### Changes
-
-Changes are documented in
-[CHANGELOG.md](https://gitlab.com/godisch/potillus/-/blob/main/CHANGELOG.md).
-
-### Roadmap
+Changes are documented in [CHANGELOG.md](CHANGELOG.md).
 
 The project's intended direction and its explicit non-goals are described in
-[ROADMAP.md](https://gitlab.com/godisch/potillus/-/blob/main/docs/ROADMAP.md).
+[ROADMAP.md](ROADMAP.md).
 
 ## AI Involvement
 
@@ -251,8 +247,8 @@ evaluating its suitability for their own use.
 
 ## License
 
-Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright
-&copy; 2026 Martin A. Godisch <[martin@godisch.de](mailto:martin@godisch.de)>
+Libellus Potionis - Privacy-Friendly Alcohol Tracker, Copyright &copy; 2026
+Martin A. Godisch <[martin@godisch.de](mailto:martin@godisch.de)>
 
 The source code can be found at the [canonical repository at
 gitlab.com](https://gitlab.com/godisch/potillus/). A read-only push mirror is
