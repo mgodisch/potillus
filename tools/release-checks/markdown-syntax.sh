@@ -58,8 +58,12 @@ check_markdown_syntax() {
     # a standalone run before `make guides` simply checks the authored docs.
     # PRIVACY.md is included because it is hosted verbatim as the store listing's
     # privacy-policy page, so a stray emphasis marker would misrender on the
-    # public page just as it would in the in-app guides.
-    local files=("$CHANGELOG" "$README" "$CONTRIBUTING" "$PRIVACY")
+    # public page just as it would in the in-app guides. The two install guides
+    # are included because a reader types their commands out: an identifier that
+    # slipped into prose renders as prose there, and a stray emphasis marker eats
+    # part of a command line.
+    local files=("$CHANGELOG" "$README" "$CONTRIBUTING" "$PRIVACY" \
+                 "$INSTALL_ANDROID" "$INSTALL_IOS")
     local g
     for g in app/src/main/res/raw*/usersguide.md; do
         [[ -f "$g" ]] && files+=("$g")

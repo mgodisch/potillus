@@ -101,6 +101,7 @@ platforms, and revises the project's own texts.
   the version `.gitlab-ci.yml` pins.
 - `release-ios` stages the `.ipa` after the SBOM scan.
 - `docs/INSTALL-ANDROID.md` and `docs/INSTALL-IOS.md` list osv-scanner.
+- `release-check.sh` §9 reads `docs/INSTALL-ANDROID.md` and `docs/INSTALL-IOS.md`.
 - The `publish.mk` targets upload what is staged, each gated on the `v<VERSION>`
   tag and the expected signing key.
 - `tools/release-check.sh` is decomposed into `tools/release-checks/lib.sh` plus
@@ -195,7 +196,8 @@ platforms, and revises the project's own texts.
 - `ReportFormatting`'s fallback formatting the settled decimal.
 - The App Store screenshot of the log-a-drink sheet showing that sheet.
 - The iOS report export handing out a document whose last sheet is missing.
-- `md-syntax.py` reading indented code blocks as prose.
+- `md-syntax.py` reading indented code blocks, link labels and wrapped code
+  spans as prose.
 
 ### Removed
 

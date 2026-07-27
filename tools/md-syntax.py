@@ -66,6 +66,7 @@ USAGE
     artefacts that only exist after an earlier build step).
 """
 
+import bisect
 import os
 import re
 import sys
@@ -88,6 +89,13 @@ _SNAKE = re.compile(
 _URL = re.compile(r"(?:https?://|www\.)\S+")
 _AUTOLINK = re.compile(r"<(?:https?://|mailto:|[^>\s]+@)[^>\s]*>")
 _LINK_DEST = re.compile(r"\]\([^)]*\)")
+# The LABEL of an inline link -- the "[...]" that carries a "(...)" destination.
+# Its text names the thing linked to, which in this tree is regularly a file
+# ([WCAG_LEVEL_A_CHECKLIST.md](...)), so an identifier there is no more
+# un-backticked prose than the destination beside it. Matched on the text before
+# neutralise() blanks the destination, which would otherwise take the "(" that
+# tells a label apart from a plain bracketed aside.
+_LINK_LABEL = re.compile(r"\[([^\]]*)\]\(")
 
 # A thematic break: a line of three or more *, _ or - (optionally spaced).
 _THEMATIC = re.compile(r"^\s*([*_-])(?:\s*\1){2,}\s*$")
@@ -178,28 +186,63 @@ def _is_glob_star(s, idx):
     )
 
 
-def scan_tokens(line, lineno, errors):
-    """Per-line rules: a code-looking token (snake_case or glob '*') outside an
-    inline-code span must be wrapped in backticks. Identifiers never wrap across
-    a line break, so scanning per line is exact here."""
-    clean, _ = strip_inline_code(line)          # balance is checked per block
-    s = _strip_leading_marker(neutralise(clean))
+def join_block(block):
+    """Join a block's lines into one string and return (joined, locate).
+
+    Every step of the pipeline below is length-preserving (spans are blanked, not
+    removed), and the lines are joined by a single space, so an offset into the
+    joined string maps back to exactly one source line; `locate(offset)` returns
+    its number. That is what lets both scans work on the whole block: an inline
+    code span may be opened on one line and closed on the next, and a scan that
+    saw only one line at a time would read the identifiers on the continuation
+    line as bare prose.
+    """
+    parts, starts, linenos, pos = [], [], [], 0
+    for lineno, text in block:
+        stripped = _strip_leading_marker(text)
+        parts.append(stripped)
+        starts.append(pos)
+        linenos.append(lineno)
+        pos += len(stripped) + 1                # + the joining space
+
+    def locate(offset):
+        return linenos[bisect.bisect_right(starts, offset) - 1]
+
+    return " ".join(parts), locate
+
+
+def scan_tokens(block, errors):
+    """Per-block rule: a code-looking token (snake_case or glob '*') outside an
+    inline-code span and outside a link label must be wrapped in backticks."""
+    joined, locate = join_block(block)
+    clean, _ = strip_inline_code(joined)        # unclosed spans: reported by scan_balance
+    labels = [m.span(1) for m in _LINK_LABEL.finditer(clean)]
+    s = neutralise(clean)
+
+    def in_label(idx):
+        return any(a <= idx < b for a, b in labels)
 
     for m in _SNAKE.finditer(s):
+        if in_label(m.start()):
+            continue
         errors.append(
-            (lineno, f"code identifier '{m.group()}' should be wrapped in backticks")
+            (locate(m.start()),
+             f"code identifier '{m.group()}' should be wrapped in backticks")
         )
+    # Blanked whether or not they were reported, so the glob pass below sees the
+    # same string in both cases.
     s = _SNAKE.sub(lambda m: _blank(m.group(), len(m.group())), s)
 
     for idx, ch in enumerate(s):
-        if ch == "*" and _is_glob_star(s, idx):
+        if ch == "*" and _is_glob_star(s, idx) and not in_label(idx):
             a, b = idx, idx
             while a > 0 and not s[a - 1].isspace():
                 a -= 1
             while b < len(s) and not s[b].isspace():
                 b += 1
             errors.append(
-                (lineno, f"wildcard '*' in '{s[a:b]}' should be wrapped in backticks")
+                (locate(idx),
+                 f"wildcard '*' in '{s[a:b]}' should be wrapped in backticks")
             )
 
 
@@ -208,7 +251,7 @@ def scan_balance(block, errors):
     on the whole block (a run of non-blank lines joined back together) is what
     lets a span legitimately wrap across a soft line break without tripping."""
     start = block[0][0]
-    joined = " ".join(_strip_leading_marker(text) for _, text in block)
+    joined, _locate = join_block(block)
 
     s, closed = strip_inline_code(joined)
     if not closed:
@@ -305,8 +348,7 @@ def check_file(path):
         errors.append((len(lines), "unterminated fenced code block (```)"))
 
     for block in blocks:
-        for lineno, line in block:
-            scan_tokens(line, lineno, errors)
+        scan_tokens(block, errors)
         scan_balance(block, errors)
 
     if is_changelog:
