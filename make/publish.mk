@@ -76,7 +76,7 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 # ── push-playstore ── upload the ALREADY-BUILT release AAB to Google Play and
 # OVERWRITE the store listing there (localized titles, short/full descriptions,
 # feature graphics, screenshots) plus the release notes, from
-# fastlane/metadata/android/. The fastlane OPTIONS (track alpha, status
+# fastlane/metadata/android/. The fastlane OPTIONS (track beta, status
 # completed, metadata-overwriting) live in the fastlane `testing` lane, NOT here —
 # override them there or via `fastlane testing track:...`.
 #
@@ -182,7 +182,7 @@ push-playstore:
 # Connect, then submit in a second, explicit step. (This mirrors how
 # push-playstore's `production` counterpart stages a draft rather than going live.)
 #
-# NOTE what `ios testing` is NOT: unlike Play's alpha track, it has no separate
+# NOTE what `ios testing` is NOT: unlike a Play testing track, it has no separate
 # audience. The App Store has ONE listing, and this target overwrites it. "testing"
 # here means "not submitted for review", not "not public". There is also no iOS
 # equivalent of VALIDATE_ONLY: deliver has no validate-only mode, so the closest

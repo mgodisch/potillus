@@ -99,6 +99,12 @@ platforms, and revises the project's own texts.
   under that name.
 - `release-android` and `release-ios` open with a check for osv-scanner 2.4.0,
   the version `.gitlab-ci.yml` pins.
+- `push-playstore` uploads to the open-testing (`beta`) track; closed testing
+  (`alpha`) is no longer used.
+- The iOS TestFlight lane is `external_testing` (renamed from `alpha`): it
+  distributes to the "Libellus Potionis External Testers" group and waits for
+  build processing, with the current version's English App Store release notes as
+  its "what to test" note.
 - `release-ios` stages the `.ipa` after the SBOM scan.
 - `docs/INSTALL-ANDROID.md` and `docs/INSTALL-IOS.md` list osv-scanner.
 - `release-check.sh` §9 reads `docs/INSTALL-ANDROID.md` and `docs/INSTALL-IOS.md`.

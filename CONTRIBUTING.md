@@ -636,8 +636,8 @@ Before tagging a new version:
       check, and the published bytes are verified. The signing key is the one in
       SECURITY.md; you will be prompted for its passphrase. The target is safe to
       re-run after a partial failure.
-- [ ] Upload the release to Google Play with `make push-playstore` (closed-testing
-      alpha track; it verifies the staged AAB's signature and signer first and
+- [ ] Upload the release to Google Play with `make push-playstore` (open-testing
+      track; it verifies the staged AAB's signature and signer first and
       never builds or stages). Exercise credentials and metadata beforehand with
       the non-publishing dry run `make push-playstore VALIDATE_ONLY=1`.
 

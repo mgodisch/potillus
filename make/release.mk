@@ -413,7 +413,7 @@ release-ios:
 	cp -a "$(IOS_SBOM)" "$(STAGED_IOS_SBOM)"
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IOS_SBOM)"
-	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios alpha ipa:\"$(STAGED_IPA)\" )"
+	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios external_testing ipa:\"$(STAGED_IPA)\" )"
 	@echo "release-ios: upload to the App Store listing with:  make push-appstore"
 
 .PHONY: cover-check release-android release-ios ios-sbom

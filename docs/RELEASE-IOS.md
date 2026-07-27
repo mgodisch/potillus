@@ -108,14 +108,16 @@ Troubleshooting the export's Apple authentication:
 
 Then pick the destination — both take the staged path the build just printed:
 
-- **TestFlight (device testing).** Internal testing; no App Store metadata or
+- **TestFlight (device testing).** External testing; no App Store metadata or
   screenshots are involved:
 
-      cd fastlane && bundle exec fastlane ios alpha ipa:releases/de.godisch.potillus_<versionCode>.ipa
+      cd fastlane && bundle exec fastlane ios external_testing ipa:releases/de.godisch.potillus_<versionCode>.ipa
 
   The build appears under TestFlight in App Store Connect once Apple finishes
-  processing it; internal testers are notified per your App Store Connect
-  settings. Install it on the device through the TestFlight app.
+  processing it; it is then submitted to Beta App Review and, once approved,
+  released to the "Libellus Potionis External Testers" group, who are notified
+  per your App Store Connect settings. The lane waits for processing, so it runs
+  longer than a bare upload. Install it on the device through the TestFlight app.
 
 - **App Store listing + screenshots.** This is a SEPARATE concern from device
   testing, and it goes through `make push-appstore` rather than a bare fastlane
@@ -133,7 +135,7 @@ Then pick the destination — both take the staged path the build just printed:
   `ios production` with `SUBMIT=1`), which pushes the listing texts and store
   screenshots from `fastlane/metadata/ios/` and `fastlane/screenshots/ios/`.
 
-  Mind what `ios testing` is *not*: unlike Play's alpha track it has no separate
+  Mind what `ios testing` is *not*: unlike a Play testing track it has no separate
   audience. The App Store has one listing and this overwrites it — "testing" means
   "not submitted for review", not "not public". There is no iOS equivalent of
   `push-playstore`'s `VALIDATE_ONLY=1`, because `deliver` has no validate-only
@@ -166,13 +168,24 @@ Then pick the destination — both take the staged path the build just printed:
   `demo_user.txt` and `demo_password.txt` stay committed and empty for the same
   reason.
 
-## Internal vs. external TestFlight
+## External TestFlight
 
-The `alpha` lane distributes **internally** (`distribute_external: false`):
-immediate, no Beta App Review, up to the team's internal-tester limit. External
-testing (public groups) additionally needs a Beta App Review and beta metadata
-and is intentionally not wired here yet; add `groups:` and
-`distribute_external: true` to the lane when that becomes relevant.
+The `external_testing` lane distributes to the **external** group "Libellus Potionis
+External Testers" (`distribute_external: true` with `groups:`). External builds
+go through Apple **Beta App Review**, so the lane waits for App Store Connect to
+finish processing the build (`skip_waiting_for_build_processing: false`) before it
+can be submitted and released -- expect it to run for several minutes, and expect
+the first build (and any with significant changes) to sit in Beta App Review
+before testers can install it. The "what to test" note handed to testers is the
+current version's English App Store release notes
+(`fastlane/metadata/ios/en-US/release_notes.txt`).
+
+Curate these once in App Store Connect, because the lane does not pass them: the
+beta app description and the feedback e-mail, and the Beta App Review contact.
+The App Store Connect API key must carry the **App Manager** or **Admin** role --
+a Developer key can upload a build but cannot update testers or submit for
+review. Internal-only distribution is no longer wired; pass
+`distribute_external: false` by hand if you ever need it again.
 
 ## Export compliance
 
