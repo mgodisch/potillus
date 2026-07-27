@@ -40,6 +40,19 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
+## v0.84.1
+
+Check GitLab permissions before uploading
+
+### Changed
+
+- `push-gitlab` creates the release before it signs and uploads.
+- The GitLab API calls report the status and the server's answer.
+- The push targets check the release tag against the GitLab remote.
+- The `api` scope and the Maintainer role required of the GitLab token.
+
+---
+
 ## v0.84.0
 
 Reach iOS parity and harden the release

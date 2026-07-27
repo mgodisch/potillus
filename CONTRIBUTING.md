@@ -635,7 +635,14 @@ Before tagging a new version:
       software bill of materials, every published file by a signature anyone can
       check, and the published bytes are verified. The signing key is the one in
       SECURITY.md; you will be prompted for its passphrase. The target is safe to
-      re-run after a partial failure.
+      re-run after a partial failure. The token in
+      `fastlane/gitlab-credentials.txt` needs the `api` scope **and** a project
+      role that satisfies the Protected-tags rule for `v*` — creating a release
+      asks GitLab whether you may create its tag, even for a tag pushed hours
+      earlier. A project access token belongs to a bot user with its own role,
+      Developer by default, which is enough to fill the package registry and not
+      enough to create the release; that role is fixed at creation, so a token
+      with too little of it is replaced rather than adjusted.
 - [ ] Upload the release to Google Play with `make push-playstore-testing`
       (open-testing track) or `make push-playstore-production` (production
       track); each verifies the staged AAB's signature and signer first and

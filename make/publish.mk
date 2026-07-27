@@ -113,6 +113,38 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 # from the output.
 PLAY_VALIDATE_ONLY := $(filter 1 true yes,$(VALIDATE_ONLY))
 
+# ── require-release-tag ── $(1) is the calling target (for the messages). The
+# release tag must exist LOCALLY and on the remote this repository publishes to.
+#
+# WHICH REMOTE. Not `@{u}`. The upstream of the current branch is a property of
+# the branch, not of the project: this repository has a GitHub mirror alongside
+# the canonical GitLab remote, and a branch tracking the mirror would have this
+# guard confirm a tag on a server none of these targets ever talks to. The remote
+# is therefore derived from GITLAB_REPO, the same constant push-gitlab addresses
+# the API with, by matching it against the configured push URLs; with no remote
+# configured for it, the URL itself is used, which `git ls-remote` accepts and
+# which needs no local configuration at all.
+#
+# GITLAB_REPO is defined further down, with the rest of the GitLab constants.
+# This is a recursively expanded variable (`=`, not `:=`), so it reads the value
+# at call time and the order of definitions does not matter.
+#
+# WHY THE STORE TARGETS APPLY IT TOO: Play and the App Store know nothing of git
+# tags, so there the guard is release hygiene -- a build reaches a store only when
+# its exact version is a pushed, signable tag. Hygiene measured against the wrong
+# server is no hygiene, which is why the one definition serves all five targets.
+require-release-tag = \
+	git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { \
+	    echo "$(1): git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; \
+	    exit 1; \
+	}; \
+	tag_remote="$$(git remote -v | awk -v repo="$(GITLAB_REPO)" '$$3 == "(push)" { u = $$2; sub(/\.git$$/, "", u); if (u ~ ("[:/]" repo "$$")) { print $$1; exit } }')"; \
+	tag_remote="$${tag_remote:-https://gitlab.com/$(GITLAB_REPO).git}"; \
+	git ls-remote --exit-code --tags "$$tag_remote" "refs/tags/v$(VERSION)" >/dev/null || { \
+	    echo "$(1): tag 'v$(VERSION)' not found on '$$tag_remote' -- push it there first (git push && git push --tags)." >&2; \
+	    exit 1; \
+	}
+
 # Expected release signing-key fingerprint (SHA-256 of the DER signing
 # certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
 # "Verifying releases" section rather than duplicated here, so the pin and the
@@ -187,10 +219,8 @@ push-playstore-testing push-playstore-production:
 	@test -n "$(PLAY_VALIDATE_ONLY)" || test -z "$(VALIDATE_ONLY)" || { echo "$@: VALIDATE_ONLY='$(VALIDATE_ONLY)' is not a value this target recognises -- pass VALIDATE_ONLY=1 (or true, or yes) for the non-publishing dry run, and leave it unset to upload." >&2; exit 1; }
 	# 1) staged AAB must exist (never builds/stages)
 	@test -f "$(STAGED_AAB)" || { echo "$@: staged AAB not found at '$(STAGED_AAB)' -- run 'make release-android' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
-	# 2) release tag must exist locally and on the push remote
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
-	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	# 2) release tag must exist locally and on the remote this project publishes to
+	@$(call require-release-tag,$@)
 	# 3) staged AAB must be signed with the expected key (jarsigner verdict + keytool SHA-256 pin)
 	js="$${JARSIGNER:-$$(command -v jarsigner || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}jarsigner")}"
 	"$$js" -verify "$(STAGED_AAB)" | grep '^jar verified\.'
@@ -318,10 +348,8 @@ push-appstore-production: IOS_LANE := production
 push-appstore-testing push-appstore-production: push-appstore-preflight
 	# 1) staged .ipa must exist (never builds/stages)
 	@test -f "$(STAGED_IPA)" || { echo "$@: staged .ipa not found at '$(STAGED_IPA)' -- run 'make release-ios' first (it archives, exports and stages the .ipa). This target does NOT build or stage it." >&2; exit 1; }
-	# 2) release tag must exist locally and on the push remote
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
-	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	# 2) release tag must exist locally and on the remote this project publishes to
+	@$(call require-release-tag,$@)
 	# Resolve the expected Team ID exactly as release-ios does: the environment
 	# wins, else ios/signing.properties. The $${VAR:-} default keeps -u happy and
 	# the file is only read when it exists (sed on a missing file would abort this
@@ -480,6 +508,16 @@ push-appstore-preflight:
 #
 # The GitLab access token is READ FROM $(GITLAB_TOKEN_FILE) (Settings ->
 # Access tokens, `api` scope -- `read_api` is not enough, the target writes).
+# The SCOPE is only half of it: a token also carries the project ROLE of whoever
+# owns it, and a PROJECT access token owns itself -- it belongs to a bot user with
+# its own role, Developer by default, not to the maintainer who created it.
+# Developer is enough to write into the package registry and NOT enough to create
+# a release when the tag is protected, which is a combination that fails late:
+# every artifact uploads, and the release call is the first thing to be refused.
+# The role must therefore satisfy the Protected-tags rule for `v*` (Settings ->
+# Repository -> Protected tags), i.e. MAINTAINER under the rule this project ships.
+# A project access token's role is fixed when it is created; a token with too
+# little of it is replaced, not adjusted.
 # That file is a SECRET, git-ignored and never committed -- mirroring the Play
 # service-account key. The recipe's commands are echoed (so you can see what
 # runs), but that does NOT leak the token: it lives in a SHELL variable --
@@ -535,17 +573,58 @@ push-gitlab:
 	command -v curl
 	command -v python3
 	command -v gpg
-	@test -f "$(GITLAB_TOKEN_FILE)" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' not found -- create it containing your GitLab personal or project access token (Settings > Access tokens, 'api' scope). It is git-ignored." >&2; exit 1; }
+	@test -f "$(GITLAB_TOKEN_FILE)" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' not found -- create it containing your GitLab personal or project access token (Settings > Access tokens, 'api' scope, and a role that satisfies the Protected-tags rule for 'v*', i.e. Maintainer). It is git-ignored." >&2; exit 1; }
 	token="$$(tr -d '[:space:]' < "$(GITLAB_TOKEN_FILE)")"
 	@test -n "$$token" || { echo "push-gitlab: token file '$(GITLAB_TOKEN_FILE)' is empty." >&2; exit 1; }
 	# token -> mode-0600 header file (never on argv); removed by the EXIT trap
 	hdr="$$(mktemp)"
 	trap 'rm -f "$$hdr"' EXIT
 	printf 'PRIVATE-TOKEN: %s\n' "$$token" > "$$hdr"
-	# release tag must exist locally and on the push remote (server resolves the release against it)
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-gitlab: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
-	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-gitlab: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	# ── api ── every JSON call to the GitLab REST API goes through this, in place
+	# of `curl -fsS`. WHY: -f turns a 4xx into exit 22 and DISCARDS the response
+	# body -- and the body is the only place the server explains itself ("You are
+	# not allowed to create this tag as it is protected"). What reached the caller
+	# instead was "curl: (22)" plus a make error naming the recipe's first line,
+	# which under .ONESHELL is not the failing line and cannot be: the whole recipe
+	# is one shell invocation. A permission problem then looks like a network
+	# problem, and the one question worth answering -- which permission -- is the
+	# one thrown away.
+	#
+	#   api <what> <tolerated codes> <curl args...>
+	#
+	# <what> names the step in the failure message. <tolerated codes> is a
+	# space-separated list of non-2xx statuses that are a normal answer rather than
+	# a failure (the release lookup below expects 404 for a release that does not
+	# exist yet); pass "" when every non-2xx is an error. The response BODY goes to
+	# stdout for the caller to parse; the status is appended by -w on a line of its
+	# own, split off here, and never reaches the caller.
+	#
+	# NOT used for the two calls that move BYTES rather than JSON -- the registry
+	# probe and the published-asset download. Those pipe into sha256sum, and a
+	# binary body cannot survive a shell variable (NUL bytes); they also treat a
+	# failed fetch as a legitimate answer, which is the opposite of this function.
+	api() {
+		local what="$$1" tolerated="$$2"; shift 2
+		local out code body
+		out="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" -w '\n%{http_code}' "$$@")" || {
+			echo "push-gitlab: $$what -- could not reach the GitLab API." >&2
+			return 1
+		}
+		code="$${out##*$$'\n'}"
+		body="$${out%$$'\n'*}"
+		case " $$tolerated " in
+		*" $$code "*) printf '%s' "$$body"; return 0 ;;
+		esac
+		case "$$code" in
+		2*) printf '%s' "$$body"; return 0 ;;
+		esac
+		echo "push-gitlab: $$what -- the GitLab API answered HTTP $$code:" >&2
+		printf '%s\n' "$$body" >&2
+		return 1
+	}
+	# release tag must exist locally and on the remote this project publishes to
+	# (the server resolves the release against it)
+	@$(call require-release-tag,push-gitlab)
 	notes="$(META)/en-US/changelogs/$(VERSION_CODE).txt"
 	@test -f "$$notes" || { echo "push-gitlab: en-US release notes '$$notes' not found (versionCode $(VERSION_CODE))." >&2; exit 1; }
 	# staged, signed APK must exist (canonical name = proof a key was used; never builds/stages)
@@ -558,7 +637,32 @@ push-gitlab:
 	echo "push-gitlab: APK signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
 	@test -f "$(STAGED_SBOM)" || { echo "push-gitlab: staged SBOM not found at '$(STAGED_SBOM)' -- run 'make release-android' first (it builds and stages the SBOM). This target does NOT build or stage it." >&2; exit 1; }
-	# 0) sign each artifact with a detached, ASCII-armoured OpenPGP signature.
+	# 0) the release itself, BEFORE a single byte is signed or uploaded. Creating
+	# it is idempotent -- an existing one is looked up and reused -- so it doubles
+	# as the permission check this target used to lack: it is the first write, and
+	# every write here needs the same thing of the token. Creating a release also
+	# asks GitLab whether the caller may CREATE ITS TAG, even for a tag that has
+	# existed for hours, so a Protected-tags rule the token's role does not satisfy
+	# is refused HERE. Ordered after the uploads, as it was, that refusal arrived
+	# with every artifact already on the server and the passphrase already typed.
+	#
+	# The cost of the order is that an interrupted run can leave a release with no
+	# assets on it. That state is visible, harmless and repaired by re-running --
+	# the same rerun-safety every other step here already has.
+	rel_api="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/releases"
+	release_json="$$(api "reading the release for tag v$(VERSION)" 404 "$$rel_api/v$(VERSION)")"
+	have_tag="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("tag_name",""))' 2>/dev/null || true)"
+	if [ -n "$$have_tag" ]; then
+		echo "push-gitlab: release for tag v$(VERSION) already exists -- reusing it"
+	else
+		# body = JSON-encoded en-US Play release notes for this versionCode
+		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
+		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","description":%s}' "$(VERSION)" "$(VERSION)" "$$body")"
+		api "creating the release for tag v$(VERSION)" "" -X POST -H "Content-Type: application/json" -d "$$payload" "$$rel_api" >/dev/null
+		echo "push-gitlab: created release 'Libellus Potionis v$(VERSION)'"
+		release_json="$$(api "reading back the release for tag v$(VERSION)" "" "$$rel_api/v$(VERSION)")"
+	fi
+	# 1) sign each artifact with a detached, ASCII-armoured OpenPGP signature.
 	# The secret key must be available; a passphrase prompt is fine here, which is
 	# why --batch is deliberately NOT used. A signature left behind by an
 	# interrupted earlier run is re-VERIFIED rather than trusted on sight and
@@ -582,7 +686,7 @@ push-gitlab:
 	for staged in "$$apk" "$(STAGED_SBOM)" $$ios_sbom; do
 		publish="$$publish $$staged $$staged.asc"
 	done
-	# 1) upload the staged files into the generic package registry (skip byte-identical re-uploads)
+	# 2) upload the staged files into the generic package registry (skip byte-identical re-uploads)
 	pkg_base="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/packages/generic/$(GITLAB_PACKAGE)/v$(VERSION)"
 	for staged in $$publish; do
 		asset="$$(basename "$$staged")"
@@ -593,23 +697,9 @@ push-gitlab:
 			echo "push-gitlab: package file $$asset already uploaded -- skipping"
 			continue
 		fi
-		curl -fsS --proto '=https' --tlsv1.2 -H @"$$hdr" --upload-file "$$staged" "$$pkg_base/$$asset" >/dev/null
+		api "uploading $$asset to the package registry" "" --upload-file "$$staged" "$$pkg_base/$$asset" >/dev/null
 		echo "push-gitlab: uploaded $$asset to the package registry"
 	done
-	# 2) create the release for the existing tag and REUSE it if present (rerun-safe)
-	rel_api="$(GITLAB_API)/projects/$(GITLAB_PROJECT_ID)/releases"
-	release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$$rel_api/v$(VERSION)" || true)"
-	have_tag="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("tag_name",""))' 2>/dev/null || true)"
-	if [ -n "$$have_tag" ]; then
-		echo "push-gitlab: release for tag v$(VERSION) already exists -- reusing it"
-	else
-		# body = JSON-encoded en-US Play release notes for this versionCode
-		body="$$(python3 -c 'import json,sys; print(json.dumps(open(sys.argv[1], encoding="utf-8").read()))' "$$notes")"
-		payload="$$(printf '{"tag_name":"v%s","name":"Libellus Potionis v%s","description":%s}' "$(VERSION)" "$(VERSION)" "$$body")"
-		curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$payload" "$$rel_api" >/dev/null
-		echo "push-gitlab: created release 'Libellus Potionis v$(VERSION)'"
-		release_json="$$(curl -sS --proto '=https' --tlsv1.2 -H @"$$hdr" "$$rel_api/v$(VERSION)")"
-	fi
 	# Existing links as "<url> <id> <direct_asset_url>" lines -- keyed by URL, the
 	# artifact's identity; the id is what a PATCH below addresses.
 	have_links="$$(printf '%s' "$$release_json" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join("%s %s %s" % (l.get("url",""), l.get("id",""), l.get("direct_asset_url","")) for l in (d.get("assets") or {}).get("links") or []))' 2>/dev/null || true)"
@@ -628,7 +718,7 @@ push-gitlab:
 		if [ -z "$$existing" ]; then
 			# direct_asset_path MUST start with '/'; it is what yields $$want_dl
 			link="$$(python3 -c 'import json,sys; print(json.dumps({"name":sys.argv[1],"url":sys.argv[2],"direct_asset_path":"/"+sys.argv[3]}))' "$$label" "$$pkg_url" "$$asset")"
-			curl -fsS --proto '=https' --tlsv1.2 -X POST -H @"$$hdr" -H "Content-Type: application/json" -d "$$link" "$$rel_api/v$(VERSION)/assets/links" >/dev/null
+			api "attaching the asset link for $$asset" "" -X POST -H "Content-Type: application/json" -d "$$link" "$$rel_api/v$(VERSION)/assets/links" >/dev/null
 			echo "push-gitlab: attached $$asset as '$$label'"
 		else
 			link_id="$${existing%% *}"; got_dl_url="$${existing##* }"
@@ -638,7 +728,7 @@ push-gitlab:
 				# link exists but lacks direct_asset_path (e.g. created in the web UI),
 				# so its permanent URL is wrong and the F-Droid Binaries: URL would 404
 				patch="$$(python3 -c 'import json,sys; print(json.dumps({"direct_asset_path":"/"+sys.argv[1]}))' "$$asset")"
-				curl -fsS --proto '=https' --tlsv1.2 -X PUT -H @"$$hdr" -H "Content-Type: application/json" -d "$$patch" "$$rel_api/v$(VERSION)/assets/links/$$link_id" >/dev/null
+				api "repairing the asset link for $$asset" "" -X PUT -H "Content-Type: application/json" -d "$$patch" "$$rel_api/v$(VERSION)/assets/links/$$link_id" >/dev/null
 				echo "push-gitlab: repaired direct_asset_path of the existing link for $$asset"
 			fi
 		fi
