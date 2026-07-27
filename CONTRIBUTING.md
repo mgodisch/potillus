@@ -648,6 +648,13 @@ Before tagging a new version:
       track); each verifies the staged AAB's signature and signer first and
       never builds or stages. Exercise credentials and metadata beforehand with
       the non-publishing dry run `make push-playstore-testing VALIDATE_ONLY=1`.
+      Play answers every upload with one warning: the bundle carries native code
+      and no debug symbols. It is expected and stays unanswered. The `.so` files
+      come from transitive dependencies rather than from this project, which has
+      no native code of its own, so symbols would name functions in someone
+      else's library; producing them means `debugSymbolLevel` in
+      `build.gradle.kts`, an NDK in the build and a larger bundle, which is a
+      poor trade against a reproducible build F-Droid rebuilds from source.
 - [ ] Roll the draft release out in the Play Console. Both targets upload as a
       draft, and rolling out is what sends the release to Google for review — so
       the console is where a release becomes a release.

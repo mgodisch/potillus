@@ -103,7 +103,7 @@ help:
 	@echo "  make tgz                       build the source release tarball"
 	@echo "  make push-playstore-testing    staged AAB -> Play open testing, as a draft  [git tag + signature gated]"
 	@echo "  make push-playstore-production staged AAB -> Play production, as a draft  [git tag + signature gated]"
-	@echo "  make push-appstore-testing     staged IPA -> TestFlight, no tester group  [Mac; tag + signature gated]"
+	@echo "  make push-appstore-testing     staged IPA -> TestFlight, no external tester group  [Mac; tag + signature gated]"
 	@echo "  make push-appstore-production  staged IPA -> App Store listing, not submitted  [Mac; tag + signature gated]"
 	@echo "  make push-gitlab               publish the GitLab release + verify each asset checksum"
 	@echo "  (none of these submit for review -- that is a click in the Play Console or App Store Connect)"

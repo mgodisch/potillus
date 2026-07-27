@@ -40,9 +40,15 @@
 # the platform-level comment before the iOS block for the details.
 #
 # NO lane submits anything for review either. A Play upload is a draft release, a
-# TestFlight upload reaches no tester group, and an App Store upload stops at
-# "Prepare for Submission". Handing a build to Google, to Apple's Beta App Review
-# or to App Store review is a deliberate act in the respective console.
+# TestFlight upload reaches no EXTERNAL tester group, and an App Store upload
+# stops at "Prepare for Submission". Handing a build to Google, to Apple's Beta
+# App Review or to App Store review is a deliberate act in the respective console.
+#
+# What a TestFlight upload DOES reach, without any further act, is the INTERNAL
+# testers -- everyone holding a role in the App Store Connect team. Apple treats
+# them as people who could have made the build themselves, so there is nothing to
+# release to them and no review between: a processed build appears on their
+# devices. `distribute_external: false` governs the external side only.
 #
 # The screenshot lanes are intended to be invoked by the `make screenshots-android`
 # and `make screenshots-ios` targets (the top-level Makefile), which wrap them with
@@ -257,11 +263,14 @@ platform :ios do
     UI.success("preflight: App Store Connect reachable; current build number: #{build_number}")
   end
 
-  desc 'Upload the SIGNED .ipa to TestFlight, where it reaches NO tester group.'
+  desc 'Upload the SIGNED .ipa to TestFlight, where it reaches no EXTERNAL tester'
+  desc 'group. Internal testers -- everyone with a role in the App Store Connect'
+  desc 'team -- receive it as soon as Apple has processed it, with no review and no'
+  desc 'further act; that side is not what this switch governs.'
   desc 'Unlike the `production` lane below, this pushes no listing metadata or'
-  desc 'screenshots -- TestFlight does not use them. It also hands the build to'
-  desc 'nobody: assigning it to the external group is a click in App Store Connect,'
-  desc 'and that click is what submits it to Apple Beta App Review. The lane waits'
+  desc 'screenshots -- TestFlight does not use them. Assigning the build to the'
+  desc 'external group is a click in App Store Connect, and that click is what'
+  desc 'submits it to Apple Beta App Review. The lane waits'
   desc 'for App Store Connect to finish processing, so it runs for several minutes'
   desc 'after the bytes are gone. Build the .ipa first with `make release-ios`;'
   desc 'the Makefile `push-appstore-testing` target guards that prerequisite and'
@@ -291,6 +300,13 @@ platform :ios do
       # testers see the one entered beside that decision. The Beta App Review
       # contact and beta app description are curated once in App Store Connect
       # (see CONTRIBUTING.md §7).
+      #
+      # EXTERNAL is the whole of what this word covers. Internal testers are the
+      # App Store Connect team itself, and Apple hands a processed build to them
+      # with no review and no release step -- it is on their devices minutes after
+      # this lane returns. A build is therefore never invisible after an upload,
+      # only unreleased; each internal group carries its own switch for automatic
+      # distribution, in App Store Connect and not here.
       distribute_external: false,
 
       # WAIT for processing rather than returning the moment the upload finishes.

@@ -37,8 +37,11 @@
 #  asset's sha256. Uploading is the last, deliberate step.
 #
 #  NONE of them submits anything for review. A Play upload is a draft release, a
-#  TestFlight upload reaches no tester group, an App Store upload stops at
-#  "Prepare for Submission". What these targets produce is something to look at in
+#  TestFlight upload reaches no EXTERNAL tester group, an App Store upload stops at
+#  "Prepare for Submission". A TestFlight upload DOES reach the internal testers,
+#  i.e. the App Store Connect team, with no review and no further act -- see the
+#  note on distribute_external in fastlane/Fastfile.
+#  What these targets produce is something to look at in
 #  the Play Console or App Store Connect; handing it to Google or Apple is a
 #  separate act, taken there.
 # =============================================================================
@@ -257,8 +260,10 @@ push-playstore-testing push-playstore-production:
 #
 # WHERE THE BUILD LANDS is the whole difference between them:
 #
-#   push-appstore-testing     `ios testing` -> TestFlight, assigned to no tester
-#                             group. Pushes no listing metadata; TestFlight does
+#   push-appstore-testing     `ios testing` -> TestFlight, assigned to no EXTERNAL
+#                             tester group; the internal testers get it as soon as
+#                             Apple has processed it, which no switch here defers.
+#                             Pushes no listing metadata; TestFlight does
 #                             not use it. Handing the build to the external group
 #                             -- which is what submits it to Apple Beta App Review
 #                             -- is a click in App Store Connect.

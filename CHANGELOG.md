@@ -50,6 +50,8 @@ Check GitLab permissions before uploading
 - The GitLab API calls report the status and the server's answer.
 - The push targets check the release tag against the GitLab remote.
 - The `api` scope and the Maintainer role required of the GitLab token.
+- A TestFlight upload reaches the internal testers without a further act.
+- Play's native-debug-symbols warning stays unanswered, with the reason.
 
 ---
 
