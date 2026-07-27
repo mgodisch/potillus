@@ -61,8 +61,32 @@ final class LimitGaugeTests: XCTestCase {
         XCTAssertEqual(LimitGauge.emphasis(totalGrams: 14.9, limitGrams: 20), .calm)
         XCTAssertEqual(LimitGauge.emphasis(totalGrams: 15.0, limitGrams: 20), .warning, "75 % exactly")
         XCTAssertEqual(LimitGauge.emphasis(totalGrams: 19.9, limitGrams: 20), .warning)
-        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20.0, limitGrams: 20), .danger, "reached")
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20.0, limitGrams: 20), .warning, "at the limit, not over it")
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20.1, limitGrams: 20), .danger, "the smallest real exceedance")
         XCTAssertEqual(LimitGauge.emphasis(totalGrams: 26.0, limitGrams: 20), .danger)
+    }
+
+    /// The red band is `isOverLimit`, epsilon and all: drift-sized excess stays
+    /// amber, excess above the epsilon is red. The inputs are the boundary cases
+    /// `test-vectors/alcohol-calculator.json` pins for `isOverLimit`, so this
+    /// test fails the moment the bar and the shared predicate part ways.
+    func testEmphasisToleratesFloatDriftAtTheLimit() {
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 190.60000000000002, limitGrams: 190.6), .warning)
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20.0000005, limitGrams: 20.0), .warning)
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20.00001, limitGrams: 20.0), .danger)
+    }
+
+    /// `.danger` and `isOverLimit` must be the same statement for every
+    /// configured limit, or the bar would disagree with the calendar dots, the
+    /// chart and the report, which all ask the shared predicate.
+    func testDangerAgreesWithIsOverLimitAcrossAGrid() {
+        for limit in [1.0, 20.0, 190.6, 500.0] {
+            for total in [0.0, limit * 0.5, limit - 0.1, limit, limit + 1e-9, limit + 0.1, limit * 1.3] {
+                let barSaysDanger = LimitGauge.emphasis(totalGrams: total, limitGrams: limit) == .danger
+                let predicateSaysOver = AlcoholCalculator.isOverLimit(totalGrams: total, limitGrams: limit)
+                XCTAssertEqual(barSaysDanger, predicateSaysOver, "total=\(total) limit=\(limit)")
+            }
+        }
     }
 
     /// The bar is full at 130 %, but it is red, not calm. Clamping the fill must
@@ -140,12 +164,15 @@ final class LimitGaugeTests: XCTestCase {
     }
 
     /// The gram bar and the drink-day bar treat a full bar differently, and that
-    /// is the point. Pin it, so a future "consistency" refactor argues with a test.
-    func testAFullGramBarIsRedButAFullDrinkDayBarNeedNotBe() {
-        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20, limitGrams: 20), .danger)
+    /// is the point: a full gram bar is amber (the allowance is spent, not
+    /// exceeded), while a full drink-day bar over a still-dry today is red (the
+    /// next drink would spend a day the user does not have). Pin it, so a future
+    /// "consistency" refactor argues with a test.
+    func testAFullGramBarIsAmberButAFullDrinkDayBarOverADryTodayIsRed() {
+        XCTAssertEqual(LimitGauge.emphasis(totalGrams: 20, limitGrams: 20), .warning)
         XCTAssertEqual(
-            LimitGauge.drinkDaysEmphasis(drinkDays: 5, maxDrinkDays: 5, todayIsDrinkDay: true),
-            .warning
+            LimitGauge.drinkDaysEmphasis(drinkDays: 5, maxDrinkDays: 5, todayIsDrinkDay: false),
+            .danger
         )
     }
 

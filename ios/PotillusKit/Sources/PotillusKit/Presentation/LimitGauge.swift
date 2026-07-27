@@ -38,11 +38,16 @@ import Foundation
 //   Conflating them would either break the layout or hide the violation.
 //
 // A DELIBERATE ASYMMETRY BETWEEN THE TWO BARS
-//   Both bars answer the same question — "may I drink now?" — and the two limits
-//   answer it differently.
+//   The two bars follow two different rules, because the two limits mean two
+//   different things.
 //
-//   GRAMS. Red when the limit is REACHED (fraction >= 1.0). Having drunk exactly
-//   the daily allowance leaves no room for the next drink, so the bar says stop.
+//   GRAMS. Red only when the limit is EXCEEDED, decided by the domain layer's
+//   ONE definition of "over the limit" (`AlcoholCalculator.isOverLimit`) — the
+//   same epsilon-guarded check the calendar dots, the statistics chart and the
+//   PDF report use, and the same rule Android's `LimitBar` applies. Reaching
+//   the limit exactly is allowed (the limit is what the user may consume), so
+//   a full bar stays amber; the epsilon keeps a total that DISPLAYS as exactly
+//   the limit from flipping red through binary floating-point drift.
 //
 //   DRINK DAYS. A full bar does NOT mean stop, because a drink day, once spent,
 //   stays spent for the whole day. What matters is whether the allowance was
@@ -71,7 +76,7 @@ public enum Emphasis: String, Sendable, Equatable, CaseIterable {
     case calm = "CALM"
     /// Three quarters or more, but still within the allowance.
     case warning = "WARNING"
-    /// The allowance is reached (grams) or exceeded (drink days).
+    /// The allowance is exceeded (grams) or exhausted before today (drink days).
     case danger = "DANGER"
 }
 
@@ -89,17 +94,26 @@ public enum LimitGauge {
         min(AlcoholCalculator.limitPercent(totalGrams: totalGrams, limitGrams: limitGrams), 1.0)
     }
 
-    /// The colour band for a gram bar, from the unclamped fraction.
+    /// The colour band for a gram bar.
+    ///
+    /// Red is decided by `AlcoholCalculator.isOverLimit` — the single,
+    /// epsilon-guarded definition of "over the limit" every other surface uses
+    /// (see the file header) — so a total exactly at the limit reads `.warning`,
+    /// never `.danger`. The amber band still comes from the unclamped fraction.
     ///
     /// An unconfigured limit (`<= 0`) reads as `.calm`: an empty bar, not a
-    /// permanent alarm. `limitPercent` already guards the division.
+    /// permanent alarm. `limitPercent` already guards the division; the guard
+    /// here additionally keeps `isOverLimit` — for which any positive total
+    /// "exceeds" a zero limit — from turning that empty bar red.
     public static func emphasis(totalGrams: Double, limitGrams: Double) -> Emphasis {
+        guard limitGrams > 0.0 else { return .calm }
+        if AlcoholCalculator.isOverLimit(totalGrams: totalGrams, limitGrams: limitGrams) {
+            return .danger
+        }
         let fraction = AlcoholCalculator.limitPercent(
             totalGrams: totalGrams, limitGrams: limitGrams
         )
-        if fraction >= 1.0 { return .danger }
-        if fraction >= warningThreshold { return .warning }
-        return .calm
+        return fraction >= warningThreshold ? .warning : .calm
     }
 
     /// The fill fraction for the drink-day bar.
