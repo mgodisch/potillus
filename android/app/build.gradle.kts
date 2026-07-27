@@ -986,9 +986,14 @@ tasks.cyclonedxDirectBom {
     // JSON only: CycloneDX JSON is the de-facto interchange format. The plugin
     // emits both JSON and XML by default; unsetting the XML output's convention
     // suppresses the XML file entirely.
+    //
+    // The `.cdx.json` suffix is one of CycloneDX's recognised file patterns, and
+    // osv-scanner classifies an SBOM by its FILE NAME: under any other name the
+    // release SCA gate (osv-scan-sbom in make/release.mk) finds no extractor and
+    // aborts. android/Makefile and make/release.mk name the same file.
     xmlOutput.unsetConvention()
     jsonOutput.set(
-        layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.json"),
+        layout.buildDirectory.file("outputs/sbom/libellus-potionis-sbom.cdx.json"),
     )
 }
 

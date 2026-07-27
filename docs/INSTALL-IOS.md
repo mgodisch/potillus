@@ -52,11 +52,12 @@ every iOS target; project generation comes first there too, matching §5 below.
 |------|---------|------------------|---------------|
 | **Xcode** | **26** | Supplies the iOS **17** SDK, the Simulators, the Swift compiler and `xcodebuild`. The project targets iOS 17.0 (`deploymentTarget.iOS: "17.0"` in `ios/project.yml`). | App Store |
 | **Command Line Tools** | bundled with Xcode | Provides `git`, `python3` and the CLI shims. | Xcode / `xcode-select` |
-| **Homebrew** | any | The package manager used for the two Mac-side build tools below. | script |
+| **Homebrew** | any | The package manager used for the Mac-side tools below. | script |
 | **GNU Make** | any recent (`gmake`) | The build is driven by the repository's `Makefile`, which uses GNU Make features. macOS ships **GNU Make 3.81**, too old to parse it, so a newer one is installed as `gmake`. | `brew` |
 | **XcodeGen** | any recent | `ios/Potillus.xcodeproj` is **generated** from `ios/project.yml`; XcodeGen does the generating. The `.xcodeproj` is not committed. | `brew` |
 | **GRDB.swift** | **7.11.1** | The SQLite layer (iOS's counterpart to Room). It is **not** installed by hand: the local Swift package `PotillusKit` depends on it, and Swift Package Manager resolves it automatically on the first build (needs network once). | automatic |
 | **SwiftLint** | 0.65.0 | Only needed to run the *full* `gmake ios` verification gate. **Not required** to build or run the app. | `brew` (optional) |
+| **osv-scanner** | **2.4.0** | Only needed for `gmake release-ios`, whose SCA gate scans the CycloneDX SBOM against the OSV database. The version is pinned in `make/release.mk` and `.gitlab-ci.yml`; `brew pin osv-scanner` holds it. **Not required** to build or run the app. | `brew` (optional) |
 
 The important idea: the Xcode project is a **build artifact**, not a source
 file. You never edit `Potillus.xcodeproj`; you edit `project.yml` and

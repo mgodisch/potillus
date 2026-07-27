@@ -61,6 +61,7 @@ tool belongs to before installing anything.
 | **Android Gradle Plugin / Kotlin** | AGP **9.2.0**, Kotlin **2.4.0** | The plugins that turn Kotlin into an APK. Declared in `android/gradle/libs.versions.toml`; Gradle fetches them from Maven Central on the first build. | automatic |
 | **git, unzip, curl** | any | Clone the source; unpack the SDK command-line tools; download them. | `apt` |
 | **python3, make, bash** | any | The `make` targets regenerate a couple of bundled text files (the in-app copyright notice and the localized user guides) with small Python helpers before compiling. | `apt` |
+| **osv-scanner** | **2.4.0** | Only needed for `make release-android`, whose SCA gate scans the CycloneDX SBOM against the OSV database. The version is pinned in `make/release.mk` and `.gitlab-ci.yml`. Prebuilt binaries: <https://github.com/google/osv-scanner/releases>. **Not required** to build or run the app. | manual (optional) |
 
 Two things are deliberately **not** on the list:
 

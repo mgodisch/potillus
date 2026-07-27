@@ -56,7 +56,7 @@
 check_third_party_notices() {
     section "12 / 15 — THIRD-PARTY NOTICE FILES"
 
-    local sbom="app/build/outputs/sbom/libellus-potionis-sbom.json"
+    local sbom="app/build/outputs/sbom/libellus-potionis-sbom.cdx.json"
     if [[ ! -f "$sbom" ]]; then
         info "SBOM not present ($sbom) — run 'make sbom' first; NOTICE scan skipped"
         pass "NOTICE scan is SBOM-gated (nothing to verify without the component inventory)"

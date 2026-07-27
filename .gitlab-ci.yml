@@ -131,7 +131,10 @@ dependency-scan:
     # Pinned to a specific release rather than `latest`, so the scanner version
     # that gates a merge is reproducible and does not drift under us (the same
     # discipline the pinned tool versions elsewhere follow), and matches the
-    # version the maintainer runs locally for the staging SBOM scan.
+    # version the maintainer runs locally for the staging SBOM scan. That match is
+    # enforced on the local side: make/release.mk carries OSV_SCANNER_VERSION with
+    # this value and its release targets refuse to run on a different one. The two
+    # are bumped together.
     OSV_SCANNER_VERSION: "2.4.0"
     # sha256 of the official prebuilt linux/amd64 binary for that version.
     # A version tag alone is NOT a pin: a release asset can be replaced upstream

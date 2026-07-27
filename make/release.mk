@@ -52,10 +52,10 @@ VERSION_CODE := $(shell grep -oE 'versionCode *= *[0-9]+' android/app/build.grad
 RELEASES_DIR := releases
 GRADLE_AAB   := android/app/build/outputs/bundle/release/app-release.aab
 GRADLE_APK   := android/app/build/outputs/apk/release/app-release.apk
-GRADLE_SBOM  := android/app/build/outputs/sbom/libellus-potionis-sbom.json
+GRADLE_SBOM  := android/app/build/outputs/sbom/libellus-potionis-sbom.cdx.json
 STAGED_AAB   := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).aab
 STAGED_APK   := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).apk
-STAGED_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_android_sbom.json
+STAGED_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_android_sbom.cdx.json
 
 # ── iOS release (Mac only) ───────────────────────────────────────────────────
 IOS_XCODEPROJ    := ios/Potillus.xcodeproj
@@ -67,8 +67,8 @@ IOS_REPRO_DIR    := $(IOS_BUILD_DIR)/repro
 IOS_IPA          := $(IOS_BUILD_DIR)/Potillus.ipa
 IOS_EXPORT_PLIST := $(IOS_BUILD_DIR)/ExportOptions.plist
 STAGED_IPA       := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE).ipa
-IOS_SBOM         := $(IOS_BUILD_DIR)/libellus-potionis-ios-sbom.json
-STAGED_IOS_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_ios_sbom.json
+IOS_SBOM         := $(IOS_BUILD_DIR)/libellus-potionis-ios-sbom.cdx.json
+STAGED_IOS_SBOM  := $(RELEASES_DIR)/$(RELEASE_ID)_$(VERSION_CODE)_ios_sbom.cdx.json
 
 # ── Release gates (presence of the device artifacts) ─────────────────────────
 # A release must ship the store screenshots and the report PDFs, and neither is
@@ -123,7 +123,9 @@ require-ios-screenshots = \
 	fi
 
 # osv-scan-sbom: the release-time Software Composition Analysis gate. $(1) is the
-# calling target (for the error message), $(2) is the CycloneDX SBOM to scan.
+# calling target (for the error message), $(2) is the CycloneDX SBOM to scan. That
+# the scanner exists and matches the pin is settled earlier, by
+# require-osv-scanner; this macro only scans.
 #
 # WHY HERE AND NOT IN CI: the check runs against the SBOM each platform's build
 # produces, and producing that SBOM needs the full toolchain (the Android SDK /
@@ -143,11 +145,47 @@ require-ios-screenshots = \
 # harmless transitive advisory does not block a release — the documented policy,
 # made machine-enforced. Network access to osv.dev is required; the scan is the
 # one release step that reaches the network.
-osv-scan-sbom = \
+#
+# THE SBOM'S FILE NAME IS LOAD-BEARING: osv-scanner derives an SBOM's format from
+# the NAME, not from the content -- the recognised patterns are `bom.json`,
+# `*.cdx.json`, `bom.xml`, `*.cdx.xml` for CycloneDX and `*.spdx.json` and its
+# siblings for SPDX -- and `-L` accepts an extractor prefix for LOCKFILES only, so
+# an SBOM under any other name aborts the scan with "could not determine extractor
+# suitable to this file". Both platforms therefore write their SBOM as
+# `*.cdx.json`, and both stage it under that suffix.
+# OSV_SCANNER_VERSION: the osv-scanner release both SCA gates run on. The CI
+# lockfile scan pins the SAME version in .gitlab-ci.yml (there additionally by the
+# sha256 of the official binary), so a merge request and a release are decided by
+# one scanner build rather than by whatever each machine happens to have; a newer
+# scanner knows other advisories and may classify a file differently, which would
+# make the two gates disagree. require-osv-scanner below holds the LOCAL
+# installation to this value. Bump both places together.
+OSV_SCANNER_VERSION := 2.4.0
+
+# require-osv-scanner: the pre-flight half of the SCA gate. $(1) is the calling
+# target (for the error message).
+#
+# WHY SEPARATE FROM THE SCAN: the scan runs on the SBOM the build produces, i.e.
+# AFTER the build. A missing or mismatched scanner discovered there costs the
+# whole build first -- on iOS two complete xcodebuild archives. Both release
+# targets therefore call this as one of their first steps, which turns that into
+# a one-second failure, the same shape as the macOS and Xcode-version guards.
+#
+# `osv-scanner --version` prints "osv-scanner version: X.Y.Z" as its first line.
+# Homebrew tracks the current release, so `brew pin osv-scanner` keeps a routine
+# `brew upgrade` from moving a release-blocking tool underneath a release.
+require-osv-scanner = \
 	command -v osv-scanner >/dev/null 2>&1 || { \
-	    echo "$(1): 'osv-scanner' not found -- install it (https://google.github.io/osv-scanner/installation/, e.g. 'go install github.com/google/osv-scanner/cmd/osv-scanner@v2') so the release SCA gate can run." >&2; \
+	    echo "$(1): 'osv-scanner' not found -- install version $(OSV_SCANNER_VERSION) so the release SCA gate can run: 'brew install osv-scanner' on macOS, the prebuilt binary from https://github.com/google/osv-scanner/releases/tag/v$(OSV_SCANNER_VERSION), or 'go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v$(OSV_SCANNER_VERSION)'." >&2; \
 	    exit 1; \
 	}; \
+	osv_have="$$(osv-scanner --version | sed -n '1s/^osv-scanner version: //p')"; \
+	if [ "$$osv_have" != "$(OSV_SCANNER_VERSION)" ]; then \
+	    echo "$(1): osv-scanner $(OSV_SCANNER_VERSION) required, but 'osv-scanner --version' reports '$$osv_have'. That version is pinned here and in .gitlab-ci.yml (OSV_SCANNER_VERSION); install the pinned one or bump both." >&2; \
+	    exit 1; \
+	fi
+
+osv-scan-sbom = \
 	echo "$(1): scanning $(2) against the OSV database (osv-scanner)…"; \
 	osv-scanner scan source --config=osv-scanner.toml -L "$(2)"
 
@@ -176,6 +214,7 @@ cover-check:
 # releases/ under their canonical names. It never uploads -- that is the fastlane
 # lanes (push-playstore), which read the staged AAB.
 release-android:
+	@$(call require-osv-scanner,release-android)
 	@$(call require-android-screenshots,release-android)
 	@$(call require-android-report-pdfs,release-android)
 	@for f in "$(STAGED_AAB)" "$(STAGED_APK)" "$(STAGED_SBOM)"; do \
@@ -216,6 +255,7 @@ ios-sbom:
 # uploads (that is the fastlane ios lanes) and refuses to overwrite a staged .ipa.
 release-ios:
 	@test "$$(uname -s)" = "Darwin" || { echo "release-ios: needs macOS (the Xcode toolchain); host is $$(uname -s)." >&2; exit 1; }
+	@$(call require-osv-scanner,release-ios)
 	@# This recipe runs as ONE bash script under `.SHELLFLAGS := -eu -o pipefail`
 	@# (see the .ONESHELL block near the top). Two consequences shape the style
 	@# below: independent commands sit on their own lines (backslashes only join a
@@ -355,18 +395,21 @@ release-ios:
 			-exportOptionsPlist "$(IOS_EXPORT_PLIST)" \
 			-allowProvisioningUpdates; \
 	fi
-	# Stage the .ipa under its canonical name. `cp -a` (not the GNU-only
-	# `cp --archive`) because this target runs on macOS, whose BSD cp accepts the
-	# short -a but not the long option.
+	# Generate the iOS SBOM from Package.resolved and normalise it with the same
+	# tool the Android SBOM uses. Analogous to the Android SBOM, which
+	# release-android stages as _android_sbom.cdx.json.
+	$(MAKE) ios-sbom
+	@# SCA gate: scan the iOS SBOM against OSV BEFORE anything reaches releases/,
+	@# mirroring release-android, where the gate also precedes every cp. Staging the
+	@# .ipa first would leave a failed release half-staged: releases/ would hold an
+	@# .ipa without its SBOM, and the "refusing to overwrite a staged release" guard
+	@# at the top of this target would then block the rerun that fixes the finding.
+	@$(call osv-scan-sbom,release-ios,$(IOS_SBOM))
+	# Stage the .ipa and the scanned SBOM under their canonical names. `cp -a` (not
+	# the GNU-only `cp --archive`) because this target runs on macOS, whose BSD cp
+	# accepts the short -a but not the long option.
 	mkdir -p "$(RELEASES_DIR)"
 	cp -a "$(IOS_IPA)" "$(STAGED_IPA)"
-	# Generate the iOS SBOM from Package.resolved and normalise it with the same
-	# tool the Android SBOM uses, then stage it beside the .ipa. Analogous to the
-	# Android SBOM, which release-android stages as _android_sbom.json.
-	$(MAKE) ios-sbom
-	@# SCA gate: scan the iOS SBOM against OSV before staging it, mirroring the
-	@# Android gate in release-android. A finding fails the release here.
-	@$(call osv-scan-sbom,release-ios,$(IOS_SBOM))
 	cp -a "$(IOS_SBOM)" "$(STAGED_IOS_SBOM)"
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IOS_SBOM)"

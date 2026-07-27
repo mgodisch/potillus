@@ -95,6 +95,12 @@ platforms, and revises the project's own texts.
   report PDFs.
 - `release-android` and `release-ios` are the sole writers of `releases/` and
   refuse to overwrite a staged artifact.
+- Both platforms write their CycloneDX SBOM as `*.cdx.json`, staged and uploaded
+  under that name.
+- `release-android` and `release-ios` open with a check for osv-scanner 2.4.0,
+  the version `.gitlab-ci.yml` pins.
+- `release-ios` stages the `.ipa` after the SBOM scan.
+- `docs/INSTALL-ANDROID.md` and `docs/INSTALL-IOS.md` list osv-scanner.
 - The `publish.mk` targets upload what is staged, each gated on the `v<VERSION>`
   tag and the expected signing key.
 - `tools/release-check.sh` is decomposed into `tools/release-checks/lib.sh` plus

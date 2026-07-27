@@ -434,11 +434,11 @@ GITLAB_PACKAGE    := releases
 # unique within a release).
 GITLAB_ASSET_LABELS := \
 	.apk=Android\ Package\ Kit \
-	_android_sbom.json=Android\ Software\ Bill\ of\ Materials \
-	_ios_sbom.json=iOS\ Software\ Bill\ of\ Materials \
+	_android_sbom.cdx.json=Android\ Software\ Bill\ of\ Materials \
+	_ios_sbom.cdx.json=iOS\ Software\ Bill\ of\ Materials \
 	.apk.asc=Android\ Package\ Kit\ OpenPGP\ Signature \
-	_android_sbom.json.asc=Android\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature \
-	_ios_sbom.json.asc=iOS\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature
+	_android_sbom.cdx.json.asc=Android\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature \
+	_ios_sbom.cdx.json.asc=iOS\ Software\ Bill\ of\ Materials\ OpenPGP\ Signature
 # OpenPGP key the release artifacts are signed with, pinned to a full 40-hex-digit
 # fingerprint rather than a short id (short ids are forgeable) -- the same key
 # SECURITY.md publishes for encrypted vulnerability reports and the one the

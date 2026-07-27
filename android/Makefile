@@ -327,8 +327,10 @@ deps: prereq
 # The reproducible CycloneDX SBOM for the release runtime. cyclonedxDirectBom writes
 # it deterministically (see the cyclonedxDirectBom block in app/build.gradle.kts);
 # sbom-normalize.py drops the one remaining non-deterministic field, so identical
-# builds produce byte-identical SBOMs.
-SBOM := app/build/outputs/sbom/libellus-potionis-sbom.json
+# builds produce byte-identical SBOMs. The `.cdx.json` suffix is what osv-scanner
+# classifies the file by -- see the osv-scan-sbom macro in ../make/release.mk --
+# and app/build.gradle.kts writes the file under this same name.
+SBOM := app/build/outputs/sbom/libellus-potionis-sbom.cdx.json
 
 sbom: $(SBOM)
 
