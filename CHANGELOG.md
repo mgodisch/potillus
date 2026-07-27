@@ -195,6 +195,7 @@ platforms, and revises the project's own texts.
 - `ReportFormatting`'s fallback formatting the settled decimal.
 - The App Store screenshot of the log-a-drink sheet showing that sheet.
 - The iOS report export handing out a document whose last sheet is missing.
+- `md-syntax.py` reading indented code blocks as prose.
 
 ### Removed
 

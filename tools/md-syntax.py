@@ -91,6 +91,10 @@ _LINK_DEST = re.compile(r"\]\([^)]*\)")
 
 # A thematic break: a line of three or more *, _ or - (optionally spaced).
 _THEMATIC = re.compile(r"^\s*([*_-])(?:\s*\1){2,}\s*$")
+# A list item's marker plus the whitespace after it; the match length is the
+# column the item's content starts in, which is what indentation inside the
+# item is measured against.
+_LIST_ITEM = re.compile(r"^ *(?:[-*+]|\d+[.)])\s+")
 
 # A CHANGELOG version heading.
 _VERSION_HEADING = re.compile(r"^## v(\d+)\.(\d+)\.(\d+)\s*$")
@@ -234,6 +238,19 @@ def check_file(path):
     # code may wrap across a soft line break but never across a block boundary,
     # so per-block balance checking avoids false positives on wrapped spans.
     blocks, cur, in_fence = [], [], False
+    # Indented code blocks (CommonMark's other code form: four spaces, no fence)
+    # are skipped like fenced ones. Without this every shell snippet written that
+    # way reads as prose, and its identifiers -- ANDROID_HOME, CODE_SIGNING_ALLOWED
+    # -- are reported as unwrapped, which is the false-positive class this checker
+    # exists to avoid. A code block opens only at a BLOCK START (no paragraph is
+    # open, since an indented line under a paragraph is a lazy continuation of it)
+    # and stays open across blank lines until a line dedents below its column.
+    #
+    # Inside a list, indentation is measured from the item's content column: the
+    # six-space continuation lines of a checklist item are prose, not code, so a
+    # code block there has to be indented four columns past that. list_col carries
+    # that column, reset by any line that starts at the left margin.
+    in_code, list_col = False, None
 
     def flush():
         if cur:
@@ -243,11 +260,30 @@ def check_file(path):
     for lineno, line in enumerate(lines, start=1):
         if line.strip().startswith("```"):
             in_fence = not in_fence
+            in_code = False
             flush()
             continue
         if in_fence:
             continue
-        if not line.strip() or _THEMATIC.match(line):
+        if not line.strip():
+            flush()                             # closes a paragraph, not a code block
+            continue
+        expanded = line.expandtabs(4)
+        indent = len(expanded) - len(expanded.lstrip(" "))
+        code_col = 4 if list_col is None else list_col + 4
+        if in_code:
+            if indent >= code_col:
+                continue
+            in_code = False
+        if not cur and indent >= code_col:
+            in_code = True
+            continue
+        marker = _LIST_ITEM.match(expanded)
+        if marker:
+            list_col = len(marker.group(0))
+        elif indent == 0:
+            list_col = None
+        if _THEMATIC.match(line):
             flush()
             continue
         if re.match(r"#{1,6}\s", line):
