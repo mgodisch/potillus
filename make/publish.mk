@@ -31,9 +31,16 @@
 #  fast if the artifact, credential or git tag is missing, so a push only runs
 #  against something you produced explicitly. They pin the release signing key
 #  (read from SECURITY.md) and require the v<VERSION> git tag to already exist --
-#  they never create it. `push` pushes commits + tags; the store pushes upload the
-#  staged AAB/IPA; push-gitlab publishes the release and verifies each asset's
-#  sha256. Uploading is the last, deliberate step.
+#  they never create it. The four store targets -- push-playstore-testing,
+#  push-playstore-production, push-appstore-testing and push-appstore-production --
+#  upload the staged AAB/IPA; push-gitlab publishes the release and verifies each
+#  asset's sha256. Uploading is the last, deliberate step.
+#
+#  NONE of them submits anything for review. A Play upload is a draft release, a
+#  TestFlight upload reaches no tester group, an App Store upload stops at
+#  "Prepare for Submission". What these targets produce is something to look at in
+#  the Play Console or App Store Connect; handing it to Google or Apple is a
+#  separate act, taken there.
 # =============================================================================
 
 tgz: potillus-$(VERSION).tar.gz
@@ -73,26 +80,28 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 		"$$top"; \
 	rm -rf "$$td"
 
-# ── push-playstore ── upload the ALREADY-BUILT release AAB to Google Play and
-# OVERWRITE the store listing there (localized titles, short/full descriptions,
-# feature graphics, screenshots) plus the release notes, from
-# fastlane/metadata/android/. The fastlane OPTIONS (track beta, status
-# completed, metadata-overwriting) live in the fastlane `testing` lane, NOT here —
-# override them there or via `fastlane testing track:...`.
+# ── push-playstore-testing / push-playstore-production ── upload the ALREADY-BUILT
+# release AAB to Google Play and OVERWRITE the store listing there (localized
+# titles, short/full descriptions, feature graphics, screenshots) plus the release
+# notes, from fastlane/metadata/android/. The two differ in ONE thing, the fastlane
+# lane they call and therefore the track it uploads to: `testing` goes to the
+# open-testing (beta) track, `production` to the production track. Everything else
+# — the guards below, the metadata overwrite, the draft release status — is shared.
 #
-# DELIBERATELY NOT A DEPENDENCY BUILD: this target has NO prerequisites, so it
-# never triggers a rebuild of the AAB or SBOM. It FAILS FAST if a precondition
+# DELIBERATELY NOT A DEPENDENCY BUILD: these targets have NO prerequisites, so they
+# never trigger a rebuild of the AAB or SBOM. They FAIL FAST if a precondition
 # is missing — the signed AAB, the bundled fastlane, or the Play service-account
 # key — so the push only runs against artifacts you built explicitly
 # (`make release-android`, or `make -C android bundle`) with credentials in place. Build
-# the AAB yourself first; this target purely uploads it.
+# the AAB yourself first; these targets purely upload it.
 #
 # The credential path mirrors the Appfile: SUPPLY_JSON_KEY if set, else
 # fastlane/play-store-credentials.json.
 #
-# VALIDATE_ONLY=1 makes this a NON-PUBLISHING dry run: fastlane supply validates
-# the upload against the Play API without changing anything on Google Play
-# (supply's validate_only). Use it to exercise credentials and metadata safely.
+# VALIDATE_ONLY=1 makes either of them a NON-PUBLISHING dry run: fastlane supply
+# validates the upload against the Play API without changing anything on Google
+# Play (supply's validate_only). Use it to exercise credentials and metadata
+# safely.
 # Expected release signing-key fingerprint (SHA-256 of the DER signing
 # certificate, bare lowercase hex). SINGLE SOURCE: it is read from SECURITY.md's
 # "Verifying releases" section rather than duplicated here, so the pin and the
@@ -121,10 +130,20 @@ SIGNING_KEY_FINGERPRINT := $(shell grep -oiE '\b[0-9a-f]{64}\b' SECURITY.md | he
 # from the root.
 PLAY_JSON_KEY := $(abspath $(if $(SUPPLY_JSON_KEY),$(SUPPLY_JSON_KEY),fastlane/play-store-credentials.json))
 
-# ── push-playstore ── upload the STAGED release bundle to Google Play via the
-# fastlane `testing` lane. Never builds or stages (that is `make release-android`); FAILS
-# FAST if the staged AAB is missing. Uploads only the staged bundle so the exact
-# verified bytes reach Play.
+# ── the two Play targets ── upload the STAGED release bundle to Google Play via
+# the fastlane lane named in PLAY_LANE. Never build or stage (that is
+# `make release-android`); FAIL FAST if the staged AAB is missing. They upload only
+# the staged bundle, so the exact verified bytes reach Play.
+#
+# ONE recipe, two targets, and the lane as a target-specific variable: the guards
+# below are the whole substance of these targets and are identical for both tracks,
+# so writing them twice would be writing a drift into the file. $@ in the messages
+# names whichever target the user actually invoked.
+#
+# The lane always uploads as a DRAFT release (hard-coded in the Fastfile's
+# upload_release), on the production track as much as on beta. Google Play sends a
+# release to review when it is ROLLED OUT, so what arrives here is something to
+# open in the Play Console and look at. Rolling it out is done there.
 #
 # Guards, in order: (1) staged AAB present; (2) release tag v$(VERSION) exists
 # locally AND on the push remote -- a RELEASE-HYGIENE gate mirroring push-gitlab
@@ -148,53 +167,80 @@ PLAY_JSON_KEY := $(abspath $(if $(SUPPLY_JSON_KEY),$(SUPPLY_JSON_KEY),fastlane/p
 # one-off does NOT get that chdir: it resolves paths against the shell's cwd,
 # which the `( cd fastlane && ... )` subshell has already moved into fastlane/.
 # Hence PLAY_JSON_KEY below is made ABSOLUTE and the two forms cannot be confused.
-push-playstore:
+push-playstore-testing:    PLAY_LANE := testing
+push-playstore-production: PLAY_LANE := production
+push-playstore-testing push-playstore-production:
 	# 1) staged AAB must exist (never builds/stages)
-	@test -f "$(STAGED_AAB)" || { echo "push-playstore: staged AAB not found at '$(STAGED_AAB)' -- run 'make release-android' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
+	@test -f "$(STAGED_AAB)" || { echo "$@: staged AAB not found at '$(STAGED_AAB)' -- run 'make release-android' first (it builds and stages the bundle). This target does NOT build or stage it." >&2; exit 1; }
 	# 2) release tag must exist locally and on the push remote
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-playstore: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
 	# 3) staged AAB must be signed with the expected key (jarsigner verdict + keytool SHA-256 pin)
 	js="$${JARSIGNER:-$$(command -v jarsigner || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}jarsigner")}"
 	"$$js" -verify "$(STAGED_AAB)" | grep '^jar verified\.'
 	kt="$${KEYTOOL:-$$(command -v keytool || echo "$${JAVA_HOME:+$$JAVA_HOME/bin/}keytool")}"
 	got="$$("$$kt" -printcert -jarfile "$(STAGED_AAB)" | grep -oiE 'SHA-?256:[[:space:]]*[0-9A-F:]+' | sed -E 's/.*SHA-?256:[[:space:]]*//I; s/://g' | tr 'A-F' 'a-f' | sort -u)"
-	echo "push-playstore: AAB signer certificate SHA-256: $$got"
+	echo "$@: AAB signer certificate SHA-256: $$got"
 	test "$$got" = "$(SIGNING_KEY_FINGERPRINT)"
-	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-playstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
-	@test -f "$(PLAY_JSON_KEY)" || { echo "push-playstore: Play service-account key not found at '$(PLAY_JSON_KEY)' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
+	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "$@: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
+	@test -f "$(PLAY_JSON_KEY)" || { echo "$@: Play service-account key not found at '$(PLAY_JSON_KEY)' -- place the JSON key there or set SUPPLY_JSON_KEY (see fastlane/Appfile)." >&2; exit 1; }
 	# 4) pre-flight: prove the key can actually reach the Play API BEFORE uploading
-	#    (the action never raises, so its success line is required explicitly)
-	( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$(PLAY_JSON_KEY)" ) | grep -q 'Successfully established connection to Google Play Store' || { echo "push-playstore: the Play service-account key at '$(PLAY_JSON_KEY)' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1; }
+	#    (the action never raises, so its success line is required explicitly).
+	#    The output is CAPTURED and then searched, rather than piped into `grep -q`:
+	#    grep -q exits at the first match, fastlane keeps writing its summary into a
+	#    pipe with no reader left, dies of SIGPIPE -- and `-o pipefail` turns that
+	#    into a failed pipeline, i.e. a healthy key reported as unreachable. Whether
+	#    it fires depends on Ruby's output buffering, which is the worst kind of
+	#    gate: one that works until it does not.
+	out="$$( cd fastlane && bundle exec fastlane run validate_play_store_json_key json_key:"$(PLAY_JSON_KEY)" 2>&1 )" || true
+	case "$$out" in \
+	*"Successfully established connection to Google Play Store"*) ;; \
+	*) echo "$$out" >&2; echo "$@: the Play service-account key at '$(PLAY_JSON_KEY)' could not connect to the Play API -- check that the service account is invited to the Play Console with 'Manage testing track releases' permission for this app (see fastlane/Appfile)." >&2; exit 1;; \
+	esac
 	# 5) upload the staged bundle (repo-root-relative aab: for fastlane's chdir)
-	( cd fastlane && bundle exec fastlane testing aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
+	( cd fastlane && bundle exec fastlane $(PLAY_LANE) aab:"$(STAGED_AAB)" $(if $(VALIDATE_ONLY),validate_only:true) )
 
-# ── push-appstore ── the iOS counterpart of push-playstore: upload the STAGED
-# .ipa to App Store Connect via the fastlane `ios testing` lane, which also
-# OVERWRITES the App Store listing (names, subtitles, keywords, descriptions,
-# screenshots and release notes) from fastlane/metadata/ios/. Never builds and
-# never stages -- that is `make release-ios`. Mac-only, like release-ios.
+# ── the two App Store targets ── the iOS counterpart of the Play pair: upload the
+# STAGED .ipa to App Store Connect via the fastlane lane named in IOS_LANE. Never
+# build and never stage -- that is `make release-ios`. Mac-only, like release-ios.
 #
-# SUBMIT=1 switches the target to the `ios production` lane, which performs the
-# SAME upload and additionally submits the build for Apple review. The default is
-# deliberately the non-submitting lane: upload, look at the result in App Store
-# Connect, then submit in a second, explicit step. (This mirrors how
-# push-playstore's `production` counterpart stages a draft rather than going live.)
+# WHERE THE BUILD LANDS is the whole difference between them:
 #
-# NOTE what `ios testing` is NOT: unlike a Play testing track, it has no separate
-# audience. The App Store has ONE listing, and this target overwrites it. "testing"
-# here means "not submitted for review", not "not public". There is also no iOS
-# equivalent of VALIDATE_ONLY: deliver has no validate-only mode, so the closest
-# thing to a dry run is `make push-appstore-preflight`, which checks the
-# credentials and touches nothing else.
+#   push-appstore-testing     `ios testing` -> TestFlight, assigned to no tester
+#                             group. Pushes no listing metadata; TestFlight does
+#                             not use it. Handing the build to the external group
+#                             -- which is what submits it to Apple Beta App Review
+#                             -- is a click in App Store Connect.
+#   push-appstore-production  `ios production` -> the App Store listing, which it
+#                             OVERWRITES (names, subtitles, keywords, descriptions,
+#                             screenshots and release notes) from
+#                             fastlane/metadata/ios/. The version stays in "Prepare
+#                             for Submission"; selecting the build and submitting
+#                             it for review happen in App Store Connect.
 #
-# Guards, in order -- (1), (2) and (5) are the same guards push-playstore applies,
+# So neither target submits anything anywhere, which is the point of the pair.
+# There is no iOS equivalent of VALIDATE_ONLY either: deliver has no validate-only
+# mode, so the closest thing to a dry run is `make push-appstore-preflight`, which
+# checks the credentials and touches nothing else.
+#
+# ONE recipe for both, with the lane as a target-specific variable and $@ naming
+# the invoked target in the messages -- as on the Play side, and for the same
+# reason: the guards are the substance, and they are shared.
+#
+# THE GUARDS ARE THE SAME FOR BOTH, including the listing checks at (6) that
+# TestFlight itself has no use for. That is deliberate. Two guard sets would mean
+# two notions of "ready to upload", and the cheaper one would be the one that gets
+# exercised. The cost is that a TestFlight upload fails while a locale's
+# release_notes.txt is still untranslated; the gain is that whatever reached
+# TestFlight can reach the App Store unchanged.
+#
+# Guards, in order -- (1), (2) and (5) are the same guards the Play targets apply,
 # and the two in between are where the platforms genuinely differ:
 #
-#   (1) the staged .ipa is present (this target never builds or stages it);
+#   (1) the staged .ipa is present (these targets never build or stage it);
 #   (2) the release tag v$(VERSION) exists locally AND on the push remote -- the
-#       same release-hygiene gate push-playstore and push-gitlab apply, so a
+#       same release-hygiene gate the Play targets and push-gitlab apply, so a
 #       build only reaches a store when its exact version is a pushed tag;
 #   (3) the .ipa's OWN Info.plist agrees with this working tree: bundle
 #       identifier, build number and marketing version must equal $(RELEASE_ID),
@@ -209,7 +255,7 @@ push-playstore:
 #       and CFBundleVersion; if the archive predates a version bump, the values
 #       disagree and this fails.
 #   (4) the .ipa is signed, the signature verifies, and it was signed by OUR team.
-#       This is the analogue of push-playstore's fingerprint pin, but it pins the
+#       This is the analogue of the Play fingerprint pin, but it pins the
 #       TEAM ID, not a certificate digest, and the difference is deliberate. The
 #       Android pin works because the maintainer owns the signing key and its
 #       SHA-256 is published in SECURITY.md for users to verify against. An iOS
@@ -226,7 +272,7 @@ push-playstore:
 #       cosmetic: under .ONESHELL the whole recipe is a single shell script, so a
 #       `$(MAKE) push-appstore-preflight` inside it would make the ENTIRE script
 #       "a line containing $(MAKE)" -- and make executes those even under `-n`.
-#       `make -n push-appstore` would then really upload. As a prerequisite it
+#       `make -n push-appstore-production` would then really upload. As a prerequisite it
 #       runs in its own recipe, `-n` stays a dry run, and the check still happens
 #       before the upload. The cost is ordering: with credentials missing you learn
 #       that before guards (1)-(4) report, and with a missing .ipa you pay one
@@ -246,24 +292,26 @@ push-playstore:
 # fastlane runs actions from the PROJECT ROOT (it chdirs one level up from
 # fastlane/), so the staged path handed to the lane's ipa: option is
 # repo-root-relative -- exactly $(STAGED_IPA), with no ../ prefix. Same convention
-# as push-playstore's aab:.
-push-appstore: push-appstore-preflight
+# as the Play targets' aab:.
+push-appstore-testing:    IOS_LANE := testing
+push-appstore-production: IOS_LANE := production
+push-appstore-testing push-appstore-production: push-appstore-preflight
 	# 1) staged .ipa must exist (never builds/stages)
-	@test -f "$(STAGED_IPA)" || { echo "push-appstore: staged .ipa not found at '$(STAGED_IPA)' -- run 'make release-ios' first (it archives, exports and stages the .ipa). This target does NOT build or stage it." >&2; exit 1; }
+	@test -f "$(STAGED_IPA)" || { echo "$@: staged .ipa not found at '$(STAGED_IPA)' -- run 'make release-ios' first (it archives, exports and stages the .ipa). This target does NOT build or stage it." >&2; exit 1; }
 	# 2) release tag must exist locally and on the push remote
-	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "push-appstore: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
+	@git rev-parse -q --verify "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: git tag 'v$(VERSION)' not found -- create and push it first (git tag -s v$(VERSION) -m 'v$(VERSION)' && git push && git push --tags). This target does NOT create the tag." >&2; exit 1; }
 	remote="$$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null | cut -d/ -f1 || true)"; remote="$${remote:-origin}"
-	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "push-appstore: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
+	git ls-remote --exit-code --tags "$$remote" "refs/tags/v$(VERSION)" >/dev/null || { echo "$@: tag 'v$(VERSION)' not found on remote '$$remote' -- push it first (git push && git push --tags)." >&2; exit 1; }
 	# Resolve the expected Team ID exactly as release-ios does: the environment
 	# wins, else ios/signing.properties. The $${VAR:-} default keeps -u happy and
 	# the file is only read when it exists (sed on a missing file would abort this
 	# .ONESHELL recipe under -e before the friendly message below could print).
 	team="$${DEVELOPMENT_TEAM:-}"
 	if [ -z "$$team" ] && [ -f ios/signing.properties ]; then \
-		team="$$(sed -n 's/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*//p' ios/signing.properties | head -n 1)"; \
+		team="$$(awk 'seen == 0 && sub(/^[[:space:]]*DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*/, "") { print; seen = 1 }' ios/signing.properties)"; \
 	fi
 	if [ -z "$$team" ] || [ "$$team" = "XXXXXXXXXX" ]; then \
-		echo "push-appstore: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
+		echo "$@: no Apple Developer Team ID -- set DEVELOPMENT_TEAM or copy ios/signing.properties.example to ios/signing.properties and fill it in (see docs/RELEASE-IOS.md)." >&2; \
 		exit 1; \
 	fi
 	# Unpack the staged .ipa so codesign and plutil can see the .app inside. The
@@ -272,47 +320,53 @@ push-appstore: push-appstore-preflight
 	trap 'rm -rf "$$work"' EXIT
 	unzip -q "$(STAGED_IPA)" -d "$$work"
 	app="$$(find "$$work/Payload" -maxdepth 1 -name '*.app' -print -quit)"
-	test -n "$$app" || { echo "push-appstore: no Payload/*.app inside '$(STAGED_IPA)' -- the staged file is not a valid .ipa. Re-run 'make release-ios'." >&2; exit 1; }
+	test -n "$$app" || { echo "$@: no Payload/*.app inside '$(STAGED_IPA)' -- the staged file is not a valid .ipa. Re-run 'make release-ios'." >&2; exit 1; }
 	# 3) the .ipa must describe THIS version of THIS app
 	got_id="$$(plutil -extract CFBundleIdentifier raw -o - -- "$$app/Info.plist")"
 	got_build="$$(plutil -extract CFBundleVersion raw -o - -- "$$app/Info.plist")"
 	got_version="$$(plutil -extract CFBundleShortVersionString raw -o - -- "$$app/Info.plist")"
-	echo "push-appstore: staged .ipa says id=$$got_id version=$$got_version build=$$got_build"
-	test "$$got_id" = "$(RELEASE_ID)" || { echo "push-appstore: staged .ipa has bundle identifier '$$got_id', expected '$(RELEASE_ID)'." >&2; exit 1; }
-	test "$$got_build" = "$(VERSION_CODE)" || { echo "push-appstore: staged .ipa has build number '$$got_build', but this tree is at versionCode $(VERSION_CODE) -- the staged .ipa is from another release. Re-run 'make release-ios' (or remove the stale releases/ artifact)." >&2; exit 1; }
-	test "$$got_version" = "$(VERSION)" || { echo "push-appstore: staged .ipa has marketing version '$$got_version', but this tree is at v$(VERSION) -- the staged .ipa is from another release. Re-run 'make release-ios'." >&2; exit 1; }
+	echo "$@: staged .ipa says id=$$got_id version=$$got_version build=$$got_build"
+	test "$$got_id" = "$(RELEASE_ID)" || { echo "$@: staged .ipa has bundle identifier '$$got_id', expected '$(RELEASE_ID)'." >&2; exit 1; }
+	test "$$got_build" = "$(VERSION_CODE)" || { echo "$@: staged .ipa has build number '$$got_build', but this tree is at versionCode $(VERSION_CODE) -- the staged .ipa is from another release. Re-run 'make release-ios' (or remove the stale releases/ artifact)." >&2; exit 1; }
+	test "$$got_version" = "$(VERSION)" || { echo "$@: staged .ipa has marketing version '$$got_version', but this tree is at v$(VERSION) -- the staged .ipa is from another release. Re-run 'make release-ios'." >&2; exit 1; }
 	# 4) the signature must verify, and it must be OUR team's. codesign writes its
 	#    report to stderr, hence the 2>&1; --verbose=4 is what prints TeamIdentifier.
 	codesign --verify --strict "$$app"
-	got_team="$$(codesign -dv --verbose=4 "$$app" 2>&1 | sed -n 's/^TeamIdentifier=//p' | head -n 1)"
-	echo "push-appstore: .ipa signed by TeamIdentifier: $$got_team"
-	test "$$got_team" = "$$team" || { echo "push-appstore: staged .ipa is signed by team '$$got_team', expected '$$team' -- it was exported with different credentials than this tree configures." >&2; exit 1; }
-	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "push-appstore: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
-	# 5) The listing itself, checked BEFORE it is sent. `make ios` already runs
+	#    The awk keeps the FIRST match without ending the pipeline early: a reader
+	#    that exits (`head -n 1`, `sed ... q`) leaves codesign writing into a closed
+	#    pipe, and `-o pipefail` reports the resulting SIGPIPE as a failure of this
+	#    assignment. Reading to EOF costs nothing here and cannot misfire.
+	got_team="$$(codesign -dv --verbose=4 "$$app" 2>&1 | awk 'seen == 0 && sub(/^TeamIdentifier=/, "") { print; seen = 1 }')"
+	echo "$@: .ipa signed by TeamIdentifier: $$got_team"
+	test "$$got_team" = "$$team" || { echo "$@: staged .ipa is signed by team '$$got_team', expected '$$team' -- it was exported with different credentials than this tree configures." >&2; exit 1; }
+	@( cd fastlane && bundle check >/dev/null 2>&1 ) || { echo "$@: fastlane gems not installed -- run 'cd fastlane && bundle install'." >&2; exit 1; }
+	# 6) The listing itself, checked BEFORE it is sent. `make ios` already runs
 	#    check-ios-metadata, but nothing ran it HERE -- which is how this cycle
 	#    spent four upload attempts learning what a gate could have said in a
 	#    second: wrong locale directory names, A4-shaped report screenshots, and
 	#    a reviewer contact still reading PLACEHOLDER. deliver catches all three,
 	#    but only from the far side of the network, one per attempt.
 	@for f in first_name last_name email_address phone_number; do \
-		test -f "fastlane/metadata/ios/review_information/$$f.txt" || { echo "push-appstore: fastlane/metadata/ios/review_information/$$f.txt is missing -- the App Store reviewer contact is git-ignored and set up once per machine: copy the .txt.example files beside it and fill in your own details." >&2; exit 1; }; \
+		test -f "fastlane/metadata/ios/review_information/$$f.txt" || { echo "$@: fastlane/metadata/ios/review_information/$$f.txt is missing -- the App Store reviewer contact is git-ignored and set up once per machine: copy the .txt.example files beside it and fill in your own details." >&2; exit 1; }; \
 	done
 	# --release here (and only here) makes check-ios-metadata enforce the
 	# per-locale release_notes.txt that `make ios` defers: this is the release
 	# path, so the translations must be present now.
 	python3 tools/check-ios-metadata.py --release
 	python3 tools/check-ios-screenshots.py
-	# 6) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
+	# 7) upload the staged .ipa (repo-root-relative ipa: for fastlane's chdir).
 	#    The App Store Connect pre-flight already ran as this target's
 	#    prerequisite -- see the comment block above for why it lives there.
-	( cd fastlane && bundle exec fastlane ios $(if $(SUBMIT),production,testing) ipa:"$(STAGED_IPA)" )
+	@echo "$@: uploading to App Store Connect. The lane waits for Apple to finish processing the build, so this takes a few minutes."
+	( cd fastlane && bundle exec fastlane ios $(IOS_LANE) ipa:"$(STAGED_IPA)" )
 
-# ── push-appstore-preflight ── the credential half of push-appstore, on its own.
+# ── push-appstore-preflight ── the credential half of the two App Store targets,
+# on its own.
 # Runs the fastlane `ios preflight` lane, which authenticates with the App Store
 # Connect API key and performs one READ-ONLY query against the app record. Nothing
 # is uploaded and nothing changes on the store, so this is safe to run at any time
-# -- it is the closest this platform gets to push-playstore's VALIDATE_ONLY dry run
-# (deliver has no validate-only mode; see the note on push-appstore above).
+# -- it is the closest this platform gets to the Play targets' VALIDATE_ONLY dry
+# run (deliver has no validate-only mode; see the note on the pair above).
 #
 # The three APP_STORE_CONNECT_API_KEY_* variables are read from the environment by
 # fastlane's own `app_store_connect_api_key` action under its default env names, so
@@ -350,7 +404,7 @@ push-appstore-preflight:
 #
 # The assets are the STAGED files from releases/ (produced by `make release-android`),
 # published under their canonical names de.godisch.potillus_<versionCode>.apk and
-# _<versionCode>_{android,ios}_sbom.json. After each upload the published asset is
+# _<versionCode>_{android,ios}_sbom.cdx.json. After each upload the published asset is
 # re-downloaded from its permanent release URL and its sha256 is diffed against
 # the staged file, so a corrupted upload is caught.
 #
@@ -392,7 +446,7 @@ push-appstore-preflight:
 # /-/releases/.../downloads/ form, which would leave the F-Droid `Binaries:` URL
 # dead. Such a link is PATCHED in place rather than reported.
 #
-# Like push-playstore, this never builds and never stages: `make release-android`
+# Like the store targets, this never builds and never stages: `make release-android`
 # builds and stages the artifacts. It FAILS FAST if the tag, the staged APK, the
 # staged SBOM, the release notes, curl/python3 or the GitLab token file are
 # missing. Build+stage first (`make release-android`) and push the tag first
@@ -427,11 +481,12 @@ GITLAB_PACKAGE    := releases
 # is added here. These are DISPLAY TEXT only; the link URL is what identifies the
 # artifact (see the note above).
 #
-# ORDER MATTERS: the match takes the LAST pair whose suffix fits, so the ".asc"
-# entries must come after their base entries -- ".apk" also matches
-# "....apk.asc", and without the later, longer pair a signature would inherit the
-# artifact's own label and collide with it (GitLab requires link names to be
-# unique within a release).
+# ORDER: the match takes the LAST pair whose suffix fits. Each signature carries
+# its own pair here, so no file depends on that ordering today -- ".apk" matches
+# a name ENDING in ".apk" and therefore not "....apk.asc". The rule is kept for
+# the day a shorter suffix is added that a longer one extends; a signature
+# inheriting its artifact's label would collide with it, and GitLab requires link
+# names to be unique within a release.
 GITLAB_ASSET_LABELS := \
 	.apk=Android\ Package\ Kit \
 	_android_sbom.cdx.json=Android\ Software\ Bill\ of\ Materials \
@@ -574,4 +629,6 @@ push-gitlab:
 	done
 	echo "push-gitlab: done -> https://gitlab.com/$(GITLAB_REPO)/-/releases/v$(VERSION)"
 
-.PHONY: tgz push-playstore push-appstore push-appstore-preflight push-gitlab
+.PHONY: tgz push-playstore-testing push-playstore-production \
+	push-appstore-testing push-appstore-production push-appstore-preflight \
+	push-gitlab

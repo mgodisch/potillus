@@ -26,16 +26,23 @@
 # =============================================================================
 #
 # This defines the lanes for BOTH platforms, in two blocks that mirror each
-# other. Android (`platform :android`, the default): `screenshots` captures the
-# in-app Play-Store screenshots via screengrab (configuration in Screengrabfile),
-# and `testing` / `production` upload an already-built, signed App Bundle plus the
+# other. `testing` and `production` name the same two audiences on both sides:
+# testing is the tester-facing channel (Play open testing, TestFlight),
+# production the store-facing one (Play production track, App Store listing).
+# Android (`platform :android`, the default): `screenshots` captures the in-app
+# Play-Store screenshots via screengrab (configuration in Screengrabfile),
+# `testing` / `production` upload an already-built, signed App Bundle plus the
 # store listing to Google Play. iOS (`platform :ios`): `screenshots` captures the
-# App Store screenshots via snapshot (Snapfile), `external_testing` uploads an
-# already-built, signed .ipa to external TestFlight, `testing` / `production`
-# upload it plus the
-# App Store listing, and `preflight` checks the App Store Connect credentials
-# without uploading anything. NO lane builds anything -- see the per-lane `desc`
-# text and the platform-level comment before the iOS block for the details.
+# App Store screenshots via snapshot (Snapfile), `testing` uploads an
+# already-built, signed .ipa to TestFlight, `production` uploads it plus the App
+# Store listing, and `preflight` checks the App Store Connect credentials without
+# uploading anything. NO lane builds anything -- see the per-lane `desc` text and
+# the platform-level comment before the iOS block for the details.
+#
+# NO lane submits anything for review either. A Play upload is a draft release, a
+# TestFlight upload reaches no tester group, and an App Store upload stops at
+# "Prepare for Submission". Handing a build to Google, to Apple's Beta App Review
+# or to App Store review is a deliberate act in the respective console.
 #
 # The screenshot lanes are intended to be invoked by the `make screenshots-android`
 # and `make screenshots-ios` targets (the top-level Makefile), which wrap them with
@@ -70,10 +77,10 @@ platform :android do
   end
 
   # ── upload_release ── the single upload_to_play_store call shared by the public
-  # `testing` and `production` lanes below. Only the track and release status differ
-  # between them, so the rest lives here ONCE (the same drift-avoidance principle
-  # the rest of the tooling follows). Private: not listed by `fastlane lanes` and
-  # not callable from the CLI -- go through `testing` / `production`.
+  # `testing` and `production` lanes below. Only the track differs between them, so
+  # the rest lives here ONCE (the same drift-avoidance principle the rest of the
+  # tooling follows). Private: not listed by `fastlane lanes` and not callable from
+  # the CLI -- go through `testing` / `production`.
   #
   # `upload_to_play_store` is the modern alias of the `supply` action. It reads the
   # package_name and the service-account key from the Appfile, uploads the AAB
@@ -83,15 +90,23 @@ platform :android do
   private_lane :upload_release do |options|
     upload_to_play_store(
       # AAB (not APK): Google Play requires the App Bundle format for new apps.
-      # The path is supplied by the caller so `make push-playstore` can upload the
-      # STAGED bundle (releases/<applicationId>_<versionCode>.aab) it has verified,
-      # rather than the raw Gradle output. Falls back to the Gradle path when the
-      # lane is run directly without an aab: option.
+      # The path is supplied by the caller so `make push-playstore-testing` and
+      # `make push-playstore-production` can upload the STAGED bundle
+      # (releases/<applicationId>_<versionCode>.aab) they have verified, rather than
+      # the raw Gradle output. Falls back to the Gradle path when the lane is run
+      # directly without an aab: option.
       aab: options[:aab] || 'android/app/build/outputs/bundle/release/app-release.aab',
 
-      # Track and release status are chosen by the calling lane.
+      # The track is chosen by the calling lane.
       track: options[:track],
-      release_status: options[:status],
+
+      # EVERY upload is a DRAFT release, on every track. Google Play sends a
+      # release to review when it is rolled out, so a draft is the state in which
+      # the maintainer can open the Play Console, look at what was uploaded, and
+      # decide. The value is hard-coded rather than a lane option: a `status:` the
+      # caller could pass would be an ungated path to `completed`, which is what
+      # this exists to prevent. Rolling out happens in the Play Console.
+      release_status: 'draft',
 
       # Dry-run switch. When true, supply VALIDATES the edit against the Play API
       # but changes nothing on Google Play (default false). Passed through from the
@@ -113,47 +128,43 @@ platform :android do
     )
   end
 
-  desc 'Upload the SIGNED release App Bundle to the OPEN-TESTING (beta) track'
-  desc 'and OVERWRITE the store listing + release notes on Google Play (titles,'
-  desc 'short/full descriptions, feature graphics, screenshots and changelogs'
-  desc 'from fastlane/metadata/android/). Build the bundle first with'
-  desc '`make -C android bundle` (or `make release`); the Makefile `push-playstore`'
-  desc 'target guards that prerequisite -- this lane does NOT build it.'
+  desc 'Upload the SIGNED release App Bundle to the OPEN-TESTING (beta) track as a'
+  desc 'DRAFT release and OVERWRITE the store listing + release notes on Google Play'
+  desc '(titles, short/full descriptions, feature graphics, screenshots and'
+  desc 'changelogs from fastlane/metadata/android/). The draft waits in the Play'
+  desc 'Console for you to review and roll out; rolling out is what sends it to'
+  desc 'review. Build the bundle first with `make -C android bundle`; the Makefile'
+  desc '`push-playstore-testing` target guards that prerequisite -- this lane does'
+  desc 'NOT build it.'
   desc 'Options (all optional):'
   desc '  track:<name>   Play track (default: beta, the open-testing track). For'
   desc '                 production use the dedicated `production` lane below.'
-  desc '  status:<name>  release status draft|completed|halted|inProgress'
-  desc '                 (default: completed -- testing tracks expect completed).'
   desc '  validate_only:<bool>  Dry run -- validate the upload against the Play API'
   desc '                 without changing anything on Google Play (default false).'
-  desc 'Example:  bundle exec fastlane testing track:beta status:draft'
+  desc 'Example:  bundle exec fastlane testing track:beta'
   lane :testing do |options|
     upload_release(
       track: options[:track] || 'beta',
-      status: options[:status] || 'completed',
       validate_only: options[:validate_only],
       aab: options[:aab],
     )
   end
 
-  desc 'Upload the SIGNED release App Bundle to the PRODUCTION track and OVERWRITE'
-  desc 'the store listing + release notes on Google Play. Same build prerequisite'
-  desc 'as `testing` (this lane does NOT build the AAB). Staged as a DRAFT by'
-  desc 'default: the release waits in the Play Console for you to review and'
-  desc 'publish manually, rather than going live automatically. NOTE: a new'
-  desc 'personal developer account cannot publish to production until the'
-  desc 'closed-testing gate is cleared (12 testers / 14 days).'
+  desc 'Upload the SIGNED release App Bundle to the PRODUCTION track as a DRAFT'
+  desc 'release and OVERWRITE the store listing + release notes on Google Play. Same'
+  desc 'build prerequisite as `testing` (this lane does NOT build the AAB). The'
+  desc 'release waits in the Play Console for you to review and roll out; rolling'
+  desc 'out is what sends it to review. NOTE: a new personal developer account'
+  desc 'cannot publish to production until the closed-testing gate is cleared'
+  desc '(12 testers / 14 days).'
   desc 'Options (all optional):'
   desc '  track:<name>   Play track (default: production).'
-  desc '  status:<name>  release status draft|completed|halted|inProgress'
-  desc '                 (default: draft -- stage for manual review/publish).'
   desc '  validate_only:<bool>  Dry run -- validate the upload against the Play API'
   desc '                 without changing anything on Google Play (default false).'
-  desc 'Example:  bundle exec fastlane production status:completed'
+  desc 'Example:  bundle exec fastlane production'
   lane :production do |options|
     upload_release(
       track: options[:track] || 'production',
-      status: options[:status] || 'draft',
       validate_only: options[:validate_only],
       aab: options[:aab],
     )
@@ -210,12 +221,14 @@ platform :ios do
   # ── preflight ── prove, BEFORE anything is uploaded, that the App Store Connect
   # API key in the environment actually authenticates AND that this app's record is
   # reachable with it. The Android counterpart of this guard lives in the Makefile
-  # (`push-playstore` runs `fastlane run validate_play_store_json_key`), because
+  # (the `push-playstore-*` targets run `fastlane run validate_play_store_json_key`),
+# because
   # supply's key is a plain file path and fastlane's CLI takes it as a string. The
   # iOS credential cannot travel that way: `app_store_connect_api_key` returns a
   # HASH, and fastlane's `run` CLI supports only primitive types -- "Hashes are not
   # currently supported" (docs.fastlane.tools). So the check lives HERE, in Ruby,
-  # where the hash is passed directly, and `make push-appstore` calls this lane.
+  # where the hash is passed directly, and both `push-appstore-*` targets call this
+# lane.
   #
   # `app_store_build_number` is a read-only App Store Connect query, which makes it
   # a cheap, side-effect-free way to exercise the whole path: the key file, the key
@@ -231,7 +244,8 @@ platform :ios do
   #                             the check.
   desc 'Verify the App Store Connect API key authenticates and this app is reachable.'
   desc 'Read-only: queries the current build number and uploads nothing. Run by'
-  desc '`make push-appstore` before the upload; useful on its own to test credentials.'
+  desc 'both `make push-appstore-*` targets before the upload; useful on its own to'
+  desc 'test credentials.'
   lane :preflight do
     api_key = app_store_connect_api_key
 
@@ -244,37 +258,21 @@ platform :ios do
     UI.success("preflight: App Store Connect reachable; current build number: #{build_number}")
   end
 
-  desc 'Upload the SIGNED .ipa to TestFlight and distribute it to the EXTERNAL'
-  desc 'tester group. Unlike the App Store lanes below, this pushes NO listing'
-  desc 'metadata or screenshots -- TestFlight does not use them. External'
-  desc 'distribution goes through Apple Beta App Review, so the build must finish'
-  desc 'processing before it can be released to the group; this lane therefore'
-  desc 'waits for processing (it does not return the moment the upload is done).'
-  desc 'The "what to test" note is the English App Store release notes of the'
-  desc 'current version. Build the .ipa first with `make release-ios`, then pass'
-  desc 'the staged path, e.g.'
-  desc '`bundle exec fastlane ios external_testing ipa:releases/de.godisch.potillus_<code>.ipa`.'
-  lane :external_testing do |options|
+  desc 'Upload the SIGNED .ipa to TestFlight, where it reaches NO tester group.'
+  desc 'Unlike the `production` lane below, this pushes no listing metadata or'
+  desc 'screenshots -- TestFlight does not use them. It also hands the build to'
+  desc 'nobody: assigning it to the external group is a click in App Store Connect,'
+  desc 'and that click is what submits it to Apple Beta App Review. The lane waits'
+  desc 'for App Store Connect to finish processing, so it runs for several minutes'
+  desc 'after the bytes are gone. Build the .ipa first with `make release-ios`;'
+  desc 'the Makefile `push-appstore-testing` target guards that prerequisite and'
+  desc 'passes the staged path -- this lane does NOT build it.'
+  lane :testing do |options|
     # Authenticate with the App Store Connect API key. Capturing the return value
     # and passing it explicitly to upload_to_testflight is the documented pattern
-    # for that action (the App Store lanes below instead rely on the token that
-    # the same call leaves in lane_context for deliver). NOTE: external
-    # distribution updates testers and submits the build for Beta App Review,
-    # which App Store Connect only permits for an App Manager or Admin key, not a
-    # Developer key (docs.fastlane.tools/actions/pilot).
+    # for that action (the `production` lane below instead relies on the token that
+    # the same call leaves in lane_context for deliver).
     api_key = app_store_connect_api_key
-
-    # "What to test" for the external testers: reuse the CURRENT version's English
-    # App Store release notes verbatim. A fastlane lane runs from the project
-    # root, so this repo-root-relative path resolves correctly. The release gate
-    # (check-ios-metadata --release) refuses to stage unless every locale's
-    # release_notes.txt is translated FOR the current version (see
-    # release_notes.versions), so "the release_notes.txt file" is by construction
-    # "the current version's notes"; that gate also caps the file at 4000
-    # characters, within TestFlight's own 4000-character what-to-test limit.
-    # Guarded so a missing file leaves the changelog unset rather than aborting.
-    release_notes_path = 'fastlane/metadata/ios/en-US/release_notes.txt'
-    what_to_test = File.exist?(release_notes_path) ? File.read(release_notes_path).strip : nil
 
     upload_to_testflight(
       api_key: api_key,
@@ -284,41 +282,44 @@ platform :ios do
       # the same `ipa:`/`aab:` option convention the Android lanes use.
       ipa: options[:ipa] || 'ios/build/Potillus.ipa',
 
-      # External distribution: release the processed build to the external group.
-      # `groups` is REQUIRED when distribute_external is true, and lists ONLY
-      # external groups by their App Store Connect name
-      # (docs.fastlane.tools/actions/upload_to_testflight). notify_external_testers
-      # has App Store Connect e-mail the group once the build clears Beta App
-      # Review. The Beta App Review contact and beta app description are curated
-      # once in App Store Connect (see docs/RELEASE-IOS.md); they are not passed
-      # here.
-      distribute_external: true,
-      groups: ['Libellus Potionis External Testers'],
-      notify_external_testers: true,
+      # NO external distribution. `distribute_external: true` would need `groups`,
+      # would e-mail those testers, and -- the reason it is off -- would submit the
+      # build to Apple Beta App Review as part of the upload
+      # (docs.fastlane.tools/actions/upload_to_testflight). Review submission is
+      # the maintainer's decision, taken in App Store Connect by adding the build
+      # to the "Libellus Potionis External Testers" group. Without external
+      # distribution there is no "what to test" note to set either; the group's
+      # testers see the one entered beside that decision. The Beta App Review
+      # contact and beta app description are curated once in App Store Connect
+      # (see docs/RELEASE-IOS.md).
+      distribute_external: false,
 
-      # The "what to test" note shown to external testers (nil => left unset).
-      changelog: what_to_test,
-
-      # External distribution CANNOT skip the processing wait: an unprocessed
-      # build cannot be submitted to Beta App Review nor handed to the group, and
-      # skip_waiting_for_build_processing:true would upload WITHOUT distributing or
-      # setting the changelog (docs.fastlane.tools getting-started beta
-      # deployment). So we wait for App Store Connect to finish processing.
+      # WAIT for processing rather than returning the moment the upload finishes.
+      # Nothing here depends on a processed build, so this is purely for the
+      # report: Apple rejects a malformed binary during processing, and waiting is
+      # what turns that into a failed lane instead of an e-mail hours later.
       skip_waiting_for_build_processing: false
     )
   end
 
-  # ── upload_appstore ── the single upload_to_app_store call shared by the public
-  # `testing` and `production` lanes below. Only submit_for_review and the review
-  # submission differ between them; the rest lives here ONCE (same drift-avoidance
-  # principle as the Android upload_release). Private: go through `testing` /
-  # `production`.
+  # ── production ── the App Store half of the pair. `upload_to_app_store` is the
+  # modern alias of the `deliver` action. It reads the app_identifier from the
+  # Appfile, uploads the signed .ipa, and syncs the listing texts, keywords and
+  # release notes from fastlane/metadata/ios/ -- the single source of truth for the
+  # App Store listing.
   #
-  # `upload_to_app_store` is the modern alias of the `deliver` action. It reads the
-  # app_identifier from the Appfile, uploads the signed .ipa, and syncs the listing
-  # texts, keywords and release notes from fastlane/metadata/ios/ -- the single
-  # source of truth for the App Store listing.
-  private_lane :upload_appstore do |options|
+  # This call used to live in a private lane behind two public ones that differed
+  # in submit_for_review alone. With review submission gone (see the note on
+  # submit_for_review's absence below), there is one caller and the indirection is
+  # spent, so the action sits here directly.
+  desc 'Upload the SIGNED .ipa and OVERWRITE the App Store listing + release notes'
+  desc '(names, subtitles, keywords, descriptions and screenshots from'
+  desc 'fastlane/metadata/ios/) WITHOUT submitting for review. The build lands in'
+  desc 'App Store Connect as "Prepare for Submission" for you to check; selecting'
+  desc 'the build and submitting it happens there. Build the .ipa first with'
+  desc '`make release-ios`; the Makefile `push-appstore-production` target guards'
+  desc 'that prerequisite and passes the staged path -- this lane does NOT build it.'
+  lane :production do |options|
     # Authenticate first; the token lands in lane_context for deliver to use.
     app_store_connect_api_key
 
@@ -337,8 +338,8 @@ platform :ios do
       # `android`/`ios` directories as LOCALE names, finds them in neither case on
       # its list of App Store languages, and aborts with "Unsupported directory
       # name(s) for screenshots/metadata". The paths are repo-root-relative because
-      # a fastlane LANE runs from the project root (see push-appstore in the
-      # Makefile for the one place where that is not true).
+      # a fastlane LANE runs from the project root (see the push-appstore-* targets
+      # in the Makefile for the one place where that is not true).
       metadata_path: 'fastlane/metadata/ios',
       screenshots_path: 'fastlane/screenshots/ios',
 
@@ -350,9 +351,13 @@ platform :ios do
       # precheck scans the listing for common rejection reasons before upload.
       run_precheck_before_submit: true,
 
-      # Whether to actually submit the uploaded build for Apple review is chosen
-      # by the calling lane; `production` submits, `testing` only uploads.
-      submit_for_review: options[:submit],
+      # NO submit_for_review. deliver defaults it to false, and the option is left
+      # out rather than spelled out as false so that no caller can pass it. Two
+      # consequences worth knowing: the version stays in "Prepare for Submission",
+      # and deliver does not select a build for it -- selecting the build is part
+      # of what submit_for_review does. So App Store Connect shows the listing this
+      # lane wrote and a TestFlight build waiting to be picked; picking it and
+      # submitting are the maintainer's two clicks.
 
       # Skip deliver's interactive confirmation of the generated HTML preview
       # report, so the lane runs unattended. It does NOT force anything onto the
@@ -364,23 +369,5 @@ platform :ios do
       # keeps precheck from failing on a category that cannot apply here.
       precheck_include_in_app_purchases: false
     )
-  end
-
-  desc 'Upload the SIGNED .ipa and OVERWRITE the App Store listing + release notes'
-  desc '(names, subtitles, keywords, descriptions and screenshots from'
-  desc 'fastlane/metadata/ios/) WITHOUT submitting for review. The build lands in'
-  desc 'App Store Connect as "Prepare for Submission" / TestFlight for you to check.'
-  desc 'Build the .ipa first with `make release-ios`; this lane does NOT build it.'
-  desc 'Pass the staged path as ipa:, e.g. ipa:releases/de.godisch.potillus_<code>.ipa.'
-  lane :testing do |options|
-    upload_appstore(submit: false, ipa: options[:ipa])
-  end
-
-  desc 'Upload the SIGNED .ipa, OVERWRITE the App Store listing, and SUBMIT the'
-  desc 'build for Apple review. Same build prerequisite as `testing` (this lane'
-  desc 'does NOT build the .ipa). Apple review gates the actual release; nothing'
-  desc 'goes live automatically without passing review.'
-  lane :production do |options|
-    upload_appstore(submit: true, ipa: options[:ipa])
   end
 end

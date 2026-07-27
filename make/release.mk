@@ -212,7 +212,7 @@ cover-check:
 # invariant gate (tools/release-check.sh --release) and the coverage gate, (4)
 # builds the AAB, APK and SBOM via the Android Makefile, and (5) copies them into
 # releases/ under their canonical names. It never uploads -- that is the fastlane
-# lanes (push-playstore), which read the staged AAB.
+# lanes (the push-playstore-* targets), which read the staged AAB.
 release-android:
 	@$(call require-osv-scanner,release-android)
 	@$(call require-android-screenshots,release-android)
@@ -269,7 +269,8 @@ release-ios:
 	$(call require-ios-screenshots,release-ios)
 	@# Store release notes must be translated for THIS version before staging --
 	@# the iOS twin of release-android's --release changelog gate. Run it fail-fast,
-	@# before the two expensive archive builds; push-appstore re-checks at upload.
+	@# before the two expensive archive builds; the push-appstore-* targets re-check
+	@# at upload.
 	python3 tools/check-ios-metadata.py --release
 	# Resolve the signing Team ID: the DEVELOPMENT_TEAM environment variable wins,
 	# else read it from ios/signing.properties. The `${VAR:-}` default keeps `-u`
@@ -413,7 +414,7 @@ release-ios:
 	cp -a "$(IOS_SBOM)" "$(STAGED_IOS_SBOM)"
 	@echo "release-ios: staged $(STAGED_IPA)"
 	@echo "release-ios: staged $(STAGED_IOS_SBOM)"
-	@echo "release-ios: upload to TestFlight with:  ( cd fastlane && bundle exec fastlane ios external_testing ipa:\"$(STAGED_IPA)\" )"
-	@echo "release-ios: upload to the App Store listing with:  make push-appstore"
+	@echo "release-ios: upload to TestFlight with:  make push-appstore-testing"
+	@echo "release-ios: upload to the App Store listing with:  make push-appstore-production"
 
 .PHONY: cover-check release-android release-ios ios-sbom

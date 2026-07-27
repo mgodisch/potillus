@@ -62,7 +62,7 @@ __pycache__/
 
 # ── Staged release artifacts ─────────────────────────────────────────────────
 # `make release-android` copies the signed AAB/APK and the SBOM here under their
-# canonical <applicationId>_<versionCode>.<ext> names; push-playstore /
+# canonical <applicationId>_<versionCode>.<ext> names; the push-playstore-* /
 # push-gitlab upload from here. Build outputs, never source.
 /releases
 
@@ -84,7 +84,7 @@ __pycache__/
 # set up once per machine from the .txt.example files beside them. The directory's
 # notes.txt/demo_user.txt/demo_password.txt stay committed (they describe the app,
 # which has no login -- not a person). tools/check-ios-metadata.py validates these
-# when present, and push-appstore refuses to upload without them.
+# when present, and the push-appstore-* targets refuse to upload without them.
 /fastlane/metadata/ios/review_information/first_name.txt
 /fastlane/metadata/ios/review_information/last_name.txt
 /fastlane/metadata/ios/review_information/email_address.txt

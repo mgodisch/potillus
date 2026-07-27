@@ -78,7 +78,7 @@ WHAT IT CHECKS
        machine from the .txt.example files beside them.  Their ABSENCE is
        therefore normal in a fresh clone and reported, not failed; what is not
        normal is a half-filled contact, so if any one of them exists, all four
-       must, and all four must be valid.  push-appstore requires them outright,
+       must, and all four must be valid.  push-appstore-* requires them outright,
        which is the moment they actually matter.
 GRACEFUL SKIP
     A tree without fastlane/metadata/ios/ (an Android-only source drop) is not
@@ -310,7 +310,7 @@ def main():
     # --release enforces the checks that only matter when actually cutting a
     # release. The per-locale App Store release notes (release_notes.txt) are the
     # iOS twin of Android's per-versionCode store changelogs (release-check.sh
-    # SECTION 1): their translations are needed at push-appstore time, not on the
+    # SECTION 1): their translations are needed at push-appstore-* time, not on the
     # on-every-build `make ios` path. So off release mode this gate ignores
     # release_notes.txt entirely — its length is not checked and it is excluded
     # from the file-set parity comparison — and push-appstore-preflight passes
@@ -433,7 +433,7 @@ def main():
         "reviewer contact OK"
         if review_configured()
         else "reviewer contact not set up on this machine (git-ignored; copy the "
-             "review_information/*.txt.example files before push-appstore)"
+             "review_information/*.txt.example files before push-appstore-*)"
     )
     print(
         f"check-ios-metadata: OK ({len(locales)} locales, all valid; "

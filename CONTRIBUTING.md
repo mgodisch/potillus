@@ -551,7 +551,8 @@ check and follow each store's own format:
 - **Play Store** — `fastlane/metadata/android/<locale>/`: `title.txt` (≤30 chars),
   `short_description.txt` (≤80), `full_description.txt` (≤4000), and
   `changelogs/<versionCode>.txt` (≤500, F-Droid's limit). Read by
-  `fastlane supply` (`make push-playstore`) and by F-Droid, which accept the same
+  `fastlane supply` (the `make push-playstore-*` targets) and by F-Droid, which
+  accept the same
   BCP-47 locale folders, so one tree serves both. A release note is named after the
   integer `versionCode` in `android/app/build.gradle.kts`; `tools/release-check.sh`
   §1 fails the build when one is missing for the current code. Titles and
@@ -636,10 +637,18 @@ Before tagging a new version:
       check, and the published bytes are verified. The signing key is the one in
       SECURITY.md; you will be prompted for its passphrase. The target is safe to
       re-run after a partial failure.
-- [ ] Upload the release to Google Play with `make push-playstore` (open-testing
-      track; it verifies the staged AAB's signature and signer first and
-      never builds or stages). Exercise credentials and metadata beforehand with
-      the non-publishing dry run `make push-playstore VALIDATE_ONLY=1`.
+- [ ] Upload the release to Google Play with `make push-playstore-testing`
+      (open-testing track) or `make push-playstore-production` (production
+      track); each verifies the staged AAB's signature and signer first and
+      never builds or stages. Exercise credentials and metadata beforehand with
+      the non-publishing dry run `make push-playstore-testing VALIDATE_ONLY=1`.
+- [ ] Roll the draft release out in the Play Console. Both targets upload as a
+      draft, and rolling out is what sends the release to Google for review — so
+      the console is where a release becomes a release.
+- [ ] On a Mac, upload to TestFlight with `make push-appstore-testing` and to the
+      App Store listing with `make push-appstore-production`. Neither submits
+      anything: assign the TestFlight build to the external group, and select the
+      build and submit the version, in App Store Connect.
 
 To avoid forgetting the signature, configure Git to sign annotated tags
 automatically in this repository (this requires `user.signingkey` to be set):
