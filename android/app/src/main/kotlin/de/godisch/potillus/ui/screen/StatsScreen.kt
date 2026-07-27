@@ -399,9 +399,17 @@ fun StatsScreen(
     // it, so the day-boundary nuance the raw calendar date cannot express is not
     // observable in practice.
     val exportToday = state.today.ifEmpty { LocalDate.now(DayResolver.clock()).toString() }
+    // The offered range starts at the configured statistics floor. Without a
+    // floor it starts at the first day the visible period covers
+    // (state.periodFrom), so the dialog proposes the period on screen instead
+    // of the single day `exportToday` would make of it — matching the iOS
+    // pre-fill in StatsScreenExport.beginExport. `exportToday` remains the last
+    // fallback for the instant before the stats flow's first emission, when
+    // periodFrom is still the seed's empty string.
+    val exportFrom = state.statsFromDate.ifEmpty { state.periodFrom.ifEmpty { exportToday } }
     if (showCsvRangeDialog) {
         ExportDateRangeDialog(
-            initialFrom = state.statsFromDate.ifEmpty { exportToday },
+            initialFrom = exportFrom,
             initialTo = exportToday,
             onConfirm = { from, to ->
                 vm.exportCsv(from, to)
@@ -412,7 +420,7 @@ fun StatsScreen(
     }
     if (showPdfRangeDialog) {
         ExportDateRangeDialog(
-            initialFrom = state.statsFromDate.ifEmpty { exportToday },
+            initialFrom = exportFrom,
             initialTo = exportToday,
             onConfirm = { from, to ->
                 vm.exportPdf(from, to)

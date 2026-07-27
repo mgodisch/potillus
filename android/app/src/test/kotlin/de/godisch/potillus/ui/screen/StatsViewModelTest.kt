@@ -50,6 +50,7 @@ import app.cash.turbine.test
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.StatsPeriod
+import de.godisch.potillus.domain.StatsWindows
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -178,6 +179,30 @@ class StatsViewModelTest {
             assertEquals(0.0, state.totalGrams, 0.001)
             assertEquals(0.0, state.avgPerDay, 0.001)
             assertEquals(0, state.daysOverDailyLimit)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * `periodFrom` carries the first day the visible period covers, after the
+     * configured statistics floor — the value StatsScreen's export dialog offers
+     * as its start when no floor is set. The expectation is derived from the
+     * same StatsWindows helpers the ViewModel uses, so the assertion holds on
+     * every wall-clock day the test may run on.
+     */
+    @Test fun `periodFrom carries the floored window start for the export dialog`() = runTest {
+        val today = DayResolver.today(4, 0)
+        entryRepo.add(entry(id = 1, date = today, grams = 5.0))
+
+        val vm = makeVm()
+        vm.uiState.test {
+            // Settled state, not the seed (see note in the over-limit-day test).
+            val state = awaitComputed()
+            val expected = StatsWindows.applyingFloor(
+                StatsWindows.window(StatsPeriod.MONTH, today)!!,
+                "2026-01-01",
+            ).from
+            assertEquals(expected, state.periodFrom)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -67,13 +67,12 @@ extension StatsScreen {
 
     /// Resolves the sheet's pre-fill, then shows it.
     ///
-    /// Android pre-fills with the "statistics from" date and today — NOT with the
-    /// window on screen. Someone looking at July who imported a backup of last
-    /// spring wants the spring, and the app should offer it rather than hide it
-    /// behind a greyed-out button.
-    ///
-    /// An empty `statsFromDate` means "from the first entry", which the window's own
-    /// start already expresses.
+    /// The offered range starts at the configured "statistics from" floor — a
+    /// user who scoped the statistics to a date wants exports scoped the same
+    /// way. Without a floor it starts at the first day the visible period
+    /// covers (`model.state.from`), so the dialog proposes the period on
+    /// screen. Android's export dialog pre-fills by the same rule
+    /// (StatsScreen's `exportFrom`).
     func beginExport(_ kind: ExportRangeSheet.Kind) async {
         let settings = await environment.preferences.load()
         let floor = settings.statsFromDate.isEmpty ? model.state.from : settings.statsFromDate

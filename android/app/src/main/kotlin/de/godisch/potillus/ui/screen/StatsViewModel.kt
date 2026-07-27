@@ -129,9 +129,14 @@ data class StatsUiState(
     val weekdayAverages: List<Double?> = emptyList(),
     // Defaults for the export date-range dialog (CSV/PDF export lives on this
     // screen). `today` is the logical current day; `statsFromDate`
-    // is the configured statistics-start floor (empty when unset).
+    // is the configured statistics-start floor (empty when unset); `periodFrom`
+    // is the first day the visible period actually covers (after that floor) —
+    // the dialog's fallback start when no floor is configured, so the offered
+    // range is the period on screen rather than a single day. iOS pre-fills
+    // from `StatsModel.state.from` the same way.
     val today: String = "",
     val statsFromDate: String = "",
+    val periodFrom: String = "",
 )
 
 /**
@@ -520,6 +525,7 @@ class StatsViewModel(
                 weekdayAverages = weekdayAverages,
                 today = today,
                 statsFromDate = statsFloor,
+                periodFrom = effectiveFrom,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
