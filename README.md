@@ -101,13 +101,13 @@ use the tracker, you may instead write to
 [android@godisch.de](mailto:android@godisch.de) or
 [ios@godisch.de](mailto:ios@godisch.de). To report a security vulnerability,
 please do **not** open a public issue. Instead, follow the private,
-PGP-encrypted reporting process described in [SECURITY.md](SECURITY.md).
+PGP-encrypted reporting process described in [`SECURITY.md`](SECURITY.md).
 
 Code and documentation contributions are welcome too. The contribution process
 — how changes are proposed and reviewed, together with the architecture,
 coding, testing, and release conventions a change must follow — is documented
-in [CONTRIBUTING.md](CONTRIBUTING.md). All participants are expected to follow
-the project's [Code of Conduct](docs/CODE_OF_CONDUCT.md).
+in [`CONTRIBUTING.md`](CONTRIBUTING.md). All participants are expected to
+follow the project's [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## Privacy & Security Architecture
 
@@ -122,7 +122,7 @@ synchronization.
 
 The app's full privacy policy — detailing exactly what is stored on the device
 and confirming that nothing is ever transmitted — is available in
-[PRIVACY.md](PRIVACY.md).
+[`PRIVACY.md`](PRIVACY.md).
 
 ## Platform Compatibility
 
@@ -186,9 +186,9 @@ and the path toward WCAG 2.2 Level AA are tracked in
 
 To build the app from source, follow the step-by-step guides that take a blank
 operating system to a runnable debug build:
-[docs/INSTALL-ANDROID.md](docs/INSTALL-ANDROID.md) (debug APK from a fresh
-Debian GNU/Linux install) and [docs/INSTALL-IOS.md](docs/INSTALL-IOS.md) (debug
-build in the iPhone Simulator from a fresh macOS install).
+[`docs/INSTALL-ANDROID.md`](docs/INSTALL-ANDROID.md) (debug APK from a fresh
+Debian GNU/Linux install) and [`docs/INSTALL-IOS.md`](docs/INSTALL-IOS.md)
+(debug build in the iPhone Simulator from a fresh macOS install).
 
 The Android build runs on the current Android Gradle Plugin, Gradle and Kotlin
 compiler line. Annotation processing goes through KSP, which Room uses to
@@ -231,10 +231,9 @@ leave it out — these build the APK/IPA and run the unit tests, lint,
 `check-guides` and the l10n parity check — so the full invariant gate never
 sits in an edit-compile-run loop.
 
-Changes are documented in [CHANGELOG.md](CHANGELOG.md).
-
-The project's intended direction and its explicit non-goals are described in
-[ROADMAP.md](ROADMAP.md).
+Changes are documented in [`CHANGELOG.md`](CHANGELOG.md). The project's
+intended direction and its explicit non-goals are described in
+[`ROADMAP.md`](ROADMAP.md).
 
 ## AI Involvement
 
@@ -254,7 +253,7 @@ The source code can be found at the [canonical repository at
 gitlab.com](https://gitlab.com/godisch/potillus/). A read-only push mirror is
 available at [github.com](https://github.com/mgodisch/potillus); it carries no
 development, but it does run supplementary checks that the canonical pipeline
-cannot — see [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md).
+cannot — see [`docs/MIRROR-CHECKS.md`](docs/MIRROR-CHECKS.md).
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

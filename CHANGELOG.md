@@ -56,7 +56,7 @@ Edit drinks from the list's edit mode
 - Play's native-debug-symbols warning stays unanswered, with the reason.
 - The export dialog offers the visible period when no start date is set.
 - The build script's report-template note names the iOS renderer.
-- README.md revised.
+- Revised README.md.
 
 ### Fixed
 
