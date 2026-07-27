@@ -39,6 +39,16 @@ import SwiftUI
 // This is the drop-in replacement: the same toggle, titled through `Loc` with
 // the "Edit"/"Done" keys the catalogue already carries for every language.
 //
+// WHY A SYMBOL RATHER THAN THE WORD
+//   The word sits between two glyphs in every toolbar that uses this button (a
+//   `plus` and the overflow menu's `ellipsis.circle`), and it is the widest item
+//   of the three in the languages that spell "Edit" long. A `Label` renders as
+//   its icon alone in a navigation bar and hands the title to VoiceOver, so the
+//   toolbar reads as three glyphs while the control still announces itself in
+//   the in-app language — the same construction the `plus` button already uses.
+//   Apple's own list apps keep the word here; the glyph is this app's choice for
+//   an evenly weighted toolbar, and it costs no catalogue key.
+//
 // HOW THE WIRING DIFFERS FROM EditButton
 //   `EditButton` and the `List` meet through the `\.editMode` environment value
 //   SwiftUI provides for them. A CUSTOM toggle cannot rely on that binding being
@@ -64,12 +74,21 @@ struct EditToggleButton: View {
     let locale: Locale
 
     var body: some View {
-        Button(Loc.string(editMode.isEditing ? "Done" : "Edit", locale: locale)) {
+        Button {
             // The same animation the stock EditButton drives, so rows slide
             // their delete badges in and out instead of snapping.
             withAnimation {
                 editMode = editMode.isEditing ? .inactive : .active
             }
+        } label: {
+            // `pencil` for the way in, `checkmark` for the way out: the pair
+            // Apple uses wherever an editing state is a glyph. `square.and.pencil`
+            // is deliberately left alone — the Drinks row's swipe carries it for
+            // the single-drink editor, and one glyph should mean one thing.
+            Label(
+                Loc.string(editMode.isEditing ? "Done" : "Edit", locale: locale),
+                systemImage: editMode.isEditing ? "checkmark" : "pencil"
+            )
         }
     }
 }

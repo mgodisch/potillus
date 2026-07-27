@@ -186,7 +186,7 @@ android {
         versionCode = 96
 
         // User-visible version number (String). Keep in sync with CHANGELOG.md.
-        versionName = "0.84.1"
+        versionName = "0.85.0"
 
         // ─────────────────────────────────────────────────────────────────────
         // LOCALISATION — how to add a new language (all steps are required)

@@ -40,12 +40,14 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
-## v0.84.1
+## v0.85.0
 
-Check GitLab permissions before uploading
+Edit drinks from the list's edit mode
 
 ### Changed
 
+- A row tap in the drinks list's edit mode opens the editor.
+- The toolbar's edit toggle shows a pencil and a checkmark.
 - `push-gitlab` creates the release before it signs and uploads.
 - The GitLab API calls report the status and the server's answer.
 - The push targets check the release tag against the GitLab remote.

@@ -45,13 +45,14 @@ struct DrinksScreen: View {
     /// localized `EditToggleButton` can drive it (see that file: the stock
     /// `EditButton` titles itself in the SYSTEM language, not the app's).
     ///
-    /// Also read by the row's tap-to-log guard, which stands down while the list
-    /// is in edit mode. A row is a raw `.onTapGesture` here — it cannot be a
-    /// `Button`, because it already contains one (the favourite star), and
-    /// SwiftUI does not suppress a raw gesture in edit mode the way it
-    /// suppresses a button. Without the guard, tapping a row to delete it would
-    /// also log the drink. Owning the state (rather than reading the
-    /// `\.editMode` environment, as before the 0.84.0 QA round) makes the guard
+    /// Also read by the row, whose tap means two different things: outside edit
+    /// mode it logs the drink, inside it opens that drink's editor. A row is a
+    /// raw `.onTapGesture` here — it cannot be a `Button`, because it already
+    /// contains one (the favourite star), and SwiftUI does not suppress a raw
+    /// gesture in edit mode the way it suppresses a button. That is what makes
+    /// the second meaning possible at all: the gesture still fires while the
+    /// delete badges are showing. Owning the state (rather than reading the
+    /// `\.editMode` environment, as before the 0.84.0 QA round) makes the row
     /// read the very value the List obeys.
     @State private var editMode: EditMode = .inactive
 
@@ -86,9 +87,9 @@ struct DrinksScreen: View {
                 ForEach(model.state.drinks, id: \.id) { drink in
                     row(drink)
                 }
-                // This drives the delete badge in `EditButton`'s edit mode — the
-                // visible, swipe-free delete path. Without a `List(selection:)` the
-                // edit mode removes one row at a time, so the set holds a single
+                // This drives the delete badge in `EditToggleButton`'s edit mode —
+                // the visible, swipe-free delete path. Without a `List(selection:)`
+                // the edit mode removes one row at a time, so the set holds a single
                 // drink; it opens the same confirmation the swipe's Delete uses
                 // (`deleting`), never deleting on the spot. The trailing swipe adds
                 // its own Delete and Edit alongside (see `row`); the two mechanisms
@@ -111,14 +112,15 @@ struct DrinksScreen: View {
                         Label(Loc.string("Add Drink", locale: locale), systemImage: "plus")
                     }
                 }
-                // The visible delete path, replacing the per-row trash icon: the
-                // edit toggle puts the list into edit mode, where each row shows a
-                // red delete badge. Editing a drink is reached by the trailing
-                // swipe's Edit action (see `row`) because the row's tap already
-                // logs; deleting stays visible here so it is not a hidden-only
-                // gesture. Shown only when there is a drink to act on. (An earlier
-                // revision of this comment claimed a long-press context menu; none
-                // was ever built — corrected in the 0.84.0 QA round.)
+                // The visible path to both rare actions, replacing the per-row
+                // pencil and trash icons: the edit toggle puts the list into edit
+                // mode, where each row shows a red delete badge and answers a tap
+                // with its editor (see `row`). The trailing swipe keeps offering
+                // the same two, for the user who reaches for it; neither is a
+                // hidden-only gesture any more. Shown only when there is a drink
+                // to act on. (An earlier revision of this comment claimed a
+                // long-press context menu; none was ever built — corrected in the
+                // 0.84.0 QA round.)
                 if !model.state.drinks.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
                         EditToggleButton(editMode: $editMode, locale: locale)
@@ -218,16 +220,23 @@ struct DrinksScreen: View {
 
     private func row(_ drink: DrinkDefinition) -> some View {
         HStack {
-            Button {
-                model.toggleFavorite(drink)
-            } label: {
-                Image(systemName: drink.isFavorite ? "star.fill" : "star")
-                    .foregroundStyle(drink.isFavorite ? .yellow : .secondary)
+            // The star is gone while the list is in edit mode, and on purpose:
+            // SwiftUI suppresses a row button's action there, so it would sit in
+            // the row looking tappable and do nothing — and, being a button, it
+            // would swallow the tap that the rest of the row answers with the
+            // editor. Hiding it makes the whole row give one answer.
+            if !editMode.isEditing {
+                Button {
+                    model.toggleFavorite(drink)
+                } label: {
+                    Image(systemName: drink.isFavorite ? "star.fill" : "star")
+                        .foregroundStyle(drink.isFavorite ? .yellow : .secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(drink.isFavorite
+                    ? Loc.string("Remove from favourites", locale: locale)
+                    : Loc.string("Add to favourites", locale: locale))
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(drink.isFavorite
-                ? Loc.string("Remove from favourites", locale: locale)
-                : Loc.string("Add to favourites", locale: locale))
 
             // Capacity dot: how many more of this drink fit within today's
             // remaining budget, against the same snapshot for every row. Between
@@ -268,29 +277,42 @@ struct DrinksScreen: View {
         }
         .contentShape(Rectangle())
         // Tapping a drink LOGS it: the action a user performs many times a day.
-        // Editing and deleting are the rare ones, so — this being the one screen
-        // whose row tap is already spoken for — they live in the trailing swipe,
-        // the native place for a row's secondary actions when the tap is taken
-        // (Mail is the model: tap opens, swipe acts). The per-row pencil and trash
-        // icons the row used to carry are gone.
+        // Editing and deleting are the rare ones, and this is the one screen whose
+        // row tap is already spoken for — so they belong to edit mode, which is
+        // what a user enters when the intent is to change the catalogue rather
+        // than to drink from it. There the same tap opens the drink's editor,
+        // alongside the delete badge. The trailing swipe keeps both actions for
+        // the user who reaches for it (Mail is the model: tap acts, swipe acts
+        // too); the per-row pencil and trash icons the row used to carry are gone.
         .onTapGesture {
-            // Standing down in edit mode: there the tap belongs to deletion, not
-            // logging (see `editMode`).
-            guard !editMode.isEditing else { return }
-            logger.clearFailure()
-            logging = drink
+            if editMode.isEditing {
+                model.clearErrors()
+                editing = drink
+            } else {
+                logger.clearFailure()
+                logging = drink
+            }
         }
-        .accessibilityHint(Loc.string("Logs this drink", locale: locale))
+        // No hint in edit mode: the sentence for the editor would be a new
+        // catalogue key in twenty-one languages, and a hint that says "logs this
+        // drink" over a row that opens an editor is worse than none. VoiceOver
+        // still reads the row and its delete badge.
+        .accessibilityHint(editMode.isEditing
+            ? ""
+            : Loc.string("Logs this drink", locale: locale))
         // Trailing swipe: Edit (blue) and Delete (red). Both actions live in this
         // one `.swipeActions` on purpose — putting only one here would let it
         // replace `.onDelete`'s automatic swipe and drop the other. `.onDelete`
         // itself stays (below), because it is what still draws the delete badge in
-        // `EditButton`'s edit mode: that is the visible, swipe-free delete path
-        // Apple's accessibility guidance asks for. `allowsFullSwipe` is off so a
-        // long swipe cannot commit a delete past the confirmation — Delete only
-        // opens the same dialog the edit-mode badge and the context of a drink-in-
-        // use share (`deleting`), never removing on the spot. Delete is declared
-        // first so it sits at the row's trailing edge.
+        // `EditToggleButton`'s edit mode: that, with the row tap beside it, is the
+        // swipe-free path to both actions Apple's accessibility guidance asks for,
+        // so neither swipe action is the only way to its dialog.
+        //
+        // `allowsFullSwipe` is off so a long swipe cannot commit a delete past
+        // the confirmation — Delete only opens the same dialog the edit-mode
+        // badge and the context of a drink-in-use share (`deleting`), never
+        // removing on the spot. Delete is declared first so it sits at the row's
+        // trailing edge.
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive) {
                 model.clearErrors()
