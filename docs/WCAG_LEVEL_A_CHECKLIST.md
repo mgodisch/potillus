@@ -94,8 +94,9 @@ viewer, the PDF export flow.
 
 - [ ] **2.1.1 Keyboard (A).** With a Bluetooth keyboard / Switch Access, every
       control is reachable and operable, including the **custom clickable
-      calendar cells** (month grid + year heat-map). They now declare
-      `role = Role.Button`; confirm they are focusable and activatable.
+      calendar cells** (month grid + year heat-map). They declare
+      `role = Role.Button` and, since 0.85.0, draw a ring while focused — confirm
+      the ring is visible on every cell fill, in both themes.
 - [ ] **2.1.2 No Keyboard Trap (A).** Focus can always move away from any control
       (dialogs, pickers).
 - [ ] **2.1.4 Character Key Shortcuts (A).** N/A — no single-character shortcuts.
@@ -157,8 +158,15 @@ blocks). For each: reason = "native offline app, feature not present".
 1. **Calendar 1.4.1 (colour-only status):** month-grid dot and year heat-map cell
    convey over/under-limit by colour. Screen-reader users are covered (both now
    have text descriptions), but *sighted colour-blind* users rely on the palette
-   being distinguishable. Decision needed: accept red-vs-blue as distinguishable,
-   or add a non-colour visual cue (outline/shape) on over-limit days.
+   being distinguishable. Partly answered since this was written: the palette is
+   blue-vs-red rather than a red/green pair, and Settings → Appearance offers
+   alternative status symbols that encode the traffic light by SHAPE. What is
+   still to decide on device is whether the CALENDAR should carry a non-colour
+   cue too — the symbol setting covers the traffic-light dot, not the calendar —
+   and whether that setting should default to on rather than off.
+   Note that the year heat-map's low-contrast EMPTY cells and today ring are a
+   separate, already-decided matter: measured, judged, and left as they are; see
+   "Non-text contrast" in docs/ROADMAP.md.
 2. **4.1.2 month-cell announcement redundancy** (see above) — verify and, if
    needed, a one-line `clearAndSetSemantics` fix.
 3. **1.3.1 headings** — verify section headers expose the `heading()` role;

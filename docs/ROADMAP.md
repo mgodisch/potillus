@@ -181,10 +181,24 @@ Reaching full AA is a larger effort (roughly 1.5–2.5 person-weeks plus manual
 on-device assistive-technology testing that no sandbox check can replace). The
 concrete, measured gaps are:
 
-- **Non-text contrast (1.4.11, AA).** Empty heat-map cells
-  (`surfaceVariant`) sit at **1.1–1.3 : 1** against the background and the
-  "today" outline at **1.2–1.5 : 1** — both below the required 3 : 1. Needs a
-  heat-map palette rework for cell separation and the today indicator.
+- **Non-text contrast (1.4.11, AA).** Measured and left as it is, deliberately.
+  Empty heat-map cells (`surfaceVariant`) sit at **1.12 : 1** against the card in
+  the dark theme and **1.29 : 1** in the light one, and the "today" outline at
+  **1.06 : 1** and **1.20 : 1** — all below the 3 : 1 the criterion asks for. The
+  DATA cells are not affected: an over-limit cell has 3.25 : 1 and an under-limit
+  one more, so the information the view exists to show clears the bar.
+  What is below it is the *empty* grid and the today marker, and lifting those to
+  3 : 1 would turn a quiet year of mostly-blank squares into a visible lattice of
+  365 tiles competing with the data drawn on it. The maintainer looked at the
+  view on device and judged the current balance right (0.85.0 QA round). This is
+  therefore a decision about what the year view is for, not an oversight: the
+  heat-map answers "when did I drink", and a day with no entry answers it by
+  staying quiet.
+  Should this be revisited, note that the ring around today has the same shape of
+  problem as the focus ring did — it surrounds a cell whose fill varies, so no
+  single colour clears 3 : 1 against all fills. The fix that worked for focus
+  applies here too: draw it on the outer box, outside the padding, where it lies
+  on the card surface and only one background matters.
 - **Text contrast (1.4.3, AA).** Red as *text* is what remains here, and it is
   now a decision rather than an oversight. The dark theme carries two reds: the
   graphical one (`dangerRedColor`, `#DD2C2C`, 3.25 : 1 on the cards) for dots,
@@ -202,9 +216,19 @@ concrete, measured gaps are:
   The light-theme caption colour, the other half of this criterion, is settled:
   `SchieferOnSurfaceVariant` is `#5D6C93` at 5.21 : 1 on the cards and 4.57 : 1
   on the background.
-- **Target size (2.5.8, AA — new in 2.2).** The 10 dp heat-map day cells are
-  below the 24 px minimum; a ≥ 24 dp (ideally 48 dp) touch target should wrap the
-  10 dp visual. (Standard Material `IconButton`s already meet this.)
+- **Target size (2.5.8, AA — new in 2.2).** Claimed under the criterion's own
+  *Spacing* exception rather than met by enlargement. The year heat-map's day
+  cells are 10 dp with a 2 dp gap, below the 24 px minimum. Wrapping each in a
+  24 dp touch target would make neighbouring targets overlap — 24 dp of target
+  around a 12 dp pitch cannot do otherwise — and where targets overlap the last
+  one drawn wins, so a tap near the edge of the 14th would open the 15th. Trading
+  an undersized target for a wrong one is not an improvement.
+  The exception applies on its terms: the targets are in a dense arrangement
+  whose spatial layout is essential (a calendar year IS its grid; the position of
+  a day carries its meaning), and the same action is available at a comfortable
+  size elsewhere — the month grid's cells fill a seventh of the screen width and
+  reach the same day. Standard Material `IconButton`s throughout the app meet the
+  minimum on their own.
 - **Focus visibility (2.4.7, AA).** Settled: both custom `clickable` surfaces —
   the year heat-map day cell and the month cell — draw a ring while focused. The
   heat-map ring sits on the outer box, outside the padding, so it lies on the

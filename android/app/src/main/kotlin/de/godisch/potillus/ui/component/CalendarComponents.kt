@@ -143,6 +143,25 @@ fun YearCalendarView(
     val red = dangerRedColor()
     val empty = MaterialTheme.colorScheme.surfaceVariant
     val todayBorder = MaterialTheme.colorScheme.outline
+
+    // MEASURED AND LEFT AS THEY ARE (WCAG 1.4.11, 0.85.0 QA round).
+    //
+    //   empty cell against the card   1.12 : 1 dark, 1.29 : 1 light
+    //   today ring against the cell   1.06 : 1 dark, 1.20 : 1 light
+    //
+    // Both are far below the 3 : 1 the criterion asks of a non-text indicator,
+    // and both are deliberate. The DATA cells clear it -- an over-limit cell has
+    // 3.25 : 1 -- so what is quiet here is the empty grid, not the information.
+    // Raising the empty cells would turn a year of mostly-blank squares into a
+    // lattice of 365 tiles competing with the data drawn on top of it, and the
+    // maintainer judged the current balance right on device.
+    //
+    // Do not "fix" this from the numbers alone; the decision and its reasoning
+    // are recorded under "Non-text contrast" in docs/ROADMAP.md. If it is ever
+    // revisited, the today ring has the same shape of problem the focus ring had
+    // (it surrounds a cell whose fill varies, so no single colour clears 3 : 1
+    // against all fills) and the same fix applies: draw it on the outer box,
+    // outside the padding, where only the card surface is behind it.
     val cellSize = 10.dp
     val cellGap = 2.dp
 
