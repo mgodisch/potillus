@@ -185,10 +185,25 @@ concrete, measured gaps are:
   (`surfaceVariant`) sit at **1.1–1.3 : 1** against the background and the
   "today" outline at **1.2–1.5 : 1** — both below the required 3 : 1. Needs a
   heat-map palette rework for cell separation and the today indicator.
-- **Text contrast (1.4.3, AA).** The light-theme secondary caption colour
-  (`onSurfaceVariant`) is **4.39 : 1** (below 4.5 : 1 for small text); the
-  warning-red used as *text* is **3.25–4.23 : 1** in dark theme (fine as a
-  non-text indicator at ≥ 3 : 1, marginal as text).
+- **Text contrast (1.4.3, AA).** Two separate cases, both re-measured since the
+  sixth review.
+  The light-theme secondary caption colour (`onSurfaceVariant`, `#6878A0`) is
+  **4.39 : 1** on the white cards — but only **3.85 : 1** on the screen
+  background, which the earlier figure did not record. Both sit below the 4.5 : 1
+  small-text threshold. It carries no other role, so darkening it slightly is a
+  contained change.
+  Red as *text* is the second case, and it is now a decision rather than an
+  oversight. `dangerRedColor()` is **3.49 : 1** on the dark theme's cards, which
+  clears 1.4.11 for the dots, bars and icons that make up most of its use, and
+  falls short of 4.5 : 1 for the four places it colours small text: the three
+  days-over-limit values and the trend value in `StatRow`, plus the two delete
+  confirmations. Reaching 4.5 needs roughly `#E66363`, light enough to read as
+  pink; that was measured, compared side by side and rejected — the signal colour
+  keeps its character. The open question is therefore not which red, but whether
+  those four sites should carry red text at all, given that the state is already
+  carried by a dot or a bar beside them. The BAC readout is a fifth red text site
+  and already conforms: `titleLarge` is 22 sp SemiBold, so the large-text
+  threshold of 3 : 1 applies to it.
 - **Target size (2.5.8, AA — new in 2.2).** The 10 dp heat-map day cells are
   below the 24 px minimum; a ≥ 24 dp (ideally 48 dp) touch target should wrap the
   10 dp visual. (Standard Material `IconButton`s already meet this.)

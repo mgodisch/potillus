@@ -149,10 +149,36 @@ internal val ErrorColorDark = Color(0xFFCF6679)
 private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
 /**
- * Slightly darker, fully saturated red used for traffic-light bullets,
- * calendar over-limit dots, and delete-action icons.
+ * The one red the app uses for "over the limit": traffic-light bullets, calendar
+ * over-limit dots, the limit line and over-limit bars in the charts, the trend
+ * arrow, delete icons and the delete confirmations. Every one of those reads this
+ * function, so the shade stays uniform by construction.
+ *
+ * MEASURED (WCAG 2.2 contrast, sRGB):
+ *
+ *   dark  #DF3A3A  3.49 : 1 on NachtSurface (#1E2538), 4.35 : 1 on NachtBackground
+ *   light #960018  9.09 : 1 on SchieferSurface (#FFFFFF), 7.97 : 1 on the background
+ *
+ * The two themes carry different hex values on purpose. A single value cannot
+ * serve both: #DF3A3A on the light theme's white cards falls to 4.37 : 1, worse
+ * than the 9.09 : 1 it has today, so unifying the literal would trade the light
+ * theme away for the dark one.
+ *
+ * WHY 3.49 AND NOT 4.5 IN THE DARK THEME
+ *   As a non-text indicator -- which is what a dot, a bar and an icon are -- the
+ *   requirement is 3 : 1 (WCAG 1.4.11), and 3.49 clears it with room to spare;
+ *   the previous #DD2C2C sat at 3.25, only just above. Small red TEXT would need
+ *   4.5 : 1, which on these backgrounds is reached only around #E66363 -- a shade
+ *   light enough to read as pink rather than red. That was measured, compared
+ *   side by side, and rejected as a design choice: the signal colour keeps its
+ *   character, and the four remaining red text sites are recorded as a known gap
+ *   in docs/ROADMAP.md rather than papered over.
+ *
+ * Note that the saturation is constant across that whole range (72 % in HSL);
+ * what changes with lightening is only the lightness, which is what makes a
+ * lighter red read as pink.
  */
-@Composable fun dangerRedColor() = if (isDarkTheme()) Color(0xFFDD2C2C) else Color(0xFF960018)
+@Composable fun dangerRedColor() = if (isDarkTheme()) Color(0xFFDF3A3A) else Color(0xFF960018)
 
 /** Returns a green that passes WCAG AA against the current theme's background. */
 @Composable fun successColor() = if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)

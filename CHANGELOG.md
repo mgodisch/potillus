@@ -81,6 +81,9 @@ Edit drinks from the list's edit mode
   are machine-generated.
 - `SECURITY.md` lists the App Store Connect variables and scopes the release
   verification to the Android artifacts.
+- The over-limit red in the Android dark theme is `#DF3A3A`.
+- The roadmap records the measured contrast of that red and of the light-theme
+  caption colour.
 
 ### Fixed
 
