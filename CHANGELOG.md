@@ -111,6 +111,7 @@ Edit drinks from the list's edit mode
 
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
 - The base `strings.xml` section comments are in English.
+- The contrast summary in `theme/Color.kt` matches the measured values.
 - The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
   directory marker, and `__pycache__` directories stay out of the tarball.
 

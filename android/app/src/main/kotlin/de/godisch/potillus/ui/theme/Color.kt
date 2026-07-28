@@ -160,7 +160,7 @@ internal val ErrorColorDark = Color(0xFFCF6679)
 // Achieved WCAG AA contrast ratios:
 //   errorColor   – Slate 5.73:1 ✓ / Night 5.28:1 ✓
 //   successColor – Slate 4.50:1 ✓ / Night 6.84:1 ✓
-//   warningColor – Slate 4.40:1 ✓ / Night 8.58:1 ✓ (dot needs ≥ 3:1 per WCAG 1.4.11)
+//   warningColor – Slate 3.35:1 ✓ / Night 8.58:1 ✓ (dot needs ≥ 3:1 per WCAG 1.4.11)
 //
 // =============================================================================
 // STATUS COLOURS — the reasoning behind the values
@@ -190,7 +190,8 @@ internal val ErrorColorDark = Color(0xFFCF6679)
 // 3. THE TWO THEMES NEED DIFFERENT HEX VALUES
 //    A value tuned for one is wrong for the other, and unifying the literal
 //    trades one theme away. The dark danger red on the light theme's white cards
-//    falls to about 4.4:1 where the light value has 9.09:1.
+//    falls to 4.70:1 (and to 4.12:1 on the background) where the light value
+//    has 9.09:1.
 //
 // 4. LIGHTENING IS NOT ALWAYS THE FIX
 //    Contrast rises by moving AWAY from the background's luminance, and which
@@ -280,7 +281,7 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
  *
  * The two themes carry different hex values on purpose. A single value cannot
  * serve both: the dark theme's red on the light theme's white cards falls to
- * around 4.4 : 1, far below the 9.09 : 1 it has today.
+ * 4.70 : 1, far below the 9.09 : 1 it has today.
  */
 @Composable fun dangerRedColor() = if (isDarkTheme()) NachtDanger else SchieferDanger
 
