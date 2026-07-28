@@ -34,9 +34,12 @@
 #   The project documentation standard (CONTRIBUTING.md, "English
 #   everywhere") requires all source code comments, KDoc, and BUILD FILES to
 #   be written in English.  German prose in code comments is confusing for
-#   international contributors.  The scan covers the Kotlin sources, the
-#   Gradle build scripts, and the Swift sources of the iOS port (when
-#   present).  Translation strings in values-de/strings.xml are excluded.
+#   international contributors.  The scan covers the Kotlin and Swift sources,
+#   the Gradle build scripts, the Makefiles, the Python/shell tooling, the
+#   declarative build and configuration files, and the non-translation XML
+#   sources -- each root is named in the function body beside its reason.
+#   Translation files (values-*/strings.xml, the guide masters) are excluded:
+#   their content is the translations themselves.
 #
 # NOTE ON FALSE POSITIVES:
 #   The word list was calibrated against the current source tree.  Short or
@@ -154,14 +157,32 @@ check_no_german_comments() {
             # The last two file classes check-headers.py owns that a `#`- or
             # `//`-comment scan can reach. The report template is HTML, so its
             # comments open with `<!--`; the daemon JVM properties file uses `#`
-            # like every other .properties file above. The remaining classes in
-            # check-headers.py's suffix list -- .md, .xml, .in -- are deliberately
-            # NOT scanned: their content is the translations themselves, so German
-            # in values-de/strings.xml or usersguide.de.md.in is correct.
+            # like every other .properties file above. Of the remaining classes in
+            # check-headers.py's suffix list -- .md, .xml, .in -- the TRANSLATION
+            # files are deliberately NOT scanned: their content is the translations
+            # themselves, so German in values-de/strings.xml or usersguide.de.md.in
+            # is correct. The .xml files that are NOT translations get their own
+            # explicit roots below.
             # -H, not just -n: grep omits the file name when given a single
             # file, and a warning that names no file is not actionable.
             grep -Hn "<!--" ../report/report_template.html 2>/dev/null || true
             grep -Hn "#" gradle/gradle-daemon-jvm.properties 2>/dev/null || true
+            # The NON-translation XML sources. The blanket .xml exclusion above
+            # exists for values-*/strings.xml, whose CONTENT is the translations;
+            # these eight files are ordinary project sources whose comments carry
+            # the English-everywhere convention like any .kt file, and until the
+            # 0.85.0 QA round no gate read them although check-headers.py owns
+            # the .xml suffix. Named as explicit roots like the build scripts:
+            # a recursive glob would sweep in the translation files.
+            grep -Hn "<!--" app/src/main/AndroidManifest.xml \
+                app/src/main/res/values/themes.xml \
+                app/src/main/res/values/colors.xml \
+                app/src/main/res/values-night/themes.xml \
+                app/src/main/res/xml/data_extraction_rules.xml \
+                app/src/main/res/xml/locale_config.xml \
+                app/src/main/res/mipmap-anydpi/ic_launcher.xml \
+                app/src/main/res/mipmap-anydpi/ic_launcher_round.xml \
+                2>/dev/null || true
         } | grep -iE "\b(${pattern})\b" | head -15 || true
     )
 

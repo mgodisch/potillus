@@ -100,6 +100,10 @@ Edit drinks from the list's edit mode
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.
+- The report template's HTML escaping on iOS compares Unicode scalars, with a
+  combining-mark case in `template-render.json`.
+- The comment-language gate reads the manifest, theme, colour, extraction-rule,
+  locale-config, and launcher-icon XML comments.
 
 ### Fixed
 
