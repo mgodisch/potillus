@@ -48,6 +48,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -90,6 +91,18 @@ import de.godisch.potillus.ui.component.SectionCard
 //   the font files themselves never leave the repository. COPYING.md remains the
 //   exhaustive inventory and travels with the source.
 // =============================================================================
+
+/**
+ * The canonical source repository, offered on the License card so the GPL's
+ * "you may study and redistribute this" is one tap away rather than a claim the
+ * reader has to take on trust.
+ *
+ * GitLab, not the GitHub mirror: the mirror is push-only and carries no
+ * development. The same address is the store listing's marketing and support URL
+ * (`fastlane/metadata/android/*/`), and the iOS twin holds it as
+ * `AppInfo.sourceRepository`.
+ */
+private const val SOURCE_REPOSITORY = "https://gitlab.com/godisch/potillus"
 
 /**
  * The About screen: the app's name and version, its license stated in full, and
@@ -138,6 +151,10 @@ fun AboutScreen(
         },
     ) { paddingValues ->
         val scroll = rememberScrollState()
+        // Resolved here rather than inside the card: a CompositionLocal is read
+        // in the composable that uses it, and the License card's link is the one
+        // place on this screen that leaves the app.
+        val uriHandler = LocalUriHandler.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -206,7 +223,18 @@ fun AboutScreen(
                         "restrictive terms and conditions.",
                 )
                 HorizontalDivider()
-                LicenseLink("GNU General Public License v3", onOpenGpl3)
+                // Above the license text's own link, because it answers the
+                // question the four paragraphs raise: the GPL grants the right to
+                // study and redistribute the source, and this is where the source
+                // is. The label stays English like every other label on this card
+                // -- see the file header on why the license chapter is not
+                // localised.
+                //
+                // The URI handler hands the address to the system browser. The app
+                // declares no INTERNET permission, and that stays true: opening a
+                // URL is the system's work, not this app's.
+                CardLink("Source code") { uriHandler.openUri(SOURCE_REPOSITORY) }
+                CardLink("GNU General Public License v3", onOpenGpl3)
             }
 
             SectionHeading("Open-source components", Modifier.padding(top = 12.dp))
@@ -220,7 +248,7 @@ fun AboutScreen(
                         "(Copyright © The JSpecify Authors).",
                 )
                 HorizontalDivider()
-                LicenseLink("Apache License 2.0", onOpenApache2)
+                CardLink("Apache License 2.0", onOpenApache2)
             }
             SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
@@ -233,7 +261,7 @@ fun AboutScreen(
                         "it.",
                 )
                 HorizontalDivider()
-                LicenseLink("GNU General Public License v2", onOpenGpl2)
+                CardLink("GNU General Public License v2", onOpenGpl2)
             }
             SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
@@ -245,7 +273,7 @@ fun AboutScreen(
                         "whenever desugared types meet a platform API.",
                 )
                 HorizontalDivider()
-                LicenseLink("BSD 3-Clause License", onOpenBsd3)
+                CardLink("BSD 3-Clause License", onOpenBsd3)
             }
         }
     }
@@ -285,15 +313,19 @@ private fun BodyText(text: String) {
 }
 
 /**
- * A tappable line that opens a verbatim license text.
+ * A tappable line at the foot of a card, opening the document or address it names.
  *
  * A [TextButton] rather than an inline `AnnotatedString` link: the paragraphs
  * above are fixed literals, and threading a `LinkAnnotation` through them would
  * mean splitting each sentence around its link. A button on its own line names
- * the document and is a bigger touch target.
+ * the target and is a bigger touch target.
+ *
+ * The name is deliberately not `LicenseLink` any more: the License card now ends
+ * with two of these, one pointing at the GPL text and one at the source
+ * repository, and only the first of them opens a license.
  */
 @Composable
-private fun LicenseLink(text: String, onClick: () -> Unit) {
+private fun CardLink(text: String, onClick: () -> Unit) {
     TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Text(text)
     }

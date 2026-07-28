@@ -60,6 +60,10 @@ Edit drinks from the list's edit mode
 - Revised README.md.
 - `AlcoholCalculator.drinkDayLimitReached` answers the drink-day gate on iOS,
   and `alcohol-calculator.json` pins it on both platforms.
+- The statistics screen sets its values flush right on iOS, wrapped rows
+  included.
+- The dry-day tick in the iOS consumption chart is smaller.
+- The About screen's License card links to the source repository.
 
 ### Fixed
 

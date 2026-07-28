@@ -130,6 +130,19 @@ struct AboutScreen: View {
                         """
                     )
                 }
+                // Above the license text's own link, because it answers the
+                // question the four paragraphs raise: the GPL grants the right to
+                // study and redistribute the source, and this is where the source
+                // is. The label stays English like every other label on this card
+                // -- see the file header on why the license chapter is not
+                // localised.
+                //
+                // `Link` hands the address to the system browser. The app itself
+                // holds no networking code, and that stays true: opening a URL is
+                // the operating system's work, not the app's.
+                if let repository = AppInfo.sourceRepository {
+                    Link("Source code", destination: repository)
+                }
                 NavigationLink("GNU General Public License v3") {
                     DocumentViewerScreen(
                         title: "GPL 3.0",

@@ -48,6 +48,20 @@ enum AppInfo {
         return String(version.prefix(while: { $0 != "-" }))
     }
 
+    /// The canonical source repository, offered on the About screen's License
+    /// card so the GPL's "you may study and redistribute this" is one tap away
+    /// rather than a claim the reader has to take on trust.
+    ///
+    /// GitLab, not the GitHub mirror: the mirror is push-only and carries no
+    /// development. The same address is the store listing's marketing and
+    /// support URL (`fastlane/metadata/ios/*/marketing_url.txt`).
+    ///
+    /// Typed as `URL?`, not `URL`: `URL(string:)` is failable and this app force-
+    /// unwraps nowhere. The About screen therefore unwraps it and simply omits the
+    /// row if it ever comes back `nil` — a missing link is a smaller failure than
+    /// a crash on a screen whose whole job is to be readable.
+    static let sourceRepository = URL(string: "https://gitlab.com/godisch/potillus")
+
     /// GRDB's license, reproduced verbatim from the project's LICENSE file
     /// (github.com/groue/GRDB.swift). docs/NOTICES.md records that the iOS about
     /// screen reproduces this inline (and pins it with the testGrdbLicense smoke

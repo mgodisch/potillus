@@ -222,6 +222,7 @@ struct StatsScreen: View {
                 Text("\(model.state.abstinentDays)")
                     .monospacedDigit()
                     .foregroundStyle(model.state.abstinentDays > 0 ? Color.green : Color.secondary)
+                    .metricValue()
             }
         } header: {
             Text(model.state.from.isEmpty ? "" : "\(model.state.from) – \(model.state.to)")
@@ -245,11 +246,15 @@ struct StatsScreen: View {
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
                 LabeledContent(Loc.string("Trend vs. Previous Period", locale: locale)) {
+                    // The modifier sits on the HStack, not on the percentage
+                    // inside it: arrow and value are one value, and pinning only
+                    // the text would leave the arrow behind at the leading edge.
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
                         trend(model.state.trendPercent)
                     }
+                    .metricValue()
                 }
             }
         }
@@ -451,9 +456,13 @@ extension StatsScreen {
 extension StatsScreen {
 
     fileprivate func grams(_ value: Double) -> some View {
-        Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g").monospacedDigit()
+        Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g")
+            .monospacedDigit()
+            .metricValue()
     }
 
+    /// No `metricValue()` here, unlike its siblings: the percentage is drawn
+    /// beside a trend arrow, and the pair is pinned as a unit at the call site.
     fileprivate func trend(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale, signed: true)) %").monospacedDigit()
     }
@@ -464,13 +473,16 @@ extension StatsScreen {
         Text("\(value)")
             .monospacedDigit()
             .foregroundStyle(value > 0 ? Color.red : Color.green)
+            .metricValue()
     }
 
     fileprivate func days(_ value: Int) -> some View {
         // The plural noun is part of the value now, so it agrees with the count in
         // every language: "1 day" / "7 days", "1 Tag" / "7 Tage", the four Polish
         // forms, the single Japanese one. The catalogue inflects; the view only asks.
-        Text(Loc.daysPlural(count: value, locale: locale)).monospacedDigit()
+        Text(Loc.daysPlural(count: value, locale: locale))
+            .monospacedDigit()
+            .metricValue()
     }
 
     /// Like `days`, but green when positive — the achievement colour Android
@@ -480,6 +492,42 @@ extension StatsScreen {
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
             .foregroundStyle(value > 0 ? Color.green : Color.secondary)
+            .metricValue()
+    }
+}
+
+// =============================================================================
+// Metric value alignment
+// =============================================================================
+//
+// WHAT THIS FIXES
+//   `LabeledContent` lays its label and its value out side by side while both
+//   fit. When they do not — a long label, a translated label, or a large Dynamic
+//   Type size — it falls back to stacking the value BELOW the label, and in that
+//   stacked arrangement the value is placed at the leading edge. The row then
+//   reads as left-aligned while every row around it reads as right-aligned,
+//   which is exactly where the eye is scanning for the numbers.
+//
+// HOW
+//   The value is given the full row width with a trailing alignment, so it sits
+//   at the trailing edge in BOTH arrangements: unchanged when the value already
+//   sits beside its label, and moved to the right when it has been pushed onto
+//   its own line. `multilineTextAlignment` covers the case where the value
+//   itself wraps over more than one line, which the plural day counts can do in
+//   the longer languages.
+//
+// WHY A MODIFIER AND NOT A `LabeledContentStyle`
+//   A custom style would have to rebuild the label/value layout by hand, and
+//   with it the very Dynamic Type stacking this fix relies on. Restyling the
+//   value leaves that behaviour to the framework and touches only the alignment.
+// =============================================================================
+
+extension View {
+    /// Pins a `LabeledContent` value to the trailing edge in both the side-by-side
+    /// and the stacked arrangement. See the note above.
+    fileprivate func metricValue() -> some View {
+        multilineTextAlignment(.trailing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 
@@ -568,8 +616,17 @@ extension StatsScreen {
                             y: .value("Grams per day", 0)
                         )
                         .symbol {
+                            // Smaller than the surrounding chart text on purpose:
+                            // the tick marks a dry day, it does not label one, and
+                            // at caption2 it drew heavier than Android's baseline
+                            // tick (two strokes, capped at 5 dp). `imageScale`
+                            // shrinks the glyph WITHIN its text style, so the mark
+                            // still grows and shrinks with Dynamic Type — a fixed
+                            // point size would freeze it at one accessibility
+                            // setting.
                             Image(systemName: "checkmark")
                                 .font(.caption2.bold())
+                                .imageScale(.small)
                                 .foregroundStyle(Color.green)
                         }
                         .foregroundStyle(Color.green)

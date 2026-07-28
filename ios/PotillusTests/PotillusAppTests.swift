@@ -78,6 +78,15 @@ final class PotillusAppTests: XCTestCase {
     // These guard the text against a well-meaning edit that would quietly break the
     // one license obligation the app carries.
 
+    /// `sourceRepository` is an `Optional` the About screen unwraps, so a typo in
+    /// the literal would not fail the build — it would silently drop the row. This
+    /// is the check that turns that into a red test instead.
+    func testSourceRepositoryResolves() throws {
+        let url = try XCTUnwrap(AppInfo.sourceRepository)
+        XCTAssertEqual(url.scheme, "https")
+        XCTAssertEqual(url.host(), "gitlab.com")
+    }
+
     func testGrdbLicenseCarriesTheCopyrightLine() {
         XCTAssertTrue(AppInfo.grdbLicense.hasPrefix("Copyright (C) 2015-2025 Gwendal Roué"))
     }
