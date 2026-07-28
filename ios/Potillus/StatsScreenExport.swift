@@ -78,9 +78,11 @@ extension StatsScreen {
     /// `DayResolver` with the freshly loaded day-change settings; they are in
     /// hand here, unlike at Android's composable site, whose raw-calendar-date
     /// fallback documents the same intent. Android's export dialog pre-fills by
-    /// the same three-step rule (StatsScreen's `exportFrom`), so the two
-    /// platforms offer the same range in every case. The `guard` below catches
-    /// an unparseable stored floor date.
+    /// the same three-step rule (StatsScreen's `exportFrom`); its last rung is
+    /// the raw calendar date, so for a dialog opened in that pre-load instant
+    /// around the day-change hour the two pre-fills can differ by one day.
+    /// Everywhere outside that window the platforms offer the same range. The
+    /// `guard` below catches an unparseable stored floor date.
     func beginExport(_ kind: ExportRangeSheet.Kind) async {
         let settings = await environment.preferences.load()
 

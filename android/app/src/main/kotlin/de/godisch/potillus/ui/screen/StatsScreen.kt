@@ -393,11 +393,15 @@ fun StatsScreen(
     // The fallback reads the clock through DayResolver.clock() (not a bare
     // LocalDate.now()) so it honours the screenshot clock override, matching the
     // app-wide rule that every date-relative surface derives "today" from
-    // DayResolver (see DayResolver.clock). This value is only ever a transient
-    // placeholder for the picker's initial date: once the flow emits, `today`
-    // (which additionally applies the configured day-change boundary) replaces
-    // it, so the day-boundary nuance the raw calendar date cannot express is not
-    // observable in practice.
+    // DayResolver (see DayResolver.clock). The fallback matters only to a dialog
+    // OPENED inside that pre-emission instant: rememberDateRangePickerState in
+    // ExportDateRangeDialog reads its initial values once, so a picker seeded
+    // then keeps the raw calendar date even after the flow emits. Around the
+    // day-change hour that seed can sit one day past the logical today — a
+    // nuance confined to that window, which iOS closes by deriving the logical
+    // today from the freshly loaded settings (StatsScreenExport.beginExport;
+    // this composable has no loaded settings in hand, which is why the raw
+    // calendar date stands in here).
     val exportToday = state.today.ifEmpty { LocalDate.now(DayResolver.clock()).toString() }
     // The offered range starts at the configured statistics floor. Without a
     // floor it starts at the first day the visible period covers
