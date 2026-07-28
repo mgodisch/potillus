@@ -91,7 +91,24 @@ Potionis erbjuder följande konfigurationsalternativ:
 ### {{personal_data}}
 
 I den här kategorin kan du ange din kroppsvikt för att uppskatta din
-alkoholkoncentration i blodet med hjälp av Widmark-formeln.
+alkoholkoncentration i blodet med hjälp av
+[Widmark-formeln](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Värdet visas sedan på skärmen "{{today}}".
+
+Formeln är **BAC [‰] = A / (P × r) − β × t**: A är mängden ren alkohol i gram,
+P kroppsvikten i kilogram, r fördelningskoefficienten, β
+nedbrytningshastigheten på ungefär 0,15 ‰ per timme och t antalet timmar sedan
+den första drycken. Grammen kommer från volym × alkoholhalt × 0,789, etanolens
+densitet.
+
+Appen registrerar inte kön och räknar därför försiktigt: r är fastställt till
+0,6, det minsta av de två klassiska koefficienterna. Ett mindre r fördelar
+samma dos i en mindre volym och ger därmed det högsta av de två värdena, så
+att uppskattningen om möjligt inte hamnar under det som en människa av vilket
+kön som helst faktiskt når. Nedbrytningshastigheten är däremot ett medelvärde:
+individuellt ligger den på ungefär 0,10 till 0,20 ‰ per timme, så den som
+bryter ned alkohol långsamt kan ligga över det visade värdet. Uppskattningen
+är en statistisk modell, inte en mätning.
 
 ### {{limits}}
 

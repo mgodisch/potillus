@@ -91,8 +91,24 @@ O menu de configurações é acessível pelo ícone de menu (☰) no canto super
 
 ### {{personal_data}}
 
-Nesta categoria você pode anotar seu peso corporal para estimar sua concentração
-de álcool no sangue por meio da fórmula de Widmark.
+Nesta categoria você pode anotar seu peso corporal para estimar sua
+concentração de álcool no sangue por meio da [fórmula de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Esse valor é então exibido na tela "{{today}}".
+
+A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
+P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
+eliminação de cerca de 0,15 ‰ por hora e t as horas desde a primeira bebida.
+Os gramas vêm de volume × teor alcoólico × 0,789, a densidade do etanol.
+
+O aplicativo não registra o sexo e por isso calcula de forma conservadora: r é
+fixado em 0,6, o menor dos dois coeficientes clássicos. Um r menor distribui a
+mesma dose em um volume menor e devolve portanto o maior dos dois valores, de
+modo que a estimativa não fique abaixo do que uma pessoa de qualquer sexo
+realmente alcança. A taxa de eliminação, em contrapartida, é uma média:
+individualmente varia de cerca de 0,10 a 0,20 ‰ por hora, de modo que quem
+metaboliza o álcool devagar pode estar acima do valor exibido. A estimativa é
+um modelo estatístico, não uma medição.
 
 ### {{limits}}
 

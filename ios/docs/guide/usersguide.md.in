@@ -101,6 +101,21 @@ alcohol concentration using the
 [Widmark formula](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
 This value will then be displayed on the "{{today}}" screen.
 
+The formula is **BAC [‰] = A / (P × r) − β × t**: A is the grams of pure
+alcohol consumed, P your body weight in kilograms, r the distribution
+coefficient, β the elimination rate of about 0.15 ‰ per hour, and t the hours
+since the first drink of the session. The grams themselves come from volume ×
+alcohol content × 0.789, the density of ethanol.
+
+The app does not record your sex, so it calculates conservatively: r is fixed
+at 0.6, the smaller of the two classic coefficients. A smaller r spreads the
+same dose through a smaller volume and so returns the higher of the two
+readings, which keeps the estimate from falling below what a person of any sex
+would reach. The elimination rate, by contrast, is an average: individual
+values range from about 0.10 to 0.20 ‰ per hour, so anyone who breaks alcohol
+down slowly can be above the figure shown. The estimate is a statistical
+model, not a measurement.
+
 ### {{limits}}
 
 In this category, you define the limits that apply to your alcohol

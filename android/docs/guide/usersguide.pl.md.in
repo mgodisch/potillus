@@ -92,7 +92,23 @@ Libellus Potionis udostępnia następujące opcje konfiguracji:
 ### {{personal_data}}
 
 W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
-stężenie alkoholu we krwi według wzoru Widmarka.
+stężenie alkoholu we krwi według [wzoru
+Widmarka](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Wartość jest następnie pokazywana na ekranie „{{today}}".
+
+Wzór brzmi **BAC [‰] = A / (P × r) − β × t**: A to gramy czystego alkoholu, P
+masa ciała w kilogramach, r współczynnik dystrybucji, β tempo eliminacji około
+0,15 ‰ na godzinę, a t liczba godzin od pierwszego napoju. Gramy wynikają z
+objętości × zawartości alkoholu × 0,789, gęstości etanolu.
+
+Aplikacja nie zapisuje płci i dlatego liczy zachowawczo: r jest ustalone na
+0,6, mniejszy z dwóch klasycznych współczynników. Mniejsze r rozprowadza tę
+samą dawkę w mniejszej objętości i daje przez to wyższą z dwóch wartości, tak
+aby oszacowanie w miarę możliwości nie schodziło poniżej tego, co osiąga
+człowiek dowolnej płci. Tempo eliminacji jest natomiast średnią: indywidualnie
+mieści się mniej więcej między 0,10 a 0,20 ‰ na godzinę, więc kto rozkłada
+alkohol wolno, może być powyżej pokazanej wartości. Oszacowanie to model
+statystyczny, a nie pomiar.
 
 ### {{limits}}
 

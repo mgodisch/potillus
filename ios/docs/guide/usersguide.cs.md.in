@@ -88,7 +88,23 @@ Potionis nabízí následující možnosti konfigurace:
 ### {{personal_data}}
 
 V této kategorii můžete uvést svou tělesnou hmotnost, aby bylo možné přibližně
-vypočítat koncentraci alkoholu v krvi podle Widmarkova vzorce.
+vypočítat koncentraci alkoholu v krvi podle [Widmarkova
+vzorce](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Tato hodnota se pak zobrazí na obrazovce „{{today}}".
+
+Vzorec zní **BAK [‰] = A / (P × r) − β × t**: A je množství čistého alkoholu v
+gramech, P tělesná hmotnost v kilogramech, r distribuční koeficient, β
+rychlost odbourávání přibližně 0,15 ‰ za hodinu a t počet hodin od prvního
+nápoje daného večera. Gramy vycházejí z objemu × obsahu alkoholu × 0,789,
+hustoty ethanolu.
+
+Aplikace pohlaví nezaznamenává, a proto počítá konzervativně: r je pevně
+nastaveno na 0,6, tedy menší ze dvou klasických koeficientů. Menší r rozděluje
+stejnou dávku do menšího objemu, a dává tak vyšší z obou hodnot, takže odhad
+pokud možno neklesne pod to, čeho člověk jakéhokoli pohlaví skutečně dosáhne.
+Rychlost odbourávání je naproti tomu průměr: individuálně se pohybuje asi mezi
+0,10 a 0,20 ‰ za hodinu, takže kdo alkohol odbourává pomalu, může být nad
+zobrazenou hodnotou. Odhad je statistický model, nikoli měření.
 
 ### {{limits}}
 

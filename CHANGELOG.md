@@ -66,6 +66,10 @@ Edit drinks from the list's edit mode
 - The About screen's License card links to the source repository.
 - The roadmap carries an opt-in Android palette on iOS and a guided tour.
 - The store descriptions carry the reworked text in all 21 locales.
+- The user's guide states the Widmark formula and its conservative
+  distribution coefficient.
+- Twelve guide locales carry the Widmark link and the master's closing
+  sentence.
 
 ### Fixed
 

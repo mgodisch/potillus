@@ -97,7 +97,25 @@ suivantes :
 ### {{personal_data}}
 
 Dans cette catégorie, vous pouvez indiquer votre poids corporel afin d'estimer
-votre alcoolémie selon la formule de Widmark.
+votre alcoolémie selon la [formule de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Cette valeur s'affiche ensuite sur l'écran « {{today}} ».
+
+La formule est **BAC [‰] = A / (P × r) − β × t** : A correspond aux grammes
+d'alcool pur, P au poids corporel en kilogrammes, r au coefficient de
+diffusion, β au taux d'élimination d'environ 0,15 ‰ par heure et t aux heures
+écoulées depuis la première boisson. Les grammes découlent du volume × titre
+alcoolique × 0,789, la densité de l'éthanol.
+
+L'application n'enregistre pas le sexe et calcule donc de façon prudente : r
+est fixé à 0,6, le plus petit des deux coefficients classiques. Un r plus
+petit répartit la même dose dans un volume plus faible et donne ainsi la plus
+élevée des deux valeurs, de sorte que l'estimation ne passe pas en dessous de
+ce qu'atteint une personne de n'importe quel sexe. Le taux d'élimination, en
+revanche, est une moyenne : il varie individuellement d'environ 0,10 à 0,20 ‰
+par heure, si bien qu'une personne qui élimine lentement peut se situer
+au-dessus de la valeur affichée. L'estimation est un modèle statistique, pas
+une mesure.
 
 ### {{limits}}
 

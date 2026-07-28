@@ -92,7 +92,24 @@ Libellus Potionis biedt de volgende configuratiemogelijkheden:
 ### {{personal_data}}
 
 In deze categorie kun je je lichaamsgewicht noteren om je
-bloedalcoholconcentratie bij benadering te berekenen met de formule van Widmark.
+bloedalcoholconcentratie bij benadering te berekenen met de [formule van
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Die waarde wordt daarna op het scherm "{{today}}" getoond.
+
+De formule luidt **BAC [‰] = A / (P × r) − β × t**: A is het aantal gram pure
+alcohol, P het lichaamsgewicht in kilogram, r de verdelingscoëfficiënt, β de
+afbraaksnelheid van ongeveer 0,15 ‰ per uur en t het aantal uren sinds het
+eerste drankje. De grammen volgen uit volume × alcoholpercentage × 0,789, de
+dichtheid van ethanol.
+
+De app registreert het geslacht niet en rekent daarom behoedzaam: r ligt vast
+op 0,6, de kleinste van de twee klassieke coëfficiënten. Een kleinere r
+verdeelt dezelfde dosis over een kleiner volume en geeft dus de hoogste van de
+twee waarden, zodat de schatting zo min mogelijk onder komt te liggen wat een
+mens van welk geslacht dan ook werkelijk bereikt. De afbraaksnelheid is
+daarentegen een gemiddelde: individueel ligt die rond 0,10 tot 0,20 ‰ per uur,
+dus wie alcohol langzaam afbreekt, kan boven de getoonde waarde zitten. De
+schatting is een statistisch model, geen meting.
 
 ### {{limits}}
 

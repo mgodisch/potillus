@@ -97,6 +97,21 @@ se calculeze aproximativ concentrația de alcool în sânge după
 [formula lui Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
 Aceasta este apoi afișată pe ecranul „{{today}}”.
 
+Formula este **BAC [‰] = A / (P × r) − β × t**: A reprezintă gramele de alcool
+pur, P greutatea corporală în kilograme, r coeficientul de distribuție, β rata
+de eliminare de circa 0,15 ‰ pe oră, iar t orele scurse de la prima băutură.
+Gramele rezultă din volum × concentrație alcoolică × 0,789, densitatea
+etanolului.
+
+Aplicația nu înregistrează sexul și de aceea calculează conservator: r este
+fixat la 0,6, cel mai mic dintre cei doi coeficienți clasici. Un r mai mic
+distribuie aceeași doză într-un volum mai mic și dă astfel valoarea mai mare
+dintre cele două, astfel încât estimarea să nu coboare sub ceea ce atinge o
+persoană de orice sex. Rata de eliminare este în schimb o medie: individual se
+situează între aproximativ 0,10 și 0,20 ‰ pe oră, așa că cine metabolizează
+alcoolul lent poate fi peste valoarea afișată. Estimarea este un model
+statistic, nu o măsurătoare.
+
 ### {{limits}}
 
 În această categorie se definesc limitele care trebuie să se aplice propriului

@@ -102,6 +102,22 @@ Blutalkoholwert näherungsweise nach der
 [Widmark-Formel](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel)
 berechnen zu lassen. Dieser wird dann auf dem Screen "{{today}}" angezeigt.
 
+Die Formel lautet **BAK [‰] = A / (P × r) − β × t**: A ist die Menge reinen
+Alkohols in Gramm, P das Körpergewicht in Kilogramm, r der
+Verteilungskoeffizient, β die Abbaurate von etwa 0,15 ‰ pro Stunde und t die
+Stunden seit dem ersten Getränk der Sitzung. Die Gramm ergeben sich aus
+Volumen × Alkoholgehalt × 0,789, der Dichte von Ethanol.
+
+Die App erfasst das Geschlecht nicht und rechnet deshalb konservativ: r ist
+auf 0,6 festgelegt, den kleineren der beiden klassischen Koeffizienten. Ein
+kleineres r verteilt dieselbe Dosis auf ein kleineres Volumen und liefert
+damit den höheren der beiden Werte, sodass die Schätzung möglichst nicht unter
+dem liegt, was ein Mensch welchen Geschlechts auch immer erreicht. Die
+Abbaurate ist dagegen ein Mittelwert: individuell liegt sie etwa zwischen 0,10
+und 0,20 ‰ pro Stunde, wer Alkohol langsam abbaut, kann also über dem
+angezeigten Wert liegen. Die Schätzung ist ein statistisches Modell, keine
+Messung.
+
 ### {{limits}}
 
 In dieser Kategorie werden die Limits definiert, die für den eigenen
