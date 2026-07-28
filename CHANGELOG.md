@@ -84,6 +84,9 @@ Edit drinks from the list's edit mode
 - The Android dark theme carries two over-limit reds: `#DD2C2C` for dots, bars
   and icons, `#DF3A3A` for text and the trend arrows. The month grid and the
   calendar's delete confirmation use them too.
+- Both dots in the month grid stay visible on a selected day.
+- Every Android status colour is a named constant in `theme/Color.kt`, next to
+  the contrast reasoning behind it.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.

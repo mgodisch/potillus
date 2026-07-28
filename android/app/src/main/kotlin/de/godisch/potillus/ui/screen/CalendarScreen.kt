@@ -60,6 +60,7 @@ import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.l10n.monthYearFormatter
 import de.godisch.potillus.ui.component.*
+import de.godisch.potillus.ui.theme.dangerOnSelectionColor
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.dangerTextColor
 import java.time.DayOfWeek
@@ -519,16 +520,25 @@ private fun MonthCalendar(
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                 )
                                 if (summary != null) {
+                                    // On a selected cell the background is
+                                    // `primary`, so neither of the normal dot
+                                    // colours works there: the neutral dot IS
+                                    // `primary` (1.00:1, invisible) and the
+                                    // over-limit red sits within 1.4:1 of it.
+                                    // Both therefore switch to the container
+                                    // pair while the cell is selected. See the
+                                    // STATUS COLOURS note in theme/Color.kt.
+                                    val over = AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)
+                                    val dotColor = when {
+                                        isSelected && over -> dangerOnSelectionColor()
+                                        isSelected -> MaterialTheme.colorScheme.primaryContainer
+                                        over -> overLimitColor
+                                        else -> MaterialTheme.colorScheme.primary
+                                    }
                                     Box(
                                         Modifier.size(5.dp)
                                             .clip(MaterialTheme.shapes.extraSmall)
-                                            .background(
-                                                if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
-                                                    overLimitColor
-                                                } else {
-                                                    MaterialTheme.colorScheme.primary
-                                                },
-                                            ),
+                                            .background(dotColor),
                                     )
                                 }
                             }
