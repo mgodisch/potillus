@@ -64,6 +64,7 @@ Edit drinks from the list's edit mode
   included.
 - The dry-day tick in the iOS consumption chart is smaller.
 - The About screen's License card links to the source repository.
+- The roadmap carries an opt-in Android palette on iOS and a guided tour.
 
 ### Fixed
 

@@ -491,6 +491,26 @@ Lower-criticality, forward-looking directions, roughly in priority order:
 - **Small, in-scope UX and feature refinements.** Incremental improvements to the
   existing screens and reports that stay within the app's purpose, without
   expanding its scope or permissions.
+- **Android's colour design on iOS, as an opt-in.** iOS currently draws the
+  status colours from the system semantic palette — `Color.red` and `Color.green`
+  on the Statistics screen, `.green` / `.orange` / `.red` in `TrafficLightDot` —
+  where Android uses hand-tuned hexes picked for WCAG contrast against each theme
+  background, `successColor()` and `warningColor()` in `ui/theme/Color.kt`. The
+  two therefore agree on meaning and differ in shade. This item would carry
+  Android's palette to iOS and put it behind a switch in the Settings screen's
+  Appearance section, so a user who runs both platforms can make them match. Note
+  that this revisits a documented decision rather than filling a gap: the porting
+  stance recorded in `StatsScreen.swift` is that a native app should read the
+  native palette. The scope is a colour source indirection plus one new setting,
+  which brings the settings model, its sanitizer, the backup format's settings
+  block and the shared `backup-settings.json` vector with it.
+- **A guided tour on first launch, and from the help menu.** A short walkthrough
+  of the main screens shown once after installation, and reachable afterwards
+  from the overflow menu's "Help" entry — which today opens the user's guide and
+  nothing else — so the tour can be replayed rather than only dismissed. The cost
+  sits less in the walkthrough than in its text: every step is user-facing prose
+  in 21 languages, in both string catalogues, and the guide itself would need to
+  stay in step with it.
 - **Two deferred iOS parity items (possible, not planned).** Both are conscious
   omissions, not oversights, and neither blocks the port:
   - *Calendar year view.* Android's calendar offers a Month/Year toggle whose
