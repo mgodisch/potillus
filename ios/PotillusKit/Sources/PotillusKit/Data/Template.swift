@@ -205,13 +205,25 @@ public enum Template {
     /// The ampersand goes first. Escaping it after `<` would turn the `&` of
     /// `&lt;` into `&amp;lt;`, and the page would show the markup rather than the
     /// text — the classic double-escape.
+    ///
+    /// EVERY REPLACEMENT PASSES `.literal`, for the reason `CsvExporter` documents
+    /// on its `formulaTriggers`: without it, `replacingOccurrences` compares by
+    /// canonical equivalence over GRAPHEME CLUSTERS and will not match a partial
+    /// cluster. A quote that carries a following combining mark is one cluster,
+    /// so the search for a bare `"` missed it and the character reached the HTML
+    /// unescaped — while Kotlin's `escapeHtml`, iterating UTF-16 units, escaped
+    /// it. The two renderers must agree character for character (the header of
+    /// this file), and `.literal` restores Kotlin's unit-wise comparison. The vector
+    /// case "a quote is escaped even when a combining mark follows it" in
+    /// `test-vectors/template-render.json` pins the unit on both platforms; a
+    /// bare quote proves nothing, because it is its own cluster either way.
     private static func escapeHTML(_ value: String) -> String {
         var escaped = value
-        escaped = escaped.replacingOccurrences(of: "&", with: "&amp;")
-        escaped = escaped.replacingOccurrences(of: "<", with: "&lt;")
-        escaped = escaped.replacingOccurrences(of: ">", with: "&gt;")
-        escaped = escaped.replacingOccurrences(of: "\"", with: "&quot;")
-        escaped = escaped.replacingOccurrences(of: "'", with: "&#39;")
+        escaped = escaped.replacingOccurrences(of: "&", with: "&amp;", options: [.literal])
+        escaped = escaped.replacingOccurrences(of: "<", with: "&lt;", options: [.literal])
+        escaped = escaped.replacingOccurrences(of: ">", with: "&gt;", options: [.literal])
+        escaped = escaped.replacingOccurrences(of: "\"", with: "&quot;", options: [.literal])
+        escaped = escaped.replacingOccurrences(of: "'", with: "&#39;", options: [.literal])
         return escaped
     }
 }

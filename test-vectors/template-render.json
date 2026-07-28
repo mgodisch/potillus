@@ -66,6 +66,15 @@
       "expected": "Beer &amp; &lt;Cider&gt; &quot;x&quot; &#39;y&#39;"
     },
     {
+      "description": "a quote is escaped even when a combining mark follows it",
+      "template": "{{NAME}}",
+      "scalars": {
+        "NAME": "say \"́ now"
+      },
+      "repeats": {},
+      "expected": "say &quot;́ now"
+    },
+    {
       "description": "an ampersand already in the template is left alone",
       "template": "AT&T {{V}}",
       "scalars": {
