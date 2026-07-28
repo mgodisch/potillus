@@ -28,6 +28,7 @@ __pycache__/
 /android/app/build
 /android/build
 /android/guides.d
+/ios/guides.d
 # fastlane bundler/vendor directories.
 /fastlane/.bundle
 /fastlane/.vendor

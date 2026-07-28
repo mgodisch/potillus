@@ -121,11 +121,39 @@ Potillus/Resources/license_gpl3.md: ../LICENSE.md
 # guides: the localized in-app user guides, one per language, rendered from the
 # templates under ios/docs/guide/ with the {{token}} labels resolved against the
 # String Catalogue -- the iOS counterpart of Android's res/raw-*/usersguide.md.
-# Generated (git-ignored). Phony because the output set is one file per language
-# rather than one fixed name; render-guide-ios.py rewrites only the guides whose
-# template or catalogue entry changed, so a rebuild is a near-no-op.
-guides:
+# Generated (git-ignored).
+#
+# Each guide is a real FILE target, not one blanket phony: `render-guide-ios.py
+# --make-deps` emits one `output: template catalogue renderer` rule per language
+# into guides.d, so make -- not a phony that runs every build -- decides which
+# guides are stale. guides.d is auto-regenerated whenever a template, the String
+# Catalogue or the renderer changes, and pulled in with `-include`. This mirrors
+# android/Makefile; read the longer commentary there for the same reasoning.
+#
+# Before 0.85.0 this was a phony target, which could not be a prerequisite of
+# `check-guides` without running on every build. The effect was that a template
+# change made `make ios` stop with "these guides are stale" and demand a manual
+# `make -C ios guides` -- found on device in the 0.85.0 QA round, after the
+# user's-guide templates changed in all 21 languages at once.
+-include guides.d
+
+guides.d: $(wildcard docs/guide/usersguide*.md.in) Potillus/Localizable.xcstrings
+	python3 ../tools/render-guide-ios.py --make-deps > $@
+
+# Shared recipe for every guide output (prerequisites come from guides.d). Guarded
+# so the empty-goal parse BEFORE guides.d exists is harmless. render-guide-ios.py
+# writes content-based (it leaves a file untouched when its text would not change),
+# which would leave the mtime older than the inputs and make the target look
+# perpetually stale -- so `touch` records that it is now up to date. The outputs
+# are git-ignored, so the touch causes no VCS churn.
+ifneq ($(IOS_GUIDE_OUTPUTS),)
+$(IOS_GUIDE_OUTPUTS):
 	python3 ../tools/render-guide-ios.py
+	touch $@
+endif
+
+# Convenience alias: build any stale guide (dependency-driven).
+guides: $(IOS_GUIDE_OUTPUTS)
 
 # check-guides: fail if a committed template or catalogue change would leave a
 # rendered guide stale. READ-ONLY -- it judges, never renders. A guide not rendered

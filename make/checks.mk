@@ -175,10 +175,17 @@ fix-headers:
 # renderer and templates are there), so it is invoked as a sub-make rather than
 # duplicated. release-check.sh is the Android counterpart; together they cover a
 # release, neither alone.
+#
+# `guides check-guides`, in that order: `check-guides` is READ-ONLY by design and
+# renders nothing, so on its own it turns a template change into a hard stop that
+# demands a manual `make -C ios guides`. Building the guides first makes the
+# rendering dependency-driven (a near-no-op when nothing changed) and leaves the
+# check to do what it is for -- confirming the result. Android reaches the same
+# place by ordering `check-guides` after its build targets in the root Makefile.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
                   check-ios-metadata check-ios-screenshots check-ios-a11y
-	$(MAKE) -C ios check-guides
+	$(MAKE) -C ios guides check-guides
 
 # release-check: the full read-only invariant gate (tools/release-check.sh) run in
 # one shot -- the Android counterpart of the per-check tools above: version
