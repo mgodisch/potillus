@@ -104,6 +104,8 @@ Edit drinks from the list's edit mode
   combining-mark case in `template-render.json`.
 - The comment-language gate reads the manifest, base-strings, theme, colour,
   extraction-rule, locale-config, and launcher-icon XML comments.
+- The coverage prose names the enforced floors and the command that prints the
+  current figures.
 
 ### Fixed
 
