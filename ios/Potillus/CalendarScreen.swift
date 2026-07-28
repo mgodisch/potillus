@@ -43,6 +43,10 @@ struct CalendarScreen: View {
     /// Observed so a return from the background reloads at once (below).
     @Environment(\.scenePhase) private var scenePhase
 
+    /// Read for the selected day's tint only: the wash that reads clearly on
+    /// white needs to be stronger against the dark theme's near-black surface.
+    @Environment(\.colorScheme) private var colorScheme
+
     @State private var model: CalendarModel
 
     /// The entry being edited, if any — drives the edit sheet (UI parity with
@@ -106,10 +110,18 @@ struct CalendarScreen: View {
                 // likewise shown only once a day is picked: without a selection
                 // there is no day to book onto, and a "+" that asks "which day?"
                 // after being tapped is a worse question than one that waits to be
-                // asked. `.primaryAction` is where iOS puts this — top trailing,
-                // beside the overflow menu, rather than floating over the grid.
+                // asked. It sits top trailing beside the overflow menu rather
+                // than floating over the grid.
+                //
+                // `.topBarTrailing`, not `.primaryAction`: the overflow menu and
+                // the other screens' toolbar items all declare that placement,
+                // and SwiftUI orders items WITHIN one placement by the order of
+                // their toolbar blocks. Mixing the two makes it two groups, which
+                // SwiftUI is free to arrange on its own — on the calendar it put
+                // the overflow menu leftmost while Drinks and Today read
+                // "+ / edit / overflow" (0.85.0 QA round, found on device).
                 if model.state.selectedDate != nil {
-                    ToolbarItem(placement: .primaryAction) {
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             isLogging = true
                         } label: {
@@ -123,7 +135,7 @@ struct CalendarScreen: View {
                 // actually has entries to act on; localized via EditToggleButton
                 // (0.84.0 QA round).
                 if !model.state.selectedEntries.isEmpty {
-                    ToolbarItem(placement: .primaryAction) {
+                    ToolbarItem(placement: .topBarTrailing) {
                         EditToggleButton(editMode: $editMode, locale: locale)
                     }
                 }
@@ -311,7 +323,13 @@ struct CalendarScreen: View {
                     .opacity(summary == nil ? 0 : 1)
             }
             .frame(maxWidth: .infinity, minHeight: 40)
-            .background(isSelected ? Color.accentColor.opacity(0.2) : .clear)
+            // The selected day's tint. It is stronger in dark mode: against a
+            // near-black background a 0.2 wash of the accent colour barely lifts
+            // off the surface, while against the light theme's white it reads
+            // clearly at the same value (0.85.0 QA round, judged on device —
+            // `accentColor` is a dynamic system colour, so its resulting contrast
+            // cannot be computed from a literal and has to be looked at).
+            .background(isSelected ? Color.accentColor.opacity(colorScheme == .dark ? 0.35 : 0.2) : .clear)
             .overlay(
                 Circle()
                     .strokeBorder(isToday ? Color.accentColor : .clear, lineWidth: 1)

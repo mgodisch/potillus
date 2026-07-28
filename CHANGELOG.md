@@ -87,6 +87,8 @@ Edit drinks from the list's edit mode
 - Both dots in the month grid stay visible on a selected day.
 - Every Android status colour is a named constant in `theme/Color.kt`, next to
   the contrast reasoning behind it.
+- The iOS calendar's toolbar reads "add, edit, overflow" like the other screens.
+- The selected day's tint in the iOS calendar is stronger in dark mode.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.
