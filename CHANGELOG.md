@@ -54,7 +54,8 @@ Edit drinks from the list's edit mode
 - The `api` scope and the Maintainer role required of the GitLab token.
 - A TestFlight upload reaches the internal testers without a further act.
 - Play's native-debug-symbols warning stays unanswered, with the reason.
-- The export dialog offers the visible period when no start date is set.
+- The export dialog offers the visible period when no start date is set, and
+  the logical today before the first load.
 - The build script's report-template note names the iOS renderer.
 - Revised README.md.
 - `AlcoholCalculator.drinkDayLimitReached` answers the drink-day gate on iOS,

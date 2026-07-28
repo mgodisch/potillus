@@ -71,15 +71,37 @@ extension StatsScreen {
     /// user who scoped the statistics to a date wants exports scoped the same
     /// way. Without a floor it starts at the first day the visible period
     /// covers (`model.state.from`), so the dialog proposes the period on
-    /// screen. Android's export dialog pre-fills by the same rule
-    /// (StatsScreen's `exportFrom`).
+    /// screen. Should even that be empty — reachable only in the race before
+    /// the model's first load has filled the state, where `state.today` is
+    /// empty too — the ladder ends at the logical today, a one-day range the
+    /// pickers can widen. That day is derived from the clock through
+    /// `DayResolver` with the freshly loaded day-change settings; they are in
+    /// hand here, unlike at Android's composable site, whose raw-calendar-date
+    /// fallback documents the same intent. Android's export dialog pre-fills by
+    /// the same three-step rule (StatsScreen's `exportFrom`), so the two
+    /// platforms offer the same range in every case. The `guard` below catches
+    /// an unparseable stored floor date.
     func beginExport(_ kind: ExportRangeSheet.Kind) async {
         let settings = await environment.preferences.load()
-        let floor = settings.statsFromDate.isEmpty ? model.state.from : settings.statsFromDate
+
+        // The logical today: the loaded state's, or — before the first load —
+        // the clock's, run through the same day-change boundary the state
+        // derivation applies.
+        var today = model.state.today
+        if today.isEmpty {
+            today = DayResolver.resolve(
+                timestampMillis: Int64(environment.clock.now().timeIntervalSince1970 * 1000.0),
+                changeHour: settings.dayChangeHour,
+                changeMinute: settings.dayChangeMinute
+            )
+        }
+
+        var floor = settings.statsFromDate.isEmpty ? model.state.from : settings.statsFromDate
+        if floor.isEmpty { floor = today }
 
         guard
             let start = DayResolver.parseDate(floor),
-            let end = DayResolver.parseDate(model.state.today)
+            let end = DayResolver.parseDate(today)
         else {
             exportFailure = Loc.string("The statistics period could not be read.", locale: locale)
             return
