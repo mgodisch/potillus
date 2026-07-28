@@ -82,7 +82,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Title of the quick-select favourites bar (entry dialog / Today). -->
     <string name="favorites_quick">Quick Selection Favorites</string>
 
-    <!-- BAC / Promille-Schätzer -->
+    <!-- BAC estimate -->
     <!-- Today screen: title of the blood-alcohol (BAC) estimate card. -->
     <string name="bac_estimate">BAC Estimate</string>
     <!-- Today screen: disclaimer under the BAC card ('·' is a separator). -->
@@ -281,7 +281,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Settings > Backup: 'Import' button and import-mode dialog title. -->
     <string name="backup_import">Import</string>
 
-    <!-- Import-Modus -->
+    <!-- Import mode -->
     <!-- Import dialog body: asks how the data should be imported. -->
     <string name="import_mode_question">How should the data be imported?</string>
     <!-- Import dialog: 'Replace' option (overwrites all data); shown in the destructive colour. -->
@@ -295,9 +295,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- System biometric-prompt subtitle ('Please authenticate'). -->
     <string name="biometric_subtitle">Please authenticate</string>
 
-    <!-- Export-Hinweis -->
-
-    <!-- Jahreskalender-Legende -->
+    <!-- Year heat-map legend -->
     <!-- Year heat-map legend: day with no entry. -->
     <string name="year_calendar_no_entry">no entry</string>
     <!-- Year heat-map legend: day under the limit. -->

@@ -102,12 +102,13 @@ Edit drinks from the list's edit mode
 - The secondary caption colour in the Android light theme is `#5D6C93`.
 - The report template's HTML escaping on iOS compares Unicode scalars, with a
   combining-mark case in `template-render.json`.
-- The comment-language gate reads the manifest, theme, colour, extraction-rule,
-  locale-config, and launcher-icon XML comments.
+- The comment-language gate reads the manifest, base-strings, theme, colour,
+  extraction-rule, locale-config, and launcher-icon XML comments.
 
 ### Fixed
 
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
+- The base `strings.xml` section comments are in English.
 - The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
   directory marker, and `__pycache__` directories stay out of the tarball.
 

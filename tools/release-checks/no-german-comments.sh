@@ -169,12 +169,20 @@ check_no_german_comments() {
             grep -Hn "#" gradle/gradle-daemon-jvm.properties 2>/dev/null || true
             # The NON-translation XML sources. The blanket .xml exclusion above
             # exists for values-*/strings.xml, whose CONTENT is the translations;
-            # these eight files are ordinary project sources whose comments carry
+            # these nine files are ordinary project sources whose comments carry
             # the English-everywhere convention like any .kt file, and until the
             # 0.85.0 QA round no gate read them although check-headers.py owns
-            # the .xml suffix. Named as explicit roots like the build scripts:
+            # the .xml suffix. The BASE values/strings.xml belongs here too: it is
+            # the English source, not a translation, and its translator notes are
+            # exactly the comment prose this gate exists for — the same round's
+            # second pass found it as the one non-translation file the blanket
+            # exclusion swept up without its reason applying. Only its
+            # `<!--`-carrying lines are scanned, like the files below, so the
+            # English string CONTENT on comment-free lines stays out of the match.
+            # Named as explicit roots like the build scripts:
             # a recursive glob would sweep in the translation files.
             grep -Hn "<!--" app/src/main/AndroidManifest.xml \
+                app/src/main/res/values/strings.xml \
                 app/src/main/res/values/themes.xml \
                 app/src/main/res/values/colors.xml \
                 app/src/main/res/values-night/themes.xml \
