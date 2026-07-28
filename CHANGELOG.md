@@ -95,6 +95,8 @@ Edit drinks from the list's edit mode
   recorded as decisions, with the reasoning.
 - The roadmap prioritises the iOS VoiceOver assessment and carries its setup and
   opening questions.
+- The roadmap records the AGP 10 readiness check and why the Gradle 10
+  deprecation waits on AGP.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.

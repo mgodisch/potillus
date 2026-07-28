@@ -691,6 +691,24 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   here can silence those three, and no AGP release is known to have addressed
   them yet; re-read the problems report when raising AGP, and again before
   moving the wrapper to Gradle 10.
+  Raising AGP by a minor version is not the remedy, and it is worth knowing why
+  before spending a cycle on it. The deprecation arrived with Gradle 9.6 and is
+  hitting the plugin ecosystem broadly — Kover and the GraalVM native-build-tools
+  filed the identical warning in May 2026 — and on the native-build-tools issue
+  the Gradle team's answer was that the only way to remove it is a change inside
+  the plugin. So this one clears when Google ships the fix in AGP, on Google's
+  schedule, and until then the warning is a status report rather than a task.
+- **AGP 10 readiness (checked, nothing to do).** A more consequential date than
+  the deprecation above: AGP 9.0 deprecated the previous DSL, and per its release
+  notes the ability to opt out of the new one goes away in AGP 10.0, expected
+  mid-2026. This project is already clear of that migration, verified rather than
+  assumed: `gradle.properties` sets no `newDsl` opt-out (it carries only
+  `android.useAndroidX`), and no build script references the old variant API
+  (`applicationVariants`, `libraryVariants`, `BaseVariant` or a variant's
+  `outputs`). The residual risk is not the project's own scripts but its
+  third-party plugins — cyclonedx, ktlint, kover, ksp — any of which may still
+  reach for interfaces AGP 10 no longer exposes. Re-check their release notes
+  when AGP 10 lands rather than upgrading blind.
 
 ## User suggestions
 
