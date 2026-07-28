@@ -1,24 +1,24 @@
-Libellus Potionis er en privatlivsvenlig, gratis, open source og reklamefri alkoholtracker, der kører helt offline. Den beder ikke om kamera, mikrofon eller placering og opretter ingen netværksforbindelser.
+Libellus Potionis er en privatlivsfokuseret, open source, gratis og reklamefri alkoholtracker, der hjælper med at overvåge, dosere og styre sine drikkevaner helt offline. Den kræver ingen indgribende enhedstilladelser – ingen adgang til kamera, mikrofon eller placering – og fungerer helt uden netværksforbindelse.
 
 VIGTIGSTE FUNKTIONER
 
-• Registrering: opret dine egne drikkevarer eller vælg blandt internationalt gængse skabeloner. Registrér drikkevarer med det samme eller bagudrettet med præcis tidskorrektion.
-• Flere grænser samtidig: sæt tre grænser parallelt – en daglig grænse (gram ren alkohol), en glidende ugentlig grænse over 7 dage (gram) og et maksimalt antal drikkedage pr. uge. Hver grænse har sin egen statuslinje.
-• Promilleestimat (BAC): indtast din kropsvægt og få et løbende estimat efter Widmark-formlen.
-• Rådgivningsrapporter: generér en PDF-rapport på to sider over dit forbrug til rådgivnings- og behandlingssamtaler.
-• Dataportabilitet: eksportér dine data som en CSV-fil til videre behandling (f.eks. i LibreOffice Calc), eller opret JSON-sikkerhedskopier til at flytte data mellem enheder.
-• Indstillinger: angiv din "dagsstart", så sene natdrikke tælles med på den foregående aften, og fastsæt en startdato for evalueringen, når du vil begynde forfra.
+• Registrering: Opret dine egne drikkevarer eller vælg blandt internationalt gængse skabeloner. Registrér drikkevarer med det samme eller bagudrettet med tidskorrektion.
+• Flere grænser samtidig: Sæt tre grænser parallelt – en daglig grænse (gram ren alkohol), en glidende ugentlig grænse over 7 dage (gram) og et maksimalt antal drikkedage pr. uge. Hver grænse har sin egen statuslinje.
+• Promilleestimat (BAC): Indtast din kropsvægt og få et løbende estimat efter Widmark-formlen.
+• Rådgivningsrapporter: Generér en PDF-rapport på to sider over dit forbrug til rådgivnings- og behandlingssamtaler.
+• Dataportabilitet: Eksportér dine data som en CSV-fil til videre behandling (f.eks. i LibreOffice Calc), eller opret JSON-sikkerhedskopier til at flytte data mellem enheder.
+• Indstillinger: Angiv din "dagsstart", så sene natdrikke tælles med på den foregående aften, og fastsæt en startdato for evalueringen, når du vil begynde forfra, f.eks. nytårsaften.
 
 En brugervejledning findes inde i appen.
 
 PRIVATLIV & SIKKERHED
 
-Appen gemmer kun det, du selv indtaster. Den indeholder slet ingen netværkskode; dine data forlader ikke enheden af sig selv. Dine data forbliver i appens private lager, beskyttet i hvile af iOS Data Protection (hardwarebaseret filkryptering) og app-sandkassen. En valgfri Face ID- eller Touch ID-lås beskytter mod uautoriseret fysisk adgang. Der er ingen sporing, ingen analyse og ingen cloud-synkronisering.
+Appen gemmer kun det, du selv indtaster. Den indeholder slet ingen netværkskode, så den er ude af stand til at tilgå netværket, og dine data forlader ikke enheden af sig selv. Dine data forbliver i appens private lager, beskyttet i hvile af iOS Data Protection (hardwarebaseret filkryptering) og app-sandkassen. En valgfri Face ID- eller Touch ID-lås beskytter mod uautoriseret fysisk adgang. Der er ingen sporing, ingen analyse og ingen cloud-synkronisering.
 
 KOMPATIBILITET
 
-Appen kører på iPhone med iOS 17 og nyere. Den har sin egen sprogvælger, som lader dig skifte appens sprog når som helst, uanset systemsproget.
+Appen kører på iOS 17 og nyere og fås også til Android 11 (API 30) og nyere.
 
 OPEN SOURCE
 
-Libellus Potionis er fri software udgivet under GNU General Public License v3 (eller senere). Kildekoden er tilgængelig i det kanoniske repository: https://gitlab.com/godisch/potillus/
+Libellus Potionis er fri software udgivet under GNU General Public License v3 (eller senere). Kildekoden er tilgængelig på projektets hjemmeside.

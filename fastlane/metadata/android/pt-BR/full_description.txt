@@ -1,13 +1,13 @@
-Libellus Potionis é um registro de consumo de álcool que respeita a privacidade, gratuito, de código aberto e sem anúncios, e funciona totalmente offline. Não pede câmera, microfone ou localização e não abre nenhuma conexão de rede.
+Libellus Potionis é um registro de consumo de álcool com foco na privacidade, de código aberto, gratuito e sem anúncios, feito para ajudar a acompanhar, dosar e administrar os hábitos de consumo inteiramente off-line. Não exige permissões invasivas do dispositivo — nem câmera, nem microfone, nem localização — e funciona totalmente sem conexão de rede.
 
 PRINCIPAIS FUNCIONALIDADES
 
-• Registro: defina suas próprias bebidas ou escolha entre modelos comuns no mundo todo. Registre as bebidas na hora ou retroativamente, com correções de horário precisas.
+• Registro: defina suas próprias bebidas ou escolha entre modelos comuns no mundo todo. Registre as bebidas na hora ou retroativamente, com correções de horário.
 • Vários limites ao mesmo tempo: defina três limites em paralelo — um limite diário (gramas de álcool puro), um limite semanal móvel de 7 dias (gramas) e um número máximo de dias de consumo por semana. Cada um tem sua própria barra de progresso.
 • Estimativa da taxa de álcool no sangue (TAS): informe seu peso corporal para obter uma estimativa contínua segundo a fórmula de Widmark.
 • Relatórios para aconselhamento: gere um relatório PDF de duas páginas sobre seu consumo, para consultas e sessões de aconselhamento.
 • Portabilidade dos dados: exporte seus dados como arquivo CSV para processamento externo (por exemplo, no LibreOffice Calc) ou crie backups JSON para mover os dados entre dispositivos.
-• Ajustes: personalize o horário de "início do dia" para que as bebidas de madrugada contem para a noite anterior, e defina uma data de início de avaliação quando quiser recomeçar.
+• Ajustes: personalize o horário de "início do dia" para que as bebidas de madrugada contem para a noite anterior, e defina uma data de início de avaliação quando quiser recomeçar, por exemplo no réveillon.
 
 Um guia do usuário está disponível dentro do aplicativo.
 
@@ -17,8 +17,8 @@ O aplicativo guarda apenas o que você digita. Ele não tem permissão de rede, 
 
 COMPATIBILIDADE
 
-O aplicativo funciona no Android 11 (API 30) e posterior. Ele traz seu próprio seletor de idioma, que funciona em todas as versões compatíveis, independentemente do seletor de idioma por aplicativo do sistema.
+O aplicativo funciona no Android 11 (API 30) e posterior e também está disponível para iOS 17 e posterior.
 
 CÓDIGO ABERTO
 
-Libellus Potionis é software livre publicado sob a GNU General Public License v3 (ou posterior). O código-fonte está disponível no repositório canônico: https://gitlab.com/godisch/potillus/
+Libellus Potionis é software livre publicado sob a GNU General Public License v3 (ou posterior). O código-fonte está disponível na página do projeto.

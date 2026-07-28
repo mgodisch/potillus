@@ -1,13 +1,13 @@
-Libellus Potionis je sledování konzumace alkoholu šetrné k soukromí, zdarma, s otevřeným zdrojovým kódem a bez reklam, které běží zcela offline. Nežádá o fotoaparát, mikrofon ani polohu a nenavazuje žádná síťová spojení.
+Libellus Potionis je bezplatný sledovač konzumace alkoholu s otevřeným zdrojovým kódem, bez reklam a s důrazem na soukromí, který pomáhá sledovat, rozvrhnout a zvládat vlastní pití zcela offline. Nevyžaduje žádná invazivní oprávnění zařízení – žádný přístup k fotoaparátu, mikrofonu ani poloze – a funguje zcela bez síťového připojení.
 
 HLAVNÍ FUNKCE
 
-• Zaznamenávání: vytvořte si vlastní nápoje nebo vyberte z mezinárodně běžných šablon. Zaznamenávejte nápoje ihned nebo zpětně s přesnou korekcí času.
-• Více limitů najednou: nastavte tři limity souběžně – denní limit (gramy čistého alkoholu), klouzavý týdenní limit za 7 dní (gramy) a maximální počet dní pití za týden. Každý limit má vlastní ukazatel průběhu.
-• Odhad hladiny alkoholu v krvi (BAC): zadejte svou tělesnou hmotnost a získejte průběžný odhad podle Widmarkova vzorce.
-• Reporty pro poradenství: vygenerujte dvoustránkový PDF report o své spotřebě pro konzultace a poradenské schůzky.
-• Přenositelnost dat: exportujte svá data jako soubor CSV pro externí zpracování (například v LibreOffice Calc) nebo vytvořte zálohy JSON pro přesun dat mezi zařízeními.
-• Nastavení: přizpůsobte si čas "začátku dne", aby se nápoje pozdě v noci počítaly do předchozího večera, a zadejte datum začátku vyhodnocení, když chcete začít znovu.
+• Zaznamenávání: Vytvořte si vlastní nápoje nebo vyberte z mezinárodně běžných šablon. Zaznamenávejte nápoje ihned nebo zpětně s korekcí času.
+• Více limitů najednou: Nastavte tři limity souběžně – denní limit (gramy čistého alkoholu), klouzavý týdenní limit za 7 dní (gramy) a maximální počet dní pití za týden. Každý limit má vlastní ukazatel průběhu.
+• Odhad hladiny alkoholu v krvi (BAC): Zadejte svou tělesnou hmotnost a získejte průběžný odhad podle Widmarkova vzorce.
+• Reporty pro poradenství: Vygenerujte dvoustránkový PDF report o své spotřebě pro konzultace a poradenské schůzky.
+• Přenositelnost dat: Exportujte svá data jako soubor CSV pro externí zpracování (například v LibreOffice Calc) nebo vytvořte zálohy JSON pro přesun dat mezi zařízeními.
+• Nastavení: Přizpůsobte si čas "začátku dne", aby se nápoje pozdě v noci počítaly do předchozího večera, a zadejte datum začátku vyhodnocení, když chcete začít znovu, například na Silvestra.
 
 V aplikaci je k dispozici uživatelská příručka.
 
@@ -17,8 +17,8 @@ Aplikace ukládá jen to, co sami zadáte. Nemá oprávnění k síti, a nemůž
 
 KOMPATIBILITA
 
-Aplikace běží na Androidu 11 (API 30) a novějším. Má vlastní výběr jazyka, který funguje na všech podporovaných verzích bez ohledu na systémový výběr jazyka pro jednotlivé aplikace.
+Aplikace běží na Androidu 11 (API 30) a novějším a je k dispozici také pro iOS 17 a novější.
 
 OTEVŘENÝ ZDROJOVÝ KÓD
 
-Libellus Potionis je svobodný software vydaný pod licencí GNU General Public License v3 (nebo novější). Zdrojový kód je dostupný v kanonickém repozitáři: https://gitlab.com/godisch/potillus/
+Libellus Potionis je svobodný software vydaný pod licencí GNU General Public License v3 (nebo novější). Zdrojový kód je dostupný na domovské stránce projektu.

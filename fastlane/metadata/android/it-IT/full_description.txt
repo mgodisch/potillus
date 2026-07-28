@@ -1,13 +1,13 @@
-Libellus Potionis è un tracker del consumo di alcol attento alla privacy, gratuito, open source e senza pubblicità, che funziona completamente offline. Non richiede fotocamera, microfono o posizione e non apre alcuna connessione di rete.
+Libellus Potionis è un tracker del consumo di alcol attento alla privacy, open source, gratuito e senza pubblicità, pensato per aiutare a monitorare, dosare e gestire le proprie abitudini di consumo interamente offline. Non richiede permessi invasivi del dispositivo — né fotocamera, né microfono, né posizione — e funziona completamente senza connessione di rete.
 
 FUNZIONI PRINCIPALI
 
-• Registrazione: crea le tue bevande o scegli tra modelli diffusi a livello internazionale. Registra le consumazioni subito o in modo retroattivo con correzioni precise dell'orario.
+• Registrazione: crea le tue bevande o scegli tra modelli diffusi a livello internazionale. Registra le consumazioni subito o in modo retroattivo con correzioni dell'orario.
 • Più limiti contemporaneamente: imposta tre limiti in parallelo — un limite giornaliero (grammi di alcol puro), un limite settimanale mobile su 7 giorni (grammi) e un numero massimo di giorni di consumo a settimana. Ognuno ha la propria barra di avanzamento.
 • Stima del tasso alcolemico (BAC): inserisci il tuo peso corporeo per ottenere una stima in tempo reale secondo la formula di Widmark.
 • Report per la consulenza: genera un report PDF di due pagine sul tuo consumo, pensato per consulti e appuntamenti di counseling.
 • Portabilità dei dati: esporta i tuoi dati come file CSV per l'elaborazione esterna (ad esempio in LibreOffice Calc) oppure crea backup JSON per spostare i dati tra dispositivi.
-• Regolazioni: personalizza l'orario di "inizio giornata" così che le bevute a tarda notte siano conteggiate nella sera precedente, e imposta una data di inizio valutazione per ripartire da zero.
+• Regolazioni: personalizza l'orario di "inizio giornata" così che le bevute a tarda notte siano conteggiate nella sera precedente, e imposta una data di inizio valutazione per ripartire da zero, ad esempio a Capodanno.
 
 Una guida utente è disponibile all'interno dell'app.
 
@@ -17,8 +17,8 @@ L'app memorizza solo ciò che inserisci. Non possiede il permesso di rete, quind
 
 COMPATIBILITÀ
 
-L'app funziona su Android 11 (API 30) e versioni successive. Include un proprio selettore di lingua, che funziona su tutte le versioni supportate, a prescindere dal selettore di lingua per app del sistema.
+L'app funziona su Android 11 (API 30) e versioni successive ed è disponibile anche per iOS 17 e versioni successive.
 
 OPEN SOURCE
 
-Libellus Potionis è software libero rilasciato sotto la GNU General Public License v3 (o successiva). Il codice sorgente è disponibile nel repository canonico: https://gitlab.com/godisch/potillus/
+Libellus Potionis è software libero rilasciato sotto la GNU General Public License v3 (o successiva). Il codice sorgente è disponibile nella pagina del progetto.

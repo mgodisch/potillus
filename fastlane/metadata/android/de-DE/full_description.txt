@@ -1,24 +1,24 @@
-Libellus Potionis ist ein datenschutzfreundlicher, kostenloser, quelloffener und werbefreier Alkohol-Tracker, der vollständig offline arbeitet. Er benötigt weder Kamera noch Mikrofon noch Standort und stellt keine Netzwerkverbindungen her.
+Libellus Potionis ist ein datenschutzfreundlicher, quelloffener, kostenloser und werbefreier Alkohol-Tracker, der Menschen hilft, ihren Alkoholkonsum zu überwachen und zu regulieren. Die App benötigt keinerlei invasive Berechtigungen, weder Kamera noch Mikrofon noch Standort und arbeitet vollständig ohne Netzwerkverbindung.
 
 FUNKTIONEN
 
-• Erfassen: lege eigene Getränke an oder nutze international gängige Vorlagen. Erfasse Getränke sofort oder nachträglich mit genauer Zeitkorrektur.
-• Mehrere Limits gleichzeitig: setze drei Grenzen parallel – ein Tageslimit (Gramm reiner Alkohol), ein gleitendes 7-Tage-Wochenlimit (Gramm) und eine maximale Anzahl Trinktage pro Woche. Jede Grenze hat ihren eigenen Fortschrittsbalken.
-• Promille-Schätzung (BAK): gib dein Körpergewicht ein und erhalte eine laufende Schätzung nach der Widmark-Formel.
-• Beratungsberichte: erzeuge einen zweiseitigen PDF-Bericht deines Konsums für Beratungs- und Suchtberatungstermine.
-• Datenportabilität: exportiere deinen Datenbestand als CSV-Datei zur Weiterverarbeitung (z. B. in LibreOffice Calc) oder erstelle JSON-Backups, um Daten zwischen Geräten zu übertragen.
-• Einstellungen: lege deinen „Tagesbeginn“ fest, damit Getränke spät in der Nacht dem vorangehenden Abend zugeordnet werden, und ein Auswertungs-Startdatum für einen sauberen Neustart.
+• Erfassen: Lege eigene Getränke an oder/und nutze international gängige Vorgaben. Erfasse Getränke sofort oder nachträglich mit Zeitkorrektur.
+• Mehrere Limits gleichzeitig: Setze drei Limits – ein Tageslimit (in Gramm reiner Alkohol), ein gleitendes 7-Tage-Limit (in Gramm) und eine maximale Anzahl von Trinktagen pro Woche. Jedes Limit hat seinen eigenen Fortschrittsbalken.
+• Promille-Schätzung (BAK): Gib dein Körpergewicht ein und erhalte eine laufende Schätzung nach der Widmark-Formel.
+• Berichte: Erzeuge einen zweiseitigen PDF-Bericht, der dein Konsumverhalten für Beratungstermine aufschlüsselt.
+• Datenportabilität: Exportiere deinen Datenbestand als CSV-Datei zur Weiterverarbeitung (z.B. in LibreOffice Calc) oder erstelle JSON-Backups, um deine Daten zwischen Geräten zu übertragen.
+• Einstellungen: Lege deinen „Tagesbeginn“ fest, damit Getränke spät in der Nacht dem vorangehenden Abend zugeordnet werden, und ein Auswertungs-Startdatum für einen sauberen Neustart, z.B. an Silvester.
 
-Eine Anleitung ist direkt in der App verfügbar.
+Eine Bedienungsanleitung ist direkt in der App verfügbar.
 
 DATENSCHUTZ & SICHERHEIT
 
-Die App speichert nur, was du einträgst. Sie besitzt keine Netzwerkberechtigung und kann daher nicht auf das Netz zugreifen; deine Daten verlassen das Gerät nicht von selbst. Deine Daten bleiben im privaten App-Speicher und sind im Ruhezustand durch Androids Geräteverschlüsselung und die App-Sandbox geschützt. Eine optionale biometrische Fingerabdrucksperre schützt vor unbefugtem physischem Zugriff. Es gibt kein Tracking, keine Analyse und keine Cloud-Synchronisation.
+Die App speichert nur, was du einträgst. Sie besitzt keine Netzwerkberechtigung und kann daher nicht auf das Internet zugreifen; deine Daten verlassen das Gerät nicht von selbst. Sie bleiben im privaten App-Speicher und sind im Ruhezustand durch Androids Geräteverschlüsselung und die App-Sandbox geschützt. Eine optionale biometrische Fingerabdrucksperre schützt vor unbefugtem physischem Zugriff. Es gibt kein Tracking, keine Nutzungsanalyse und keine Cloud-Synchronisation.
 
 KOMPATIBILITÄT
 
-Die App läuft ab Android 11 (API 30). Sie bringt einen eigenen Sprachwähler mit, der auf allen unterstützten Versionen funktioniert, unabhängig von der systemweiten App-Sprachauswahl.
+Die App läuft ab Android 11 (API 30) und ist auch für iOS ab Version 17 verfügbar.
 
 OPEN SOURCE
 
-Libellus Potionis ist freie Software unter der GNU General Public License v3 (oder später). Der Quellcode ist im kanonischen Repository verfügbar: https://gitlab.com/godisch/potillus/
+Libellus Potionis ist freie Software unter der GNU General Public License v3 (oder später). Der Quellcode steht auf der Projekt-Homepage zur Verfügung.

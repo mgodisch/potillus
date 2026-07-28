@@ -54,7 +54,7 @@ lock-step by a shared set of golden test vectors.
 ## Key Features
 
 *   Logging: predefine custom beverages or use internationally common presets.
-    Log drinks instantly or retroactively with precise timestamp corrections.
+    Log drinks instantly or retroactively with timestamp corrections.
 *   Concurrent limits: set three boundaries at once: a daily limit in grams of
     pure alcohol, a rolling 7-day limit in grams, and a maximum number of
     drinking days per week. Each limit has its own progress bar.

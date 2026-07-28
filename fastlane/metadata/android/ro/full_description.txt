@@ -1,13 +1,13 @@
-Libellus Potionis este un jurnal al consumului de alcool prietenos cu confidențialitatea, gratuit, open source și fără reclame, care funcționează complet offline. Nu cere cameră, microfon sau locație și nu deschide nicio conexiune de rețea.
+Libellus Potionis este un jurnal al consumului de alcool axat pe confidențialitate, cu sursă deschisă, gratuit și fără reclame, gândit să ajute la urmărirea, dozarea și gestionarea obiceiurilor de consum complet offline. Nu are nevoie de permisiuni invazive ale dispozitivului — nici cameră, nici microfon, nici locație — și funcționează complet fără conexiune la rețea.
 
 FUNCȚII PRINCIPALE
 
-• Înregistrare: definește-ți propriile băuturi sau alege dintre șabloane uzuale la nivel internațional. Înregistrează băuturile imediat sau retroactiv, cu corecții precise de timp.
+• Înregistrare: definește-ți propriile băuturi sau alege dintre șabloane uzuale la nivel internațional. Înregistrează băuturile imediat sau retroactiv, cu corecții de timp.
 • Mai multe limite simultan: stabilește trei limite în paralel — o limită zilnică (grame de alcool pur), o limită săptămânală glisantă pe 7 zile (grame) și un număr maxim de zile de consum pe săptămână. Fiecare are propria bară de progres.
 • Estimarea alcoolemiei (BAC): introdu greutatea corporală pentru a obține o estimare continuă după formula Widmark.
 • Rapoarte pentru consiliere: generează un raport PDF de două pagini despre consumul tău, pentru consultații și ședințe de consiliere.
 • Portabilitatea datelor: exportă datele ca fișier CSV pentru prelucrare externă (de exemplu, în LibreOffice Calc) sau creează copii de rezervă JSON pentru a muta datele între dispozitive.
-• Ajustări: personalizează ora de "început al zilei", astfel încât băuturile de noapte târziu să fie numărate în seara precedentă, și stabilește o dată de început al evaluării când vrei să o iei de la capăt.
+• Ajustări: personalizează ora de "început al zilei", astfel încât băuturile de noapte târziu să fie numărate în seara precedentă, și stabilește o dată de început al evaluării când vrei să o iei de la capăt, de exemplu de Revelion.
 
 În aplicație este disponibil un ghid de utilizare.
 
@@ -17,8 +17,8 @@ Aplicația salvează doar ceea ce introduci tu. Nu are permisiune de rețea, dec
 
 COMPATIBILITATE
 
-Aplicația rulează pe Android 11 (API 30) și versiuni mai noi. Are propriul selector de limbă, care funcționează pe toate versiunile acceptate, indiferent de selectorul de limbă per aplicație al sistemului.
+Aplicația rulează pe Android 11 (API 30) și versiuni mai noi și este disponibilă și pentru iOS 17 și versiuni mai noi.
 
 SURSĂ DESCHISĂ
 
-Libellus Potionis este software liber, lansat sub licența GNU General Public License v3 (sau ulterioară). Codul sursă este disponibil în depozitul canonic: https://gitlab.com/godisch/potillus/
+Libellus Potionis este software liber, lansat sub licența GNU General Public License v3 (sau ulterioară). Codul sursă este disponibil pe pagina proiectului.
