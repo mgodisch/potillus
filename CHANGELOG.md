@@ -70,6 +70,10 @@ Edit drinks from the list's edit mode
   distribution coefficient.
 - Twelve guide locales carry the Widmark link and the master's closing
   sentence.
+- The roadmap carries Hebrew as the first right-to-left language.
+- `SupportedLocales` names the places an RTL language reaches beyond layout
+  mirroring.
+- The roadmap carries plausibility guards for the shell gates' extractions.
 
 ### Fixed
 

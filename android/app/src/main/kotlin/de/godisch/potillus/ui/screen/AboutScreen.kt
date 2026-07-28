@@ -99,8 +99,15 @@ import de.godisch.potillus.ui.component.SectionCard
  *
  * GitLab, not the GitHub mirror: the mirror is push-only and carries no
  * development. The same address is the store listing's marketing and support URL
- * (`fastlane/metadata/android/*/`), and the iOS twin holds it as
+ * (`fastlane/metadata/android/<locale>/`), and the iOS twin holds it as
  * `AppInfo.sourceRepository`.
+ *
+ * The path is written with `<locale>` rather than a glob on purpose. A star
+ * between two slashes reads as a comment OPENER, and Kotlin block comments
+ * NEST: that opener would swallow the terminator below as its own, leaving this
+ * comment running to the end of the file. It did exactly that once, and the
+ * compiler reported it as an unclosed comment on the file's last line — nowhere
+ * near the KDoc that caused it.
  */
 private const val SOURCE_REPOSITORY = "https://gitlab.com/godisch/potillus"
 

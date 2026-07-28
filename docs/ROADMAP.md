@@ -511,6 +511,33 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   sits less in the walkthrough than in its text: every step is user-facing prose
   in 21 languages, in both string catalogues, and the guide itself would need to
   stay in step with it.
+- **Hebrew, and with it the first right-to-left language.** Hebrew is the
+  candidate that would take the app past its Latin/Cyrillic/CJK set: both stores
+  carry it, as `iw-IL` on Play and `he` on the App Store, and
+  `android:supportsRtl="true"` has been set all along. Layout mirroring in
+  Compose and SwiftUI comes free, but three places do not follow: the charts in
+  `ChartComponents.kt` are drawn on a `Canvas` from x coordinates the code
+  computes itself, `report/report_template.html` carries no `dir` attribute, and
+  six Compose call sites pin an explicit alignment. Hebrew also brings the plural
+  category `two`, which no shipped language needs today and which
+  `plural-days.json` and both vector suites would have to learn. One further
+  point wants a device rather than a decision: this file's tag maps to the
+  resource qualifier unchanged, so `he` would give `values-he`, while Android has
+  carried Hebrew under the legacy code `iw` — which of `values-he`, `values-iw`
+  and `values-b+he` actually resolves has to be tried, because the wrong one
+  falls back to English in silence.
+- **Plausibility guards for the shell gates' own extractions.** Several checks in
+  `tools/release-checks/` derive a set from a source file with a grep pipeline —
+  `locale-consistency.sh`, for one, builds its locale tags from
+  `grep 'Locale("' … | grep -oE … | sort`. Nothing then asks whether the result
+  is the size it should be. Should such a pipeline ever come back short, the
+  check does not report an unreadable input; it reports a content mismatch, and
+  the message actively misleads: one seen in the field claimed a store locale
+  mapped to no shipped translation while the very next line asserted the same
+  translation existed. A single comparison of the extracted count against the
+  number of source lines would turn that class of confusion into a plain "input
+  not read completely". Cheap, and it makes every future failure of these gates
+  mean what it says.
 - **Two deferred iOS parity items (possible, not planned).** Both are conscious
   omissions, not oversights, and neither blocks the port:
   - *Calendar year view.* Android's calendar offers a Month/Year toggle whose

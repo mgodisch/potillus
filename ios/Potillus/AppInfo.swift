@@ -54,7 +54,7 @@ enum AppInfo {
     ///
     /// GitLab, not the GitHub mirror: the mirror is push-only and carries no
     /// development. The same address is the store listing's marketing and
-    /// support URL (`fastlane/metadata/ios/*/marketing_url.txt`).
+    /// support URL (`fastlane/metadata/ios/<locale>/marketing_url.txt`).
     ///
     /// Typed as `URL?`, not `URL`: `URL(string:)` is failable and this app force-
     /// unwraps nowhere. The About screen therefore unwraps it and simply omits the

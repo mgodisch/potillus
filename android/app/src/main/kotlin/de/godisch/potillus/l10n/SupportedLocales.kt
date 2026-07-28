@@ -66,9 +66,17 @@ package de.godisch.potillus.l10n
 //   └─────────────────────────────────────────────────────────────────────┘
 //
 // RTL LANGUAGES (Arabic, Hebrew, …)
-//   android:supportsRtl="true" is already set in AndroidManifest.xml.
-//   No further code changes are needed; Compose mirrors the layout
-//   automatically.
+//   android:supportsRtl="true" is already set in AndroidManifest.xml, and both
+//   Compose and SwiftUI mirror LAYOUTS on their own.
+//
+//   What they do NOT mirror is anything drawn from coordinates the code works
+//   out itself: the Canvas charts in ui/component/ChartComponents.kt place bars
+//   and dry-day ticks at an x they compute, so they would keep running
+//   left-to-right inside a mirrored screen. The PDF template
+//   (report/report_template.html) carries no `dir` attribute either, and a
+//   handful of Compose call sites pin an explicit alignment. Adding the first
+//   RTL language therefore means visiting those places, not only steps 1 to 4
+//   above. docs/ROADMAP.md records the full list under the Hebrew entry.
 // =============================================================================
 
 /**
