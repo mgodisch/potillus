@@ -93,6 +93,8 @@ Edit drinks from the list's edit mode
 - Calendar day cells draw a focus ring while focused.
 - The year view's low-contrast empty cells and its undersized day targets are
   recorded as decisions, with the reasoning.
+- The roadmap prioritises the iOS VoiceOver assessment and carries its setup and
+  opening questions.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.

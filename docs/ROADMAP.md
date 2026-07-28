@@ -247,22 +247,53 @@ A lightweight regression guard exists in the meantime: `tools/release-check.sh`
 regress. It is a labelling invariant only — it deliberately does **not** assert
 WCAG conformance, which (per W3C) a static check cannot.
 
-### iOS accessibility assessment (future work)
+### iOS accessibility assessment (prioritised)
+
+**The next piece of accessibility work after 0.85.0.** The Android side is
+measured and decided — the Level-AA gaps carry either a fix or a recorded
+decision — which leaves the iOS port as the only part of the app about which no
+accessibility statement exists at all. That matters more than it would for a
+single-platform app: one privacy policy, one description and one set of claims
+serve both stores, so a statement made about the app is read as covering the iOS
+build too.
 
 The conformance discussion, the measured Level-AA gaps, and the on-device
 self-assessment protocol ([WCAG_LEVEL_A_CHECKLIST.md](WCAG_LEVEL_A_CHECKLIST.md))
-above are scoped to the Android app and TalkBack. The iOS port already provides
-VoiceOver names on its controls — the calendar navigation arrows and the capacity
-traffic-light dot, for instance, carry explicit accessibility labels — but no
-structured VoiceOver evaluation has been recorded for it, and the checklist does
-not yet cover it. Future accessibility work therefore includes an iOS/VoiceOver
-counterpart to that protocol: walk the same success criteria on-device with
-VoiceOver, record the iOS-specific findings (the Compose-specific heat-map gaps above do not
-transfer verbatim — the iOS chart and calendar are separate implementations that
-must be assessed on their own terms), and
-extend or fork the checklist so each platform's self-assessment is tracked
-separately. Like the Android assessment, this is a manual on-device effort no
-sandbox check can replace.
+above are scoped to the Android app and TalkBack. No structured VoiceOver
+evaluation has been recorded for iOS, and the checklist does not cover it.
+
+**What is actually to be assessed.** The iOS port carries exactly four explicit
+accessibility annotations: the capacity traffic-light dot, the favourite star in
+the drink list, the calendar's month-navigation arrows, and the calendar day
+cells. Everything else relies on SwiftUI deriving a label from the `Text` it
+renders. The question is therefore not whether labels are missing but whether the
+derived ones carry — a screen can read perfectly to the eye and announce a row of
+bare numbers to VoiceOver. The Compose-specific heat-map findings above do not
+transfer: the iOS chart and calendar are separate implementations and must be
+judged on their own terms, and iOS ships no year heat-map at all.
+
+**Setting up, before VoiceOver is switched on.** Settings → Accessibility →
+Accessibility Shortcut → VoiceOver, so a triple-click of the Home button toggles
+it (the test device is an iPhone SE 3rd generation). Without that, turning
+VoiceOver off again is itself an exercise, because every gesture changes. Set the
+speaking rate low. The six gestures the walkthrough needs: single tap selects and
+speaks, swipe right and left move to the next and previous element, double tap
+activates, three-finger swipe scrolls, two-finger swipe down reads from the top,
+two-finger tap pauses.
+
+**The questions the first screen raised**, kept so a second attempt does not
+start from nothing. On the today screen: does the reading order match the visual
+order, or does focus jump into the toolbar and back; does the traffic-light dot
+announce its status rather than "image"; do the three progress bars say which
+limit they are and how full, or do label and value arrive as two unrelated
+elements with the bar contributing nothing; and is the BAC readout spoken with
+its unit and its warning state, which is otherwise carried by colour alone.
+
+The output of the session is an iOS counterpart to the Android protocol —
+extending or forking the checklist so each platform is tracked separately. It is
+written afterwards, from what the walkthrough finds, rather than beforehand: an
+empty checklist nobody has filled in is one more document that can drift. Like
+the Android assessment, this is manual on-device work no sandbox check replaces.
 
 ## Badge administration (bestpractices.dev, project 13480)
 
