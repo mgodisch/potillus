@@ -52,7 +52,7 @@ import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
-import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.dangerTextColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.util.WebViewPdfPrinter
 import java.time.DayOfWeek
@@ -229,19 +229,19 @@ fun StatsScreen(
                         // used by delete icons and traffic-light bullets, instead
                         // of the softer Material `error` colour, so every "over
                         // limit" cue in the app looks identical.
-                        valueColor = if (state.daysOverDailyLimit > 0) dangerRedColor() else successColor(),
+                        valueColor = if (state.daysOverDailyLimit > 0) dangerTextColor() else successColor(),
                     )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.days_over_weekly_limit),
                         state.daysOverWeeklyLimit.toString(),
-                        valueColor = if (state.daysOverWeeklyLimit > 0) dangerRedColor() else successColor(),
+                        valueColor = if (state.daysOverWeeklyLimit > 0) dangerTextColor() else successColor(),
                     )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.days_over_drink_day_limit),
                         state.daysOverDrinkDayLimit.toString(),
-                        valueColor = if (state.daysOverDrinkDayLimit > 0) dangerRedColor() else successColor(),
+                        valueColor = if (state.daysOverDrinkDayLimit > 0) dangerTextColor() else successColor(),
                     )
                     HorizontalDivider()
                     StatRow(
@@ -280,7 +280,7 @@ fun StatsScreen(
                         valueColor = when (state.trend) {
                             // A rising per-day average is a "bad" signal, shown in
                             // the same saturated danger red as the over-limit stats.
-                            Trend.UP -> dangerRedColor()
+                            Trend.UP -> dangerTextColor()
                             Trend.DOWN -> successColor()
                             Trend.FLAT -> MaterialTheme.colorScheme.onSurface
                         },

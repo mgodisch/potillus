@@ -50,7 +50,7 @@ import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.fmt2
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
-import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.dangerTextColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
 
@@ -238,7 +238,7 @@ fun TodayScreen(
                                         color = if (state.monthTrend == Trend.DOWN) {
                                             successColor()
                                         } else {
-                                            dangerRedColor()
+                                            dangerTextColor()
                                         },
                                         modifier = Modifier.padding(bottom = 4.dp),
                                     )
@@ -296,7 +296,7 @@ fun TodayScreen(
                                         "${bac.fmt2(locale)} ‰",
                                         style = MaterialTheme.typography.titleLarge,
                                         color = when {
-                                            bac >= 0.5 -> dangerRedColor()
+                                            bac >= 0.5 -> dangerTextColor()
                                             bac >= 0.3 -> warningColor()
                                             else -> successColor()
                                         },
@@ -410,7 +410,7 @@ fun TodayScreen(
                     vm.deleteEntry(entry)
                     deleteEntry = null
                 }) {
-                    Text(stringResource(R.string.delete), color = dangerRedColor())
+                    Text(stringResource(R.string.delete), color = dangerTextColor())
                 }
             },
             dismissButton = {

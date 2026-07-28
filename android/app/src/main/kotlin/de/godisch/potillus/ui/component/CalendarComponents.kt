@@ -40,7 +40,7 @@ package de.godisch.potillus.ui.component
 //   The colours are resolved from:
 //     - empty (no summary):      MaterialTheme.colorScheme.surfaceVariant
 //     - under limit:             MaterialTheme.colorScheme.primary   (app accent)
-//     - over limit:              errorColor()  (red)
+//     - over limit:              dangerRedColor()  (red)
 //   Today gets an additional border ring to distinguish it from data cells.
 //
 // COLOUR CAPTURE (same pattern as ChartComponents.kt):
@@ -81,7 +81,7 @@ import java.time.format.FormatStyle
  * Renders 12 months in a 4×3 grid. Each day is a small coloured square:
  *   - **surfaceVariant** (neutral)  → no consumption entry recorded.
  *   - **primary** (accent blue)     → entry exists, daily total ≤ [limitGrams].
- *   - **errorColor** (red)          → entry exists, daily total > [limitGrams].
+ *   - **dangerRedColor** (red)      → entry exists, daily total > [limitGrams].
  *   - **outline border**            → the cell additionally shows a border when
  *                                     the day equals [today] (regardless of consumption).
  *

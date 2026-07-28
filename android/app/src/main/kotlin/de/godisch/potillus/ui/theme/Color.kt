@@ -89,13 +89,33 @@ val NachtPrimaryContainer = Color(0xFF1E2A40) // card accent surface
 val NachtOnPrimaryContainer = Color(0xFFB8D0F5) // text on primaryContainer
 
 // ── THEME "SCHIEFER" (Light) ──────────────────────────────────────────────────
+//
+// SchieferOnSurfaceVariant carries every secondary caption in the light theme,
+// and it is the one value here picked against a contrast threshold rather than
+// by eye. MEASURED (WCAG 2.2, sRGB):
+//
+//   #5D6C93  5.21 : 1 on SchieferSurface (#FFFFFF), 4.57 : 1 on SchieferBackground
+//
+// Both clear the 4.5 : 1 small-text requirement. The predecessor #6878A0 did
+// not: 4.39 on the cards and 3.85 on the background. The second figure is the
+// one that matters and the one an earlier review missed by measuring against the
+// cards alone -- captions appear on both surfaces.
+//
+// The shade is the smallest step that clears both, deliberately: it keeps 2.83 : 1
+// against SchieferOnSurface below, so the caption still reads as subordinate to
+// the primary text rather than merging with it. Darkening further would buy
+// contrast the criterion does not ask for and spend the hierarchy that makes a
+// caption a caption.
+//
+// SchieferSurfaceVariant is not a text background -- it is the progress-bar track
+// only -- so the 3.41 : 1 a caption would have on it does not arise.
 
 val SchieferBackground = Color(0xFFEDF0F8) // slate-white canvas
 val SchieferSurface = Color(0xFFFFFFFF) // pure white cards
 val SchieferSurfaceVariant = Color(0xFFDDE3F0) // light bluish-grey
 val SchieferOutline = Color(0xFFC8D0E4) // soft blue-grey borders
 val SchieferOnSurface = Color(0xFF1C2745) // deep navy text
-val SchieferOnSurfaceVariant = Color(0xFF6878A0) // medium navy-grey captions
+val SchieferOnSurfaceVariant = Color(0xFF5D6C93) // medium navy-grey captions
 val SchieferPrimary = Color(0xFF2F3F6E) // navy accent
 val SchieferOnPrimary = Color(0xFFFFFFFF) // white text on primary
 val SchieferPrimaryContainer = Color(0xFFD8E0F5) // light blue card accent
@@ -149,36 +169,59 @@ internal val ErrorColorDark = Color(0xFFCF6679)
 private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
 /**
- * The one red the app uses for "over the limit": traffic-light bullets, calendar
- * over-limit dots, the limit line and over-limit bars in the charts, the trend
- * arrow, delete icons and the delete confirmations. Every one of those reads this
- * function, so the shade stays uniform by construction.
+ * The red for GRAPHICAL over-limit elements: traffic-light bullets, calendar
+ * over-limit dots, the limit line and the over-limit bars in the charts, and the
+ * delete icons. Text uses [dangerTextColor] instead — see there for why the two
+ * differ in the dark theme.
+ *
+ * MEASURED (WCAG 2.2 contrast, sRGB):
+ *
+ *   dark  #DD2C2C  3.25 : 1 on NachtSurface (#1E2538), 4.05 : 1 on NachtBackground
+ *   light #960018  9.09 : 1 on SchieferSurface (#FFFFFF), 7.97 : 1 on the background
+ *
+ * A dot, a bar and an icon are non-text, so the requirement is 3 : 1 (WCAG
+ * 1.4.11) and both values clear it. This is the fully saturated shade the app is
+ * designed around; lightening it to serve the text threshold as well was tried
+ * and reverted, because a red light enough for 4.5 : 1 reads as pink and the
+ * signal loses its character exactly where it matters most.
+ *
+ * The two themes carry different hex values on purpose. A single value cannot
+ * serve both: the dark theme's red on the light theme's white cards falls to
+ * around 4.4 : 1, far below the 9.09 : 1 it has today.
+ */
+@Composable fun dangerRedColor() = if (isDarkTheme()) Color(0xFFDD2C2C) else Color(0xFF960018)
+
+/**
+ * The red for over-limit TEXT and for the trend arrow glyphs that sit inside a
+ * line of text: the days-over-limit values and the trend value in the statistics
+ * screen, the month-trend arrow and the BAC readout on the today screen, and the
+ * delete confirmations.
  *
  * MEASURED (WCAG 2.2 contrast, sRGB):
  *
  *   dark  #DF3A3A  3.49 : 1 on NachtSurface (#1E2538), 4.35 : 1 on NachtBackground
  *   light #960018  9.09 : 1 on SchieferSurface (#FFFFFF), 7.97 : 1 on the background
  *
- * The two themes carry different hex values on purpose. A single value cannot
- * serve both: #DF3A3A on the light theme's white cards falls to 4.37 : 1, worse
- * than the 9.09 : 1 it has today, so unifying the literal would trade the light
- * theme away for the dark one.
+ * WHY THIS IS A SEPARATE FUNCTION
+ *   WCAG asks more of a colour that carries letters than of one that fills a
+ *   shape: 4.5 : 1 for small text against 3 : 1 for a non-text indicator. The two
+ *   uses therefore pull the shade in opposite directions, and one value cannot
+ *   sit at the optimum of both. Splitting them lets the graphical red stay
+ *   saturated while the text red moves a step toward the threshold.
  *
- * WHY 3.49 AND NOT 4.5 IN THE DARK THEME
- *   As a non-text indicator -- which is what a dot, a bar and an icon are -- the
- *   requirement is 3 : 1 (WCAG 1.4.11), and 3.49 clears it with room to spare;
- *   the previous #DD2C2C sat at 3.25, only just above. Small red TEXT would need
- *   4.5 : 1, which on these backgrounds is reached only around #E66363 -- a shade
- *   light enough to read as pink rather than red. That was measured, compared
- *   side by side, and rejected as a design choice: the signal colour keeps its
- *   character, and the four remaining red text sites are recorded as a known gap
- *   in docs/ROADMAP.md rather than papered over.
+ *   3.49 : 1 does not reach 4.5 : 1, and this function does not pretend it does.
+ *   The remaining gap is recorded in docs/ROADMAP.md under "Text contrast": the
+ *   question left open there is whether those sites should carry red text at
+ *   all, given that a dot or a bar beside them already carries the state. Until
+ *   that is decided, this is the closest step to the threshold that keeps the
+ *   colour recognisably the same red as the dots beside it.
  *
- * Note that the saturation is constant across that whole range (72 % in HSL);
- * what changes with lightening is only the lightness, which is what makes a
- * lighter red read as pink.
+ *   The arrow glyphs are grouped with text, not with graphics, because they are
+ *   drawn as characters inside a text run and must match the value they sit next
+ *   to. In the light theme both functions return the same value; the split
+ *   exists for the dark theme, where the backgrounds are close to the red.
  */
-@Composable fun dangerRedColor() = if (isDarkTheme()) Color(0xFFDF3A3A) else Color(0xFF960018)
+@Composable fun dangerTextColor() = if (isDarkTheme()) Color(0xFFDF3A3A) else Color(0xFF960018)
 
 /** Returns a green that passes WCAG AA against the current theme's background. */
 @Composable fun successColor() = if (isDarkTheme()) Color(0xFF4CAF50) else Color(0xFF2E7D32)

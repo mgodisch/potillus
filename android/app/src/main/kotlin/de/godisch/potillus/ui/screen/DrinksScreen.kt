@@ -48,6 +48,7 @@ import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.dangerTextColor
 import de.godisch.potillus.ui.theme.warningColor
 
 /**
@@ -308,7 +309,7 @@ fun DrinksScreen(
                     vm.deleteDrink(drink)
                     deleteDrink = null
                 }) {
-                    Text(stringResource(R.string.delete), color = dangerRedColor())
+                    Text(stringResource(R.string.delete), color = dangerTextColor())
                 }
             },
             dismissButton = {

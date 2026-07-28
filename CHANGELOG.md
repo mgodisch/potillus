@@ -81,9 +81,12 @@ Edit drinks from the list's edit mode
   are machine-generated.
 - `SECURITY.md` lists the App Store Connect variables and scopes the release
   verification to the Android artifacts.
-- The over-limit red in the Android dark theme is `#DF3A3A`.
+- The Android dark theme carries two over-limit reds: `#DD2C2C` for dots, bars
+  and icons, `#DF3A3A` for text and the trend arrows. The month grid and the
+  calendar's delete confirmation use them too.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
+- The secondary caption colour in the Android light theme is `#5D6C93`.
 
 ### Fixed
 

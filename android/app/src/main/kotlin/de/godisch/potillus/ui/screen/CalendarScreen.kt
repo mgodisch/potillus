@@ -60,7 +60,8 @@ import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.l10n.monthYearFormatter
 import de.godisch.potillus.ui.component.*
-import de.godisch.potillus.ui.theme.errorColor
+import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.dangerTextColor
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -341,7 +342,7 @@ fun CalendarScreen(
                     vm.deleteEntry(entry)
                     deleteEntry = null
                 }) {
-                    Text(stringResource(R.string.delete), color = errorColor())
+                    Text(stringResource(R.string.delete), color = dangerTextColor())
                 }
             },
             dismissButton = {
@@ -457,8 +458,15 @@ private fun MonthCalendar(
         val startOffset = (firstDay.dayOfWeek.value - weekStart + 7) % 7
         val rows = (startOffset + totalDays + 6) / 7
 
-        // Capture composable color before the loop
-        val overLimitColor = errorColor()
+        // Capture composable color before the loop.
+        //
+        // dangerRedColor(), not errorColor(): an over-limit day is the same fact
+        // the traffic-light dot, the year heat-map cell and the chart's bar
+        // report, and it carries the same shade. errorColor() is Material's error
+        // ROLE -- an invalid input, a failed export -- and this grid states no
+        // error. The two were the same colour to the eye until the dark theme's
+        // reds were measured; #CF6679 reads pink beside #DD2C2C.
+        val overLimitColor = dangerRedColor()
         // Long, localized date used in each day cell's accessibility label
         // (built once per grid composition rather than per cell).
         val dayDescFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
