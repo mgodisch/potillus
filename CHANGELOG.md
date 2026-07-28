@@ -108,6 +108,8 @@ Edit drinks from the list's edit mode
 ### Fixed
 
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
+- The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
+  directory marker, and `__pycache__` directories stay out of the tarball.
 
 ---
 

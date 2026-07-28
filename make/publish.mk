@@ -55,9 +55,20 @@ tgz: potillus-$(VERSION).tar.gz
 #   * Comments (# ...), trailing whitespace and blank lines are stripped.
 #   * A negation (!pattern) cannot be expressed with tar --exclude, so we abort
 #     rather than silently over-exclude. (There are none today.)
-#   * git treats a pattern that contains a '/' as anchored to the repo root and
-#     one without any '/' as matching at ANY depth. tar's default is the
-#     opposite (all patterns float), so we split the list: anchored patterns get
+#   * A trailing '/' in .gitignore restricts the pattern to DIRECTORIES; it
+#     does NOT anchor it (gitignore(5): only a separator at the beginning or
+#     middle anchors). tar --exclude cannot express "directories only", and a
+#     pattern that ends in '/' matches NO member at all (observed with GNU tar
+#     1.35: an excluded __pycache__/ still rode into the archive, at every
+#     depth). The trailing slash is therefore stripped during cleaning, and
+#     the pattern is matched by NAME. The cost: a plain FILE named like the
+#     directory pattern would be excluded too, where git would keep it — an
+#     accepted approximation, stated here rather than silent.
+#   * git treats a pattern with a '/' at the beginning or middle as anchored
+#     to the repo root and one without as matching at ANY depth. tar's default
+#     is the opposite (all patterns float), so we split the list — AFTER the
+#     trailing-slash strip above, so a directory pattern like __pycache__/
+#     lands in the floating set, where it belongs: anchored patterns get
 #     the archive's top directory (this repo dir) prepended and are matched with
 #     --anchored; the rest are matched with --no-anchored.
 #   * tar lets '*' cross '/' by default, which would make e.g. '/*.pdf' (root
@@ -73,7 +84,7 @@ potillus-$(VERSION).tar.gz: CHANGELOG.md
 	    exit 1; \
 	fi
 	@top=`basename "$$PWD"`; td=`mktemp -d`; \
-	clean=`sed -e 's/#.*$$//' -e 's/[[:space:]]*$$//' -e '/^$$/d' .gitignore`; \
+	clean=`sed -e 's/#.*$$//' -e 's/[[:space:]]*$$//' -e 's#/$$##' -e '/^$$/d' .gitignore`; \
 	printf '%s\n' "$$clean" | grep '/'    | sed -e 's#^/##' -e "s#^#$$top/#" > "$$td/anchored"   || true; \
 	printf '%s\n' "$$clean" | grep -v '/'                                    > "$$td/unanchored" || true; \
 	tar czf ../potillus-$(VERSION).tar.gz -C .. \
