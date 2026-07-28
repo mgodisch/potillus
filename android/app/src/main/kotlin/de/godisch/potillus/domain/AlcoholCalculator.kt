@@ -288,6 +288,9 @@ object AlcoholCalculator {
      *
      * The two cases show the same "5 / 5" to the user, and differ in their answer.
      * Extracted so that [trafficLight] and the drink-days bar cannot disagree.
+     * Pinned by the `drinkDayLimitReached` section of
+     * `test-vectors/alcohol-calculator.json`, which both suites assert — the iOS
+     * port carries the same predicate under the same name.
      *
      * @param drinkDaysThisWeek Distinct drink days in the rolling window, today included.
      * @param maxDrinkDaysPerWeek The configured allowance.

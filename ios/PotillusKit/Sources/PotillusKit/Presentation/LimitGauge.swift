@@ -59,10 +59,10 @@ import Foundation
 //     - Today is NOT yet a drink day and the count is already full: the first
 //       drink today would spend a day the user does not have. Red.
 //
-//   This is precisely the drink-day gate in `AlcoholCalculator.trafficLight`:
-//
-//       pastDrinkDays = drinkDaysThisWeek - (todayIsDrinkDay ? 1 : 0)
-//       if pastDrinkDays >= maxDrinkDaysPerWeek { return .red }
+//   This is precisely `AlcoholCalculator.drinkDayLimitReached`, the ONE named
+//   drink-day gate — the same predicate `trafficLight` consults, mirroring
+//   Kotlin's `drinkDayLimitReached`, and pinned by the `drinkDayLimitReached`
+//   section of `alcohol-calculator.json` on both platforms.
 //
 //   The bar and the traffic-light dot therefore cannot disagree, which they could
 //   under the simpler `days > max` rule: at 5/5 with today already a drink day,
@@ -137,9 +137,15 @@ public enum LimitGauge {
     public static func drinkDaysEmphasis(
         drinkDays: Int, maxDrinkDays: Int, todayIsDrinkDay: Bool
     ) -> Emphasis {
-        // The same gate as AlcoholCalculator.trafficLight, so bar and dot agree.
-        let pastDrinkDays = drinkDays - (todayIsDrinkDay ? 1 : 0)
-        if pastDrinkDays >= maxDrinkDays { return .danger }
+        // The same predicate AlcoholCalculator.trafficLight consults, so bar
+        // and dot agree by construction (see the file header).
+        if AlcoholCalculator.drinkDayLimitReached(
+            drinkDaysThisWeek: drinkDays,
+            maxDrinkDaysPerWeek: maxDrinkDays,
+            todayIsDrinkDay: todayIsDrinkDay
+        ) {
+            return .danger
+        }
 
         let denominator = Double(max(maxDrinkDays, 1))
         let fraction = max(Double(drinkDays) / denominator, 0.0)

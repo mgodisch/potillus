@@ -43,8 +43,10 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 ## Files
 
 - `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
-  fractions, the traffic-light capacity status, and the rolling seven-day
-  violation counts. Harvested from `AlcoholCalculatorTest.kt`.
+  fractions, the traffic-light capacity status, the drink-day gate
+  (`drinkDayLimitReached`, shared by the traffic light and the drink-day bar on
+  both platforms), and the rolling seven-day violation counts. Harvested from
+  `AlcoholCalculatorTest.kt`.
 - `drink-validation.json` — the rules a drink definition must satisfy. The
   `bounds` block is GENERATED from `domain/DrinkValidator.kt`, and both suites
   assert it, so a bound narrowed on one platform cannot pass unnoticed on the

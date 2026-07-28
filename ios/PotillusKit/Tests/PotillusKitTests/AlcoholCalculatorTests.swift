@@ -191,6 +191,23 @@ final class AlcoholCalculatorTests: XCTestCase {
         }
     }
 
+    // ── drinkDayLimitReached ─────────────────────────────────────────────────
+    //
+    // The drink-day gate is consumed twice per platform (traffic light and
+    // drink-day bar), so the predicate itself is pinned, not only trafficLight's
+    // use of it. See the predicate's documentation for the two 5/5 cases.
+
+    func testDrinkDayLimitReachedAgainstSharedVectors() {
+        for testCase in vectors.drinkDayLimitReached {
+            let actual = AlcoholCalculator.drinkDayLimitReached(
+                drinkDaysThisWeek: testCase.drinkDaysThisWeek,
+                maxDrinkDaysPerWeek: testCase.maxDrinkDaysPerWeek,
+                todayIsDrinkDay: testCase.todayIsDrinkDay
+            )
+            XCTAssertEqual(actual, testCase.expected, "drinkDayLimitReached: \(testCase.description)")
+        }
+    }
+
     // ── countLimitViolations ─────────────────────────────────────────────────
 
     func testCountLimitViolationsAgainstSharedVectors() throws {

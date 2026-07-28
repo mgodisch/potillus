@@ -241,6 +241,45 @@ public enum AlcoholCalculator {
         return fraction
     }
 
+    /// Whether the weekly drink-day allowance is already spent, so that a drink
+    /// logged *today* would exceed it.
+    ///
+    /// A drink day, once spent, stays spent for the rest of that day. What
+    /// decides the question is therefore the number of drink days **strictly
+    /// before today**:
+    ///
+    /// ```
+    /// pastDrinkDays = drinkDaysThisWeek − (todayIsDrinkDay ? 1 : 0)
+    /// ```
+    ///
+    /// - Today is already a drink day and completed the count (e.g. 5/5):
+    ///   another drink today adds no further drink day, so the allowance is
+    ///   *not* reached.
+    /// - Today is still dry and the count is already full (also 5/5): the first
+    ///   drink would spend a day the user does not have. The allowance *is*
+    ///   reached.
+    ///
+    /// The two cases show the same "5 / 5" to the user, and differ in their
+    /// answer. Extracted — mirroring Kotlin's `drinkDayLimitReached`, and pinned
+    /// by the `drinkDayLimitReached` section of `alcohol-calculator.json` on
+    /// both platforms — so that `trafficLight` and `LimitGauge`'s drink-day bar
+    /// cannot disagree.
+    ///
+    /// - Parameters:
+    ///   - drinkDaysThisWeek: Distinct drink days in the rolling window, today
+    ///     included.
+    ///   - maxDrinkDaysPerWeek: The configured allowance.
+    ///   - todayIsDrinkDay: Whether today has already seen alcohol
+    ///     (`todayGrams > 0`).
+    public static func drinkDayLimitReached(
+        drinkDaysThisWeek: Int,
+        maxDrinkDaysPerWeek: Int,
+        todayIsDrinkDay: Bool
+    ) -> Bool {
+        let pastDrinkDays = drinkDaysThisWeek - (todayIsDrinkDay ? 1 : 0)
+        return pastDrinkDays >= maxDrinkDaysPerWeek
+    }
+
     /// Whole servings of `gramsPerDrink` that fit into `remainingGrams`.
     ///
     /// A negative remaining budget counts as zero. Returns zero for a
@@ -292,10 +331,15 @@ public enum AlcoholCalculator {
     ) -> TrafficLight {
         guard gramsPerDrink > 0.0 else { return .green }
 
-        // Drink-day gate: count only the drink days strictly before today.
-        let todayIsDrinkDay = todayGrams > 0.0
-        let pastDrinkDays = drinkDaysThisWeek - (todayIsDrinkDay ? 1 : 0)
-        if pastDrinkDays >= maxDrinkDaysPerWeek { return .red }
+        // Drink-day gate: `drinkDayLimitReached` counts only the drink days
+        // strictly before today (see its documentation for the two 5/5 cases).
+        if drinkDayLimitReached(
+            drinkDaysThisWeek: drinkDaysThisWeek,
+            maxDrinkDaysPerWeek: maxDrinkDaysPerWeek,
+            todayIsDrinkDay: todayGrams > 0.0
+        ) {
+            return .red
+        }
 
         // Gram checks: whole servings fitting the remaining daily / weekly budget.
         let dailyCount = servingsFitting(

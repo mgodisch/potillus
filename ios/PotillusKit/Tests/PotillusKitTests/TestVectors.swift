@@ -269,6 +269,7 @@ struct AlcoholCalculatorVectors: Decodable {
     let limitPercent: [LimitPercentCase]
     let isOverLimit: [IsOverLimitCase]
     let trafficLight: [TrafficLightCase]
+    let drinkDayLimitReached: [DrinkDayLimitCase]
     let countLimitViolations: [ViolationsCase]
 
     struct Constants: Decodable {
@@ -321,6 +322,14 @@ struct AlcoholCalculatorVectors: Decodable {
         /// `TrafficLight` is `String`-backed and `Codable`, so the JSON values
         /// "GREEN"/"YELLOW"/"RED" decode straight onto the Kotlin enum names.
         let expected: TrafficLight
+    }
+
+    struct DrinkDayLimitCase: Decodable {
+        let description: String
+        let drinkDaysThisWeek: Int
+        let maxDrinkDaysPerWeek: Int
+        let todayIsDrinkDay: Bool
+        let expected: Bool
     }
 
     struct ViolationsCase: Decodable {

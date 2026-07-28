@@ -57,6 +57,8 @@ Edit drinks from the list's edit mode
 - The export dialog offers the visible period when no start date is set.
 - The build script's report-template note names the iOS renderer.
 - Revised README.md.
+- `AlcoholCalculator.drinkDayLimitReached` answers the drink-day gate on iOS,
+  and `alcohol-calculator.json` pins it on both platforms.
 
 ### Fixed
 

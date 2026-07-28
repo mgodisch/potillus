@@ -255,6 +255,43 @@
       "expected": "GREEN"
     }
   ],
+  "drinkDayLimitReached": [
+    {
+      "description": "At the cap with today already a drink day, today is free",
+      "drinkDaysThisWeek": 5,
+      "maxDrinkDaysPerWeek": 5,
+      "todayIsDrinkDay": true,
+      "expected": false
+    },
+    {
+      "description": "At the cap with today still dry, the first drink would spend a sixth day",
+      "drinkDaysThisWeek": 5,
+      "maxDrinkDaysPerWeek": 5,
+      "todayIsDrinkDay": false,
+      "expected": true
+    },
+    {
+      "description": "Below the allowance",
+      "drinkDaysThisWeek": 3,
+      "maxDrinkDaysPerWeek": 5,
+      "todayIsDrinkDay": false,
+      "expected": false
+    },
+    {
+      "description": "Below the allowance with today already a drink day",
+      "drinkDaysThisWeek": 3,
+      "maxDrinkDaysPerWeek": 5,
+      "todayIsDrinkDay": true,
+      "expected": false
+    },
+    {
+      "description": "Past the allowance, and today being a drink day changes nothing",
+      "drinkDaysThisWeek": 6,
+      "maxDrinkDaysPerWeek": 5,
+      "todayIsDrinkDay": true,
+      "expected": true
+    }
+  ],
   "countLimitViolations": [
     {
       "description": "Counts days over the daily limit",

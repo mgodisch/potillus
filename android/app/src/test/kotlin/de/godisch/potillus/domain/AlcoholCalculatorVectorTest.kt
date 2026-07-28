@@ -188,6 +188,28 @@ class AlcoholCalculatorVectorTest {
         }
     }
 
+    // ── drinkDayLimitReached ─────────────────────────────────────────────────
+    //
+    // The drink-day gate is consumed twice per platform (traffic light and
+    // drink-day bar), so the predicate itself is pinned, not only trafficLight's
+    // use of it. See the predicate's KDoc for the two 5/5 cases that motivate it.
+
+    @Test
+    fun `drinkDayLimitReached matches the shared vectors`() {
+        VECTORS.getJSONArray("drinkDayLimitReached").objects().forEach { case ->
+            val actual = AlcoholCalculator.drinkDayLimitReached(
+                drinkDaysThisWeek = case.getInt("drinkDaysThisWeek"),
+                maxDrinkDaysPerWeek = case.getInt("maxDrinkDaysPerWeek"),
+                todayIsDrinkDay = case.getBoolean("todayIsDrinkDay"),
+            )
+            assertEquals(
+                "drinkDayLimitReached: ${case.getString("description")}",
+                case.getBoolean("expected"),
+                actual,
+            )
+        }
+    }
+
     // ── countLimitViolations ─────────────────────────────────────────────────
 
     @Test
