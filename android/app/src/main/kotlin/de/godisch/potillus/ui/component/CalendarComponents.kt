@@ -56,7 +56,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -206,9 +211,38 @@ fun YearCalendarView(
                                                 stringResource(statusRes),
                                             )
                                         }
+                                        var focused by remember { mutableStateOf(false) }
                                         Box(
                                             modifier = Modifier
                                                 .size(cellSize)
+                                                // FOCUS VISIBILITY (WCAG 2.4.7).
+                                                // The ring is drawn on the OUTER
+                                                // box, before the padding that
+                                                // insets the coloured square, so
+                                                // it lies on the card surface
+                                                // rather than on the cell colour.
+                                                // That matters: no single ring
+                                                // colour clears 3:1 against all
+                                                // four cell fills in both themes
+                                                // (onSurface reaches only 2.73:1
+                                                // on an under-limit cell in the
+                                                // dark theme, 1.44:1 in the
+                                                // light one), while against the
+                                                // card it has 12.42:1 and
+                                                // 14.73:1. One background, one
+                                                // answer.
+                                                .onFocusChanged { focused = it.isFocused }
+                                                .then(
+                                                    if (focused) {
+                                                        Modifier.border(
+                                                            1.dp,
+                                                            MaterialTheme.colorScheme.onSurface,
+                                                            RoundedCornerShape(2.dp),
+                                                        )
+                                                    } else {
+                                                        Modifier
+                                                    },
+                                                )
                                                 .padding(cellGap / 2)
                                                 .background(color, RoundedCornerShape(1.dp))
                                                 .then(

@@ -90,6 +90,7 @@ Edit drinks from the list's edit mode
 - The iOS calendar's toolbar reads "add, edit, overflow" like the other screens.
 - The selected day's tint in the iOS calendar is stronger in dark mode.
 - `make ios` renders a stale user's guide by itself, as the Android build does.
+- Calendar day cells draw a focus ring while focused.
 - The roadmap records the measured contrast of that red and of the light-theme
   caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.

@@ -26,6 +26,7 @@
 package de.godisch.potillus.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -498,11 +500,38 @@ private fun MonthCalendar(
                                 stringResource(statusRes),
                             )
                         }
+                        var focused by remember { mutableStateOf(false) }
                         Box(
                             modifier = Modifier
                                 .weight(1f).aspectRatio(1f)
                                 .clip(MaterialTheme.shapes.small)
                                 .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                // FOCUS VISIBILITY (WCAG 2.4.7). Unlike the year
+                                // heat-map's cells this one fills its whole slot,
+                                // so the ring has to sit ON the cell and its
+                                // colour follows the fill: onPrimary over a
+                                // selected cell (5.67:1 dark, 10.21:1 light),
+                                // onSurface over an unselected one, which is the
+                                // card surface (12.42:1 and 14.73:1). Both are
+                                // existing role colours; no new value is needed
+                                // because here, unlike the heat-map, there are
+                                // only two possible backgrounds.
+                                .onFocusChanged { focused = it.isFocused }
+                                .then(
+                                    if (focused) {
+                                        Modifier.border(
+                                            2.dp,
+                                            if (isSelected) {
+                                                MaterialTheme.colorScheme.onPrimary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurface
+                                            },
+                                            MaterialTheme.shapes.small,
+                                        )
+                                    } else {
+                                        Modifier
+                                    },
+                                )
                                 .then(
                                     // Rich label for days with data; day-number text
                                     // remains the name for empty days.

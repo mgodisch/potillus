@@ -205,9 +205,13 @@ concrete, measured gaps are:
 - **Target size (2.5.8, AA — new in 2.2).** The 10 dp heat-map day cells are
   below the 24 px minimum; a ≥ 24 dp (ideally 48 dp) touch target should wrap the
   10 dp visual. (Standard Material `IconButton`s already meet this.)
-- **Focus visibility (2.4.7, AA).** The two custom `clickable` surfaces — the
-  year heat-map day cell and the month cell — need a visible focus indicator.
-  They already carry `role = Role.Button`, so 4.1.2 is not part of this item.
+- **Focus visibility (2.4.7, AA).** Settled: both custom `clickable` surfaces —
+  the year heat-map day cell and the month cell — draw a ring while focused. The
+  heat-map ring sits on the outer box, outside the padding, so it lies on the
+  card surface (12.42 : 1 dark, 14.73 : 1 light) instead of on the cell colour,
+  where no single ring colour clears 3 : 1 against all four fills. The month cell
+  fills its slot, so its ring follows the fill: `onPrimary` when selected,
+  `onSurface` otherwise.
 
 None of the four remaining gaps introduces a user-facing string, so none of
 them triggers `LocaleSyncTest` across all locales — unlike the chart summaries,
