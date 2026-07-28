@@ -95,10 +95,12 @@ tracker](https://gitlab.com/godisch/potillus/-/issues) with the `good first
 issue` label; filter by that label to find current ones. Small tasks that fit
 this project especially well include:
 
-- **Translation review.** English and German are hand-authored; the other
-  locales are machine-generated (see Section 6). Reviewing and correcting the
+- **Translation review.** Of the 21 interface languages, English and German are
+  hand-authored; the other **19 are machine-generated and have never been read
+  by a speaker of the language** (see Section 6). Reviewing and correcting the
   strings for a language you speak natively is a self-contained contribution
-  that needs no build setup.
+  that needs no build setup, and a correction to a single string is as welcome
+  as a whole file.
 - **Documentation.** Clarifying or correcting the README, this guide, or the
   in-app user guide.
 - **Test cases.** Adding tests for existing behaviour that is not yet covered.

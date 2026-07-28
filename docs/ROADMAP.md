@@ -59,11 +59,15 @@ attainable until each is resolved. They are the most critical open items.
 
 - **Continuity arrangement** (`access_continuity`). Ensure the project can
   continue — issues, changes, and releases within a week — if the sole
-  maintainer becomes unavailable. Designate a trusted successor or co-maintainer
-  with the necessary repository access and legal rights, and document the
-  arrangement in `docs/GOVERNANCE.md`. F-Droid distribution helps (its
-  reproducible-build re-signing removes the private-key hand-off) but is not
-  itself a successor.
+  maintainer becomes unavailable. The arrangement as it stands is written down
+  in `docs/GOVERNANCE.md` under "Continuity": what does not stop (the licence,
+  the public history, F-Droid's reproducible re-signing, the documented backup
+  format) and what does — there is no designated successor, and until there is
+  one, an update to either store cannot be published by anyone else. What
+  remains open is therefore the naming itself: a trusted successor or
+  co-maintainer with the necessary repository access and legal rights, willing
+  to take it on. F-Droid distribution helps, in that its re-signing removes the
+  private-key hand-off, but it is not itself a successor.
 - **Continuous integration** (`automated_integration_testing`). A GitLab CI
   pipeline (`.gitlab-ci.yml`) now replaces the Woodpecker pipeline the project
   ran while hosted on Codeberg. It stands where the old one stood — device-free
@@ -219,24 +223,8 @@ extend or fork the checklist so each platform's self-assessment is tracked
 separately. Like the Android assessment, this is a manual on-device effort no
 sandbox check can replace.
 
-## Finalize already-documented "Met" items
-
-These are met in the repository but depend on a maintainer action to hold in
-practice.
-
-- **Run ktlint formatting once** (`coding_standards_enforced`). Run
-  `./gradlew ktlintFormat`, commit the result, and push, so `ktlintCheck` passes.
-- **Sign release tags** (`version_tags_signed`). Create future release tags with
-  `git tag -s` (`tag.gpgSign true` is documented); optionally re-sign the current
-  release tag.
-
 ## Badge administration (bestpractices.dev, project 13480)
 
-- Complete and submit the **passing**-badge form with the prepared justifications
-  (`achieve_passing`).
-- Keep the silver "Met URL" entries pointing at the moved docs: `governance` and
-  `roles_responsibilities` -> `docs/GOVERNANCE.md`, `documentation_roadmap` ->
-  `docs/ROADMAP.md`, `assurance_case` -> `docs/ASSURANCE_CASE.md`.
 - Keep a version-controlled snapshot of the badge answers (metal series passing,
   silver, gold, plus OSPS Baseline Level 1) in `.bestpractices.json` (repository
   root), the maintained source of truth. `make bestpractices` downloads the

@@ -109,6 +109,18 @@ coding, testing, and release conventions a change must follow — is documented
 in [`CONTRIBUTING.md`](CONTRIBUTING.md). All participants are expected to
 follow the project's [Code of Conduct](docs/CODE_OF_CONDUCT.md).
 
+**Translations are where help is most useful.** Of the 21 interface languages,
+exactly two are written by a native speaker: German and English. The other 19 —
+Czech, Danish, Greek, Spanish, French, Italian, Japanese, Korean, Dutch,
+Norwegian, Polish, Portuguese (Brazil and Portugal), Romanian, Russian,
+Swedish, Ukrainian, and both written forms of Chinese — are machine-generated
+and have not been reviewed by anyone who speaks them. They are grammatical, and
+they may still be wrong: a term of art rendered as an everyday word, a register
+that reads oddly, a phrase that is simply not what a person would say. If you
+speak one of them, a correction to a single string is a welcome contribution,
+and no smaller than any other. The workflow is in
+[`CONTRIBUTING.md`](CONTRIBUTING.md), section 6.
+
 ## Privacy & Security Architecture
 
 The app stores only what you enter. On Android it holds no network permission,
@@ -123,6 +135,34 @@ synchronization.
 The app's full privacy policy — detailing exactly what is stored on the device
 and confirming that nothing is ever transmitted — is available in
 [`PRIVACY.md`](PRIVACY.md).
+
+## Interface Stability
+
+An app has no API in the usual sense, but it does have interfaces that outlive
+any one install, and those are the ones a version number should speak about.
+For Libellus Potionis there are two, and they are the only things that ever
+leave the device:
+
+- **The JSON backup format.** This is the contract that matters. It is
+  versioned — `BACKUP_VERSION`, currently 3 — and both apps read it, so a
+  backup written on Android imports on iOS and the other way round.
+  **Backward compatibility is the project's aim: a backup written by any
+  released version is intended to remain importable by later versions.** A
+  release that added a field bumps the version so that an older app, which
+  cannot know about the field, declines the file cleanly instead of importing
+  it partially. The reverse direction is the promise: newer apps keep reading
+  older files.
+- **The CSV export.** Column set, ordering, and the ISO-8601 date and time
+  format are treated as a stable interface too, because people build
+  spreadsheets on them. Columns may be added at the end; existing ones are not
+  renamed, reordered, or repurposed without a version change that says so.
+
+Everything else — the Room database schema, the internal module layout, the
+Swift package structure, every Kotlin and Swift type — is internal. It changes
+whenever the app has reason to change it, and no external contract depends on
+it. The database has its own separate freeze and migration rules, documented in
+[`CONTRIBUTING.md`](CONTRIBUTING.md), section 8; those govern upgrades on a
+single device, not interchange between devices.
 
 ## Platform Compatibility
 

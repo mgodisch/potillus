@@ -90,3 +90,44 @@ level needed for the person's role and escalated only as further need is
 demonstrated, and revoked when no longer needed. Until such a grant, all
 contributions are submitted as merge requests and merged only by the maintainer,
 so no contributor holds escalated permissions without this review.
+
+## Continuity
+
+The project has one maintainer, and this section says plainly what that means
+for anyone depending on it.
+
+**There is no designated successor today.** Should the maintainer become
+unavailable, no one else currently holds the rights to publish an update to
+Google Play or the App Store, and no one else can answer a security report at
+the address in [SECURITY.md](../SECURITY.md). A user should assume that in that
+event the published apps stop receiving updates.
+
+**What does not stop.** The project is deliberately arranged so that its
+disappearance from the stores would not be the end of it:
+
+1. The source is GPL-3.0-or-later. Anyone may fork it, build it, and publish
+   their own build under their own signing identity, without asking.
+2. The canonical repository is public and carries the full history, the
+   documentation, the release tooling and the golden test vectors — everything
+   needed to continue, not merely the sources. The GitHub mirror is a second
+   copy of the same history.
+3. The F-Droid build is reproducible and re-signed by F-Droid from source. That
+   channel therefore does not depend on the maintainer's private signing key,
+   and a successor taking over the repository would not need it handed over.
+4. The app stores no data anywhere but on the device, and its backup format is
+   documented and versioned. A user's data outlives the project: it can be
+   exported and read without this app.
+
+**When a successor would be named.** The maintainer will designate a
+co-maintainer or successor once a contributor has established a track record
+under the review process described above and is willing to take the role on.
+Naming someone who has not is worse than naming no one: it would satisfy a
+checklist while leaving the actual obligations — security response, store
+accounts, signing identity — with a person who has not agreed to carry them.
+Should that change, this section and the "Key roles" list above are updated
+together, and the change is announced in the CHANGELOG.
+
+**Reporting a maintainer who has gone silent.** If the maintainer does not
+respond within the period stated in [SECURITY.md](../SECURITY.md) and no
+successor is listed here, treat the project as unmaintained and fork it. The
+license grants that right precisely so that no permission is needed for it.

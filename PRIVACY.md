@@ -45,7 +45,7 @@ same change, and the Play Data safety form updated accordingly.
 
 # Privacy Policy — Libellus Potionis
 
-- **Last updated:** 2026-07-15
+- **Last updated:** 2026-07-28
 - **Application:** Libellus Potionis (package `de.godisch.potillus`)
 - **Developer:** Martin A. Godisch — <android@godisch.de> <ios@godisch.de>
 - **Source code:** <https://gitlab.com/godisch/potillus>
@@ -70,19 +70,26 @@ To do its job the app keeps the following **on your device only**:
   selected in-app language).
 
 This data lives in the app's private, sandboxed storage. It is protected at rest
-by Android's device storage encryption and the per-app sandbox. The small
-preferences secret is additionally sealed with a key held in the Android
-Keystore (AES-256-GCM). The app is **not** end-to-end encrypted at the database
-level; it relies on the platform's storage encryption and sandbox isolation.
+by the platform: on Android by the device storage encryption and the per-app
+sandbox, on iOS by iOS Data Protection (hardware-backed file encryption) and the
+app sandbox. The small preferences secret is additionally sealed with a key the
+platform holds for the app and never hands out — the Android Keystore on one
+side, the Keychain with a device-only accessibility class on the other
+(AES-256-GCM in both cases). The app is **not** end-to-end encrypted at the
+database level; it relies on the platform's storage encryption and sandbox
+isolation.
 
-An optional biometric fingerprint lock can guard the app against unauthorized
-physical access. Biometric matching is performed entirely by the Android system;
-the app never sees, receives, or stores your biometric data.
+An optional biometric lock can guard the app against unauthorized physical
+access: a fingerprint on Android, Face ID or Touch ID on iOS. The biometric
+matching is performed entirely by the operating system; the app never sees,
+receives, or stores your biometric data.
 
 ## What the app does NOT do
 
-- **No network access.** The app declares no internet permission and makes no
-  network connections. Your data cannot leave the device through the app.
+- **No network access.** On Android the app declares no internet permission; on
+  iOS, where no such permission exists, it contains no networking code at all.
+  Either way it makes no network connections, and your data cannot leave the
+  device through the app.
 - **No tracking, analytics, advertising, or crash reporting.** There are no
   third-party SDKs that phone home.
 - **No data sharing or selling.** Because nothing is transmitted, there is no
@@ -119,13 +126,19 @@ the JSON backup you export yourself, described above.
 
 ## Permissions
 
-The app requests a single, optional permission:
+On Android the app requests a single, optional permission:
 
 - `USE_BIOMETRIC` — to offer the optional fingerprint app lock described above.
 
 It requests no camera, microphone, location, telephony, contacts, or storage
 permissions. Writing CSV/PDF/JSON to the public Downloads folder uses the
 scoped MediaStore API and needs no storage permission.
+
+On iOS the app requests no permission at all. Face ID and Touch ID are reached
+through the system authentication prompt, which needs no entitlement beyond the
+usage description the app declares, and files are written through the system
+document picker you operate yourself. There is no camera, microphone, location,
+contacts, photo-library, or tracking access of any kind.
 
 ## Children
 

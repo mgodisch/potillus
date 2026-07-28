@@ -74,6 +74,13 @@ Edit drinks from the list's edit mode
 - `SupportedLocales` names the places an RTL language reaches beyond layout
   mirroring.
 - The roadmap carries plausibility guards for the shell gates' extractions.
+- The privacy policy describes both platforms: storage protection, the biometric
+  lock, the absence of networking, and the permission profile.
+- `GOVERNANCE.md` states the continuity arrangement.
+- The README states which interfaces are stable and that 19 of the 21 languages
+  are machine-generated.
+- `SECURITY.md` lists the App Store Connect variables and scopes the release
+  verification to the Android artifacts.
 
 ### Fixed
 

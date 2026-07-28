@@ -268,8 +268,11 @@ to version control:
 repository. The templates (`android/keystore.properties.example` and
 `fastlane/Appfile`) document their structure without any secret values. On a
 build host the values are supplied through those local files or, equivalently,
-through environment variables (`POTILLUS_KEYSTORE_*`, `SUPPLY_JSON_KEY`), so a
-secret is injected at build time rather than persisted in the tree.
+through environment variables (`POTILLUS_KEYSTORE_*` and `SUPPLY_JSON_KEY` on
+the Android side, `APP_STORE_CONNECT_API_KEY_KEY_ID`,
+`APP_STORE_CONNECT_API_KEY_ISSUER_ID` and
+`APP_STORE_CONNECT_API_KEY_KEY_FILEPATH` on the iOS side), so a secret is
+injected at build time rather than persisted in the tree.
 
 **Accessing.** The project has a single maintainer, who is the only holder of
 these secrets and keeps them solely on trusted and encrypted local machines;
@@ -288,6 +291,14 @@ compromise, following the key-rotation process of the distribution channel
 replaced before the next release.
 
 ## Verifying releases
+
+This section is about the Android artifacts, because they are the only ones a
+user receives as a file. An iOS build is delivered exclusively through the App
+Store or TestFlight, signed by Apple after upload and never handed to the user
+as a verifiable artifact; there is nothing for a reader to check by hand, and
+the trust anchor is Apple's distribution chain. What the project does publish
+for iOS is its Software Bill of Materials, which carries a detached OpenPGP
+signature like every other release file.
 
 Releases are cryptographically signed, in two independent ways. The GitLab
 release APK and the F-Droid build are signed with the maintainer's own Android
