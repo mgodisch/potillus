@@ -241,9 +241,10 @@ class ScreenshotTest {
      *     picker, so the rendered UI language is deterministic and does NOT depend on
      *     the (here unreliable) system-locale switch — otherwise every locale run
      *     comes out in the device language.
-     *  4. Clears the statistics start floor (AppSettings.statsFromDate) so the
-     *     Statistics period spans the whole demo history instead of being clamped to
-     *     the fresh-install default (the APK install date = the capture day).
+     *  4. Takes the statistics start floor (AppSettings.statsFromDate) from the demo
+     *     fixture, which sets it a day before the first entry so the Statistics period
+     *     spans the whole demo history rather than the fresh-install default (the APK
+     *     install date = the capture day).
      *  5. Installs the full-screen screenshot strategy (includes the demo-mode
      *     status bar).
      */

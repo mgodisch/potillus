@@ -106,6 +106,8 @@ Edit drinks from the list's edit mode
   extraction-rule, locale-config, and launcher-icon XML comments.
 - The coverage prose names the enforced floors and the command that prints the
   current figures.
+- The year heat-map draws only the days from the statistics start date through
+  today.
 
 ### Fixed
 

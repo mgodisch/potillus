@@ -89,6 +89,8 @@ import java.time.format.FormatStyle
  *   - **dangerRedColor** (red)      → entry exists, daily total > [limitGrams].
  *   - **outline border**            → the cell additionally shows a border when
  *                                     the day equals [today] (regardless of consumption).
+ *   - **nothing at all**            → the day lies outside the evaluated window:
+ *                                     after [today], or before [statsFrom].
  *
  * Cells with a consumption entry are tappable; empty cells are inert.
  *
@@ -105,9 +107,13 @@ import java.time.format.FormatStyle
  * @param limitGrams  Daily limit in grams; determines over/under colouring.
  * @param today       Logical today (from [de.godisch.potillus.domain.DayResolver]).
  *                    Must be derived from DayResolver (not [LocalDate.now]) so the
- *                    day-change time is respected.
+ *                    day-change time is respected. Also the upper end of the
+ *                    drawn window: later days render as nothing.
  * @param onDayClick  Called with the ISO-8601 date when the user taps a non-empty day.
  * @param modifier    Optional layout modifier for the outer [Column].
+ * @param statsFrom   Statistics start floor, or `null` for none. Earlier days
+ *                    render as nothing, entry or not, because they are excluded
+ *                    from every statistic the app shows.
  */
 @Composable
 fun YearCalendarView(
@@ -118,6 +124,7 @@ fun YearCalendarView(
     onDayClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     weekStart: Int = 1,
+    statsFrom: LocalDate? = null,
 ) {
     // Per-app locale (LocaleSupport.kt rule: never Locale.getDefault() for
     // user-visible text). Without the explicit locale this formatter followed
@@ -193,18 +200,56 @@ fun YearCalendarView(
                             Row {
                                 for (dow in 0..6) {
                                     val dayNum = week * 7 + dow - startPad + 1
-                                    if (dayNum < 1 || dayNum > ym.lengthOfMonth()) {
+                                    val cellDate = if (dayNum in 1..ym.lengthOfMonth()) {
+                                        ym.atDay(dayNum)
+                                    } else {
+                                        null
+                                    }
+                                    // OUTSIDE THE EVALUATED WINDOW: nothing is drawn.
+                                    //
+                                    // Three kinds of cell get the same empty box. The first
+                                    // is the grid padding around the month. The other two
+                                    // are days the app has no claim about:
+                                    //
+                                    //   - after the logical today: the future, which cannot
+                                    //     have been abstinent yet.
+                                    //   - before [statsFrom]: the span the user excluded from
+                                    //     every statistic (R.string.stats_from_desc). Entries
+                                    //     there are excluded too, so a coloured cell would
+                                    //     show the heat-map counting what the Statistics
+                                    //     screen does not.
+                                    //
+                                    // Both used to render as a neutral cell, which is the
+                                    // same square an abstinent day gets. The legend calls
+                                    // that colour "no entry" and that stayed true, but a
+                                    // whole grid of it reads as recorded abstinence -- and
+                                    // with statsFromDate defaulting to the install date
+                                    // (AppPreferences.toAppSettings), every fresh install
+                                    // showed a year of it. Drawing nothing says nothing.
+                                    //
+                                    // The empty box keeps its size and padding, so the week
+                                    // columns stay aligned, and it carries no click target
+                                    // and no semantics: a hidden day is inert and silent to
+                                    // a screen reader, like the padding cells always were.
+                                    val outsideWindow = cellDate == null ||
+                                        cellDate.isAfter(today) ||
+                                        (statsFrom != null && cellDate.isBefore(statsFrom))
+                                    if (outsideWindow) {
                                         // Empty placeholder to preserve grid alignment
                                         Box(Modifier.size(cellSize).padding(cellGap / 2))
                                     } else {
-                                        val date = ym.atDay(dayNum).toString() // "YYYY-MM-DD"
+                                        // Derived from dayNum again rather than reusing the
+                                        // nullable `cellDate`: this branch needs a plain
+                                        // LocalDate, and the guard above already established
+                                        // that dayNum names a day of this month.
+                                        val localDate = ym.atDay(dayNum)
+                                        val date = localDate.toString() // "YYYY-MM-DD"
                                         val summary = summaries[date]
                                         val color = when {
                                             summary == null || summary.totalGrams == 0.0 -> empty
                                             AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams) -> red
                                             else -> green
                                         }
-                                        val localDate = ym.atDay(dayNum)
                                         val isToday = localDate == today
                                         // Per-cell accessibility label: the under/over-limit
                                         // state is conveyed on screen by cell COLOUR alone, so a

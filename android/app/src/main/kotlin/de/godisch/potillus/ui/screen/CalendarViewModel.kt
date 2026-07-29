@@ -87,6 +87,16 @@ data class CalendarUiState(
     /** Logical today as a LocalDate, respecting the configured day-change time. */
     val today: LocalDate = LocalDate.now(DayResolver.clock()),
     val daySummaries: Map<String, DaySummary> = emptyMap(),
+    /**
+     * The statistics start floor as a date, or `null` when none is configured.
+     *
+     * Parsed once in the ViewModel rather than carried as the raw
+     * [de.godisch.potillus.domain.model.AppSettings.statsFromDate] string, so the
+     * year heat-map compares two [LocalDate] values like it already does for
+     * [today] instead of re-deriving a date per cell. The empty-string sentinel
+     * ("no floor set", see AppSettings.statsFromDate) becomes `null` here.
+     */
+    val statsFrom: LocalDate? = null,
     val selectedDate: String? = null,
     val selectedEntries: List<ConsumptionEntry> = emptyList(),
     val totalGramsSelected: Double = 0.0,
@@ -128,6 +138,7 @@ private data class CalendarParams(
     val month: YearMonth,
     val year: Int,
     val today: LocalDate,
+    val statsFrom: LocalDate?,
     val selDate: String?,
     val limitInfo: LimitInfo,
     val from: String,
@@ -210,6 +221,15 @@ class CalendarViewModel(
     ) { mode, month, selDate, settings, _ ->
         val todayStr = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
         val todayDate = DayResolver.parseDate(todayStr)
+        // The statistics start floor, as a date. An empty string is the "not
+        // configured" sentinel (AppSettings.statsFromDate), and a stored value
+        // that is not a canonical date makes DayResolver.parseDate throw — inside
+        // this combine block that would take the Calendar screen down, so an
+        // unreadable floor is treated as no floor rather than as a crash. Both
+        // cases arrive downstream as null.
+        val statsFromDate = settings.statsFromDate.takeIf { it.isNotEmpty() }?.let { floor ->
+            runCatching { DayResolver.parseDate(floor) }.getOrNull()
+        }
         // year is always derived from the current _month value so both
         // are structurally consistent without a separate StateFlow.
         val year = month.year
@@ -217,7 +237,7 @@ class CalendarViewModel(
             CalendarViewMode.MONTH -> DayResolver.formatDate(month.atDay(1)) to DayResolver.formatDate(month.atEndOfMonth())
             CalendarViewMode.YEAR -> "$year-01-01" to "$year-12-31"
         }
-        CalendarParams(mode, month, year, todayDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
+        CalendarParams(mode, month, year, todayDate, statsFromDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
     }
         // Swallow the once-per-minute ticks on which nothing — including the
         // logical day — actually changed, so the DB stages below restart only on
@@ -236,6 +256,7 @@ class CalendarViewModel(
                     currentMonth = p.month,
                     currentYear = p.year,
                     today = p.today,
+                    statsFrom = p.statsFrom,
                     daySummaries = summaries.associateBy { it.date },
                     selectedDate = p.selDate,
                     limitInfo = p.limitInfo,

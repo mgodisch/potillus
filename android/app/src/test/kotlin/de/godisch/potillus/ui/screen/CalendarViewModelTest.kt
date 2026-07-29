@@ -139,6 +139,64 @@ class CalendarViewModelTest {
         }
     }
 
+    // ── Statistics start floor ────────────────────────────────────────────────
+
+    /**
+     * A configured statistics start date reaches the state as a parsed date.
+     *
+     * The year heat-map draws nothing before this day, so the value has to
+     * survive the combine block rather than staying in the settings snapshot.
+     */
+    @Test fun `configured statistics start reaches the state as a date`() = runTest {
+        prefs = FakeAppPreferences(
+            AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = "2026-03-01"),
+        )
+        val vm = makeVm()
+        vm.uiState.test {
+            var s = awaitItem()
+            while (s.statsFrom == null) s = awaitItem()
+            assertEquals(DayResolver.parseDate("2026-03-01"), s.statsFrom)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * The empty-string sentinel means "no floor configured" and stays null, so
+     * the heat-map draws every day up to today.
+     */
+    @Test fun `empty statistics start leaves the floor unset`() = runTest {
+        prefs = FakeAppPreferences(
+            AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = ""),
+        )
+        val vm = makeVm()
+        vm.uiState.test {
+            var s = awaitItem()
+            while (s.selectedDate == null) s = awaitItem()
+            assertNull(s.statsFrom)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /**
+     * A stored floor that is not a canonical date is treated as no floor.
+     *
+     * DayResolver.parseDate throws on such input, and the combine block runs on
+     * every settings emission and every ticker tick: an exception there would
+     * take the Calendar screen down for as long as the value stays stored.
+     */
+    @Test fun `unparseable statistics start is treated as no floor`() = runTest {
+        prefs = FakeAppPreferences(
+            AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = "2026-02-30"),
+        )
+        val vm = makeVm()
+        vm.uiState.test {
+            var s = awaitItem()
+            while (s.selectedDate == null) s = awaitItem()
+            assertNull(s.statsFrom)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ── Month navigation ──────────────────────────────────────────────────────
 
     /**
