@@ -159,10 +159,18 @@ extension CalendarScreen {
     /// (`systemBackground`: #FFFFFF light, #000000 dark):
     ///
     ///   light #DDE3F0  L* 90.1  -> delta L* 9.9
-    ///   dark  #1B1B1D  L*  9.8  -> delta L* 9.8
+    ///   dark  #242426  L* 14.3  -> delta L* 14.3
     ///
-    /// Both match the 9.9 of Android's light theme, the one judged good on a
-    /// device; the light value IS Android's, so the two ports now agree. A WCAG
+    /// The light value is Android's, matching its 9.9, and the two ports agree
+    /// there. The DARK one is deliberately larger. Android's dark grid sits on
+    /// #1E2538 (L* 14.9) while this one sits on #000000, and the same lightness
+    /// step read as less from that darker foot — 9.8 was judged too faint on a
+    /// device, 14.3 right. L* is near-linear in perception across the midrange,
+    /// but a near-black background is where that stops holding, so the two dark
+    /// themes carry different numbers to look alike.
+    ///
+    /// The value keeps the faint blue cast of Apple's dark greys and lands
+    /// between systemGray6 (L* 10.3) and systemGray5 (L* 18.1). A WCAG
     /// ratio is the wrong instrument here and 1.4.11's 3:1 the wrong target —
     /// see `heatmapEmptyColor` in Android's Color.kt for the reasoning, which
     /// applies unchanged. Re-measure delta L* rather than the ratio, and check on
@@ -177,7 +185,7 @@ extension CalendarScreen {
     /// measurements behind the two values.
     private var emptyCellFill: Color {
         colorScheme == .dark
-            ? Color(red: 0x1B / 255, green: 0x1B / 255, blue: 0x1D / 255)
+            ? Color(red: 0x24 / 255, green: 0x24 / 255, blue: 0x26 / 255)
             : Color(red: 0xDD / 255, green: 0xE3 / 255, blue: 0xF0 / 255)
     }
 
