@@ -138,7 +138,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Αντίγραφο ασφαλείας</string>
-    <string name="backup_desc">Πλήρες αντίγραφο ασφαλείας (εγγραφές + ποτά) ως αρχείο JSON</string>
+    <string name="backup_include_settings">Συμπερίληψη ρυθμίσεων</string>
+    <string name="backup_desc_with_settings">Ένα αρχείο JSON με τα ποτά σας, το ημερολόγιό σας και τις ρυθμίσεις σας — συμπεριλαμβανομένου του σωματικού σας βάρους. Δεν φεύγει ποτέ από αυτήν τη συσκευή, εκτός αν το στείλετε εσείς.</string>
+    <string name="backup_desc_without_settings">Ένα αρχείο JSON με τα ποτά σας και το ημερολόγιό σας. Οι ρυθμίσεις σας, συμπεριλαμβανομένου του σωματικού σας βάρους, δεν περιλαμβάνονται.</string>
     <string name="backup_export">Εξαγωγή</string>
     <string name="backup_import">Εισαγωγή</string>
     <string name="import_mode_question">Πώς να εισαχθούν τα δεδομένα;</string>

@@ -231,16 +231,20 @@ class SettingsViewModel(
      * Exports all drinks and entries to a JSON backup file in shared storage and,
      * on success, sets [shareTarget] so the screen can offer a share sheet.
      * Updates [exportStatus] with the result.
+     *
+     * @param includeSettings When false, the file carries drinks and entries only
+     *        and the `settings` key is left out, so importing it elsewhere leaves
+     *        that device's preferences — body weight included — as they are.
      */
     @AndroidIoBound
-    fun exportBackup() {
+    fun exportBackup(includeSettings: Boolean = true) {
         viewModelScope.launch {
             val entries = entryRepo.getAll()
             val drinks = drinkRepo.drinks.first()
             // The preferences live in a separate DataStore, so the backup only
             // captures them if we read a snapshot here and hand it to the writer.
             // Without this the exported JSON would omit every user setting.
-            val settings = prefs.settingsFlow.first()
+            val settings = if (includeSettings) prefs.settingsFlow.first() else null
             val result = withContext(Dispatchers.IO) {
                 BackupManager.exportToJson(appContext, drinks, entries, settings)
             }

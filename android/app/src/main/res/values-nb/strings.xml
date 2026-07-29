@@ -171,7 +171,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sikkerhetskopiering</string>
-    <string name="backup_desc">Fullstendig sikkerhetskopi (registreringer + drikker) som JSON-fil</string>
+    <string name="backup_include_settings">Ta med innstillinger</string>
+    <string name="backup_desc_with_settings">En JSON-fil med drinkene dine, loggen din og innstillingene dine — inkludert kroppsvekten din. Den forlater aldri denne enheten, med mindre du selv sender den.</string>
+    <string name="backup_desc_without_settings">En JSON-fil med drinkene dine og loggen din. Innstillingene dine, inkludert kroppsvekten din, utelates.</string>
     <string name="backup_export">Eksporter</string>
     <string name="backup_import">Importer</string>
 

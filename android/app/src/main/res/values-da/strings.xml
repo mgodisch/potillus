@@ -138,7 +138,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sikkerhedskopi</string>
-    <string name="backup_desc">Fuld sikkerhedskopi (poster + drikkevarer) som JSON-fil</string>
+    <string name="backup_include_settings">Medtag indstillinger</string>
+    <string name="backup_desc_with_settings">En JSON-fil med dine drikke, din log og dine indstillinger — inklusive din kropsvægt. Den forlader aldrig denne enhed, medmindre du selv sender den.</string>
+    <string name="backup_desc_without_settings">En JSON-fil med dine drikke og din log. Dine indstillinger, inklusive din kropsvægt, udelades.</string>
     <string name="backup_export">Eksporter</string>
     <string name="backup_import">Importer</string>
     <string name="import_mode_question">Hvordan skal data importeres?</string>

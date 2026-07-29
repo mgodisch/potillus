@@ -150,7 +150,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sauvegarde</string>
-    <string name="backup_desc">Sauvegarde complète (entrées + boissons) en JSON</string>
+    <string name="backup_include_settings">Inclure les réglages</string>
+    <string name="backup_desc_with_settings">Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l\'envoyez quelque part.</string>
+    <string name="backup_desc_without_settings">Un fichier JSON contenant vos boissons et votre journal. Vos réglages, y compris votre poids corporel, ne sont pas inclus.</string>
     <string name="backup_export">Exporter</string>
     <string name="backup_import">Importer</string>
     <string name="import_mode_question">Comment importer les données ?</string>

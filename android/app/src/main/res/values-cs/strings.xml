@@ -138,7 +138,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Záloha</string>
-    <string name="backup_desc">Úplná záloha (záznamy + nápoje) jako soubor JSON</string>
+    <string name="backup_include_settings">Zahrnout nastavení</string>
+    <string name="backup_desc_with_settings">Soubor JSON s vašimi nápoji, deníkem a nastavením — včetně vaší tělesné hmotnosti. Nikdy neopustí toto zařízení, pokud jej sami neodešlete.</string>
+    <string name="backup_desc_without_settings">Soubor JSON s vašimi nápoji a deníkem. Vaše nastavení, včetně tělesné hmotnosti, zůstává stranou.</string>
     <string name="backup_export">Exportovat</string>
     <string name="backup_import">Importovat</string>
     <string name="import_mode_question">Jak importovat data?</string>

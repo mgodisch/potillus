@@ -109,6 +109,15 @@ fun SettingsScreen(
     var showStatDatePicker by rememberSaveable { mutableStateOf(false) }
     var pendingImportUri by rememberSaveable { mutableStateOf<android.net.Uri?>(null) }
 
+    // What the NEXT export writes, not a stored preference: on at every open, like
+    // iOS' @State in SettingsScreen.swift. It belongs HERE and not inside the
+    // backup card's `item { }`: a LazyColumn disposes items that scroll out of
+    // view, so a plain `remember` down there would silently flip the switch back
+    // on whenever the card left the screen and came back. rememberSaveable for the
+    // same reason the dialog flags above use it — a rotation must not change what
+    // the Export button is about to write.
+    var includeSettingsInExport by rememberSaveable { mutableStateOf(true) }
+
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             pendingImportUri = uri
@@ -322,13 +331,39 @@ fun SettingsScreen(
             item {
                 SectionCard {
                     Text(
-                        stringResource(R.string.backup_desc),
+                        stringResource(
+                            if (includeSettingsInExport) {
+                                R.string.backup_desc_with_settings
+                            } else {
+                                R.string.backup_desc_without_settings
+                            },
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(8.dp))
+                    // Above the buttons, in reading order: the switch describes the
+                    // file the Export button is about to write.
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            stringResource(R.string.backup_include_settings),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Switch(
+                            checked = includeSettingsInExport,
+                            onCheckedChange = { includeSettingsInExport = it },
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = { vm.exportBackup() }, modifier = Modifier.weight(1f)) {
+                        OutlinedButton(
+                            onClick = { vm.exportBackup(includeSettingsInExport) },
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text(stringResource(R.string.backup_export))
                         }
                         OutlinedButton(onClick = { importLauncher.launch("application/json") }, modifier = Modifier.weight(1f)) {

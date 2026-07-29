@@ -178,7 +178,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">備份</string>
-    <string name="backup_desc">完整備份（記錄 + 飲品）為 JSON 檔案</string>
+    <string name="backup_include_settings">包含設定</string>
+    <string name="backup_desc_with_settings">一個包含你的飲品、記錄和設定（含體重）的 JSON 檔案。除非你自行傳送，否則絕不會離開此裝置。</string>
+    <string name="backup_desc_without_settings">一個包含你的飲品和記錄的 JSON 檔案。你的設定（含體重）不包含在內。</string>
     <string name="backup_export">匯出</string>
     <string name="backup_import">匯入</string>
 

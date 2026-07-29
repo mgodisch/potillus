@@ -47,6 +47,20 @@ class BackupManagerParseDefaultsTest {
         assertTrue(result.entries.isEmpty())
     }
 
+    /**
+     * A file written with the export switch off has no `settings` key, and that
+     * absence must reach the caller as a null rather than as a block of defaults.
+     * The caller then leaves the local preferences alone; defaults would overwrite
+     * them with values the exporting device never chose. This is the property the
+     * "Include settings" switch rests on, from both ports.
+     */
+    @Test fun `backup without a settings block yields no settings`() {
+        val json = """{"version":3,"drinks":[],"entries":[]}"""
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertNull(result.settings)
+    }
+
     @Test fun `a drink with only required fields uses defaults`() {
         val json = """{"version":1,"drinks":[{"name":"Beer","volumeMl":500,"alcoholPercent":5.0}]}"""
         val result = BackupManager.parseBackupJson(json)

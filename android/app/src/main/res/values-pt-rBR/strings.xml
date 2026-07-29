@@ -180,7 +180,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Backup</string>
-    <string name="backup_desc">Backup completo (registros + bebidas) como arquivo JSON</string>
+    <string name="backup_include_settings">Incluir configurações</string>
+    <string name="backup_desc_with_settings">Um arquivo JSON com suas bebidas, seu registro e suas configurações — incluindo seu peso corporal. Ele nunca sai deste dispositivo, a menos que você o envie.</string>
+    <string name="backup_desc_without_settings">Um arquivo JSON com suas bebidas e seu registro. Suas configurações, incluindo seu peso corporal, ficam de fora.</string>
     <string name="backup_export">Exportar</string>
     <string name="backup_import">Importar</string>
 

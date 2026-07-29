@@ -168,7 +168,13 @@ object BackupManager {
      * @param context  Context for ContentResolver access.
      * @param drinks   Current drink catalogue (including presets).
      * @param entries  All consumption entries.
-     * @param settings Current user preferences snapshot to embed (format 3+).
+     * @param settings Current user preferences snapshot to embed (format 3+), or
+     *                 `null` to omit the `settings` key entirely. Omission and a
+     *                 block of defaults are not the same thing: an absent key
+     *                 tells the importer to leave the local settings alone, while
+     *                 a defaulted one would overwrite them with someone else's.
+     *                 iOS draws the same distinction in `BackupExporter
+     *                 .makeBackup(includeSettings:)`.
      * @return [ExportResult] on success; `null` on I/O error.
      */
     @AndroidIoBound
@@ -176,7 +182,7 @@ object BackupManager {
         context: Context,
         drinks: List<DrinkDefinition>,
         entries: List<ConsumptionEntry>,
-        settings: AppSettings,
+        settings: AppSettings?,
     ): ExportResult? {
         // Capture Instant.now() once so the file name and the
         // "exportedAt" field in the JSON root are guaranteed to match exactly,
@@ -230,27 +236,40 @@ object BackupManager {
                     }
                 },
             )
-            put(
-                "settings",
-                // The user preferences live in a separate encrypted DataStore, so
-                // they must be serialised explicitly here (format 3+). Field names
-                // mirror [AppSettings]; enums are stored by their stable `name`.
-                // These keys are read back in [parseSettings] with the same names.
-                JSONObject().apply {
-                    put("themeMode", settings.themeMode.name)
-                    put("dayChangeHour", settings.dayChangeHour)
-                    put("dayChangeMinute", settings.dayChangeMinute)
-                    put("dailyLimitGrams", settings.dailyLimitGrams)
-                    put("weeklyLimitGrams", settings.weeklyLimitGrams)
-                    put("maxDrinkDaysPerWeek", settings.maxDrinkDaysPerWeek)
-                    put("statsFromDate", settings.statsFromDate)
-                    put("biometricEnabled", settings.biometricEnabled)
-                    put("allowScreenshots", settings.allowScreenshots)
-                    put("alternativeStatusSymbols", settings.alternativeStatusSymbols)
-                    put("language", settings.language)
-                    put("weightKg", settings.weightKg)
-                },
-            )
+            // Written only when a snapshot was handed in. A `settings` key that is
+            // absent means "the importer should leave my settings alone", which is
+            // exactly what the export switch expresses; see [parseBackupJson],
+            // which returns a null [ImportResult.settings] for a file without the
+            // key and leaves the local preferences untouched.
+            settings?.let { snapshot ->
+                put(
+                    "settings",
+                    // The user preferences live in a separate encrypted DataStore, so
+                    // they must be serialised explicitly here (format 3+). Field names
+                    // mirror [AppSettings]; enums are stored by their stable `name`.
+                    // These keys are read back in [parseSettings] with the same names.
+                    JSONObject().apply {
+                        put("themeMode", snapshot.themeMode.name)
+                        put("dayChangeHour", snapshot.dayChangeHour)
+                        put("dayChangeMinute", snapshot.dayChangeMinute)
+                        put("dailyLimitGrams", snapshot.dailyLimitGrams)
+                        put("weeklyLimitGrams", snapshot.weeklyLimitGrams)
+                        put("maxDrinkDaysPerWeek", snapshot.maxDrinkDaysPerWeek)
+                        put("statsFromDate", snapshot.statsFromDate)
+                        put("biometricEnabled", snapshot.biometricEnabled)
+                        put("allowScreenshots", snapshot.allowScreenshots)
+                        put("alternativeStatusSymbols", snapshot.alternativeStatusSymbols)
+                        put("language", snapshot.language)
+                        put("weightKg", snapshot.weightKg)
+                    },
+                )
+            }
+            // The export switch itself is deliberately NOT among these keys, and it
+            // is not a stored preference either. Were it carried here, it could only
+            // ever be written as "on": a file written with the switch off has no
+            // settings block to carry it in. The value would be a constant, and a
+            // constant tells an importer nothing. It lives as screen state in
+            // SettingsScreen, on at every open, matching iOS.
         }
 
         val contentValues = ContentValues().apply {

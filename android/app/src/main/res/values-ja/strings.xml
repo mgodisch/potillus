@@ -176,7 +176,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">バックアップ</string>
-    <string name="backup_desc">完全バックアップ（記録＋飲み物）を JSON ファイルとして保存</string>
+    <string name="backup_include_settings">設定を含める</string>
+    <string name="backup_desc_with_settings">飲み物、記録、設定（体重を含む）を含む JSON ファイルです。自分で送信しない限り、この端末から外に出ることはありません。</string>
+    <string name="backup_desc_without_settings">飲み物と記録を含む JSON ファイルです。体重を含む設定は含まれません。</string>
     <string name="backup_export">エクスポート</string>
     <string name="backup_import">インポート</string>
 

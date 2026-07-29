@@ -169,7 +169,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Резервна копія</string>
-    <string name="backup_desc">Повна резервна копія (записи + напої) як файл JSON</string>
+    <string name="backup_include_settings">Включити налаштування</string>
+    <string name="backup_desc_with_settings">Файл JSON з вашими напоями, журналом і налаштуваннями — включно з масою тіла. Він ніколи не залишає цей пристрій, якщо ви самі його не надішлете.</string>
+    <string name="backup_desc_without_settings">Файл JSON з вашими напоями та журналом. Ваші налаштування, включно з масою тіла, не включаються.</string>
     <string name="backup_export">Експортувати</string>
     <string name="backup_import">Імпортувати</string>
 

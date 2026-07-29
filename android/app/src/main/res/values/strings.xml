@@ -278,7 +278,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Settings section header: Backup. -->
     <string name="backup_section">Backup</string>
     <!-- Settings > Backup: description of the full JSON backup. -->
-    <string name="backup_desc">Full backup (drinks &amp; log) as a JSON file</string>
+    <!-- Settings > Backup: switch deciding whether the export carries the settings block. -->
+    <string name="backup_include_settings">Include settings</string>
+    <!-- Settings > Backup: description while 'Include settings' is on. -->
+    <string name="backup_desc_with_settings">A JSON file containing your drinks, your log, and your settings — including your body weight. It never leaves this device unless you send it somewhere.</string>
+    <!-- Settings > Backup: description while 'Include settings' is off. -->
+    <string name="backup_desc_without_settings">A JSON file containing your drinks and your log. Your settings, including your body weight, are left out.</string>
     <!-- Settings > Backup: 'Export' button; also the export-range dialog confirm button. -->
     <string name="backup_export">Export</string>
     <!-- Settings > Backup: 'Import' button and import-mode dialog title. -->

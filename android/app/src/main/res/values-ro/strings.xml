@@ -178,7 +178,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_csv">CSV</string>
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Copie de rezervă</string>
-    <string name="backup_desc">Copie de rezervă completă (înregistrări + băuturi) ca fișier JSON</string>
+    <string name="backup_include_settings">Include setările</string>
+    <string name="backup_desc_with_settings">Un fișier JSON cu băuturile tale, jurnalul tău și setările tale — inclusiv greutatea ta corporală. Nu părăsește niciodată acest dispozitiv decât dacă îl trimiți tu.</string>
+    <string name="backup_desc_without_settings">Un fișier JSON cu băuturile tale și jurnalul tău. Setările tale, inclusiv greutatea corporală, rămân excluse.</string>
     <string name="backup_export">Exportă</string>
     <string name="backup_import">Importă</string>
 

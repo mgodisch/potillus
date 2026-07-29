@@ -47,6 +47,7 @@ Edit drinks from the list's edit mode
 ### Added
 
 - The statistics start date has a row that clears it.
+- The backup export has a switch for the settings block.
 
 ### Changed
 
