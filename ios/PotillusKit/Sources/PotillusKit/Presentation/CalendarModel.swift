@@ -30,9 +30,13 @@ import Observation
 // CalendarModel.swift – a month of logical days
 // =============================================================================
 //
-// The counterpart of Android's `CalendarViewModel`, month view only. The YEAR
-// view is deliberately absent: it is a second layout over the same summaries, and
-// it arrives with the Statistics screen, which already owns per-month aggregation.
+// The counterpart of Android's `CalendarViewModel`, month and year. The year view
+// is a second layout over the same summaries: `YearGrid` lays out twelve months,
+// the cells read from the same `summaries` dictionary, and only the query range
+// widens. It was left out until 0.85.0 on the reasoning that the Statistics
+// screen already owns per-month aggregation — but that screen aggregates, and
+// this one shows the individual days, which is a different question about the
+// same data and the reason Android has carried both layouts from the start.
 //
 // THE MONTH IS NOT AN INSTANT
 //   A cell is a logical day — the string "2026-01-02" — because that is what the
@@ -41,14 +45,30 @@ import Observation
 //   Only "today" is read from the clock, once.
 // =============================================================================
 
+/// Which layout the calendar screen draws.
+///
+/// The raw values match Android's `CalendarViewMode` entries, so the two ports
+/// name the same two states.
+public enum CalendarViewMode: String, Sendable, Equatable {
+    case month = "MONTH"
+    case year = "YEAR"
+}
+
 /// What the calendar screen shows.
 public struct CalendarState: Sendable, Equatable {
 
     public var year: Int = 0
     public var month: Int = 0
 
+    /// Month layout or year heat-map. The month is what the screen opens on.
+    public var viewMode: CalendarViewMode = .month
+
     /// The grid: days, leading blanks, weekday headers.
     public var grid = MonthGrid(year: 2026, month: 1, firstDayOfWeekIso: 1)
+
+    /// The year layout, valid while `viewMode` is `.year`. Carries the drawn
+    /// window (statistics start date through today) alongside the twelve months.
+    public var yearGrid = YearGrid(year: 2026, firstDayOfWeekIso: 1, today: "", statsFrom: "")
 
     /// Summaries for the visible month, keyed by logical date. A day with no
     /// entries is absent, not zero.
@@ -114,6 +134,11 @@ public final class CalendarModel {
     /// The live subscriptions, torn down by `stop()`.
     private var observations: [Task<Void, Never>] = []
 
+    /// The statistics start date, as stored (empty means none). Held rather than
+    /// re-read per redraw: `load()` refreshes it, and the year layout hands it to
+    /// `YearGrid`, which turns the empty sentinel into "no lower bound".
+    private var statsFromDate: String = ""
+
     public init(
         entries: any EntryRepositoryProtocol,
         drinks: any DrinkRepositoryProtocol,
@@ -155,6 +180,10 @@ public final class CalendarModel {
         state.today = today
         state.limitInfo = AlcoholCalculator.getLimitInfo(settings)
         state.drinks = (try? drinks.allOnce()) ?? []
+        // Kept for the year layout's window. Read on every load, so clearing the
+        // date in Settings ("Include all history") reaches an open calendar
+        // through the settings observation like any other preference change.
+        statsFromDate = settings.statsFromDate
 
         if state.year == 0 {
             // "2026-01-02" — parsed as integers, not as a date.
@@ -162,7 +191,39 @@ public final class CalendarModel {
             state.year = parts.count == 3 ? parts[0] : 2026
             state.month = parts.count == 3 ? parts[1] : 1
         }
-        await reloadMonth()
+        await reloadVisiblePeriod()
+    }
+
+    /// Loads whichever period the current view mode shows.
+    private func reloadVisiblePeriod() async {
+        switch state.viewMode {
+        case .month: await reloadMonth()
+        case .year: await reloadYear()
+        }
+    }
+
+    /// Fetches the visible year's summaries and re-reads the selection.
+    ///
+    /// One query for twelve months, exactly as the month path does for one: the
+    /// cells read from the same `summaries` dictionary, so nothing downstream has
+    /// to know which layout asked for it.
+    private func reloadYear() async {
+        state.yearGrid = YearGrid(
+            year: state.year,
+            firstDayOfWeekIso: firstDayOfWeekIso,
+            today: state.today,
+            statsFrom: statsFromDate
+        )
+        let range = state.yearGrid.range
+
+        do {
+            let summaries = try entries.dailySummaries(from: range.from, to: range.to)
+            state.summaries = Dictionary(uniqueKeysWithValues: summaries.map { ($0.date, $0) })
+            try reloadSelection()
+            failure = nil
+        } catch {
+            failure = String(describing: error)
+        }
     }
 
     /// Fetches the visible month's summaries and re-reads the selection.
@@ -196,10 +257,11 @@ public final class CalendarModel {
     // ── Observation ──────────────────────────────────────────────────────────
     //
     // The calendar observes the SAME triggers as the statistics screen — the set of
-    // logged dates and the settings — but reloads the CURRENT month rather than a
-    // fixed window. The month changes underfoot when the user pages, so the stream
-    // must not carry a range: it carries the fact that something changed, and
-    // `reloadMonth()` reads whichever month is on screen when it fires.
+    // logged dates and the settings — but reloads the CURRENT period rather than a
+    // fixed window. That period changes underfoot when the user pages or switches
+    // layout, so the stream must not carry a range: it carries the fact that
+    // something changed, and `reloadVisiblePeriod()` reads whichever month or year
+    // is on screen when it fires.
     //
     // `observeDailySummaries(from:to:)` would tie the stream to one month and would
     // have to be resubscribed on every page turn. `observeAllDates()` is month-blind
@@ -216,9 +278,11 @@ public final class CalendarModel {
     ///
     /// Unlike `StatsModel`, this calls `load()` up front rather than leaning on the
     /// first emission: `load()` resolves today and seeds `state.year`/`state.month`,
-    /// which `reloadMonth()` needs before it can pick a month. The entry stream then
-    /// drives `reloadMonth()` — the grid, not the whole model — and the settings
-    /// stream drives `load()`, because a changed day-boundary moves what today is.
+    /// which the reload paths need before they can pick a period. The entry stream
+    /// then drives `reloadVisiblePeriod()` — the grid on screen, not the whole model
+    /// — and the settings stream drives `load()`, because a changed day-boundary
+    /// moves what today is, and a changed statistics start date moves the year
+    /// view's window.
     public func start() async {
         stop()
         await load()
@@ -234,7 +298,7 @@ public final class CalendarModel {
                         // check that late element would still write state — the
                         // "a stopped observation still fired" the tests guard.
                         if Task.isCancelled { break }
-                        await self.reloadMonth()
+                        await self.reloadVisiblePeriod()
                     }
                 } catch {
                     self.failure = String(describing: error)
@@ -322,6 +386,31 @@ public final class CalendarModel {
         await reloadMonth()
     }
 
+    /// Switches between the month layout and the year heat-map.
+    ///
+    /// The selection is dropped on the way, matching Android's `toggleViewMode`:
+    /// a day picked in one layout has no place in the other, and carrying it
+    /// would leave the detail panel showing a day the grid no longer marks.
+    public func toggleViewMode() async {
+        state.viewMode = state.viewMode == .month ? .year : .month
+        clearSelection()
+        await reloadVisiblePeriod()
+    }
+
+    /// Integer arithmetic again, and no month bookkeeping: the year layout draws
+    /// all twelve, so paging moves the year alone.
+    public func previousYear() async {
+        state.year -= 1
+        clearSelection()
+        await reloadYear()
+    }
+
+    public func nextYear() async {
+        state.year += 1
+        clearSelection()
+        await reloadYear()
+    }
+
     /// A selection belongs to the month it was made in; carrying it across would
     /// show January's entries under a February heading.
     private func clearSelection() {
@@ -399,7 +488,7 @@ public final class CalendarModel {
             failure = String(describing: error)
             return
         }
-        await reloadMonth()
+        await reloadVisiblePeriod()
     }
 
     public func deleteEntry(_ entry: ConsumptionEntry) async {
@@ -409,11 +498,11 @@ public final class CalendarModel {
             failure = String(describing: error)
             return
         }
-        await reloadMonth()
+        await reloadVisiblePeriod()
     }
 
-    /// Applies an edited entry, then reloads the month so both the grid summary
-    /// and the selected-day list reflect the change. The entry keeps its `id`
+    /// Applies an edited entry, then reloads the visible period so both the grid
+    /// summary and the selected-day list reflect the change. The entry keeps its `id`
     /// and `logicalDate`, so editing volume/percent/time/note updates the row
     /// in place — the same contract as Android's `updateEntry`, which the
     /// repository's `update` preserves.
@@ -424,7 +513,7 @@ public final class CalendarModel {
             failure = String(describing: error)
             return
         }
-        await reloadMonth()
+        await reloadVisiblePeriod()
     }
 
     /// Whether a day exceeded the daily limit. Absent days are not over.

@@ -38,16 +38,21 @@ import SwiftUI
 
 struct CalendarScreen: View {
 
-    @Environment(\.appLocale) private var locale
+    // Not `private`: the year heat-map lives in an extension in
+    // CalendarScreenYear.swift, and `private` reaches only as far as the file
+    // its declaration sits in. Exactly the three members that extension needs
+    // are internal; everything else on this view stays private, as StatsScreen
+    // does for StatsScreenExport.
+    @Environment(\.appLocale) var locale
 
     /// Observed so a return from the background reloads at once (below).
     @Environment(\.scenePhase) private var scenePhase
 
     /// Read for the selected day's tint only: the wash that reads clearly on
     /// white needs to be stronger against the dark theme's near-black surface.
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorScheme) var colorScheme
 
-    @State private var model: CalendarModel
+    @State var model: CalendarModel
 
     /// The entry being edited, if any — drives the edit sheet (UI parity with
     /// Android's calendar edit action).
@@ -92,9 +97,15 @@ struct CalendarScreen: View {
             // views carries its own `.padding(.horizontal)`).
             List {
                 Section {
-                    monthHeader
-                    weekdayHeader
-                    grid
+                    if model.state.viewMode == .month {
+                        monthHeader
+                        weekdayHeader
+                        grid
+                    } else {
+                        yearHeader
+                        yearGrid
+                        yearLegend
+                    }
                 }
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
@@ -106,6 +117,20 @@ struct CalendarScreen: View {
             .navigationTitle(Loc.string("Calendar", locale: locale))
             .appOverflowMenu(environment: environment)
             .toolbar {
+                // Month ⇄ year, the counterpart of Android's text button in the
+                // same corner. Leading, so it cannot displace the "+" and edit
+                // items that the other screens carry on the trailing side and
+                // that appear and vanish with the selection.
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        Task { await model.toggleViewMode() }
+                    } label: {
+                        Text(Loc.string(
+                            model.state.viewMode == .month ? "Year" : "Month",
+                            locale: locale
+                        ))
+                    }
+                }
                 // The counterpart of Android's floating action button, which is
                 // likewise shown only once a day is picked: without a selection
                 // there is no day to book onto, and a "+" that asks "which day?"
