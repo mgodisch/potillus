@@ -80,6 +80,7 @@ val SchwarzblauDunkel = Color(0xFF0D1018)
 val NachtBackground = SchwarzblauDunkel // near-black canvas
 val NachtSurface = Color(0xFF1E2538) // card / sheet surface
 val NachtSurfaceVariant = Color(0xFF252D45) // progress track, chip background
+val NachtHeatmapEmpty = Color(0xFF303A57) // year heat-map: a day with no entry
 val NachtOutline = Color(0xFF2A3050) // dividers, borders
 val NachtOnSurface = Color(0xFFE4E8F0) // primary text
 val NachtOnSurfaceVariant = Color(0xFF8896B3) // secondary text, captions
@@ -284,6 +285,33 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
  * 4.70 : 1, far below the 9.09 : 1 it has today.
  */
 @Composable fun dangerRedColor() = if (isDarkTheme()) NachtDanger else SchieferDanger
+
+/**
+ * The fill of a year heat-map cell with nothing logged.
+ *
+ * MEASURED (CIE L*, sRGB), against the card the grid sits on:
+ *
+ *   light #DDE3F0  L* 90.1 on SchieferSurface (#FFFFFF)  -> delta L* 9.9
+ *   dark  #303A57  L* 24.8 on NachtSurface   (#1E2538)  -> delta L* 9.9
+ *
+ * WHY DELTA L* AND NOT A CONTRAST RATIO
+ *   This cell has to be distinguishable from the card BEHIND it, because a day
+ *   with no entry and a day outside the drawn window (which is not painted at
+ *   all) must not look alike. Reported as a WCAG ratio, the light theme sits at
+ *   1.29 : 1 and reads well on a device, while the dark theme sat at 1.12 : 1 and
+ *   read as nothing at all — the ratio barely separates the two cases, so it is
+ *   the wrong instrument here. Lightness difference does separate them: 9.9
+ *   against 3.9. The dark value is chosen to match the light theme's 9.9, which
+ *   was judged good on hardware, keeping the same hue as the surface it sits on.
+ *
+ *   The 3:1 of WCAG 1.4.11 is deliberately NOT the target. It would make an empty
+ *   day compete with the days that carry data (4.54 : 1 and 3.25 : 1 in the dark
+ *   theme), which inverts the grid's meaning: the reading is in the filled cells.
+ *
+ *   Judge changes to these two values on a device, in both themes, and re-measure
+ *   delta L* rather than the ratio.
+ */
+@Composable fun heatmapEmptyColor() = if (isDarkTheme()) NachtHeatmapEmpty else SchieferSurfaceVariant
 
 /**
  * The red for over-limit TEXT and for the trend arrow glyphs that sit inside a

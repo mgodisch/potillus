@@ -50,21 +50,14 @@ package de.godisch.potillus.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -75,6 +68,7 @@ import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
+import de.godisch.potillus.ui.theme.heatmapEmptyColor
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -92,7 +86,8 @@ import java.time.format.FormatStyle
  *   - **nothing at all**            → the day lies outside the evaluated window:
  *                                     after [today], or before [statsFrom].
  *
- * Cells with a consumption entry are tappable; empty cells are inert.
+ * No cell is tappable: at 9.dp they are far below the 48.dp touch target a
+ * reliable tap needs, so the grid reads and the month view edits.
  *
  * HOW THE GRID INDEX WORKS:
  *   For month M starting on weekday `startPad` (0 = Mon):
@@ -109,7 +104,6 @@ import java.time.format.FormatStyle
  *                    Must be derived from DayResolver (not [LocalDate.now]) so the
  *                    day-change time is respected. Also the upper end of the
  *                    drawn window: later days render as nothing.
- * @param onDayClick  Called with the ISO-8601 date when the user taps a non-empty day.
  * @param modifier    Optional layout modifier for the outer [Column].
  * @param statsFrom   Statistics start floor, or `null` for none. Earlier days
  *                    render as nothing, entry or not, because they are excluded
@@ -121,7 +115,6 @@ fun YearCalendarView(
     summaries: Map<String, DaySummary>,
     limitGrams: Double,
     today: LocalDate,
-    onDayClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     weekStart: Int = 1,
     statsFrom: LocalDate? = null,
@@ -148,7 +141,7 @@ fun YearCalendarView(
     // Capture theme colours before entering Box/Column lambdas (see file header note)
     val green = MaterialTheme.colorScheme.primary
     val red = dangerRedColor()
-    val empty = MaterialTheme.colorScheme.surfaceVariant
+    val empty = heatmapEmptyColor()
     val todayBorder = MaterialTheme.colorScheme.outline
 
     // MEASURED AND LEFT AS THEY ARE (WCAG 1.4.11, 0.85.0 QA round).
@@ -257,8 +250,8 @@ fun YearCalendarView(
                                         // 1.4.1). We attach a "date, grams, status" description —
                                         // status reuses the same localized legend captions shown
                                         // below the grid. Only days that carry a summary are
-                                        // tappable and labelled; empty days stay inert and silent
-                                        // so the reader is not flooded with 300+ "no entry" nodes.
+                                        // labelled; empty days stay silent so the reader is not
+                                        // flooded with 300+ "no entry" nodes.
                                         // (The blue/red under/over palette is already colour-blind
                                         // distinguishable — it is not a red/green pair — so no
                                         // extra non-colour VISUAL cue is added here.)
@@ -275,38 +268,22 @@ fun YearCalendarView(
                                                 stringResource(statusRes),
                                             )
                                         }
-                                        var focused by remember { mutableStateOf(false) }
+                                        // NOT TAPPABLE, deliberately. A cell is 9.dp
+                                        // wide where a touch target must be 48.dp
+                                        // (WCAG 2.5.8, Material's own guidance): a
+                                        // target four times too small is one the user
+                                        // misses, and the neighbour they hit instead
+                                        // selects the wrong day silently. The month
+                                        // view is where a day is picked and edited;
+                                        // this grid is for reading. Nothing is lost —
+                                        // switching layouts clears the selection on
+                                        // both platforms anyway.
+                                        //
+                                        // No focus ring either: it marked where a tap
+                                        // would land, and nothing lands here now.
                                         Box(
                                             modifier = Modifier
                                                 .size(cellSize)
-                                                // FOCUS VISIBILITY (WCAG 2.4.7).
-                                                // The ring is drawn on the OUTER
-                                                // box, before the padding that
-                                                // insets the coloured square, so
-                                                // it lies on the card surface
-                                                // rather than on the cell colour.
-                                                // That matters: no single ring
-                                                // colour clears 3:1 against all
-                                                // four cell fills in both themes
-                                                // (onSurface reaches only 2.73:1
-                                                // on an under-limit cell in the
-                                                // dark theme, 1.44:1 in the
-                                                // light one), while against the
-                                                // card it has 12.42:1 and
-                                                // 14.73:1. One background, one
-                                                // answer.
-                                                .onFocusChanged { focused = it.isFocused }
-                                                .then(
-                                                    if (focused) {
-                                                        Modifier.border(
-                                                            1.dp,
-                                                            MaterialTheme.colorScheme.onSurface,
-                                                            RoundedCornerShape(2.dp),
-                                                        )
-                                                    } else {
-                                                        Modifier
-                                                    },
-                                                )
                                                 .padding(cellGap / 2)
                                                 .background(color, RoundedCornerShape(1.dp))
                                                 .then(
@@ -319,12 +296,13 @@ fun YearCalendarView(
                                                 .then(
                                                     // A labelled cell exposes its description to
                                                     // accessibility services; an empty cell adds
-                                                    // no semantics and stays silent.
+                                                    // no semantics and stays silent. Reading does
+                                                    // not depend on tapping, so the description
+                                                    // outlived the click that used to sit here.
                                                     cellDesc?.let { d ->
                                                         Modifier.semantics { contentDescription = d }
                                                     } ?: Modifier,
-                                                )
-                                                .clickable(enabled = summary != null, role = Role.Button) { onDayClick(date) },
+                                                ),
                                         )
                                     }
                                 }

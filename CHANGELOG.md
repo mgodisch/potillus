@@ -48,7 +48,7 @@ Edit drinks from the list's edit mode
 
 - The statistics start date has a row that clears it.
 - The backup export has a switch for the settings block.
-- A year heat-map in the calendar, with a month and year toggle.
+- A read-only year heat-map in the calendar, with a month and year toggle.
 
 ### Changed
 
@@ -120,6 +120,7 @@ Edit drinks from the list's edit mode
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
 - The base `strings.xml` section comments are in English.
 - The contrast summary in `theme/Color.kt` matches the measured values.
+- The empty cell in the year heat-map stands out from the card behind it.
 - The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
   directory marker, and `__pycache__` directories stay out of the tarball.
 

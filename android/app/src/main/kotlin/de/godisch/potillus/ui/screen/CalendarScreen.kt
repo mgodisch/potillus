@@ -185,7 +185,6 @@ fun CalendarScreen(
                             summaries = state.daySummaries,
                             limitGrams = state.limitInfo.limitGrams,
                             today = state.today,
-                            onDayClick = { date -> vm.selectDate(date) },
                             weekStart = state.weekStartDay,
                             statsFrom = state.statsFrom,
                         )
