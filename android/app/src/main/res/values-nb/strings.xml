@@ -63,6 +63,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Estimat · ikke for kjørebeslutninger</string>
     <string name="stats_from_label">Statistikk fra</string>
     <string name="stats_from_desc">Registreringer før denne datoen utelates fra all statistikk.</string>
+    <string name="stats_from_clear">Ta med hele historikken</string>
     <string name="body_weight">Kroppsvekt</string>
     <string name="not_set">ikke angitt</string>
 

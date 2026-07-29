@@ -292,6 +292,28 @@ fun SettingsScreen(
                         }
                         IconButton(onClick = { showStatDatePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
+                    // Clears the floor, which is the only way back to "count my
+                    // whole history". The empty string is a MEANINGFUL stored
+                    // value, not an absent one: AppPreferences.toAppSettings maps
+                    // a MISSING key to the install date, so a stored "" survives
+                    // the next launch instead of falling back to it. iOS writes
+                    // the same value from SettingsModel.clearStatsFromDate() and
+                    // carries the same label, so both ports read alike.
+                    //
+                    // Shown only while a floor is set: with none, the button
+                    // would offer a state the screen is already in. errorColor(),
+                    // matching the Replace choice in the import dialog — the
+                    // Material error ROLE for a choice that discards something,
+                    // not dangerRedColor(), which this app reserves for the
+                    // over-limit reading.
+                    if (settings.statsFromDate.isNotEmpty()) {
+                        TextButton(
+                            onClick = { vm.setStatsFromDate("") },
+                            modifier = Modifier.align(Alignment.End),
+                        ) {
+                            Text(stringResource(R.string.stats_from_clear), color = errorColor())
+                        }
+                    }
                 }
             }
 

@@ -91,6 +91,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_from_label">Statistics From</string>
     <!-- Settings > Statistics: description under 'Statistics From'. -->
     <string name="stats_from_desc">Entries before this date are ignored in all statistics.</string>
+    <!-- Settings > Statistics: clears the start date so every entry counts.
+         Destructive-styled row, shown only while a start date is set. -->
+    <string name="stats_from_clear">Include all history</string>
     <!-- Settings > Personal Data: body-weight row label and its edit-dialog title (used for BAC). -->
     <string name="body_weight">Body Weight</string>
     <!-- Placeholder when body weight is unset. -->

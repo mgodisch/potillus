@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Uppskattning · ej för körning</string>
     <string name="stats_from_label">Statistik från</string>
     <string name="stats_from_desc">Poster före detta datum utesluts från all statistik.</string>
+    <string name="stats_from_clear">Inkludera hela historiken</string>
     <string name="body_weight">Kroppsvikt</string>
     <string name="not_set">ej inställt</string>
     <string name="add_entry">Lägg till post</string>

@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Odhad · není pro řízení</string>
     <string name="stats_from_label">Statistiky od</string>
     <string name="stats_from_desc">Záznamy před tímto datem jsou vyloučeny ze všech statistik.</string>
+    <string name="stats_from_clear">Zahrnout celou historii</string>
     <string name="body_weight">Tělesná hmotnost</string>
     <string name="not_set">nenastaveno</string>
     <string name="add_entry">Přidat záznam</string>

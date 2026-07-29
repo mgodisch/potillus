@@ -69,6 +69,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Estimare · nu pentru decizii de condus</string>
     <string name="stats_from_label">Statistici de la</string>
     <string name="stats_from_desc">Înregistrările dinaintea acestei date sunt excluse din toate statisticile.</string>
+    <string name="stats_from_clear">Include tot istoricul</string>
     <string name="body_weight">Greutate corporală</string>
     <string name="not_set">nesetat</string>
 

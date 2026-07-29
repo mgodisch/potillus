@@ -61,6 +61,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Оцінка · не для рішень щодо водіння</string>
     <string name="stats_from_label">Статистика від</string>
     <string name="stats_from_desc">Записи до цієї дати виключаються з усієї статистики.</string>
+    <string name="stats_from_clear">Включити всю історію</string>
     <string name="body_weight">Вага тіла</string>
     <string name="not_set">не встановлено</string>
 

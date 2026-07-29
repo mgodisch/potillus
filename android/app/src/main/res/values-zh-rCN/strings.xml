@@ -51,6 +51,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">估算值 · 不用于驾驶判断</string>
     <string name="stats_from_label">统计起始</string>
     <string name="stats_from_desc">此日期之前的记录将从所有统计中排除。</string>
+    <string name="stats_from_clear">包含全部历史</string>
     <string name="body_weight">体重</string>
     <string name="not_set">未设置</string>
 

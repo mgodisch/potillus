@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Оценка · не для вождения</string>
     <string name="stats_from_label">Статистика с</string>
     <string name="stats_from_desc">Записи до этой даты исключаются из всей статистики.</string>
+    <string name="stats_from_clear">Включить всю историю</string>
     <string name="body_weight">Масса тела</string>
     <string name="not_set">не задано</string>
     <string name="add_entry">Добавить запись</string>

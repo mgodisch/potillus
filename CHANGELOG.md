@@ -44,6 +44,10 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Edit drinks from the list's edit mode
 
+### Added
+
+- The statistics start date has a row that clears it.
+
 ### Changed
 
 - A row tap in the drinks list's edit mode opens the editor.

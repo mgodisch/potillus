@@ -68,6 +68,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">推定値 · 運転判断には使用しないでください</string>
     <string name="stats_from_label">統計開始日</string>
     <string name="stats_from_desc">この日付より前の記録はすべての統計から除外されます。</string>
+    <string name="stats_from_clear">全履歴を含める</string>
     <string name="body_weight">体重</string>
     <string name="not_set">未設定</string>
 

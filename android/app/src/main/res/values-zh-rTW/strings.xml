@@ -70,6 +70,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">估算值・不適用於駕駛判斷</string>
     <string name="stats_from_label">統計起始日</string>
     <string name="stats_from_desc">此日期之前的記錄將從所有統計中排除。</string>
+    <string name="stats_from_clear">包含全部歷史</string>
     <string name="body_weight">體重</string>
     <string name="not_set">未設定</string>
 

@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Szacunek · nie do jazdy</string>
     <string name="stats_from_label">Statystyki od</string>
     <string name="stats_from_desc">Wpisy przed tą datą są wykluczone ze wszystkich statystyk.</string>
+    <string name="stats_from_clear">Uwzględnij całą historię</string>
     <string name="body_weight">Masa ciała</string>
     <string name="not_set">nie ustawiono</string>
     <string name="add_entry">Dodaj wpis</string>

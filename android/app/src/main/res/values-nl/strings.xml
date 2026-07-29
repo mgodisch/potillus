@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Schatting · niet voor rijden</string>
     <string name="stats_from_label">Statistieken vanaf</string>
     <string name="stats_from_desc">Invoer vóór deze datum wordt uitgesloten van alle statistieken.</string>
+    <string name="stats_from_clear">Volledige geschiedenis opnemen</string>
     <string name="body_weight">Lichaamsgewicht</string>
     <string name="not_set">niet ingesteld</string>
     <string name="add_entry">Invoer toevoegen</string>

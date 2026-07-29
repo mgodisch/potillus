@@ -105,4 +105,23 @@ class AppPreferencesDefaultsTest {
         assertEquals(6, settings.maxDrinkDaysPerWeek)
         assertEquals("2026-03-01", settings.statsFromDate, "an explicit floor beats the install date")
     }
+
+    /**
+     * An empty stored floor means "count my whole history" and must survive.
+     *
+     * This is what the "Include all history" button writes. The fallback in
+     * `toAppSettings` is `?:`, so it fires on a MISSING key — a key holding the
+     * empty string is a stored value and passes through. Were that not so, the
+     * button would appear to work and the install date would be back on the next
+     * launch. iOS draws the same line, by the presence of its preferences file
+     * (see `PreferencesStore.seedOnFirstLaunch`).
+     */
+    @Test
+    fun `a stored empty floor is a choice, not a missing value`() {
+        val stored = mutablePreferencesOf(AppPreferences.KEY_STATS_FROM to "")
+
+        val settings = stored.toAppSettings(INSTALL_DATE)
+
+        assertEquals("", settings.statsFromDate, "an empty floor must not fall back to the install date")
+    }
 }

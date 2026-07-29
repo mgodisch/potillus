@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Estimat · ikke til kørsel</string>
     <string name="stats_from_label">Statistik fra</string>
     <string name="stats_from_desc">Poster før denne dato udelades fra al statistik.</string>
+    <string name="stats_from_clear">Medtag hele historikken</string>
     <string name="body_weight">Legemsvægt</string>
     <string name="not_set">ikke angivet</string>
     <string name="add_entry">Tilføj post</string>

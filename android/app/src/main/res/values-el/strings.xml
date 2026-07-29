@@ -43,6 +43,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Εκτίμηση · όχι για οδήγηση</string>
     <string name="stats_from_label">Στατιστικά από</string>
     <string name="stats_from_desc">Εγγραφές πριν από αυτή την ημερομηνία εξαιρούνται από όλα τα στατιστικά.</string>
+    <string name="stats_from_clear">Συμπερίληψη όλου του ιστορικού</string>
     <string name="body_weight">Σωματικό βάρος</string>
     <string name="not_set">μη ορισμένο</string>
     <string name="add_entry">Προσθήκη εγγραφής</string>

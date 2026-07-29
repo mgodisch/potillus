@@ -47,6 +47,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Estimación · no válida para conducir</string>
     <string name="stats_from_label">Estadísticas desde</string>
     <string name="stats_from_desc">Las entradas anteriores a esta fecha se excluyen de todas las estadísticas.</string>
+    <string name="stats_from_clear">Incluir todo el historial</string>
     <string name="body_weight">Peso corporal</string>
     <string name="not_set">no definido</string>
 

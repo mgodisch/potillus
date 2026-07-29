@@ -72,6 +72,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="bac_disclaimer">Estimativa · não usar para direção</string>
     <string name="stats_from_label">Estatísticas a partir de</string>
     <string name="stats_from_desc">Registros anteriores a esta data são excluídos de todas as estatísticas.</string>
+    <string name="stats_from_clear">Incluir todo o histórico</string>
     <string name="body_weight">Peso corporal</string>
     <string name="not_set">não definido</string>
 
