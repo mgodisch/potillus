@@ -188,6 +188,41 @@ object StatsWindows {
     }
 
     /**
+     * How many whole periods lie between the one holding [day] and the one
+     * holding [today] — the largest offset that still reaches [day].
+     *
+     * Used as the ceiling for the offset: further back there is nothing to show,
+     * because [day] is the earliest day the statistics count (the user's floor, or
+     * the oldest logged day when no floor is set).
+     *
+     * PERIOD ARITHMETIC, NOT DAY COUNTING
+     *   Months and years are counted as calendar periods, so 31 January and
+     *   1 February are one month apart even though two days lie between them. The
+     *   week is the exception by design: it is a rolling seven-day window, not a
+     *   calendar week, so whole sevens are what separate two of them.
+     *
+     * @return 0 when [day] falls inside the current period, or when either date
+     *         is unparseable — an unreadable bound must not open the offset up.
+     *         Never negative: a day after today names no past period.
+     */
+    fun offsetOf(period: StatsPeriod, today: String, day: String): Int {
+        val todayDate = runCatching { DayResolver.parseDate(today) }.getOrNull() ?: return 0
+        val dayDate = runCatching { DayResolver.parseDate(day) }.getOrNull() ?: return 0
+        if (dayDate >= todayDate) return 0
+
+        // Arithmetic on the dates' own fields, so this file stays import-free like
+        // the rest of it — it is pure domain code with no java.time names spelled
+        // out anywhere.
+        val steps = when (period) {
+            StatsPeriod.WEEK -> (todayDate.toEpochDay() - dayDate.toEpochDay()) / 7
+            StatsPeriod.MONTH ->
+                (todayDate.year * 12L + todayDate.monthValue) - (dayDate.year * 12L + dayDate.monthValue)
+            StatsPeriod.YEAR -> (todayDate.year - dayDate.year).toLong()
+        }
+        return steps.coerceAtLeast(0L).toInt()
+    }
+
+    /**
      * Raises both windows' start to [floor], if the user set one.
      *
      * String comparison, not date arithmetic: `yyyy-MM-dd` sorts

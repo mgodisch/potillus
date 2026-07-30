@@ -137,6 +137,25 @@ data class StatsUiState(
     val today: String = "",
     val statsFromDate: String = "",
     val periodFrom: String = "",
+    /**
+     * The last day the visible period covers. The current period ends today; a
+     * past one ends on its own last day (see StatsWindows.window). Together with
+     * [periodFrom] this is what the screen's period label spells out — without it
+     * an offset screen shows figures without saying what they are about.
+     */
+    val periodTo: String = "",
+    /** Whole periods back from the current one; 0 while the screen shows today. */
+    val periodOffset: Int = 0,
+    /**
+     * Whether a step further into the past has anything to show, and whether a
+     * step towards today is possible at all.
+     *
+     * Computed here, not in the view: the answer needs the statistics floor, the
+     * logged days and the period, all of which meet in this flow. The view only
+     * asks, so the swipe and the two arrows cannot disagree about the edges.
+     */
+    val canGoEarlier: Boolean = false,
+    val canGoLater: Boolean = false,
 )
 
 /**
@@ -169,6 +188,17 @@ class StatsViewModel(
     // the user having to switch away from a too-narrow week view. WEEK and YEAR
     // remain available via the period selector in the statistics screen.
     private val _period = MutableStateFlow(StatsPeriod.MONTH)
+
+    /**
+     * How many whole periods back the screen is showing; 0 is the current one.
+     *
+     * A second dimension beside [_period], not a replacement: the period says how
+     * long a window is, the offset says which one. Both feed [StatsWindows.window],
+     * and everything the screen shows follows from what comes back — the figures,
+     * the streaks, the trend baseline, the categories and the chart. A chart over
+     * March beside figures over July would be a defect, not a feature.
+     */
+    private val _offset = MutableStateFlow(0)
 
     // ── Export (CSV / PDF) ────────────────────────────────────────────────
     // Data export belongs with the
@@ -313,6 +343,8 @@ class StatsViewModel(
      */
     private data class StatsParams(
         val period: StatsPeriod,
+        /** Whole periods back from the current one; see [_offset]. */
+        val offset: Int,
         val settings: AppSettings,
         val allDates: List<String>,
         /**
@@ -344,18 +376,20 @@ class StatsViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<StatsUiState> = combine(
         _period,
+        _offset,
         prefs.settingsFlow,
         entryRepo.getAllDatesFlow(),
         ticker,
-    ) { period, settings, allDates, _ ->
+    ) { period, offset, settings, allDates, _ ->
         StatsParams(
             period,
+            offset,
             settings,
             allDates,
             today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute),
         )
     }.distinctUntilChanged().flatMapLatest { params ->
-        val (period, settings, allDates, today) = params
+        val (period, offset, settings, allDates, today) = params
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         val fmt = DayResolver.DATE_FORMATTER
 
@@ -370,7 +404,17 @@ class StatsViewModel(
         // computed state rather than throwing keeps an impossible input from
         // taking the screen down.
         val statsFloor = settings.statsFromDate
-        val window = StatsWindows.window(period, today)?.let {
+        // How far back the user may go: the period holding the earliest day that
+        // counts. That is the floor when one is set, and otherwise the oldest
+        // entry — going further would only produce empty windows. With no history
+        // and no floor the ceiling is 0, so the screen cannot leave today.
+        val earliestDay = statsFloor.ifEmpty { allDates.minOrNull() ?: today }
+        val maxOffset = StatsWindows.offsetOf(period, today, earliestDay)
+        // Clamped here rather than trusted: the ceiling moves when the floor, the
+        // period or the set of logged days changes, and the offset held in _offset
+        // may predate that move.
+        val effectiveOffset = offset.coerceIn(0, maxOffset)
+        val window = StatsWindows.window(period, today, effectiveOffset)?.let {
             StatsWindows.applyingFloor(it, statsFloor)
         } ?: return@flatMapLatest flowOf(StatsUiState(period = period))
 
@@ -526,13 +570,52 @@ class StatsViewModel(
                 today = today,
                 statsFromDate = statsFloor,
                 periodFrom = effectiveFrom,
+                periodTo = to,
+                periodOffset = effectiveOffset,
+                // The clamped offset decides both edges, so the arrows cannot offer
+                // a step the window would refuse.
+                canGoEarlier = effectiveOffset < maxOffset,
+                canGoLater = effectiveOffset > 0,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
 
-    /** Selects the statistics aggregation period [p] (week / month / year …). */
+    /**
+     * Selects the statistics aggregation period [p] (week / month / year …).
+     *
+     * The offset returns to the current period. "Three periods back" means
+     * something else for weeks than for years, so carrying the number across a
+     * change of period would land the user somewhere they did not ask for.
+     */
     fun setPeriod(p: StatsPeriod) {
         _period.value = p
+        _offset.value = 0
+    }
+
+    /**
+     * Moves the shown period by [delta] steps: positive into the past, negative
+     * towards today.
+     *
+     * The lower bound is enforced here, the upper one downstream where the
+     * earliest countable day is known (see `maxOffset` in [uiState]) — that value
+     * depends on the settings and the logged days, neither of which this function
+     * has in hand. Overshooting therefore lands on the boundary rather than out
+     * of range, and the screen shows the edge period.
+     */
+    fun shiftPeriod(delta: Int) {
+        _offset.value = (_offset.value + delta).coerceAtLeast(0)
+    }
+
+    /**
+     * Returns to the current period.
+     *
+     * Called when the screen is entered anew, so returning to Statistics from
+     * another screen starts at today. A rotation must NOT call this: it is the
+     * same screen, and the user's place in it should survive (the caller tells the
+     * two apart with a saved marker; see StatsScreen).
+     */
+    fun resetToCurrentPeriod() {
+        _offset.value = 0
     }
 
     /**

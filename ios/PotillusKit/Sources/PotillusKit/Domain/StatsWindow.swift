@@ -173,6 +173,52 @@ public enum StatsWindows {
         )
     }
 
+    /// How many whole periods lie between the one holding `day` and the one holding
+    /// `today` — the largest offset that still reaches `day`.
+    ///
+    /// Used as the ceiling for the offset: further back there is nothing to show,
+    /// because `day` is the earliest day the statistics count (the user's floor, or
+    /// the oldest logged day when no floor is set).
+    ///
+    /// PERIOD ARITHMETIC, NOT DAY COUNTING
+    ///   Months and years are counted as calendar periods, so 31 January and
+    ///   1 February are one month apart even though two days lie between them. The
+    ///   week is the exception by design: it is a rolling seven-day window, not a
+    ///   calendar week, so whole sevens separate two of them.
+    ///
+    /// Returns 0 when `day` falls inside the current period, or when either date is
+    /// unparseable — an unreadable bound must not open the offset up. Never
+    /// negative: a day after today names no past period. Kotlin's `offsetOf`
+    /// answers identically.
+    public static func offsetOf(period: StatsPeriod, today: String, day: String) -> Int {
+        guard let todayDate = DayResolver.parseDate(today),
+              let dayDate = DayResolver.parseDate(day),
+              dayDate < todayDate
+        else { return 0 }
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+
+        let steps: Int
+        switch period {
+        case .week:
+            let days = calendar.dateComponents([.day], from: dayDate, to: todayDate).day ?? 0
+            steps = days / 7
+        case .month:
+            // From the first of each month, so the distance is the number of month
+            // boundaries crossed and not an effect of the days within them.
+            guard let dayStart = calendar.date(from: calendar.dateComponents([.year, .month], from: dayDate)),
+                  let todayStart = calendar.date(from: calendar.dateComponents([.year, .month], from: todayDate))
+            else { return 0 }
+            steps = calendar.dateComponents([.month], from: dayStart, to: todayStart).month ?? 0
+        case .year:
+            let dayYear = calendar.component(.year, from: dayDate)
+            let todayYear = calendar.component(.year, from: todayDate)
+            steps = todayYear - dayYear
+        }
+        return max(0, steps)
+    }
+
     /// Raises both windows' start to `floor`, if the user set one.
     ///
     /// String comparison, not date arithmetic: `yyyy-MM-dd` sorts
