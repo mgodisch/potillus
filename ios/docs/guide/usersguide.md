@@ -68,7 +68,7 @@ deletes the beverage. Swiping a row left offers the same two actions.
 The settings are reached from the More button (…) in the top-right corner.
 Libellus Potionis provides the following configuration options:
 
-### Personal data
+### Personal Data
 
 In this category, you can enter your body weight to approximate your blood
 alcohol concentration using the
@@ -120,12 +120,12 @@ A backup is a single JSON file containing all your drinks and your complete
 log. To move your data to another phone:
 
 1. On the old phone, open "Settings" → Backup →
-   Export backup and save the JSON file somewhere safe — for example your
+   Export and save the JSON file somewhere safe — for example your
    own cloud drive, an e-mail to yourself, or a USB transfer.
 2. Install Libellus Potionis on the new phone.
-3. Open "Settings" → Backup → Import backup and select that
-   JSON file. Choose Replace my data to overwrite everything, or
-   Merge with my data to combine it with any entries already present.
+3. Open "Settings" → Backup → Import and select that
+   JSON file. Choose Replace to overwrite everything, or
+   Merge to combine it with any entries already present.
 
 Export regularly: a backup only protects the data that existed at the moment
 you created it.
@@ -133,7 +133,7 @@ you created it.
 ### Security
 
 This category protects access to the app and controls its visibility. Enable
-App lock to require Face ID or Touch ID each time the app is opened.
+Biometric Lock to require Face ID or Touch ID each time the app is opened.
 The Show in app switcher switch controls whether the app's contents appear in
 the App Switcher; it is off by default, so the app is hidden there when you
 leave it. iOS does not let an app block screenshots or screen recordings, so

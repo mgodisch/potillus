@@ -118,21 +118,31 @@ rechts sitzt die Plus-Taste; sie öffnet den Buchungsdialog.
 
 ### Der Buchungsdialog
 
-Ganz oben wählst du unter {{select_drink}} aus deinem Katalog. Darunter stehen
-vier Felder:
+Ganz oben steht das Feld {{drink}}; ein Tippen darauf öffnet die Auswahl aus
+deinem Katalog. Darunter stehen drei Felder:
 
 - **{{volume_ml}}** -- die getrunkene Menge in Millilitern. Erlaubt ist 1 bis
   5000; die Vorbelegung ist die Standardmenge des gewählten Getränks.
-- **{{alcohol_percent}}** -- der Alkoholgehalt in Volumenprozent, 0 bis 100.
-  Auch dieser Wert kommt aus dem Katalog und lässt sich hier für diesen einen
-  Eintrag überschreiben, ohne den Katalog zu ändern. Praktisch für das eine
-  stärkere Bier aus derselben Sorte.
 - **{{time}}** -- voreingestellt auf jetzt. Änderbar, wenn du etwas nachträgst.
 - **{{note}}** -- eine freie Bemerkung, etwa der Anlass oder mit wem.
+
+Der Alkoholgehalt gehört zum Getränk und lässt sich hier nicht abweichend
+eintragen. Wenn dieselbe Sorte einmal deutlich stärker ist, legst du sie im
+Katalog als eigenes Getränk an.
 
 Unter den Feldern steht laufend mitgerechnet, wie viel {{pure_alcohol}} diese
 Eingabe ergibt. Diese Zahl ist es, mit der die App rechnet -- nicht die
 Milliliter.
+
+Daneben sitzt ein farbiger Statuspunkt. Er beantwortet für diese Menge die
+Frage, wie viel noch hineingeht: grün, wenn davon heute mindestens zwei passen,
+gelb bei genau einem, rot, wenn keines mehr passt oder deine Trinktage
+aufgebraucht sind. Gerechnet wird gegen Tageslimit, 7-Tage-Limit und Trinktage
+gemeinsam, der strengste Wert gilt. Ein Screenreader liest dazu
+{{capacity_status_ok}}, {{capacity_status_low}} oder
+{{capacity_status_reached}}. Die Farbe allein trägt diese Aussage nicht -- wer
+sie schlecht unterscheiden kann, schaltet unter {{appearance}} die
+{{alt_status_symbols}} hinzu; dann zeigt der Punkt zusätzlich ein Zeichen.
 
 ### Schnellauswahl für Getränke, die du oft buchst
 
@@ -154,7 +164,11 @@ einmal nach, weil ein versehentlich gelöschter Eintrag nicht zurückzuholen ist
 Über der Getränkeliste steht eine Übersicht, die sich nach jeder Buchung
 aktualisiert. Von oben nach unten:
 
-**{{total_today}}** -- die Summe des heute gebuchten reinen Alkohols in Gramm.
+**Zwei große Zahlen** stehen nebeneinander: links {{total_today}}, die Summe des
+heute gebuchten reinen Alkohols in Gramm, rechts unter „Ø" mit dem Monatsnamen
+der Durchschnitt des laufenden Monats in Gramm pro Tag. Der Monatswert ist der
+einzige auf diesem Schirm, der über den Tag hinausblickt. Steht ein Pfeil
+daneben, vergleicht er ihn mit dem Vormonat; ohne Vormonatswert bleibt er aus.
 
 **Zwei Mengenbalken** -- der erste zeigt den heutigen Stand gegen dein
 Tageslimit, der zweite die Summe der letzten sieben Tage gegen dein
@@ -163,17 +177,14 @@ Tageslimit, der zweite die Summe der letzten sieben Tage gegen dein
 **{{drink_days_label}}** -- wie viele der letzten sieben Tage Trinktage waren,
 gegen deine erlaubte Anzahl. Auch hier Zahl und Balken.
 
-**Ein Statuspunkt** neben jedem Balken sagt in einem Wort, wo du stehst:
-{{capacity_status_ok}}, {{capacity_status_low}} oder
-{{capacity_status_reached}}. Die Farbe allein trägt diese Aussage nicht --
-wer sie schlecht unterscheiden kann, schaltet unter {{appearance}} die
-{{alt_status_symbols}} hinzu.
-
 **Der geschätzte Blutalkoholwert** erscheint nur, wenn du ein Körpergewicht
 eingetragen hast, und nur, solange rechnerisch noch Alkohol im Blut ist.
+Darunter steht der Hinweis, dass es ein Schätzwert ist und für Entscheidungen
+über eine Fahrt nicht taugt.
 
-**Ein Feld mit „Ø"** zeigt den Durchschnitt des laufenden Monats in Gramm pro
-Tag. Es ist der einzige Wert auf diesem Schirm, der über den Tag hinausblickt.
+Den farbigen Statuspunkt, der sagt, wie viel von einem Getränk noch hineingeht,
+findest du nicht hier, sondern dort, wo er zu einer Entscheidung gehört: im
+Buchungsdialog und in der Getränkeliste.
 
 ## Dein Getränkekatalog
 
@@ -181,9 +192,16 @@ Der Schirm „{{drinks}}" verwaltet die Getränke, aus denen du beim Buchen
 wählst. Ausgeliefert wird die App mit einer Auswahl gebräuchlicher Getränke;
 du kannst sie ändern, ergänzen und -- mit einer Einschränkung -- löschen.
 
+Jede Zeile zeigt Menge, Alkoholgehalt und die daraus folgenden Gramm, davor den
+Statuspunkt für diese Portion. Ein Tippen auf die Zeile öffnet den
+Buchungsdialog mit diesem Getränk -- der zweite Weg dorthin neben der
+Plus-Taste auf dem Heute-Schirm. Der Stern links schaltet den Favoriten um --
+Favoriten erscheinen in der Schnellauswahl auf dem Heute-Schirm --, die beiden
+Symbole rechts öffnen den Editor und die Löschabfrage.
+
 ### Ein Getränk anlegen oder ändern
 
-Die Plus-Taste öffnet {{add_drink}}, ein Tippen im Bearbeitungsmodus öffnet
+Die Plus-Taste öffnet {{add_drink}}, das Stift-Symbol einer Zeile öffnet
 {{edit_drink}}. Beide fragen dasselbe:
 
 - **{{drink_name}}** -- frei wählbar, bis zu 100 Zeichen.
@@ -194,9 +212,6 @@ Die Plus-Taste öffnet {{add_drink}}, ein Tippen im Bearbeitungsmodus öffnet
   {{category_spirits}}, {{category_longdrink}}, {{category_liqueur}} oder
   {{category_other}}. Die Kategorie ändert nichts an der Rechnung; sie
   gruppiert die Auswertung auf dem Statistik-Schirm.
-
-Ein Stern-Symbol markiert das Getränk als Favoriten, womit es in der
-Schnellauswahl auf dem Heute-Schirm erscheint.
 
 ### Warum sich manche Getränke nicht löschen lassen
 
@@ -289,9 +304,14 @@ Drehung des Geräts behält dagegen deine Stelle.
 - **{{avg_per_drink_day}}** -- Durchschnitt nur über die Tage mit Konsum. Die
   Differenz zum vorigen Wert sagt viel: Liegen die beiden weit auseinander,
   trinkst du selten, dann aber viel.
-- **{{abstinent_days}}** -- Tage ohne Eintrag im Zeitraum.
 - **{{days_over_daily_limit}}** -- Tage, an denen dein Tageslimit
   überschritten wurde.
+- **{{days_over_weekly_limit}}** -- Trinktage, an denen die Summe aus diesem und
+  den sechs vorangegangenen Tagen über deinem 7-Tage-Limit lag.
+- **{{days_over_drink_day_limit}}** -- Trinktage, die in diesem Fenster mehr
+  Trinktage vorfanden als erlaubt: der sechste Trinktag in sieben Tagen, wenn du
+  fünf erlaubt hast.
+- **{{abstinent_days}}** -- Tage ohne Eintrag im Zeitraum.
 
 ### {{streak_trend}}
 
@@ -304,8 +324,23 @@ mit dem unmittelbar davorliegenden gleicher Länge und zeigt die Richtung an.
 
 Ein Balkendiagramm zeigt den Verlauf im Zeitraum; die Breite der Balken
 richtet sich nach dessen Länge -- Tage bei einer Woche, gröbere Abschnitte beim
-Jahr. Ein Ringdiagramm unter {{stats_category_breakdown}} zeigt, wie sich dein
-Konsum auf die sechs Getränkekategorien verteilt.
+Jahr.
+
+Darunter folgen drei Auswertungen, die nicht nach dem Wann, sondern nach dem
+Muster fragen:
+
+**{{stats_time_of_day}}** teilt den Tag in acht Abschnitte von je drei Stunden
+und zeigt für jeden den Durchschnitt in Gramm pro Tag. Hier wird sichtbar, ob
+sich dein Konsum auf den Abend legt oder über den Tag verteilt.
+
+**{{stats_weekday}}** zeigt denselben Durchschnitt je Wochentag, beginnend mit
+dem ersten Tag deiner Woche.
+
+**{{stats_category_breakdown}}** zeigt als Ringdiagramm, wie sich dein Konsum
+auf die sechs Getränkekategorien verteilt.
+
+Alle drei bleiben aus, solange der Zeitraum nichts enthält, was sie zeigen
+könnten.
 
 ## Daten aus der App holen
 

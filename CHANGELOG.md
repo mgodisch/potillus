@@ -57,7 +57,9 @@ Edit drinks from the list's edit mode
 - The statistics window can name a period before the current one.
 - The statistics screen carries which period it shows.
 - A swipe or the arrows on the statistics screen move to another period.
-- The German users guide describes every screen, switch and gesture.
+- The users guides describe every screen, switch and gesture on both
+  platforms.
+- The iOS guide renderer maps every token to a label the app shows.
 - A row tap in the drinks list's edit mode opens the editor.
 - The toolbar's edit toggle shows a pencil and a checkmark.
 - `push-gitlab` creates the release before it signs and uploads.
@@ -123,6 +125,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- The security footer on iOS follows the in-app language.
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
 - The base `strings.xml` section comments are in English.
 - The contrast summary in `theme/Color.kt` matches the measured values.

@@ -37,7 +37,7 @@ WHY A SEPARATE SCRIPT FROM THE ANDROID ONE
     ``.xcstrings`` (keyed by the English source string, not by a resource name),
     ships one flat resource bundle, and its guide text differs from Android's in
     a few platform-specific spots (Face ID vs a fingerprint, the App Switcher vs
-    the recent-apps overview, the menu in the top-left rather than top-right).
+    the recent-apps overview, a toolbar "+" rather than a floating button).
     Those differences are why the iOS guide is authored separately, and this
     renderer targets the iOS catalogue and bundle layout instead.
 
@@ -76,29 +76,120 @@ TPL = os.path.join(ROOT, "ios", "docs", "guide")
 OUT = os.path.join(ROOT, "ios", "Potillus", "Resources")
 CATALOG = os.path.join(ROOT, "ios", "Potillus", "Localizable.xcstrings")
 
-TOKEN_RE = re.compile(r"\{\{([a-z_]+)\}\}")
+# Digits are part of a token name (`weekly_limit_grams` has none, but a future
+# `limit_7d` would): the Android renderer has always allowed them, and a pattern
+# that did not would leave such a token unresolved in the shipped guide instead
+# of failing the build.
+TOKEN_RE = re.compile(r"\{\{([a-z0-9_]+)\}\}")
 
-# Each guide token names a screen title or a settings row; this maps it to the
-# English catalogue key that holds that label. The iOS wording differs from
-# Android's for a few (Android "Biometric Lock" -> iOS "App lock", "Import" ->
-# "Import backup"), which is exactly why the map is explicit rather than derived.
+# Each guide token names a screen title, a settings row, a field label or one of
+# the words a legend spells out; this maps it to the English catalogue key that
+# holds that label. The map is explicit rather than derived from Android's
+# resource names, because the two platforms do not always say the same thing in
+# the same place: Android's `week` reads "7 Days" where iOS says "Week", and iOS
+# has a row Android has none of (`device_backup`) while Android has labels iOS
+# never shows (`pure_alcohol`, `no_data`, `select_drink`), which is why those
+# tokens are absent here and must not appear in an iOS template.
+#
+# EVERY VALUE IS A LABEL THE APP ACTUALLY SHOWS. Five of them were not: the map
+# pointed `biometric_lock` at "App lock", `backup_export` at "Export backup",
+# `backup_import` at "Import backup", `import_replace` at "Replace my data" and
+# `import_merge` at "Merge with my data" -- catalogue keys that no view reads, so
+# the guide named buttons the user cannot find (0.85.0 QA round). When a label
+# changes in a view, it changes here.
 TOKEN_TO_KEY = {
+    # The four main screens and the overflow menu.
     "today": "Today",
     "calendar": "Calendar",
     "statistics": "Statistics",
     "drinks": "Drinks",
     "settings": "Settings",
-    "personal_data": "Personal data",
+    "menu": "Menu",
+    "help": "Help",
+    "about": "About",
+    "lock_app": "Lock app",
+    # Settings: personal data, limits, the logical day, the statistics floor.
+    "personal_data": "Personal Data",
+    "body_weight": "Body Weight",
     "limits": "Limits",
+    "daily_limit_grams": "Daily Limit in Grams",
+    "weekly_limit_grams": "7-Day Limit in Grams",
+    "drink_days_setting": "Max. Drinking Days/7 Days",
+    "day_starts_at": "New Day Starts At",
+    "stats_from_label": "Statistics From",
+    "stats_from_clear": "Include all history",
+    # Logging an entry and correcting it.
+    "drink": "Drink",
+    "volume_ml": "Amount",
+    "time": "Time",
+    "note": "Note",
+    "alcohol_content": "Alcohol Content",
+    "edit_entry": "Edit Entry",
+    "delete": "Delete",
+    "favorites_quick": "Quick Selection Favorites",
+    # The Today summary and the capacity dot.
+    "total_today": "Today's Total",
+    "drink_days_label": "Drinking Days (last 7 days)",
+    "capacity_status_ok": "Within your limits",
+    "capacity_status_low": "Almost at your limit",
+    "capacity_status_reached": "Limit reached",
+    # The drink catalogue.
+    "add_drink": "Add Drink",
+    "edit_drink": "Edit Drink",
+    "drink_name": "Name",
+    "alcohol_percent": "Alcohol (%)",
+    "category": "Category",
+    "category_beer": "Beer",
+    "category_wine": "Wine / Sparkling Wine",
+    "category_spirits": "Spirits",
+    "category_longdrink": "Long Drink / Mix",
+    "category_liqueur": "Liqueur",
+    "category_other": "Other",
+    # The year heat-map's legend.
+    "year_calendar_no_entry": "no entry",
+    "year_calendar_under_limit": "under limit",
+    "year_calendar_over_limit": "over limit",
+    # Statistics: the period, the figures, the charts.
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "total_period": "Total in Period",
+    "avg_per_day": "Average per Day",
+    "avg_per_drink_day": "Average per Drinking Day",
+    "days_over_daily_limit": "Days Over Daily Limit",
+    "days_over_weekly_limit": "Days Over 7-Day Limit",
+    "days_over_drink_day_limit": "Days Over Drinking Days Limit",
+    "abstinent_days": "Abstinent Days",
+    "streak_trend": "Abstinence & Trend",
+    "current_streak": "Current Abstinence",
+    "longest_streak": "Longest Abstinence",
+    "trend_vs_prev": "Trend vs. Previous Period",
+    "stats_time_of_day": "Time of Day",
+    "stats_weekday": "Weekday",
+    "stats_category_breakdown": "Categories",
+    # Export and backup.
+    "export": "Export",
+    "export_csv": "Export CSV",
+    "export_pdf": "Export PDF report",
     "backup_section": "Backup",
-    "backup_export": "Export backup",
-    "backup_import": "Import backup",
-    "import_replace": "Replace my data",
-    "import_merge": "Merge with my data",
+    "backup_include_settings": "Include settings",
+    "backup_export": "Export",
+    "backup_import": "Import",
+    "import_replace": "Replace",
+    "import_merge": "Merge",
+    # Security and appearance.
     "security": "Security",
-    "biometric_lock": "App lock",
+    "biometric_lock": "Biometric Lock",
     "allow_screenshots": "Show in app switcher",
+    "device_backup": "Include in device backup",
     "appearance": "Appearance",
+    "theme_mode": "Color Scheme",
+    "theme_system": "System",
+    "theme_day": "Light",
+    "theme_night": "Dark",
+    "language": "Language",
+    "language_system": "(System)",
+    "alt_status_symbols": "Alternative Status Symbols",
 }
 
 

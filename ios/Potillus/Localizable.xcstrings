@@ -18353,6 +18353,137 @@
         }
       }
     },
+    "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app's preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app's preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ist die App-Sperre eingeschaltet, verlangt Libellus Potionis nach 30 Sekunden im Hintergrund erneut eine Anmeldung. Ist %1$@ aus, bleibt die Vorschau der App verdeckt, solange sie im Hintergrund ist. Ist %2$@ aus, bleibt dein Konsumprotokoll aus jeder Gerätesicherung heraus, aus iCloud wie von einem Rechner; die JSON-Sicherung bleibt der Weg auf ein neues Gerät."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Når app-låsen er slået til, beder Libellus Potionis om oplåsning igen efter 30 sekunder i baggrunden. Når %1$@ er slået fra, forbliver appens forhåndsvisning skjult, mens appen er i baggrunden. Når %2$@ er slået fra, holdes din forbrugslog uden for enhver sikkerhedskopi af enheden, både iCloud og computer; JSON-sikkerhedskopien er fortsat vejen til en ny enhed."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als de app-vergrendeling aan staat, vraagt Libellus Potionis na 30 seconden op de achtergrond opnieuw om ontgrendeling. Als %1$@ uit staat, blijft de voorvertoning van de app verborgen zolang de app op de achtergrond is. Als %2$@ uit staat, blijft je consumptielogboek buiten elke apparaatback-up, zowel iCloud als computer; de JSON-back-up blijft de manier om gegevens naar een nieuw apparaat te verplaatsen."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Når applåsen er på, ber Libellus Potionis om opplåsing igjen etter 30 sekunder i bakgrunnen. Når %1$@ er av, holdes forhåndsvisningen av appen skjult mens appen er i bakgrunnen. Når %2$@ er av, holdes forbruksloggen din utenfor enhver sikkerhetskopi av enheten, både iCloud og datamaskin; JSON-sikkerhetskopien er fortsatt veien til en ny enhet."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "När applåset är på ber Libellus Potionis om upplåsning igen efter 30 sekunder i bakgrunden. När %1$@ är av förblir appens förhandsvisning dold medan appen är i bakgrunden. När %2$@ är av hålls din konsumtionslogg utanför varje säkerhetskopia av enheten, både iCloud och dator; JSON-säkerhetskopian är fortfarande vägen till en ny enhet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando el bloqueo de la app está activado, Libellus Potionis vuelve a pedir el desbloqueo después de 30 segundos en segundo plano. Cuando %1$@ está desactivado, la vista previa de la app permanece oculta mientras está en segundo plano. Cuando %2$@ está desactivado, tu registro de consumo queda fuera de toda copia de seguridad del dispositivo, tanto de iCloud como del ordenador; la copia en JSON sigue siendo la vía para llevar los datos a un dispositivo nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lorsque le verrouillage de l’app est activé, Libellus Potionis redemande le déverrouillage après 30 secondes en arrière-plan. Lorsque %1$@ est désactivé, l’aperçu de l’app reste masqué tant qu’elle est en arrière-plan. Lorsque %2$@ est désactivé, votre journal de consommation reste exclu de toute sauvegarde de l’appareil, iCloud comme ordinateur ; la sauvegarde JSON demeure le moyen de transférer vos données vers un nouvel appareil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando il blocco dell’app è attivo, Libellus Potionis richiede di nuovo lo sblocco dopo 30 secondi in background. Quando %1$@ è disattivato, l’anteprima dell’app resta nascosta finché l’app è in background. Quando %2$@ è disattivato, il tuo registro dei consumi resta fuori da ogni backup del dispositivo, sia iCloud sia computer; il backup JSON rimane la strada per portare i dati su un nuovo dispositivo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando o bloqueio da app está ativado, o Libellus Potionis pede novamente o desbloqueio após 30 segundos em segundo plano. Quando %1$@ está desativado, a pré-visualização da app permanece oculta enquanto está em segundo plano. Quando %2$@ está desativado, o seu registo de consumo fica fora de qualquer cópia de segurança do dispositivo, tanto do iCloud como do computador; a cópia em JSON continua a ser a forma de levar os dados para um novo dispositivo."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando o bloqueio do app está ativado, o Libellus Potionis pede o desbloqueio novamente após 30 segundos em segundo plano. Quando %1$@ está desativado, a prévia do app permanece oculta enquanto ele está em segundo plano. Quando %2$@ está desativado, seu registro de consumo fica fora de qualquer backup do dispositivo, tanto do iCloud quanto do computador; o backup em JSON continua sendo o caminho para levar os dados a um novo dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Când blocarea aplicației este activată, Libellus Potionis cere din nou deblocarea după 30 de secunde în fundal. Când %1$@ este dezactivat, previzualizarea aplicației rămâne ascunsă cât timp aplicația este în fundal. Când %2$@ este dezactivat, jurnalul tău de consum rămâne în afara oricărei copii de siguranță a dispozitivului, atât iCloud, cât și computer; copia JSON rămâne calea prin care muți datele pe un dispozitiv nou."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Když je zámek aplikace zapnutý, Libellus Potionis si po 30 sekundách na pozadí vyžádá odemknutí znovu. Když je %1$@ vypnuto, náhled aplikace zůstává skrytý, dokud je aplikace na pozadí. Když je %2$@ vypnuto, tvůj záznam o konzumaci zůstává mimo každou záložní kopii zařízení, jak na iCloudu, tak v počítači; záloha ve formátu JSON zůstává cestou k přenosu dat na nové zařízení."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy blokada aplikacji jest włączona, Libellus Potionis po 30 sekundach w tle prosi o ponowne odblokowanie. Gdy %1$@ jest wyłączone, podgląd aplikacji pozostaje ukryty, dopóki aplikacja działa w tle. Gdy %2$@ jest wyłączone, Twój dziennik spożycia pozostaje poza każdą kopią zapasową urządzenia, zarówno w iCloud, jak i na komputerze; kopia JSON pozostaje sposobem na przeniesienie danych na nowe urządzenie."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Когда блокировка приложения включена, Libellus Potionis снова запрашивает разблокировку через 30 секунд в фоновом режиме. Когда %1$@ выключено, предварительный просмотр приложения остаётся скрытым, пока приложение в фоне. Когда %2$@ выключено, ваш журнал потребления не попадает ни в одну резервную копию устройства — ни в iCloud, ни на компьютер; резервная копия в формате JSON остаётся способом перенести данные на новое устройство."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коли блокування застосунку ввімкнено, Libellus Potionis знову запитує розблокування через 30 секунд у фоновому режимі. Коли %1$@ вимкнено, попередній перегляд застосунку залишається прихованим, поки застосунок у фоні. Коли %2$@ вимкнено, ваш журнал споживання не потрапляє до жодної резервної копії пристрою — ні в iCloud, ні на комп’ютер; резервна копія у форматі JSON залишається способом перенести дані на новий пристрій."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Όταν το κλείδωμα της εφαρμογής είναι ενεργό, το Libellus Potionis ζητά ξανά ξεκλείδωμα μετά από 30 δευτερόλεπτα στο παρασκήνιο. Όταν το %1$@ είναι απενεργοποιημένο, η προεπισκόπηση της εφαρμογής παραμένει κρυμμένη όσο η εφαρμογή βρίσκεται στο παρασκήνιο. Όταν το %2$@ είναι απενεργοποιημένο, το αρχείο κατανάλωσής σου μένει έξω από κάθε αντίγραφο ασφαλείας της συσκευής, τόσο του iCloud όσο και του υπολογιστή· το αντίγραφο JSON παραμένει ο τρόπος να μεταφέρεις τα δεδομένα σε νέα συσκευή."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリロックが有効な場合、バックグラウンドで 30 秒経過すると Libellus Potionis は再びロック解除を求めます。%1$@ がオフのときは、アプリがバックグラウンドにある間、プレビューは隠されたままです。%2$@ がオフのときは、飲酒記録が iCloud でもコンピュータでも、デバイスのバックアップに含まれません。新しいデバイスへデータを移すには JSON バックアップを使います。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 잠금이 켜져 있으면 백그라운드에서 30초가 지난 뒤 Libellus Potionis가 다시 잠금 해제를 요청합니다. %1$@이(가) 꺼져 있으면 앱이 백그라운드에 있는 동안 미리보기가 가려집니다. %2$@이(가) 꺼져 있으면 음주 기록이 iCloud와 컴퓨터를 포함한 모든 기기 백업에서 제외됩니다. 새 기기로 데이터를 옮기려면 JSON 백업을 사용하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启应用锁后，应用在后台超过 30 秒，Libellus Potionis 会再次要求解锁。关闭%1$@时，应用在后台期间的预览保持隐藏。关闭%2$@时，你的饮酒记录不会进入任何设备备份，iCloud 和电脑备份都不会；把数据转移到新设备仍然要用 JSON 备份。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟應用程式鎖定後，應用程式在背景超過 30 秒，Libellus Potionis 會再次要求解鎖。關閉%1$@時，應用程式在背景期間的預覽會保持隱藏。關閉%2$@時，你的飲酒記錄不會進入任何裝置備份，iCloud 與電腦備份都不會；要把資料轉移到新裝置，仍須使用 JSON 備份。"
+          }
+        }
+      }
+    },
     "Wine / Sparkling Wine": {
       "extractionState": "manual",
       "localizations": {

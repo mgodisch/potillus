@@ -497,17 +497,27 @@ extension SettingsScreen {
         } footer: {
             // Two footers would be tidier but a Section takes one. All switches are
             // explained here, in the order they appear.
-            Text(
+            //
+            // ONE catalogue key with the two switch names interpolated, not a Swift
+            // literal: a bare literal in a Text view looked the label up against the
+            // ENVIRONMENT locale, which tracks the system language, and no catalogue
+            // entry covered it — so this paragraph stood in English in all twenty
+            // other languages while the switches above it were translated (0.85.0 QA
+            // round). The names come from the switches' own keys, so a reworded
+            // label rewords the sentence with it.
+            Text(Loc.string(
                 """
-                When app lock is on, Libellus Potionis asks to unlock after 30 \
-                seconds in the background. When "Show in app switcher" is off, the \
-                app's preview is hidden while it is in the background. When "Include \
-                in device backup" is off, your consumption log is kept out of every \
-                device backup — both iCloud and a computer backup — so it never \
-                leaves the device; the JSON backup remains the way to move data to a \
+                When the app lock is on, Libellus Potionis asks to unlock after 30 \
+                seconds in the background. When %1$@ is off, the app's preview stays \
+                hidden while the app is in the background. When %2$@ is off, your \
+                consumption log is kept out of every device backup, iCloud and \
+                computer alike; the JSON backup remains the way to move data to a \
                 new device.
-                """
-            )
+                """,
+                Loc.string("Show in app switcher", locale: locale),
+                Loc.string("Include in device backup", locale: locale),
+                locale: locale
+            ))
         }
         .task {
             includeInDeviceBackup = BackupExclusion.includesInBackup()
