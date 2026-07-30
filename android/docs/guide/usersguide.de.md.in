@@ -245,10 +245,42 @@ Startdatum; {{stats_from_clear}} in den Einstellungen holt es zurück.
 
 ## Auswerten: die Statistik
 
-Der Schirm „{{statistics}}" fasst zusammen. Oben wählst du den Zeitraum:
-{{week}}, {{month}} oder {{year}}. Alles darunter bezieht sich auf diese Wahl,
-und alles ignoriert Einträge vor deinem {{stats_from_label}}. Gibt es im
-gewählten Zeitraum nichts, steht dort {{no_data}}.
+Der Schirm „{{statistics}}" fasst zusammen. Oben wählst du die Art des
+Zeitraums: {{week}}, {{month}} oder {{year}}. Alles darunter bezieht sich auf
+diese Wahl, und alles ignoriert Einträge vor deinem {{stats_from_label}}. Gibt
+es im gewählten Zeitraum nichts, steht dort {{no_data}}.
+
+### In der Zeit zurückgehen
+
+Unter der Zeitraumwahl steht, welchen Zeitraum du gerade ansiehst -- als
+Datumsbereich, nicht als Monatsname. Das hat einen Grund: Der laufende Monat
+endet heute und nicht am Monatsletzten, und wenn du ein {{stats_from_label}}
+gesetzt hast, beginnt der Bereich erst dort. Es steht also genau da, was die
+Zahlen darunter abdecken.
+
+Links und rechts der Angabe sitzt je ein Pfeil. Der linke geht einen Zeitraum
+zurück, der rechte wieder in Richtung Gegenwart. Dasselbe erreichst du mit einem
+Wisch über den Schirm -- und zwar über die ganze Fläche, nicht nur über der
+Zeitraumangabe. Die Richtung ist die des Blätterns: nach rechts wischen holt den
+früheren Zeitraum herein, nach links den späteren. Jede Wischbewegung bewegt
+genau einen Schritt, egal wie weit du ziehst.
+
+Zwei Grenzen gibt es. Nach vorn endet es beim laufenden Zeitraum -- weiter ist
+nichts passiert. Nach hinten beim Zeitraum, in dem dein {{stats_from_label}}
+liegt; hast du keines gesetzt, beim Zeitraum deines ältesten Eintrags. Ist eine
+Grenze erreicht, wird der zugehörige Pfeil blass und der Wisch bleibt ohne
+Wirkung.
+
+Alles auf diesem Schirm folgt dem gewählten Zeitraum: Kennzahlen, Serien,
+Trendvergleich, Kategorien und das Diagramm. Der Trend vergleicht immer mit dem
+unmittelbar davorliegenden Zeitraum gleicher Länge -- beim März also mit dem
+Februar. Auch der Exportbereich wird mit dem Zeitraum vorbelegt, den du gerade
+ansiehst.
+
+Wechselst du die Art des Zeitraums, beginnst du wieder beim laufenden: „drei
+Zeiträume zurück" bedeutet bei Wochen etwas anderes als bei Jahren. Verlässt du
+den Schirm und kommst zurück, stehst du ebenfalls wieder in der Gegenwart. Eine
+Drehung des Geräts behält dagegen deine Stelle.
 
 ### Die Kennzahlen
 
