@@ -44,6 +44,24 @@ public struct StatsState: Sendable, Equatable {
 
     public var period: StatsPeriod = .month
 
+    /// Whole periods back from the current one; 0 while the screen shows today.
+    ///
+    /// A second dimension beside `period`, not a replacement: the period says how
+    /// long a window is, the offset says which one. Everything below follows from
+    /// what `StatsWindows.window` returns for the pair, so a chart over March
+    /// beside figures over July cannot happen.
+    public var periodOffset: Int = 0
+
+    /// Whether a step further into the past has anything to show, and whether a
+    /// step towards today is possible at all.
+    ///
+    /// Answered here rather than in the view: it takes the floor, the logged days
+    /// and the period, which meet in `reload()`. The view only asks, so the swipe
+    /// and the two arrows cannot disagree about the edges. Android's
+    /// `StatsUiState` carries the same pair.
+    public var canGoEarlier: Bool = false
+    public var canGoLater: Bool = false
+
     /// The days actually covered, after the user's floor.
     public var from: String = ""
     public var to: String = ""
@@ -134,8 +152,37 @@ public final class StatsModel {
         self.tickInterval = tickInterval
     }
 
+    /// Selects the aggregation period, back at the current one.
+    ///
+    /// "Three periods back" means something else for weeks than for years, so
+    /// carrying the offset across a change of period would land the user somewhere
+    /// they did not ask for.
     public func setPeriod(_ period: StatsPeriod) async {
         state.period = period
+        state.periodOffset = 0
+        await load()
+    }
+
+    /// Moves the shown period by `delta` steps: positive into the past, negative
+    /// towards today.
+    ///
+    /// The lower bound is enforced here; the upper one in `reload()`, where the
+    /// earliest countable day is known. Overshooting therefore lands on the
+    /// boundary rather than out of range.
+    public func shiftPeriod(by delta: Int) async {
+        state.periodOffset = max(0, state.periodOffset + delta)
+        await load()
+    }
+
+    /// Returns to the current period.
+    ///
+    /// Called when the screen is entered anew, so arriving at Statistics from
+    /// another tab starts at today. On iOS `onAppear` already tells that apart from
+    /// a rotation, which does not rebuild the screen; Android needs a saved marker
+    /// for the same distinction.
+    public func resetToCurrentPeriod() async {
+        guard state.periodOffset != 0 else { return }
+        state.periodOffset = 0
         await load()
     }
 
@@ -255,8 +302,25 @@ public final class StatsModel {
             timeZone: timeZone
         )
 
-        guard let raw = StatsWindows.window(period: state.period, today: today) else { return }
         let floor = settings.statsFromDate
+        // How far back the user may go: the period holding the earliest day that
+        // counts — the floor when one is set, otherwise the oldest logged day.
+        // Further back lie only empty windows. With no history and no floor the
+        // ceiling is 0 and the screen cannot leave today.
+        // Read once and used twice: for the offset ceiling here and for the streaks
+        // further down. Two calls would be two queries for the same answer.
+        let allDates = try entries.allDates()
+        let earliestDay = floor.isEmpty ? (allDates.min() ?? today) : floor
+        let maxOffset = StatsWindows.offsetOf(period: state.period, today: today, day: earliestDay)
+        // Clamped rather than trusted: the ceiling moves when the floor, the period
+        // or the set of logged days changes, and the stored offset may predate it.
+        let offset = min(max(0, state.periodOffset), maxOffset)
+        state.periodOffset = offset
+        state.canGoEarlier = offset < maxOffset
+        state.canGoLater = offset > 0
+
+        guard let raw = StatsWindows.window(period: state.period, today: today, offset: offset)
+        else { return }
         let window = StatsWindows.applyingFloor(raw, floor: floor)
 
         // The current period.
@@ -299,7 +363,6 @@ public final class StatsModel {
 
         // Streaks look at the whole history above the floor, not just this period:
         // a dry streak began before the month did.
-        let allDates = try entries.allDates()
         let streakDates = floor.isEmpty ? allDates : allDates.filter { $0 >= floor }
 
         let granularity: ChartGranularity = state.period == .year ? .monthly : .daily
