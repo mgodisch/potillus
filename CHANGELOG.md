@@ -126,6 +126,7 @@ Edit drinks from the list's edit mode
 ### Fixed
 
 - The security footer on iOS follows the in-app language.
+- The import dialog on iOS says what each mode does with the drink list.
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
 - The base `strings.xml` section comments are in English.
 - The contrast summary in `theme/Color.kt` matches the measured values.

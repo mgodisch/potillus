@@ -156,10 +156,7 @@ struct SettingsScreen: View {
                 }
                 Button(Loc.string("Cancel", locale: locale), role: .cancel) { pendingImport = nil }
             } message: { _ in
-                Text(Loc.string(
-                    "Replacing deletes your log and the drinks you created. Presets are kept.",
-                    locale: locale
-                ))
+                Text(importModeMessage)
             }
             .alert(
                 Loc.string("Import finished", locale: locale),
@@ -439,6 +436,23 @@ extension SettingsScreen {
 // =============================================================================
 
 extension SettingsScreen {
+
+    /// What the import dialog says above its two buttons: one sentence per path,
+    /// because the reader is choosing between them. The earlier text described
+    /// replacing alone and promised that presets survive it, while
+    /// `BackupImporter` clears EVERY drink in that mode and rebuilds the catalogue
+    /// from the file (0.85.0 QA round). Lives here rather than at the call site so
+    /// the type body stays inside SwiftLint's `type_body_length`.
+    var importModeMessage: String {
+        Loc.string(
+            """
+            Replacing deletes your log and every drink, presets included; the \
+            file's contents take their place. Merging keeps what is there and adds \
+            what is missing.
+            """,
+            locale: locale
+        )
+    }
 
     /// A measured value in the in-app locale plus its unit, e.g. "140 g" / "80,0 kg"
     /// — kept here in the extension so the row call sites stay short and the main

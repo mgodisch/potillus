@@ -13507,133 +13507,133 @@
         }
       }
     },
-    "Replacing deletes your log and the drinks you created. Presets are kept.": {
+    "Replacing deletes your log and every drink, presets included; the file's contents take their place. Merging keeps what is there and adds what is missing.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Replacing deletes your log and the drinks you created. Presets are kept."
+            "value": "Replacing deletes your log and every drink, presets included; the file's contents take their place. Merging keeps what is there and adds what is missing."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beim Ersetzen werden dein Logbuch und die von dir erstellten Getränke gelöscht. Vorlagen bleiben erhalten."
+            "value": "Ersetzen löscht dein Protokoll und alle Getränke einschließlich der Vorlagen; an ihre Stelle tritt der Inhalt der Datei. Zusammenführen behält, was da ist, und ergänzt, was fehlt."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erstatning sletter din log og de drikke, du har oprettet. Forudindstillinger bevares."
+            "value": "Erstat sletter din log og alle drikkevarer, også skabelonerne; filens indhold træder i stedet. Flet bevarer det, der er, og tilføjer det, der mangler."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vervangen verwijdert je logboek en de door jou gemaakte drankjes. Voorinstellingen blijven behouden."
+            "value": "Vervangen verwijdert je logboek en alle dranken, ook de voorbeelddranken; de inhoud van het bestand komt ervoor in de plaats. Samenvoegen houdt wat er is en vult aan wat ontbreekt."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erstatning sletter loggen din og drinkene du har opprettet. Forhåndsinnstillinger beholdes."
+            "value": "Erstatt sletter loggen din og alle drikker, også malene; innholdet i filen tar plassen deres. Slå sammen beholder det som finnes, og legger til det som mangler."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ersättning raderar din logg och de drycker du har skapat. Förinställningar behålls."
+            "value": "Ersätt tar bort din logg och alla drycker, även förlagorna; filens innehåll tar deras plats. Slå samman behåller det som finns och lägger till det som saknas."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reemplazar elimina tu registro y las bebidas que creaste. Los preajustes se conservan."
+            "value": "Reemplazar borra tu registro y todas las bebidas, incluidas las predefinidas; el contenido del archivo ocupa su lugar. Combinar conserva lo que hay y añade lo que falta."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le remplacement supprime votre journal et les boissons que vous avez créées. Les préréglages sont conservés."
+            "value": "Remplacer supprime votre journal et toutes les boissons, y compris les prédéfinies ; le contenu du fichier prend leur place. Fusionner conserve ce qui existe et ajoute ce qui manque."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "La sostituzione elimina il tuo registro e le bevande che hai creato. Le preimpostazioni vengono mantenute."
+            "value": "Sostituisci elimina il tuo registro e tutte le bevande, comprese quelle predefinite; al loro posto va il contenuto del file. Unisci mantiene ciò che c’è e aggiunge ciò che manca."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Substituir elimina o seu registo e as bebidas que criou. As predefinições são mantidas."
+            "value": "Substituir elimina o seu registo e todas as bebidas, incluindo as predefinidas; o conteúdo do ficheiro ocupa o seu lugar. Combinar mantém o que existe e acrescenta o que falta."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Substituir exclui seu registro e as bebidas que você criou. As predefinições são mantidas."
+            "value": "Substituir apaga seu registro e todas as bebidas, inclusive as predefinidas; o conteúdo do arquivo entra no lugar. Mesclar mantém o que existe e acrescenta o que falta."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Înlocuirea șterge jurnalul tău și băuturile create de tine. Presetările sunt păstrate."
+            "value": "Înlocuirea șterge jurnalul și toate băuturile, inclusiv cele predefinite; locul lor este luat de conținutul fișierului. Îmbinarea păstrează ce există și adaugă ce lipsește."
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nahrazení smaže váš deník a nápoje, které jste vytvořili. Předvolby zůstanou zachovány."
+            "value": "Nahrazení smaže tvůj záznam a všechny nápoje včetně předloh; na jejich místo přijde obsah souboru. Sloučení ponechá, co je, a doplní, co chybí."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zastąpienie usuwa dziennik i utworzone przez Ciebie napoje. Ustawienia wstępne są zachowywane."
+            "value": "Zastąpienie usuwa Twój dziennik i wszystkie napoje, także wzorcowe; ich miejsce zajmuje zawartość pliku. Scalenie zachowuje to, co jest, i dodaje to, czego brakuje."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Замена удаляет ваш журнал и созданные вами напитки. Шаблоны сохраняются."
+            "value": "Замена удаляет журнал и все напитки, включая предустановленные; их место занимает содержимое файла. Объединение сохраняет то, что есть, и добавляет то, чего не хватает."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Заміна видаляє ваш журнал і створені вами напої. Шаблони зберігаються."
+            "value": "Заміна видаляє журнал і всі напої, включно з попередньо встановленими; їхнє місце займає вміст файлу. Об’єднання зберігає те, що є, і додає те, чого немає."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Η αντικατάσταση διαγράφει το ημερολόγιό σας και τα ποτά που δημιουργήσατε. Οι προεπιλογές διατηρούνται."
+            "value": "Η αντικατάσταση διαγράφει το αρχείο σου και όλα τα ποτά, μαζί με τα προεπιλεγμένα· τη θέση τους παίρνει το περιεχόμενο του αρχείου. Η συγχώνευση κρατά ό,τι υπάρχει και προσθέτει ό,τι λείπει."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "置き換えると記録と作成した飲み物が削除されます。プリセットは保持されます。"
+            "value": "置き換えると、記録とすべての飲み物がプリセットも含めて削除され、その場所にファイルの内容が入ります。統合すると、いまあるものは残り、足りないものが追加されます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "교체하면 기록과 직접 만든 음료가 삭제됩니다. 프리셋은 유지됩니다."
+            "value": "교체하면 기록과 모든 음료가 기본 항목까지 삭제되고 그 자리에 파일의 내용이 들어갑니다. 병합하면 지금 있는 것은 그대로 두고 없는 것만 추가합니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "替换会删除你的记录和你创建的饮品。预设会保留。"
+            "value": "替换会删除你的记录和所有饮品（包括预设），文件的内容取而代之。合并会保留现有内容，只补上缺少的部分。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "取代會刪除你的記錄和你建立的飲品。預設會保留。"
+            "value": "取代會刪除你的記錄和所有飲品（包括預設），並以檔案的內容取代。合併會保留現有內容，只補上缺少的部分。"
           }
         }
       }
