@@ -103,23 +103,18 @@ use the tracker, you may instead write to
 please do **not** open a public issue. Instead, follow the private,
 PGP-encrypted reporting process described in [`SECURITY.md`](SECURITY.md).
 
-Code and documentation contributions are welcome too. The contribution process
-— how changes are proposed and reviewed, together with the architecture,
-coding, testing, and release conventions a change must follow — is documented
-in [`CONTRIBUTING.md`](CONTRIBUTING.md). All participants are expected to
-follow the project's [Code of Conduct](docs/CODE_OF_CONDUCT.md).
-
-**Translations are where help is most useful.** Of the 21 interface languages,
-exactly two are written by a native speaker: German and English. The other 19 —
-Czech, Danish, Greek, Spanish, French, Italian, Japanese, Korean, Dutch,
-Norwegian, Polish, Portuguese (Brazil and Portugal), Romanian, Russian,
-Swedish, Ukrainian, and both written forms of Chinese — are machine-generated
-and have not been reviewed by anyone who speaks them. They are grammatical, and
-they may still be wrong: a term of art rendered as an everyday word, a register
-that reads oddly, a phrase that is simply not what a person would say. If you
-speak one of them, a correction to a single string is a welcome contribution,
-and no smaller than any other. The workflow is in
-[`CONTRIBUTING.md`](CONTRIBUTING.md), section 6.
+**Translations contributions are where help is most useful.** Of the 21
+interface languages, exactly one is written by a native speaker: German. The
+other 20 — English, Czech, Danish, Greek, Spanish, French, Italian, Japanese,
+Korean, Dutch, Norwegian, Polish, Portuguese (Brazil and Portugal), Romanian,
+Russian, Swedish, Ukrainian, and both written forms of Chinese — are
+machine-generated. They are grammatical, and they may still be wrong: a term of
+art rendered as an everyday word, a register that reads oddly, a phrase that is
+simply not what a person would say. If you speak one of them, a correction to a
+single string is a welcome contribution, and no smaller than any other. The
+workflow is in [`CONTRIBUTING.md`](CONTRIBUTING.md), section 6. All
+participants are expected to follow the project's [Code of
+Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## Privacy & Security Architecture
 
