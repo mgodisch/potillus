@@ -138,6 +138,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">下個月</string>
     <string name="cd_prev_year">上一年</string>
     <string name="cd_next_year">下一年</string>
+    <string name="cd_prev_period">上一時段</string>
+    <string name="cd_next_period">下一時段</string>
     <string name="delete">刪除</string>
     <string name="change">修改</string>
     <string name="delete_confirm">確定要刪除\u300c%1$s\u300d嗎？</string>

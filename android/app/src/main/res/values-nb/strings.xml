@@ -131,6 +131,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Neste måned</string>
     <string name="cd_prev_year">Forrige år</string>
     <string name="cd_next_year">Neste år</string>
+    <string name="cd_prev_period">Tidligere periode</string>
+    <string name="cd_next_period">Senere periode</string>
     <string name="delete">Slett</string>
     <string name="change">Endre</string>
     <string name="delete_confirm">Slett virkelig \u00ab%1$s\u00bb?</string>

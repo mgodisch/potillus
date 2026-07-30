@@ -138,6 +138,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Luna următoare</string>
     <string name="cd_prev_year">Anul anterior</string>
     <string name="cd_next_year">Anul următor</string>
+    <string name="cd_prev_period">Perioada anterioară</string>
+    <string name="cd_next_period">Perioada următoare</string>
     <string name="delete">Șterge</string>
     <string name="change">Modifică</string>
     <string name="delete_confirm">Se șterge „%1$s”?</string>

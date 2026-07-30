@@ -120,6 +120,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Nächster Monat</string>
     <string name="cd_prev_year">Voriges Jahr</string>
     <string name="cd_next_year">Nächstes Jahr</string>
+    <string name="cd_prev_period">Früherer Zeitraum</string>
+    <string name="cd_next_period">Späterer Zeitraum</string>
     <string name="delete">Löschen</string>
     <string name="change">Ändern</string>
     <string name="delete_confirm">„%1$s“ wirklich löschen?</string>

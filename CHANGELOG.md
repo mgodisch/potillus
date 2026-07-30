@@ -56,6 +56,7 @@ Edit drinks from the list's edit mode
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
 - The statistics screen carries which period it shows.
+- A swipe or the arrows on the statistics screen move to another period.
 - A row tap in the drinks list's edit mode opens the editor.
 - The toolbar's edit toggle shows a pencil and a checkmark.
 - `push-gitlab` creates the release before it signs and uploads.

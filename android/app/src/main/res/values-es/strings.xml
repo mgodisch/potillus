@@ -112,6 +112,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Mes siguiente</string>
     <string name="cd_prev_year">Año anterior</string>
     <string name="cd_next_year">Año siguiente</string>
+    <string name="cd_prev_period">Periodo anterior</string>
+    <string name="cd_next_period">Periodo posterior</string>
     <string name="delete">Eliminar</string>
     <string name="change">Cambiar</string>
     <string name="delete_confirm">¿Eliminar \u00ab%1$s\u00bb?</string>

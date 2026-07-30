@@ -204,6 +204,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Next month</string>
     <string name="cd_prev_year">Previous year</string>
     <string name="cd_next_year">Next year</string>
+    <!-- Statistics: the two arrows beside the period label. One pair for all
+         three period kinds, since the seven-day one is called "7 Days" here. -->
+    <string name="cd_prev_period">Earlier period</string>
+    <string name="cd_next_period">Later period</string>
     <!-- Delete button, delete-confirm dialog title, and delete-icon description. -->
     <string name="delete">Delete</string>
     <!-- Edit-pencil icon description on Settings rows. -->

@@ -102,6 +102,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Næste måned</string>
     <string name="cd_prev_year">Forrige år</string>
     <string name="cd_next_year">Næste år</string>
+    <string name="cd_prev_period">Tidligere periode</string>
+    <string name="cd_next_period">Senere periode</string>
     <string name="delete">Slet</string>
     <string name="change">Skift</string>
     <string name="delete_confirm">Virkelig slette \u201e%1$s\u201c?</string>

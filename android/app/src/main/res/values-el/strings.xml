@@ -102,6 +102,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Επόμενος μήνας</string>
     <string name="cd_prev_year">Προηγούμενο έτος</string>
     <string name="cd_next_year">Επόμενο έτος</string>
+    <string name="cd_prev_period">Προηγούμενη περίοδος</string>
+    <string name="cd_next_period">Επόμενη περίοδος</string>
     <string name="delete">Διαγραφή</string>
     <string name="change">Αλλαγή</string>
     <string name="delete_confirm">Διαγραφή «%1$s»;</string>

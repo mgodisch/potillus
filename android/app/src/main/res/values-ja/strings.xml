@@ -136,6 +136,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">次の月</string>
     <string name="cd_prev_year">前の年</string>
     <string name="cd_next_year">次の年</string>
+    <string name="cd_prev_period">前の期間</string>
+    <string name="cd_next_period">次の期間</string>
     <string name="delete">削除</string>
     <string name="change">変更</string>
     <string name="delete_confirm">「%1$s」を本当に削除しますか？</string>

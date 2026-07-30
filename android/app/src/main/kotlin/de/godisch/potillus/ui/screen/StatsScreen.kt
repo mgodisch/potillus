@@ -27,17 +27,24 @@ package de.godisch.potillus.ui.screen
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,6 +64,8 @@ import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.util.WebViewPdfPrinter
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.format.TextStyle
 
 /**
@@ -87,6 +96,27 @@ fun StatsScreen(
     // Per-app locale for chart axis labels (weekday / month names). Derived from
     // the context so it follows the in-app language, not Locale.getDefault().
     val locale = context.formattingLocale()
+
+    // ENTERING THE SCREEN RETURNS TO THE CURRENT PERIOD, a rotation does not.
+    //
+    // The offset lives in the ViewModel, which outlives both: it is created in
+    // AppNav and survives a configuration change as well as a trip to another
+    // screen. So the reset cannot hang off the model's lifetime and needs
+    // something that tells the two apart — this marker does. rememberSaveable is
+    // restored from the saved state after a rotation (marker present: the same
+    // screen, keep the user's place) and starts out false when the composable was
+    // discarded and rebuilt, which is what a return from another screen looks like
+    // (marker absent: start at today).
+    //
+    // iOS needs no marker: `onAppear` fires on a tab change and not on a rotation,
+    // which does not rebuild the view there.
+    var visited by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!visited) {
+            vm.resetToCurrentPeriod()
+            visited = true
+        }
+    }
 
     // Export date-range dialogs (CSV/PDF export lives on the Statistics screen).
     // rememberSaveable so an open dialog survives a configuration change
@@ -161,7 +191,36 @@ fun StatsScreen(
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                // THE WHOLE SCREEN moves the period, not just the chart card. The
+                // offset is the state of everything below, so confining the gesture
+                // to one card would make the reader hunt for a small target for an
+                // effect that is anything but small. Nothing else on this screen
+                // scrolls horizontally — the period chips are a fixed Row, the
+                // charts a fixed width — so there is no inner consumer to yield to,
+                // which is also why the main screens stopped being swipeable
+                // (see ui/nav/AppNav.kt).
+                //
+                // Content follows the finger: dragging LEFT pulls the later period
+                // in, dragging RIGHT the earlier one. The arrows in the card point
+                // the other way round, because an arrow points at its target.
+                .pointerInput(Unit) {
+                    var total = 0f
+                    detectHorizontalDragGestures(
+                        onDragStart = { total = 0f },
+                        onDragEnd = {
+                            // One step per gesture, whatever the distance: a long
+                            // drag is not an instruction to jump three months.
+                            if (total <= -SWIPE_THRESHOLD_PX) {
+                                vm.shiftPeriod(-1)
+                            } else if (total >= SWIPE_THRESHOLD_PX) {
+                                vm.shiftPeriod(1)
+                            }
+                        },
+                    ) { _, dragAmount -> total += dragAmount }
+                },
         ) {
             // ── Period selector ───────────────────────────────────────────
             item {
@@ -185,6 +244,44 @@ fun StatsScreen(
             // ── Bar chart ─────────────────────────────────────────────────
             item {
                 SectionCard {
+                    // WHICH period is on screen. Without this the offset would be
+                    // invisible: three swipes back, figures for some month, and no
+                    // way to tell which. The dates are the window's own, so they
+                    // already carry the statistics floor and — in the current
+                    // period — end today rather than at the month's end.
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // The arrows point the way they travel, which is the
+                        // opposite of the swipe that does the same thing: content
+                        // follows the finger, an arrow points at its target.
+                        IconButton(
+                            onClick = { vm.shiftPeriod(1) },
+                            enabled = state.canGoEarlier,
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.cd_prev_period),
+                            )
+                        }
+                        Text(
+                            periodRangeLabel(state.periodFrom, state.periodTo, locale),
+                            style = MaterialTheme.typography.titleSmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(
+                            onClick = { vm.shiftPeriod(-1) },
+                            enabled = state.canGoLater,
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = stringResource(R.string.cd_next_period),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
                     val labelFn: (ChartBucket) -> String = { b ->
                         val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
                         when (state.period) {
@@ -471,4 +568,36 @@ private fun StatRow(label: String, value: String, valueColor: Color = MaterialTh
             modifier = Modifier.padding(start = 12.dp),
         )
     }
+}
+
+/**
+ * How far a horizontal drag has to travel before it counts as a period step.
+ *
+ * In pixels, deliberately generous: below this a sideways wobble during vertical
+ * scrolling would change the period under the reader's hands, which is worse than
+ * a swipe that has to be meant.
+ */
+private const val SWIPE_THRESHOLD_PX = 80f
+
+/**
+ * "1 Jul 2026 – 30 Jul 2026", in the in-app locale.
+ *
+ * Both dates come from the window, so the label states what the figures below
+ * actually cover: the floor is already applied, and the current period ends today
+ * rather than on the period's last day. A range of one day collapses to that day.
+ *
+ * The dash is spelled out rather than taken from a string resource: an en dash
+ * between two dates reads the same in every locale this app ships, and the dates
+ * themselves are formatted by [DateTimeFormatter.ofLocalizedDate], which is what
+ * carries the locale's order and separators.
+ */
+private fun periodRangeLabel(from: String, to: String, locale: java.util.Locale): String {
+    if (from.isEmpty() || to.isEmpty()) return ""
+    val fmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+    val start = runCatching { LocalDate.parse(from, DayResolver.DATE_FORMATTER).format(fmt) }
+        .getOrElse { return "" }
+    if (from == to) return start
+    val end = runCatching { LocalDate.parse(to, DayResolver.DATE_FORMATTER).format(fmt) }
+        .getOrElse { return "" }
+    return "$start \u2013 $end"
 }

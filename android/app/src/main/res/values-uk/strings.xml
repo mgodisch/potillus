@@ -129,6 +129,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Наступний місяць</string>
     <string name="cd_prev_year">Попередній рік</string>
     <string name="cd_next_year">Наступний рік</string>
+    <string name="cd_prev_period">Попередній період</string>
+    <string name="cd_next_period">Наступний період</string>
     <string name="delete">Видалити</string>
     <string name="change">Змінити</string>
     <string name="delete_confirm">Справді видалити «%1$s»?</string>

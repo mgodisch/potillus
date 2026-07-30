@@ -102,6 +102,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Další měsíc</string>
     <string name="cd_prev_year">Předchozí rok</string>
     <string name="cd_next_year">Další rok</string>
+    <string name="cd_prev_period">Předchozí období</string>
+    <string name="cd_next_period">Následující období</string>
     <string name="delete">Smazat</string>
     <string name="change">Změnit</string>
     <string name="delete_confirm">Opravdu smazat \u201e%1$s\u201c?</string>

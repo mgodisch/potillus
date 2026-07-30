@@ -140,6 +140,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="cd_next_month">Próximo mês</string>
     <string name="cd_prev_year">Ano anterior</string>
     <string name="cd_next_year">Próximo ano</string>
+    <string name="cd_prev_period">Período anterior</string>
+    <string name="cd_next_period">Período posterior</string>
     <string name="delete">Excluir</string>
     <string name="change">Alterar</string>
     <string name="delete_confirm">Excluir \u201c%1$s\u201d?</string>
