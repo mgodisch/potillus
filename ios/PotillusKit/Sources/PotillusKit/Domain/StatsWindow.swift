@@ -78,48 +78,84 @@ public struct StatsWindow: Sendable, Equatable {
 
 public enum StatsWindows {
 
-    /// The window for `period`, ending on `today`.
+    /// The window for `period`, `offset` periods before the one containing `today`.
     ///
-    /// - Parameter today: A logical date, `yyyy-MM-dd`.
-    public static func window(period: StatsPeriod, today: String) -> StatsWindow? {
+    /// WHERE THE WINDOW ENDS
+    ///   At `offset == 0` it ends on `today`: the current month is the part of it
+    ///   that has happened, not the whole month, or every average would be divided
+    ///   by days still to come. At `offset > 0` the period is over, so it ends on
+    ///   its own last day. Kotlin's `StatsWindows.window` draws the same line, and
+    ///   the shared vectors pin both cases.
+    ///
+    /// WHY EVERY OFFSET IS MEASURED FROM TODAY
+    ///   The offset is subtracted in one step rather than one period at a time.
+    ///   Stepping would drift: from 31 March, one month back clamps to 28 February,
+    ///   and a second step from there would land on 28 January and lose the 31st.
+    ///
+    /// - Parameters:
+    ///   - today: A logical date, `yyyy-MM-dd`.
+    ///   - offset: Whole periods to go back; 0 is the current one. Negative values
+    ///     would name a period after today, which cannot be observed yet, and are
+    ///     treated as 0.
+    public static func window(period: StatsPeriod, today: String, offset: Int = 0) -> StatsWindow? {
         guard let todayDate = DayResolver.parseDate(today) else { return nil }
 
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "UTC")!
 
+        let steps = max(0, offset)
+
+        // The day the offset period is anchored on: today itself at offset 0.
+        let anchorComponent: Calendar.Component
+        switch period {
+        case .week: anchorComponent = .day
+        case .month: anchorComponent = .month
+        case .year: anchorComponent = .year
+        }
+        let anchorValue = period == .week ? -7 * steps : -steps
+        guard let anchor = calendar.date(byAdding: anchorComponent, value: anchorValue, to: todayDate)
+        else { return nil }
+
         let from: Date
         let previousFrom: Date
+        let to: Date
 
         switch period {
         case .week:
-            // Today plus the six days before it, and the seven before those.
-            guard let start = calendar.date(byAdding: .day, value: -6, to: todayDate),
+            // The anchor plus the six days before it, and the seven before those.
+            // A rolling seven days ends on its anchor, not on a calendar boundary.
+            guard let start = calendar.date(byAdding: .day, value: -6, to: anchor),
                   let previousStart = calendar.date(byAdding: .day, value: -7, to: start)
             else { return nil }
             from = start
             previousFrom = previousStart
+            to = anchor
 
         case .month:
             guard let start = calendar.date(
-                    from: calendar.dateComponents([.year, .month], from: todayDate)
+                    from: calendar.dateComponents([.year, .month], from: anchor)
                   ),
-                  let previousStart = calendar.date(byAdding: .month, value: -1, to: start)
+                  let previousStart = calendar.date(byAdding: .month, value: -1, to: start),
+                  let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: start)
             else { return nil }
             from = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: start) ?? start
             previousFrom = calendar.date(
                 bySettingHour: 12, minute: 0, second: 0, of: previousStart
             ) ?? previousStart
+            to = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: monthEnd) ?? monthEnd
 
         case .year:
             guard let start = calendar.date(
-                    from: calendar.dateComponents([.year], from: todayDate)
+                    from: calendar.dateComponents([.year], from: anchor)
                   ),
-                  let previousStart = calendar.date(byAdding: .year, value: -1, to: start)
+                  let previousStart = calendar.date(byAdding: .year, value: -1, to: start),
+                  let yearEnd = calendar.date(byAdding: DateComponents(year: 1, day: -1), to: start)
             else { return nil }
             from = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: start) ?? start
             previousFrom = calendar.date(
                 bySettingHour: 12, minute: 0, second: 0, of: previousStart
             ) ?? previousStart
+            to = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: yearEnd) ?? yearEnd
         }
 
         // The previous window always ends the day before the current one begins.
@@ -129,7 +165,9 @@ public enum StatsWindows {
 
         return StatsWindow(
             from: DayResolver.formatDate(from),
-            to: today,
+            // At offset 0 this is `today` itself; the branch above computed the
+            // period's own last day, which only applies once the period is over.
+            to: steps == 0 ? today : DayResolver.formatDate(to),
             previousFrom: DayResolver.formatDate(previousFrom),
             previousTo: DayResolver.formatDate(previousTo)
         )

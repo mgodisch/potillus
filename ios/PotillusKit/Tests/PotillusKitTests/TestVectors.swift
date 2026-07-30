@@ -398,17 +398,21 @@ struct AlcoholCalculatorVectors: Decodable {
 /// unit tests and the Kotlin derivation sat inline in its ViewModel.
 struct StatsWindowVectors: Decodable {
     let window: [Case]
+    let windowOffset: [Case]
     let invalidToday: [InvalidCase]
     let adjacency: Adjacency
     let applyingFloor: [Case]
 
-    /// One expected window. `floor` is present only in `applyingFloor` cases.
+    /// One expected window. `floor` is present only in `applyingFloor` cases, and
+    /// `offset` only in `windowOffset` ones — an absent offset means the current
+    /// period, which is what the other blocks describe.
     struct Case: Decodable {
         let description: String
         /// `"WEEK"`, `"MONTH"` or `"YEAR"` — the `StatsPeriod` raw values.
         let period: String
         let today: String
         let floor: String?
+        let offset: Int?
         let from: String
         let to: String
         let previousFrom: String

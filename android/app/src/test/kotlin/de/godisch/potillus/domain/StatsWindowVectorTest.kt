@@ -46,6 +46,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class StatsWindowVectorTest {
@@ -82,6 +83,25 @@ class StatsWindowVectorTest {
     fun `window matches the shared vectors`() {
         VECTORS.getJSONArray("window").objects().forEach { case ->
             assertMatches(case, StatsWindows.window(period(case), case.getString("today")))
+        }
+    }
+
+    /**
+     * The offset cases, where a period other than the current one is asked for.
+     *
+     * The boundary these pin is where the window ENDS: the current period stops at
+     * today, a past one at its own last day. Getting that wrong divides an average
+     * by days that have not happened.
+     */
+    @Test
+    fun `window with an offset matches the shared vectors`() {
+        val cases = VECTORS.getJSONArray("windowOffset")
+        assertTrue("the shared vectors carry offset cases", cases.length() > 0)
+        cases.objects().forEach { case ->
+            assertMatches(
+                case,
+                StatsWindows.window(period(case), case.getString("today"), case.getInt("offset")),
+            )
         }
     }
 

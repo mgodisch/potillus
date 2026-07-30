@@ -113,26 +113,62 @@ data class StatsWindow(
 object StatsWindows {
 
     /**
-     * The window for [period], ending on [today].
+     * The window for [period], [offset] periods before the one containing [today].
+     *
+     * WHERE THE WINDOW ENDS
+     *   At `offset = 0` it ends on [today]: the current month is the part of it
+     *   that has happened, not the whole month, or every average would be divided
+     *   by days that are still to come. At `offset > 0` the period is over, so it
+     *   ends on its own last day. The two cases are genuinely different, and this
+     *   is the one place that knows it.
+     *
+     * WHY EVERY OFFSET IS MEASURED FROM TODAY
+     *   Each call subtracts `offset` periods from [today] in one step rather than
+     *   stepping back one period at a time. Stepping would drift: from 31 March,
+     *   one month back clamps to 28 February, and a second step from there would
+     *   land on 28 January and lose the 31st. Measuring from today gives January
+     *   whatever its length is, every time.
      *
      * @param period Which span the user selected.
      * @param today The current logical date, `yyyy-MM-dd`.
+     * @param offset How many whole periods to go back; 0 is the current one.
+     *        Negative values would name a period after today, which cannot be
+     *        observed yet, and are treated as 0. The caller enforces the other
+     *        end (see the offset ceiling in the statistics model).
      * @return The window, or `null` if [today] is not a parseable logical date.
      *         Swift returns `nil` for the same input; the shared vectors pin
      *         that case, so the two must agree on it and not merely on the
      *         happy path.
      */
-    fun window(period: StatsPeriod, today: String): StatsWindow? {
+    fun window(period: StatsPeriod, today: String, offset: Int = 0): StatsWindow? {
         val todayDate = runCatching { DayResolver.parseDate(today) }.getOrNull() ?: return null
+        val steps = offset.coerceAtLeast(0).toLong()
 
+        // The day the offset period is anchored on: today itself at offset 0.
+        val anchor = when (period) {
+            StatsPeriod.WEEK -> todayDate.minusDays(7 * steps)
+            StatsPeriod.MONTH -> todayDate.minusMonths(steps)
+            StatsPeriod.YEAR -> todayDate.minusYears(steps)
+        }
         val from = when (period) {
-            // Today plus the six days before it.
-            StatsPeriod.WEEK -> todayDate.minusDays(6)
-            StatsPeriod.MONTH -> todayDate.withDayOfMonth(1)
-            StatsPeriod.YEAR -> todayDate.withDayOfYear(1)
+            // The anchor plus the six days before it.
+            StatsPeriod.WEEK -> anchor.minusDays(6)
+            StatsPeriod.MONTH -> anchor.withDayOfMonth(1)
+            StatsPeriod.YEAR -> anchor.withDayOfYear(1)
+        }
+        val to = if (steps == 0L) {
+            todayDate
+        } else {
+            when (period) {
+                // A rolling seven days ends on its anchor, not on a calendar
+                // boundary: the week stays a rolling window at every offset.
+                StatsPeriod.WEEK -> anchor
+                StatsPeriod.MONTH -> from.plusMonths(1).minusDays(1)
+                StatsPeriod.YEAR -> from.plusYears(1).minusDays(1)
+            }
         }
         val previousFrom = when (period) {
-            // The seven days before the current seven.
+            // The seven days before these seven.
             StatsPeriod.WEEK -> from.minusDays(7)
             // Calendar arithmetic, not a fixed day count: this is what puts the
             // leap day inside the previous February and keeps a 31-day month
@@ -143,10 +179,10 @@ object StatsWindows {
 
         return StatsWindow(
             from = DayResolver.formatDate(from),
-            to = today,
+            to = DayResolver.formatDate(to),
             previousFrom = DayResolver.formatDate(previousFrom),
             // The previous window always ends the day before the current one
-            // begins: no gap, no overlap, whatever the period.
+            // begins: no gap, no overlap, whatever the period or offset.
             previousTo = DayResolver.formatDate(from.minusDays(1)),
         )
     }

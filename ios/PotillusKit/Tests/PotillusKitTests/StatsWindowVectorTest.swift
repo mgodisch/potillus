@@ -60,6 +60,26 @@ final class StatsWindowVectorTest: XCTestCase {
 
     // ── The three periods and their boundaries ───────────────────────────────
 
+    /// The offset cases, where a period other than the current one is asked for.
+    ///
+    /// The boundary these pin is where the window ENDS: the current period stops
+    /// at today, a past one at its own last day. Getting that wrong divides an
+    /// average by days that have not happened.
+    func testWindowWithAnOffsetMatchesTheVectors() throws {
+        let vectors = try TestVectors.load("stats-window", as: StatsWindowVectors.self)
+        XCTAssertFalse(vectors.windowOffset.isEmpty, "the shared vectors carry offset cases")
+        for testCase in vectors.windowOffset {
+            try assertMatches(
+                testCase,
+                StatsWindows.window(
+                    period: try period(testCase.period),
+                    today: testCase.today,
+                    offset: testCase.offset ?? 0
+                )
+            )
+        }
+    }
+
     func testWindowMatchesTheVectors() throws {
         let vectors = try TestVectors.load("stats-window", as: StatsWindowVectors.self)
         for testCase in vectors.window {
