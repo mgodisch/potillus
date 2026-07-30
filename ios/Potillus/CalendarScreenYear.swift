@@ -86,6 +86,17 @@ extension CalendarScreen {
     }
 
     /// One month of the heat-map: its abbreviated name over a grid of day cells.
+    ///
+    /// THE MONTH IS THE TOUCH TARGET. A block is about a third of the width and six
+    /// rows tall, far past the HIG's 44 points, and its meaning is plain: show me
+    /// this month. Tapping opens the month layout on it without selecting a day —
+    /// the finger named a month, and reading a day out of where inside the block it
+    /// landed would be invention.
+    ///
+    /// `onTapGesture` and an explicit `accessibilityAction`, NOT a `Button`: a
+    /// Button would merge its children into one element and take the per-day labels
+    /// with it. This way the days stay individually readable and VoiceOver still
+    /// offers the jump, announced by the month's full name.
     private func yearMonth(_ month: YearGrid.Month) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(monthAbbreviation(month.month))
@@ -104,6 +115,11 @@ extension CalendarScreen {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .onTapGesture { Task { await model.showMonth(month.month) } }
+        .accessibilityAction(named: monthFullName(month.month)) {
+            Task { await model.showMonth(month.month) }
+        }
     }
 
     private var yearColumns: [GridItem] {
@@ -116,9 +132,9 @@ extension CalendarScreen {
     ///
     /// NOT TAPPABLE, deliberately. A 9-point square is far under the 44-point
     /// target the HIG asks for, and a target that small is one the user misses —
-    /// hitting the neighbouring day instead, silently. Picking and editing a day
-    /// is the month view's job; this grid is for reading. Switching layouts drops
-    /// the selection anyway, so no route to a day is lost.
+    /// hitting the neighbouring day instead, silently. The tap target is the month
+    /// block around it (see `yearMonth`), which opens the month layout where days
+    /// are picked and edited at a size a finger can hit.
     @ViewBuilder
     private func yearDayCell(_ date: String) -> some View {
         if !model.state.yearGrid.isDrawn(date) {
@@ -234,6 +250,17 @@ extension CalendarScreen {
     /// formatting ones: these are bare month names without a day beside them, and
     /// inflected languages spell the two differently — the same distinction
     /// Android draws with "LLL" against "MMM".
+    /// The full standalone month name, for the block's accessibility action. Same
+    /// standalone-vs-format reasoning as `monthAbbreviation`; the year is included
+    /// because the grid can be paged away from the current one.
+    private func monthFullName(_ month: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        let symbols = formatter.standaloneMonthSymbols ?? []
+        guard symbols.count == 12, (1...12).contains(month) else { return "" }
+        return "\(symbols[month - 1]) \(model.state.year)"
+    }
+
     private func monthAbbreviation(_ month: Int) -> String {
         let formatter = DateFormatter()
         formatter.locale = locale

@@ -50,6 +50,7 @@ package de.godisch.potillus.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -85,8 +87,9 @@ import java.time.format.FormatStyle
  *   - **nothing at all**            → the day lies outside the evaluated window:
  *                                     after [today], or before [statsFrom].
  *
- * No cell is tappable: at 9.dp they are far below the 48.dp touch target a
- * reliable tap needs, so the grid reads and the month view edits.
+ * Individual DAYS are not tappable: at 9.dp they are far below the 48.dp touch
+ * target a reliable tap needs. A whole MONTH is, and it is comfortably large:
+ * tapping one opens the month view on it, which is where a day gets picked.
  *
  * HOW THE GRID INDEX WORKS:
  *   For month M starting on weekday `startPad` (0 = Mon):
@@ -99,6 +102,9 @@ import java.time.format.FormatStyle
  * @param summaries   Map from "YYYY-MM-DD" → [DaySummary] for all days with entries.
  *                    Days without entries are simply absent from the map.
  * @param limitGrams  Daily limit in grams; determines over/under colouring.
+ * @param onMonthClick Called with the month number (1..12) when the user taps a
+ *                    month block. The caller switches to the month view; no day
+ *                    is selected, because a tap this size names a month, not a day.
  * @param today       Logical today (from [de.godisch.potillus.domain.DayResolver]).
  *                    Must be derived from DayResolver (not [LocalDate.now]) so the
  *                    day-change time is respected. Also the upper end of the
@@ -114,6 +120,7 @@ fun YearCalendarView(
     summaries: Map<String, DaySummary>,
     limitGrams: Double,
     today: LocalDate,
+    onMonthClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     weekStart: Int = 1,
     statsFrom: LocalDate? = null,
@@ -132,6 +139,11 @@ fun YearCalendarView(
     // (TextStyle.FULL_STANDALONE) and the month+year labels (monthYearFormatter,
     // see l10n/LocaleSupport.kt).
     val monthFmt = DateTimeFormatter.ofPattern("LLL", locale)
+    // The full standalone month name for the block's accessibility label. "LLLL"
+    // for the same reason "LLL" is used above: a bare month name, not the genitive
+    // that follows a day number. The year is included because the grid can be
+    // paged away from the current one.
+    val monthLabelFmt = DateTimeFormatter.ofPattern("LLLL yyyy", locale)
     // Localized MEDIUM date for the per-cell accessibility label (e.g. "28 Jun
     // 2026" / "2026/06/28"). Built once and reused for every labelled day cell.
     val dayDescDateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
@@ -172,7 +184,25 @@ fun YearCalendarView(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 rowMonths.forEach { ym ->
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
+                    // THE MONTH IS THE TOUCH TARGET, not the day. A block spans about a
+                    // third of the width and six cell rows, so it clears the 48.dp
+                    // minimum many times over, and what it means is unambiguous: show
+                    // me this month. The click sits on the Column rather than on the
+                    // cells, which keeps the day cells free of targets too small to hit.
+                    //
+                    // clickable does NOT merge the children, so each labelled day stays
+                    // its own node for accessibility services; the block adds a level
+                    // above them. It carries the full month name (not the abbreviation
+                    // the cells show) so the action is announced with a name rather than
+                    // as an unlabelled target.
+                    val monthLabel = ym.format(monthLabelFmt)
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .clickable(role = Role.Button) { onMonthClick(ym.monthValue) }
+                            .semantics { contentDescription = monthLabel },
+                    ) {
                         // Month abbreviation header (e.g. "Jan", "Feb")
                         Text(
                             ym.format(monthFmt),
@@ -272,14 +302,14 @@ fun YearCalendarView(
                                         // (WCAG 2.5.8, Material's own guidance): a
                                         // target four times too small is one the user
                                         // misses, and the neighbour they hit instead
-                                        // selects the wrong day silently. The month
-                                        // view is where a day is picked and edited;
-                                        // this grid is for reading. Nothing is lost —
-                                        // switching layouts clears the selection on
-                                        // both platforms anyway.
+                                        // selects the wrong day silently. The target
+                                        // is the month block around these cells,
+                                        // which opens the month view where a day can
+                                        // be picked at a size a finger can hit.
                                         //
-                                        // No focus ring either: it marked where a tap
-                                        // would land, and nothing lands here now.
+                                        // No focus ring on the cell either: it marked
+                                        // where a tap would land, and the tap has
+                                        // moved out to the block.
                                         Box(
                                             modifier = Modifier
                                                 .size(cellSize)

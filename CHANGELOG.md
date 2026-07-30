@@ -48,7 +48,8 @@ Edit drinks from the list's edit mode
 
 - The statistics start date has a row that clears it.
 - The backup export has a switch for the settings block.
-- A read-only year heat-map in the calendar, with a month and year toggle.
+- A year heat-map in the calendar, with a month and year toggle, where a month
+  opens the month view.
 
 ### Changed
 

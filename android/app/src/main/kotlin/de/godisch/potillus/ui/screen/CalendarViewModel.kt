@@ -302,6 +302,25 @@ class CalendarViewModel(
         _selectedDate.value = null
     }
 
+    /**
+     * Opens the month view on [month] (1..12) of the year currently on display.
+     *
+     * The year calendar's month blocks call this. It sets the month, the view mode
+     * and the (empty) selection together, so no emission can observe a half-applied
+     * navigation — the same reason [prevPeriod] moves `_month` by whole years in
+     * YEAR mode rather than touching a separate year field.
+     *
+     * NO DAY IS SELECTED. The tap named a month, not a day: the block is a third of
+     * the screen wide, and reading a day out of where a finger landed inside it
+     * would be invention. The month view opens unselected, as it does after any
+     * other navigation.
+     */
+    fun showMonth(month: Int) {
+        _month.value = YearMonth.of(_month.value.year, month)
+        _viewMode.value = CalendarViewMode.MONTH
+        _selectedDate.value = null
+    }
+
     /** Navigate to the previous month (MONTH mode) or previous year (YEAR mode). */
     fun prevPeriod() {
         // In YEAR mode, advance _month by 12 months so that _month.value.year

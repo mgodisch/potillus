@@ -229,10 +229,11 @@ nennt die drei Zustände: {{year_calendar_no_entry}},
 {{year_calendar_under_limit}}, {{year_calendar_over_limit}}. Der heutige Tag
 trägt einen Rahmen.
 
-Diese Ansicht ist zum Lesen da, nicht zum Bearbeiten: Die Quadrate lassen sich
-nicht antippen. Dafür sind sie zu klein — man träfe regelmäßig den Nachbartag,
-ohne es zu merken. Wenn du einen Tag ändern willst, wechsle in die
-Monatsansicht.
+Ein Tippen auf einen Monat wechselt in die Monatsansicht dieses Monats. Die
+einzelnen Quadrate sind dagegen nicht antippbar -- dafür sind sie zu klein, man
+träfe regelmäßig den Nachbartag, ohne es zu merken. Ausgewählt wird durch den
+Wechsel also kein Tag; das tust du dann in der Monatsansicht, wo die Felder groß
+genug sind.
 
 Zwei Zeiträume bleiben leer, und zwar absichtlich: alles nach heute, und alles
 vor deinem {{stats_from_label}}. Beides sind Tage, über die die App nichts

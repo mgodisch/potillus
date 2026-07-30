@@ -397,19 +397,6 @@ public final class CalendarModel {
         await reloadVisiblePeriod()
     }
 
-    /// Integer arithmetic again, and no month bookkeeping: the year layout draws
-    /// all twelve, so paging moves the year alone.
-    public func previousYear() async {
-        state.year -= 1
-        clearSelection()
-        await reloadYear()
-    }
-
-    public func nextYear() async {
-        state.year += 1
-        clearSelection()
-        await reloadYear()
-    }
 
     /// A selection belongs to the month it was made in; carrying it across would
     /// show January's entries under a February heading.
@@ -522,5 +509,52 @@ public final class CalendarModel {
         return AlcoholCalculator.isOverLimit(
             totalGrams: summary.totalGrams, limitGrams: state.limitInfo.limitGrams
         )
+    }
+}
+
+// =============================================================================
+// Navigating the year layout
+// =============================================================================
+//
+// In an extension, not in the class body, for the reason check-swift-length gives:
+// SwiftLint's type_body_length counts the body and not its extensions, and the
+// body had reached the limit. The seam is a real one — these three are what the
+// year heat-map's own controls call — so the split follows meaning, not only the
+// line count.
+//
+// No @MainActor annotation: the isolation comes from the type, which carries it,
+// and repeating it here would be redundant.
+// =============================================================================
+
+extension CalendarModel {
+
+    /// Integer arithmetic again, and no month bookkeeping: the year layout draws
+    /// all twelve, so paging moves the year alone.
+    public func previousYear() async {
+        state.year -= 1
+        clearSelection()
+        await reloadYear()
+    }
+
+    public func nextYear() async {
+        state.year += 1
+        clearSelection()
+        await reloadYear()
+    }
+
+    /// Opens the month layout on `month` (1...12) of the year on display.
+    ///
+    /// The year heat-map's month blocks call this. Mode, month and the cleared
+    /// selection are set together, so no observer sees half a navigation.
+    ///
+    /// NO DAY IS SELECTED. The tap named a month: a block is a third of the screen
+    /// wide, and picking a day out of where the finger landed inside it would be
+    /// invention. The month opens unselected, as after any other navigation.
+    public func showMonth(_ month: Int) async {
+        guard (1...12).contains(month) else { return }
+        state.month = month
+        state.viewMode = .month
+        clearSelection()
+        await reloadMonth()
     }
 }
