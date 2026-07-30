@@ -46,38 +46,44 @@ package de.godisch.potillus.ui.nav
 //
 // MainPage:
 //   Separates navigation concerns from UI concerns (title, icon). The four
-//   main screens are pages of a HorizontalPager (not separate NavHost routes),
-//   identified by their pager index.
+//   main screens are switched inside the Home destination (not separate NavHost
+//   routes), identified by their index.
 //
-// MAIN-SCREEN NAVIGATION (HorizontalPager):
-//   The four top-level screens (Today, Calendar, Statistics, Drinks) live in a
-//   bounded HorizontalPager inside the Home destination. Swiping moves between
-//   adjacent screens; the pager is NOT circular, so the first/last screens have
-//   no further page to swipe to. The bottom bar tab follows the current page,
-//   and tapping a tab animates to that page.
+// MAIN-SCREEN NAVIGATION (a selected index, no swiping):
+//   The four top-level screens (Today, Calendar, Statistics, Drinks) are switched
+//   by the bottom bar and nothing else. Until 0.85.0 they were pages of a
+//   HorizontalPager, so a horizontal swipe anywhere on a screen moved to the
+//   neighbouring one. Material's own guidance argues against exactly that for
+//   bottom-navigation destinations: a lateral transition implies a relationship
+//   between the destinations that does not exist, and it teaches the horizontal
+//   axis as "change screen", which then cannot mean anything else INSIDE a
+//   screen. iOS never had it either — RootView uses a plain TabView — so the two
+//   ports now share one model: tap to change screen, swipe for content.
+//
+//   Crossfade, which is the transition Material recommends here, and which says
+//   the destinations are peers rather than neighbours on a strip.
 //
 // TWO NAVHOST DESTINATIONS:
-//   Only Home (the pager + bottom bar) and Settings are NavHost routes. Settings
+//   Only Home (the screens + bottom bar) and Settings are NavHost routes. Settings
 //   is pushed on top of Home via the gear icon and has no bottom bar; Back/Up
 //   returns to Home on the page the user left.
 // =============================================================================
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.*
 import de.godisch.potillus.R
 import de.godisch.potillus.ui.screen.*
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 // ── Route definitions ─────────────────────────────────────────────────────────
@@ -97,7 +103,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed interface Screen {
-    /** The four swipeable top-level screens, hosted together in a HorizontalPager. */
+    /** The four top-level screens, hosted together behind the bottom bar. */
     @Serializable data object Home : Screen
 
     /** Settings, opened via the overflow menu and pushed on top of [Home]. */
@@ -151,19 +157,18 @@ sealed interface Screen {
 // ── Bottom-bar metadata ───────────────────────────────────────────────────────
 
 /**
- * UI metadata for one pager page / bottom-bar tab.
+ * UI metadata for one main screen / bottom-bar tab.
  *
- * The page is identified by its position in [mainPages] (the pager index), so —
- * unlike the former NavItem — it no longer carries a navigation route object:
- * the four main screens are pages of a [HorizontalPager], not separate NavHost
- * destinations.
+ * The screen is identified by its position in [mainPages], so — unlike the former
+ * NavItem — it no longer carries a navigation route object: the four main screens
+ * are switched inside the Home destination, not separate NavHost destinations.
  *
  * @param titleRes  String resource for the bottom-bar label / accessibility text.
  * @param icon      Material icon shown in the [NavigationBar].
  */
 private data class MainPage(val titleRes: Int, val icon: ImageVector)
 
-// The four swipeable screens, in pager/tab order. Settings is intentionally NOT
+// The four main screens, in tab order. Settings is intentionally NOT
 // here: it is opened via a gear action in each screen's top bar and pushed as a
 // separate destination (no bottom bar).
 private val mainPages = listOf(
@@ -211,7 +216,7 @@ fun AppNavigation(
         startDestination = Screen.Home,
     ) {
         composable<Screen.Home> {
-            MainPagerHost(
+            MainScreenHost(
                 todayVm = todayVm,
                 calendarVm = calendarVm,
                 statsVm = statsVm,
@@ -295,22 +300,20 @@ fun AppNavigation(
 }
 
 /**
- * Hosts the four top-level screens in a bounded [HorizontalPager] with a
- * [NavigationBar] below.
+ * Hosts the four top-level screens with a [NavigationBar] below.
  *
  * NAVIGATION BEHAVIOUR:
- *   - Swiping left/right moves between adjacent screens.
- *   - The pager is NOT circular (the default): swiping right on the first page
- *     (Today) or left on the last page (Drinks) does nothing.
- *   - Tapping a bottom-bar item animates to that page; the selected item follows
- *     the current page when the user swipes.
+ *   - Tapping a bottom-bar item shows that screen, crossfading from the previous
+ *     one. There is no swipe between screens; see this file's header for why.
+ *   - The selected item is the shown screen, by construction: both read the same
+ *     [rememberSaveable] index.
  *
- * Each page is a full screen with its own top bar (including the Settings gear).
- * The pager content is padded by the Scaffold's [innerPadding] so it never sits
- * under the bottom navigation bar.
+ * Each screen is full-height with its own top bar (including the Settings gear).
+ * The content is padded by the Scaffold's [innerPadding] so it never sits under
+ * the bottom navigation bar.
  */
 @Composable
-private fun MainPagerHost(
+private fun MainScreenHost(
     todayVm: TodayViewModel,
     calendarVm: CalendarViewModel,
     statsVm: StatsViewModel,
@@ -321,8 +324,10 @@ private fun MainPagerHost(
     /** Forwarded to each page's [AppOverflowMenu] for the "Lock app" entry. */
     onLockApp: () -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = { mainPages.size })
-    val scope = rememberCoroutineScope()
+    // rememberSaveable, not remember: the index has to outlive a rotation and the
+    // trip to Settings and back, which is what the pager state did before. Saving
+    // it is also what lets Back from Settings land on the screen the user left.
+    var selectedPage by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
         // Each page's own Scaffold handles the top inset; this one only owns the
@@ -338,19 +343,18 @@ private fun MainPagerHost(
                         // Statistics tab uses a short synonym (see `mainPages`) so
                         // long translations do not wrap.
                         label = { Text(stringResource(page.titleRes)) },
-                        // Highlight the tab for the page currently shown by the
-                        // pager — this updates automatically when the user swipes.
-                        selected = pagerState.currentPage == index,
-                        // animateScrollToPage runs in a coroutine; the pager
-                        // enforces the bounds (no wrap-around).
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        // The shown screen and the highlighted tab are the same
+                        // value, so they cannot disagree.
+                        selected = selectedPage == index,
+                        onClick = { selectedPage = index },
                     )
                 }
             }
         },
     ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState,
+        Crossfade(
+            targetState = selectedPage,
+            label = "main-screen",
             modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) { page ->
             when (page) {

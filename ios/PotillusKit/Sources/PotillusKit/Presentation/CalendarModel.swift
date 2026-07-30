@@ -397,7 +397,6 @@ public final class CalendarModel {
         await reloadVisiblePeriod()
     }
 
-
     /// A selection belongs to the month it was made in; carrying it across would
     /// show January's entries under a February heading.
     private func clearSelection() {
