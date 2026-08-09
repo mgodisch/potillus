@@ -706,7 +706,14 @@ val generateUserGuides = tasks.register<Exec>("generateUserGuides") {
     workingDir = rootProject.projectDir
     // workingDir is the android/ Gradle root; the tooling now lives in tools/ at
     // the repository root, i.e. one level up.
-    commandLine("python3", "../tools/render-guide.py")
+    //
+    // --platform IS MANDATORY. One renderer serves both ports from the shared
+    // templates in docs/guide/, and it refuses to guess which one it is rendering
+    // for. This call site was missed when the two renderers were merged, and CI
+    // caught it where the Makefile path could not: `make` passes the flag, Gradle
+    // did not, so every build that went through preBuild failed with
+    // "--platform android|ios is required" (0.85.0 QA round).
+    commandLine("python3", "../tools/render-guide.py", "--platform", "android")
 }
 
 // Copies each verbatim license text the app must reproduce into res/raw, one

@@ -114,16 +114,21 @@ class LocaleSyncTest {
 
         /**
          * Directory holding the user-guide templates
-         * (docs/guide/usersguide*.md.in). It lives one level ABOVE the app
-         * module (…/android/docs/guide), i.e. a sibling of the module that
-         * RES_DIR is under, hence the "../docs/guide" hop from the module root.
+         * (docs/guide/usersguide*.md.in).
+         *
+         * AT THE REPOSITORY ROOT, two levels above the app module: ONE set of
+         * templates serves Android and iOS, each picking its own {{#android}} /
+         * {{#ios}} blocks. It used to sit at android/docs/guide, one level up,
+         * and the "../docs/guide" hop that pointed there survived the move —
+         * `listFiles` then returned null and the parity test failed on an empty
+         * template set (0.85.0 QA round).
          */
         private val GUIDE_DIR: File = run {
             val override = System.getProperty("potillus.project.dir")
             if (override != null) {
-                File(override, "../docs/guide")
+                File(override, "../../docs/guide")
             } else {
-                File("../docs/guide")
+                File("../../docs/guide")
             }
         }
 
@@ -132,10 +137,23 @@ class LocaleSyncTest {
          *
          * Android encodes region variants with a lowercase "r" prefix:
          *   values-pt-rBR  →  "pt-BR"
-         *   values-zh-rCN  →  "zh-CN"
          *   values-de      →  "de"
+         *
+         * Chinese is the exception: the shared guide templates use the SCRIPT
+         * subtags the rest of the world settled on, while Android names its
+         * resource directories by region. No rule connects "CN" to "Hans", so
+         * the pair is listed rather than derived — the same table
+         * render-guide.py holds, and both must agree or the parity check would
+         * report Chinese as missing on one side and surplus on the other.
+         *
+         *   values-zh-rCN  →  "zh-Hans"
+         *   values-zh-rTW  →  "zh-Hant"
          */
-        private fun qualifierToBcp47(qualifier: String): String = qualifier.replace(Regex("-r([A-Z])"), "-$1")
+        private fun qualifierToBcp47(qualifier: String): String = when (qualifier) {
+            "zh-rCN" -> "zh-Hans"
+            "zh-rTW" -> "zh-Hant"
+            else -> qualifier.replace(Regex("-r([A-Z])"), "-$1")
+        }
 
         /**
          * Counts <string name="…"> elements in an XML file.
@@ -465,9 +483,9 @@ class LocaleSyncTest {
 
     /**
      * Returns the set of BCP-47 tags that have a user-guide template under
-     * [GUIDE_DIR]. Template file names already carry the plain BCP-47 tag
-     * (e.g. `usersguide.pt-BR.md.in`, `usersguide.zh-CN.md.in`), so no
-     * qualifier conversion is needed. The code-less base `usersguide.md.in`
+     * [GUIDE_DIR]. Template file names carry the plain BCP-47 tag
+     * (e.g. `usersguide.pt-BR.md.in`, `usersguide.zh-Hans.md.in`), so no
+     * qualifier conversion is needed here. The code-less base `usersguide.md.in`
      * maps to the English base locale `"en"` — matching how
      * [localeTagsFromDirs] treats the unqualified `values/` directory.
      */

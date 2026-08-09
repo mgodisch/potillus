@@ -31,7 +31,8 @@ import SwiftUI
 // Mirrors Android's DocumentViewerScreen: it shows one bundled document, scrolled,
 // read-only. It backs two kinds of destination:
 //   - Help     → the localized user guide `usersguide_<tag>.md`, rendered from
-//                the templates under ios/docs/guide/ at build time.
+//                the shared templates under docs/guide/ at build time — the same
+//                ones Android renders, with the {{#ios}} blocks picked out.
 //   - License  → `license_gpl3.md`, a verbatim copy of the project-root
 //                LICENSE.md — the same file Android copies into its res/raw/,
 //                so the two platforms show byte-identical text. Linked from the About

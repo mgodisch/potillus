@@ -63,7 +63,8 @@ Edit drinks from the list's edit mode
 - Every guide token maps to a label the app shows.
 - One template per language feeds both platforms, with `{{#android}}` and
   `{{#ios}}` blocks.
-- `render-guide.py --platform` renders Android and iOS from `docs/guide/`.
+- `render-guide.py --platform` renders Android and iOS from `docs/guide/`,
+  called that way by Gradle and by both Makefiles.
 - Platform blocks sit on their own lines or inside a sentence.
 - The English renders live as `docs/guide/usersguide.android.md` and
   `usersguide.ios.md`.
