@@ -5,7 +5,8 @@
     "Harvested from the authoritative Android unit tests. Changing a value here is a",
     "deliberate, reviewable change to health-relevant behaviour.",
     "Tolerances: grams and bac compare with an absolute epsilon of 0.001.",
-    "isOverLimit(total, limit) = total > limit + 1e-6. The tolerance exists because 0.1-g values summed as binary doubles can drift above an exactly-met limit; a strict '>' would then report an exceedance the user cannot see."
+    "isOverLimit(total, limit) = total > limit + 1e-6. The tolerance exists because 0.1-g values summed as binary doubles can drift above an exactly-met limit; a strict '>' would then report an exceedance the user cannot see.",
+    "isDrinkDay(total) = total > 0. No tolerance: the comparison is against zero, not against a user-set limit, and grams live on a 0.1 g grid. A day of alcohol-free entries has a summary row but no alcohol, and is a dry day on every surface."
   ],
   "constants": {
     "ethanolDensity": 0.789,
@@ -603,6 +604,23 @@
       "description": "Excess above epsilon is a real exceedance",
       "totalGrams": 20.00001,
       "limitGrams": 20.0,
+      "expected": true
+    }
+  ],
+  "isDrinkDay": [
+    {
+      "description": "A day with nothing but alcohol-free drinks sums to zero and is not a drink day",
+      "totalGrams": 0.0,
+      "expected": false
+    },
+    {
+      "description": "The smallest amount the 0.1 g grid can hold is a drink day",
+      "totalGrams": 0.1,
+      "expected": true
+    },
+    {
+      "description": "An ordinary drinking day",
+      "totalGrams": 23.7,
       "expected": true
     }
   ]

@@ -247,6 +247,35 @@ final class ReportDataTests: XCTestCase {
         )
     }
 
+    // ── Alcohol-free days ────────────────────────────────────────────────────
+
+    /// A day of alcohol-free entries belongs to the period but is not a drink
+    /// day: abstinent, out of the drink-day divisor, and no break in a run.
+    ///
+    /// The day carries entries, so it has a summary row and every figure here
+    /// used to read it as drinking (v0.85.0). The dry day sits inside the gap
+    /// from 1 to 11 March, which the old reading split in two.
+    func testADayOfAlcoholFreeEntriesIsAbstinent() throws {
+        let entries = [
+            entry(1, drink: 1, date: "2026-03-01", grams: 10),
+            entry(2, drink: 1, date: "2026-03-06", grams: 0),
+            entry(3, drink: 1, date: "2026-03-11", grams: 30),
+        ]
+        let report = try XCTUnwrap(
+            ReportData.make(
+                entries: entries, drinks: [drink(1, .beer)],
+                settings: settings(daily: 24, weekly: 168, drinkDays: 5),
+                periodEnd: "2026-03-11", today: "2026-03-12",
+                timeZone: TimeZone(identifier: "UTC")!
+            )
+        )
+        XCTAssertEqual(report.drinkDays, 2, "the 0.0 g day is not a drink day")
+        XCTAssertEqual(report.abstinentDays, report.totalDays - report.drinkDays)
+        XCTAssertEqual(report.avgPerDrinkDay, 20.0, accuracy: 0.001)
+        // Nine dry days between the two drink days, not two runs of four.
+        XCTAssertEqual(report.longestAbstinence, 9)
+    }
+
     // ── The weekday profile follows the locale ───────────────────────────────
 
     func testWeekdayOrderStartsAtTheLocalesFirstDay() throws {

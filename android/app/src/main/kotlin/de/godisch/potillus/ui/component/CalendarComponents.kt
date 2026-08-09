@@ -270,7 +270,12 @@ fun YearCalendarView(
                                         val date = localDate.toString() // "YYYY-MM-DD"
                                         val summary = summaries[date]
                                         val color = when {
-                                            summary == null || summary.totalGrams == 0.0 -> empty
+                                            // A day with only alcohol-free entries reads as
+                                            // empty here, like a day with none at all: the
+                                            // heat map is about drinking, and
+                                            // AlcoholCalculator.isDrinkDay decides that
+                                            // everywhere in the app.
+                                            summary == null || !AlcoholCalculator.isDrinkDay(summary.totalGrams) -> empty
                                             AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams) -> red
                                             else -> green
                                         }

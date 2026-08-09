@@ -85,6 +85,13 @@ public struct TodayState: Sendable, Equatable {
     /// such baseline exists.
     public var monthTrend: Trend = .flat
 
+    /// Completed alcohol-free days up to, but not including, today (see
+    /// `DayResolver.computeCurrentAbstinence`). Zero whenever alcohol was logged
+    /// today, so a value above zero always means today stands at 0.0 g and at
+    /// least one full dry day lies behind it. The Statistics screen shows the
+    /// same figure as the current abstinence.
+    public var currentAbstinence: Int = 0
+
     /// The Widmark estimate in per mille, or nil when it cannot be computed.
     ///
     /// Nil is not zero. Nil means "we do not know" — the user has not entered a
@@ -298,7 +305,7 @@ public final class TodayModel {
                                         settings: settings, nowMillis: nowMillis)
 
             let window = try weeklyWindow(endingOn: today)
-            next.drinkDaysThisWeek = window.filter { $0.totalGrams > 0.0 }.count
+            next.drinkDaysThisWeek = AlcoholCalculator.drinkDates(summaries: window).count
             next.weeklyTotalGrams = window.reduce(0.0) { $0 + $1.totalGrams }
 
             if let todayDate = DayResolver.parseDate(today) {
@@ -310,6 +317,18 @@ public final class TodayModel {
             let month = try monthlyAverage(today: today, statsFloor: settings.statsFromDate)
             next.monthlyAvgPerDay = month.average
             next.monthTrend = month.trend
+
+            // The same call with the same arguments as the Statistics screen's
+            // current streak, so the two screens cannot show two numbers. The
+            // floor is passed for the case with no alcohol on record at all: the
+            // streak then runs from the day the user chose to start counting.
+            let floor = settings.statsFromDate
+            let drinkDates = try entries.drinkDates()
+            next.currentAbstinence = DayResolver.computeCurrentAbstinence(
+                sortedDates: floor.isEmpty ? drinkDates : drinkDates.filter { $0 >= floor },
+                today: today,
+                statsFrom: floor
+            )
 
             // Bail out before publishing if the task was cancelled during the
             // awaits above. `stop()` cancels the ticker, but cancellation is
@@ -358,7 +377,9 @@ public final class TodayModel {
         let curMonth = history.filter { $0.date >= monthFromStr }
         let days = DayResolver.effectivePeriodDays(
             from: monthFromStr, today: today,
-            todayIsDrinkDay: curMonth.contains { $0.date == today }
+            todayIsDrinkDay: curMonth.contains {
+                $0.date == today && AlcoholCalculator.isDrinkDay(totalGrams: $0.totalGrams)
+            }
         )
         let average = days > 0 ? curMonth.reduce(0.0) { $0 + $1.totalGrams } / Double(days) : 0.0
 

@@ -306,6 +306,27 @@ final class StatsModelTests: XCTestCase {
         XCTAssertEqual(model.state.currentStreak, 14, "today is unfinished and does not count")
     }
 
+    // ── Alcohol-free days ────────────────────────────────────────────────────
+
+    /// A day of alcohol-free drinks is not a drink day and leaves a streak
+    /// running. The database returns a summary row for it — an entry was logged —
+    /// so everything here used to read it as drinking (v0.85.0).
+    ///
+    /// Today is 15 January. Alcohol on the 10th, a 0.0 g drink on the 12th: the
+    /// completed dry days since the last DRINK day are the 11th to the 14th.
+    func testAnAlcoholFreeDayIsNotADrinkDay() async throws {
+        try log("2026-01-10", grams: 30.0)
+        try log("2026-01-12", grams: 0.0)
+
+        let model = makeModel()
+        await model.setPeriod(.month)
+
+        XCTAssertEqual(model.state.currentStreak, 4, "the 0.0 g day leaves the streak running")
+        // averagePerDrinkDay = totalGrams / drinkDays. Counting the dry day would
+        // halve this to 15 g.
+        XCTAssertEqual(model.state.averagePerDrinkDay, 30.0, accuracy: 0.001)
+    }
+
     // ── The chart and the aggregations are wired through ─────────────────────
 
     func testTheYearPeriodBucketsByMonth() async throws {

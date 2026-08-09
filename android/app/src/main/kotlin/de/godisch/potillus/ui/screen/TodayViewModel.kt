@@ -94,6 +94,14 @@ data class TodayUiState(
      * (FLAT when there is no such baseline or the two are equal at 0.1 g).
      */
     val monthTrend: Trend = Trend.FLAT,
+    /**
+     * Completed alcohol-free days up to, but not including, today (see
+     * [de.godisch.potillus.domain.DayResolver.computeCurrentAbstinence]). Zero
+     * whenever alcohol was logged today, so a value above zero always means
+     * today stands at 0.0 g and at least one full dry day lies behind it. The
+     * same figure the Statistics screen shows as the current abstinence.
+     */
+    val currentAbstinence: Int = 0,
     /** Localized standalone name of the current month (e.g. "June" / "Juni"). */
     val currentMonthLabel: String = "",
     val bacPermille: Double? = null,
@@ -300,8 +308,13 @@ class TodayViewModel(
             drinkRepo.drinks,
             entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
             entryRepo.getDailySummaries(historyFrom, DayResolver.formatDate(windowEnd)),
-            ticker,
-        ) { entries, drinks, weeklySummaries, historySummaries, _ ->
+            // The ticker keeps its role as the BAC clock (see its KDoc) and carries
+            // the drink-day dates along: the typed `combine` overloads stop at five
+            // sources, and the streak needs the whole history, not just the queried
+            // windows above. The date list changes only when an entry is written, so
+            // the minute tick re-emits the previous list unchanged.
+            combine(entryRepo.getDrinkDatesFlow(), ticker) { drinkDates, _ -> drinkDates },
+        ) { entries, drinks, weeklySummaries, historySummaries, drinkDates ->
             val totalGrams = entries.sumOf { it.gramsAlcohol }
 
             // BAC calculation: only use entries with actual alcohol (> 0 %) so that
@@ -334,7 +347,9 @@ class TodayViewModel(
                 val days = DayResolver.effectivePeriodDays(
                     from = monthFromStr,
                     today = today,
-                    todayIsDrinkDay = curMonth.any { it.date == today },
+                    todayIsDrinkDay = curMonth.any {
+                        it.date == today && AlcoholCalculator.isDrinkDay(it.totalGrams)
+                    },
                 )
                 if (days > 0) curMonth.sumOf { it.totalGrams } / days else 0.0
             }
@@ -345,7 +360,7 @@ class TodayViewModel(
                 entries = entries,
                 totalGrams = totalGrams,
                 limitInfo = limitInfo,
-                drinkDaysThisWeek = weeklySummaries.count { it.totalGrams > 0.0 },
+                drinkDaysThisWeek = AlcoholCalculator.drinkDates(weeklySummaries).size,
                 weeklyTotalGrams = weeklySummaries.sumOf { it.totalGrams },
                 weeklyRangeLabel = weekLabel,
                 // Per-day average for the current month (app-wide superposition rule),
@@ -353,6 +368,16 @@ class TodayViewModel(
                 monthlyAvgPerDay = curMonthAvg,
                 monthTrend = Trend.of(curMonthAvg, baselineAvg),
                 currentMonthLabel = monthLabel,
+                // Same call and same arguments as the Statistics screen's current
+                // streak, so the two screens can only ever show one number. The
+                // statistics start date is passed for the case with no alcohol on
+                // record at all: the streak then runs from the day the user chose
+                // to start counting.
+                currentAbstinence = DayResolver.computeCurrentAbstinence(
+                    sortedDates = if (statsFloor.isNotEmpty()) drinkDates.filter { it >= statsFloor } else drinkDates,
+                    today = today,
+                    statsFrom = statsFloor,
+                ),
                 bacPermille = bac,
                 favorites = drinks.filter { it.isFavorite },
                 settings = settings,

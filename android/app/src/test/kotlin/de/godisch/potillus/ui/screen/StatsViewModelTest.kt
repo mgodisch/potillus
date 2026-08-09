@@ -415,6 +415,38 @@ class StatsViewModelTest {
         }
     }
 
+    // ── Alcohol-free days ────────────────────────────────────────────────────
+
+    /**
+     * A day holding only alcohol-free entries is not a drink day, does not end
+     * the abstinence streak, and counts among the abstinent days.
+     *
+     * The database returns a summary row for it — an entry was logged — so
+     * everything here used to read it as a drinking day. The figures now go
+     * through [de.godisch.potillus.domain.AlcoholCalculator.isDrinkDay] instead
+     * (v0.85.0). Dates are derived from the LOGICAL today so the test does not
+     * depend on the wall clock.
+     */
+    @Test fun `a day of alcohol-free entries is not a drink day`() = runTest {
+        val today = DayResolver.today(4, 0)
+        val todayDate = LocalDate.parse(today)
+        // Alcohol five days ago, an alcohol-free drink two days ago, dry since.
+        entryRepo.add(entry(id = 1, date = todayDate.minusDays(5).toString(), grams = 30.0))
+        entryRepo.add(entry(id = 2, date = todayDate.minusDays(2).toString(), grams = 0.0))
+
+        val vm = makeVm()
+        vm.setPeriod(StatsPeriod.WEEK)
+        vm.uiState.test {
+            val state = awaitComputed()
+            // avgPerDrinkDay = totalGrams / drinkDays. Counting the 0.0 g day as a
+            // drink day would halve this to 15 g.
+            assertEquals("only the day with alcohol is a drink day", 30.0, state.avgPerDrinkDay, 0.001)
+            // The completed days between the last drink day and today: 4.
+            assertEquals("the 0.0 g day leaves the streak running", 4, state.currentStreak)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ── Export status (CSV/PDF export) ─────────────
 
     /**

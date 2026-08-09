@@ -75,11 +75,22 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
     /**
      * Reactive stream of all distinct dates that have at least one entry.
      *
-     * Used by [de.godisch.potillus.ui.screen.StatsViewModel] for streak calculation.
-     * The returned list is always sorted ascending ("YYYY-MM-DD" lexicographic
-     * order equals chronological order, so String comparison is correct).
+     * Used by [de.godisch.potillus.ui.screen.StatsViewModel] to decide how far the
+     * period navigation may page back. The returned list is always sorted ascending
+     * ("YYYY-MM-DD" lexicographic order equals chronological order, so String
+     * comparison is correct).
      */
     override fun getAllDatesFlow(): Flow<List<String>> = dao.getAllDatesFlow()
+
+    /**
+     * Reactive stream of the distinct dates on which alcohol was consumed.
+     *
+     * Feeds the abstinence streaks on the Today and Statistics screens. Sorted
+     * ascending like [getAllDatesFlow], and narrower than it by exactly the days
+     * that hold only alcohol-free entries — see
+     * [de.godisch.potillus.domain.AlcoholCalculator.isDrinkDay].
+     */
+    override fun getDrinkDatesFlow(): Flow<List<String>> = dao.getDrinkDatesFlow()
 
     /**
      * Reactive stream of all entries in a logical date range.

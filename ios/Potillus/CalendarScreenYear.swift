@@ -193,7 +193,11 @@ extension CalendarScreen {
     /// a device: "Increase Contrast" and a non-standard background both shift the
     /// result.
     private func yearCellColour(_ date: String, summary: DaySummary?) -> Color {
-        guard let summary, summary.totalGrams > 0 else { return emptyCellFill }
+        // A day of alcohol-free entries reads as empty here, like a day with
+        // none at all: the heat map is about drinking, and
+        // `AlcoholCalculator.isDrinkDay` decides that everywhere in the app.
+        guard let summary, AlcoholCalculator.isDrinkDay(totalGrams: summary.totalGrams)
+        else { return emptyCellFill }
         return model.isOverLimit(date) ? .red : .accentColor
     }
 

@@ -234,10 +234,31 @@ struct TodayScreen: View {
             // 0.83.0 UI-parity pass lifts them here so someone who switches
             // platforms reads the same two numbers in the same place. They are
             // a `LabeledContent` each so VoiceOver announces caption + value.
-            LabeledContent {
-                headlineValue(grams(model.state.totalGrams))
-            } label: {
-                Text(Loc.string("Today's Total", locale: locale))
+            // WHAT THE FIRST ROW SHOWS. Someone who has set out to abstain is
+            // served better by the length of the run than by a gram total that
+            // reads 0.0 every day, so while a streak is running the caption and
+            // the value switch to it, green as on the Statistics screen. Logging
+            // a drink puts the streak at 0 and the gram total back, until a full
+            // dry day has been completed again.
+            //
+            // `currentAbstinence > 0` is the whole condition:
+            // `DayResolver.computeCurrentAbstinence` returns 0 as soon as today
+            // holds alcohol, so a positive value already implies 0.0 g today.
+            // Testing the grams as well would be a second source for one
+            // decision. Android's Today card switches on the same value.
+            if model.state.currentAbstinence > 0 {
+                LabeledContent {
+                    headlineValue(Loc.daysPlural(count: model.state.currentAbstinence, locale: locale))
+                        .foregroundStyle(Color.green)
+                } label: {
+                    Text(Loc.string("Current Abstinence", locale: locale))
+                }
+            } else {
+                LabeledContent {
+                    headlineValue(grams(model.state.totalGrams))
+                } label: {
+                    Text(Loc.string("Today's Total", locale: locale))
+                }
             }
 
             LabeledContent {
@@ -296,7 +317,7 @@ struct TodayScreen: View {
                 emphasis: LimitGauge.drinkDaysEmphasis(
                     drinkDays: model.state.drinkDaysThisWeek,
                     maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek,
-                    todayIsDrinkDay: model.state.totalGrams > 0
+                    todayIsDrinkDay: AlcoholCalculator.isDrinkDay(totalGrams: model.state.totalGrams)
                 )
             )
 

@@ -306,9 +306,10 @@ public final class StatsModel {
         // How far back the user may go: the period holding the earliest day that
         // counts — the floor when one is set, otherwise the oldest logged day.
         // Further back lie only empty windows. With no history and no floor the
-        // ceiling is 0 and the screen cannot leave today.
-        // Read once and used twice: for the offset ceiling here and for the streaks
-        // further down. Two calls would be two queries for the same answer.
+        // ceiling is 0 and the screen cannot leave today. Every logged day counts
+        // here, alcohol-free ones included: the user may page back to a day they
+        // recorded, whatever was in the glass. The streaks further down ask the
+        // narrower question and read their own list.
         let allDates = try entries.allDates()
         let earliestDay = floor.isEmpty ? (allDates.min() ?? today) : floor
         let maxOffset = StatsWindows.offsetOf(period: state.period, today: today, day: earliestDay)
@@ -334,7 +335,7 @@ public final class StatsModel {
             : []
 
         let totalGrams = summaries.reduce(0.0) { $0 + $1.totalGrams }
-        let drinkDays = summaries.filter { $0.totalGrams > 0.0 }.count
+        let drinkDays = AlcoholCalculator.drinkDates(summaries: summaries).count
 
         // An unfinished dry day is excluded, so today's absence of drinking does not
         // dilute the average until the day is over. THE RULE IS ABOUT TODAY, NOT
@@ -343,7 +344,9 @@ public final class StatsModel {
         // dropped it from the count. `windowDays` takes both and decides.
         let windowEndsToday = window.to == today
         let todayIsDrinkDay = windowEndsToday
-            && summaries.contains { $0.date == window.to && $0.totalGrams > 0.0 }
+            && summaries.contains {
+                $0.date == window.to && AlcoholCalculator.isDrinkDay(totalGrams: $0.totalGrams)
+            }
         let periodDays = DayResolver.windowDays(
             from: window.from, to: window.to, today: today, todayIsDrinkDay: todayIsDrinkDay
         )
@@ -367,8 +370,11 @@ public final class StatsModel {
         let previousAverage = previousDays > 0 ? previousTotal / Double(previousDays) : 0.0
 
         // Streaks look at the whole history above the floor, not just this period:
-        // a dry streak began before the month did.
-        let streakDates = floor.isEmpty ? allDates : allDates.filter { $0 >= floor }
+        // a dry streak began before the month did. Drink days only — a day spent
+        // on alcohol-free drinks leaves the run intact — so this reads its own
+        // query rather than `allDates`, which answers the navigation question.
+        let allDrinkDates = try entries.drinkDates()
+        let streakDates = floor.isEmpty ? allDrinkDates : allDrinkDates.filter { $0 >= floor }
 
         let granularity: ChartGranularity = state.period == .year ? .monthly : .daily
 

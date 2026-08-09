@@ -197,7 +197,7 @@ object ChartBucketing {
             if (inProgressDay != null) {
                 val ip = LocalDate.parse(inProgressDay, DayResolver.DATE_FORMATTER)
                 val ipInBucket = !ip.isBefore(bucketStart) && ip.isBefore(cappedEndExclusive)
-                val ipIsDrinkDay = (gramsByDate[inProgressDay] ?: 0.0) > 0.0
+                val ipIsDrinkDay = AlcoholCalculator.isDrinkDay(gramsByDate[inProgressDay] ?: 0.0)
                 bucketHoldsInProgressDay = ipInBucket
                 if (ipInBucket && !ipIsDrinkDay && dayCount > 0) dayCount--
             }
@@ -209,7 +209,7 @@ object ChartBucketing {
                     // Abstinent = recorded fully alcohol-free AND a completed period.
                     // The `!bucketHoldsInProgressDay` guard is consequence (2) above:
                     // the current day/week/month never earns a tick until it closes.
-                    isAbstinent = sum == 0.0 && !bucketHoldsInProgressDay,
+                    isAbstinent = !AlcoholCalculator.isDrinkDay(sum) && !bucketHoldsInProgressDay,
                 ),
             )
 

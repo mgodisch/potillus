@@ -61,6 +61,13 @@ interface IEntryRepository {
     /** Emits the sorted list of all logical dates that have at least one entry. */
     fun getAllDatesFlow(): Flow<List<String>>
 
+    /**
+     * Emits the sorted list of logical dates on which alcohol was consumed, i.e.
+     * the drink days as [de.godisch.potillus.domain.AlcoholCalculator.isDrinkDay]
+     * defines them. Days holding only alcohol-free entries are absent.
+     */
+    fun getDrinkDatesFlow(): Flow<List<String>>
+
     /** Emits all entries whose logicalDate is within the inclusive range [[from], [to]]. */
     fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>>
 

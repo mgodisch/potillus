@@ -427,6 +427,51 @@ object AlcoholCalculator {
     fun isOverLimit(totalGrams: Double, limitGrams: Double): Boolean = totalGrams > limitGrams + LIMIT_EPSILON
 
     /**
+     * Whether a day whose entries sum to [totalGrams] counts as a drink day.
+     *
+     * This is the SINGLE definition of "drink day" in the app. A day is a drink
+     * day when alcohol was consumed on it — not when something was logged on it.
+     * A day holding nothing but alcohol-free entries (a 0.0 % beer sums to 0.0 g)
+     * is therefore a dry day: it does not enter the drink-day counts, it does not
+     * end an abstinence streak, and it is not deducted from the abstinent days.
+     *
+     * WHY A NAMED PREDICATE AND NOT `> 0.0` AT EACH SITE:
+     *   The comparison used to be written out in some places and replaced by "a
+     *   summary row exists for this date" in others, which is a different
+     *   question — one the database answers with a row for every logged entry,
+     *   alcohol-free ones included. The two answers disagreed exactly on the days
+     *   that matter to someone abstaining. Everything that asks "is this a drink
+     *   day" now asks here.
+     *
+     * NO EPSILON, UNLIKE [isOverLimit]: this compares against zero, not against a
+     * user-set limit, and [calculateGrams] rounds to the 0.1 g grid, so the
+     * smallest non-zero value it can produce is 0.1 g. A sum of zero grams is
+     * exactly 0.0 — there is no drift to absorb.
+     *
+     * The SQL twin of this predicate lives in
+     * [de.godisch.potillus.data.db.dao.EntryDao.getDrinkDatesFlow]; the two must
+     * stay in step.
+     *
+     * @param totalGrams A day's summed grams of pure alcohol.
+     * @return True when the day saw alcohol.
+     */
+    fun isDrinkDay(totalGrams: Double): Boolean = totalGrams > 0.0
+
+    /**
+     * The dates of the drink days in [summaries], ascending.
+     *
+     * The list shape the abstinence streaks expect (see
+     * [de.godisch.potillus.domain.DayResolver.computeCurrentAbstinence]), and the
+     * list whose size is the drink-day count. Days without alcohol are dropped by
+     * [isDrinkDay], so both figures rest on one definition.
+     *
+     * @param summaries Per-day summaries in any order.
+     * @return The drink days' dates, ascending and distinct (one summary per date).
+     */
+    fun drinkDates(summaries: List<DaySummary>): List<String> =
+        summaries.filter { isDrinkDay(it.totalGrams) }.map { it.date }.sorted()
+
+    /**
      * Counts limit violations across a list of per-day summaries, used by the
      * Statistics screen and the PDF export.
      *
@@ -487,7 +532,7 @@ object AlcoholCalculator {
         // Consumption days only (> 0 g), sorted ascending by date so the window can
         // advance with a single forward pass. We parse the ISO date once per day.
         val days = summaries
-            .filter { it.totalGrams > 0.0 }
+            .filter { isDrinkDay(it.totalGrams) }
             .map { LocalDate.parse(it.date) to it.totalGrams }
             .sortedBy { it.first }
 

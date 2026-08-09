@@ -110,6 +110,33 @@ interface EntryDao {
     @Query("SELECT DISTINCT logicalDate FROM entries ORDER BY logicalDate ASC")
     fun getAllDatesFlow(): Flow<List<String>>
 
+    /**
+     * Reactive stream of the distinct logical dates on which alcohol was consumed.
+     *
+     * The SQL twin of [de.godisch.potillus.domain.AlcoholCalculator.isDrinkDay]:
+     * a date qualifies when its entries sum to more than zero grams, so a day
+     * holding nothing but alcohol-free drinks is absent here while
+     * [getAllDatesFlow] still lists it. The two queries answer different
+     * questions and both are needed — the streaks and drink-day counts ask this
+     * one, the period navigation asks the other (a day with only alcohol-free
+     * entries is still a day the user can page back to).
+     *
+     * HAVING SUM() rather than WHERE gramsAlcohol > 0: the predicate is defined
+     * on a DAY's total, and grouping first is the literal transcription of it.
+     * Grams are never negative, so the two forms select the same dates; the
+     * grouped form is the one that stays correct if that ever changes.
+     */
+    @Query(
+        """
+        SELECT logicalDate
+        FROM entries
+        GROUP BY logicalDate
+        HAVING SUM(gramsAlcohol) > 0
+        ORDER BY logicalDate ASC
+    """,
+    )
+    fun getDrinkDatesFlow(): Flow<List<String>>
+
     // ── Single-row queries ────────────────────────────────────────────────────
 
     // getById(id) has been removed: no production code ever looked an entry up

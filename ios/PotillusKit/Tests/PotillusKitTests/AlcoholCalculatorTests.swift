@@ -159,6 +159,33 @@ final class AlcoholCalculatorTests: XCTestCase {
         }
     }
 
+    // ── isDrinkDay ───────────────────────────────────────────────────────────
+    //
+    // The predicate every drink-day count, every abstinent-day count and both
+    // abstinence streaks read on both platforms. A day of alcohol-free entries
+    // sums to zero and must stay a dry day.
+
+    func testIsDrinkDayAgainstSharedVectors() {
+        for testCase in vectors.isDrinkDay {
+            let actual = AlcoholCalculator.isDrinkDay(totalGrams: testCase.totalGrams)
+            XCTAssertEqual(actual, testCase.expected, "isDrinkDay: \(testCase.description)")
+        }
+    }
+
+    /// `drinkDates` is `isDrinkDay` over a list, and keeps the dates ascending
+    /// however the summaries arrive — the streak calculators require that order.
+    func testDrinkDatesKeepsOnlyDrinkDaysAndSortsThem() {
+        let summaries = [
+            DaySummary(date: "2026-03-03", totalGrams: 12.0, entryCount: 1),
+            DaySummary(date: "2026-03-01", totalGrams: 0.0, entryCount: 2),
+            DaySummary(date: "2026-03-02", totalGrams: 0.1, entryCount: 1)
+        ]
+        XCTAssertEqual(
+            AlcoholCalculator.drinkDates(summaries: summaries),
+            ["2026-03-02", "2026-03-03"]
+        )
+    }
+
     /// The tolerance must never be large enough to swallow a real exceedance. The
     /// smallest one representable on the 0.1 g data grid is 0.1 g.
     func testToleranceCannotAbsorbTheSmallestRealExceedance() {

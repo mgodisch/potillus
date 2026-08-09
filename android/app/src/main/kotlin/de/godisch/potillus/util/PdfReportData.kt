@@ -287,16 +287,23 @@ data class PdfReportData(
                 .datesUntil(LocalDate.parse(lastDate).plusDays(1))
                 .count().toInt()
 
-            val drinkDays = byDate.size
+            // One summary per recorded day, built before every figure that rests on
+            // it. Shared with the limit-violation counter → identical figures to the
+            // Statistics screen.
+            val daySummaries = byDate.map { (date, es) ->
+                DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size)
+            }
+            // The days that saw alcohol. A day of alcohol-free drinks has a summary
+            // row and belongs to the reporting period, but it is not a drink day:
+            // it counts as abstinent, it is not in the drink-day divisor, and it
+            // does not interrupt a streak (AlcoholCalculator.isDrinkDay).
+            val drinkDates = AlcoholCalculator.drinkDates(daySummaries)
+
+            val drinkDays = drinkDates.size
             val abstinentDays = (totalDays - drinkDays).coerceAtLeast(0)
             val totalGrams = entries.sumOf { it.gramsAlcohol }
             val avgPerDay = if (totalDays > 0) totalGrams / totalDays else 0.0
             val avgPerDrink = if (drinkDays > 0) totalGrams / drinkDays else 0.0
-
-            // Shared limit-violation counter → identical figures to the Statistics screen.
-            val daySummaries = byDate.map { (date, es) ->
-                DaySummary(date, es.sumOf { it.gramsAlcohol }, es.size)
-            }
             val violations = AlcoholCalculator.countLimitViolations(
                 summaries = daySummaries,
                 dailyLimitGrams = limitInfo.limitGrams,
@@ -334,7 +341,9 @@ data class PdfReportData(
                     val mOver = days.count { AlcoholCalculator.isOverLimit(it.value.sumOf { e -> e.gramsAlcohol }, limitInfo.limitGrams) }
                     MonthStat(
                         monthKey = monthKey,
-                        drinkDays = days.size,
+                        drinkDays = days.count { (_, es) ->
+                            AlcoholCalculator.isDrinkDay(es.sumOf { e -> e.gramsAlcohol })
+                        },
                         totalGrams = mGrams,
                         avgPerCalendarDay = mGrams / effDays,
                         daysOverDailyLimit = mOver,
@@ -380,7 +389,11 @@ data class PdfReportData(
                     day = day.plusDays(1)
                 }
             }
-            val perDrinkDayTotals = byDate.values.map { es -> es.sumOf { it.gramsAlcohol } }
+            // Drink days only: a 0.0 g day in this list would pull the median of the
+            // drinking down to a figure no drinking day produced.
+            val perDrinkDayTotals = daySummaries
+                .filter { AlcoholCalculator.isDrinkDay(it.totalGrams) }
+                .map { it.totalGrams }
             val medianPerDay = median(perDayTotals)
             val medianPerDrinkDay = median(perDrinkDayTotals)
             // Drink-days-per-month distribution across the calendar months in the period.
@@ -433,8 +446,12 @@ data class PdfReportData(
             //    for — and disagreed with the Statistics screen, against this file's
             //    "identical figures" contract (fixed in the v0.79.0 QA review; see
             //    PdfReportDataTest for the pinning tests). No statsFrom is passed:
-            //    the report is scoped to [firstDate, lastDate] and firstDate is by
-            //    construction a drink day, so no initial gap can exist here.
+            //    the report is scoped to [firstDate, lastDate], and the streaks run
+            //    over the DRINK days in it. When the period opens on a day of
+            //    alcohol-free entries, the dry run before the first drink is left
+            //    uncounted rather than measured from a start the user never declared
+            //    — the conservative reading, and the one the parameterless call has
+            //    always given.
             //
             //    STREAK ANCHOR for historical ranges (v0.81.0 QA fix): the export
             //    dialog lets the user pick a range that ended in the past. Anchoring
@@ -450,15 +467,14 @@ data class PdfReportData(
             //    today (the default export) the anchor stays the real logical
             //    today, preserving the in-progress-day semantics and the screen
             //    parity. A null periodEnd keeps the legacy today anchor.
-            val allDates = byDate.keys.sorted()
             val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
             val streakAnchor = if (periodEnd != null && periodEnd < today) {
                 DayResolver.formatDate(DayResolver.parseDate(periodEnd).plusDays(1))
             } else {
                 today
             }
-            val longest = DayResolver.computeLongestAbstinence(allDates, streakAnchor)
-            val current = DayResolver.computeCurrentAbstinence(allDates, streakAnchor)
+            val longest = DayResolver.computeLongestAbstinence(drinkDates, streakAnchor)
+            val current = DayResolver.computeCurrentAbstinence(drinkDates, streakAnchor)
 
             // Time-axis consumption series for the report chart. The span is the
             // recorded range [firstDate, lastDate]; granularity scales with its

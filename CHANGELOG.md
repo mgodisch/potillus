@@ -50,6 +50,7 @@ Edit drinks from the list's edit mode
 - The backup export has a switch for the settings block.
 - A year heat-map in the calendar, with a month and year toggle, where a month
   opens the month view.
+- The Today screen shows the current abstinence while a streak runs.
 
 ### Changed
 
@@ -130,6 +131,10 @@ Edit drinks from the list's edit mode
   current figures.
 - The year heat-map draws only the days from the statistics start date through
   today.
+- A day of alcohol-free entries is a dry day: no drink day, no break in an
+  abstinence streak.
+- `AlcoholCalculator.isDrinkDay` and the drink-date queries carry that
+  definition on both platforms.
 
 ### Fixed
 

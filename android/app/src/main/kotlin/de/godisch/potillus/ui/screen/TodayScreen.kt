@@ -35,9 +35,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -148,6 +150,20 @@ fun TodayScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(Modifier.padding(16.dp)) {
+                        // WHAT THE LEFT HALF OF THE CARD SHOWS.
+                        //   Someone who has set out to abstain is served better by
+                        //   the length of the run than by a gram total that reads
+                        //   0.0 every day. So while an abstinence streak is running,
+                        //   the left caption and headline switch to it; the moment a
+                        //   drink is logged the streak is 0 and the gram total is
+                        //   back, until a full dry day has been completed again.
+                        //
+                        //   `currentAbstinence > 0` is the only condition needed:
+                        //   DayResolver.computeCurrentAbstinence returns 0 as soon as
+                        //   today holds alcohol, so a positive value already implies
+                        //   today stands at 0.0 g. Testing the grams here as well
+                        //   would add a second, redundant source for one decision.
+                        val showAbstinence = state.currentAbstinence > 0
                         // Row 1: captions — "Today's total" (left) vs "Ø <month>"
                         // (right, the current month's per-day average), mirrored
                         // across the card width.
@@ -162,7 +178,9 @@ fun TodayScreen(
                         // caption eat the row and break the month name across lines.
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                stringResource(R.string.total_today),
+                                stringResource(
+                                    if (showAbstinence) R.string.current_streak else R.string.total_today,
+                                ),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.weight(1f),
@@ -192,20 +210,53 @@ fun TodayScreen(
                             verticalAlignment = Alignment.Bottom,
                         ) {
                             Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f)) {
-                                Text(
-                                    state.totalGrams.fmt1(locale),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    softWrap = false,
-                                    maxLines = 1,
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(
-                                    "g",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                )
+                                if (showAbstinence) {
+                                    // Count and noun in ONE headline string, not a
+                                    // figure with a small unit beside it like the
+                                    // grams: the plural form depends on the count in
+                                    // most of the shipped languages (pl has four, ru
+                                    // three, ja none), so the two cannot be separated
+                                    // without inflecting the noun by hand. The
+                                    // catalogue does it correctly for every locale.
+                                    //
+                                    // Ellipsis, not the default clipping: the right
+                                    // group is measured first at its natural width
+                                    // (see the layout note above), so a long pairing
+                                    // — el "365 ημέρες" beside a wide "Ø <month>" —
+                                    // runs out of room on THIS side, and it should
+                                    // end in a visible … rather than a half glyph.
+                                    // `maxLines = 1` alone holds the single line
+                                    // here; `softWrap = false`, which the gram figure
+                                    // beside it uses, measures the line at unbounded
+                                    // width and leaves the ellipsis nothing to fit
+                                    // into.
+                                    Text(
+                                        pluralStringResource(
+                                            R.plurals.days,
+                                            state.currentAbstinence,
+                                            state.currentAbstinence,
+                                        ),
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        color = successColor(),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                } else {
+                                    Text(
+                                        state.totalGrams.fmt1(locale),
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        softWrap = false,
+                                        maxLines = 1,
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text(
+                                        "g",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(bottom = 4.dp),
+                                    )
+                                }
                             }
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
@@ -277,7 +328,7 @@ fun TodayScreen(
                             maxDrinkDays = state.limitInfo.maxDrinkDaysPerWeek,
                             // Today's own status decides whether a full bar means
                             // "stop": a day already spent costs nothing further.
-                            todayIsDrinkDay = state.totalGrams > 0.0,
+                            todayIsDrinkDay = AlcoholCalculator.isDrinkDay(state.totalGrams),
                             weekLabel = state.weeklyRangeLabel,
                         )
                         // BAC estimate (Widmark formula) – only shown when weight is configured

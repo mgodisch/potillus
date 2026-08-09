@@ -235,6 +235,69 @@ class TodayViewModelTest {
     }
 
     /** Minimal [ConsumptionEntry] on a given logical [date] for the floor test. */
+    // ── Current abstinence on the Today card ─────────────────────────────────
+
+    /**
+     * The card's abstinence figure counts the COMPLETED dry days since the last
+     * drink, and an alcohol-free entry is not a drink.
+     *
+     * Scenario: alcohol four days ago, an alcohol-free drink the day before
+     * yesterday, nothing today. The completed days between the last DRINK day and
+     * today are three; the 0.0 g day is one of them and must not reset the count.
+     * The clock is pinned mid-June (see the mid-month test above for the reason)
+     * so every derived date stays inside one calendar month.
+     */
+    @Test fun `an alcohol-free day does not interrupt the current abstinence`() = runTest(dispatcher) {
+        DayResolver.clockOverride = java.time.Clock.fixed(
+            java.time.Instant.parse("2026-06-20T12:00:00Z"),
+            java.time.ZoneOffset.UTC,
+        )
+        try {
+            val today = java.time.LocalDate.parse(DayResolver.today(4, 0))
+            entryRepo.add(monthEntry(id = 1, date = today.minusDays(4).toString(), grams = 20.0))
+            entryRepo.add(monthEntry(id = 2, date = today.minusDays(2).toString(), grams = 0.0))
+
+            val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+            vm.uiState.test {
+                var state = awaitItem()
+                while (state.currentAbstinence == 0) state = awaitItem()
+                assertEquals(3, state.currentAbstinence)
+                // The same 0.0 g day is not a drink day for the 7-day bar either.
+                assertEquals(1, state.drinkDaysThisWeek)
+                cancelAndIgnoreRemainingEvents()
+            }
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
+        }
+    }
+
+    /**
+     * Alcohol today puts the figure at zero, whatever ran before it: the card
+     * falls back to the gram total, and the switch on the screen is that single
+     * value (see TodayScreen's summary card).
+     */
+    @Test fun `alcohol today ends the current abstinence`() = runTest(dispatcher) {
+        DayResolver.clockOverride = java.time.Clock.fixed(
+            java.time.Instant.parse("2026-06-20T12:00:00Z"),
+            java.time.ZoneOffset.UTC,
+        )
+        try {
+            val today = java.time.LocalDate.parse(DayResolver.today(4, 0))
+            entryRepo.add(monthEntry(id = 1, date = today.minusDays(6).toString(), grams = 20.0))
+            entryRepo.add(monthEntry(id = 2, date = today.toString(), grams = 12.0))
+
+            val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+            vm.uiState.test {
+                var state = awaitItem()
+                while (state.totalGrams == 0.0) state = awaitItem()
+                assertEquals(0, state.currentAbstinence)
+                cancelAndIgnoreRemainingEvents()
+            }
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
+        }
+    }
+
     private fun monthEntry(id: Long, date: String, grams: Double) = ConsumptionEntry(
         id = id,
         drinkId = 1L,

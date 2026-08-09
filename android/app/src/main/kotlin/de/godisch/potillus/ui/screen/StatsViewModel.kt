@@ -346,7 +346,18 @@ class StatsViewModel(
         /** Whole periods back from the current one; see [_offset]. */
         val offset: Int,
         val settings: AppSettings,
+        /**
+         * Every logical date with an entry, alcohol-free days included. Answers
+         * how far the period navigation may page back: a day the user logged a
+         * 0.0 % beer on is a day worth reaching.
+         */
         val allDates: List<String>,
+        /**
+         * The subset of [allDates] on which alcohol was consumed (see
+         * [AlcoholCalculator.isDrinkDay]). The abstinence streaks read this one:
+         * an alcohol-free day does not interrupt them.
+         */
+        val drinkDates: List<String>,
         /**
          * The logical day the period bounds are anchored to. Carried INSIDE the
          * params — and therefore part of their equality — so the pipeline
@@ -378,18 +389,23 @@ class StatsViewModel(
         _period,
         _offset,
         prefs.settingsFlow,
-        entryRepo.getAllDatesFlow(),
+        // Paired before the outer combine because the typed `combine` overloads
+        // stop at five sources and the ticker holds the fifth slot. Both queries
+        // are cheap date-only reads over the same table and change together, so
+        // pairing them costs nothing and keeps the two lists in one emission.
+        combine(entryRepo.getAllDatesFlow(), entryRepo.getDrinkDatesFlow()) { all, drink -> all to drink },
         ticker,
-    ) { period, offset, settings, allDates, _ ->
+    ) { period, offset, settings, dates, _ ->
         StatsParams(
             period,
             offset,
             settings,
-            allDates,
+            allDates = dates.first,
+            drinkDates = dates.second,
             today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute),
         )
     }.distinctUntilChanged().flatMapLatest { params ->
-        val (period, offset, settings, allDates, today) = params
+        val (period, offset, settings, allDates, drinkDates, today) = params
         val limitInfo = AlcoholCalculator.getLimitInfo(settings)
         val fmt = DayResolver.DATE_FORMATTER
 
@@ -421,7 +437,10 @@ class StatsViewModel(
         val to = window.to
         val prevTo = window.previousTo
         val effectiveFrom = window.from
-        val streakDates = if (statsFloor.isNotEmpty()) allDates.filter { it >= statsFloor } else allDates
+        // Drink days only: a day spent on alcohol-free drinks leaves an abstinence
+        // streak running (AlcoholCalculator.isDrinkDay). `allDates` above answers a
+        // different question and stays with the navigation ceiling.
+        val streakDates = if (statsFloor.isNotEmpty()) drinkDates.filter { it >= statsFloor } else drinkDates
 
         // The clipped baseline start (v0.81.0 QA fix): before it, only the current
         // period was clipped, so the trend compared against days the user had
@@ -443,7 +462,10 @@ class StatsViewModel(
             val totalGrams = current.sumOf { it.totalGrams }
             // Drink days in the period, INCLUDING today if a drink was logged today
             // (the daily-summary query is inclusive of `to`, which equals today).
-            val drinkDays = current.size
+            // Counted through AlcoholCalculator.isDrinkDay, not through the presence
+            // of a summary row: the query returns a row for every day that holds an
+            // entry, and a day of alcohol-free drinks holds entries worth 0.0 g.
+            val drinkDays = AlcoholCalculator.drinkDates(current).size
 
             // Effective period length for the per-day rate and the abstinent-day count.
             //
@@ -461,7 +483,8 @@ class StatsViewModel(
             // handing THAT to the superposition rule dropped it from the count.
             // `windowDays` takes both and decides (see DayResolver.windowDays).
             val windowEndsToday = to == today
-            val todayIsDrinkDay = windowEndsToday && current.any { it.date == to }
+            val todayIsDrinkDay = windowEndsToday &&
+                current.any { it.date == to && AlcoholCalculator.isDrinkDay(it.totalGrams) }
             val effectivePeriodDays = DayResolver.windowDays(effectiveFrom, to, today, todayIsDrinkDay)
 
             val categoryBreakdown = periodEntries

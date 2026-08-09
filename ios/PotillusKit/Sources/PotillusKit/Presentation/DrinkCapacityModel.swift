@@ -197,7 +197,7 @@ public final class DrinkCapacityModel {
                 dailyLimitGrams: limits.limitGrams,
                 weeklyTotalGrams: window.reduce(0.0) { $0 + $1.totalGrams },
                 weeklyLimitGrams: limits.weeklyLimitGrams,
-                drinkDaysThisWeek: window.filter { $0.totalGrams > 0.0 }.count,
+                drinkDaysThisWeek: AlcoholCalculator.drinkDates(summaries: window).count,
                 maxDrinkDaysPerWeek: limits.maxDrinkDaysPerWeek
             )
             // Only after a SUCCESSFUL read: a failed load leaves the marker where

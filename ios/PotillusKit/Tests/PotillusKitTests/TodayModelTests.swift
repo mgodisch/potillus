@@ -170,6 +170,39 @@ final class TodayModelTests: XCTestCase {
         XCTAssertEqual(model.state.drinkDaysThisWeek, 0)
     }
 
+    // ── Current abstinence ───────────────────────────────────────────────────
+
+    /// The card's abstinence figure counts the COMPLETED dry days since the last
+    /// drink, and an alcohol-free entry is not a drink.
+    ///
+    /// Today is 15 January. Alcohol on the 10th, a 0.0 g drink on the 12th: the
+    /// 11th to the 14th are four completed dry days, and the alcohol-free one is
+    /// among them. The Statistics screen shows the same figure.
+    func testAnAlcoholFreeDayDoesNotInterruptTheCurrentAbstinence() async throws {
+        let pils = try addDrink("Pils")
+        let alcoholFree = try addDrink("Alkoholfrei", percent: 0.0)
+        try logDay(pils, "2026-01-10", grams: 30.0)
+        try logDay(alcoholFree, "2026-01-12", grams: 0.0)
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        XCTAssertEqual(model.state.currentAbstinence, 4)
+    }
+
+    /// Alcohol today puts the figure at zero, whatever ran before it — which is
+    /// what lets the screen switch on that one value.
+    func testAlcoholTodayEndsTheCurrentAbstinence() async throws {
+        let pils = try addDrink("Pils")
+        try logDay(pils, "2026-01-05", grams: 30.0)
+        try logDay(pils, "2026-01-15", grams: 12.0)
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        XCTAssertEqual(model.state.currentAbstinence, 0)
+    }
+
     // ── The estimate ─────────────────────────────────────────────────────────
 
     /// Nil is not zero. Without a body weight the app cannot estimate, and 0.0‰

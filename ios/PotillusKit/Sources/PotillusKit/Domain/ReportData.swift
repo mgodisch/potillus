@@ -258,13 +258,8 @@ public struct ReportData: Sendable, Equatable {
         let allDays = DayResolver.inclusiveDates(from: firstDate, to: lastDate)
         let totalDays = allDays.count
 
-        let drinkDays = byDate.count
-        let abstinentDays = max(totalDays - drinkDays, 0)
-        let totalGrams = entries.reduce(0.0) { $0 + $1.gramsAlcohol }
-        let avgPerDay = totalDays > 0 ? totalGrams / Double(totalDays) : 0.0
-        let avgPerDrinkDay = drinkDays > 0 ? totalGrams / Double(drinkDays) : 0.0
-
-        // One summary per drink day, in the shape the shared calculators expect.
+        // One summary per recorded day, in the shape the shared calculators
+        // expect. Built before every figure that rests on it.
         let daySummaries = byDate
             .map { date, dayEntries in
                 DaySummary(
@@ -274,6 +269,18 @@ public struct ReportData: Sendable, Equatable {
                 )
             }
             .sorted { $0.date < $1.date }
+
+        // The days that saw alcohol. A day of alcohol-free drinks has a summary
+        // row and belongs to the reporting period, but it is not a drink day: it
+        // counts as abstinent, it stays out of the drink-day divisor, and it does
+        // not interrupt a streak (`AlcoholCalculator.isDrinkDay`).
+        let drinkDates = AlcoholCalculator.drinkDates(summaries: daySummaries)
+
+        let drinkDays = drinkDates.count
+        let abstinentDays = max(totalDays - drinkDays, 0)
+        let totalGrams = entries.reduce(0.0) { $0 + $1.gramsAlcohol }
+        let avgPerDay = totalDays > 0 ? totalGrams / Double(totalDays) : 0.0
+        let avgPerDrinkDay = drinkDays > 0 ? totalGrams / Double(drinkDays) : 0.0
 
         let violations = AlcoholCalculator.countLimitViolations(
             summaries: daySummaries,
@@ -304,7 +311,11 @@ public struct ReportData: Sendable, Equatable {
         var totalByDate: [String: Double] = [:]
         for summary in daySummaries { totalByDate[summary.date] = summary.totalGrams }
         let perDayTotals = allDays.map { totalByDate[$0] ?? 0.0 }
-        let perDrinkDayTotals = daySummaries.map(\.totalGrams)
+        // Drink days only: a 0.0 g day in this list would pull the median of the
+        // drinking down to a figure no drinking day produced.
+        let perDrinkDayTotals = daySummaries
+            .filter { AlcoholCalculator.isDrinkDay(totalGrams: $0.totalGrams) }
+            .map(\.totalGrams)
 
         let drinkDaysPerMonth = months.map { Double($0.drinkDays) }
         let avgDrinkDaysPerMonth = drinkDaysPerMonth.isEmpty
@@ -347,11 +358,11 @@ public struct ReportData: Sendable, Equatable {
                 summaries: daySummaries, firstDayOfWeekIso: firstWeekday
             ),
             longestAbstinence: DayResolver.computeLongestAbstinence(
-                sortedDates: daySummaries.map(\.date),
+                sortedDates: drinkDates,
                 today: streakAnchor(periodEnd: periodEnd, today: today)
             ),
             currentAbstinence: DayResolver.computeCurrentAbstinence(
-                sortedDates: daySummaries.map(\.date),
+                sortedDates: drinkDates,
                 today: streakAnchor(periodEnd: periodEnd, today: today)
             )
         )
@@ -437,7 +448,7 @@ public struct ReportData: Sendable, Equatable {
 
             return MonthStat(
                 monthKey: monthKey,
-                drinkDays: days.count,
+                drinkDays: AlcoholCalculator.drinkDates(summaries: days).count,
                 totalGrams: grams,
                 avgPerCalendarDay: grams / Double(effectiveDays),
                 daysOverDailyLimit: over,

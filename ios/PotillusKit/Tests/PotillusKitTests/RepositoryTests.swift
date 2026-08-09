@@ -251,6 +251,20 @@ final class RepositoryTests: XCTestCase {
         XCTAssertEqual(observed, ["2026-01-01", "2026-01-02"])
     }
 
+    /// `drinkDates` is `allDates` minus the days that saw no alcohol. The SQL
+    /// groups first and tests the DAY's total, so a day mixing an alcohol-free
+    /// drink with a real one stays a drink day.
+    func testDrinkDatesDropTheDaysWithoutAlcohol() throws {
+        let id = try addDrink("Pils")
+        try addEntry(drinkId: id, at: 1_000, on: "2026-01-01", grams: 0.0)
+        try addEntry(drinkId: id, at: 2_000, on: "2026-01-02", grams: 0.0)
+        try addEntry(drinkId: id, at: 3_000, on: "2026-01-02", grams: 12.0)
+        try addEntry(drinkId: id, at: 4_000, on: "2026-01-03", grams: 8.0)
+
+        XCTAssertEqual(try entries.allDates(), ["2026-01-01", "2026-01-02", "2026-01-03"])
+        XCTAssertEqual(try entries.drinkDates(), ["2026-01-02", "2026-01-03"])
+    }
+
     /// Ordered by CONSUMPTION time, not by row id: a back-dated entry logged
     /// today must not become "the most recent drink".
     func testMostRecentEntryUsesTimestampNotInsertionOrder() async throws {

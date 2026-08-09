@@ -109,6 +109,41 @@ public enum AlcoholCalculator {
         totalGrams > limitGrams + limitEpsilon
     }
 
+    /// Whether a day whose entries sum to `totalGrams` counts as a drink day.
+    ///
+    /// This is the SINGLE definition of "drink day". A day is a drink day when
+    /// alcohol was consumed on it — not when something was logged on it. A day
+    /// holding nothing but alcohol-free entries (a 0.0 % beer sums to 0.0 g) is
+    /// a dry day: it stays out of the drink-day counts, it does not end an
+    /// abstinence streak, and it is not deducted from the abstinent days.
+    ///
+    /// **Why a named predicate.** The comparison used to be written out at some
+    /// call sites and replaced by "a summary row exists for this date" at
+    /// others, which is a different question — one the database answers with a
+    /// row for every logged entry, alcohol-free ones included. The two answers
+    /// disagreed on exactly the days that matter to someone abstaining.
+    ///
+    /// **No epsilon, unlike `isOverLimit`.** This compares against zero, not
+    /// against a user-set limit, and `calculateGrams` rounds to the 0.1 g grid,
+    /// so the smallest non-zero value it can produce is 0.1 g. There is no drift
+    /// to absorb.
+    ///
+    /// The SQL twin lives in `EntryRepository.drinkDates()`; the two must stay
+    /// in step. Pinned against Android by `test-vectors/alcohol-calculator.json`.
+    public static func isDrinkDay(totalGrams: Double) -> Bool {
+        totalGrams > 0.0
+    }
+
+    /// The dates of the drink days in `summaries`, ascending.
+    ///
+    /// The list shape the abstinence streaks expect (see
+    /// `DayResolver.computeCurrentAbstinence`), and the list whose count is the
+    /// drink-day figure. Days without alcohol are dropped by `isDrinkDay`, so
+    /// both rest on one definition.
+    public static func drinkDates(summaries: [DaySummary]) -> [String] {
+        summaries.filter { isDrinkDay(totalGrams: $0.totalGrams) }.map(\.date).sorted()
+    }
+
     // ── Widmark parameters ───────────────────────────────────────────────────
 
     /// Widmark distribution coefficient *r*, fixed at the conservative 0.6.
@@ -409,7 +444,7 @@ public enum AlcoholCalculator {
         // Consumption days only (> 0 g), sorted ascending so the window can
         // advance in a single forward pass. Each ISO date is parsed once.
         let days: [(date: Date, grams: Double)] = summaries
-            .filter { $0.totalGrams > 0.0 }
+            .filter { isDrinkDay(totalGrams: $0.totalGrams) }
             .compactMap { summary in
                 guard let parsed = IsoDay.parse(summary.date) else { return nil }
                 return (parsed, summary.totalGrams)

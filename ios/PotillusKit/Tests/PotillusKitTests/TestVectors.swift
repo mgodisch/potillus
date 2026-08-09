@@ -268,6 +268,7 @@ struct AlcoholCalculatorVectors: Decodable {
     let calculateBAC: [BacCase]
     let limitPercent: [LimitPercentCase]
     let isOverLimit: [IsOverLimitCase]
+    let isDrinkDay: [IsDrinkDayCase]
     let trafficLight: [TrafficLightCase]
     let drinkDayLimitReached: [DrinkDayLimitCase]
     let countLimitViolations: [ViolationsCase]
@@ -285,6 +286,12 @@ struct AlcoholCalculatorVectors: Decodable {
         let description: String
         let totalGrams: Double
         let limitGrams: Double
+        let expected: Bool
+    }
+
+    struct IsDrinkDayCase: Decodable {
+        let description: String
+        let totalGrams: Double
         let expected: Bool
     }
 

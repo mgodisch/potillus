@@ -157,6 +157,39 @@ class AlcoholCalculatorVectorTest {
         }
     }
 
+    // ── isDrinkDay ───────────────────────────────────────────────────────────
+    //
+    // The predicate every drink-day count, every abstinent-day count and both
+    // abstinence streaks read on both platforms. A day of alcohol-free entries
+    // sums to zero and must stay a dry day.
+
+    @Test
+    fun `isDrinkDay matches the shared vectors`() {
+        VECTORS.getJSONArray("isDrinkDay").objects().forEach { case ->
+            val actual = AlcoholCalculator.isDrinkDay(case.getDouble("totalGrams"))
+            assertEquals(
+                "isDrinkDay: ${case.getString("description")}",
+                case.getBoolean("expected"),
+                actual,
+            )
+        }
+    }
+
+    /**
+     * [AlcoholCalculator.drinkDates] is the predicate over a list, and keeps the
+     * dates ascending however the summaries arrive — the streak calculators
+     * require that order.
+     */
+    @Test
+    fun `drinkDates keeps only drink days and sorts them`() {
+        val summaries = listOf(
+            DaySummary("2026-03-03", 12.0, 1),
+            DaySummary("2026-03-01", 0.0, 2),
+            DaySummary("2026-03-02", 0.1, 1),
+        )
+        assertEquals(listOf("2026-03-02", "2026-03-03"), AlcoholCalculator.drinkDates(summaries))
+    }
+
     /**
      * Reproduces the drift the tolerance exists for: summing these three
      * 0.1-g-grid values yields 190.60000000000002 against a 190.6 g limit.

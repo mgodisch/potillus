@@ -70,6 +70,7 @@ class EntryRepositoryTest {
         assertEquals("Lager", repo.getEntriesForDate("2026-01-01").first().first().drinkName)
         assertEquals("2026-01-01", repo.getDailySummaries("a", "b").first().first().date)
         assertEquals(listOf("2026-01-01"), repo.getAllDatesFlow().first())
+        assertEquals(listOf("2026-01-01"), repo.getDrinkDatesFlow().first())
         assertEquals(1, repo.getEntriesForPeriod("a", "b").first().size)
         assertEquals("Lager", repo.mostRecentEntry().first()?.drinkName)
     }
@@ -134,6 +135,8 @@ private class FakeEntryDao : EntryDao {
     override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> = flowOf(listOf(DailySummaryRaw(logicalDate = "2026-01-01", totalGrams = 20.0, entryCount = 1)))
 
     override fun getAllDatesFlow(): Flow<List<String>> = flowOf(listOf("2026-01-01"))
+
+    override fun getDrinkDatesFlow(): Flow<List<String>> = flowOf(listOf("2026-01-01"))
 
     override suspend fun insert(entry: EntryEntity): Long {
         lastInserted = entry

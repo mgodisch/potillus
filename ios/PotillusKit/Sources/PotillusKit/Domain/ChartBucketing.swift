@@ -179,7 +179,9 @@ public enum ChartBucketing {
             var bucketHoldsInProgressDay = false
             if let inProgressDay, let inProgress = DayResolver.parseDate(inProgressDay) {
                 let isInBucket = inProgress >= bucketStart && inProgress < cappedEndExclusive
-                let isDrinkDay = (gramsByDate[inProgressDay] ?? 0.0) > 0.0
+                let isDrinkDay = AlcoholCalculator.isDrinkDay(
+                    totalGrams: gramsByDate[inProgressDay] ?? 0.0
+                )
                 bucketHoldsInProgressDay = isInBucket
                 if isInBucket && !isDrinkDay && dayCount > 0 { dayCount -= 1 }
             }
@@ -191,7 +193,8 @@ public enum ChartBucketing {
                     // Abstinent = recorded fully alcohol-free AND a completed
                     // period. The guard is consequence (2): the current
                     // day/week/month never earns a tick until it closes.
-                    isAbstinent: sum == 0.0 && !bucketHoldsInProgressDay
+                    isAbstinent: !AlcoholCalculator.isDrinkDay(totalGrams: sum)
+                        && !bucketHoldsInProgressDay
                 )
             )
 

@@ -76,6 +76,15 @@ class FakeEntryRepository : IEntryRepository {
 
     override fun getAllDatesFlow(): Flow<List<String>> = _entries.map { it.map { e -> e.logicalDate }.distinct().sorted() }
 
+    // Mirrors EntryDao.getDrinkDatesFlow: grouped by day, kept when the day saw
+    // alcohol. The predicate is the production one, so the fake cannot drift from
+    // the SQL it stands in for.
+    override fun getDrinkDatesFlow(): Flow<List<String>> = _entries.map { list ->
+        list.groupBy { it.logicalDate }
+            .filter { (_, es) -> AlcoholCalculator.isDrinkDay(es.sumOf { it.gramsAlcohol }) }
+            .keys.sorted()
+    }
+
     override fun getEntriesForPeriod(from: String, to: String): Flow<List<ConsumptionEntry>> = _entries.map { it.filter { e -> e.logicalDate in from..to } }
 
     override fun mostRecentEntry(): Flow<ConsumptionEntry?> = _entries.map { list -> list.maxByOrNull { it.timestampMillis } }

@@ -229,6 +229,33 @@ class PdfReportDataTest {
         }
     }
 
+    // ── Alcohol-free days (v0.85.0) ───────────────────────────────────────────
+
+    /**
+     * A day of alcohol-free entries belongs to the reporting period but is not a
+     * drink day: it is abstinent, it stays out of the drink-day divisor, and it
+     * leaves an abstinence run intact.
+     *
+     * The day carries entries, so the summary row exists and every figure here
+     * used to read it as drinking. The extra day sits in the middle of the
+     * fixture's longest gap (Jan 20 → Feb 5, 15 dry days), which the old reading
+     * split into two runs of seven.
+     */
+    @Test fun `a day of alcohol-free entries is abstinent`() {
+        val withAlcoholFreeDay = entries + entry("2026-01-28", 1, 0.0)
+        val d = PdfReportData.from(withAlcoholFreeDay, drinks, settings)
+
+        assertEquals("the 0.0 g day is not a drink day", 3, d.drinkDays)
+        assertEquals(d.totalDays - d.drinkDays, d.abstinentDays)
+        assertEquals("its grams change nothing", 54.3, d.totalGrams, 0.001)
+        assertEquals("nor does it enter the drink-day average", 18.1, d.avgPerDrinkDay, 0.001)
+        assertEquals("January keeps its two drink days", 2, d.months[0].drinkDays)
+        // The long gap stays one 15-day run rather than splitting into 7 and 7.
+        withToday("2026-02-06") {
+            assertEquals(15, PdfReportData.from(withAlcoholFreeDay, drinks, settings).longestAbstinence)
+        }
+    }
+
     // ── Historical export ranges (v0.81.0 QA fix) ─────────────────────────────
 
     /**

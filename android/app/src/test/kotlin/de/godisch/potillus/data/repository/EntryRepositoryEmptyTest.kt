@@ -61,6 +61,7 @@ private class EmptyEntryDao : EntryDao {
     override fun getByDate(date: String): Flow<List<EntryEntity>> = flowOf(emptyList())
     override fun getDailySummaries(from: String, to: String): Flow<List<DailySummaryRaw>> = flowOf(emptyList())
     override fun getAllDatesFlow(): Flow<List<String>> = flowOf(emptyList())
+    override fun getDrinkDatesFlow(): Flow<List<String>> = flowOf(emptyList())
     override suspend fun insert(entry: EntryEntity): Long = 0L
     override suspend fun insertOrReplace(entry: EntryEntity): Long = 0L
     override suspend fun update(entry: EntryEntity) {}

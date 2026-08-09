@@ -114,8 +114,16 @@ public protocol EntryRepositoryProtocol: Sendable {
     func lastEntry() throws -> ConsumptionEntry?
 
     /// Every logical date on which anything was logged, ascending and distinct.
-    /// The one-shot twin of `observeAllDates`, for the abstinence streaks.
+    /// The one-shot twin of `observeAllDates`. Answers how far the statistics
+    /// period navigation may page back — a day the user logged an alcohol-free
+    /// drink on is a day worth reaching.
     func allDates() throws -> [String]
+
+    /// The logical dates on which alcohol was consumed, ascending and distinct,
+    /// i.e. the drink days as `AlcoholCalculator.isDrinkDay` defines them. The
+    /// abstinence streaks and the drink-day counts read this one; days holding
+    /// only alcohol-free entries are absent.
+    func drinkDates() throws -> [String]
 
     /// Inserts `entry` and returns its new database id.
     func add(_ entry: ConsumptionEntry) throws -> Int64
@@ -302,6 +310,26 @@ public struct EntryRepository: EntryRepositoryProtocol {
         )
     }
 
+    /// The SQL transcription of `AlcoholCalculator.isDrinkDay`, day by day.
+    ///
+    /// `HAVING SUM(gramsAlcohol) > 0` rather than `WHERE gramsAlcohol > 0`: the
+    /// predicate is defined on a DAY's total, and grouping first says exactly
+    /// that. Grams are never negative, so both forms select the same dates; the
+    /// grouped one stays correct if that ever changes. The Kotlin twin is
+    /// `EntryDao.getDrinkDatesFlow`.
+    private static func fetchDrinkDates(_ db: Database) throws -> [String] {
+        try String.fetchAll(
+            db,
+            sql: """
+            SELECT logicalDate
+            FROM entries
+            GROUP BY logicalDate
+            HAVING SUM(gramsAlcohol) > 0
+            ORDER BY logicalDate ASC
+            """
+        )
+    }
+
     /// `SELECT DISTINCT logicalDate FROM entries ORDER BY logicalDate ASC`
     public func observeAllDates() -> AsyncThrowingStream<[String], Error> {
         observing(reader: database.reader) { db in try Self.fetchAllDates(db) }
@@ -358,6 +386,10 @@ public struct EntryRepository: EntryRepositoryProtocol {
 
     public func allDates() throws -> [String] {
         try database.read { db in try Self.fetchAllDates(db) }
+    }
+
+    public func drinkDates() throws -> [String] {
+        try database.read { db in try Self.fetchDrinkDates(db) }
     }
 
     public func add(_ entry: ConsumptionEntry) throws -> Int64 {
