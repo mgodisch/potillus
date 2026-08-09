@@ -41,7 +41,8 @@ package de.godisch.potillus.ui.component
 //     - empty (no summary):      MaterialTheme.colorScheme.surfaceVariant
 //     - under limit:             MaterialTheme.colorScheme.primary   (app accent)
 //     - over limit:              dangerRedColor()  (red)
-//   Today gets an additional border ring to distinguish it from data cells.
+//   Today gets a ring around the cell to distinguish it from data cells; it is
+//   drawn before the padding, in onSurfaceVariant, so the card is behind it.
 //
 // COLOUR CAPTURE (same pattern as ChartComponents.kt):
 //   Theme colours must be captured in the @Composable scope before any
@@ -82,8 +83,8 @@ import java.time.format.FormatStyle
  *   - **surfaceVariant** (neutral)  → no consumption entry recorded.
  *   - **primary** (accent blue)     → entry exists, daily total ≤ [limitGrams].
  *   - **dangerRedColor** (red)      → entry exists, daily total > [limitGrams].
- *   - **outline border**            → the cell additionally shows a border when
- *                                     the day equals [today] (regardless of consumption).
+ *   - **onSurfaceVariant ring**     → drawn around the cell when the day equals
+ *                                     [today], whatever its fill (or lack of one).
  *   - **nothing at all**            → the day lies outside the evaluated window:
  *                                     after [today], or before [statsFrom].
  *
@@ -153,26 +154,27 @@ fun YearCalendarView(
     val green = MaterialTheme.colorScheme.primary
     val red = dangerRedColor()
     val empty = heatmapEmptyColor()
-    val todayBorder = MaterialTheme.colorScheme.outline
+    val todayBorder = MaterialTheme.colorScheme.onSurfaceVariant
 
-    // MEASURED AND LEFT AS THEY ARE (WCAG 1.4.11, 0.85.0 QA round).
+    // MEASURED AND LEFT AS IT IS (WCAG 1.4.11, 0.85.0 QA round).
     //
     //   empty cell against the card   1.12 : 1 dark, 1.29 : 1 light
-    //   today ring against the cell   1.06 : 1 dark, 1.20 : 1 light
     //
-    // Both are far below the 3 : 1 the criterion asks of a non-text indicator,
-    // and both are deliberate. The DATA cells clear it -- an over-limit cell has
+    // That is far below the 3 : 1 the criterion asks of a non-text indicator,
+    // and it is deliberate. The DATA cells clear it -- an over-limit cell has
     // 3.25 : 1 -- so what is quiet here is the empty grid, not the information.
     // Raising the empty cells would turn a year of mostly-blank squares into a
     // lattice of 365 tiles competing with the data drawn on top of it, and the
     // maintainer judged the current balance right on device.
     //
     // Do not "fix" this from the numbers alone; the decision and its reasoning
-    // are recorded under "Non-text contrast" in docs/ROADMAP.md. If it is ever
-    // revisited, the today ring has the same shape of problem the focus ring had
-    // (it surrounds a cell whose fill varies, so no single colour clears 3 : 1
-    // against all fills) and the same fix applies: draw it on the outer box,
-    // outside the padding, where only the card surface is behind it.
+    // are recorded under "Non-text contrast" in docs/ROADMAP.md.
+    //
+    // THE TODAY RING LEFT THAT GROUP. It was drawn in `outline` on top of the
+    // cell fill, at 1.06 : 1 dark and 1.20 : 1 light, and on device it was a
+    // marker nobody could find in either theme -- a different matter from a grid
+    // that is quiet on purpose. It now sits outside the cell padding in
+    // `onSurfaceVariant`, against the card alone: 5.13 : 1 and 5.21 : 1.
     val cellSize = 10.dp
     val cellGap = 2.dp
 
@@ -313,15 +315,34 @@ fun YearCalendarView(
                                         Box(
                                             modifier = Modifier
                                                 .size(cellSize)
-                                                .padding(cellGap / 2)
-                                                .background(color, RoundedCornerShape(1.dp))
+                                                // TODAY RING BEFORE THE PADDING, so only the card
+                                                // surface lies behind it and ONE colour clears 3:1
+                                                // for every cell: 5.13:1 dark, 5.21:1 light. Drawn
+                                                // after the padding it sat on the cell FILL, which
+                                                // varies between empty, under-limit blue and
+                                                // over-limit red, and no single colour clears the
+                                                // bar against all three -- `onSurfaceVariant`
+                                                // manages 3.78:1 on an empty cell but 1.13:1 on a
+                                                // blue one. Same move the focus ring made, for the
+                                                // same reason.
                                                 .then(
                                                     if (isToday) {
-                                                        Modifier.border(1.dp, todayBorder, RoundedCornerShape(1.dp))
+                                                        Modifier.border(
+                                                            // 1.5.dp, not 1.dp: the gap between two
+                                                            // cells is cellGap, so a hairline ring
+                                                            // merely fills it and reads as a wider
+                                                            // gap. The half dp that reaches over
+                                                            // the fill is what makes it a ring.
+                                                            1.5.dp,
+                                                            todayBorder,
+                                                            RoundedCornerShape(2.dp),
+                                                        )
                                                     } else {
                                                         Modifier
                                                     },
                                                 )
+                                                .padding(cellGap / 2)
+                                                .background(color, RoundedCornerShape(1.dp))
                                                 .then(
                                                     // A labelled cell exposes its description to
                                                     // accessibility services; an empty cell adds

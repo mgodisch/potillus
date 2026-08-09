@@ -164,9 +164,10 @@ blocks). For each: reason = "native offline app, feature not present".
    still to decide on device is whether the CALENDAR should carry a non-colour
    cue too — the symbol setting covers the traffic-light dot, not the calendar —
    and whether that setting should default to on rather than off.
-   Note that the year heat-map's low-contrast EMPTY cells and today ring are a
-   separate, already-decided matter: measured, judged, and left as they are; see
-   "Non-text contrast" in docs/ROADMAP.md.
+   Note that the year heat-map's low-contrast EMPTY cells are a separate,
+   already-decided matter: measured, judged, and left as they are; see "Non-text
+   contrast" in docs/ROADMAP.md, which also records why the today ring left that
+   group.
 2. **4.1.2 month-cell announcement redundancy** (see above) — verify and, if
    needed, a one-line `clearAndSetSemantics` fix.
 3. **1.3.1 headings** — verify section headers expose the `heading()` role;

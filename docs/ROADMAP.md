@@ -183,22 +183,22 @@ concrete, measured gaps are:
 
 - **Non-text contrast (1.4.11, AA).** Measured and left as it is, deliberately.
   Empty heat-map cells (`surfaceVariant`) sit at **1.12 : 1** against the card in
-  the dark theme and **1.29 : 1** in the light one, and the "today" outline at
-  **1.06 : 1** and **1.20 : 1** — all below the 3 : 1 the criterion asks for. The
-  DATA cells are not affected: an over-limit cell has 3.25 : 1 and an under-limit
-  one more, so the information the view exists to show clears the bar.
-  What is below it is the *empty* grid and the today marker, and lifting those to
-  3 : 1 would turn a quiet year of mostly-blank squares into a visible lattice of
-  365 tiles competing with the data drawn on it. The maintainer looked at the
-  view on device and judged the current balance right (0.85.0 QA round). This is
-  therefore a decision about what the year view is for, not an oversight: the
-  heat-map answers "when did I drink", and a day with no entry answers it by
-  staying quiet.
-  Should this be revisited, note that the ring around today has the same shape of
-  problem as the focus ring did — it surrounds a cell whose fill varies, so no
-  single colour clears 3 : 1 against all fills. The fix that worked for focus
-  applies here too: draw it on the outer box, outside the padding, where it lies
-  on the card surface and only one background matters.
+  the dark theme and **1.29 : 1** in the light one — below the 3 : 1 the criterion
+  asks for. The DATA cells are not affected: an over-limit cell has 3.25 : 1 and
+  an under-limit one more, so the information the view exists to show clears the
+  bar. What is below it is the *empty* grid, and lifting it to 3 : 1 would turn a
+  quiet year of mostly-blank squares into a visible lattice of 365 tiles competing
+  with the data drawn on it. The maintainer looked at the view on device and
+  judged the current balance right (0.85.0 QA round). This is therefore a decision
+  about what the year view is for, not an oversight: the heat-map answers "when
+  did I drink", and a day with no entry answers it by staying quiet.
+  The ring around today was listed here too, at **1.06 : 1** and **1.20 : 1**, on
+  the same reasoning. That did not hold on device: the marker was invisible in
+  both themes, which is a different matter from a grid that is quiet on purpose.
+  It had the same shape of problem as the focus ring — it surrounds a cell whose
+  fill varies, so no single colour clears 3 : 1 against all fills — and it took
+  the same fix: drawn before the padding it lies on the card surface alone, where
+  `onSurfaceVariant` gives **5.13 : 1** dark and **5.21 : 1** light.
 - **Text contrast (1.4.3, AA).** Red as *text* is what remains here, and it is
   now a decision rather than an oversight. The dark theme carries two reds: the
   graphical one (`dangerRedColor`, `#DD2C2C`, 3.25 : 1 on the cards) for dots,

@@ -130,6 +130,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- The year heat-map marks today with a ring the eye can find.
 - The security footer on iOS follows the in-app language.
 - The import dialog on iOS says what each mode does with the drink list.
 - The gram-limit bars turn red only past the limit, on iOS as on Android.
