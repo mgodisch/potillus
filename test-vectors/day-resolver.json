@@ -237,6 +237,72 @@
       "expected": 0
     }
   ],
+  "windowDays": [
+    {
+      "description": "past month counts its last day, dry (the July-31 regression)",
+      "from": "2026-07-01",
+      "to": "2026-07-31",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": false,
+      "expected": 31
+    },
+    {
+      "description": "past month counts its last day, drink day",
+      "from": "2026-07-01",
+      "to": "2026-07-31",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": true,
+      "expected": 31
+    },
+    {
+      "description": "window ending today keeps the unfinished dry day out",
+      "from": "2026-08-01",
+      "to": "2026-08-02",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": false,
+      "expected": 1
+    },
+    {
+      "description": "window ending today counts it once it is a drink day",
+      "from": "2026-08-01",
+      "to": "2026-08-02",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": true,
+      "expected": 2
+    },
+    {
+      "description": "past single day counts as one",
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": false,
+      "expected": 1
+    },
+    {
+      "description": "today as a single-day window, still dry",
+      "from": "2026-08-02",
+      "to": "2026-08-02",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": false,
+      "expected": 0
+    },
+    {
+      "description": "past leap February counts all 29 days",
+      "from": "2024-02-01",
+      "to": "2024-02-29",
+      "today": "2024-03-15",
+      "todayIsDrinkDay": false,
+      "expected": 29
+    },
+    {
+      "description": "inverted past range returns 0",
+      "from": "2026-07-31",
+      "to": "2026-07-01",
+      "today": "2026-08-02",
+      "todayIsDrinkDay": false,
+      "expected": 0
+    }
+  ],
   "computeCurrentAbstinence": [
     {
       "description": "empty list, no statsFrom",

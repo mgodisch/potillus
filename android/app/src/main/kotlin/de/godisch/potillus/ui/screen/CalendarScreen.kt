@@ -104,6 +104,28 @@ fun CalendarScreen(
     var editEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
     var deleteEntry by remember { mutableStateOf<ConsumptionEntry?>(null) }
 
+    // ENTERING THE SCREEN RETURNS TO THE CURRENT MONTH, a rotation does not.
+    //
+    // The month and the day selection live in the ViewModel, which outlives both:
+    // it is created in AppNav and survives a configuration change as well as a trip
+    // to another screen. So the reset cannot hang off the model's lifetime and
+    // needs something that tells the two apart — this marker does, exactly as on
+    // the statistics screen. rememberSaveable is restored from the saved state
+    // after a rotation (marker present: the same screen, keep the user's place)
+    // and starts out false when the composable was discarded and rebuilt, which is
+    // what a return from another screen looks like (marker absent: start at today).
+    //
+    // Why the calendar resets at all: the plus button logs to the SELECTED day. A
+    // selection left over from browsing March would turn the next tap on it into an
+    // entry booked three months back. See CalendarViewModel.resetToCurrentMonth.
+    var visited by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!visited) {
+            vm.resetToCurrentMonth()
+            visited = true
+        }
+    }
+
     val isYear = state.viewMode == CalendarViewMode.YEAR
 
     // Per-app locale for the daily-limit caption number, so its formatting matches

@@ -451,16 +451,18 @@ class StatsViewModel(
             // it a confirmed DRINK day, so it joins the period immediately (with the
             // amount consumed so far). With no drink yet, today stays out until it
             // finishes. This is the app-wide per-day rule, centralised in
-            // DayResolver.effectivePeriodDays and shared with the Today card and the
-            // chart's current bucket so all three agree. It also returns 0 for an
-            // empty/inverted range (effectiveFrom > to), avoiding a divide-by-zero.
+            // DayResolver and shared with the Today card and the chart's current
+            // bucket so all three agree. It also returns 0 for an empty/inverted
+            // range (effectiveFrom > to), avoiding a divide-by-zero.
             //
-            // Everything derived from it is consistent: `totalGrams` (which includes
-            // today's drinks) is divided by a period that includes today exactly when
-            // those drinks exist, and `abstinentDays` never counts the unfinished day
-            // (effectivePeriodDays − drinkDays = completed dry days).
-            val todayIsDrinkDay = current.any { it.date == to }
-            val effectivePeriodDays = DayResolver.effectivePeriodDays(effectiveFrom, to, todayIsDrinkDay)
+            // THE RULE IS ABOUT TODAY, NOT ABOUT THE WINDOW'S LAST DAY. `to` is the
+            // end of the window ON SCREEN, which equals today only at offset 0;
+            // stepping back a period makes it the last day of a finished month, and
+            // handing THAT to the superposition rule dropped it from the count.
+            // `windowDays` takes both and decides (see DayResolver.windowDays).
+            val windowEndsToday = to == today
+            val todayIsDrinkDay = windowEndsToday && current.any { it.date == to }
+            val effectivePeriodDays = DayResolver.windowDays(effectiveFrom, to, today, todayIsDrinkDay)
 
             val categoryBreakdown = periodEntries
                 .groupBy { e -> drinkMap[e.drinkId]?.category ?: DrinkCategory.OTHER }
@@ -522,8 +524,16 @@ class StatsViewModel(
             // WEEKLY, i.e. ~52 bars); the two are intentionally independent.
             val chartGranularity =
                 if (period == StatsPeriod.YEAR) ChartGranularity.MONTHLY else ChartGranularity.DAILY
-            val chartBuckets =
-                ChartBucketing.bucketize(current, effectiveFrom, to, chartGranularity, inProgressDay = to)
+            // inProgressDay is the REAL logical day or nothing: a window that ends
+            // in the past holds no running day, and naming its last day here left
+            // that day without its abstinence tick and out of its bucket's divisor.
+            val chartBuckets = ChartBucketing.bucketize(
+                current,
+                effectiveFrom,
+                to,
+                chartGranularity,
+                inProgressDay = today.takeIf { windowEndsToday },
+            )
 
             // Trend vs the previous period, on a PER-DAY-AVERAGE basis (never totals)
             // so an in-progress period compares fairly against a full previous one.

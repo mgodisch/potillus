@@ -336,11 +336,16 @@ public final class StatsModel {
         let totalGrams = summaries.reduce(0.0) { $0 + $1.totalGrams }
         let drinkDays = summaries.filter { $0.totalGrams > 0.0 }.count
 
-        // `effectivePeriodDays` excludes an unfinished dry day, so today's absence
-        // of drinking does not dilute the average until the day is over.
-        let todayIsDrinkDay = summaries.contains { $0.date == window.to && $0.totalGrams > 0.0 }
-        let periodDays = DayResolver.effectivePeriodDays(
-            from: window.from, today: window.to, todayIsDrinkDay: todayIsDrinkDay
+        // An unfinished dry day is excluded, so today's absence of drinking does not
+        // dilute the average until the day is over. THE RULE IS ABOUT TODAY, NOT
+        // ABOUT THE WINDOW'S LAST DAY: `window.to` equals today only at offset 0,
+        // and handing the last day of a finished month to the superposition rule
+        // dropped it from the count. `windowDays` takes both and decides.
+        let windowEndsToday = window.to == today
+        let todayIsDrinkDay = windowEndsToday
+            && summaries.contains { $0.date == window.to && $0.totalGrams > 0.0 }
+        let periodDays = DayResolver.windowDays(
+            from: window.from, to: window.to, today: today, todayIsDrinkDay: todayIsDrinkDay
         )
 
         let limitInfo = AlcoholCalculator.getLimitInfo(settings)
@@ -373,9 +378,12 @@ public final class StatsModel {
         next.to = window.to
         next.today = today
         next.chartGranularity = granularity
+        // inProgressDay is the REAL logical day or nothing: a window that ends in the
+        // past holds no running day, and naming its last day here left that day
+        // without its abstinence tick and out of its bucket's divisor.
         next.chartBuckets = ChartBucketing.bucketize(
             summaries: summaries, from: window.from, to: window.to,
-            granularity: granularity, inProgressDay: window.to
+            granularity: granularity, inProgressDay: windowEndsToday ? today : nil
         )
         next.totalGrams = totalGrams
         next.averagePerDay = averagePerDay

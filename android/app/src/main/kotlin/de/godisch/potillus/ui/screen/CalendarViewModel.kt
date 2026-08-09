@@ -321,6 +321,26 @@ class CalendarViewModel(
         _selectedDate.value = null
     }
 
+    /**
+     * Returns to the current month, in month view, with nothing selected.
+     *
+     * Called when the screen is entered anew, so coming back to the calendar from
+     * another screen starts at today — the same rule the statistics screen follows,
+     * and for a sharper reason here: THE PLUS BUTTON LOGS TO THE SELECTED DAY. A
+     * selection left over from browsing March, still there after a trip to the
+     * drinks list, turns the next tap on it into an entry booked three months back,
+     * and nothing on screen contradicts it.
+     *
+     * A rotation must NOT call this: it is the same screen, and the user's place in
+     * it should survive (the caller tells the two apart with a saved marker; see
+     * CalendarScreen, which mirrors StatsScreen).
+     */
+    fun resetToCurrentMonth() {
+        _month.value = YearMonth.now(DayResolver.clock())
+        _viewMode.value = CalendarViewMode.MONTH
+        _selectedDate.value = null
+    }
+
     /** Navigate to the previous month (MONTH mode) or previous year (YEAR mode). */
     fun prevPeriod() {
         // In YEAR mode, advance _month by 12 months so that _month.value.year

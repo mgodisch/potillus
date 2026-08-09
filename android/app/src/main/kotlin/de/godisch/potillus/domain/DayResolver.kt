@@ -197,6 +197,40 @@ object DayResolver {
     }
 
     /**
+     * Days in the inclusive window [[from], [to]] that a per-day average may be
+     * divided by, and that an abstinent-day count may be subtracted from.
+     *
+     * WHICH OF TWO RULES APPLIES DEPENDS ON WHERE THE WINDOW ENDS, and that is the
+     * whole point of this function:
+     *
+     *  - The window ends TODAY (the statistics screen at offset 0, the Today
+     *    card's month): the last day is still running, so
+     *    [effectivePeriodDays] applies and keeps it out until it resolves.
+     *  - The window ends in the PAST (any offset > 0): every day in it is
+     *    finished, including the last one, so all of them count.
+     *
+     * Passing the window's end as if it were today conflated the two and cost the
+     * last day of every past period: July was 30 days long, its average divided by
+     * 30, its abstinent-day count one short, and its final bar drew no abstinence
+     * tick because the bucket believed the day might still become a drink day
+     * (0.85.0 QA round). Callers therefore hand in BOTH the window end and the
+     * real logical day and let this function decide.
+     *
+     * @param from            Inclusive window start ("yyyy-MM-dd").
+     * @param to              Inclusive window end ("yyyy-MM-dd").
+     * @param today           The real current logical day ("yyyy-MM-dd").
+     * @param todayIsDrinkDay Whether a drink has already been logged today. Read
+     *                        only when the window ends today.
+     */
+    fun windowDays(from: String, to: String, today: String, todayIsDrinkDay: Boolean): Int {
+        if (to == today) return effectivePeriodDays(from, to, todayIsDrinkDay)
+        val f = parseDate(from)
+        val t = parseDate(to)
+        if (f.isAfter(t)) return 0
+        return f.datesUntil(t.plusDays(1)).count().toInt() // [from, to] — inclusive
+    }
+
+    /**
      * The first weekday of the calendar week for the given [locale], as an ISO-8601
      * weekday number (1 = Monday … 7 = Sunday).
      *

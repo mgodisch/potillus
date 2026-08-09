@@ -43,6 +43,7 @@ import XCTest
 struct DayResolverVectors: Decodable {
     let resolve: [ResolveCase]
     let effectivePeriodDays: [EffectiveDaysCase]
+    let windowDays: [WindowDaysCase]
     let computeCurrentAbstinence: [CurrentAbstinenceCase]
     let computeLongestAbstinence: [LongestAbstinenceCase]
 
@@ -60,6 +61,15 @@ struct DayResolverVectors: Decodable {
     struct EffectiveDaysCase: Decodable {
         let description: String
         let from: String
+        let today: String
+        let todayIsDrinkDay: Bool
+        let expected: Int
+    }
+
+    struct WindowDaysCase: Decodable {
+        let description: String
+        let from: String
+        let to: String
         let today: String
         let todayIsDrinkDay: Bool
         let expected: Int
@@ -143,6 +153,20 @@ final class DayResolverTests: XCTestCase {
                 todayIsDrinkDay: testCase.todayIsDrinkDay
             )
             XCTAssertEqual(actual, testCase.expected, "effectivePeriodDays: \(testCase.description)")
+        }
+    }
+
+    // ── windowDays ───────────────────────────────────────────────────────────
+
+    func testWindowDaysAgainstSharedVectors() {
+        for testCase in vectors.windowDays {
+            let actual = DayResolver.windowDays(
+                from: testCase.from,
+                to: testCase.to,
+                today: testCase.today,
+                todayIsDrinkDay: testCase.todayIsDrinkDay
+            )
+            XCTAssertEqual(actual, testCase.expected, "windowDays: \(testCase.description)")
         }
     }
 

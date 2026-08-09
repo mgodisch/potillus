@@ -287,6 +287,41 @@ public enum DayResolver {
         return days
     }
 
+    /// Days in the inclusive window `from ... to` that a per-day average may be
+    /// divided by, and that an abstinent-day count may be subtracted from.
+    ///
+    /// WHICH OF TWO RULES APPLIES DEPENDS ON WHERE THE WINDOW ENDS, and that is
+    /// the whole point of this function:
+    ///
+    /// - The window ends TODAY (the statistics screen at offset 0, the Today
+    ///   card's month): the last day is still running, so `effectivePeriodDays`
+    ///   applies and keeps it out until it resolves.
+    /// - The window ends in the PAST (any offset > 0): every day in it is
+    ///   finished, the last one included, so all of them count.
+    ///
+    /// Passing the window's end as if it were today conflated the two and cost the
+    /// last day of every past period: July was 30 days long, its average divided
+    /// by 30, its abstinent-day count one short, and its final bar drew no
+    /// abstinence tick because the bucket believed the day might still become a
+    /// drink day (0.85.0 QA round). Callers therefore hand in BOTH the window end
+    /// and the real logical day and let this function decide.
+    ///
+    /// - Parameters:
+    ///   - from: Inclusive window start ("yyyy-MM-dd").
+    ///   - to: Inclusive window end ("yyyy-MM-dd").
+    ///   - today: The real current logical day ("yyyy-MM-dd").
+    ///   - todayIsDrinkDay: Whether a drink has already been logged today. Read
+    ///     only when the window ends today.
+    public static func windowDays(
+        from: String, to: String, today: String, todayIsDrinkDay: Bool
+    ) -> Int {
+        if to == today {
+            return effectivePeriodDays(from: from, today: to, todayIsDrinkDay: todayIsDrinkDay)
+        }
+        guard let start = parseDate(from), let end = parseDate(to), start <= end else { return 0 }
+        return daysUntil(start, end) + 1  // [from, to] — inclusive
+    }
+
     // ── Abstinence streaks ───────────────────────────────────────────────────
 
     /// Completed, alcohol-free days since the most recent drink — or since

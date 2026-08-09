@@ -397,6 +397,34 @@ public final class CalendarModel {
         await reloadVisiblePeriod()
     }
 
+    /// Returns to the current month, in the month layout, with nothing selected.
+    ///
+    /// Called when the screen is entered anew, so arriving at the calendar from
+    /// another tab starts at today — the same rule the statistics screen follows,
+    /// and for a sharper reason here: THE PLUS BUTTON LOGS TO THE SELECTED DAY. A
+    /// selection left over from browsing March, still there after a trip to the
+    /// drinks tab, turns the next tap on it into an entry booked three months back,
+    /// and nothing on screen contradicts it.
+    ///
+    /// `state.year == 0` means `load()` has not run yet; it seeds the month from
+    /// today on its own, so there is nothing to reset and no `state.today` to read.
+    /// On iOS `onAppear` already tells entering apart from a rotation, which does
+    /// not rebuild the screen; Android needs a saved marker for the same
+    /// distinction.
+    public func resetToCurrentMonth() async {
+        guard state.year != 0 else { return }
+        let parts = state.today.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3 else { return }
+        let alreadyThere = state.year == parts[0] && state.month == parts[1]
+            && state.viewMode == .month && state.selectedDate == nil
+        guard !alreadyThere else { return }
+        state.year = parts[0]
+        state.month = parts[1]
+        state.viewMode = .month
+        clearSelection()
+        await reloadMonth()
+    }
+
     /// A selection belongs to the month it was made in; carrying it across would
     /// show January's entries under a February heading.
     private func clearSelection() {

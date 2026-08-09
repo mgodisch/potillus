@@ -53,6 +53,7 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The calendar opens on the current month, with no day selected.
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
 - The statistics screen carries which period it shows, above the cards.
@@ -131,6 +132,8 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- The last day of a past statistics period counts towards its average,
+  its abstinent days and its chart.
 - The year heat-map marks today with a ring the eye can find.
 - The security footer on iOS follows the in-app language.
 - The import dialog on iOS says what each mode does with the drink list.

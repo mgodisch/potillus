@@ -114,6 +114,25 @@ class DayResolverVectorTest {
         }
     }
 
+    // ── windowDays ───────────────────────────────────────────────────────────
+
+    @Test
+    fun `windowDays matches the shared vectors`() {
+        VECTORS.getJSONArray("windowDays").objects().forEach { case ->
+            val actual = DayResolver.windowDays(
+                from = case.getString("from"),
+                to = case.getString("to"),
+                today = case.getString("today"),
+                todayIsDrinkDay = case.getBoolean("todayIsDrinkDay"),
+            )
+            assertEquals(
+                "windowDays: ${case.getString("description")}",
+                case.getInt("expected"),
+                actual,
+            )
+        }
+    }
+
     // ── computeCurrentAbstinence ─────────────────────────────────────────────
 
     @Test

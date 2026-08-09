@@ -246,6 +246,13 @@ struct CalendarScreen: View {
             // `start()` loads and then subscribes; a database change in another
             // tab reaches this month without a manual reload.
             .task { await model.start() }
+            // Entering the screen returns to the current month, with nothing
+            // selected. `onAppear` fires on a tab change and not on a rotation,
+            // which does not rebuild the view here — so no marker is needed, unlike
+            // on Android (see CalendarScreen.kt). It runs after `start()` has
+            // seeded the month, and is a no-op when the calendar already shows
+            // today (see CalendarModel.resetToCurrentMonth).
+            .onAppear { Task { await model.resetToCurrentMonth() } }
             .onDisappear { model.stop() }
             // Reload on foregrounding; see TodayScreen for the full rationale
             // (onAppear does not fire, the ticker only bounds staleness).
