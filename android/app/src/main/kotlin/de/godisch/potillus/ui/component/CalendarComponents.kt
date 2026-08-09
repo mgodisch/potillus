@@ -291,7 +291,16 @@ fun YearCalendarView(
                                         // (The blue/red under/over palette is already colour-blind
                                         // distinguishable — it is not a red/green pair — so no
                                         // extra non-colour VISUAL cue is added here.)
-                                        val cellDesc: String? = summary?.let { s ->
+                                        //
+                                        // A day of alcohol-free entries is silent too, and for the
+                                        // same reason its cell is drawn empty above: the label
+                                        // states what the colour states, and "0.0 g, under limit"
+                                        // for a cell that shows nothing logged would put the two
+                                        // at odds. The day's entries are reachable in the month
+                                        // view, where the day can be tapped.
+                                        val drinkSummary =
+                                            summary?.takeIf { AlcoholCalculator.isDrinkDay(it.totalGrams) }
+                                        val cellDesc: String? = drinkSummary?.let { s ->
                                             val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
                                                 R.string.year_calendar_over_limit
                                             } else {

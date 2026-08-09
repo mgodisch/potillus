@@ -529,14 +529,6 @@ public final class CalendarModel {
         }
         await reloadVisiblePeriod()
     }
-
-    /// Whether a day exceeded the daily limit. Absent days are not over.
-    public func isOverLimit(_ date: String) -> Bool {
-        guard let summary = state.summaries[date] else { return false }
-        return AlcoholCalculator.isOverLimit(
-            totalGrams: summary.totalGrams, limitGrams: state.limitInfo.limitGrams
-        )
-    }
 }
 
 // =============================================================================
@@ -583,5 +575,35 @@ extension CalendarModel {
         state.viewMode = .month
         clearSelection()
         await reloadMonth()
+    }
+}
+
+// =============================================================================
+// What a day was
+// =============================================================================
+//
+// In an extension for the reason the year-navigation block above gives: the
+// class body sits at SwiftLint's type_body_length limit. The seam is a real one
+// — both grids ask these two about a date before they draw it or speak it, and
+// neither touches the loading machinery above.
+// =============================================================================
+
+extension CalendarModel {
+
+    /// Whether a day exceeded the daily limit. Absent days are not over.
+    public func isOverLimit(_ date: String) -> Bool {
+        guard let summary = state.summaries[date] else { return false }
+        return AlcoholCalculator.isOverLimit(
+            totalGrams: summary.totalGrams, limitGrams: state.limitInfo.limitGrams
+        )
+    }
+
+    /// Whether alcohol was consumed on a day. A day with no entries is dry, and
+    /// so is one holding only alcohol-free ones — `AlcoholCalculator.isDrinkDay`
+    /// decides. Both calendar grids ask this before they draw a dot or a colour,
+    /// and before they hand the day to a screen reader.
+    public func isDrinkDay(_ date: String) -> Bool {
+        guard let summary = state.summaries[date] else { return false }
+        return AlcoholCalculator.isDrinkDay(totalGrams: summary.totalGrams)
     }
 }

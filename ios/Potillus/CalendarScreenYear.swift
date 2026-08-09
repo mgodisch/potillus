@@ -143,7 +143,7 @@ extension CalendarScreen {
         } else {
             let summary = model.state.summaries[date]
             RoundedRectangle(cornerRadius: 2)
-                .fill(yearCellColour(date, summary: summary))
+                .fill(yearCellColour(date))
                 .frame(width: 9, height: 9)
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
@@ -152,11 +152,13 @@ extension CalendarScreen {
                             lineWidth: 1
                         )
                 )
-                // Only days with something logged are spoken, matching the month
-                // grid's dot and Android's heat-map: a reader met with 365 "no
-                // entry" nodes learns nothing from them. Reading never depended on
-                // tapping, so the label outlived the button.
-                .accessibilityHidden(summary == nil)
+                // Only days with alcohol are spoken, matching this grid's own
+                // colours, the month grid's dot and Android's heat-map: a reader
+                // met with 365 "no entry" nodes learns nothing from them, and
+                // "0.0 g, under limit" over a cell drawn empty would put label
+                // and display at odds. Reading never depended on tapping, so the
+                // label outlived the button.
+                .accessibilityHidden(!model.isDrinkDay(date))
                 .accessibilityLabel(yearCellLabel(date, summary: summary))
         }
     }
@@ -192,12 +194,15 @@ extension CalendarScreen {
     /// applies unchanged. Re-measure delta L* rather than the ratio, and check on
     /// a device: "Increase Contrast" and a non-standard background both shift the
     /// result.
-    private func yearCellColour(_ date: String, summary: DaySummary?) -> Color {
+    ///
+    /// The day is read from the model rather than passed in: "is this a drink
+    /// day" and "is it over the limit" are one question each, and both already
+    /// live there.
+    private func yearCellColour(_ date: String) -> Color {
         // A day of alcohol-free entries reads as empty here, like a day with
         // none at all: the heat map is about drinking, and
         // `AlcoholCalculator.isDrinkDay` decides that everywhere in the app.
-        guard let summary, AlcoholCalculator.isDrinkDay(totalGrams: summary.totalGrams)
-        else { return emptyCellFill }
+        guard model.isDrinkDay(date) else { return emptyCellFill }
         return model.isOverLimit(date) ? .red : .accentColor
     }
 
@@ -210,7 +215,7 @@ extension CalendarScreen {
     }
 
     private func yearCellLabel(_ date: String, summary: DaySummary?) -> String {
-        guard let summary else { return "" }
+        guard let summary, model.isDrinkDay(date) else { return "" }
         let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
         let status = Loc.string(
             model.isOverLimit(date) ? "over limit" : "under limit",

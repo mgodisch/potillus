@@ -510,7 +510,15 @@ private fun MonthCalendar(
                         // would otherwise miss it (WCAG 1.4.1 / 1.1.1). Reuse the
                         // year heat-map's "date, grams, status" caption strings so
                         // no new locale keys are needed. Empty days stay unlabelled.
-                        val dayDesc: String? = summary?.let { s ->
+                        // Only a day with alcohol carries a status: the dot below is
+                        // drawn for exactly those days, and "0.0 g, under limit"
+                        // spoken over a cell that shows no dot would put label and
+                        // display at odds. A day of alcohol-free entries stays
+                        // silent like an empty one; its entries are one tap away in
+                        // the day list below the grid.
+                        val drinkSummary =
+                            summary?.takeIf { AlcoholCalculator.isDrinkDay(it.totalGrams) }
+                        val dayDesc: String? = drinkSummary?.let { s ->
                             val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
                                 R.string.year_calendar_over_limit
                             } else {
@@ -571,7 +579,12 @@ private fun MonthCalendar(
                                     style = MaterialTheme.typography.bodySmall,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                 )
-                                if (summary != null) {
+                                // The dot means alcohol, not "something is logged":
+                                // it is drawn in the neutral or the over-limit colour,
+                                // and neither reading fits a day of alcohol-free
+                                // entries. Such a day looks like a dry one here, as it
+                                // does in the year heat map.
+                                if (drinkSummary != null) {
                                     // On a selected cell the background is
                                     // `primary`, so neither of the normal dot
                                     // colours works there: the neutral dot IS
@@ -580,7 +593,7 @@ private fun MonthCalendar(
                                     // Both therefore switch to the container
                                     // pair while the cell is selected. See the
                                     // STATUS COLOURS note in theme/Color.kt.
-                                    val over = AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)
+                                    val over = AlcoholCalculator.isOverLimit(drinkSummary.totalGrams, limitGrams)
                                     val dotColor = when {
                                         isSelected && over -> dangerOnSelectionColor()
                                         isSelected -> MaterialTheme.colorScheme.primaryContainer

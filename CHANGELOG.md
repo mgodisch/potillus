@@ -133,7 +133,7 @@ Edit drinks from the list's edit mode
 - The year heat-map draws only the days from the statistics start date through
   today.
 - A day of alcohol-free entries is a dry day: no drink day, no break in an
-  abstinence streak.
+  abstinence streak, and no dot or colour in the calendars.
 - `AlcoholCalculator.isDrinkDay` and the drink-date queries carry that
   definition on both platforms.
 

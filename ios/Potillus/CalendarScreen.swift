@@ -347,12 +347,16 @@ struct CalendarScreen: View {
                 Text(dayNumber(date))
                     .font(.callout)
                     .monospacedDigit()
-                // A dot only when something was logged: an empty day says nothing,
-                // rather than saying zero.
+                // A dot only when alcohol was consumed: it is drawn in the neutral
+                // or the over-limit colour, and neither reading fits a day of
+                // alcohol-free entries. Such a day looks like a dry one here, as
+                // it does in the year heat map; its entries are one tap away in
+                // the day list below. An empty day says nothing, rather than
+                // saying zero.
                 Circle()
                     .fill(model.isOverLimit(date) ? Color.red : Color.accentColor)
                     .frame(width: 5, height: 5)
-                    .opacity(summary == nil ? 0 : 1)
+                    .opacity(model.isDrinkDay(date) ? 1 : 0)
             }
             .frame(maxWidth: .infinity, minHeight: 40)
             // The selected day's tint. It is stronger in dark mode: against a
@@ -381,6 +385,10 @@ struct CalendarScreen: View {
         return String(day)
     }
 
+    /// The label names the day and its grams, with no limit status — that state
+    /// belongs to the dot, and the dot is only drawn for a drink day. A day of
+    /// alcohol-free entries therefore reads as "0.0 grams", which is what the
+    /// missing dot says and what the day list confirms.
     private func accessibilityLabel(_ date: String, summary: DaySummary?) -> String {
         guard let summary else {
             return Loc.string("%@, nothing logged", date, locale: locale)

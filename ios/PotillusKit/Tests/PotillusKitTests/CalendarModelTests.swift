@@ -306,6 +306,24 @@ final class CalendarModelTests: XCTestCase {
         XCTAssertFalse(model.isOverLimit("2026-01-12"), "a day with no entries is not over")
     }
 
+    /// Both grids draw and speak a day through `isDrinkDay`, so a day of
+    /// alcohol-free entries must answer like an empty one: no dot in the month
+    /// grid, no colour in the heat map, and nothing for a screen reader to read
+    /// that the display does not show.
+    func testADayOfAlcoholFreeEntriesIsNotADrinkDay() async throws {
+        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
+        try addEntry(on: "2026-01-11", grams: 0.0, at: midJanuary + 1)
+
+        let model = makeModel(at: midJanuary)
+        await model.load()
+
+        XCTAssertTrue(model.isDrinkDay("2026-01-10"))
+        XCTAssertFalse(model.isDrinkDay("2026-01-11"), "0.0 g is not a drink day")
+        XCTAssertFalse(model.isDrinkDay("2026-01-12"), "a day with no entries is not one either")
+        // The day keeps its summary, so the day list still shows what was logged.
+        XCTAssertNotNil(model.state.summaries["2026-01-11"])
+    }
+
     /// Deleting the last entry of a day must remove its summary, not leave a
     /// coloured cell behind.
     func testDeletingTheLastEntryOfADayRemovesItsSummary() async throws {
