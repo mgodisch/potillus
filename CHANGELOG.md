@@ -46,6 +46,8 @@ Edit drinks from the list's edit mode
 
 ### Added
 
+- Six WCAG 2.2 self-assessment protocols, one per platform and level.
+- `docs/OPENSSF_BADGES.md` with the open badge criteria per tier.
 - The statistics start date has a row that clears it.
 - The backup export has a switch for the settings block.
 - A year heat-map in the calendar, with a month and year toggle, where a month
@@ -54,6 +56,10 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The roadmap, the README, CONTRIBUTING.md and the label gate point at the
+  accessibility protocols and the badge document.
+- The roadmap carries the open work only.
+- The roadmap's iOS notes describe the year heat-map the app ships.
 - The `json` gem is at 2.21.2 in `fastlane/Gemfile.lock`.
 - The calendar opens on the current month, with no day selected.
 - The bottom bar is the only way between the four main screens.
@@ -116,13 +122,13 @@ Edit drinks from the list's edit mode
 - `make ios` renders a stale user's guide by itself, as the Android build does.
 - Calendar day cells draw a focus ring while focused.
 - The year view's low-contrast empty cells and its undersized day targets are
-  recorded as decisions, with the reasoning.
-- The roadmap prioritises the iOS VoiceOver assessment and carries its setup and
-  opening questions.
+  recorded as decisions in the Android Level AA protocol.
+- The iOS Level A protocol carries the VoiceOver setup and the opening
+  questions.
 - The roadmap records the AGP 10 readiness check and why the Gradle 10
   deprecation waits on AGP.
-- The roadmap records the measured contrast of that red and of the light-theme
-  caption colour.
+- The Android Level AA protocol records the measured contrast of that red and of
+  the light-theme caption colour.
 - The secondary caption colour in the Android light theme is `#5D6C93`.
 - The report template's HTML escaping on iOS compares Unicode scalars, with a
   combining-mark case in `template-render.json`.
@@ -139,6 +145,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- The README's link to the roadmap.
 - The last day of a past statistics period counts towards its average,
   its abstinent days and its chart.
 - The year heat-map marks today with a ring the eye can find.

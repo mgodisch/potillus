@@ -213,9 +213,9 @@ used.
 used**, because a conformance claim requires meeting all criteria of a level
 under a thorough human evaluation, which has not yet been performed.
 Additionally, there are known open Level AA items, and W3C logos are scoped to
-web pages rather than native apps. The concrete, measured accessibility gaps
-and the path toward WCAG 2.2 Level AA are tracked in
-[`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility).
+web pages rather than native apps. The evaluation protocols, one per platform and
+level, are listed in [`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility) and carry
+the measurements and the open questions.
 
 ## Build Infrastructure & Tooling
 
@@ -268,7 +268,7 @@ sits in an edit-compile-run loop.
 
 Changes are documented in [`CHANGELOG.md`](CHANGELOG.md). The project's
 intended direction and its explicit non-goals are described in
-[`ROADMAP.md`](ROADMAP.md).
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## AI Involvement
 

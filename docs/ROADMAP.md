@@ -28,502 +28,58 @@ apply to it are stated in the accompanying COPYING.md file.
 
 This roadmap describes both the intended direction of Libellus Potionis and the
 concrete open tasks currently on the table, so it doubles as the project's task
-list. Near-term work is listed first, ordered by criticality (most critical
-first), followed by the longer-term direction and — just as importantly — what
-the project deliberately will **not** do. It is a statement of intent, not a
-promise: priorities may shift, and items may be reordered, deferred, or dropped.
+list. It is a statement of intent, not a promise: priorities may shift, and items
+may be reordered, deferred, or dropped.
 
-Many near-term items arose while working toward the OpenSSF Best Practices badges
-(project 13480); each notes its originating criterion in `code` font for
-traceability.
-
-## Current state: the iOS port
-
-Libellus Potionis is no longer Android-only. A native Swift/SwiftUI port lives in
-this same repository under `ios/`, sharing the data-interchange backup format (not
-live sync) and a single human-readable version with Android. It is feature-complete
-for daily use — the five screens, CSV and PDF export, the app lock, the twenty UI
-languages with localised report and plurals — and its behaviour is pinned to
-Android's by a shared set of golden test vectors. Two Android features are
-consciously not ported (the calendar year heat-map and, pending on-device
-verification, a PDF footer tweak); both are recorded as possible future work below.
-The design and parity strategy are recorded in the `v0.82.0`
-[changelog](../CHANGELOG.md) entry and enforced by the shared golden test vectors
-in `test-vectors/`. What is still open is App Store distribution
-(listing, screenshots, and the compliance declarations), tracked below.
-
-## Blocking the OpenSSF silver badge (MUST)
-
-These silver-level MUST criteria are currently unmet; the silver badge is not
-attainable until each is resolved. They are the most critical open items.
-
-- **Continuity arrangement** (`access_continuity`). Ensure the project can
-  continue — issues, changes, and releases within a week — if the sole
-  maintainer becomes unavailable. The arrangement as it stands is written down
-  in `docs/GOVERNANCE.md` under "Continuity": what does not stop (the licence,
-  the public history, F-Droid's reproducible re-signing, the documented backup
-  format) and what does — there is no designated successor, and until there is
-  one, an update to either store cannot be published by anyone else. What
-  remains open is therefore the naming itself: a trusted successor or
-  co-maintainer with the necessary repository access and legal rights, willing
-  to take it on. F-Droid distribution helps, in that its re-signing removes the
-  private-key hand-off, but it is not itself a successor.
-- **Continuous integration** (`automated_integration_testing`). A GitLab CI
-  pipeline (`.gitlab-ci.yml`) now replaces the Woodpecker pipeline the project
-  ran while hosted on Codeberg. It stands where the old one stood — device-free
-  only, no build — and runs three jobs on a plain `python:3-slim` image: the two
-  gates that pass in the QA log, `tools/release-check.sh --Werror` and
-  `make check-static`, which together cover the shared invariants plus the iOS
-  static checks reproduced in Python (Swift symbol/length/test linting, l10n
-  parity, store-metadata limits, ...), so the Swift toolchain is covered without
-  a Mac; plus a `dependency-scan` job running osv-scanner over the committed
-  lockfiles on every change (see the security work below and
-  [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). A workflow rule
-  restricts it to merge requests targeting `main`; `main` is protected against
-  direct pushes, so no second path into it needs its own trigger. A full Android
-  build (`lintDebug`, `./gradlew testDebugUnitTest`, instrumented tests) needs
-  the SDK and an emulator; an iOS build needs macOS + Xcode and cannot run on a
-  hosted Linux runner at all — so building, and running the unit-test/lint
-  suites in CI, stays out of this first pipeline and remains its own heavier
-  item below ("Run the test and lint suites in CI"). CI also settles
-  `test_continuous_integration` (SUGGESTED at passing, a MUST at gold) and
-  contributes to `static_analysis_often`.
-  The gate is enforced, not advisory: *Merge requests > "Pipelines must
-  succeed"* is enabled, so a red pipeline blocks the merge. With that in place
-  the CI-conditional answers in `.bestpractices.json` are Met again — sanitize
-  and validate untrusted inputs (`OSPS-BR-01.01`), deny untrusted code snapshots
-  access to privileged credentials (`OSPS-BR-01.03`), least-privilege default
-  permissions and job permissions (`OSPS-AC-04.01`, `OSPS-AC-04.02`), status
-  checks before merge (`OSPS-QA-03.01`) and automated per-change
-  dependency-policy enforcement (`OSPS-VM-05.03`). `OSPS-QA-03.01` was the
-  single control keeping OSPS Baseline Level 2 incomplete, so **Level 2 is
-  complete again**. `OSPS-BR-01.04` stays N/A on purpose: it is conditional on a
-  pipeline that accepts collaborator input, and this one has no manual trigger,
-  no inputs and no user-supplied variables.
-  Two criteria stay unmet by design rather than by omission. `OSPS-QA-06.01`
-  (a test SUITE inside CI) and `automated_integration_testing` wait on the
-  heavier item below, and `static_analysis_often` is left unmet on both its
-  counts: the analysis is tied to merge requests rather than every commit, and
-  the two real linters (`./gradlew lintDebug`, SwiftLint) need an SDK-bearing
-  image and a Mac runner. Running on every push to a working branch was
-  considered and rejected — `main` is closed to direct pushes, so the merge
-  request is the only way in and therefore the only place the gate has to sit;
-  scanning half-finished intermediate commits would spend compute minutes on
-  states the author already knows are unfinished. `OSPS-QA-06.01` (a test SUITE running inside
-  CI) stays N/A on purpose: even the restored pipeline runs the device-free
-  checks only, not the unit-test suites (which need the Android SDK and, for
-  `swift test`, a Linux Swift toolchain), so claiming a CI test run would assert
-  something that does not happen — that widening is the heavier item below.
-
-## Recommended, not blocking (SHOULD)
-
-- **Raise the bus factor** (`bus_factor`). Gain a second significant, ongoing
-  maintainer — the same underlying need as the continuity arrangement above.
-- **Cryptographic algorithm agility** (`crypto_algorithm_agility`). Not planned.
-  Sealing the preferences blob under a second algorithm would buy no practical
-  protection here and would risk moving the key out of the Android Keystore; the
-  full reasoning is recorded in the criterion's justification in
-  `.bestpractices.json`. Note also that the versioned blob format previously
-  sketched here would *not* by itself satisfy the criterion, which asks for
-  multiple algorithms rather than a migration marker. Should a self-describing,
-  versioned blob (a version byte authenticated as GCM AAD, with a read-legacy /
-  write-versioned migration) in `KeystoreSecretStore` be wanted anyway, it should
-  be justified on its own merits as a future migration aid — a security-critical
-  change requiring thorough tests, including an instrumented round-trip, a
-  legacy-blob read, and tamper/downgrade rejection.
-- **Re-visit explicit iOS App Transport Security.** ATS is currently left at its
-  strict Xcode default, which is correct: the app makes no network connections at
-  all, so there is nothing for an explicit declaration to harden, and the only way
-  to state one (a nested Info.plist dictionary) would trade a working
-  `GENERATE_INFOPLIST_FILE` setup for either an `info:`/`properties:` block or a
-  PlistBuddy build step, all for zero behavioural change. If a future auditor or a
-  store reviewer wants an explicit `NSAllowsArbitraryLoads = false` on record as a
-  visible commitment, revisit this and add it deliberately, verifying the Info.plist
-  generation stays intact.
+Two areas are tracked in their own documents, because both are long enough to
+crowd out everything else and both are read on their own: accessibility and the
+OpenSSF badges. The sections below name them and link to them.
 
 ## Accessibility
 
-**Conformance status — no WCAG level is claimed.** Libellus Potionis follows accessibility
-best practices but does **not** claim conformance to any WCAG 2.2 level, and it
-uses **none** of the W3C WCAG conformance logos. The reasons are deliberate and
-honest:
+**No WCAG level is claimed, and none of the W3C WCAG conformance logos is used.**
+The app follows accessibility best practices, but a conformance logo is a formal
+claim that every success criterion of the chosen level is met, backed by a
+thorough human evaluation — W3C states explicitly that no automated or tool check
+suffices — and no such evaluation has been performed. There are also verified
+unmet Level AA criteria, and the logos are web-page scoped (WCAG = *Web Content*
+Accessibility Guidelines), which does not map onto a native mobile app.
 
-- A W3C conformance logo is a formal *claim* that **all** success criteria of
-  the chosen level are met, backed by a **thorough human evaluation** — W3C
-  states explicitly that no automated/tool check suffices. No such evaluation
-  has been performed here.
-- There are **verified unmet Level AA criteria** (listed below), so AA/AAA are
-  out regardless. The Level A criteria have no open implementation item — see
-  [WCAG_LEVEL_A_CHECKLIST.md](WCAG_LEVEL_A_CHECKLIST.md) — but that checklist's
-  on-device pass with TalkBack has not been walked, and a static reading of the
-  source is not the human evaluation a claim needs. Level A therefore stays
-  unclaimed as well.
-- The W3C logos are **web-page scoped** (WCAG = *Web Content* Accessibility
-  Guidelines; a logo covers "a single page"). Libellus Potionis is a native mobile app;
-  the per-page conformance model does not map onto it. (WCAG could be applied via
-  WCAG2ICT as a written claim, but that is not a W3C logo.)
+The evaluation protocols are one document per platform and level, each listing the
+criteria that apply to this app, what has been measured, and what is still open:
 
-What the app *does* support today (capabilities, not a conformance claim):
-screen-reader (TalkBack) names on **all** interactive controls — including, since
-the sixth QA review, the calendar month/year navigation arrows, the
-drink-category icon, and every year heat-map day cell that carries data
-(`year_calendar_day_desc`); a per-app language selector with RTL support;
-a one-line summary on each of the three drawn charts (`chart_desc_daily_avg`,
-`chart_desc_value_bars`, `chart_desc_categories`, translated into all 21
-languages); `sp`-based text that honours the system font-scale (WCAG 1.4.4);
-and an
-under/over-limit palette that is **blue vs. red — not a red/green pair** — so it
-is colour-blind distinguishable.
+| Level | Android | iOS |
+| --- | --- | --- |
+| A | [WCAG_LEVEL_A_ANDROID.md](WCAG_LEVEL_A_ANDROID.md) | [WCAG_LEVEL_A_IOS.md](WCAG_LEVEL_A_IOS.md) |
+| AA | [WCAG_LEVEL_AA_ANDROID.md](WCAG_LEVEL_AA_ANDROID.md) | [WCAG_LEVEL_AA_IOS.md](WCAG_LEVEL_AA_IOS.md) |
+| AAA | [WCAG_LEVEL_AAA_ANDROID.md](WCAG_LEVEL_AAA_ANDROID.md) | [WCAG_LEVEL_AAA_IOS.md](WCAG_LEVEL_AAA_IOS.md) |
 
-### Verified gaps toward Level AA (measured in the sixth QA review)
+None of the six has been walked on device. They are protocols, not results: the
+Android Level A and AA documents carry measurements and recorded decisions from
+the QA reviews, the iOS ones carry what a reading of the source raises, and every
+checkbox in all six is unticked. Whether and when a pass is run is not decided
+here.
 
-Reaching full AA is a larger effort (roughly 1.5–2.5 person-weeks plus manual
-on-device assistive-technology testing that no sandbox check can replace). The
-concrete, measured gaps are:
+What the app supports today is a capability list, not a conformance claim:
+screen-reader names on all interactive controls, a one-line summary on each drawn
+chart, a per-app language selector with RTL support, `sp`-based text that honours
+the system font scale, and an under/over-limit palette that is blue versus red
+rather than a red/green pair. A regression guard exists in `tools/release-check.sh`
+§13, which fails the build if any `Icon` inside an `IconButton` is left with
+`contentDescription = null`. It is a labelling invariant only and deliberately
+asserts no WCAG conformance, which a static check cannot.
 
-- **Non-text contrast (1.4.11, AA).** Measured and left as it is, deliberately.
-  Empty heat-map cells (`surfaceVariant`) sit at **1.12 : 1** against the card in
-  the dark theme and **1.29 : 1** in the light one — below the 3 : 1 the criterion
-  asks for. The DATA cells are not affected: an over-limit cell has 3.25 : 1 and
-  an under-limit one more, so the information the view exists to show clears the
-  bar. What is below it is the *empty* grid, and lifting it to 3 : 1 would turn a
-  quiet year of mostly-blank squares into a visible lattice of 365 tiles competing
-  with the data drawn on it. The maintainer looked at the view on device and
-  judged the current balance right (0.85.0 QA round). This is therefore a decision
-  about what the year view is for, not an oversight: the heat-map answers "when
-  did I drink", and a day with no entry answers it by staying quiet.
-  The ring around today was listed here too, at **1.06 : 1** and **1.20 : 1**, on
-  the same reasoning. That did not hold on device: the marker was invisible in
-  both themes, which is a different matter from a grid that is quiet on purpose.
-  It had the same shape of problem as the focus ring — it surrounds a cell whose
-  fill varies, so no single colour clears 3 : 1 against all fills — and it took
-  the same fix: drawn before the padding it lies on the card surface alone, where
-  `onSurfaceVariant` gives **5.13 : 1** dark and **5.21 : 1** light.
-- **Text contrast (1.4.3, AA).** Red as *text* is what remains here, and it is
-  now a decision rather than an oversight. The dark theme carries two reds: the
-  graphical one (`dangerRedColor`, `#DD2C2C`, 3.25 : 1 on the cards) for dots,
-  bars, the chart limit line and delete icons, which clears the 3 : 1 of 1.4.11;
-  and the text one (`dangerTextColor`, `#DF3A3A`, 3.49 : 1) for the three
-  days-over-limit values and the trend value in `StatRow`, the month-trend arrow,
-  the BAC readout and the two delete confirmations. The text red is a step toward
-  the 4.5 : 1 small-text threshold without reaching it. Reaching it needs roughly
-  `#E66363`, light enough to read as pink; that was measured, compared side by
-  side and rejected — the signal colour keeps its character. The open question is
-  therefore not which red, but whether those sites should carry red text at all,
-  given that a dot or a bar beside them already carries the state. The BAC
-  readout already conforms on its own: `titleLarge` is 22 sp SemiBold, so the
-  large-text threshold of 3 : 1 applies to it.
-  The light-theme caption colour, the other half of this criterion, is settled:
-  `SchieferOnSurfaceVariant` is `#5D6C93` at 5.21 : 1 on the cards and 4.57 : 1
-  on the background.
-- **Target size (2.5.8, AA — new in 2.2).** Claimed under the criterion's own
-  *Spacing* exception rather than met by enlargement. The year heat-map's day
-  cells are 10 dp with a 2 dp gap, below the 24 px minimum. Wrapping each in a
-  24 dp touch target would make neighbouring targets overlap — 24 dp of target
-  around a 12 dp pitch cannot do otherwise — and where targets overlap the last
-  one drawn wins, so a tap near the edge of the 14th would open the 15th. Trading
-  an undersized target for a wrong one is not an improvement.
-  The exception applies on its terms: the targets are in a dense arrangement
-  whose spatial layout is essential (a calendar year IS its grid; the position of
-  a day carries its meaning), and the same action is available at a comfortable
-  size elsewhere — the month grid's cells fill a seventh of the screen width and
-  reach the same day. Standard Material `IconButton`s throughout the app meet the
-  minimum on their own.
-- **Focus visibility (2.4.7, AA).** Settled: both custom `clickable` surfaces —
-  the year heat-map day cell and the month cell — draw a ring while focused. The
-  heat-map ring sits on the outer box, outside the padding, so it lies on the
-  card surface (12.42 : 1 dark, 14.73 : 1 light) instead of on the cell colour,
-  where no single ring colour clears 3 : 1 against all four fills. The month cell
-  fills its slot, so its ring follows the fill: `onPrimary` when selected,
-  `onSurface` otherwise.
+## OpenSSF badges
 
-None of the four remaining gaps introduces a user-facing string, so none of
-them triggers `LocaleSyncTest` across all locales — unlike the chart summaries,
-which did.
-
-A lightweight regression guard exists in the meantime: `tools/release-check.sh`
-§13 fails the build if any `Icon` inside an `IconButton` is left with
-`contentDescription = null`, so the labels the project *has* added cannot silently
-regress. It is a labelling invariant only — it deliberately does **not** assert
-WCAG conformance, which (per W3C) a static check cannot.
-
-### iOS accessibility assessment (prioritised)
-
-**The next piece of accessibility work after 0.85.0.** The Android side is
-measured and decided — the Level-AA gaps carry either a fix or a recorded
-decision — which leaves the iOS port as the only part of the app about which no
-accessibility statement exists at all. That matters more than it would for a
-single-platform app: one privacy policy, one description and one set of claims
-serve both stores, so a statement made about the app is read as covering the iOS
-build too.
-
-The conformance discussion, the measured Level-AA gaps, and the on-device
-self-assessment protocol ([WCAG_LEVEL_A_CHECKLIST.md](WCAG_LEVEL_A_CHECKLIST.md))
-above are scoped to the Android app and TalkBack. No structured VoiceOver
-evaluation has been recorded for iOS, and the checklist does not cover it.
-
-**What is actually to be assessed.** The iOS port carries exactly four explicit
-accessibility annotations: the capacity traffic-light dot, the favourite star in
-the drink list, the calendar's month-navigation arrows, and the calendar day
-cells. Everything else relies on SwiftUI deriving a label from the `Text` it
-renders. The question is therefore not whether labels are missing but whether the
-derived ones carry — a screen can read perfectly to the eye and announce a row of
-bare numbers to VoiceOver. The Compose-specific heat-map findings above do not
-transfer: the iOS chart and calendar are separate implementations and must be
-judged on their own terms, and iOS ships no year heat-map at all.
-
-**Setting up, before VoiceOver is switched on.** Settings → Accessibility →
-Accessibility Shortcut → VoiceOver, so a triple-click of the Home button toggles
-it (the test device is an iPhone SE 3rd generation). Without that, turning
-VoiceOver off again is itself an exercise, because every gesture changes. Set the
-speaking rate low. The six gestures the walkthrough needs: single tap selects and
-speaks, swipe right and left move to the next and previous element, double tap
-activates, three-finger swipe scrolls, two-finger swipe down reads from the top,
-two-finger tap pauses.
-
-**The questions the first screen raised**, kept so a second attempt does not
-start from nothing. On the today screen: does the reading order match the visual
-order, or does focus jump into the toolbar and back; does the traffic-light dot
-announce its status rather than "image"; do the three progress bars say which
-limit they are and how full, or do label and value arrive as two unrelated
-elements with the bar contributing nothing; and is the BAC readout spoken with
-its unit and its warning state, which is otherwise carried by colour alone.
-
-The output of the session is an iOS counterpart to the Android protocol —
-extending or forking the checklist so each platform is tracked separately. It is
-written afterwards, from what the walkthrough finds, rather than beforehand: an
-empty checklist nobody has filled in is one more document that can drift. Like
-the Android assessment, this is manual on-device work no sandbox check replaces.
-
-## Badge administration (bestpractices.dev, project 13480)
-
-- Keep a version-controlled snapshot of the badge answers (metal series passing,
-  silver, gold, plus OSPS Baseline Level 1) in `.bestpractices.json` (repository
-  root), the maintained source of truth. `make bestpractices` downloads the
-  current bestpractices.dev export and reports, grouped by level, which committed
-  answers the site does not yet match, so the maintainer knows what to enter
-  upstream (no credentials; the working tree is not touched). The reverse
-  direction is unavailable here — bestpractices.dev has no path that reads a
-  committed answer file back into the site, and the URL-based automation-proposal
-  path is impractical because the server rejects the long URLs the full answer set
-  produces. (Its repository analysis targets GitHub and GitLab, so with the move
-  to GitLab that analysis at least now sees the canonical repository rather than a
-  mirror.) (Baseline Level 1 is complete; Level 2 lost a single control with the
-  retirement of CI and returns with it; Level 3 is in progress — see "Working
-  toward OpenSSF Baseline Level 3" below.)
-
-## OpenSSF Scorecard badge (newly in reach, pending CI)
-
-The move of the canonical repository to GitLab removed the reason this badge was
-previously ruled out. Scorecard analyses a single repository on GitHub or GitLab,
-and its badge is fed by a CI job that publishes a signed result through the
-forge's OIDC token. That was impossible while the canonical repository lived on a
-forge Scorecard has no backend for and the GitHub/GitLab repositories were
-read-only mirrors carrying no development, review, CI or release activity. Now
-the canonical repository *is* one Scorecard can analyse, so the measurement would
-for the first time look at where the project actually lives.
-
-The earlier trial run against the GitHub mirror scored 5.2/10, and that shortfall
-was almost entirely a **measurement artifact of the mirror topology**, not a
-security weakness. The substantive checks were already maximal --
-Dangerous-Workflow, Token-Permissions, Vulnerabilities, Security-Policy,
-Pinned-Dependencies and License each scored 10, Binary-Artifacts 9. The low checks
-were the host-dependent ones -- Code-Review, CI-Tests, Contributors,
-Branch-Protection and Signed-Releases -- which measured a mirror on which nothing
-happens; pointed at gitlab.com/godisch/potillus they measure real activity
-instead. Two prerequisites remain before the badge can be pursued honestly:
-
-1. **CI.** The pipeline exists and is enforced (first roadmap item above), but
-   Scorecard's badge publication needs a job of its own that runs the analysis
-   and pushes the signed result, and CI-Tests scores what the pipeline actually
-   runs — for now the device-free checks only.
-2. **Badge re-registration.** The CII-Best-Practices check reads the project's
-   bestpractices.dev entry (project 13480), which is registered under the old
-   canonical URL; it has to be re-pointed at the GitLab repository.
-
-Until both are done the badge is not linked, because publishing a score that
-understates the project's real posture would be worse than publishing none.
-
-The GitHub mirror now carries supplementary GitHub Actions checks (an Android
-build with lint and unit tests, plus `actionlint`/`zizmor` over the workflows
-themselves — see [MIRROR-CHECKS.md](MIRROR-CHECKS.md)). This does **not** change
-the conclusion above: Scorecard must still be pointed at GitLab, where the
-development, review and release activity actually is. The mirror workflows are
-relevant to the badge in one narrow way only — they are the surface
-Dangerous-Workflow and Token-Permissions measure, which is why every action is
-SHA-pinned and every file declares `contents: read`. Two follow-ups remain open
-there:
-
-- **The mirror checks now cover iOS too.** A macOS runner builds the app with
-  XcodeGen and xcodebuild, runs the PotillusKit suite with its coverage floor,
-  and runs real SwiftLint at the pinned version — the first time any of this
-  happens outside the maintainer's own Mac. The Python reimplementations in
-  `tools/check-swift-*.py` stay: they are what covers the Swift side on the
-  canonical, Linux-only pipeline, which is the blocking one. The Android
-  instrumentation tests run there too, on an API 36 emulator. What remains
-  uncovered anywhere but locally are the iOS tests that need a booted simulator:
-  the app-target XCTests and the XCUITests.
-- **Decide on dependency submission.** Dependabot cannot see the Android
-  dependency graph without a submitted graph, and submitting one needs
-  `contents: write` on the mirror. The write scope has been declined for now;
-  the consequence is that Dependabot's coverage there is limited to the
-  committed lockfiles, which the GitLab scan already covers.
-
-CodeQL also runs there now, over Kotlin and Swift, weekly and on `main`. It adds
-a class of analysis the project had on neither platform: data flow across
-functions and files, rather than the per-file reasoning ktlint, Android Lint,
-SwiftLint and the `tools/` scripts do.
-
-Two different questions have to be kept apart here, and an earlier version of
-this section ran them together.
-
-*Does a criterion ask whether a check GATES a change?* Then the mirror does not
-help. `OSPS-QA-03.01` and `OSPS-QA-06.01` are about enforcement, and enforcement
-lives in the GitLab pipeline together with *Merge requests > "Pipelines must
-succeed"*. A workflow that cannot block a merge cannot satisfy them, and the
-items above — a scheduled pipeline, an SDK-bearing image — remain the path.
-
-*Or does it ask whether a PRACTICE is carried out?* Then the mirror settles it,
-because the practice is now real regardless of where the machine stands. Two CII
-Best Practices criteria fall in this group and have moved to Met in
-`.bestpractices.json`:
-
-- **`static_analysis_often`** — ktlint, Android Lint and real SwiftLint run on
-  every push to every branch, CodeQL weekly and on `main`. Both halves of the
-  criterion's wording are now answered.
-- **`automated_integration_testing`** — the JVM unit tests, the Android
-  instrumentation suite and the PotillusKit suite all run per change.
-
-`test_branch_coverage80` moved to Met in the 0.84.0 QA round, and the premise
-this paragraph used to carry — that Kover would first have to report branch
-coverage — was wrong: it had been measuring branches all along, which is what
-let `koverVerify` enforce a BRANCH bound. Only the FIGURE was never printed by
-any run, so it survived here and in `.bestpractices.json` as a quoted "~80%"
-that no one had checked. `koverXmlReport` put it above 80, and the enforced
-floor was raised from 75 to 80 to match. The figure itself is not repeated
-here: a number in prose is a measurement with no run behind it the moment the
-next test lands, which is how the "~80%" above came about.
-`make -C android cover-figures` prints the current one.
-
-## Working toward OpenSSF Baseline Level 3
-
-Baseline Levels 1 and 2 are complete. Level 2 briefly lost `OSPS-QA-03.01`
-(automated status checks before merge) when the move to GitLab retired the old CI
-pipeline, and regained it with the GitLab pipeline and the *Merge requests >
-"Pipelines must succeed"* setting (first roadmap item); `OSPS-AC-04.01` made the
-same round trip.
-
-The remaining Level 3 gaps are largely the same structural constraints as the
-gold tier — a non-author human reviewer
-(`OSPS-QA-07.01`, cf. `two_person_review`) and CI-based automated blocking of
-policy violations:
-
-- **Unify VEX with the scanner, and publish it as a feed** (strengthens
-  `OSPS-VM-04.02`, already Met). The project records non-exploitable advisories
-  in a machine-readable VEX document, [../openvex.json](../openvex.json)
-  (OpenVEX), kept in step with the scanner's `osv-scanner.toml` triage by
-  `tools/check-vex.py` (see [../SECURITY.md](../SECURITY.md), "Dependency
-  monitoring"). Two improvements remain, both blocked on upstream rather than on
-  effort here. First, osv-scanner does not yet consume VEX (support is announced
-  but unreleased); once it does, the VEX document can drive suppression directly
-  and the parallel `osv-scanner.toml` ignores — and `check-vex.py` — can be
-  retired, removing the double bookkeeping. Second, the in-repo document could be
-  published as a release asset (a VEX "feed") alongside the SBOM, so downstream
-  consumers can fetch it. Neither is pressing while the dependency set is clean
-  and the VEX document therefore empty.
-- **Run the test and lint suites in CI (the "heavy" pipeline widening)**
-  (`OSPS-QA-06.01`, `OSPS-VM-06.02`, `test_continuous_integration`,
-  `automated_integration_testing`, `static_analysis_often`). The GitLab pipeline
-  (first roadmap item) runs the device-free checks and a lockfile SCA scan, all
-  on a small `python:3-slim` image. The remaining CI-conditional criteria ask
-  specifically for the TEST and LINT suites to run in the pipeline: `./gradlew
-  testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
-  `abortOnError` build gate today, but CI would enforce it on every change), and
-  ideally `swift test` for the Swift package.
-  The premise this item was written under has changed with the move to GitLab,
-  and the reasoning is worth restating rather than inheriting. The old pipeline
-  was shaped by the principle of being a good guest on DONATED infrastructure;
-  GitLab's instance runners are a metered allowance instead, so the question is
-  no longer whether a heavy image is an imposition but whether it fits the
-  monthly compute quota (Settings > Usage Quotas). That reframes the cost from a
-  matter of courtesy into an arithmetic one.
-  What that opens up, in rising order of cost:
-  1. **A scheduled pipeline** (Build > Pipeline schedules, available on the free
-     plan) would run the existing checks nightly. That alone settles the "on
-     every commit or at least daily" half of `static_analysis_often` without
-     touching the merge-request rule or adding a single megabyte.
-  2. **An Android SDK image** would carry `./gradlew testDebugUnitTest`,
-     `lintDebug` and the Kover coverage run. Worth being precise where the
-     earlier wording was not: UNIT tests need the SDK but NOT an emulator, so
-     this is a container job, not a virtualisation problem. It is what would move
-     `OSPS-QA-06.01` off N/A, settle `automated_integration_testing`, supply the
-     linter half of `static_analysis_often`, and produce the branch-coverage
-     figure `test_branch_coverage80` is measured against. Pin the image to a
-     version matching the local toolchain (as the CI osv-scanner is pinned to the
-     maintainer's local version) to avoid CI-vs-local drift.
-  3. **`make check-reuse` as its own job.** Its exclusion from `check-static` is
-     self-imposed — the aggregate is kept pip-free so the small image needs no
-     install step (see tools/check-reuse.py). A separate job may `pip install
-     reuse`, which would turn the REUSE gate from local-plus-badge into an
-     enforced per-merge-request check.
-  What stays out of reach, and why, so it is not re-investigated:
-  * **The Swift suite cannot run on Linux.** PotillusKit declares macOS as a
-     platform precisely so `swift test` needs no simulator, but its sources
-     import `CryptoKit` and `Security`, both Apple-only. A Linux Swift toolchain
-     image is therefore not enough; it would take porting the crypto layer to
-     swift-crypto, which is a change to shipping code and not worth making for a
-     CI convenience. The iOS half stays locally verified.
-  * **Instrumented (on-device) tests** need an emulator and thus nested
-     virtualisation, which instance runners do not offer. This also keeps
-     `dynamic_analysis` out of reach by that route; the Kover branch-coverage
-     path remains its more likely remedy.
-  Note what none of this buys: no badge TIER changes. Baseline Level 3 hangs on
-  `OSPS-QA-07.01` alone (a reviewer who is not the author), and silver and gold
-  hang on `access_continuity`, `bus_factor`, `two_person_review` and
-  `contributors_unassociated`. Those are people, not pipelines. The widening is
-  worth doing for the tighter net it gives the maintainer, and for the three
-  individual criteria named above — not as a route to the next tier.
-
-## Working toward the OpenSSF gold badge
-
-Gold requires the silver badge first (every silver item above must be resolved).
-These are the additional gold-level criteria that are not yet met, recorded as
-they are assessed and ordered by criticality. Several are structural and need a
-second active participant in the project.
-
-- **Bus factor of 2 or more** (`bus_factor`, gold MUST). With a single maintainer
-  the bus factor is 1. This is the silver "Raise the bus factor" item above,
-  promoted to a hard requirement at gold: it needs a second, significantly
-  involved maintainer.
-- **Two unassociated significant contributors** (`contributors_unassociated`,
-  gold MUST). Requires at least two significant contributors who are not
-  associated with each other (e.g. not the same employer/organization). With a
-  single maintainer this is unmet; it is resolved by the same step as the bus
-  factor — a second, independent contributor.
-- **Two-person review of >= 50% of changes** (`two_person_review`, gold MUST).
-  Requires at least half of all proposed modifications to be reviewed before
-  release by someone other than their author. The review process itself is
-  documented (CONTRIBUTING.md, "Code review requirements"), but with a single
-  author-reviewer no change is reviewed by a second person. Resolved by the same
-  step as the two items above — a second, independent maintainer who can review.
-- **Raise the branch-coverage floor further** (follow-up to
-  `test_branch_coverage80`, which is Met). Kover is fully integrated and
-  enforced: both statement and branch coverage clear their build-breaking floors
-  (`koverVerify`: LINE >= 90 / BRANCH >= 80), wired into the release gate
-  (`make cover-check`); `make -C android cover-figures` prints what each
-  currently measures. The gold threshold is cleared by about a point, so a
-  single-digit number of covered branches lost — or of uncovered ones added —
-  takes it under 80 and turns the gate red. The
-  branches still uncovered sit in Android-/Compose-adjacent code (ViewModel
-  `StateFlow` assembly, resource-bound error mapping) that is awkward to
-  exercise from JVM unit tests; targeted tests, or a small refactor that makes
-  that logic pure, would buy the headroom back. The related passing `test_most`
-  and the silver/gold statement-coverage criteria
-  (`test_statement_coverage80`, `test_statement_coverage90`) are met as well.
+The project holds the OpenSSF Best Practices passing badge and OSPS Baseline
+Levels 1 and 2. What is still open on silver, gold and Level 3, plus the badge
+administration and the Scorecard prerequisites, is in
+[OPENSSF_BADGES.md](OPENSSF_BADGES.md). Most of it needs a second person rather
+than a change to the software.
 
 ## Longer-term direction (~12 months)
 
-Lower-criticality, forward-looking directions, roughly in priority order:
+Forward-looking directions, roughly in priority order:
 
 - **Split the CHANGELOG archive** (repository hygiene). `CHANGELOG.md` has grown
   past 6,600 lines; every review diff and several release gates read the whole
@@ -598,29 +154,53 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   number of source lines would turn that class of confusion into a plain "input
   not read completely". Cheap, and it makes every future failure of these gates
   mean what it says.
-- **Two deferred iOS parity items (possible, not planned).** Both are conscious
-  omissions, not oversights, and neither blocks the port:
-  - *Calendar year view.* Android's calendar offers a Month/Year toggle whose
-    year layout is a 12-month heat-map of coloured day squares. iOS ships the
-    month view only, because the *analytical* year overview it would duplicate is
-    already covered by the Statistics screen's `year` period (KPIs, trend, and a
-    monthly-bucket chart). The year heat-map would be a second, purely visual take
-    on the same data; it can be added later if it proves wanted.
-  - *iOS PDF report rendering (footer and layout parity).* The two-page report is
-    now rendered by the app itself and rasterized into store screenshots 07–08 by
-    `make screenshots-ios`, fully non-interactively (unlike Android's semi-manual
-    `report-pdfs`). The WebKit-printed iOS output does not yet match Android's
-    layout exactly — the footer placement in particular is still off — and this
-    imperfection is knowingly accepted as VISIBLE in the 07–08 screenshots for now.
-    Bringing the iOS `ReportRenderer` output into full parity with Android (footer
-    position, the `min-height: 267mm` sheet, and the two-page split) is a
-    template/renderer tweak, deferred here; the capture pipeline already produces
-    the pages, so this is polish, not a blocker.
-- **Publish on the Google Play Store.** In addition to F-Droid, make the app
-  available on Google Play so more users can find and install it.
-- **Publish on the Apple App Store.** The iOS port is feature-complete (see
-  below); what remains before submission is App Store tooling — the store
-  listing, screenshots, and the export-compliance and privacy declarations.
+- **Run the test and lint suites in the canonical pipeline.** The GitLab pipeline
+  runs the device-free checks and a lockfile SCA scan on a small `python:3-slim`
+  image. What it does not run are the TEST and LINT suites: `./gradlew
+  testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
+  `abortOnError` build gate today), and ideally `swift test` for the Swift package.
+  GitLab's instance runners are a metered allowance, so the question is whether a
+  heavier image fits the monthly compute quota rather than whether it is an
+  imposition. In rising order of cost:
+  1. **A scheduled pipeline** (Build > Pipeline schedules, free plan) would run the
+     existing checks nightly without adding a megabyte.
+  2. **An Android SDK image** would carry `./gradlew testDebugUnitTest`, `lintDebug`
+     and the Kover coverage run. UNIT tests need the SDK but NOT an emulator, so
+     this is a container job, not a virtualisation problem. Pin the image to a
+     version matching the local toolchain to avoid CI-vs-local drift.
+  3. **`make check-reuse` as its own job.** Its exclusion from `check-static` is
+     self-imposed — the aggregate is kept pip-free so the small image needs no
+     install step. A separate job may `pip install reuse`.
+  What stays out of reach, so it is not re-investigated: the Swift suite cannot run
+  on Linux, because PotillusKit's sources import `CryptoKit` and `Security`, and
+  porting the crypto layer to swift-crypto is a change to shipping code for a CI
+  convenience. Instrumented tests need an emulator and thus nested virtualisation,
+  which instance runners do not offer.
+  Note what none of this buys: no badge tier changes. The open badge criteria are
+  people, not pipelines (see [OPENSSF_BADGES.md](OPENSSF_BADGES.md)). The widening
+  is worth doing for the tighter net it gives the maintainer.
+- **Unify VEX with the scanner, and publish it as a feed.** The project records
+  non-exploitable advisories in a machine-readable VEX document,
+  [../openvex.json](../openvex.json) (OpenVEX), kept in step with the scanner's
+  `osv-scanner.toml` triage by `tools/check-vex.py` (see
+  [../SECURITY.md](../SECURITY.md), "Dependency monitoring"). Two improvements
+  remain, both blocked on upstream rather than on effort here. First, osv-scanner
+  does not yet consume VEX; once it does, the VEX document can drive suppression
+  directly and the parallel `osv-scanner.toml` ignores — and `check-vex.py` — can
+  be retired. Second, the in-repo document could be published as a release asset
+  alongside the SBOM, so downstream consumers can fetch it. Neither is pressing
+  while the dependency set is clean and the VEX document therefore empty.
+- **iOS PDF report rendering (footer and layout parity).** A conscious omission,
+  not an oversight, and no blocker for the port. The two-page report is rendered
+  by the app itself and rasterized into store screenshots 07–08 by
+  `make screenshots-ios`, fully non-interactively (unlike Android's semi-manual
+  `report-pdfs`). The WebKit-printed iOS output does not yet match Android's
+  layout exactly — the footer placement in particular is still off — and this
+  imperfection is knowingly accepted as VISIBLE in the 07–08 screenshots for now.
+  Bringing the iOS `ReportRenderer` output into full parity with Android (footer
+  position, the `min-height: 267mm` sheet, and the two-page split) is a
+  template/renderer tweak; the capture pipeline already produces the pages, so
+  this is polish.
 - **Independent iOS reproducibility verification** (`build_repeatable`,
   `build_reproducible`). `make release-ios` already rebuilds the archive twice on
   the pinned Xcode and refuses to stage unless the two unsigned `Potillus.app`
@@ -628,6 +208,15 @@ Lower-criticality, forward-looking directions, roughly in priority order:
   reproducible. What Android gets from F-Droid but the App Store cannot provide is
   an *independent* rebuilder; a cross-machine or third-party reproduction check
   would raise this from self-attested to externally verified.
+- **Re-visit explicit iOS App Transport Security.** ATS is currently left at its
+  strict Xcode default, which is correct: the app makes no network connections at
+  all, so there is nothing for an explicit declaration to harden, and the only way
+  to state one (a nested Info.plist dictionary) would trade a working
+  `GENERATE_INFOPLIST_FILE` setup for either an `info:`/`properties:` block or a
+  PlistBuddy build step, all for zero behavioural change. If a future auditor or a
+  store reviewer wants an explicit `NSAllowsArbitraryLoads = false` on record as a
+  visible commitment, revisit this and add it deliberately, verifying the
+  Info.plist generation stays intact.
 - **iOS branch coverage (parity with Android).** The new iOS `cover-check` enforces
   a LINE floor of 90 (matching Android's Kover LINE bound -- the gold
   `test_statement_coverage90` level) over PotillusKit, which clears it with

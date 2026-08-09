@@ -24,18 +24,24 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-# Libellus Potionis — WCAG 2.2 Level A self-assessment protocol
+# Libellus Potionis — WCAG 2.2 Level A self-assessment protocol (Android)
 
 Purpose: a guided, repeatable manual evaluation you (the author) run on-device to
-establish WCAG 2.2 **Level A** for the app. This is a **self-assessment**; record
-it as such (not an independent audit). A Level-A *conformance claim* requires that
-**every** in-scope Level-A success criterion (SC) passes **and** a thorough human
+establish WCAG 2.2 **Level A** for the Android app. This is a **self-assessment**;
+record it as such (not an independent audit). A Level-A *conformance claim* requires
+that **every** in-scope Level-A success criterion (SC) passes **and** a thorough human
 evaluation — which is what this protocol is. Automated checks alone are not
 sufficient (per W3C).
 
-Scope note: Libellus Potionis is a native, offline Android app with no media, no timers,
+Scope note: Libellus Potionis is a native, offline app with no media, no timers,
 no hyperlinks, and no login. Several Level-A SC are therefore **N/A** and marked
 below; do not claim them, just record them as not applicable with the reason.
+
+One protocol per platform and level. The others:
+[AA](WCAG_LEVEL_AA_ANDROID.md) and [AAA](WCAG_LEVEL_AAA_ANDROID.md) for Android,
+[A](WCAG_LEVEL_A_IOS.md), [AA](WCAG_LEVEL_AA_IOS.md) and
+[AAA](WCAG_LEVEL_AAA_IOS.md) for iOS. Each level stands on the ones below it: an
+AA claim needs this protocol to pass first.
 
 ## 0. Setup (do once)
 
@@ -165,9 +171,9 @@ blocks). For each: reason = "native offline app, feature not present".
    cue too — the symbol setting covers the traffic-light dot, not the calendar —
    and whether that setting should default to on rather than off.
    Note that the year heat-map's low-contrast EMPTY cells are a separate,
-   already-decided matter: measured, judged, and left as they are; see "Non-text
-   contrast" in docs/ROADMAP.md, which also records why the today ring left that
-   group.
+   already-decided matter: measured, judged, and left as they are; see 1.4.11 in
+   [WCAG_LEVEL_AA_ANDROID.md](WCAG_LEVEL_AA_ANDROID.md), which also records why
+   the today ring left that group.
 2. **4.1.2 month-cell announcement redundancy** (see above) — verify and, if
    needed, a one-line `clearAndSetSemantics` fix.
 3. **1.3.1 headings** — verify section headers expose the `heading()` role;

@@ -41,8 +41,8 @@
 #
 #   SCOPE / HONESTY: this is a labelling invariant, NOT a WCAG conformance test.
 #   Per W3C, no automated check can determine WCAG conformance — see
-#   docs/ROADMAP.md (Accessibility) for the honest status and the open Level AA
-#   gaps. The gate exists so the labels the project HAS added cannot silently
+#   docs/ROADMAP.md (Accessibility) for the honest status and
+#   docs/WCAG_LEVEL_AA_ANDROID.md for the open Level AA gaps. The gate exists so the labels the project HAS added cannot silently
 #   regress. It skips gracefully (info) where python3 is unavailable and warns
 #   only on a real finding.
 check_accessibility_labels() {
