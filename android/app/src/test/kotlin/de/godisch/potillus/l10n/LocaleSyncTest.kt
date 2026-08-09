@@ -137,23 +137,32 @@ class LocaleSyncTest {
          *
          * Android encodes region variants with a lowercase "r" prefix:
          *   values-pt-rBR  →  "pt-BR"
+         *   values-zh-rCN  →  "zh-CN"
          *   values-de      →  "de"
          *
-         * Chinese is the exception: the shared guide templates use the SCRIPT
-         * subtags the rest of the world settled on, while Android names its
-         * resource directories by region. No rule connects "CN" to "Hans", so
-         * the pair is listed rather than derived — the same table
-         * render-guide.py holds, and both must agree or the parity check would
-         * report Chinese as missing on one side and surplus on the other.
-         *
-         *   values-zh-rCN  →  "zh-Hans"
-         *   values-zh-rTW  →  "zh-Hant"
+         * THIS SPELLING IS THE APP'S OWN, and it is what [SupportedLocales.TAGS]
+         * and locale_config.xml are checked against. The guide templates spell
+         * Chinese by script; converting for THAT comparison is
+         * [toGuideTag]'s job, not this one — folding it in here made the
+         * directories look like `zh-Hans` to the registry test, which knows only
+         * `zh-CN` (0.85.0 QA round).
          */
-        private fun qualifierToBcp47(qualifier: String): String = when (qualifier) {
-            "zh-rCN" -> "zh-Hans"
-            "zh-rTW" -> "zh-Hant"
-            else -> qualifier.replace(Regex("-r([A-Z])"), "-$1")
-        }
+        private fun qualifierToBcp47(qualifier: String): String = qualifier.replace(Regex("-r([A-Z])"), "-$1")
+
+        /**
+         * Converts one of this catalogue's tags to the spelling the shared guide
+         * templates use.
+         *
+         * Only Chinese differs: the templates serve both platforms and carry the
+         * SCRIPT subtags iOS String Catalogs key by, while this app names its
+         * resource directories by region. The pair is not derivable — no rule
+         * connects "CN" to "Hans" — so it is read from
+         * [SupportedLocales.MIGRATED_TAGS], the table the app already keeps for
+         * reading iOS backups, inverted here. One table, three readers: the app,
+         * render-guide.py and this test.
+         */
+        private fun toGuideTag(tag: String): String =
+            SupportedLocales.MIGRATED_TAGS.entries.firstOrNull { it.value == tag }?.key ?: tag
 
         /**
          * Counts <string name="…"> elements in an XML file.
@@ -507,6 +516,9 @@ class LocaleSyncTest {
      * (its `{{tokens}}` have no source). This is the JVM/CI twin of the guard
      * in `render-guide.py`; keeping both means neither a Gradle test run nor a
      * plain `make` build can let the two sets drift apart.
+     *
+     * COMPARED IN THE TEMPLATES' VOCABULARY, via [toGuideTag]: the templates
+     * serve both platforms and spell Chinese by script.
      */
     @Test
     fun `guide templates and string resources cover the same languages`() {
@@ -514,7 +526,7 @@ class LocaleSyncTest {
         require(guideTags.isNotEmpty()) {
             "No user-guide templates found under: ${GUIDE_DIR.absolutePath}"
         }
-        val stringTags = localeTagsFromDirs()
+        val stringTags = localeTagsFromDirs().map { toGuideTag(it) }.toSet()
 
         val missingGuide = (stringTags - guideTags).sorted() // strings, no guide
         val missingStrings = (guideTags - stringTags).sorted() // guide, no strings
