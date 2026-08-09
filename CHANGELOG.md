@@ -54,6 +54,7 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The `json` gem is at 2.21.2 in `fastlane/Gemfile.lock`.
 - The calendar opens on the current month, with no day selected.
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
