@@ -39,19 +39,31 @@ platform's own string store, and writes the result where the app can bundle it.
 PLATFORM BLOCKS
 ---------------
 A block is opened by ``{{#android}}`` or ``{{#ios}}`` and closed by
-``{{/android}}`` / ``{{/ios}}``, each marker ALONE ON ITS LINE. Blocks of the
-other platform are removed whole; the surviving ones lose their markers::
+``{{/android}}`` / ``{{/ios}}``. Blocks of the other platform are removed whole;
+the surviving ones lose their markers. A block may span whole lines::
 
     {{#android}}
-    Unten rechts sitzt die Plus-Taste.
+    Unten rechts sitzt die Plus-Taste, sie öffnet den Buchungsdialog.
     {{/android}}
     {{#ios}}
-    Oben rechts sitzt die Plus-Taste.
+    Oben rechts sitzt die Plus-Taste, sie öffnet den Buchungsdialog.
     {{/ios}}
+
+or sit INSIDE a sentence, which is what most divergences actually are -- one
+word, one clause, a different position for the same button::
+
+    {{#android}}Unten{{/android}}{{#ios}}Oben{{/ios}} rechts sitzt die Plus-Taste.
+
+Both forms are the same construct and may mix in one file. The whole-line form
+is handled first so that removing such a block takes its newline with it; an
+inline block leaves the rest of its line intact. The German guide, where the two
+platforms diverge in about thirty places, is almost entirely the inline form:
+splitting "Unten/Oben rechts" into two paragraphs to satisfy the parser produced
+a text nobody would want to read or translate.
 
 There is no ``else``: where both platforms speak, two blocks stand next to each
 other, which reads better in the source than a branch and keeps the translator's
-unit of work a paragraph rather than a construct.
+unit of work a sentence rather than a construct.
 
 STRIP FIRST, THEN SUBSTITUTE. This order is what lets a block mention a label
 that only ONE platform has -- ``{{pure_alcohol}}`` (Android) or
@@ -135,10 +147,18 @@ PLATFORMS = ("android", "ios")
 # token unresolved in the shipped guide instead of failing the build.
 TOKEN_RE = re.compile(r"\{\{([a-z0-9_]+)\}\}")
 
-# A block marker owns its line. Anchoring on the line keeps the two jobs apart:
-# TOKEN_RE never sees a marker (no `#` or `/` in its character class), and the
-# stripper never has to reason about prose around a marker.
-MARKER_RE = re.compile(r"^\{\{(#|/)([a-z]+)\}\}$", re.M)
+# A marker may sit anywhere -- on its own line or in the middle of a sentence.
+# The two jobs stay apart through the character class alone: TOKEN_RE never sees
+# a marker, because `#` and `/` are not in `[a-z0-9_]`.
+#
+# This was anchored to the whole line (`^...$`) until the German guide was
+# written against it. Nearly every divergence between the two platforms is one
+# word inside a sentence, and an anchored parser forces each of them into its own
+# paragraph, which reads badly and hands the translator a construct instead of a
+# sentence. Worse, the anchored form failed QUIETLY: a mid-line `{{#ios}}` simply
+# was not a marker, so the block stayed in the Android text and the build died
+# further along on an iOS-only token, pointing at the wrong thing.
+MARKER_RE = re.compile(r"\{\{(#|/)([a-z]+)\}\}")
 
 # Each guide token names a screen title, a settings row, a field label or one of
 # the words a legend spells out; this maps it to the English catalogue key that
@@ -369,11 +389,34 @@ def strip_platform(text: str, platform: str, label: str) -> str:
         sys.exit(f"render-guide: [{label}] unclosed {{{{#{open_name}}}}} block")
 
     other = "ios" if platform == "android" else "android"
+
+    # WHOLE-LINE FORM FIRST, in both passes. A block that owns its lines must
+    # take its closing newline with it, or the paragraph it stood in collapses
+    # into the next one; an inline block must NOT, or it would swallow the rest
+    # of its sentence. The order matters only because the whole-line pattern is
+    # the more specific of the two: whatever it does not match falls through to
+    # the general pass below and is treated as inline.
     text = re.sub(rf"^\{{\{{#{other}\}}\}}\n.*?^\{{\{{/{other}\}}\}}\n", "", text,
                   flags=re.S | re.M)
+    text = re.sub(rf"\{{\{{#{other}\}}\}}.*?\{{\{{/{other}\}}\}}", "", text, flags=re.S)
     text = re.sub(rf"^\{{\{{[#/]{platform}\}}\}}\n", "", text, flags=re.M)
+    text = re.sub(rf"\{{\{{[#/]{platform}\}}\}}", "", text)
+
     # Removing a block between two paragraphs leaves its blank lines behind.
-    return re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    # The inline form leaves the spaces that flanked it: "steht {{#ios}}oben{{/ios}}
+    # rechts" renders on Android as "steht  rechts" when the author put a space on
+    # both sides. Interior runs only -- leading spaces are list-item continuation
+    # and are load-bearing. No template has an interior double space of its own,
+    # so nothing but this artefact is being collapsed.
+    #
+    # NOTHING is done about a space left in front of punctuation, though the same
+    # artefact can occur there ("Feldern {{#ios}}…{{/ios}}, wie viele"): French
+    # puts a space before `;:!?` by typographic rule, twenty times in the French
+    # guide alone, and a pass that "tidied" it would corrupt every one. Write the
+    # flanking space INSIDE the block instead -- "Feldern{{#ios}} in der Zeile
+    # X{{/ios}}, wie viele" -- which is what the German guide does.
+    return re.sub(r"(?<=\S) {2,}(?=\S)", " ", text)
 
 
 def unescape_android(value: str) -> str:
