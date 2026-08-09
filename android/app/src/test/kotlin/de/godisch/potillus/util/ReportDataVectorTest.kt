@@ -25,6 +25,7 @@
  */
 package de.godisch.potillus.util
 
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.SharedTestVectors
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -93,15 +94,44 @@ class ReportDataVectorTest {
             )
         }.toList()
 
+    /**
+     * Runs [block] with the wall clock pinned to noon UTC of [isoDate], clearing
+     * the pin afterwards so it cannot leak into another test sharing the JVM.
+     *
+     * `PdfReportData.from` reads today through `DayResolver.today()`, which
+     * honours the test-only override. A case that carries a `today` needs it: a
+     * window ending on the running day is decided against that day, and the real
+     * clock would make the figures drift with the calendar. Noon leaves a margin
+     * either side of the 04:00 day-change default in any zone a runner uses.
+     */
+    private fun withToday(isoDate: String, block: () -> Unit) {
+        DayResolver.clockOverride = java.time.Clock.fixed(
+            java.time.Instant.parse("${isoDate}T12:00:00Z"),
+            java.time.ZoneOffset.UTC,
+        )
+        try {
+            block()
+        } finally {
+            DayResolver.clockOverride = null
+        }
+    }
+
     @Test
     fun `the computed figures match the shared vectors`() {
         VECTORS.getJSONArray("cases").objects().forEach { case ->
             val label = case.getString("description")
-            val data = PdfReportData.from(
-                entries = entries(case),
-                drinks = drinks(case),
-                settings = settings(case),
-            )
+            val pinnedToday = case.optString("today").takeIf { it.isNotEmpty() }
+            lateinit var data: PdfReportData
+            val compute = {
+                data = PdfReportData.from(
+                    entries = entries(case),
+                    drinks = drinks(case),
+                    settings = settings(case),
+                    periodStart = case.optString("periodStart").takeIf { it.isNotEmpty() },
+                    periodEnd = case.optString("periodEnd").takeIf { it.isNotEmpty() },
+                )
+            }
+            if (pinnedToday != null) withToday(pinnedToday) { compute() } else compute()
             val expected = case.getJSONObject("expected")
 
             assertEquals(label, expected.getString("firstDate"), data.firstDate)
@@ -173,6 +203,6 @@ class ReportDataVectorTest {
 
     @Test
     fun `the vector file is not empty`() {
-        assertTrue(VECTORS.getJSONArray("cases").length() >= 5)
+        assertTrue(VECTORS.getJSONArray("cases").length() >= 8)
     }
 }

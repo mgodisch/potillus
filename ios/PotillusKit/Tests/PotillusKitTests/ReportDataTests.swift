@@ -101,7 +101,9 @@ final class ReportDataTests: XCTestCase {
                         weekly: testCase.weeklyLimitGrams,
                         drinkDays: testCase.maxDrinkDaysPerWeek
                     ),
-                    today: "2026-12-31",
+                    periodStart: testCase.periodStart,
+                    periodEnd: testCase.periodEnd,
+                    today: testCase.today ?? "2026-12-31",
                     timeZone: TimeZone(identifier: "UTC")!
                 )
             )
@@ -163,7 +165,7 @@ final class ReportDataTests: XCTestCase {
     }
 
     func testTheVectorFileIsNotEmpty() {
-        XCTAssertGreaterThanOrEqual(vectors.cases.count, 5)
+        XCTAssertGreaterThanOrEqual(vectors.cases.count, 8)
     }
 
     // ── What the vectors cannot reach ────────────────────────────────────────
@@ -347,5 +349,128 @@ final class ReportDataTests: XCTestCase {
         XCTAssertEqual(
             ReportData.maxRollingSevenDays([0, 1, 1, 1, 1, 1, 1, 1]), 7.0, accuracy: Self.epsilon
         )
+    }
+}
+
+// =============================================================================
+// The reporting window
+// =============================================================================
+//
+// An extension because SwiftLint caps a type body at 250 lines and does not
+// count extensions. The shared vectors pin the arithmetic of a window; these
+// cover what a file cannot reach — the agreement with DayResolver.windowDays,
+// and the shapes a user can still ask for that leave the window degenerate.
+
+extension ReportDataTests {
+
+    private func windowed(
+        _ entries: [ConsumptionEntry], from: String, to: String, today: String
+    ) throws -> ReportData {
+        try XCTUnwrap(
+            ReportData.make(
+                entries: entries, drinks: [drink(1, .beer)],
+                settings: settings(daily: 24, weekly: 168, drinkDays: 5),
+                periodStart: from, periodEnd: to, today: today,
+                timeZone: TimeZone(identifier: "UTC")!
+            )
+        )
+    }
+
+    /// A window is exactly as long as the Statistics screen's, day for day.
+    ///
+    /// The report holds the window as a pair of dates and the screen as a count,
+    /// so the two could drift apart without either looking wrong alone.
+    func testTotalDaysEqualsTheSharedWindowRule() throws {
+        let entries = [
+            entry(1, drink: 1, date: "2026-01-10", grams: 20),
+            entry(2, drink: 1, date: "2026-02-05", grams: 10),
+        ]
+        // No entry falls on 2026-03-01, so the running day is dry throughout.
+        for (from, to) in [
+            ("2026-01-01", "2026-02-28"),
+            ("2026-01-01", "2026-03-01"),
+            ("2026-02-01", "2026-02-05"),
+        ] {
+            let report = try windowed(entries, from: from, to: to, today: "2026-03-01")
+            XCTAssertEqual(
+                report.totalDays,
+                DayResolver.windowDays(
+                    from: from, to: to, today: "2026-03-01", todayIsDrinkDay: false
+                ),
+                "\(from) … \(to)"
+            )
+        }
+    }
+
+    /// The running day counts once alcohol is on it and waits while it is dry.
+    func testAWindowEndingTodayWaitsForTheRunningDay() throws {
+        let base = [entry(1, drink: 1, date: "2026-02-01", grams: 20)]
+        let dry = try windowed(base, from: "2026-02-01", to: "2026-02-06", today: "2026-02-06")
+        XCTAssertEqual(dry.lastDate, "2026-02-05")
+        XCTAssertEqual(dry.totalDays, 5)
+
+        let wet = try windowed(
+            base + [entry(2, drink: 1, date: "2026-02-06", grams: 8)],
+            from: "2026-02-01", to: "2026-02-06", today: "2026-02-06"
+        )
+        XCTAssertEqual(wet.lastDate, "2026-02-06")
+        XCTAssertEqual(wet.totalDays, 6)
+    }
+
+    /// "Today only", before the first drink of the day: dropping the running day
+    /// would leave no days at all, and a report over nothing states nothing.
+    func testAOneDayWindowOnADryTodayKeepsThatDay() throws {
+        let report = try windowed(
+            [entry(1, drink: 1, date: "2026-02-05", grams: 0)],
+            from: "2026-02-05", to: "2026-02-05", today: "2026-02-05"
+        )
+        XCTAssertEqual(report.firstDate, "2026-02-05")
+        XCTAssertEqual(report.lastDate, "2026-02-05")
+        XCTAssertEqual(report.totalDays, 1)
+    }
+
+    /// One bound is not a window: `periodEnd` alone, as the historical streak
+    /// anchor passed it before the window existed, leaves the entry span.
+    func testPeriodEndAloneLeavesTheEntrySpanInPlace() throws {
+        let report = try XCTUnwrap(
+            ReportData.make(
+                entries: [
+                    entry(1, drink: 1, date: "2026-01-10", grams: 20),
+                    entry(2, drink: 1, date: "2026-02-05", grams: 10),
+                ],
+                drinks: [drink(1, .beer)],
+                settings: settings(daily: 24, weekly: 168, drinkDays: 5),
+                periodEnd: "2026-02-28", today: "2026-06-30",
+                timeZone: TimeZone(identifier: "UTC")!
+            )
+        )
+        XCTAssertEqual(report.firstDate, "2026-01-10")
+        XCTAssertEqual(report.lastDate, "2026-02-05")
+    }
+
+    /// Every month the period covers is a row, the dry ones included: the table
+    /// has to add up to the period printed above it.
+    func testAMonthWithoutEntriesKeepsItsRow() throws {
+        let report = try windowed(
+            [
+                entry(1, drink: 1, date: "2026-01-10", grams: 20),
+                entry(2, drink: 1, date: "2026-02-05", grams: 10),
+            ],
+            from: "2026-01-01", to: "2026-04-30", today: "2026-06-30"
+        )
+        XCTAssertEqual(report.months.map(\.monthKey), ["2026-01", "2026-02", "2026-03", "2026-04"])
+        let march = try XCTUnwrap(report.months.first { $0.monthKey == "2026-03" })
+        XCTAssertEqual(march.drinkDays, 0)
+        XCTAssertEqual(march.totalGrams, 0, accuracy: Self.epsilon)
+        XCTAssertEqual(march.effectiveDays, 31)
+    }
+
+    func testMonthKeysCoverEveryMonthThePeriodTouches() {
+        XCTAssertEqual(
+            ReportData.monthKeys(from: "2026-11-20", to: "2027-02-03"),
+            ["2026-11", "2026-12", "2027-01", "2027-02"]
+        )
+        XCTAssertEqual(ReportData.monthKeys(from: "2026-05-02", to: "2026-05-30"), ["2026-05"])
+        XCTAssertEqual(ReportData.monthKeys(from: "2026-05-30", to: "2026-05-02"), [])
     }
 }

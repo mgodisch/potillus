@@ -114,12 +114,16 @@ object PdfReportBuilder {
      * @param entries   Consumption entries for the period (must be non-empty).
      * @param drinks    Drink catalogue for category look-ups.
      * @param settings  Current user preferences (limits, weight, week start, …).
+     * @param periodStart The user-chosen inclusive start of the export range
+     *                  ("YYYY-MM-DD"), or `null` when no explicit range exists.
+     *                  Forwarded to [PdfReportData.from], where it bounds the
+     *                  reporting window together with [periodEnd].
      * @param periodEnd The user-chosen inclusive end of the export range
      *                  ("YYYY-MM-DD"), or `null` when no explicit range exists.
      *                  Forwarded to [PdfReportData.from], which uses it to anchor
      *                  the abstinence streaks so a HISTORICAL report does not
      *                  count post-period days as abstinent (v0.81.0 QA fix; see
-     *                  the streak block there).
+     *                  the streak block there), and to bound the window.
      * @return Complete HTML ready to be loaded into a WebView for printing.
      */
     fun buildHtml(
@@ -127,6 +131,7 @@ object PdfReportBuilder {
         entries: List<ConsumptionEntry>,
         drinks: List<DrinkDefinition>,
         settings: AppSettings,
+        periodStart: String? = null,
         periodEnd: String? = null,
     ): String {
         // Locale for all value formatting in this report. We take it from the
@@ -140,7 +145,7 @@ object PdfReportBuilder {
         // same locale further down.
         val locale = context.formattingLocale()
 
-        val d = PdfReportData.from(entries, drinks, settings, periodEnd, locale)
+        val d = PdfReportData.from(entries, drinks, settings, periodStart, periodEnd, locale)
         val dateFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
         // monthYearFormatter (NOT a literal "MMM yyyy"): CJK reports need the
         // year-first order ("2026年6月") and inflected languages the standalone

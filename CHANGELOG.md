@@ -56,6 +56,8 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The PDF report covers the period picked in the export dialog.
+- The report's month table lists every month the period covers.
 - The roadmap, the README, CONTRIBUTING.md and the label gate point at the
   accessibility protocols and the badge document.
 - The roadmap carries the open work only.

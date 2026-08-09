@@ -303,11 +303,19 @@ class StatsViewModel(
             // number format of the report is resolved from this context.
             val reportContext = appContext.perAppLocalizedContext()
             // HTML assembly (template fill) is CPU work, not UI work → off the main thread.
-            // `to` (the user-chosen inclusive range end) is forwarded so a report
-            // over a HISTORICAL range anchors its abstinence streaks at the period
-            // end instead of the real today (v0.81.0 QA fix; see PdfReportData).
+            // BOTH range bounds are forwarded. `to` anchors the abstinence streaks
+            // of a HISTORICAL report at the period end instead of the real today
+            // (v0.81.0 QA fix), and the pair makes the report's denominators the
+            // window the user picked here rather than the span of the entries the
+            // query happened to return (see the reporting-window block in
+            // PdfReportData). `from` used to stop at getInRange above.
             val rendered = withContext(Dispatchers.Default) {
-                runCatching { PdfReportBuilder.buildHtml(reportContext, entries, drinks, settings, periodEnd = to) }
+                runCatching {
+                    PdfReportBuilder.buildHtml(
+                        reportContext, entries, drinks, settings,
+                        periodStart = from, periodEnd = to,
+                    )
+                }
             }
             val html = rendered.getOrNull()
             if (html != null) {

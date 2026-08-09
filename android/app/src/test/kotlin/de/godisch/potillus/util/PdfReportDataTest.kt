@@ -292,4 +292,115 @@ class PdfReportDataTest {
             assertEquals(23, explicit.currentAbstinence)
         }
     }
+
+    // ── The reporting window ──────────────────────────────────────────────────
+    //
+    // The shared vectors pin the arithmetic of a window; these cover what a file
+    // cannot reach — the agreement with DayResolver.windowDays, and the two
+    // degenerate shapes a user can still ask for.
+
+    /**
+     * A window is exactly as long as the Statistics screen's, day for day.
+     *
+     * The report expresses the window as a pair of dates and the screen as a
+     * count, so the two rules could drift apart without either looking wrong on
+     * its own. This walks the four shapes that matter: a historical window, one
+     * ending today with and without a drink on it, and one shorter than the
+     * entries' own span.
+     */
+    @Test fun `totalDays equals the shared window rule`() {
+        withToday("2026-03-01") {
+            // No entry falls on 2026-03-01, so the running day is dry in every
+            // shape below; that is the third argument to windowDays.
+            listOf(
+                "2026-01-01" to "2026-02-28", // ends in the past
+                "2026-01-01" to "2026-03-01", // ends today, today still dry
+                "2026-02-01" to "2026-02-05", // narrower than the entries' span
+            ).forEach { (from, to) ->
+                val d = PdfReportData.from(
+                    entries, drinks, settings, periodStart = from, periodEnd = to,
+                )
+                assertEquals(
+                    "$from … $to",
+                    DayResolver.windowDays(from, to, "2026-03-01", false),
+                    d.totalDays,
+                )
+            }
+        }
+    }
+
+    /**
+     * A window ending today counts today once alcohol is on it, and waits while
+     * the day is still dry — the superposition rule the Statistics screen
+     * applies, arrived at here through the reported last day.
+     */
+    @Test fun `a window ending today waits for the running day`() {
+        withToday("2026-02-06") {
+            val dry = PdfReportData.from(
+                entries, drinks, settings,
+                periodStart = "2026-02-01", periodEnd = "2026-02-06",
+            )
+            assertEquals("2026-02-05", dry.lastDate)
+            assertEquals(5, dry.totalDays)
+
+            val wet = PdfReportData.from(
+                entries + entry("2026-02-06", 1, 8.0), drinks, settings,
+                periodStart = "2026-02-01", periodEnd = "2026-02-06",
+            )
+            assertEquals("2026-02-06", wet.lastDate)
+            assertEquals(6, wet.totalDays)
+        }
+    }
+
+    /**
+     * "Today only", exported before the first drink of the day: dropping the
+     * running day would leave a window of no days at all, and a report over
+     * nothing states nothing. The raw window stands there instead.
+     */
+    @Test fun `a one-day window on a dry today keeps that day`() {
+        withToday("2026-02-05") {
+            val d = PdfReportData.from(
+                listOf(entry("2026-02-05", 1, 0.0)), drinks, settings,
+                periodStart = "2026-02-05", periodEnd = "2026-02-05",
+            )
+            assertEquals("2026-02-05", d.firstDate)
+            assertEquals("2026-02-05", d.lastDate)
+            assertEquals(1, d.totalDays)
+        }
+    }
+
+    /**
+     * Only one bound is not a window: a caller that passes `periodEnd` alone —
+     * as the historical streak anchor did before the window existed — still gets
+     * the entry span, so no legacy call changed its figures.
+     */
+    @Test fun `periodEnd alone leaves the entry span in place`() {
+        withToday("2026-06-30") {
+            val d = PdfReportData.from(entries, drinks, settings, periodEnd = "2026-02-28")
+            assertEquals("2026-01-10", d.firstDate)
+            assertEquals("2026-02-05", d.lastDate)
+        }
+    }
+
+    /**
+     * Every month the period covers is a row, the dry ones included. Without
+     * this the table skipped a month whose days the KPIs above it had counted,
+     * and a reader could not tell an abstinent month from a missing one.
+     */
+    @Test fun `a month without entries keeps its row`() {
+        withToday("2026-06-30") {
+            val d = PdfReportData.from(
+                entries, drinks, settings,
+                periodStart = "2026-01-01", periodEnd = "2026-04-30",
+            )
+            assertEquals(
+                listOf("2026-01", "2026-02", "2026-03", "2026-04"),
+                d.months.map { it.monthKey },
+            )
+            val march = d.months.single { it.monthKey == "2026-03" }
+            assertEquals(0, march.drinkDays)
+            assertEquals(0.0, march.totalGrams, 0.001)
+            assertEquals(31, march.effectiveDays)
+        }
+    }
 }

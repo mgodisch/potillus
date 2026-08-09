@@ -17,6 +17,12 @@
     "Entries carry only what these figures need: an id, a drink, a logical date and",
     "the grams. Timestamps are irrelevant to every value below.",
     "",
+    "A case may carry periodStart, periodEnd and today. Those three make the",
+    "  reporting window explicit, and a case without them keeps the entry span —",
+    "  the legacy shape the first five cases pin. `today` is pinned by both suites",
+    "  (Kotlin through DayResolver.clockOverride, Swift by the parameter), so a",
+    "  window ending on the running day is deterministic on either side.",
+    "",
     "Vectors encode CURRENT behaviour. Changing one changes both platforms."
   ],
   "cases": [
@@ -395,6 +401,237 @@
           {
             "categoryName": "OTHER",
             "grams": 12.0,
+            "percent": 100
+          }
+        ]
+      }
+    },
+    {
+      "description": "the period is the window the user picked, not the entries inside it",
+      "dailyLimitGrams": 24.0,
+      "weeklyLimitGrams": 168.0,
+      "maxDrinkDaysPerWeek": 5,
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "today": "2026-12-31",
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "entries": [
+        {
+          "id": 1,
+          "drinkId": 1,
+          "logicalDate": "2026-07-10",
+          "gramsAlcohol": 20.0
+        },
+        {
+          "id": 2,
+          "drinkId": 1,
+          "logicalDate": "2026-07-11",
+          "gramsAlcohol": 30.0
+        },
+        {
+          "id": 3,
+          "drinkId": 2,
+          "logicalDate": "2026-07-12",
+          "gramsAlcohol": 10.0
+        }
+      ],
+      "expected": {
+        "firstDate": "2026-07-01",
+        "lastDate": "2026-07-31",
+        "totalDays": 31,
+        "drinkDays": 3,
+        "abstinentDays": 28,
+        "totalGrams": 60.0,
+        "avgPerDay": 1.935483870967742,
+        "avgPerDrinkDay": 20.0,
+        "bingeDays": 0,
+        "daysOverDailyLimit": 1,
+        "medianPerDay": 0.0,
+        "medianPerDrinkDay": 20.0,
+        "avgDrinkDaysPerMonth": 3.0,
+        "medianDrinkDaysPerMonth": 3.0,
+        "maxPerDay": 30.0,
+        "maxPer7Days": 60.0,
+        "months": [
+          {
+            "monthKey": "2026-07",
+            "drinkDays": 3,
+            "totalGrams": 60.0,
+            "avgPerCalendarDay": 1.935483870967742,
+            "daysOverDailyLimit": 1
+          }
+        ],
+        "categories": [
+          {
+            "categoryName": "BEER",
+            "grams": 50.0,
+            "percent": 83
+          },
+          {
+            "categoryName": "WINE",
+            "grams": 10.0,
+            "percent": 17
+          }
+        ]
+      }
+    },
+    {
+      "description": "a month the period covers keeps its row even when it saw no drinking",
+      "dailyLimitGrams": 24.0,
+      "weeklyLimitGrams": 168.0,
+      "maxDrinkDaysPerWeek": 5,
+      "periodStart": "2026-02-15",
+      "periodEnd": "2026-04-15",
+      "today": "2026-12-31",
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "entries": [
+        {
+          "id": 1,
+          "drinkId": 1,
+          "logicalDate": "2026-03-05",
+          "gramsAlcohol": 40.0
+        },
+        {
+          "id": 2,
+          "drinkId": 2,
+          "logicalDate": "2026-03-06",
+          "gramsAlcohol": 5.0
+        }
+      ],
+      "expected": {
+        "firstDate": "2026-02-15",
+        "lastDate": "2026-04-15",
+        "totalDays": 60,
+        "drinkDays": 2,
+        "abstinentDays": 58,
+        "totalGrams": 45.0,
+        "avgPerDay": 0.75,
+        "avgPerDrinkDay": 22.5,
+        "bingeDays": 0,
+        "daysOverDailyLimit": 1,
+        "medianPerDay": 0.0,
+        "medianPerDrinkDay": 22.5,
+        "avgDrinkDaysPerMonth": 0.6666666666666666,
+        "medianDrinkDaysPerMonth": 0.0,
+        "maxPerDay": 40.0,
+        "maxPer7Days": 45.0,
+        "months": [
+          {
+            "monthKey": "2026-02",
+            "drinkDays": 0,
+            "totalGrams": 0,
+            "avgPerCalendarDay": 0.0,
+            "daysOverDailyLimit": 0
+          },
+          {
+            "monthKey": "2026-03",
+            "drinkDays": 2,
+            "totalGrams": 45.0,
+            "avgPerCalendarDay": 1.4516129032258065,
+            "daysOverDailyLimit": 1
+          },
+          {
+            "monthKey": "2026-04",
+            "drinkDays": 0,
+            "totalGrams": 0,
+            "avgPerCalendarDay": 0.0,
+            "daysOverDailyLimit": 0
+          }
+        ],
+        "categories": [
+          {
+            "categoryName": "BEER",
+            "grams": 40.0,
+            "percent": 89
+          },
+          {
+            "categoryName": "WINE",
+            "grams": 5.0,
+            "percent": 11
+          }
+        ]
+      }
+    },
+    {
+      "description": "a window ending today stops at the day before while today is dry",
+      "dailyLimitGrams": 24.0,
+      "weeklyLimitGrams": 168.0,
+      "maxDrinkDaysPerWeek": 5,
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-05-04",
+      "today": "2026-05-04",
+      "drinks": [
+        {
+          "id": 1,
+          "category": "BEER"
+        },
+        {
+          "id": 2,
+          "category": "WINE"
+        }
+      ],
+      "entries": [
+        {
+          "id": 1,
+          "drinkId": 1,
+          "logicalDate": "2026-05-02",
+          "gramsAlcohol": 30.0
+        },
+        {
+          "id": 2,
+          "drinkId": 1,
+          "logicalDate": "2026-05-03",
+          "gramsAlcohol": 10.0
+        }
+      ],
+      "expected": {
+        "firstDate": "2026-05-01",
+        "lastDate": "2026-05-03",
+        "totalDays": 3,
+        "drinkDays": 2,
+        "abstinentDays": 1,
+        "totalGrams": 40.0,
+        "avgPerDay": 13.333333333333334,
+        "avgPerDrinkDay": 20.0,
+        "bingeDays": 0,
+        "daysOverDailyLimit": 1,
+        "medianPerDay": 10.0,
+        "medianPerDrinkDay": 20.0,
+        "avgDrinkDaysPerMonth": 2.0,
+        "medianDrinkDaysPerMonth": 2.0,
+        "maxPerDay": 30.0,
+        "maxPer7Days": 40.0,
+        "months": [
+          {
+            "monthKey": "2026-05",
+            "drinkDays": 2,
+            "totalGrams": 40.0,
+            "avgPerCalendarDay": 13.333333333333334,
+            "daysOverDailyLimit": 1
+          }
+        ],
+        "categories": [
+          {
+            "categoryName": "BEER",
+            "grams": 40.0,
             "percent": 100
           }
         ]

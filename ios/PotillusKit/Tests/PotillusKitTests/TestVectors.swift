@@ -193,6 +193,14 @@ struct ReportDataVectors: Decodable {
         let dailyLimitGrams: Double
         let weeklyLimitGrams: Double
         let maxDrinkDaysPerWeek: Int
+        /// Inclusive start of the reporting window, absent for the legacy cases
+        /// that pin the entry-span behaviour.
+        let periodStart: String?
+        /// Inclusive end of the reporting window, absent with `periodStart`.
+        let periodEnd: String?
+        /// The logical day to compute against. Absent means the case does not
+        /// depend on it, and the suite may pick any day after the entries.
+        let today: String?
         let drinks: [Drink]
         let entries: [Entry]
         let expected: Expected

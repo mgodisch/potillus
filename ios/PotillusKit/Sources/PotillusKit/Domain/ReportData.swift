@@ -157,7 +157,15 @@ public struct CategoryStat: Sendable, Equatable {
 public struct ReportData: Sendable, Equatable {
 
     // ── The period ───────────────────────────────────────────────────────────
+    /// Inclusive first day of the reported period, and the one the header prints.
+    ///
+    /// The window the caller asked for when it passed both bounds to `make`;
+    /// otherwise the first day carrying an entry. Not necessarily a day with
+    /// entries — a period may open on dry days, and they belong in it.
     public let firstDate: String
+    /// Inclusive last day of the reported period. Set like `firstDate`, except
+    /// that a window ending on the running day ends on the day before it until
+    /// that day has seen alcohol — see the reporting-window block in `make`.
     public let lastDate: String
     /// Calendar days in `[firstDate, lastDate]`, inclusive. Abstinent days count.
     public let totalDays: Int
@@ -215,8 +223,10 @@ public struct ReportData: Sendable, Equatable {
     ///     because an empty report is refused rather than rendered blank.
     ///   - drinks: The catalogue, for mapping each entry to a category.
     ///   - settings: Limits, weight, and the day-change hour.
+    ///   - periodStart: The user-chosen INCLUSIVE start of the export range, or
+    ///     `nil`. With `periodEnd` it bounds the reporting window; see below.
     ///   - periodEnd: The user-chosen INCLUSIVE end of the export range, or `nil`.
-    ///     It anchors the abstinence streaks; see below.
+    ///     It anchors the abstinence streaks and bounds the window; see below.
     ///   - today: The current logical day. Passed in rather than read from a clock,
     ///     so the figures are reproducible in a test and in a screenshot.
     ///   - timeZone: The zone whose wall clock decides the hour-of-day bucket.
@@ -236,6 +246,7 @@ public struct ReportData: Sendable, Equatable {
         entries: [ConsumptionEntry],
         drinks: [DrinkDefinition],
         settings: AppSettings,
+        periodStart: String? = nil,
         periodEnd: String? = nil,
         today: String,
         timeZone: TimeZone = .current,
@@ -251,8 +262,43 @@ public struct ReportData: Sendable, Equatable {
         var byDate: [String: [ConsumptionEntry]] = [:]
         for entry in entries { byDate[entry.logicalDate, default: []].append(entry) }
 
-        let firstDate = entries.map(\.logicalDate).min()!
-        let lastDate = entries.map(\.logicalDate).max()!
+        // ── The reporting window ─────────────────────────────────────────────
+        //
+        // Every denominator below rests on `[firstDate, lastDate]`: totalDays and
+        // the abstinent days, the per-day series behind the medians and the
+        // rolling peak, the clipped first and last month, the chart's axis, and
+        // the period the report prints in its header. Derived from the entries,
+        // those dates answered a question nobody asked — a July export of someone
+        // who drank from the 10th to the 20th became a report over 11 days, while
+        // the Statistics screen divided the same July by 31.
+        //
+        // The window therefore applies when the caller passes BOTH bounds; with
+        // neither, or with `periodEnd` alone as the historical streak anchor used
+        // to arrive, the entry span stands and every legacy call is unchanged.
+        //
+        // A window ending today ends on an unfinished day. Dividing by it deflates
+        // the average and books it as abstinent before it can become anything, so
+        // it waits unless alcohol has already been logged — the rule
+        // `DayResolver.windowDays` applies for the Statistics screen, expressed as
+        // a date because the aggregates need a bound rather than a length.
+        let firstDate: String
+        let lastDate: String
+        if let periodStart, let periodEnd {
+            let todayGrams = byDate[periodEnd]?.reduce(0.0) { $0 + $1.gramsAlcohol } ?? 0.0
+            let todayIsDrinkDay = AlcoholCalculator.isDrinkDay(totalGrams: todayGrams)
+            var windowEnd = periodEnd
+            if periodEnd == today, !todayIsDrinkDay, let end = DayResolver.parseDate(periodEnd) {
+                windowEnd = DayResolver.formatDate(DayResolver.addingDays(-1, to: end))
+            }
+            firstDate = periodStart
+            // Dropping the unfinished day can empty a window the user did pick —
+            // "today only", exported before the first drink of the day. A report
+            // over zero days states nothing, so the raw window stands there.
+            lastDate = windowEnd < periodStart ? periodEnd : windowEnd
+        } else {
+            firstDate = entries.map(\.logicalDate).min()!
+            lastDate = entries.map(\.logicalDate).max()!
+        }
         let limitInfo = AlcoholCalculator.getLimitInfo(settings)
 
         let allDays = DayResolver.inclusiveDates(from: firstDate, to: lastDate)
@@ -367,8 +413,18 @@ public struct ReportData: Sendable, Equatable {
             )
         )
     }
+}
 
-    // ── Pieces ───────────────────────────────────────────────────────────────
+// =============================================================================
+// The pieces the computation is assembled from
+// =============================================================================
+//
+// An extension rather than more of the struct body: SwiftLint caps a type body
+// at 250 lines and does not count extensions, and these are helpers of the
+// computation above rather than part of the value it returns. Several are
+// internal rather than private so the test suite can reach them directly.
+
+extension ReportData {
 
     /// Where the abstinence streaks are measured from.
     ///
@@ -406,7 +462,14 @@ public struct ReportData: Sendable, Equatable {
         return hours
     }
 
-    /// One row per calendar month that saw a drink, ascending.
+    /// One row per calendar month the period touches, ascending.
+    ///
+    /// EVERY such month is listed, the dry ones included. Listing only the months
+    /// with entries left a table whose rows did not add up to the period printed
+    /// above it: a reader of a January-to-June report that skips April cannot tell
+    /// an abstinent month from a missing one, while the abstinent days in the KPIs
+    /// counted April all along. In a report meant for a conversation the dry month
+    /// is often the row that matters.
     ///
     /// `avgPerCalendarDay` divides by the month's days INSIDE the period, not by the
     /// month's full length. For a partial first or last month the untouched tail
@@ -423,13 +486,13 @@ public struct ReportData: Sendable, Equatable {
             byMonth[String(summary.date.prefix(7)), default: []].append(summary)
         }
 
-        return byMonth.keys.sorted().compactMap { monthKey -> MonthStat? in
+        return monthKeys(from: firstDate, to: lastDate).compactMap { monthKey -> MonthStat? in
             guard
-                let days = byMonth[monthKey],
                 let monthStart = DayResolver.parseDate("\(monthKey)-01"),
                 let periodStart = DayResolver.parseDate(firstDate),
                 let periodEnd = DayResolver.parseDate(lastDate)
             else { return nil }
+            let days = byMonth[monthKey] ?? []
 
             let effectiveStart = max(monthStart, periodStart)
             let effectiveEnd = min(lastDayOfMonth(monthStart), periodEnd)
@@ -455,6 +518,39 @@ public struct ReportData: Sendable, Equatable {
                 effectiveDays: effectiveDays
             )
         }
+    }
+
+    /// The `"YYYY-MM"` keys of every calendar month the inclusive period touches,
+    /// ascending. A period inside one month yields that one key.
+    /// Counted on the year and month numbers rather than on `Date`, so no calendar
+    /// or time zone can shift a boundary: the keys are the strings the day
+    /// summaries are already grouped by.
+    static func monthKeys(from: String, to: String) -> [String] {
+        guard let start = DayResolver.parseDate(from), let end = DayResolver.parseDate(to),
+              start <= end
+        else { return [] }
+
+        let startKey = String(from.prefix(7))
+        let endKey = String(to.prefix(7))
+        guard
+            let startYear = Int(startKey.prefix(4)), let startMonth = Int(startKey.suffix(2)),
+            Int(endKey.prefix(4)) != nil, Int(endKey.suffix(2)) != nil
+        else { return [] }
+
+        var keys: [String] = []
+        var year = startYear
+        var month = startMonth
+        while true {
+            let key = String(format: "%04d-%02d", year, month)
+            keys.append(key)
+            if key >= endKey { break }
+            month += 1
+            if month > 12 {
+                month = 1
+                year += 1
+            }
+        }
+        return keys
     }
 
     /// The last day of the month containing `monthStart`.

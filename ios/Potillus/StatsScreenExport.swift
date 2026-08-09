@@ -192,6 +192,7 @@ extension StatsScreen {
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),
                 settings: settings,
+                periodStart: from,
                 periodEnd: to,
                 today: model.state.today
             ) else {

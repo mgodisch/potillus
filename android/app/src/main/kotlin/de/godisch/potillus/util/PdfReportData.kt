@@ -172,8 +172,21 @@ data class CategoryStat(
  */
 data class PdfReportData(
     // ── Period & configuration ───────────────────────────────────────────────
+    /**
+     * Inclusive first day of the reported period, and the one the header prints.
+     *
+     * The window the caller asked for when it passed both bounds to [from];
+     * otherwise the first day that carries an entry. It is not necessarily a day
+     * with entries: a period may open on dry days, and they belong in it.
+     */
     val firstDate: String,
+    /**
+     * Inclusive last day of the reported period. Set like [firstDate], except
+     * that a window ending on the running day ends on the day before it until
+     * that day has seen alcohol — see the reporting-window block in [from].
+     */
     val lastDate: String,
+    /** Calendar days in `[firstDate, lastDate]`, inclusive. The denominator. */
     val totalDays: Int,
     val limitInfo: LimitInfo,
     val weightKg: Double,
@@ -254,22 +267,30 @@ data class PdfReportData(
         /**
          * Computes the full report dataset for [entries] in the chosen period.
          *
-         * @param entries   Consumption entries for the (inclusive) date range. Must be
-         *                  non-empty; the caller checks this before calling.
-         * @param drinks    Drink catalogue, used to map each entry to its category.
-         * @param settings  Current limits, weight and day-change configuration.
-         * @param periodEnd The user-chosen INCLUSIVE end of the export range
-         *                  ("YYYY-MM-DD"), or `null` when the caller has no explicit
-         *                  range (legacy behaviour: the streaks anchor at the real
-         *                  logical today). Used only to anchor the abstinence
-         *                  streaks — see the streak block below for why a HISTORICAL
-         *                  range must not anchor at today (v0.81.0 QA fix).
+         * @param entries     Consumption entries for the (inclusive) date range. Must be
+         *                    non-empty; the caller checks this before calling.
+         * @param drinks      Drink catalogue, used to map each entry to its category.
+         * @param settings    Current limits, weight and day-change configuration.
+         * @param periodStart The user-chosen INCLUSIVE start of the export range
+         *                    ("YYYY-MM-DD"), or `null` when the caller has no explicit
+         *                    range. Together with [periodEnd] it makes the REPORTED
+         *                    PERIOD the window the user asked for instead of the span
+         *                    of the entries in it — see the reporting-window block
+         *                    below.
+         * @param periodEnd   The user-chosen INCLUSIVE end of the export range
+         *                    ("YYYY-MM-DD"), or `null` when the caller has no explicit
+         *                    range (legacy behaviour: the streaks anchor at the real
+         *                    logical today). Anchors the abstinence streaks — see the
+         *                    streak block below for why a HISTORICAL range must not
+         *                    anchor at today (v0.81.0 QA fix) — and, with
+         *                    [periodStart], bounds the reporting window.
          * @return A fully computed [PdfReportData].
          */
         fun from(
             entries: List<ConsumptionEntry>,
             drinks: List<DrinkDefinition>,
             settings: AppSettings,
+            periodStart: String? = null,
             periodEnd: String? = null,
             locale: Locale = Locale.getDefault(),
         ): PdfReportData {
@@ -278,8 +299,57 @@ data class PdfReportData(
             // Group once; reused for every per-day / per-month aggregate below.
             val byDate = entries.groupBy { it.logicalDate }
 
-            val firstDate = entries.minOf { it.logicalDate }
-            val lastDate = entries.maxOf { it.logicalDate }
+            // The real logical day. Needed twice: once by the reporting window
+            // immediately below, once by the streak anchor further down.
+            val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+
+            // ── The reporting window ────────────────────────────────────────────
+            //
+            // WHAT [firstDate, lastDate] MEANS, AND WHY IT IS NOT THE ENTRY SPAN.
+            //   Every denominator in this file — totalDays, abstinentDays, the
+            //   per-day series behind the medians and the rolling peak, the clipped
+            //   first/last month, the chart's time axis — is derived from these two
+            //   dates, and the report prints them as its period. Deriving them from
+            //   the entries answered a question nobody asked: someone who exports
+            //   July and drank from the 10th to the 20th got a report over 11 days,
+            //   with no abstinent days and a g/day figure divided by 11, while the
+            //   Statistics screen divided the same July by 31. The export dialog
+            //   knows the window; it just never reached the arithmetic.
+            //
+            //   The window therefore applies when the caller passes BOTH bounds.
+            //   A caller that passes neither (or only periodEnd, as the historical
+            //   streak anchor did before this) keeps the entry span, so the shared
+            //   vectors and every legacy call read exactly as they did.
+            //
+            // THE LAST DAY. A window ending today ends on a day that is still
+            //   running, and an unfinished day must not be divided by: it would
+            //   deflate the average and be counted as abstinent before it has had
+            //   the chance to become anything. This is the same rule
+            //   [DayResolver.windowDays] applies for the Statistics screen — a day
+            //   that has already seen alcohol counts, an empty one waits — so the
+            //   report and the screen agree about today. Expressed here as a date
+            //   rather than a count, because the aggregates need a bound, not a
+            //   length; the two are pinned against each other in PdfReportDataTest.
+            val firstDate: String
+            val lastDate: String
+            if (periodStart != null && periodEnd != null) {
+                val todayIsDrinkDay = periodEnd == today &&
+                    AlcoholCalculator.isDrinkDay(byDate[periodEnd]?.sumOf { it.gramsAlcohol } ?: 0.0)
+                val windowEnd = if (periodEnd == today && !todayIsDrinkDay) {
+                    DayResolver.formatDate(DayResolver.parseDate(periodEnd).minusDays(1))
+                } else {
+                    periodEnd
+                }
+                firstDate = periodStart
+                // Dropping the unfinished day can empty a window that the user did
+                // pick — exporting "today only" before the first drink of the day.
+                // A report over zero days states nothing, so the raw window stands
+                // in that one case and the running day is reported as it is.
+                lastDate = if (windowEnd < periodStart) periodEnd else windowEnd
+            } else {
+                firstDate = entries.minOf { it.logicalDate }
+                lastDate = entries.maxOf { it.logicalDate }
+            }
             val limitInfo = AlcoholCalculator.getLimitInfo(settings)
 
             // Calendar span of the period (inclusive), used for averages and abstinent days.
@@ -317,13 +387,25 @@ data class PdfReportData(
             //    NOT truncate to a row budget here: the HTML report paginates
             //    automatically, so all months are emitted and flow across pages.
             //
+            //    EVERY month the period touches gets a row, including the ones that
+            //    saw no drinking. Listing only the months with entries left a table
+            //    whose rows did not add up to the period above it — a reader of a
+            //    January-to-June report that skips April cannot tell an abstinent
+            //    month from a missing one, and the abstinent days in the KPIs
+            //    counted April all along. A dry month is a statement in its own
+            //    right, and in a report meant for a conversation it is often the
+            //    statement that matters.
+            //
             //    Period bounds as LocalDate, reused to clip partial first/last months.
             val periodStartDate = LocalDate.parse(firstDate)
             val periodEndExclusive = LocalDate.parse(lastDate).plusDays(1)
-            val months = byDate.entries
-                .groupBy { it.key.substring(0, 7) } // "YYYY-MM"
-                .toSortedMap()
-                .map { (monthKey, days) ->
+            val byMonth = byDate.entries.groupBy { it.key.substring(0, 7) } // "YYYY-MM"
+            val monthKeys = generateSequence(periodStartDate.withDayOfMonth(1)) { month ->
+                month.plusMonths(1).takeIf { it.isBefore(periodEndExclusive) }
+            }.map { it.toString().substring(0, 7) }.toList()
+            val months = monthKeys
+                .map { monthKey ->
+                    val days = byMonth[monthKey].orEmpty()
                     val monthStart = LocalDate.parse("$monthKey-01")
                     val monthEndExclusive = monthStart.plusMonths(1)
                     // Number of THIS month's calendar days that actually fall inside the
@@ -467,7 +549,15 @@ data class PdfReportData(
             //    today (the default export) the anchor stays the real logical
             //    today, preserving the in-progress-day semantics and the screen
             //    parity. A null periodEnd keeps the legacy today anchor.
-            val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+            //
+            //    The anchor and the reporting window read the same periodEnd but
+            //    ask different things of it. The window asks whether the last day
+            //    is FINISHED, and drops it while it is not. The anchor asks whether
+            //    the report ends in the PAST, and clamps the streaks to the period
+            //    when it does. A range ending today therefore keeps the real-today
+            //    anchor while the window may already have dropped that day: the
+            //    streaks still count only completed dry days, so both readings
+            //    agree on what a finished day is.
             val streakAnchor = if (periodEnd != null && periodEnd < today) {
                 DayResolver.formatDate(DayResolver.parseDate(periodEnd).plusDays(1))
             } else {
