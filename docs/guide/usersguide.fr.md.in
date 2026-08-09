@@ -1,0 +1,337 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+
+{{#android}}
+# Libellus Potionis -- Guide de l'utilisateur
+
+Cette page décrit les caractéristiques et les fonctions de Libellus Potionis,
+le journal personnel de votre consommation d'alcool.
+
+## Aperçu
+
+Libellus Potionis est open source : le code source peut être consulté et
+vérifié par tout le monde. L'application ne requiert aucune autorisation, ni
+pour l'appareil photo ou le microphone, ni pour le GPS ou l'accès au réseau.
+Vos données restent dans le stockage privé de l'application sur votre appareil,
+protégées par le chiffrement de l'appareil, et l'accès à l'application peut
+être restreint à l'aide d'une empreinte digitale.
+
+L'application vous indique à tout moment si « la petite sœur » tient encore
+dans votre budget, ce qui vous permet de doser votre consommation jusqu'à votre
+limite. Pour un rendez-vous en addictologie, elle produit sur demande un
+rapport PDF de deux pages sur vos habitudes de consommation. Elle est gratuite
+et sans publicité.
+
+Libellus Potionis nécessite Android 11 ou une version ultérieure. Il est
+utilisé en continu par l'auteur sur un Google Pixel 10 Pro sous GrapheneOS et
+testé en complément sur un Fairphone 4.
+
+## Écran « {{today}} »
+
+Sur cet écran, vous trouverez la liste des boissons alcoolisées que vous avez
+consommées aujourd'hui. Si vous avez commis une erreur en enregistrant une
+boisson, vous pouvez modifier ou supprimer les entrées ici. Utilisez le bouton
+plus pour ajouter d'autres boissons.
+
+Au-dessus de la liste des boissons, vous trouverez un aperçu de la journée en
+cours avec les informations suivantes : la quantité d'alcool déjà consommée
+aujourd'hui (en grammes), cette même quantité par rapport à vos limites
+journalière et hebdomadaire (en grammes et sous forme de barre de
+progression), et le nombre de jours de consommation d'alcool jusqu'à présent
+cette semaine par rapport à votre limite (sous forme de nombre et de barre de
+progression).
+
+De plus, un badge marqué « Ø » indique votre consommation moyenne pour le mois
+en cours (moyenne de grammes d’alcool pur par jour).
+
+## Écran « {{calendar}} »
+
+Sur cet écran, vous trouverez le calendrier. Les jours où de l'alcool a été
+consommé sont marqués d'un point bleu (quantité non critique) ou d'un point
+rouge (limite dépassée). En sélectionnant un jour, les boissons correspondantes
+s'affichent et peuvent, si nécessaire, être corrigées ou supprimées. Il est
+également possible d'ajouter des boissons consommées a posteriori.
+
+## Écran « {{statistics}} »
+
+Cet écran présente des analyses statistiques de votre consommation d'alcool,
+filtrables par semaine, mois ou année. Un export CSV est disponible pour
+traiter les données dans un tableur. De plus, un export PDF est proposé, qui met
+en forme vos habitudes de consommation dans une présentation adaptée au suivi en
+addictologie.
+
+## Écran « {{drinks}} »
+
+Cet écran contient la liste des boissons. L'application est préconfigurée avec
+un ensemble de boissons courantes à l'international. Toutes peuvent être
+modifiées ou supprimées. Vous pouvez définir une nouvelle boisson à l'aide de
+l'icône plus. Un appui sur une boisson ouvre une boîte de dialogue permettant de
+l'enregistrer comme consommée.
+
+## Écran « {{settings}} »
+
+Le menu des paramètres est accessible via l'icône de menu (☰) en haut à droite. Libellus Potionis propose les options de configuration
+suivantes :
+
+### {{personal_data}}
+
+Dans cette catégorie, vous pouvez indiquer votre poids corporel afin d'estimer
+votre alcoolémie selon la [formule de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Cette valeur s'affiche ensuite sur l'écran « {{today}} ».
+
+La formule est **BAC [‰] = A / (P × r) − β × t** : A correspond aux grammes
+d'alcool pur, P au poids corporel en kilogrammes, r au coefficient de
+diffusion, β au taux d'élimination d'environ 0,15 ‰ par heure et t aux heures
+écoulées depuis la première boisson. Les grammes découlent du volume × titre
+alcoolique × 0,789, la densité de l'éthanol.
+
+L'application n'enregistre pas le sexe et calcule donc de façon prudente : r
+est fixé à 0,6, le plus petit des deux coefficients classiques. Un r plus
+petit répartit la même dose dans un volume plus faible et donne ainsi la plus
+élevée des deux valeurs, de sorte que l'estimation ne passe pas en dessous de
+ce qu'atteint une personne de n'importe quel sexe. Le taux d'élimination, en
+revanche, est une moyenne : il varie individuellement d'environ 0,10 à 0,20 ‰
+par heure, si bien qu'une personne qui élimine lentement peut se situer
+au-dessus de la valeur affichée. L'estimation est un modèle statistique, pas
+une mesure.
+
+### {{limits}}
+
+Dans cette catégorie, vous saisissez les limites qui s'appliquent à votre
+consommation d'alcool. Les champs à renseigner sont : la limite journalière
+maximale en grammes d'alcool pur, la limite hebdomadaire maximale et le nombre
+maximal de jours de consommation par semaine. Toutes les limites s'appliquent
+simultanément. En conséquence, trois barres de progression sont visibles sur
+l'écran « {{today}} ». Si vous ne savez pas quoi configurer ici, vous pouvez
+vous inspirer des recommandations de différents pays sur Wikipédia.
+
+### {{statistics}}
+
+Les paramètres statistiques vous permettent de définir l'heure à laquelle
+commence un nouveau jour (afin qu'une boisson prise à 1 h du matin compte encore
+pour la veille, par exemple) et — pour les bonnes résolutions du Nouvel An —
+la date à partir de laquelle l'analyse des données doit débuter.
+
+### {{backup_section}}
+
+**Vos données ne quittent jamais cet appareil d'elles-mêmes.** Libellus
+Potionis conserve tout dans le stockage privé de l'application et ne participe
+délibérément à aucune sauvegarde automatique dans le cloud ni à aucun transfert
+d'appareil à appareil. Si vous changez de téléphone, effectuez une
+réinitialisation d'usine ou réinstallez l'application, **le seul moyen de
+conserver vos données est de les sauvegarder vous-même** — il n'existe aucune
+autre voie de récupération, et les données non exportées ne peuvent pas être
+récupérées par la suite.
+
+Une sauvegarde est un unique fichier JSON contenant toutes vos boissons et la
+totalité de votre journal. Pour transférer vos données vers un autre téléphone
+:
+
+1. Sur l'ancien téléphone, ouvrez « {{settings}} » → {{backup_section}} →
+   {{backup_export}} et enregistrez le fichier JSON en lieu sûr — par exemple
+   votre propre espace cloud, un e-mail que vous vous envoyez ou un transfert
+   USB.
+2. Installez Libellus Potionis sur le nouveau téléphone.
+3. Ouvrez « {{settings}} » → {{backup_section}} → {{backup_import}} et
+   sélectionnez ce fichier JSON. Choisissez {{import_replace}} pour tout
+   remplacer, ou {{import_merge}} pour le combiner avec les entrées déjà
+   présentes.
+
+Exportez régulièrement : une sauvegarde ne protège que les données existant au
+moment de sa création.
+
+### {{security}}
+
+Cette catégorie protège l’accès à l’application et contrôle sa visibilité.
+Activez {{biometric_lock}} pour exiger une empreinte digitale ou la
+reconnaissance faciale à chaque ouverture de l’application. L’interrupteur
+{{allow_screenshots}} détermine si les captures et les enregistrements d’écran
+de la fenêtre de l’application sont autorisés ; il est désactivé par défaut, de
+sorte que la fenêtre est masquée sur les captures d’écran et dans l’aperçu des
+applications récentes.
+
+### {{appearance}}
+
+Dans cette catégorie, vous pouvez définir le thème de couleurs et la langue
+indépendamment des paramètres du système.
+{{/android}}
+
+{{#ios}}
+# Libellus Potionis -- Guide de l'utilisateur
+
+Cette page décrit les caractéristiques et les fonctions de Libellus Potionis,
+le journal personnel de votre consommation d'alcool.
+
+## Aperçu
+
+Libellus Potionis est open source : le code source peut être consulté et
+vérifié par tout le monde. L'application ne requiert aucune autorisation, ni
+pour l'appareil photo ou le microphone, ni pour le GPS ou l'accès au réseau.
+Vos données restent dans le stockage privé de l'application sur votre appareil,
+protégées par le chiffrement de l'appareil, et l'accès à l'application peut
+être restreint à l'aide de Face ID ou Touch ID.
+
+L'application vous indique à tout moment si « la petite sœur » tient encore
+dans votre budget, ce qui vous permet de doser votre consommation jusqu'à votre
+limite. Pour un rendez-vous en addictologie, elle produit sur demande un
+rapport PDF de deux pages sur vos habitudes de consommation. Elle est gratuite
+et sans publicité.
+
+Libellus Potionis nécessite iOS 17.0 ou une version ultérieure. Il est utilisé
+en continu par l'auteur sur un iPhone 16E et testé en complément sur un
+émulateur d'iPhone 17 Pro.
+
+## Écran « {{today}} »
+
+Sur cet écran, vous trouverez la liste des boissons alcoolisées que vous avez
+consommées aujourd'hui. Si vous avez commis une erreur en enregistrant une
+boisson, vous pouvez modifier ou supprimer les entrées ici. Utilisez le bouton
+plus pour ajouter d'autres boissons. Touchez une entrée pour la modifier, ou balayez-la vers la gauche pour la supprimer. Le bouton en forme de crayon de la barre d'outils propose également une option de suppression.
+
+Au-dessus de la liste des boissons, vous trouverez un aperçu de la journée en
+cours avec les informations suivantes : la quantité d'alcool déjà consommée
+aujourd'hui (en grammes), cette même quantité par rapport à vos limites
+journalière et hebdomadaire (en grammes et sous forme de barre de
+progression), et le nombre de jours de consommation d'alcool jusqu'à présent
+cette semaine par rapport à votre limite (sous forme de nombre et de barre de
+progression).
+
+De plus, un badge marqué « Ø » indique votre consommation moyenne pour le mois
+en cours (moyenne de grammes d’alcool pur par jour).
+
+## Écran « {{calendar}} »
+
+Sur cet écran, vous trouverez le calendrier. Les jours où de l'alcool a été
+consommé sont marqués d'un point bleu (quantité non critique) ou d'un point
+rouge (limite dépassée). En sélectionnant un jour, les boissons correspondantes
+s'affichent et peuvent, si nécessaire, être corrigées ou supprimées. Il est
+également possible d'ajouter des boissons consommées a posteriori. Touchez une entrée pour la corriger, ou balayez-la vers la gauche pour la supprimer ; le bouton en forme de crayon de la barre d'outils propose la même chose.
+
+## Écran « {{statistics}} »
+
+Cet écran présente des analyses statistiques de votre consommation d'alcool,
+filtrables par semaine, mois ou année. Un export CSV est disponible pour
+traiter les données dans un tableur. De plus, un export PDF est proposé, qui met
+en forme vos habitudes de consommation dans une présentation adaptée au suivi en
+addictologie.
+
+## Écran « {{drinks}} »
+
+Cet écran contient la liste des boissons. L'application est préconfigurée avec
+un ensemble de boissons courantes à l'international. Toutes peuvent être
+modifiées ou supprimées. Vous pouvez définir une nouvelle boisson à l'aide de
+l'icône plus. Un appui sur une boisson ouvre une boîte de dialogue permettant de
+l'enregistrer comme consommée. Pour modifier ou supprimer une boisson, touchez le bouton en forme de crayon de la barre d'outils : dans ce mode, toucher une ligne ouvre sa fenêtre de modification et le badge rouge supprime la boisson. Un balayage vers la gauche propose les deux mêmes actions.
+
+## Écran « {{settings}} »
+
+Le menu des paramètres est accessible via le bouton Plus (…) en haut à droite. Libellus Potionis propose les options de configuration
+suivantes :
+
+### {{personal_data}}
+
+Dans cette catégorie, vous pouvez indiquer votre poids corporel afin d'estimer
+votre alcoolémie selon la [formule de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Cette valeur s'affiche ensuite sur l'écran « {{today}} ».
+
+La formule est **BAC [‰] = A / (P × r) − β × t** : A correspond aux grammes
+d'alcool pur, P au poids corporel en kilogrammes, r au coefficient de
+diffusion, β au taux d'élimination d'environ 0,15 ‰ par heure et t aux heures
+écoulées depuis la première boisson. Les grammes découlent du volume × titre
+alcoolique × 0,789, la densité de l'éthanol.
+
+L'application n'enregistre pas le sexe et calcule donc de façon prudente : r
+est fixé à 0,6, le plus petit des deux coefficients classiques. Un r plus
+petit répartit la même dose dans un volume plus faible et donne ainsi la plus
+élevée des deux valeurs, de sorte que l'estimation ne passe pas en dessous de
+ce qu'atteint une personne de n'importe quel sexe. Le taux d'élimination, en
+revanche, est une moyenne : il varie individuellement d'environ 0,10 à 0,20 ‰
+par heure, si bien qu'une personne qui élimine lentement peut se situer
+au-dessus de la valeur affichée. L'estimation est un modèle statistique, pas
+une mesure.
+
+### {{limits}}
+
+Dans cette catégorie, vous saisissez les limites qui s'appliquent à votre
+consommation d'alcool. Les champs à renseigner sont : la limite journalière
+maximale en grammes d'alcool pur, la limite hebdomadaire maximale et le nombre
+maximal de jours de consommation par semaine. Toutes les limites s'appliquent
+simultanément. En conséquence, trois barres de progression sont visibles sur
+l'écran « {{today}} ». Si vous ne savez pas quoi configurer ici, vous pouvez
+vous inspirer des recommandations de différents pays sur Wikipédia.
+
+### {{statistics}}
+
+Les paramètres statistiques vous permettent de définir l'heure à laquelle
+commence un nouveau jour (afin qu'une boisson prise à 1 h du matin compte encore
+pour la veille, par exemple) et — pour les bonnes résolutions du Nouvel An —
+la date à partir de laquelle l'analyse des données doit débuter.
+
+### {{backup_section}}
+
+**Vos données ne quittent jamais cet appareil d'elles-mêmes.** Libellus
+Potionis conserve tout dans le stockage privé de l'application et ne participe
+délibérément à aucune sauvegarde automatique dans le cloud ni à aucun transfert
+d'appareil à appareil. Si vous changez de téléphone, effectuez une
+réinitialisation d'usine ou réinstallez l'application, **le seul moyen de
+conserver vos données est de les sauvegarder vous-même** — il n'existe aucune
+autre voie de récupération, et les données non exportées ne peuvent pas être
+récupérées par la suite.
+
+Une sauvegarde est un unique fichier JSON contenant toutes vos boissons et la
+totalité de votre journal. Pour transférer vos données vers un autre téléphone
+:
+
+1. Sur l'ancien téléphone, ouvrez « {{settings}} » → {{backup_section}} →
+   {{backup_export}} et enregistrez le fichier JSON en lieu sûr — par exemple
+   votre propre espace cloud, un e-mail que vous vous envoyez ou un transfert
+   USB.
+2. Installez Libellus Potionis sur le nouveau téléphone.
+3. Ouvrez « {{settings}} » → {{backup_section}} → {{backup_import}} et
+   sélectionnez ce fichier JSON. Choisissez {{import_replace}} pour tout
+   remplacer, ou {{import_merge}} pour le combiner avec les entrées déjà
+   présentes.
+
+Exportez régulièrement : une sauvegarde ne protège que les données existant au
+moment de sa création.
+
+### {{security}}
+
+Cette catégorie protège l'accès à l'application et contrôle sa visibilité.
+Activez {{biometric_lock}} pour exiger Face ID ou Touch ID à chaque ouverture
+de l'application. L'interrupteur {{allow_screenshots}} détermine si le contenu
+de l'application apparaît dans le sélecteur d'apps (App Switcher) ; il est
+désactivé par défaut, de sorte que l'application y est masquée lorsque vous la
+quittez. iOS ne permet pas à une application de bloquer les captures ou les
+enregistrements d'écran, ce réglage n'a donc aucun effet sur eux.
+
+### {{appearance}}
+
+Dans cette catégorie, vous pouvez définir le thème de couleurs et la langue
+indépendamment des paramètres du système.
+{{/ios}}

@@ -197,9 +197,11 @@ app/src/main/res/raw/license_bsd3.md: ../docs/LICENSE.BSD-3-Clause.md
 	@mkdir -p $(@D)
 	cp $< $@
 
-# Localized user guides. render-guide.py resolves the {{screen-name}} tokens in
-# docs/guide/usersguide*.md.in against the matching strings.xml, so the in-app
-# res/raw[-xx]/usersguide.md copies can never drift from the labels the app shows.
+# Localized user guides. render-guide.py picks the {{#android}} blocks out of the
+# shared templates in ../docs/guide/usersguide*.md.in -- one template per language
+# for both platforms -- and resolves the {{screen-name}} tokens against the
+# matching strings.xml, so the in-app res/raw[-xx]/usersguide.md copies can never
+# drift from the labels the app shows.
 #
 # Each guide is a real FILE target, not one blanket phony: `render-guide.py
 # --make-deps` emits one `output: template strings.xml render-guide.py` rule per
@@ -215,8 +217,8 @@ app/src/main/res/raw/license_bsd3.md: ../docs/LICENSE.BSD-3-Clause.md
 # guides.d and RESTARTS, so on the parse that matters the variable is populated).
 prereq: $(GUIDE_OUTPUTS)
 
-guides.d: $(wildcard docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/values*/strings.xml) ../tools/render-guide.py
-	python3 ../tools/render-guide.py --make-deps > $@
+guides.d: $(wildcard ../docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/values*/strings.xml) ../tools/render-guide.py
+	python3 ../tools/render-guide.py --platform android --make-deps > $@
 
 # Shared recipe for every guide output (prerequisites come from guides.d). Guarded
 # so the empty-goal parse BEFORE guides.d exists is harmless. render-guide.py
@@ -226,7 +228,7 @@ guides.d: $(wildcard docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/v
 # are git-ignored, so the touch causes no VCS churn.
 ifneq ($(GUIDE_OUTPUTS),)
 $(GUIDE_OUTPUTS):
-	python3 ../tools/render-guide.py
+	python3 ../tools/render-guide.py --platform android
 	touch $@
 endif
 
@@ -239,7 +241,7 @@ guides: $(GUIDE_OUTPUTS)
 # not stale -- nothing has drifted, the build simply has not run -- so it is
 # reported and skipped, not failed (which used to break a fresh clone).
 check-guides:
-	python3 ../tools/render-guide.py --check
+	python3 ../tools/render-guide.py --platform android --check
 	for pair in \
 	    "license_gpl3.md:../LICENSE.md" \
 	    "license_apache2.md:../LICENSES/Apache-2.0.txt" \

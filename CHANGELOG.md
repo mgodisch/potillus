@@ -59,7 +59,12 @@ Edit drinks from the list's edit mode
 - A swipe or the arrows on the statistics screen move to another period.
 - The users guides describe every screen, switch and gesture on both
   platforms.
-- The iOS guide renderer maps every token to a label the app shows.
+- Every guide token maps to a label the app shows.
+- One template per language feeds both platforms, with `{{#android}}` and
+  `{{#ios}}` blocks.
+- `render-guide.py --platform` renders Android and iOS from `docs/guide/`.
+- The English renders live as `docs/guide/usersguide.android.md` and
+  `usersguide.ios.md`.
 - A row tap in the drinks list's edit mode opens the editor.
 - The toolbar's edit toggle shows a pencil and a checkmark.
 - `push-gitlab` creates the release before it signs and uploads.

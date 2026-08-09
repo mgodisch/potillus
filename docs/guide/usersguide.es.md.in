@@ -1,0 +1,322 @@
+<!-- vim: set et ts=4:
+=============================================================================
+Libellus Potionis - Privacy-Friendly Alcohol Tracker
+Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
+=============================================================================
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.
+
+In addition, as permitted by section 7 of the GNU General Public License,
+this program may carry additional permissions; any such permissions that
+apply to it are stated in the accompanying COPYING.md file.
+
+=============================================================================
+-->
+
+{{#android}}
+# Libellus Potionis -- Guía del usuario
+
+Esta página describe las características y funciones de Libellus Potionis, el
+registro personal de tu consumo de alcohol.
+
+## Resumen
+
+Libellus Potionis es de código abierto: cualquiera puede consultar y verificar
+el código fuente. La aplicación no requiere ningún permiso: ni para la cámara o
+el micrófono, ni para el GPS o el acceso a la red. Tus datos permanecen en el
+almacenamiento privado de la aplicación en tu dispositivo, protegidos por el
+cifrado del dispositivo, y el acceso a la aplicación puede restringirse
+mediante huella dactilar.
+
+La aplicación te indica en todo momento si «la petite sœur» todavía cabe en tu
+presupuesto, de modo que puedas dosificarte hasta tu límite. Para las citas en
+un centro de atención a las adicciones genera, si lo deseas, un informe PDF de
+dos páginas sobre tus hábitos de consumo. Es gratuita y sin publicidad.
+
+Libellus Potionis requiere Android 11 o superior. El autor lo utiliza de forma
+continua en un Google Pixel 10 Pro con GrapheneOS y, además, lo prueba en un
+Fairphone 4.
+
+## Pantalla "{{today}}"
+
+En esta pantalla encontrarás una lista de las bebidas alcohólicas que has
+disfrutado hoy. Si cometiste un error al registrar una bebida, aquí puedes
+editar o eliminar las entradas. Usa el botón más para añadir más bebidas.
+
+Sobre la lista de bebidas encontrarás un resumen del día actual con la siguiente
+información: la cantidad de alcohol ya consumida hoy (en gramos), esa misma
+cantidad en relación con tus límites diario y semanal (en gramos y como barra de
+progreso), y el número de días con consumo de alcohol en lo que va de semana en
+relación con tu límite (como número y como barra de progreso).
+
+Además, una insignia marcada con «Ø» muestra tu consumo medio del mes actual
+(media de gramos de alcohol puro al día).
+
+## Pantalla "{{calendar}}"
+
+En esta pantalla encontrarás el calendario. Los días en los que se consumió
+alcohol se marcan con un punto azul (cantidad no crítica) o un punto rojo
+(límite superado). Al seleccionar un día se muestran las bebidas
+correspondientes, que pueden corregirse o eliminarse si es necesario. También es
+posible añadir bebidas consumidas de forma retroactiva.
+
+## Pantalla "{{statistics}}"
+
+Esta pantalla muestra análisis estadísticos de tu consumo de alcohol,
+filtrables por semana, mes o año. Hay disponible una exportación CSV para seguir
+procesando los datos en una hoja de cálculo. Además, se ofrece una exportación
+PDF que presenta los hábitos de consumo en un formato adecuado para la terapia
+de adicciones.
+
+## Pantalla "{{drinks}}"
+
+Esta pantalla contiene la lista de bebidas. La aplicación viene preconfigurada
+con un conjunto de bebidas comunes a nivel internacional. Todas ellas pueden
+modificarse o eliminarse. Puedes definir una nueva bebida con el icono más. Al
+tocar una bebida se abre un diálogo para registrarla como consumida.
+
+## Pantalla "{{settings}}"
+
+El menú de ajustes es accesible a través del icono de menú (☰) situado en la esquina superior derecha. Libellus Potionis ofrece las siguientes opciones de
+configuración:
+
+### {{personal_data}}
+
+En esta categoría puedes anotar tu peso corporal para estimar tu concentración
+de alcohol en sangre mediante la [fórmula de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Ese valor se muestra después en la pantalla "{{today}}".
+
+La fórmula es **BAC [‰] = A / (P × r) − β × t**: A son los gramos de alcohol
+puro, P el peso corporal en kilogramos, r el coeficiente de distribución, β la
+tasa de eliminación de unos 0,15 ‰ por hora y t las horas transcurridas desde
+la primera consumición. Los gramos salen de volumen × graduación × 0,789, la
+densidad del etanol.
+
+La aplicación no registra el sexo, así que calcula de forma conservadora: r
+está fijado en 0,6, el menor de los dos coeficientes clásicos. Un r menor
+reparte la misma dosis en un volumen menor y devuelve por tanto el mayor de
+los dos valores, de modo que la estimación no quede por debajo de lo que
+alcanza una persona de cualquier sexo. La tasa de eliminación, en cambio, es
+un promedio: individualmente va de unos 0,10 a 0,20 ‰ por hora, así que quien
+metaboliza el alcohol despacio puede estar por encima del valor mostrado. La
+estimación es un modelo estadístico, no una medición.
+
+### {{limits}}
+
+En esta categoría introduces los límites que se aplican a tu consumo de alcohol.
+Los campos obligatorios son: el límite diario máximo en gramos de alcohol puro,
+el límite semanal máximo y el número máximo de días de consumo por semana. Todos
+los límites se aplican simultáneamente. En consecuencia, en la pantalla
+"{{today}}" se muestran tres barras de progreso. Si no estás seguro de qué
+configurar aquí, puedes inspirarte en las recomendaciones de distintos países en
+Wikipedia.
+
+### {{statistics}}
+
+Los ajustes estadísticos te permiten definir la hora a la que comienza un nuevo
+día (de modo que, por ejemplo, una bebida a la 1:00 de la madrugada siga
+contando para el día anterior) y —para los propósitos de Año Nuevo— la fecha a
+partir de la cual debe iniciarse el análisis de los datos.
+
+### {{backup_section}}
+
+**Tus datos nunca salen de este dispositivo por sí solos.** Libellus Potionis
+guarda todo en el almacenamiento privado de la aplicación y deliberadamente no
+participa en ninguna copia de seguridad automática en la nube ni en ninguna
+transferencia de dispositivo a dispositivo. Si cambias de teléfono, restableces
+los valores de fábrica o reinstalas la aplicación, **la única forma de
+conservar tus datos es hacer una copia de seguridad tú mismo**: no hay ningún
+otro modo de recuperación, y los datos que no se exportaron no se pueden
+recuperar después.
+
+Una copia de seguridad es un único archivo JSON que contiene todas tus bebidas
+y tu registro completo. Para mover tus datos a otro teléfono:
+
+1. En el teléfono antiguo, abre «{{settings}}» → {{backup_section}} →
+   {{backup_export}} y guarda el archivo JSON en un lugar seguro: por ejemplo,
+   tu propio almacenamiento en la nube, un correo electrónico que te envíes a
+   ti mismo o una transferencia por USB.
+2. Instala Libellus Potionis en el teléfono nuevo.
+3. Abre «{{settings}}» → {{backup_section}} → {{backup_import}} y selecciona
+   ese archivo JSON. Elige {{import_replace}} para sobrescribir todo o
+   {{import_merge}} para combinarlo con las entradas ya existentes.
+
+Exporta con regularidad: una copia de seguridad solo protege los datos que
+existían en el momento en que la creaste.
+
+### {{security}}
+
+Esta categoría protege el acceso a la aplicación y controla su visibilidad.
+Activa {{biometric_lock}} para exigir una huella dactilar o el reconocimiento
+facial cada vez que se abre la aplicación. El interruptor {{allow_screenshots}}
+controla si se permiten capturas de pantalla y grabaciones de pantalla de la
+ventana de la aplicación; está desactivado de forma predeterminada, por lo que
+la ventana se oculta en las capturas de pantalla y en la vista de aplicaciones
+recientes.
+
+### {{appearance}}
+
+En esta categoría puedes establecer el tema de color y el idioma con
+independencia de los ajustes del sistema.
+{{/android}}
+
+{{#ios}}
+# Libellus Potionis -- Guía del usuario
+
+Esta página describe las características y funciones de Libellus Potionis, el
+registro personal de tu consumo de alcohol.
+
+## Resumen
+
+Libellus Potionis es de código abierto: cualquiera puede consultar y verificar
+el código fuente. La aplicación no requiere ningún permiso: ni para la cámara o
+el micrófono, ni para el GPS o el acceso a la red. Tus datos permanecen en el
+almacenamiento privado de la aplicación en tu dispositivo, protegidos por el
+cifrado del dispositivo, y el acceso a la aplicación puede restringirse
+mediante Face ID o Touch ID.
+
+La aplicación te indica en todo momento si «la petite sœur» todavía cabe en tu
+presupuesto, de modo que puedas dosificarte hasta tu límite. Para las citas en
+un centro de atención a las adicciones genera, si lo deseas, un informe PDF de
+dos páginas sobre tus hábitos de consumo. Es gratuita y sin publicidad.
+
+Libellus Potionis requiere iOS 17.0 o superior. El autor lo utiliza de forma
+continua en un iPhone 16E y, además, lo prueba en un emulador de iPhone 17
+Pro.
+
+## Pantalla "{{today}}"
+
+En esta pantalla encontrarás una lista de las bebidas alcohólicas que has
+disfrutado hoy. Si cometiste un error al registrar una bebida, aquí puedes
+editar o eliminar las entradas. Usa el botón más para añadir más bebidas. Toca una entrada para editarla, o deslízala hacia la izquierda para eliminarla. El botón con el lápiz de la barra de herramientas también muestra un control para eliminar.
+
+Sobre la lista de bebidas encontrarás un resumen del día actual con la siguiente
+información: la cantidad de alcohol ya consumida hoy (en gramos), esa misma
+cantidad en relación con tus límites diario y semanal (en gramos y como barra de
+progreso), y el número de días con consumo de alcohol en lo que va de semana en
+relación con tu límite (como número y como barra de progreso).
+
+Además, una insignia marcada con «Ø» muestra tu consumo medio del mes actual
+(media de gramos de alcohol puro al día).
+
+## Pantalla "{{calendar}}"
+
+En esta pantalla encontrarás el calendario. Los días en los que se consumió
+alcohol se marcan con un punto azul (cantidad no crítica) o un punto rojo
+(límite superado). Al seleccionar un día se muestran las bebidas
+correspondientes, que pueden corregirse o eliminarse si es necesario. También es
+posible añadir bebidas consumidas de forma retroactiva. Toca una entrada para corregirla, o deslízala hacia la izquierda para eliminarla; el botón con el lápiz de la barra de herramientas ofrece lo mismo.
+
+## Pantalla "{{statistics}}"
+
+Esta pantalla muestra análisis estadísticos de tu consumo de alcohol,
+filtrables por semana, mes o año. Hay disponible una exportación CSV para seguir
+procesando los datos en una hoja de cálculo. Además, se ofrece una exportación
+PDF que presenta los hábitos de consumo en un formato adecuado para la terapia
+de adicciones.
+
+## Pantalla "{{drinks}}"
+
+Esta pantalla contiene la lista de bebidas. La aplicación viene preconfigurada
+con un conjunto de bebidas comunes a nivel internacional. Todas ellas pueden
+modificarse o eliminarse. Puedes definir una nueva bebida con el icono más. Al
+tocar una bebida se abre un diálogo para registrarla como consumida. Para modificar o eliminar una bebida, toca el botón con el lápiz de la barra de herramientas: en ese modo, al tocar una fila se abre su diálogo de edición y la marca roja elimina la bebida. Deslizar la fila hacia la izquierda ofrece las mismas dos acciones.
+
+## Pantalla "{{settings}}"
+
+El menú de ajustes es accesible a través del botón Más (…) situado en la esquina superior derecha. Libellus Potionis ofrece las siguientes opciones de
+configuración:
+
+### {{personal_data}}
+
+En esta categoría puedes anotar tu peso corporal para estimar tu concentración
+de alcohol en sangre mediante la [fórmula de
+Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
+Ese valor se muestra después en la pantalla "{{today}}".
+
+La fórmula es **BAC [‰] = A / (P × r) − β × t**: A son los gramos de alcohol
+puro, P el peso corporal en kilogramos, r el coeficiente de distribución, β la
+tasa de eliminación de unos 0,15 ‰ por hora y t las horas transcurridas desde
+la primera consumición. Los gramos salen de volumen × graduación × 0,789, la
+densidad del etanol.
+
+La aplicación no registra el sexo, así que calcula de forma conservadora: r
+está fijado en 0,6, el menor de los dos coeficientes clásicos. Un r menor
+reparte la misma dosis en un volumen menor y devuelve por tanto el mayor de
+los dos valores, de modo que la estimación no quede por debajo de lo que
+alcanza una persona de cualquier sexo. La tasa de eliminación, en cambio, es
+un promedio: individualmente va de unos 0,10 a 0,20 ‰ por hora, así que quien
+metaboliza el alcohol despacio puede estar por encima del valor mostrado. La
+estimación es un modelo estadístico, no una medición.
+
+### {{limits}}
+
+En esta categoría introduces los límites que se aplican a tu consumo de alcohol.
+Los campos obligatorios son: el límite diario máximo en gramos de alcohol puro,
+el límite semanal máximo y el número máximo de días de consumo por semana. Todos
+los límites se aplican simultáneamente. En consecuencia, en la pantalla
+"{{today}}" se muestran tres barras de progreso. Si no estás seguro de qué
+configurar aquí, puedes inspirarte en las recomendaciones de distintos países en
+Wikipedia.
+
+### {{statistics}}
+
+Los ajustes estadísticos te permiten definir la hora a la que comienza un nuevo
+día (de modo que, por ejemplo, una bebida a la 1:00 de la madrugada siga
+contando para el día anterior) y —para los propósitos de Año Nuevo— la fecha a
+partir de la cual debe iniciarse el análisis de los datos.
+
+### {{backup_section}}
+
+**Tus datos nunca salen de este dispositivo por sí solos.** Libellus Potionis
+guarda todo en el almacenamiento privado de la aplicación y deliberadamente no
+participa en ninguna copia de seguridad automática en la nube ni en ninguna
+transferencia de dispositivo a dispositivo. Si cambias de teléfono, restableces
+los valores de fábrica o reinstalas la aplicación, **la única forma de
+conservar tus datos es hacer una copia de seguridad tú mismo**: no hay ningún
+otro modo de recuperación, y los datos que no se exportaron no se pueden
+recuperar después.
+
+Una copia de seguridad es un único archivo JSON que contiene todas tus bebidas
+y tu registro completo. Para mover tus datos a otro teléfono:
+
+1. En el teléfono antiguo, abre «{{settings}}» → {{backup_section}} →
+   {{backup_export}} y guarda el archivo JSON en un lugar seguro: por ejemplo,
+   tu propio almacenamiento en la nube, un correo electrónico que te envíes a
+   ti mismo o una transferencia por USB.
+2. Instala Libellus Potionis en el teléfono nuevo.
+3. Abre «{{settings}}» → {{backup_section}} → {{backup_import}} y selecciona
+   ese archivo JSON. Elige {{import_replace}} para sobrescribir todo o
+   {{import_merge}} para combinarlo con las entradas ya existentes.
+
+Exporta con regularidad: una copia de seguridad solo protege los datos que
+existían en el momento en que la creaste.
+
+### {{security}}
+
+Esta categoría protege el acceso a la aplicación y controla su visibilidad.
+Activa {{biometric_lock}} para exigir Face ID o Touch ID cada vez que se abre
+la aplicación. El interruptor {{allow_screenshots}} controla si el contenido
+de la aplicación aparece en el Cambiador de Apps (App Switcher); está
+desactivado de forma predeterminada, por lo que la aplicación se oculta allí
+al salir de ella. iOS no permite que una aplicación bloquee las capturas de
+pantalla ni las grabaciones de pantalla, por lo que este ajuste no afecta a
+estas.
+
+### {{appearance}}
+
+En esta categoría puedes establecer el tema de color y el idioma con
+independencia de los ajustes del sistema.
+{{/ios}}

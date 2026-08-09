@@ -50,9 +50,10 @@
 #   regardless of where make invoked the tool from. No sys.path juggling needed.
 #
 # NOT FOR EVERY TOOL
-#   render-guide.py is a deliberate NON-consumer: its `ROOT` points at android/,
-#   not the repository root (it self-anchors one level deeper on purpose), so it
-#   keeps its own constant. See the comment at its definition.
+#   A tool that anchors somewhere other than the repository root keeps its own
+#   constant. render-guide.py used to be such a case, back when Android and iOS
+#   had separate renderers and its `ROOT` pointed at android/; the merged one
+#   reads docs/guide/ at the top and is an ordinary consumer.
 # =============================================================================
 
 import re
