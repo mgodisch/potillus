@@ -318,7 +318,11 @@ class PdfReportDataTest {
                 "2026-02-01" to "2026-02-05", // narrower than the entries' span
             ).forEach { (from, to) ->
                 val d = PdfReportData.from(
-                    entries, drinks, settings, periodStart = from, periodEnd = to,
+                    entries,
+                    drinks,
+                    settings,
+                    periodStart = from,
+                    periodEnd = to,
                 )
                 assertEquals(
                     "$from … $to",
@@ -337,15 +341,21 @@ class PdfReportDataTest {
     @Test fun `a window ending today waits for the running day`() {
         withToday("2026-02-06") {
             val dry = PdfReportData.from(
-                entries, drinks, settings,
-                periodStart = "2026-02-01", periodEnd = "2026-02-06",
+                entries,
+                drinks,
+                settings,
+                periodStart = "2026-02-01",
+                periodEnd = "2026-02-06",
             )
             assertEquals("2026-02-05", dry.lastDate)
             assertEquals(5, dry.totalDays)
 
             val wet = PdfReportData.from(
-                entries + entry("2026-02-06", 1, 8.0), drinks, settings,
-                periodStart = "2026-02-01", periodEnd = "2026-02-06",
+                entries + entry("2026-02-06", 1, 8.0),
+                drinks,
+                settings,
+                periodStart = "2026-02-01",
+                periodEnd = "2026-02-06",
             )
             assertEquals("2026-02-06", wet.lastDate)
             assertEquals(6, wet.totalDays)
@@ -360,8 +370,11 @@ class PdfReportDataTest {
     @Test fun `a one-day window on a dry today keeps that day`() {
         withToday("2026-02-05") {
             val d = PdfReportData.from(
-                listOf(entry("2026-02-05", 1, 0.0)), drinks, settings,
-                periodStart = "2026-02-05", periodEnd = "2026-02-05",
+                listOf(entry("2026-02-05", 1, 0.0)),
+                drinks,
+                settings,
+                periodStart = "2026-02-05",
+                periodEnd = "2026-02-05",
             )
             assertEquals("2026-02-05", d.firstDate)
             assertEquals("2026-02-05", d.lastDate)
@@ -390,8 +403,11 @@ class PdfReportDataTest {
     @Test fun `a month without entries keeps its row`() {
         withToday("2026-06-30") {
             val d = PdfReportData.from(
-                entries, drinks, settings,
-                periodStart = "2026-01-01", periodEnd = "2026-04-30",
+                entries,
+                drinks,
+                settings,
+                periodStart = "2026-01-01",
+                periodEnd = "2026-04-30",
             )
             assertEquals(
                 listOf("2026-01", "2026-02", "2026-03", "2026-04"),

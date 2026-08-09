@@ -262,43 +262,13 @@ public struct ReportData: Sendable, Equatable {
         var byDate: [String: [ConsumptionEntry]] = [:]
         for entry in entries { byDate[entry.logicalDate, default: []].append(entry) }
 
-        // ── The reporting window ─────────────────────────────────────────────
-        //
-        // Every denominator below rests on `[firstDate, lastDate]`: totalDays and
-        // the abstinent days, the per-day series behind the medians and the
-        // rolling peak, the clipped first and last month, the chart's axis, and
-        // the period the report prints in its header. Derived from the entries,
-        // those dates answered a question nobody asked — a July export of someone
-        // who drank from the 10th to the 20th became a report over 11 days, while
-        // the Statistics screen divided the same July by 31.
-        //
-        // The window therefore applies when the caller passes BOTH bounds; with
-        // neither, or with `periodEnd` alone as the historical streak anchor used
-        // to arrive, the entry span stands and every legacy call is unchanged.
-        //
-        // A window ending today ends on an unfinished day. Dividing by it deflates
-        // the average and books it as abstinent before it can become anything, so
-        // it waits unless alcohol has already been logged — the rule
-        // `DayResolver.windowDays` applies for the Statistics screen, expressed as
-        // a date because the aggregates need a bound rather than a length.
-        let firstDate: String
-        let lastDate: String
-        if let periodStart, let periodEnd {
-            let todayGrams = byDate[periodEnd]?.reduce(0.0) { $0 + $1.gramsAlcohol } ?? 0.0
-            let todayIsDrinkDay = AlcoholCalculator.isDrinkDay(totalGrams: todayGrams)
-            var windowEnd = periodEnd
-            if periodEnd == today, !todayIsDrinkDay, let end = DayResolver.parseDate(periodEnd) {
-                windowEnd = DayResolver.formatDate(DayResolver.addingDays(-1, to: end))
-            }
-            firstDate = periodStart
-            // Dropping the unfinished day can empty a window the user did pick —
-            // "today only", exported before the first drink of the day. A report
-            // over zero days states nothing, so the raw window stands there.
-            lastDate = windowEnd < periodStart ? periodEnd : windowEnd
-        } else {
-            firstDate = entries.map(\.logicalDate).min()!
-            lastDate = entries.map(\.logicalDate).max()!
-        }
+        // The period every denominator below rests on. Its own function: see
+        // `reportingWindow` for what the two dates mean and why they are not
+        // simply the span of the entries.
+        let (firstDate, lastDate) = reportingWindow(
+            entries: entries, byDate: byDate,
+            periodStart: periodStart, periodEnd: periodEnd, today: today
+        )
         let limitInfo = AlcoholCalculator.getLimitInfo(settings)
 
         let allDays = DayResolver.inclusiveDates(from: firstDate, to: lastDate)
@@ -349,19 +319,10 @@ public struct ReportData: Sendable, Equatable {
             )
         )
 
-        // ── Per-day totals over EVERY calendar day, abstinent days as zeros ──
-        //
-        // The median and the rolling window both need the dry days. Taking them
-        // from `byDate` alone would median only the drinking, which is a different
-        // and much less flattering number.
-        var totalByDate: [String: Double] = [:]
-        for summary in daySummaries { totalByDate[summary.date] = summary.totalGrams }
-        let perDayTotals = allDays.map { totalByDate[$0] ?? 0.0 }
-        // Drink days only: a 0.0 g day in this list would pull the median of the
-        // drinking down to a figure no drinking day produced.
-        let perDrinkDayTotals = daySummaries
-            .filter { AlcoholCalculator.isDrinkDay(totalGrams: $0.totalGrams) }
-            .map(\.totalGrams)
+        // The two per-day series the medians and the rolling peak rest on; see
+        // `perDayTotals` and `perDrinkDayTotals` for why they differ.
+        let perDayTotals = perDayTotals(daySummaries: daySummaries, allDays: allDays)
+        let perDrinkDayTotals = perDrinkDayTotals(daySummaries: daySummaries)
 
         let drinkDaysPerMonth = months.map { Double($0.drinkDays) }
         let avgDrinkDaysPerMonth = drinkDaysPerMonth.isEmpty
@@ -425,6 +386,82 @@ public struct ReportData: Sendable, Equatable {
 // internal rather than private so the test suite can reach them directly.
 
 extension ReportData {
+
+    /// The inclusive period the report covers, as `(first, last)`.
+    ///
+    /// WHAT THESE TWO DATES DECIDE
+    ///   Every denominator rests on them: `totalDays` and the abstinent days, the
+    ///   per-day series behind the medians and the rolling peak, the clipped first
+    ///   and last month, the chart's axis, and the period the header prints.
+    ///
+    /// WHY NOT THE SPAN OF THE ENTRIES
+    ///   Derived from the entries, they answered a question nobody asked: a July
+    ///   export by someone who drank from the 10th to the 20th became a report
+    ///   over 11 days, while the Statistics screen divided the same July by 31.
+    ///   The export dialog knew the window; it never reached the arithmetic.
+    ///
+    ///   The window applies when the caller passes BOTH bounds. With neither, or
+    ///   with `periodEnd` alone — the shape the historical streak anchor arrived
+    ///   in — the entry span stands, so no legacy call changed its figures.
+    ///
+    /// THE LAST DAY
+    ///   A window ending today ends on an unfinished day. Dividing by it deflates
+    ///   the average and books it as abstinent before it can become anything, so
+    ///   it waits until alcohol is logged on it. That is the rule
+    ///   `DayResolver.windowDays` applies for the Statistics screen, expressed
+    ///   here as a date because the aggregates need a bound, not a length; the two
+    ///   are pinned against each other in ReportDataTests.
+    ///
+    /// - Parameters:
+    ///   - entries: The report's entries, non-empty. Read only for the fallback.
+    ///   - byDate: Those entries grouped by logical date, for the drink-day test.
+    ///   - periodStart: Inclusive window start, or `nil`.
+    ///   - periodEnd: Inclusive window end, or `nil`.
+    ///   - today: The current logical day.
+    static func reportingWindow(
+        entries: [ConsumptionEntry],
+        byDate: [String: [ConsumptionEntry]],
+        periodStart: String?,
+        periodEnd: String?,
+        today: String
+    ) -> (first: String, last: String) {
+        guard let periodStart, let periodEnd else {
+            return (entries.map(\.logicalDate).min()!, entries.map(\.logicalDate).max()!)
+        }
+
+        let todayGrams = byDate[periodEnd]?.reduce(0.0) { $0 + $1.gramsAlcohol } ?? 0.0
+        var windowEnd = periodEnd
+        if periodEnd == today,
+           !AlcoholCalculator.isDrinkDay(totalGrams: todayGrams),
+           let end = DayResolver.parseDate(periodEnd) {
+            windowEnd = DayResolver.formatDate(DayResolver.addingDays(-1, to: end))
+        }
+        // Dropping the unfinished day can empty a window the user did pick —
+        // "today only", exported before the first drink of the day. A report over
+        // zero days states nothing, so the raw window stands in that one case.
+        return (periodStart, windowEnd < periodStart ? periodEnd : windowEnd)
+    }
+
+    /// Grams per calendar day over the whole period, dry days as zeros.
+    ///
+    /// The median and the rolling seven-day peak both need the dry days. Taken
+    /// from the summaries alone, the median would describe only the drinking,
+    /// which is a different and much less flattering number.
+    static func perDayTotals(daySummaries: [DaySummary], allDays: [String]) -> [Double] {
+        var totalByDate: [String: Double] = [:]
+        for summary in daySummaries { totalByDate[summary.date] = summary.totalGrams }
+        return allDays.map { totalByDate[$0] ?? 0.0 }
+    }
+
+    /// Grams per DRINK day, dry days left out.
+    ///
+    /// A 0.0 g day in this list would pull the median of the drinking down to a
+    /// figure no drinking day produced.
+    static func perDrinkDayTotals(daySummaries: [DaySummary]) -> [Double] {
+        daySummaries
+            .filter { AlcoholCalculator.isDrinkDay(totalGrams: $0.totalGrams) }
+            .map(\.totalGrams)
+    }
 
     /// Where the abstinence streaks are measured from.
     ///

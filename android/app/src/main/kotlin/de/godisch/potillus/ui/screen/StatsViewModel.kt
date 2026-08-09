@@ -312,8 +312,12 @@ class StatsViewModel(
             val rendered = withContext(Dispatchers.Default) {
                 runCatching {
                     PdfReportBuilder.buildHtml(
-                        reportContext, entries, drinks, settings,
-                        periodStart = from, periodEnd = to,
+                        reportContext,
+                        entries,
+                        drinks,
+                        settings,
+                        periodStart = from,
+                        periodEnd = to,
                     )
                 }
             }
