@@ -62,28 +62,6 @@ final class TodayModelTests: XCTestCase {
         environment = try AppEnvironment.makeEphemeral()
     }
 
-    private func makeModel(at millis: Int64) -> TodayModel {
-        TodayModel(
-            entries: environment.entries,
-            drinks: environment.drinks,
-            preferences: environment.preferences,
-            clock: FixedClock(millis: millis),
-            timeZone: TimeZone(identifier: "UTC")!
-        )
-    }
-
-    @discardableResult
-    private func addDrink(
-        _ name: String, percent: Double = 4.9, favorite: Bool = false
-    ) throws -> DrinkDefinition {
-        let id = try environment.drinks.add(
-            DrinkDefinition(
-                name: name, volumeMl: 500, alcoholPercent: percent, isFavorite: favorite
-            )
-        )
-        return try XCTUnwrap(try environment.drinks.allOnce().first { $0.id == id })
-    }
-
     // ── The logical day ──────────────────────────────────────────────────────
 
     /// A drink at 02:00 belongs to the previous evening. The screen must show
@@ -455,6 +433,28 @@ final class TodayModelTests: XCTestCase {
 // Fixtures live in an extension: SwiftLint's `type_body_length` counts only the
 // class body, and a test class should earn its length from tests, not fixtures.
 extension TodayModelTests {
+
+    private func makeModel(at millis: Int64) -> TodayModel {
+        TodayModel(
+            entries: environment.entries,
+            drinks: environment.drinks,
+            preferences: environment.preferences,
+            clock: FixedClock(millis: millis),
+            timeZone: TimeZone(identifier: "UTC")!
+        )
+    }
+
+    @discardableResult
+    private func addDrink(
+        _ name: String, percent: Double = 4.9, favorite: Bool = false
+    ) throws -> DrinkDefinition {
+        let id = try environment.drinks.add(
+            DrinkDefinition(
+                name: name, volumeMl: 500, alcoholPercent: percent, isFavorite: favorite
+            )
+        )
+        return try XCTUnwrap(try environment.drinks.allOnce().first { $0.id == id })
+    }
 
     /// Builds a consumption entry for a drink at a moment, so a test can write one
     /// straight to the repository. `evening` (2026-01-02 20:14 UTC) resolves to the
