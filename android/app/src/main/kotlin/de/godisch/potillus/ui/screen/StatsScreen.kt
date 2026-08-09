@@ -27,7 +27,6 @@ package de.godisch.potillus.ui.screen
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -39,7 +38,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -191,36 +189,16 @@ fun StatsScreen(
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            // NO HORIZONTAL DRAG GESTURE. A swipe across the whole screen used to
+            // move the period as well; the arrows below are now the only way. A
+            // gesture with no affordance is one that has to be known before it can
+            // be found, and it sat over content — charts, figures, the export menu
+            // — where a sideways wobble during vertical scrolling could move the
+            // period without the reader asking for it. The arrows are visible,
+            // reachable, and say which way they go.
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                // THE WHOLE SCREEN moves the period, not just the chart card. The
-                // offset is the state of everything below, so confining the gesture
-                // to one card would make the reader hunt for a small target for an
-                // effect that is anything but small. Nothing else on this screen
-                // scrolls horizontally — the period chips are a fixed Row, the
-                // charts a fixed width — so there is no inner consumer to yield to,
-                // which is also why the main screens stopped being swipeable
-                // (see ui/nav/AppNav.kt).
-                //
-                // Content follows the finger: dragging LEFT pulls the later period
-                // in, dragging RIGHT the earlier one. The arrows in the card point
-                // the other way round, because an arrow points at its target.
-                .pointerInput(Unit) {
-                    var total = 0f
-                    detectHorizontalDragGestures(
-                        onDragStart = { total = 0f },
-                        onDragEnd = {
-                            // One step per gesture, whatever the distance: a long
-                            // drag is not an instruction to jump three months.
-                            if (total <= -SWIPE_THRESHOLD_PX) {
-                                vm.shiftPeriod(-1)
-                            } else if (total >= SWIPE_THRESHOLD_PX) {
-                                vm.shiftPeriod(1)
-                            }
-                        },
-                    ) { _, dragAmount -> total += dragAmount }
-                },
+                .padding(paddingValues),
         ) {
             // ── Period selector ───────────────────────────────────────────
             item {
@@ -241,47 +219,56 @@ fun StatsScreen(
                 }
             }
 
+            // ── Which period, and the arrows that move it ─────────────────
+            //
+            // OUTSIDE ANY CARD, between the period chips and the first card. It
+            // had sat inside the chart card, which said the wrong thing: the
+            // arrows govern every figure and every chart on the screen, and a
+            // control that lives in one card reads as belonging to that card. Up
+            // here it sits with the chips, which are the other control over the
+            // whole screen, and iOS has the same two rows above its sections.
+            item {
+                // WHICH period is on screen. Without this the offset would be
+                // invisible: three steps back, figures for some month, and no
+                // way to tell which. The dates are the window's own, so they
+                // already carry the statistics floor and — in the current
+                // period — end today rather than at the month's end.
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // Each arrow points the way it travels: back towards the past
+                    // on the left, forward towards today on the right.
+                    IconButton(
+                        onClick = { vm.shiftPeriod(1) },
+                        enabled = state.canGoEarlier,
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_prev_period),
+                        )
+                    }
+                    Text(
+                        periodRangeLabel(state.periodFrom, state.periodTo, locale),
+                        style = MaterialTheme.typography.titleSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(
+                        onClick = { vm.shiftPeriod(-1) },
+                        enabled = state.canGoLater,
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = stringResource(R.string.cd_next_period),
+                        )
+                    }
+                }
+            }
+
             // ── Bar chart ─────────────────────────────────────────────────
             item {
                 SectionCard {
-                    // WHICH period is on screen. Without this the offset would be
-                    // invisible: three swipes back, figures for some month, and no
-                    // way to tell which. The dates are the window's own, so they
-                    // already carry the statistics floor and — in the current
-                    // period — end today rather than at the month's end.
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        // The arrows point the way they travel, which is the
-                        // opposite of the swipe that does the same thing: content
-                        // follows the finger, an arrow points at its target.
-                        IconButton(
-                            onClick = { vm.shiftPeriod(1) },
-                            enabled = state.canGoEarlier,
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.cd_prev_period),
-                            )
-                        }
-                        Text(
-                            periodRangeLabel(state.periodFrom, state.periodTo, locale),
-                            style = MaterialTheme.typography.titleSmall,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(
-                            onClick = { vm.shiftPeriod(-1) },
-                            enabled = state.canGoLater,
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = stringResource(R.string.cd_next_period),
-                            )
-                        }
-                    }
-                    Spacer(Modifier.height(4.dp))
                     val labelFn: (ChartBucket) -> String = { b ->
                         val d = LocalDate.parse(b.labelDate, DayResolver.DATE_FORMATTER)
                         when (state.period) {
@@ -569,15 +556,6 @@ private fun StatRow(label: String, value: String, valueColor: Color = MaterialTh
         )
     }
 }
-
-/**
- * How far a horizontal drag has to travel before it counts as a period step.
- *
- * In pixels, deliberately generous: below this a sideways wobble during vertical
- * scrolling would change the period under the reader's hands, which is worse than
- * a swipe that has to be meant.
- */
-private const val SWIPE_THRESHOLD_PX = 80f
 
 /**
  * "1 Jul 2026 – 30 Jul 2026", in the in-app locale.

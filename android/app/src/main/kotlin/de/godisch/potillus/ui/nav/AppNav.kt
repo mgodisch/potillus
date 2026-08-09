@@ -58,7 +58,9 @@ package de.godisch.potillus.ui.nav
 //   between the destinations that does not exist, and it teaches the horizontal
 //   axis as "change screen", which then cannot mean anything else INSIDE a
 //   screen. iOS never had it either — RootView uses a plain TabView — so the two
-//   ports now share one model: tap to change screen, swipe for content.
+//   ports share one model: the screen is chosen by tapping. The statistics screen
+//   briefly kept a horizontal swipe of its own to move the period; that went the
+//   same way in 0.85.0, and the horizontal axis now means nothing anywhere.
 //
 //   Crossfade, which is the transition Material recommends here, and which says
 //   the destinations are peers rather than neighbours on a strip.

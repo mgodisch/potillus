@@ -133,27 +133,12 @@ struct StatsScreen: View {
             // screen. Pull-to-refresh stays: it costs nothing and it is the gesture
             // people reach for when they doubt what they see.
             .task { model.start() }
-            // THE WHOLE SCREEN moves the period. The offset is the state of
-            // everything on it, so confining the gesture to the chart card would
-            // make the reader aim at a small target for a large effect. Nothing
-            // here scrolls horizontally — the picker keeps its own gesture, which
-            // is right: on it you choose the KIND of period, not which one.
-            //
-            // Content follows the finger: dragging LEFT pulls the later period in,
-            // dragging RIGHT the earlier one. minimumDistance keeps a sideways
-            // wobble during vertical scrolling from changing the period, and one
-            // gesture is one step whatever the distance.
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 40)
-                    .onEnded { value in
-                        guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                        if value.translation.width < 0 {
-                            Task { await model.shiftPeriod(by: -1) }
-                        } else {
-                            Task { await model.shiftPeriod(by: 1) }
-                        }
-                    }
-            )
+            // NO DRAG GESTURE HERE. A swipe across the whole screen used to move
+            // the period as well; the arrows in `periodRange` are now the only way,
+            // on Android too. A gesture with no affordance has to be known before
+            // it can be found, and this one lay over every chart and figure on the
+            // screen, where a sideways wobble during vertical scrolling could move
+            // the period unasked. The arrows are visible and say which way they go.
             // Entering the screen returns to the current period. `onAppear` fires
             // on a tab change and not on a rotation, which does not rebuild the
             // view here — so no marker is needed, unlike on Android (see

@@ -44,15 +44,23 @@ extension StatsScreen {
 
     /// WHICH period is on screen, with an arrow either side.
     ///
-    /// Without it the offset would be invisible: three swipes back, figures for
+    /// Without it the offset would be invisible: three steps back, figures for
     /// some month, and no way to tell which. The dates are the window's own, so the
     /// label states what the figures actually cover — the floor is already applied,
     /// and the current period ends today rather than on the period's last day.
     ///
-    /// The arrows point the way they travel, which is the opposite of the swipe
-    /// that does the same thing: content follows the finger, an arrow points at its
-    /// target. Both read `canGoEarlier` / `canGoLater` from the model, so gesture
-    /// and buttons cannot disagree about the edges.
+    /// Each arrow points the way it travels: back towards the past on the left,
+    /// forward towards today on the right. They are the only way to move the
+    /// period — the screen-wide swipe that used to do the same is gone, here and
+    /// on Android. Both read `canGoEarlier` / `canGoLater` from the model, so the
+    /// buttons cannot disagree with it about the edges.
+    ///
+    /// `.borderless` ON EACH BUTTON, and it is not decoration. A `List` row gives
+    /// its content the default button style, which makes the WHOLE ROW one target;
+    /// with two buttons in the row the tap belongs to neither and nothing happens.
+    /// The arrows still drew their disabled state, so they looked alive while only
+    /// the swipe worked — which is how it shipped (0.85.0 QA round). A borderless
+    /// button is its own target and behaves as it looks.
     var periodRange: some View {
         HStack {
             Button {
@@ -60,6 +68,7 @@ extension StatsScreen {
             } label: {
                 Image(systemName: "chevron.left")
             }
+            .buttonStyle(.borderless)
             .disabled(!model.state.canGoEarlier)
             .accessibilityLabel(Loc.string("Earlier period", locale: locale))
             Spacer()
@@ -72,6 +81,7 @@ extension StatsScreen {
             } label: {
                 Image(systemName: "chevron.right")
             }
+            .buttonStyle(.borderless)
             .disabled(!model.state.canGoLater)
             .accessibilityLabel(Loc.string("Later period", locale: locale))
         }

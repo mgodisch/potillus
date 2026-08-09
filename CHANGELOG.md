@@ -55,8 +55,8 @@ Edit drinks from the list's edit mode
 
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
-- The statistics screen carries which period it shows.
-- A swipe or the arrows on the statistics screen move to another period.
+- The statistics screen carries which period it shows, above the cards.
+- Two arrows on the statistics screen move to another period.
 - The users guides describe every screen, switch and gesture on both
   platforms.
 - Every guide token maps to a label the app shows.

@@ -152,7 +152,7 @@ data class StatsUiState(
      *
      * Computed here, not in the view: the answer needs the statistics floor, the
      * logged days and the period, all of which meet in this flow. The view only
-     * asks, so the swipe and the two arrows cannot disagree about the edges.
+     * asks, so the two arrows cannot disagree with the model about the edges.
      */
     val canGoEarlier: Boolean = false,
     val canGoLater: Boolean = false,
