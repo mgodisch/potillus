@@ -55,30 +55,21 @@ extension StatsScreen {
     /// on Android. Both read `canGoEarlier` / `canGoLater` from the model, so the
     /// buttons cannot disagree with it about the edges.
     ///
-    /// WHY THE ARROWS ARE BUILT THE WAY THEY ARE
-    ///   A `List` row hands its content the default button style, which makes the
-    ///   WHOLE ROW one target; with two buttons in a row the tap belongs to
-    ///   neither and nothing happens. `.borderless` was the documented answer and
-    ///   shipped in 0.85.0; on device it did not take, and both arrows stayed
-    ///   dead however precisely they were hit. So the row no longer relies on a
-    ///   button style resolving correctly inside a list: `.plain` keeps the row
-    ///   mechanism out of it, and an explicit `contentShape` over a sized frame
-    ///   states the target instead of inheriting whatever a bare glyph implies.
-    ///   A bare `Image` is about twelve by fifteen points of hit area, well under
-    ///   the 44 the HIG asks for and under WCAG 2.5.8's 24 as well.
+    /// `PagerArrow`, not a `Button`: see that type for why two buttons in a list
+    /// row cannot be tapped, and what the calendar's headers do about it. The two
+    /// headers there page through months and years the same way, from the same
+    /// component, so all three read and behave alike.
     ///
-    /// WHY THE EDGE IS VISIBLE
-    ///   At the oldest period the left arrow is disabled, at the current one the
-    ///   right. Two grey chevrons side by side read as a broken control rather
-    ///   than as an edge, so the backing shape stays put and only its fill and
-    ///   its glyph drop back. What is there and what is reachable then say two
-    ///   different things, which is what the user needs to know.
+    /// The row itself carries no background and no separator, so the label sits
+    /// directly on the list's own surface as the period picker above it does. Left
+    /// alone it drew a full row background with a rule on top, which read as a card
+    /// cut in half.
     var periodRange: some View {
         HStack(spacing: 12) {
-            periodArrow(
-                systemImage: "chevron.left",
-                enabled: model.state.canGoEarlier,
-                label: Loc.string("Earlier period", locale: locale)
+            PagerArrow(
+                direction: .backward,
+                label: Loc.string("Earlier period", locale: locale),
+                enabled: model.state.canGoEarlier
             ) {
                 Task { await model.shiftPeriod(by: 1) }
             }
@@ -87,50 +78,17 @@ extension StatsScreen {
                 .font(.subheadline)
                 .monospacedDigit()
             Spacer()
-            periodArrow(
-                systemImage: "chevron.right",
-                enabled: model.state.canGoLater,
-                label: Loc.string("Later period", locale: locale)
+            PagerArrow(
+                direction: .forward,
+                label: Loc.string("Later period", locale: locale),
+                enabled: model.state.canGoLater
             ) {
                 Task { await model.shiftPeriod(by: -1) }
             }
         }
-        // The row carries no background and no separator of its own, so the label
-        // sits directly on the list's own surface the way the period picker above
-        // it does. Left alone it drew a full row background with a rule on top,
-        // which read as a card cut in half.
         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
-    }
-
-    /// One paging arrow: a tinted square that is its own tap target.
-    ///
-    /// The shape is what the segmented picker above uses for its own track, so the
-    /// two controls read as one band. 44 points square is the HIG's minimum and
-    /// comfortably above WCAG 2.5.8.
-    @ViewBuilder
-    private func periodArrow(
-        systemImage: String,
-        enabled: Bool,
-        label: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(enabled ? Color.primary : Color.secondary.opacity(0.5))
-                .frame(width: 44, height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.tertiarySystemFill).opacity(enabled ? 1.0 : 0.4))
-                )
-                // Stated, not inherited: without it the target is the glyph.
-                .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .disabled(!enabled)
-        .accessibilityLabel(label)
     }
 
     /// "1 Jul 2026 – 30 Jul 2026" in the in-app locale, or the single day when the

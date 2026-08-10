@@ -266,18 +266,22 @@ struct CalendarScreen: View {
 
     private var monthHeader: some View {
         HStack {
-            Button { Task { await model.previousMonth() } } label: {
-                Image(systemName: "chevron.left")
+            PagerArrow(
+                direction: .backward,
+                label: Loc.string("Previous month", locale: locale)
+            ) {
+                Task { await model.previousMonth() }
             }
-            .accessibilityLabel(Loc.string("Previous month", locale: locale))
             Spacer()
             Text(monthName)
                 .font(.headline)
             Spacer()
-            Button { Task { await model.nextMonth() } } label: {
-                Image(systemName: "chevron.right")
+            PagerArrow(
+                direction: .forward,
+                label: Loc.string("Next month", locale: locale)
+            ) {
+                Task { await model.nextMonth() }
             }
-            .accessibilityLabel(Loc.string("Next month", locale: locale))
         }
         .padding(.horizontal)
     }

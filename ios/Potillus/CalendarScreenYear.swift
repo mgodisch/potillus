@@ -54,19 +54,23 @@ extension CalendarScreen {
 
     var yearHeader: some View {
         HStack {
-            Button { Task { await model.previousYear() } } label: {
-                Image(systemName: "chevron.left")
+            PagerArrow(
+                direction: .backward,
+                label: Loc.string("Previous year", locale: locale)
+            ) {
+                Task { await model.previousYear() }
             }
-            .accessibilityLabel(Loc.string("Previous year", locale: locale))
             Spacer()
             Text(String(model.state.year))
                 .font(.headline)
                 .monospacedDigit()
             Spacer()
-            Button { Task { await model.nextYear() } } label: {
-                Image(systemName: "chevron.right")
+            PagerArrow(
+                direction: .forward,
+                label: Loc.string("Next year", locale: locale)
+            ) {
+                Task { await model.nextYear() }
             }
-            .accessibilityLabel(Loc.string("Next year", locale: locale))
         }
         .padding(.horizontal)
     }

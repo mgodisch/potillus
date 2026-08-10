@@ -57,6 +57,7 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The three time headers share one arrow control.
 - The PDF report covers the period picked in the export dialog.
 - The report's month table lists every month the period covers.
 - The roadmap, the README, CONTRIBUTING.md and the label gate point at the
@@ -69,8 +70,8 @@ Edit drinks from the list's edit mode
 - The statistics window can name a period before the current one.
 - The statistics screen carries which period it shows, above the cards, on
   the list surface.
-- Two arrows on the statistics screen move to another period, each with its
-  own tinted tap target that dims at the edge.
+- Two arrows on the statistics screen move to another period, each a tinted
+  tap target that dims at the edge.
 - The users guides describe every screen, switch, gesture and route between
   screens on both platforms.
 - Every guide token maps to a label the app shows.
@@ -150,6 +151,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- Paging a month, a year or a statistics period from its header.
 - A statistics figure moves below its label when the two do not fit.
 - The README's link to the roadmap.
 - The last day of a past statistics period counts towards its average,
