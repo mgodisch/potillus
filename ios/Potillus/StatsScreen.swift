@@ -265,6 +265,18 @@ struct StatsScreen: View {
                         trend(model.state.trendPercent)
                     }
                 }
+                // The visible label abbreviates ("Trend ggü. Vorperiode" in
+                // German, and Android carries the same short form), which a
+                // reader meets as spelled-out letters. The spoken label writes it
+                // out; the arrow stays silent, as on the Today screen, because it
+                // repeats the sign of the number beside it.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Loc.string("Trend compared to previous period", locale: locale))
+                .accessibilityValue(Loc.string(
+                    "%1$@ percent",
+                    Loc.number(model.state.trendPercent, fractionDigits: 1, locale: locale, signed: true),
+                    locale: locale
+                ))
             }
         }
     }
@@ -314,12 +326,14 @@ struct StatsScreen: View {
                     .foregroundStyle(CategoryPalette.color(for: slice.category))
                 }
                 // The built-in legend is hidden: the one below carries grams and
-                // percentages too, which Swift Charts' cannot. The arcs themselves
-                // are unlabelled, but every slice is named in that legend, and each
-                // legend item is combined into one accessibility element -- so the
-                // ring is decoration over text, not text replaced by a ring.
+                // percentages too, which Swift Charts' cannot. The ring itself is
+                // hidden from VoiceOver as well — Swift Charts announced each
+                // sector as a bare number, so a reader met the shares twice, once
+                // stripped of their category and once whole in the legend below.
+                // The legend is where this section's content lives.
                 .chartLegend(.hidden)
                 .frame(height: 160)
+                .accessibilityHidden(true)
 
                 // Two columns, as on Android. The legend is not decoration: it
                 // carries the grams and the percentage the plain list used to show,
@@ -346,7 +360,12 @@ struct StatsScreen: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        .accessibilityElement(children: .combine)
+                        // One sentence per slice, in the order the list is
+                        // already sorted in: largest share first. Combining the
+                        // children would read "12,3 g · 45 %" with the separator
+                        // and the units as characters, so the label is stated.
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(legendSpoken(slice, of: total))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -361,6 +380,21 @@ struct StatsScreen: View {
         let gramsText = Loc.number(grams, fractionDigits: 1, locale: locale)
         let percentText = Loc.number(percent, fractionDigits: 0, locale: locale)
         return "\(gramsText) g · \(percentText) %"
+    }
+
+    /// The same line as a sentence: the category, its share, its grams. The share
+    /// comes first because it is what the ring shows and what the eye compares;
+    /// the visible line leads with the grams, where the column alignment does that
+    /// work instead.
+    private func legendSpoken(_ slice: CategorySlice, of total: Double) -> String {
+        let percent = total > 0 ? slice.grams / total * 100 : 0
+        return Loc.string(
+            "%1$@: %2$@ percent, %3$@ grams of alcohol",
+            name(slice.category),
+            Loc.number(percent, fractionDigits: 0, locale: locale),
+            Loc.number(slice.grams, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
     }
 
     /// Largest first, so the biggest slice starts at twelve o'clock and the legend

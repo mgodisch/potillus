@@ -73,6 +73,13 @@ struct EditToggleButton: View {
     /// `Loc` rather than the system localization the stock control uses.
     let locale: Locale
 
+    /// What the button says it will edit, in the in-app language. The glyph is
+    /// the same everywhere, so without this every screen announced a bare
+    /// "Edit" and a reader had to infer the list from context. The DONE state
+    /// keeps the plain word: by then the answer is on screen, and the button's
+    /// job is to leave, not to name what is being left.
+    let editLabel: String
+
     var body: some View {
         Button {
             // The same animation the stock EditButton drives, so rows slide
@@ -86,7 +93,7 @@ struct EditToggleButton: View {
             // is deliberately left alone — the Drinks row's swipe carries it for
             // the single-drink editor, and one glyph should mean one thing.
             Label(
-                Loc.string(editMode.isEditing ? "Done" : "Edit", locale: locale),
+                editMode.isEditing ? Loc.string("Done", locale: locale) : editLabel,
                 systemImage: editMode.isEditing ? "checkmark" : "pencil"
             )
         }

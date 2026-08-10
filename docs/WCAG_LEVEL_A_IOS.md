@@ -96,6 +96,18 @@ and not where to stop:
   "g/day" reach a reader as the words they abbreviate. The trend arrow beside the
   average is silent.
 - The day-change time in Settings is one element carrying its title and its time.
+- The edit toggle names the list it edits, on each of the three screens that
+  carry it.
+- An entry row speaks as one element: the drink as its name, then the time as a
+  clock value and the figures with their units written out.
+- The calendar's weekday header speaks full weekday names, and a day cell names
+  its day and month rather than the stored `yyyy-MM-dd` string.
+- The statistics period speaks its window in the long date style, joined by the
+  word for "to"; the trend row speaks the comparison unabbreviated and leaves its
+  arrow silent.
+- The category ring is hidden from VoiceOver and its legend states each slice as
+  one sentence, largest share first. This is the one drawn chart in the app
+  without a spoken summary of its own; `docs/ROADMAP.md` names the exception.
 
 ## 1. Perceivable
 

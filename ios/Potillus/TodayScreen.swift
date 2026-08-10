@@ -113,7 +113,11 @@ struct TodayScreen: View {
                 // localized via EditToggleButton (0.84.0 QA round).
                 if !model.state.entries.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        EditToggleButton(editMode: $editMode, locale: locale)
+                        EditToggleButton(
+                            editMode: $editMode,
+                            locale: locale,
+                            editLabel: Loc.string("Edit today's drinks", locale: locale)
+                        )
                     }
                 }
             }
@@ -482,6 +486,40 @@ extension TodayScreen {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // The row speaks as one element: the drink is its name, everything else
+        // its value. See `entrySpokenDetail` for why the time is a `Text` of its
+        // own and not part of the formatted string.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(entry.drinkName)
+        .accessibilityValue(entrySpokenValue(entry))
+        // `Text(_:style:)` renders and speaks against `\.locale`, which is the
+        // SYSTEM locale here — every other string on this screen goes through
+        // `Loc` against the in-app one. Setting it on the row keeps the spoken
+        // clock in the language the rest of the row is in.
+        .environment(\.locale, locale)
+    }
+
+    /// The row's spoken value: the time, then the figures with their units
+    /// written out, then the note.
+    ///
+    /// The time is a `Text(_:style:)` rather than a formatted string on purpose.
+    /// VoiceOver reads "17:16" as two numbers; handed a date it speaks the
+    /// locale's own clock form. That is also why the rest arrives as a separate
+    /// catalogue string whose key OPENS with a separator: the two halves are
+    /// concatenated, so the comma has to live at the front of the second one.
+    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
+        let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        var detail = Loc.string(
+            ", %1$lld millilitres, %2$@ percent, %3$@ grams",
+            entry.volumeMl,
+            Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale),
+            Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
+        if !entry.note.isEmpty {
+            detail += Loc.string(", %1$@", entry.note, locale: locale)
+        }
+        return Text(time, style: .time) + Text(detail)
     }
 
     /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the same

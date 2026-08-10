@@ -123,7 +123,11 @@ struct DrinksScreen: View {
                 // 0.84.0 QA round.)
                 if !model.state.drinks.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        EditToggleButton(editMode: $editMode, locale: locale)
+                        EditToggleButton(
+                            editMode: $editMode,
+                            locale: locale,
+                            editLabel: Loc.string("Edit drinks", locale: locale)
+                        )
                     }
                 }
             }

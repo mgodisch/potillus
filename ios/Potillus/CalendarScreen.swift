@@ -161,7 +161,11 @@ struct CalendarScreen: View {
                 // (0.84.0 QA round).
                 if !model.state.selectedEntries.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        EditToggleButton(editMode: $editMode, locale: locale)
+                        EditToggleButton(
+                            editMode: $editMode,
+                            locale: locale,
+                            editLabel: Loc.string("Edit this day's entries", locale: locale)
+                        )
                     }
                 }
             }
@@ -301,6 +305,10 @@ struct CalendarScreen: View {
         guard let date = calendar.date(from: components) else { return "" }
 
         let formatter = DateFormatter()
+        // Without this the month name came from the SYSTEM language while every
+        // other string on the screen came from the in-app one — the split
+        // `Localization.swift` exists to prevent.
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("yMMMM")
         return formatter.string(from: date)
     }
@@ -311,18 +319,14 @@ struct CalendarScreen: View {
                 Text(weekdaySymbol(iso))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                    // The visible cell is one letter, and one letter is what
+                    // VoiceOver read out — "capital M" says nothing about which
+                    // column this is. The full standalone name is the same fact
+                    // in a form a reader can use.
+                    .accessibilityLabel(weekdayName(iso))
             }
         }
         .padding(.horizontal)
-    }
-
-    /// `DateFormatter.veryShortStandaloneWeekdaySymbols` is Sunday-indexed; the
-    /// grid speaks ISO. The same conversion as in `DayResolver`, inverted.
-    private func weekdaySymbol(_ iso: Int) -> String {
-        let symbols = DateFormatter().veryShortStandaloneWeekdaySymbols ?? []
-        guard symbols.count == 7 else { return "" }
-        let sundayIndex = iso == 7 ? 0 : iso
-        return symbols[sundayIndex]
     }
 
     // ── Grid ─────────────────────────────────────────────────────────────────
@@ -393,15 +397,34 @@ struct CalendarScreen: View {
     /// belongs to the dot, and the dot is only drawn for a drink day. A day of
     /// alcohol-free entries therefore reads as "0.0 grams", which is what the
     /// missing dot says and what the day list confirms.
+    ///
+    /// The day arrives as "8 August", not as the stored "2026-08-08": VoiceOver
+    /// read the ISO string out digit group by digit group. Day AND month, because
+    /// the ordinal day alone is spoken as an ordinal in only some of the twenty-one
+    /// languages, while a month name carries in all of them — and the month above
+    /// the grid makes it a repetition, not a surprise.
     private func accessibilityLabel(_ date: String, summary: DaySummary?) -> String {
+        let spokenDate = dayAndMonth(date)
         guard let summary else {
-            return Loc.string("%@, nothing logged", date, locale: locale)
+            return Loc.string("%@, nothing logged", spokenDate, locale: locale)
         }
         // The grams number is formatted in the in-app locale (one decimal) and
         // passed as the second positional argument, so VoiceOver reads it in the
         // same language as the rest of the label.
         let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
-        return Loc.string("%1$@, %2$@ grams", date, grams, locale: locale)
+        return Loc.string("%1$@, %2$@ grams", spokenDate, grams, locale: locale)
+    }
+
+    /// "2026-08-08" → "8 August", ordered and named by the in-app locale. Parsed
+    /// and formatted in UTC, as `weekRange` is, so the device's zone cannot shift
+    /// the day the grid drew.
+    private func dayAndMonth(_ date: String) -> String {
+        guard let day = DayResolver.parseDate(date) else { return date }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.setLocalizedDateFormatFromTemplate("dMMMM")
+        return formatter.string(from: day)
     }
 
     // ── Selected day ─────────────────────────────────────────────────────────
@@ -524,6 +547,29 @@ extension CalendarScreen {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // The same spoken shape as Today's row; see `entrySpokenValue` there for
+        // why the time is a `Text` of its own and why `\.locale` is set here.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(entry.drinkName)
+        .accessibilityValue(entrySpokenValue(entry))
+        .environment(\.locale, locale)
+    }
+
+    /// The row's spoken value: the time, the figures with their units written
+    /// out, then the note. Shares its catalogue strings with Today's row.
+    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
+        let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        var detail = Loc.string(
+            ", %1$lld millilitres, %2$@ percent, %3$@ grams",
+            entry.volumeMl,
+            Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale),
+            Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
+        if !entry.note.isEmpty {
+            detail += Loc.string(", %1$@", entry.note, locale: locale)
+        }
+        return Text(time, style: .time) + Text(detail)
     }
 
     /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the
@@ -552,5 +598,44 @@ extension CalendarScreen {
             volumeMl: entry.volumeMl,
             alcoholPercent: entry.alcoholPercent
         )
+    }
+}
+
+// ============================================================================
+// CalendarScreen – weekday symbols
+// ============================================================================
+//
+// In an extension for the length budget, as the selected-day block above is:
+// three small helpers that only the weekday header calls. `private` is file
+// scope, so they still see the view's `locale`.
+// ============================================================================
+
+extension CalendarScreen {
+
+    /// `DateFormatter.veryShortStandaloneWeekdaySymbols` is Sunday-indexed; the
+    /// grid speaks ISO. The same conversion as in `DayResolver`, inverted.
+    private func weekdaySymbol(_ iso: Int) -> String {
+        weekdaySymbols(\.veryShortStandaloneWeekdaySymbols, iso: iso)
+    }
+
+    /// The full standalone weekday name, for the header's spoken label.
+    private func weekdayName(_ iso: Int) -> String {
+        weekdaySymbols(\.standaloneWeekdaySymbols, iso: iso)
+    }
+
+    /// One weekday out of a `DateFormatter` symbol list, by ISO number.
+    ///
+    /// The formatter carries the in-app locale. It used to be built bare, so the
+    /// header's letters came from the SYSTEM language while the month name above
+    /// them and the day list below came from the in-app one.
+    private func weekdaySymbols(
+        _ list: KeyPath<DateFormatter, [String]?>, iso: Int
+    ) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        let symbols = formatter[keyPath: list] ?? []
+        guard symbols.count == 7 else { return "" }
+        let sundayIndex = iso == 7 ? 0 : iso
+        return symbols[sundayIndex]
     }
 }

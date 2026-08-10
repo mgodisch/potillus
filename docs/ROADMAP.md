@@ -62,7 +62,9 @@ here.
 
 What the app supports today is a capability list, not a conformance claim:
 screen-reader names on all interactive controls, a one-line summary on each drawn
-chart, a per-app language selector with RTL support, `sp`-based text that honours
+chart — apart from the iOS category ring, which is silent because the legend
+beneath it states every slice in full — a per-app language selector with RTL
+support, `sp`-based text that honours
 the system font scale, and an under/over-limit palette that is blue versus red
 rather than a red/green pair. A regression guard exists in `tools/release-check.sh`
 §13, which fails the build if any `Icon` inside an `IconButton` is left with

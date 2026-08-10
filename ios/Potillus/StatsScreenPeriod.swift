@@ -77,6 +77,11 @@ extension StatsScreen {
             Text(periodRangeLabel)
                 .font(.subheadline)
                 .monospacedDigit()
+                // The visible label is the medium style, which German writes as
+                // "01.08.2026" and VoiceOver reads as three numbers with dots
+                // between them. The spoken one is the long style, where the month
+                // is a word and the day an ordinal in the languages that have one.
+                .accessibilityLabel(periodRangeSpoken)
             Spacer()
             PagerArrow(
                 direction: .forward,
@@ -111,5 +116,25 @@ extension StatsScreen {
         let startText = formatter.string(from: start)
         if from == to { return startText }
         return "\(startText) \u{2013} \(formatter.string(from: end))"
+    }
+
+    /// The same window in the long date style, joined by the word for "to".
+    ///
+    /// The en dash the visible label uses is read out as a dash or as nothing at
+    /// all, which turns a range into two loose dates; the word states the relation.
+    private var periodRangeSpoken: String {
+        let from = model.state.from
+        let to = model.state.to
+        guard !from.isEmpty, !to.isEmpty,
+              let start = DayResolver.parseDate(from), let end = DayResolver.parseDate(to)
+        else { return "" }
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateStyle = .long
+        let startText = formatter.string(from: start)
+        if from == to { return startText }
+        return Loc.string("%1$@ to %2$@", startText, formatter.string(from: end), locale: locale)
     }
 }

@@ -157,6 +157,11 @@ Edit drinks from the list's edit mode
 - The body-weight note in Settings names what the weight is used for.
 - The day-change time speaks as one row, with its note beneath it.
 - The iOS Level A protocol carries the spoken form of those rows.
+- Entry rows, calendar days and the statistics period speak their dates and
+  units as words.
+- The edit toggle names the list it edits.
+- The category ring is silent and its legend states each slice in one sentence.
+- The calendar header and month name follow the in-app language.
 
 ### Fixed
 
