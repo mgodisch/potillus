@@ -81,6 +81,12 @@ struct SettingsScreen: View {
     /// only after the device owner authenticates, and this snaps back if they don't.
     @State private var appLockArmed = false
 
+    /// Whether the statistics-floor sheet is open, and the date it holds until
+    /// Done. Held here rather than in the settings so an opened-and-cancelled
+    /// sheet writes nothing; see `statsFloorSheet`.
+    @State var isPickingStatsFloor = false
+    @State var statsFloorDraft = Date()
+
     init(environment: AppEnvironment) {
         self.environment = environment
         _model = State(initialValue: SettingsModel(preferences: environment.preferences))
@@ -210,19 +216,6 @@ struct SettingsScreen: View {
         }
     }
 
-    // ── The logical day ──────────────────────────────────────────────────────
-    // The day-change time now lives inside the Statistics section (below),
-    // matching Android, where it is the first row of that section.
-
-    /// The stored hour and minute, as a `Date` the picker can edit. Only the time
-    /// components are read back, so the date part is irrelevant.
-    private var dayChangeDate: Date {
-        var components = DateComponents()
-        components.hour = model.settings.dayChangeHour
-        components.minute = model.settings.dayChangeMinute
-        return Calendar.current.date(from: components) ?? Date()
-    }
-
     // ── Body weight ──────────────────────────────────────────────────────────
 
     private var personalDataSection: some View {
@@ -258,62 +251,6 @@ struct SettingsScreen: View {
                     : "Without a body weight, no blood-alcohol estimate is shown.",
                 locale: locale
             ))
-        }
-    }
-
-    // ── Statistics floor ─────────────────────────────────────────────────────
-
-    private var statisticsSection: some View {
-        Section {
-            // The day-change time — Android's first Statistics row. An inline
-            // hour/minute picker, iOS-idiomatic (Android opens a dialog).
-            DatePicker(
-                Loc.string("New Day Starts At", locale: locale),
-                selection: Binding(
-                    get: { dayChangeDate },
-                    set: { newValue in
-                        let parts = Calendar.current.dateComponents([.hour, .minute], from: newValue)
-                        Task {
-                            await model.update {
-                                $0.dayChangeHour = parts.hour ?? 4
-                                $0.dayChangeMinute = parts.minute ?? 0
-                            }
-                        }
-                    }
-                ),
-                displayedComponents: .hourAndMinute
-            )
-
-            // The statistics-start date is ALWAYS editable, matching Android's
-            // always-present date row. iOS previously showed it as read-only text
-            // with an "include all history" button, and once history was included
-            // there was no way to pick a date again (0.83.0 bug). The picker is
-            // always shown; when no floor is set it seeds from today, and picking
-            // a date sets the floor. A clear button removes the floor without
-            // hiding the control.
-            DatePicker(
-                Loc.string("Statistics From", locale: locale),
-                selection: Binding(
-                    get: { Self.day(from: model.settings.statsFromDate) ?? Date() },
-                    set: { newValue in
-                        Task { await model.update { $0.statsFromDate = Self.isoDay(from: newValue) } }
-                    }
-                ),
-                displayedComponents: .date
-            )
-            if model.hasStatsFloor {
-                Button(Loc.string("Include all history", locale: locale), role: .destructive) {
-                    Task { await model.clearStatsFromDate() }
-                }
-            }
-        } header: {
-            Text(Loc.string("Statistics", locale: locale))
-        } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                // The day-change footnote (kept from the old day-change section).
-                Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
-                Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
-            }
         }
     }
 

@@ -57,6 +57,7 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The statistics start date reads as all history until one is picked.
 - The three time headers share one arrow control.
 - The PDF report covers the period picked in the export dialog.
 - The report's month table lists every month the period covers.
