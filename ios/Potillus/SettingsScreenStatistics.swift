@@ -97,16 +97,57 @@ extension SettingsScreen {
             //   reachable either way. That preserves what the inline picker was
             //   introduced for in 0.83.0 — a way back to picking a date after
             //   clearing — without the control having to invent a value.
-            Button {
-                statsFloorDraft = Self.day(from: model.settings.statsFromDate) ?? Date()
-                isPickingStatsFloor = true
-            } label: {
-                LabeledContent(Loc.string("Statistics From", locale: locale)) {
-                    Text(statsFloorValue)
-                        .foregroundStyle(.secondary)
-                }
+            //
+            // NO `Button` AND NO SHEET, and both for reasons this screen has
+            // already paid for once.
+            //
+            //   A `Button` in a list row is what left the statistics arrows dead
+            //   through two releases; a shaped `onTapGesture` is what this app
+            //   has that works (see `PagerArrow`).
+            //
+            //   The picker opens INLINE rather than in a sheet. The Form already
+            //   carries six presentations — one alert on `model.failure`, a file
+            //   exporter, a file importer, a confirmation dialog and two more
+            //   alerts — four of them bound to `.constant(...)`, which SwiftUI
+            //   re-evaluates on every render. A seventh presentation competing
+            //   with those opened and closed again in the same breath. An
+            //   expanding row presents nothing and cannot be pre-empted.
+            LabeledContent(Loc.string("Statistics From", locale: locale)) {
+                Text(statsFloorValue)
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                statsFloorDraft = Self.day(from: model.settings.statsFromDate) ?? Date()
+                isPickingStatsFloor.toggle()
+            }
+            .accessibilityAddTraits(.isButton)
+            if isPickingStatsFloor {
+                DatePicker(
+                    Loc.string("Statistics From", locale: locale),
+                    selection: $statsFloorDraft,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                // Committed on Done, dropped on Cancel: opening the row out of
+                // curiosity writes nothing. The inline picker this replaces wrote
+                // on every turn of the wheel, so a stray scroll set a floor the
+                // user never chose.
+                HStack {
+                    Button(Loc.string("Cancel", locale: locale), role: .cancel) {
+                        isPickingStatsFloor = false
+                    }
+                    Spacer()
+                    Button(Loc.string("Done", locale: locale)) {
+                        let picked = Self.isoDay(from: statsFloorDraft)
+                        isPickingStatsFloor = false
+                        Task { await model.update { $0.statsFromDate = picked } }
+                    }
+                    .fontWeight(.semibold)
+                }
+                .buttonStyle(.borderless)
+            }
             if model.hasStatsFloor {
                 Button(Loc.string("Include all history", locale: locale), role: .destructive) {
                     Task { await model.clearStatsFromDate() }
@@ -125,7 +166,12 @@ extension SettingsScreen {
                 }
             }
         }
-        .sheet(isPresented: $isPickingStatsFloor) { statsFloorSheet }
+        // NO `.sheet` HERE. It sat on this Section, and a sheet presented from a
+        // row inside a Form goes away with the view that presents it: the Form
+        // rebuilds the section on the next state change — which the sheet's own
+        // appearance triggers — and the presentation is dropped mid-animation.
+        // It opened and shut again in the same breath. It is attached to the
+        // Form in `SettingsScreen.body`, which outlives every row.
     }
 
     /// What the row states: the date, or that there is no floor.
@@ -150,35 +196,4 @@ extension SettingsScreen {
         return formatter.string(from: day)
     }
 
-    /// Picking a floor.
-    ///
-    /// The draft is committed on Done and dropped on Cancel, so opening the sheet
-    /// out of curiosity sets nothing. The inline picker it replaces had no such
-    /// step: it wrote on every change of the wheel.
-    private var statsFloorSheet: some View {
-        NavigationStack {
-            Form {
-                DatePicker(
-                    Loc.string("Statistics From", locale: locale),
-                    selection: $statsFloorDraft,
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-            }
-            .navigationTitle(Loc.string("Statistics From", locale: locale))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(Loc.string("Cancel", locale: locale)) { isPickingStatsFloor = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(Loc.string("Done", locale: locale)) {
-                        let picked = Self.isoDay(from: statsFloorDraft)
-                        isPickingStatsFloor = false
-                        Task { await model.update { $0.statsFromDate = picked } }
-                    }
-                }
-            }
-        }
-    }
 }

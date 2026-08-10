@@ -57,6 +57,9 @@ Edit drinks from the list's edit mode
 
 ### Changed
 
+- The consumption chart names weekdays, days or months, as Android does.
+- The time-of-day axis carries each bucket's starting hour.
+- The longest abstinence reads green while it stands.
 - The statistics start date reads as all history until one is picked.
 - The three time headers share one arrow control.
 - The PDF report covers the period picked in the export dialog.

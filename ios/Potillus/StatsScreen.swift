@@ -250,7 +250,7 @@ struct StatsScreen: View {
                 daysColored(model.state.currentStreak)
             }
             metricRow(Loc.string("Longest Abstinence", locale: locale)) {
-                days(model.state.longestStreak)
+                daysColored(model.state.longestStreak)
             }
             // The trend belongs in this card on Android, not up in the metrics.
             // Hidden, not zeroed: without a previous period there is nothing to
@@ -483,21 +483,22 @@ extension StatsScreen {
             .foregroundStyle(value > 0 ? Color.red : Color.green)
     }
 
-    fileprivate func days(_ value: Int) -> some View {
-        // The plural noun is part of the value now, so it agrees with the count in
-        // every language: "1 day" / "7 days", "1 Tag" / "7 Tage", the four Polish
-        // forms, the single Japanese one. The catalogue inflects; the view only asks.
-        Text(Loc.daysPlural(count: value, locale: locale))
-            .monospacedDigit()
-    }
-
     /// Like `days`, but green when positive — the achievement colour Android
-    /// gives the current streak and the dry-day count. Grey at zero (nothing to
-    /// celebrate yet), never red: a low streak is not a failure state.
+    /// gives the streaks and the dry-day count. Never red: a low streak is not a
+    /// failure state.
+    ///
+    /// PLAIN at zero, not grey. Android colours its current streak
+    /// `onSurface` at zero (`StatsScreen.kt`), and grey read as "not applicable"
+    /// where the figure is simply nought. Both streak rows use this now; the
+    /// longest one was left in the default colour and never turned green at all.
+    ///
+    /// The plural noun is part of the value, so it agrees with the count in every
+    /// language: "1 day" / "7 days", "1 Tag" / "7 Tage", the four Polish forms,
+    /// the single Japanese one. The catalogue inflects; the view only asks.
     fileprivate func daysColored(_ value: Int) -> some View {
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
-            .foregroundStyle(value > 0 ? Color.green : Color.secondary)
+            .foregroundStyle(value > 0 ? Color.green : Color.primary)
     }
 }
 
@@ -642,6 +643,52 @@ extension StatsScreen {
         return over ? Color.red : Color.accentColor
     }
 
+    // ── The consumption chart's x-axis ───────────────────────────────────────
+    //
+    // Android's rule, adopted here so the two charts read alike
+    // (`ChartComponents.kt`): up to twelve bars carry a label each, beyond that a
+    // handful of evenly spaced ones give the axis context. Which bars exist
+    // depends on the period — seven days, twenty-eight to thirty-one days, or
+    // twelve months — so the wording follows the period rather than the count.
+
+    /// The bucket dates that get a label. All of them while they fit; otherwise
+    /// six evenly spaced, first and last included.
+    fileprivate var chartAxisDates: [String] {
+        let dates = model.state.chartBuckets.map(\.labelDate)
+        guard dates.count > 12 else { return dates }
+
+        let target = 6
+        let step = max(Double(dates.count - 1) / Double(target - 1), 1)
+        let picked = (0..<target).map { min(Int(Double($0) * step), dates.count - 1) }
+        // `Set` would lose the order, and the axis wants them ascending.
+        var seen = Set<Int>()
+        return picked.filter { seen.insert($0).inserted }.map { dates[$0] }
+    }
+
+    /// What one bar says about itself: the weekday over a week, the day of the
+    /// month over a month, the month's name over a year — Android's `labelFn`,
+    /// in the in-app locale.
+    fileprivate func chartAxisLabel(for labelDate: String) -> String {
+        switch model.state.period {
+        case .month:
+            // The stored form is `yyyy-MM-dd`, so the last two characters are the
+            // day. Taken from the string rather than from a parsed date: it is
+            // already in the shape the label wants.
+            return String(labelDate.suffix(2))
+        case .week, .year:
+            guard let date = DayResolver.parseDate(labelDate) else { return "" }
+            let formatter = DateFormatter()
+            formatter.locale = locale
+            formatter.timeZone = TimeZone(identifier: "UTC")
+            // A template, not a fixed pattern: the locale decides what a short
+            // weekday or month name looks like.
+            formatter.setLocalizedDateFormatFromTemplate(
+                model.state.period == .week ? "EEE" : "MMM"
+            )
+            return formatter.string(from: date)
+        }
+    }
+
     fileprivate var consumptionChart: some View {
         Section(Loc.string("Consumption", locale: locale)) {
             // `Chart { ForEach ... }` rather than `Chart(data, id:)`: the limit
@@ -701,8 +748,19 @@ extension StatsScreen {
                 }
             }
             .chartXAxis {
-                // Labels only every few buckets: 31 dates do not fit.
-                AxisMarks(values: .automatic(desiredCount: 5))
+                // The dates are STRINGS, so this is a nominal axis, and a nominal
+                // axis labels every category it is given — `desiredCount` is for
+                // a continuous scale and was quietly ignored here, which is how
+                // thirty-one dates ended up on top of one another. The values are
+                // therefore chosen explicitly.
+                AxisMarks(values: chartAxisDates) { value in
+                    AxisTick()
+                    AxisValueLabel {
+                        if let date = value.as(String.self) {
+                            Text(chartAxisLabel(for: date))
+                        }
+                    }
+                }
             }
             .chartYAxisLabel(Loc.string("g / day", locale: locale))
             .frame(height: 180)

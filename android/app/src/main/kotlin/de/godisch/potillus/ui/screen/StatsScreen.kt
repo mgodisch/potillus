@@ -351,7 +351,14 @@ fun StatsScreen(
                         valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
                     )
                     HorizontalDivider()
-                    StatRow(stringResource(R.string.longest_streak), pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak))
+                    StatRow(
+                        stringResource(R.string.longest_streak),
+                        pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak),
+                        // Coloured like the current streak above: green for an
+                        // achievement, plain at nought, never red. It carried the
+                        // default colour and so never turned green at all.
+                        valueColor = if (state.longestStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
+                    )
                     HorizontalDivider()
                     val trendText = when (state.trend) {
                         Trend.UP -> "+${state.trendPercent.fmt0(locale)} % ↑"
@@ -387,7 +394,12 @@ fun StatsScreen(
                         ValueBarChart(
                             // Eight 3-hour buckets; average grams/day printed above.
                             values = state.hourBucketAverages,
-                            labelFor = { b -> "${b * 3}\u2013${b * 3 + 3}" },
+                            // The START HOUR, two digits, as iOS labels it: "00",
+                            // "03" … "21". The range form "0–3" needed twice the
+                            // width for the same information, and eight of them
+                            // crowded the axis on a narrow screen. The bucket's
+                            // span stays in the screen-reader text below.
+                            labelFor = { b -> "%02d".format(b * 3) },
                             showValues = true,
                             chartLabel = stringResource(R.string.stats_time_of_day),
                         )

@@ -84,9 +84,9 @@ struct SettingsScreen: View {
     /// only after the device owner authenticates, and this snaps back if they don't.
     @State private var appLockArmed = false
 
-    /// Whether the statistics-floor sheet is open, and the date it holds until
+    /// Whether the statistics-floor row is expanded, and the date it holds until
     /// Done. Held here rather than in the settings so an opened-and-cancelled
-    /// sheet writes nothing; see `statsFloorSheet`.
+    /// picker writes nothing; see the Statistics section.
     @State var isPickingStatsFloor = false
     @State var statsFloorDraft = Date()
 
