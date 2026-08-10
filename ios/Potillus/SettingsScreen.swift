@@ -47,9 +47,12 @@ import UniformTypeIdentifiers
 
 struct SettingsScreen: View {
 
-    @Environment(\.appLocale) private var locale
+    // Internal, not private: the Statistics section lives in
+    // SettingsScreenStatistics.swift, and `private` does not reach across a
+    // file boundary. StatsScreen states the same for the same reason.
+    @Environment(\.appLocale) var locale
 
-    @State private var model: SettingsModel
+    @State var model: SettingsModel
     @Environment(\.dismiss) private var dismiss
 
     private let environment: AppEnvironment
@@ -351,7 +354,7 @@ struct SettingsScreen: View {
 // =============================================================================
 
 extension SettingsScreen {
-    nonisolated fileprivate static func isoDay(from date: Date) -> String {
+    nonisolated static func isoDay(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
@@ -359,7 +362,7 @@ extension SettingsScreen {
     }
 
     /// Parses an ISO `yyyy-MM-dd` back to a `Date`, or `nil` when empty/invalid.
-    nonisolated fileprivate static func day(from iso: String) -> Date? {
+    nonisolated static func day(from iso: String) -> Date? {
         guard !iso.isEmpty else { return nil }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

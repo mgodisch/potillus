@@ -54,7 +54,10 @@ extension SettingsScreen {
 
     // ── Statistics floor ─────────────────────────────────────────────────────
 
-    private var statisticsSection: some View {
+    // `body` in SettingsScreen.swift inserts this one, so it is internal;
+    // `private` would not reach across the file boundary. The three helpers
+    // below are used only here and stay private, as StatsScreenExport does.
+    var statisticsSection: some View {
         Section {
             // The day-change time — Android's first Statistics row. An inline
             // hour/minute picker, iOS-idiomatic (Android opens a dialog).
@@ -99,12 +102,8 @@ extension SettingsScreen {
                 isPickingStatsFloor = true
             } label: {
                 LabeledContent(Loc.string("Statistics From", locale: locale)) {
-                    Text(
-                        model.hasStatsFloor
-                            ? statsFloorText
-                            : Loc.string("All history", locale: locale)
-                    )
-                    .foregroundStyle(.secondary)
+                    Text(statsFloorValue)
+                        .foregroundStyle(.secondary)
                 }
             }
             .buttonStyle(.plain)
@@ -127,6 +126,18 @@ extension SettingsScreen {
             }
         }
         .sheet(isPresented: $isPickingStatsFloor) { statsFloorSheet }
+    }
+
+    /// What the row states: the date, or that there is no floor.
+    ///
+    /// A `String` computed outside the view builder rather than a conditional
+    /// inside `Text`. A ternary in a `ViewBuilder` is a known way to send Swift's
+    /// type checker off for a long walk — "unable to type-check this expression in
+    /// reasonable time" — and this one sits inside a `Button` label inside a
+    /// `LabeledContent` inside a `Form`, which is exactly the depth where that
+    /// bites.
+    private var statsFloorValue: String {
+        model.hasStatsFloor ? statsFloorText : Loc.string("All history", locale: locale)
     }
 
     /// The floor as the in-app locale writes it, medium style — the same style the
