@@ -152,7 +152,8 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
-- Paging a month, a year or a statistics period from its header.
+- Paging a month, a year or a statistics period from its header, and the
+  statistics arrows knowing which periods exist.
 - A statistics figure moves below its label when the two do not fit.
 - The README's link to the roadmap.
 - The last day of a past statistics period counts towards its average,

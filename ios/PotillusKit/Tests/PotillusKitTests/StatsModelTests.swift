@@ -373,3 +373,84 @@ final class StatsModelTests: XCTestCase {
         XCTAssertNil(model.failure)
     }
 }
+
+// =============================================================================
+// Paging
+// =============================================================================
+//
+// An extension because SwiftLint caps a type body at 250 lines and does not
+// count extensions.
+//
+// These cover the seam between the arithmetic and the published state, which
+// is where the paging arrows were lost: `offsetOf` had shared vectors and was
+// right, the window was right, the figures were right, and the two flags the
+// arrows read were computed and then dropped by the single `state = next` that
+// publishes everything else. The bug was invisible to every test there was,
+// because each one asked about a figure.
+
+extension StatsModelTests {
+
+    /// A floor two months back leaves the month view somewhere to go.
+    func testAFloorInThePastLeavesTheEarlierArrowLive() async throws {
+        try await environment.preferences.update { $0.statsFromDate = "2025-11-01" }
+        let model = makeModel()
+        await model.setPeriod(.month)
+
+        XCTAssertTrue(model.state.canGoEarlier, "November is two months before January")
+        XCTAssertFalse(model.state.canGoLater, "the current period is the latest one")
+    }
+
+    /// A floor inside the current period leaves nowhere to go, in either direction.
+    func testAFloorInsideTheCurrentPeriodPinsBothArrows() async throws {
+        try await environment.preferences.update { $0.statsFromDate = "2026-01-05" }
+        let model = makeModel()
+        await model.setPeriod(.month)
+
+        XCTAssertFalse(model.state.canGoEarlier)
+        XCTAssertFalse(model.state.canGoLater)
+    }
+
+    /// Stepping back survives the load it triggers, and turns the other arrow on.
+    func testSteppingBackSurvivesTheReload() async throws {
+        try await environment.preferences.update { $0.statsFromDate = "2025-11-01" }
+        let model = makeModel()
+        await model.setPeriod(.month)
+
+        await model.shiftPeriod(by: 1)
+        XCTAssertEqual(model.state.periodOffset, 1, "the step is published, not discarded")
+        XCTAssertEqual(model.state.from, "2025-12-01")
+        XCTAssertTrue(model.state.canGoLater, "there is a period between this one and today")
+        XCTAssertTrue(model.state.canGoEarlier, "November is still further back")
+
+        await model.shiftPeriod(by: 1)
+        XCTAssertEqual(model.state.periodOffset, 2)
+        XCTAssertFalse(model.state.canGoEarlier, "November is the floor's own month")
+    }
+
+    /// Overshooting lands on the boundary rather than out of range, and the
+    /// clamped value is the one that gets published.
+    func testOvershootingIsClampedToTheOldestPeriod() async throws {
+        try await environment.preferences.update { $0.statsFromDate = "2025-11-01" }
+        let model = makeModel()
+        await model.setPeriod(.month)
+
+        await model.shiftPeriod(by: 99)
+        XCTAssertEqual(model.state.periodOffset, 2)
+        XCTAssertEqual(model.state.from, "2025-11-01")
+        XCTAssertFalse(model.state.canGoEarlier)
+        XCTAssertTrue(model.state.canGoLater)
+    }
+
+    /// Returning to the present clears the offset and flips the pair back.
+    func testResetReturnsToTheCurrentPeriod() async throws {
+        try await environment.preferences.update { $0.statsFromDate = "2025-11-01" }
+        let model = makeModel()
+        await model.setPeriod(.month)
+        await model.shiftPeriod(by: 2)
+
+        await model.resetToCurrentPeriod()
+        XCTAssertEqual(model.state.periodOffset, 0)
+        XCTAssertTrue(model.state.canGoEarlier)
+        XCTAssertFalse(model.state.canGoLater)
+    }
+}

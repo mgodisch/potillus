@@ -315,10 +315,19 @@ public final class StatsModel {
         let maxOffset = StatsWindows.offsetOf(period: state.period, today: today, day: earliestDay)
         // Clamped rather than trusted: the ceiling moves when the floor, the period
         // or the set of logged days changes, and the stored offset may predate it.
+        //
+        // HELD LOCALLY, NOT WRITTEN TO `state` HERE. Everything this function
+        // computes is published in ONE assignment at the end, `state = next`.
+        // These three were written straight onto `state` up here instead, and
+        // that assignment then replaced them with a fresh `StatsState`'s
+        // defaults: 0, false, false. The screen therefore drew two dead arrows
+        // whatever the floor was, and any offset a tap did manage to set was
+        // discarded by the next load. Nothing else was affected, because every
+        // other field is copied into `next` below — which is why the figures and
+        // the date range were right while the navigation was not.
         let offset = min(max(0, state.periodOffset), maxOffset)
-        state.periodOffset = offset
-        state.canGoEarlier = offset < maxOffset
-        state.canGoLater = offset > 0
+        let canGoEarlier = offset < maxOffset
+        let canGoLater = offset > 0
 
         guard let raw = StatsWindows.window(period: state.period, today: today, offset: offset)
         else { return }
@@ -380,6 +389,10 @@ public final class StatsModel {
 
         var next = StatsState()
         next.period = state.period
+        // The navigation triple, carried over deliberately: see the note above.
+        next.periodOffset = offset
+        next.canGoEarlier = canGoEarlier
+        next.canGoLater = canGoLater
         next.from = window.from
         next.to = window.to
         next.today = today
