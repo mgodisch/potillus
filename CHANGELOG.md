@@ -152,6 +152,11 @@ Edit drinks from the list's edit mode
   abstinence streak, and no dot or colour in the calendars.
 - `AlcoholCalculator.isDrinkDay` and the drink-date queries carry that
   definition on both platforms.
+- The limit bars and the Today summary rows speak as one sentence, with their
+  units written out.
+- The body-weight note in Settings names what the weight is used for.
+- The day-change time speaks as one row, with its note beneath it.
+- The iOS Level A protocol carries the spoken form of those rows.
 
 ### Fixed
 

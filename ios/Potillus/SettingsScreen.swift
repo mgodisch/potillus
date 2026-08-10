@@ -250,7 +250,7 @@ struct SettingsScreen: View {
             // read English in every non-English language (0.84.0 QA round).
             Text(Loc.string(
                 model.hasWeight
-                    ? "Used only to estimate blood alcohol. It never leaves this device."
+                    ? "Used only to estimate blood alcohol."
                     : "Without a body weight, no blood-alcohol estimate is shown.",
                 locale: locale
             ))

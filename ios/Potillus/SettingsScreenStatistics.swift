@@ -77,6 +77,22 @@ extension SettingsScreen {
                 ),
                 displayedComponents: .hourAndMinute
             )
+            // A `DatePicker` is two accessibility elements — its title and the
+            // wheel — so VoiceOver read the label, stopped, and then announced a
+            // bare hour as a collapsed control belonging to nothing. Combined,
+            // the row states its name and its time in one breath and keeps the
+            // picker's own action.
+            .accessibilityElement(children: .combine)
+
+            // The footnote sits HERE, as a row of its own, and no longer in the
+            // Section's footer. A footer belongs to the whole Section, so a
+            // reader met this sentence after the statistics start date — three
+            // rows below the setting it explains, and attached to the wrong one.
+            // Android states the same rule inside the card that carries the
+            // control. Secondary and small, so the eye still reads it as a note.
+            Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
+                .font(.footnote)
+                .foregroundStyle(.secondary)
 
             // THE FLOOR HAS THREE STATES AND A `DatePicker` CAN SHOW TWO.
             //   "No floor" is a value the user chooses: "Include all history"
@@ -156,14 +172,12 @@ extension SettingsScreen {
         } header: {
             Text(Loc.string("Statistics", locale: locale))
         } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                // The day-change footnote (kept from the old day-change section).
-                Text(Loc.string("A drink logged before this time counts towards the previous day.", locale: locale))
-                // Only while a floor is set: without one there is no such date,
-                // and the sentence would state a rule that is not in force.
-                if model.hasStatsFloor {
-                    Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
-                }
+            // Only while a floor is set: without one there is no such date, and
+            // the sentence would state a rule that is not in force. The footer
+            // now carries this one sentence alone, which is the one that speaks
+            // for the Section as a whole rather than for a single row.
+            if model.hasStatsFloor {
+                Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
             }
         }
         // NO `.sheet` HERE. It sat on this Section, and a sheet presented from a

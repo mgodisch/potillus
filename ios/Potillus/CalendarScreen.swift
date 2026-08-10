@@ -459,6 +459,16 @@ extension CalendarScreen {
                         emphasis: LimitGauge.emphasis(
                             totalGrams: model.state.totalGramsSelected,
                             limitGrams: model.state.limitInfo.limitGrams
+                        ),
+                        // The same sentence the Today screen's bars speak; see
+                        // `LimitBar.spokenSummary` for why the row assembles one
+                        // rather than leaving VoiceOver to read its parts.
+                        spokenSummary: Loc.string(
+                            "%1$@: %2$@ of at most %3$@ grams",
+                            Loc.string("Today", locale: locale),
+                            Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale),
+                            Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 1, locale: locale),
+                            locale: locale
                         )
                     )
                 }

@@ -224,121 +224,9 @@ struct TodayScreen: View {
     }
 
     // ── Sections ─────────────────────────────────────────────────────────────
-
-    private var summarySection: some View {
-        Section {
-            // Headline pair, mirroring Android's Today card: today's own gram
-            // total on the left, the month-so-far per-day average (with its
-            // trend arrow) on the right. On iOS these used to be missing (the
-            // total entirely) or placed below the bars (the average); the
-            // 0.83.0 UI-parity pass lifts them here so someone who switches
-            // platforms reads the same two numbers in the same place. They are
-            // a `LabeledContent` each so VoiceOver announces caption + value.
-            // WHAT THE FIRST ROW SHOWS. Someone who has set out to abstain is
-            // served better by the length of the run than by a gram total that
-            // reads 0.0 every day, so while a streak is running the caption and
-            // the value switch to it, green as on the Statistics screen. Logging
-            // a drink puts the streak at 0 and the gram total back, until a full
-            // dry day has been completed again.
-            //
-            // `currentAbstinence > 0` is the whole condition:
-            // `DayResolver.computeCurrentAbstinence` returns 0 as soon as today
-            // holds alcohol, so a positive value already implies 0.0 g today.
-            // Testing the grams as well would be a second source for one
-            // decision. Android's Today card switches on the same value.
-            if model.state.currentAbstinence > 0 {
-                LabeledContent {
-                    headlineValue(Loc.daysPlural(count: model.state.currentAbstinence, locale: locale))
-                        .foregroundStyle(Color.green)
-                } label: {
-                    Text(Loc.string("Current Abstinence", locale: locale))
-                }
-            } else {
-                LabeledContent {
-                    headlineValue(grams(model.state.totalGrams))
-                } label: {
-                    Text(Loc.string("Today's Total", locale: locale))
-                }
-            }
-
-            LabeledContent {
-                HStack(spacing: 4) {
-                    headlineValue(perDay(model.state.monthlyAvgPerDay))
-                    // The arrow only when the month differs from the pre-month
-                    // baseline; `.flat` means no baseline or no real change.
-                    if model.state.monthTrend != .flat {
-                        Image(systemName: monthTrendSymbol).foregroundStyle(monthTrendColor)
-                    }
-                }
-            } label: {
-                Text(monthlyAverageCaption)
-            }
-
-            LimitBar(
-                caption: Loc.string("Today", locale: locale),
-                value: grams(model.state.totalGrams),
-                limit: grams(model.state.limitInfo.limitGrams),
-                fill: LimitGauge.fillFraction(
-                    totalGrams: model.state.totalGrams,
-                    limitGrams: model.state.limitInfo.limitGrams
-                ),
-                emphasis: LimitGauge.emphasis(
-                    totalGrams: model.state.totalGrams,
-                    limitGrams: model.state.limitInfo.limitGrams
-                )
-            )
-
-            LimitBar(
-                caption: sevenDayCaption,
-                value: grams(model.state.weeklyTotalGrams),
-                limit: grams(model.state.limitInfo.weeklyLimitGrams),
-                fill: LimitGauge.fillFraction(
-                    totalGrams: model.state.weeklyTotalGrams,
-                    limitGrams: model.state.limitInfo.weeklyLimitGrams
-                ),
-                emphasis: LimitGauge.emphasis(
-                    totalGrams: model.state.weeklyTotalGrams,
-                    limitGrams: model.state.limitInfo.weeklyLimitGrams
-                )
-            )
-
-            LimitBar(
-                caption: Loc.string("Drinking Days (last 7 days)", locale: locale),
-                value: "\(model.state.drinkDaysThisWeek)",
-                limit: "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
-                fill: LimitGauge.drinkDaysFillFraction(
-                    drinkDays: model.state.drinkDaysThisWeek,
-                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek
-                ),
-                // Today's own status decides the colour. A day already spent as
-                // a drink day costs nothing further, so a full bar can stay amber;
-                // a dry day at the cap means the next drink spends a day the user
-                // does not have, and the bar goes red.
-                emphasis: LimitGauge.drinkDaysEmphasis(
-                    drinkDays: model.state.drinkDaysThisWeek,
-                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek,
-                    todayIsDrinkDay: AlcoholCalculator.isDrinkDay(totalGrams: model.state.totalGrams)
-                )
-            )
-
-            // Absent rather than zero: without a body weight, or with nothing
-            // alcoholic logged, the app does not know — and must not imply 0.0.
-            if let bac = model.state.bacPermille {
-                LabeledContent(Loc.string("BAC Estimate", locale: locale)) {
-                    Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
-                }
-            }
-        }
-    }
-
-    /// A headline figure in the summary pair: the same monospaced-digit,
-    /// title-weight styling for the total and the average so the two read as a
-    /// matched pair, echoing Android's `headlineLarge` figures.
-    private func headlineValue(_ text: String) -> some View {
-        Text(text)
-            .font(.title3)
-            .monospacedDigit()
-    }
+    //
+    // The summary section sits in the extension below, with the formatting it
+    // needs; see the note there.
 
     /// One tap logs the favourite at its own serving size — the shortcut the
     /// whole screen exists for. The sheet is for anything else.
@@ -388,10 +276,180 @@ struct TodayScreen: View {
     }
 }
 
-// Formatting that depends on the in-app locale lives here, off the view body, so
-// the body stays within its length budget. `private` is file scope in Swift, so
-// a same-file extension still sees the view's `locale` and `model`.
+// The summary section and the formatting it depends on live here, off the view
+// body, so the body stays within its length budget — the section moved out when
+// the spoken labels pushed `TodayScreen` past SwiftLint's type_body_length.
+// `private` is file scope in Swift, so a same-file extension still sees the
+// view's `locale` and `model`.
 extension TodayScreen {
+
+    private var summarySection: some View {
+        Section {
+            // Headline pair, mirroring Android's Today card: today's own gram
+            // total on the left, the month-so-far per-day average (with its
+            // trend arrow) on the right. On iOS these used to be missing (the
+            // total entirely) or placed below the bars (the average); the
+            // 0.83.0 UI-parity pass lifts them here so someone who switches
+            // platforms reads the same two numbers in the same place.
+            //
+            // WHAT THE FIRST ROW SHOWS. Someone who has set out to abstain is
+            // served better by the length of the run than by a gram total that
+            // reads 0.0 every day, so while a streak is running the caption and
+            // the value switch to it, green as on the Statistics screen. Logging
+            // a drink puts the streak at 0 and the gram total back, until a full
+            // dry day has been completed again.
+            //
+            // `currentAbstinence > 0` is the whole condition:
+            // `DayResolver.computeCurrentAbstinence` returns 0 as soon as today
+            // holds alcohol, so a positive value already implies 0.0 g today.
+            // Testing the grams as well would be a second source for one
+            // decision. Android's Today card switches on the same value.
+            //
+            // WHY EACH ROW CARRIES ITS OWN SPOKEN LABEL. A `LabeledContent` in a
+            // List is TWO accessibility elements, not one: VoiceOver reads the
+            // caption, stops, and reads the value as if it belonged to nothing.
+            // `children: .ignore` collapses the row to a single element and the
+            // label below says the whole sentence. The label also spells out what
+            // the eye reads from a symbol — "g" as grams, "Ø" as average — because
+            // a screen reader speaks those as the characters they are.
+            if model.state.currentAbstinence > 0 {
+                LabeledContent {
+                    headlineValue(Loc.daysPlural(count: model.state.currentAbstinence, locale: locale))
+                        .foregroundStyle(Color.green)
+                } label: {
+                    Text(Loc.string("Current Abstinence", locale: locale))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Loc.string(
+                    "%1$@: %2$@",
+                    Loc.string("Current Abstinence", locale: locale),
+                    Loc.daysPlural(count: model.state.currentAbstinence, locale: locale),
+                    locale: locale
+                ))
+            } else {
+                LabeledContent {
+                    headlineValue(grams(model.state.totalGrams))
+                } label: {
+                    Text(Loc.string("Today's Total", locale: locale))
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Loc.string(
+                    "%1$@: %2$@ grams",
+                    Loc.string("Today's Total", locale: locale),
+                    Loc.number(model.state.totalGrams, fractionDigits: 1, locale: locale),
+                    locale: locale
+                ))
+            }
+
+            LabeledContent {
+                HStack(spacing: 4) {
+                    headlineValue(perDay(model.state.monthlyAvgPerDay))
+                    // The arrow only when the month differs from the pre-month
+                    // baseline; `.flat` means no baseline or no real change.
+                    if model.state.monthTrend != .flat {
+                        Image(systemName: monthTrendSymbol).foregroundStyle(monthTrendColor)
+                    }
+                }
+            } label: {
+                Text(monthlyAverageCaption)
+            }
+            // The trend arrow stays silent: it is a second reading of a number
+            // the sentence has just given, and naming it would make every
+            // average end in a direction the eye takes in at a glance.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(monthlyAverageSpoken)
+
+            LimitBar(
+                caption: Loc.string("Today", locale: locale),
+                value: grams(model.state.totalGrams),
+                limit: grams(model.state.limitInfo.limitGrams),
+                fill: LimitGauge.fillFraction(
+                    totalGrams: model.state.totalGrams,
+                    limitGrams: model.state.limitInfo.limitGrams
+                ),
+                emphasis: LimitGauge.emphasis(
+                    totalGrams: model.state.totalGrams,
+                    limitGrams: model.state.limitInfo.limitGrams
+                ),
+                spokenSummary: gramsSpoken(
+                    caption: Loc.string("Today", locale: locale),
+                    value: model.state.totalGrams,
+                    limit: model.state.limitInfo.limitGrams
+                )
+            )
+
+            LimitBar(
+                caption: sevenDayCaption,
+                value: grams(model.state.weeklyTotalGrams),
+                limit: grams(model.state.limitInfo.weeklyLimitGrams),
+                fill: LimitGauge.fillFraction(
+                    totalGrams: model.state.weeklyTotalGrams,
+                    limitGrams: model.state.limitInfo.weeklyLimitGrams
+                ),
+                emphasis: LimitGauge.emphasis(
+                    totalGrams: model.state.weeklyTotalGrams,
+                    limitGrams: model.state.limitInfo.weeklyLimitGrams
+                ),
+                // The caption on screen carries the window's dates; the spoken
+                // one does not. A date range read out on every pass buries the
+                // two figures the row exists for, and the calendar states the
+                // same window in a form a reader can navigate.
+                spokenSummary: gramsSpoken(
+                    caption: Loc.string("7 Days", locale: locale),
+                    value: model.state.weeklyTotalGrams,
+                    limit: model.state.limitInfo.weeklyLimitGrams
+                )
+            )
+
+            LimitBar(
+                caption: Loc.string("Drinking Days (last 7 days)", locale: locale),
+                value: "\(model.state.drinkDaysThisWeek)",
+                limit: "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
+                fill: LimitGauge.drinkDaysFillFraction(
+                    drinkDays: model.state.drinkDaysThisWeek,
+                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek
+                ),
+                // Today's own status decides the colour. A day already spent as
+                // a drink day costs nothing further, so a full bar can stay amber;
+                // a dry day at the cap means the next drink spends a day the user
+                // does not have, and the bar goes red.
+                emphasis: LimitGauge.drinkDaysEmphasis(
+                    drinkDays: model.state.drinkDaysThisWeek,
+                    maxDrinkDays: model.state.limitInfo.maxDrinkDaysPerWeek,
+                    todayIsDrinkDay: AlcoholCalculator.isDrinkDay(totalGrams: model.state.totalGrams)
+                ),
+                // The spoken caption is the parenthesis-free form: read aloud, a
+                // bracket is either silence or the word "bracket", and neither
+                // helps. The counted noun sits in the caption rather than after
+                // the limit, so the sentence needs no plural agreement — the app
+                // ships 21 languages and four of them inflect this in four ways.
+                spokenSummary: Loc.string(
+                    "%1$@: %2$@ of at most %3$@",
+                    Loc.string("Drinking days, last 7 days", locale: locale),
+                    "\(model.state.drinkDaysThisWeek)",
+                    "\(model.state.limitInfo.maxDrinkDaysPerWeek)",
+                    locale: locale
+                )
+            )
+
+            // Absent rather than zero: without a body weight, or with nothing
+            // alcoholic logged, the app does not know — and must not imply 0.0.
+            if let bac = model.state.bacPermille {
+                LabeledContent(Loc.string("BAC Estimate", locale: locale)) {
+                    Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
+                }
+            }
+        }
+    }
+
+    /// A headline figure in the summary pair: the same monospaced-digit,
+    /// title-weight styling for the total and the average so the two read as a
+    /// matched pair, echoing Android's `headlineLarge` figures.
+    private func headlineValue(_ text: String) -> some View {
+        Text(text)
+            .font(.title3)
+            .monospacedDigit()
+    }
 
     /// One entry: the drink, its detail line and its note. The whole row is the
     /// edit affordance now — tapping it opens the same sheet the pencil used to.
@@ -454,6 +512,32 @@ extension TodayScreen {
             name: entry.drinkName,
             volumeMl: entry.volumeMl,
             alcoholPercent: entry.alcoholPercent
+        )
+    }
+
+    /// What VoiceOver says for a gram bar: "<caption>: <value> of at most <limit>
+    /// grams". The numbers arrive as `Double`s and are formatted here rather than
+    /// taken from the visible strings, because those carry a "g" that a reader
+    /// speaks as the letter.
+    private func gramsSpoken(caption: String, value: Double, limit: Double) -> String {
+        Loc.string(
+            "%1$@: %2$@ of at most %3$@ grams",
+            caption,
+            Loc.number(value, fractionDigits: 1, locale: locale),
+            Loc.number(limit, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
+    }
+
+    /// "Average <month>: <value> grams per day" — the spoken form of the caption
+    /// and value above. The visible pair abbreviates both halves ("Ø", "g/day");
+    /// spelled out they are the same sentence a sighted user reads at a glance.
+    private var monthlyAverageSpoken: String {
+        Loc.string(
+            "Average %1$@: %2$@ grams per day",
+            monthName(model.state.logicalDate),
+            Loc.number(model.state.monthlyAvgPerDay, fractionDigits: 1, locale: locale),
+            locale: locale
         )
     }
 
@@ -530,6 +614,15 @@ struct LimitBar: View {
     let fill: Double
     let emphasis: Emphasis
 
+    /// The whole row as one sentence, for VoiceOver. The caller assembles it,
+    /// because only the caller still has the raw numbers: by the time they reach
+    /// `value` and `limit` they are display strings carrying a "g", and the
+    /// caption may carry a date range that is worth showing and not worth saying.
+    /// Without this the row was three elements — the value, the "caption · limit"
+    /// pair, and nothing at all for the bar — and a reader met the figures with no
+    /// statement of which limit they belonged to.
+    let spokenSummary: String
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             // Label order mirrors Android's LimitBar: the CONSUMED value sits on
@@ -568,6 +661,8 @@ struct LimitBar: View {
             .accessibilityHidden(true)
         }
         .padding(.vertical, 2)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(spokenSummary)
     }
 }
 

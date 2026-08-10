@@ -88,7 +88,14 @@ and not where to stop:
   does not meet 365 "no entry" nodes — and offers a named accessibility action per
   month.
 - The statistics screen labels its period arrows and combines one row group.
-- The `LimitBar` track is hidden from VoiceOver as decoration.
+- Every `LimitBar` is a single element whose label states the caption, the value
+  and the limit as one sentence with the unit spelled out; the track behind it is
+  hidden as decoration. The date range in the seven-day caption is shown and not
+  spoken.
+- The two summary rows on Today carry the same kind of sentence, so "Ø" and
+  "g/day" reach a reader as the words they abbreviate. The trend arrow beside the
+  average is silent.
+- The day-change time in Settings is one element carrying its title and its time.
 
 ## 1. Perceivable
 
@@ -97,12 +104,13 @@ and not where to stop:
   - Traffic-light dot → announces its capacity state, not "image". Confirm in both
     styles (Settings → Appearance → alternative status symbols, off and on).
   - The three `LimitBar`s on Today → the bar itself is deliberately hidden, on the
-    reasoning that the numbers above it already say the same thing. **Verify that
-    reasoning holds on device**: the value and the "caption · limit" pair are two
-    separate `Text`s in an `HStack`, so VoiceOver may announce them as two
-    unrelated elements, in which case the bar's information — which limit, how full
-    — arrives in pieces or not at all. If so, the fix is to combine the row into
-    one element with a value, not to unhide the capsule.
+    reasoning that the numbers above it already say the same thing. That reasoning
+    was checked on device and the row did arrive in pieces: the value and the
+    "caption · limit" pair were announced as two unrelated elements, with no
+    statement of which limit the figures belonged to. Each row is now one element
+    with a spoken sentence, and the capsule stays hidden. **Confirm the new
+    wording**, including the drinking-days row, whose caption carries the counted
+    noun so the sentence needs no plural agreement.
   - The statistics charts → Swift Charts derives its spoken output from the labels
     passed to `.value(...)`. **Those labels are English literals in the source**
     ("Date", "Grams per day", "Daily limit"), while the axis label beside them goes
@@ -119,7 +127,12 @@ and not where to stop:
     section has a real header; check the hand-built card headers.
   - Form fields in the entry sheet and the drink editor are associated with their
     labels. `TextField`, `Picker`, `DatePicker` and `Stepper` all receive a
-    localised title in the source; confirm the title is what VoiceOver speaks.
+    localised title in the source; confirm the title is what VoiceOver speaks. A
+    title alone does not make the row one element — the day-change `DatePicker`
+    read its title and its hour as two, and now combines its children.
+  - The footnote about the day-change time sits in the Section it explains, as a
+    row under the control rather than in the Section footer, which a reader
+    reaches after the last row and therefore after the wrong setting.
 - [ ] **1.3.2 Meaningful Sequence (A).** VoiceOver reading order matches the visual
       order on every screen. **Start on Today**: does focus run top to bottom, or
       does it jump into the toolbar and back? This was the first question the
