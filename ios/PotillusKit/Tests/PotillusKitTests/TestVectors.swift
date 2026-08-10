@@ -414,6 +414,7 @@ struct AlcoholCalculatorVectors: Decodable {
 struct StatsWindowVectors: Decodable {
     let window: [Case]
     let windowOffset: [Case]
+    let earliestOffset: [OffsetCase]
     let invalidToday: [InvalidCase]
     let adjacency: Adjacency
     let applyingFloor: [Case]
@@ -435,6 +436,16 @@ struct StatsWindowVectors: Decodable {
         /// `previousFrom <= previousTo`. False means there is no comparable
         /// history, not that the baseline was zero.
         let hasBaseline: Bool
+    }
+
+    /// How many steps of a period lie between `day` and `today` — the ceiling
+    /// the statistics screen's paging arrows read as `canGoEarlier`.
+    struct OffsetCase: Decodable {
+        let description: String
+        let period: String
+        let today: String
+        let day: String
+        let offset: Int
     }
 
     struct InvalidCase: Decodable {

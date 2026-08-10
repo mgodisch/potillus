@@ -80,6 +80,30 @@ final class StatsWindowVectorTest: XCTestCase {
         }
     }
 
+    /// How far back the arrows may go.
+    ///
+    /// `offsetOf` answers how many steps of a period lie between a day and today,
+    /// and the statistics screen turns that into `canGoEarlier`. A wrong ceiling
+    /// misdraws nothing — it disables a button, which reads as a broken control
+    /// rather than as a boundary. It reached 0.85.0 without shared coverage.
+    func testEarliestOffsetMatchesTheVectors() throws {
+        let vectors = try TestVectors.load("stats-window", as: StatsWindowVectors.self)
+        XCTAssertFalse(
+            vectors.earliestOffset.isEmpty, "the shared vectors carry earliest-offset cases"
+        )
+        for testCase in vectors.earliestOffset {
+            XCTAssertEqual(
+                StatsWindows.offsetOf(
+                    period: try period(testCase.period),
+                    today: testCase.today,
+                    day: testCase.day
+                ),
+                testCase.offset,
+                testCase.description
+            )
+        }
+    }
+
     func testWindowMatchesTheVectors() throws {
         let vectors = try TestVectors.load("stats-window", as: StatsWindowVectors.self)
         for testCase in vectors.window {

@@ -213,21 +213,21 @@ struct StatsScreen: View {
 
     private var keyMetrics: some View {
         Section {
-            LabeledContent(Loc.string("Total in Period", locale: locale)) { grams(model.state.totalGrams) }
-            LabeledContent(Loc.string("Average per Day", locale: locale)) { grams(model.state.averagePerDay) }
-            LabeledContent(Loc.string("Average per Drinking Day", locale: locale)) {
+            metricRow(Loc.string("Total in Period", locale: locale)) { grams(model.state.totalGrams) }
+            metricRow(Loc.string("Average per Day", locale: locale)) { grams(model.state.averagePerDay) }
+            metricRow(Loc.string("Average per Drinking Day", locale: locale)) {
                 grams(model.state.averagePerDrinkDay)
             }
-            LabeledContent(Loc.string("Days Over Daily Limit", locale: locale)) {
+            metricRow(Loc.string("Days Over Daily Limit", locale: locale)) {
                 count(model.state.daysOverDailyLimit)
             }
-            LabeledContent(Loc.string("Days Over 7-Day Limit", locale: locale)) {
+            metricRow(Loc.string("Days Over 7-Day Limit", locale: locale)) {
                 count(model.state.daysOverWeeklyLimit)
             }
-            LabeledContent(Loc.string("Days Over Drinking Days Limit", locale: locale)) {
+            metricRow(Loc.string("Days Over Drinking Days Limit", locale: locale)) {
                 count(model.state.daysOverDrinkDayLimit)
             }
-            LabeledContent(Loc.string("Abstinent Days", locale: locale)) {
+            metricRow(Loc.string("Abstinent Days", locale: locale)) {
                 // Green when positive, plain at zero — never red: a dry-day count
                 // is an achievement, not a limit breach. `count` is for the
                 // days-over rows (red/green); this needs green/plain.
@@ -247,17 +247,17 @@ struct StatsScreen: View {
         Section(Loc.string("Abstinence & Trend", locale: locale)) {
             // Today is excluded from the current streak: the day is not over, and a
             // drink may still be logged. Green when positive, like Android.
-            LabeledContent(Loc.string("Current Abstinence", locale: locale)) {
+            metricRow(Loc.string("Current Abstinence", locale: locale)) {
                 daysColored(model.state.currentStreak)
             }
-            LabeledContent(Loc.string("Longest Abstinence", locale: locale)) {
+            metricRow(Loc.string("Longest Abstinence", locale: locale)) {
                 days(model.state.longestStreak)
             }
             // The trend belongs in this card on Android, not up in the metrics.
             // Hidden, not zeroed: without a previous period there is nothing to
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
-                LabeledContent(Loc.string("Trend vs. Previous Period", locale: locale)) {
+                metricRow(Loc.string("Trend vs. Previous Period", locale: locale)) {
                     // The modifier sits on the HStack, not on the percentage
                     // inside it: arrow and value are one value, and pinning only
                     // the text would leave the arrow behind at the leading edge.
@@ -540,6 +540,44 @@ extension View {
     fileprivate func metricValue() -> some View {
         multilineTextAlignment(.trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+}
+
+// =============================================================================
+// Metric rows
+// =============================================================================
+//
+// WHAT WENT WRONG
+//   `LabeledContent(_:)` builds its label from a `Text`, and a `Text` negotiating
+//   for width truncates before it wraps. On a 4.7-inch screen that left most of
+//   this screen unreadable: "Total in Peri...", "Days Over Dai...", "Days Over
+//   7-D...". One row escaped it — "Average per Drinking Day" — not because it was
+//   built differently but because it is long enough that SwiftUI gives up on the
+//   side-by-side arrangement and stacks label over value, where the label has the
+//   whole width and wraps. The good behaviour was an accident of length.
+//
+// WHAT MAKES IT DELIBERATE
+//   `fixedSize(horizontal: false, vertical: true)` tells the label to take the
+//   height it needs rather than trade characters for width, so every row wraps
+//   the way that one row did. The value keeps `metricValue()`, which already
+//   handles both arrangements.
+//
+// WHY A FUNCTION AND NOT A MODIFIER
+//   The fix belongs to the label, and the label is only reachable through the
+//   two-closure form of `LabeledContent`. Wrapping the whole row keeps the ten
+//   call sites reading as one line each instead of carrying the same three
+//   modifiers ten times over.
+// =============================================================================
+
+extension StatsScreen {
+    /// One figure row: a label that wraps, and a value pinned to the trailing edge.
+    func metricRow(_ label: String, @ViewBuilder value: () -> some View) -> some View {
+        LabeledContent {
+            value()
+        } label: {
+            Text(label)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 

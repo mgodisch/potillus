@@ -46,6 +46,7 @@ Edit drinks from the list's edit mode
 
 ### Added
 
+- Shared vectors for how far the statistics screen can page back.
 - Six WCAG 2.2 self-assessment protocols, one per platform and level.
 - `docs/OPENSSF_BADGES.md` with the open badge criteria per tier.
 - The statistics start date has a row that clears it.
@@ -66,10 +67,12 @@ Edit drinks from the list's edit mode
 - The calendar opens on the current month, with no day selected.
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
-- The statistics screen carries which period it shows, above the cards.
-- Two arrows on the statistics screen move to another period.
-- The users guides describe every screen, switch and gesture on both
-  platforms.
+- The statistics screen carries which period it shows, above the cards, on
+  the list surface.
+- Two arrows on the statistics screen move to another period, each with its
+  own tinted tap target that dims at the edge.
+- The users guides describe every screen, switch, gesture and route between
+  screens on both platforms.
 - Every guide token maps to a label the app shows.
 - One template per language feeds both platforms, with `{{#android}}` and
   `{{#ios}}` blocks.
@@ -147,6 +150,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
+- Statistics figure labels wrap to a second line.
 - The README's link to the roadmap.
 - The last day of a past statistics period counts towards its average,
   its abstinent days and its chart.

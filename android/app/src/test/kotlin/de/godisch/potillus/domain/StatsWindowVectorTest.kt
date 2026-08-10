@@ -105,6 +105,32 @@ class StatsWindowVectorTest {
         }
     }
 
+    /**
+     * How far back the arrows may go.
+     *
+     * `offsetOf` answers how many steps of a period lie between a day and today,
+     * and the statistics screen turns that answer into `canGoEarlier`. A wrong
+     * ceiling does not misdraw anything — it disables a button, which looks like
+     * a broken control rather than like a boundary. It reached 0.85.0 without
+     * shared coverage; these cases give both platforms the same ceiling.
+     */
+    @Test
+    fun `offsetOf matches the shared vectors`() {
+        val cases = VECTORS.getJSONArray("earliestOffset")
+        assertTrue("the shared vectors carry earliest-offset cases", cases.length() > 0)
+        cases.objects().forEach { case ->
+            assertEquals(
+                case.getString("description"),
+                case.getInt("offset"),
+                StatsWindows.offsetOf(
+                    period(case),
+                    case.getString("today"),
+                    case.getString("day"),
+                ),
+            )
+        }
+    }
+
     // ── The floor ────────────────────────────────────────────────────────────
 
     @Test
