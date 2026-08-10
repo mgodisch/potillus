@@ -150,7 +150,7 @@ Edit drinks from the list's edit mode
 
 ### Fixed
 
-- Statistics figure labels wrap to a second line.
+- A statistics figure moves below its label when the two do not fit.
 - The README's link to the roadmap.
 - The last day of a past statistics period counts towards its average,
   its abstinent days and its chart.

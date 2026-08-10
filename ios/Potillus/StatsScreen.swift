@@ -209,7 +209,9 @@ struct StatsScreen: View {
     // iOS used to shorten these ("Total", "Per day") and split the days-over
     // rows into a separate "Days over limit" section; the 0.83.0 UI-parity pass
     // adopts Android's wording and grouping so a platform switcher reads one
-    // vocabulary. The period stays in the section header, iOS-idiomatic.
+    // vocabulary. The period is NOT repeated in a section header: it already
+    // stands above the cards, formatted for the in-app locale, and the header
+    // spelled the same window a second time in raw ISO dates.
 
     private var keyMetrics: some View {
         Section {
@@ -234,10 +236,7 @@ struct StatsScreen: View {
                 Text("\(model.state.abstinentDays)")
                     .monospacedDigit()
                     .foregroundStyle(model.state.abstinentDays > 0 ? Color.green : Color.secondary)
-                    .metricValue()
             }
-        } header: {
-            Text(model.state.from.isEmpty ? "" : "\(model.state.from) – \(model.state.to)")
         }
     }
 
@@ -258,15 +257,13 @@ struct StatsScreen: View {
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
                 metricRow(Loc.string("Trend vs. Previous Period", locale: locale)) {
-                    // The modifier sits on the HStack, not on the percentage
-                    // inside it: arrow and value are one value, and pinning only
-                    // the text would leave the arrow behind at the leading edge.
+                    // Arrow and percentage are one value: they travel together
+                    // into whichever arrangement MetricRow picks.
                     HStack(spacing: 4) {
                         Image(systemName: trendSymbol)
                             .foregroundStyle(trendColor)
                         trend(model.state.trendPercent)
                     }
-                    .metricValue()
                 }
             }
         }
@@ -470,11 +467,10 @@ extension StatsScreen {
     fileprivate func grams(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale)) g")
             .monospacedDigit()
-            .metricValue()
     }
 
-    /// No `metricValue()` here, unlike its siblings: the percentage is drawn
-    /// beside a trend arrow, and the pair is pinned as a unit at the call site.
+    /// The percentage alone; the trend arrow is put beside it at the call site,
+    /// and `MetricRow` arranges the pair as one value.
     fileprivate func trend(_ value: Double) -> some View {
         Text("\(Loc.number(value, fractionDigits: 1, locale: locale, signed: true)) %").monospacedDigit()
     }
@@ -485,7 +481,6 @@ extension StatsScreen {
         Text("\(value)")
             .monospacedDigit()
             .foregroundStyle(value > 0 ? Color.red : Color.green)
-            .metricValue()
     }
 
     fileprivate func days(_ value: Int) -> some View {
@@ -494,7 +489,6 @@ extension StatsScreen {
         // forms, the single Japanese one. The catalogue inflects; the view only asks.
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
-            .metricValue()
     }
 
     /// Like `days`, but green when positive — the achievement colour Android
@@ -504,42 +498,6 @@ extension StatsScreen {
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
             .foregroundStyle(value > 0 ? Color.green : Color.secondary)
-            .metricValue()
-    }
-}
-
-// =============================================================================
-// Metric value alignment
-// =============================================================================
-//
-// WHAT THIS FIXES
-//   `LabeledContent` lays its label and its value out side by side while both
-//   fit. When they do not — a long label, a translated label, or a large Dynamic
-//   Type size — it falls back to stacking the value BELOW the label, and in that
-//   stacked arrangement the value is placed at the leading edge. The row then
-//   reads as left-aligned while every row around it reads as right-aligned,
-//   which is exactly where the eye is scanning for the numbers.
-//
-// HOW
-//   The value is given the full row width with a trailing alignment, so it sits
-//   at the trailing edge in BOTH arrangements: unchanged when the value already
-//   sits beside its label, and moved to the right when it has been pushed onto
-//   its own line. `multilineTextAlignment` covers the case where the value
-//   itself wraps over more than one line, which the plural day counts can do in
-//   the longer languages.
-//
-// WHY A MODIFIER AND NOT A `LabeledContentStyle`
-//   A custom style would have to rebuild the label/value layout by hand, and
-//   with it the very Dynamic Type stacking this fix relies on. Restyling the
-//   value leaves that behaviour to the framework and touches only the alignment.
-// =============================================================================
-
-extension View {
-    /// Pins a `LabeledContent` value to the trailing edge in both the side-by-side
-    /// and the stacked arrangement. See the note above.
-    fileprivate func metricValue() -> some View {
-        multilineTextAlignment(.trailing)
-            .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 
@@ -547,36 +505,71 @@ extension View {
 // Metric rows
 // =============================================================================
 //
-// WHAT WENT WRONG
-//   `LabeledContent(_:)` builds its label from a `Text`, and a `Text` negotiating
+// WHAT WENT WRONG, TWICE
+//   `LabeledContent(_:)` builds its label from a `Text`, and a `Text` bargaining
 //   for width truncates before it wraps. On a 4.7-inch screen that left most of
-//   this screen unreadable: "Total in Peri...", "Days Over Dai...", "Days Over
-//   7-D...". One row escaped it — "Average per Drinking Day" — not because it was
-//   built differently but because it is long enough that SwiftUI gives up on the
-//   side-by-side arrangement and stacks label over value, where the label has the
-//   whole width and wraps. The good behaviour was an accident of length.
+//   this screen unreadable: "Total in Peri...", "Days Over Dai...". One row
+//   escaped it, "Average per Drinking Day", not because it was built differently
+//   but because it is long enough that SwiftUI abandons the side-by-side
+//   arrangement and stacks value under label. The good behaviour was an accident
+//   of length.
 //
-// WHAT MAKES IT DELIBERATE
-//   `fixedSize(horizontal: false, vertical: true)` tells the label to take the
-//   height it needs rather than trade characters for width, so every row wraps
-//   the way that one row did. The value keeps `metricValue()`, which already
-//   handles both arrangements.
+//   Telling the label to wrap instead of truncate then made every row worse: it
+//   wrapped INSIDE the label's half of the row, two cramped lines against a
+//   value that stayed put, and the row outgrew its height. The one row that had
+//   been right lost what made it right.
 //
-// WHY A FUNCTION AND NOT A MODIFIER
-//   The fix belongs to the label, and the label is only reachable through the
-//   two-closure form of `LabeledContent`. Wrapping the whole row keeps the ten
-//   call sites reading as one line each instead of carrying the same three
-//   modifiers ten times over.
+// WHAT THE ROW HAS TO DO
+//   Side by side while both fit. When they do not: label on the first line with
+//   the WHOLE width to itself, value alone on the second, pinned to the trailing
+//   edge where the eye scans for numbers. That is what the accidental row did,
+//   and it is what every row should do.
+//
+// HOW
+//   `ViewThatFits` is handed both arrangements and picks the first that fits.
+//   The single-line one asks for its natural width — `lineLimit(1)` and
+//   `fixedSize` on both parts, so neither can shrink itself into fitting and
+//   hide the overflow. When that width is not there, the stacked arrangement is
+//   used, and it gives each part the full row.
+//
+// WHY NOT `LabeledContent`
+//   Its stacking is the framework's own and cannot be asked for on the
+//   application's terms: it arrives with Dynamic Type, not with a label that has
+//   run out of room. Owning both arrangements is what makes the outcome the same
+//   on a 4.7-inch screen as on a 6.9-inch one.
 // =============================================================================
 
 extension StatsScreen {
-    /// One figure row: a label that wraps, and a value pinned to the trailing edge.
+    /// One figure row: label and value side by side, or stacked when they do not
+    /// fit. See the note above.
     func metricRow(_ label: String, @ViewBuilder value: () -> some View) -> some View {
-        LabeledContent {
-            value()
-        } label: {
-            Text(label)
-                .fixedSize(horizontal: false, vertical: true)
+        MetricRow(label: label, value: value())
+    }
+}
+
+private struct MetricRow<Value: View>: View {
+    let label: String
+    let value: Value
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(label)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                Spacer(minLength: 8)
+                value
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                value
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
         }
     }
 }
