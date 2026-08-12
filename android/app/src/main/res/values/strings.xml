@@ -388,8 +388,13 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_limit_plain">%1$s: %2$s of at most %3$s</string>
     <!-- TalkBack: the drink-days caption without its brackets. -->
     <string name="a11y_drink_days_caption">Drinking days, last 7 days</string>
-    <!-- TalkBack: an entry's figures. %1$d = millilitres, %2$s = percent, %3$s = grams. -->
-    <string name="a11y_entry_detail">%1$d millilitres, %2$s percent, %3$s grams of alcohol</string>
+    <!-- TalkBack: an entry's figures. %1$d = millilitres, %2$s = percent, %3$s = grams.
+         PluralsCandidate is suppressed rather than answered: the volume is a
+         drink's serving size, so the one-millilitre case the plural exists for
+         does not arise, and the visible row states the same figure as an
+         unpluralized "500 ml". Answering it would mean a six-form plural in each
+         of the 21 shipped languages for a quantity that never takes the singular. -->
+    <string name="a11y_entry_detail" tools:ignore="PluralsCandidate">%1$d millilitres, %2$s percent, %3$s grams of alcohol</string>
     <!-- TalkBack: appends a further part to a spoken label. %1$s = the part. -->
     <string name="a11y_append">, %1$s</string>
     <!-- TalkBack: the blood-alcohol estimate. %1$s = caption, %2$s = figure. -->
