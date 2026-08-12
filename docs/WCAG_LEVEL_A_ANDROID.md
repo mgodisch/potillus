@@ -77,8 +77,12 @@ viewer, the PDF export flow.
     leading with its time (implemented). *Confirm the wording on device.*
   - The blood-alcohol figure → the per-mille sign is spoken as the word
     (implemented); left as the sign it is spelled out letter by letter.
+  - A drinks-list row → one node: the drink, its category, its figures, its
+    capacity state, in that order (implemented). The dot is drawn first and read
+    last on purpose; a row that opens with a warning buries what it is about.
   - Drink-category icons, star/favourite, delete/edit icons → each has a
-    description. *Verify none announce as "unlabelled".*
+    description. *Verify none announce as "unlabelled".* The delete icons name
+    their object ("Delete drink", "Delete entry") rather than the bare verb.
   - Purely decorative graphics announce nothing.
 - [ ] **1.3.1 Info and Relationships (A).** Structure is programmatically
       determinable.

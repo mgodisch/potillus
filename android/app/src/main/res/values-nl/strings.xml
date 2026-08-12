@@ -203,6 +203,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s promille</string>
     <string name="delete_entry">Registratie verwijderen</string>
+    <string name="a11y_drink_row">%1$s, %2$s, %3$d milliliter, %4$s procent, %5$s gram alcohol, %6$s</string>
+    <string name="delete_drink">Drankje verwijderen</string>
     <string name="drink_days_setting">Max. drinkdagen/7 dagen</string>
     <string name="personal_data">Persoonlijke gegevens</string>
     <string name="limits">Limieten</string>

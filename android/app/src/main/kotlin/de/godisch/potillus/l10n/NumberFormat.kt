@@ -90,3 +90,23 @@ fun Double.fmt0(locale: Locale): String = String.format(locale, "%.0f", this)
  * @param locale The per-app locale (see [fmt1]).
  */
 fun Double.fmt2(locale: Locale): String = String.format(locale, "%.2f", this)
+
+/**
+ * Formats [this] with ONE decimal place, or two when the second is not a zero —
+ * `"5.0"` and `"9.25"` for en, `"5,0"` and `"9,25"` for de.
+ *
+ * For a figure the USER typed, where the trailing digit carries their input and
+ * a fixed width would either drop it or pad it: a drink's alcohol percentage is
+ * the case this exists for. A fixed [fmt1] would round 9.25 % to 9.2 % and
+ * silently disagree with what the editor accepted; a fixed [fmt2] would spell
+ * every beer as 5.00 %.
+ *
+ * Trailing-zero suppression stops at the second decimal, so the result never
+ * grows past two — the editor's own validation bounds the input there.
+ *
+ * @param locale The per-app locale (see [fmt1]).
+ */
+fun Double.fmtPercent(locale: Locale): String {
+    val two = String.format(locale, "%.2f", this)
+    return if (two.endsWith("0")) String.format(locale, "%.1f", this) else two
+}

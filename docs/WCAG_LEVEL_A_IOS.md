@@ -100,6 +100,10 @@ and not where to stop:
 - The day-change time in Settings is one element carrying its title and its time.
 - The edit toggle names the list it edits, on each of the three screens that
   carry it.
+- A drinks-list row is one element stating the drink, its category, its figures
+  and its capacity state, with the favourite star beside it as its own element.
+  The "logs this drink" hint sits on that element rather than on the enclosing
+  row, where every child inherited it — including the star, which logs nothing.
 - An entry row speaks as one element: the drink as its name, then the time as a
   clock value and the figures with their units written out.
 - The calendar's weekday header speaks full weekday names, and a day cell names

@@ -242,6 +242,16 @@ struct DrinksScreen: View {
                     : Loc.string("Add to favourites", locale: locale))
             }
 
+            // ONE SENTENCE FOR VOICEOVER: the drink, its category, its figures,
+            // its capacity state — the order a reader searches in. Left alone the
+            // HStack is four elements, and the dot comes FIRST on screen, so every
+            // row opened with a warning and named the drink two swipes later. The
+            // star stays outside this group and keeps its own focus and label.
+            //
+            // The category is spoken though the row does not show it: it is a
+            // real property of the drink (the statistics group by it), and Android
+            // states it here through its category glyph.
+            Group {
             // Capacity dot: how many more of this drink fit within today's
             // remaining budget, against the same snapshot for every row. Between
             // the star and the name, as on Android.
@@ -276,6 +286,24 @@ struct DrinksScreen: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(spokenDrink(drink))
+            // The hint sits HERE, not on the enclosing HStack: a hint on a
+            // container is inherited by every element inside it, so the star
+            // announced "logs this drink" over a button that does no such thing.
+            .accessibilityHint(editMode.isEditing
+                ? ""
+                : Loc.string("Logs this drink", locale: locale))
+            .accessibilityAction {
+                if editMode.isEditing {
+                    model.clearErrors()
+                    editing = drink
+                } else {
+                    logger.clearFailure()
+                    logging = drink
+                }
+            }
 
             Spacer()
         }
@@ -297,13 +325,6 @@ struct DrinksScreen: View {
                 logging = drink
             }
         }
-        // No hint in edit mode: the sentence for the editor would be a new
-        // catalogue key in twenty-one languages, and a hint that says "logs this
-        // drink" over a row that opens an editor is worse than none. VoiceOver
-        // still reads the row and its delete badge.
-        .accessibilityHint(editMode.isEditing
-            ? ""
-            : Loc.string("Logs this drink", locale: locale))
         // Trailing swipe: Edit (blue) and Delete (red). Both actions live in this
         // one `.swipeActions` on purpose — putting only one here would let it
         // replace `.onDelete`'s automatic swipe and drop the other. `.onDelete`
@@ -335,7 +356,33 @@ struct DrinksScreen: View {
     }
 
     private func percent(_ value: Double) -> String {
-        "\(Loc.number(value, fractionDigits: 1, locale: locale)) %"
+        "\(Loc.percent(value, locale: locale)) %"
+    }
+
+    /// The whole row as one sentence for VoiceOver: name, category, volume,
+    /// strength, grams, capacity state.
+    ///
+    /// Assembled rather than combined from the row's views, because the order
+    /// differs from the visual one — the dot is drawn first and spoken last —
+    /// and because the units on screen are symbols ("ml", "%", "≈ … g") that a
+    /// reader meets as characters. The "≈" is dropped rather than resolved: the
+    /// figure is an estimate either way, and a word for it on every row buys
+    /// nothing.
+    private func spokenDrink(_ drink: DrinkDefinition) -> String {
+        let grams = AlcoholCalculator.calculateGrams(
+            volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
+        )
+        let light = capacity.capacity.status(forServing: grams)
+        return Loc.string(
+            "%1$@, %2$@, %3$lld millilitres, %4$@ percent, %5$@ grams of alcohol, %6$@",
+            drink.name,
+            Loc.string(drink.category.categoryDisplayKey, locale: locale),
+            drink.volumeMl,
+            Loc.percent(drink.alcoholPercent, locale: locale),
+            Loc.number(grams, fractionDigits: 1, locale: locale),
+            TrafficLightDot.statusDescription(for: light, locale: locale),
+            locale: locale
+        )
     }
 }
 

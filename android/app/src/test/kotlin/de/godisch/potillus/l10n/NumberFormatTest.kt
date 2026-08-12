@@ -62,4 +62,16 @@ class NumberFormatTest {
         assertEquals("0.42", 0.42.fmt2(Locale.US))
         assertEquals("0,42", 0.42.fmt2(Locale.GERMANY))
     }
+
+    @Test
+    fun fmtPercent_keepsTheSecondDecimalOnlyWhenItCarriesADigit() {
+        assertEquals("9.25", 9.25.fmtPercent(Locale.US))
+        assertEquals("9,25", 9.25.fmtPercent(Locale.GERMANY))
+        assertEquals("5.0", 5.0.fmtPercent(Locale.US))
+        assertEquals("5,0", 5.0.fmtPercent(Locale.GERMANY))
+        // A trailing zero in the SECOND place falls back to one decimal, so
+        // 9.20 reads as 9.2 rather than 9.20.
+        assertEquals("9.2", 9.2.fmtPercent(Locale.US))
+        assertEquals("12.5", 12.5.fmtPercent(Locale.US))
+    }
 }

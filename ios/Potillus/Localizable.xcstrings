@@ -30419,6 +30419,137 @@
           }
         }
       }
+    },
+    "%1$@, %2$@, %3$lld millilitres, %4$@ percent, %5$@ grams of alcohol, %6$@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld millilitres, %4$@ percent, %5$@ grams of alcohol, %6$@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld Milliliter, %4$@ Prozent, %5$@ Gramm Alkohol, %6$@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld milliliter, %4$@ procent, %5$@ gram alkohol, %6$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld milliliter, %4$@ procent, %5$@ gram alcohol, %6$@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld milliliter, %4$@ prosent, %5$@ gram alkohol, %6$@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld milliliter, %4$@ procent, %5$@ gram alkohol, %6$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitros, %4$@ por ciento, %5$@ gramos de alcohol, %6$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld millilitres, %4$@ pour cent, %5$@ grammes d’alcool, %6$@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld millilitri, %4$@ per cento, %5$@ grammi di alcol, %6$@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitros, %4$@ por cento, %5$@ gramas de álcool, %6$@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitros, %4$@ por cento, %5$@ gramas de álcool, %6$@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitri, %4$@ la sută, %5$@ grame de alcool, %6$@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitrů, %4$@ procenta, %5$@ gramů alkoholu, %6$@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld mililitrów, %4$@ procent, %5$@ gramów alkoholu, %6$@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld миллилитров, %4$@ процента, %5$@ граммов алкоголя, %6$@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld мілілітрів, %4$@ відсотка, %5$@ грамів алкоголю, %6$@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld χιλιοστόλιτρα, %4$@ τοις εκατό, %5$@ γραμμάρια αλκοόλ, %6$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@、%2$@、%3$lld ミリリットル、%4$@ パーセント、%5$@ グラムのアルコール、%6$@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$lld 밀리리터, %4$@ 퍼센트, %5$@ 그램의 알코올, %6$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，%2$@，%3$lld 毫升，%4$@ 百分比，%5$@ 克酒精，%6$@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，%2$@，%3$lld 毫升，%4$@ 百分比，%5$@ 克酒精，%6$@"
+          }
+        }
+      }
     }
   }
 }

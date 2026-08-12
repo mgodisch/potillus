@@ -401,6 +401,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s per mille</string>
     <!-- Content description of an entry row's delete button. -->
     <string name="delete_entry">Delete entry</string>
+    <!-- TalkBack: one drink row. %1$s = name, %2$s = category, %3$d = millilitres, %4$s = percent, %5$s = grams, %6$s = capacity status. -->
+    <string name="a11y_drink_row" tools:ignore="PluralsCandidate">%1$s, %2$s, %3$d millilitres, %4$s percent, %5$s grams of alcohol, %6$s</string>
+    <!-- Content description of a drink row's delete button. -->
+    <string name="delete_drink">Delete drink</string>
     <!-- Settings > Limits: max-drinking-days row label and its edit-dialog title. -->
     <string name="drink_days_setting">Max. Drinking Days/7 Days</string>
     <!-- Settings section header: Personal Data. -->

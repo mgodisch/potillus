@@ -231,6 +231,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">，%1$s</string>
     <string name="a11y_caption_permille">%1$s：%2$s 千分之一</string>
     <string name="delete_entry">删除记录</string>
+    <string name="a11y_drink_row">%1$s，%2$s，%3$d 毫升，%4$s 百分比，%5$s 克酒精，%6$s</string>
+    <string name="delete_drink">删除饮品</string>
     <string name="drink_days_setting">7天最多饮酒天数</string>
     <string name="personal_data">个人数据</string>
     <string name="limits">限额</string>

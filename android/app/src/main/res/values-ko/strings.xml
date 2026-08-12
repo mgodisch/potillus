@@ -248,6 +248,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s 퍼밀</string>
     <string name="delete_entry">기록 삭제</string>
+    <string name="a11y_drink_row">%1$s, %2$s, %3$d 밀리리터, %4$s 퍼센트, %5$s 그램의 알코올, %6$s</string>
+    <string name="delete_drink">음료 삭제</string>
     <string name="drink_days_setting">7일 최대 음주일 수</string>
     <string name="personal_data">개인 데이터</string>
     <string name="limits">한도</string>

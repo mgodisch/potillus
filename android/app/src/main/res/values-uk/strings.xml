@@ -247,6 +247,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s проміле</string>
     <string name="delete_entry">Видалити запис</string>
+    <string name="a11y_drink_row">%1$s, %2$s, %3$d мілілітрів, %4$s відсотка, %5$s грамів алкоголю, %6$s</string>
+    <string name="delete_drink">Видалити напій</string>
     <string name="drink_days_setting">Макс. днів вживання/7 днів</string>
     <string name="personal_data">Особисті дані</string>
     <string name="limits">Ліміти</string>

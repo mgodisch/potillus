@@ -217,6 +217,20 @@ fun DrinkCategory.displayLabel(): String = when (this) {
     DrinkCategory.OTHER -> stringResource(R.string.category_other)
 }
 
+/**
+ * The localised capacity status behind the traffic-light dot ("Limit reached").
+ *
+ * Split out of [TrafficLightDot] so a row that speaks as ONE sentence can name
+ * the status the dot shows without repeating the mapping. The dot itself still
+ * carries it as its own content description when it stands alone.
+ */
+@Composable
+fun TrafficLight.displayLabel(): String = when (this) {
+    TrafficLight.GREEN -> stringResource(R.string.capacity_status_ok)
+    TrafficLight.YELLOW -> stringResource(R.string.capacity_status_low)
+    TrafficLight.RED -> stringResource(R.string.capacity_status_reached)
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // FAVOURITES QUICK BAR
 // ════════════════════════════════════════════════════════════════════════════
@@ -581,11 +595,7 @@ fun TrafficLightDot(
     }
     // Localised, state-specific text alternative for screen readers. Resolved in
     // the composable scope (stringResource is @Composable) before the Canvas.
-    val statusDescription = when (light) {
-        TrafficLight.GREEN -> stringResource(R.string.capacity_status_ok)
-        TrafficLight.YELLOW -> stringResource(R.string.capacity_status_low)
-        TrafficLight.RED -> stringResource(R.string.capacity_status_reached)
-    }
+    val statusDescription = light.displayLabel()
     // Capture colours BEFORE entering the Canvas lambda (DrawScope is not Composable).
     val highlight = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.52f)
     val glyphColor = androidx.compose.ui.graphics.Color.White

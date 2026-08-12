@@ -84,6 +84,16 @@ struct TrafficLightDot: View {
     }
 
     private var statusDescription: String {
+        TrafficLightDot.statusDescription(for: light, locale: locale)
+    }
+
+    /// The spoken capacity state, as a plain string.
+    ///
+    /// `static` so a row that speaks as ONE sentence can name the state its dot
+    /// shows without repeating the mapping — the drinks list does exactly that,
+    /// and hides the dot itself. The dot keeps this as its own label wherever it
+    /// stands alone.
+    static func statusDescription(for light: TrafficLight, locale: Locale) -> String {
         switch light {
         case .green: return Loc.string("Within your limits", locale: locale)
         case .yellow: return Loc.string("Almost at your limit", locale: locale)

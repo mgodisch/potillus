@@ -164,6 +164,8 @@ Edit drinks from the list's edit mode
 - The calendar header and month name follow the in-app language.
 - The language picker labels its system entry in the system language.
 - Gram limits read without a decimal place.
+- The drinks list speaks each row as one sentence naming the drink first.
+- Drink strength shows one or two decimals in the in-app language.
 
 ### Removed
 

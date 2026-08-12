@@ -37,6 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,6 +48,7 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt1
+import de.godisch.potillus.l10n.fmtPercent
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerRedColor
@@ -245,22 +249,47 @@ fun DrinksScreen(
                                 drinkDaysThisWeek = capacity.drinkDaysThisWeek,
                                 maxDrinkDaysPerWeek = capacity.maxDrinkDaysPerWeek,
                             )
+                            // ONE SENTENCE FOR TALKBACK, in the order a reader
+                            // searches: the drink, its category, its figures, its
+                            // capacity status. Left alone the row announced the dot
+                            // FIRST (it comes first on screen), so every card opened
+                            // with a warning and named the drink two swipes later.
+                            //
+                            // The dot, the name row and the detail line hide
+                            // themselves; the wrapper states the sentence. The three
+                            // icon buttons stay outside it and keep their own focus.
+                            val spokenDrink = stringResource(
+                                R.string.a11y_drink_row,
+                                drink.name,
+                                drink.category.displayLabel(),
+                                drink.volumeMl,
+                                drink.alcoholPercent.fmtPercent(locale),
+                                AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent).fmt1(locale),
+                                light.displayLabel(),
+                            )
                             TrafficLightDot(
                                 light = light,
-                                modifier = Modifier.padding(end = 8.dp),
+                                modifier = Modifier.padding(end = 8.dp).semantics { hideFromAccessibility() },
                                 useSymbols = todayState.settings.alternativeStatusSymbols,
                             )
                             // ── Name + category + volume info ─────────────────────────
-                            Column(modifier = Modifier.weight(1f)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                                    .semantics(mergeDescendants = true) { contentDescription = spokenDrink },
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
+                                ) {
                                     Text(drink.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                                     Spacer(Modifier.width(6.dp))
                                     DrinkCategoryIcon(drink.category)
                                 }
                                 Text(
-                                    "${drink.volumeMl} ml · ${drink.alcoholPercent} % · ≈ ${AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent).fmt1(locale)} g",
+                                    "${drink.volumeMl} ml · ${drink.alcoholPercent.fmtPercent(locale)} % · ≈ ${AlcoholCalculator.calculateGrams(drink.volumeMl, drink.alcoholPercent).fmt1(locale)} g",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                             }
                             // ── Edit / Delete buttons ─────────────────────────────────
@@ -269,7 +298,9 @@ fun DrinksScreen(
                                     Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_drink), tint = MaterialTheme.colorScheme.primary)
                                 }
                                 IconButton(onClick = { deleteDrink = drink }) {
-                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = dangerRedColor())
+                                    // Not R.string.delete: the bare word names no
+                                    // object, as on the entry rows.
+                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_drink), tint = dangerRedColor())
                                 }
                             }
                         }

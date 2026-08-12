@@ -105,6 +105,27 @@ enum Loc {
         String(format: string(key, locale: locale), locale: locale, arg, arg2, arg3)
     }
 
+    /// Six interpolated arguments, positional. The drinks row is the one sentence
+    /// long enough to need them; anything longer belongs in two sentences.
+    static func string(
+        _ key: String, _ arg: CVarArg, _ arg2: CVarArg, _ arg3: CVarArg,
+        _ arg4: CVarArg, _ arg5: CVarArg, _ arg6: CVarArg, locale: Locale
+    ) -> String {
+        String(format: string(key, locale: locale), locale: locale, arg, arg2, arg3, arg4, arg5, arg6)
+    }
+
+    /// A percentage the USER typed: one decimal, or two when the second carries a
+    /// digit — "5,0" and "9,25".
+    ///
+    /// A fixed one decimal would round 9,25 % to 9,2 % and disagree with what the
+    /// drink editor accepted; a fixed two would spell every beer as 5,00 %. The
+    /// editor bounds the input at two decimals, so the result never grows past
+    /// them. Android's `fmtPercent` is the same rule.
+    static func percent(_ value: Double, locale: Locale) -> String {
+        let two = number(value, fractionDigits: 2, locale: locale)
+        return two.hasSuffix("0") ? number(value, fractionDigits: 1, locale: locale) : two
+    }
+
     /// A decimal number in the CHOSEN locale: its decimal separator and grouping,
     /// so a comma-decimal language shows "20,0" where a dot language shows "20.0".
     /// This is for on-SCREEN numbers (grams, BAC, percentages, body weight); it

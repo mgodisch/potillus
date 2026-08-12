@@ -248,6 +248,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">、%1$s</string>
     <string name="a11y_caption_permille">%1$s：%2$s パーミル</string>
     <string name="delete_entry">記録を削除</string>
+    <string name="a11y_drink_row">%1$s、%2$s、%3$d ミリリットル、%4$s パーセント、%5$s グラムのアルコール、%6$s</string>
+    <string name="delete_drink">飲み物を削除</string>
     <string name="drink_days_setting">7日間の最大飲酒日数</string>
     <string name="personal_data">個人データ</string>
     <string name="limits">上限</string>
