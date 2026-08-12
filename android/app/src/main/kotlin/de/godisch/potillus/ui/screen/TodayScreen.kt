@@ -37,8 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -212,13 +212,13 @@ fun TodayScreen(
                                 ),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.weight(1f).clearAndSetSemantics { },
+                                modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
                             )
                             Text(
                                 stringResource(R.string.avg_of_month, state.currentMonthLabel),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 8.dp).clearAndSetSemantics { },
+                                modifier = Modifier.padding(start = 8.dp).semantics { hideFromAccessibility() },
                                 softWrap = false,
                                 maxLines = 1,
                             )
@@ -273,6 +273,7 @@ fun TodayScreen(
                                         color = successColor(),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.semantics { hideFromAccessibility() },
                                     )
                                 } else {
                                     Text(
@@ -281,13 +282,15 @@ fun TodayScreen(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         softWrap = false,
                                         maxLines = 1,
+                                        modifier = Modifier.semantics { hideFromAccessibility() },
                                     )
                                     Spacer(Modifier.width(4.dp))
                                     Text(
                                         "g",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(bottom = 4.dp),
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                            .semantics { hideFromAccessibility() },
                                     )
                                 }
                             }
@@ -302,13 +305,15 @@ fun TodayScreen(
                                     state.monthlyAvgPerDay.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
                                     color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     stringResource(R.string.grams_per_day),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(bottom = 4.dp),
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                        .semantics { hideFromAccessibility() },
                                 )
                                 // Trend vs. last month: ↓ green = fewer grams/day,
                                 // ↑ red = more. Nothing when equal (at 0.1 g) or when
@@ -330,7 +335,8 @@ fun TodayScreen(
                                         } else {
                                             dangerTextColor()
                                         },
-                                        modifier = Modifier.padding(bottom = 4.dp),
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                            .semantics { hideFromAccessibility() },
                                     )
                                 }
                             }
@@ -389,22 +395,22 @@ fun TodayScreen(
                                 bac.fmt2(locale),
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
+                                // Caption and figure as one sentence: the per-mille
+                                // sign is spelled out letter by letter by TalkBack
+                                // ("p e r m i l"), so the pair states the word.
+                                Column(
+                                    Modifier.weight(1f)
+                                        .semantics(mergeDescendants = true) { contentDescription = spokenBac },
+                                ) {
                                     Text(
                                         stringResource(R.string.bac_estimate),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.clearAndSetSemantics { },
+                                        modifier = Modifier.semantics { hideFromAccessibility() },
                                     )
                                     Text(
                                         "${bac.fmt2(locale)} ‰",
-                                        // The per-mille sign is spelled out letter by
-                                        // letter by TalkBack ("p e r m i l"), so the
-                                        // row states the word instead. The caption
-                                        // above it joins the same sentence.
-                                        modifier = Modifier.semantics(mergeDescendants = true) {
-                                            contentDescription = spokenBac
-                                        },
+                                        modifier = Modifier.semantics { hideFromAccessibility() },
                                         style = MaterialTheme.typography.titleLarge,
                                         color = when {
                                             bac >= 0.5 -> dangerTextColor()

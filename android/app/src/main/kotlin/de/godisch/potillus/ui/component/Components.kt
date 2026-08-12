@@ -61,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -350,11 +351,13 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                 )
                 Text(
                     "$time · ${entry.volumeMl} ml · ${entry.alcoholPercent} % · ${entry.gramsAlcohol.fmt1(locale)} g",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                 )
                 if (entry.note.isNotBlank()) {
                     Text(
@@ -363,6 +366,7 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.semantics { hideFromAccessibility() },
                     )
                 }
             }
@@ -451,12 +455,14 @@ fun LimitBar(
     //   A node's own contentDescription is what an accessibility service reads,
     //   in place of the text collected from its children.
     //
-    //   MERGE, NOT clearAndSetSemantics. Clearing drops the child Texts from the
-    //   semantics tree entirely — including the UNMERGED tree that `onNodeWithText`
-    //   searches — so the UI tests asserting the visible label could no longer see
-    //   it (0.85.0: they went red exactly this way). Merging changes what is SPOKEN
-    //   and leaves the tree inspectable with `useUnmergedTree = true`. The progress
-    //   indicator is silenced on its own below, where no text is lost.
+    //   MERGE PLUS hideFromAccessibility, NOT clearAndSetSemantics. Clearing drops
+    //   the child Texts from the semantics tree entirely — including the UNMERGED
+    //   tree that `onNodeWithText` searches — so the UI tests asserting the visible
+    //   label could no longer see it (0.85.0: they went red exactly this way).
+    //   Merging alone is not enough either: a parent's contentDescription is read
+    //   IN ADDITION to whatever its children contribute, so the row announced its
+    //   sentence and then the same figures again. Each child therefore hides
+    //   itself, which keeps it in the tree for a test and out of the announcement.
     val spoken = stringResource(
         R.string.a11y_limit_grams,
         spokenCaption,
@@ -484,14 +490,18 @@ fun LimitBar(
             } else {
                 "${totalGrams.fmt1(locale)} g"
             }
-            Text(leftText, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+            Text(
+                leftText,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
+            )
             Text(
                 caption,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 // Guaranteed minimum visual gap from the left text so the two
                 // values never visually merge.
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = 8.dp).semantics { hideFromAccessibility() },
                 softWrap = false,
                 maxLines = 1,
             )
@@ -501,7 +511,7 @@ fun LimitBar(
             progress = { fraction.coerceIn(0f, 1f) },
             // Silent: its ProgressBarRangeInfo would otherwise merge into the row
             // above and add a bare percentage to the sentence.
-            modifier = Modifier.fillMaxWidth().height(8.dp).clearAndSetSemantics { },
+            modifier = Modifier.fillMaxWidth().height(8.dp).semantics { hideFromAccessibility() },
             color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
@@ -746,7 +756,7 @@ fun DrinkDaysBar(
             Text(
                 "$drinkDays / $maxDrinkDays ${stringResource(R.string.drink_days_label)}",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
             )
             if (weekLabel.isNotEmpty()) {
                 Text(
@@ -755,7 +765,7 @@ fun DrinkDaysBar(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     // Mirrors LimitBar: a minimum gap, and a value that can never
                     // be broken across lines.
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 8.dp).semantics { hideFromAccessibility() },
                     softWrap = false,
                     maxLines = 1,
                 )
@@ -766,7 +776,7 @@ fun DrinkDaysBar(
             progress = { fraction.coerceIn(0f, 1f) },
             // Silent: its ProgressBarRangeInfo would otherwise merge into the row
             // above and add a bare percentage to the sentence.
-            modifier = Modifier.fillMaxWidth().height(8.dp).clearAndSetSemantics { },
+            modifier = Modifier.fillMaxWidth().height(8.dp).semantics { hideFromAccessibility() },
             color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
