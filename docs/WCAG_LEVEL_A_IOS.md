@@ -89,8 +89,10 @@ and not where to stop:
   month.
 - The statistics screen labels its period arrows and combines one row group.
 - Every `LimitBar` is a single element whose label states the caption, the value
-  and the limit as one sentence with the unit spelled out; the track behind it is
-  hidden as decoration. The date range in the seven-day caption is shown and not
+  and the limit as one sentence with the unit spelled out ("grams of alcohol",
+  the mass every limit here is counted in); the track behind it is hidden as
+  decoration. Android's bars state the same sentence from strings of the same
+  English wording. The date range in the seven-day caption is shown and not
   spoken.
 - The two summary rows on Today carry the same kind of sentence, so "Ø" and
   "g/day" reach a reader as the words they abbreviate. The trend arrow beside the

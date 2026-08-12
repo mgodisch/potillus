@@ -28455,399 +28455,6 @@
         }
       }
     },
-    "%1$@: %2$@ grams": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ grams"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ Gramm"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gram"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gram"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gram"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gram"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gramos"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ : %2$@ grammes"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ grammi"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gramas"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gramas"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ grame"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gramů"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ gramów"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ граммов"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ грамів"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ γραμμάρια"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：%2$@ グラム"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ 그램"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：%2$@ 克"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：%2$@ 克"
-          }
-        }
-      }
-    },
-    "Average %1$@: %2$@ grams per day": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Average %1$@: %2$@ grams per day"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Durchschnitt %1$@: %2$@ Gramm pro Tag"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gennemsnit %1$@: %2$@ gram pr. dag"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gemiddelde %1$@: %2$@ gram per dag"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gjennomsnitt %1$@: %2$@ gram per dag"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genomsnitt %1$@: %2$@ gram per dag"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Promedio de %1$@: %2$@ gramos por día"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moyenne de %1$@ : %2$@ grammes par jour"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Media di %1$@: %2$@ grammi al giorno"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Média de %1$@: %2$@ gramas por dia"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Média de %1$@: %2$@ gramas por dia"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Media pe %1$@: %2$@ grame pe zi"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Průměr za %1$@: %2$@ gramů za den"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Średnia za %1$@: %2$@ gramów dziennie"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Среднее за %1$@: %2$@ граммов в день"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Середнє за %1$@: %2$@ грамів на день"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Μέσος όρος %1$@: %2$@ γραμμάρια την ημέρα"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@の平均：1日あたり %2$@ グラム"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ 평균: 하루 %2$@ 그램"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@平均：每天 %2$@ 克"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@平均：每天 %2$@ 克"
-          }
-        }
-      }
-    },
-    "%1$@: %2$@ of at most %3$@ grams": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ of at most %3$@ grams"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ von maximal %3$@ Gramm"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ af højst %3$@ gram"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ van maximaal %3$@ gram"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ av maksimalt %3$@ gram"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ av högst %3$@ gram"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ de un máximo de %3$@ gramos"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ : %2$@ sur un maximum de %3$@ grammes"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ su un massimo di %3$@ grammi"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ de um máximo de %3$@ gramas"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ de um máximo de %3$@ gramas"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ dintr-un maximum de %3$@ grame"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ z maximálně %3$@ gramů"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ z maksymalnie %3$@ gramów"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ из максимум %3$@ граммов"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ з максимум %3$@ грамів"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: %2$@ από το πολύ %3$@ γραμμάρια"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：最大 %3$@ グラム中 %2$@ グラム"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@: 최대 %3$@ 그램 중 %2$@ 그램"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：%2$@ 克，上限 %3$@ 克"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@：%2$@ 克，上限 %3$@ 克"
-          }
-        }
-      }
-    },
     "%1$@: %2$@ of at most %3$@": {
       "extractionState": "manual",
       "localizations": {
@@ -29634,137 +29241,6 @@
         }
       }
     },
-    ", %1$lld millilitres, %2$@ percent, %3$@ grams": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld millilitres, %2$@ percent, %3$@ grams"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld Milliliter, %2$@ Prozent, %3$@ Gramm"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld milliliter, %2$@ procent, %3$@ gram"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld milliliter, %2$@ procent, %3$@ gram"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld milliliter, %2$@ prosent, %3$@ gram"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld milliliter, %2$@ procent, %3$@ gram"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitros, %2$@ por ciento, %3$@ gramos"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld millilitres, %2$@ pour cent, %3$@ grammes"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld millilitri, %2$@ per cento, %3$@ grammi"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitros, %2$@ por cento, %3$@ gramas"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitros, %2$@ por cento, %3$@ gramas"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitri, %2$@ la sută, %3$@ grame"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitrů, %2$@ procenta, %3$@ gramů"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld mililitrów, %2$@ procent, %3$@ gramów"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld миллилитров, %2$@ процента, %3$@ граммов"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld мілілітрів, %2$@ відсотка, %3$@ грамів"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld χιλιοστόλιτρα, %2$@ τοις εκατό, %3$@ γραμμάρια"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "、%1$lld ミリリットル、%2$@ パーセント、%3$@ グラム"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ", %1$lld 밀리리터, %2$@ 퍼센트, %3$@ 그램"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "，%1$lld 毫升，%2$@ 百分比，%3$@ 克"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "，%1$lld 毫升，%2$@ 百分比，%3$@ 克"
-          }
-        }
-      }
-    },
     ", %1$@": {
       "extractionState": "manual",
       "localizations": {
@@ -30416,6 +29892,530 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@：%2$@ 百分比，酒精 %3$@ 克"
+          }
+        }
+      }
+    },
+    "%1$@: %2$@ grams of alcohol": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ grams of alcohol"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ Gramm Alkohol"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gram alkohol"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gram alcohol"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gram alkohol"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gram alkohol"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gramos de alcohol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ : %2$@ grammes d'alcool"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ grammi di alcol"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gramas de álcool"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gramas de álcool"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ grame de alcool"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gramů alkoholu"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ gramów alkoholu"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ граммов алкоголя"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ грамів алкоголю"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ γραμμάρια αλκοόλ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：%2$@ グラムのアルコール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ 그램의 알코올"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：%2$@ 克酒精"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：%2$@ 克酒精"
+          }
+        }
+      }
+    },
+    "%1$@: %2$@ of at most %3$@ grams of alcohol": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ of at most %3$@ grams of alcohol"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ von maximal %3$@ Gramm Alkohol"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ af højst %3$@ gram alkohol"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ van maximaal %3$@ gram alcohol"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ av maksimalt %3$@ gram alkohol"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ av högst %3$@ gram alkohol"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ de un máximo de %3$@ gramos de alcohol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ : %2$@ sur un maximum de %3$@ grammes d'alcool"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ su un massimo di %3$@ grammi di alcol"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ de um máximo de %3$@ gramas de álcool"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ de um máximo de %3$@ gramas de álcool"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ dintr-un maximum de %3$@ grame de alcool"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ z maximálně %3$@ gramů alkoholu"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ z maksymalnie %3$@ gramów alkoholu"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ из максимум %3$@ граммов алкоголя"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ з максимум %3$@ грамів алкоголю"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ από το πολύ %3$@ γραμμάρια αλκοόλ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：最大 %3$@ グラムのアルコール中 %2$@ グラムのアルコール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: 최대 %3$@ 그램의 알코올 중 %2$@ 그램의 알코올"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：%2$@ 克酒精，上限 %3$@ 克酒精"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@：%2$@ 克酒精，上限 %3$@ 克酒精"
+          }
+        }
+      }
+    },
+    "Average %1$@: %2$@ grams of alcohol per day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Average %1$@: %2$@ grams of alcohol per day"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durchschnitt %1$@: %2$@ Gramm Alkohol pro Tag"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemsnit %1$@: %2$@ gram alkohol pr. dag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemiddelde %1$@: %2$@ gram alcohol per dag"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomsnitt %1$@: %2$@ gram alkohol per dag"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genomsnitt %1$@: %2$@ gram alkohol per dag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Promedio de %1$@: %2$@ gramos de alcohol por día"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moyenne de %1$@ : %2$@ grammes d'alcool par jour"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media di %1$@: %2$@ grammi di alcol al giorno"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Média de %1$@: %2$@ gramas de álcool por dia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Média de %1$@: %2$@ gramas de álcool por dia"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Media pe %1$@: %2$@ grame de alcool pe zi"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Průměr za %1$@: %2$@ gramů alkoholu za den"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Średnia za %1$@: %2$@ gramów alkoholu dziennie"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Среднее за %1$@: %2$@ граммов алкоголя в день"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Середнє за %1$@: %2$@ грамів алкоголю на день"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μέσος όρος %1$@: %2$@ γραμμάρια αλκοόλ την ημέρα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@の平均：1日あたり %2$@ グラムのアルコール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 평균: 하루 %2$@ 그램의 알코올"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@平均：每天 %2$@ 克酒精"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@平均：每天 %2$@ 克酒精"
+          }
+        }
+      }
+    },
+    "%1$lld millilitres, %2$@ percent, %3$@ grams of alcohol": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld millilitres, %2$@ percent, %3$@ grams of alcohol"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Milliliter, %2$@ Prozent, %3$@ Gramm Alkohol"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld milliliter, %2$@ procent, %3$@ gram alkohol"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld milliliter, %2$@ procent, %3$@ gram alcohol"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld milliliter, %2$@ prosent, %3$@ gram alkohol"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld milliliter, %2$@ procent, %3$@ gram alkohol"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitros, %2$@ por ciento, %3$@ gramos de alcohol"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld millilitres, %2$@ pour cent, %3$@ grammes d'alcool"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld millilitri, %2$@ per cento, %3$@ grammi di alcol"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitros, %2$@ por cento, %3$@ gramas de álcool"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitros, %2$@ por cento, %3$@ gramas de álcool"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitri, %2$@ la sută, %3$@ grame de alcool"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitrů, %2$@ procenta, %3$@ gramů alkoholu"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld mililitrów, %2$@ procent, %3$@ gramów alkoholu"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld миллилитров, %2$@ процента, %3$@ граммов алкоголя"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld мілілітрів, %2$@ відсотка, %3$@ грамів алкоголю"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld χιλιοστόλιτρα, %2$@ τοις εκατό, %3$@ γραμμάρια αλκοόλ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld ミリリットル、%2$@ パーセント、%3$@ グラムのアルコール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld 밀리리터, %2$@ 퍼센트, %3$@ 그램의 알코올"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
           }
         }
       }

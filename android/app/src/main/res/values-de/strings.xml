@@ -48,7 +48,6 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- BAC / Promille-Schätzer -->
     <string name="bac_estimate">Promille-Schätzung</string>
-    <string name="bac_disclaimer">Schätzwert · nicht zur Einschätzung der Fahreignung geeignet</string>
     <string name="stats_from_label">Statistik ab</string>
     <string name="stats_from_desc">Einträge vor diesem Datum werden in allen Statistiken ignoriert.</string>
     <string name="stats_from_clear">Gesamten Verlauf einbeziehen</string>
@@ -225,6 +224,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Notiz</string>
     <string name="pdf_unit_g_per_day">g/Tag</string>
     <string name="drink_days_label">Trinktage (letzte 7 Tage)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s Gramm Alkohol</string>
+    <string name="a11y_average_per_day">Durchschnitt %1$s: %2$s Gramm Alkohol pro Tag</string>
+    <string name="a11y_limit_grams">%1$s: %2$s von maximal %3$s Gramm Alkohol</string>
+    <string name="a11y_limit_plain">%1$s: %2$s von maximal %3$s</string>
+    <string name="a11y_drink_days_caption">Trinktage, letzte 7 Tage</string>
+    <string name="a11y_entry_detail">%1$d Milliliter, %2$s Prozent, %3$s Gramm Alkohol</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s Promille</string>
+    <string name="delete_entry">Eintrag löschen</string>
     <string name="drink_days_setting">Max. Trinktage/7 Tage</string>
     <string name="personal_data">Persönliche Daten</string>
     <string name="limits">Limits</string>

@@ -278,6 +278,14 @@ struct TodayScreen: View {
     private func grams(_ value: Double) -> String {
         "\(Loc.number(value, fractionDigits: 1, locale: locale)) g"
     }
+
+    /// A LIMIT in grams, with no decimal place. A limit is a round figure the
+    /// user typed; the tenth is noise beside it, and Android has always shown
+    /// it this way. The consumed value keeps its decimal — that is the figure
+    /// the screen exists to resolve.
+    private func limitGrams(_ value: Double) -> String {
+        "\(Loc.number(value, fractionDigits: 0, locale: locale)) g"
+    }
 }
 
 // The summary section and the formatting it depends on live here, off the view
@@ -338,7 +346,7 @@ extension TodayScreen {
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Loc.string(
-                    "%1$@: %2$@ grams",
+                    "%1$@: %2$@ grams of alcohol",
                     Loc.string("Today's Total", locale: locale),
                     Loc.number(model.state.totalGrams, fractionDigits: 1, locale: locale),
                     locale: locale
@@ -366,7 +374,7 @@ extension TodayScreen {
             LimitBar(
                 caption: Loc.string("Today", locale: locale),
                 value: grams(model.state.totalGrams),
-                limit: grams(model.state.limitInfo.limitGrams),
+                limit: limitGrams(model.state.limitInfo.limitGrams),
                 fill: LimitGauge.fillFraction(
                     totalGrams: model.state.totalGrams,
                     limitGrams: model.state.limitInfo.limitGrams
@@ -385,7 +393,7 @@ extension TodayScreen {
             LimitBar(
                 caption: sevenDayCaption,
                 value: grams(model.state.weeklyTotalGrams),
-                limit: grams(model.state.limitInfo.weeklyLimitGrams),
+                limit: limitGrams(model.state.limitInfo.weeklyLimitGrams),
                 fill: LimitGauge.fillFraction(
                     totalGrams: model.state.weeklyTotalGrams,
                     limitGrams: model.state.limitInfo.weeklyLimitGrams
@@ -490,7 +498,7 @@ extension TodayScreen {
         // its value. See `entrySpokenDetail` for why the time is a `Text` of its
         // own and not part of the formatted string.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(entry.drinkName)
+        .accessibilityLabel(entrySpokenLabel(entry))
         .accessibilityValue(entrySpokenValue(entry))
         // `Text(_:style:)` renders and speaks against `\.locale`, which is the
         // SYSTEM locale here — every other string on this screen goes through
@@ -499,18 +507,29 @@ extension TodayScreen {
         .environment(\.locale, locale)
     }
 
-    /// The row's spoken value: the time, then the figures with their units
-    /// written out, then the note.
+    /// The row's spoken NAME: the time, then the drink.
     ///
-    /// The time is a `Text(_:style:)` rather than a formatted string on purpose.
-    /// VoiceOver reads "17:16" as two numbers; handed a date it speaks the
-    /// locale's own clock form. That is also why the rest arrives as a separate
-    /// catalogue string whose key OPENS with a separator: the two halves are
-    /// concatenated, so the comma has to live at the front of the second one.
-    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
+    /// The time leads because it is what orders the list and what a reader
+    /// scanning for one entry listens for; the drink name repeats across rows.
+    /// It is a `Text(_:style:)` rather than a formatted string on purpose —
+    /// VoiceOver reads "17:16" as two numbers, but speaks a date value in the
+    /// locale's own clock form.
+    private func entrySpokenLabel(_ entry: ConsumptionEntry) -> Text {
         let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        return Text(time, style: .time) + Text(Loc.string(", %1$@", entry.drinkName, locale: locale))
+    }
+
+    /// The row's spoken VALUE: the figures with their units written out, then
+    /// the note. The time and the drink are the row's name; see
+    /// `entrySpokenLabel`.
+    ///
+    /// The units are spelled out because a reader meets "ml", "%" and "g" as the
+    /// characters they are. "Grams of alcohol" rather than "grams": the row lists
+    /// a volume of drink and a mass of alcohol next to each other, and only the
+    /// second is the figure every limit in this app is counted in.
+    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
         var detail = Loc.string(
-            ", %1$lld millilitres, %2$@ percent, %3$@ grams",
+            "%1$lld millilitres, %2$@ percent, %3$@ grams of alcohol",
             entry.volumeMl,
             Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale),
             Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale),
@@ -519,7 +538,7 @@ extension TodayScreen {
         if !entry.note.isEmpty {
             detail += Loc.string(", %1$@", entry.note, locale: locale)
         }
-        return Text(time, style: .time) + Text(detail)
+        return Text(detail)
     }
 
     /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the same
@@ -559,10 +578,10 @@ extension TodayScreen {
     /// speaks as the letter.
     private func gramsSpoken(caption: String, value: Double, limit: Double) -> String {
         Loc.string(
-            "%1$@: %2$@ of at most %3$@ grams",
+            "%1$@: %2$@ of at most %3$@ grams of alcohol",
             caption,
             Loc.number(value, fractionDigits: 1, locale: locale),
-            Loc.number(limit, fractionDigits: 1, locale: locale),
+            Loc.number(limit, fractionDigits: 0, locale: locale),
             locale: locale
         )
     }
@@ -572,7 +591,7 @@ extension TodayScreen {
     /// spelled out they are the same sentence a sighted user reads at a glance.
     private var monthlyAverageSpoken: String {
         Loc.string(
-            "Average %1$@: %2$@ grams per day",
+            "Average %1$@: %2$@ grams of alcohol per day",
             monthName(model.state.logicalDate),
             Loc.number(model.state.monthlyAvgPerDay, fractionDigits: 1, locale: locale),
             locale: locale

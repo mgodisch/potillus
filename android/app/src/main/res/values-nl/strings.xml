@@ -40,7 +40,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="no_entries_day">Geen invoer voor deze dag.</string>
     <string name="favorites_quick">Snelle selectie favorieten</string>
     <string name="bac_estimate">Promille-schatting</string>
-    <string name="bac_disclaimer">Schatting · niet voor rijden</string>
     <string name="stats_from_label">Statistieken vanaf</string>
     <string name="stats_from_desc">Invoer vóór deze datum wordt uitgesloten van alle statistieken.</string>
     <string name="stats_from_clear">Volledige geschiedenis opnemen</string>
@@ -194,6 +193,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Notitie</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drinkdagen (laatste 7 dagen)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s gram alcohol</string>
+    <string name="a11y_average_per_day">Gemiddelde %1$s: %2$s gram alcohol per dag</string>
+    <string name="a11y_limit_grams">%1$s: %2$s van maximaal %3$s gram alcohol</string>
+    <string name="a11y_limit_plain">%1$s: %2$s van maximaal %3$s</string>
+    <string name="a11y_drink_days_caption">Drinkdagen, laatste 7 dagen</string>
+    <string name="a11y_entry_detail">%1$d milliliter, %2$s procent, %3$s gram alcohol</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s promille</string>
+    <string name="delete_entry">Registratie verwijderen</string>
     <string name="drink_days_setting">Max. drinkdagen/7 dagen</string>
     <string name="personal_data">Persoonlijke gegevens</string>
     <string name="limits">Limieten</string>

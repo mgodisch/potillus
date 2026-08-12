@@ -66,7 +66,6 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- BAC estimate -->
     <string name="bac_estimate">Estimare BAC</string>
-    <string name="bac_disclaimer">Estimare · nu pentru decizii de condus</string>
     <string name="stats_from_label">Statistici de la</string>
     <string name="stats_from_desc">Înregistrările dinaintea acestei date sunt excluse din toate statisticile.</string>
     <string name="stats_from_clear">Include tot istoricul</string>
@@ -247,6 +246,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_unit_g_per_day">g/zi</string>
     <!-- Drinking-days and weekly gram mode -->
     <string name="drink_days_label">zile de băut (ultimele 7 zile)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s grame de alcool</string>
+    <string name="a11y_average_per_day">Media pe %1$s: %2$s grame de alcool pe zi</string>
+    <string name="a11y_limit_grams">%1$s: %2$s dintr-un maximum de %3$s grame de alcool</string>
+    <string name="a11y_limit_plain">%1$s: %2$s dintr-un maximum de %3$s</string>
+    <string name="a11y_drink_days_caption">Zile de băut, ultimele 7 zile</string>
+    <string name="a11y_entry_detail">%1$d mililitri, %2$s la sută, %3$s grame de alcool</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s la mie</string>
+    <string name="delete_entry">Șterge înregistrarea</string>
     <string name="drink_days_setting">Max. zile de băut/7 zile</string>
     <string name="personal_data">Date personale</string>
     <string name="limits">Limite</string>

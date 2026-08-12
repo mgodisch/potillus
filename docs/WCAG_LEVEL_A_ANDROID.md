@@ -68,6 +68,15 @@ viewer, the PDF export flow.
   - Traffic-light capacity dot → TalkBack announces the capacity state
     (implemented: `contentDescription` on `TrafficLightDot`).
   - Statistics charts (bar/value/donut) → each announces a summary (implemented).
+  - Limit bars → each is one node stating its caption, its value and its limit as
+    a sentence, with the units written out; the progress indicator inside is
+    silent (implemented). It used to announce a bare percentage of its own, and
+    the drink-days bar composed "1 / 4", which a screen reader speaks as the
+    fraction "one quarter".
+  - Today's two headline pairs and an entry row → one node each, the entry row
+    leading with its time (implemented). *Confirm the wording on device.*
+  - The blood-alcohol figure → the per-mille sign is spoken as the word
+    (implemented); left as the sign it is spelled out letter by letter.
   - Drink-category icons, star/favourite, delete/edit icons → each has a
     description. *Verify none announce as "unlabelled".*
   - Purely decorative graphics announce nothing.

@@ -60,7 +60,6 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- BAC estimate -->
     <string name="bac_estimate">BAC-estimat</string>
-    <string name="bac_disclaimer">Estimat · ikke for kjørebeslutninger</string>
     <string name="stats_from_label">Statistikk fra</string>
     <string name="stats_from_desc">Registreringer før denne datoen utelates fra all statistikk.</string>
     <string name="stats_from_clear">Ta med hele historikken</string>
@@ -236,6 +235,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Notat</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drikkedager (siste 7 dager)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s gram alkohol</string>
+    <string name="a11y_average_per_day">Gjennomsnitt %1$s: %2$s gram alkohol per dag</string>
+    <string name="a11y_limit_grams">%1$s: %2$s av maksimalt %3$s gram alkohol</string>
+    <string name="a11y_limit_plain">%1$s: %2$s av maksimalt %3$s</string>
+    <string name="a11y_drink_days_caption">Drikkedager, siste 7 dager</string>
+    <string name="a11y_entry_detail">%1$d milliliter, %2$s prosent, %3$s gram alkohol</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s promille</string>
+    <string name="delete_entry">Slett registrering</string>
     <string name="drink_days_setting">Maks. drikkedager/7 dager</string>
     <string name="personal_data">Personlige data</string>
     <string name="limits">Grenser</string>

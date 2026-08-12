@@ -44,7 +44,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="favorites_quick">Favoritos rápidos</string>
 
     <string name="bac_estimate">Estimación de alcoholemia</string>
-    <string name="bac_disclaimer">Estimación · no válida para conducir</string>
     <string name="stats_from_label">Estadísticas desde</string>
     <string name="stats_from_desc">Las entradas anteriores a esta fecha se excluyen de todas las estadísticas.</string>
     <string name="stats_from_clear">Incluir todo el historial</string>
@@ -212,6 +211,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Nota</string>
     <string name="pdf_unit_g_per_day">g/día</string>
     <string name="drink_days_label">días de bebida (últimos 7 días)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s gramos de alcohol</string>
+    <string name="a11y_average_per_day">Promedio de %1$s: %2$s gramos de alcohol por día</string>
+    <string name="a11y_limit_grams">%1$s: %2$s de un máximo de %3$s gramos de alcohol</string>
+    <string name="a11y_limit_plain">%1$s: %2$s de un máximo de %3$s</string>
+    <string name="a11y_drink_days_caption">Días de bebida, últimos 7 días</string>
+    <string name="a11y_entry_detail">%1$d mililitros, %2$s por ciento, %3$s gramos de alcohol</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s por mil</string>
+    <string name="delete_entry">Eliminar registro</string>
     <string name="drink_days_setting">Días máx./7 días</string>
     <string name="personal_data">Datos personales</string>
     <string name="limits">Límites</string>

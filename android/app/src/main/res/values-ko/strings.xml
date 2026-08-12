@@ -65,7 +65,6 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- BAC estimate -->
     <string name="bac_estimate">혈중 알코올 농도 추정</string>
-    <string name="bac_disclaimer">추정값 · 운전 판단에 사용하지 마세요</string>
     <string name="stats_from_label">통계 시작일</string>
     <string name="stats_from_desc">이 날짜 이전의 기록은 모든 통계에서 제외됩니다.</string>
     <string name="stats_from_clear">전체 기록 포함</string>
@@ -239,6 +238,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">메모</string>
     <string name="pdf_unit_g_per_day">g/일</string>
     <string name="drink_days_label">음주일 수 (최근 7일)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s 그램의 알코올</string>
+    <string name="a11y_average_per_day">%1$s 평균: 하루 %2$s 그램의 알코올</string>
+    <string name="a11y_limit_grams">%1$s: 최대 %3$s 그램의 알코올 중 %2$s 그램</string>
+    <string name="a11y_limit_plain">%1$s: 최대 %3$s 중 %2$s</string>
+    <string name="a11y_drink_days_caption">음주일 수, 최근 7일</string>
+    <string name="a11y_entry_detail">%1$d 밀리리터, %2$s 퍼센트, %3$s 그램의 알코올</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s 퍼밀</string>
+    <string name="delete_entry">기록 삭제</string>
     <string name="drink_days_setting">7일 최대 음주일 수</string>
     <string name="personal_data">개인 데이터</string>
     <string name="limits">한도</string>

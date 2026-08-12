@@ -309,6 +309,12 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
         val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.timestampMillis), ZoneId.systemDefault())
         "%02d:%02d".format(ldt.hour, ldt.minute)
     }
+    val spokenDetail = stringResource(
+        R.string.a11y_entry_detail,
+        entry.volumeMl,
+        entry.alcoholPercent.fmt1(locale),
+        entry.gramsAlcohol.fmt1(locale),
+    )
     // Not [SectionCard]: this row wants 12dp of vertical padding, not the card's
     // standard 16dp, and it lays its content out as a Row rather than a Column.
     // Same colours and lift, deliberately.
@@ -321,7 +327,18 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            // ONE SENTENCE FOR TALKBACK: time, drink, figures, note. Left alone the
+            // Column is three nodes read in visual order — the drink name first,
+            // then the two icon buttons between it and the detail line, so the
+            // figures arrived detached from the drink they belong to. The time
+            // leads because it is what orders the list; the units are spelled out
+            // ("ml", "%" and "g" reach a reader as characters), and the colon-free
+            // separators keep the sentence flat.
+            val spoken = time +
+                stringResource(R.string.a11y_append, entry.drinkName) +
+                stringResource(R.string.a11y_append, spokenDetail) +
+                if (entry.note.isNotBlank()) stringResource(R.string.a11y_append, entry.note) else ""
+            Column(modifier = Modifier.weight(1f).clearAndSetSemantics { contentDescription = spoken }) {
                 Text(
                     entry.drinkName,
                     style = MaterialTheme.typography.bodyLarge,
@@ -349,7 +366,9 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
                     Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_entry), tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = dangerRedColor())
+                    // Not R.string.delete: on its own the word names no object,
+                    // and the row's own text is a separate node from this button.
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_entry), tint = dangerRedColor())
                 }
             }
         }
@@ -392,6 +411,7 @@ fun LimitBar(
     caption: String,
     modifier: Modifier = Modifier,
     leftSuffix: String = "",
+    spokenCaption: String = caption,
 ) {
     // Per-app locale for the consumed-grams label (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
@@ -413,7 +433,24 @@ fun LimitBar(
         fraction < 0.75f -> MaterialTheme.colorScheme.primary
         else -> warningColor()
     }
-    Column(modifier = modifier) {
+    // ONE SENTENCE FOR TALKBACK (v0.85.0 VoiceOver/TalkBack round).
+    //   Left to itself this Column is three nodes: the gram figure, the caption,
+    //   and the progress indicator — which announces a bare percentage ("99
+    //   percent, progress bar"), a number the screen never shows and that says
+    //   nothing about which limit it belongs to. A reader met the two figures
+    //   split apart with a stray percentage between them.
+    //
+    //   clearAndSetSemantics collapses all of that to the sentence [spokenCaption]
+    //   and the figures make, with the units spelled out ("g" reads as the
+    //   letter) and the limit's decimal dropped as it is on screen. The bar goes
+    //   silent: it is a second rendering of the same ratio.
+    val spoken = stringResource(
+        R.string.a11y_limit_grams,
+        spokenCaption,
+        totalGrams.fmt1(locale),
+        limitGrams.fmt0(locale),
+    )
+    Column(modifier = modifier.clearAndSetSemantics { contentDescription = spoken }) {
         // LAYOUT HARDENING (v0.81.0 QA, eighth round) — same rule as StatsScreen's
         // StatRow: the FLEXIBLE text gets the weight, the FIXED one is pinned to a
         // single unbroken line.
@@ -673,7 +710,18 @@ fun DrinkDaysBar(
         fraction < 0.75f -> MaterialTheme.colorScheme.primary
         else -> warningColor()
     }
-    Column(modifier = modifier) {
+    // ONE SENTENCE FOR TALKBACK — see LimitBar for the reasoning. This row had a
+    // fault of its own on top of it: the visible label composes "1 / 4", and a
+    // screen reader speaks that as the FRACTION "one quarter". The spoken form
+    // states the two numbers separately, and the counted noun sits in the caption
+    // so the sentence needs no plural agreement in the 21 shipped languages.
+    val spoken = stringResource(
+        R.string.a11y_limit_plain,
+        stringResource(R.string.a11y_drink_days_caption),
+        drinkDays.toString(),
+        maxDrinkDays.toString(),
+    )
+    Column(modifier = modifier.clearAndSetSemantics { contentDescription = spoken }) {
         // LAYOUT HARDENING (v0.81.0 QA, eighth round) — see LimitBar for the full
         // rationale. This row is where the defect was first observed: the Greek and
         // Russian "N / M drinking days (last 7 days)" label is long enough to claim

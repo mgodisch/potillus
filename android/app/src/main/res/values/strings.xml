@@ -85,8 +85,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- BAC estimate -->
     <!-- Today screen: title of the blood-alcohol (BAC) estimate card. -->
     <string name="bac_estimate">BAC Estimate</string>
-    <!-- Today screen: disclaimer under the BAC card ('·' is a separator). -->
-    <string name="bac_disclaimer">Estimated value · not suitable for driving decisions</string>
     <!-- Settings > Statistics: label of the evaluation-start-date row. -->
     <string name="stats_from_label">Statistics From</string>
     <!-- Settings > Statistics: description under 'Statistics From'. -->
@@ -378,6 +376,26 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_unit_g_per_day">g/day</string>
     <!-- Today/Components: 'Drinking Days (last 7 days)' bar label. -->
     <string name="drink_days_label">Drinking Days (last 7 days)</string>
+    <!-- TalkBack: a caption and a gram figure as one sentence. %1$s = caption, %2$s = grams. -->
+    <!-- TalkBack: a caption and its value as one sentence. %1$s = caption, %2$s = value. -->
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s grams of alcohol</string>
+    <!-- TalkBack: the monthly average. %1$s = month, %2$s = grams. -->
+    <string name="a11y_average_per_day">Average %1$s: %2$s grams of alcohol per day</string>
+    <!-- TalkBack: one limit bar. %1$s = caption, %2$s = consumed, %3$s = limit. -->
+    <string name="a11y_limit_grams">%1$s: %2$s of at most %3$s grams of alcohol</string>
+    <!-- TalkBack: the drink-days bar. %1$s = caption, %2$s = used, %3$s = limit. -->
+    <string name="a11y_limit_plain">%1$s: %2$s of at most %3$s</string>
+    <!-- TalkBack: the drink-days caption without its brackets. -->
+    <string name="a11y_drink_days_caption">Drinking days, last 7 days</string>
+    <!-- TalkBack: an entry's figures. %1$d = millilitres, %2$s = percent, %3$s = grams. -->
+    <string name="a11y_entry_detail">%1$d millilitres, %2$s percent, %3$s grams of alcohol</string>
+    <!-- TalkBack: appends a further part to a spoken label. %1$s = the part. -->
+    <string name="a11y_append">, %1$s</string>
+    <!-- TalkBack: the blood-alcohol estimate. %1$s = caption, %2$s = figure. -->
+    <string name="a11y_caption_permille">%1$s: %2$s per mille</string>
+    <!-- Content description of an entry row's delete button. -->
+    <string name="delete_entry">Delete entry</string>
     <!-- Settings > Limits: max-drinking-days row label and its edit-dialog title. -->
     <string name="drink_days_setting">Max. Drinking Days/7 Days</string>
     <!-- Settings section header: Personal Data. -->

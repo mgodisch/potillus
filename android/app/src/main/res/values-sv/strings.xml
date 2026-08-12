@@ -40,7 +40,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="no_entries_day">Inga poster för den här dagen.</string>
     <string name="favorites_quick">Snabbval av favoriter</string>
     <string name="bac_estimate">Promilleuppskattning</string>
-    <string name="bac_disclaimer">Uppskattning · ej för körning</string>
     <string name="stats_from_label">Statistik från</string>
     <string name="stats_from_desc">Poster före detta datum utesluts från all statistik.</string>
     <string name="stats_from_clear">Inkludera hela historiken</string>
@@ -194,6 +193,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Anteckning</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drinkdagar (senaste 7 dagarna)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s gram alkohol</string>
+    <string name="a11y_average_per_day">Genomsnitt %1$s: %2$s gram alkohol per dag</string>
+    <string name="a11y_limit_grams">%1$s: %2$s av högst %3$s gram alkohol</string>
+    <string name="a11y_limit_plain">%1$s: %2$s av högst %3$s</string>
+    <string name="a11y_drink_days_caption">Drinkdagar, senaste 7 dagarna</string>
+    <string name="a11y_entry_detail">%1$d milliliter, %2$s procent, %3$s gram alkohol</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s promille</string>
+    <string name="delete_entry">Ta bort registrering</string>
     <string name="drink_days_setting">Max. drinkdagar/7 dagar</string>
     <string name="personal_data">Personliga uppgifter</string>
     <string name="limits">Gränser</string>

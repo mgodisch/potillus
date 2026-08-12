@@ -487,10 +487,10 @@ extension CalendarScreen {
                         // `LimitBar.spokenSummary` for why the row assembles one
                         // rather than leaving VoiceOver to read its parts.
                         spokenSummary: Loc.string(
-                            "%1$@: %2$@ of at most %3$@ grams",
+                            "%1$@: %2$@ of at most %3$@ grams of alcohol",
                             Loc.string("Today", locale: locale),
                             Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale),
-                            Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 1, locale: locale),
+                            Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale),
                             locale: locale
                         )
                     )
@@ -550,17 +550,29 @@ extension CalendarScreen {
         // The same spoken shape as Today's row; see `entrySpokenValue` there for
         // why the time is a `Text` of its own and why `\.locale` is set here.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(entry.drinkName)
+        .accessibilityLabel(entrySpokenLabel(entry))
         .accessibilityValue(entrySpokenValue(entry))
         .environment(\.locale, locale)
     }
 
-    /// The row's spoken value: the time, the figures with their units written
-    /// out, then the note. Shares its catalogue strings with Today's row.
-    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
+    /// The row's spoken NAME: the time, then the drink.
+    ///
+    /// The time leads because it is what orders the list and what a reader
+    /// scanning for one entry listens for; the drink name repeats across rows.
+    /// It is a `Text(_:style:)` rather than a formatted string on purpose —
+    /// VoiceOver reads "17:16" as two numbers, but speaks a date value in the
+    /// locale's own clock form.
+    private func entrySpokenLabel(_ entry: ConsumptionEntry) -> Text {
         let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        return Text(time, style: .time) + Text(Loc.string(", %1$@", entry.drinkName, locale: locale))
+    }
+
+    /// The row's spoken VALUE: the figures with their units written out, then
+    /// the note. Shares its catalogue strings with Today's row, whose
+    /// `entrySpokenValue` carries the reasoning.
+    private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
         var detail = Loc.string(
-            ", %1$lld millilitres, %2$@ percent, %3$@ grams",
+            "%1$lld millilitres, %2$@ percent, %3$@ grams of alcohol",
             entry.volumeMl,
             Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale),
             Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale),
@@ -569,7 +581,7 @@ extension CalendarScreen {
         if !entry.note.isEmpty {
             detail += Loc.string(", %1$@", entry.note, locale: locale)
         }
-        return Text(time, style: .time) + Text(detail)
+        return Text(detail)
     }
 
     /// "<time> · <ml> ml · <percent> % · <grams> g" in the in-app locale, the

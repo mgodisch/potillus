@@ -40,7 +40,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="no_entries_day">Нет записей за этот день.</string>
     <string name="favorites_quick">Быстрый выбор избранного</string>
     <string name="bac_estimate">Оценка промилле</string>
-    <string name="bac_disclaimer">Оценка · не для вождения</string>
     <string name="stats_from_label">Статистика с</string>
     <string name="stats_from_desc">Записи до этой даты исключаются из всей статистики.</string>
     <string name="stats_from_clear">Включить всю историю</string>
@@ -198,6 +197,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Заметка</string>
     <string name="pdf_unit_g_per_day">г/день</string>
     <string name="drink_days_label">дней с алкоголем (последние 7 дней)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s граммов алкоголя</string>
+    <string name="a11y_average_per_day">Среднее за %1$s: %2$s граммов алкоголя в день</string>
+    <string name="a11y_limit_grams">%1$s: %2$s из максимум %3$s граммов алкоголя</string>
+    <string name="a11y_limit_plain">%1$s: %2$s из максимум %3$s</string>
+    <string name="a11y_drink_days_caption">Дни с алкоголем, последние 7 дней</string>
+    <string name="a11y_entry_detail">%1$d миллилитров, %2$s процента, %3$s граммов алкоголя</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s промилле</string>
+    <string name="delete_entry">Удалить запись</string>
     <string name="drink_days_setting">Макс. дней/7 дней</string>
     <string name="personal_data">Личные данные</string>
     <string name="limits">Лимиты</string>

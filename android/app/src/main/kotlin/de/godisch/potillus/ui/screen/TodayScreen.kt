@@ -36,6 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -176,6 +178,32 @@ fun TodayScreen(
                         // a verbose language pair (e.g. el "Σύνολο σήμερα" +
                         // "Ø Σεπτέμβριος") the unweighted layout would let the left
                         // caption eat the row and break the month name across lines.
+                        //
+                        // TALKBACK: both captions are silent HERE and are spoken
+                        // with their figures in row 2 below. The pairing is what
+                        // carries the meaning, and the two halves sit in different
+                        // Rows because the layout needs them to; a reader met four
+                        // nodes, of which "Ø August" and a bare "19,7" then "g" say
+                        // nothing on their own. Empty semantics rather than a
+                        // repeated sentence, so nothing is announced twice.
+                        val spokenTotal = if (showAbstinence) {
+                            stringResource(
+                                R.string.a11y_caption_value,
+                                stringResource(R.string.current_streak),
+                                pluralStringResource(R.plurals.days, state.currentAbstinence, state.currentAbstinence),
+                            )
+                        } else {
+                            stringResource(
+                                R.string.a11y_caption_grams,
+                                stringResource(R.string.total_today),
+                                state.totalGrams.fmt1(locale),
+                            )
+                        }
+                        val spokenAverage = stringResource(
+                            R.string.a11y_average_per_day,
+                            state.currentMonthLabel,
+                            state.monthlyAvgPerDay.fmt1(locale),
+                        )
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 stringResource(
@@ -183,13 +211,13 @@ fun TodayScreen(
                                 ),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.weight(1f).clearAndSetSemantics { },
                             )
                             Text(
                                 stringResource(R.string.avg_of_month, state.currentMonthLabel),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 8.dp),
+                                modifier = Modifier.padding(start = 8.dp).clearAndSetSemantics { },
                                 softWrap = false,
                                 maxLines = 1,
                             )
@@ -209,7 +237,11 @@ fun TodayScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.Bottom,
                         ) {
-                            Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f)) {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                modifier = Modifier.weight(1f)
+                                    .clearAndSetSemantics { contentDescription = spokenTotal },
+                            ) {
                                 if (showAbstinence) {
                                     // Count and noun in ONE headline string, not a
                                     // figure with a small unit beside it like the
@@ -258,7 +290,13 @@ fun TodayScreen(
                                     )
                                 }
                             }
-                            Row(verticalAlignment = Alignment.Bottom) {
+                            // The trend arrow inside is silent as a consequence:
+                            // it repeats the direction of a figure the sentence has
+                            // just given, and iOS leaves it unspoken too.
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                modifier = Modifier.clearAndSetSemantics { contentDescription = spokenAverage },
+                            ) {
                                 Text(
                                     state.monthlyAvgPerDay.fmt1(locale),
                                     style = MaterialTheme.typography.headlineLarge,
@@ -310,6 +348,10 @@ fun TodayScreen(
                                 R.string.limit_caption_day,
                                 state.limitInfo.limitGrams.fmt0(locale),
                             ),
+                            // The visible caption is "20 g/day", which a reader
+                            // meets as letters and a slash; spoken it is the plain
+                            // word for the window the limit covers.
+                            spokenCaption = stringResource(R.string.today),
                         )
                         Spacer(Modifier.height(10.dp))
                         LimitBar(
@@ -320,6 +362,10 @@ fun TodayScreen(
                                 state.limitInfo.weeklyLimitGrams.fmt0(locale),
                             ),
                             leftSuffix = if (state.weeklyRangeLabel.isNotEmpty()) "(${state.weeklyRangeLabel})" else "",
+                            // The date range stays visible and unspoken: read out on
+                            // every pass it buries the two figures the row is for,
+                            // and the calendar states the same window navigably.
+                            spokenCaption = stringResource(R.string.week),
                         )
                         // Drink-days bar: distinct drink days this week vs. the max.
                         Spacer(Modifier.height(10.dp))
@@ -336,15 +382,28 @@ fun TodayScreen(
                             Spacer(Modifier.height(10.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                             Spacer(Modifier.height(8.dp))
+                            val spokenBac = stringResource(
+                                R.string.a11y_caption_permille,
+                                stringResource(R.string.bac_estimate),
+                                bac.fmt2(locale),
+                            )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         stringResource(R.string.bac_estimate),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.clearAndSetSemantics { },
                                     )
                                     Text(
                                         "${bac.fmt2(locale)} ‰",
+                                        // The per-mille sign is spelled out letter by
+                                        // letter by TalkBack ("p e r m i l"), so the
+                                        // row states the word instead. The caption
+                                        // above it joins the same sentence.
+                                        modifier = Modifier.clearAndSetSemantics {
+                                            contentDescription = spokenBac
+                                        },
                                         style = MaterialTheme.typography.titleLarge,
                                         color = when {
                                             bac >= 0.5 -> dangerTextColor()
@@ -353,13 +412,6 @@ fun TodayScreen(
                                         },
                                     )
                                 }
-                                Text(
-                                    stringResource(R.string.bac_disclaimer),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.End,
-                                )
                             }
                         }
                     }

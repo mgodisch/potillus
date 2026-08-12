@@ -40,7 +40,6 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="no_entries_day">Žádné záznamy pro tento den.</string>
     <string name="favorites_quick">Rychlý výběr oblíbených</string>
     <string name="bac_estimate">Odhad promile</string>
-    <string name="bac_disclaimer">Odhad · není pro řízení</string>
     <string name="stats_from_label">Statistiky od</string>
     <string name="stats_from_desc">Záznamy před tímto datem jsou vyloučeny ze všech statistik.</string>
     <string name="stats_from_clear">Zahrnout celou historii</string>
@@ -198,6 +197,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Poznámka</string>
     <string name="pdf_unit_g_per_day">g/den</string>
     <string name="drink_days_label">dny s alkoholem (posledních 7 dní)</string>
+    <string name="a11y_caption_value">%1$s: %2$s</string>
+    <string name="a11y_caption_grams">%1$s: %2$s gramů alkoholu</string>
+    <string name="a11y_average_per_day">Průměr za %1$s: %2$s gramů alkoholu za den</string>
+    <string name="a11y_limit_grams">%1$s: %2$s z maximálně %3$s gramů alkoholu</string>
+    <string name="a11y_limit_plain">%1$s: %2$s z maximálně %3$s</string>
+    <string name="a11y_drink_days_caption">Dny s alkoholem, posledních 7 dní</string>
+    <string name="a11y_entry_detail">%1$d mililitrů, %2$s procenta, %3$s gramů alkoholu</string>
+    <string name="a11y_append">, %1$s</string>
+    <string name="a11y_caption_permille">%1$s: %2$s promile</string>
+    <string name="delete_entry">Smazat záznam</string>
     <string name="drink_days_setting">Max. dní/7 dní</string>
     <string name="personal_data">Osobní údaje</string>
     <string name="limits">Limity</string>

@@ -65,7 +65,6 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- BAC estimate -->
     <string name="bac_estimate">血中アルコール濃度の推定</string>
-    <string name="bac_disclaimer">推定値 · 運転判断には使用しないでください</string>
     <string name="stats_from_label">統計開始日</string>
     <string name="stats_from_desc">この日付より前の記録はすべての統計から除外されます。</string>
     <string name="stats_from_clear">全履歴を含める</string>
@@ -239,6 +238,16 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">メモ</string>
     <string name="pdf_unit_g_per_day">g／日</string>
     <string name="drink_days_label">飲酒日数（直近7日間）</string>
+    <string name="a11y_caption_value">%1$s：%2$s</string>
+    <string name="a11y_caption_grams">%1$s：%2$s グラムのアルコール</string>
+    <string name="a11y_average_per_day">%1$sの平均：1日あたり %2$s グラムのアルコール</string>
+    <string name="a11y_limit_grams">%1$s：最大 %3$s グラムのアルコール中 %2$s グラム</string>
+    <string name="a11y_limit_plain">%1$s：最大 %3$s 中 %2$s</string>
+    <string name="a11y_drink_days_caption">飲酒日数、直近7日間</string>
+    <string name="a11y_entry_detail">%1$d ミリリットル、%2$s パーセント、%3$s グラムのアルコール</string>
+    <string name="a11y_append">、%1$s</string>
+    <string name="a11y_caption_permille">%1$s：%2$s パーミル</string>
+    <string name="delete_entry">記録を削除</string>
     <string name="drink_days_setting">7日間の最大飲酒日数</string>
     <string name="personal_data">個人データ</string>
     <string name="limits">上限</string>

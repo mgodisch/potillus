@@ -235,6 +235,9 @@ fun CalendarScreen(
                                         R.string.limit_caption_day,
                                         state.limitInfo.limitGrams.fmt0(locale),
                                     ),
+                                    // See TodayScreen's bars: the visible caption is
+                                    // an abbreviation, the spoken one a word.
+                                    spokenCaption = stringResource(R.string.today),
                                 )
                             }
                         }
@@ -296,6 +299,9 @@ fun CalendarScreen(
                                         R.string.limit_caption_day,
                                         state.limitInfo.limitGrams.fmt0(locale),
                                     ),
+                                    // See TodayScreen's bars: the visible caption is
+                                    // an abbreviation, the spoken one a word.
+                                    spokenCaption = stringResource(R.string.today),
                                 )
                             }
                         }

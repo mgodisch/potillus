@@ -152,17 +152,22 @@ Edit drinks from the list's edit mode
   abstinence streak, and no dot or colour in the calendars.
 - `AlcoholCalculator.isDrinkDay` and the drink-date queries carry that
   definition on both platforms.
-- The limit bars and the Today summary rows speak as one sentence, with their
-  units written out.
+- The limit bars and the Today summary rows speak as one sentence on both
+  platforms, with their units written out.
 - The body-weight note in Settings names what the weight is used for.
 - The day-change time speaks as one row, with its note beneath it.
 - The iOS Level A protocol carries the spoken form of those rows.
 - Entry rows, calendar days and the statistics period speak their dates and
-  units as words.
+  units as words; an entry row leads with its time on both platforms.
 - The edit toggle names the list it edits.
 - The category ring is silent and its legend states each slice in one sentence.
 - The calendar header and month name follow the in-app language.
 - The language picker labels its system entry in the system language.
+- Gram limits read without a decimal place.
+
+### Removed
+
+- The disclaimer beside the blood-alcohol estimate.
 
 ### Fixed
 
