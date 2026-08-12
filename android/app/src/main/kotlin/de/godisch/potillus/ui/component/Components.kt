@@ -72,6 +72,7 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.domain.model.TrafficLight
+import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
