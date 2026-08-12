@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.LocaleManagerCompat
 import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,6 +51,7 @@ import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.l10n.formattingLocale
+import de.godisch.potillus.l10n.localizedContextFor
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.errorColor
 import de.godisch.potillus.ui.theme.successColor
@@ -812,7 +814,20 @@ private fun LanguageDropdown(selected: String, onSelect: (String) -> Unit) {
     // offered as the first entry, "(System)", so a user can return to it after
     // choosing a fixed language (0.83.0: previously there was no way back). The
     // remaining entries come from SupportedLocales.ALL, the single source of truth.
-    val systemLabel = stringResource(R.string.language_system)
+    //
+    // Its label is resolved against the SYSTEM locale, not the per-app one, for
+    // the reason the other entries are autonyms: whoever needs the way back has
+    // set the app to a language they cannot read, and a label in that same
+    // language does not offer one. LocalContext carries the per-app locale (see
+    // LocaleSupport.kt), so the string is fetched from a context re-localized to
+    // the system list — LocaleManagerCompat.getSystemLocales reports it while
+    // ignoring the app override, which AppCompatDelegate.getApplicationLocales
+    // would return instead.
+    val context = LocalContext.current
+    val systemLabel = remember(context) {
+        context.localizedContextFor(LocaleManagerCompat.getSystemLocales(context))
+            .getString(R.string.language_system)
+    }
     val languages = listOf("" to systemLabel) + SupportedLocales.ALL.map { it.tag to it.autonym }
     val currentLabel = languages.find { it.first == selected }?.second ?: systemLabel
     var expanded by remember { mutableStateOf(false) }

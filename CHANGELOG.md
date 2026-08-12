@@ -162,6 +162,7 @@ Edit drinks from the list's edit mode
 - The edit toggle names the list it edits.
 - The category ring is silent and its legend states each slice in one sentence.
 - The calendar header and month name follow the in-app language.
+- The language picker labels its system entry in the system language.
 
 ### Fixed
 

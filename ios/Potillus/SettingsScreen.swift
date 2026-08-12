@@ -278,7 +278,15 @@ struct SettingsScreen: View {
                 // default. Offered first as "(System)" so a user can return to it
                 // after choosing a fixed language (0.83.0: previously the picker
                 // listed only the fixed languages, with no way back to system).
-                Text(Loc.string("(System)", locale: locale)).tag("")
+                //
+                // Its label is resolved against the SYSTEM locale, not the chosen
+                // one, for the reason the list below shows autonyms: whoever needs
+                // the way back has set the app to a language they cannot read, and
+                // a label in that same language does not offer a way back. The
+                // system locale is the one language such a user is known to have
+                // chosen deliberately. `Loc.locale(for: "")` IS the system locale
+                // — the same expression that resolves this very setting.
+                Text(Loc.string("(System)", locale: Loc.locale(for: ""))).tag("")
                 // The autonym: a language picker shows "Deutsch", not "German".
                 // Someone who needs the list cannot necessarily read the current
                 // interface language.
