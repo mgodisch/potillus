@@ -339,7 +339,10 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
                 stringResource(R.string.a11y_append, entry.drinkName) +
                 stringResource(R.string.a11y_append, spokenDetail) +
                 if (entry.note.isNotBlank()) stringResource(R.string.a11y_append, entry.note) else ""
-            Column(modifier = Modifier.weight(1f).clearAndSetSemantics { contentDescription = spoken }) {
+            Column(
+                modifier = Modifier.weight(1f)
+                    .semantics(mergeDescendants = true) { contentDescription = spoken },
+            ) {
                 Text(
                     entry.drinkName,
                     style = MaterialTheme.typography.bodyLarge,
@@ -441,17 +444,25 @@ fun LimitBar(
     //   nothing about which limit it belongs to. A reader met the two figures
     //   split apart with a stray percentage between them.
     //
-    //   clearAndSetSemantics collapses all of that to the sentence [spokenCaption]
-    //   and the figures make, with the units spelled out ("g" reads as the
-    //   letter) and the limit's decimal dropped as it is on screen. The bar goes
-    //   silent: it is a second rendering of the same ratio.
+    //   The row therefore MERGES its descendants and states one sentence of its
+    //   own: [spokenCaption] and the figures, with the units spelled out ("g"
+    //   reads as the letter) and the limit's decimal dropped as it is on screen.
+    //   A node's own contentDescription is what an accessibility service reads,
+    //   in place of the text collected from its children.
+    //
+    //   MERGE, NOT clearAndSetSemantics. Clearing drops the child Texts from the
+    //   semantics tree entirely — including the UNMERGED tree that `onNodeWithText`
+    //   searches — so the UI tests asserting the visible label could no longer see
+    //   it (0.85.0: they went red exactly this way). Merging changes what is SPOKEN
+    //   and leaves the tree inspectable with `useUnmergedTree = true`. The progress
+    //   indicator is silenced on its own below, where no text is lost.
     val spoken = stringResource(
         R.string.a11y_limit_grams,
         spokenCaption,
         totalGrams.fmt1(locale),
         limitGrams.fmt0(locale),
     )
-    Column(modifier = modifier.clearAndSetSemantics { contentDescription = spoken }) {
+    Column(modifier = modifier.semantics(mergeDescendants = true) { contentDescription = spoken }) {
         // LAYOUT HARDENING (v0.81.0 QA, eighth round) — same rule as StatsScreen's
         // StatRow: the FLEXIBLE text gets the weight, the FIXED one is pinned to a
         // single unbroken line.
@@ -487,7 +498,9 @@ fun LimitBar(
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
             progress = { fraction.coerceIn(0f, 1f) },
-            modifier = Modifier.fillMaxWidth().height(8.dp),
+            // Silent: its ProgressBarRangeInfo would otherwise merge into the row
+            // above and add a bare percentage to the sentence.
+            modifier = Modifier.fillMaxWidth().height(8.dp).clearAndSetSemantics { },
             color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
@@ -722,7 +735,7 @@ fun DrinkDaysBar(
         drinkDays.toString(),
         maxDrinkDays.toString(),
     )
-    Column(modifier = modifier.clearAndSetSemantics { contentDescription = spoken }) {
+    Column(modifier = modifier.semantics(mergeDescendants = true) { contentDescription = spoken }) {
         // LAYOUT HARDENING (v0.81.0 QA, eighth round) — see LimitBar for the full
         // rationale. This row is where the defect was first observed: the Greek and
         // Russian "N / M drinking days (last 7 days)" label is long enough to claim
@@ -750,7 +763,9 @@ fun DrinkDaysBar(
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
             progress = { fraction.coerceIn(0f, 1f) },
-            modifier = Modifier.fillMaxWidth().height(8.dp),
+            // Silent: its ProgressBarRangeInfo would otherwise merge into the row
+            // above and add a bare percentage to the sentence.
+            modifier = Modifier.fillMaxWidth().height(8.dp).clearAndSetSemantics { },
             color = barColor,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )

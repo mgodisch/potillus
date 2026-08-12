@@ -39,6 +39,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -240,7 +241,7 @@ fun TodayScreen(
                             Row(
                                 verticalAlignment = Alignment.Bottom,
                                 modifier = Modifier.weight(1f)
-                                    .clearAndSetSemantics { contentDescription = spokenTotal },
+                                    .semantics(mergeDescendants = true) { contentDescription = spokenTotal },
                             ) {
                                 if (showAbstinence) {
                                     // Count and noun in ONE headline string, not a
@@ -295,7 +296,7 @@ fun TodayScreen(
                             // just given, and iOS leaves it unspoken too.
                             Row(
                                 verticalAlignment = Alignment.Bottom,
-                                modifier = Modifier.clearAndSetSemantics { contentDescription = spokenAverage },
+                                modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = spokenAverage },
                             ) {
                                 Text(
                                     state.monthlyAvgPerDay.fmt1(locale),
@@ -401,7 +402,7 @@ fun TodayScreen(
                                         // letter by TalkBack ("p e r m i l"), so the
                                         // row states the word instead. The caption
                                         // above it joins the same sentence.
-                                        modifier = Modifier.clearAndSetSemantics {
+                                        modifier = Modifier.semantics(mergeDescendants = true) {
                                             contentDescription = spokenBac
                                         },
                                         style = MaterialTheme.typography.titleLarge,

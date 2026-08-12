@@ -122,14 +122,21 @@ class LimitBarUiTest {
         }
     }
 
-    /** The consumed-grams label (one decimal) and the caption must both render. */
+    /**
+     * The consumed-grams label (one decimal) and the caption must both render.
+     *
+     * `useUnmergedTree = true` throughout this file: [LimitBar] merges its
+     * descendants and speaks ONE sentence of its own to an accessibility service
+     * (see its `spokenCaption`). These tests assert what is on SCREEN, which is a
+     * different question, so they look past the merge at the child Texts.
+     */
     @Test
     fun showsConsumedGramsAndCaption() {
         setThemedContent {
             LimitBar(totalGrams = 20.0, limitGrams = 30.0, caption = "of 30 g")
         }
-        composeTestRule.onNodeWithText("20.0 g").assertIsDisplayed()
-        composeTestRule.onNodeWithText("of 30 g").assertIsDisplayed()
+        composeTestRule.onNodeWithText("20.0 g", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("of 30 g", useUnmergedTree = true).assertIsDisplayed()
     }
 
     /** A non-empty leftSuffix is appended to the consumed-grams label. */
@@ -143,6 +150,6 @@ class LimitBarUiTest {
                 leftSuffix = "(week)",
             )
         }
-        composeTestRule.onNodeWithText("12.5 g (week)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("12.5 g (week)", useUnmergedTree = true).assertIsDisplayed()
     }
 }

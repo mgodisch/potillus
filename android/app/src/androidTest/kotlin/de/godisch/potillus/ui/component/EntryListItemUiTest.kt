@@ -143,12 +143,15 @@ class EntryListItemUiTest {
     /** The drink name and the (non-blank) note must both be visible. */
     @Test
     fun displaysDrinkNameAndNote() {
+        // useUnmergedTree: the row merges its descendants and speaks one sentence
+        // of its own (time, drink, figures, note). What is on SCREEN is a separate
+        // question, so this looks past the merge at the child Texts.
         setThemedContent {
             EntryListItem(entry = sampleEntry, onEdit = {}, onDelete = {})
         }
 
-        composeTestRule.onNodeWithText("Pilsner").assertIsDisplayed()
-        composeTestRule.onNodeWithText("after work").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Pilsner", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("after work", useUnmergedTree = true).assertIsDisplayed()
     }
 
     /** Tapping the edit (pencil) icon must invoke the onEdit callback exactly once. */
@@ -183,7 +186,7 @@ class EntryListItemUiTest {
         }
 
         composeTestRule
-            .onNodeWithContentDescription(context.getString(R.string.delete))
+            .onNodeWithContentDescription(context.getString(R.string.delete_entry))
             .performClick()
 
         // See tappingEdit_invokesOnEdit: drain the queued click before asserting
