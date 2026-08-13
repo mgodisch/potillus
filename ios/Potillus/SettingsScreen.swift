@@ -468,8 +468,11 @@ extension SettingsScreen {
             case .dailyLimit: return SettingsSanitizer.dailyLimitRange
             case .weeklyLimit: return SettingsSanitizer.weeklyLimitRange
             case .drinkDays:
-                return Double(SettingsSanitizer.drinkDaysRange.lowerBound)
-                    ...Double(SettingsSanitizer.drinkDaysRange.upperBound)
+                // On one statement: a `return` followed by a line break ends the
+                // statement, so the `...` on the next line was parsed as an
+                // expression of its own and the range never formed.
+                let days = SettingsSanitizer.drinkDaysRange
+                return Double(days.lowerBound)...Double(days.upperBound)
             case .bodyWeight: return SettingsSanitizer.weightRange
             }
         }
