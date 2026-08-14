@@ -41,6 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.app.LocaleManagerCompat
 import androidx.core.app.ShareCompat
@@ -216,6 +220,17 @@ fun SettingsScreen(
                         )
                         IconButton(onClick = { showWeightInput = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
+                    // What the weight is for, or what its absence costs — the
+                    // sentence iOS carries under the same row. Android stated
+                    // neither, so the field stood without a reason to fill it.
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        stringResource(
+                            if (settings.weightKg > 0) R.string.weight_desc else R.string.weight_desc_unset,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
 
@@ -247,10 +262,23 @@ fun SettingsScreen(
                     Spacer(Modifier.height(4.dp))
                     // Max drink days per week
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        // The visible label abbreviates ("Max. Drinking Days/7
+                        // Days"), which a screen reader meets as letters and a
+                        // slash; spelled out it does not fit beside its value. The
+                        // spoken label writes it out. iOS carries the same pair.
+                        val spokenDrinkDays = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.a11y_drink_days_setting),
+                            settings.maxDrinkDaysPerWeek.toString(),
+                        )
                         Text(
                             stringResource(R.string.drink_days_setting) + ": ${settings.maxDrinkDaysPerWeek}",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f),
+                            // clearAndSetSemantics, not semantics: the abbreviation
+                            // must not reach a reader at all, and this Text has no
+                            // children to lose by clearing.
+                            modifier = Modifier.weight(1f)
+                                .clearAndSetSemantics { contentDescription = spokenDrinkDays },
                         )
                         IconButton(onClick = { showMaxDrinkDays = true }) {
                             Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary)
@@ -264,7 +292,22 @@ fun SettingsScreen(
             item {
                 SectionCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
+                        // Label and time as ONE node: apart, a reader met the
+                        // setting's name and then a bare hour belonging to
+                        // nothing. iOS states the same pair in one breath.
+                        val spokenDayStart = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.day_starts_at),
+                            stringResource(
+                                R.string.day_change_time_value,
+                                settings.dayChangeHour,
+                                settings.dayChangeMinute,
+                            ),
+                        )
+                        Column(
+                            Modifier.weight(1f)
+                                .semantics(mergeDescendants = true) { contentDescription = spokenDayStart },
+                        ) {
                             Text(stringResource(R.string.day_starts_at), style = MaterialTheme.typography.bodyMedium)
                             Text(
                                 stringResource(R.string.day_change_time_value, settings.dayChangeHour, settings.dayChangeMinute),
@@ -274,6 +317,15 @@ fun SettingsScreen(
                         }
                         IconButton(onClick = { showTimePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
                     }
+                    // The rule the setting implies, stated where the setting is.
+                    // iOS has carried this sentence since 0.85.0; Android had it
+                    // nowhere, so the hour stood without the consequence it has.
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        stringResource(R.string.day_change_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
             item {
@@ -288,7 +340,26 @@ fun SettingsScreen(
                         Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(Modifier.weight(1f)) {
+                        // Label and date as ONE node, as the day-change row above.
+                        // The date is already the long localized style, so the
+                        // month reaches a reader as a word rather than as digits.
+                        val statsFromLabel = stringResource(R.string.stats_from_label)
+                        val spokenStatsFrom = if (settings.statsFromDate.isNotEmpty()) {
+                            stringResource(
+                                R.string.a11y_caption_value,
+                                statsFromLabel,
+                                formatStatsDate(settings.statsFromDate),
+                            )
+                        } else {
+                            // With no floor the row shows the label alone, and
+                            // says the same: inventing "all history" here would
+                            // speak a value the screen does not show.
+                            statsFromLabel
+                        }
+                        Column(
+                            Modifier.weight(1f)
+                                .semantics(mergeDescendants = true) { contentDescription = spokenStatsFrom },
+                        ) {
                             Text(
                                 stringResource(R.string.stats_from_label),
                                 style = MaterialTheme.typography.bodyMedium,
@@ -719,7 +790,11 @@ private fun SettingsSectionHeader(title: String) {
         title,
         style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(vertical = 4.dp),
+        // heading(): without it TalkBack read a bare line of text and then the
+        // LazyColumn's own count ("Personal data, in list, 16 items"), which says
+        // nothing about structure. Marked as a heading it announces "heading" and
+        // becomes a stop for heading-by-heading navigation, as on iOS.
+        modifier = Modifier.padding(vertical = 4.dp).semantics { heading() },
     )
 }
 

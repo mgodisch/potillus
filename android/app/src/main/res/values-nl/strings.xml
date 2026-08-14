@@ -204,6 +204,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s promille</string>
     <string name="delete_entry">Registratie verwijderen</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d milliliter, %4$s procent, %5$s gram alcohol, %6$s</string>
+    <string name="day_change_desc">Een drankje dat vóór dit tijdstip wordt geregistreerd, telt voor de vorige dag.</string>
+    <string name="weight_desc">Wordt alleen gebruikt om het bloedalcoholgehalte te schatten.</string>
+    <string name="weight_desc_unset">Zonder lichaamsgewicht wordt er geen schatting van het bloedalcoholgehalte getoond.</string>
+    <string name="a11y_drink_days_setting">Maximaal aantal drinkdagen per zeven dagen</string>
     <string name="delete_drink">Drankje verwijderen</string>
     <string name="drink_days_setting">Max. drinkdagen/7 dagen</string>
     <string name="personal_data">Persoonlijke gegevens</string>

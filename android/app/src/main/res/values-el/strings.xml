@@ -204,6 +204,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s τοις χιλίοις</string>
     <string name="delete_entry">Διαγραφή καταχώρισης</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d χιλιοστόλιτρα, %4$s τοις εκατό, %5$s γραμμάρια αλκοόλ, %6$s</string>
+    <string name="day_change_desc">Ένα ποτό που καταγράφεται πριν από αυτήν την ώρα προσμετράται στην προηγούμενη ημέρα.</string>
+    <string name="weight_desc">Χρησιμοποιείται μόνο για την εκτίμηση του αλκοόλ στο αίμα.</string>
+    <string name="weight_desc_unset">Χωρίς σωματικό βάρος δεν εμφανίζεται εκτίμηση του αλκοόλ στο αίμα.</string>
+    <string name="a11y_drink_days_setting">Μέγιστες μέρες κατανάλωσης ανά επτά ημέρες</string>
     <string name="delete_drink">Διαγραφή ποτού</string>
     <string name="drink_days_setting">Μέγ. μέρες/7 ημέρες</string>
     <string name="personal_data">Προσωπικά δεδομένα</string>

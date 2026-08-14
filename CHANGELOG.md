@@ -155,7 +155,8 @@ Edit drinks from the list's edit mode
 - The limit bars and the Today summary rows speak as one sentence on both
   platforms, with their units written out.
 - The body-weight note in Settings names what the weight is used for.
-- The day-change time speaks as one row, with its note beneath it.
+- The day-change time speaks as one row on both platforms, with its note
+  beneath it.
 - The iOS Level A protocol carries the spoken form of those rows.
 - Entry rows, calendar days and the statistics period speak their dates and
   units as words; an entry row leads with its time on both platforms.
@@ -163,6 +164,10 @@ Edit drinks from the list's edit mode
 - The category ring is silent and its legend states each slice in one sentence.
 - The calendar header and month name follow the in-app language.
 - The language picker labels its system entry in the system language.
+- Settings section headings, the drinking-days row and the statistics start date
+  speak as headings, words and one row.
+- Notes about the body weight, the backup file and the statistics floor sit in
+  the card they explain.
 - Gram limits read without a decimal place.
 - The drinks list speaks each row as one sentence naming the drink first.
 - Drink strength shows one or two decimals in the in-app language.

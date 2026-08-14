@@ -208,6 +208,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s промилле</string>
     <string name="delete_entry">Удалить запись</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d миллилитров, %4$s процента, %5$s граммов алкоголя, %6$s</string>
+    <string name="day_change_desc">Напиток, записанный до этого времени, засчитывается за предыдущий день.</string>
+    <string name="weight_desc">Используется только для оценки содержания алкоголя в крови.</string>
+    <string name="weight_desc_unset">Без массы тела оценка содержания алкоголя в крови не отображается.</string>
+    <string name="a11y_drink_days_setting">Максимум дней с алкоголем за семь дней</string>
     <string name="delete_drink">Удалить напиток</string>
     <string name="drink_days_setting">Макс. дней/7 дней</string>
     <string name="personal_data">Личные данные</string>

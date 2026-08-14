@@ -403,6 +403,14 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="delete_entry">Delete entry</string>
     <!-- TalkBack: one drink row. %1$s = name, %2$s = category, %3$d = millilitres, %4$s = percent, %5$s = grams, %6$s = capacity status. -->
     <string name="a11y_drink_row" tools:ignore="PluralsCandidate">%1$s, %2$s, %3$d millilitres, %4$s percent, %5$s grams of alcohol, %6$s</string>
+    <!-- Note under the day-change time, stating the rule it implies. -->
+    <string name="day_change_desc">A drink logged before this time counts towards the previous day.</string>
+    <!-- Note under the body weight, once one is set. -->
+    <string name="weight_desc">Used only to estimate blood alcohol.</string>
+    <!-- Note under the body weight while none is set. -->
+    <string name="weight_desc_unset">Without a body weight, no blood-alcohol estimate is shown.</string>
+    <!-- TalkBack: the drinking-days setting spelled out. -->
+    <string name="a11y_drink_days_setting">Maximum drinking days per seven days</string>
     <!-- Content description of a drink row's delete button. -->
     <string name="delete_drink">Delete drink</string>
     <!-- Settings > Limits: max-drinking-days row label and its edit-dialog title. -->

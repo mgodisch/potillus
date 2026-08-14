@@ -240,6 +240,11 @@ struct DrinksScreen: View {
                 .accessibilityLabel(drink.isFavorite
                     ? Loc.string("Remove from favourites", locale: locale)
                     : Loc.string("Add to favourites", locale: locale))
+                // Read AFTER the row it belongs to, though it is drawn before it:
+                // what the row is comes first, what can be done with it second.
+                // A sort priority reorders the reading without moving anything on
+                // screen; higher goes first, so the row's group carries 1.
+                .accessibilitySortPriority(0)
             }
 
             // ONE SENTENCE FOR VOICEOVER: the drink, its category, its figures,
@@ -251,7 +256,12 @@ struct DrinksScreen: View {
             // The category is spoken though the row does not show it: it is a
             // real property of the drink (the statistics group by it), and Android
             // states it here through its category glyph.
-            Group {
+            // An HStack, NOT a Group: a Group hands its modifiers to each child
+            // separately, so `children: .ignore` made the dot and the text column
+            // two elements that each announced the whole sentence, and the dot
+            // stayed audible (0.85.0). A real container takes the modifier once.
+            // Default spacing throughout, so the row looks as it did.
+            HStack {
             // Capacity dot: how many more of this drink fit within today's
             // remaining budget, against the same snapshot for every row. Between
             // the star and the name, as on Android.
@@ -289,6 +299,7 @@ struct DrinksScreen: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(spokenDrink(drink))
+            .accessibilitySortPriority(1)
             // The hint sits HERE, not on the enclosing HStack: a hint on a
             // container is inherited by every element inside it, so the star
             // announced "logs this drink" over a button that does no such thing.

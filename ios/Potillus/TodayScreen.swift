@@ -99,7 +99,11 @@ struct TodayScreen: View {
                     Button {
                         isLogging = true
                     } label: {
-                        Label(Loc.string("Log a drink", locale: locale), systemImage: "plus")
+                        // "Add Entry", the wording Android's button, its calendar
+                        // twin and the entry dialog all carry. The sheet's own
+                        // title stays "Log a drink": that one names the act, this
+                        // one names what the list gains.
+                        Label(Loc.string("Add Entry", locale: locale), systemImage: "plus")
                     }
                     .disabled(model.state.drinks.isEmpty)
                     .accessibilityIdentifier("nav.addDrink")

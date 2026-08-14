@@ -208,6 +208,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s promila</string>
     <string name="delete_entry">Usuń wpis</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitrów, %4$s procent, %5$s gramów alkoholu, %6$s</string>
+    <string name="day_change_desc">Napój zarejestrowany przed tą godziną liczy się do poprzedniego dnia.</string>
+    <string name="weight_desc">Używane wyłącznie do szacowania alkoholu we krwi.</string>
+    <string name="weight_desc_unset">Bez masy ciała szacunek alkoholu we krwi nie jest wyświetlany.</string>
+    <string name="a11y_drink_days_setting">Maksymalna liczba dni z alkoholem na siedem dni</string>
     <string name="delete_drink">Usuń napój</string>
     <string name="drink_days_setting">Maks. dni/7 dni</string>
     <string name="personal_data">Dane osobowe</string>

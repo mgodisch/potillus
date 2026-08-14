@@ -429,111 +429,6 @@ extension SettingsScreen {
         )
     }
 
-    /// The four numeric settings a user can type instead of stepping to.
-    ///
-    /// One enum rather than four flags and four drafts: the alert takes a title,
-    /// a range and a decimal count, and those are all this differs in. `weightKg`
-    /// is the only one with a fractional part, and the only one whose zero means
-    /// "not set" — but the field is offered only while a weight EXISTS, so the
-    /// sentinel never reaches this code.
-    private enum NumericSetting: String, Identifiable {
-        case dailyLimit, weeklyLimit, drinkDays, bodyWeight
-
-        var id: String { rawValue }
-
-        var titleKey: String {
-            switch self {
-            case .dailyLimit: return "Daily Limit in Grams"
-            case .weeklyLimit: return "7-Day Limit in Grams"
-            case .drinkDays: return "Max. Drinking Days/7 Days"
-            case .bodyWeight: return "Body Weight"
-            }
-        }
-
-        /// The unit shown beside the value, or none where the value counts days.
-        var unit: String {
-            switch self {
-            case .dailyLimit, .weeklyLimit: return "g"
-            case .drinkDays: return ""
-            case .bodyWeight: return "kg"
-            }
-        }
-
-        var fractionDigits: Int { self == .bodyWeight ? 1 : 0 }
-
-        /// The same bounds the sanitiser applies to an imported file, so typing a
-        /// value and importing one cannot disagree about what is allowed.
-        var range: ClosedRange<Double> {
-            switch self {
-            case .dailyLimit: return SettingsSanitizer.dailyLimitRange
-            case .weeklyLimit: return SettingsSanitizer.weeklyLimitRange
-            case .drinkDays:
-                // On one statement: a `return` followed by a line break ends the
-                // statement, so the `...` on the next line was parsed as an
-                // expression of its own and the range never formed.
-                let days = SettingsSanitizer.drinkDaysRange
-                return Double(days.lowerBound)...Double(days.upperBound)
-            case .bodyWeight: return SettingsSanitizer.weightRange
-            }
-        }
-    }
-
-    /// The label of a stepper row, with its value as a button that opens the field.
-    ///
-    /// `.buttonStyle(.plain)` because a tinted value in a settings row reads as a
-    /// link; the affordance here is the tap, not the colour.
-    private func numberRow(_ setting: NumericSetting) -> some View {
-        LabeledContent(Loc.string(setting.titleKey, locale: locale)) {
-            Button {
-                numberDraft = Loc.number(
-                    value(of: setting), fractionDigits: setting.fractionDigits, locale: locale
-                )
-                editingNumber = setting
-            } label: {
-                Text(measure(
-                    value(of: setting), fractionDigits: setting.fractionDigits, unit: setting.unit
-                ))
-                .monospacedDigit()
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private func value(of setting: NumericSetting) -> Double {
-        switch setting {
-        case .dailyLimit: return model.settings.dailyLimitGrams
-        case .weeklyLimit: return model.settings.weeklyLimitGrams
-        case .drinkDays: return Double(model.settings.maxDrinkDaysPerWeek)
-        case .bodyWeight: return model.settings.weightKg
-        }
-    }
-
-    /// Reads the typed number and writes it, clamped to the setting's range.
-    ///
-    /// A draft that is not a number leaves the setting alone — the keypad offers
-    /// digits, but a paste can still put anything in the field. Parsing goes
-    /// through the in-app locale, so a comma-decimal language reads "1.500" as
-    /// fifteen hundred rather than as one and a half. The day count rounds to a
-    /// whole number; the others keep what the range allows.
-    private func commitNumber(_ setting: NumericSetting) {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.numberStyle = .decimal
-        guard let typed = formatter.number(from: numberDraft)?.doubleValue else { return }
-        let range = setting.range
-        let clamped = min(max(typed, range.lowerBound), range.upperBound)
-        Task {
-            await model.update { settings in
-                switch setting {
-                case .dailyLimit: settings.dailyLimitGrams = clamped.rounded()
-                case .weeklyLimit: settings.weeklyLimitGrams = clamped.rounded()
-                case .drinkDays: settings.maxDrinkDaysPerWeek = Int(clamped.rounded())
-                case .bodyWeight: settings.weightKg = clamped
-                }
-            }
-        }
-    }
-
     /// A measured value in the in-app locale plus its unit, e.g. "140 g" / "80,0 kg"
     /// — kept here in the extension so the row call sites stay short and the main
     /// type body stays within SwiftLint's `type_body_length`.
@@ -623,6 +518,22 @@ extension SettingsScreen {
 
     var backupSection: some View {
         Section {
+            // FIRST ROW, NOT FOOTER. A Section footer is read after the last row,
+            // so this sentence reached a listener behind Export and Import — after
+            // the decision it exists to inform. Android carries it at the top of
+            // the card. Footnote-sized, so the eye still takes it as a note.
+            Text(Loc.string(
+                includeSettingsInExport
+                    ? "A JSON file containing your drinks, your log, and your settings"
+                        + " — including your body weight. It never leaves this device"
+                        + " unless you send it somewhere."
+                    : "A JSON file containing your drinks and your log. Your settings,"
+                        + " including your body weight, are left out.",
+                locale: locale
+            ))
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+
             Toggle(Loc.string("Include settings", locale: locale), isOn: $includeSettingsInExport)
 
             Button(Loc.string("Export", locale: locale)) {
@@ -633,20 +544,6 @@ extension SettingsScreen {
             }
         } header: {
             Text(Loc.string("Backup", locale: locale))
-        } footer: {
-            // The one sentence that makes the feature trustworthy, and true —
-            // and, since the 0.84.0 QA round, in the user's language: the
-            // concatenated literals this used to be were plain `String`s, so
-            // they bypassed the in-app language AND had no catalogue keys.
-            Text(Loc.string(
-                includeSettingsInExport
-                    ? "A JSON file containing your drinks, your log, and your settings"
-                        + " — including your body weight. It never leaves this device"
-                        + " unless you send it somewhere."
-                    : "A JSON file containing your drinks and your log. Your settings,"
-                        + " including your body weight, are left out.",
-                locale: locale
-            ))
         }
     }
 

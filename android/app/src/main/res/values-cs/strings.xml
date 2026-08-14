@@ -208,6 +208,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s promile</string>
     <string name="delete_entry">Smazat záznam</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitrů, %4$s procenta, %5$s gramů alkoholu, %6$s</string>
+    <string name="day_change_desc">Nápoj zaznamenaný před tímto časem se počítá do předchozího dne.</string>
+    <string name="weight_desc">Používá se pouze k odhadu alkoholu v krvi.</string>
+    <string name="weight_desc_unset">Bez tělesné hmotnosti se odhad alkoholu v krvi nezobrazuje.</string>
+    <string name="a11y_drink_days_setting">Maximální počet dnů s alkoholem za sedm dní</string>
     <string name="delete_drink">Smazat nápoj</string>
     <string name="drink_days_setting">Max. dní/7 dní</string>
     <string name="personal_data">Osobní údaje</string>

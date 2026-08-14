@@ -222,6 +222,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s por mil</string>
     <string name="delete_entry">Eliminar registro</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitros, %4$s por ciento, %5$s gramos de alcohol, %6$s</string>
+    <string name="day_change_desc">Una bebida registrada antes de esta hora cuenta para el día anterior.</string>
+    <string name="weight_desc">Se usa solo para estimar el alcohol en sangre.</string>
+    <string name="weight_desc_unset">Sin un peso corporal no se muestra ninguna estimación del alcohol en sangre.</string>
+    <string name="a11y_drink_days_setting">Máximo de días de bebida por siete días</string>
     <string name="delete_drink">Eliminar bebida</string>
     <string name="drink_days_setting">Días máx./7 días</string>
     <string name="personal_data">Datos personales</string>

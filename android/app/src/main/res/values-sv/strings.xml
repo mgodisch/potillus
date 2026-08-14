@@ -204,6 +204,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s promille</string>
     <string name="delete_entry">Ta bort registrering</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d milliliter, %4$s procent, %5$s gram alkohol, %6$s</string>
+    <string name="day_change_desc">En dryck som registreras före denna tid räknas till föregående dag.</string>
+    <string name="weight_desc">Används endast för att uppskatta promillehalten.</string>
+    <string name="weight_desc_unset">Utan en kroppsvikt visas ingen promilleuppskattning.</string>
+    <string name="a11y_drink_days_setting">Högsta antal drinkdagar per sju dagar</string>
     <string name="delete_drink">Ta bort drink</string>
     <string name="drink_days_setting">Max. drinkdagar/7 dagar</string>
     <string name="personal_data">Personliga uppgifter</string>

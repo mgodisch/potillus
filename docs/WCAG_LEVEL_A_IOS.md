@@ -147,10 +147,13 @@ and not where to stop:
     labels. `TextField`, `Picker`, `DatePicker` and `Stepper` all receive a
     localised title in the source; confirm the title is what VoiceOver speaks. A
     title alone does not make the row one element — the day-change `DatePicker`
-    read its title and its hour as two, and now combines its children.
-  - The footnote about the day-change time sits in the Section it explains, as a
-    row under the control rather than in the Section footer, which a reader
-    reaches after the last row and therefore after the wrong setting.
+    read its title and its hour as two. Combining its children joined them but
+    left the TIME unsaid, so the row states label and value outright.
+  - Footnotes sit in the Section they explain, as rows rather than Section
+    footers: a footer is read after the last row, so a note reached a listener
+    past the setting it belongs to. This covers the day-change rule, the
+    statistics floor, and the sentence describing the backup file — that one is
+    the first row of its Section rather than the last thing said about it.
 - [ ] **1.3.2 Meaningful Sequence (A).** VoiceOver reading order matches the visual
       order on every screen. **Start on Today**: does focus run top to bottom, or
       does it jump into the toolbar and back? This was the first question the

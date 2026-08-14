@@ -257,6 +257,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s por mil</string>
     <string name="delete_entry">Excluir registro</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitros, %4$s por cento, %5$s gramas de álcool, %6$s</string>
+    <string name="day_change_desc">Uma bebida registrada antes deste horário conta para o dia anterior.</string>
+    <string name="weight_desc">Usado apenas para estimar o álcool no sangue.</string>
+    <string name="weight_desc_unset">Sem um peso corporal, nenhuma estimativa de álcool no sangue é exibida.</string>
+    <string name="a11y_drink_days_setting">Máximo de dias de consumo por sete dias</string>
     <string name="delete_drink">Excluir bebida</string>
     <string name="drink_days_setting">Máx. dias de consumo/7 dias</string>
     <string name="personal_data">Dados pessoais</string>

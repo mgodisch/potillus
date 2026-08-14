@@ -249,6 +249,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s：%2$s パーミル</string>
     <string name="delete_entry">記録を削除</string>
     <string name="a11y_drink_row">%1$s、%2$s、%3$d ミリリットル、%4$s パーセント、%5$s グラムのアルコール、%6$s</string>
+    <string name="day_change_desc">この時刻より前に記録された飲み物は前日に数えられます。</string>
+    <string name="weight_desc">血中アルコール濃度の推定にのみ使用されます。</string>
+    <string name="weight_desc_unset">体重が未設定の場合、血中アルコール濃度の推定は表示されません。</string>
+    <string name="a11y_drink_days_setting">7日あたりの最大飲酒日数</string>
     <string name="delete_drink">飲み物を削除</string>
     <string name="drink_days_setting">7日間の最大飲酒日数</string>
     <string name="personal_data">個人データ</string>

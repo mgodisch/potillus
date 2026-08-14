@@ -235,6 +235,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_caption_permille">%1$s: %2$s Promille</string>
     <string name="delete_entry">Eintrag löschen</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d Milliliter, %4$s Prozent, %5$s Gramm Alkohol, %6$s</string>
+    <string name="day_change_desc">Ein Getränk vor dieser Uhrzeit zählt zum Vortag.</string>
+    <string name="weight_desc">Wird nur zur Schätzung des Blutalkohols verwendet.</string>
+    <string name="weight_desc_unset">Ohne Körpergewicht wird keine Blutalkohol-Schätzung angezeigt.</string>
+    <string name="a11y_drink_days_setting">Maximale Trinktage pro sieben Tage</string>
     <string name="delete_drink">Getränk löschen</string>
     <string name="drink_days_setting">Max. Trinktage/7 Tage</string>
     <string name="personal_data">Persönliche Daten</string>

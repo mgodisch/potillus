@@ -79,10 +79,13 @@ extension SettingsScreen {
             )
             // A `DatePicker` is two accessibility elements — its title and the
             // wheel — so VoiceOver read the label, stopped, and then announced a
-            // bare hour as a collapsed control belonging to nothing. Combined,
-            // the row states its name and its time in one breath and keeps the
-            // picker's own action.
-            .accessibilityElement(children: .combine)
+            // bare hour as a collapsed control belonging to nothing. Combining
+            // them joined the two elements but left the TIME unsaid: a collapsed
+            // picker contributes its label, not its value. Stating label and
+            // value outright says both and keeps the picker's own action.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Loc.string("New Day Starts At", locale: locale))
+            .accessibilityValue(Text(dayChangeDate, style: .time))
 
             // The footnote sits HERE, as a row of its own, and no longer in the
             // Section's footer. A footer belongs to the whole Section, so a
@@ -132,6 +135,12 @@ extension SettingsScreen {
                 Text(statsFloorValue)
                     .foregroundStyle(.secondary)
             }
+            // The visible date is the medium style, which German writes as
+            // "01.06.2026" and VoiceOver reads as three numbers with dots between
+            // them. Spoken it is the long style, where the month is a word.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Loc.string("Statistics From", locale: locale))
+            .accessibilityValue(statsFloorSpoken)
             .contentShape(Rectangle())
             .onTapGesture {
                 statsFloorDraft = Self.day(from: model.settings.statsFromDate) ?? Date()
@@ -164,21 +173,20 @@ extension SettingsScreen {
                 }
                 .buttonStyle(.borderless)
             }
+            // The note about the floor sits HERE rather than in the Section
+            // footer, for the reason the day-change note does: a footer belongs
+            // to the whole Section, and a reader meets it after the last row —
+            // past the setting it explains. Android states it inside the card.
             if model.hasStatsFloor {
+                Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 Button(Loc.string("Include all history", locale: locale), role: .destructive) {
                     Task { await model.clearStatsFromDate() }
                 }
             }
         } header: {
             Text(Loc.string("Statistics", locale: locale))
-        } footer: {
-            // Only while a floor is set: without one there is no such date, and
-            // the sentence would state a rule that is not in force. The footer
-            // now carries this one sentence alone, which is the one that speaks
-            // for the Section as a whole rather than for a single row.
-            if model.hasStatsFloor {
-                Text(Loc.string("Entries before this date are ignored in all statistics.", locale: locale))
-            }
         }
         // NO `.sheet` HERE. It sat on this Section, and a sheet presented from a
         // row inside a Form goes away with the view that presents it: the Form
@@ -198,6 +206,17 @@ extension SettingsScreen {
     /// bites.
     private var statsFloorValue: String {
         model.hasStatsFloor ? statsFloorText : Loc.string("All history", locale: locale)
+    }
+
+    /// The floor for VoiceOver: the long date style, or the words for "no floor".
+    private var statsFloorSpoken: String {
+        guard model.hasStatsFloor, let day = Self.day(from: model.settings.statsFromDate) else {
+            return Loc.string("All history", locale: locale)
+        }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateStyle = .long
+        return formatter.string(from: day)
     }
 
     /// The floor as the in-app locale writes it, medium style — the same style the
