@@ -87,8 +87,11 @@ struct SettingsScreen: View {
     /// Direct entry: which numeric setting is being typed, and what stands in the
     /// field so far. The draft is a String rather than a number so a half-typed
     /// "1" of an intended "150" is not written straight through.
-    @State private var editingNumber: NumericSetting?
-    @State private var numberDraft = ""
+    // Internal, not private: `SettingsScreenNumbers.swift` reads and writes both.
+    // Swift's `private` reaches the enclosing declaration and its extensions IN
+    // THE SAME FILE, so a member split into another file has to widen.
+    @State var editingNumber: NumericSetting?
+    @State var numberDraft = ""
 
     /// Whether the statistics-floor row is expanded, and the date it holds until
     /// Done. Held here rather than in the settings so an opened-and-cancelled
@@ -432,7 +435,7 @@ extension SettingsScreen {
     /// A measured value in the in-app locale plus its unit, e.g. "140 g" / "80,0 kg"
     /// — kept here in the extension so the row call sites stay short and the main
     /// type body stays within SwiftLint's `type_body_length`.
-    private func measure(_ value: Double, fractionDigits: Int, unit: String) -> String {
+    func measure(_ value: Double, fractionDigits: Int, unit: String) -> String {
         let number = Loc.number(value, fractionDigits: fractionDigits, locale: locale)
         // An empty unit is the day count, which has none: without this it would
         // carry a trailing space into the row and into what VoiceOver reads.

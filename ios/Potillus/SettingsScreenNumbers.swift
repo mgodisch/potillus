@@ -41,12 +41,17 @@ extension SettingsScreen {
 
     /// The four numeric settings a user can type instead of stepping to.
     ///
+    /// Internal rather than private, as are `numberRow` and `commitNumber`: the
+    /// rows and the field that use them sit in `SettingsScreen.swift`, and
+    /// Swift's `private` reaches only the same file. `value(of:)` stays private
+    /// — it is called from this file alone.
+    ///
     /// One enum rather than four flags and four drafts: the alert takes a title,
     /// a range and a decimal count, and those are all this differs in. `weightKg`
     /// is the only one with a fractional part, and the only one whose zero means
     /// "not set" — but the field is offered only while a weight EXISTS, so the
     /// sentinel never reaches this code.
-    private enum NumericSetting: String, Identifiable {
+    enum NumericSetting: String, Identifiable {
         case dailyLimit, weeklyLimit, drinkDays, bodyWeight
 
         var id: String { rawValue }
@@ -101,7 +106,7 @@ extension SettingsScreen {
     ///
     /// `.buttonStyle(.plain)` because a tinted value in a settings row reads as a
     /// link; the affordance here is the tap, not the colour.
-    private func numberRow(_ setting: NumericSetting) -> some View {
+    func numberRow(_ setting: NumericSetting) -> some View {
         LabeledContent(Loc.string(setting.titleKey, locale: locale)) {
             Button {
                 numberDraft = Loc.number(
@@ -138,7 +143,7 @@ extension SettingsScreen {
     /// through the in-app locale, so a comma-decimal language reads "1.500" as
     /// fifteen hundred rather than as one and a half. The day count rounds to a
     /// whole number; the others keep what the range allows.
-    private func commitNumber(_ setting: NumericSetting) {
+    func commitNumber(_ setting: NumericSetting) {
         let formatter = NumberFormatter()
         formatter.locale = locale
         formatter.numberStyle = .decimal
