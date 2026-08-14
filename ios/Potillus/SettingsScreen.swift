@@ -87,9 +87,10 @@ struct SettingsScreen: View {
     /// Direct entry: which numeric setting is being typed, and what stands in the
     /// field so far. The draft is a String rather than a number so a half-typed
     /// "1" of an intended "150" is not written straight through.
-    // Internal, not private: `SettingsScreenNumbers.swift` reads and writes both.
-    // Swift's `private` reaches the enclosing declaration and its extensions IN
-    // THE SAME FILE, so a member split into another file has to widen.
+    ///
+    /// Internal, not private: `SettingsScreenNumbers.swift` reads and writes both.
+    /// Swift's `private` reaches the enclosing declaration and its extensions IN
+    /// THE SAME FILE, so a member split into another file has to widen.
     @State var editingNumber: NumericSetting?
     @State var numberDraft = ""
 
