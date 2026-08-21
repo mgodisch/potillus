@@ -4,8 +4,8 @@ Libellus Potionis is a diary for your own drinking. You log what you drink;
 the app works out how much pure alcohol that was and how close it brings you
 to the limits you set yourself.
 
-This guide walks through the app, step by step: how it is laid out, how to
-set it up, how to log a drink, how to look back and take stock, and how to
+This guide walks you through the app, step by step: how it is laid out, how
+to set it up, how to log a drink, how to look back and take stock, and how to
 keep your data safe. The headings are there for looking things up later.
 
 ## What the app does, and what it doesn't
@@ -89,12 +89,11 @@ collects them.
 ### Your body weight
 
 The Personal Data section holds a single value, Body Weight, and it
-is optional. Until you set one, all you see is the button that adds
-it; after that you can step it up or down, and a second button removes it
-again. The app works perfectly well without it. The only thing you
-lose is the blood alcohol estimate on the Today screen, which cannot be
-worked out without a weight. "How the figures are worked out" explains where
-it comes from.
+is optional. Until you set one, all you see is the button that adds it; after
+that you can step it up or down, and a second button removes it again. The
+app works perfectly well without it. The only thing you lose is the blood
+alcohol estimate on the Today screen, which cannot be worked out without
+a weight. "How the figures are worked out" explains where it comes from.
 
 ### When your day begins
 
