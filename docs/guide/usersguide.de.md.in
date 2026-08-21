@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,665 +24,507 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-# Libellus Potionis -- Benutzerhandbuch
+# Libellus Potionis - Benutzerhandbuch
 
-Libellus Potionis ist ein Trinktagebuch. Du buchst ein, was du trinkst, und die
-App rechnet aus, wie viel reiner Alkohol das war und wie es zu den Grenzen
-steht, die du dir selbst gesetzt hast.
+Libellus Potionis ist eine Tagebuch-App zum Protokollieren des eigenen
+Alkoholkonsums. Wer sie benutzt, bucht ein, was er trinkt; die App rechnet
+aus, wie viel reiner Alkohol das war und wie nahe der Konsum an den selbst
+gesetzten Limits liegt.
 
-Dieses Handbuch beschreibt jeden Bedienschritt und jeden Schalter. Es ist der
-Reihe nach geschrieben, wie man die App kennenlernt: erst einrichten, dann
-buchen, dann zurückblicken, dann auswerten, dann sichern. Wer etwas Bestimmtes
-sucht, findet es über die Überschriften.
+Dieses Handbuch führt schrittweise durch die App: erst der Aufbau, dann das
+Einrichten, das Buchen, dann Rückblick und Auswertung, schließlich Backups.
+Einzelne Themen lassen sich anhand der Überschriften schnell finden.
 
-## Was die App ist -- und was nicht
+## Was die App leistet – und was nicht
 
-Libellus Potionis protokolliert. Sie bewertet nicht, sie mahnt nicht, und sie
-schickt nichts weg. Die Zahlen, die sie zeigt, sind deine eigenen Eingaben,
-zurückgerechnet auf Gramm reinen Alkohols.
+Libellus Potionis protokolliert. Die App bewertet nicht und mahnt nicht. Die
+gezeigten Zahlen entsprechen den eigenen Eingaben, umgerechnet in Gramm
+reinen Alkohol. Wer jeden Drink protokolliert, kann in nüchterner Stimmung
+prüfend auf das eigene Trinkverhalten zurückschauen -- dann wird der Vorteil
+dieser App sichtbar.
 
-{{#android}}
-Die App ist quelloffen und fordert keine einzige Berechtigung an -- weder Kamera
-noch Mikrofon, weder Standort noch Netzwerkzugriff. Sie kann gar nicht senden,
-was sie nicht darf. Alle Daten liegen im privaten App-Speicher deines Geräts,
-geschützt durch die Geräteverschlüsselung.
-{{/android}}
+Libellus Potionis ist freie Software unter der GNU General Public License,
+Version 3.0 oder später, das heißt: Der Quellcode der App ist öffentlich
+einsehbar und Aussagen zum Datenschutzverhalten der App sind damit jederzeit
+überprüfbar. Libellus Potionis nimmt Datenschutz sehr ernst und fordert keine
+einzige kritische Berechtigung an, weder Kamera noch Mikrofon, weder Standort
+noch Dateizugriff, nicht einmal Netzwerkzugriff. Alle eingegebenen Daten
+liegen im privaten App-Speicher des Geräts, geschützt durch die
+Geräteverschlüsselung. Der App-Zugriff lässt sich optional in den
+Einstellungen mittels
+{{#android}}Fingerabdruck-Sensors{{/android}}{{#ios}}Face ID{{/ios}} sperren;
+dies ist die einzige Berechtigung, die tatsächlich angefordert wird.
 
-{{#ios}}
-Die App ist quelloffen und fragt nichts ab -- weder Kamera noch Mikrofon, weder
-Standort noch Netzwerkzugriff. Nur wenn du die App-Sperre einschaltest, fragt
-iOS einmal nach der Erlaubnis für Face ID. Alle Daten liegen im privaten
-App-Speicher deines Geräts, geschützt durch die Geräteverschlüsselung.
-{{/ios}}
+Was Libellus Potionis _nicht_ ist: Diese App ist kein Messgerät und kein
+Medizinprodukt. Der Blutalkoholwert ist ein Schätzwert, der auf einem
+statistischen Modell beruht (siehe „Wie gerechnet wird“). Die Aussagen der
+App taugen weder für die Beurteilung der Fahrtüchtigkeit noch für eine
+medizinische Diagnose. Was Libellus Potionis kann: ein Bild des eigenen
+Verhaltens über Wochen und Monate geben, und auf Wunsch auch als zweiseitiges
+PDF zum Ausdrucken auf einem Blatt Papier, das sich zu einem
+Beratungsgespräch mitnehmen lässt.
 
-Was sie nicht ist: ein Messgerät und keine medizinische Anwendung. Der
-Blutalkoholwert, den sie schätzt, ist ein statistisches Modell (siehe „Wie
-gerechnet wird"). Für die Beurteilung der Fahrtüchtigkeit taugt er nicht, und
-für eine Diagnose auch nicht. Was er kann: dir ein Bild deines eigenen
-Verhaltens über Wochen und Monate geben -- und auf Wunsch ein zweiseitiges PDF,
-das sich zu einem Termin in einer Suchtberatung mitnehmen lässt.
+Libellus Potionis setzt {{#android}}Android 11 oder höher voraus, das umfasst
+Smartphones seit etwa 2020. Die App wird regelmäßig auf einem Google Pixel 10
+Pro unter GrapheneOS (Android 16) und einem Fairphone 4 (Android
+15){{/android}}{{#ios}}iOS 17 oder höher voraus, das umfasst iPhones seit
+etwa 2018. Die App wird regelmäßig auf einem iPhone 16e und iPhone SE 3rd
+generation (beide iOS 26){{/ios}} getestet.
 
-{{#android}}
-Libellus Potionis setzt Android 11 oder höher voraus. Der Autor nutzt sie
-täglich auf einem Google Pixel 10 Pro unter GrapheneOS (Android 16) und testet
-sie zusätzlich auf einem Fairphone 4 (Android 15) und einem virtuellen Pixel 4
-(Android 11).
-{{/android}}
+## Aufbau der App
 
-{{#ios}}
-Libellus Potionis setzt iOS 17 oder höher voraus. Der Autor nutzt sie täglich
-auf einem iPhone 16e und testet sie zusätzlich auf einem iPhone 17 Pro im
-Simulator.
-{{/ios}}
+Libellus Potionis hat vier Ansichten. Zwischen ihnen wird über die Leiste am
+unteren Bildschirmrand gewechselt, die in jeder der vier Ansichten
+eingeblendet ist:
+
+- **{{today}}** -– der Einstieg: der heutige Stand und die Buchungen des
+  Tages,
+- **{{calendar}}** -– der Rückblick auf einzelne Tage, Monate und Jahre, und
+  die Möglichkeit, deren Buchungen zu korrigieren , falls nötig,
+- **{{statistics}}** -– statistische Auswertungen über einen wählbaren
+  Zeitraum,
+- **{{drinks}}** -– der Katalog der Getränke, die gebucht werden können.
+
+Oben rechts befindet sich auf allen vier Ansichten dasselbe Menüsymbol. Es
+öffnet {{menu}} mit „{{settings}}“, {{help}} (dieses Handbuch) und {{about}}
+mit Version, Lizenz und den verwendeten Fremdkomponenten. Ist auf dem Gerät
+eine Bildschirmsperre eingerichtet, steht dort außerdem {{lock_app}}, womit
+die App unmittelbar gesperrt wird.
+
+{{settings}}, {{help}} und {{about}} öffnen sich {{#android}}als eigene
+Seiten; der Zurück-Button des Geräts oder der Pfeil oben links führt auf die
+Ansicht zurück, von der aus sie geöffnet wurden{{/android}}{{#ios}}als eigene
+Dialogfenster, die oben rechts wieder geschlossen werden{{/ios}}.
 
 ## Der erste Start
 
-{{#android}}
-Nach der Installation ist die App leer, aber schon benutzbar: Ein
-Getränkekatalog mit international gebräuchlichen Getränken ist vorinstalliert,
-du kannst also sofort das erste Bier buchen. Sinnvoll ist trotzdem, zuerst drei
-Dinge einzustellen. Alle drei findest du unter „{{settings}}", erreichbar über
-das Menüsymbol oben rechts.
-{{/android}}
+Nach der Installation ist die App zwar noch ohne Einträge, aber bereits
+benutzbar: Ein vordefinierter Katalog mit international gebräuchlichen
+Getränken ermöglicht es, das erste Bier direkt einzubuchen. Trotzdem ist es
+sinnvoll, zunächst drei Dinge einzustellen. Alle drei stehen unter
+„{{settings}}“; die übrigen Einstellungen sind weiter unten beschrieben.
 
-{{#ios}}
-Nach der Installation ist die App leer, aber schon benutzbar: Ein
-Getränkekatalog mit international gebräuchlichen Getränken ist vorinstalliert,
-du kannst also sofort das erste Bier buchen. Sinnvoll ist trotzdem, zuerst drei
-Dinge einzustellen. Alle drei findest du unter „{{settings}}", erreichbar über
-das „…"-Symbol oben rechts. Die Einstellungen öffnen sich als eigenes Blatt, das
-du oben rechts wieder schließt.
-{{/ios}}
+### Limits festlegen
 
-### Deine Grenzen festlegen
-
-{{#android}}
-Unter {{limits}} trägst du ein, was für dich gelten soll. Drei Werte, die
+Unter {{limits}} sind die für einen selbst geltenden Werte einzustellen, die
 gleichzeitig aktiv sind:
-{{/android}}
 
-{{#ios}}
-Unter {{limits}} stellst du ein, was für dich gelten soll -- drei Werte, jeder
-über Plus und Minus zu verändern, die gleichzeitig aktiv sind:
-{{/ios}}
+- **{{daily_limit_grams}}** -- das tägliche Limit reinen Alkohols in Gramm,
+- **{{weekly_limit_grams}}** -- das wöchentliche Limit reinen Alkohols in
+  Gramm, gerechnet über ein gleitendes Sieben-Tage-Fenster,
+- **{{drink_days_setting}}** -- das wöchentliche Limit an Trinktagen,
+  ebenfalls über ein gleitendes Sieben-Tage-Fenster.
 
-- **{{daily_limit_grams}}** -- wie viel reiner Alkohol an einem einzelnen Tag
-  höchstens zusammenkommen soll.
-- **{{weekly_limit_grams}}** -- dieselbe Frage für ein gleitendes Fenster aus
-  heute und den sechs vorangegangenen Tagen.
-- **{{drink_days_setting}}** -- an wie vielen dieser sieben Tage überhaupt
-  getrunken werden soll, unabhängig von der Menge.
+Der dritte Wert ist der, den man leicht übersieht, und oft der
+interessanteste: Er begrenzt nicht die Menge, sondern die Häufigkeit. Wer
+vier Trinktage einstellt und in den sechs Tagen davor an dreien getrunken
+hat, sieht auf der Heute-Ansicht, dass das erste Getränk den vierten Trinktag
+verbrauchen würde, ein zweites Getränk am selben Tag aber keinen weiteren.
 
-Der dritte Wert ist der, den man leicht übersieht, und oft der interessanteste:
-Er begrenzt nicht die Menge, sondern die Häufigkeit. Wer sechs Trinktage
-einstellt und am sechsten Tag noch trocken ist, sieht auf dem Heute-Schirm, dass
-das erste Getränk diesen Tag verbrauchen würde.
+Um eine Vorstellung davon zu vermitteln, welche Zahlen sinnvoll sind, sei
+hier auf die Empfehlungen der Gesundheitsbehörden verschiedener Länder
+verwiesen. Diese Empfehlungen gehen weit auseinander, sie sind auf
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+zu finden.
 
-Wenn du keine Vorstellung hast, welche Zahlen sinnvoll sind: Die
-Empfehlungen der Gesundheitsbehörden verschiedener Länder gehen weit
-auseinander, ein Überblick steht auf
-[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country).
+### Körpergewicht
 
-### Dein Körpergewicht eintragen
-
-{{#android}}
-Unter {{personal_data}} steht ein einziges Feld: {{body_weight}}. Es ist
-freiwillig. Trägst du nichts ein, funktioniert die App vollständig -- nur der
-geschätzte Blutalkoholwert auf dem Heute-Schirm bleibt aus, weil er ohne
-Körpergewicht nicht berechenbar ist. Wie er zustande kommt, steht unter „Wie
-gerechnet wird".
-{{/android}}
-
-{{#ios}}
 Unter {{personal_data}} steht ein einziger Wert: {{body_weight}}. Er ist
-freiwillig. Solange keiner gesetzt ist, steht dort nur der Knopf, der ihn
-anlegt; danach lässt er sich schrittweise ändern und mit einem zweiten Knopf
-wieder entfernen. Ohne Körpergewicht funktioniert die App vollständig -- nur der
-geschätzte Blutalkoholwert auf dem Heute-Schirm bleibt aus, weil er dann nicht
-berechenbar ist. Wie er zustande kommt, steht unter „Wie gerechnet wird".
-{{/ios}}
+optional. Solange kein Wert eingetragen ist, steht dort nur der Knopf, der
+ihn anlegt; danach lässt er sich schrittweise ändern und mit einem zweiten
+Knopf wieder entfernen. Auch ohne Angabe eines Körpergewichts funktioniert
+die App vollständig, nur ein geschätzter Blutalkoholwert auf der
+Heute-Ansicht wird dann nicht angezeigt, weil er nicht berechenbar ist. Wie
+er zustande kommt, steht unter „Wie gerechnet wird“.
 
-### Festlegen, wann dein Tag beginnt
+### Tagesbeginn
 
 Unter {{statistics}} steht {{day_starts_at}}, voreingestellt auf vier Uhr
-morgens. Diese Einstellung entscheidet, zu welchem Tag ein Getränk zählt: Wer um
-ein Uhr nachts noch ein Glas trinkt, bucht es damit auf den Abend davor, wo es
-für sein Empfinden hingehört. Die Uhrzeit gilt überall in der App -- im
-Kalender, in der Statistik, im Export.
+morgens. Diese Einstellung entscheidet, zu welchem Tag ein Getränk zählt: Wer
+um ein Uhr nachts noch ein Glas trinkt, bucht es damit auf den Abend davor,
+wo es hingehört. Die Uhrzeit gilt überall in der App, im Kalender wie in der
+Statistik und im Export.
 
-{{#android}}
 Ebenfalls dort steht {{stats_from_label}}. Dieses Datum ist die untere Grenze
-aller Auswertungen: Einträge davor werden in jeder Statistik ignoriert. Bei
-einer frischen Installation steht es auf dem Installationstag. Das ist meist
-richtig, hat aber eine Folge, die überrascht, wenn man ein Backup mit älteren
-Daten einspielt: Die alten Einträge sind da, zählen aber nirgends mit. Der Knopf
-{{stats_from_clear}} hebt die Grenze wieder auf.
-{{/android}}
+aller Auswertungen: Einträge davor werden in jeder Statistik ignoriert. Mit
+dieser Funktion lässt sich zum 1. Januar für einen Neujahrsvorsatz ein klarer
+Schnitt machen, ohne die bisherigen Buchungsdaten zu verlieren. Bei einer
+frischen Installation steht dieses Datum auf dem Installationstag. Das ist
+meist richtig, hat aber eine Folge, die überrascht, wenn man ein Backup mit
+älteren Daten einspielt: Die alten Einträge sind da, zählen aber nirgends
+mit. Der Knopf {{stats_from_clear}} hebt die Grenze wieder auf; er erscheint
+nur, solange eine gesetzt ist.
 
-{{#ios}}
-Ebenfalls dort steht {{stats_from_label}}. Dieses Datum ist die untere Grenze
-aller Auswertungen: Einträge davor werden in jeder Statistik ignoriert. Bei
-einer frischen Installation steht es auf dem Installationstag. Das ist meist
-richtig, hat aber eine Folge, die überrascht, wenn man ein Backup mit älteren
-Daten einspielt: Die alten Einträge sind da, zählen aber nirgends mit. Der Knopf
-{{stats_from_clear}} hebt die Grenze wieder auf; er erscheint nur, solange eine
-gesetzt ist.
-{{/ios}}
+## Die Heute-Ansicht
+
+Über der Getränkeliste steht eine Übersicht, die sich nach jeder Buchung und
+mit Verlauf der Zeit aktualisiert. Von oben nach unten:
+
+**Zwei große Zahlen** stehen {{#android}}nebeneinander:
+links{{/android}}{{#ios}}untereinander:{{/ios}} {{current_streak}}, die Dauer
+der aktuellen Abstinenzphase in Tagen, oder {{total_today}}, die Summe des
+heute gebuchten reinen Alkohols in Gramm,
+{{#android}}rechts{{/android}}{{#ios}}darunter{{/ios}} unter „Ø“ der
+Durchschnitt des laufenden Monats in Gramm pro Tag. Der Monatswert ist der
+einzige auf dieser Ansicht, der über den Tag hinausblickt. Steht ein grüner
+oder roter Trendpfeil daneben, vergleicht er diesen Wert mit dem des
+Vormonats; ohne Vormonatswert bleibt er aus.
+
+**Drei Mengenbalken**: Der erste zeigt den heutigen Stand gegen das
+konfigurierte Tageslimit, der zweite die Summe der letzten sieben Tage gegen
+das konfigurierte 7-Tage-Limit, der dritte die Zahl der Trinktage der letzten
+sieben Tage gegen das konfigurierte Limit. Alle drei zeigen die Zahl und den
+Balken.
+
+**Der geschätzte Blutalkoholwert** erscheint nur, wenn ein Körpergewicht
+eingetragen ist, und nur, solange rechnerisch noch Alkohol im Blut ist. Es
+handelt sich um einen Schätzwert, der zur Beurteilung der Fahrtüchtigkeit
+nicht taugt.
+
+Darunter steht die Liste der Getränke, die heute gebucht wurden.
 
 ## Ein Getränk buchen
 
-{{#android}}
-Der Schirm „{{today}}" ist der, auf dem du die meiste Zeit sein wirst. Unten
-rechts sitzt die Plus-Taste; sie öffnet den Buchungsdialog.
-{{/android}}
-
-{{#ios}}
-Der Schirm „{{today}}" ist der, auf dem du die meiste Zeit sein wirst. Oben
-rechts sitzt die Plus-Taste; sie öffnet den Buchungsdialog.
-{{/ios}}
+Getränke lassen sich an mehreren Orten einbuchen. Die Ansicht „{{today}}“
+bietet die erste Möglichkeit, weitere bieten die Ansichten „{{calendar}}“ und
+„{{drinks}}“. {{#android}}Unten{{/android}}{{#ios}}Oben{{/ios}} rechts auf
+der „{{today}}“-Ansicht sitzt die Plus-Taste; sie öffnet den Buchungsdialog.
 
 ### Der Buchungsdialog
 
-{{#android}}
-Ganz oben steht das Feld {{drink}}; ein Tippen darauf öffnet die Auswahl aus
-deinem Katalog. Darunter stehen drei Felder:
-{{/android}}
+Ganz oben steht die Zeile {{drink}} mit der Auswahl aus dem Katalog; wurde
+nur ein einziges Getränk angelegt, steht dort dessen Name ohne Auswahl.
+Darunter stehen drei Felder:
 
-{{#ios}}
-Ganz oben steht die Zeile {{drink}} mit der Auswahl aus deinem Katalog; hast du
-nur ein einziges Getränk angelegt, steht dort dessen Name ohne Auswahl. Darunter
-stehen drei Felder:
-{{/ios}}
-
-- **{{volume_ml}}** -- die getrunkene Menge in Millilitern. Erlaubt ist 1 bis
-  5000; die Vorbelegung ist die Standardmenge des gewählten Getränks.
-- **{{time}}** -- voreingestellt auf jetzt. Änderbar, wenn du etwas nachträgst.
-- **{{note}}** -- eine freie Bemerkung, etwa der Anlass oder mit wem.
+- **{{volume_ml}}**: die getrunkene Menge in Millilitern. Erlaubt ist 1 bis
+  5.000 ml; die Vorbelegung ist die Standardmenge des gewählten Getränks.
+- **{{time}}**: voreingestellt auf jetzt. Änderbar, wenn etwas nachgetragen
+  werden soll.
+- **{{note}}**: eine freie Bemerkung, etwa der Anlass oder mit wem.
 
 Der Alkoholgehalt gehört zum Getränk und lässt sich hier nicht abweichend
-eintragen. Wenn dieselbe Sorte einmal deutlich stärker ist, legst du sie im
-Katalog als eigenes Getränk an.
+eintragen. Wenn dieselbe Sorte einmal deutlich stärker ist, ist sie im
+Katalog als eigenes Getränk anzulegen.
 
-{{#android}}
-Unter den Feldern steht laufend mitgerechnet, wie viel {{pure_alcohol}} diese
-Eingabe ergibt. Diese Zahl ist es, mit der die App rechnet -- nicht die
-Milliliter.
-{{/android}}
+Sobald die Menge im erlaubten Bereich liegt, steht unter den Feldern{{#ios}}
+in der Zeile {{alcohol_content}}{{/ios}}, wie viele Gramm reinen Alkohols
+diese Eingabe ergibt. Diese Zahl ist es, mit der Libellus Potionis rechnet,
+nicht die Milliliter.
 
-{{#ios}}
-Sobald die Menge im erlaubten Bereich liegt, steht unter den Feldern in der
-Zeile {{alcohol_content}}, wie viele Gramm reinen Alkohols diese Eingabe ergibt.
-Diese Zahl ist es, mit der die App rechnet -- nicht die Milliliter.
-{{/ios}}
+Daneben sitzt ein farbiger Statuspunkt. Er besagt, wie viele Einheiten des
+gewählten Getränks am selben Tag innerhalb der drei definierten Limits noch
+konsumiert werden können: grün, wenn noch mindestens zwei möglich sind, gelb,
+wenn noch genau eines passt, rot, wenn der Konsum eines oder mehrere Limits
+verletzen würde. Gerechnet wird gegen das Tageslimit, das 7-Tage-Limit und
+die Trinktage. Ein Screenreader liest dazu {{capacity_status_ok}},
+{{capacity_status_low}} oder {{capacity_status_reached}}. Menschen mit
+Rot-Grün-Schwäche können in „{{settings}}“ unter {{appearance}} die
+{{alt_status_symbols}} einschalten; dann zeigt der farbige Punkt zusätzlich
+ein entsprechendes Zeichen.
 
-Daneben sitzt ein farbiger Statuspunkt. Er beantwortet für diese Menge die
-Frage, wie viel noch hineingeht: grün, wenn davon heute mindestens zwei passen,
-gelb bei genau einem, rot, wenn keines mehr passt oder deine Trinktage
-aufgebraucht sind. Gerechnet wird gegen Tageslimit, 7-Tage-Limit und Trinktage
-gemeinsam, der strengste Wert gilt. Ein Screenreader liest dazu
-{{capacity_status_ok}}, {{capacity_status_low}} oder
-{{capacity_status_reached}}. Die Farbe allein trägt diese Aussage nicht -- wer
-sie schlecht unterscheiden kann, schaltet unter {{appearance}} die
-{{alt_status_symbols}} hinzu; dann zeigt der Punkt zusätzlich ein Zeichen.
+{{#ios}}Der Dialog schließt über seine beiden Knöpfe oben. Sobald etwas
+eingetragen ist, beendet ihn ein Wischen nach unten nicht mehr, damit eine
+halbe Eingabe nicht verloren geht.{{/ios}}
 
-{{#ios}}
-Der Dialog schließt über seine beiden Knöpfe oben. Solange etwas eingetragen
-ist, beendet ihn ein Wischen nach unten nicht mehr, damit eine halbe Eingabe
-nicht verlorengeht.
-{{/ios}}
+### Schnellauswahl für Getränke, die oft gebucht werden
 
-### Schnellauswahl für Getränke, die du oft buchst
-
-{{#android}}
-Getränke, die du im Katalog als Favoriten markiert hast, erscheinen auf dem
-Heute-Schirm als {{favorites_quick}}: eine Reihe von Knöpfen über der
+Getränke, die im Katalog als Favoriten markiert sind, erscheinen auf der
+„{{today}}“-Ansicht als {{favorites_quick}}: eine Reihe von Knöpfen über der
 Tagesliste. Ein Tippen bucht das Getränk mit seiner Standardmenge sofort ein,
-ohne Dialog. Für das Feierabendbier, das immer dasselbe ist, ist das der
+ohne Dialog. Für das Feierabendbier, das immer das gleiche ist, ist dies der
 kürzeste Weg.
-{{/android}}
-
-{{#ios}}
-Getränke, die du im Katalog als Favoriten markiert hast, erscheinen auf dem
-Heute-Schirm im Abschnitt {{favorites_quick}} über der Tagesliste, jedes mit
-seiner Standardmenge daneben. Ein Tippen bucht es damit sofort ein, ohne Dialog.
-Für das Feierabendbier, das immer dasselbe ist, ist das der kürzeste Weg.
-{{/ios}}
 
 ### Etwas korrigieren oder löschen
 
-{{#android}}
-Unter der Übersicht steht die Liste dessen, was du heute gebucht hast. Ein
-Tippen auf einen Eintrag öffnet ihn als {{edit_entry}} -- dieselben Felder wie
-beim Buchen, dieselben Grenzen. Zum Entfernen dient {{delete}}; die App fragt
-einmal nach, weil ein versehentlich gelöschter Eintrag nicht zurückzuholen ist.
-{{/android}}
+Ein Tippen auf einen Eintrag der Tagesliste öffnet ihn als {{edit_entry}}:
+dieselben Felder wie beim Buchen, dieselben Grenzen. {{#android}}Zum
+Entfernen dient {{delete}}; die App fragt einmal nach,{{/android}}{{#ios}}Zum
+Entfernen kann die Zeile nach links gewischt werden, oder im
+Bearbeitungsmodus (oben rechts) das rote Zeichen der Zeile angetippt werden.
+Beide Wege führen zu {{delete}} und derselben Rückfrage,{{/ios}} weil ein
+versehentlich gelöschter Eintrag nicht zurückzuholen ist.
 
-{{#ios}}
-Unter der Übersicht steht die Liste dessen, was du heute gebucht hast. Ein
-Tippen auf einen Eintrag öffnet ihn als {{edit_entry}} -- dieselben Felder wie
-beim Buchen, dieselben Grenzen. Zum Entfernen wischst du die Zeile nach links,
-oder du schaltest oben rechts den Bearbeitungsmodus ein und tippst das rote
-Zeichen der Zeile an. Beide Wege führen zu {{delete}} und derselben Rückfrage,
-denn ein versehentlich gelöschter Eintrag ist nicht zurückzuholen.
-{{/ios}}
+## Der Getränkekatalog
 
-## Was der Heute-Schirm anzeigt
+Die Ansicht „{{drinks}}“ verwaltet die Getränke, aus denen beim Buchen
+gewählt wird. Ausgeliefert wird die App mit einer Auswahl gebräuchlicher
+Getränke; sie lassen sich ändern, ergänzen und auch löschen.
 
-Über der Getränkeliste steht eine Übersicht, die sich nach jeder Buchung
-aktualisiert. Von oben nach unten:
+Jede Zeile zeigt Namen, Kategoriensymbol, Menge, Alkoholgehalt und die daraus
+folgenden Gramm Reinalkohol, davor den Favoritenstern und den Statuspunkt für
+diese Portion{{#android}}, dahinter ein Editier- und ein
+Lösch-Symbol{{/android}}. Der Stern schaltet den Favoriten um: Favoriten
+erscheinen in der Schnellauswahl auf der Heute-Ansicht.
 
-{{#android}}
-**Zwei große Zahlen** stehen nebeneinander: links {{total_today}}, die Summe des
-heute gebuchten reinen Alkohols in Gramm, rechts unter „Ø" mit dem Monatsnamen
-der Durchschnitt des laufenden Monats in Gramm pro Tag. Der Monatswert ist der
-einzige auf diesem Schirm, der über den Tag hinausblickt. Steht ein Pfeil
-daneben, vergleicht er ihn mit dem Vormonat; ohne Vormonatswert bleibt er aus.
-{{/android}}
-
-{{#ios}}
-**Zwei große Zahlen** stehen in zwei Zeilen: {{total_today}}, die Summe des heute
-gebuchten reinen Alkohols in Gramm, und darunter unter „Ø" mit dem Monatsnamen
-der Durchschnitt des laufenden Monats in Gramm pro Tag. Der Monatswert ist der
-einzige auf diesem Schirm, der über den Tag hinausblickt. Steht ein Pfeil
-daneben, vergleicht er ihn mit dem Vormonat; ohne Vormonatswert bleibt er aus.
-{{/ios}}
-
-**Zwei Mengenbalken** -- der erste zeigt den heutigen Stand gegen dein
-Tageslimit, der zweite die Summe der letzten sieben Tage gegen dein
-7-Tage-Limit. Beide zeigen die Zahl und den Balken.
-
-**{{drink_days_label}}** -- wie viele der letzten sieben Tage Trinktage waren,
-gegen deine erlaubte Anzahl. Auch hier Zahl und Balken.
-
-{{#android}}
-**Der geschätzte Blutalkoholwert** erscheint nur, wenn du ein Körpergewicht
-eingetragen hast, und nur, solange rechnerisch noch Alkohol im Blut ist.
-Darunter steht der Hinweis, dass es ein Schätzwert ist und für Entscheidungen
-über eine Fahrt nicht taugt.
-{{/android}}
-
-{{#ios}}
-**Der geschätzte Blutalkoholwert** erscheint nur, wenn du ein Körpergewicht
-eingetragen hast, und nur, solange rechnerisch noch Alkohol im Blut ist.
-{{/ios}}
-
-Den farbigen Statuspunkt, der sagt, wie viel von einem Getränk noch hineingeht,
-findest du nicht hier, sondern dort, wo er zu einer Entscheidung gehört: im
-Buchungsdialog und in der Getränkeliste.
-
-## Dein Getränkekatalog
-
-Der Schirm „{{drinks}}" verwaltet die Getränke, aus denen du beim Buchen
-wählst. Ausgeliefert wird die App mit einer Auswahl gebräuchlicher Getränke;
-du kannst sie ändern, ergänzen und -- mit einer Einschränkung -- löschen.
-
-{{#android}}
-Jede Zeile zeigt Menge, Alkoholgehalt und die daraus folgenden Gramm, davor den
-Statuspunkt für diese Portion. Ein Tippen auf die Zeile öffnet den
-Buchungsdialog mit diesem Getränk -- der zweite Weg dorthin neben der
-Plus-Taste auf dem Heute-Schirm. Der Stern links schaltet den Favoriten um --
-Favoriten erscheinen in der Schnellauswahl auf dem Heute-Schirm --, die beiden
-Symbole rechts öffnen den Editor und die Löschabfrage.
-{{/android}}
-
-{{#ios}}
-Jede Zeile zeigt Menge, Alkoholgehalt und die daraus folgenden Gramm, davor den
-Statuspunkt für diese Portion. Ein Tippen auf die Zeile öffnet den
-Buchungsdialog mit diesem Getränk -- der zweite Weg dorthin neben der
-Plus-Taste auf dem Heute-Schirm. Der Stern links schaltet den Favoriten um;
-Favoriten erscheinen in der Schnellauswahl auf dem Heute-Schirm.
-
-Ändern und Löschen gehören in den Bearbeitungsmodus, den du oben rechts
-einschaltest. Dort öffnet dasselbe Tippen den Editor, und das rote Zeichen der
-Zeile führt zur Löschabfrage; der Stern ist dann ausgeblendet, damit die Zeile
-eine einzige Antwort gibt. Ein Wisch nach links bietet beide Aktionen auch ohne
-den Bearbeitungsmodus.
-{{/ios}}
+{{#android}}Ein Tippen auf die Zeile (nicht auf die Symbole) öffnet den
+Buchungsdialog mit diesem Getränk; dies ist der zweite Weg zum Einbuchen,
+neben der Plus-Taste auf der Heute-Ansicht. Die beiden Symbole rechts öffnen
+den Editor und die Löschabfrage.{{/android}}{{#ios}}Ein Tippen auf die Zeile
+öffnet den Buchungsdialog mit diesem Getränk; dies ist der zweite Weg zum
+Einbuchen, neben der Plus-Taste auf der Heute-Ansicht. Ändern und Löschen
+gehören in den Bearbeitungsmodus, der oben rechts eingeschaltet wird: dort
+öffnet dasselbe Tippen den Editor, und das rote Zeichen der Zeile führt zur
+Löschabfrage. Ein Wisch nach links bietet beide Aktionen ebenfalls an, im
+Bearbeitungsmodus wie außerhalb.{{/ios}}
 
 ### Ein Getränk anlegen oder ändern
 
-{{#android}}
-Die Plus-Taste öffnet {{add_drink}}, das Stift-Symbol einer Zeile öffnet
-{{edit_drink}}. Beide fragen dasselbe:
-{{/android}}
+Die Plus-Taste öffnet {{add_drink}}, {{#android}}das Stift-Symbol einer
+Zeile{{/android}}{{#ios}}ein Tippen im Bearbeitungsmodus{{/ios}} öffnet
+{{edit_drink}}. Beide Dialoge fragen dasselbe:
 
-{{#ios}}
-Die Plus-Taste öffnet {{add_drink}}, ein Tippen im Bearbeitungsmodus öffnet
-{{edit_drink}}. Beide fragen dasselbe:
-{{/ios}}
-
-- **{{drink_name}}** -- frei wählbar, bis zu 100 Zeichen.
-- **{{volume_ml}}** -- die Standardmenge, mit der das Getränk im
-  Buchungsdialog vorbelegt wird. 1 bis 5000 Milliliter.
-- **{{alcohol_percent}}** -- der übliche Alkoholgehalt, 0 bis 100 Prozent.
-- **{{category}}** -- eine von sechs: {{category_beer}}, {{category_wine}},
-  {{category_spirits}}, {{category_longdrink}}, {{category_liqueur}} oder
-  {{category_other}}. Die Kategorie ändert nichts an der Rechnung; sie
-  gruppiert die Auswertung auf dem Statistik-Schirm.
+- **{{drink_name}}**: frei wählbar, bis zu 100 Zeichen.
+- **{{volume_ml}}**: die Standardmenge, mit der das Getränk im Buchungsdialog
+  vorbelegt wird. 1 bis 5.000 Milliliter.
+- **{{alcohol_percent}}**: der übliche Alkoholgehalt, 0 bis 100 Prozent.
+- **{{category}}**: eine von sechs Kategorien: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} oder {{category_other}}. Die Kategorie ändert nichts
+  an der Rechnung; sie gruppiert die Auswertung auf der Statistik-Ansicht.
 
 ### Warum sich manche Getränke nicht löschen lassen
 
 Ein Getränk, auf das bereits gebuchte Einträge verweisen, lässt sich nicht
-entfernen -- die App sagt dann, wie viele Einträge daran hängen. Der Grund ist,
-dass deine Protokolleinträge sonst ihren Namen verlören und die Statistik
-Löcher bekäme. Wenn du ein Getränk nicht mehr verwenden willst, nimm ihm den
-Favoritenstern; im Katalog bleibt es stehen, aus dem Weg ist es trotzdem.
+entfernen; die App sagt dann, wie viele Einträge daran hängen. Der Grund ist,
+dass Protokolleinträge andernfalls die Zuordnung verlören und die Statistik
+unvollständig würde.
 
 ## Zurückblicken: der Kalender
 
-Der Schirm „{{calendar}}" zeigt, was war. Oben links schaltest du zwischen zwei
-Ansichten um.
+Die Ansicht „{{calendar}}“ zeigt, was war. Oben
+{{#android}}rechts{{/android}}{{#ios}}links{{/ios}} wird zwischen zwei
+Ansichten des Kalenders umgeschaltet.
+
+Beim Betreten steht der Kalender wieder auf dem aktuellen Monat, auch wenn
+beim letzten Mal zurückgeblättert wurde. Das hat einen Grund: Die Plus-Taste
+bucht auf den ausgewählten Tag, und eine stehengebliebene Auswahl aus dem
+März würde die nächste Buchung drei Monate zurück legen.
 
 ### Die Monatsansicht
 
-Ein gewöhnliches Monatsraster. Tage mit Einträgen tragen einen Punkt: blau,
-wenn du unter deinem Tageslimit geblieben bist, rot darüber. Tage ohne Eintrag
-tragen keinen Punkt -- ein leerer Tag sagt nichts, er sagt nicht „null".
+Die Monatsansicht zeigt ein gewöhnliches Monatsraster und ist die
+Standardansicht. Über dem Raster steht der Monat, links und rechts davon je
+ein Pfeil zum Blättern.
 
-{{#android}}
-Ein Tippen wählt den Tag aus und listet darunter seine Einträge auf. Dort
-kannst du sie genauso bearbeiten und löschen wie auf dem Heute-Schirm, und die
-Plus-Taste oben bucht auf den ausgewählten Tag -- so trägst du nach, was du
-gestern zu buchen vergessen hast.
-{{/android}}
+Tage mit Einträgen tragen einen Punkt: ein blauer für einen Trinktag
+unterhalb der Limits, ein roter für einen Trinktag, der ein Limit gerissen
+hat. Tage ohne Eintrag tragen keinen Punkt.
 
-{{#ios}}
 Ein Tippen wählt den Tag aus und listet darunter seine Einträge auf. Dort
-kannst du sie genauso bearbeiten und löschen wie auf dem Heute-Schirm, und die
-Plus-Taste oben rechts -- die erst mit der Auswahl erscheint, weil es ohne
-gewählten Tag nichts zu buchen gibt -- bucht auf den ausgewählten Tag. So trägst
-du nach, was du gestern zu buchen vergessen hast.
-{{/ios}}
+lassen sie sich genauso bearbeiten und löschen wie auf der Heute-Ansicht, und
+die Plus-Taste {{#android}}unten{{/android}}{{#ios}}oben{{/ios}} rechts, die
+erst mit der Auswahl erscheint, bucht auf den ausgewählten Tag. Auf diese
+Weise lässt sich nachtragen, was während des Trinkens nicht erfasst wurde.
 
 ### Die Jahresansicht
 
-Zwölf Monate als Raster kleiner Quadrate, eines je Tag. Die Legende darunter
-nennt die drei Zustände: {{year_calendar_no_entry}},
+Die Jahresansicht zeigt die zwölf Monate eines Jahres als Raster kleiner
+Quadrate, eines je Tag. Über dem Raster steht die Jahreszahl, links und
+rechts davon je ein Pfeil, mit dem sich das Jahr wechseln lässt. Die Legende
+darunter nennt die drei Zustände: {{year_calendar_no_entry}},
 {{year_calendar_under_limit}}, {{year_calendar_over_limit}}. Der heutige Tag
 trägt einen Rahmen.
 
 Ein Tippen auf einen Monat wechselt in die Monatsansicht dieses Monats. Die
-einzelnen Quadrate sind dagegen nicht antippbar -- dafür sind sie zu klein, man
-träfe regelmäßig den Nachbartag, ohne es zu merken. Ausgewählt wird durch den
-Wechsel also kein Tag; das tust du dann in der Monatsansicht, wo die Felder groß
-genug sind.
+einzelnen Quadrate sind nicht antippbar. Ausgewählt wird durch den Wechsel
+kein Tag; dieser ist in der dann wieder sichtbaren Monatsansicht zu wählen.
 
-Zwei Zeiträume bleiben leer, und zwar absichtlich: alles nach heute, und alles
-vor deinem {{stats_from_label}}. Beides sind Tage, über die die App nichts
-aussagen kann -- die Zukunft war noch nicht, und der Bereich vor deinem
-Startdatum ist aus jeder Auswertung ausgenommen. Ein graues Quadrat würde dort
-aussehen wie ein Tag ohne Alkohol, also wie eine Behauptung, die niemand
-gemacht hat. Wenn dir ein ganzes leeres Jahr begegnet, liegt es vor deinem
-Startdatum; {{stats_from_clear}} in den Einstellungen holt es zurück.
+Zwei Zeiträume bleiben leer, und zwar absichtlich: alles nach heute, und
+alles vor {{stats_from_label}}. Über beides kann die App nichts aussagen. Ein
+graues Quadrat würde dort aussehen wie ein Tag ohne Alkohol.
+{{stats_from_clear}} in den Einstellungen holt ältere Einträge zurück, wenn
+gewünscht.
 
 ## Auswerten: die Statistik
 
-{{#android}}
-Der Schirm „{{statistics}}" fasst zusammen. Oben wählst du die Art des
-Zeitraums: {{week}}, {{month}} oder {{year}}. Alles darunter bezieht sich auf
-diese Wahl, und alles ignoriert Einträge vor deinem {{stats_from_label}}. Gibt
-es im gewählten Zeitraum nichts, steht dort {{no_data}}.
-{{/android}}
-
-{{#ios}}
-Der Schirm „{{statistics}}" fasst zusammen. Oben wählst du die Art des
-Zeitraums: {{week}}, {{month}} oder {{year}}. Alles darunter bezieht sich auf
-diese Wahl, und alles ignoriert Einträge vor deinem {{stats_from_label}}. Ist im
-gewählten Zeitraum nichts gebucht, bleiben die Abschnitte stehen und zeigen
-Nullen; ein verschwundener Abschnitt wäre nicht von einer fehlenden Funktion zu
-unterscheiden.
-{{/ios}}
+Die Ansicht „{{statistics}}“ analysiert. Oben wird die Länge des Zeitraums
+gewählt: {{week}}, {{month}} oder {{year}}. Alles darunter bezieht sich auf
+diese Wahl. Alle Berechnungen ignorieren Einträge vor dem
+{{stats_from_label}}. Gibt es im gewählten Zeitraum nichts, {{#android}}steht
+in den Diagrammen {{no_data}}{{/android}}{{#ios}}bleiben die Abschnitte
+stehen und zeigen Nullen{{/ios}}.
 
 ### In der Zeit zurückgehen
 
-Unter der Zeitraumwahl steht, welchen Zeitraum du gerade ansiehst -- als
-Datumsbereich, nicht als Monatsname. Das hat einen Grund: Der laufende Monat
-endet heute und nicht am Monatsletzten, und wenn du ein {{stats_from_label}}
-gesetzt hast, beginnt der Bereich erst dort. Es steht also genau da, was die
-Zahlen darunter abdecken.
+Unter der Zeitraumwahl wird die aktuell dargestellte Zeitspanne als exakter
+Datumsbereich angezeigt. Der laufende Monat endet heute und nicht am
+Monatsletzten, und wenn ein {{stats_from_label}} gesetzt ist, beginnt der
+Bereich erst dort. Es steht also genau da, was die Zahlen darunter abdecken.
 
 Links und rechts der Angabe sitzt je ein Pfeil. Der linke geht einen Zeitraum
-zurück, der rechte wieder in Richtung Gegenwart. Dasselbe erreichst du mit einem
-Wisch über den Schirm -- und zwar über die ganze Fläche, nicht nur über der
-Zeitraumangabe. Die Richtung ist die des Blätterns: nach rechts wischen holt den
-früheren Zeitraum herein, nach links den späteren. Jede Wischbewegung bewegt
-genau einen Schritt, egal wie weit du ziehst.
+zurück, der rechte wieder in Richtung Gegenwart. Die Pfeile sind der einzige
+Weg dorthin; einen Wisch über den Bildschirm gibt es nicht.
 
-Zwei Grenzen gibt es. Nach vorn endet es beim laufenden Zeitraum -- weiter ist
-nichts passiert. Nach hinten beim Zeitraum, in dem dein {{stats_from_label}}
-liegt; hast du keines gesetzt, beim Zeitraum deines ältesten Eintrags. Ist eine
-Grenze erreicht, wird der zugehörige Pfeil blass und der Wisch bleibt ohne
-Wirkung.
+Zwei Grenzen gibt es: Das Ende in die Zukunft ist der aktuelle Zeitraum, der
+Beginn der Vergangenheit ist das gewählte {{stats_from_label}}; wurde keines
+gesetzt, ist es der älteste Eintrag. Beim Betreten der Ansicht steht der
+Zeitraum wieder auf der Gegenwart.
 
-Alles auf diesem Schirm folgt dem gewählten Zeitraum: Kennzahlen, Serien,
-Trendvergleich, Kategorien und das Diagramm. Der Trend vergleicht immer mit dem
-unmittelbar davorliegenden Zeitraum gleicher Länge -- beim März also mit dem
-Februar. Auch der Exportbereich wird mit dem Zeitraum vorbelegt, den du gerade
-ansiehst.
-
-Wechselst du die Art des Zeitraums, beginnst du wieder beim laufenden: „drei
-Zeiträume zurück" bedeutet bei Wochen etwas anderes als bei Jahren. Verlässt du
-den Schirm und kommst zurück, stehst du ebenfalls wieder in der Gegenwart. Eine
-Drehung des Geräts behält dagegen deine Stelle.
+Alles in dieser Ansicht folgt dem gewählten Zeitraum, sowohl Kennzahlen als
+auch Diagramme. {{trend_vs_prev}} vergleicht immer mit dem unmittelbar
+davorliegenden Zeitraum gleicher Länge, beim März also mit dem Februar.
 
 ### Die Kennzahlen
 
-- **{{total_period}}** -- Gramm reinen Alkohols im Zeitraum.
-- **{{avg_per_day}}** -- Durchschnitt über alle Tage, auch die trockenen.
-- **{{avg_per_drink_day}}** -- Durchschnitt nur über die Tage mit Konsum. Die
-  Differenz zum vorigen Wert sagt viel: Liegen die beiden weit auseinander,
-  trinkst du selten, dann aber viel.
-- **{{days_over_daily_limit}}** -- Tage, an denen dein Tageslimit
+- **{{total_period}}**: Gramm reinen Alkohols im gewählten Zeitraum.
+- **{{avg_per_day}}**: Durchschnitt über alle Kalendertage.
+- **{{avg_per_drink_day}}**: Durchschnitt über alle Trinktage. Die Differenz
+  zum vorigen Wert sagt viel: Liegen beide weit auseinander, ist dies ein
+  Hinweis auf seltenen, dann aber intensiven Konsum.
+- **{{days_over_daily_limit}}**: Anzahl der Tage, an denen das Tageslimit
   überschritten wurde.
-- **{{days_over_weekly_limit}}** -- Trinktage, an denen die Summe aus diesem und
-  den sechs vorangegangenen Tagen über deinem 7-Tage-Limit lag.
-- **{{days_over_drink_day_limit}}** -- Trinktage, die in diesem Fenster mehr
-  Trinktage vorfanden als erlaubt: der sechste Trinktag in sieben Tagen, wenn du
-  fünf erlaubt hast.
-- **{{abstinent_days}}** -- Tage ohne Eintrag im Zeitraum.
+- **{{days_over_weekly_limit}}**: Anzahl der Trinktage, an denen die Summe
+  aus diesem und den sechs vorangegangenen Tagen über dem Siebentageslimit
+  lag.
+- **{{days_over_drink_day_limit}}**: Trinktage, die im jeweiligen
+  Siebentagesfenster oberhalb des Trinktage-Limits lagen, etwa der fünfte
+  Trinktag in sieben Tagen, wenn nur vier erlaubt sind.
+- **{{abstinent_days}}**: Tage ohne Einträge im Zeitraum.
 
-### {{streak_trend}}
-
-**{{current_streak}}** zählt die Tage seit deinem letzten Getränk,
-**{{longest_streak}}** die längste Phase ohne Alkohol im Zeitraum.
-**{{trend_vs_prev}}** vergleicht den Tagesdurchschnitt des gewählten Zeitraums
-mit dem unmittelbar davorliegenden gleicher Länge und zeigt die Richtung an.
+Darunter stehen unter der Überschrift {{streak_trend}} drei weitere Werte:
+**{{current_streak}}** zählt die Tage seit dem letzten Getränk,
+**{{longest_streak}}** die längste Phase ohne Alkohol im Zeitraum, und
+**{{trend_vs_prev}}** zeigt die Richtung des Vergleichs mit dem
+davorliegenden Zeitraum.
 
 ### Die Diagramme
 
-Ein Balkendiagramm zeigt den Verlauf im Zeitraum; die Breite der Balken
-richtet sich nach dessen Länge -- Tage bei einer Woche, gröbere Abschnitte beim
-Jahr.
+Ein Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum. Darunter
+folgen drei Auswertungen hinsichtlich des Musters:
 
-Darunter folgen drei Auswertungen, die nicht nach dem Wann, sondern nach dem
-Muster fragen:
+**{{stats_time_of_day}}** teilt den Tag in acht Abschnitte von je drei
+Stunden und zeigt für jeden den Durchschnitt in Gramm pro Tag. Hier wird
+sichtbar, ob der Konsum abends stattfindet oder über den Tag verteilt. Dieser
+Abschnitt erscheint nur, wenn im gewählten Zeitraum überhaupt getrunken
+wurde.
 
-**{{stats_time_of_day}}** teilt den Tag in acht Abschnitte von je drei Stunden
-und zeigt für jeden den Durchschnitt in Gramm pro Tag. Hier wird sichtbar, ob
-sich dein Konsum auf den Abend legt oder über den Tag verteilt.
+**{{stats_weekday}}** zeigt denselben Durchschnitt je Wochentag.
 
-**{{stats_weekday}}** zeigt denselben Durchschnitt je Wochentag, beginnend mit
-dem ersten Tag deiner Woche.
-
-**{{stats_category_breakdown}}** zeigt als Ringdiagramm, wie sich dein Konsum
+**{{stats_category_breakdown}}** zeigt als Ringdiagramm, wie sich der Konsum
 auf die sechs Getränkekategorien verteilt.
 
-{{#android}}
-Alle drei bleiben aus, solange der Zeitraum nichts enthält, was sie zeigen
-könnten.
-{{/android}}
-
-{{#ios}}
-Alle drei bleiben auch dann stehen, wenn der Zeitraum nichts enthält, was sie
-zeigen könnten.
-{{/ios}}
+{{#ios}}Ein Ziehen der Ansicht nach unten lädt die Zahlen neu.{{/ios}}
 
 ## Daten aus der App holen
 
-{{#android}}
-Unter {{export}} auf dem Statistik-Schirm stehen zwei Formate.
-{{/android}}
-
-{{#ios}}
-Das {{export}}-Symbol oben rechts auf dem Statistik-Schirm öffnet ein Menü mit
-zwei Formaten.
-{{/ios}}
+Unter {{export}} auf der Statistik-Ansicht stehen zwei Formate zur Verfügung.
 
 **{{export_csv}}** schreibt eine Tabelle mit einer Zeile je Eintrag, geeignet
-für Tabellenkalkulationen. Zahlen stehen im maschinenlesbaren Format mit
-Dezimalpunkt, unabhängig von der App-Sprache.
+für Tabellenkalkulationen wie etwa
+[LibreOffice](https://www.libreoffice.org/) Calc. Zahlen stehen im
+maschinenlesbaren Format mit Dezimalpunkt, unabhängig von der App-Sprache.
 
-**{{export_pdf}}** erzeugt einen zweiseitigen Bericht: Kerndaten,
+**{{export_pdf}}** erzeugt einen zweiseitigen Bericht als PDF: Kerndaten,
 Monatsübersicht, Langzeittrend, Konsummuster nach Kategorie, Tageszeit und
-Wochentag sowie ein Abschnitt zu Risikokonsum und Abstinenz. Das Format ist für
-ein Gespräch in einer Suchtberatung gedacht, und der Fußtext sagt ausdrücklich,
-dass es sich um selbst protokollierte Schätzwerte handelt.
+Wochentag sowie ein Abschnitt zu Risikokonsum und Abstinenz. Das Format ist
+für ein Gespräch mit einer Suchtberatung geeignet.
 
-{{#android}}
-Beide fragen zuerst nach dem Zeitraum, vorbelegt mit dem, was du gerade
-ansiehst. Die fertige Datei landet in deinem Download-Ordner, und die App bietet
-danach an, sie zu teilen.
-{{/android}}
+Beide Formate fragen zuerst nach dem Zeitraum. Vorbelegt ist der gesamte
+ausgewertete Bereich: vom {{stats_from_label}} bis heute, und ohne ein
+gesetztes {{stats_from_label}} vom Beginn des gerade sichtbaren Zeitraums an.
+Ein abweichender Zeitraum lässt sich im Dialog wählen.
 
-{{#ios}}
-Beide fragen zuerst nach dem Zeitraum, vorbelegt mit dem, was du gerade
-ansiehst. Danach öffnet sich die Dateiauswahl des Systems, in der du bestimmst,
-wohin die Datei geht -- nach „Dateien", in deinen Cloud-Speicher oder in eine
-andere App.
-{{/ios}}
+Der PDF-Bericht deckt genau den gewählten Zeitraum ab, nicht nur die Tage
+darin, an denen etwas gebucht wurde. Wer den Juli exportiert und darin nur an
+elf Tagen getrunken hat, bekommt einen Bericht über einunddreißig Tage, mit
+zwanzig abstinenten Tagen und einem Tagesdurchschnitt, der durch
+einunddreißig teilt. Die Monatstabelle führt jeden Monat des Zeitraums, auch
+einen ohne jede Buchung. Damit stimmen die Zahlen des Berichts mit denen der
+Statistik-Ansicht überein. Endet der gewählte Zeitraum heute, so endet der
+Bericht auf dem gestrigen Tag, solange heute noch nichts gebucht ist: Ein
+angebrochener Tag würde den Durchschnitt drücken und als abstinent zählen,
+bevor er vorüber ist.
 
-## Deine Daten sichern
+{{#android}}Die CSV-Datei landet im Download-Ordner, und die App bietet
+danach an, sie zu teilen; für den PDF-Bericht öffnet sich stattdessen der
+Druckdialog des Systems, aus dem er sich drucken oder als Datei sichern
+lässt.{{/android}}{{#ios}}Danach öffnet sich die Dateiauswahl des Systems, in
+der bestimmt wird, wo die Datei abgelegt werden soll: nach „Dateien“, in den
+Cloud-Speicher oder in eine andere App.{{/ios}}
 
-{{#android}}
-**Deine Daten verlassen dieses Gerät nicht von selbst.** Libellus Potionis
-nimmt an keinem automatischen Cloud-Backup und keiner Geräte-zu-Geräte-
-Übertragung teil. Beim Gerätewechsel, nach einem Werksreset oder einer
-Neuinstallation ist **eine selbst erstellte Sicherung der einzige Weg**, die
-Daten zu behalten. Was nicht exportiert wurde, ist dann fort.
-{{/android}}
+## Weitere Einstellungen
 
-{{#ios}}
-**Deine Daten verlassen dieses Gerät nicht von selbst.** Libellus Potionis hält
-ihr Protokoll aus jeder Gerätesicherung heraus, aus iCloud wie aus der Sicherung
-auf einem Rechner; ein Schalter unter {{security}} kann das umkehren (siehe
-„Zugang und Sichtbarkeit"). Solange er aus ist, ist beim Gerätewechsel, nach
-einem Werksreset oder einer Neuinstallation **eine selbst erstellte Sicherung
-der einzige Weg**, die Daten zu behalten. Was nicht exportiert wurde, ist dann
-fort.
-{{/ios}}
+### Daten sichern
+
+**Erfasste Daten verlassen dieses Gerät nicht von selbst.**
+{{#android}}Libellus Potionis nimmt an keinem automatischen Cloud-Backup und
+keiner Geräte-zu-Geräte-Übertragung teil. **Beim Gerätewechsel, nach einem
+Werksreset oder einer Neuinstallation ist eine selbst erstellte Sicherung der
+einzige Weg, die Daten zu behalten.** Was nicht exportiert wurde, ist dann
+fort.{{/android}}{{#ios}}Libellus Potionis hält die App-Daten aus jeder
+Gerätesicherung heraus, aus iCloud wie aus der Sicherung auf einem Rechner;
+der Schalter {{device_backup}} unter {{security}} kann das umkehren (siehe
+„Zugang und Sichtbarkeit“). Solange er aus ist, ist beim Gerätewechsel, nach
+einem Werksreset oder einer Neuinstallation eine selbst erstellte Sicherung
+der einzige Weg, die Daten zu behalten.{{/ios}}
 
 Ein Backup ist eine einzelne JSON-Datei. Der Schalter
-{{backup_include_settings}} entscheidet, ob deine Einstellungen mit
-hineingeschrieben werden -- einschließlich deines Körpergewichts. Er steht
-beim Öffnen der Einstellungen immer auf „an"; schaltest du ihn aus, enthält die
-Datei nur Getränke und Protokoll, und ein Import lässt die Einstellungen des
-Zielgeräts unberührt. Der Text über den Knöpfen sagt jeweils, was gerade
-geschrieben würde.
+{{backup_include_settings}} entscheidet, ob die Einstellungen mit
+hineingeschrieben werden. Er steht bei jedem Öffnen der Einstellungen wieder
+auf ein; die Wahl wird nicht gemerkt. Wird er ausgeschaltet, enthält das
+Backup nur den Getränkekatalog und die eingebuchten Getränke, und ein Import
+lässt die Einstellungen des Zielgeräts unberührt.
 
-So überträgst du deine Daten auf ein neues Gerät:
+So werden die Daten auf ein neues Gerät übertragen:
 
-{{#android}}
-1. Auf dem alten Gerät „{{settings}}" → {{backup_section}} →
-   {{backup_export}}. Lege die Datei an einen sicheren Ort -- in deinen eigenen
-   Cloud-Speicher, als E-Mail an dich selbst oder per Kabel auf einen Rechner.
-2. Installiere Libellus Potionis auf dem neuen Gerät.
-3. Dort „{{settings}}" → {{backup_section}} → {{backup_import}}, dann die Datei
-   auswählen.
-{{/android}}
+1. Auf dem alten Gerät „{{settings}}“ → {{backup_section}} →
+   {{backup_export}} wählen. Die Datei an einem sicheren Ort aufbewahren,
+   etwa in einer [Signal](https://signal.org/)-Notiz an sich selbst.
+2. Libellus Potionis auf dem neuen Gerät installieren.
+3. Dort über „{{settings}}“ → {{backup_section}} → {{backup_import}} den
+   Datenbestand wiederherstellen.
 
-{{#ios}}
-1. Auf dem alten Gerät „{{settings}}" → {{backup_section}} →
-   {{backup_export}}. Die Dateiauswahl des Systems fragt, wohin die Datei geht;
-   lege sie an einen sicheren Ort -- in deinen eigenen Cloud-Speicher oder per
-   Kabel auf einen Rechner.
-2. Installiere Libellus Potionis auf dem neuen Gerät.
-3. Dort „{{settings}}" → {{backup_section}} → {{backup_import}}, dann die Datei
-   auswählen.
-{{/ios}}
+Beim Import fragt die App, wie sie vorgehen soll. {{import_replace}}
+verwirft, was auf dem Gerät ist: Getränkekatalog, Buchungsdaten, und die
+Einstellungen, sofern das Backup welche enthält. {{import_merge}} löscht
+bestehende Getränkedefinitionen und Buchungsdaten nicht und fügt hinzu, was
+fehlt. Einträge, die es schon gibt, werden nicht verdoppelt, und die
+aktuellen Einstellungen werden nicht überschrieben.
 
-Beim Import fragt die App, wie sie vorgehen soll. {{import_replace}} verwirft,
-was auf dem Gerät ist, und übernimmt den Inhalt der Datei. {{import_merge}}
-behält beides und fügt hinzu, was fehlt; Einträge, die es schon gibt, werden
-nicht verdoppelt.
+### Zugang und Sichtbarkeit
 
-Sichere regelmäßig. Ein Backup schützt nur, was zum Zeitpunkt seiner
-Erstellung da war.
+Unter {{security}} stehen {{#android}}zwei{{/android}}{{#ios}}drei{{/ios}}
+Schalter.
 
-## Zugang und Sichtbarkeit
+{{#android}}**{{biometric_lock}}** verlangt beim Öffnen der App einen
+Fingerabdruck, eine Gesichtserkennung oder die
+Gerätesperre.{{/android}}{{#ios}}**{{biometric_lock}}** verlangt beim Öffnen
+der App Face ID, Touch ID oder den Gerätecode.{{/ios}} Um die Sperre zu
+aktivieren oder zu deaktivieren, ist die entsprechende Authentifizierung
+erforderlich. Die Sperre greift auch, wenn die App verlassen wird und man
+dann zurückkehrt, nicht jedoch bei einer Rückkehr innerhalb von dreißig
+Sekunden. Im Menü oben rechts ist außerdem {{lock_app}} zu finden, womit die
+App unmittelbar gesperrt wird.
 
-{{#android}}
-Unter {{security}} stehen zwei Schalter.
+**{{allow_screenshots}}** ist standardmäßig aus. Solange Screenshots
+deaktiviert sind, {{#android}}lässt sich vom App-Fenster kein Bildschirmfoto
+anfertigen, und in der Übersicht der zuletzt benutzten Apps bleibt der Inhalt
+verdeckt.{{/android}}{{#ios}}bleibt der Inhalt in der App-Übersicht
+verdeckt.{{/ios}} Wer das entsperrte Gerät in die Hand nimmt und durch die
+offenen Apps blättert, sieht dort nichts.
+{{#ios}}Ein Bildschirmfoto kann die iOS-App dagegen nicht verhindern; iOS
+stellt hierzu keine Schnittstelle zur Verfügung, und dieser Schalter ändert
+daran nichts.{{/ios}}
 
-**{{biometric_lock}}** verlangt beim Öffnen der App einen Fingerabdruck, eine
-Gesichtserkennung oder die Gerätesperre. Die Sperre greift auch, wenn du die
-App kurz verlässt und zurückkehrst -- nicht jedoch bei einem Wechsel von
-wenigen Sekunden, damit ein Blick in eine Nachricht nicht jedes Mal eine neue
-Anmeldung kostet.
+{{#ios}}**{{device_backup}}** ist ebenfalls standardmäßig aus. Solange der
+Schalter aus ist, bleiben die App-Daten aus jeder Gerätesicherung heraus, aus
+iCloud wie aus der Sicherung auf einem Rechner. Ist er eingeschaltet,
+übersteht der Datenbestand die Wiederherstellung eines Geräts aus dessen
+Sicherung, liegt dann aber auch dort, wo diese Sicherung liegt.{{/ios}}
 
-**{{allow_screenshots}}** ist standardmäßig aus. Solange er aus ist, lässt sich
-vom App-Fenster kein Bildschirmfoto anfertigen, und in der Übersicht der
-zuletzt benutzten Apps bleibt der Inhalt verdeckt -- wer dein entsperrtes Gerät
-in die Hand nimmt und durch die offenen Apps blättert, sieht dort nichts.
+### Erscheinungsbild und Sprache
 
-Im Menü oben rechts steht außerdem {{lock_app}}: Das sperrt sofort, ohne die
-App zu verlassen.
-{{/android}}
+Unter {{appearance}} lässt sich dreierlei einstellen:
 
-{{#ios}}
-Unter {{security}} stehen drei Schalter.
+**{{theme_mode}}**: {{theme_system}}, sowie {{theme_day}} oder
+{{theme_night}} unabhängig von der Systemeinstellung.
 
-**{{biometric_lock}}** verlangt beim Öffnen der App Face ID, Touch ID oder den
-Gerätecode. Die Sperre greift auch, wenn du die App verlässt und zurückkehrst --
-nicht jedoch innerhalb von dreißig Sekunden, damit ein Blick in eine Nachricht
-nicht jedes Mal eine neue Anmeldung kostet. Kennt dein Gerät weder Face ID oder
-Touch ID noch einen Code, steht an dieser Stelle kein Schalter, sondern der
-Hinweis darauf: eine Sperre, die niemand öffnen kann, wäre keine.
+**{{language}}**: die App-Sprache, ebenfalls unabhängig vom System.
+{{language_system}} folgt wieder der Systemsprache.
 
-**{{allow_screenshots}}** ist standardmäßig aus. Solange er aus ist, bleibt der
-Inhalt in der App-Übersicht verdeckt -- wer dein entsperrtes Gerät in die Hand
-nimmt und durch die offenen Apps blättert, sieht dort nichts. Ein Bildschirmfoto
-kann die App dagegen nicht verhindern; iOS gibt einer App dieses Mittel nicht in
-die Hand, und dieser Schalter ändert daran nichts.
-
-**{{device_backup}}** ist ebenfalls aus. Solange er aus ist, bleibt dein
-Protokoll aus jeder Gerätesicherung heraus, aus iCloud und aus der Sicherung auf
-einem Rechner. Schaltest du ihn ein, übersteht dein Tagebuch die
-Wiederherstellung eines Geräts aus dessen Sicherung -- liegt dann aber auch
-dort, wo diese Sicherung liegt.
-
-Im Menü oben rechts steht außerdem {{lock_app}}: Das sperrt sofort, ohne die
-App zu verlassen. Der Eintrag fehlt, wenn dein Gerät keine Anmeldung anbieten
-kann.
-{{/ios}}
-
-## Erscheinungsbild und Sprache
-
-Unter {{appearance}} stellst du dreierlei ein.
-
-**{{theme_mode}}** -- {{theme_system}}, {{theme_day}} oder {{theme_night}},
-unabhängig von der Systemeinstellung.
-
-**{{language}}** -- die App-Sprache, ebenfalls unabhängig vom System.
-{{language_system}} folgt der Systemsprache.
-
-**{{alt_status_symbols}}** -- zeigt in den Statuspunkten zusätzlich zur Farbe
-ein Symbol an. Damit bleiben die drei Zustände unterscheidbar, wenn Farben
-schwer auseinanderzuhalten sind.
-
-## Das Menü
-
-{{#android}}
-Das Symbol oben rechts öffnet {{menu}} mit vier Einträgen: „{{settings}}",
-{{help}} (dieses Handbuch), {{lock_app}} und {{about}} mit Version, Lizenz und
-den verwendeten Fremdkomponenten.
-{{/android}}
-
-{{#ios}}
-Das „…"-Symbol oben rechts öffnet {{menu}} mit vier Einträgen: „{{settings}}",
-{{help}} (dieses Handbuch), {{lock_app}} und {{about}} mit Version, Lizenz und
-den verwendeten Fremdkomponenten. Es steht auf allen vier Hauptschirmen an
-derselben Stelle.
-{{/ios}}
+**{{alt_status_symbols}}** zeigt in den Statuspunkten zusätzlich zur Farbe
+ein Symbol an. Damit bleiben die drei Zustände unterscheidbar, wenn rot, gelb
+und grün schwer auseinanderzuhalten sind.
 
 ## Wie gerechnet wird
 
@@ -692,14 +534,14 @@ Jeder Eintrag wird beim Speichern in Gramm reinen Alkohols umgerechnet:
 
 **Gramm = Menge in ml × Alkoholgehalt × 0,789**
 
-0,789 ist die Dichte von Ethanol in Gramm je Milliliter. Ein halber Liter Bier
-mit 5 % ergibt also 500 × 0,05 × 0,789 ≈ 19,7 Gramm. Alle Limits, Statistiken
-und Exporte arbeiten mit dieser Zahl, nie mit Millilitern -- nur so sind ein
-Glas Wein und ein Schnaps überhaupt vergleichbar.
+0,789 ist die Dichte von Ethanol in Gramm je Milliliter. Ein halber Liter
+Bier mit 5 % ergibt also 500 ml × 0,05 × 0,789 g/ml ≈ 19,7 g. Alle Limits,
+Statistiken und Exporte arbeiten mit dieser Zahl, nie mit Millilitern. Nur so
+sind ein Glas Wein und ein Schnaps überhaupt vergleichbar.
 
 ### Der geschätzte Blutalkoholwert
 
-Wenn ein Körpergewicht eingetragen ist, schätzt die App die
+Wenn ein Körpergewicht eingetragen ist, schätzt Libellus Potionis die
 Blutalkoholkonzentration nach der
 [Widmark-Formel](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel):
 
@@ -709,27 +551,27 @@ A ist die Menge reinen Alkohols in Gramm, P das Körpergewicht in Kilogramm, r
 der Verteilungskoeffizient, β die Abbaurate von etwa 0,15 ‰ pro Stunde und t
 die Zeit in Stunden seit dem ersten Getränk.
 
-Die App erfasst dein Geschlecht nicht und rechnet deshalb bewusst vorsichtig: r
-ist fest auf 0,6 gesetzt, den kleineren der beiden klassischen Koeffizienten.
-Ein kleineres r verteilt dieselbe Menge auf ein kleineres Volumen und ergibt
-damit den höheren der beiden Werte -- die Schätzung soll eher zu hoch als zu
-niedrig liegen. Die Abbaurate ist dagegen ein Mittelwert; individuell liegt sie
-etwa zwischen 0,10 und 0,20 ‰ pro Stunde. Wer langsam abbaut, liegt über dem
-angezeigten Wert.
+Die App erfasst das Geschlecht nicht und rechnet deshalb bewusst vorsichtig:
+r ist fest auf 0,6 gesetzt, den kleineren der beiden klassischen
+Koeffizienten. Ein kleineres r verteilt dieselbe Menge auf ein kleineres
+Volumen und ergibt damit den höheren der beiden Werte: Die Schätzung soll
+eher zu hoch als zu niedrig liegen. Die Abbaurate ist dagegen ein Mittelwert;
+individuell liegt sie etwa zwischen 0,10 und 0,20 ‰ pro Stunde. Wer langsam
+abbaut, liegt über dem angezeigten Wert.
 
-Das Ergebnis ist ein Modell, keine Messung. Es ersetzt kein Messgerät und taugt
-nicht zur Beurteilung der Fahrtüchtigkeit.
+Das Ergebnis ist ein Modell, keine Messung. Es ersetzt kein Messgerät und
+taugt nicht zur Beurteilung der Fahrtüchtigkeit.
 
 ### Der logische Tag
 
-Ein Getränk gehört zu dem Tag, der unter {{day_starts_at}} begonnen hat, nicht
-zu dem, den die Uhr anzeigt. Bei der Voreinstellung von vier Uhr zählt ein Glas
-um halb zwei nachts noch zum Vortag. Diese Regel gilt in der gesamten App
-einheitlich, auch über Zeitumstellungen hinweg.
+Ein Getränk gehört zu dem Tag, der unter {{day_starts_at}} begonnen hat,
+nicht zu dem, den die Uhr anzeigt. Bei der Voreinstellung von vier Uhr zählt
+ein Glas um halb zwei nachts noch zum Vortag. Diese Regel gilt in der
+gesamten App einheitlich, auch über Zeitumstellungen hinweg.
 
 ### Die gleitende Woche
 
-Das 7-Tage-Limit und die Trinktage beziehen sich nicht auf eine Kalenderwoche,
-sondern auf heute und die sechs vorangegangenen Tage. Das Fenster wandert also
-täglich mit. Ein schwerer Samstag bleibt darin sichtbar, bis er sechs Tage
-zurückliegt -- am folgenden Samstag fällt er heraus.
+Das 7-Tage-Limit und die Trinktage beziehen sich nicht auf eine
+Kalenderwoche, sondern auf heute und die sechs vorangegangenen Tage. Das
+Fenster wandert also täglich mit. Ein schwerer Samstag bleibt darin sichtbar,
+bis er sechs Tage zurückliegt; am folgenden Samstag fällt er heraus.
