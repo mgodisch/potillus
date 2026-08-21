@@ -173,6 +173,7 @@ Edit drinks from the list's edit mode
 - Drink strength shows one or two decimals in the in-app language.
 - Limits, drinking days and body weight on iOS take a typed value, and the
   7-day limit steps by 1.
+- Both String Catalogs mark their language-invariant keys as not to translate.
 
 ### Removed
 
@@ -195,6 +196,7 @@ Edit drinks from the list's edit mode
 - The empty cell in the year heat-map stands out from the card behind it.
 - The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
   directory marker, and `__pycache__` directories stay out of the tarball.
+- The l10n gate on freshly harvested String Catalog keys.
 
 ---
 
