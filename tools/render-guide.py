@@ -206,7 +206,7 @@ TOKEN_TO_KEY = {
     "delete": "Delete",
     "favorites_quick": "Quick Selection Favorites",
     # The Today summary and the capacity dot.
-    "total_today": "Today's Total",
+    "total_today": "Today’s Total",
     "drink_days_label": "Drinking Days (last 7 days)",
     "capacity_status_ok": "Within your limits",
     "capacity_status_low": "Almost at your limit",

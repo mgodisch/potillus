@@ -176,6 +176,7 @@ Edit drinks from the list's edit mode
 - Both String Catalogs mark their language-invariant keys as not to translate.
 - Shared vectors pin the year heat-map's drawing window on both platforms.
 - `check-l10n-parity` compares strings that carry format specifiers.
+- App text, report labels and the guide token map spell the apostrophe as `’`.
 
 ### Removed
 

@@ -39,6 +39,9 @@ apply to it are stated in the accompanying COPYING.md file.
              drink_delete_blocked) — keep the braces and identifiers verbatim.
            * Typographic quote escapes (\u201e \u201c \u201d …): use your locale's
              quotation convention, consistently within the language.
+           * The apostrophe is \u2019 (U+2019), not the typewriter ' — in French,
+             Italian and Ukrainian it stands inside words, and U+2019 is the form
+             those orthographies ask for. It also needs no backslash escape here.
          Comments are documentation only and do not affect the build.
     ===================================================================== -->
     <!-- App name shown in the launcher (AndroidManifest android:label). Proper noun — keep untranslated. -->
@@ -66,13 +69,13 @@ apply to it are stated in the accompanying COPYING.md file.
 
     <!-- Today Screen -->
     <!-- Today screen: label above the day's total-alcohol figure. -->
-    <string name="total_today">Today\'s Total</string>
+    <string name="total_today">Today’s Total</string>
     <!-- Today screen: monthly-average badge. %1$s = current month label (e.g. 'July'). -->
     <string name="avg_of_month">Ø %1$s</string>
     <!-- Today screen: unit suffix under the average ('g/day'). -->
     <string name="grams_per_day">g/day</string>
     <!-- Today screen: header of today's entry list. -->
-    <string name="entries_today">Today\'s Entries</string>
+    <string name="entries_today">Today’s Entries</string>
     <!-- Today screen empty state. Has a line break; the quoted '+' refers to the add button. -->
     <string name="no_entries_today">No entries yet today.\nTap \u201c+\u201d to add an entry.</string>
     <!-- Calendar day-detail empty state. -->

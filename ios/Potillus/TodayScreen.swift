@@ -120,7 +120,7 @@ struct TodayScreen: View {
                         EditToggleButton(
                             editMode: $editMode,
                             locale: locale,
-                            editLabel: Loc.string("Edit today's drinks", locale: locale)
+                            editLabel: Loc.string("Edit today’s drinks", locale: locale)
                         )
                     }
                 }
@@ -254,7 +254,7 @@ struct TodayScreen: View {
     }
 
     private var entriesSection: some View {
-        Section(Loc.string("Today's Entries", locale: locale)) {
+        Section(Loc.string("Today’s Entries", locale: locale)) {
             if model.state.entries.isEmpty {
                 Text(Loc.string("No entries yet today.\nTap “+” to add an entry.", locale: locale))
                     .foregroundStyle(.secondary)
@@ -346,12 +346,12 @@ extension TodayScreen {
                 LabeledContent {
                     headlineValue(grams(model.state.totalGrams))
                 } label: {
-                    Text(Loc.string("Today's Total", locale: locale))
+                    Text(Loc.string("Today’s Total", locale: locale))
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Loc.string(
                     "%1$@: %2$@ grams of alcohol",
-                    Loc.string("Today's Total", locale: locale),
+                    Loc.string("Today’s Total", locale: locale),
                     Loc.number(model.state.totalGrams, fractionDigits: 1, locale: locale),
                     locale: locale
                 ))

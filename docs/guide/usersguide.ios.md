@@ -120,7 +120,7 @@ the day wears on. From the top:
 
 **Two large figures**, one above the other. First you see either
 Current Abstinence, the number of days you have gone without, or
-Today's Total, the pure alcohol you have logged today in grams.
+Today’s Total, the pure alcohol you have logged today in grams.
 Below, under "Ø", is your
 average for the month so far in grams per day. That monthly figure is the
 only thing on this screen that looks beyond today. A green or red trend arrow

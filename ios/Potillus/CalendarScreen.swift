@@ -164,7 +164,7 @@ struct CalendarScreen: View {
                         EditToggleButton(
                             editMode: $editMode,
                             locale: locale,
-                            editLabel: Loc.string("Edit this day's entries", locale: locale)
+                            editLabel: Loc.string("Edit this day’s entries", locale: locale)
                         )
                     }
                 }

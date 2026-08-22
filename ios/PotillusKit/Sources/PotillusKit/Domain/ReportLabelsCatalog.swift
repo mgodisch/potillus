@@ -433,8 +433,8 @@ extension ReportLabels {
     private mutating func applyfr() {
         self.title = "Résumé alcool"
         self.footer1 =
-            "Estimations – pas un diagnostic médical. Ne convient pas à l'évaluation de " +
-            "l'aptitude à la conduite ni au diagnostic."
+            "Estimations – pas un diagnostic médical. Ne convient pas à l’évaluation de " +
+            "l’aptitude à la conduite ni au diagnostic."
         self.sectionKpis = "Chiffres clés"
         self.sectionMonths = "Aperçu mensuel"
         self.sectionTrend = "Tendance long terme (moy. g/jour)"
@@ -442,7 +442,7 @@ extension ReportLabels {
         self.sectionDaytime = "Profil horaire de consommation"
         self.sectionWeekday = "Profil hebdomadaire (moy. g alcool)"
         self.sectionRisk = "Consommation à risque & abstinence"
-        self.metaExportDate = "Date d'export"
+        self.metaExportDate = "Date d’export"
         self.metaPeriod = "Période"
         self.metaLimit = "Limites"
         self.metaWeight = "Poids corporel"
@@ -457,7 +457,7 @@ extension ReportLabels {
         self.kpiMedianPerDay = "Médiane par jour"
         self.kpiMedianPerDrinkDay = "Md par jour de conso."
         self.kpiDrinkDays = "Jours de conso."
-        self.kpiAbstinentDays = "Jours d'abstinence"
+        self.kpiAbstinentDays = "Jours d’abstinence"
         self.days = { DayPlural.format($0, language: "fr", forms: DayForms(one: "%1$d jour", other: "%1$d jours")) }
         self.kpiMaxPerDay = "Max. par jour"
         self.kpiMaxPer7Days = "Max. sur 7 jours"
@@ -489,7 +489,7 @@ extension ReportLabels {
     private mutating func applyit() {
         self.title = "Riepilogo alcol"
         self.footer1 =
-            "Stime – non una diagnosi medica. Non per la valutazione dell'idoneità alla guida né " +
+            "Stime – non una diagnosi medica. Non per la valutazione dell’idoneità alla guida né " +
             "per scopi diagnostici."
         self.sectionKpis = "Dati chiave"
         self.sectionMonths = "Panoramica mensile"

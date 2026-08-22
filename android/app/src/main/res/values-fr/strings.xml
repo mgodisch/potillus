@@ -27,7 +27,7 @@ apply to it are stated in the accompanying COPYING.md file.
 <resources>
     <string name="app_name">Libellus Potionis</string>
 
-    <string name="today">Aujourd\'hui</string>
+    <string name="today">Aujourd’hui</string>
     <string name="calendar">Calendrier</string>
     <string name="statistics">Statistiques</string>
     <string name="nav_statistics">Stats</string>
@@ -38,12 +38,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="avg_of_month">Ø %1$s</string>
     <string name="grams_per_day">g/jour</string>
     <string name="entries_today">Entrées du jour</string>
-    <string name="no_entries_today">Aucune entrée aujourd\'hui.\nAppuyez sur + pour ajouter.</string>
+    <string name="no_entries_today">Aucune entrée aujourd’hui.\nAppuyez sur + pour ajouter.</string>
     <string name="no_entries_day">Aucune entrée pour ce jour.</string>
 
     <string name="favorites_quick">Favoris rapides</string>
 
-    <string name="bac_estimate">Estimation d\'alcoolémie</string>
+    <string name="bac_estimate">Estimation d’alcoolémie</string>
     <string name="stats_from_label">Statistiques à partir de</string>
     <string name="stats_from_desc">Les entrées avant cette date sont exclues de toutes les statistiques.</string>
     <string name="stats_from_clear">Inclure tout l’historique</string>
@@ -51,12 +51,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="not_set">non défini</string>
 
     <string name="add_entry">Ajouter une entrée</string>
-    <string name="edit_entry">Modifier l\'entrée</string>
+    <string name="edit_entry">Modifier l’entrée</string>
     <string name="drink">Boisson</string>
     <string name="select_drink">Choisir une boisson…</string>
     <string name="volume_ml">Quantité</string>
     <string name="time">Heure</string>
-    <string name="pure_alcohol">g d\'alcool pur</string>
+    <string name="pure_alcohol">g d’alcool pur</string>
     <string name="note">Note (facultatif)</string>
 
     <string name="add_drink">Ajouter une boisson</string>
@@ -82,9 +82,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_section_daytime">Profil horaire de consommation</string>
     <string name="pdf_section_weekday">Profil hebdomadaire (moy. g alcool)</string>
     <string name="pdf_section_risk">Consommation à risque &amp; abstinence</string>
-    <string name="pdf_footer1">Estimations – pas un diagnostic médical. Ne convient pas à l\'évaluation de l\'aptitude à la conduite ni au diagnostic.</string>
+    <string name="pdf_footer1">Estimations – pas un diagnostic médical. Ne convient pas à l’évaluation de l’aptitude à la conduite ni au diagnostic.</string>
     <!-- PDF metadata / KPI labels -->
-    <string name="pdf_meta_export_date">Date d\'export</string>
+    <string name="pdf_meta_export_date">Date d’export</string>
     <string name="pdf_meta_period">Période</string>
     <string name="pdf_meta_limit">Limites</string>
     <string name="pdf_meta_weight">Poids corporel</string>
@@ -92,7 +92,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_kpi_avg_day">Moy. par jour</string>
     <string name="pdf_kpi_avg_drink_day">Ø par jour de conso.</string>
     <string name="pdf_kpi_drink_days">Jours de conso.</string>
-    <string name="pdf_kpi_abstinent_days">Jours d\'abstinence</string>
+    <string name="pdf_kpi_abstinent_days">Jours d’abstinence</string>
     <string name="pdf_kpi_binge">Jours binge (>%1$s g)</string>
     <string name="pdf_col_month">Mois</string>
     <string name="pdf_col_drink_days">Jours de conso.</string>
@@ -124,7 +124,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="total_period">Total de la période</string>
     <string name="avg_per_day">Moyenne par jour</string>
     <string name="avg_per_drink_day">Moy. par jour de conso.</string>
-    <string name="abstinent_days">Jours d\'abstinence</string>
+    <string name="abstinent_days">Jours d’abstinence</string>
     <string name="stats_category_breakdown">Catégories</string>
     <string name="streak_trend">Abstinence et tendance</string>
     <string name="current_streak">Abstinence actuelle</string>
@@ -141,9 +141,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="day_starts_at">Nouveau jour à partir de</string>
     <string name="weekly_limit_grams">Limite sur 7 jours en grammes</string>
     <string name="biometric_lock">Verrouillage biométrique</string>
-    <string name="biometric_desc">Verrouiller l\'application à l\'ouverture</string>
-    <string name="allow_screenshots">Autoriser les captures d\'écran</string>
-    <string name="allow_screenshots_desc">Autoriser les captures et enregistrements d\'écran de la fenêtre de l\'application</string>
+    <string name="biometric_desc">Verrouiller l’application à l’ouverture</string>
+    <string name="allow_screenshots">Autoriser les captures d’écran</string>
+    <string name="allow_screenshots_desc">Autoriser les captures et enregistrements d’écran de la fenêtre de l’application</string>
     <string name="language">Langue</string>
     <string name="language_system">(Système)</string>
     <string name="export">Export des données</string>
@@ -152,7 +152,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="export_pdf">PDF</string>
     <string name="backup_section">Sauvegarde</string>
     <string name="backup_include_settings">Inclure les réglages</string>
-    <string name="backup_desc_with_settings">Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l\'envoyez quelque part.</string>
+    <string name="backup_desc_with_settings">Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l’envoyez quelque part.</string>
     <string name="backup_desc_without_settings">Un fichier JSON contenant vos boissons et votre journal. Vos réglages, y compris votre poids corporel, ne sont pas inclus.</string>
     <string name="backup_export">Exporter</string>
     <string name="backup_import">Importer</string>
@@ -199,7 +199,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="drink_validation_name_too_long">Le nom de la boisson est trop long (max. 100 caractères).</string>
     <string name="drink_validation_volume_range">Le volume doit être compris entre 1 ml et 5 000 ml.</string>
     <string name="drink_validation_alcohol_range" formatted="false">La teneur en alcool doit être comprise entre 0 % et 100 %.</string>
-    <string name="drink_validation_alcohol_invalid">La teneur en alcool n\'est pas un nombre valide.</string>
+    <string name="drink_validation_alcohol_invalid">La teneur en alcool n’est pas un nombre valide.</string>
     <string name="day_change_time_value">%1$02dh%2$02d</string>
     <string name="csv_col_date">Date</string>
     <string name="csv_col_time">Heure</string>
@@ -223,8 +223,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="delete_entry">Supprimer l’entrée</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d millilitres, %4$s pour cent, %5$s grammes d’alcool, %6$s</string>
     <string name="day_change_desc">Une boisson enregistrée avant cette heure compte pour la veille.</string>
-    <string name="weight_desc">Utilisé uniquement pour estimer l\'alcoolémie.</string>
-    <string name="weight_desc_unset">Sans poids corporel, aucune estimation de l\'alcoolémie n\'est affichée.</string>
+    <string name="weight_desc">Utilisé uniquement pour estimer l’alcoolémie.</string>
+    <string name="weight_desc_unset">Sans poids corporel, aucune estimation de l’alcoolémie n’est affichée.</string>
     <string name="a11y_drink_days_setting">Nombre maximal de jours de boisson sur sept jours</string>
     <string name="delete_drink">Supprimer la boisson</string>
     <string name="drink_days_setting">Jours boisson max./7 j</string>
@@ -253,7 +253,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_kpi_median_drink_days_month">Md jours de conso./mois</string>
     <string name="pdf_kpi_max_day">Max. par jour</string>
     <string name="pdf_kpi_max_7days">Max. sur 7 jours</string>
-    <string name="lock_app">Verrouiller l\'appli</string>
+    <string name="lock_app">Verrouiller l’appli</string>
     <plurals name="days">
         <item quantity="one">%1$d jour</item>
         <item quantity="many">%1$d jours</item>
@@ -264,9 +264,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="capacity_status_ok">Dans vos limites</string>
     <string name="capacity_status_low">Presque à votre limite</string>
     <string name="capacity_status_reached">Limite atteinte</string>
-    <string name="alt_status_symbols">Symboles d\'état alternatifs</string>
-    <string name="alt_status_symbols_desc">Afficher une forme (croix, 1, flèche) dans le point d\'état en plus de la couleur</string>
-    <string name="chart_desc_daily_avg">Diagramme en barres de l\'alcool moyen par jour</string>
+    <string name="alt_status_symbols">Symboles d’état alternatifs</string>
+    <string name="alt_status_symbols_desc">Afficher une forme (croix, 1, flèche) dans le point d’état en plus de la couleur</string>
+    <string name="chart_desc_daily_avg">Diagramme en barres de l’alcool moyen par jour</string>
     <string name="chart_desc_value_bars">Diagramme en barres</string>
     <string name="chart_desc_categories">Diagramme en anneau des catégories de boissons</string>
 </resources>

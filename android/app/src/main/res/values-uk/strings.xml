@@ -72,7 +72,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="volume_ml">Кількість</string>
     <string name="time">Час</string>
     <string name="pure_alcohol">г чистого алкоголю</string>
-    <string name="note">Примітка (необов\'язково)</string>
+    <string name="note">Примітка (необов’язково)</string>
 
     <!-- Drink Dialog -->
     <string name="add_drink">Додати напій</string>
@@ -179,7 +179,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Import mode -->
     <string name="import_mode_question">Як імпортувати дані?</string>
     <string name="import_replace">Замінити</string>
-    <string name="import_merge">Об\'єднати</string>
+    <string name="import_merge">Об’єднати</string>
 
     <!-- Biometric Prompt -->
     <string name="biometric_title">Libellus Potionis</string>

@@ -1830,7 +1830,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ : %2$@ pour cent, %3$@ grammes d'alcool"
+            "value" : "%1$@ : %2$@ pour cent, %3$@ grammes d’alcool"
           }
         },
         "it" : {
@@ -4310,7 +4310,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l'envoyez quelque part."
+            "value" : "Un fichier JSON contenant vos boissons, votre journal et vos réglages — y compris votre poids corporel. Il ne quitte jamais cet appareil, sauf si vous l’envoyez quelque part."
           }
         },
         "it" : {
@@ -4834,7 +4834,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jours d'abstinence"
+            "value" : "Jours d’abstinence"
           }
         },
         "it" : {
@@ -6406,7 +6406,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Symboles d'état alternatifs"
+            "value" : "Symboles d’état alternatifs"
           }
         },
         "it" : {
@@ -7454,7 +7454,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estimation d'alcoolémie"
+            "value" : "Estimation d’alcoolémie"
           }
         },
         "it" : {
@@ -14266,7 +14266,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifier l'entrée"
+            "value" : "Modifier l’entrée"
           }
         },
         "it" : {
@@ -14355,7 +14355,7 @@
         }
       }
     },
-    "Edit this day's entries" : {
+    "Edit this day’s entries" : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -14385,7 +14385,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit this day's entries"
+            "value" : "Edit this day’s entries"
           }
         },
         "es" : {
@@ -14486,7 +14486,7 @@
         }
       }
     },
-    "Edit today's drinks" : {
+    "Edit today’s drinks" : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -14516,7 +14516,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit today's drinks"
+            "value" : "Edit today’s drinks"
           }
         },
         "es" : {
@@ -18863,13 +18863,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verrouiller l'appli"
+            "value" : "Verrouiller l’appli"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blocca l'app"
+            "value" : "Blocca l’app"
           }
         },
         "ja" : {
@@ -20114,7 +20114,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Об'єднати"
+            "value" : "Об’єднати"
           }
         },
         "zh-Hans" : {
@@ -21614,7 +21614,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucune entrée aujourd'hui.\nAppuyez sur + pour ajouter."
+            "value" : "Aucune entrée aujourd’hui.\nAppuyez sur + pour ajouter."
           }
         },
         "it" : {
@@ -24847,7 +24847,7 @@
         }
       }
     },
-    "Replacing deletes your log and every drink, presets included; the file's contents take their place. Merging keeps what is there and adds what is missing." : {
+    "Replacing deletes your log and every drink, presets included; the file’s contents take their place. Merging keeps what is there and adds what is missing." : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -24877,7 +24877,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Replacing deletes your log and every drink, presets included; the file's contents take their place. Merging keeps what is there and adds what is missing."
+            "value" : "Replacing deletes your log and every drink, presets included; the file’s contents take their place. Merging keeps what is there and adds what is missing."
           }
         },
         "es" : {
@@ -26592,7 +26592,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La teneur en alcool n'est pas un nombre valide."
+            "value" : "La teneur en alcool n’est pas un nombre valide."
           }
         },
         "it" : {
@@ -28164,7 +28164,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aujourd'hui"
+            "value" : "Aujourd’hui"
           }
         },
         "it" : {
@@ -28253,7 +28253,7 @@
         }
       }
     },
-    "Today's Entries" : {
+    "Today’s Entries" : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -28283,7 +28283,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Today's Entries"
+            "value" : "Today’s Entries"
           }
         },
         "es" : {
@@ -28384,7 +28384,7 @@
         }
       }
     },
-    "Today's Total" : {
+    "Today’s Total" : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -28414,7 +28414,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Today's Total"
+            "value" : "Today’s Total"
           }
         },
         "es" : {
@@ -29474,7 +29474,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilisé uniquement pour estimer l'alcoolémie."
+            "value" : "Utilisé uniquement pour estimer l’alcoolémie."
           }
         },
         "it" : {
@@ -30087,7 +30087,7 @@
         }
       }
     },
-    "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app's preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device." : {
+    "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app’s preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device." : {
       "extractionState" : "manual",
       "localizations" : {
         "cs" : {
@@ -30117,7 +30117,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app's preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device."
+            "value" : "When the app lock is on, Libellus Potionis asks to unlock after 30 seconds in the background. When %1$@ is off, the app’s preview stays hidden while the app is in the background. When %2$@ is off, your consumption log is kept out of every device backup, iCloud and computer alike; the JSON backup remains the way to move data to a new device."
           }
         },
         "es" : {
@@ -30522,7 +30522,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans poids corporel, aucune estimation de l'alcoolémie n'est affichée."
+            "value" : "Sans poids corporel, aucune estimation de l’alcoolémie n’est affichée."
           }
         },
         "it" : {
