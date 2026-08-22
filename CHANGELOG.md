@@ -160,7 +160,8 @@ Edit drinks from the list's edit mode
   beneath it.
 - The iOS Level A protocol carries the spoken form of those rows.
 - Entry rows, calendar days and the statistics period speak their dates and
-  units as words; an entry row leads with its time on both platforms.
+  units as words, the period as one span; an entry row leads with its time on
+  both platforms.
 - The edit toggle names the list it edits.
 - The category ring is silent and its legend states each slice in one sentence.
 - The calendar header and month name follow the in-app language.

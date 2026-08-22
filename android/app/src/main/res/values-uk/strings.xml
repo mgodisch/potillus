@@ -247,6 +247,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d мілілітрів, %2$s відсотка, %3$s грамів алкоголю</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s проміле</string>
+    <string name="a11y_period_range">%1$s до %2$s</string>
     <string name="delete_entry">Видалити запис</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d мілілітрів, %4$s відсотка, %5$s грамів алкоголю, %6$s</string>
     <string name="day_change_desc">Напій, записаний до цього часу, зараховується до попереднього дня.</string>

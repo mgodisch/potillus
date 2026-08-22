@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -248,11 +250,19 @@ fun StatsScreen(
                             contentDescription = stringResource(R.string.cd_prev_period),
                         )
                     }
+                    // The label shows the dash and speaks the word: `contentDescription`
+                    // replaces what TalkBack reads without touching what is drawn.
+                    // The joiner is passed in because `stringResource` is composable
+                    // and `periodRangeSpoken` — like its visible twin — is not.
+                    val spokenRange = periodRangeSpoken(state.periodFrom, state.periodTo, locale) { a, b ->
+                        context.getString(R.string.a11y_period_range, a, b)
+                    }
                     Text(
                         periodRangeLabel(state.periodFrom, state.periodTo, locale),
                         style = MaterialTheme.typography.titleSmall,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                            .semantics { contentDescription = spokenRange },
                     )
                     IconButton(
                         onClick = { vm.shiftPeriod(-1) },
@@ -577,9 +587,10 @@ private fun StatRow(label: String, value: String, valueColor: Color = MaterialTh
  * rather than on the period's last day. A range of one day collapses to that day.
  *
  * The dash is spelled out rather than taken from a string resource: an en dash
- * between two dates reads the same in every locale this app ships, and the dates
+ * between two dates LOOKS the same in every locale this app ships, and the dates
  * themselves are formatted by [DateTimeFormatter.ofLocalizedDate], which is what
- * carries the locale's order and separators.
+ * carries the locale's order and separators. It does not READ the same — see
+ * [periodRangeSpoken], which is what TalkBack is given.
  */
 private fun periodRangeLabel(from: String, to: String, locale: java.util.Locale): String {
     if (from.isEmpty() || to.isEmpty()) return ""
@@ -590,4 +601,30 @@ private fun periodRangeLabel(from: String, to: String, locale: java.util.Locale)
     val end = runCatching { LocalDate.parse(to, DayResolver.DATE_FORMATTER).format(fmt) }
         .getOrElse { return "" }
     return "$start \u2013 $end"
+}
+
+/**
+ * The same window in the long date style, joined by the word for "to".
+ *
+ * A screen reader reads the en dash of [periodRangeLabel] as a dash or as nothing
+ * at all, which leaves two loose dates where a span was meant: "1 August 2026
+ * 22 August 2026". The word states the relation. The long style is what iOS
+ * speaks here too, so a user switching platforms hears the same sentence.
+ *
+ * One day stays one date, with no joining word — there is nothing to join.
+ */
+private fun periodRangeSpoken(
+    from: String,
+    to: String,
+    locale: java.util.Locale,
+    joiner: (String, String) -> String,
+): String {
+    if (from.isEmpty() || to.isEmpty()) return ""
+    val fmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
+    val start = runCatching { LocalDate.parse(from, DayResolver.DATE_FORMATTER).format(fmt) }
+        .getOrElse { return "" }
+    if (from == to) return start
+    val end = runCatching { LocalDate.parse(to, DayResolver.DATE_FORMATTER).format(fmt) }
+        .getOrElse { return "" }
+    return joiner(start, end)
 }

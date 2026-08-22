@@ -248,6 +248,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d ミリリットル、%2$s パーセント、%3$s グラムのアルコール</string>
     <string name="a11y_append">、%1$s</string>
     <string name="a11y_caption_permille">%1$s：%2$s パーミル</string>
+    <string name="a11y_period_range">%1$s から %2$s まで</string>
     <string name="delete_entry">記録を削除</string>
     <string name="a11y_drink_row">%1$s、%2$s、%3$d ミリリットル、%4$s パーセント、%5$s グラムのアルコール、%6$s</string>
     <string name="day_change_desc">この時刻より前に記録された飲み物は前日に数えられます。</string>

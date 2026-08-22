@@ -221,6 +221,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d millilitres, %2$s pour cent, %3$s grammes d’alcool</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s : %2$s pour mille</string>
+    <string name="a11y_period_range">%1$s au %2$s</string>
     <string name="delete_entry">Supprimer l’entrée</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d millilitres, %4$s pour cent, %5$s grammes d’alcool, %6$s</string>
     <string name="day_change_desc">Une boisson enregistrée avant cette heure compte pour la veille.</string>

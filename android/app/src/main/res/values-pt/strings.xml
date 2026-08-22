@@ -205,6 +205,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d mililitros, %2$s por cento, %3$s gramas de álcool</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s por mil</string>
+    <string name="a11y_period_range">%1$s até %2$s</string>
     <string name="delete_entry">Eliminar registo</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitros, %4$s por cento, %5$s gramas de álcool, %6$s</string>
     <string name="day_change_desc">Uma bebida registada antes desta hora conta para o dia anterior.</string>

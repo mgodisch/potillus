@@ -248,6 +248,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d 밀리리터, %2$s 퍼센트, %3$s 그램의 알코올</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s 퍼밀</string>
+    <string name="a11y_period_range">%1$s부터 %2$s까지</string>
     <string name="delete_entry">기록 삭제</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d 밀리리터, %4$s 퍼센트, %5$s 그램의 알코올, %6$s</string>
     <string name="day_change_desc">이 시간 이전에 기록된 음료는 전날로 계산됩니다.</string>

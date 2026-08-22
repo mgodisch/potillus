@@ -203,6 +203,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_entry_detail">%1$d χιλιοστόλιτρα, %2$s τοις εκατό, %3$s γραμμάρια αλκοόλ</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s τοις χιλίοις</string>
+    <string name="a11y_period_range">%1$s έως %2$s</string>
     <string name="delete_entry">Διαγραφή καταχώρισης</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d χιλιοστόλιτρα, %4$s τοις εκατό, %5$s γραμμάρια αλκοόλ, %6$s</string>
     <string name="day_change_desc">Ένα ποτό που καταγράφεται πριν από αυτήν την ώρα προσμετράται στην προηγούμενη ημέρα.</string>
