@@ -127,8 +127,11 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="drink_name">Name</string>
     <!-- Drink dialog: alcohol-content field label (suffix 'Vol.-%'). -->
     <string name="alcohol_percent">Alcohol Content</string>
-    <!-- Drink dialog/list: favourite-toggle description. -->
-    <string name="favorite">Favorite</string>
+    <!-- Drinks screen: favourite toggle, spoken by TalkBack. Two strings,
+         not one: the star changes shape, and a screen reader user hears
+         only the word — so the word has to carry the state. -->
+    <string name="favorite_add">Add to favourites</string>
+    <string name="favorite_remove">Remove from favourites</string>
     <!-- Drinks screen empty state. -->
     <string name="no_drinks">No drinks defined yet.</string>
     <!-- Drink dialog: category selector label; also the PDF category-table head. -->

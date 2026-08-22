@@ -87,7 +87,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Editează băutură</string>
     <string name="drink_name">Denumire</string>
     <string name="alcohol_percent">Conținut de alcool</string>
-    <string name="favorite">Favorit</string>
+    <string name="favorite_add">Adaugă la favorite</string>
+    <string name="favorite_remove">Elimină din favorite</string>
     <string name="no_drinks">Nicio băutură definită încă.</string>
     <string name="category">Categorie</string>
     <string name="category_beer">Bere</string>

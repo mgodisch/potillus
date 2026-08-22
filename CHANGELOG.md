@@ -170,7 +170,9 @@ Edit drinks from the list's edit mode
 - Notes about the body weight, the backup file and the statistics floor sit in
   the card they explain.
 - Gram limits read without a decimal place.
-- The drinks list speaks each row as one sentence naming the drink first.
+- The drinks list speaks each row as one sentence naming the drink first, ahead
+  of the favourite star.
+- The favourite star names the state it switches to.
 - Drink strength shows one or two decimals in the in-app language.
 - Limits, drinking days and body weight on iOS take a typed value, and the
   7-day limit steps by 1.

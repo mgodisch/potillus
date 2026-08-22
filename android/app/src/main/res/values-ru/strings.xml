@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Редактировать напиток</string>
     <string name="drink_name">Название</string>
     <string name="alcohol_percent">Содержание алкоголя</string>
-    <string name="favorite">Избранное</string>
+    <string name="favorite_add">В избранное</string>
+    <string name="favorite_remove">Убрать из избранного</string>
     <string name="no_drinks">Напитки ещё не определены.</string>
     <string name="category">Категория</string>
     <string name="category_beer">Пиво</string>

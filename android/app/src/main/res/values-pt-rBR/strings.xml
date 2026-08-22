@@ -90,7 +90,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Editar bebida</string>
     <string name="drink_name">Nome</string>
     <string name="alcohol_percent">Teor alcoólico</string>
-    <string name="favorite">Favorito</string>
+    <string name="favorite_add">Adicionar aos favoritos</string>
+    <string name="favorite_remove">Remover dos favoritos</string>
     <string name="no_drinks">Nenhuma bebida definida ainda.</string>
     <string name="category">Categoria</string>
     <string name="category_beer">Cerveja</string>

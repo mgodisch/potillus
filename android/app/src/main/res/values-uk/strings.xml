@@ -79,7 +79,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Редагувати напій</string>
     <string name="drink_name">Назва</string>
     <string name="alcohol_percent">Вміст алкоголю</string>
-    <string name="favorite">Обране</string>
+    <string name="favorite_add">До обраного</string>
+    <string name="favorite_remove">Прибрати з обраного</string>
     <string name="no_drinks">Ще не визначено жодного напою.</string>
     <string name="category">Категорія</string>
     <string name="category_beer">Пиво</string>

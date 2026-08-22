@@ -63,7 +63,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Editar bebida</string>
     <string name="drink_name">Nombre</string>
     <string name="alcohol_percent">Contenido de alcohol</string>
-    <string name="favorite">Favorito</string>
+    <string name="favorite_add">Añadir a favoritos</string>
+    <string name="favorite_remove">Quitar de favoritos</string>
     <string name="no_drinks">No hay bebidas definidas.</string>
     <string name="category">Categoría</string>
     <string name="category_beer">Cerveza</string>

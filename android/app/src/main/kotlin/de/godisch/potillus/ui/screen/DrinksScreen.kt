@@ -39,7 +39,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -221,7 +223,24 @@ fun DrinksScreen(
                         onClick = { logDrink = drink },
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp)
+                                // READING ORDER, not drawing order. The star is drawn
+                                // first because that is where the eye wants it, but a
+                                // screen reader user meets it before anything has said
+                                // WHICH drink it belongs to. traversalIndex reorders the
+                                // announcement without moving a pixel; iOS does the same
+                                // through accessibilitySortPriority, only counting the
+                                // other way (higher first there, lower first here).
+                                //
+                                // isTraversalGroup fences the indices to this row --
+                                // without it they are weighed against every other node
+                                // on the screen, and the rows interleave.
+                                //
+                                // The three are stated even though 0f is the default:
+                                // an override like this is fragile against later edits,
+                                // and a child moved within the Row would otherwise take
+                                // the announcement back to drawing order in silence.
+                                .semantics { isTraversalGroup = true },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             // ── Favourite star ────────────────────────────────────────
@@ -229,10 +248,19 @@ fun DrinksScreen(
                             // no validated field, and an imported drink may sit outside
                             // the editor's bounds (see the setFavorite KDoc) — a full
                             // re-validation here made such a drink un-favouritable.
-                            IconButton(onClick = { vm.setFavorite(drink, !drink.isFavorite) }) {
+                            IconButton(
+                                onClick = { vm.setFavorite(drink, !drink.isFavorite) },
+                                modifier = Modifier.semantics { traversalIndex = 1f },
+                            ) {
                                 Icon(
                                     imageVector = if (drink.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                                    contentDescription = stringResource(R.string.favorite),
+                                    // The state is in the WORD, not only in the shape:
+                                    // filled and outlined stars look different and sound
+                                    // identical, so one label for both told a screen
+                                    // reader user nothing about which one this is.
+                                    contentDescription = stringResource(
+                                        if (drink.isFavorite) R.string.favorite_remove else R.string.favorite_add
+                                    ),
                                     tint = if (drink.isFavorite) warningColor() else MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
@@ -275,7 +303,10 @@ fun DrinksScreen(
                             // ── Name + category + volume info ─────────────────────────
                             Column(
                                 modifier = Modifier.weight(1f)
-                                    .semantics(mergeDescendants = true) { contentDescription = spokenDrink },
+                                    .semantics(mergeDescendants = true) {
+                                        contentDescription = spokenDrink
+                                        traversalIndex = 0f
+                                    },
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -293,7 +324,19 @@ fun DrinksScreen(
                                 )
                             }
                             // ── Edit / Delete buttons ─────────────────────────────────
-                            Row {
+                            // The index belongs on the enclosing Row, not on the two
+                            // buttons: traversalIndex only ranks siblings WITHIN one
+                            // group, so an index on a child of this inner Row would rank
+                            // it against its neighbour here and leave the Row itself at
+                            // the default 0f in the row above -- read before the star it
+                            // is supposed to follow. isTraversalGroup keeps the pair
+                            // together, and inside it drawing order already reads right.
+                            Row(
+                                modifier = Modifier.semantics {
+                                    isTraversalGroup = true
+                                    traversalIndex = 2f
+                                },
+                            ) {
                                 IconButton(onClick = { editDrink = drink }) {
                                     Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_drink), tint = MaterialTheme.colorScheme.primary)
                                 }

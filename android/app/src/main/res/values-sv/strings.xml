@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Redigera dryck</string>
     <string name="drink_name">Namn</string>
     <string name="alcohol_percent">Alkoholhalt</string>
-    <string name="favorite">Favorit</string>
+    <string name="favorite_add">Lägg till i favoriter</string>
+    <string name="favorite_remove">Ta bort från favoriter</string>
     <string name="no_drinks">Inga drycker definierade ännu.</string>
     <string name="category">Kategori</string>
     <string name="category_beer">Öl</string>

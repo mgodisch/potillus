@@ -69,7 +69,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">编辑饮品</string>
     <string name="drink_name">名称</string>
     <string name="alcohol_percent">酒精含量</string>
-    <string name="favorite">收藏</string>
+    <string name="favorite_add">添加到收藏</string>
+    <string name="favorite_remove">从收藏中移除</string>
     <string name="no_drinks">尚未定义任何饮品。</string>
     <string name="category">类别</string>
     <string name="category_beer">啤酒</string>

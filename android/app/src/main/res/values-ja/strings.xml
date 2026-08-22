@@ -86,7 +86,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">飲み物を編集</string>
     <string name="drink_name">名前</string>
     <string name="alcohol_percent">アルコール度数</string>
-    <string name="favorite">お気に入り</string>
+    <string name="favorite_add">お気に入りに追加</string>
+    <string name="favorite_remove">お気に入りから削除</string>
     <string name="no_drinks">飲み物がまだ登録されていません。</string>
     <string name="category">カテゴリ</string>
     <string name="category_beer">ビール</string>

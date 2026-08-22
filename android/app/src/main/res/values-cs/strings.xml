@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Upravit nápoj</string>
     <string name="drink_name">Název</string>
     <string name="alcohol_percent">Obsah alkoholu</string>
-    <string name="favorite">Oblíbené</string>
+    <string name="favorite_add">Přidat k oblíbeným</string>
+    <string name="favorite_remove">Odebrat z oblíbených</string>
     <string name="no_drinks">Zatím žádné nápoje.</string>
     <string name="category">Kategorie</string>
     <string name="category_beer">Pivo</string>

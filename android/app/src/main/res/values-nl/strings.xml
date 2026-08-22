@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Drank bewerken</string>
     <string name="drink_name">Naam</string>
     <string name="alcohol_percent">Alcoholpercentage</string>
-    <string name="favorite">Favoriet</string>
+    <string name="favorite_add">Aan favorieten toevoegen</string>
+    <string name="favorite_remove">Uit favorieten verwijderen</string>
     <string name="no_drinks">Nog geen dranken gedefinieerd.</string>
     <string name="category">Categorie</string>
     <string name="category_beer">Bier</string>

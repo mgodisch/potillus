@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Modifica bevanda</string>
     <string name="drink_name">Nome</string>
     <string name="alcohol_percent">Contenuto alcolico</string>
-    <string name="favorite">Preferito</string>
+    <string name="favorite_add">Aggiungi ai preferiti</string>
+    <string name="favorite_remove">Rimuovi dai preferiti</string>
     <string name="no_drinks">Nessuna bevanda definita.</string>
     <string name="category">Categoria</string>
     <string name="category_beer">Birra</string>

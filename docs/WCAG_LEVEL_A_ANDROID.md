@@ -93,6 +93,11 @@ viewer, the PDF export flow.
   - Form fields in dialogs are associated with their labels.
 - [ ] **1.3.2 Meaningful Sequence (A).** TalkBack reading order matches the
       visual order on every screen.
+  - Deliberate exception, drinks list: the favourite star is drawn first and
+    spoken second, through `traversalIndex` on the row. Drawn first is where the
+    eye wants it; spoken first it arrives before anything has named the drink it
+    belongs to, which is the sequence this criterion is about. iOS does the same
+    through `accessibilitySortPriority`. **Do not "fix" this back.**
 - [ ] **1.3.3 Sensory Characteristics (A).** No instruction relies on shape/
       position/colour alone ("tap the green dot"). Scan all in-app help text.
 - [ ] **1.4.1 Use of Color (A).** Colour is never the *only* visual means of

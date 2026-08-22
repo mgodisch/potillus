@@ -88,7 +88,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">編輯飲品</string>
     <string name="drink_name">名稱</string>
     <string name="alcohol_percent">酒精濃度</string>
-    <string name="favorite">最愛</string>
+    <string name="favorite_add">加入收藏</string>
+    <string name="favorite_remove">從收藏中移除</string>
     <string name="no_drinks">尚未定義任何飲品。</string>
     <string name="category">類別</string>
     <string name="category_beer">啤酒</string>

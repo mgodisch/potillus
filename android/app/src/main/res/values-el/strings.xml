@@ -57,7 +57,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">Επεξεργασία ποτού</string>
     <string name="drink_name">Όνομα</string>
     <string name="alcohol_percent">Περιεκτικότητα αλκοόλης</string>
-    <string name="favorite">Αγαπημένο</string>
+    <string name="favorite_add">Προσθήκη στα αγαπημένα</string>
+    <string name="favorite_remove">Αφαίρεση από τα αγαπημένα</string>
     <string name="no_drinks">Δεν έχουν οριστεί ποτά ακόμα.</string>
     <string name="category">Κατηγορία</string>
     <string name="category_beer">Μπύρα</string>

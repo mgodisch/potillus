@@ -86,7 +86,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="edit_drink">음료 편집</string>
     <string name="drink_name">이름</string>
     <string name="alcohol_percent">알코올 함량</string>
-    <string name="favorite">즐겨찾기</string>
+    <string name="favorite_add">즐겨찾기에 추가</string>
+    <string name="favorite_remove">즐겨찾기에서 제거</string>
     <string name="no_drinks">아직 등록된 음료가 없습니다.</string>
     <string name="category">카테고리</string>
     <string name="category_beer">맥주</string>
