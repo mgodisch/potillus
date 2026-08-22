@@ -38,7 +38,7 @@ mikrofon, eller till GPS eller nätverksåtkomst. Dina data stannar i appens
 privata lagring på din enhet, skyddade av enhetens kryptering, och åtkomsten
 till appen kan begränsas med ett fingeravtryck.
 
-Appen talar när som helst om för dig om "la petite sœur" fortfarande ryms inom
+Appen talar när som helst om för dig om ”la petite sœur” fortfarande ryms inom
 din budget, så att du kan dosera dig upp till din gräns. Till besök i
 beroendevården tar den på begäran fram en tvåsidig PDF-rapport över dina
 dryckesvanor. Den är gratis och reklamfri.
@@ -47,7 +47,7 @@ Libellus Potionis kräver Android 11 eller senare. Den används kontinuerligt av
 upphovspersonen på en Google Pixel 10 Pro med GrapheneOS och testas dessutom på
 en Fairphone 4.
 
-## Skärm "{{today}}"
+## Skärm ”{{today}}”
 
 På den här skärmen hittar du en lista över de alkoholhaltiga drycker du har
 njutit av i dag. Om du gjorde ett misstag när du registrerade en dryck kan du
@@ -63,7 +63,7 @@ din gräns (som siffra och som förloppsindikator).
 Dessutom visar en märkning med ”Ø” din genomsnittliga konsumtion för
 innevarande månad (genomsnittligt antal gram ren alkohol per dag).
 
-## Skärm "{{calendar}}"
+## Skärm ”{{calendar}}”
 
 På den här skärmen hittar du kalendern. Dagar då alkohol konsumerades är
 markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
@@ -71,21 +71,21 @@ markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
 korrigeras eller tas bort. Det är också möjligt att lägga till konsumerade
 drycker i efterhand.
 
-## Skärm "{{statistics}}"
+## Skärm ”{{statistics}}”
 
 Den här skärmen visar statistiska analyser av din alkoholkonsumtion, filtrerbara
 per vecka, månad eller år. En CSV-export finns tillgänglig för att bearbeta data
 vidare i ett kalkylprogram. Dessutom erbjuds en PDF-export som presenterar
 dryckesvanorna i ett format som lämpar sig för beroendevård.
 
-## Skärm "{{drinks}}"
+## Skärm ”{{drinks}}”
 
 Den här skärmen innehåller listan över drycker. Appen levereras förkonfigurerad
 med en uppsättning internationellt vanliga drycker. Alla kan ändras eller tas
 bort. Du kan definiera en ny dryck med plusikonen. När du trycker på en dryck
 öppnas en dialogruta för att registrera den som konsumerad.
 
-## Skärm "{{settings}}"
+## Skärm ”{{settings}}”
 
 Inställningsmenyn nås via menyikonen (☰) längst upp till höger. Libellus
 Potionis erbjuder följande konfigurationsalternativ:
@@ -95,7 +95,7 @@ Potionis erbjuder följande konfigurationsalternativ:
 I den här kategorin kan du ange din kroppsvikt för att uppskatta din
 alkoholkoncentration i blodet med hjälp av
 [Widmark-formeln](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Värdet visas sedan på skärmen "{{today}}".
+Värdet visas sedan på skärmen ”{{today}}”.
 
 Formeln är **BAC [‰] = A / (P × r) − β × t**: A är mängden ren alkohol i gram,
 P kroppsvikten i kilogram, r fördelningskoefficienten, β
@@ -117,7 +117,7 @@ bryter ned alkohol långsamt kan ligga över det visade värdet. Uppskattningen
 I den här kategorin anger du de gränser som gäller för din alkoholkonsumtion.
 Fälten som ska fyllas i är: maximal daglig gräns i gram ren alkohol, maximal
 veckogräns och högsta antal dryckesdagar per vecka. Alla gränser gäller
-samtidigt. Därför visas tre förloppsindikatorer på skärmen "{{today}}". Om du är
+samtidigt. Därför visas tre förloppsindikatorer på skärmen ”{{today}}”. Om du är
 osäker på vad du ska ställa in här kan du hämta inspiration från olika länders
 rekommendationer på Wikipedia.
 
@@ -141,12 +141,12 @@ få tillbaka efteråt.
 En säkerhetskopia är en enda JSON-fil som innehåller alla dina drycker och hela
 din logg. Så här flyttar du dina data till en annan telefon:
 
-1. På den gamla telefonen öppnar du "{{settings}}" → {{backup_section}} →
+1. På den gamla telefonen öppnar du ”{{settings}}” → {{backup_section}} →
    {{backup_export}} och sparar JSON-filen på ett säkert ställe — till exempel
    din egen molnlagring, ett e-postmeddelande till dig själv eller en
    USB-överföring.
 2. Installera Libellus Potionis på den nya telefonen.
-3. Öppna "{{settings}}" → {{backup_section}} → {{backup_import}} och välj den
+3. Öppna ”{{settings}}” → {{backup_section}} → {{backup_import}} och välj den
    JSON-filen. Välj {{import_replace}} för att skriva över allt, eller
    {{import_merge}} för att kombinera den med poster som redan finns.
 
@@ -182,7 +182,7 @@ mikrofon, eller till GPS eller nätverksåtkomst. Dina data stannar i appens
 privata lagring på din enhet, skyddade av enhetens kryptering, och åtkomsten
 till appen kan begränsas med Face ID eller Touch ID.
 
-Appen talar när som helst om för dig om "la petite sœur" fortfarande ryms inom
+Appen talar när som helst om för dig om ”la petite sœur” fortfarande ryms inom
 din budget, så att du kan dosera dig upp till din gräns. Till besök i
 beroendevården tar den på begäran fram en tvåsidig PDF-rapport över dina
 dryckesvanor. Den är gratis och reklamfri.
@@ -191,7 +191,7 @@ Libellus Potionis kräver iOS 17.0 eller senare. Den används kontinuerligt av
 upphovspersonen på en iPhone 16E och testas dessutom på en iPhone 17
 Pro-emulator.
 
-## Skärm "{{today}}"
+## Skärm ”{{today}}”
 
 På den här skärmen hittar du en lista över de alkoholhaltiga drycker du har
 njutit av i dag. Om du gjorde ett misstag när du registrerade en dryck kan du
@@ -207,7 +207,7 @@ din gräns (som siffra och som förloppsindikator).
 Dessutom visar en märkning med ”Ø” din genomsnittliga konsumtion för
 innevarande månad (genomsnittligt antal gram ren alkohol per dag).
 
-## Skärm "{{calendar}}"
+## Skärm ”{{calendar}}”
 
 På den här skärmen hittar du kalendern. Dagar då alkohol konsumerades är
 markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
@@ -215,21 +215,21 @@ markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
 korrigeras eller tas bort. Det är också möjligt att lägga till konsumerade
 drycker i efterhand. Tryck på en post för att korrigera den, eller svep den åt vänster för att ta bort den; pennknappen i verktygsfältet gör detsamma.
 
-## Skärm "{{statistics}}"
+## Skärm ”{{statistics}}”
 
 Den här skärmen visar statistiska analyser av din alkoholkonsumtion, filtrerbara
 per vecka, månad eller år. En CSV-export finns tillgänglig för att bearbeta data
 vidare i ett kalkylprogram. Dessutom erbjuds en PDF-export som presenterar
 dryckesvanorna i ett format som lämpar sig för beroendevård.
 
-## Skärm "{{drinks}}"
+## Skärm ”{{drinks}}”
 
 Den här skärmen innehåller listan över drycker. Appen levereras förkonfigurerad
 med en uppsättning internationellt vanliga drycker. Alla kan ändras eller tas
 bort. Du kan definiera en ny dryck med plusikonen. När du trycker på en dryck
 öppnas en dialogruta för att registrera den som konsumerad. För att ändra eller ta bort en dryck trycker du på pennknappen i verktygsfältet: i det läget öppnar ett tryck på en rad dess redigeringsruta, och den röda markeringen tar bort drycken. Ett svep åt vänster ger samma två alternativ.
 
-## Skärm "{{settings}}"
+## Skärm ”{{settings}}”
 
 Inställningsmenyn nås via Mer-knappen (…) längst upp till höger. Libellus
 Potionis erbjuder följande konfigurationsalternativ:
@@ -239,7 +239,7 @@ Potionis erbjuder följande konfigurationsalternativ:
 I den här kategorin kan du ange din kroppsvikt för att uppskatta din
 alkoholkoncentration i blodet med hjälp av
 [Widmark-formeln](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Värdet visas sedan på skärmen "{{today}}".
+Värdet visas sedan på skärmen ”{{today}}”.
 
 Formeln är **BAC [‰] = A / (P × r) − β × t**: A är mängden ren alkohol i gram,
 P kroppsvikten i kilogram, r fördelningskoefficienten, β
@@ -261,7 +261,7 @@ bryter ned alkohol långsamt kan ligga över det visade värdet. Uppskattningen
 I den här kategorin anger du de gränser som gäller för din alkoholkonsumtion.
 Fälten som ska fyllas i är: maximal daglig gräns i gram ren alkohol, maximal
 veckogräns och högsta antal dryckesdagar per vecka. Alla gränser gäller
-samtidigt. Därför visas tre förloppsindikatorer på skärmen "{{today}}". Om du är
+samtidigt. Därför visas tre förloppsindikatorer på skärmen ”{{today}}”. Om du är
 osäker på vad du ska ställa in här kan du hämta inspiration från olika länders
 rekommendationer på Wikipedia.
 
@@ -285,12 +285,12 @@ få tillbaka efteråt.
 En säkerhetskopia är en enda JSON-fil som innehåller alla dina drycker och hela
 din logg. Så här flyttar du dina data till en annan telefon:
 
-1. På den gamla telefonen öppnar du "{{settings}}" → {{backup_section}} →
+1. På den gamla telefonen öppnar du ”{{settings}}” → {{backup_section}} →
    {{backup_export}} och sparar JSON-filen på ett säkert ställe — till exempel
    din egen molnlagring, ett e-postmeddelande till dig själv eller en
    USB-överföring.
 2. Installera Libellus Potionis på den nya telefonen.
-3. Öppna "{{settings}}" → {{backup_section}} → {{backup_import}} och välj den
+3. Öppna ”{{settings}}” → {{backup_section}} → {{backup_import}} och välj den
    JSON-filen. Välj {{import_replace}} för att skriva över allt, eller
    {{import_merge}} för att kombinera den med poster som redan finns.
 

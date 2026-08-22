@@ -1,4 +1,4 @@
-# Libellus Potionis - User's Guide
+# Libellus Potionis - User’s Guide
 
 Libellus Potionis is a diary for your own drinking. You log what you drink;
 the app works out how much pure alcohol that was and how close it brings you
@@ -8,9 +8,9 @@ This guide walks you through the app, step by step: how it is laid out, how
 to set it up, how to log a drink, how to look back and take stock, and how to
 keep your data safe. The headings are there for looking things up later.
 
-## What the app does, and what it doesn't
+## What the app does, and what it doesn’t
 
-Libellus Potionis keeps record. It doesn't judge and it doesn't nag. The
+Libellus Potionis keeps record. It doesn’t judge and it doesn’t nag. The
 figures it shows are your own entries, converted to grams of pure alcohol. If
 you log every drink, you will be able to look back at your drinking habits
 while sober -- which is where the app earns its keep.
@@ -20,14 +20,14 @@ version 3.0 or later. Its source code is public, so anyone anywhere can check
 what it does with your data. Libellus Potionis takes privacy very seriously,
 it asks for no sensitive permission at all: no camera, no microphone, no
 location, no file access, not even network access. Everything you enter stays
-in the app's private storage on your device, protected by the device's own
+in the app’s private storage on your device, protected by the device’s own
 encryption. You can lock access to the app using your
 fingerprint in the settings; that is the
 only permission the app ever requests.
 
 What Libellus Potionis is _not:_ The app is neither a measuring instrument
 nor a medical device. The blood alcohol figure is an estimate from a
-statistical model (see "How the figures are worked out"). Nothing the app
+statistical model (see “How the figures are worked out”). Nothing the app
 says can tell you whether you are fit to drive, and nothing it says is a
 diagnosis. What Libellus Potionis can do is show you a picture of your
 drinking habits over weeks and months, and, if you want, print that picture
@@ -51,13 +51,13 @@ of the display, which is present on all four:
 - **Drinks** -- the catalog you log your drinks from.
 
 Top right on all four screens sits the same menu button. It opens Menu,
-which holds "Settings", Help (this guide) and About, where you
+which holds “Settings”, Help (this guide) and About, where you
 find the version, the license and the third-party components in use. If your
 device has a screen lock set up, Lock app is there too, and locks the app
 at once.
 
 Settings, Help and About open as pages of their own;
-the device's back button, or the arrow at the top left, return you to the
+the device’s back button, or the arrow at the top left, return you to the
 screen you came from.
 
 ## Setting up
@@ -65,7 +65,7 @@ screen you came from.
 Straight after installing, the app has no entries yet but is ready to use: it
 ships with a catalog of drinks common around the world, so you can log that
 first beer right away. Three things are worth setting first, though. All
-three live under "Settings"; the remaining settings are covered further
+three live under “Settings”; the remaining settings are covered further
 down.
 
 ### Your limits
@@ -96,7 +96,7 @@ is optional. Until you set one, all you see is the button that adds it; after
 that you can step it up or down, and a second button removes it again. The
 app works perfectly well without it. The only thing you lose is the blood
 alcohol estimate on the Today screen, which cannot be worked out without
-a weight. "How the figures are worked out" explains where it comes from.
+a weight. “How the figures are worked out” explains where it comes from.
 
 ### When your day begins
 
@@ -109,7 +109,7 @@ exports.
 The Statistics From row sits in the same place. It is the floor under
 every calculation: anything logged before that date is left out of the
 figures. That is what lets you draw a line on the first of January for a new
-year's resolution without throwing away what came before. A fresh install
+year’s resolution without throwing away what came before. A fresh install
 sets it to the day you installed the app, which is usually right, and has one
 consequence that catches people out when they restore an older backup: the
 old entries are all there, and none of them count toward anything. The
@@ -118,14 +118,14 @@ floor is set.
 
 ## What the Today screen shows
 
-Above the day's list is a summary that refreshes after every entry, and as
+Above the day’s list is a summary that refreshes after every entry, and as
 the day wears on. From the top:
 
 **Two large figures**, side by side. On the
 left you see either
 Current Abstinence, the number of days you have gone without, or
 Today’s Total, the pure alcohol you have logged today in grams.
-On the right, under "Ø", is your
+On the right, under “Ø”, is your
 average for the month so far in grams per day. That monthly figure is the
 only thing on this screen that looks beyond today. A green or red trend arrow
 beside it compares the month with the one before; with no previous month to
@@ -156,7 +156,7 @@ one drink defined, its name simply stands there with nothing to pick. Three
 fields follow:
 
 - **Amount** - how much you drank, in milliliters, from 1 to 5,000.
-  It starts at the drink's usual serving.
+  It starts at the drink’s usual serving.
 - **Time** - set to now, and adjustable if you are catching up on
   something.
 - **Note (optional)** - anything you want to remember: the occasion, the company.
@@ -175,19 +175,19 @@ would, yellow if exactly one would, red if the next one breaks a limit. All
 three limits are checked - daily, seven-day, and drinking days. A screen
 reader announces Within your limits, Almost at your limit or
 Limit reached. If red and green are hard for you to tell apart,
-turn on Alternative Status Symbols under Appearance in "Settings", and
+turn on Alternative Status Symbols under Appearance in “Settings”, and
 the dot carries a shape as well as a color.
 
 ### Quick buttons for your regulars
 
 Mark a drink as a favorite in the catalog and it appears on the Today
-screen as Quick Selection Favorites: a row of buttons above the day's list. One tap
+screen as Quick Selection Favorites: a row of buttons above the day’s list. One tap
 logs the drink at its usual serving, with no sheet in between. For the beer
 after work that is always the same beer, this is the short way.
 
 ### Fixing or removing an entry
 
-Tap an entry in the day's list and it opens as Edit Entry, with the same
+Tap an entry in the day’s list and it opens as Edit Entry, with the same
 fields and the same bounds as when you logged it. Delete
 removes it, and the app asks once before it does, because an entry deleted by mistake is gone for good.
 
@@ -211,7 +211,7 @@ prompt.
 
 ### Adding or changing a drink
 
-The plus button opens Add Drink; a row's pencil
+The plus button opens Add Drink; a row’s pencil
 icon opens Edit Drink. Both
 ask the same four things:
 
@@ -284,7 +284,7 @@ the charts read No data for this period..
 ### Moving back through time
 
 Below the period buttons, the stretch you are looking at is spelled out as
-exact dates. The current month ends today rather than at month's end, and if
+exact dates. The current month ends today rather than at month’s end, and if
 you have set a Statistics From date, the stretch begins there. So what
 stands there is precisely what the figures below cover.
 
@@ -389,11 +389,11 @@ leaves the settings on the receiving device alone.
 
 Moving your data to a new device:
 
-1. On the old device, choose "Settings" -> Backup ->
+1. On the old device, choose “Settings” -> Backup ->
    Export. Keep the file somewhere safe, a
    [Signal](https://signal.org/) note to yourself for instance.
 2. Install Libellus Potionis on the new device.
-3. There, choose "Settings" -> Backup -> Import
+3. There, choose “Settings” -> Backup -> Import
    and restore.
 
 The app asks how you want the import to go. Replace throws away
@@ -415,7 +415,7 @@ and come back, though not if you come back within thirty seconds. The menu at
 the top right also carries Lock app, which locks the app there and then.
 
 **Allow Screenshots** is off to begin with. While screenshots are
-off, you cannot take one of the app, and the app's window stays
+off, you cannot take one of the app, and the app’s window stays
 covered in the list of recently used
 apps. Someone who picks up your unlocked phone and thumbs through
 the open apps sees nothing there.
@@ -427,7 +427,7 @@ The Appearance section offers three things.
 **Color Scheme**: System, or Light or Dark
 regardless of what the system does.
 
-**Language**: the app's language, again independent of the system.
+**Language**: the app’s language, again independent of the system.
 (System) hands it back to the system.
 
 **Alternative Status Symbols** gives the status dots a shape as well as a color,

@@ -48,7 +48,7 @@ O Libellus Potionis requer o Android 11 ou superior. É utilizado de forma
 contínua pelo autor num Google Pixel 10 Pro com GrapheneOS e testado
 adicionalmente num Fairphone 4.
 
-## Ecrã "{{today}}"
+## Ecrã «{{today}}»
 
 Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
 cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
@@ -63,7 +63,7 @@ semana em relação ao teu limite (como número e como barra de progresso).
 Além disso, um emblema marcado com «Ø» mostra o teu consumo médio do mês atual
 (média de gramas de álcool puro por dia).
 
-## Ecrã "{{calendar}}"
+## Ecrã «{{calendar}}»
 
 Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
 assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
@@ -71,7 +71,7 @@ assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
 bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
 adicionar bebidas consumidas de forma retroativa.
 
-## Ecrã "{{statistics}}"
+## Ecrã «{{statistics}}»
 
 Este ecrã mostra análises estatísticas do teu consumo de álcool, filtráveis por
 semana, mês ou ano. Está disponível uma exportação CSV para continuar a
@@ -79,14 +79,14 @@ processar os dados numa folha de cálculo. Além disso, é fornecida uma exporta
 PDF que apresenta os hábitos de consumo num formato adequado ao acompanhamento
 em adições.
 
-## Ecrã "{{drinks}}"
+## Ecrã «{{drinks}}»
 
 Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
 conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
 eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
 bebida, abre-se uma caixa de diálogo para a registar como consumida.
 
-## Ecrã "{{settings}}"
+## Ecrã «{{settings}}»
 
 O menu de definições é acessível através do ícone de menu (☰) no canto superior direito. O Libellus Potionis disponibiliza as seguintes opções de
 configuração:
@@ -96,7 +96,7 @@ configuração:
 Nesta categoria podes anotar o teu peso corporal para estimar a tua
 concentração de álcool no sangue através da [fórmula de
 Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é depois apresentado no ecrã "{{today}}".
+Esse valor é depois apresentado no ecrã «{{today}}».
 
 A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
 P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
@@ -117,7 +117,7 @@ estimativa é um modelo estatístico, não uma medição.
 Nesta categoria introduzes os limites que se aplicam ao teu consumo de álcool. Os
 campos a preencher são: o limite diário máximo em gramas de álcool puro, o limite
 semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam em simultâneo. Por conseguinte, no ecrã "{{today}}" são visíveis três
+se aplicam em simultâneo. Por conseguinte, no ecrã «{{today}}» são visíveis três
 barras de progresso. Se não tiveres a certeza do que configurar aqui, podes
 inspirar-te nas recomendações de vários países na Wikipédia.
 
@@ -194,7 +194,7 @@ O Libellus Potionis requer o iOS 17.0 ou superior. É utilizado de forma
 contínua pelo autor num iPhone 16E e testado adicionalmente num emulador de
 iPhone 17 Pro.
 
-## Ecrã "{{today}}"
+## Ecrã «{{today}}»
 
 Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
 cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
@@ -209,7 +209,7 @@ semana em relação ao teu limite (como número e como barra de progresso).
 Além disso, um emblema marcado com «Ø» mostra o teu consumo médio do mês atual
 (média de gramas de álcool puro por dia).
 
-## Ecrã "{{calendar}}"
+## Ecrã «{{calendar}}»
 
 Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
 assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
@@ -217,7 +217,7 @@ assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
 bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
 adicionar bebidas consumidas de forma retroativa. Toca numa entrada para a corrigir, ou desliza-a para a esquerda para a eliminar; o botão com o lápis na barra de ferramentas oferece o mesmo.
 
-## Ecrã "{{statistics}}"
+## Ecrã «{{statistics}}»
 
 Este ecrã mostra análises estatísticas do teu consumo de álcool, filtráveis por
 semana, mês ou ano. Está disponível uma exportação CSV para continuar a
@@ -225,14 +225,14 @@ processar os dados numa folha de cálculo. Além disso, é fornecida uma exporta
 PDF que apresenta os hábitos de consumo num formato adequado ao acompanhamento
 em adições.
 
-## Ecrã "{{drinks}}"
+## Ecrã «{{drinks}}»
 
 Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
 conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
 eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
 bebida, abre-se uma caixa de diálogo para a registar como consumida. Para alterar ou eliminar uma bebida, toca no botão com o lápis na barra de ferramentas: nesse modo, tocar numa linha abre a caixa de edição dela e a marca vermelha elimina a bebida. Deslizar a linha para a esquerda oferece as mesmas duas ações.
 
-## Ecrã "{{settings}}"
+## Ecrã «{{settings}}»
 
 O menu de definições é acessível através do botão Mais (…) no canto superior direito. O Libellus Potionis disponibiliza as seguintes opções de
 configuração:
@@ -242,7 +242,7 @@ configuração:
 Nesta categoria podes anotar o teu peso corporal para estimar a tua
 concentração de álcool no sangue através da [fórmula de
 Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é depois apresentado no ecrã "{{today}}".
+Esse valor é depois apresentado no ecrã «{{today}}».
 
 A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
 P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
@@ -263,7 +263,7 @@ estimativa é um modelo estatístico, não uma medição.
 Nesta categoria introduzes os limites que se aplicam ao teu consumo de álcool. Os
 campos a preencher são: o limite diário máximo em gramas de álcool puro, o limite
 semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam em simultâneo. Por conseguinte, no ecrã "{{today}}" são visíveis três
+se aplicam em simultâneo. Por conseguinte, no ecrã «{{today}}» são visíveis três
 barras de progresso. Se não tiveres a certeza do que configurar aqui, podes
 inspirar-te nas recomendações de vários países na Wikipédia.
 

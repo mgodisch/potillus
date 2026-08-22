@@ -39,7 +39,7 @@ permanecem no armazenamento privado do aplicativo no seu dispositivo,
 protegidos pela criptografia do dispositivo, e o acesso ao aplicativo pode ser
 restringido por impressão digital.
 
-O aplicativo informa a qualquer momento se «la petite sœur» ainda cabe no seu
+O aplicativo informa a qualquer momento se “la petite sœur” ainda cabe no seu
 orçamento, para que você possa se dosar até o seu limite. Para uma consulta de
 tratamento de dependência, ele produz, quando solicitado, um relatório PDF de
 duas páginas sobre seus hábitos de consumo. É gratuito e sem anúncios.
@@ -48,7 +48,7 @@ O Libellus Potionis requer o Android 11 ou superior. É usado continuamente pelo
 autor em um Google Pixel 10 Pro com GrapheneOS e testado adicionalmente em um
 Fairphone 4.
 
-## Tela "{{today}}"
+## Tela “{{today}}”
 
 Nesta tela você encontra uma lista das bebidas alcoólicas que consumiu hoje. Se
 cometeu um erro ao registrar uma bebida, pode editar ou excluir os registros
@@ -63,7 +63,7 @@ nesta semana em relação ao seu limite (como número e como barra de progresso)
 Além disso, um emblema marcado com “Ø” mostra o seu consumo médio do mês atual
 (média de gramas de álcool puro por dia).
 
-## Tela "{{calendar}}"
+## Tela “{{calendar}}”
 
 Nesta tela você encontra o calendário. Os dias em que houve consumo de álcool são
 marcados com um ponto azul (quantidade não crítica) ou um ponto vermelho (limite
@@ -71,7 +71,7 @@ ultrapassado). Ao selecionar um dia, são exibidas as respectivas bebidas, que
 podem ser corrigidas ou excluídas se necessário. Também é possível adicionar
 bebidas consumidas de forma retroativa.
 
-## Tela "{{statistics}}"
+## Tela “{{statistics}}”
 
 Esta tela mostra análises estatísticas do seu consumo de álcool, filtráveis por
 semana, mês ou ano. Há uma exportação CSV disponível para continuar processando
@@ -79,14 +79,14 @@ os dados em uma planilha. Além disso, é oferecida uma exportação PDF que
 apresenta os hábitos de consumo em um formato adequado ao tratamento de
 dependência.
 
-## Tela "{{drinks}}"
+## Tela “{{drinks}}”
 
 Esta tela contém a lista de bebidas. O aplicativo vem pré-configurado com um
 conjunto de bebidas comuns no âmbito internacional. Todas podem ser alteradas ou
 excluídas. Você pode definir uma nova bebida pelo ícone de mais. Ao tocar em uma
 bebida, abre-se uma caixa de diálogo para registrá-la como consumida.
 
-## Tela "{{settings}}"
+## Tela “{{settings}}”
 
 O menu de configurações é acessível pelo ícone de menu (☰) no canto superior direito. O Libellus Potionis oferece as seguintes opções de configuração:
 
@@ -95,7 +95,7 @@ O menu de configurações é acessível pelo ícone de menu (☰) no canto super
 Nesta categoria você pode anotar seu peso corporal para estimar sua
 concentração de álcool no sangue por meio da [fórmula de
 Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é então exibido na tela "{{today}}".
+Esse valor é então exibido na tela “{{today}}”.
 
 A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
 P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
@@ -116,7 +116,7 @@ um modelo estatístico, não uma medição.
 Nesta categoria você insere os limites que se aplicam ao seu consumo de álcool. Os
 campos obrigatórios são: o limite diário máximo em gramas de álcool puro, o limite
 semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam simultaneamente. Por isso, na tela "{{today}}" ficam visíveis três
+se aplicam simultaneamente. Por isso, na tela “{{today}}” ficam visíveis três
 barras de progresso. Se você não tiver certeza do que configurar aqui, pode se
 inspirar nas recomendações de diversos países na Wikipédia.
 
@@ -140,12 +140,12 @@ exportados não podem ser recuperados depois.
 Um backup é um único arquivo JSON que contém todas as suas bebidas e o seu
 registro completo. Para mover seus dados para outro celular:
 
-1. No celular antigo, abra "{{settings}}" → {{backup_section}} →
+1. No celular antigo, abra “{{settings}}” → {{backup_section}} →
    {{backup_export}} e salve o arquivo JSON em um lugar seguro — por exemplo,
    seu próprio armazenamento na nuvem, um e-mail para você mesmo ou uma
    transferência por USB.
 2. Instale o Libellus Potionis no celular novo.
-3. Abra "{{settings}}" → {{backup_section}} → {{backup_import}} e selecione
+3. Abra “{{settings}}” → {{backup_section}} → {{backup_import}} e selecione
    esse arquivo JSON. Escolha {{import_replace}} para substituir tudo ou
    {{import_merge}} para combiná-lo com as entradas já existentes.
 
@@ -182,7 +182,7 @@ permanecem no armazenamento privado do aplicativo no seu dispositivo,
 protegidos pela criptografia do dispositivo, e o acesso ao aplicativo pode ser
 restringido por Face ID ou Touch ID.
 
-O aplicativo informa a qualquer momento se «la petite sœur» ainda cabe no seu
+O aplicativo informa a qualquer momento se “la petite sœur” ainda cabe no seu
 orçamento, para que você possa se dosar até o seu limite. Para uma consulta de
 tratamento de dependência, ele produz, quando solicitado, um relatório PDF de
 duas páginas sobre seus hábitos de consumo. É gratuito e sem anúncios.
@@ -191,7 +191,7 @@ O Libellus Potionis requer o iOS 17.0 ou superior. É usado continuamente pelo
 autor em um iPhone 16E e testado adicionalmente em um emulador de iPhone 17
 Pro.
 
-## Tela "{{today}}"
+## Tela “{{today}}”
 
 Nesta tela você encontra uma lista das bebidas alcoólicas que consumiu hoje. Se
 cometeu um erro ao registrar uma bebida, pode editar ou excluir os registros
@@ -206,7 +206,7 @@ nesta semana em relação ao seu limite (como número e como barra de progresso)
 Além disso, um emblema marcado com “Ø” mostra o seu consumo médio do mês atual
 (média de gramas de álcool puro por dia).
 
-## Tela "{{calendar}}"
+## Tela “{{calendar}}”
 
 Nesta tela você encontra o calendário. Os dias em que houve consumo de álcool são
 marcados com um ponto azul (quantidade não crítica) ou um ponto vermelho (limite
@@ -214,7 +214,7 @@ ultrapassado). Ao selecionar um dia, são exibidas as respectivas bebidas, que
 podem ser corrigidas ou excluídas se necessário. Também é possível adicionar
 bebidas consumidas de forma retroativa. Toque em um registro para corrigi-lo, ou deslize-o para a esquerda para excluí-lo; o botão com o lápis na barra de ferramentas oferece o mesmo.
 
-## Tela "{{statistics}}"
+## Tela “{{statistics}}”
 
 Esta tela mostra análises estatísticas do seu consumo de álcool, filtráveis por
 semana, mês ou ano. Há uma exportação CSV disponível para continuar processando
@@ -222,14 +222,14 @@ os dados em uma planilha. Além disso, é oferecida uma exportação PDF que
 apresenta os hábitos de consumo em um formato adequado ao tratamento de
 dependência.
 
-## Tela "{{drinks}}"
+## Tela “{{drinks}}”
 
 Esta tela contém a lista de bebidas. O aplicativo vem pré-configurado com um
 conjunto de bebidas comuns no âmbito internacional. Todas podem ser alteradas ou
 excluídas. Você pode definir uma nova bebida pelo ícone de mais. Ao tocar em uma
 bebida, abre-se uma caixa de diálogo para registrá-la como consumida. Para alterar ou excluir uma bebida, toque no botão com o lápis na barra de ferramentas: nesse modo, tocar em uma linha abre a caixa de edição dela e a marca vermelha exclui a bebida. Deslizar a linha para a esquerda oferece as mesmas duas ações.
 
-## Tela "{{settings}}"
+## Tela “{{settings}}”
 
 O menu de configurações é acessível pelo botão Mais (…) no canto superior direito. O Libellus Potionis oferece as seguintes opções de configuração:
 
@@ -238,7 +238,7 @@ O menu de configurações é acessível pelo botão Mais (…) no canto superior
 Nesta categoria você pode anotar seu peso corporal para estimar sua
 concentração de álcool no sangue por meio da [fórmula de
 Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é então exibido na tela "{{today}}".
+Esse valor é então exibido na tela “{{today}}”.
 
 A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
 P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
@@ -259,7 +259,7 @@ um modelo estatístico, não uma medição.
 Nesta categoria você insere os limites que se aplicam ao seu consumo de álcool. Os
 campos obrigatórios são: o limite diário máximo em gramas de álcool puro, o limite
 semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam simultaneamente. Por isso, na tela "{{today}}" ficam visíveis três
+se aplicam simultaneamente. Por isso, na tela “{{today}}” ficam visíveis três
 barras de progresso. Se você não tiver certeza do que configurar aqui, pode se
 inspirar nas recomendações de diversos países na Wikipédia.
 
@@ -283,12 +283,12 @@ exportados não podem ser recuperados depois.
 Um backup é um único arquivo JSON que contém todas as suas bebidas e o seu
 registro completo. Para mover seus dados para outro celular:
 
-1. No celular antigo, abra "{{settings}}" → {{backup_section}} →
+1. No celular antigo, abra “{{settings}}” → {{backup_section}} →
    {{backup_export}} e salve o arquivo JSON em um lugar seguro — por exemplo,
    seu próprio armazenamento na nuvem, um e-mail para você mesmo ou uma
    transferência por USB.
 2. Instale o Libellus Potionis no celular novo.
-3. Abra "{{settings}}" → {{backup_section}} → {{backup_import}} e selecione
+3. Abra “{{settings}}” → {{backup_section}} → {{backup_import}} e selecione
    esse arquivo JSON. Escolha {{import_replace}} para substituir tudo ou
    {{import_merge}} para combiná-lo com as entradas já existentes.
 

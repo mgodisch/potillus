@@ -146,12 +146,12 @@ mai pot fi recuperate ulterior.
 O copie de rezervă este un singur fișier JSON care conține toate băuturile tale
 și întregul tău jurnal. Pentru a-ți muta datele pe alt telefon:
 
-1. Pe telefonul vechi, deschide „{{settings}}" → {{backup_section}} →
+1. Pe telefonul vechi, deschide „{{settings}}” → {{backup_section}} →
    {{backup_export}} și salvează fișierul JSON într-un loc sigur — de exemplu,
    propriul tău spațiu de stocare în cloud, un e-mail către tine însuți sau un
    transfer prin USB.
 2. Instalează Libellus Potionis pe telefonul nou.
-3. Deschide „{{settings}}" → {{backup_section}} → {{backup_import}} și
+3. Deschide „{{settings}}” → {{backup_section}} → {{backup_import}} și
    selectează acel fișier JSON. Alege {{import_replace}} pentru a suprascrie
    tot sau {{import_merge}} pentru a-l combina cu intrările deja existente.
 
@@ -295,12 +295,12 @@ mai pot fi recuperate ulterior.
 O copie de rezervă este un singur fișier JSON care conține toate băuturile tale
 și întregul tău jurnal. Pentru a-ți muta datele pe alt telefon:
 
-1. Pe telefonul vechi, deschide „{{settings}}" → {{backup_section}} →
+1. Pe telefonul vechi, deschide „{{settings}}” → {{backup_section}} →
    {{backup_export}} și salvează fișierul JSON într-un loc sigur — de exemplu,
    propriul tău spațiu de stocare în cloud, un e-mail către tine însuți sau un
    transfer prin USB.
 2. Instalează Libellus Potionis pe telefonul nou.
-3. Deschide „{{settings}}" → {{backup_section}} → {{backup_import}} și
+3. Deschide „{{settings}}” → {{backup_section}} → {{backup_import}} și
    selectează acel fișier JSON. Alege {{import_replace}} pentru a suprascrie
    tot sau {{import_merge}} pentru a-l combina cu intrările deja existente.
 

@@ -38,7 +38,7 @@ eller til GPS eller nettverkstilgang. Dataene dine blir værende i appens
 private lager på enheten din, beskyttet av enhetens kryptering, og tilgangen
 til appen kan begrenses med et fingeravtrykk.
 
-Appen forteller deg når som helst om "la petite sœur" fortsatt er innenfor
+Appen forteller deg når som helst om «la petite sœur» fortsatt er innenfor
 budsjettet ditt, slik at du kan dosere deg opp til grensen din. Til avtaler i
 rusbehandlingen leverer den på forespørsel en tosidig PDF-rapport over
 drikkevanene dine. Den er gratis og reklamefri.
@@ -47,7 +47,7 @@ Libellus Potionis krever Android 11 eller nyere. Den brukes løpende av
 forfatteren på en Google Pixel 10 Pro med GrapheneOS og testes i tillegg på en
 Fairphone 4.
 
-## Skjerm "{{today}}"
+## Skjerm «{{today}}»
 
 På denne skjermen finner du en liste over de alkoholholdige drikkene du har nytt
 i dag. Hvis du gjorde en feil da du registrerte en drikk, kan du redigere eller
@@ -62,7 +62,7 @@ samt antall dager med alkoholforbruk hittil denne uken i forhold til grensen din
 I tillegg viser et merke med «Ø» ditt gjennomsnittlige forbruk for inneværende
 måned (gjennomsnittlig antall gram ren alkohol per dag).
 
-## Skjerm "{{calendar}}"
+## Skjerm «{{calendar}}»
 
 På denne skjermen finner du kalenderen. Dager da det ble inntatt alkohol, er
 merket med en blå prikk (ikke-kritisk mengde) eller en rød prikk (grensen
@@ -70,21 +70,21 @@ overskredet). Når du velger en dag, vises de tilhørende drikkene, som om
 nødvendig kan korrigeres eller slettes. Det er også mulig å legge til inntatte
 drikker i ettertid.
 
-## Skjerm "{{statistics}}"
+## Skjerm «{{statistics}}»
 
 Denne skjermen viser statistiske analyser av alkoholforbruket ditt, som kan
 filtreres etter uke, måned eller år. En CSV-eksport er tilgjengelig for videre
 behandling av dataene i et regneark. I tillegg tilbys en PDF-eksport som
 presenterer drikkevanene i et format som egner seg for rusbehandling.
 
-## Skjerm "{{drinks}}"
+## Skjerm «{{drinks}}»
 
 Denne skjermen inneholder listen over drikker. Appen leveres forhåndskonfigurert
 med et sett internasjonalt vanlige drikker. Alle kan endres eller slettes. Med
 plussikonet kan du definere en ny drikk. Når du trykker på en drikk, åpnes en
 dialog der du kan registrere den som inntatt.
 
-## Skjerm "{{settings}}"
+## Skjerm «{{settings}}»
 
 Innstillingsmenyen er tilgjengelig via menyikonet (☰) øverst til høyre. Libellus
 Potionis tilbyr følgende konfigurasjonsmuligheter:
@@ -94,7 +94,7 @@ Potionis tilbyr følgende konfigurasjonsmuligheter:
 I denne kategorien kan du notere kroppsvekten din for å beregne
 alkoholkonsentrasjonen i blodet tilnærmet ved hjelp av
 [Widmark-formelen](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Verdien vises deretter på skjermen "{{today}}".
+Verdien vises deretter på skjermen «{{today}}».
 
 Formelen er **BAC [‰] = A / (P × r) − β × t**: A er mengden ren alkohol i
 gram, P kroppsvekten i kilogram, r fordelingskoeffisienten, β
@@ -117,7 +117,7 @@ I denne kategorien angir du grensene som gjelder for alkoholforbruket ditt.
 Feltene som skal fylles ut, er: den maksimale daglige grensen i gram ren alkohol,
 den maksimale ukentlige grensen og det maksimale antallet drikkedager per uke.
 Alle grenser gjelder samtidig. Derfor vises tre fremdriftslinjer på skjermen
-"{{today}}". Hvis du er usikker på hva du skal stille inn her, kan du hente
+«{{today}}». Hvis du er usikker på hva du skal stille inn her, kan du hente
 inspirasjon fra ulike lands anbefalinger på Wikipedia.
 
 ### {{statistics}}
@@ -178,7 +178,7 @@ eller til GPS eller nettverkstilgang. Dataene dine blir værende i appens
 private lager på enheten din, beskyttet av enhetens kryptering, og tilgangen
 til appen kan begrenses med Face ID eller Touch ID.
 
-Appen forteller deg når som helst om "la petite sœur" fortsatt er innenfor
+Appen forteller deg når som helst om «la petite sœur» fortsatt er innenfor
 budsjettet ditt, slik at du kan dosere deg opp til grensen din. Til avtaler i
 rusbehandlingen leverer den på forespørsel en tosidig PDF-rapport over
 drikkevanene dine. Den er gratis og reklamefri.
@@ -186,7 +186,7 @@ drikkevanene dine. Den er gratis og reklamefri.
 Libellus Potionis krever iOS 17.0 eller nyere. Den brukes løpende av
 forfatteren på en iPhone 16E og testes i tillegg på en iPhone 17 Pro-emulator.
 
-## Skjerm "{{today}}"
+## Skjerm «{{today}}»
 
 På denne skjermen finner du en liste over de alkoholholdige drikkene du har nytt
 i dag. Hvis du gjorde en feil da du registrerte en drikk, kan du redigere eller
@@ -201,7 +201,7 @@ samt antall dager med alkoholforbruk hittil denne uken i forhold til grensen din
 I tillegg viser et merke med «Ø» ditt gjennomsnittlige forbruk for inneværende
 måned (gjennomsnittlig antall gram ren alkohol per dag).
 
-## Skjerm "{{calendar}}"
+## Skjerm «{{calendar}}»
 
 På denne skjermen finner du kalenderen. Dager da det ble inntatt alkohol, er
 merket med en blå prikk (ikke-kritisk mengde) eller en rød prikk (grensen
@@ -209,21 +209,21 @@ overskredet). Når du velger en dag, vises de tilhørende drikkene, som om
 nødvendig kan korrigeres eller slettes. Det er også mulig å legge til inntatte
 drikker i ettertid. Trykk på en oppføring for å korrigere den, eller sveip den mot venstre for å slette den; blyantknappen på verktøylinjen gjør det samme.
 
-## Skjerm "{{statistics}}"
+## Skjerm «{{statistics}}»
 
 Denne skjermen viser statistiske analyser av alkoholforbruket ditt, som kan
 filtreres etter uke, måned eller år. En CSV-eksport er tilgjengelig for videre
 behandling av dataene i et regneark. I tillegg tilbys en PDF-eksport som
 presenterer drikkevanene i et format som egner seg for rusbehandling.
 
-## Skjerm "{{drinks}}"
+## Skjerm «{{drinks}}»
 
 Denne skjermen inneholder listen over drikker. Appen leveres forhåndskonfigurert
 med et sett internasjonalt vanlige drikker. Alle kan endres eller slettes. Med
 plussikonet kan du definere en ny drikk. Når du trykker på en drikk, åpnes en
 dialog der du kan registrere den som inntatt. For å endre eller slette en drikk trykker du på blyantknappen på verktøylinjen: i denne modusen åpner et trykk på en rad redigeringsdialogen, og det røde merket sletter drikken. Et sveip mot venstre gir de samme to valgene.
 
-## Skjerm "{{settings}}"
+## Skjerm «{{settings}}»
 
 Innstillingsmenyen er tilgjengelig via Mer-knappen (…) øverst til høyre. Libellus
 Potionis tilbyr følgende konfigurasjonsmuligheter:
@@ -233,7 +233,7 @@ Potionis tilbyr følgende konfigurasjonsmuligheter:
 I denne kategorien kan du notere kroppsvekten din for å beregne
 alkoholkonsentrasjonen i blodet tilnærmet ved hjelp av
 [Widmark-formelen](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Verdien vises deretter på skjermen "{{today}}".
+Verdien vises deretter på skjermen «{{today}}».
 
 Formelen er **BAC [‰] = A / (P × r) − β × t**: A er mengden ren alkohol i
 gram, P kroppsvekten i kilogram, r fordelingskoeffisienten, β
@@ -256,7 +256,7 @@ I denne kategorien angir du grensene som gjelder for alkoholforbruket ditt.
 Feltene som skal fylles ut, er: den maksimale daglige grensen i gram ren alkohol,
 den maksimale ukentlige grensen og det maksimale antallet drikkedager per uke.
 Alle grenser gjelder samtidig. Derfor vises tre fremdriftslinjer på skjermen
-"{{today}}". Hvis du er usikker på hva du skal stille inn her, kan du hente
+«{{today}}». Hvis du er usikker på hva du skal stille inn her, kan du hente
 inspirasjon fra ulike lands anbefalinger på Wikipedia.
 
 ### {{statistics}}

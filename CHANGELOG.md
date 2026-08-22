@@ -177,6 +177,7 @@ Edit drinks from the list's edit mode
 - Shared vectors pin the year heat-map's drawing window on both platforms.
 - `check-l10n-parity` compares strings that carry format specifiers.
 - App text, report labels and the guide token map spell the apostrophe as `’`.
+- Each user guide quotes and elides in the typography of its language.
 
 ### Removed
 

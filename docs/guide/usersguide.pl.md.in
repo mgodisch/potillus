@@ -47,7 +47,7 @@ Libellus Potionis wymaga systemu Android 11 lub nowszego. Autor używa go na
 bieżąco na urządzeniu Google Pixel 10 Pro z GrapheneOS i dodatkowo testuje na
 Fairphone 4.
 
-## Ekran „{{today}}"
+## Ekran „{{today}}”
 
 Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
 przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
@@ -62,7 +62,7 @@ Twojego limitu (jako liczba i jako pasek postępu).
 Dodatkowo odznaka oznaczona „Ø” pokazuje Twoje średnie spożycie w bieżącym
 miesiącu (średnia liczba gramów czystego alkoholu na dzień).
 
-## Ekran „{{calendar}}"
+## Ekran „{{calendar}}”
 
 Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
 niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
@@ -70,7 +70,7 @@ Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby mo
 poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
 wsteczną.
 
-## Ekran „{{statistics}}"
+## Ekran „{{statistics}}”
 
 Ten ekran przedstawia analizy statystyczne Twojego spożycia alkoholu, z
 możliwością filtrowania według tygodnia, miesiąca lub roku. Dostępny jest eksport
@@ -78,14 +78,14 @@ CSV, aby dalej przetwarzać dane w arkuszu kalkulacyjnym. Ponadto oferowany jest
 eksport PDF, który przedstawia nawyki picia w układzie odpowiednim dla terapii
 uzależnień.
 
-## Ekran „{{drinks}}"
+## Ekran „{{drinks}}”
 
 Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
 skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
 można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
 Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty.
 
-## Ekran „{{settings}}"
+## Ekran „{{settings}}”
 
 Menu ustawień jest dostępne przez ikonę menu (☰) w prawym górnym rogu.
 Libellus Potionis udostępnia następujące opcje konfiguracji:
@@ -95,7 +95,7 @@ Libellus Potionis udostępnia następujące opcje konfiguracji:
 W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
 stężenie alkoholu we krwi według [wzoru
 Widmarka](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Wartość jest następnie pokazywana na ekranie „{{today}}".
+Wartość jest następnie pokazywana na ekranie „{{today}}”.
 
 Wzór brzmi **BAC [‰] = A / (P × r) − β × t**: A to gramy czystego alkoholu, P
 masa ciała w kilogramach, r współczynnik dystrybucji, β tempo eliminacji około
@@ -116,7 +116,7 @@ statystyczny, a nie pomiar.
 W tej kategorii wprowadzasz limity obowiązujące dla Twojego spożycia alkoholu.
 Pola do wypełnienia to: maksymalny limit dzienny w gramach czystego alkoholu,
 maksymalny limit tygodniowy oraz maksymalna liczba dni picia w tygodniu.
-Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}"
+Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}”
 widoczne są trzy paski postępu. Jeśli nie wiesz, co tutaj ustawić, możesz
 zainspirować się zaleceniami różnych krajów w Wikipedii.
 
@@ -141,12 +141,12 @@ odzyskać.
 Kopia zapasowa to pojedynczy plik JSON zawierający wszystkie Twoje napoje i
 pełny dziennik. Aby przenieść dane na inny telefon:
 
-1. Na starym telefonie otwórz „{{settings}}" → {{backup_section}} →
+1. Na starym telefonie otwórz „{{settings}}” → {{backup_section}} →
    {{backup_export}} i zapisz plik JSON w bezpiecznym miejscu — na przykład we
    własnej chmurze, w wiadomości e-mail do samego siebie lub przez transfer
    USB.
 2. Zainstaluj Libellus Potionis na nowym telefonie.
-3. Otwórz „{{settings}}" → {{backup_section}} → {{backup_import}} i wybierz ten
+3. Otwórz „{{settings}}” → {{backup_section}} → {{backup_import}} i wybierz ten
    plik JSON. Wybierz {{import_replace}}, aby zastąpić wszystko, lub
    {{import_merge}}, aby połączyć go z już istniejącymi wpisami.
 
@@ -191,7 +191,7 @@ raport PDF o Twoich nawykach picia. Jest bezpłatna i wolna od reklam.
 Libellus Potionis wymaga systemu iOS 17.0 lub nowszego. Autor używa go na
 bieżąco na iPhonie 16E i dodatkowo testuje na emulatorze iPhone 17 Pro.
 
-## Ekran „{{today}}"
+## Ekran „{{today}}”
 
 Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
 przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
@@ -206,7 +206,7 @@ Twojego limitu (jako liczba i jako pasek postępu).
 Dodatkowo odznaka oznaczona „Ø” pokazuje Twoje średnie spożycie w bieżącym
 miesiącu (średnia liczba gramów czystego alkoholu na dzień).
 
-## Ekran „{{calendar}}"
+## Ekran „{{calendar}}”
 
 Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
 niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
@@ -214,7 +214,7 @@ Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby mo
 poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
 wsteczną. Dotknij wpisu, aby go poprawić, albo przesuń go w lewo, aby go usunąć; przycisk z ołówkiem na pasku narzędzi oferuje to samo.
 
-## Ekran „{{statistics}}"
+## Ekran „{{statistics}}”
 
 Ten ekran przedstawia analizy statystyczne Twojego spożycia alkoholu, z
 możliwością filtrowania według tygodnia, miesiąca lub roku. Dostępny jest eksport
@@ -222,14 +222,14 @@ CSV, aby dalej przetwarzać dane w arkuszu kalkulacyjnym. Ponadto oferowany jest
 eksport PDF, który przedstawia nawyki picia w układzie odpowiednim dla terapii
 uzależnień.
 
-## Ekran „{{drinks}}"
+## Ekran „{{drinks}}”
 
 Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
 skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
 można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
 Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty. Aby zmienić lub usunąć napój, dotknij przycisku z ołówkiem na pasku narzędzi: w tym trybie dotknięcie wiersza otwiera okno edycji, a czerwony znak usuwa napój. Przesunięcie wiersza w lewo oferuje te same dwie akcje.
 
-## Ekran „{{settings}}"
+## Ekran „{{settings}}”
 
 Menu ustawień jest dostępne przez przycisk Więcej (…) w prawym górnym rogu.
 Libellus Potionis udostępnia następujące opcje konfiguracji:
@@ -239,7 +239,7 @@ Libellus Potionis udostępnia następujące opcje konfiguracji:
 W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
 stężenie alkoholu we krwi według [wzoru
 Widmarka](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Wartość jest następnie pokazywana na ekranie „{{today}}".
+Wartość jest następnie pokazywana na ekranie „{{today}}”.
 
 Wzór brzmi **BAC [‰] = A / (P × r) − β × t**: A to gramy czystego alkoholu, P
 masa ciała w kilogramach, r współczynnik dystrybucji, β tempo eliminacji około
@@ -260,7 +260,7 @@ statystyczny, a nie pomiar.
 W tej kategorii wprowadzasz limity obowiązujące dla Twojego spożycia alkoholu.
 Pola do wypełnienia to: maksymalny limit dzienny w gramach czystego alkoholu,
 maksymalny limit tygodniowy oraz maksymalna liczba dni picia w tygodniu.
-Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}"
+Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}”
 widoczne są trzy paski postępu. Jeśli nie wiesz, co tutaj ustawić, możesz
 zainspirować się zaleceniami różnych krajów w Wikipedii.
 
@@ -285,12 +285,12 @@ odzyskać.
 Kopia zapasowa to pojedynczy plik JSON zawierający wszystkie Twoje napoje i
 pełny dziennik. Aby przenieść dane na inny telefon:
 
-1. Na starym telefonie otwórz „{{settings}}" → {{backup_section}} →
+1. Na starym telefonie otwórz „{{settings}}” → {{backup_section}} →
    {{backup_export}} i zapisz plik JSON w bezpiecznym miejscu — na przykład we
    własnej chmurze, w wiadomości e-mail do samego siebie lub przez transfer
    USB.
 2. Zainstaluj Libellus Potionis na nowym telefonie.
-3. Otwórz „{{settings}}" → {{backup_section}} → {{backup_import}} i wybierz ten
+3. Otwórz „{{settings}}” → {{backup_section}} → {{backup_import}} i wybierz ten
    plik JSON. Wybierz {{import_replace}}, aby zastąpić wszystko, lub
    {{import_merge}}, aby połączyć go z już istniejącymi wpisami.
 
