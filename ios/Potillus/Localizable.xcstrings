@@ -1437,7 +1437,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ : %2$@ grammes d'alcool"
+            "value" : "%1$@ : %2$@ grammes d’alcool"
           }
         },
         "it" : {
@@ -1699,7 +1699,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ : %2$@ sur un maximum de %3$@ grammes d'alcool"
+            "value" : "%1$@ : %2$@ sur un maximum de %3$@ grammes d’alcool"
           }
         },
         "it" : {
@@ -1711,13 +1711,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@：最大 %3$@ グラムのアルコール中 %2$@ グラムのアルコール"
+            "value" : "%1$@：最大 %3$@ グラムのアルコール中 %2$@ グラム"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@: 최대 %3$@ 그램의 알코올 중 %2$@ 그램의 알코올"
+            "value" : "%1$@: 최대 %3$@ 그램의 알코올 중 %2$@ 그램"
           }
         },
         "nb" : {
@@ -1777,13 +1777,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@：%2$@ 克酒精，上限 %3$@ 克酒精"
+            "value" : "%1$@：%2$@ 克，上限 %3$@ 克酒精"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@：%2$@ 克酒精，上限 %3$@ 克酒精"
+            "value" : "%1$@：%2$@ 克，上限 %3$@ 克酒精"
           }
         }
       }
@@ -1961,7 +1961,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld millilitres, %2$@ pour cent, %3$@ grammes d'alcool"
+            "value" : "%1$lld millilitres, %2$@ pour cent, %3$@ grammes d’alcool"
           }
         },
         "it" : {
@@ -2039,13 +2039,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "，%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
+            "value" : "%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "，%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
+            "value" : "%1$lld 毫升，%2$@ 百分比，%3$@ 克酒精"
           }
         }
       }
@@ -7061,7 +7061,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Moyenne de %1$@ : %2$@ grammes d'alcool par jour"
+            "value" : "Moyenne de %1$@ : %2$@ grammes d’alcool par jour"
           }
         },
         "it" : {

@@ -58,6 +58,7 @@
 # =============================================================================
 
 import html
+import itertools
 import json
 import re
 import sys
@@ -128,6 +129,34 @@ def android_map(path):
 
 def android_dir_suffix(tag):
     return ANDROID_DIR.get(tag, tag)
+
+
+# Android and iOS spell the SAME placeholder differently: `%1$s` against `%1$@`,
+# `%3$d` against `%3$lld`. A byte comparison therefore never matches a string that
+# takes an argument, and CHECKS 2 and 4 silently skipped every one of them -- all
+# 23 argument-bearing Android strings, among them the eight assembled screen-reader
+# announcements (`a11y_drink_row`, `a11y_entry_detail`, ...), which are exactly the
+# sentences where wording and word ORDER decide what a user hears. That the two
+# sides agreed anyway was hand-work, not the gate.
+#
+# WHAT IS ERASED AND WHAT IS NOT
+#   The TYPE is erased, the POSITION is kept: `%1$s: %2$s` normalises to
+#   `{1}: {2}`, so a translation that swaps its arguments to `%2$s: %1$s` still
+#   reads `{2}: {1}` and is still reported. Losing the position would make the
+#   check accept a sentence that names the limit where the value belongs.
+#
+#   Un-numbered specifiers (`%@`, `%lld`, the form Android writes as a bare `%s`)
+#   carry their position implicitly, in order of appearance, and are numbered here
+#   the same way -- which is what the platforms themselves do with them.
+PLACEHOLDER_NUMBERED = re.compile(r"%(\d+)\$(?:@|s|d|ld|lld|f)")
+PLACEHOLDER_BARE = re.compile(r"%(?:@|s|d|ld|lld|f)")
+
+
+def normalize_placeholders(text):
+    """A string with its format specifiers reduced to `{n}`, position preserved."""
+    text = PLACEHOLDER_NUMBERED.sub(lambda m: "{%s}" % m.group(1), text)
+    counter = itertools.count(1)
+    return PLACEHOLDER_BARE.sub(lambda _: "{%d}" % next(counter), text)
 
 
 def swift_unescape(value):
@@ -267,14 +296,18 @@ def check_translation_parity(catalog):
     e.g. "Month" is both `month` ("月") and `pdf_col_month` ("月份"), and "Statistics"
     is both the screen title `statistics` and the short tab label `nav_statistics`.
     So a key is in parity if its iOS translation matches ANY Android string that
-    shares the English value; a mismatch is reported only when it matches NONE."""
+    shares the English value; a mismatch is reported only when it matches NONE.
+
+    Both sides pass through `normalize_placeholders` first, so `%1$s` and `%1$@`
+    name the same argument. Without it a string that takes one is compared byte for
+    byte, matches nothing, and is waved through as iOS-only."""
     en = android_map(ANDROID_EN)
     if not en:
         return [f"cannot read {ANDROID_EN.relative_to(ROOT)} for the parity check"]
-    # English value → every Android string name that carries it.
+    # Normalised English value → every Android string name that carries it.
     value_to_names = {}
     for name, value in en.items():
-        value_to_names.setdefault(value, []).append(name)
+        value_to_names.setdefault(normalize_placeholders(value), []).append(name)
 
     problems = []
     for tag in LANGUAGES:
@@ -282,7 +315,7 @@ def check_translation_parity(catalog):
         for key, entry in catalog.items():
             if entry.get("shouldTranslate") is False or key in PROPER_NOUNS:
                 continue
-            names = value_to_names.get(key)
+            names = value_to_names.get(normalize_placeholders(key))
             if not names:
                 continue  # iOS-only string: nothing on the Android side to compare
             candidates = [android[n] for n in names if n in android]
@@ -291,7 +324,7 @@ def check_translation_parity(catalog):
             ios_value = catalog_value(entry, tag)
             if ios_value is None:
                 continue  # plural or untranslated; the missing-key check covers absence
-            if ios_value not in candidates:
+            if normalize_placeholders(ios_value) not in [normalize_placeholders(c) for c in candidates]:
                 shown = " / ".join(repr(c) for c in sorted(set(candidates)))
                 problems.append(
                     f"[{tag}] {key!r}: iOS {ios_value!r} matches none of Android {shown}"
@@ -351,13 +384,18 @@ def check_collapsed_divergent_mappings(catalog):
     report label (a FIELDS value, rendered from ReportLabelsCatalog — which is how
     `month` vs `pdf_col_month`, "月" vs "月份", stays correct). If two or more of the
     DIVERGING names are left for one plain iOS key to cover, that key cannot be right
-    in every place, and this fails."""
+    in every place, and this fails.
+
+    The grouping normalises placeholders, as CHECK 2 does. The two must share one
+    notion of "same English value" or a pair that CHECK 2 now couples could still
+    fall outside the split that CHECK 4 demands for it. No Android string pair
+    differs only in its specifiers today, so this widens nothing at present."""
     en = android_map(ANDROID_EN)
     if not en:
         return [f"cannot read {ANDROID_EN.relative_to(ROOT)} for the parity check"]
     value_to_names = {}
     for name, value in en.items():
-        value_to_names.setdefault(value, []).append(name)
+        value_to_names.setdefault(normalize_placeholders(value), []).append(name)
 
     # Android translations per language, loaded once (English included).
     per_lang = {"en": en}

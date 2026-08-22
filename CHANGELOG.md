@@ -175,6 +175,7 @@ Edit drinks from the list's edit mode
   7-day limit steps by 1.
 - Both String Catalogs mark their language-invariant keys as not to translate.
 - Shared vectors pin the year heat-map's drawing window on both platforms.
+- `check-l10n-parity` compares strings that carry format specifiers.
 
 ### Removed
 
@@ -199,6 +200,7 @@ Edit drinks from the list's edit mode
   directory marker, and `__pycache__` directories stay out of the tarball.
 - The l10n gate on freshly harvested String Catalog keys.
 - A dead link in the best-practices self-assessment.
+- French, Japanese, Korean and Chinese wording in four spoken labels.
 
 ---
 
