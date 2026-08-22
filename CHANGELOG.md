@@ -174,6 +174,7 @@ Edit drinks from the list's edit mode
 - Limits, drinking days and body weight on iOS take a typed value, and the
   7-day limit steps by 1.
 - Both String Catalogs mark their language-invariant keys as not to translate.
+- Shared vectors pin the year heat-map's drawing window on both platforms.
 
 ### Removed
 
@@ -197,6 +198,7 @@ Edit drinks from the list's edit mode
 - The `tgz` exclude derivation reads a trailing slash in `.gitignore` as a
   directory marker, and `__pycache__` directories stay out of the tarball.
 - The l10n gate on freshly harvested String Catalog keys.
+- A dead link in the best-practices self-assessment.
 
 ---
 

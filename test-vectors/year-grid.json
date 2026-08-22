@@ -1,0 +1,115 @@
+{
+  "_comment": [
+    "Shared golden vectors for the year heat-map's drawing window. Loaded by BOTH",
+    "suites: YearGridVectorTest.swift drives PotillusKit's YearGrid.isDrawn, and",
+    "YearGridVectorTest.kt drives ui/component/CalendarComponents.kt's isDrawn.",
+    "",
+    "The rule is the one thing the year view has that the month view does not: a",
+    "day after the logical today is the future, and a day before the statistics",
+    "start date is in the span the user excluded from every statistic. Both are",
+    "drawn as nothing at all, because a neutral cell is what an ABSTINENT day",
+    "gets and using it here would claim something no entry supports.",
+    "",
+    "Dates are `yyyy-MM-dd` and are compared as STRINGS on both platforms — the",
+    "format is fixed-width and zero-padded, so lexical order is chronological.",
+    "statsFrom null means no statistics start date is set.",
+    "",
+    "The boundaries are the point of this file: `today` itself IS drawn, the",
+    "start date itself IS drawn, and the day either side of them is not. Both",
+    "bounds are inclusive; a strict comparison on one platform and a",
+    "non-strict one on the other is exactly the drift this pins."
+  ],
+  "isDrawn": [
+    {
+      "description": "a day inside the window with no floor",
+      "date": "2026-03-14",
+      "today": "2026-08-22",
+      "statsFrom": null,
+      "expected": true
+    },
+    {
+      "description": "today itself is drawn",
+      "date": "2026-08-22",
+      "today": "2026-08-22",
+      "statsFrom": null,
+      "expected": true
+    },
+    {
+      "description": "yesterday is drawn",
+      "date": "2026-08-21",
+      "today": "2026-08-22",
+      "statsFrom": null,
+      "expected": true
+    },
+    {
+      "description": "tomorrow is the future",
+      "date": "2026-08-23",
+      "today": "2026-08-22",
+      "statsFrom": null,
+      "expected": false
+    },
+    {
+      "description": "a later month of the same year is the future",
+      "date": "2026-12-31",
+      "today": "2026-08-22",
+      "statsFrom": null,
+      "expected": false
+    },
+    {
+      "description": "the start date itself is drawn",
+      "date": "2026-02-01",
+      "today": "2026-08-22",
+      "statsFrom": "2026-02-01",
+      "expected": true
+    },
+    {
+      "description": "the day before the start date is excluded",
+      "date": "2026-01-31",
+      "today": "2026-08-22",
+      "statsFrom": "2026-02-01",
+      "expected": false
+    },
+    {
+      "description": "the day after the start date is drawn",
+      "date": "2026-02-02",
+      "today": "2026-08-22",
+      "statsFrom": "2026-02-01",
+      "expected": true
+    },
+    {
+      "description": "the whole previous year is excluded by the floor",
+      "date": "2025-06-15",
+      "today": "2026-08-22",
+      "statsFrom": "2026-02-01",
+      "expected": false
+    },
+    {
+      "description": "a fresh install: the start date is today, so only today is drawn",
+      "date": "2026-08-22",
+      "today": "2026-08-22",
+      "statsFrom": "2026-08-22",
+      "expected": true
+    },
+    {
+      "description": "a fresh install: yesterday falls outside the floor",
+      "date": "2026-08-21",
+      "today": "2026-08-22",
+      "statsFrom": "2026-08-22",
+      "expected": false
+    },
+    {
+      "description": "both bounds bite: after today and before the floor cannot both hold, so the future wins",
+      "date": "2026-12-01",
+      "today": "2026-08-22",
+      "statsFrom": "2026-02-01",
+      "expected": false
+    },
+    {
+      "description": "29 February of a leap year is an ordinary day inside the window",
+      "date": "2024-02-29",
+      "today": "2024-12-31",
+      "statsFrom": "2024-01-01",
+      "expected": true
+    }
+  ]
+}

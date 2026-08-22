@@ -513,3 +513,20 @@ struct MonthRollupVectors: Decodable {
         }
     }
 }
+
+/// `year-grid.json` — which cells the year heat-map draws.
+///
+/// `statsFrom` is `null` when no statistics start date is set, which is why it
+/// decodes as an optional rather than an empty string: the vectors say absent,
+/// not blank, and `YearGrid.statsFrom` is optional for the same reason.
+struct YearGridVectors: Decodable {
+    let isDrawn: [Case]
+
+    struct Case: Decodable {
+        let description: String
+        let date: String
+        let today: String
+        let statsFrom: String?
+        let expected: Bool
+    }
+}
