@@ -59,6 +59,7 @@ import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
+import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.l10n.monthYearFormatter
 import de.godisch.potillus.ui.component.*
@@ -530,11 +531,16 @@ private fun MonthCalendar(
                         //
                         // One decimal, as the year heat-map has always used: the
                         // same day read "12 g" here and "12.3 g" there.
+                        // Also the dot's condition further down: one place decides
+                        // what counts as a drink day, so the label and the dot can
+                        // never disagree about it.
+                        val drinkSummary =
+                            summary?.takeIf { AlcoholCalculator.isDrinkDay(it.totalGrams) }
                         val spokenDay = dayDescFmt.format(currentMonth.atDay(day))
                         val dayDesc: String = when {
                             summary == null ->
                                 stringResource(R.string.a11y_calendar_day_empty, spokenDay)
-                            !AlcoholCalculator.isDrinkDay(summary.totalGrams) ->
+                            drinkSummary == null ->
                                 stringResource(
                                     R.string.a11y_calendar_day_grams,
                                     spokenDay,
@@ -543,9 +549,9 @@ private fun MonthCalendar(
                             else -> stringResource(
                                 R.string.year_calendar_day_desc,
                                 spokenDay,
-                                summary.totalGrams.fmt1(locale),
+                                drinkSummary.totalGrams.fmt1(locale),
                                 stringResource(
-                                    if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
+                                    if (AlcoholCalculator.isOverLimit(drinkSummary.totalGrams, limitGrams)) {
                                         R.string.year_calendar_over_limit
                                     } else {
                                         R.string.year_calendar_under_limit
