@@ -163,6 +163,9 @@ Edit drinks from the list's edit mode
 - Entry rows, calendar days and the statistics period speak their dates and
   units as words, the period as one span; an entry row leads with its time on
   both platforms.
+- The blood-alcohol row speaks as one sentence on both platforms.
+- Calendar days speak their limit status, their grams to one decimal, and an
+  empty day says so.
 - The edit toggle names the list it edits.
 - The category ring is silent on both platforms and its legend states each slice
   in one sentence.

@@ -260,6 +260,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">Tendința față de perioada anterioară</string>
     <string name="a11y_percent">%1$s la sută</string>
     <string name="a11y_category_slice">%1$s: %2$s la sută, %3$s grame de alcool</string>
+    <string name="a11y_calendar_day_empty">%1$s, nimic înregistrat</string>
+    <string name="a11y_calendar_day_grams">%1$s, %2$s grame</string>
     <string name="delete_entry">Șterge înregistrarea</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitri, %4$s la sută, %5$s grame de alcool, %6$s</string>
     <string name="day_change_desc">O băutură înregistrată înainte de această oră se contorizează pentru ziua precedentă.</string>

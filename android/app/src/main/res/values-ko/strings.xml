@@ -252,6 +252,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">이전 기간 대비 추세</string>
     <string name="a11y_percent">%1$s 퍼센트</string>
     <string name="a11y_category_slice">%1$s: %2$s 퍼센트, 알코올 %3$s 그램</string>
+    <string name="a11y_calendar_day_empty">%1$s, 기록 없음</string>
+    <string name="a11y_calendar_day_grams">%1$s, %2$s 그램</string>
     <string name="delete_entry">기록 삭제</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d 밀리리터, %4$s 퍼센트, %5$s 그램의 알코올, %6$s</string>
     <string name="day_change_desc">이 시간 이전에 기록된 음료는 전날로 계산됩니다.</string>

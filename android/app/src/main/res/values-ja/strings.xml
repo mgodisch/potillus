@@ -252,6 +252,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">前期間との比較の傾向</string>
     <string name="a11y_percent">%1$s パーセント</string>
     <string name="a11y_category_slice">%1$s：%2$s パーセント、アルコール %3$s グラム</string>
+    <string name="a11y_calendar_day_empty">%1$s、記録なし</string>
+    <string name="a11y_calendar_day_grams">%1$s、%2$s グラム</string>
     <string name="delete_entry">記録を削除</string>
     <string name="a11y_drink_row">%1$s、%2$s、%3$d ミリリットル、%4$s パーセント、%5$s グラムのアルコール、%6$s</string>
     <string name="day_change_desc">この時刻より前に記録された飲み物は前日に数えられます。</string>

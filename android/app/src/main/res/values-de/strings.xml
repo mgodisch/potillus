@@ -238,6 +238,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">Trend gegenüber Vorperiode</string>
     <string name="a11y_percent">%1$s Prozent</string>
     <string name="a11y_category_slice">%1$s: %2$s Prozent, %3$s Gramm Alkohol</string>
+    <string name="a11y_calendar_day_empty">%1$s, nichts erfasst</string>
+    <string name="a11y_calendar_day_grams">%1$s, %2$s Gramm</string>
     <string name="delete_entry">Eintrag löschen</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d Milliliter, %4$s Prozent, %5$s Gramm Alkohol, %6$s</string>
     <string name="day_change_desc">Ein Getränk vor dieser Uhrzeit zählt zum Vortag.</string>

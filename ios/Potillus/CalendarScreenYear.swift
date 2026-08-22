@@ -225,7 +225,11 @@ extension CalendarScreen {
             model.isOverLimit(date) ? "over limit" : "under limit",
             locale: locale
         )
-        return Loc.string("%@, %@ g, %@", date, grams, status, locale: locale)
+        // `dayAndMonth`, not the raw `date`: this passed the stored "2026-08-08"
+        // straight into the label, which VoiceOver reads out digit group by digit
+        // group — the very thing the month grid's label was given `dayAndMonth`
+        // to avoid.
+        return Loc.string("%@, %@ g, %@", dayAndMonth(date), grams, status, locale: locale)
     }
 
     /// The three states, named. Without it the colours are a code the screen

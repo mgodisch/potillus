@@ -454,6 +454,17 @@ extension TodayScreen {
                 LabeledContent(Loc.string("BAC Estimate", locale: locale)) {
                     Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
                 }
+                // The only row of this block that was left unspoken: caption and
+                // figure arrived as two stops, and the per-mille sign as its own
+                // characters. Android states the pair as one sentence through
+                // `a11y_caption_permille`; this is that sentence.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Loc.string(
+                    "%1$@: %2$@ per mille",
+                    Loc.string("BAC Estimate", locale: locale),
+                    Loc.number(bac, fractionDigits: 2, locale: locale),
+                    locale: locale
+                ))
             }
         }
     }

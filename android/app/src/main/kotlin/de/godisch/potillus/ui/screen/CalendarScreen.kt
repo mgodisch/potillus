@@ -513,28 +513,44 @@ private fun MonthCalendar(
                         val isSelected = date == selectedDate
                         // Accessibility label: the under/over-limit state is shown
                         // on screen by the dot's COLOUR only, so a screen reader
-                        // would otherwise miss it (WCAG 1.4.1 / 1.1.1). Reuse the
-                        // year heat-map's "date, grams, status" caption strings so
-                        // no new locale keys are needed. Empty days stay unlabelled.
-                        // Only a day with alcohol carries a status: the dot below is
-                        // drawn for exactly those days, and "0.0 g, under limit"
-                        // spoken over a cell that shows no dot would put label and
-                        // display at odds. A day of alcohol-free entries stays
-                        // silent like an empty one; its entries are one tap away in
-                        // the day list below the grid.
-                        val drinkSummary =
-                            summary?.takeIf { AlcoholCalculator.isDrinkDay(it.totalGrams) }
-                        val dayDesc: String? = drinkSummary?.let { s ->
-                            val statusRes = if (AlcoholCalculator.isOverLimit(s.totalGrams, limitGrams)) {
-                                R.string.year_calendar_over_limit
-                            } else {
-                                R.string.year_calendar_under_limit
-                            }
-                            stringResource(
+                        // would otherwise miss it (WCAG 1.4.1 / 1.1.1).
+                        //
+                        // THREE STATES, because a cell has three and a reader can
+                        // tell them apart only if the label does:
+                        //   no entries        -> the day and "nothing logged". A
+                        //     silent cell gave back the bare day number, and a
+                        //     reader could not tell an empty day from one whose
+                        //     content had escaped them.
+                        //   entries, no alcohol -> the day and its nought grams, no
+                        //     status: no dot is drawn for such a day, and naming a
+                        //     status the cell does not show would put label and
+                        //     display at odds.
+                        //   a drink day       -> the day, its grams and its status,
+                        //     which is what the dot's colour says to everyone else.
+                        //
+                        // One decimal, as the year heat-map has always used: the
+                        // same day read "12 g" here and "12.3 g" there.
+                        val spokenDay = dayDescFmt.format(currentMonth.atDay(day))
+                        val dayDesc: String = when {
+                            summary == null ->
+                                stringResource(R.string.a11y_calendar_day_empty, spokenDay)
+                            !AlcoholCalculator.isDrinkDay(summary.totalGrams) ->
+                                stringResource(
+                                    R.string.a11y_calendar_day_grams,
+                                    spokenDay,
+                                    summary.totalGrams.fmt1(locale),
+                                )
+                            else -> stringResource(
                                 R.string.year_calendar_day_desc,
-                                dayDescFmt.format(currentMonth.atDay(day)),
-                                s.totalGrams.fmt0(locale),
-                                stringResource(statusRes),
+                                spokenDay,
+                                summary.totalGrams.fmt1(locale),
+                                stringResource(
+                                    if (AlcoholCalculator.isOverLimit(summary.totalGrams, limitGrams)) {
+                                        R.string.year_calendar_over_limit
+                                    } else {
+                                        R.string.year_calendar_under_limit
+                                    }
+                                ),
                             )
                         }
                         var focused by remember { mutableStateOf(false) }
@@ -570,9 +586,9 @@ private fun MonthCalendar(
                                     },
                                 )
                                 .then(
-                                    // Rich label for days with data; day-number text
-                                    // remains the name for empty days.
-                                    dayDesc?.let { d -> Modifier.semantics { contentDescription = d } } ?: Modifier,
+                                    // Every cell carries a label now, including the
+                                    // empty ones — see the three states above.
+                                    Modifier.semantics { contentDescription = dayDesc },
                                 )
                                 // role = Button so assistive tech announces the cell as
                                 // an actionable control (WCAG 4.1.2 Name, Role, Value).

@@ -209,6 +209,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">Tendenza rispetto al periodo precedente</string>
     <string name="a11y_percent">%1$s per cento</string>
     <string name="a11y_category_slice">%1$s: %2$s per cento, %3$s grammi di alcol</string>
+    <string name="a11y_calendar_day_empty">%1$s, nessuna registrazione</string>
+    <string name="a11y_calendar_day_grams">%1$s, %2$s grammi</string>
     <string name="delete_entry">Elimina voce</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d millilitri, %4$s per cento, %5$s grammi di alcol, %6$s</string>
     <string name="day_change_desc">Una bevanda registrata prima di quest’ora conta per il giorno precedente.</string>

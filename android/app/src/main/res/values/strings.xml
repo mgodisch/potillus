@@ -418,6 +418,14 @@ apply to it are stated in the accompanying COPYING.md file.
          %1$s = category, %2$s = share, %3$s = grams. The share leads: it is
          what the ring draws, where the visible line leads with the grams. -->
     <string name="a11y_category_slice">%1$s: %2$s percent, %3$s grams of alcohol</string>
+    <!-- TalkBack: a calendar day with no entries. %1$s = the day. A silent cell
+         leaves a reader with the bare day number and no way to tell an empty
+         day from one whose content escaped them. -->
+    <string name="a11y_calendar_day_empty">%1$s, nothing logged</string>
+    <!-- TalkBack: a calendar day whose entries carry no alcohol. %1$s = the day,
+         %2$s = grams. No limit status: no dot is drawn for such a day, and
+         naming a status the cell does not show would put the two at odds. -->
+    <string name="a11y_calendar_day_grams">%1$s, %2$s grams</string>
     <!-- Content description of an entry row's delete button. -->
     <string name="delete_entry">Delete entry</string>
     <!-- TalkBack: one drink row. %1$s = name, %2$s = category, %3$d = millilitres, %4$s = percent, %5$s = grams, %6$s = capacity status. -->

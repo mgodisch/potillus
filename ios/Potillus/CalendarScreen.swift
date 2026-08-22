@@ -393,10 +393,19 @@ struct CalendarScreen: View {
         return String(day)
     }
 
-    /// The label names the day and its grams, with no limit status — that state
-    /// belongs to the dot, and the dot is only drawn for a drink day. A day of
-    /// alcohol-free entries therefore reads as "0.0 grams", which is what the
-    /// missing dot says and what the day list confirms.
+    /// The label names the day, its grams and — for a drink day — its limit
+    /// status.
+    ///
+    /// The status used to be left out, on the grounds that it belongs to the dot.
+    /// It does, and that is the problem: the dot carries it in COLOUR alone, which
+    /// is exactly what WCAG 1.4.1 asks a second channel for. A reader who cannot
+    /// see the dot heard the grams and nothing about the limit they sit against.
+    ///
+    /// The status is stated only where a dot is drawn. A day of alcohol-free
+    /// entries reads as "0.0 grams" with no status: naming one over a cell that
+    /// shows none would put label and display at odds. A day with no entries at
+    /// all says so, so an empty cell can be told apart from one whose content
+    /// escaped the reader.
     ///
     /// The day arrives as "8 August", not as the stored "2026-08-08": VoiceOver
     /// read the ISO string out digit group by digit group. Day AND month, because
@@ -412,13 +421,23 @@ struct CalendarScreen: View {
         // passed as the second positional argument, so VoiceOver reads it in the
         // same language as the rest of the label.
         let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
-        return Loc.string("%1$@, %2$@ grams", spokenDate, grams, locale: locale)
+        guard model.isDrinkDay(date) else {
+            return Loc.string("%1$@, %2$@ grams", spokenDate, grams, locale: locale)
+        }
+        let status = Loc.string(
+            model.isOverLimit(date) ? "over limit" : "under limit",
+            locale: locale
+        )
+        return Loc.string("%@, %@ g, %@", spokenDate, grams, status, locale: locale)
     }
 
     /// "2026-08-08" → "8 August", ordered and named by the in-app locale. Parsed
     /// and formatted in UTC, as `weekRange` is, so the device's zone cannot shift
     /// the day the grid drew.
-    private func dayAndMonth(_ date: String) -> String {
+    ///
+    /// Not `private`: the year heat-map in CalendarScreenYear.swift needs the same
+    /// spoken date, and read the raw ISO string until it had this.
+    func dayAndMonth(_ date: String) -> String {
         guard let day = DayResolver.parseDate(date) else { return date }
         let formatter = DateFormatter()
         formatter.locale = locale
