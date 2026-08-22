@@ -7,7 +7,7 @@ NAJWAŻNIEJSZE FUNKCJE
 • Szacowanie stężenia alkoholu we krwi (BAC): Podaj masę ciała, aby uzyskać bieżące oszacowanie według wzoru Widmarka.
 • Raporty na konsultacje: Wygeneruj dwustronicowy raport PDF o swoim spożyciu na konsultacje i spotkania doradcze.
 • Przenośność danych: Wyeksportuj swoje dane jako plik CSV do przetwarzania zewnętrznego (np. w LibreOffice Calc) lub utwórz kopie zapasowe JSON, aby przenosić dane między urządzeniami.
-• Ustawienia: Dostosuj godzinę "początku dnia", aby napoje spożyte późno w nocy liczyły się do poprzedniego wieczoru, i ustaw datę początku oceny, gdy chcesz zacząć od nowa, na przykład w sylwestra.
+• Ustawienia: Dostosuj godzinę „początku dnia”, aby napoje spożyte późno w nocy liczyły się do poprzedniego wieczoru, i ustaw datę początku oceny, gdy chcesz zacząć od nowa, na przykład w sylwestra.
 
 Przewodnik użytkownika jest dostępny w aplikacji.
 

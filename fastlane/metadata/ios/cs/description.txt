@@ -7,7 +7,7 @@ HLAVNÍ FUNKCE
 • Odhad hladiny alkoholu v krvi (BAC): Zadejte svou tělesnou hmotnost a získejte průběžný odhad podle Widmarkova vzorce.
 • Reporty pro poradenství: Vygenerujte dvoustránkový PDF report o své spotřebě pro konzultace a poradenské schůzky.
 • Přenositelnost dat: Exportujte svá data jako soubor CSV pro externí zpracování (například v LibreOffice Calc) nebo vytvořte zálohy JSON pro přesun dat mezi zařízeními.
-• Nastavení: Přizpůsobte si čas "začátku dne", aby se nápoje pozdě v noci počítaly do předchozího večera, a zadejte datum začátku vyhodnocení, když chcete začít znovu, například na Silvestra.
+• Nastavení: Přizpůsobte si čas „začátku dne“, aby se nápoje pozdě v noci počítaly do předchozího večera, a zadejte datum začátku vyhodnocení, když chcete začít znovu, například na Silvestra.
 
 V aplikaci je k dispozici uživatelská příručka.
 

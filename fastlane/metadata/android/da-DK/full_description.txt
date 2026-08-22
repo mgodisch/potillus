@@ -7,7 +7,7 @@ VIGTIGSTE FUNKTIONER
 • Promilleestimat (BAC): Indtast din kropsvægt og få et løbende estimat efter Widmark-formlen.
 • Rådgivningsrapporter: Generér en PDF-rapport på to sider over dit forbrug til rådgivnings- og behandlingssamtaler.
 • Dataportabilitet: Eksportér dine data som en CSV-fil til videre behandling (f.eks. i LibreOffice Calc), eller opret JSON-sikkerhedskopier til at flytte data mellem enheder.
-• Indstillinger: Angiv din "dagsstart", så sene natdrikke tælles med på den foregående aften, og fastsæt en startdato for evalueringen, når du vil begynde forfra, f.eks. nytårsaften.
+• Indstillinger: Angiv din „dagsstart“, så sene natdrikke tælles med på den foregående aften, og fastsæt en startdato for evalueringen, når du vil begynde forfra, f.eks. nytårsaften.
 
 En brugervejledning findes inde i appen.
 

@@ -5,9 +5,9 @@
 #   tagline  -- one line per paragraph (wrapped automatically to the column)
 #   bullet   -- EXACTLY four short phrases; force a break with a literal \n
 title: LIBELLUS POTIONIS
-tagline: Votre suivi de consommation d'alcool discret et privé.
+tagline: Votre suivi de consommation d’alcool discret et privé.
 tagline: Contrôle total sans compromis.
 bullet: Fixer et respecter les limites
-bullet: 100 % vie privée :\nverrouillage d'app &\nhors ligne
+bullet: 100 % vie privée :\nverrouillage d’app &\nhors ligne
 bullet: Rapports CSV & PDF
 bullet: Gratuit, sans pub &\nOpen Source

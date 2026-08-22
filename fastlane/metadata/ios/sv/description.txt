@@ -7,7 +7,7 @@ HUVUDFUNKTIONER
 • Promilleuppskattning (BAC): Ange din kroppsvikt för att få en löpande uppskattning enligt Widmark-formeln.
 • Rapporter för rådgivning: Skapa en PDF-rapport på två sidor över din konsumtion, avsedd för konsultationer och rådgivningsbesök.
 • Dataportabilitet: Exportera dina data som en CSV-fil för extern bearbetning (till exempel i LibreOffice Calc), eller skapa JSON-säkerhetskopior för att flytta data mellan enheter.
-• Inställningar: Anpassa din "dagsstart" så att sena nattdrycker räknas till kvällen innan, och ange ett startdatum för utvärderingen när du vill börja om, till exempel på nyårsafton.
+• Inställningar: Anpassa din ”dagsstart” så att sena nattdrycker räknas till kvällen innan, och ange ett startdatum för utvärderingen när du vill börja om, till exempel på nyårsafton.
 
 En användarguide finns inne i appen.
 

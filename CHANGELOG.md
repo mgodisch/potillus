@@ -178,6 +178,7 @@ Edit drinks from the list's edit mode
 - `check-l10n-parity` compares strings that carry format specifiers.
 - App text, report labels and the guide token map spell the apostrophe as `’`.
 - Each user guide quotes and elides in the typography of its language.
+- Store listings follow the same typography.
 
 ### Removed
 

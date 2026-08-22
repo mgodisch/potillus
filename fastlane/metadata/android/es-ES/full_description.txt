@@ -7,7 +7,7 @@ CARACTERÍSTICAS PRINCIPALES
 • Estimación de la tasa de alcohol en sangre (TAS): introduce tu peso corporal y obtén una estimación en vivo según la fórmula de Widmark.
 • Informes para asesoramiento: genera un informe PDF de dos páginas sobre tu consumo, pensado para consultas y citas de asesoramiento.
 • Portabilidad de datos: exporta tus datos como archivo CSV para procesarlos externamente (por ejemplo, en LibreOffice Calc) o crea copias de seguridad JSON para mover los datos entre dispositivos.
-• Ajustes: personaliza la hora de "inicio del día" para que las bebidas de la madrugada cuenten en la noche anterior, y define una fecha de inicio de evaluación para reiniciar desde cero, por ejemplo en Nochevieja.
+• Ajustes: personaliza la hora de «inicio del día» para que las bebidas de la madrugada cuenten en la noche anterior, y define una fecha de inicio de evaluación para reiniciar desde cero, por ejemplo en Nochevieja.
 
 Dentro de la aplicación encontrarás una guía de usuario.
 

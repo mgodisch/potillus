@@ -7,7 +7,7 @@ PRINCIPAIS FUNCIONALIDADES
 • Estimativa da taxa de álcool no sangue (TAS): introduza o seu peso corporal para obter uma estimativa contínua segundo a fórmula de Widmark.
 • Relatórios para aconselhamento: gere um relatório PDF de duas páginas sobre o seu consumo, para consultas e sessões de aconselhamento.
 • Portabilidade dos dados: exporte os seus dados como ficheiro CSV para processamento externo (por exemplo, no LibreOffice Calc) ou crie cópias de segurança JSON para transferir dados entre dispositivos.
-• Ajustes: personalize a hora de "início do dia" para que as bebidas a altas horas contem para a noite anterior, e defina uma data de início de avaliação quando quiser recomeçar, por exemplo na passagem de ano.
+• Ajustes: personalize a hora de «início do dia» para que as bebidas a altas horas contem para a noite anterior, e defina uma data de início de avaliação quando quiser recomeçar, por exemplo na passagem de ano.
 
 Um guia do utilizador está disponível dentro da aplicação.
 

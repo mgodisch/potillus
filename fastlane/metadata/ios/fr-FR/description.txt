@@ -1,24 +1,24 @@
-Libellus Potionis est un suivi de consommation d'alcool respectueux de la vie privée, libre, gratuit et sans publicité, conçu pour aider à surveiller, doser et gérer ses habitudes de consommation entièrement hors ligne. Il ne demande aucune autorisation intrusive — ni caméra, ni microphone, ni localisation — et fonctionne totalement sans connexion réseau.
+Libellus Potionis est un suivi de consommation d’alcool respectueux de la vie privée, libre, gratuit et sans publicité, conçu pour aider à surveiller, doser et gérer ses habitudes de consommation entièrement hors ligne. Il ne demande aucune autorisation intrusive — ni caméra, ni microphone, ni localisation — et fonctionne totalement sans connexion réseau.
 
 FONCTIONNALITÉS PRINCIPALES
 
-• Saisie : définissez vos propres boissons ou choisissez parmi des modèles courants à l'international. Enregistrez vos consommations sur le moment ou rétroactivement avec correction d'heure.
-• Plusieurs limites simultanées : fixez trois limites en parallèle — une limite quotidienne (grammes d'alcool pur), une limite hebdomadaire glissante sur 7 jours (grammes) et un nombre maximal de jours de consommation par semaine. Chacune a sa propre barre de progression.
-• Estimation de l'alcoolémie (BAC) : saisissez votre poids corporel pour obtenir une estimation en direct selon la formule de Widmark.
+• Saisie : définissez vos propres boissons ou choisissez parmi des modèles courants à l’international. Enregistrez vos consommations sur le moment ou rétroactivement avec correction d’heure.
+• Plusieurs limites simultanées : fixez trois limites en parallèle — une limite quotidienne (grammes d’alcool pur), une limite hebdomadaire glissante sur 7 jours (grammes) et un nombre maximal de jours de consommation par semaine. Chacune a sa propre barre de progression.
+• Estimation de l’alcoolémie (BAC) : saisissez votre poids corporel pour obtenir une estimation en direct selon la formule de Widmark.
 • Rapports pour le suivi : générez un rapport PDF de deux pages sur votre consommation, destiné aux consultations et aux rendez-vous de conseil.
-• Portabilité des données : exportez vos données dans un fichier CSV pour un traitement externe (par exemple dans LibreOffice Calc), ou créez des sauvegardes JSON pour transférer vos données d'un appareil à l'autre.
-• Réglages : personnalisez votre heure de « début de journée » pour que les boissons de fin de nuit soient comptées sur la soirée précédente, et fixez une date de début d'évaluation pour repartir à zéro, par exemple au réveillon du Nouvel An.
+• Portabilité des données : exportez vos données dans un fichier CSV pour un traitement externe (par exemple dans LibreOffice Calc), ou créez des sauvegardes JSON pour transférer vos données d’un appareil à l’autre.
+• Réglages : personnalisez votre heure de « début de journée » pour que les boissons de fin de nuit soient comptées sur la soirée précédente, et fixez une date de début d’évaluation pour repartir à zéro, par exemple au réveillon du Nouvel An.
 
-Un guide d'utilisation est disponible dans l'application.
+Un guide d’utilisation est disponible dans l’application.
 
 CONFIDENTIALITÉ ET SÉCURITÉ
 
-L'application n'enregistre que ce que vous saisissez. Elle ne contient aucun code réseau : elle est donc incapable d'accéder au réseau, et vos données ne quittent pas l'appareil d'elles-mêmes. Vos données restent dans le stockage privé de l'application, protégées au repos par iOS Data Protection (chiffrement des fichiers assisté par le matériel) et le bac à sable de l'application. Un verrouillage facultatif par Face ID ou Touch ID protège contre tout accès physique non autorisé. Il n'y a ni pistage, ni analyse d'usage, ni synchronisation dans le nuage.
+L’application n’enregistre que ce que vous saisissez. Elle ne contient aucun code réseau : elle est donc incapable d’accéder au réseau, et vos données ne quittent pas l’appareil d’elles-mêmes. Vos données restent dans le stockage privé de l’application, protégées au repos par iOS Data Protection (chiffrement des fichiers assisté par le matériel) et le bac à sable de l’application. Un verrouillage facultatif par Face ID ou Touch ID protège contre tout accès physique non autorisé. Il n’y a ni pistage, ni analyse d’usage, ni synchronisation dans le nuage.
 
 COMPATIBILITÉ
 
-L'application fonctionne sous iOS 17 et versions ultérieures, et elle est également disponible pour Android 11 (API 30) et versions ultérieures.
+L’application fonctionne sous iOS 17 et versions ultérieures, et elle est également disponible pour Android 11 (API 30) et versions ultérieures.
 
 OPEN SOURCE
 
-Libellus Potionis est un logiciel libre publié sous la GNU General Public License v3 (ou ultérieure). Le code source est disponible sur la page d'accueil du projet.
+Libellus Potionis est un logiciel libre publié sous la GNU General Public License v3 (ou ultérieure). Le code source est disponible sur la page d’accueil du projet.

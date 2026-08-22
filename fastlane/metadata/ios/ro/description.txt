@@ -7,7 +7,7 @@ FUNCȚII PRINCIPALE
 • Estimarea alcoolemiei (BAC): introdu greutatea corporală pentru a obține o estimare continuă după formula Widmark.
 • Rapoarte pentru consiliere: generează un raport PDF de două pagini despre consumul tău, pentru consultații și ședințe de consiliere.
 • Portabilitatea datelor: exportă datele ca fișier CSV pentru prelucrare externă (de exemplu, în LibreOffice Calc) sau creează copii de rezervă JSON pentru a muta datele între dispozitive.
-• Ajustări: personalizează ora de "început al zilei", astfel încât băuturile de noapte târziu să fie numărate în seara precedentă, și stabilește o dată de început al evaluării când vrei să o iei de la capăt, de exemplu de Revelion.
+• Ajustări: personalizează ora de „început al zilei”, astfel încât băuturile de noapte târziu să fie numărate în seara precedentă, și stabilește o dată de început al evaluării când vrei să o iei de la capăt, de exemplu de Revelion.
 
 În aplicație este disponibil un ghid de utilizare.
 

@@ -5,9 +5,9 @@ BELANGRIJKSTE FUNCTIES
 • Registreren: Maak je eigen dranken aan of kies uit internationaal gangbare sjablonen. Registreer dranken meteen of achteraf met tijdcorrecties.
 • Meerdere limieten tegelijk: Stel drie limieten parallel in — een daglimiet (gram pure alcohol), een voortschrijdende weeklimiet over 7 dagen (gram) en een maximaal aantal drinkdagen per week. Elke limiet heeft een eigen voortgangsbalk.
 • Promilleschatting (BAC): Voer je lichaamsgewicht in voor een live schatting volgens de Widmark-formule.
-• Rapporten voor begeleiding: Genereer een PDF-rapport van twee pagina's over je gebruik, bedoeld voor consulten en begeleidingsgesprekken.
+• Rapporten voor begeleiding: Genereer een PDF-rapport van twee pagina’s over je gebruik, bedoeld voor consulten en begeleidingsgesprekken.
 • Gegevensportabiliteit: Exporteer je gegevens als CSV-bestand voor externe verwerking (bijvoorbeeld in LibreOffice Calc), of maak JSON-back-ups om gegevens tussen apparaten te verplaatsen.
-• Instellingen: Pas je "dagbegin" aan zodat drankjes laat in de nacht bij de voorgaande avond worden geteld, en stel een startdatum voor de evaluatie in voor een schone herstart, bijvoorbeeld op oudejaarsavond.
+• Instellingen: Pas je “dagbegin” aan zodat drankjes laat in de nacht bij de voorgaande avond worden geteld, en stel een startdatum voor de evaluatie in voor een schone herstart, bijvoorbeeld op oudejaarsavond.
 
 Een handleiding is beschikbaar in de app.
 
