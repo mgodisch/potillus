@@ -252,10 +252,17 @@ fun StatsScreen(
                     }
                     // The label shows the dash and speaks the word: `contentDescription`
                     // replaces what TalkBack reads without touching what is drawn.
-                    // The joiner is passed in because `stringResource` is composable
-                    // and `periodRangeSpoken` — like its visible twin — is not.
-                    val spokenRange = periodRangeSpoken(state.periodFrom, state.periodTo, locale) { a, b ->
-                        context.getString(R.string.a11y_period_range, a, b)
+                    // The joining happens HERE because `stringResource` is composable
+                    // and reads the resource the way Compose wants it read.
+                    val spokenDays = periodSpokenDays(state.periodFrom, state.periodTo, locale)
+                    val spokenRange = when (spokenDays.size) {
+                        0 -> ""
+                        1 -> spokenDays[0]
+                        else -> stringResource(
+                            R.string.a11y_period_range,
+                            spokenDays[0],
+                            spokenDays[1],
+                        )
                     }
                     Text(
                         periodRangeLabel(state.periodFrom, state.periodTo, locale),
@@ -680,7 +687,7 @@ private fun StatRow(
  * between two dates LOOKS the same in every locale this app ships, and the dates
  * themselves are formatted by [DateTimeFormatter.ofLocalizedDate], which is what
  * carries the locale's order and separators. It does not READ the same — see
- * [periodRangeSpoken], which is what TalkBack is given.
+ * [periodSpokenDays], whose days TalkBack is given.
  */
 private fun periodRangeLabel(from: String, to: String, locale: java.util.Locale): String {
     if (from.isEmpty() || to.isEmpty()) return ""
@@ -694,27 +701,27 @@ private fun periodRangeLabel(from: String, to: String, locale: java.util.Locale)
 }
 
 /**
- * The same window in the long date style, joined by the word for "to".
+ * The window's days in the long date style: two of them, or one when the window
+ * covers a single day, or none when there is nothing to state.
+ *
+ * The JOINING is left to the caller, which is a composable and can therefore use
+ * `stringResource`. Handing a `Context` down here instead would read the resource
+ * through `LocalContext`, which Compose's own lint forbids: a `Context` read that
+ * way is not invalidated when the configuration changes, so the sentence could
+ * survive a language switch that every other string on the screen follows.
  *
  * A screen reader reads the en dash of [periodRangeLabel] as a dash or as nothing
  * at all, which leaves two loose dates where a span was meant: "1 August 2026
- * 22 August 2026". The word states the relation. The long style is what iOS
- * speaks here too, so a user switching platforms hears the same sentence.
- *
- * One day stays one date, with no joining word — there is nothing to join.
+ * 22 August 2026". The joining word states the relation. The long style is what
+ * iOS speaks here too, so a user switching platforms hears the same sentence.
  */
-private fun periodRangeSpoken(
-    from: String,
-    to: String,
-    locale: java.util.Locale,
-    joiner: (String, String) -> String,
-): String {
-    if (from.isEmpty() || to.isEmpty()) return ""
+private fun periodSpokenDays(from: String, to: String, locale: java.util.Locale): List<String> {
+    if (from.isEmpty() || to.isEmpty()) return emptyList()
     val fmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale)
     val start = runCatching { LocalDate.parse(from, DayResolver.DATE_FORMATTER).format(fmt) }
-        .getOrElse { return "" }
-    if (from == to) return start
+        .getOrElse { return emptyList() }
+    if (from == to) return listOf(start)
     val end = runCatching { LocalDate.parse(to, DayResolver.DATE_FORMATTER).format(fmt) }
-        .getOrElse { return "" }
-    return joiner(start, end)
+        .getOrElse { return emptyList() }
+    return listOf(start, end)
 }
