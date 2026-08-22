@@ -153,8 +153,9 @@ Edit drinks from the list's edit mode
   abstinence streak, and no dot or colour in the calendars.
 - `AlcoholCalculator.isDrinkDay` and the drink-date queries carry that
   definition on both platforms.
-- The limit bars and the Today summary rows speak as one sentence on both
-  platforms, with their units written out.
+- The limit bars, the Today summary rows and the statistics figures speak as one
+  sentence on both platforms, with their units written out.
+- The trend row speaks its label unabbreviated and its figure as a percentage.
 - The body-weight note in Settings names what the weight is used for.
 - The day-change time speaks as one row on both platforms, with its note
   beneath it.

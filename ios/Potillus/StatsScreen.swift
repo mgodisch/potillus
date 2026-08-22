@@ -215,9 +215,18 @@ struct StatsScreen: View {
 
     private var keyMetrics: some View {
         Section {
-            metricRow(Loc.string("Total in Period", locale: locale)) { grams(model.state.totalGrams) }
-            metricRow(Loc.string("Average per Day", locale: locale)) { grams(model.state.averagePerDay) }
-            metricRow(Loc.string("Average per Drinking Day", locale: locale)) {
+            metricRow(
+                Loc.string("Total in Period", locale: locale),
+                spokenLabel: gramsSpoken("Total in Period", model.state.totalGrams)
+            ) { grams(model.state.totalGrams) }
+            metricRow(
+                Loc.string("Average per Day", locale: locale),
+                spokenLabel: gramsSpoken("Average per Day", model.state.averagePerDay)
+            ) { grams(model.state.averagePerDay) }
+            metricRow(
+                Loc.string("Average per Drinking Day", locale: locale),
+                spokenLabel: gramsSpoken("Average per Drinking Day", model.state.averagePerDrinkDay)
+            ) {
                 grams(model.state.averagePerDrinkDay)
             }
             metricRow(Loc.string("Days Over Daily Limit", locale: locale)) {
@@ -256,7 +265,25 @@ struct StatsScreen: View {
             // Hidden, not zeroed: without a previous period there is nothing to
             // compare against, and "0 %" would claim there was.
             if model.state.hasBaseline {
-                metricRow(Loc.string("Trend vs. Previous Period", locale: locale)) {
+                // The visible label abbreviates ("Trend ggü. Vorperiode" in
+                // German, and Android carries the same short form), which a
+                // reader meets as spelled-out letters. The spoken label writes it
+                // out; the arrow stays silent, as on the Today screen, because it
+                // repeats the sign of the number beside it.
+                //
+                // Stated through MetricRow rather than as modifiers on the row:
+                // MetricRow now speaks as one element for every metric, and a
+                // second `accessibilityElement` wrapped around the outside would
+                // leave two descriptions of one row to argue over.
+                metricRow(
+                    Loc.string("Trend vs. Previous Period", locale: locale),
+                    spokenLabel: Loc.string("Trend compared to previous period", locale: locale),
+                    spokenValue: Loc.string(
+                        "%1$@ percent",
+                        Loc.number(model.state.trendPercent, fractionDigits: 1, locale: locale, signed: true),
+                        locale: locale
+                    )
+                ) {
                     // Arrow and percentage are one value: they travel together
                     // into whichever arrangement MetricRow picks.
                     HStack(spacing: 4) {
@@ -265,18 +292,6 @@ struct StatsScreen: View {
                         trend(model.state.trendPercent)
                     }
                 }
-                // The visible label abbreviates ("Trend ggü. Vorperiode" in
-                // German, and Android carries the same short form), which a
-                // reader meets as spelled-out letters. The spoken label writes it
-                // out; the arrow stays silent, as on the Today screen, because it
-                // repeats the sign of the number beside it.
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Loc.string("Trend compared to previous period", locale: locale))
-                .accessibilityValue(Loc.string(
-                    "%1$@ percent",
-                    Loc.number(model.state.trendPercent, fractionDigits: 1, locale: locale, signed: true),
-                    locale: locale
-                ))
             }
         }
     }
@@ -503,6 +518,20 @@ extension StatsScreen {
             .monospacedDigit()
     }
 
+    /// "Total in Period: 123.4 grams of alcohol" — the row as one sentence.
+    ///
+    /// The drawn value ends in `g`, which a reader gives back as a letter. The
+    /// same pattern carries the limit bars and the Today summary on both
+    /// platforms, so the figure sounds the same wherever it appears.
+    fileprivate func gramsSpoken(_ label: String, _ value: Double) -> String {
+        Loc.string(
+            "%1$@: %2$@ grams of alcohol",
+            Loc.string(label, locale: locale),
+            Loc.number(value, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
+    }
+
     /// The percentage alone; the trend arrow is put beside it at the call site,
     /// and `MetricRow` arranges the pair as one value.
     fileprivate func trend(_ value: Double) -> some View {
@@ -533,79 +562,6 @@ extension StatsScreen {
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
             .foregroundStyle(value > 0 ? Color.green : Color.primary)
-    }
-}
-
-// =============================================================================
-// Metric rows
-// =============================================================================
-//
-// WHAT WENT WRONG, TWICE
-//   `LabeledContent(_:)` builds its label from a `Text`, and a `Text` bargaining
-//   for width truncates before it wraps. On a 4.7-inch screen that left most of
-//   this screen unreadable: "Total in Peri...", "Days Over Dai...". One row
-//   escaped it, "Average per Drinking Day", not because it was built differently
-//   but because it is long enough that SwiftUI abandons the side-by-side
-//   arrangement and stacks value under label. The good behaviour was an accident
-//   of length.
-//
-//   Telling the label to wrap instead of truncate then made every row worse: it
-//   wrapped INSIDE the label's half of the row, two cramped lines against a
-//   value that stayed put, and the row outgrew its height. The one row that had
-//   been right lost what made it right.
-//
-// WHAT THE ROW HAS TO DO
-//   Side by side while both fit. When they do not: label on the first line with
-//   the WHOLE width to itself, value alone on the second, pinned to the trailing
-//   edge where the eye scans for numbers. That is what the accidental row did,
-//   and it is what every row should do.
-//
-// HOW
-//   `ViewThatFits` is handed both arrangements and picks the first that fits.
-//   The single-line one asks for its natural width — `lineLimit(1)` and
-//   `fixedSize` on both parts, so neither can shrink itself into fitting and
-//   hide the overflow. When that width is not there, the stacked arrangement is
-//   used, and it gives each part the full row.
-//
-// WHY NOT `LabeledContent`
-//   Its stacking is the framework's own and cannot be asked for on the
-//   application's terms: it arrives with Dynamic Type, not with a label that has
-//   run out of room. Owning both arrangements is what makes the outcome the same
-//   on a 4.7-inch screen as on a 6.9-inch one.
-// =============================================================================
-
-extension StatsScreen {
-    /// One figure row: label and value side by side, or stacked when they do not
-    /// fit. See the note above.
-    func metricRow(_ label: String, @ViewBuilder value: () -> some View) -> some View {
-        MetricRow(label: label, value: value())
-    }
-}
-
-private struct MetricRow<Value: View>: View {
-    let label: String
-    let value: Value
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text(label)
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-                Spacer(minLength: 8)
-                value
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                value
-                    .multilineTextAlignment(.trailing)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-        }
     }
 }
 

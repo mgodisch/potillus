@@ -257,6 +257,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s la mie</string>
     <string name="a11y_period_range">%1$s până la %2$s</string>
+    <string name="a11y_trend_vs_prev">Tendința față de perioada anterioară</string>
+    <string name="a11y_percent">%1$s la sută</string>
     <string name="delete_entry">Șterge înregistrarea</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitri, %4$s la sută, %5$s grame de alcool, %6$s</string>
     <string name="day_change_desc">O băutură înregistrată înainte de această oră se contorizează pentru ziua precedentă.</string>

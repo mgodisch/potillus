@@ -246,6 +246,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s promille</string>
     <string name="a11y_period_range">%1$s til %2$s</string>
+    <string name="a11y_trend_vs_prev">Trend sammenlignet med forrige periode</string>
+    <string name="a11y_percent">%1$s prosent</string>
     <string name="delete_entry">Slett registrering</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d milliliter, %4$s prosent, %5$s gram alkohol, %6$s</string>
     <string name="day_change_desc">En drink registrert før dette tidspunktet teller til dagen før.</string>

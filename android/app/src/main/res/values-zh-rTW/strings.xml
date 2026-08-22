@@ -251,6 +251,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">，%1$s</string>
     <string name="a11y_caption_permille">%1$s：%2$s 千分之一</string>
     <string name="a11y_period_range">%1$s 至 %2$s</string>
+    <string name="a11y_trend_vs_prev">與上一時段相比的趨勢</string>
+    <string name="a11y_percent">%1$s 百分比</string>
     <string name="delete_entry">刪除記錄</string>
     <string name="a11y_drink_row">%1$s，%2$s，%3$d 毫升，%4$s 百分比，%5$s 克酒精，%6$s</string>
     <string name="day_change_desc">在此時間之前記錄的飲品計入前一天。</string>

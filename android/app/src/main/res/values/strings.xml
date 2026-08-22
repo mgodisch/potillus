@@ -409,6 +409,11 @@ apply to it are stated in the accompanying COPYING.md file.
          The visible label joins the two with an en dash, which a screen
          reader drops; the word is what makes it one span. -->
     <string name="a11y_period_range">%1$s to %2$s</string>
+    <!-- TalkBack: the trend row's label. The visible one abbreviates, which a
+         screen reader spells out letter by letter. -->
+    <string name="a11y_trend_vs_prev">Trend compared to previous period</string>
+    <!-- TalkBack: a percentage as a word. %1$s = the signed number. -->
+    <string name="a11y_percent">%1$s percent</string>
     <!-- Content description of an entry row's delete button. -->
     <string name="delete_entry">Delete entry</string>
     <!-- TalkBack: one drink row. %1$s = name, %2$s = category, %3$d = millilitres, %4$s = percent, %5$s = grams, %6$s = capacity status. -->

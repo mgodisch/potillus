@@ -310,15 +310,44 @@ fun StatsScreen(
             // ── Key metrics ───────────────────────────────────────────────
             item {
                 SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StatRow(stringResource(R.string.total_period), "${state.totalGrams.fmt1(locale)} g")
+                    StatRow(
+                        stringResource(R.string.total_period),
+                        "${state.totalGrams.fmt1(locale)} g",
+                        spoken = stringResource(
+                            R.string.a11y_caption_grams,
+                            stringResource(R.string.total_period),
+                            state.totalGrams.fmt1(locale),
+                        ),
+                    )
                     HorizontalDivider()
-                    StatRow(stringResource(R.string.avg_per_day), "${state.avgPerDay.fmt1(locale)} g")
+                    StatRow(
+                        stringResource(R.string.avg_per_day),
+                        "${state.avgPerDay.fmt1(locale)} g",
+                        spoken = stringResource(
+                            R.string.a11y_caption_grams,
+                            stringResource(R.string.avg_per_day),
+                            state.avgPerDay.fmt1(locale),
+                        ),
+                    )
                     HorizontalDivider()
-                    StatRow(stringResource(R.string.avg_per_drink_day), "${state.avgPerDrinkDay.fmt1(locale)} g")
+                    StatRow(
+                        stringResource(R.string.avg_per_drink_day),
+                        "${state.avgPerDrinkDay.fmt1(locale)} g",
+                        spoken = stringResource(
+                            R.string.a11y_caption_grams,
+                            stringResource(R.string.avg_per_drink_day),
+                            state.avgPerDrinkDay.fmt1(locale),
+                        ),
+                    )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.days_over_daily_limit),
                         state.daysOverDailyLimit.toString(),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.days_over_daily_limit),
+                            state.daysOverDailyLimit.toString(),
+                        ),
                         // Over-limit statistics share the saturated danger red
                         // used by delete icons and traffic-light bullets, instead
                         // of the softer Material `error` colour, so every "over
@@ -329,18 +358,33 @@ fun StatsScreen(
                     StatRow(
                         stringResource(R.string.days_over_weekly_limit),
                         state.daysOverWeeklyLimit.toString(),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.days_over_weekly_limit),
+                            state.daysOverWeeklyLimit.toString(),
+                        ),
                         valueColor = if (state.daysOverWeeklyLimit > 0) dangerTextColor() else successColor(),
                     )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.days_over_drink_day_limit),
                         state.daysOverDrinkDayLimit.toString(),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.days_over_drink_day_limit),
+                            state.daysOverDrinkDayLimit.toString(),
+                        ),
                         valueColor = if (state.daysOverDrinkDayLimit > 0) dangerTextColor() else successColor(),
                     )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.abstinent_days),
                         state.abstinentDays.toString(),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.abstinent_days),
+                            state.abstinentDays.toString(),
+                        ),
                         valueColor = if (state.abstinentDays > 0) successColor() else MaterialTheme.colorScheme.onSurface,
                     )
                 }
@@ -358,12 +402,22 @@ fun StatsScreen(
                     StatRow(
                         stringResource(R.string.current_streak),
                         pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.current_streak),
+                            pluralStringResource(R.plurals.days, state.currentStreak, state.currentStreak),
+                        ),
                         valueColor = if (state.currentStreak > 0) successColor() else MaterialTheme.colorScheme.onSurface,
                     )
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.longest_streak),
                         pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak),
+                        spoken = stringResource(
+                            R.string.a11y_caption_value,
+                            stringResource(R.string.longest_streak),
+                            pluralStringResource(R.plurals.days, state.longestStreak, state.longestStreak),
+                        ),
                         // Coloured like the current streak above: green for an
                         // achievement, plain at nought, never red. It carried the
                         // default colour and so never turned green at all.
@@ -375,9 +429,29 @@ fun StatsScreen(
                         Trend.DOWN -> "${state.trendPercent.fmt0(locale)} % ↓"
                         Trend.FLAT -> "–"
                     }
+                    // Three things the visible value cannot do when read aloud:
+                    // "ggü." arrives as spelled-out letters, "%" as a sign, and the
+                    // arrow repeats what the number's sign already says. The spoken
+                    // form writes the label out, says the word for percent, and
+                    // drops the arrow — the same three decisions iOS makes here.
+                    // FLAT draws a dash and speaks its nought, because "no change"
+                    // is a figure, not an absence.
+                    val trendSpoken = stringResource(
+                        R.string.a11y_caption_value,
+                        stringResource(R.string.a11y_trend_vs_prev),
+                        stringResource(
+                            R.string.a11y_percent,
+                            if (state.trend == Trend.UP) {
+                                "+${state.trendPercent.fmt0(locale)}"
+                            } else {
+                                state.trendPercent.fmt0(locale)
+                            },
+                        ),
+                    )
                     StatRow(
                         stringResource(R.string.trend_vs_prev),
                         trendText,
+                        spoken = trendSpoken,
                         valueColor = when (state.trend) {
                             // A rising per-day average is a "bad" signal, shown in
                             // the same saturated danger red as the over-limit stats.
@@ -549,7 +623,20 @@ fun StatsScreen(
  * @param valueColor Optional colour for the value (e.g. red for over-limit).
  */
 @Composable
-private fun StatRow(label: String, value: String, valueColor: Color = MaterialTheme.colorScheme.onSurface) {
+private fun StatRow(
+    label: String,
+    value: String,
+    /**
+     * What TalkBack says instead of the two Texts below.
+     *
+     * The row draws a label and a figure side by side, which a screen reader
+     * meets as two separate stops: "Total in Period", swipe, "123.4 g" — a
+     * figure with nothing to attach it to, and a unit read as a letter. One
+     * sentence puts them back together and writes the unit out.
+     */
+    spoken: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface,
+) {
     // Layout hardening (v0.78.0 QA): give the LABEL the flexible width and pin the
     // VALUE to a single, unbroken line. Without a weight both Texts are measured at
     // their intrinsic width; a long label (seen with some translations, e.g. the
@@ -560,7 +647,10 @@ private fun StatRow(label: String, value: String, valueColor: Color = MaterialTh
     // value can never stack, in any locale, whatever the label length. The start
     // padding keeps a gap; the value stays right-aligned because the weighted label
     // fills the rest of the row.
-    Row(Modifier.fillMaxWidth()) {
+    Row(
+        Modifier.fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = spoken },
+    ) {
         Text(
             label,
             style = MaterialTheme.typography.bodyMedium,

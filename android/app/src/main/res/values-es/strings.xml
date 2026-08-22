@@ -222,6 +222,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s por mil</string>
     <string name="a11y_period_range">%1$s hasta %2$s</string>
+    <string name="a11y_trend_vs_prev">Tendencia respecto al período anterior</string>
+    <string name="a11y_percent">%1$s por ciento</string>
     <string name="delete_entry">Eliminar registro</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitros, %4$s por ciento, %5$s gramos de alcohol, %6$s</string>
     <string name="day_change_desc">Una bebida registrada antes de esta hora cuenta para el día anterior.</string>

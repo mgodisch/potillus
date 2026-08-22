@@ -204,6 +204,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s promille</string>
     <string name="a11y_period_range">%1$s til %2$s</string>
+    <string name="a11y_trend_vs_prev">Tendens sammenlignet med forrige periode</string>
+    <string name="a11y_percent">%1$s procent</string>
     <string name="delete_entry">Slet registrering</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d milliliter, %4$s procent, %5$s gram alkohol, %6$s</string>
     <string name="day_change_desc">En drik registreret før dette tidspunkt tæller til den foregående dag.</string>
