@@ -259,7 +259,7 @@ fun DrinksScreen(
                                     // identical, so one label for both told a screen
                                     // reader user nothing about which one this is.
                                     contentDescription = stringResource(
-                                        if (drink.isFavorite) R.string.favorite_remove else R.string.favorite_add
+                                        if (drink.isFavorite) R.string.favorite_remove else R.string.favorite_add,
                                     ),
                                     tint = if (drink.isFavorite) warningColor() else MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
