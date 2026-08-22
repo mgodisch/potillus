@@ -54,6 +54,7 @@ Edit drinks from the list's edit mode
 - A year heat-map in the calendar, with a month and year toggle, where a month
   opens the month view.
 - The Today screen shows the current abstinence while a streak runs.
+- `check-typography` gates the apostrophe and the quotation pair per language.
 
 ### Changed
 

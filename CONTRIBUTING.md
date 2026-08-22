@@ -534,6 +534,26 @@ strings with different translations — e.g. `month` → "月" and `pdf_col_mont
 "月份" — so the iOS value is accepted if it matches *any* Android string sharing that
 English word.)
 
+**Typography — quotation marks and the apostrophe.** The apostrophe is `’`
+(U+2019), never the typewriter `'`: in `aujourd’hui` and `об’єм` it is part of the
+word, and in `strings.xml` it also needs no backslash escape. Quotation marks
+follow the language, not the source text:
+
+| Form | Languages |
+| --- | --- |
+| `„…“` | cs, da, de |
+| `„…”` | pl, ro |
+| `«…»` | el, es, fr, it, nb, pt, ru, uk |
+| `“…”` | en, ko, nl, pt-BR, zh-Hans |
+| `”…”` | sv |
+| `「…」` | ja, zh-Hant |
+
+French carries a non-breaking space inside the guillemets. This applies to the
+app strings, the report labels, the user guides and the store listings alike;
+[`tools/check-typography.py`](tools/check-typography.py) enforces it and runs in
+both `make ios` and `make android`. Published release notes are exempt — they
+record what shipped and are not edited afterwards.
+
 **Adding a new locale on iOS.** After adding it on the Android side (above):
 1. In `Localizable.xcstrings`, add the language (in Xcode: the "+" in the language
    list, or add its `localizations` entry in the JSON) and translate every key.

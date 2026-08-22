@@ -88,6 +88,13 @@ check-l10n:
 check-l10n-parity:
 	python3 tools/check-l10n-parity.py
 
+# check-typography: every user-facing text quotes and elides the way its language
+# does -- the apostrophe is U+2019, and each language uses its own quotation pair.
+# Catches what an audit round otherwise finds years later: a straight quote in a
+# new string, or an opener from one convention closed by another.
+check-typography:
+	python3 tools/check-typography.py
+
 # check-ui-string-parity: the allow-list of views that carry fixed English literals
 # BY DESIGN (not catalogue keys) must stay in sync -- the companion to check-l10n,
 # which would otherwise flag those intentional literals.
@@ -184,6 +191,7 @@ fix-headers:
 # place by ordering `check-guides` after its build targets in the root Makefile.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
+                  check-typography \
                   check-ios-metadata check-ios-screenshots check-ios-a11y
 	$(MAKE) -C ios guides check-guides
 
@@ -209,6 +217,7 @@ check-static: check-ios-static check-ui-string-parity check-bestpractices-levels
 .PHONY: check-headers check-makefile check-report-paper check-report-labels check-report-pdfs \
         check-fixture-parity check-l10n \
         check-l10n-parity \
+        check-typography \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
         check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \
         check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \

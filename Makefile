@@ -219,6 +219,7 @@ include make/publish.mk
 android:
 	$(MAKE) -C android debug-apk unit-tests lint check-guides
 	$(MAKE) check-l10n-parity
+	$(MAKE) check-typography
 
 # ios: the daily iOS check. The Mac-free static gate runs FIRST (so a Linux CI
 # fails fast on what it can catch), then the Mac-only SwiftLint, PotillusKit tests
