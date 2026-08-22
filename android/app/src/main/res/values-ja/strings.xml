@@ -251,6 +251,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s から %2$s まで</string>
     <string name="a11y_trend_vs_prev">前期間との比較の傾向</string>
     <string name="a11y_percent">%1$s パーセント</string>
+    <string name="a11y_category_slice">%1$s：%2$s パーセント、アルコール %3$s グラム</string>
     <string name="delete_entry">記録を削除</string>
     <string name="a11y_drink_row">%1$s、%2$s、%3$d ミリリットル、%4$s パーセント、%5$s グラムのアルコール、%6$s</string>
     <string name="day_change_desc">この時刻より前に記録された飲み物は前日に数えられます。</string>
@@ -297,5 +298,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">色に加えて、状態のドット内に記号（×、1、矢印）を表示します</string>
     <string name="chart_desc_daily_avg">1日あたりの平均アルコール量の棒グラフ</string>
     <string name="chart_desc_value_bars">棒グラフ</string>
-    <string name="chart_desc_categories">飲料カテゴリのドーナツグラフ</string>
 </resources>

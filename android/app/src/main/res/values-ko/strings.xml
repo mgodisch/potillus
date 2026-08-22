@@ -251,6 +251,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s부터 %2$s까지</string>
     <string name="a11y_trend_vs_prev">이전 기간 대비 추세</string>
     <string name="a11y_percent">%1$s 퍼센트</string>
+    <string name="a11y_category_slice">%1$s: %2$s 퍼센트, 알코올 %3$s 그램</string>
     <string name="delete_entry">기록 삭제</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d 밀리리터, %4$s 퍼센트, %5$s 그램의 알코올, %6$s</string>
     <string name="day_change_desc">이 시간 이전에 기록된 음료는 전날로 계산됩니다.</string>
@@ -297,5 +298,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">색상과 함께 상태 점 안에 기호(가위표, 1, 화살표)를 표시합니다</string>
     <string name="chart_desc_daily_avg">하루 평균 알코올 막대 그래프</string>
     <string name="chart_desc_value_bars">막대 그래프</string>
-    <string name="chart_desc_categories">음료 카테고리 도넛 차트</string>
 </resources>

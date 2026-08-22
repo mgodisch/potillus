@@ -67,7 +67,12 @@ viewer, the PDF export flow.
       text alternative.
   - Traffic-light capacity dot → TalkBack announces the capacity state
     (implemented: `contentDescription` on `TrafficLightDot`).
-  - Statistics charts (bar/value/donut) → each announces a summary (implemented).
+  - Statistics charts (bar/value) → each announces a summary (implemented).
+  - Category ring → the ring itself is SILENT and its legend carries the text
+    alternative: one sentence per slice, naming the category, its share and its
+    grams. That is more than the ring's own summary stated, and it arrives where
+    the figures are rather than ahead of them. iOS hides its ring for the same
+    reason. **Do not restore a description on the canvas.**
   - Limit bars → each is one node stating its caption, its value and its limit as
     a sentence, with the units written out; the progress indicator inside is
     silent (implemented). It used to announce a bare percentage of its own, and

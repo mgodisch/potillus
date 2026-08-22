@@ -414,6 +414,10 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_trend_vs_prev">Trend compared to previous period</string>
     <!-- TalkBack: a percentage as a word. %1$s = the signed number. -->
     <string name="a11y_percent">%1$s percent</string>
+    <!-- TalkBack: one slice of the category ring, as the legend states it.
+         %1$s = category, %2$s = share, %3$s = grams. The share leads: it is
+         what the ring draws, where the visible line leads with the grams. -->
+    <string name="a11y_category_slice">%1$s: %2$s percent, %3$s grams of alcohol</string>
     <!-- Content description of an entry row's delete button. -->
     <string name="delete_entry">Delete entry</string>
     <!-- TalkBack: one drink row. %1$s = name, %2$s = category, %3$d = millilitres, %4$s = percent, %5$s = grams, %6$s = capacity status. -->
@@ -498,5 +502,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">Show a shape (cross, 1, arrow) in the capacity dot in addition to the colour</string>
     <string name="chart_desc_daily_avg">Bar chart of average alcohol per day</string>
     <string name="chart_desc_value_bars">Bar chart</string>
-    <string name="chart_desc_categories">Donut chart of drink categories</string>
 </resources>

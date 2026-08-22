@@ -206,6 +206,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s έως %2$s</string>
     <string name="a11y_trend_vs_prev">Τάση σε σύγκριση με την προηγούμενη περίοδο</string>
     <string name="a11y_percent">%1$s τοις εκατό</string>
+    <string name="a11y_category_slice">%1$s: %2$s τοις εκατό, %3$s γραμμάρια αλκοόλ</string>
     <string name="delete_entry">Διαγραφή καταχώρισης</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d χιλιοστόλιτρα, %4$s τοις εκατό, %5$s γραμμάρια αλκοόλ, %6$s</string>
     <string name="day_change_desc">Ένα ποτό που καταγράφεται πριν από αυτήν την ώρα προσμετράται στην προηγούμενη ημέρα.</string>
@@ -253,5 +254,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">Εκτός από το χρώμα, εμφάνιση σχήματος (σταυρός, 1, βέλος) στην κουκκίδα κατάστασης</string>
     <string name="chart_desc_daily_avg">Ραβδόγραμμα μέσου αλκοόλ ανά ημέρα</string>
     <string name="chart_desc_value_bars">Ραβδόγραμμα</string>
-    <string name="chart_desc_categories">Δακτυλιοειδές γράφημα κατηγοριών ποτών</string>
 </resources>

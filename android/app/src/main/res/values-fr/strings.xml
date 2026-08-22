@@ -224,6 +224,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s au %2$s</string>
     <string name="a11y_trend_vs_prev">Tendance par rapport à la période précédente</string>
     <string name="a11y_percent">%1$s pour cent</string>
+    <string name="a11y_category_slice">%1$s : %2$s pour cent, %3$s grammes d’alcool</string>
     <string name="delete_entry">Supprimer l’entrée</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d millilitres, %4$s pour cent, %5$s grammes d’alcool, %6$s</string>
     <string name="day_change_desc">Une boisson enregistrée avant cette heure compte pour la veille.</string>
@@ -272,5 +273,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">Afficher une forme (croix, 1, flèche) dans le point d’état en plus de la couleur</string>
     <string name="chart_desc_daily_avg">Diagramme en barres de l’alcool moyen par jour</string>
     <string name="chart_desc_value_bars">Diagramme en barres</string>
-    <string name="chart_desc_categories">Diagramme en anneau des catégories de boissons</string>
 </resources>

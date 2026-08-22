@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -543,16 +544,17 @@ fun CategoryDonutChart(
     // Per-app locale for the legend's gram/percent numbers (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
 
-    // Text alternative for assistive technology (WCAG 1.1.1): the donut arcs are
-    // drawn on a bare Canvas, so we announce what it breaks down. (No category
-    // count in the text: "%d drink categories" trips lint's PluralsCandidate check.)
-    val chartDescription = stringResource(R.string.chart_desc_categories)
-
+    // The ring itself says nothing (WCAG 1.1.1 is met by the legend below, not
+    // here). It used to announce "Donut chart of drink categories", which named
+    // the picture without stating any of it — and it arrived as the FIRST stop of
+    // the section, before a single figure. The legend that follows carries every
+    // category with its share and its grams, which is a fuller text alternative
+    // than the sentence it replaces. iOS hides its ring for the same reason.
     Canvas(
         modifier = modifier
             .fillMaxWidth()
             .height(160.dp)
-            .semantics { contentDescription = chartDescription },
+            .semantics { hideFromAccessibility() },
     ) {
         // Donut geometry: radius fills 88 % of the smaller canvas dimension;
         // stroke width is 38 % of the radius, giving the "ring" appearance.
@@ -588,8 +590,24 @@ fun CategoryDonutChart(
         entries.chunked(2).forEach { row ->
             Row(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
                 row.forEach { (category, grams) ->
+                    // ONE SENTENCE PER SLICE, in the order the entries are already
+                    // sorted: largest share first. Left alone the two-column
+                    // layout announced the two NAMES first and their two VALUES
+                    // afterwards — Compose sorts by position, and both names sit
+                    // on the same line — so a reader met "Wine" and "Beer", then
+                    // two figures with nothing to attach them to. The share leads
+                    // the sentence because that is what the ring draws; the
+                    // visible line leads with the grams, where the column
+                    // alignment does that work instead.
+                    val spokenSlice = stringResource(
+                        R.string.a11y_category_slice,
+                        category.displayLabel(),
+                        (grams / total * 100).fmt0(locale),
+                        grams.fmt1(locale),
+                    )
                     Row(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                            .semantics(mergeDescendants = true) { contentDescription = spokenSlice },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Colour swatch drawn via drawBehind to avoid an extra composable

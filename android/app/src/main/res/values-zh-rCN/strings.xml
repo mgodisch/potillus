@@ -234,6 +234,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s 至 %2$s</string>
     <string name="a11y_trend_vs_prev">与上一时段相比的趋势</string>
     <string name="a11y_percent">%1$s 百分比</string>
+    <string name="a11y_category_slice">%1$s：%2$s 百分比，酒精 %3$s 克</string>
     <string name="delete_entry">删除记录</string>
     <string name="a11y_drink_row">%1$s，%2$s，%3$d 毫升，%4$s 百分比，%5$s 克酒精，%6$s</string>
     <string name="day_change_desc">在此时间之前记录的饮品计入前一天。</string>
@@ -280,5 +281,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">在状态圆点中除颜色外再显示一个符号（叉、1、箭头）</string>
     <string name="chart_desc_daily_avg">每日平均酒精量的柱状图</string>
     <string name="chart_desc_value_bars">柱状图</string>
-    <string name="chart_desc_categories">饮品类别的环形图</string>
 </resources>

@@ -237,6 +237,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s bis %2$s</string>
     <string name="a11y_trend_vs_prev">Trend gegenüber Vorperiode</string>
     <string name="a11y_percent">%1$s Prozent</string>
+    <string name="a11y_category_slice">%1$s: %2$s Prozent, %3$s Gramm Alkohol</string>
     <string name="delete_entry">Eintrag löschen</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d Milliliter, %4$s Prozent, %5$s Gramm Alkohol, %6$s</string>
     <string name="day_change_desc">Ein Getränk vor dieser Uhrzeit zählt zum Vortag.</string>
@@ -284,5 +285,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">Zusätzlich zur Farbe ein Symbol (Kreuz, 1, Pfeil) im Statuspunkt anzeigen</string>
     <string name="chart_desc_daily_avg">Balkendiagramm des durchschnittlichen Alkohols pro Tag</string>
     <string name="chart_desc_value_bars">Balkendiagramm</string>
-    <string name="chart_desc_categories">Ringdiagramm der Getränkekategorien</string>
 </resources>

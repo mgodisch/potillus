@@ -259,6 +259,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_period_range">%1$s până la %2$s</string>
     <string name="a11y_trend_vs_prev">Tendința față de perioada anterioară</string>
     <string name="a11y_percent">%1$s la sută</string>
+    <string name="a11y_category_slice">%1$s: %2$s la sută, %3$s grame de alcool</string>
     <string name="delete_entry">Șterge înregistrarea</string>
     <string name="a11y_drink_row">%1$s, %2$s, %3$d mililitri, %4$s la sută, %5$s grame de alcool, %6$s</string>
     <string name="day_change_desc">O băutură înregistrată înainte de această oră se contorizează pentru ziua precedentă.</string>
@@ -307,5 +308,4 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="alt_status_symbols_desc">Afișează o formă (cruce, 1, săgeată) în punctul de stare pe lângă culoare</string>
     <string name="chart_desc_daily_avg">Grafic cu bare al alcoolului mediu pe zi</string>
     <string name="chart_desc_value_bars">Grafic cu bare</string>
-    <string name="chart_desc_categories">Grafic inelar al categoriilor de băuturi</string>
 </resources>
