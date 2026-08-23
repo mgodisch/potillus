@@ -105,6 +105,18 @@ enum Loc {
         String(format: string(key, locale: locale), locale: locale, arg, arg2, arg3)
     }
 
+    /// Four interpolated arguments, positional (`%1$…` … `%4$…`). The calendar's
+    /// entry row is the one that needs them: its drink name sits in the VALUE
+    /// beside the three figures, because the LABEL has to stay a bare date value
+    /// for VoiceOver to speak the time as a clock reading (see
+    /// `CalendarScreen.entrySpokenLabel`).
+    static func string(
+        _ key: String, _ arg: CVarArg, _ arg2: CVarArg, _ arg3: CVarArg,
+        _ arg4: CVarArg, locale: Locale
+    ) -> String {
+        String(format: string(key, locale: locale), locale: locale, arg, arg2, arg3, arg4)
+    }
+
     /// Six interpolated arguments, positional. The drinks row is the one sentence
     /// long enough to need them; anything longer belongs in two sentences.
     static func string(
