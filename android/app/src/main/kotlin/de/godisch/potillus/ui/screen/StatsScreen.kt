@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -658,11 +659,16 @@ private fun StatRow(
         Modifier.fillMaxWidth()
             .semantics(mergeDescendants = true) { contentDescription = spoken },
     ) {
+        // MERGE PLUS hideFromAccessibility, as the limit bars in Components.kt do:
+        // a parent's contentDescription is read IN ADDITION to what its children
+        // contribute, so without this the row announced its sentence and then the
+        // label and figure over again. Hiding — not clearing — keeps both Texts in
+        // the unmerged tree, where `onNodeWithText` can still find them.
         Text(
             label,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
         )
         Text(
             value,
@@ -671,7 +677,7 @@ private fun StatRow(
             color = valueColor,
             softWrap = false,
             maxLines = 1,
-            modifier = Modifier.padding(start = 12.dp),
+            modifier = Modifier.padding(start = 12.dp).semantics { hideFromAccessibility() },
         )
     }
 }

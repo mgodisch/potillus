@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.app.LocaleManagerCompat
@@ -308,11 +309,20 @@ fun SettingsScreen(
                             Modifier.weight(1f)
                                 .semantics(mergeDescendants = true) { contentDescription = spokenDayStart },
                         ) {
-                            Text(stringResource(R.string.day_starts_at), style = MaterialTheme.typography.bodyMedium)
+                            // Hidden, not cleared: a parent's contentDescription is
+                            // read IN ADDITION to its children, so the row said its
+                            // sentence and then the label and time again. Hiding
+                            // leaves both Texts findable by `onNodeWithText`.
+                            Text(
+                                stringResource(R.string.day_starts_at),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.semantics { hideFromAccessibility() },
+                            )
                             Text(
                                 stringResource(R.string.day_change_time_value, settings.dayChangeHour, settings.dayChangeMinute),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.semantics { hideFromAccessibility() },
                             )
                         }
                         IconButton(onClick = { showTimePicker = true }) { Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change), tint = MaterialTheme.colorScheme.primary) }
@@ -360,15 +370,18 @@ fun SettingsScreen(
                             Modifier.weight(1f)
                                 .semantics(mergeDescendants = true) { contentDescription = spokenStatsFrom },
                         ) {
+                            // Hidden for the same reason as the row above.
                             Text(
                                 stringResource(R.string.stats_from_label),
                                 style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.semantics { hideFromAccessibility() },
                             )
                             if (settings.statsFromDate.isNotEmpty()) {
                                 Text(
                                     formatStatsDate(settings.statsFromDate),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                             }
                         }

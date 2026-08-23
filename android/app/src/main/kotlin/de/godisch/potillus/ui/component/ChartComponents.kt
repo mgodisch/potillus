@@ -621,7 +621,12 @@ fun CategoryDonutChart(
                                 ),
                         )
                         Spacer(Modifier.width(6.dp))
-                        Column {
+                        // Hidden, not cleared: the parent's contentDescription is
+                        // read IN ADDITION to what these two contribute, so the
+                        // entry said its sentence and then the name and figures
+                        // over again. Hiding keeps them in the unmerged tree for
+                        // `onNodeWithText`.
+                        Column(modifier = Modifier.semantics { hideFromAccessibility() }) {
                             Text(
                                 category.displayLabel(),
                                 style = MaterialTheme.typography.labelSmall,
