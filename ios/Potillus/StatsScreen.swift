@@ -492,7 +492,6 @@ extension StatsScreen {
 // into a tuple element is not a promise worth leaning on.
 // =============================================================================
 
-
 private struct CategorySlice {
     let category: DrinkCategory
     let grams: Double
