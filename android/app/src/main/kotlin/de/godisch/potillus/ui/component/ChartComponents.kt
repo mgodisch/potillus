@@ -520,11 +520,15 @@ fun ValueBarChart(
     // Silent when the columns speak: the axis abbreviates to what fits — "00",
     // "03", "Mo", "Di" — and a reader given those gets digits and fragments. The
     // column's sentence carries the same information in words.
-    Row(
-        Modifier.fillMaxWidth()
-            .then(if (spoken != null) Modifier.semantics { hideFromAccessibility() } else Modifier),
-        horizontalArrangement = Arrangement.SpaceAround,
-    ) {
+    //
+    // Hidden on EACH Text, not on the Row around them. `hideFromAccessibility`
+    // marks the node it sits on; a Text carries its own `text` semantics and
+    // stays a node of its own, so hiding only the parent left all eight labels
+    // announcing themselves after the columns had already said everything. The
+    // limit bars in Components.kt hide their children one by one for the same
+    // reason — there the parent merges, here it does not, and either way the
+    // child is what has to be hidden.
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         values.indices.forEach { i ->
             Text(
                 text = labelFor(i),
@@ -533,7 +537,14 @@ fun ValueBarChart(
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f)
+                    .then(
+                        if (spoken != null) {
+                            Modifier.semantics { hideFromAccessibility() }
+                        } else {
+                            Modifier
+                        },
+                    ),
             )
         }
     }
