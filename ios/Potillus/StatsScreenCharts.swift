@@ -36,7 +36,11 @@ import SwiftUI
 
 extension StatsScreen {
 
-    fileprivate var timeOfDay: some View {
+    // `timeOfDay` and `weekdays` carry no access modifier: the body that
+    // composes them lives in StatsScreen.swift, and `fileprivate` would end
+    // at this file. The helpers below them stay fileprivate — they have no
+    // caller outside it.
+    var timeOfDay: some View {
         Section(Loc.string("Time of Day", locale: locale)) {
             Chart(hourPoints) { point in
                 BarMark(
@@ -87,7 +91,7 @@ extension StatsScreen {
         String(format: "%02d", index * 3)
     }
 
-    fileprivate var weekdays: some View {
+    var weekdays: some View {
         Section(Loc.string("Weekday", locale: locale)) {
             Chart(weekdayPoints) { point in
                 BarMark(
@@ -159,10 +163,6 @@ extension StatsScreen {
         let symbols = formatter.standaloneWeekdaySymbols ?? []
         guard symbols.count == 7 else { return "" }
         return symbols[iso == 7 ? 0 : iso]
-    }
-
-    private func name(_ category: DrinkCategory) -> String {
-        Loc.string(category.categoryDisplayKey, locale: locale)
     }
 }
 

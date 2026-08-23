@@ -510,6 +510,14 @@ private struct CategorySlice {
 
 extension StatsScreen {
 
+    /// The category's display name, in the in-app language.
+    ///
+    /// Belongs beside the ring's legend, which is its only caller — it briefly sat
+    /// in StatsScreenCharts.swift, where `DrinkCategory` is not even in scope.
+    private func name(_ category: DrinkCategory) -> String {
+        Loc.string(category.categoryDisplayKey, locale: locale)
+    }
+
     /// Whether the daily-limit line is meaningful for the period on screen.
     ///
     /// The YEAR view's buckets are per-month averages of grams per day, and a
