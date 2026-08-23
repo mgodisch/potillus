@@ -422,87 +422,6 @@ struct StatsScreen: View {
 }
 
 // =============================================================================
-// StatsScreen – the hour and weekday charts
-// =============================================================================
-//
-// Two more chart sections, in an extension for the same length-budget reason as
-// the formatting helpers below (SwiftLint `type_body_length`).
-// =============================================================================
-
-extension StatsScreen {
-
-    fileprivate var timeOfDay: some View {
-        Section(Loc.string("Time of Day", locale: locale)) {
-            Chart(hourPoints) { point in
-                BarMark(
-                    x: .value("Hour", point.label),
-                    y: .value("Grams per day", point.average)
-                )
-            }
-            .chartYAxisLabel(Loc.string("g / day", locale: locale))
-            .frame(height: 140)
-        }
-    }
-
-    /// Named rather than a tuple: `Chart` wants `Identifiable`, and a key path
-    /// into a tuple element is not something to rely on.
-    fileprivate var hourPoints: [HourPoint] {
-        model.state.hourBucketAverages.enumerated().map { index, average in
-            HourPoint(id: index, label: bucketLabel(index), average: average)
-        }
-    }
-
-    /// "00", "03" … "21". The bucket covers three hours starting there.
-    fileprivate func bucketLabel(_ index: Int) -> String {
-        String(format: "%02d", index * 3)
-    }
-
-    fileprivate var weekdays: some View {
-        Section(Loc.string("Weekday", locale: locale)) {
-            Chart(weekdayPoints) { point in
-                BarMark(
-                    x: .value("Weekday", point.label),
-                    y: .value("Grams", point.average)
-                )
-            }
-            .chartYAxisLabel(Loc.string("g", locale: locale))
-            .frame(height: 140)
-        }
-    }
-
-    /// Columns whose average is nil are DROPPED, not drawn as zero: that weekday
-    /// never occurred in the period, which is not the same as a dry weekday.
-    fileprivate var weekdayPoints: [WeekdayPoint] {
-        zip(model.state.weekdayOrder, model.state.weekdayAverages)
-            .compactMap { iso, average in
-                average.map { WeekdayPoint(id: iso, label: weekdaySymbol(iso), average: $0) }
-            }
-    }
-}
-
-// =============================================================================
-// Presentation helpers
-// =============================================================================
-//
-// These live in a same-file extension rather than the main type so that
-// `StatsScreen`'s body stays within SwiftLint's `type_body_length`. A same-file
-// extension shares the type's `private` scope, so the view code above still
-// reaches them.
-// =============================================================================
-
-extension StatsScreen {
-    private func weekdaySymbol(_ iso: Int) -> String {
-        let symbols = DateFormatter().shortStandaloneWeekdaySymbols ?? []
-        guard symbols.count == 7 else { return "" }
-        return symbols[iso == 7 ? 0 : iso]
-    }
-
-    private func name(_ category: DrinkCategory) -> String {
-        Loc.string(category.categoryDisplayKey, locale: locale)
-    }
-}
-
-// =============================================================================
 // StatsScreen – value formatting
 // =============================================================================
 //
@@ -573,18 +492,6 @@ extension StatsScreen {
 // into a tuple element is not a promise worth leaning on.
 // =============================================================================
 
-private struct HourPoint: Identifiable {
-    let id: Int
-    let label: String
-    let average: Double
-}
-
-private struct WeekdayPoint: Identifiable {
-    /// The ISO weekday number, which is already unique within a week.
-    let id: Int
-    let label: String
-    let average: Double
-}
 
 private struct CategorySlice {
     let category: DrinkCategory

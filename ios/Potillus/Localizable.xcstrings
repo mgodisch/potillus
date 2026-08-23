@@ -1002,6 +1002,137 @@
         }
       }
     },
+    "%1$@ to %2$@ hours: %3$@ grams of alcohol" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ až %2$@ hodin: %3$@ gramů alkoholu"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ til %2$@: %3$@ gram alkohol"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ bis %2$@ Uhr: %3$@ Gramm Alkohol"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ έως %2$@: %3$@ γραμμάρια αλκοόλ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ to %2$@ hours: %3$@ grams of alcohol"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hasta %2$@ h: %3$@ gramos de alcohol"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ à %2$@ heures : %3$@ grammes d’alcool"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ alle %2$@: %3$@ grammi di alcol"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 時から %2$@ 時まで：%3$@ グラムのアルコール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@시부터 %2$@시까지: %3$@ 그램의 알코올"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ til %2$@: %3$@ gram alkohol"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ tot %2$@ uur: %3$@ gram alcohol"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ do %2$@: %3$@ gramów alkoholu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ até %2$@ h: %3$@ gramas de álcool"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ até %2$@ h: %3$@ gramas de álcool"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ până la %2$@: %3$@ grame de alcool"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ по %2$@ часов: %3$@ граммов алкоголя"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ till %2$@: %3$@ gram alkohol"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ до %2$@ години: %3$@ грамів алкоголю"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 至 %2$@ 时：%3$@ 克酒精"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 至 %2$@ 時：%3$@ 克酒精"
+          }
+        }
+      }
+    },
     "%1$@, %2$@ grams" : {
       "extractionState" : "manual",
       "localizations" : {

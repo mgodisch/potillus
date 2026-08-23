@@ -494,6 +494,16 @@ fun StatsScreen(
                             labelFor = { b -> "%02d".format(b * 3) },
                             showValues = true,
                             chartLabel = stringResource(R.string.stats_time_of_day),
+                            // The axis shows the start hour; the sentence states
+                            // the whole three-hour span, which is what the bar
+                            // actually covers.
+                            spokenFor = { b ->
+                                hourBucketSpoken(
+                                    b,
+                                    state.hourBucketAverages.getOrElse(b) { 0.0 },
+                                    locale,
+                                )
+                            },
                         )
                     }
                 }
@@ -517,12 +527,24 @@ fun StatsScreen(
                             DayOfWeek.of(iso)
                                 .getDisplayName(TextStyle.SHORT, locale).take(2)
                         }
+                        // The same days written out, for the spoken form. The axis
+                        // has room for two letters; a reader has room for the word.
+                        val weekdaySpoken = state.weekdayOrder.mapIndexed { i, iso ->
+                            stringResource(
+                                R.string.a11y_caption_grams,
+                                DayOfWeek.of(iso).getDisplayName(TextStyle.FULL_STANDALONE, locale),
+                                (state.weekdayAverages.getOrNull(i) ?: 0.0).fmt1(locale),
+                            )
+                        }
                         ValueBarChart(
                             // null (weekday never a drink day) → 0.0 ⇒ empty slot.
                             values = state.weekdayAverages.map { it ?: 0.0 },
                             labelFor = { i -> weekdayLabels.getOrElse(i) { "" } },
                             showValues = true,
                             chartLabel = stringResource(R.string.stats_weekday),
+                            // The full weekday name, not the two-letter axis form:
+                            // "Di" and "Fr" reach a reader as "dei" and "Frau".
+                            spokenFor = { i -> weekdaySpoken.getOrElse(i) { "" } },
                         )
                     }
                 }
@@ -681,6 +703,26 @@ private fun StatRow(
         )
     }
 }
+
+/**
+ * "0 to 3 hours: 0.5 grams of alcohol" for one three-hour bucket.
+ *
+ * Composable because `stringResource` is: the caller sits inside a chart's
+ * parameter list, and reading the resource any other way is what Compose's own
+ * lint forbids.
+ *
+ * The bucket index is turned into its two boundary hours here rather than at the
+ * call site, so the axis label and the sentence cannot disagree about which hours
+ * a bar covers.
+ */
+@Composable
+private fun hourBucketSpoken(bucket: Int, average: Double, locale: java.util.Locale): String =
+    stringResource(
+        R.string.a11y_hour_bucket,
+        (bucket * 3).toString(),
+        ((bucket + 1) * 3).toString(),
+        average.fmt1(locale),
+    )
 
 /**
  * "1 Jul 2026 – 30 Jul 2026", in the in-app locale.

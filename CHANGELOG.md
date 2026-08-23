@@ -169,6 +169,9 @@ Edit drinks from the list's edit mode
 - The edit toggle names the list it edits.
 - The category ring is silent on both platforms and its legend states each slice
   in one sentence.
+- The hour and weekday charts speak one sentence per column, the hours as a span
+  and the weekdays by name.
+- The weekday axis follows the in-app language.
 - The calendar header and month name follow the in-app language.
 - The language picker labels its system entry in the system language.
 - Settings section headings, the drinking-days row and the statistics start date

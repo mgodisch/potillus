@@ -418,6 +418,10 @@ apply to it are stated in the accompanying COPYING.md file.
          %1$s = category, %2$s = share, %3$s = grams. The share leads: it is
          what the ring draws, where the visible line leads with the grams. -->
     <string name="a11y_category_slice">%1$s: %2$s percent, %3$s grams of alcohol</string>
+    <!-- TalkBack: one three-hour bucket of the time-of-day chart.
+         %1$s = first hour, %2$s = last hour, %3$s = grams per day. The
+         axis shows only the start hour; the span belongs in the words. -->
+    <string name="a11y_hour_bucket">%1$s to %2$s hours: %3$s grams of alcohol</string>
     <!-- TalkBack: a calendar day with no entries. %1$s = the day. A silent cell
          leaves a reader with the bare day number and no way to tell an empty
          day from one whose content escaped them. -->

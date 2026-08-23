@@ -382,6 +382,17 @@ fun ValueBarChart(
     modifier: Modifier = Modifier,
     showValues: Boolean = false,
     chartLabel: String? = null,
+    /**
+     * What a screen reader says for the bar at this index, or `null` to leave the
+     * chart with one description for the whole canvas.
+     *
+     * A single description was all the canvas could offer, and it named the
+     * picture rather than its content: "Time of Day", one stop, and the figures
+     * out of reach. The axis labels made it worse, arriving as their own stops —
+     * "00", "03" — because two digits are what the axis has room for, and a
+     * reader gets them as digits.
+     */
+    spokenFor: ((Int) -> String)? = null,
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
         Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {
@@ -409,16 +420,24 @@ fun ValueBarChart(
     // Text alternative for assistive technology (WCAG 1.1.1). Prefer the caller's
     // label (which knows what the bars mean); otherwise fall back to a neutral
     // generic name. (No bar count in the fallback: "%d bars" trips Android lint's
-    // PluralsCandidate check.)
+    // PluralsCandidate check.) With [spokenFor] the per-bar sentences carry the
+    // alternative instead, and this describes nothing a reader has to hear.
     val chartDescription = chartLabel ?: stringResource(R.string.chart_desc_value_bars)
 
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(150.dp)
-            .padding(top = 8.dp, bottom = 4.dp)
-            .semantics { contentDescription = chartDescription },
-    ) {
+    Box(modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .padding(top = 8.dp, bottom = 4.dp)
+                .then(
+                    if (spokenFor != null) {
+                        Modifier.semantics { hideFromAccessibility() }
+                    } else {
+                        Modifier.semantics { contentDescription = chartDescription }
+                    },
+                ),
+        ) {
         val chartH = size.height
         val chartW = size.width
         val spacing = chartW / values.size
@@ -460,11 +479,45 @@ fun ValueBarChart(
                 )
             }
         }
+
+        // ONE FOCUS STOP PER COLUMN, laid over the canvas.
+        //
+        // The bars are painted, not composed, so there is no node to focus. These
+        // empty Boxes supply one — and they take their width from `weight(1f)`,
+        // the same division the DrawScope makes with `chartW / values.size`, so
+        // the geometry has a single source. Recomputing the bar rectangles out
+        // here to match them exactly would give it two, and the second would drift
+        // the first time the drawing changes.
+        //
+        // The stop therefore covers the column, not the bar within it. For a
+        // reader that is the better shape anyway: the empty space above a short
+        // bar belongs to the same three hours.
+        if (spokenFor != null) {
+            Row(Modifier.matchParentSize()) {
+                values.indices.forEach { i ->
+                    val spoken = spokenFor(i)
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .semantics { contentDescription = spoken },
+                    )
+                }
+            }
+        }
     }
 
     // Axis labels, one weighted cell per column; labelFor returns "" for the
     // thinned-out slots so dense (hourly) axes stay readable.
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+    //
+    // Silent when the columns speak: the axis abbreviates to what fits — "00",
+    // "03", "Mo", "Di" — and a reader given those gets digits and fragments. The
+    // column's sentence carries the same information in words.
+    Row(
+        Modifier.fillMaxWidth()
+            .then(if (spokenFor != null) Modifier.semantics { hideFromAccessibility() } else Modifier),
+        horizontalArrangement = Arrangement.SpaceAround,
+    ) {
         values.indices.forEach { i ->
             Text(
                 text = labelFor(i),
