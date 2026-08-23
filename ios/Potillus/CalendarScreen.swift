@@ -319,11 +319,12 @@ struct CalendarScreen: View {
                 Text(weekdaySymbol(iso))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    // The visible cell is one letter, and one letter is what
-                    // VoiceOver read out — "capital M" says nothing about which
-                    // column this is. The full standalone name is the same fact
-                    // in a form a reader can use.
-                    .accessibilityLabel(weekdayName(iso))
+                    // Silent, as on Android. Writing the name out was the first
+                    // answer to "capital M", but it puts seven stops before the
+                    // month's first day for a fact every cell below carries: each
+                    // day states its own full date. A column header helps an eye
+                    // scanning a grid; a reader moves through the cells.
+                    .accessibilityHidden(true)
             }
         }
         .padding(.horizontal)
@@ -464,6 +465,26 @@ struct CalendarScreen: View {
 
 extension CalendarScreen {
 
+    /// "2026-08-06" → "6 August 2026", ordered and named by the in-app locale.
+    ///
+    /// The iOS counterpart of Android's `formatLogicalDate`. Parsed and formatted
+    /// in UTC, as [dayAndMonth] is, so the device's zone cannot shift the day the
+    /// grid drew. Falls back to the stored string if it cannot be parsed — a
+    /// heading is not worth crashing over.
+    func longDate(_ date: String) -> String {
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.timeZone = TimeZone(identifier: "UTC")
+        parser.dateFormat = "yyyy-MM-dd"
+        guard let parsed = parser.date(from: date) else { return date }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter.string(from: parsed)
+    }
+
     /// The selected day as List sections: a summary block (date, grams, the daily
     /// bar) with its separators hidden so it reads as a caption, and a second
     /// section of the day's entries. The entries carry `.onDelete`, so the swipe
@@ -474,24 +495,24 @@ extension CalendarScreen {
         Group {
             Section {
                 if let date = model.state.selectedDate {
-                    HStack {
-                        Text(date).font(.headline)
-                        Spacer()
-                        Text("\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g")
-                            .monospacedDigit()
-                            .foregroundStyle(
-                                AlcoholCalculator.isOverLimit(
-                                    totalGrams: model.state.totalGramsSelected,
-                                    limitGrams: model.state.limitInfo.limitGrams
-                                ) ? .red : .secondary
-                            )
-                    }
+                    // The heading showed the STORED form, "2026-08-06", because the
+                    // string went into the Text unparsed. It is a date on screen and
+                    // a date to a reader, so it is formatted here like every other
+                    // date in the app.
+                    //
+                    // The grams that sat beside it are gone. The bar below states
+                    // the same figure against its limit, which is the more useful
+                    // of the two, and a reader met the number twice.
+                    Text(longDate(date)).font(.headline)
+                        // Silent: the bar below opens with this date, so the card
+                        // speaks as one sentence rather than two stops.
+                        .accessibilityHidden(true)
 
                     // The daily-limit bar under the selected day, as on Android's
                     // calendar. Only the daily gram limit is meaningful for a single
                     // historical day, so the weekly/drink-day bars are not shown.
                     LimitBar(
-                        caption: Loc.string("Today", locale: locale),
+                        caption: longDate(date),
                         value: "\(Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale)) g",
                         limit: "\(Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale)) g",
                         fill: LimitGauge.fillFraction(
@@ -507,7 +528,7 @@ extension CalendarScreen {
                         // rather than leaving VoiceOver to read its parts.
                         spokenSummary: Loc.string(
                             "%1$@: %2$@ of at most %3$@ grams of alcohol",
-                            Loc.string("Today", locale: locale),
+                            longDate(date),
                             Loc.number(model.state.totalGramsSelected, fractionDigits: 1, locale: locale),
                             Loc.number(model.state.limitInfo.limitGrams, fractionDigits: 0, locale: locale),
                             locale: locale
@@ -578,20 +599,26 @@ extension CalendarScreen {
     ///
     /// The time leads because it is what orders the list and what a reader
     /// scanning for one entry listens for; the drink name repeats across rows.
-    /// It is a `Text(_:style:)` rather than a formatted string on purpose —
-    /// VoiceOver reads "17:16" as two numbers, but speaks a date value in the
-    /// locale's own clock form.
+    ///
+    /// NOT CONCATENATED. `Text(_:style:)` hands VoiceOver a date VALUE, which it
+    /// speaks in the locale's clock form; a formatted string is just digits, read
+    /// out as digits — "19 0 5" for 19:05. That was the reasoning here already,
+    /// but the `+` undid it: joining two Texts flattens them into one string, and
+    /// the style went with it. The drink name now travels in the row's value
+    /// instead, where it does not have to share a Text with a date.
     private func entrySpokenLabel(_ entry: ConsumptionEntry) -> Text {
-        let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
-        return Text(time, style: .time) + Text(Loc.string(", %1$@", entry.drinkName, locale: locale))
+        Text(Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0), style: .time)
     }
 
     /// The row's spoken VALUE: the figures with their units written out, then
     /// the note. Shares its catalogue strings with Today's row, whose
     /// `entrySpokenValue` carries the reasoning.
     private func entrySpokenValue(_ entry: ConsumptionEntry) -> Text {
+        // The drink name leads the value, having moved out of the label so the
+        // time there could stay a date value — see `entrySpokenLabel`.
         var detail = Loc.string(
-            "%1$lld millilitres, %2$@ percent, %3$@ grams of alcohol",
+            "%1$@, %2$lld millilitres, %3$@ percent, %4$@ grams of alcohol",
+            entry.drinkName,
             entry.volumeMl,
             Loc.number(entry.alcoholPercent, fractionDigits: 1, locale: locale),
             Loc.number(entry.gramsAlcohol, fractionDigits: 1, locale: locale),

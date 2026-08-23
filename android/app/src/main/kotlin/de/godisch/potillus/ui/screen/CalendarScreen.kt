@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -225,6 +226,11 @@ fun CalendarScreen(
                                 Text(
                                     formatLogicalDate(date),
                                     style = MaterialTheme.typography.titleMedium,
+                                    // Silent here, spoken by the bar below: the two
+                                    // were separate stops, and the second opened with
+                                    // "Today" — a word for a day that may be months
+                                    // back. The bar now names the date it belongs to.
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
@@ -236,9 +242,10 @@ fun CalendarScreen(
                                         R.string.limit_caption_day,
                                         state.limitInfo.limitGrams.fmt0(locale),
                                     ),
-                                    // See TodayScreen's bars: the visible caption is
-                                    // an abbreviation, the spoken one a word.
-                                    spokenCaption = stringResource(R.string.today),
+                                    // The date, not "Today": this bar shows whichever
+                                    // day is selected, and the heading above it is
+                                    // silent, so the card speaks as one sentence.
+                                    spokenCaption = formatLogicalDate(date),
                                 )
                             }
                         }
@@ -289,6 +296,11 @@ fun CalendarScreen(
                                 Text(
                                     formatLogicalDate(date),
                                     style = MaterialTheme.typography.titleMedium,
+                                    // Silent here, spoken by the bar below: the two
+                                    // were separate stops, and the second opened with
+                                    // "Today" — a word for a day that may be months
+                                    // back. The bar now names the date it belongs to.
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 LimitBar(
@@ -300,9 +312,10 @@ fun CalendarScreen(
                                         R.string.limit_caption_day,
                                         state.limitInfo.limitGrams.fmt0(locale),
                                     ),
-                                    // See TodayScreen's bars: the visible caption is
-                                    // an abbreviation, the spoken one a word.
-                                    spokenCaption = stringResource(R.string.today),
+                                    // The date, not "Today": this bar shows whichever
+                                    // day is selected, and the heading above it is
+                                    // silent, so the card speaks as one sentence.
+                                    spokenCaption = formatLogicalDate(date),
                                 )
                             }
                         }
@@ -479,7 +492,13 @@ private fun MonthCalendar(
             }.forEach { label ->
                 Text(
                     label,
-                    modifier = Modifier.weight(1f),
+                    // Silent. The two-letter form reaches a reader as a fragment
+                    // ("Di" as "dei", "Fr" as "Frau"), and writing it out would put
+                    // seven stops before the month's first day for a fact every cell
+                    // below already carries: each day states its own full date. A
+                    // column header helps an eye scanning a grid; a reader moves
+                    // through the cells themselves.
+                    modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -606,6 +625,12 @@ private fun MonthCalendar(
                                     day.toString(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                    // Silent: the cell's contentDescription names the
+                                    // day in full, and a Text keeps its own `text`
+                                    // semantics whatever the parent says — so the
+                                    // number arrived a second time, after the date it
+                                    // is already part of.
+                                    modifier = Modifier.semantics { hideFromAccessibility() },
                                 )
                                 // The dot means alcohol, not "something is logged":
                                 // it is drawn in the neutral or the over-limit colour,
