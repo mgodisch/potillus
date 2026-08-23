@@ -483,6 +483,11 @@ fun StatsScreen(
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(Modifier.height(12.dp))
+                        // Resolved here, in composable context, and handed over as
+                        // finished text: the chart takes a list, not a lambda.
+                        val hourSpoken = state.hourBucketAverages.mapIndexed { b, v ->
+                            hourBucketSpoken(b, v, locale)
+                        }
                         ValueBarChart(
                             // Eight 3-hour buckets; average grams/day printed above.
                             values = state.hourBucketAverages,
@@ -497,13 +502,7 @@ fun StatsScreen(
                             // The axis shows the start hour; the sentence states
                             // the whole three-hour span, which is what the bar
                             // actually covers.
-                            spokenFor = { b ->
-                                hourBucketSpoken(
-                                    b,
-                                    state.hourBucketAverages.getOrElse(b) { 0.0 },
-                                    locale,
-                                )
-                            },
+                            spoken = hourSpoken,
                         )
                     }
                 }
@@ -544,7 +543,7 @@ fun StatsScreen(
                             chartLabel = stringResource(R.string.stats_weekday),
                             // The full weekday name, not the two-letter axis form:
                             // "Di" and "Fr" reach a reader as "dei" and "Frau".
-                            spokenFor = { i -> weekdaySpoken.getOrElse(i) { "" } },
+                            spoken = weekdaySpoken,
                         )
                     }
                 }

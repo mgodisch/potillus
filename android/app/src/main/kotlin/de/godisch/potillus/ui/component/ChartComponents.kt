@@ -383,8 +383,14 @@ fun ValueBarChart(
     showValues: Boolean = false,
     chartLabel: String? = null,
     /**
-     * What a screen reader says for the bar at this index, or `null` to leave the
-     * chart with one description for the whole canvas.
+     * One sentence per bar, in the order of [values] — or `null` to leave the
+     * chart with a single description for the whole canvas.
+     *
+     * A LIST, not a lambda: the sentences are built from string resources, and
+     * `stringResource` is composable. A plain `(Int) -> String` would be called
+     * from inside a parameter list, where it is not, and the caller would have to
+     * reach for a Context instead — which is what Compose's own lint forbids.
+     * Resolved at the call site, they arrive here as finished text.
      *
      * A single description was all the canvas could offer, and it named the
      * picture rather than its content: "Time of Day", one stop, and the figures
@@ -392,7 +398,7 @@ fun ValueBarChart(
      * "00", "03" — because two digits are what the axis has room for, and a
      * reader gets them as digits.
      */
-    spokenFor: ((Int) -> String)? = null,
+    spoken: List<String>? = null,
 ) {
     if (values.isEmpty() || values.all { it <= 0.0 }) {
         Box(modifier.height(140.dp), contentAlignment = Alignment.Center) {
@@ -420,7 +426,7 @@ fun ValueBarChart(
     // Text alternative for assistive technology (WCAG 1.1.1). Prefer the caller's
     // label (which knows what the bars mean); otherwise fall back to a neutral
     // generic name. (No bar count in the fallback: "%d bars" trips Android lint's
-    // PluralsCandidate check.) With [spokenFor] the per-bar sentences carry the
+    // PluralsCandidate check.) With [spoken] the per-bar sentences carry the
     // alternative instead, and this describes nothing a reader has to hear.
     val chartDescription = chartLabel ?: stringResource(R.string.chart_desc_value_bars)
 
@@ -431,52 +437,53 @@ fun ValueBarChart(
                 .height(150.dp)
                 .padding(top = 8.dp, bottom = 4.dp)
                 .then(
-                    if (spokenFor != null) {
+                    if (spoken != null) {
                         Modifier.semantics { hideFromAccessibility() }
                     } else {
                         Modifier.semantics { contentDescription = chartDescription }
                     },
                 ),
         ) {
-        val chartH = size.height
-        val chartW = size.width
-        val spacing = chartW / values.size
-        // 70% of a slice as bar width works for both the 7-bar weekday chart and
-        // the 24-bar hour chart; coerceAtLeast(2f) keeps thin hour bars visible.
-        val barW = (spacing * 0.7f).coerceAtLeast(2f)
+            val chartH = size.height
+            val chartW = size.width
+            val spacing = chartW / values.size
+            // 70% of a slice as bar width works for both the 7-bar weekday chart and
+            // the 24-bar hour chart; coerceAtLeast(2f) keeps thin hour bars visible.
+            val barW = (spacing * 0.7f).coerceAtLeast(2f)
 
-        val valuePaint = if (showValues) {
-            android.graphics.Paint().apply {
-                isAntiAlias = true
-                color = valueArgb
-                textAlign = android.graphics.Paint.Align.CENTER
-                textSize = 10.sp.toPx()
+            val valuePaint = if (showValues) {
+                android.graphics.Paint().apply {
+                    isAntiAlias = true
+                    color = valueArgb
+                    textAlign = android.graphics.Paint.Align.CENTER
+                    textSize = 10.sp.toPx()
+                }
+            } else {
+                null
             }
-        } else {
-            null
-        }
 
-        values.forEachIndexed { i, v ->
-            if (v <= 0.0) return@forEachIndexed
-            // barH proportional to the tallest bar; coerceAtLeast(2f) keeps a tiny
-            // but non-zero value visible.
-            val barH = (v / heightRef * chartH).toFloat().coerceAtLeast(2f)
-            val centerX = i * spacing + spacing / 2f
-            val barTop = chartH - barH
-            drawRoundRect(
-                color = barColor,
-                topLeft = Offset(centerX - barW / 2f, barTop),
-                size = Size(barW, barH),
-                cornerRadius = CornerRadius(3.dp.toPx()),
-            )
-            // Value just above the bar (one decimal), if requested.
-            valuePaint?.let { p ->
-                drawContext.canvas.nativeCanvas.drawText(
-                    v.fmt1(locale),
-                    centerX,
-                    barTop - 2.dp.toPx(),
-                    p,
+            values.forEachIndexed { i, v ->
+                if (v <= 0.0) return@forEachIndexed
+                // barH proportional to the tallest bar; coerceAtLeast(2f) keeps a tiny
+                // but non-zero value visible.
+                val barH = (v / heightRef * chartH).toFloat().coerceAtLeast(2f)
+                val centerX = i * spacing + spacing / 2f
+                val barTop = chartH - barH
+                drawRoundRect(
+                    color = barColor,
+                    topLeft = Offset(centerX - barW / 2f, barTop),
+                    size = Size(barW, barH),
+                    cornerRadius = CornerRadius(3.dp.toPx()),
                 )
+                // Value just above the bar (one decimal), if requested.
+                valuePaint?.let { p ->
+                    drawContext.canvas.nativeCanvas.drawText(
+                        v.fmt1(locale),
+                        centerX,
+                        barTop - 2.dp.toPx(),
+                        p,
+                    )
+                }
             }
         }
 
@@ -492,15 +499,15 @@ fun ValueBarChart(
         // The stop therefore covers the column, not the bar within it. For a
         // reader that is the better shape anyway: the empty space above a short
         // bar belongs to the same three hours.
-        if (spokenFor != null) {
+        if (spoken != null) {
             Row(Modifier.matchParentSize()) {
                 values.indices.forEach { i ->
-                    val spoken = spokenFor(i)
+                    val sentence = spoken.getOrElse(i) { "" }
                     Box(
                         Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .semantics { contentDescription = spoken },
+                            .semantics { contentDescription = sentence },
                     )
                 }
             }
@@ -515,7 +522,7 @@ fun ValueBarChart(
     // column's sentence carries the same information in words.
     Row(
         Modifier.fillMaxWidth()
-            .then(if (spokenFor != null) Modifier.semantics { hideFromAccessibility() } else Modifier),
+            .then(if (spoken != null) Modifier.semantics { hideFromAccessibility() } else Modifier),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         values.indices.forEach { i ->
