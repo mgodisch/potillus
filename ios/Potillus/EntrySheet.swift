@@ -133,6 +133,26 @@ struct EntrySheet: View {
         return selection != nil && DrinkValidator.volumeMlRange.contains(volume)
     }
 
+    /// "11.0 grams of pure alcohol: within your limits" — the preview row as one
+    /// sentence, matching what Android's preview says.
+    ///
+    /// Without the dot's state it is just the figure; the caption "Alcohol
+    /// Content" drops out, having been the least useful of the three stops — a
+    /// reader who has just typed an amount knows what the row is about.
+    private func alcoholSpoken(_ grams: Double, capacity: DrinkCapacity?) -> String {
+        let amount = Loc.string(
+            "%1$@: %2$@ grams of alcohol",
+            Loc.string("Alcohol Content", locale: locale),
+            Loc.number(grams, fractionDigits: 1, locale: locale),
+            locale: locale
+        )
+        guard let capacity else { return amount }
+        let status = TrafficLightDot.statusDescription(
+            for: capacity.status(forServing: grams), locale: locale
+        )
+        return Loc.string("%1$@: %2$@", amount, status, locale: locale)
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -154,8 +174,24 @@ struct EntrySheet: View {
 
                     TextField(Loc.string("Amount", locale: locale), text: $volumeText)
                         .keyboardType(.numberPad)
+                        // The visible label is one word and the unit lives in the
+                        // section's prose, so a reader met a bare "40, text field".
+                        // The spoken label carries the unit; the value stays the
+                        // field's own text, which is what matters while typing.
+                        .accessibilityLabel(Loc.string("Amount in millilitres", locale: locale))
 
-                    DatePicker(Loc.string("Time", locale: locale), selection: $timestamp)
+                    // Hours and minutes only. The picker offered a date as well,
+                    // which the field's own name contradicts and which the screen
+                    // behind it already fixes — the Today screen is today, and from
+                    // the calendar the view model overrides the logical date anyway,
+                    // so the date part of this timestamp is never the one that
+                    // counts. A reader heard it read out digit by digit before
+                    // reaching the time.
+                    DatePicker(
+                        Loc.string("Time", locale: locale),
+                        selection: $timestamp,
+                        displayedComponents: .hourAndMinute
+                    )
 
                     TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
                 } footer: {
@@ -182,6 +218,11 @@ struct EntrySheet: View {
                     let grams = AlcoholCalculator.calculateGrams(
                         volumeMl: volume, alcoholPercent: drink.alcoholPercent
                     )
+                    // Three stops became one: the caption, the dot's status and the
+                    // figure each spoke for themselves, so a reader met "Alcohol
+                    // Content", "Within your limits" and "11.0 g" with nothing
+                    // joining them. The sentence states the amount and how it
+                    // stands against the limit, as Android's preview row does.
                     LabeledContent(Loc.string("Alcohol Content", locale: locale)) {
                         HStack(spacing: 8) {
                             if let capacity {
@@ -196,6 +237,8 @@ struct EntrySheet: View {
                                 .monospacedDigit()
                         }
                     }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(alcoholSpoken(grams, capacity: capacity))
                 }
             }
             .navigationTitle(Loc.string(

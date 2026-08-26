@@ -261,6 +261,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s la sută</string>
     <string name="a11y_category_slice">%1$s: %2$s la sută, %3$s grame de alcool</string>
     <string name="a11y_hour_bucket">%1$s până la %2$s: %3$s grame de alcool</string>
+    <string name="a11y_volume_ml">Cantitate în mililitri</string>
     <string name="a11y_calendar_day_empty">%1$s, nimic înregistrat</string>
     <string name="a11y_calendar_day_grams">%1$s, %2$s grame</string>
     <string name="delete_entry">Șterge înregistrarea</string>

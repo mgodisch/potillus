@@ -208,6 +208,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s procent</string>
     <string name="a11y_category_slice">%1$s: %2$s procent, %3$s gram alkohol</string>
     <string name="a11y_hour_bucket">%1$s till %2$s: %3$s gram alkohol</string>
+    <string name="a11y_volume_ml">Mängd i milliliter</string>
     <string name="a11y_calendar_day_empty">%1$s, inget loggat</string>
     <string name="a11y_calendar_day_grams">%1$s, %2$s gram</string>
     <string name="delete_entry">Ta bort registrering</string>

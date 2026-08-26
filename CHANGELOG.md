@@ -170,6 +170,9 @@ Edit drinks from the list's edit mode
 - The selected day speaks as one sentence naming its date, and its heading shows
   a formatted one on both platforms.
 - An entry row speaks its time in the clock form of its language.
+- The add-entry dialog speaks each field as one sentence naming it before its
+  value.
+- The iOS time picker offers hours and minutes.
 - The edit toggle names the list it edits.
 - The category ring is silent on both platforms and its legend states each slice
   in one sentence.

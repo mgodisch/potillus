@@ -208,6 +208,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s τοις εκατό</string>
     <string name="a11y_category_slice">%1$s: %2$s τοις εκατό, %3$s γραμμάρια αλκοόλ</string>
     <string name="a11y_hour_bucket">%1$s έως %2$s: %3$s γραμμάρια αλκοόλ</string>
+    <string name="a11y_volume_ml">Ποσότητα σε χιλιοστόλιτρα</string>
     <string name="a11y_calendar_day_empty">%1$s, καμία καταγραφή</string>
     <string name="a11y_calendar_day_grams">%1$s, %2$s γραμμάρια</string>
     <string name="delete_entry">Διαγραφή καταχώρισης</string>

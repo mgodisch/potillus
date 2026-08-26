@@ -253,6 +253,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s パーセント</string>
     <string name="a11y_category_slice">%1$s：%2$s パーセント、アルコール %3$s グラム</string>
     <string name="a11y_hour_bucket">%1$s 時から %2$s 時まで：%3$s グラムのアルコール</string>
+    <string name="a11y_volume_ml">数量（ミリリットル）</string>
     <string name="a11y_calendar_day_empty">%1$s、記録なし</string>
     <string name="a11y_calendar_day_grams">%1$s、%2$s グラム</string>
     <string name="delete_entry">記録を削除</string>

@@ -58,6 +58,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -164,7 +167,14 @@ fun AddEditEntryDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(stringResource(R.string.drink)) },
-                        leadingIcon = selectedDrink?.let { { DrinkCategoryIcon(it.category) } },
+                        // The icon is decoration here: it repeats the category of a
+                        // drink whose name follows, and being a leading icon it
+                        // arrived FIRST — "Rum. Spirits." before the field had said
+                        // what it is. The list below still names the category for
+                        // each choice.
+                        leadingIcon = selectedDrink?.let {
+                            { Box(Modifier.semantics { hideFromAccessibility() }) { DrinkCategoryIcon(it.category) } }
+                        },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = drinkDropdownOpen) },
                         modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                     )
@@ -196,41 +206,76 @@ fun AddEditEntryDialog(
                 }
 
                 // ── Volume ────────────────────────────────────────────────────
+                val spokenVolumeLabel = stringResource(R.string.a11y_volume_ml)
                 OutlinedTextField(
                     value = volumeText,
                     onValueChange = { volumeText = it.filter { c -> c.isDigit() } },
                     label = { Text(stringResource(R.string.volume_ml)) },
-                    suffix = { Text("ml") },
+                    // "ml" is its own node and was read as two letters after the
+                    // field name. The spoken label carries the unit as a word
+                    // instead; the value comes from the field's own editable text,
+                    // which is what a reader needs while typing.
+                    suffix = { Text("ml", modifier = Modifier.semantics { hideFromAccessibility() }) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = volumeText.isNotEmpty() &&
                         (volumeText.toIntOrNull() ?: 0) !in DrinkValidator.VOLUME_ML_RANGE,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .semantics { contentDescription = spokenVolumeLabel },
                 )
 
                 // ── Time picker ───────────────────────────────────────────────
                 // Tapping the HH:MM field opens the Material 3 clock-style picker
                 // (TimePickerDialog) — the same interaction as setting an alarm.
+                // The caption and the button were two stops — "Time", swipe,
+                // "19:51, button" — with nothing tying the second to the first.
+                // The button carries both, because the button is what a reader
+                // acts on; the caption beside it falls silent.
+                val spokenTime = stringResource(
+                    R.string.a11y_caption_value,
+                    stringResource(R.string.time),
+                    "%02d:%02d".format(hour, minute),
+                )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    Text(stringResource(R.string.time), style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        stringResource(R.string.time),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.semantics { hideFromAccessibility() },
+                    )
                     Spacer(Modifier.weight(1f))
-                    OutlinedButton(onClick = { showTimePicker = true }) {
+                    OutlinedButton(
+                        onClick = { showTimePicker = true },
+                        modifier = Modifier.semantics { contentDescription = spokenTime },
+                    ) {
                         Text("%02d:%02d".format(hour, minute))
                     }
                 }
 
                 // ── Note ──────────────────────────────────────────────────────
+                val spokenNote = stringResource(R.string.note)
                 OutlinedTextField(
                     value = noteText,
                     onValueChange = { noteText = it },
                     label = { Text(stringResource(R.string.note)) },
                     maxLines = 2,
-                    modifier = Modifier.fillMaxWidth(),
+                    // An empty field reports its placeholder LAST, so the field
+                    // type arrived before the name of the thing being typed. A
+                    // stated description puts the name first.
+                    modifier = Modifier.fillMaxWidth()
+                        .semantics { contentDescription = spokenNote },
                 )
 
                 // ── Grams preview + traffic-light dot ─────────────────────────
                 // Shown only when a drink is selected and the volume is valid.
                 if (selectedDrink != null && volume > 0) {
+                    // The figure and the dot were two stops: "11.0 g pure alcohol",
+                    // swipe, "Within your limits" — the status arriving with nothing
+                    // to attach it to. One sentence states what the row shows: the
+                    // amount, and how it stands against the limit.
+                    val previewText = "\u2248 ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}"
+                    val spokenPreview = trafficLight?.let {
+                        stringResource(R.string.a11y_caption_value, previewText, it.displayLabel())
+                    } ?: previewText
                     Surface(
                         color = MaterialTheme.colorScheme.primaryContainer,
                         shape = MaterialTheme.shapes.small,
@@ -238,14 +283,17 @@ fun AddEditEntryDialog(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .semantics(mergeDescendants = true) { contentDescription = spokenPreview },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
-                                "≈ ${previewGrams.fmt1(locale)} ${stringResource(R.string.pure_alcohol)}",
+                                previewText,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f),
+                                // Hidden, not cleared: a parent's description is read
+                                // IN ADDITION to its children.
+                                modifier = Modifier.weight(1f).semantics { hideFromAccessibility() },
                             )
                             // Traffic-light dot: appears once a drink is selected and
                             // capacity data is available. Updates on every recomposition
@@ -253,7 +301,8 @@ fun AddEditEntryDialog(
                             if (trafficLight != null) {
                                 TrafficLightDot(
                                     light = trafficLight,
-                                    modifier = Modifier.padding(start = 4.dp),
+                                    modifier = Modifier.padding(start = 4.dp)
+                                        .semantics { hideFromAccessibility() },
                                     useSymbols = useStatusSymbols,
                                 )
                             }
