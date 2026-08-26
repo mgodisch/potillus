@@ -192,7 +192,14 @@ fun DrinksScreen(
         },
     ) { paddingValues ->
         LazyColumn(
-            contentPadding = PaddingValues(16.dp),
+            // Room to scroll the last row clear of the floating button; see
+            // FabListBottomPadding for why Scaffold's own padding is not enough.
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = FabListBottomPadding,
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxSize().padding(paddingValues),
         ) {

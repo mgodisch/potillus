@@ -85,6 +85,29 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 // ════════════════════════════════════════════════════════════════════════════
+// LIST PADDING BELOW A FLOATING ACTION BUTTON
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Extra bottom padding for a list that scrolls under a `FloatingActionButton`.
+ *
+ * `Scaffold` reports only the bars that DISPLACE content — status bar, top bar,
+ * bottom navigation. A FAB floats above the content by design and is not in that
+ * figure, so a list padded with the same 16dp it uses at the top ends with its
+ * last row underneath the button. On the Today and Drinks screens that row's
+ * delete button sits on the right, exactly where the FAB is.
+ *
+ * It is not only a reach problem: TalkBack treats a node that lies wholly beneath
+ * another as obscured and passes over it, so the last delete button went
+ * unspoken as well.
+ *
+ * 16dp bottom margin + 56dp button (Material's default `FloatingActionButton`;
+ * a Large or Small one would need a different figure) + 16dp clearance, so the
+ * row can be scrolled clear of the button rather than merely up to its edge.
+ */
+val FabListBottomPadding = 16.dp + 56.dp + 16.dp
+
+// ════════════════════════════════════════════════════════════════════════════
 // SECTION CARD
 // ════════════════════════════════════════════════════════════════════════════
 
