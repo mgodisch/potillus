@@ -206,21 +206,24 @@ fun AddEditEntryDialog(
                 }
 
                 // ── Volume ────────────────────────────────────────────────────
-                val spokenVolumeLabel = stringResource(R.string.a11y_volume_ml)
                 OutlinedTextField(
                     value = volumeText,
                     onValueChange = { volumeText = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.volume_ml)) },
-                    // "ml" is its own node and was read as two letters after the
-                    // field name. The spoken label carries the unit as a word
-                    // instead; the value comes from the field's own editable text,
-                    // which is what a reader needs while typing.
-                    suffix = { Text("ml", modifier = Modifier.semantics { hideFromAccessibility() }) },
+                    // The unit is IN the label, and the "ml" suffix beside the field
+                    // is gone. The suffix was its own node and reached a reader as
+                    // two letters trailing the field name.
+                    //
+                    // Not a separate spoken description: a Material text field reads
+                    // as VALUE, ROLE, LABEL, and a contentDescription is added to
+                    // that rather than replacing it — which said the field's name
+                    // twice. The order is the framework's; `clearAndSetSemantics`
+                    // would take it back, and with it the editable text and the set
+                    // action that make the field usable at all.
+                    label = { Text(stringResource(R.string.volume_ml_unit)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = volumeText.isNotEmpty() &&
                         (volumeText.toIntOrNull() ?: 0) !in DrinkValidator.VOLUME_ML_RANGE,
-                    modifier = Modifier.fillMaxWidth()
-                        .semantics { contentDescription = spokenVolumeLabel },
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // ── Time picker ───────────────────────────────────────────────
@@ -247,22 +250,23 @@ fun AddEditEntryDialog(
                         onClick = { showTimePicker = true },
                         modifier = Modifier.semantics { contentDescription = spokenTime },
                     ) {
-                        Text("%02d:%02d".format(hour, minute))
+                        // Hidden, not cleared: a description on the button is read
+                        // IN ADDITION to the text inside it, so the time arrived
+                        // twice — once in the sentence, once on its own.
+                        Text(
+                            "%02d:%02d".format(hour, minute),
+                            modifier = Modifier.semantics { hideFromAccessibility() },
+                        )
                     }
                 }
 
                 // ── Note ──────────────────────────────────────────────────────
-                val spokenNote = stringResource(R.string.note)
                 OutlinedTextField(
                     value = noteText,
                     onValueChange = { noteText = it },
                     label = { Text(stringResource(R.string.note)) },
                     maxLines = 2,
-                    // An empty field reports its placeholder LAST, so the field
-                    // type arrived before the name of the thing being typed. A
-                    // stated description puts the name first.
-                    modifier = Modifier.fillMaxWidth()
-                        .semantics { contentDescription = spokenNote },
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // ── Grams preview + traffic-light dot ─────────────────────────

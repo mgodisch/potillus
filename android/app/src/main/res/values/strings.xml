@@ -422,10 +422,11 @@ apply to it are stated in the accompanying COPYING.md file.
          %1$s = first hour, %2$s = last hour, %3$s = grams per day. The
          axis shows only the start hour; the span belongs in the words. -->
     <string name="a11y_hour_bucket">%1$s to %2$s hours: %3$s grams of alcohol</string>
-    <!-- TalkBack: the amount field. The visible label is "Amount" with a
-         separate "ml" suffix, and the suffix is its own node — it arrived
-         as two letters after the field name. Here the unit is a word. -->
-    <string name="a11y_volume_ml">Amount in millilitres</string>
+    <!-- Amount field label, visible AND spoken. The unit used to sit beside
+         the field as a "ml" suffix, which is its own node and reached a screen
+         reader as two letters after the field name. In the label it is a word
+         for everyone. -->
+    <string name="volume_ml_unit">Amount in millilitres</string>
     <!-- TalkBack: a calendar day with no entries. %1$s = the day. A silent cell
          leaves a reader with the bare day number and no way to tell an empty
          day from one whose content escaped them. -->

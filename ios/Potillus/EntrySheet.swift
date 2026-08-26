@@ -172,13 +172,16 @@ struct EntrySheet: View {
                         LabeledContent(Loc.string("Drink", locale: locale), value: only.name)
                     }
 
-                    TextField(Loc.string("Amount", locale: locale), text: $volumeText)
-                        .keyboardType(.numberPad)
-                        // The visible label is one word and the unit lives in the
-                        // section's prose, so a reader met a bare "40, text field".
-                        // The spoken label carries the unit; the value stays the
-                        // field's own text, which is what matters while typing.
-                        .accessibilityLabel(Loc.string("Amount in millilitres", locale: locale))
+                    // A bare TextField shows its placeholder only while empty, so
+                    // once a value was typed the row read "40" with nothing naming
+                    // it — on screen and to a reader alike. LabeledContent keeps the
+                    // name in view beside the value, as the rows below it do, and
+                    // the unit sits in the name rather than in a suffix node.
+                    LabeledContent(Loc.string("Amount in millilitres", locale: locale)) {
+                        TextField("", text: $volumeText)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                    }
 
                     // Hours and minutes only. The picker offered a date as well,
                     // which the field's own name contradicts and which the screen
@@ -192,6 +195,10 @@ struct EntrySheet: View {
                         selection: $timestamp,
                         displayedComponents: .hourAndMinute
                     )
+                    // Caption and value as one stop. `.combine` rather than
+                    // `.ignore`: it joins what the children say while leaving their
+                    // actions in place, and the picker has to stay operable.
+                    .accessibilityElement(children: .combine)
 
                     TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
                 } footer: {
