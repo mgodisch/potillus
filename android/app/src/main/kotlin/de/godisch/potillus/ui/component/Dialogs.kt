@@ -173,7 +173,7 @@ fun AddEditEntryDialog(
                         // what it is. The list below still names the category for
                         // each choice.
                         leadingIcon = selectedDrink?.let {
-                            { Box(Modifier.semantics { hideFromAccessibility() }) { DrinkCategoryIcon(it.category) } }
+                            { DrinkCategoryIcon(it.category, Modifier.semantics { hideFromAccessibility() }) }
                         },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = drinkDropdownOpen) },
                         modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
@@ -496,14 +496,21 @@ fun AddEditDrinkDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(stringResource(R.string.category)) },
-                        leadingIcon = { DrinkCategoryIcon(category) },
+                        // Silent: the icon's accessible name IS the category label,
+                        // and the field's value is that same word — so the category
+                        // arrived twice, once from the icon and once from the value
+                        // beside it. It keeps its name wherever it stands without
+                        // the word next to it, as in the drinks list.
+                        leadingIcon = { DrinkCategoryIcon(category, Modifier.semantics { hideFromAccessibility() }) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catExpanded) },
                         modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                     )
                     ExposedDropdownMenu(expanded = catExpanded, onDismissRequest = { catExpanded = false }) {
                         DrinkCategory.entries.forEach { cat ->
                             DropdownMenuItem(
-                                leadingIcon = { DrinkCategoryIcon(cat) },
+                                // Silent for the same reason: the row's text is the
+                                // category label, which is also the icon's name.
+                                leadingIcon = { DrinkCategoryIcon(cat, Modifier.semantics { hideFromAccessibility() }) },
                                 text = { Text(cat.displayLabel()) },
                                 onClick = {
                                     category = cat

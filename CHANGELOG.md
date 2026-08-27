@@ -170,8 +170,8 @@ Edit drinks from the list's edit mode
 - The selected day speaks as one sentence naming its date, and its heading shows
   a formatted one on both platforms.
 - An entry row speaks its time in the clock form of its language.
-- The add-entry dialog names each field once, and the amount carries its unit in
-  the label on both platforms.
+- The add-entry and drink dialogs name each field once, and the amount carries
+  its unit in the label on both platforms.
 - The iOS time picker offers hours and minutes.
 - The edit toggle names the list it edits.
 - The category ring is silent on both platforms and its legend states each slice
