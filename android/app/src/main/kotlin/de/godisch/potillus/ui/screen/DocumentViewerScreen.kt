@@ -102,13 +102,16 @@ fun DocumentViewerScreen(
     title: String,
     @RawRes rawRes: Int,
     renderAsMarkdown: Boolean,
-    onBack: () -> Unit = {},
     /**
      * What a screen reader says instead of [title], where the visible form does
      * not survive being read aloud. "BSD" reaches a speech synthesiser as the ISO
      * currency code for the Bahamian dollar.
      */
     spokenTitle: String = title,
+    // Last, as Kotlin's convention has it: a trailing lambda binds to the final
+    // parameter, and every caller here happens to name `onBack` — the next one
+    // might not.
+    onBack: () -> Unit = {},
 ) {
     val resources = LocalResources.current
     // Read the bundled raw resource OFF the main thread. Although the asset ships

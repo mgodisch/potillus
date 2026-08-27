@@ -245,7 +245,7 @@ fun AboutScreen(
                 // declares no INTERNET permission, and that stays true: opening a
                 // URL is the system's work, not this app's.
                 CardLink("Source code") { uriHandler.openUri(SOURCE_REPOSITORY) }
-                CardLink("GNU General Public License v3", onOpenGpl3)
+                CardLink("GNU General Public License v3", onClick = onOpenGpl3)
             }
 
             SectionHeading("Open-source components", Modifier.padding(top = 12.dp))
@@ -259,7 +259,7 @@ fun AboutScreen(
                         "(Copyright © The JSpecify Authors).",
                 )
                 HorizontalDivider()
-                CardLink("Apache License 2.0", onOpenApache2)
+                CardLink("Apache License 2.0", onClick = onOpenApache2)
             }
             SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
@@ -272,7 +272,7 @@ fun AboutScreen(
                         "it.",
                 )
                 HorizontalDivider()
-                CardLink("GNU General Public License v2", onOpenGpl2)
+                CardLink("GNU General Public License v2", onClick = onOpenGpl2)
             }
             SectionCard(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 BodyText(
@@ -297,8 +297,8 @@ fun AboutScreen(
                 // actually carries.
                 CardLink(
                     "BSD 3-Clause License",
-                    onOpenBsd3,
                     spoken = "Berkeley Software Distribution 3-Clause License",
+                    onClick = onOpenBsd3,
                 )
             }
         }
@@ -360,7 +360,11 @@ private fun BodyText(text: String, spoken: String? = null) {
  * repository, and only the first of them opens a license.
  */
 @Composable
-private fun CardLink(text: String, onClick: () -> Unit, spoken: String = text) {
+// `spoken` before `onClick`, not after: a trailing lambda binds to the LAST
+// parameter, so `CardLink("Source code") { … }` would hand the lambda to `spoken`
+// and leave `onClick` unfilled. Kotlin's own convention puts the function last for
+// exactly this reason.
+private fun CardLink(text: String, spoken: String = text, onClick: () -> Unit) {
     TextButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
