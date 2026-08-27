@@ -293,6 +293,7 @@ fun AppNavigation(
         composable<Screen.LicenseBsd3> {
             DocumentViewerScreen(
                 title = "BSD 3-Clause",
+                spokenTitle = "Berkeley Software Distribution 3-Clause",
                 rawRes = R.raw.license_bsd3,
                 renderAsMarkdown = true,
                 onBack = { navController.navigateUp() },

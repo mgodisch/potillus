@@ -172,6 +172,8 @@ Edit drinks from the list's edit mode
 - An entry row speaks its time in the clock form of its language.
 - The add-entry and drink dialogs name each field once, and the amount carries
   its unit in the label on both platforms.
+- The BSD licence names are spoken in full.
+- The iOS About screen speaks English, the language it is written in.
 - The iOS time picker offers hours and minutes.
 - The edit toggle names the list it edits.
 - The category ring is silent on both platforms and its legend states each slice

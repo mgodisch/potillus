@@ -48,6 +48,8 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
@@ -101,6 +103,12 @@ fun DocumentViewerScreen(
     @RawRes rawRes: Int,
     renderAsMarkdown: Boolean,
     onBack: () -> Unit = {},
+    /**
+     * What a screen reader says instead of [title], where the visible form does
+     * not survive being read aloud. "BSD" reaches a speech synthesiser as the ISO
+     * currency code for the Bahamian dollar.
+     */
+    spokenTitle: String = title,
 ) {
     val resources = LocalResources.current
     // Read the bundled raw resource OFF the main thread. Although the asset ships
@@ -127,7 +135,14 @@ fun DocumentViewerScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = {
+                    Text(
+                        title,
+                        // A Text has no children to lose by clearing, and a stated
+                        // description would otherwise be read in addition to it.
+                        modifier = Modifier.clearAndSetSemantics { contentDescription = spokenTitle },
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(

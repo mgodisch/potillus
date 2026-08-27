@@ -192,6 +192,19 @@ struct AboutScreen: View {
         // title is too. The menu entry that leads here is localised.
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
+        // ENGLISH TO THE SPEECH SYNTHESISER TOO.
+        //
+        // Every word on this screen is English — the licence prose has to be, and
+        // the labels around it follow so the page does not switch language halfway
+        // down. VoiceOver did not know that: it read the whole thing with a German
+        // voice for a German user, which turns "General Public License" into
+        // something between languages.
+        //
+        // SwiftUI has no accessibility-language modifier. It derives the speech
+        // language from the view's locale, so setting the locale here states in one
+        // place what the screen already is. The strings are literals rather than
+        // catalogue lookups, so nothing else on this screen depends on the locale.
+        .environment(\.locale, Locale(identifier: "en"))
     }
 }
 

@@ -50,6 +50,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.BuildConfig
@@ -278,9 +282,24 @@ fun AboutScreen(
                         "besides the rewriting recipe D8 reads at build time, it " +
                         "carries the conversion classes that run on the device " +
                         "whenever desugared types meet a platform API.",
+                    // Same reason as the link below: "BSD" is spoken as a currency.
+                    spoken = "Under the Berkeley Software Distribution 3-Clause " +
+                        "License: desugar_jdk_libs_configuration (Copyright © 2016, " +
+                        "the R8 project authors). It ships beside desugar_jdk_libs " +
+                        "above: besides the rewriting recipe D8 reads at build time, " +
+                        "it carries the conversion classes that run on the device " +
+                        "whenever desugared types meet a platform API.",
                 )
                 HorizontalDivider()
-                CardLink("BSD 3-Clause License", onOpenBsd3)
+                // "BSD" reaches a speech synthesiser as the ISO currency code for
+                // the Bahamian dollar — "three Bahamian dollar clause license".
+                // Spelled out it is both unambiguous and the name the licence
+                // actually carries.
+                CardLink(
+                    "BSD 3-Clause License",
+                    onOpenBsd3,
+                    spoken = "Berkeley Software Distribution 3-Clause License",
+                )
             }
         }
     }
@@ -315,8 +334,17 @@ private fun SectionHeading(text: String, modifier: Modifier = Modifier) {
  * change the typeface.
  */
 @Composable
-private fun BodyText(text: String) {
-    Text(text = text, style = MaterialTheme.typography.bodyMedium)
+private fun BodyText(text: String, spoken: String? = null) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        // clearAndSetSemantics is not needed: a Text without a stated description
+        // speaks its own text, and a stated one replaces nothing — so the spoken
+        // form goes on through `semantics` only when there IS one, and the plain
+        // case stays untouched.
+        modifier = spoken?.let { Modifier.clearAndSetSemantics { contentDescription = it } }
+            ?: Modifier,
+    )
 }
 
 /**
@@ -332,8 +360,14 @@ private fun BodyText(text: String) {
  * repository, and only the first of them opens a license.
  */
 @Composable
-private fun CardLink(text: String, onClick: () -> Unit) {
-    TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Text(text)
+private fun CardLink(text: String, onClick: () -> Unit, spoken: String = text) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+            .semantics { contentDescription = spoken },
+    ) {
+        // Hidden, not cleared: a description on the button is read IN ADDITION
+        // to the text inside it.
+        Text(text, modifier = Modifier.semantics { hideFromAccessibility() })
     }
 }
