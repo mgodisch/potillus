@@ -226,6 +226,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s por ciento</string>
     <string name="a11y_category_slice">%1$s: %2$s por ciento, %3$s gramos de alcohol</string>
     <string name="a11y_hour_bucket">%1$s hasta %2$s h: %3$s gramos de alcohol</string>
+    <string name="a11y_bucket_average">%1$s: %2$s gramos de alcohol al día de media</string>
     <string name="volume_ml_unit">Cantidad en mililitros</string>
     <string name="a11y_calendar_day_empty">%1$s, sin registros</string>
     <string name="a11y_calendar_day_grams">%1$s, %2$s gramos</string>
@@ -275,6 +276,5 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="capacity_status_reached">Límite alcanzado</string>
     <string name="alt_status_symbols">Símbolos de estado alternativos</string>
     <string name="alt_status_symbols_desc">Mostrar una forma (cruz, 1, flecha) en el punto de estado además del color</string>
-    <string name="chart_desc_daily_avg">Gráfico de barras del alcohol medio por día</string>
     <string name="chart_desc_value_bars">Gráfico de barras</string>
 </resources>

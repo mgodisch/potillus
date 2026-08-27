@@ -208,6 +208,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s procent</string>
     <string name="a11y_category_slice">%1$s: %2$s procent, %3$s gram alcohol</string>
     <string name="a11y_hour_bucket">%1$s tot %2$s uur: %3$s gram alcohol</string>
+    <string name="a11y_bucket_average">%1$s: gemiddeld %2$s gram alcohol per dag</string>
     <string name="volume_ml_unit">Hoeveelheid in milliliter</string>
     <string name="a11y_calendar_day_empty">%1$s, niets vastgelegd</string>
     <string name="a11y_calendar_day_grams">%1$s, %2$s gram</string>
@@ -256,6 +257,5 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="capacity_status_reached">Limiet bereikt</string>
     <string name="alt_status_symbols">Alternatieve statussymbolen</string>
     <string name="alt_status_symbols_desc">Toon naast de kleur een vorm (kruis, 1, pijl) in de statusstip</string>
-    <string name="chart_desc_daily_avg">Staafdiagram van gemiddelde alcohol per dag</string>
     <string name="chart_desc_value_bars">Staafdiagram</string>
 </resources>

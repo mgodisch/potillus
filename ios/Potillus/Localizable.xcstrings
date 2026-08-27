@@ -1788,6 +1788,137 @@
         }
       }
     },
+    "%1$@: %2$@ grams of alcohol per day on average" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: průměrně %2$@ gramů alkoholu denně"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: gennemsnitligt %2$@ gram alkohol om dagen"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: durchschnittlich %2$@ Gramm Alkohol pro Tag"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: κατά μέσο όρο %2$@ γραμμάρια αλκοόλ την ημέρα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ grams of alcohol per day on average"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: %2$@ gramos de alcohol al día de media"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ : %2$@ grammes d’alcool par jour en moyenne"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: in media %2$@ grammi di alcol al giorno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@：1 日あたり平均 %2$@ グラムのアルコール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: 하루 평균 %2$@ 그램의 알코올"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: gjennomsnittlig %2$@ gram alkohol per dag"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: gemiddeld %2$@ gram alcohol per dag"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: średnio %2$@ gramów alkoholu dziennie"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: em média %2$@ gramas de álcool por dia"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: em média %2$@ gramas de álcool por dia"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: în medie %2$@ grame de alcool pe zi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: в среднем %2$@ граммов алкоголя в день"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: i genomsnitt %2$@ gram alkohol per dag"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@: у середньому %2$@ грамів алкоголю на день"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@：平均每天 %2$@ 克酒精"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@：平均每天 %2$@ 克酒精"
+          }
+        }
+      }
+    },
     "%1$@: %2$@ of at most %3$@" : {
       "extractionState" : "manual",
       "localizations" : {

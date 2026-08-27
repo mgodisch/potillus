@@ -299,6 +299,30 @@ fun StatsScreen(
                         }
                     }
                     val isYear = state.period == StatsPeriod.YEAR
+                    // One sentence per bar. Two phrasings, because a bar means two
+                    // different things: in WEEK and MONTH it is a DAY and its figure
+                    // is that day's total; in YEAR it is a MONTH and the figure is a
+                    // mean over its days. A dry day states its nought rather than
+                    // falling silent, so a reader does not take it for a gap.
+                    // The long date style, as the period line and the calendar use:
+                    // an abbreviated month reaches a reader as letters.
+                    val spokenDayFmt = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+                        .withLocale(locale)
+                    val spokenBuckets = state.chartBuckets.map { bucket ->
+                        val value = bucket.avgPerDay.fmt1(locale)
+                        val spokenDate = runCatching {
+                            LocalDate.parse(bucket.labelDate, DayResolver.DATE_FORMATTER)
+                        }.getOrNull()
+                        if (isYear) {
+                            val month = spokenDate?.let {
+                                "${it.month.getDisplayName(TextStyle.FULL_STANDALONE, locale)} ${it.year}"
+                            } ?: labelFn(bucket)
+                            stringResource(R.string.a11y_bucket_average, month, value)
+                        } else {
+                            val day = spokenDate?.format(spokenDayFmt) ?: labelFn(bucket)
+                            stringResource(R.string.a11y_caption_grams, day, value)
+                        }
+                    }
                     AlcoholBarChart(
                         buckets = state.chartBuckets,
                         limitGrams = state.limitInfo.limitGrams,
@@ -311,6 +335,7 @@ fun StatsScreen(
                         // (the month's grams-per-day). The dense ~30-bar MONTH
                         // view stays unlabelled to avoid clutter.
                         showBarValues = state.period == StatsPeriod.WEEK || isYear,
+                        spoken = spokenBuckets,
                     )
                 }
             }

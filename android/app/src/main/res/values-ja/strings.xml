@@ -253,6 +253,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="a11y_percent">%1$s パーセント</string>
     <string name="a11y_category_slice">%1$s：%2$s パーセント、アルコール %3$s グラム</string>
     <string name="a11y_hour_bucket">%1$s 時から %2$s 時まで：%3$s グラムのアルコール</string>
+    <string name="a11y_bucket_average">%1$s：1 日あたり平均 %2$s グラムのアルコール</string>
     <string name="volume_ml_unit">数量（ミリリットル）</string>
     <string name="a11y_calendar_day_empty">%1$s、記録なし</string>
     <string name="a11y_calendar_day_grams">%1$s、%2$s グラム</string>
@@ -300,6 +301,5 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="capacity_status_reached">上限に達しました</string>
     <string name="alt_status_symbols">代替ステータス記号</string>
     <string name="alt_status_symbols_desc">色に加えて、状態のドット内に記号（×、1、矢印）を表示します</string>
-    <string name="chart_desc_daily_avg">1日あたりの平均アルコール量の棒グラフ</string>
     <string name="chart_desc_value_bars">棒グラフ</string>
 </resources>

@@ -534,6 +534,39 @@ extension StatsScreen {
     /// comparison. The predicate carries the 1e-6 epsilon both platforms share, so
     /// the bar reddens on exactly the days the days-over-limit count above it
     /// counts — the alternative is a screen that contradicts itself.
+    /// "3 August 2026: 3.0 grams of alcohol" — one bar as a sentence.
+    ///
+    /// Two phrasings, because a bar means two different things. In the week and
+    /// month views it is a DAY and its figure is that day's total; in the year
+    /// view it is a MONTH and the figure is a mean over the month's days, which
+    /// is why no daily-limit line is drawn there either (see [showsLimitLine]).
+    /// One wording for both would state a total where an average stands.
+    ///
+    /// The date is spelled out. The stored form goes to the chart's x value, and
+    /// that is what VoiceOver was reading back as digits.
+    private func bucketSpoken(_ bucket: ChartBucket) -> String {
+        let grams = Loc.number(bucket.avgPerDay, fractionDigits: 1, locale: locale)
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.timeZone = TimeZone(identifier: "UTC")
+        parser.dateFormat = "yyyy-MM-dd"
+        let parsed = parser.date(from: bucket.labelDate)
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        if model.state.period == .year {
+            formatter.setLocalizedDateFormatFromTemplate("yMMMM")
+            let month = parsed.map { formatter.string(from: $0) } ?? bucket.labelDate
+            return Loc.string(
+                "%1$@: %2$@ grams of alcohol per day on average", month, grams, locale: locale
+            )
+        }
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        let day = parsed.map { formatter.string(from: $0) } ?? bucket.labelDate
+        return Loc.string("%1$@: %2$@ grams of alcohol", day, grams, locale: locale)
+    }
+
     private func barColor(for bucket: ChartBucket) -> Color {
         guard showsLimitLine else { return Color.accentColor }
         let over = AlcoholCalculator.isOverLimit(
@@ -624,12 +657,23 @@ extension StatsScreen {
                                 .foregroundStyle(Color.green)
                         }
                         .foregroundStyle(Color.green)
+                        // A dry day states its nought rather than falling silent,
+                        // so a reader does not take it for a gap in the series.
+                        .accessibilityLabel(bucketSpoken(bucket))
+                        .accessibilityValue("")
                     } else {
                         BarMark(
                             x: .value("Date", bucket.labelDate),
                             y: .value("Grams per day", bucket.avgPerDay)
                         )
                         .foregroundStyle(barColor(for: bucket))
+                        // Swift Charts speaks a mark from its `.value` labels, and
+                        // the x value here is the STORED date — "2026 0 8 0 3 0",
+                        // the ISO string read digit by digit with the figure after
+                        // it. The sentence replaces both, on the mark itself so the
+                        // focus lands on the bar it belongs to.
+                        .accessibilityLabel(bucketSpoken(bucket))
+                        .accessibilityValue("")
                     }
                 }
                 if showsLimitLine {

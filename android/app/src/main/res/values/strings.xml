@@ -422,6 +422,10 @@ apply to it are stated in the accompanying COPYING.md file.
          %1$s = first hour, %2$s = last hour, %3$s = grams per day. The
          axis shows only the start hour; the span belongs in the words. -->
     <string name="a11y_hour_bucket">%1$s to %2$s hours: %3$s grams of alcohol</string>
+    <!-- TalkBack: one bar of the YEAR view, where a bar is a month and
+         its value a mean over that month’s days, not a total. The day
+         views use a11y_caption_grams, whose figure IS the day. -->
+    <string name="a11y_bucket_average">%1$s: %2$s grams of alcohol per day on average</string>
     <!-- Amount field label, visible AND spoken. The unit used to sit beside
          the field as a "ml" suffix, which is its own node and reached a screen
          reader as two letters after the field name. In the label it is a word
@@ -517,6 +521,5 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="capacity_status_reached">Limit reached</string>
     <string name="alt_status_symbols">Alternative Status Symbols</string>
     <string name="alt_status_symbols_desc">Show a shape (cross, 1, arrow) in the capacity dot in addition to the colour</string>
-    <string name="chart_desc_daily_avg">Bar chart of average alcohol per day</string>
     <string name="chart_desc_value_bars">Bar chart</string>
 </resources>

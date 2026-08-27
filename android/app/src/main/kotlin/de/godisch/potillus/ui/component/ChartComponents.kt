@@ -162,6 +162,16 @@ fun AlcoholBarChart(
     modifier: Modifier = Modifier,
     showLimitLine: Boolean = true,
     showBarValues: Boolean = false,
+    /**
+     * One sentence per bar, in the order of [buckets] — or `null` to fall back to
+     * a single description for the whole canvas.
+     *
+     * A LIST, not a lambda: the sentences are built from string resources, and
+     * `stringResource` is composable. The screen builds them because only it knows
+     * whether a bar is a DAY (its figure is that day's total) or a MONTH (a mean
+     * over the month's days) — one phrasing cannot serve both.
+     */
+    spoken: List<String>? = null,
 ) {
     if (buckets.isEmpty()) {
         Box(modifier.height(180.dp), contentAlignment = Alignment.Center) {
@@ -204,109 +214,139 @@ fun AlcoholBarChart(
     // TalkBack announces something meaningful. (No bucket count in the text: a
     // "%d periods" phrasing trips Android lint's PluralsCandidate check, and the
     // exact number adds little for a screen-reader summary.)
-    val chartDescription = stringResource(R.string.chart_desc_daily_avg)
+    val chartDescription = stringResource(R.string.chart_desc_value_bars)
 
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(top = 8.dp, bottom = 24.dp)
-            .semantics { contentDescription = chartDescription },
-    ) {
-        val chartH = size.height
-        val chartW = size.width
-        // Each bar occupies an equal horizontal slice (spacing = chartW / numBars).
-        // The actual bar width is 60 % of the slice to leave gaps between bars.
-        // coerceAtLeast(2f) keeps a hairline bar visible even with ~53 weekly bars.
-        val spacing = chartW / buckets.size
-        val barW = (spacing * 0.6f).coerceAtLeast(2f)
+    Box(modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(top = 8.dp, bottom = 24.dp)
+                .then(
+                    if (spoken != null) {
+                        Modifier.semantics { hideFromAccessibility() }
+                    } else {
+                        Modifier.semantics { contentDescription = chartDescription }
+                    },
+                ),
+        ) {
+            val chartH = size.height
+            val chartW = size.width
+            // Each bar occupies an equal horizontal slice (spacing = chartW / numBars).
+            // The actual bar width is 60 % of the slice to leave gaps between bars.
+            // coerceAtLeast(2f) keeps a hairline bar visible even with ~53 weekly bars.
+            val spacing = chartW / buckets.size
+            val barW = (spacing * 0.6f).coerceAtLeast(2f)
 
-        // Paint for the per-bar value labels (grams), centred above each bar.
-        // Null when labels are disabled, so the loop below skips drawing them.
-        val valuePaint = if (showBarValues) {
-            android.graphics.Paint().apply {
-                isAntiAlias = true
-                color = valueArgb
-                textAlign = android.graphics.Paint.Align.CENTER
-                textSize = 9.sp.toPx()
+            // Paint for the per-bar value labels (grams), centred above each bar.
+            // Null when labels are disabled, so the loop below skips drawing them.
+            val valuePaint = if (showBarValues) {
+                android.graphics.Paint().apply {
+                    isAntiAlias = true
+                    color = valueArgb
+                    textAlign = android.graphics.Paint.Align.CENTER
+                    textSize = 9.sp.toPx()
+                }
+            } else {
+                null
             }
-        } else {
-            null
+
+            // Dashed horizontal daily-limit line — only when meaningful. The YEAR
+            // view shows monthly totals with no daily-limit reference, so it passes
+            // showLimitLine = false and no line is drawn.
+            if (showLimitLine) {
+                val limitY = chartH - (limitGrams / maxVal * chartH).toFloat()
+                drawLine(
+                    color = limitColor,
+                    start = Offset(0f, limitY),
+                    end = Offset(chartW, limitY),
+                    strokeWidth = 2.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f)),
+                )
+            }
+
+            buckets.forEachIndexed { i, bucket ->
+                val centerX = i * spacing + spacing / 2f
+                if (bucket.isAbstinent) {
+                    // Green tick at the baseline: two short strokes forming a check.
+                    // Sized to the slice so it stays visible but never overlaps neighbours.
+                    val s = (spacing * 0.30f).coerceIn(2.dp.toPx(), 5.dp.toPx())
+                    val baseY = chartH - 1.dp.toPx()
+                    val w = 1.5.dp.toPx()
+                    drawLine(
+                        tickColor,
+                        Offset(centerX - s, baseY - s * 0.5f),
+                        Offset(centerX - s * 0.25f, baseY),
+                        strokeWidth = w,
+                    )
+                    drawLine(
+                        tickColor,
+                        Offset(centerX - s * 0.25f, baseY),
+                        Offset(centerX + s, baseY - s),
+                        strokeWidth = w,
+                    )
+                } else if (bucket.avgPerDay > 0.0) {
+                    // Bar value: the bucket's per-day average (day grams for DAILY
+                    // buckets, the month's grams-per-day for the YEAR view).
+                    val value = bucket.avgPerDay
+                    // barH: height in pixels; coerceAtLeast(2f) makes even 0.x-gram bars visible
+                    val barH = (value / maxVal * chartH).toFloat().coerceAtLeast(2f)
+                    val left = centerX - barW / 2f
+                    // Over-limit red only applies when a daily-limit line is shown.
+                    val color = if (showLimitLine && AlcoholCalculator.isOverLimit(value, limitGrams)) overColor else barColor
+                    drawRoundRect(
+                        color = color,
+                        topLeft = Offset(left, chartH - barH),
+                        size = Size(barW, barH),
+                        cornerRadius = CornerRadius(3.dp.toPx()),
+                    )
+                    // Value label just above the bar: per-day average, commercially
+                    // rounded to a whole number (HALF_UP via %.0f; values are ≥ 0) and
+                    // printed without a unit to keep it narrow.
+                    valuePaint?.let { p ->
+                        drawContext.canvas.nativeCanvas.drawText(
+                            value.fmt0(locale),
+                            centerX,
+                            chartH - barH - 2.dp.toPx(),
+                            p,
+                        )
+                    }
+                }
+                // else: a non-abstinent bucket with a zero average is the still-in-
+                // progress current day/period (superposition). It is neither a finished
+                // abstinent bucket (no tick) nor a real consumption bar (no bar), so it
+                // is left as an empty slot until it resolves — a drink is logged (bar)
+                // or the day-change time passes with the period dry (tick). This pairs
+                // with ChartBucketing.bucketize, which withholds isAbstinent from any
+                // bucket that still holds the open day.
+            }
         }
 
-        // Dashed horizontal daily-limit line — only when meaningful. The YEAR
-        // view shows monthly totals with no daily-limit reference, so it passes
-        // showLimitLine = false and no line is drawn.
-        if (showLimitLine) {
-            val limitY = chartH - (limitGrams / maxVal * chartH).toFloat()
-            drawLine(
-                color = limitColor,
-                start = Offset(0f, limitY),
-                end = Offset(chartW, limitY),
-                strokeWidth = 2.dp.toPx(),
-                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f)),
-            )
-        }
-
-        buckets.forEachIndexed { i, bucket ->
-            val centerX = i * spacing + spacing / 2f
-            if (bucket.isAbstinent) {
-                // Green tick at the baseline: two short strokes forming a check.
-                // Sized to the slice so it stays visible but never overlaps neighbours.
-                val s = (spacing * 0.30f).coerceIn(2.dp.toPx(), 5.dp.toPx())
-                val baseY = chartH - 1.dp.toPx()
-                val w = 1.5.dp.toPx()
-                drawLine(
-                    tickColor,
-                    Offset(centerX - s, baseY - s * 0.5f),
-                    Offset(centerX - s * 0.25f, baseY),
-                    strokeWidth = w,
-                )
-                drawLine(
-                    tickColor,
-                    Offset(centerX - s * 0.25f, baseY),
-                    Offset(centerX + s, baseY - s),
-                    strokeWidth = w,
-                )
-            } else if (bucket.avgPerDay > 0.0) {
-                // Bar value: the bucket's per-day average (day grams for DAILY
-                // buckets, the month's grams-per-day for the YEAR view).
-                val value = bucket.avgPerDay
-                // barH: height in pixels; coerceAtLeast(2f) makes even 0.x-gram bars visible
-                val barH = (value / maxVal * chartH).toFloat().coerceAtLeast(2f)
-                val left = centerX - barW / 2f
-                // Over-limit red only applies when a daily-limit line is shown.
-                val color = if (showLimitLine && AlcoholCalculator.isOverLimit(value, limitGrams)) overColor else barColor
-                drawRoundRect(
-                    color = color,
-                    topLeft = Offset(left, chartH - barH),
-                    size = Size(barW, barH),
-                    cornerRadius = CornerRadius(3.dp.toPx()),
-                )
-                // Value label just above the bar: per-day average, commercially
-                // rounded to a whole number (HALF_UP via %.0f; values are ≥ 0) and
-                // printed without a unit to keep it narrow.
-                valuePaint?.let { p ->
-                    drawContext.canvas.nativeCanvas.drawText(
-                        value.fmt0(locale),
-                        centerX,
-                        chartH - barH - 2.dp.toPx(),
-                        p,
+        // ONE FOCUS STOP PER BAR, laid over the canvas — see ValueBarChart for
+        // why the columns take their width from weight(1f) rather than from a
+        // second copy of the DrawScope's arithmetic.
+        if (spoken != null) {
+            Row(Modifier.matchParentSize()) {
+                buckets.indices.forEach { i ->
+                    val sentence = spoken.getOrElse(i) { "" }
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .semantics { contentDescription = sentence },
                     )
                 }
             }
-            // else: a non-abstinent bucket with a zero average is the still-in-
-            // progress current day/period (superposition). It is neither a finished
-            // abstinent bucket (no tick) nor a real consumption bar (no bar), so it
-            // is left as an empty slot until it resolves — a drink is logged (bar)
-            // or the day-change time passes with the period dry (tick). This pairs
-            // with ChartBucketing.bucketize, which withholds isAbstinent from any
-            // bucket that still holds the open day.
         }
     }
 
     // X-axis labels. For a short series, one aligned label per bar; for a dense
     // series, a handful of evenly spaced labels for axis context.
+    //
+    // Hidden on EACH Text when the bars speak: a Text keeps its own semantics
+    // whatever sits around it, and the thinned axis reaches a reader as loose
+    // fragments — "01", "06" — after the bars have already said the dates in
+    // full. Visible it stays; it is useful to an eye.
     if (buckets.size <= 12) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             buckets.forEach { bucket ->
@@ -317,7 +357,14 @@ fun AlcoholBarChart(
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f)
+                        .then(
+                            if (spoken != null) {
+                                Modifier.semantics { hideFromAccessibility() }
+                            } else {
+                                Modifier
+                            },
+                        ),
                 )
             }
         }
@@ -337,6 +384,11 @@ fun AlcoholBarChart(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = if (spoken != null) {
+                        Modifier.semantics { hideFromAccessibility() }
+                    } else {
+                        Modifier
+                    },
                 )
             }
         }

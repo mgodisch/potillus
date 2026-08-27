@@ -180,6 +180,8 @@ Edit drinks from the list's edit mode
   in one sentence.
 - The hour and weekday charts speak one sentence per column, the hours as a span
   and the weekdays by name.
+- The consumption chart speaks one sentence per bar, a day as its total and a
+  month as its average.
 - The weekday axis follows the in-app language.
 - The calendar header and month name follow the in-app language.
 - The language picker labels its system entry in the system language.
