@@ -246,6 +246,7 @@ Edit drinks from the list's edit mode
 - The security documents name the asset the app's own encryption covers.
 - The time-of-day chart on the iOS statistics screen reads the recorded frame.
 - The weekday chart averages over every occurrence of the weekday.
+- `make -C android verification-metadata` rewrites the checksum file.
 
 ---
 

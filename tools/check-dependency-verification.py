@@ -62,7 +62,8 @@ WHAT IT DOES NOT CHECK
     configuration at task-execution time, so those artifacts belong to no
     configuration the catalogue names and no amount of reading the catalogue
     reveals them. They are also the ones a regeneration forgets most easily --
-    see the `--rerun-tasks` note in CONTRIBUTING.md §7.
+    which is why the regeneration command lives in one place, the
+    `verification-metadata` target of android/Makefile, rather than in prose.
 
     Signatures are not checked either, here or by Gradle: `verify-signatures` is
     false, so integrity rests on the checksums rather than on publisher keys.
@@ -168,9 +169,7 @@ def main():
     if not METADATA.exists():
         print(
             f"check-dependency-verification: {METADATA} is missing -- generate it with\n"
-            "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
-            "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
-            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify",
+            "  make -C android verification-metadata",
             file=sys.stderr,
         )
         return 1
@@ -221,9 +220,7 @@ def main():
             print(f"  {line}", file=sys.stderr)
         print(
             "\nRegenerate after every version bump:\n"
-            "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
-            "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
-            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify",
+            "  make -C android verification-metadata",
             file=sys.stderr,
         )
         return 1

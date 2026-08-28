@@ -340,6 +340,43 @@ $(SBOM): prereq
 	./gradlew :app:cyclonedxDirectBom
 	python3 ../tools/sbom-normalize.py "$(SBOM)"
 
+# verification-metadata: rewrite gradle/verification-metadata.xml.
+#
+# WHY THIS IS A TARGET AND NOT A LINE IN A DOCUMENT
+#   The command has to name every task whose resolution the file must cover, and
+#   getting that list right took four attempts, each found by a build that had
+#   already failed. A list that hard to get right belongs in one place that can
+#   be corrected once, not in prose that has to be copied by hand.
+#
+# WHAT EACH FLAG IS FOR
+#   --refresh-dependencies  Gradle records a checksum for an artifact it READS
+#       from a repository during the run. Anything already in the local cache is
+#       reused without being read, and so goes unrecorded — which is how
+#       `kotlinx-coroutines-bom` stayed missing while `kotlinx-coroutines-core-jvm`
+#       of the same version was written.
+#   --rerun-tasks  A task Gradle reports as up to date resolves nothing. Without
+#       this, an incremental run records checksums for exactly the artifacts it
+#       did not need.
+#   kspDebugKotlin, kspReleaseKotlin  KSP resolves its processor and coroutines
+#       through a DETACHED configuration, at task-execution time. They reach the
+#       build through no configuration the version catalogue names, which is why
+#       they are the ones that keep going missing.
+#
+# WHY cyclonedxBom IS ABSENT
+#   Under --rerun-tasks the plugin cannot create `cyclonedxDirectBom` at all: the
+#   assemble tasks in the same invocation have consumed the configuration it
+#   wants to modify. It needs nothing from this run either — it reads
+#   `releaseRuntimeClasspath` and `coreLibraryDesugaring`, both resolved here.
+#
+# AFTER RUNNING IT, commit the file. `make release-android` gates on
+# tools/check-dependency-verification.py, and a real build is what catches a
+# transitive artifact the catalogue does not name.
+verification-metadata: prereq
+	./gradlew --write-verification-metadata sha256 --refresh-dependencies --rerun-tasks \
+	    kspDebugKotlin kspReleaseKotlin \
+	    assembleDebug assembleRelease bundleRelease \
+	    testDebugUnitTest lintDebug ktlintCheck koverVerify
+
 # release: the release APK (F-Droid and direct install). bundle: the release AAB
 # (Google Play requires the bundle format for new apps). Both carry the SBOM as a
 # prerequisite so it is produced alongside the artifact.
@@ -410,4 +447,5 @@ distclean: clean
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
         debug-apk screenshot-apks unit-tests device-tests lint format deps \
-        sbom release bundle cover-check cover-figures clean distclean
+        sbom release bundle cover-check cover-figures verification-metadata \
+        clean distclean

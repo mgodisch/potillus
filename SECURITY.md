@@ -252,8 +252,10 @@ way that happens, so
 [tools/check-dependency-verification.py](tools/check-dependency-verification.py)
 asserts that every library and plugin in the catalogue is covered at its CURRENT
 version. It runs in `make check-static` and is a gate in `make release-android`.
-The command that regenerates the file is in
-[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
+Regeneration is `make -C android verification-metadata`; the target's header in
+`android/Makefile` states which tasks and flags it needs and why, and
+[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7 places it
+in the release checklist.
 
 Alongside these two gates there is a third, advisory source: **Dependabot
 alerts** are enabled on the GitHub mirror, so the GitHub Advisory Database is

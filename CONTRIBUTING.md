@@ -636,35 +636,18 @@ Before tagging a new version:
       `libs.versions.toml` changed since the last release. Gradle writes the file
       only when asked and never warns that it has fallen behind; it just fails
       the next build that needs an artifact the file does not list, and the next
-      builder may be F-Droid rebuilding the published APK. Regenerate with the
-      tasks that between them resolve everything the project uses:
+      builder may be F-Droid rebuilding the published APK. Regenerate with:
 
       ```
-      cd android && ./gradlew --write-verification-metadata sha256 --rerun-tasks \
-          kspDebugKotlin kspReleaseKotlin \
-          assembleDebug assembleRelease bundleRelease \
-          testDebugUnitTest lintDebug ktlintCheck koverVerify
+      make -C android verification-metadata
       ```
 
-      Two details in that line are the whole trick. `--rerun-tasks` forces
-      tasks Gradle would report as up to date to run anyway: a task that does
-      not run resolves nothing, so an incremental write-run records checksums
-      for exactly the artifacts it did not need. And KSP is named explicitly
-      because it resolves its own processor and coroutines through a DETACHED
-      configuration, at task-execution time rather than at configuration time —
-      `symbol-processing-aa-embeddable` and `kotlinx-coroutines-core-jvm` reach
-      the build through no configuration the version catalogue names, which is
-      why they are the two that keep going missing.
-
-      `cyclonedxBom` is deliberately NOT in the list: under `--rerun-tasks` the
-      plugin fails to create `cyclonedxDirectBom` at all ("Cannot mutate the
-      artifacts of configuration … after the configuration was consumed as a
-      variant"), because the assemble tasks in the same invocation have already
-      consumed the configuration it wants to modify. It needs nothing from this
-      run either — it reads `releaseRuntimeClasspath` and
-      `coreLibraryDesugaring`, both of which `assembleRelease` resolves here, so
-      their artifacts are recorded regardless. `make sbom` runs it on its own,
-      and would fail loudly if it ever did want an artifact this file lacks.
+      The target carries the task list and the flags, and its header in
+      `android/Makefile` says what each of them is for. It lives there rather
+      than here because getting that list right took four attempts, each found
+      by a build that had already failed: a command that hard to get right
+      belongs in one place that can be corrected once, not in prose that has to
+      be copied by hand. Commit the rewritten file afterwards.
 
       `make release-android` gates on
       `tools/check-dependency-verification.py`, which fails when a catalogue
