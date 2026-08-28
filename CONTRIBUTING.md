@@ -643,7 +643,7 @@ Before tagging a new version:
       cd android && ./gradlew --write-verification-metadata sha256 --rerun-tasks \
           kspDebugKotlin kspReleaseKotlin \
           assembleDebug assembleRelease bundleRelease \
-          testDebugUnitTest lintDebug ktlintCheck koverVerify cyclonedxBom
+          testDebugUnitTest lintDebug ktlintCheck koverVerify
       ```
 
       Two details in that line are the whole trick. `--rerun-tasks` forces
@@ -655,6 +655,16 @@ Before tagging a new version:
       `symbol-processing-aa-embeddable` and `kotlinx-coroutines-core-jvm` reach
       the build through no configuration the version catalogue names, which is
       why they are the two that keep going missing.
+
+      `cyclonedxBom` is deliberately NOT in the list: under `--rerun-tasks` the
+      plugin fails to create `cyclonedxDirectBom` at all ("Cannot mutate the
+      artifacts of configuration … after the configuration was consumed as a
+      variant"), because the assemble tasks in the same invocation have already
+      consumed the configuration it wants to modify. It needs nothing from this
+      run either — it reads `releaseRuntimeClasspath` and
+      `coreLibraryDesugaring`, both of which `assembleRelease` resolves here, so
+      their artifacts are recorded regardless. `make sbom` runs it on its own,
+      and would fail loudly if it ever did want an artifact this file lacks.
 
       `make release-android` gates on
       `tools/check-dependency-verification.py`, which fails when a catalogue

@@ -170,8 +170,7 @@ def main():
             f"check-dependency-verification: {METADATA} is missing -- generate it with\n"
             "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
             "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
-            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify "
-            "cyclonedxBom",
+            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify",
             file=sys.stderr,
         )
         return 1
@@ -224,8 +223,7 @@ def main():
             "\nRegenerate after every version bump:\n"
             "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
             "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
-            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify "
-            "cyclonedxBom",
+            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify",
             file=sys.stderr,
         )
         return 1
