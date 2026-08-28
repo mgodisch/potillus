@@ -85,6 +85,13 @@ requirements are met — including the threat model and trust boundaries — is 
   optional lock.** The biometric lock is an access gate, not full-disk
   encryption or a forensic countermeasure; data protection ultimately depends on
   the device's own lock-screen and storage encryption.
+- **The log itself is not encrypted by the app.** Read the "on-device,
+  sandboxed storage" point above in the order it is written: the preferences
+  store carries an application-level AES-256-GCM envelope, the consumption
+  database does not. It is a plain SQLite file, resting on the sandbox and the
+  platform's storage encryption alone; SQLCipher was removed in v0.73.0. So the
+  asset that matters most carries the weaker application-level protection, and
+  anyone who defeats the device's own encryption reads the log.
 - **Exported files leave the app's control.** CSV, PDF, and JSON files you
   export are written where you choose (e.g. the public Downloads folder) and are
   no longer protected by the app; safeguarding and deleting them is your

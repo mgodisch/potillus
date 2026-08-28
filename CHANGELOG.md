@@ -243,6 +243,7 @@ Edit drinks from the list's edit mode
 - An entry's clock time after a change of time zone or a daylight-saving switch.
 - The Room schema check reads the version the exported file states.
 - The badge note on running the suites in CI.
+- The security documents name the asset the app's own encryption covers.
 
 ---
 

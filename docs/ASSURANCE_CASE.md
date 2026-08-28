@@ -54,8 +54,20 @@ below.
 
 ### Assets
 
-- The user's drinking history and related entries (sensitive personal data).
-- Application settings, including the encrypted preferences store.
+- The user's drinking history and related entries (sensitive personal data), in
+  a plain SQLite database inside the app's private storage.
+- Application settings, including the body weight, in a preferences store the
+  app seals itself.
+
+Note the asymmetry, because reading the two lines above in the other order
+misleads: the asset that matters most carries the WEAKER application-level
+protection. The history rests on the platform — the app sandbox and file-based
+storage encryption — while the settings additionally carry an AES-256-GCM
+envelope whose key lives in the Android Keystore or the iOS Keychain. There is
+no application-level database encryption; SQLCipher was removed in v0.73.0
+(see the CHANGELOG entry for that version). Wherever this
+document says "at-rest encryption" as a property of the app rather than of the
+platform, it means the preferences store and not the history.
 
 ### Adversaries and attacks considered in scope
 
@@ -75,7 +87,10 @@ below.
 - **Someone who obtains the locked device** → data at rest is protected by the
   platform's storage encryption, plus the Keystore-sealed (Android) or
   Keychain-sealed (iOS) preferences; the iOS key's `ThisDeviceOnly` class keeps
-  it off every backup and off any other device.
+  it off every backup and off any other device. For the history the platform is
+  the whole of the defence: someone who defeats the device's own encryption
+  reads the database, and the biometric lock does not stand in their way — it
+  gates the app, not the file.
 - **A network attacker** → not applicable on either platform: the app holds no
   network permission or entitlement and performs no network communication, so
   there is no network attack surface.
@@ -130,8 +145,10 @@ below.
 - **Economy of mechanism** — a small, focused architecture with a framework-free,
   shared domain layer and few dependencies (Room on Android, GRDB on iOS),
   reducing the code that must be trusted.
-- **Defense in depth** — sandbox + at-rest encryption + optional biometric gate +
-  screen-privacy layer independently.
+- **Defense in depth** — sandbox + platform storage encryption + the sealed
+  preferences store + optional biometric gate + screen-privacy layer, each
+  independent of the others. The layers are not uniform across the assets: see
+  the note under Assets for which of them covers the drinking history.
 - **Fail-safe defaults** — invalid input is rejected rather than coerced by the
   shared validators; the amount dialog enters a controlled error state instead of
   accepting bad values.
