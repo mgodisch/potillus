@@ -57,6 +57,13 @@ WHAT IT DOES NOT CHECK
     dependency). Gradle itself is the backstop for that, and the release path
     runs the real build before an artifact is staged.
 
+    KSP is the concrete example of what stays out of reach here: it resolves
+    `symbol-processing-aa-embeddable` and its coroutines through a DETACHED
+    configuration at task-execution time, so those artifacts belong to no
+    configuration the catalogue names and no amount of reading the catalogue
+    reveals them. They are also the ones a regeneration forgets most easily --
+    see the `--rerun-tasks` note in CONTRIBUTING.md §7.
+
     Signatures are not checked either, here or by Gradle: `verify-signatures` is
     false, so integrity rests on the checksums rather than on publisher keys.
     That is a deliberate scope, documented in SECURITY.md.
@@ -161,9 +168,10 @@ def main():
     if not METADATA.exists():
         print(
             f"check-dependency-verification: {METADATA} is missing -- generate it with\n"
-            "  ./gradlew --write-verification-metadata sha256 assembleDebug "
-            "assembleRelease bundleRelease testDebugUnitTest lintDebug "
-            "ktlintCheck koverVerify cyclonedxBom",
+            "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
+            "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
+            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify "
+            "cyclonedxBom",
             file=sys.stderr,
         )
         return 1
@@ -214,9 +222,10 @@ def main():
             print(f"  {line}", file=sys.stderr)
         print(
             "\nRegenerate after every version bump:\n"
-            "  ./gradlew --write-verification-metadata sha256 assembleDebug "
-            "assembleRelease bundleRelease testDebugUnitTest lintDebug "
-            "ktlintCheck koverVerify cyclonedxBom",
+            "  ./gradlew --write-verification-metadata sha256 --rerun-tasks "
+            "kspDebugKotlin kspReleaseKotlin assembleDebug assembleRelease "
+            "bundleRelease testDebugUnitTest lintDebug ktlintCheck koverVerify "
+            "cyclonedxBom",
             file=sys.stderr,
         )
         return 1

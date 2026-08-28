@@ -640,15 +640,21 @@ Before tagging a new version:
       tasks that between them resolve everything the project uses:
 
       ```
-      cd android && ./gradlew --write-verification-metadata sha256 \
+      cd android && ./gradlew --write-verification-metadata sha256 --rerun-tasks \
+          kspDebugKotlin kspReleaseKotlin \
           assembleDebug assembleRelease bundleRelease \
           testDebugUnitTest lintDebug ktlintCheck koverVerify cyclonedxBom
       ```
 
-      `assembleDebug` is in the list for a reason: KSP and the coroutines
-      artifacts it pulls resolve through a detached configuration that a
-      release-only run never touches, so a file written without it fails the
-      first debug build on artifacts nothing had asked for yet.
+      Two details in that line are the whole trick. `--rerun-tasks` forces
+      tasks Gradle would report as up to date to run anyway: a task that does
+      not run resolves nothing, so an incremental write-run records checksums
+      for exactly the artifacts it did not need. And KSP is named explicitly
+      because it resolves its own processor and coroutines through a DETACHED
+      configuration, at task-execution time rather than at configuration time —
+      `symbol-processing-aa-embeddable` and `kotlinx-coroutines-core-jvm` reach
+      the build through no configuration the version catalogue names, which is
+      why they are the two that keep going missing.
 
       `make release-android` gates on
       `tools/check-dependency-verification.py`, which fails when a catalogue
