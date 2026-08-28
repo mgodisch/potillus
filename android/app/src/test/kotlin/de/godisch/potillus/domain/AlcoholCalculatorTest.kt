@@ -73,46 +73,46 @@ class AlcoholCalculatorTest {
     // figures, these tests pin the properties.
 
     /** 2026-01-01T18:00Z, the instant the shared vectors are anchored to. */
-    private val t0 = 1_767_290_400_000L
+    private val anchor = 1_767_290_400_000L
 
     private fun hours(count: Double): Long = (count * AlcoholCalculator.MILLIS_PER_HOUR).toLong()
 
     @Test fun `calculateBAC 80kg 20g at once`() {
         // 20 / (80 * 0.6) = 0.4167 ‰, one decimal
-        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(t0, 20.0)), 80.0, t0)
+        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(anchor, 20.0)), 80.0, anchor)
         assertEquals(0.4, bac, 0.001)
     }
 
     @Test fun `calculateBAC 60kg 12g at once`() {
         // 12 / (60 * 0.6) = 0.333 ‰, one decimal
-        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(t0, 12.0)), 60.0, t0)
+        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(anchor, 12.0)), 60.0, anchor)
         assertEquals(0.3, bac, 0.001)
     }
 
     @Test fun `calculateBAC decreases over time`() {
-        val dose = listOf(AlcoholDose(t0, 40.0))
-        val at0h = AlcoholCalculator.calculateBAC(dose, 75.0, t0)
-        val at2h = AlcoholCalculator.calculateBAC(dose, 75.0, t0 + hours(2.0))
+        val dose = listOf(AlcoholDose(anchor, 40.0))
+        val at0h = AlcoholCalculator.calculateBAC(dose, 75.0, anchor)
+        val at2h = AlcoholCalculator.calculateBAC(dose, 75.0, anchor + hours(2.0))
         assertTrue("BAC after 2h must be less than BAC at 0h", at2h < at0h)
     }
 
     @Test fun `calculateBAC never negative`() {
-        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(t0, 10.0)), 80.0, t0 + hours(10.0))
+        val bac = AlcoholCalculator.calculateBAC(listOf(AlcoholDose(anchor, 10.0)), 80.0, anchor + hours(10.0))
         assertTrue("BAC must never be negative", bac >= 0.0)
     }
 
     @Test fun `calculateBAC zero weight returns zero`() {
-        assertEquals(0.0, AlcoholCalculator.calculateBAC(listOf(AlcoholDose(t0, 20.0)), 0.0, t0), 0.0)
+        assertEquals(0.0, AlcoholCalculator.calculateBAC(listOf(AlcoholDose(anchor, 20.0)), 0.0, anchor), 0.0)
     }
 
     @Test fun `calculateBAC without doses returns zero`() {
-        assertEquals(0.0, AlcoholCalculator.calculateBAC(emptyList(), 80.0, t0), 0.0)
+        assertEquals(0.0, AlcoholCalculator.calculateBAC(emptyList(), 80.0, anchor), 0.0)
     }
 
     @Test fun `calculateBAC ignores alcohol-free doses`() {
-        val withFree = listOf(AlcoholDose(t0, 0.0), AlcoholDose(t0 + hours(4.0), 20.0))
-        val alone = listOf(AlcoholDose(t0 + hours(4.0), 20.0))
-        val now = t0 + hours(4.0)
+        val withFree = listOf(AlcoholDose(anchor, 0.0), AlcoholDose(anchor + hours(4.0), 20.0))
+        val alone = listOf(AlcoholDose(anchor + hours(4.0), 20.0))
+        val now = anchor + hours(4.0)
         assertEquals(
             "an alcohol-free drink must not anchor the elimination",
             AlcoholCalculator.calculateBAC(alone, 80.0, now),
@@ -122,23 +122,23 @@ class AlcoholCalculatorTest {
     }
 
     @Test fun `calculateBAC ignores doses that lie in the future`() {
-        val doses = listOf(AlcoholDose(t0, 40.0), AlcoholDose(t0 + hours(3.0), 40.0))
-        val now = t0 + hours(1.0)
+        val doses = listOf(AlcoholDose(anchor, 40.0), AlcoholDose(anchor + hours(3.0), 40.0))
+        val now = anchor + hours(1.0)
         assertEquals(
             "a drink entered for later has not been drunk yet",
-            AlcoholCalculator.calculateBAC(listOf(AlcoholDose(t0, 40.0)), 75.0, now),
+            AlcoholCalculator.calculateBAC(listOf(AlcoholDose(anchor, 40.0)), 75.0, now),
             AlcoholCalculator.calculateBAC(doses, 75.0, now),
             0.0,
         )
     }
 
     @Test fun `calculateBAC clamps elimination across a dry gap`() {
-        // 40 g at t0 is gone well before t0+10h. Lumping both doses and
-        // subtracting from the first would carry that deficit into the second
-        // round and report 0.25 ‰ where the second round alone stands at 0.8 ‰.
-        val split = listOf(AlcoholDose(t0, 40.0), AlcoholDose(t0 + hours(10.0), 40.0))
-        val secondAlone = listOf(AlcoholDose(t0 + hours(10.0), 40.0))
-        val now = t0 + hours(11.0)
+        // 40 g at the anchor is gone well before ten hours on. Lumping both
+        // doses and subtracting from the first would carry that deficit into the
+        // second round and report 0.25 ‰ where the second alone stands at 0.8 ‰.
+        val split = listOf(AlcoholDose(anchor, 40.0), AlcoholDose(anchor + hours(10.0), 40.0))
+        val secondAlone = listOf(AlcoholDose(anchor + hours(10.0), 40.0))
+        val now = anchor + hours(11.0)
         assertEquals(0.8, AlcoholCalculator.calculateBAC(split, 70.0, now), 0.001)
         assertEquals(
             "with the first dose eliminated, the estimate is the second round's",
@@ -151,8 +151,8 @@ class AlcoholCalculatorTest {
     @Test fun `calculateBAC matches the lumped form without a gap`() {
         // Two doses an hour apart never let the level reach zero, so the
         // dose-by-dose walk and the textbook shorthand agree: 80 / 42 - 0.15 * 2.
-        val doses = listOf(AlcoholDose(t0, 40.0), AlcoholDose(t0 + hours(1.0), 40.0))
-        assertEquals(1.6, AlcoholCalculator.calculateBAC(doses, 70.0, t0 + hours(2.0)), 0.001)
+        val doses = listOf(AlcoholDose(anchor, 40.0), AlcoholDose(anchor + hours(1.0), 40.0))
+        assertEquals(1.6, AlcoholCalculator.calculateBAC(doses, 70.0, anchor + hours(2.0)), 0.001)
     }
 
     // ── getLimitInfo ──────────────────────────────────────────────────────────

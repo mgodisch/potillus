@@ -160,9 +160,10 @@ class TodayViewModelTest {
             val state = awaitItem()
             assertTrue("yesterday's drink must not appear in today's list", state.entries.isEmpty())
             assertEquals("today's total must stay at zero", 0.0, state.totalGrams, 0.0)
+            val bac = state.bacPermille
             assertTrue(
                 "the estimate must not vanish at the day boundary",
-                state.bacPermille != null && state.bacPermille!! > 0.0,
+                bac != null && bac > 0.0,
             )
             cancelAndIgnoreRemainingEvents()
         }

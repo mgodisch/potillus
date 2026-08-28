@@ -101,7 +101,7 @@ final class AlcoholCalculatorTests: XCTestCase {
     // ── calculateBAC ─────────────────────────────────────────────────────────
 
     /// 2026-01-01T18:00Z, the instant the shared vectors are anchored to.
-    private static let t0: Int64 = 1_767_290_400_000
+    private static let anchor: Int64 = 1_767_290_400_000
 
     private static func hours(_ count: Double) -> Int64 {
         Int64(count * AlcoholCalculator.millisPerHour)
@@ -127,18 +127,17 @@ final class AlcoholCalculatorTests: XCTestCase {
     /// monotonically non-increasing as the asking instant moves on, and never
     /// negative.
     func testCalculateBACDecaysAndNeverGoesNegative() {
-        let doses = [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0)]
+        let doses = [AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 40.0)]
         var previous = Double.greatestFiniteMagnitude
         for hour in 0...12 {
             let bac = AlcoholCalculator.calculateBAC(
-                doses: doses, weightKg: 75.0, nowMillis: Self.t0 + Self.hours(Double(hour))
+                doses: doses, weightKg: 75.0, nowMillis: Self.anchor + Self.hours(Double(hour))
             )
             XCTAssertGreaterThanOrEqual(bac, 0.0, "BAC must never be negative")
             XCTAssertLessThanOrEqual(bac, previous, "BAC must not rise as time passes")
             previous = bac
         }
     }
-
 
     // ── limitPercent ─────────────────────────────────────────────────────────
 
@@ -343,17 +342,18 @@ final class AlcoholCalculatorTests: XCTestCase {
 
 extension AlcoholCalculatorTests {
 
-    /// The point of walking dose by dose: 40 g at `t0` is eliminated well before
-    /// `t0+10h`, so the deficit must not be carried into the second round. The
+    /// The point of walking dose by dose: 40 g at the anchor is eliminated well
+    /// before ten hours on, so the deficit must not be carried into the second
+    /// round. The
     /// lumped shorthand reported 0.25 per mille here where the second round alone
     /// stands at 0.8.
     func testCalculateBACClampsEliminationAcrossADryGap() {
         let split = [
-            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
-            AlcoholDose(timestampMillis: Self.t0 + Self.hours(10), gramsAlcohol: 40.0)
+            AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.anchor + Self.hours(10), gramsAlcohol: 40.0)
         ]
-        let secondAlone = [AlcoholDose(timestampMillis: Self.t0 + Self.hours(10), gramsAlcohol: 40.0)]
-        let now = Self.t0 + Self.hours(11)
+        let secondAlone = [AlcoholDose(timestampMillis: Self.anchor + Self.hours(10), gramsAlcohol: 40.0)]
+        let now = Self.anchor + Self.hours(11)
         XCTAssertEqual(
             AlcoholCalculator.calculateBAC(doses: split, weightKg: 70.0, nowMillis: now),
             0.8, accuracy: Self.epsilon
@@ -370,12 +370,12 @@ extension AlcoholCalculatorTests {
     /// apart never let the level reach zero, so 80 / 42 - 0.15 * 2 still holds.
     func testCalculateBACMatchesTheLumpedFormWithoutAGap() {
         let doses = [
-            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
-            AlcoholDose(timestampMillis: Self.t0 + Self.hours(1), gramsAlcohol: 40.0)
+            AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.anchor + Self.hours(1), gramsAlcohol: 40.0)
         ]
         XCTAssertEqual(
             AlcoholCalculator.calculateBAC(
-                doses: doses, weightKg: 70.0, nowMillis: Self.t0 + Self.hours(2)
+                doses: doses, weightKg: 70.0, nowMillis: Self.anchor + Self.hours(2)
             ),
             1.6, accuracy: Self.epsilon
         )
@@ -385,11 +385,11 @@ extension AlcoholCalculatorTests {
     /// the elimination at its own timestamp.
     func testCalculateBACIgnoresAlcoholFreeDoses() {
         let withFree = [
-            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 0.0),
-            AlcoholDose(timestampMillis: Self.t0 + Self.hours(4), gramsAlcohol: 20.0)
+            AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 0.0),
+            AlcoholDose(timestampMillis: Self.anchor + Self.hours(4), gramsAlcohol: 20.0)
         ]
-        let alone = [AlcoholDose(timestampMillis: Self.t0 + Self.hours(4), gramsAlcohol: 20.0)]
-        let now = Self.t0 + Self.hours(4)
+        let alone = [AlcoholDose(timestampMillis: Self.anchor + Self.hours(4), gramsAlcohol: 20.0)]
+        let now = Self.anchor + Self.hours(4)
         XCTAssertEqual(
             AlcoholCalculator.calculateBAC(doses: withFree, weightKg: 80.0, nowMillis: now),
             AlcoholCalculator.calculateBAC(doses: alone, weightKg: 80.0, nowMillis: now),
@@ -400,14 +400,14 @@ extension AlcoholCalculatorTests {
     /// A drink entered for later in the evening has not been drunk yet.
     func testCalculateBACIgnoresDosesInTheFuture() {
         let doses = [
-            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
-            AlcoholDose(timestampMillis: Self.t0 + Self.hours(3), gramsAlcohol: 40.0)
+            AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.anchor + Self.hours(3), gramsAlcohol: 40.0)
         ]
-        let now = Self.t0 + Self.hours(1)
+        let now = Self.anchor + Self.hours(1)
         XCTAssertEqual(
             AlcoholCalculator.calculateBAC(doses: doses, weightKg: 75.0, nowMillis: now),
             AlcoholCalculator.calculateBAC(
-                doses: [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0)],
+                doses: [AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 40.0)],
                 weightKg: 75.0, nowMillis: now
             ),
             accuracy: 0.0
@@ -419,13 +419,13 @@ extension AlcoholCalculatorTests {
     func testCalculateBACReturnsZeroWithoutWeightOrDoses() {
         XCTAssertEqual(
             AlcoholCalculator.calculateBAC(
-                doses: [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 20.0)],
-                weightKg: 0.0, nowMillis: Self.t0
+                doses: [AlcoholDose(timestampMillis: Self.anchor, gramsAlcohol: 20.0)],
+                weightKg: 0.0, nowMillis: Self.anchor
             ),
             0.0, accuracy: 0.0
         )
         XCTAssertEqual(
-            AlcoholCalculator.calculateBAC(doses: [], weightKg: 80.0, nowMillis: Self.t0),
+            AlcoholCalculator.calculateBAC(doses: [], weightKg: 80.0, nowMillis: Self.anchor),
             0.0, accuracy: 0.0
         )
     }
