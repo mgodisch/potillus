@@ -8044,7 +8044,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Genomsnitt per drickdag"
+            "value" : "Genomsnitt per dryckesdag"
           }
         },
         "uk" : {
@@ -13808,7 +13808,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "drinkdagar (senaste 7 dagarna)"
+            "value" : "dryckesdagar (senaste 7 dagarna)"
           }
         },
         "uk" : {
@@ -13939,7 +13939,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drinkdagar, senaste 7 dagarna"
+            "value" : "Dryckesdagar, senaste 7 dagarna"
           }
         },
         "uk" : {
@@ -20370,7 +20370,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Max. drinkdagar/7 dagar"
+            "value" : "Max. dryckesdagar/7 dagar"
           }
         },
         "uk" : {
@@ -20501,7 +20501,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Högsta antal drinkdagar per sju dagar"
+            "value" : "Högsta antal dryckesdagar per sju dagar"
           }
         },
         "uk" : {

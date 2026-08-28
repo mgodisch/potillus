@@ -207,6 +207,9 @@ Edit drinks from the list's edit mode
 - An entry records the UTC offset it was logged at, optional in the backup.
 - `release-check` counts a check whose input is absent as skipped.
 - The UI-string map names the labels that exist on one platform only.
+- Gradle verifies a SHA-256 for every artifact the Android build resolves.
+- `check-dependency-verification` and `check-swift-argument-order`.
+- Swedish and Norwegian spell the drinking day one way.
 
 ### Removed
 

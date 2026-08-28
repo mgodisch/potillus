@@ -144,6 +144,10 @@ SKIP_BASENAMES = {
 # Files that carry no header by deliberate convention.
 SKIP_RELATIVE = {
     "fastlane/metadata/android/screenshots.html",  # written by fastlane screengrab
+    # Written by `./gradlew --write-verification-metadata`. Gradle rewrites the
+    # whole file on every regeneration, so a header added by hand would be lost
+    # at the next dependency bump; REUSE.toml covers it centrally instead.
+    "android/gradle/verification-metadata.xml",
 }
 
 # Extensions the project normally licenses.  Used only for the WARNING pass.

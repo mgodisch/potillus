@@ -112,6 +112,14 @@ check-bestpractices-levels:
 check-vex:
 	python3 tools/check-vex.py
 
+# check-dependency-verification: every library and plugin in the Gradle version
+# catalogue has a checksum in gradle/verification-metadata.xml at its CURRENT
+# version. Gradle regenerates that file only when asked and does not warn when
+# it falls behind -- it just fails the next build that needs a missing artifact,
+# on whoever builds next, F-Droid included. See tools/check-dependency-verification.py.
+check-dependency-verification:
+	python3 tools/check-dependency-verification.py
+
 # check-reuse: the tree is REUSE-compliant -- every file carries an SPDX license
 # and copyright, every referenced license text is in LICENSES/, and none is left
 # unused. Deliberately kept OUT of check-static: it needs the external `reuse`
@@ -148,6 +156,14 @@ check-swift-length:
 # assertion (e.g. XCTAssertEqual(await x, y)) in a way XCTest mishandles.
 check-swift-tests:
 	python3 tools/check-swift-tests.py
+
+# check-swift-argument-order: every call to ConsumptionEntry/Entry names its
+# labelled arguments in the order the initializer declares them. Swift requires
+# it, Kotlin does not, so a parameter reordered on both sides breaks only the
+# Swift side -- and only a Mac compiler would say so. See
+# tools/check-swift-argument-order.py.
+check-swift-argument-order:
+	python3 tools/check-swift-argument-order.py
 
 # check-ios-metadata: the App Store metadata is present and within Apple's limits
 # for every locale.
@@ -190,6 +206,7 @@ fix-headers:
 # check to do what it is for -- confirming the result. Android reaches the same
 # place by ordering `check-guides` after its build targets in the root Makefile.
 check-ios-static: check-headers check-makefile check-swift-tests check-swift-symbols \
+                  check-swift-argument-order \
                   check-swift-length check-report-paper check-l10n-parity check-l10n \
                   check-typography \
                   check-ios-metadata check-ios-screenshots check-ios-a11y
@@ -211,6 +228,7 @@ release-check:
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
+              check-dependency-verification \
               check-report-labels check-fixture-parity \
               check-report-pdfs
 
@@ -219,6 +237,8 @@ check-static: check-ios-static check-ui-string-parity check-bestpractices-levels
         check-l10n-parity \
         check-typography \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
-        check-swift-symbols check-swift-length check-swift-tests check-ios-metadata \
+        check-dependency-verification \
+        check-swift-symbols check-swift-length check-swift-tests check-swift-argument-order \
+        check-ios-metadata \
         check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \
         check-static

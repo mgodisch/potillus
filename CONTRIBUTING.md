@@ -632,6 +632,25 @@ Before tagging a new version:
       run the scan as a staging gate and refuse to stage on an unresolved
       finding, so this box is ticked by a successful staging run rather than by
       a separate manual scan.
+- [ ] `android/gradle/verification-metadata.xml` regenerated if any version in
+      `libs.versions.toml` changed since the last release. Gradle writes the file
+      only when asked and never warns that it has fallen behind; it just fails
+      the next build that needs an artifact the file does not list, and the next
+      builder may be F-Droid rebuilding the published APK. Regenerate with the
+      tasks that between them resolve everything the project uses:
+
+      ```
+      cd android && ./gradlew --write-verification-metadata sha256 \
+          assembleRelease testDebugUnitTest lintDebug ktlintCheck \
+          koverVerify cyclonedxBom
+      ```
+
+      `make release-android` gates on
+      `tools/check-dependency-verification.py`, which fails when a catalogue
+      entry has no checksum at its current version — so a forgotten
+      regeneration stops the release rather than a later build. The check
+      covers the DIRECT dependencies the catalogue names; a new transitive
+      artifact is caught by Gradle itself during the release build.
 - [ ] Create the release tag as a **GPG-signed** annotated tag with
       `git tag -s vX.Y.Z -m "vX.Y.Z"`, signed with the maintainer's key, and push
       it. Tags are verifiable with `git tag -v vX.Y.Z` (see SECURITY.md,
