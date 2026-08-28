@@ -117,8 +117,16 @@ class SchemaParityTest {
                 )
                 assertEquals(
                     "$name.$columnName: notNull",
+                    // The CONTRACT always spells the key out, so it is read
+                    // strictly: a typo there must fail rather than default.
                     column.getBoolean("notNull"),
-                    field.getBoolean("notNull"),
+                    // ROOM'S EXPORT OMITS THE KEY for a nullable column and only
+                    // writes it when the column is NOT NULL. Reading it strictly
+                    // turned the first nullable column the schema ever got
+                    // (`entries.utcOffsetSeconds`) into a JSONException instead of
+                    // a comparison. Absent means nullable, which is what the
+                    // default says.
+                    field.optBoolean("notNull", false),
                 )
             }
         }
