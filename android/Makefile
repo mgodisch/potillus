@@ -348,12 +348,22 @@ $(SBOM): prereq
 #   already failed. A list that hard to get right belongs in one place that can
 #   be corrected once, not in prose that has to be copied by hand.
 #
-# WHAT EACH FLAG IS FOR
-#   --refresh-dependencies  Gradle records a checksum for an artifact it READS
-#       from a repository during the run. Anything already in the local cache is
-#       reused without being read, and so goes unrecorded — which is how
-#       `kotlinx-coroutines-bom` stayed missing while `kotlinx-coroutines-core-jvm`
-#       of the same version was written.
+# THE RUN WRITES WHAT IT READS, WHICH IS WHY IT USES AN EMPTY CACHE
+#   Gradle records a checksum for an artifact it READS from a repository during
+#   the run. Anything already in the local cache is reused without being read,
+#   and so goes unrecorded — a file written on a developer machine covers what
+#   that machine happened to fetch, not what the build needs. A fresh CI runner
+#   or an F-Droid builder then fails on the difference, which is exactly how
+#   `kotlinx-coroutines-bom` came to be missing while
+#   `kotlinx-coroutines-core-jvm` of the same version was present.
+#
+#   So the run gets a throwaway GRADLE_USER_HOME. That makes it identical, by
+#   construction, to a machine that has nothing — the only state in which
+#   "everything the build reads" and "everything the build needs" are the same
+#   set. It downloads the full dependency graph and is correspondingly slow;
+#   this happens at a version bump, not daily.
+#
+# WHAT THE REST IS FOR
 #   --rerun-tasks  A task Gradle reports as up to date resolves nothing. Without
 #       this, an incremental run records checksums for exactly the artifacts it
 #       did not need.
@@ -372,7 +382,13 @@ $(SBOM): prereq
 # tools/check-dependency-verification.py, and a real build is what catches a
 # transitive artifact the catalogue does not name.
 verification-metadata: prereq
-	./gradlew --write-verification-metadata sha256 --refresh-dependencies --rerun-tasks \
+	# The cache is removed on EVERY exit, including the abort that .SHELLFLAGS'
+	# `-e` performs on a failed Gradle run. Without the trap a failed attempt
+	# would leave several gigabytes behind, once per attempt.
+	cache=$$(mktemp -d)
+	trap 'rm -rf "$$cache"' EXIT
+	echo "verification-metadata: resolving into a throwaway cache at $$cache"
+	GRADLE_USER_HOME="$$cache" ./gradlew --write-verification-metadata sha256 --rerun-tasks \
 	    kspDebugKotlin kspReleaseKotlin \
 	    assembleDebug assembleRelease bundleRelease \
 	    testDebugUnitTest lintDebug ktlintCheck koverVerify
