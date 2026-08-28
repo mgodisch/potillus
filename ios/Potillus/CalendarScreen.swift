@@ -607,7 +607,12 @@ extension CalendarScreen {
     /// the style went with it. The drink name now travels in the row's value
     /// instead, where it does not have to share a Text with a date.
     private func entrySpokenLabel(_ entry: ConsumptionEntry) -> Text {
-        Text(Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0), style: .time)
+        // See Today's `entrySpokenLabel` for why the instant is shifted rather
+        // than the formatter configured: `Text(_:style:)` has no time zone.
+        let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
+        let shown = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
+        let shift = TimeInterval(shown.secondsFromGMT(for: time) - TimeZone.current.secondsFromGMT(for: time))
+        return Text(time.addingTimeInterval(shift), style: .time)
     }
 
     /// The row's spoken VALUE: the figures with their units written out, then
@@ -639,6 +644,10 @@ extension CalendarScreen {
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("Hm")
+        // Read in the frame the drink was logged in, not the one the phone is in
+        // now. The two differ after a flight and after every daylight-saving
+        // switch, and the row's date has been frozen since it was written.
+        formatter.timeZone = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
         let time = formatter.string(
             from: Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
         )

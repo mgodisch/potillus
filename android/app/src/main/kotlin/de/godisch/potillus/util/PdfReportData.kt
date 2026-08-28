@@ -38,8 +38,6 @@ import de.godisch.potillus.domain.model.LimitInfo
 import de.godisch.potillus.domain.model.LimitViolations
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
@@ -454,9 +452,10 @@ data class PdfReportData(
             //    24-bar chart, which replaced the older "share before / after 17:00" split.
             val hourlyGrams = DoubleArray(24)
             entries.forEach { e ->
-                val hour = LocalDateTime
-                    .ofInstant(Instant.ofEpochMilli(e.timestampMillis), ZoneId.systemDefault())
-                    .hour
+                // The hour the drink was logged at, in the frame it was logged
+                // in. Reading it in the CURRENT device frame moved every bar of
+                // a travelled or daylight-saving-crossed history by an hour.
+                val hour = DayResolver.localDateTime(e.timestampMillis, e.utcOffsetSeconds).hour
                 hourlyGrams[hour] += e.gramsAlcohol
             }
 

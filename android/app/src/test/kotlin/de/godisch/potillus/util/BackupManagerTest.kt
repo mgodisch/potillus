@@ -227,6 +227,37 @@ class BackupManagerTest {
         assertEquals(19.7, result.entries.first().gramsAlcohol, 0.001)
     }
 
+    @Test fun `utcOffsetSeconds is optional and absent means null`() {
+        // Every file written before the field existed lacks it. Its absence is
+        // not an error; the entry simply records no frame.
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1)),
+            entries = listOf(entryJson(drinkId = 1)),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertNull(result.entries.first().utcOffsetSeconds)
+    }
+
+    @Test fun `utcOffsetSeconds survives the round trip`() {
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1)),
+            entries = listOf(entryJson(drinkId = 1, utcOffsetSeconds = 7200)),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertEquals(7200, result.entries.first().utcOffsetSeconds)
+    }
+
+    @Test fun `utcOffsetSeconds beyond the widest real zone is rejected`() {
+        // The IANA database runs from -12:00 to +14:00; 100 hours is not a zone.
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1)),
+            entries = listOf(entryJson(drinkId = 1, utcOffsetSeconds = 360_000)),
+        )
+        assertReadError(BackupManager.parseBackupJson(json))
+    }
+
     @Test fun `gramsAlcohol from before the 0_1 g rounding is accepted`() {
         // Entries written with two decimals predate AlcoholCalculator's 0.1 g
         // grid: 150 ml at 13.5 % stood at 15.98 g where the recomputation now
@@ -531,5 +562,11 @@ class BackupManagerTest {
         timestampMillis: Long = 1_700_000_000_000L,
         logicalDate: String = "2023-11-14",
         note: String = "",
-    ) = """{"id":$id,"drinkId":$drinkId,"drinkName":"$drinkName","volumeMl":$volumeMl,"alcoholPercent":$alcoholPercent,"gramsAlcohol":$gramsAlcohol,"timestampMillis":$timestampMillis,"logicalDate":"$logicalDate","note":"$note"}"""
+        utcOffsetSeconds: Int? = null,
+    ): String {
+        // Omitted by default, which is what a file written before the field
+        // existed looks like — the shape most of these tests want.
+        val offset = utcOffsetSeconds?.let { ""","utcOffsetSeconds":$it""" } ?: ""
+        return """{"id":$id,"drinkId":$drinkId,"drinkName":"$drinkName","volumeMl":$volumeMl,"alcoholPercent":$alcoholPercent,"gramsAlcohol":$gramsAlcohol,"timestampMillis":$timestampMillis$offset,"logicalDate":"$logicalDate","note":"$note"}"""
+    }
 }

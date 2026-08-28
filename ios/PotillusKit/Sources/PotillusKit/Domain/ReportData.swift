@@ -488,10 +488,16 @@ extension ReportData {
     /// about when a person drinks, not which day the app books it to.
     static func hourlyGrams(entries: [ConsumptionEntry], timeZone: TimeZone) -> [Double] {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = timeZone
 
+        // The hour a drink was logged at, in the frame it was logged in. Reading
+        // every entry in the CURRENT frame moved every bar of a travelled or
+        // daylight-saving-crossed history by an hour. `timeZone` is the fallback
+        // for entries that recorded no frame.
         var hours = [Double](repeating: 0.0, count: 24)
         for entry in entries {
+            calendar.timeZone = DayResolver.displayTimeZone(
+                utcOffsetSeconds: entry.utcOffsetSeconds, fallback: timeZone
+            )
             let date = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
             let hour = calendar.component(.hour, from: date)
             hours[hour] += entry.gramsAlcohol

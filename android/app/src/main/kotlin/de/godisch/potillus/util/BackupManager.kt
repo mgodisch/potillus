@@ -76,6 +76,17 @@ import kotlin.math.abs
 //   The importer rejects files with version > BACKUP_VERSION (written by a
 //   newer app) to avoid silently truncating unknown fields.
 //
+//   ADDED WITHIN FORMAT 3, WITHOUT A BUMP: entries may carry an optional
+//   "utcOffsetSeconds". The version marks what a reader must UNDERSTAND to read
+//   a file correctly, and a reader that ignores this key still gets every entry
+//   right — it lands where the app's own pre-column rows land, on the fallback
+//   in [de.godisch.potillus.domain.DayResolver.localDateTime]. Raising the
+//   version would instead have made every new file unreadable to any
+//   installation that has not updated yet, on either platform, which is the one
+//   thing this format exists to prevent. The rule for next time: the version
+//   rises when a field changes meaning, becomes required, or shifts a default —
+//   not when an optional field with a defined fallback is added.
+//
 // WHY ARE SETTINGS PART OF THE BACKUP AT ALL?
 //   The preferences live in a SEPARATE, encrypted Jetpack DataStore
 //   ([de.godisch.potillus.data.prefs.AppPreferences]) – not in the Room
@@ -242,6 +253,11 @@ object BackupManager {
                                 put("alcoholPercent", e.alcoholPercent)
                                 put("gramsAlcohol", e.gramsAlcohol)
                                 put("timestampMillis", e.timestampMillis)
+                                // Optional on the wire, and omitted rather than
+                                // guessed when the entry has none: a reader that
+                                // finds no offset derives the same fallback the
+                                // app derives for its own pre-column rows.
+                                e.utcOffsetSeconds?.let { put("utcOffsetSeconds", it) }
                                 put("logicalDate", e.logicalDate)
                                 put("note", e.note)
                             },
@@ -571,6 +587,19 @@ object BackupManager {
                 }
                 val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
+                // ── Guard 3c: utcOffsetSeconds, optional ─────────────────────────
+                // Absent in every file written before the field existed, and in a
+                // file written by an older build of the other platform, so its
+                // absence is not an error — `null` is carried through and read
+                // back through the fallback in DayResolver.localDateTime. When it
+                // IS present it must be a real offset: the widest zones in the
+                // IANA database run from -12:00 to +14:00.
+                val utcOffsetSeconds = if (obj.has("utcOffsetSeconds") && !obj.isNull("utcOffsetSeconds")) {
+                    obj.getInt("utcOffsetSeconds")
+                        .also { require(it in -12 * 3600..14 * 3600) { "utcOffsetSeconds out of range: $it" } }
+                } else {
+                    null
+                }
                 // ── Guard 4: logicalDate – full calendar-semantic validation ─────
                 // Since the 0.84.0 review DayResolver.parseDate performs the same
                 // round-trip, so this is belt over braces. It stays because it names
@@ -609,6 +638,7 @@ object BackupManager {
                         alcoholPercent = entryAlcoholPercent,
                         gramsAlcohol = gramsAlcohol,
                         timestampMillis = timestampMillis,
+                        utcOffsetSeconds = utcOffsetSeconds,
                         logicalDate = logicalDate,
                         note = obj.optString("note", ""),
                     ),

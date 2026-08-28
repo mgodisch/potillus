@@ -108,7 +108,19 @@ public enum CsvExporter {
         var categoryById: [Int64: DrinkCategory] = [:]
         for drink in drinks { categoryById[drink.id] = drink.category }
 
-        let timeFormatter = Self.timeFormatter(for: timeZone)
+        // One formatter per frame, not per row: an export is almost always a
+        // single frame, and building a DateFormatter is the expensive part.
+        // `timeZone` is the fallback for entries that recorded none.
+        var formatters: [Int: DateFormatter] = [:]
+        func timeFormatter(for entry: ConsumptionEntry) -> DateFormatter {
+            let zone = DayResolver.displayTimeZone(
+                utcOffsetSeconds: entry.utcOffsetSeconds, fallback: timeZone
+            )
+            if let cached = formatters[zone.secondsFromGMT()] { return cached }
+            let made = Self.timeFormatter(for: zone)
+            formatters[zone.secondsFromGMT()] = made
+            return made
+        }
 
         // Headers are escaped too — see the note above.
         let header = headerCells.map(escapeField).joined(separator: ",")
@@ -121,7 +133,7 @@ public enum CsvExporter {
 
             return [
                 entry.logicalDate,
-                timeFormatter.string(from: instant),
+                timeFormatter(for: entry).string(from: instant),
                 escapeField(entry.drinkName),
                 category.rawValue,
                 String(entry.volumeMl),

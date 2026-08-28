@@ -104,6 +104,14 @@ public struct EntryLogger: Sendable {
                 volumeMl: volumeMl, alcoholPercent: drink.alcoholPercent
             ),
             timestampMillis: timestampMillis,
+            // The local frame is recorded here, beside the logical date and for
+            // the same reason: both are facts about where and when the drink was
+            // logged, and neither survives being re-derived later. Recorded even
+            // when the DATE comes from a calendar selection — the time of day is
+            // still a wall-clock reading the user made here and now.
+            utcOffsetSeconds: DayResolver.utcOffsetSeconds(
+                timestampMillis: timestampMillis, timeZone: timeZone
+            ),
             logicalDate: logicalDate ?? DayResolver.resolve(
                 timestampMillis: timestampMillis,
                 changeHour: settings.dayChangeHour,

@@ -127,6 +127,40 @@ class MigrationTest {
         db.close()
     }
 
+    /**
+     * v2 → v3 adds the nullable `entries.utcOffsetSeconds` (see [MIGRATION_2_3]).
+     *
+     * Verifies that (a) the migrated schema matches `3.json`, (b) the column
+     * exists afterwards, and (c) a pre-existing row survives with NULL in it —
+     * the value that tells every reader the entry predates the column and its
+     * clock time is to be derived from the device zone's rules.
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate2To3_addsUtcOffsetColumn_andLeavesOldRowsNull() {
+        helper.createDatabase(TEST_DB, 2).apply {
+            execSQL(
+                "INSERT INTO drinks (id, name, volumeMl, alcoholPercent, isPreset, isFavorite, category) " +
+                    "VALUES (1, 'Test Lager', 500, 5.0, 0, 0, 'BEER')",
+            )
+            execSQL(
+                "INSERT INTO entries " +
+                    "(id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol, timestampMillis, logicalDate, note) " +
+                    "VALUES (1, 1, 'Test Lager', 500, 5.0, 19.7, 1700000000000, '2026-05-30', '')",
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 3, true, MIGRATION_2_3)
+
+        db.query("SELECT utcOffsetSeconds, logicalDate FROM entries WHERE id = 1").use { c ->
+            assertTrue("seeded entry must survive the migration", c.moveToFirst())
+            assertTrue("a pre-migration row records no frame", c.isNull(0))
+            assertEquals("2026-05-30", c.getString(1))
+        }
+        db.close()
+    }
+
     /** Returns true if [table] has an index named [index] (via `PRAGMA index_list`). */
     private fun hasIndex(db: SupportSQLiteDatabase, table: String, index: String): Boolean = db.query("PRAGMA index_list($table)").use { c ->
         val nameCol = c.getColumnIndex("name")

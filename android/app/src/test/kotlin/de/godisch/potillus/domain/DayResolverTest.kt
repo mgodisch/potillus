@@ -27,6 +27,7 @@ package de.godisch.potillus.domain
 
 import org.junit.Assert.*
 import org.junit.Test
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -275,5 +276,46 @@ class DayResolverTest {
 
     @Test fun `effectivePeriodDays returns 0 for an inverted range`() {
         assertEquals(0, DayResolver.effectivePeriodDays("2026-06-10", "2026-06-01", todayIsDrinkDay = true))
+    }
+    // ── The recorded local frame ─────────────────────────────────────────────
+
+    @Test fun `utcOffsetSeconds reads the offset in force at that instant`() {
+        val berlin = ZoneId.of("Europe/Berlin")
+        // 2026-01-15T12:00Z is winter in Berlin: +01:00.
+        val winter = Instant.parse("2026-01-15T12:00:00Z").toEpochMilli()
+        // 2026-07-15T12:00Z is summer: +02:00.
+        val summer = Instant.parse("2026-07-15T12:00:00Z").toEpochMilli()
+        assertEquals(3600, DayResolver.utcOffsetSeconds(winter, berlin))
+        assertEquals(7200, DayResolver.utcOffsetSeconds(summer, berlin))
+    }
+
+    @Test fun `localDateTime reads the entry in its recorded frame`() {
+        // 22:30 in Berlin in January, read from a device that has since moved to
+        // New York. The recorded frame still says 22:30.
+        val instant = Instant.parse("2026-01-15T21:30:00Z").toEpochMilli()
+        val local = DayResolver.localDateTime(instant, 3600, ZoneId.of("America/New_York"))
+        assertEquals(22, local.hour)
+        assertEquals(30, local.minute)
+        assertEquals(15, local.dayOfMonth)
+    }
+
+    @Test fun `localDateTime without a recorded frame falls back to the zone rules`() {
+        // No offset on record: the device zone's rules for THAT instant, which is
+        // what the app did for every entry before the column existed. January is
+        // +01:00 in Berlin even when the reading is made in July.
+        val instant = Instant.parse("2026-01-15T21:30:00Z").toEpochMilli()
+        val local = DayResolver.localDateTime(instant, null, ZoneId.of("Europe/Berlin"))
+        assertEquals(22, local.hour)
+        assertEquals(30, local.minute)
+    }
+
+    @Test fun `localDateTime survives a daylight-saving switch`() {
+        // Logged at 02:30 Berlin summer time on the day before the autumn switch,
+        // read after it. The recorded +02:00 keeps the reading at 02:30; deriving
+        // the offset from the zone at READ time would have moved it to 01:30.
+        val instant = Instant.parse("2026-10-24T00:30:00Z").toEpochMilli()
+        val recorded = DayResolver.localDateTime(instant, 7200, ZoneId.of("Europe/Berlin"))
+        assertEquals(2, recorded.hour)
+        assertEquals(30, recorded.minute)
     }
 }

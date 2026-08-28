@@ -230,6 +230,12 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
     public var alcoholPercent: Double
     public var gramsAlcohol: Double
     public var timestampMillis: Int64
+
+    /// The UTC offset in force where and when the drink was logged, which is the
+    /// frame its clock time is read in. `nil` for entries written before the
+    /// field existed and for backups that predate it; see
+    /// `DayResolver.displayTimeZone`.
+    public var utcOffsetSeconds: Int?
     public var logicalDate: String
     public var note: String
 
@@ -242,7 +248,8 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
         gramsAlcohol: Double,
         timestampMillis: Int64,
         logicalDate: String,
-        note: String = ""
+        note: String = "",
+        utcOffsetSeconds: Int? = nil
     ) {
         self.id = id
         self.drinkId = drinkId
@@ -251,6 +258,7 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
         self.alcoholPercent = alcoholPercent
         self.gramsAlcohol = gramsAlcohol
         self.timestampMillis = timestampMillis
+        self.utcOffsetSeconds = utcOffsetSeconds
         self.logicalDate = logicalDate
         self.note = note
     }

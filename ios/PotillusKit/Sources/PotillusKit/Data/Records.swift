@@ -138,6 +138,11 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
     /// The wall-clock instant of consumption, in milliseconds since the epoch.
     public var timestampMillis: Int64
 
+    /// The UTC offset in force where and when the drink was logged, which is the
+    /// frame its clock time is read in. `nil` for rows written before the column
+    /// existed; see `DayResolver.displayTimeZone` for what that falls back to.
+    public var utcOffsetSeconds: Int?
+
     /// The LOGICAL day this entry belongs to (`yyyy-MM-dd`), as decided by
     /// `DayResolver`. Stored, not derived, because the user may move the
     /// day-change time later and history must not silently re-bucket.
@@ -156,7 +161,8 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
         gramsAlcohol: Double,
         timestampMillis: Int64,
         logicalDate: String,
-        note: String = ""
+        note: String = "",
+        utcOffsetSeconds: Int? = nil
     ) {
         self.id = id
         self.drinkId = drinkId
@@ -165,6 +171,7 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
         self.alcoholPercent = alcoholPercent
         self.gramsAlcohol = gramsAlcohol
         self.timestampMillis = timestampMillis
+        self.utcOffsetSeconds = utcOffsetSeconds
         self.logicalDate = logicalDate
         self.note = note
     }

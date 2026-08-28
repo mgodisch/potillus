@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
@@ -80,9 +81,6 @@ import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.theme.dangerRedColor
 import de.godisch.potillus.ui.theme.successColor
 import de.godisch.potillus.ui.theme.warningColor
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 // ════════════════════════════════════════════════════════════════════════════
 // LIST PADDING BELOW A FLOATING ACTION BUTTON
@@ -345,8 +343,11 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
     // Per-app locale for the gram value, so its decimal separator matches the
     // in-app language rather than the system locale (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
-    val time = remember(entry.timestampMillis) {
-        val ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.timestampMillis), ZoneId.systemDefault())
+    // Read in the frame the drink was logged in, not the one the phone is in now.
+    // The two differ after a flight and after every daylight-saving switch, and
+    // the row's date has been frozen since it was written.
+    val time = remember(entry.timestampMillis, entry.utcOffsetSeconds) {
+        val ldt = DayResolver.localDateTime(entry.timestampMillis, entry.utcOffsetSeconds)
         "%02d:%02d".format(ldt.hour, ldt.minute)
     }
     val spokenDetail = stringResource(

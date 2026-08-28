@@ -78,6 +78,10 @@ import androidx.room.PrimaryKey
  * @param gramsAlcohol    Pre-calculated pure alcohol in grams (avoids re-computing
  *                        in SQL aggregate queries like SUM).
  * @param timestampMillis Unix epoch milliseconds (UTC) of the consumption.
+ * @param utcOffsetSeconds UTC offset the entry was logged at, or `null` for an
+ *                        entry written before this column existed. See
+ *                        [de.godisch.potillus.domain.DayResolver.localDateTime]
+ *                        for what `null` falls back to.
  * @param logicalDate     ISO-8601 "YYYY-MM-DD" as resolved by [de.godisch.potillus.domain.DayResolver].
  * @param note            Optional free-text annotation.
  */
@@ -104,4 +108,10 @@ data class EntryEntity(
     val timestampMillis: Long,
     val logicalDate: String,
     val note: String = "",
+    // LAST, deliberately: `ALTER TABLE … ADD COLUMN` appends, so declaring it
+    // here makes a freshly created table and a migrated one carry their columns
+    // in the same order. Room validates the column SET rather than its order,
+    // but a database that differs depending on when it was created is a trap for
+    // the next person reading `PRAGMA table_info`.
+    val utcOffsetSeconds: Int? = null,
 )

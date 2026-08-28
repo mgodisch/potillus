@@ -61,7 +61,7 @@ public final class AppDatabase: Sendable {
     ///
     /// Kept as a plain constant for the parity test to assert against; GRDB
     /// itself tracks applied steps by name in `grdb_migrations`.
-    public static let schemaVersion = 2
+    public static let schemaVersion = 3
 
     /// The write-serialising connection. A queue (not a pool) because the app is
     /// single-user and offline: correctness and simplicity beat read concurrency.
@@ -255,6 +255,25 @@ public final class AppDatabase: Sendable {
                 on: "entries",
                 columns: ["logicalDate"]
             )
+        }
+
+        // The twin of Room's MIGRATION_2_3. The column records the UTC offset a
+        // drink was logged at, so its clock time can be read back in the frame it
+        // was written in rather than in whatever frame the device is in at read
+        // time. See `DayResolver.utcOffsetSeconds` for what is stored and
+        // `DayResolver.displayTimeZone` for how it is read.
+        //
+        // NULLABLE, AND EXISTING ROWS ARE LEFT NULL. A backfill would have to
+        // guess: the only offset available at migration time is the one the
+        // device is in now, which is right for someone who never travelled and
+        // wrong for someone who did — and once written, the guess would be
+        // indistinguishable from a recorded fact. NULL says "not recorded" and
+        // lets every read derive the same fallback, which is exactly what the app
+        // did for every entry before this column existed.
+        migrator.registerMigration("v3-entry-utc-offset") { db in
+            try db.alter(table: "entries") { table in
+                table.add(column: "utcOffsetSeconds", .integer)
+            }
         }
 
         return migrator

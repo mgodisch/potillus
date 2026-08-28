@@ -88,7 +88,7 @@ import java.security.KeyStore
 // guarantee) for the promise this upholds.
 @Database(
     entities = [DrinkEntity::class, EntryEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -200,7 +200,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME,
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .addCallback(PrepopulateCallback(applicationScope))
                     .build()
                     .also { instance = it }
@@ -282,6 +282,32 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL(
             "CREATE INDEX IF NOT EXISTS index_entries_logicalDate ON entries (logicalDate)",
         )
+    }
+}
+
+/**
+ * v2 → v3: Add `entries.utcOffsetSeconds`.
+ *
+ * The column records the UTC offset a drink was logged at, so its clock time can
+ * be read back in the frame it was written in rather than in whatever frame the
+ * device is in at read time. See
+ * [de.godisch.potillus.domain.DayResolver.utcOffsetSeconds] for what is stored
+ * and [de.godisch.potillus.domain.DayResolver.localDateTime] for how it is read.
+ *
+ * NULLABLE, AND EXISTING ROWS ARE LEFT NULL. A backfill would have to guess: the
+ * only offset available at migration time is the one the device is in now, which
+ * is right for someone who never travelled and wrong for someone who did — and
+ * once written, the guess would be indistinguishable from a recorded fact. NULL
+ * says "not recorded" and lets [DayResolver.localDateTime] derive the same
+ * fallback on every read, which is exactly what the app did for every entry
+ * before this column existed.
+ *
+ * `ALTER TABLE … ADD COLUMN` is safe on a table with data: SQLite rewrites no
+ * row, and a nullable column needs no DEFAULT.
+ */
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE entries ADD COLUMN utcOffsetSeconds INTEGER")
     }
 }
 

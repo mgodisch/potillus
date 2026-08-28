@@ -30,6 +30,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.WeekFields
@@ -130,6 +131,65 @@ object DayResolver {
      * [resolve] so the configured day-change boundary is honoured either way.
      */
     fun today(changeHour: Int, changeMinute: Int): String = resolve(clock().millis(), changeHour, changeMinute)
+
+    // ── The recorded local frame ─────────────────────────────────────────────
+    //
+    // WHY AN ENTRY CARRIES ITS OWN UTC OFFSET
+    //   `logicalDate` is frozen at write time; the clock time was not. It used to
+    //   be recomputed from `timestampMillis` and whatever zone the device was in
+    //   at READ time, so date and time came from two different frames as soon as
+    //   the frame moved. Fly from Berlin to New York and a 23:30 drink still sat
+    //   under the 1st but read 17:30. Twice a year the same thing happened
+    //   without travelling: after a daylight-saving switch every historical time
+    //   shifted by an hour, and with a 04:00 day boundary an entry could end up
+    //   displaying a time on the far side of the boundary its own logicalDate
+    //   says it is on.
+    //
+    //   Storing the offset the drink was logged at makes the local frame part of
+    //   the record, next to the date that already was. `timestampMillis` stays
+    //   the single instant: it is what elapsed-time arithmetic, ordering and
+    //   duplicate detection use, and the offset never enters them.
+
+    /**
+     * The UTC offset in seconds that [zoneId] was at [timestampMillis].
+     *
+     * Read once, when an entry is written, and stored with it. The zone's
+     * historical rules are consulted for the instant in question, so an entry
+     * logged in winter records the winter offset even if it is written from a
+     * summer clock.
+     *
+     * @param timestampMillis Unix timestamp in milliseconds (UTC).
+     * @param zoneId          Timezone to read the offset from. Defaults to the
+     *                        device zone, which is what a live log wants.
+     */
+    fun utcOffsetSeconds(timestampMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): Int =
+        zoneId.rules.getOffset(Instant.ofEpochMilli(timestampMillis)).totalSeconds
+
+    /**
+     * The local wall-clock time of [timestampMillis] in the frame [utcOffsetSeconds].
+     *
+     * NULL MEANS "NOT RECORDED", NOT "UTC". Entries written before the offset
+     * existed, and entries read from a backup that predates it, carry no frame.
+     * They fall back to what the app did for all of them until now: the device
+     * zone's rules for that instant. For anyone who has not changed zones that
+     * reproduces the previous display exactly, and it gets past daylight-saving
+     * switches right, because the rules are historical rather than current.
+     *
+     * @param timestampMillis  Unix timestamp in milliseconds (UTC).
+     * @param utcOffsetSeconds The recorded offset, or `null` when the entry
+     *                         predates the column.
+     * @param zoneId           Zone used for the fallback only.
+     */
+    fun localDateTime(
+        timestampMillis: Long,
+        utcOffsetSeconds: Int?,
+        zoneId: ZoneId = ZoneId.systemDefault(),
+    ): LocalDateTime {
+        val instant = Instant.ofEpochMilli(timestampMillis)
+        val offset = utcOffsetSeconds?.let(ZoneOffset::ofTotalSeconds)
+            ?: zoneId.rules.getOffset(instant)
+        return LocalDateTime.ofInstant(instant, offset)
+    }
 
     /**
      * Parses a canonical `"YYYY-MM-DD"` date.

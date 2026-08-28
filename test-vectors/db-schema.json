@@ -9,9 +9,10 @@
     "contract: a database FILE is not an interchange format between the platforms.",
     "The JSON backup is. What is shared is the table shape, so the domain logic and",
     "the queries mean the same thing on both sides.",
-    "Column order follows the Room export and is significant only for readability."
+    "Column order follows the Room export and is significant only for readability.",
+    "entries.utcOffsetSeconds is nullable on purpose: NULL means the entry predates the column and its clock time is read through the device zone's historical rules. It is appended last so a freshly created table and one reached by ALTER TABLE carry the same column order."
   ],
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "tables": [
     {
       "name": "drinks",
@@ -106,6 +107,11 @@
           "name": "note",
           "type": "TEXT",
           "notNull": true
+        },
+        {
+          "name": "utcOffsetSeconds",
+          "type": "INTEGER",
+          "notNull": false
         }
       ],
       "primaryKey": [

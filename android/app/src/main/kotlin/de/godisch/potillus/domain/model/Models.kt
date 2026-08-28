@@ -100,6 +100,11 @@ data class DrinkDefinition(
  *                        that SQL SUM() queries are numerically stable without
  *                        re-deriving the value from volume × ABV on every read.
  * @param timestampMillis Unix epoch milliseconds (UTC) of the consumption event.
+ * @param utcOffsetSeconds UTC offset in force where and when the drink was
+ *                        logged, which is what the entry's clock time is read
+ *                        in. `null` for entries written before the field
+ *                        existed and for backups that predate it; see
+ *                        [de.godisch.potillus.domain.DayResolver.localDateTime].
  * @param logicalDate     ISO-8601 "YYYY-MM-DD" resolved by
  *                        [de.godisch.potillus.domain.DayResolver], which attributes
  *                        late-night entries to the previous calendar day when
@@ -116,6 +121,7 @@ data class ConsumptionEntry(
     val timestampMillis: Long,
     val logicalDate: String,
     val note: String = "",
+    val utcOffsetSeconds: Int? = null,
 )
 
 /**

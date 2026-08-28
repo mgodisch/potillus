@@ -72,8 +72,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 // ════════════════════════════════════════════════════════════════════════════
 // STATS
@@ -509,9 +507,10 @@ class StatsViewModel(
             // screen's 24-bar time-of-day chart (the same series the PDF uses).
             val hourlyGrams = DoubleArray(24)
             periodEntries.forEach { e ->
-                val hour = LocalDateTime
-                    .ofInstant(Instant.ofEpochMilli(e.timestampMillis), ZoneId.systemDefault())
-                    .hour
+                // The hour the drink was logged at, in the frame it was logged
+                // in. Reading it in the CURRENT device frame moved every bar of
+                // a travelled or daylight-saving-crossed history by an hour.
+                val hour = DayResolver.localDateTime(e.timestampMillis, e.utcOffsetSeconds).hour
                 hourlyGrams[hour] += e.gramsAlcohol
             }
             // Collapse the 24 clock hours into eight 3-hour buckets (0–3, 3–6 … 21–24)

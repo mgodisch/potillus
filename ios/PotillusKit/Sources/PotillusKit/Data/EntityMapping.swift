@@ -87,6 +87,7 @@ extension Entry {
             alcoholPercent: alcoholPercent,
             gramsAlcohol: gramsAlcohol,
             timestampMillis: timestampMillis,
+            utcOffsetSeconds: utcOffsetSeconds,
             logicalDate: logicalDate,
             note: note
         )
@@ -101,6 +102,7 @@ extension Entry {
             alcoholPercent: entry.alcoholPercent,
             gramsAlcohol: entry.gramsAlcohol,
             timestampMillis: entry.timestampMillis,
+            utcOffsetSeconds: entry.utcOffsetSeconds,
             logicalDate: entry.logicalDate,
             note: entry.note
         )

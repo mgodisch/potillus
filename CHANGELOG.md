@@ -204,6 +204,7 @@ Edit drinks from the list's edit mode
 - Store listings follow the same typography.
 - The blood-alcohol estimate spans the day boundary and carries one decimal.
 - A backup entry's grams are checked against its volume and ABV.
+- An entry records the UTC offset it was logged at, optional in the backup.
 
 ### Removed
 
@@ -233,6 +234,7 @@ Edit drinks from the list's edit mode
 - French, Japanese, Korean and Chinese wording in four spoken labels.
 - The blood-alcohol estimate across a gap between two rounds.
 - The stated origin of the 60 g threshold, and the cost of the last-entry query.
+- An entry's clock time after a change of time zone or a daylight-saving switch.
 
 ---
 

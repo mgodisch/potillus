@@ -31,6 +31,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.VisibleForTesting
 import de.godisch.potillus.R
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
 import java.io.IOException
@@ -199,19 +200,24 @@ object CsvExporter {
     ): String {
         // Build a map from drink ID → definition for O(1) category lookups.
         val drinkMap = drinks.associateBy { it.id }
-        val timeFmt = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+        // No zone on the formatter: the entry carries its own frame, and
+        // DayResolver.localDateTime resolves it (or falls back for a row written
+        // before the offset existed). Formatting a LocalDateTime that already
+        // stands in the right frame is what keeps the exported time equal to the
+        // time the drink was logged at, in the row whose date says the same.
+        val timeFmt = DateTimeFormatter.ofPattern("HH:mm")
 
         // Headers are escaped too (see step 2 in the KDoc above).
         val header = headerCells.joinToString(",") { escapeField(it) }
 
         val rows = entries.map { e ->
-            val instant = Instant.ofEpochMilli(e.timestampMillis)
+            val local = DayResolver.localDateTime(e.timestampMillis, e.utcOffsetSeconds)
             // Category falls back to "OTHER" for entries whose drink was edited
             // or if a future backup format includes an unknown category.
             val category = drinkMap[e.drinkId]?.category?.name ?: "OTHER"
             listOf(
                 e.logicalDate,
-                timeFmt.format(instant),
+                timeFmt.format(local),
                 escapeField(e.drinkName),
                 category,
                 e.volumeMl.toString(),

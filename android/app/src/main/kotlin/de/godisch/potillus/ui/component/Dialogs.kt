@@ -67,6 +67,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.DrinkValidator
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
@@ -119,8 +120,13 @@ fun AddEditEntryDialog(
     var noteText by remember { mutableStateOf(entry?.note ?: "") }
     var drinkDropdownOpen by remember { mutableStateOf(false) }
 
-    val initDt = entry?.timestampMillis?.let {
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+    // Editing shows the time the entry RECORDS, not what its instant reads in the
+    // device's present frame. The picker is then round-trip honest: the user sees
+    // 23:30, confirms 23:30, and the row still says 23:30 afterwards — the save
+    // below builds a new instant from the frame they are in now, and the
+    // repository records that frame with it.
+    val initDt = entry?.let {
+        DayResolver.localDateTime(it.timestampMillis, it.utcOffsetSeconds)
     } ?: LocalDateTime.now()
     var hour by remember { mutableIntStateOf(initDt.hour) }
     var minute by remember { mutableIntStateOf(initDt.minute) }

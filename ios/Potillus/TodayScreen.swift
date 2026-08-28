@@ -531,7 +531,15 @@ extension TodayScreen {
     /// locale's own clock form.
     private func entrySpokenLabel(_ entry: ConsumptionEntry) -> Text {
         let time = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
-        return Text(time, style: .time) + Text(Loc.string(", %1$@", entry.drinkName, locale: locale))
+        // `Text(_:style:)` renders in the DEVICE frame with no way to override it,
+        // so the recorded frame is applied by shifting the instant by the
+        // difference between the two. The value spoken is then the same clock
+        // time the row shows; without this the two disagreed after a flight or a
+        // daylight-saving switch, which is worse than either being wrong alone.
+        let shown = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
+        let shift = TimeInterval(shown.secondsFromGMT(for: time) - TimeZone.current.secondsFromGMT(for: time))
+        return Text(time.addingTimeInterval(shift), style: .time)
+            + Text(Loc.string(", %1$@", entry.drinkName, locale: locale))
     }
 
     /// The row's spoken VALUE: the figures with their units written out, then
@@ -568,6 +576,10 @@ extension TodayScreen {
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("Hm")
+        // Read in the frame the drink was logged in, not the one the phone is in
+        // now. The two differ after a flight and after every daylight-saving
+        // switch, and the row's date has been frozen since it was written.
+        formatter.timeZone = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
         let time = formatter.string(
             from: Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
         )

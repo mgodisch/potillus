@@ -110,6 +110,7 @@ internal fun EntryEntity.toDomain() = ConsumptionEntry(
     alcoholPercent = alcoholPercent,
     gramsAlcohol = gramsAlcohol,
     timestampMillis = timestampMillis,
+    utcOffsetSeconds = utcOffsetSeconds,
     logicalDate = logicalDate,
     note = note,
 )
@@ -126,6 +127,7 @@ internal fun ConsumptionEntry.toEntity() = EntryEntity(
     alcoholPercent = alcoholPercent,
     gramsAlcohol = gramsAlcohol,
     timestampMillis = timestampMillis,
+    utcOffsetSeconds = utcOffsetSeconds,
     logicalDate = logicalDate,
     note = note,
 )

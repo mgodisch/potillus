@@ -521,8 +521,18 @@ public final class CalendarModel {
     /// in place — the same contract as Android's `updateEntry`, which the
     /// repository's `update` preserves.
     public func updateEntry(_ entry: ConsumptionEntry) async {
+        // The frame is re-read with the timestamp, unlike the logical date. The
+        // two answer different questions: the date is where the user filed the
+        // drink, the offset is the frame the time they just typed was typed in.
+        // Keeping a stale offset would show the edited entry at an hour the user
+        // did not enter. Done here rather than in the view, so no caller can
+        // forget it — the shape Android gives its repository.
+        var stamped = entry
+        stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
+            timestampMillis: entry.timestampMillis, timeZone: timeZone
+        )
         do {
-            try entries.update(entry)
+            try entries.update(stamped)
         } catch {
             failure = String(describing: error)
             return

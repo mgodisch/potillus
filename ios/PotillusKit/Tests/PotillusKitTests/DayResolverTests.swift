@@ -260,3 +260,56 @@ final class DayResolverTests: XCTestCase {
         }
     }
 }
+
+// =============================================================================
+// The recorded local frame
+// =============================================================================
+//
+// In an extension so `type_body_length` stays inside SwiftLint's limit; these
+// belong to the same suite and run with it.
+
+extension DayResolverTests {
+
+    func testUtcOffsetSecondsReadsTheOffsetInForceAtThatInstant() {
+        let berlin = TimeZone(identifier: "Europe/Berlin")!
+        // 2026-01-15T12:00Z is winter in Berlin: +01:00.
+        let winter: Int64 = 1_768_478_400_000
+        // 2026-07-15T12:00Z is summer: +02:00.
+        let summer: Int64 = 1_784_116_800_000
+        XCTAssertEqual(
+            DayResolver.utcOffsetSeconds(timestampMillis: winter, timeZone: berlin), 3600
+        )
+        XCTAssertEqual(
+            DayResolver.utcOffsetSeconds(timestampMillis: summer, timeZone: berlin), 7200
+        )
+    }
+
+    func testDisplayTimeZoneUsesTheRecordedOffset() {
+        let zone = DayResolver.displayTimeZone(
+            utcOffsetSeconds: 3600, fallback: TimeZone(identifier: "America/New_York")!
+        )
+        XCTAssertEqual(zone.secondsFromGMT(), 3600)
+    }
+
+    /// Nil is not UTC: an entry that recorded no frame falls back to the device
+    /// zone, which is what the app did for every entry before the field existed.
+    func testDisplayTimeZoneFallsBackWhenNothingWasRecorded() {
+        let fallback = TimeZone(identifier: "Europe/Berlin")!
+        XCTAssertEqual(
+            DayResolver.displayTimeZone(utcOffsetSeconds: nil, fallback: fallback), fallback
+        )
+    }
+
+    /// 22:30 in Berlin in January, read from a device that has since moved to New
+    /// York. The recorded frame still says 22:30.
+    func testARecordedFrameSurvivesAChangeOfZone() {
+        let instant = Date(timeIntervalSince1970: 1_768_512_600)  // 2026-01-15T21:30Z
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = DayResolver.displayTimeZone(
+            utcOffsetSeconds: 3600, fallback: TimeZone(identifier: "America/New_York")!
+        )
+        XCTAssertEqual(calendar.component(.hour, from: instant), 22)
+        XCTAssertEqual(calendar.component(.minute, from: instant), 30)
+        XCTAssertEqual(calendar.component(.day, from: instant), 15)
+    }
+}

@@ -350,6 +350,18 @@ public enum BackupReader {
         guard let logicalDate = object["logicalDate"] as? String else {
             throw BackupError.missingField(object: "entry", key: "logicalDate")
         }
+        // OPTIONAL, and its absence is not an error: every file written before
+        // the field existed lacks it, as does one written by an older build of
+        // the other platform. `nil` is carried through and read back through the
+        // fallback in `DayResolver.displayTimeZone`. When it IS present it must
+        // be a real offset — the widest zones in the IANA database run from
+        // -12:00 to +14:00. Android's Guard 3c is the twin.
+        let utcOffsetSeconds = intValue(object["utcOffsetSeconds"])
+        if let offset = utcOffsetSeconds, !(-12 * 3600...14 * 3600).contains(offset) {
+            throw BackupError.valueOutOfRange(
+                object: "entry", key: "utcOffsetSeconds", value: String(offset)
+            )
+        }
 
         // Same rationale as `parseDrink`: `gramsAlcohol` is the primary input to
         // every BAC and statistics computation, so a non-finite or negative value
@@ -418,6 +430,7 @@ public enum BackupReader {
             alcoholPercent: alcoholPercent,
             gramsAlcohol: gramsAlcohol,
             timestampMillis: timestampMillis,
+            utcOffsetSeconds: utcOffsetSeconds,
             logicalDate: logicalDate,
             note: object["note"] as? String ?? ""
         )
@@ -527,7 +540,7 @@ public enum BackupWriter {
     }
 
     private static func encode(_ entry: ConsumptionEntry) -> [String: Any] {
-        [
+        var object: [String: Any] = [
             "id": entry.id,
             "drinkId": entry.drinkId,
             "drinkName": entry.drinkName,
@@ -538,6 +551,13 @@ public enum BackupWriter {
             "logicalDate": entry.logicalDate,
             "note": entry.note,
         ]
+        // Written only when the entry has one, and omitted rather than guessed
+        // when it has not: a reader that finds no offset derives the same
+        // fallback the app derives for its own pre-column rows.
+        if let offset = entry.utcOffsetSeconds {
+            object["utcOffsetSeconds"] = offset
+        }
+        return object
     }
 
     private static func encode(_ settings: BackupSettings) -> [String: Any] {

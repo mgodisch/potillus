@@ -105,8 +105,15 @@ struct EntrySheet: View {
         if let editing {
             _volumeText = State(initialValue: String(editing.volumeMl))
             _note = State(initialValue: editing.note)
-            initialTimestamp = Date(
-                timeIntervalSince1970: Double(editing.timestampMillis) / 1000.0
+            // Editing shows the time the entry RECORDS, not what its instant
+            // reads in the device's present frame. The picker is then round-trip
+            // honest: the user sees 23:30, confirms 23:30, and the row still
+            // says 23:30 afterwards — the save builds a new instant in the frame
+            // they are in now, and the model records that frame with it.
+            let instant = Date(timeIntervalSince1970: Double(editing.timestampMillis) / 1000.0)
+            let shown = DayResolver.displayTimeZone(utcOffsetSeconds: editing.utcOffsetSeconds)
+            initialTimestamp = instant.addingTimeInterval(
+                TimeInterval(shown.secondsFromGMT(for: instant) - TimeZone.current.secondsFromGMT(for: instant))
             )
         } else {
             _volumeText = State(initialValue: initial.map { String($0.volumeMl) } ?? "")

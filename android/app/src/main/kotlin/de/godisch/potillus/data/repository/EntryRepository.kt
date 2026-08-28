@@ -156,6 +156,10 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
                 alcoholPercent = drink.alcoholPercent,
                 gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
                 timestampMillis = timestampMillis,
+                // The local frame is recorded here, beside the logical date and
+                // for the same reason: both are facts about where and when the
+                // drink was logged, and neither survives being re-derived later.
+                utcOffsetSeconds = DayResolver.utcOffsetSeconds(timestampMillis),
                 logicalDate = logical,
                 note = note,
             ),
@@ -192,6 +196,10 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
             alcoholPercent = drink.alcoholPercent,
             gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
             timestampMillis = timestampMillis,
+            // Recorded even though the DATE comes from the calendar selection:
+            // the time of day is still a wall-clock reading the user made here
+            // and now, and it is that reading the entry must keep showing.
+            utcOffsetSeconds = DayResolver.utcOffsetSeconds(timestampMillis),
             logicalDate = logicalDate,
             note = note,
         ),
@@ -217,7 +225,14 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
             settings.dayChangeHour,
             settings.dayChangeMinute,
         )
-        dao.update(entry.copy(logicalDate = newLogicalDate).toEntity())
+        // The timestamp may have moved, so the frame is re-read with it: the user
+        // typed a new wall-clock time on the device they are holding now.
+        dao.update(
+            entry.copy(
+                logicalDate = newLogicalDate,
+                utcOffsetSeconds = DayResolver.utcOffsetSeconds(entry.timestampMillis),
+            ).toEntity(),
+        )
     }
 
     /**
@@ -228,10 +243,19 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
      * (the calendar day the entry belongs to) must remain unchanged, because
      * the user deliberately assigned it to that date.
      *
-     * @param entry  The entry to persist. All fields including [logicalDate] are
-     *               written as-is.
+     * The LOCAL FRAME is re-read, unlike the date. The two answer different
+     * questions: the date is where the user filed the drink, the offset is the
+     * frame the time they just typed was typed in. Keeping a stale offset here
+     * would show the edited entry at an hour the user did not enter.
+     *
+     * @param entry  The entry to persist. Every field except
+     *               [ConsumptionEntry.utcOffsetSeconds] is written as-is,
+     *               [logicalDate] included.
      */
-    override suspend fun update(entry: ConsumptionEntry) = dao.update(entry.toEntity())
+    override suspend fun update(entry: ConsumptionEntry) =
+        dao.update(
+            entry.copy(utcOffsetSeconds = DayResolver.utcOffsetSeconds(entry.timestampMillis)).toEntity(),
+        )
 
     /** Deletes [entry] from the database. */
     override suspend fun delete(entry: ConsumptionEntry) = dao.delete(entry.toEntity())
