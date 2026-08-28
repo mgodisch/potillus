@@ -156,6 +156,40 @@ Forward-looking directions, roughly in priority order:
   number of source lines would turn that class of confusion into a plain "input
   not read completely". Cheap, and it makes every future failure of these gates
   mean what it says.
+- **Gradle dependency verification, if it is worth its upkeep.** The build pins
+  every dependency by VERSION, not by content: nothing checks that the artifact
+  a repository serves is the one the catalogue names. Gradle answers that with
+  `gradle/verification-metadata.xml`, and the project carried such a file
+  briefly before it was taken out again. What that attempt established, so the
+  next attempt does not rediscover it:
+
+  The file was generated in the most maintenance-heavy configuration Gradle
+  offers — `verify-metadata` on, `verify-signatures` off, so every artifact is
+  covered by a per-version checksum. In that shape EVERY dependency bump
+  invalidates the file, and regenerating it correctly is harder than it looks:
+  a task Gradle reports as up to date resolves nothing and therefore records
+  nothing, KSP pulls its processor and coroutines through a detached
+  configuration at task-execution time, the CycloneDX plugin cannot run in the
+  same invocation as the assemble tasks, and an artifact already in the local
+  cache is reused without being read and so goes unrecorded. Four regeneration
+  attempts each failed on a different one of these, the last of them in CI,
+  where a fresh runner needs exactly what a developer machine had not fetched.
+
+  The way out is not a better regeneration command. It is the configuration:
+  prefer `<trusted-key>` entries over checksums wherever an artifact is signed,
+  because one key covers every release signed with it and a version bump then
+  leaves the file untouched — the trade being that a key entry trusts the key
+  rather than the bytes, so a malicious release signed with a stolen key would
+  pass where a checksum would not. Checksums stay for what is unsigned, in
+  practice mostly Gradle Plugin Portal artifacts. Automated upkeep exists too:
+  Renovate maintains the file when it finds one, which Dependabot (what the
+  project runs today, for advisories only) does not.
+
+  Deferred rather than dropped: the protection is real, and F-Droid rebuilding
+  the published APK from this repository is a good reason to want it. But it is
+  a security decision about whom to trust, not a build chore, and it should be
+  taken deliberately — decide the trust model first, then let the file follow
+  from it.
 - **Run the test and lint suites in the canonical pipeline.** The GitLab pipeline
   runs the device-free checks and a lockfile SCA scan on a small `python:3-slim`
   image. What it does not run are the TEST and LINT suites: `./gradlew

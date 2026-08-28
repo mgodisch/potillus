@@ -231,32 +231,6 @@ dependency vulnerabilities is limited, but they are tracked and addressed
 regardless. This check is part of the release checklist in
 [CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
 
-Vulnerability scanning answers whether a dependency is KNOWN to be flawed. A
-second question is whether the artifact that arrives is the one the catalogue
-names, and that is answered by Gradle's dependency verification:
-[android/gradle/verification-metadata.xml](android/gradle/verification-metadata.xml)
-pins a SHA-256 for every artifact the Android build resolves, direct and
-transitive, and the build fails rather than compiles if one of them does not
-match. The scope is deliberate and worth stating plainly: `verify-metadata` is
-on, `verify-signatures` is off, so integrity rests on the recorded checksums and
-not on publisher keys — a substituted or tampered artifact is caught, a
-maliciously published one signed by its own author is not. On iOS the equivalent
-is [ios/PotillusKit/Package.resolved](ios/PotillusKit/Package.resolved), which
-pins the single dependency to an exact version and git revision.
-
-Gradle regenerates the checksum file only when asked, and it does not warn when
-the file has fallen behind — it simply fails the next build that needs an
-artifact the file does not list, which may be a rebuild by F-Droid rather than
-one here. Raising a version in `libs.versions.toml` without regenerating is the
-way that happens, so
-[tools/check-dependency-verification.py](tools/check-dependency-verification.py)
-asserts that every library and plugin in the catalogue is covered at its CURRENT
-version. It runs in `make check-static` and is a gate in `make release-android`.
-Regeneration is `make -C android verification-metadata`; the target's header in
-`android/Makefile` states which tasks and flags it needs and why, and
-[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7 places it
-in the release checklist.
-
 Alongside these two gates there is a third, advisory source: **Dependabot
 alerts** are enabled on the GitHub mirror, so the GitHub Advisory Database is
 consulted in addition to the OSV data osv-scanner uses. An alert is a

@@ -112,14 +112,6 @@ check-bestpractices-levels:
 check-vex:
 	python3 tools/check-vex.py
 
-# check-dependency-verification: every library and plugin in the Gradle version
-# catalogue has a checksum in gradle/verification-metadata.xml at its CURRENT
-# version. Gradle regenerates that file only when asked and does not warn when
-# it falls behind -- it just fails the next build that needs a missing artifact,
-# on whoever builds next, F-Droid included. See tools/check-dependency-verification.py.
-check-dependency-verification:
-	python3 tools/check-dependency-verification.py
-
 # check-reuse: the tree is REUSE-compliant -- every file carries an SPDX license
 # and copyright, every referenced license text is in LICENSES/, and none is left
 # unused. Deliberately kept OUT of check-static: it needs the external `reuse`
@@ -228,7 +220,6 @@ release-check:
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
-              check-dependency-verification \
               check-report-labels check-fixture-parity \
               check-report-pdfs
 
@@ -237,7 +228,6 @@ check-static: check-ios-static check-ui-string-parity check-bestpractices-levels
         check-l10n-parity \
         check-typography \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
-        check-dependency-verification \
         check-swift-symbols check-swift-length check-swift-tests check-swift-argument-order \
         check-ios-metadata \
         check-ios-screenshots check-ios-a11y fix-headers release-check check-ios-static \

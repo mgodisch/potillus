@@ -340,59 +340,6 @@ $(SBOM): prereq
 	./gradlew :app:cyclonedxDirectBom
 	python3 ../tools/sbom-normalize.py "$(SBOM)"
 
-# verification-metadata: rewrite gradle/verification-metadata.xml.
-#
-# WHY THIS IS A TARGET AND NOT A LINE IN A DOCUMENT
-#   The command has to name every task whose resolution the file must cover, and
-#   getting that list right took four attempts, each found by a build that had
-#   already failed. A list that hard to get right belongs in one place that can
-#   be corrected once, not in prose that has to be copied by hand.
-#
-# THE RUN WRITES WHAT IT READS, WHICH IS WHY IT USES AN EMPTY CACHE
-#   Gradle records a checksum for an artifact it READS from a repository during
-#   the run. Anything already in the local cache is reused without being read,
-#   and so goes unrecorded — a file written on a developer machine covers what
-#   that machine happened to fetch, not what the build needs. A fresh CI runner
-#   or an F-Droid builder then fails on the difference, which is exactly how
-#   `kotlinx-coroutines-bom` came to be missing while
-#   `kotlinx-coroutines-core-jvm` of the same version was present.
-#
-#   So the run gets a throwaway GRADLE_USER_HOME. That makes it identical, by
-#   construction, to a machine that has nothing — the only state in which
-#   "everything the build reads" and "everything the build needs" are the same
-#   set. It downloads the full dependency graph and is correspondingly slow;
-#   this happens at a version bump, not daily.
-#
-# WHAT THE REST IS FOR
-#   --rerun-tasks  A task Gradle reports as up to date resolves nothing. Without
-#       this, an incremental run records checksums for exactly the artifacts it
-#       did not need.
-#   kspDebugKotlin, kspReleaseKotlin  KSP resolves its processor and coroutines
-#       through a DETACHED configuration, at task-execution time. They reach the
-#       build through no configuration the version catalogue names, which is why
-#       they are the ones that keep going missing.
-#
-# WHY cyclonedxBom IS ABSENT
-#   Under --rerun-tasks the plugin cannot create `cyclonedxDirectBom` at all: the
-#   assemble tasks in the same invocation have consumed the configuration it
-#   wants to modify. It needs nothing from this run either — it reads
-#   `releaseRuntimeClasspath` and `coreLibraryDesugaring`, both resolved here.
-#
-# AFTER RUNNING IT, commit the file. `make release-android` gates on
-# tools/check-dependency-verification.py, and a real build is what catches a
-# transitive artifact the catalogue does not name.
-verification-metadata: prereq
-	# The cache is removed on EVERY exit, including the abort that .SHELLFLAGS'
-	# `-e` performs on a failed Gradle run. Without the trap a failed attempt
-	# would leave several gigabytes behind, once per attempt.
-	cache=$$(mktemp -d)
-	trap 'rm -rf "$$cache"' EXIT
-	echo "verification-metadata: resolving into a throwaway cache at $$cache"
-	GRADLE_USER_HOME="$$cache" ./gradlew --write-verification-metadata sha256 --rerun-tasks \
-	    kspDebugKotlin kspReleaseKotlin \
-	    assembleDebug assembleRelease bundleRelease \
-	    testDebugUnitTest lintDebug ktlintCheck koverVerify
-
 # release: the release APK (F-Droid and direct install). bundle: the release AAB
 # (Google Play requires the bundle format for new apps). Both carry the SBOM as a
 # prerequisite so it is produced alongside the artifact.
@@ -463,5 +410,4 @@ distclean: clean
 
 .PHONY: help prereq java android gradle-wrapper guides check-guides \
         debug-apk screenshot-apks unit-tests device-tests lint format deps \
-        sbom release bundle cover-check cover-figures verification-metadata \
-        clean distclean
+        sbom release bundle cover-check cover-figures clean distclean

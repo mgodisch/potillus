@@ -209,25 +209,14 @@ cover-check:
 # release-android: gate, build, stage. In order it (1) asserts the store
 # screenshots and report PDFs are present, (2) refuses to overwrite an already-
 # staged (possibly published) artifact for this versionCode, (3) runs the read-only
-# invariant gate (tools/release-check.sh --release), the dependency-checksum gate
-# and the coverage gate, (4) builds the AAB, APK and SBOM via the Android
-# Makefile, and (5) copies them into releases/ under their canonical names. It
-# never uploads -- that is the fastlane lanes (the push-playstore-* targets),
-# which read the staged AAB.
-#
-# WHY THE CHECKSUM GATE RUNS HERE AND NOT ONLY IN check-static
-#   gradle/verification-metadata.xml is what makes a substituted dependency fail
-#   the build instead of reaching an APK, and Gradle regenerates it only when
-#   asked. A version raised in the catalogue without regenerating it leaves the
-#   file behind silently until some later build needs the missing artifact --
-#   and the next builder may be F-Droid, rebuilding the published APK from this
-#   repository. A release is the last moment at which that is cheap to notice,
-#   so the check is a gate here rather than advice.
+# invariant gate (tools/release-check.sh --release) and the coverage gate, (4)
+# builds the AAB, APK and SBOM via the Android Makefile, and (5) copies them into
+# releases/ under their canonical names. It never uploads -- that is the fastlane
+# lanes (the push-playstore-* targets), which read the staged AAB.
 release-android:
 	@$(call require-osv-scanner,release-android)
 	@$(call require-android-screenshots,release-android)
 	@$(call require-android-report-pdfs,release-android)
-	$(MAKE) check-dependency-verification
 	@for f in "$(STAGED_AAB)" "$(STAGED_APK)" "$(STAGED_SBOM)"; do \
 	    if test -e "$$f"; then echo "release-android: staged file '$$f' already exists -- refusing to overwrite a staged release. Remove the releases/ artifacts for this versionCode (or bump versionCode) and re-run." >&2; exit 1; fi; \
 	done

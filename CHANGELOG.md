@@ -207,8 +207,7 @@ Edit drinks from the list's edit mode
 - An entry records the UTC offset it was logged at, optional in the backup.
 - `release-check` counts a check whose input is absent as skipped.
 - The UI-string map names the labels that exist on one platform only.
-- Gradle verifies a SHA-256 for every artifact the Android build resolves.
-- `check-dependency-verification` and `check-swift-argument-order`.
+- `check-swift-argument-order`.
 - Every language spells the drinking day one way.
 - The release checklist names the tasks that resolve every artifact.
 
@@ -244,9 +243,9 @@ Edit drinks from the list's edit mode
 - The Room schema check reads the version the exported file states.
 - The badge note on running the suites in CI.
 - The security documents name the asset the app's own encryption covers.
+- The roadmap carries what a dependency-verification attempt established.
 - The time-of-day chart on the iOS statistics screen reads the recorded frame.
 - The weekday chart averages over every occurrence of the weekday.
-- `make -C android verification-metadata` rewrites the checksum file.
 
 ---
 
