@@ -88,6 +88,14 @@ check-l10n:
 check-l10n-parity:
 	python3 tools/check-l10n-parity.py
 
+# check-plural-parity: the shared vectors in test-vectors/plural-days.json spell a
+# day count for iOS, the Android <plurals> resources spell it for Android, and only
+# the iOS side has a test that reads the vectors -- an Android JVM test cannot
+# resolve a plurals resource. This closes that half: both are text, so the wording
+# behind each plural category is comparable without either platform.
+check-plural-parity:
+	python3 tools/check-plural-parity.py
+
 # check-typography: every user-facing text quotes and elides the way its language
 # does -- the apostrophe is U+2019, and each language uses its own quotation pair.
 # Catches what an audit round otherwise finds years later: a straight quote in a
@@ -220,12 +228,12 @@ release-check:
 # levels map). The broadest "is the tree consistent?" gate that needs no device,
 # no Mac and no network.
 check-static: check-ios-static check-ui-string-parity check-bestpractices-levels check-vex \
-              check-report-labels check-fixture-parity \
+              check-report-labels check-fixture-parity check-plural-parity \
               check-report-pdfs
 
 .PHONY: check-headers check-makefile check-report-paper check-report-labels check-report-pdfs \
         check-fixture-parity check-l10n \
-        check-l10n-parity \
+        check-l10n-parity check-plural-parity \
         check-typography \
         check-ui-string-parity check-bestpractices-levels check-vex check-reuse check-trackers \
         check-swift-symbols check-swift-length check-swift-tests check-swift-argument-order \

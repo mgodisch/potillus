@@ -275,6 +275,26 @@ public enum BackupReader {
         let entryObjects = root["entries"] as? [[String: Any]] ?? []
         let entries = try entryObjects.map(parseEntry)
 
+        // Every entry must point at a drink this file defines. The importer would
+        // catch a dangling reference too — `ImportError.unmappedDrink`, thrown
+        // inside the transaction, so nothing is written either way — but it catches
+        // it after the user has confirmed the import. Android's `BackupManager`
+        // refuses the file at its parse gate, and refusing here puts the two
+        // platforms in the same place: the reader rejects a file it cannot restore,
+        // before anyone is asked to confirm it.
+        //
+        // `valueOutOfRange` rather than a case of its own: a drink id that names
+        // nothing in the file is outside the range this reader accepts, and the
+        // existing case already carries the object, the key and the offending
+        // value, which is what a message needs to name. A new case would need a
+        // new translated string in every shipped language to say the same thing.
+        let definedDrinkIds = Set(drinks.map(\.id))
+        for entry in entries where !definedDrinkIds.contains(entry.drinkId) {
+            throw BackupError.valueOutOfRange(
+                object: "entry", key: "drinkId", value: String(entry.drinkId)
+            )
+        }
+
         var settings: BackupSettings?
         if let raw = root["settings"] as? [String: Any] {
             settings = parseSettings(raw)

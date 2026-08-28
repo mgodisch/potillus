@@ -57,6 +57,8 @@ Edit drinks from the list's edit mode
 - `check-typography` gates the apostrophe and the quotation pair per language.
 - Shared vectors for the bar height, the donut ring, and the locale's first
   weekday.
+- `check-plural-parity` holds the day-count wording of both platforms
+  together.
 
 ### Changed
 
@@ -213,6 +215,7 @@ Edit drinks from the list's edit mode
 - Every language spells the drinking day one way.
 - The release checklist names the tasks that resolve every artifact.
 - Bar heights and donut slices in the Android report come from named functions.
+- The iOS backup reader refuses an entry whose drink the file omits.
 
 ### Removed
 

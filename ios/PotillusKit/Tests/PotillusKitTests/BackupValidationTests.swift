@@ -120,7 +120,10 @@ final class BackupValidationTests: XCTestCase {
     func testEntryGramsAlcoholFromBeforeTheRoundingChangeIsAccepted() throws {
         let data = try json([
             "version": 2,
-            "drinks": [],
+            // The drink is defined here so the entry has something to point at:
+            // the reader checks that reference since the 0.85.0 QA round, and this
+            // test is about the gram tolerance, not about a dangling id.
+            "drinks": [["id": 1, "name": "Wein", "volumeMl": 150, "alcoholPercent": 13.5]],
             "entries": [["id": 1, "drinkId": 1, "drinkName": "Wein", "volumeMl": 150,
                          "alcoholPercent": 13.5, "gramsAlcohol": 15.98,
                          "timestampMillis": 1_767_381_240_000, "logicalDate": "2026-01-01"]],
@@ -174,6 +177,46 @@ final class BackupValidationTests: XCTestCase {
 
     /// The in-`parse` backstop refuses an over-limit buffer before the JSON
     /// parser walks it, regardless of how the bytes were obtained.
+    // ── Referential integrity (Android BackupManager Guard 5 parity) ─────────
+    //
+    // An entry naming a drink the file does not define cannot be restored. The
+    // importer refuses it too, inside the transaction, but only once the user has
+    // confirmed; Android refuses it while reading, and since the 0.85.0 QA round
+    // so does this side.
+
+    func testAnEntryNamingADrinkTheFileDoesNotDefineIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [["id": 1, "name": "Pils", "volumeMl": 500, "alcoholPercent": 4.9]],
+            "entries": [[
+                "id": 1, "drinkId": 99, "drinkName": "Pils", "volumeMl": 500,
+                "alcoholPercent": 4.9, "gramsAlcohol": 19.3,
+                "timestampMillis": 1_767_290_400_000, "logicalDate": "2026-01-01",
+            ]],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "entry", key: "drinkId", value: "99"))
+        }
+    }
+
+    /// The mirror image: the same file with a drink id the entry can reach reads
+    /// through, so the guard above rejects the reference and not the shape.
+    func testAnEntryNamingADefinedDrinkIsAccepted() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [["id": 99, "name": "Pils", "volumeMl": 500, "alcoholPercent": 4.9]],
+            "entries": [[
+                "id": 1, "drinkId": 99, "drinkName": "Pils", "volumeMl": 500,
+                "alcoholPercent": 4.9, "gramsAlcohol": 19.3,
+                "timestampMillis": 1_767_290_400_000, "logicalDate": "2026-01-01",
+            ]],
+        ])
+        let backup = try BackupReader.parse(data)
+        XCTAssertEqual(backup.entries.count, 1)
+        XCTAssertEqual(backup.entries[0].drinkId, 99)
+    }
+
     func testOversizedDataIsRejected() {
         let data = Data(count: BackupReader.maxBackupBytes + 1)
         XCTAssertThrowsError(try BackupReader.parse(data)) { error in

@@ -580,6 +580,18 @@ object AlcoholCalculator {
 
         // Consumption days only (> 0 g), sorted ascending by date so the window can
         // advance with a single forward pass. We parse the ISO date once per day.
+        //
+        // A DATE THAT DOES NOT PARSE THROWS HERE, AND THE SWIFT PORT DROPS IT. The
+        // two ports part on this one input: `LocalDate.parse` raises, while
+        // `IsoDay.parse` returns null into a `compactMap` and the day leaves the
+        // window silently. Neither behaviour is reachable from the app — every
+        // route into a summary runs through the importer or the database, and both
+        // refuse a date that is not the canonical spelling of a real day. The
+        // difference is recorded rather than levelled: making this side tolerant
+        // would turn a corrupt row into a quietly wrong statistic, and making the
+        // other side throw would cross a Swift API that returns optionals by
+        // design. Should a caller ever hand in unvalidated dates, it must do the
+        // validating, because the two platforms will not agree on what happens.
         val days = summaries
             .filter { isDrinkDay(it.totalGrams) }
             .map { LocalDate.parse(it.date) to it.totalGrams }
