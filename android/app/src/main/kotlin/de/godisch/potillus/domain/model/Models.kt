@@ -119,6 +119,24 @@ data class ConsumptionEntry(
 )
 
 /**
+ * One dose of alcohol at one instant: everything the Widmark estimate needs.
+ *
+ * WHY NOT PASS [ConsumptionEntry] DIRECTLY?
+ *   [de.godisch.potillus.domain.AlcoholCalculator.calculateBAC] reads two of its
+ *   nine fields. Taking the narrow type keeps the pharmacokinetics free of the
+ *   logging model — no drink name, no logical date, nothing that could tempt a
+ *   later reader into resolving the estimate by day again — and it lets the
+ *   shared golden vectors state a case as two numbers instead of a whole entry.
+ *
+ * @param timestampMillis Unix epoch milliseconds (UTC) at which it was drunk.
+ * @param gramsAlcohol    Pure alcohol in grams; zero for an alcohol-free drink.
+ */
+data class AlcoholDose(
+    val timestampMillis: Long,
+    val gramsAlcohol: Double,
+)
+
+/**
  * Aggregated per-day drinking summary produced by a SQL GROUP BY query.
  *
  * Only days with at least one entry appear; zero-gram days are omitted

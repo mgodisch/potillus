@@ -256,6 +256,28 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
     }
 }
 
+/// One dose of alcohol at one instant: everything the Widmark estimate needs.
+///
+/// Mirrors Android's `AlcoholDose`. `AlcoholCalculator.calculateBAC` reads two of
+/// `ConsumptionEntry`'s nine fields, and taking the narrow type keeps the
+/// pharmacokinetics free of the logging model — no drink name, no logical date,
+/// nothing that could tempt a later reader into resolving the estimate by day
+/// again. It also lets the shared golden vectors state a case as two numbers
+/// rather than a whole entry.
+public struct AlcoholDose: Sendable, Equatable {
+
+    /// Unix epoch milliseconds (UTC) at which it was drunk.
+    public var timestampMillis: Int64
+
+    /// Pure alcohol in grams; zero for an alcohol-free drink.
+    public var gramsAlcohol: Double
+
+    public init(timestampMillis: Int64, gramsAlcohol: Double) {
+        self.timestampMillis = timestampMillis
+        self.gramsAlcohol = gramsAlcohol
+    }
+}
+
 /// The subset of user preferences the calculator needs.
 ///
 /// The full Android `AppSettings` carries UI preferences too; only the limit

@@ -189,6 +189,15 @@ public enum BackupReader {
     /// crafted to exhaust memory when parsed.
     public static let maxBackupBytes = 10 * 1024 * 1024
 
+    /// How far an imported `gramsAlcohol` may sit from the mass its volume and
+    /// ABV imply before the file is rejected.
+    ///
+    /// 0.1 g is the grid every current value lives on and twice the widest gap a
+    /// pre-0.1-g-rounding entry can show (0.055 g), so it admits a user's own
+    /// older backups and still rejects a value that belongs to a different
+    /// drink. Android's `BackupManager.GRAMS_TOLERANCE` carries the same figure.
+    static let gramsTolerance = 0.1
+
     /// Reads a backup file from `url`, refusing anything over `maxBackupBytes`
     /// WITHOUT loading the whole file into memory first.
     ///
@@ -354,6 +363,31 @@ public enum BackupReader {
         }
         guard gramsAlcohol.isFinite, gramsAlcohol >= 0.0 else {
             throw BackupError.valueOutOfRange(object: "entry", key: "gramsAlcohol", value: String(gramsAlcohol))
+        }
+        // The range check above accepts any finite non-negative number, so a
+        // hand-edited or corrupt file could put 999 g on a 100 ml glass of 5 %
+        // and every statistic, limit bar and blood-alcohol estimate would carry
+        // it. The value is checked against the mass its own volume and ABV imply.
+        //
+        // WHY A TOLERANCE AND NOT EQUALITY: entries written before the 0.1 g
+        // rounding (see `AlcoholCalculator.calculateGrams`) carry two decimals —
+        // 150 ml at 13.5 % is 15.98 g in such a file where the recomputation now
+        // says 16.0 g. Equality would reject a user's own older backup. The
+        // widest such gap is 0.055 g, so 0.1 g passes every genuine legacy value
+        // while still catching anything that is not the drink it claims to be.
+        //
+        // WHY NOT RECOMPUTE INSTEAD: `gramsAlcohol` is what the entry recorded at
+        // log time, and overwriting it would rewrite the user's history in
+        // silence. The importer checks; it does not edit. Android's
+        // `BackupManager` Guard 3b carries the same figure and the same reason.
+        let impliedGrams = AlcoholCalculator.calculateGrams(
+            volumeMl: volumeMl, alcoholPercent: alcoholPercent
+        )
+        guard abs(gramsAlcohol - impliedGrams) <= gramsTolerance else {
+            throw BackupError.valueOutOfRange(
+                object: "entry", key: "gramsAlcohol",
+                value: "\(gramsAlcohol) for \(volumeMl) ml at \(alcoholPercent) % (expected \(impliedGrams))"
+            )
         }
         guard timestampMillis > 0 else {
             throw BackupError.valueOutOfRange(object: "entry", key: "timestampMillis", value: String(timestampMillis))

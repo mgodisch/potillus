@@ -312,10 +312,15 @@ struct AlcoholCalculatorVectors: Decodable {
 
     struct BacCase: Decodable {
         let description: String
-        let totalGrams: Double
+        let doses: [DoseCase]
         let weightKg: Double
-        let hoursElapsed: Double
+        let nowMillis: Int64
         let expected: Double
+    }
+
+    struct DoseCase: Decodable {
+        let timestampMillis: Int64
+        let gramsAlcohol: Double
     }
 
     struct LimitPercentCase: Decodable {

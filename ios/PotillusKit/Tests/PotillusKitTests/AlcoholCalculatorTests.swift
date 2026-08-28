@@ -100,12 +100,21 @@ final class AlcoholCalculatorTests: XCTestCase {
 
     // ── calculateBAC ─────────────────────────────────────────────────────────
 
+    /// 2026-01-01T18:00Z, the instant the shared vectors are anchored to.
+    private static let t0: Int64 = 1_767_290_400_000
+
+    private static func hours(_ count: Double) -> Int64 {
+        Int64(count * AlcoholCalculator.millisPerHour)
+    }
+
     func testCalculateBACAgainstSharedVectors() {
         for testCase in vectors.calculateBAC {
             let actual = AlcoholCalculator.calculateBAC(
-                totalGrams: testCase.totalGrams,
+                doses: testCase.doses.map {
+                    AlcoholDose(timestampMillis: $0.timestampMillis, gramsAlcohol: $0.gramsAlcohol)
+                },
                 weightKg: testCase.weightKg,
-                hoursElapsed: testCase.hoursElapsed
+                nowMillis: testCase.nowMillis
             )
             XCTAssertEqual(
                 actual, testCase.expected, accuracy: Self.epsilon,
@@ -115,18 +124,21 @@ final class AlcoholCalculatorTests: XCTestCase {
     }
 
     /// The Widmark model eliminates alcohol over time, so the estimate must be
-    /// monotonically non-increasing in `hoursElapsed`, and never negative.
+    /// monotonically non-increasing as the asking instant moves on, and never
+    /// negative.
     func testCalculateBACDecaysAndNeverGoesNegative() {
+        let doses = [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0)]
         var previous = Double.greatestFiniteMagnitude
         for hour in 0...12 {
             let bac = AlcoholCalculator.calculateBAC(
-                totalGrams: 40.0, weightKg: 75.0, hoursElapsed: Double(hour)
+                doses: doses, weightKg: 75.0, nowMillis: Self.t0 + Self.hours(Double(hour))
             )
             XCTAssertGreaterThanOrEqual(bac, 0.0, "BAC must never be negative")
             XCTAssertLessThanOrEqual(bac, previous, "BAC must not rise as time passes")
             previous = bac
         }
     }
+
 
     // ── limitPercent ─────────────────────────────────────────────────────────
 
@@ -319,5 +331,102 @@ final class AlcoholCalculatorTests: XCTestCase {
         XCTAssertNil(IsoDay.parse("2026-01"))
         XCTAssertNil(IsoDay.parse("not-a-date"))
         XCTAssertNil(IsoDay.parse(""))
+    }
+}
+
+// =============================================================================
+// The dose-by-dose properties
+// =============================================================================
+//
+// In an extension so `type_body_length` stays inside SwiftLint's limit; these
+// belong to the same suite and run with it.
+
+extension AlcoholCalculatorTests {
+
+    /// The point of walking dose by dose: 40 g at `t0` is eliminated well before
+    /// `t0+10h`, so the deficit must not be carried into the second round. The
+    /// lumped shorthand reported 0.25 per mille here where the second round alone
+    /// stands at 0.8.
+    func testCalculateBACClampsEliminationAcrossADryGap() {
+        let split = [
+            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.t0 + Self.hours(10), gramsAlcohol: 40.0)
+        ]
+        let secondAlone = [AlcoholDose(timestampMillis: Self.t0 + Self.hours(10), gramsAlcohol: 40.0)]
+        let now = Self.t0 + Self.hours(11)
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(doses: split, weightKg: 70.0, nowMillis: now),
+            0.8, accuracy: Self.epsilon
+        )
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(doses: split, weightKg: 70.0, nowMillis: now),
+            AlcoholCalculator.calculateBAC(doses: secondAlone, weightKg: 70.0, nowMillis: now),
+            accuracy: 0.0,
+            "with the first dose eliminated, the estimate is the second round's"
+        )
+    }
+
+    /// Without a gap the walk and the textbook shorthand agree: two doses an hour
+    /// apart never let the level reach zero, so 80 / 42 - 0.15 * 2 still holds.
+    func testCalculateBACMatchesTheLumpedFormWithoutAGap() {
+        let doses = [
+            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.t0 + Self.hours(1), gramsAlcohol: 40.0)
+        ]
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(
+                doses: doses, weightKg: 70.0, nowMillis: Self.t0 + Self.hours(2)
+            ),
+            1.6, accuracy: Self.epsilon
+        )
+    }
+
+    /// An alcohol-free drink contributes nothing and, above all, does not anchor
+    /// the elimination at its own timestamp.
+    func testCalculateBACIgnoresAlcoholFreeDoses() {
+        let withFree = [
+            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 0.0),
+            AlcoholDose(timestampMillis: Self.t0 + Self.hours(4), gramsAlcohol: 20.0)
+        ]
+        let alone = [AlcoholDose(timestampMillis: Self.t0 + Self.hours(4), gramsAlcohol: 20.0)]
+        let now = Self.t0 + Self.hours(4)
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(doses: withFree, weightKg: 80.0, nowMillis: now),
+            AlcoholCalculator.calculateBAC(doses: alone, weightKg: 80.0, nowMillis: now),
+            accuracy: 0.0
+        )
+    }
+
+    /// A drink entered for later in the evening has not been drunk yet.
+    func testCalculateBACIgnoresDosesInTheFuture() {
+        let doses = [
+            AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0),
+            AlcoholDose(timestampMillis: Self.t0 + Self.hours(3), gramsAlcohol: 40.0)
+        ]
+        let now = Self.t0 + Self.hours(1)
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(doses: doses, weightKg: 75.0, nowMillis: now),
+            AlcoholCalculator.calculateBAC(
+                doses: [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 40.0)],
+                weightKg: 75.0, nowMillis: now
+            ),
+            accuracy: 0.0
+        )
+    }
+
+    /// No weight on record, or no dose at all: the caller gets zero and turns it
+    /// into an absent row.
+    func testCalculateBACReturnsZeroWithoutWeightOrDoses() {
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(
+                doses: [AlcoholDose(timestampMillis: Self.t0, gramsAlcohol: 20.0)],
+                weightKg: 0.0, nowMillis: Self.t0
+            ),
+            0.0, accuracy: 0.0
+        )
+        XCTAssertEqual(
+            AlcoholCalculator.calculateBAC(doses: [], weightKg: 80.0, nowMillis: Self.t0),
+            0.0, accuracy: 0.0
+        )
     }
 }

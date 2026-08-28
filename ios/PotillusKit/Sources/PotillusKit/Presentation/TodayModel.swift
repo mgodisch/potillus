@@ -284,7 +284,20 @@ public final class TodayModel {
                 timeZone: timeZone
             )
 
-            let todaysEntries = try entries.inRange(from: today, to: today)
+            // TWO logical days, not one. The screen shows today's rows, but the
+            // blood-alcohol estimate must not fall off a cliff at the day-change
+            // time: someone who drank until three in the morning is not sober at
+            // four. Yesterday plus today spans at least 24 and at most 48 hours,
+            // which covers any dose that can still be showing; beyond that even a
+            // heavy evening has been eliminated, and `calculateBAC` clamps such
+            // doses to nothing anyway.
+            let yesterday = DayResolver.parseDate(today)
+                .map { DayResolver.formatDate(DayResolver.addingDays(-1, to: $0)) } ?? today
+            let recentEntries = try entries.inRange(from: yesterday, to: today)
+            // The screen's own list and its gram total stay scoped to today: they
+            // answer "how much have I had today", which is what the limits are
+            // measured against. Only the estimate reaches back further.
+            let todaysEntries = recentEntries.filter { $0.logicalDate == today }
             let totalGrams = todaysEntries.reduce(0.0) { $0 + $1.gramsAlcohol }
 
             var next = TodayState()
@@ -301,8 +314,8 @@ public final class TodayModel {
             if let last = try entries.lastEntry() {
                 next.lastUsedDrink = catalogue.first { $0.id == last.drinkId }
             }
-            next.bacPermille = Self.bac(for: todaysEntries, totalGrams: totalGrams,
-                                        settings: settings, nowMillis: nowMillis)
+            next.bacPermille = Self.bac(for: recentEntries, settings: settings,
+                                        nowMillis: nowMillis)
 
             let window = try weeklyWindow(endingOn: today)
             next.drinkDaysThisWeek = AlcoholCalculator.drinkDates(summaries: window).count
@@ -395,21 +408,24 @@ public final class TodayModel {
 
     /// The Widmark estimate, or nil when it would be a guess.
     ///
-    /// Mirrors Android exactly: a weight is required, and at least one entry with
-    /// alcohol in it. The elapsed time runs from the FIRST alcoholic entry of the
-    /// day, since that is when absorption began.
+    /// Mirrors Android exactly. A weight is required; `calculateBAC` drops
+    /// alcohol-free doses and doses that lie in the future itself, so nothing
+    /// needs pre-filtering here.
+    ///
+    /// Absent rather than zero: a reading of 0.0 ‰ would be a claim about the
+    /// body, and the estimate is not one. The row goes away instead.
     private static func bac(
-        for entries: [ConsumptionEntry], totalGrams: Double,
-        settings: AppSettings, nowMillis: Int64
+        for entries: [ConsumptionEntry], settings: AppSettings, nowMillis: Int64
     ) -> Double? {
         guard settings.weightKg > 0 else { return nil }
-        let alcoholic = entries.filter { $0.alcoholPercent > 0.0 }
-        guard let firstTimestamp = alcoholic.map(\.timestampMillis).min() else { return nil }
-
-        let hoursElapsed = Double(nowMillis - firstTimestamp) / AlcoholCalculator.millisPerHour
-        return AlcoholCalculator.calculateBAC(
-            totalGrams: totalGrams, weightKg: settings.weightKg, hoursElapsed: hoursElapsed
+        let value = AlcoholCalculator.calculateBAC(
+            doses: entries.map {
+                AlcoholDose(timestampMillis: $0.timestampMillis, gramsAlcohol: $0.gramsAlcohol)
+            },
+            weightKg: settings.weightKg,
+            nowMillis: nowMillis
         )
+        return value > 0.0 ? value : nil
     }
 
     // ── Actions ──────────────────────────────────────────────────────────────

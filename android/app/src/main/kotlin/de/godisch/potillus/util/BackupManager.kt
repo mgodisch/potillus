@@ -32,6 +32,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -47,6 +48,7 @@ import java.io.InputStream
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 // =============================================================================
 // BackupManager.kt – Full JSON backup and restore
@@ -142,6 +144,17 @@ object BackupManager {
      *   produces roughly 500 KB) and serves as a hard safety cap.
      */
     private const val MAX_BACKUP_BYTES = 10L * 1_024 * 1_024 // 10 MB
+
+    /**
+     * How far an imported `gramsAlcohol` may sit from the mass its volume and
+     * ABV imply before the file is rejected (Guard 3b in [parseBackupJson]).
+     *
+     * 0.1 g is the grid every current value lives on and twice the widest gap a
+     * pre-0.1-g-rounding entry can show (0.055 g), so it admits a user's own
+     * older backups and still rejects a value that belongs to a different drink.
+     * The iOS importer carries the same figure.
+     */
+    private const val GRAMS_TOLERANCE = 0.1
 
     /** Timestamp format for the backup file name. */
     private val FILE_FMT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault())
@@ -527,6 +540,30 @@ object BackupManager {
                     .also { require(it.isFinite() && it in 0.0..100.0) { "entry alcoholPercent invalid: $it" } }
                 val gramsAlcohol = obj.getDouble("gramsAlcohol")
                     .also { require(it.isFinite() && it >= 0.0) { "gramsAlcohol invalid: $it" } }
+                // ── Guard 3b: gramsAlcohol agrees with volume and ABV ────────────
+                // The range check above accepts any finite non-negative number, so
+                // a hand-edited or corrupt file could put 999 g on a 100 ml glass
+                // of 5 % and every statistic, limit bar and blood-alcohol estimate
+                // would carry it. The value is checked against the mass its own
+                // volume and ABV imply.
+                //
+                // WHY A TOLERANCE AND NOT EQUALITY: entries written before the
+                // 0.1 g rounding (see AlcoholCalculator.calculateGrams) carry two
+                // decimals — 150 ml at 13.5 % is 15.98 g in such a file where the
+                // recomputation now says 16.0 g. Equality would reject a user's
+                // own older backup. The widest such gap is 0.055 g, so 0.1 g
+                // passes every genuine legacy value while still catching anything
+                // that is not the drink it claims to be.
+                //
+                // WHY NOT RECOMPUTE INSTEAD: gramsAlcohol is what the entry
+                // recorded at log time, and overwriting it would rewrite the
+                // user's history in silence. The importer checks; it does not edit.
+                .also {
+                    val implied = AlcoholCalculator.calculateGrams(entryVolumeMl, entryAlcoholPercent)
+                    require(abs(it - implied) <= GRAMS_TOLERANCE) {
+                        "gramsAlcohol $it does not match $entryVolumeMl ml at $entryAlcoholPercent % (expected $implied)"
+                    }
+                }
                 val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
                 // ── Guard 4: logicalDate – full calendar-semantic validation ─────

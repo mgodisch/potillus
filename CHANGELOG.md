@@ -202,6 +202,8 @@ Edit drinks from the list's edit mode
 - App text, report labels and the guide token map spell the apostrophe as `’`.
 - Each user guide quotes and elides in the typography of its language.
 - Store listings follow the same typography.
+- The blood-alcohol estimate spans the day boundary and carries one decimal.
+- A backup entry's grams are checked against its volume and ABV.
 
 ### Removed
 
@@ -229,6 +231,8 @@ Edit drinks from the list's edit mode
 - The l10n gate on freshly harvested String Catalog keys.
 - A dead link in the best-practices self-assessment.
 - French, Japanese, Korean and Chinese wording in four spoken labels.
+- The blood-alcohol estimate across a gap between two rounds.
+- The stated origin of the 60 g threshold, and the cost of the last-entry query.
 
 ---
 

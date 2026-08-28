@@ -223,21 +223,24 @@ final class TodayModelTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(later, 0.0, "the estimate is never negative")
     }
 
-    /// Elapsed time runs from the FIRST alcoholic drink of the day, since that is
-    /// when absorption began.
-    func testDecayIsMeasuredFromTheFirstAlcoholicEntry() async throws {
+    /// An alcohol-free drink neither raises the estimate nor anchors the
+    /// elimination at its own, earlier timestamp.
+    func testAnAlcoholFreeEntryDoesNotStartTheClock() async throws {
         try await environment.preferences.update { $0.weightKg = 82.5 }
         let alcoholFree = try addDrink("Alkoholfrei", percent: 0.0)
         let pils = try addDrink("Pils")
 
-        let model = makeModel(at: evening + 2 * 3_600_000)
+        let now = evening + 2 * 3_600_000
+        let model = makeModel(at: now)
         await model.load()
         // The alcohol-free drink is older; it must not start the clock.
         await model.addEntry(drink: alcoholFree, volumeMl: 500, timestampMillis: evening - 3_600_000)
         await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening)
 
         let expected = AlcoholCalculator.calculateBAC(
-            totalGrams: model.state.totalGrams, weightKg: 82.5, hoursElapsed: 2.0
+            doses: [AlcoholDose(timestampMillis: evening, gramsAlcohol: model.state.totalGrams)],
+            weightKg: 82.5,
+            nowMillis: now
         )
         XCTAssertEqual(try XCTUnwrap(model.state.bacPermille), expected, accuracy: 1e-9)
     }
@@ -526,5 +529,53 @@ extension TodayModelTests {
                 timestampMillis: Int64(noon.timeIntervalSince1970 * 1000), logicalDate: date
             )
         )
+    }
+}
+
+// =============================================================================
+// The estimate at the day boundary
+// =============================================================================
+//
+// In an extension so `type_body_length` stays inside SwiftLint's limit; it
+// belongs to the same suite and runs with it.
+
+extension TodayModelTests {
+
+    /// The regression this pins: the estimate used to be fed from the entries of
+    /// the CURRENT logical day only, so at the day-change time it vanished while
+    /// the person was still very much over zero.
+    ///
+    /// The clock runs in UTC here, as everywhere in this file, so the boundary is
+    /// exact: three drinks at 02:00 belong to the 2nd, and 04:30 is the 3rd.
+    func testTheEstimateSurvivesTheDayBoundary() async throws {
+        try await environment.preferences.update { $0.weightKg = 82.5 }
+        let pils = try addDrink("Pils")
+
+        let beforeMidnightBoundary: Int64 = 1_767_405_600_000  // 2026-01-03, 02:00 UTC
+        let lateNight = makeModel(at: beforeMidnightBoundary)
+        await lateNight.load()
+        for _ in 0..<3 {
+            await lateNight.addEntry(drink: pils, volumeMl: 500)
+        }
+        XCTAssertEqual(lateNight.state.logicalDate, "2026-01-02")
+
+        // 04:30 UTC, half an hour past the 04:00 change hour.
+        let afterBoundary = makeModel(at: 1_767_414_600_000)
+        await afterBoundary.load()
+
+        XCTAssertEqual(afterBoundary.state.logicalDate, "2026-01-03")
+        XCTAssertTrue(
+            afterBoundary.state.entries.isEmpty,
+            "yesterday's drinks must not appear in today's list"
+        )
+        XCTAssertEqual(
+            afterBoundary.state.totalGrams, 0.0, accuracy: 0.0,
+            "today's total must stay at zero"
+        )
+        let bac = try XCTUnwrap(
+            afterBoundary.state.bacPermille,
+            "the estimate must not vanish at the day boundary"
+        )
+        XCTAssertGreaterThan(bac, 0.0)
     }
 }

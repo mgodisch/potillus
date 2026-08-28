@@ -44,6 +44,7 @@ package de.godisch.potillus.ui.screen
 // =============================================================================
 
 import app.cash.turbine.test
+import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -127,6 +128,42 @@ class TodayViewModelTest {
                 state.bacPermille != null,
             )
             assertTrue("BAC should be positive", state.bacPermille!! > 0.0)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test fun `uiState BAC survives the day boundary`() = runTest(dispatcher) {
+        // The regression this pins: the estimate used to be fed from the entries
+        // of the CURRENT logical day only, so at the day-change time it vanished
+        // while the person was still very much over zero. Here today is dry and
+        // the drink sits on yesterday's logical day two hours ago; the screen's
+        // own figures must stay at zero and the estimate must not.
+        prefs = FakeAppPreferences(AppSettings(weightKg = 75.0, dayChangeHour = 4))
+        val now = System.currentTimeMillis()
+        val yesterday = DayResolver.formatDate(
+            DayResolver.parseDate(DayResolver.today(4, 0)).minusDays(1),
+        )
+        entryRepo.add(
+            ConsumptionEntry(
+                drinkId = 1,
+                drinkName = "Lager",
+                volumeMl = 500,
+                alcoholPercent = 5.0,
+                gramsAlcohol = 19.7,
+                timestampMillis = now - 2 * AlcoholCalculator.MILLIS_PER_HOUR.toLong(),
+                logicalDate = yesterday,
+            ),
+        )
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+
+        vm.uiState.test {
+            val state = awaitItem()
+            assertTrue("yesterday's drink must not appear in today's list", state.entries.isEmpty())
+            assertEquals("today's total must stay at zero", 0.0, state.totalGrams, 0.0)
+            assertTrue(
+                "the estimate must not vanish at the day boundary",
+                state.bacPermille != null && state.bacPermille!! > 0.0,
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

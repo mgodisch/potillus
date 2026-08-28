@@ -52,7 +52,6 @@ import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
-import de.godisch.potillus.l10n.fmt2
 import de.godisch.potillus.l10n.formattingLocale
 import de.godisch.potillus.ui.component.*
 import de.godisch.potillus.ui.theme.dangerTextColor
@@ -399,7 +398,7 @@ fun TodayScreen(
                             val spokenBac = stringResource(
                                 R.string.a11y_caption_permille,
                                 stringResource(R.string.bac_estimate),
-                                bac.fmt2(locale),
+                                bac.fmt1(locale),
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 // Caption and figure as one sentence: the per-mille
@@ -416,7 +415,7 @@ fun TodayScreen(
                                         modifier = Modifier.semantics { hideFromAccessibility() },
                                     )
                                     Text(
-                                        "${bac.fmt2(locale)} ‰",
+                                        "${bac.fmt1(locale)} ‰",
                                         modifier = Modifier.semantics { hideFromAccessibility() },
                                         style = MaterialTheme.typography.titleLarge,
                                         color = when {

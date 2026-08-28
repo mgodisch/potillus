@@ -30,13 +30,31 @@ package de.godisch.potillus.domain
 // =============================================================================
 //
 // WIDMARK FORMULA (Erik Widmark, 1932):
-//   BAC [‰] = A / (P × r) − β × t
+//   One dose raises the blood alcohol concentration by
 //
-//   A  = grams of pure alcohol consumed
+//       ΔBAC [‰] = A / (P × r)
+//
+//   and elimination removes β ‰ per hour while alcohol is present.
+//
+//   A  = grams of pure alcohol in the dose
 //   P  = body weight in kilograms
 //   r  = distribution coefficient (fixed at 0.6 here; see R_CONSERVATIVE)
 //   β  = elimination rate ≈ 0.15 ‰ per hour (average value)
-//   t  = hours elapsed since the FIRST drink of the episode
+//
+// WHY DOSE BY DOSE AND NOT ONE LUMPED SUBTRACTION
+//   The textbook shorthand sums every dose of a session and subtracts
+//   β × (now − first dose). That form holds only while the concentration stays
+//   above zero for the whole span. Across a dry afternoon between two rounds it
+//   keeps subtracting from a level that is already zero, and the deficit is
+//   carried into the evening: 40 g at noon and 40 g at ten, asked at eleven,
+//   came out at 0.25 ‰ where the second round alone stands at 0.80 ‰. The error
+//   pointed the unsafe way, and it grew with the length of the gap.
+//
+//   [calculateBAC] therefore walks the doses in time order, eliminates over each
+//   interval, clamps the level at zero before adding the next dose, and
+//   eliminates once more up to the moment asked about. For an unbroken session
+//   this yields exactly the lumped figure; for a split one it yields the higher,
+//   correct figure.
 //
 // WHY A FIXED r = 0.6 (NOT PER-SEX)?
 //   The app no longer stores the user's sex. To keep the BAC display honest as
@@ -57,6 +75,7 @@ package de.godisch.potillus.domain
 //   call AlcoholCalculator.calculateGrams(…) directly.
 // =============================================================================
 
+import de.godisch.potillus.domain.model.AlcoholDose
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.LimitInfo
@@ -73,11 +92,19 @@ object AlcoholCalculator {
     const val ETHANOL_DENSITY = 0.789
 
     /**
-     * Binge-drinking threshold in grams of pure alcohol per occasion.
+     * Binge-drinking threshold in grams of pure alcohol.
      *
-     * Fixed at 60 g, the WHO/NIAAA threshold historically used for women. As the
-     * app no longer stores the user's sex, the lower (stricter) of the two
-     * thresholds is used so the PDF report flags binge days conservatively.
+     * 60 g is the figure the WHO uses for heavy episodic drinking. That
+     * indicator is sex-neutral — it is reported broken down by sex, not defined
+     * per sex — so it fits an app that does not store the user's sex. The NIAAA
+     * thresholds are a different measure: they are sex-specific and counted in
+     * US standard drinks of 14 g, which puts them near 56 g and 70 g rather
+     * than at 60 g.
+     *
+     * ONE LIMIT OF THE READING: the WHO counts per OCCASION, the report counts
+     * per logical day. A day is not an occasion, least of all with a
+     * user-chosen day-change time, so the figure is the count of days above the
+     * threshold rather than a count of WHO episodes.
      */
     const val BINGE_THRESHOLD = 60.0
 
@@ -120,31 +147,22 @@ object AlcoholCalculator {
     // ── Private utility ───────────────────────────────────────────────────────
 
     /**
-     * Rounds a [Double] to two decimal places using Kotlin's [roundToLong].
+     * Rounds a [Double] to one decimal place.
+     *
+     * Two callers, one precision. For alcohol GRAM values one decimal is what
+     * the UI displays ("20.0 g") and what every daily-limit and binge comparison
+     * uses, so the number a user sees is the number that is compared; see
+     * [calculateGrams]. For the BLOOD-ALCOHOL estimate it is the precision the
+     * model supports: β varies between roughly 0.10 and 0.20 ‰/h across people
+     * and r is a population average, so a second decimal would claim an accuracy
+     * the Widmark model does not have.
      *
      * WHY a private extension instead of [Math.round]?
      *   `Math.round` is Java-style and requires explicit casting:
-     *     `Math.round(x * 100.0) / 100.0`
+     *     `Math.round(x * 10.0) / 10.0`
      *   Kotlin's [roundToLong] (from `kotlin.math`) is idiomatic and type-safe.
-     *   A named extension function documents the intent ("2 decimal places") at
-     *   the call site, avoids the magic literal `100.0`, and can be reused
-     *   by any future calculation that needs the same rounding precision.
-     *
-     * The sole caller is [calculateBAC]: the estimated blood-alcohol value in ‰
-     * is rounded to two decimal places, the precision the Today screen displays
-     * ("0.42 ‰"). Alcohol GRAM values are NOT rounded here — they use
-     * [roundTo1Decimal] (0.1 g) so the displayed and limit-compared gram figures
-     * agree; see [calculateGrams] and [roundTo1Decimal].
-     */
-    private fun Double.roundTo2Decimals(): Double = (this * 100.0).roundToLong() / 100.0
-
-    /**
-     * Rounds a [Double] to one decimal place (0.1 g).
-     *
-     * Used for alcohol gram values. One decimal is the precision the UI displays
-     * ("20.0 g") AND the precision every daily-limit / binge comparison uses, so
-     * the number a user sees is exactly the number that is compared against the
-     * limit. See [calculateGrams] for why this matters.
+     *   A named extension function documents the intent ("one decimal place") at
+     *   the call site and avoids the magic literal `10.0`.
      */
     private fun Double.roundTo1Decimal(): Double = (this * 10.0).roundToLong() / 10.0
 
@@ -180,38 +198,69 @@ object AlcoholCalculator {
     }
 
     /**
-     * Estimates the blood alcohol concentration (BAC) using the Widmark formula.
+     * Estimates the blood alcohol concentration (BAC) at [nowMillis].
      *
-     * BAC [‰] = A / (P × r) − β × t
+     * The doses are walked in time order. Between two of them the level falls by
+     * [BETA] per hour and is clamped at zero, so a gap long enough to sober up
+     * cannot be subtracted a second time from the round that follows it; see the
+     * file header for what the lumped form got wrong. After the last dose the
+     * same elimination runs up to [nowMillis].
      *
-     * The distribution coefficient r is fixed at the conservative value
-     * [R_CONSERVATIVE] (0.6), so the returned value is a worst-case (maximum)
-     * estimate rather than a sex-specific one.
+     * The distribution coefficient r is fixed at [R_CONSERVATIVE] (0.6), the
+     * smaller of the two classic values, so the result is a worst-case estimate
+     * rather than a sex-specific one.
      *
-     * Important: only entries with [alcoholPercent] > 0 should be included in
-     * [totalGrams], and their earliest timestamp should be used for [hoursElapsed].
-     * Including alcohol-free entries would falsely push the start time earlier,
-     * underestimating the BAC.
+     * NOT BOUND TO THE LOGICAL DAY. The caller passes the doses of a span of
+     * hours, not of a calendar or logical day. Someone who drank until three in
+     * the morning is not sober at four because the day-change time passed, and
+     * this function has no notion of a day that could make them look sober.
      *
-     * @param totalGrams    Total grams of pure alcohol in the current episode.
-     * @param weightKg      Body weight in kilograms (must be > 0).
-     * @param hoursElapsed  Hours since the first alcoholic drink of the episode.
-     *                      Negative values are treated as 0 (coerced).
-     * @return Estimated BAC in ‰, always ≥ 0.0.
-     *                      Returns 0.0 for invalid inputs (weight ≤ 0 or no alcohol).
+     * Doses of zero grams are dropped: an alcohol-free drink neither raises the
+     * level nor anchors the elimination. Doses timestamped after [nowMillis] are
+     * dropped too — a drink entered for later in the evening has not been drunk.
+     *
+     * @param doses     The doses to consider, in any order.
+     * @param weightKg  Body weight in kilograms (must be > 0).
+     * @param nowMillis The instant the estimate is asked about, Unix epoch ms.
+     * @return Estimated BAC in ‰, rounded to one decimal and never negative.
+     *         0.0 when no weight is on record or no dose applies.
      */
     fun calculateBAC(
-        totalGrams: Double,
+        doses: List<AlcoholDose>,
         weightKg: Double,
-        hoursElapsed: Double,
+        nowMillis: Long,
     ): Double {
-        if (weightKg <= 0 || totalGrams <= 0) return 0.0
-        val raw = (totalGrams / (weightKg * R_CONSERVATIVE)) - (BETA * hoursElapsed.coerceAtLeast(0.0))
-        val bac = raw.coerceAtLeast(0.0).roundTo2Decimals()
-        // Postcondition (see @return): the estimate is clamped to ≥ 0, so a BAC is
-        // never reported as negative. Verifies the coerceAtLeast above still holds.
+        if (weightKg <= 0) return 0.0
+        val relevant = doses
+            .filter { it.gramsAlcohol > 0.0 && it.timestampMillis <= nowMillis }
+            .sortedBy { it.timestampMillis }
+        if (relevant.isEmpty()) return 0.0
+
+        // `level` is the concentration reached just after the dose at `last`.
+        var level = 0.0
+        var last = relevant.first().timestampMillis
+        for (dose in relevant) {
+            level = eliminated(level, last, dose.timestampMillis)
+            level += dose.gramsAlcohol / (weightKg * R_CONSERVATIVE)
+            last = dose.timestampMillis
+        }
+        val bac = eliminated(level, last, nowMillis).roundTo1Decimal()
+        // Postcondition (see @return): every step clamps at zero, so the estimate
+        // is never negative. Checked under -ea during the test suite.
         assert(bac >= 0.0) { "calculateBAC: negative BAC $bac" }
         return bac
+    }
+
+    /**
+     * [level] after eliminating from [fromMillis] to [toMillis], clamped at zero.
+     *
+     * The clamp is the whole point: elimination is a zero-order process that only
+     * runs while there is alcohol to eliminate. Letting the level go negative and
+     * carrying that deficit forward is exactly the error the lumped formula made.
+     */
+    private fun eliminated(level: Double, fromMillis: Long, toMillis: Long): Double {
+        val hours = ((toMillis - fromMillis) / MILLIS_PER_HOUR).coerceAtLeast(0.0)
+        return (level - BETA * hours).coerceAtLeast(0.0)
     }
 
     // soberByMillis(bacPermille, nowMillis) has been removed: it was never

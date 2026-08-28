@@ -35,13 +35,30 @@ import Foundation
 // asserted against BOTH implementations so they cannot drift apart.
 //
 // WIDMARK FORMULA (Erik Widmark, 1932):
-//   BAC [‰] = A / (P × r) − β × t
+//   One dose raises the blood alcohol concentration by
 //
-//   A = grams of pure alcohol consumed
+//       ΔBAC [‰] = A / (P × r)
+//
+//   and elimination removes β ‰ per hour while alcohol is present.
+//
+//   A = grams of pure alcohol in the dose
 //   P = body weight in kilograms
 //   r = distribution coefficient (fixed at 0.6; see `widmarkR`)
 //   β = elimination rate ≈ 0.15 ‰ per hour (population average)
-//   t = hours elapsed since the FIRST drink of the episode
+//
+// WHY DOSE BY DOSE AND NOT ONE LUMPED SUBTRACTION
+//   The textbook shorthand sums every dose of a session and subtracts
+//   β × (now − first dose). That form holds only while the concentration stays
+//   above zero for the whole span. Across a dry afternoon between two rounds it
+//   keeps subtracting from a level that is already zero and carries the deficit
+//   into the evening: 40 g at noon and 40 g at ten, asked at eleven, came out at
+//   0.25 ‰ where the second round alone stands at 0.80 ‰. The error pointed the
+//   unsafe way and grew with the length of the gap.
+//
+//   `calculateBAC` therefore walks the doses in time order, eliminates over each
+//   interval, clamps the level at zero before adding the next dose, and
+//   eliminates once more up to the moment asked about. An unbroken session
+//   yields exactly the lumped figure; a split one yields the higher, correct one.
 //
 // WHY A FIXED r = 0.6 (NOT PER-SEX)?
 //   The app does not store the user's sex. To keep the readout honest as a
@@ -70,11 +87,19 @@ public enum AlcoholCalculator {
     /// Density of ethanol in g/ml (CRC Handbook).
     public static let ethanolDensity = 0.789
 
-    /// Binge-drinking threshold in grams of pure alcohol per occasion.
+    /// Binge-drinking threshold in grams of pure alcohol.
     ///
-    /// Fixed at 60 g, the WHO/NIAAA threshold historically used for women. As
-    /// the app does not store the user's sex, the stricter of the two
-    /// thresholds is used so the report flags binge days conservatively.
+    /// 60 g is the figure the WHO uses for heavy episodic drinking. That
+    /// indicator is sex-neutral — reported broken down by sex, not defined per
+    /// sex — so it fits an app that does not store the user's sex. The NIAAA
+    /// thresholds are a different measure: sex-specific and counted in US
+    /// standard drinks of 14 g, which puts them near 56 g and 70 g rather than
+    /// at 60 g.
+    ///
+    /// ONE LIMIT OF THE READING: the WHO counts per OCCASION, the report counts
+    /// per logical day. A day is not an occasion, least of all with a
+    /// user-chosen day-change time, so the figure is the count of days above the
+    /// threshold rather than a count of WHO episodes.
     public static let bingeThreshold = 60.0
 
     /// Length of the gliding consumption window, in days (today plus the six
@@ -173,15 +198,14 @@ public enum AlcoholCalculator {
     // out explicitly rather than relying on the default, to make the choice
     // visible to a future reader who might extend these to negative inputs.
 
-    /// Rounds to two decimal places, matching the Kotlin original's precision
-    /// for the BAC readout (e.g. "0.42 ‰").
-    private static func roundTo2Decimals(_ value: Double) -> Double {
-        (value * 100.0).rounded(.toNearestOrAwayFromZero) / 100.0
-    }
-
-    /// Rounds to one decimal place (0.1 g), the precision used for every gram
-    /// value the UI displays *and* every limit comparison, so the number a user
-    /// sees is exactly the number that is compared against the limit.
+    /// Rounds to one decimal place.
+    ///
+    /// Two callers, one precision. For alcohol GRAM values one decimal is what
+    /// the UI displays ("20.0 g") and what every limit comparison uses, so the
+    /// number a user sees is the number that is compared. For the BLOOD-ALCOHOL
+    /// estimate it is the precision the model supports: β varies between roughly
+    /// 0.10 and 0.20 ‰/h across people and r is a population average, so a
+    /// second decimal would claim an accuracy Widmark does not have.
     private static func roundTo1Decimal(_ value: Double) -> Double {
         (value * 10.0).rounded(.toNearestOrAwayFromZero) / 10.0
     }
@@ -214,38 +238,67 @@ public enum AlcoholCalculator {
         return grams
     }
 
-    /// Estimates the blood alcohol concentration using the Widmark formula.
+    /// Estimates the blood alcohol concentration at `nowMillis`.
     ///
-    /// `BAC [‰] = A / (P × r) − β × t`
+    /// The doses are walked in time order. Between two of them the level falls
+    /// by `beta` per hour and is clamped at zero, so a gap long enough to sober
+    /// up cannot be subtracted a second time from the round that follows it; see
+    /// the file header for what the lumped form got wrong. After the last dose
+    /// the same elimination runs up to `nowMillis`.
     ///
     /// The coefficient *r* is fixed at the conservative 0.6, so the value is a
     /// worst-case rather than sex-specific estimate.
     ///
-    /// Only entries with a positive ABV should contribute to `totalGrams`, and
-    /// their earliest timestamp should drive `hoursElapsed`. Including
-    /// alcohol-free entries would push the start time earlier and underestimate
-    /// the BAC.
+    /// NOT BOUND TO THE LOGICAL DAY. The caller passes the doses of a span of
+    /// hours, not of a calendar or logical day. Someone who drank until three in
+    /// the morning is not sober at four because the day-change time passed, and
+    /// this function has no notion of a day that could make them look sober.
+    ///
+    /// Doses of zero grams are dropped: an alcohol-free drink neither raises the
+    /// level nor anchors the elimination. Doses timestamped after `nowMillis` are
+    /// dropped too — a drink entered for later in the evening has not been drunk.
     ///
     /// - Parameters:
-    ///   - totalGrams: Total grams of pure alcohol in the current episode.
+    ///   - doses: The doses to consider, in any order.
     ///   - weightKg: Body weight in kilograms; must be positive.
-    ///   - hoursElapsed: Hours since the first alcoholic drink. Negative values
-    ///     are treated as zero.
-    /// - Returns: Estimated BAC in ‰, never negative. Returns 0 for invalid
-    ///   input (non-positive weight, or no alcohol).
+    ///   - nowMillis: The instant the estimate is asked about, Unix epoch ms.
+    /// - Returns: Estimated BAC in ‰, rounded to one decimal and never negative.
+    ///   Zero when no weight is on record or no dose applies.
     public static func calculateBAC(
-        totalGrams: Double,
+        doses: [AlcoholDose],
         weightKg: Double,
-        hoursElapsed: Double
+        nowMillis: Int64
     ) -> Double {
-        guard weightKg > 0, totalGrams > 0 else { return 0.0 }
-        let elapsed = max(hoursElapsed, 0.0)
-        let raw = (totalGrams / (weightKg * widmarkR)) - (beta * elapsed)
-        let bac = roundTo2Decimals(max(raw, 0.0))
-        // Postcondition: the estimate is clamped to >= 0, so a BAC is never
+        guard weightKg > 0 else { return 0.0 }
+        let relevant = doses
+            .filter { $0.gramsAlcohol > 0.0 && $0.timestampMillis <= nowMillis }
+            .sorted { $0.timestampMillis < $1.timestampMillis }
+        guard let first = relevant.first else { return 0.0 }
+
+        // `level` is the concentration reached just after the dose at `last`.
+        var level = 0.0
+        var last = first.timestampMillis
+        for dose in relevant {
+            level = eliminated(level, from: last, to: dose.timestampMillis)
+            level += dose.gramsAlcohol / (weightKg * widmarkR)
+            last = dose.timestampMillis
+        }
+        let bac = roundTo1Decimal(eliminated(level, from: last, to: nowMillis))
+        // Postcondition: every step clamps at zero, so the estimate is never
         // reported as negative.
         assert(bac >= 0.0, "calculateBAC: negative BAC \(bac)")
         return bac
+    }
+
+    /// `level` after eliminating from `fromMillis` to `toMillis`, clamped at zero.
+    ///
+    /// The clamp is the whole point: elimination is a zero-order process that
+    /// only runs while there is alcohol to eliminate. Letting the level go
+    /// negative and carrying that deficit forward is exactly the error the
+    /// lumped formula made.
+    private static func eliminated(_ level: Double, from fromMillis: Int64, to toMillis: Int64) -> Double {
+        let hours = max(Double(toMillis - fromMillis) / millisPerHour, 0.0)
+        return max(level - beta * hours, 0.0)
     }
 
     /// Translates user settings into the active limit thresholds.

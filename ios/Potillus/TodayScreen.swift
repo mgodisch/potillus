@@ -452,7 +452,7 @@ extension TodayScreen {
             // alcoholic logged, the app does not know — and must not imply 0.0.
             if let bac = model.state.bacPermille {
                 LabeledContent(Loc.string("BAC Estimate", locale: locale)) {
-                    Text("\(Loc.number(bac, fractionDigits: 2, locale: locale)) ‰").monospacedDigit()
+                    Text("\(Loc.number(bac, fractionDigits: 1, locale: locale)) ‰").monospacedDigit()
                 }
                 // The only row of this block that was left unspoken: caption and
                 // figure arrived as two stops, and the per-mille sign as its own
@@ -462,7 +462,7 @@ extension TodayScreen {
                 .accessibilityLabel(Loc.string(
                     "%1$@: %2$@ per mille",
                     Loc.string("BAC Estimate", locale: locale),
-                    Loc.number(bac, fractionDigits: 2, locale: locale),
+                    Loc.number(bac, fractionDigits: 1, locale: locale),
                     locale: locale
                 ))
             }

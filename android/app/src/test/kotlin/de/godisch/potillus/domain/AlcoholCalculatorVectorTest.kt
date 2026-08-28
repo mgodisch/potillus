@@ -39,6 +39,7 @@ package de.godisch.potillus.domain
 // too, and so any future edit to the vectors is felt on both platforms at once.
 // =============================================================================
 
+import de.godisch.potillus.domain.model.AlcoholDose
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.TrafficLight
 import org.json.JSONArray
@@ -105,9 +106,14 @@ class AlcoholCalculatorVectorTest {
     fun `calculateBAC matches the shared vectors`() {
         VECTORS.getJSONArray("calculateBAC").objects().forEach { case ->
             val actual = AlcoholCalculator.calculateBAC(
-                totalGrams = case.getDouble("totalGrams"),
+                doses = case.getJSONArray("doses").objects().map {
+                    AlcoholDose(
+                        timestampMillis = it.getLong("timestampMillis"),
+                        gramsAlcohol = it.getDouble("gramsAlcohol"),
+                    )
+                }.toList(),
                 weightKg = case.getDouble("weightKg"),
-                hoursElapsed = case.getDouble("hoursElapsed"),
+                nowMillis = case.getLong("nowMillis"),
             )
             assertEquals(
                 "calculateBAC: ${case.getString("description")}",

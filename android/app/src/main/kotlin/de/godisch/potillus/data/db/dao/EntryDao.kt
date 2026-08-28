@@ -197,9 +197,15 @@ interface EntryDao {
      * Reactive single most-recently-logged entry (by timestamp), or null if the
      * table is empty.
      *
-     * Used to pre-select the "last used" drink in the add-entry dialog. The
-     * `LIMIT 1` keeps this cheap regardless of history size — only one row is
-     * ever read, not the whole table.
+     * Used to pre-select the "last used" drink in the add-entry dialog.
+     *
+     * COST: `LIMIT 1` bounds what is RETURNED, not what is read. There is no
+     * index on `timestampMillis` (the table carries one on `drinkId` and one on
+     * `logicalDate`), so SQLite scans and sorts the whole table to find the
+     * newest row. At the size a personal history reaches — thousands of rows,
+     * not millions — that is well under a millisecond and no reason to add a
+     * third index; the point is that the cost grows with the history, which the
+     * previous note here denied.
      */
     @Query("SELECT * FROM entries ORDER BY timestampMillis DESC LIMIT 1")
     fun getMostRecent(): Flow<EntryEntity?>

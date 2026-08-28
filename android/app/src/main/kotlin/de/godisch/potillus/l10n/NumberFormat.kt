@@ -84,8 +84,13 @@ fun Double.fmt1(locale: Locale): String = String.format(locale, "%.1f", this)
 fun Double.fmt0(locale: Locale): String = String.format(locale, "%.0f", this)
 
 /**
- * Formats [this] with two decimal places using [locale] (e.g. a BAC value
- * `"0.42"` for en, `"0,42"` for de).
+ * Formats [this] with two decimal places using [locale] — `"1.25"` for en,
+ * `"1,25"` for de.
+ *
+ * No production call site since the blood-alcohol readout moved to one decimal
+ * (a second decimal would claim an accuracy the Widmark model does not have; see
+ * `AlcoholCalculator.roundTo1Decimal`). Kept as the counterpart of [fmt0] and
+ * [fmt1] so the family stays complete, and exercised by `NumberFormatTest`.
  *
  * @param locale The per-app locale (see [fmt1]).
  */

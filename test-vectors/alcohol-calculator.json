@@ -5,6 +5,7 @@
     "Harvested from the authoritative Android unit tests. Changing a value here is a",
     "deliberate, reviewable change to health-relevant behaviour.",
     "Tolerances: grams and bac compare with an absolute epsilon of 0.001.",
+    "calculateBAC integrates dose by dose: elimination runs between doses and is clamped at zero, so a gap in which the estimate reaches zero cannot be subtracted twice. The lumped form that anchored elimination at the first dose of the day underestimated a split session. The readout carries one decimal.",
     "isOverLimit(total, limit) = total > limit + 1e-6. The tolerance exists because 0.1-g values summed as binary doubles can drift above an exactly-met limit; a strict '>' would then report an exceedance the user cannot see.",
     "isDrinkDay(total) = total > 0. No tolerance: the comparison is against zero, not against a user-set limit, and grams live on a 0.1 g grid. A day of alcohol-free entries has a summary row but no alcohol, and is a dry day on every surface."
   ],
@@ -56,60 +57,159 @@
   ],
   "calculateBAC": [
     {
-      "description": "80 kg, 20 g, 0 h",
-      "totalGrams": 20.0,
+      "description": "One dose, nothing elapsed",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 20.0
+        }
+      ],
       "weightKg": 80.0,
-      "hoursElapsed": 0.0,
-      "expected": 0.42
+      "nowMillis": 1767290400000,
+      "expected": 0.4
     },
     {
-      "description": "60 kg, 12 g, 0 h",
-      "totalGrams": 12.0,
+      "description": "One dose, nothing elapsed, lighter person",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 12.0
+        }
+      ],
       "weightKg": 60.0,
-      "hoursElapsed": 0.0,
-      "expected": 0.33
+      "nowMillis": 1767290400000,
+      "expected": 0.3
     },
     {
-      "description": "75 kg, 40 g, 0 h",
-      "totalGrams": 40.0,
+      "description": "One dose, nothing elapsed, larger dose",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        }
+      ],
       "weightKg": 75.0,
-      "hoursElapsed": 0.0,
-      "expected": 0.89
+      "nowMillis": 1767290400000,
+      "expected": 0.9
     },
     {
-      "description": "75 kg, 40 g, 2 h \u2014 decays by beta per hour",
-      "totalGrams": 40.0,
+      "description": "One dose, two hours of elimination",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        }
+      ],
       "weightKg": 75.0,
-      "hoursElapsed": 2.0,
-      "expected": 0.59
+      "nowMillis": 1767297600000,
+      "expected": 0.6
     },
     {
-      "description": "Never negative: fully eliminated after 10 h",
-      "totalGrams": 10.0,
-      "weightKg": 80.0,
-      "hoursElapsed": 10.0,
+      "description": "One dose, fully eliminated after ten hours",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        }
+      ],
+      "weightKg": 75.0,
+      "nowMillis": 1767326400000,
       "expected": 0.0
     },
     {
-      "description": "Zero weight returns zero",
-      "totalGrams": 20.0,
+      "description": "Two doses an hour apart, no gap to clamp",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        },
+        {
+          "timestampMillis": 1767294000000,
+          "gramsAlcohol": 40.0
+        }
+      ],
+      "weightKg": 70.0,
+      "nowMillis": 1767297600000,
+      "expected": 1.6
+    },
+    {
+      "description": "Two doses ten hours apart: the first is gone before the second lands",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        },
+        {
+          "timestampMillis": 1767326400000,
+          "gramsAlcohol": 40.0
+        }
+      ],
+      "weightKg": 70.0,
+      "nowMillis": 1767330000000,
+      "expected": 0.8
+    },
+    {
+      "description": "A dose logged for later does not count yet",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        },
+        {
+          "timestampMillis": 1767301200000,
+          "gramsAlcohol": 40.0
+        }
+      ],
+      "weightKg": 75.0,
+      "nowMillis": 1767294000000,
+      "expected": 0.7
+    },
+    {
+      "description": "An alcohol-free entry neither raises nor anchors the estimate",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 0.0
+        },
+        {
+          "timestampMillis": 1767304800000,
+          "gramsAlcohol": 20.0
+        }
+      ],
+      "weightKg": 80.0,
+      "nowMillis": 1767304800000,
+      "expected": 0.4
+    },
+    {
+      "description": "No weight on record",
+      "doses": [
+        {
+          "timestampMillis": 1767290400000,
+          "gramsAlcohol": 40.0
+        }
+      ],
       "weightKg": 0.0,
-      "hoursElapsed": 0.0,
+      "nowMillis": 1767290400000,
       "expected": 0.0
     },
     {
-      "description": "Zero grams returns zero",
-      "totalGrams": 0.0,
+      "description": "No doses at all",
+      "doses": [],
       "weightKg": 80.0,
-      "hoursElapsed": 0.0,
+      "nowMillis": 1767290400000,
       "expected": 0.0
     },
     {
-      "description": "Negative elapsed hours are coerced to zero",
-      "totalGrams": 20.0,
-      "weightKg": 80.0,
-      "hoursElapsed": -5.0,
-      "expected": 0.42
+      "description": "Crossing the day boundary: last night still shows",
+      "doses": [
+        {
+          "timestampMillis": 1767315600000,
+          "gramsAlcohol": 60.0
+        }
+      ],
+      "weightKg": 75.0,
+      "nowMillis": 1767330000000,
+      "expected": 0.7
     }
   ],
   "limitPercent": [

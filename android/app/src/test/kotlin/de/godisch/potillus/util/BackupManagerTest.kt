@@ -198,6 +198,26 @@ class BackupManagerTest {
         assertReadError(BackupManager.parseBackupJson(json))
     }
 
+    @Test fun `gramsAlcohol that contradicts volume and ABV is rejected as ReadError`() {
+        // 500 ml at 5 % is 19.7 g. 999 g is not a rounding artefact, it is a
+        // different drink — the kind of value a hand-edited or corrupt file
+        // carries into every statistic and into the blood-alcohol estimate.
+        val json = buildBackupJson(entries = listOf(entryJson(gramsAlcohol = 999.0)))
+        assertReadError(BackupManager.parseBackupJson(json))
+    }
+
+    @Test fun `gramsAlcohol from before the 0_1 g rounding is accepted`() {
+        // Entries written with two decimals predate AlcoholCalculator's 0.1 g
+        // grid: 150 ml at 13.5 % stood at 15.98 g where the recomputation now
+        // says 16.0 g. A user's own older backup must still import.
+        val json = buildBackupJson(
+            entries = listOf(entryJson(volumeMl = 150, alcoholPercent = 13.5, gramsAlcohol = 15.98)),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertEquals(15.98, result.entries.first().gramsAlcohol, 0.001)
+    }
+
     @Test fun `entry alcoholPercent above 100 is rejected as ReadError`() {
         val json = buildBackupJson(entries = listOf(entryJson(alcoholPercent = 100.1)))
         assertReadError(BackupManager.parseBackupJson(json))

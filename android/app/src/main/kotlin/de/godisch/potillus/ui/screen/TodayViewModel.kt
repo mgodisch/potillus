@@ -304,7 +304,16 @@ class TodayViewModel(
         val weekLabel = "${windowStart.format(fmt)}–${windowEnd.format(fmt)}"
 
         combine(
-            entryRepo.getEntriesForDate(today),
+            // TWO logical days, not one. The screen shows today's rows, but the
+            // blood-alcohol estimate must not fall off a cliff at the day-change
+            // time: someone who drank until three in the morning is not sober at
+            // four. Yesterday plus today spans at least 24 and at most 48 hours,
+            // which covers any dose that can still be showing — beyond that even
+            // a heavy evening has been eliminated, and calculateBAC clamps such
+            // doses to nothing anyway, so a wider span would only cost rows.
+            // The query is the one the Calendar screen already uses, over the
+            // indexed logicalDate column; today's rows are filtered out below.
+            entryRepo.getEntriesForPeriod(DayResolver.formatDate(windowEnd.minusDays(1)), today),
             drinkRepo.drinks,
             entryRepo.getDailySummaries(DayResolver.formatDate(windowStart), DayResolver.formatDate(windowEnd)),
             entryRepo.getDailySummaries(historyFrom, DayResolver.formatDate(windowEnd)),
@@ -314,18 +323,27 @@ class TodayViewModel(
             // windows above. The date list changes only when an entry is written, so
             // the minute tick re-emits the previous list unchanged.
             combine(entryRepo.getDrinkDatesFlow(), ticker) { drinkDates, _ -> drinkDates },
-        ) { entries, drinks, weeklySummaries, historySummaries, drinkDates ->
+        ) { recentEntries, drinks, weeklySummaries, historySummaries, drinkDates ->
+            // The screen's own list and its gram total stay scoped to today: they
+            // answer "how much have I had today", which is what the limits are
+            // measured against. Only the estimate below reaches back further.
+            val entries = recentEntries.filter { it.logicalDate == today }
             val totalGrams = entries.sumOf { it.gramsAlcohol }
 
-            // BAC calculation: only use entries with actual alcohol (> 0 %) so that
-            // alcohol-free entries don't push the "first drink" timestamp earlier than
-            // the real drinking episode started.
-            val alcoholEntries = entries.filter { it.alcoholPercent > 0.0 }
+            // Blood-alcohol estimate over both logical days. calculateBAC drops
+            // alcohol-free doses itself, so nothing needs pre-filtering here; it
+            // also drops doses that lie in the future, which a retroactively
+            // entered drink can be.
             val nowMillis = System.currentTimeMillis()
-            val bac: Double? = if (settings.weightKg > 0 && alcoholEntries.isNotEmpty()) {
-                val firstTs = alcoholEntries.minOf { it.timestampMillis }
-                val hoursElapsed = (nowMillis - firstTs) / AlcoholCalculator.MILLIS_PER_HOUR
-                AlcoholCalculator.calculateBAC(totalGrams, settings.weightKg, hoursElapsed)
+            val bac: Double? = if (settings.weightKg > 0) {
+                AlcoholCalculator.calculateBAC(
+                    doses = recentEntries.map { AlcoholDose(it.timestampMillis, it.gramsAlcohol) },
+                    weightKg = settings.weightKg,
+                    nowMillis = nowMillis,
+                    // Absent rather than zero: a reading of 0.0 ‰ would be a claim
+                    // about the body, and the estimate is not one. The row goes
+                    // away instead.
+                ).takeIf { it > 0.0 }
             } else {
                 null
             }

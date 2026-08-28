@@ -94,6 +94,41 @@ final class BackupValidationTests: XCTestCase {
         }
     }
 
+    /// 500 ml at 4.9 % is 19.3 g. 999 g is not a rounding artefact, it is a
+    /// different drink — the kind of value a hand-edited or corrupt file carries
+    /// into every statistic and into the blood-alcohol estimate.
+    func testEntryGramsAlcoholThatContradictsVolumeAndABVIsRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [],
+            "entries": [["id": 1, "drinkId": 1, "drinkName": "Pils", "volumeMl": 500,
+                         "alcoholPercent": 4.9, "gramsAlcohol": 999.0,
+                         "timestampMillis": 1_767_381_240_000, "logicalDate": "2026-01-01"]],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            guard case .valueOutOfRange(let object, let key, _)? = error as? BackupError else {
+                return XCTFail("expected valueOutOfRange, got \(error)")
+            }
+            XCTAssertEqual(object, "entry")
+            XCTAssertEqual(key, "gramsAlcohol")
+        }
+    }
+
+    /// Entries written with two decimals predate the 0.1 g grid: 150 ml at
+    /// 13.5 % stood at 15.98 g where the recomputation now says 16.0 g. A user's
+    /// own older backup must still import.
+    func testEntryGramsAlcoholFromBeforeTheRoundingChangeIsAccepted() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [],
+            "entries": [["id": 1, "drinkId": 1, "drinkName": "Wein", "volumeMl": 150,
+                         "alcoholPercent": 13.5, "gramsAlcohol": 15.98,
+                         "timestampMillis": 1_767_381_240_000, "logicalDate": "2026-01-01"]],
+        ])
+        let file = try BackupReader.parse(data)
+        XCTAssertEqual(file.entries.first?.gramsAlcohol, 15.98)
+    }
+
     func testANonPositiveEntryTimestampIsRejected() throws {
         let data = try json([
             "version": 2,
