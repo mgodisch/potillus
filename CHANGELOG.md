@@ -216,6 +216,8 @@ Edit drinks from the list's edit mode
 - The release checklist names the tasks that resolve every artifact.
 - Bar heights and donut slices in the Android report come from named functions.
 - The iOS backup reader refuses an entry whose drink the file omits.
+- The iOS settings screen names a device-backup setting the database file
+  did not take.
 
 ### Removed
 

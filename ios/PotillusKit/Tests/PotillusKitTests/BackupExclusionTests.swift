@@ -124,6 +124,48 @@ final class BackupExclusionTests: XCTestCase {
         XCTAssertTrue(BackupExclusion.isExcluded(databasePath: fileURL.path))
     }
 
+    // ── Preference against attribute ─────────────────────────────────────────
+    //
+    // `matchesPreference` is what lets the settings screen say that the switch's
+    // promise does not currently hold for the file. Before the 0.85.0 QA round
+    // both write paths used `try?`, so a failed attribute write left the two
+    // disagreeing with nothing to notice it.
+
+    /// The ordinary case: preference applied, attribute agrees.
+    func testMatchesPreferenceAfterApplying() throws {
+        try BackupExclusion.applyPreference(databasePath: fileURL.path, defaults: defaults)
+        XCTAssertTrue(
+            BackupExclusion.matchesPreference(databasePath: fileURL.path, defaults: defaults)
+        )
+    }
+
+    /// An excluded preference against an included file — what a failed write or a
+    /// framework reset leaves behind.
+    func testAResetAttributeNoLongerMatchesAnExcludedPreference() throws {
+        try BackupExclusion.setExcluded(false, databasePath: fileURL.path)
+        XCTAssertFalse(
+            BackupExclusion.matchesPreference(databasePath: fileURL.path, defaults: defaults)
+        )
+    }
+
+    /// The mirror direction: the user opted in, but the file is still excluded.
+    func testAnExcludedFileDoesNotMatchAnOptedInPreference() throws {
+        try BackupExclusion.setIncludesInBackup(true, databasePath: fileURL.path, defaults: defaults)
+        try BackupExclusion.setExcluded(true, databasePath: fileURL.path)
+        XCTAssertFalse(
+            BackupExclusion.matchesPreference(databasePath: fileURL.path, defaults: defaults)
+        )
+    }
+
+    /// A database that does not exist yet carries no attribute, and an absent file
+    /// must not read as a violated preference on a first launch.
+    func testAMissingFileCountsAsInSync() {
+        let absent = fileURL.deletingLastPathComponent().appendingPathComponent("absent.sqlite")
+        XCTAssertTrue(
+            BackupExclusion.matchesPreference(databasePath: absent.path, defaults: defaults)
+        )
+    }
+
     /// Opting back out records the preference and re-excludes.
     func testOptingBackOut() throws {
         try BackupExclusion.setIncludesInBackup(true, databasePath: fileURL.path, defaults: defaults)

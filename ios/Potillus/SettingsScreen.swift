@@ -73,6 +73,10 @@ struct SettingsScreen: View {
     /// AppSettings field: the attribute on the file is the single source of truth,
     /// so this is loaded from it on appear and written straight back on change.
     @State private var includeInDeviceBackup = false
+
+    /// Set when the device-backup preference and the file attribute disagree after
+    /// a repair attempt. See the switch's `onChange` and the view's `task`.
+    @State private var backupExclusionOutOfSync = false
     @State private var backupFailure: String?
 
     /// Asked when the lock toggle is drawn, to decide whether it may be armed.
@@ -484,10 +488,27 @@ extension SettingsScreen {
             // stored as a preference and re-applied each launch; see BackupExclusion.
             Toggle(Loc.string("Include in device backup", locale: locale), isOn: $includeInDeviceBackup)
                 .onChange(of: includeInDeviceBackup) { _, include in
-                    if let path = environment.database.path {
-                        try? BackupExclusion.setIncludesInBackup(include, databasePath: path)
+                    guard let path = environment.database.path else { return }
+                    // `setIncludesInBackup` writes the preference first and the file
+                    // attribute second, so a failure here leaves the switch and the
+                    // file disagreeing. Swallowing it (`try?`, until the 0.85.0 QA
+                    // round) meant the app went on promising an exclusion the
+                    // database did not have.
+                    do {
+                        try BackupExclusion.setIncludesInBackup(include, databasePath: path)
+                        backupExclusionOutOfSync = false
+                    } catch {
+                        backupExclusionOutOfSync = true
                     }
                 }
+
+            if backupExclusionOutOfSync {
+                Text(Loc.string(
+                    "This setting could not be applied to the database file.",
+                    locale: locale
+                ))
+                    .foregroundStyle(.red)
+            }
         } header: {
             Text(Loc.string("Security", locale: locale))
         } footer: {
@@ -517,6 +538,14 @@ extension SettingsScreen {
         }
         .task {
             includeInDeviceBackup = BackupExclusion.includesInBackup()
+            if let path = environment.database.path {
+                // Repair before reporting. A file write can reset the attribute and
+                // `setResourceValues` can fail transiently, so the preference is
+                // re-applied here as it is at every launch; only a disagreement that
+                // survives that attempt is worth putting in front of the user.
+                try? BackupExclusion.applyPreference(databasePath: path)
+                backupExclusionOutOfSync = !BackupExclusion.matchesPreference(databasePath: path)
+            }
         }
     }
 

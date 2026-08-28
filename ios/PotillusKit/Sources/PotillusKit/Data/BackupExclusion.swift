@@ -113,6 +113,30 @@ public enum BackupExclusion {
         return values?.isExcludedFromBackup ?? false
     }
 
+    /// Whether the file's attribute currently says what the preference asks for.
+    ///
+    /// The two can part company, and nothing in the file system announces it when
+    /// they do. `setResourceValues` may fail — the preference is written first and
+    /// survives, the attribute does not — and Apple documents that some file
+    /// operations reset the attribute on their own. Either way the app would go on
+    /// showing the switch position the user chose while the database sat on the
+    /// other side of the question.
+    ///
+    /// The settings screen calls this AFTER re-applying the preference, so what it
+    /// reports is a disagreement that survived a repair attempt rather than a
+    /// transient one. `false` means the promise the switch makes does not currently
+    /// hold for the file.
+    ///
+    /// A missing file counts as in sync: `isExcluded` reads `false` for a path that
+    /// does not exist, which would otherwise read as a violated preference on a
+    /// device where the database has not been created yet.
+    public static func matchesPreference(
+        databasePath: String, defaults: UserDefaults = .standard
+    ) -> Bool {
+        guard FileManager.default.fileExists(atPath: databasePath) else { return true }
+        return isExcluded(databasePath: databasePath) == !includesInBackup(defaults: defaults)
+    }
+
     /// Sets the exclusion on the database and its transient journal, if present.
     /// A missing sidecar is not an error — it simply does not exist yet.
     public static func setExcluded(_ excluded: Bool, databasePath: String) throws {
