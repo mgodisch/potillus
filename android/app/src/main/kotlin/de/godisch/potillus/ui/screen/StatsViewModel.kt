@@ -58,6 +58,7 @@ import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.StatsPeriod
 import de.godisch.potillus.domain.StatsWindows
 import de.godisch.potillus.domain.Trend
+import de.godisch.potillus.domain.WeekdayProfile
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.util.AndroidIoBound
@@ -528,13 +529,8 @@ class StatsViewModel(
             // column is the locale's first weekday. Computed from the daily summaries
             // (one total per day), mirroring PdfReportData so screen and PDF agree.
             val weekStartIso = DayResolver.firstDayOfWeekIso()
-            val weekdayOrder = (0..6).map { i -> (weekStartIso - 1 + i) % 7 + 1 } // ISO 1..7
-            val weekdayTotals = Array(7) { mutableListOf<Double>() }
-            current.forEach { s ->
-                val col = (LocalDate.parse(s.date, fmt).dayOfWeek.value - weekStartIso + 7) % 7
-                weekdayTotals[col].add(s.totalGrams)
-            }
-            val weekdayAverages = weekdayTotals.map { if (it.isEmpty()) null else it.average() }
+            val weekdayOrder = WeekdayProfile.order(weekStartIso)
+            val weekdayAverages = WeekdayProfile.averages(current, effectiveFrom, to, weekStartIso)
 
             // All three limits are evaluated together over the period's days.
             // Daily is a per-day check; the gram and drink-day limits use a gliding

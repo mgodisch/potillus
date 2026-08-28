@@ -200,7 +200,10 @@ final class StatsAggregatorTests: XCTestCase {
             DaySummary(date: "2026-01-01", totalGrams: 10.0, entryCount: 6),
             DaySummary(date: "2026-01-08", totalGrams: 20.0, entryCount: 1),
         ]
-        let averages = StatsAggregator.weekdayAverages(summaries: summaries, firstDayOfWeekIso: 1)
+        // Two Thursdays in the range, both with entries: 10 and 20 average to 15.
+        let averages = StatsAggregator.weekdayAverages(
+            summaries: summaries, from: "2026-01-01", to: "2026-01-08", firstDayOfWeekIso: 1
+        )
 
         XCTAssertEqual(averages[3] ?? 0, 15.0, accuracy: 1e-9, "Thursday is column 3")
         XCTAssertEqual(averages.count, 7)
@@ -208,14 +211,44 @@ final class StatsAggregatorTests: XCTestCase {
 
     /// Nil is not zero. "No Tuesdays in this period" and "Tuesdays were dry" are
     /// different statements, and a bar chart must be able to draw both.
-    func testAWeekdayWithNoDaysIsNilAndOneWithDryDaysIsZero() {
+    func testAWeekdayOutsideTheRangeIsNilAndADryOneIsZero() {
         let summaries = [
             DaySummary(date: "2026-01-01", totalGrams: 0.0, entryCount: 1)   // dry Thursday
         ]
-        let averages = StatsAggregator.weekdayAverages(summaries: summaries, firstDayOfWeekIso: 1)
+        // A single-day range: only Thursday occurs in it at all.
+        let averages = StatsAggregator.weekdayAverages(
+            summaries: summaries, from: "2026-01-01", to: "2026-01-01", firstDayOfWeekIso: 1
+        )
 
         XCTAssertEqual(averages[3], 0.0, "a dry Thursday averages zero")
-        XCTAssertNil(averages[0], "no Mondays at all")
+        XCTAssertNil(averages[0], "no Monday in the range at all")
+    }
+
+    /// Every occurrence of the weekday counts, not only the ones that carry an
+    /// entry: four Thursdays with one 40 g evening read 10, not 40.
+    func testDryOccurrencesOfTheWeekdayCountTowardsTheAverage() {
+        let summaries = [DaySummary(date: "2026-01-01", totalGrams: 40.0, entryCount: 1)]
+        let averages = StatsAggregator.weekdayAverages(
+            summaries: summaries, from: "2026-01-01", to: "2026-01-28", firstDayOfWeekIso: 1
+        )
+
+        XCTAssertEqual(averages[3] ?? 0, 10.0, accuracy: 1e-9, "four Thursdays, one of them wet")
+    }
+
+    /// The seven bars sum to a week's consumption. That only holds because every
+    /// occurrence of the weekday is in the divisor.
+    func testTheSevenAveragesSumToAWeeksConsumption() {
+        let summaries = [
+            DaySummary(date: "2026-01-01", totalGrams: 14.0, entryCount: 1),
+            DaySummary(date: "2026-01-05", totalGrams: 28.0, entryCount: 1),
+        ]
+        let averages = StatsAggregator.weekdayAverages(
+            summaries: summaries, from: "2026-01-01", to: "2026-01-28", firstDayOfWeekIso: 1
+        )
+        let week = averages.compactMap { $0 }.reduce(0.0, +)
+
+        // 42 g over four weeks is 10.5 g a week.
+        XCTAssertEqual(week, 10.5, accuracy: 1e-9)
     }
 
     func testTheColumnFollowsTheLocalesFirstDay() {
@@ -223,10 +256,14 @@ final class StatsAggregatorTests: XCTestCase {
 
         // Monday first: Thursday is column 3. Sunday first: column 4.
         XCTAssertEqual(
-            StatsAggregator.weekdayAverages(summaries: thursday, firstDayOfWeekIso: 1)[3], 10.0
+            StatsAggregator.weekdayAverages(
+                summaries: thursday, from: "2026-01-01", to: "2026-01-01", firstDayOfWeekIso: 1
+            )[3], 10.0
         )
         XCTAssertEqual(
-            StatsAggregator.weekdayAverages(summaries: thursday, firstDayOfWeekIso: 7)[4], 10.0
+            StatsAggregator.weekdayAverages(
+                summaries: thursday, from: "2026-01-01", to: "2026-01-01", firstDayOfWeekIso: 7
+            )[4], 10.0
         )
     }
 

@@ -432,7 +432,8 @@ public final class StatsModel {
         )
         next.weekdayOrder = StatsAggregator.weekdayOrder(firstDayOfWeekIso: firstDayOfWeekIso)
         next.weekdayAverages = StatsAggregator.weekdayAverages(
-            summaries: summaries, firstDayOfWeekIso: firstDayOfWeekIso
+            summaries: summaries, from: window.from, to: window.to,
+            firstDayOfWeekIso: firstDayOfWeekIso
         )
         next.limitInfo = limitInfo
 

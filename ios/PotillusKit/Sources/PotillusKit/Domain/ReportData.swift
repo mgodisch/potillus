@@ -204,8 +204,9 @@ public struct ReportData: Sendable, Equatable {
     public let hourlyGrams: [Double]
     /// ISO weekdays in display order, rotated to the locale's first day.
     public let weekdayOrder: [Int]
-    /// Pairs index-for-index with `weekdayOrder`. `nil` = the weekday never
-    /// occurred as a drink day.
+    /// Pairs index-for-index with `weekdayOrder`. Every occurrence of the
+    /// weekday in the period is averaged, dry ones included; `nil` means the
+    /// weekday does not occur in the period at all.
     public let weekdayAverages: [Double?]
 
     // ── Streaks ──────────────────────────────────────────────────────────────
@@ -362,7 +363,8 @@ public struct ReportData: Sendable, Equatable {
             hourlyGrams: hourlyGrams(entries: entries, timeZone: timeZone),
             weekdayOrder: StatsAggregator.weekdayOrder(firstDayOfWeekIso: firstWeekday),
             weekdayAverages: StatsAggregator.weekdayAverages(
-                summaries: daySummaries, firstDayOfWeekIso: firstWeekday
+                summaries: daySummaries, from: firstDate, to: lastDate,
+                firstDayOfWeekIso: firstWeekday
             ),
             longestAbstinence: DayResolver.computeLongestAbstinence(
                 sortedDates: drinkDates,

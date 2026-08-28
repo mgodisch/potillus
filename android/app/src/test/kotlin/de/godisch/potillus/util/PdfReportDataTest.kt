@@ -26,8 +26,10 @@
 package de.godisch.potillus.util
 
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.WeekdayProfile
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
+import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import org.junit.Assert.*
@@ -138,6 +140,31 @@ class PdfReportDataTest {
         // All fixture entries share timestamp 0L (the same clock hour), so exactly
         // one bucket carries the whole total and the rest are empty.
         assertEquals(1, d.hourlyGrams.count { it > 0.0 })
+    }
+
+    @Test fun `weekday averages divide by every occurrence of the weekday`() {
+        // 2026-01-01 is a Thursday; the period 01-01…01-28 holds four of them.
+        // 40 g on one of them reads 10 g, not 40: the three dry Thursdays are
+        // Thursdays too. The seven bars then sum to a week's consumption.
+        val summaries = listOf(DaySummary("2026-01-01", 40.0, 1))
+        val averages = WeekdayProfile.averages(summaries, "2026-01-01", "2026-01-28", 1)
+
+        assertEquals(10.0, averages[3]!!, 0.001)
+        assertEquals(0.0, averages[0]!!, 0.001)
+        assertEquals(10.0, averages.filterNotNull().sum(), 0.001)
+    }
+
+    @Test fun `a weekday outside the range is null, a dry one is zero`() {
+        // A single-day range: only Thursday occurs in it at all. Null and zero
+        // are different statements and the chart draws them differently.
+        val averages = WeekdayProfile.averages(
+            listOf(DaySummary("2026-01-01", 0.0, 1)),
+            "2026-01-01",
+            "2026-01-01",
+            1,
+        )
+        assertEquals(0.0, averages[3]!!, 0.001)
+        assertNull(averages[0])
     }
 
     @Test fun `hourly histogram reads an entry in its recorded frame`() {

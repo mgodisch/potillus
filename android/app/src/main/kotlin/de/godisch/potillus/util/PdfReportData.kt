@@ -30,6 +30,7 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartBucketing
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.WeekdayProfile
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DaySummary
@@ -507,13 +508,8 @@ data class PdfReportData(
             //    language they picked in the app. iOS passes its report locale the
             //    same way (ReportData.swift: `firstDayOfWeekIso(locale: locale)`).
             val ws = DayResolver.firstDayOfWeekIso(locale)
-            val weekdayOrder = (0..6).map { i -> (ws - 1 + i) % 7 + 1 } // ISO 1..7
-            val dayTotals = Array(7) { mutableListOf<Double>() }
-            byDate.forEach { (dateStr, es) ->
-                val col = (LocalDate.parse(dateStr).dayOfWeek.value - ws + 7) % 7 // 0 = week-start
-                dayTotals[col].add(es.sumOf { it.gramsAlcohol })
-            }
-            val weekdayAverages = dayTotals.map { list -> if (list.isEmpty()) null else list.average() }
+            val weekdayOrder = WeekdayProfile.order(ws)
+            val weekdayAverages = WeekdayProfile.averages(daySummaries, firstDate, lastDate, ws)
 
             // ── Abstinence streaks (shared DayResolver logic).
             //    The anchor is passed to BOTH computations so the tail gap — the

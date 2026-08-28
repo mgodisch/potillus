@@ -129,27 +129,56 @@ public enum StatsAggregator {
 
     /// Average grams for each weekday column, in `weekdayOrder`.
     ///
-    /// Computed from the DAILY SUMMARIES — one total per day — not from individual
-    /// entries, so a day with six beers counts once, as a day. Android's PDF does
-    /// the same, and screen and report must not disagree.
+    /// EVERY MONDAY IN THE PERIOD IS A MONDAY, including the dry ones. The
+    /// divisor is how often the weekday OCCURS between `from` and `to`, not how
+    /// many of those days happen to carry an entry, so the bar answers "how much
+    /// do I drink on a Monday" rather than "when I drink on a Monday, how much".
+    /// Four Mondays with one 40 g evening read 10 g here, not 40.
     ///
-    /// A column with no days at all is `nil`, not `0.0`: an average of nothing is
-    /// not zero, and a bar chart must be able to draw the difference between "no
-    /// Tuesdays in this period" and "Tuesdays were dry".
+    /// The report already states the two forms separately elsewhere — average per
+    /// day beside average per drink day — and the neighbouring hour chart divides
+    /// by the period's length for the same reason: only then do the bars sum to
+    /// something, seven weekday averages to a week's consumption. Dividing one
+    /// chart by a different denominator than the other, with nothing in the
+    /// caption to say so, was the earlier behaviour.
+    ///
+    /// Computed from the DAILY SUMMARIES — one total per day — not from
+    /// individual entries, so a day with six beers counts once, as a day. A day
+    /// with only alcohol-free drinks has a summary of 0.0 g and now counts as
+    /// what it is: a dry day, like any other.
+    ///
+    /// A column is `nil` only when the weekday does not occur in the period at
+    /// all — a range shorter than a week. An average of nothing is not zero, and
+    /// a bar chart must be able to draw the difference between "no Tuesday in
+    /// this period" and "Tuesdays were dry".
+    ///
+    /// - Parameters:
+    ///   - summaries: Daily totals; days absent from the list count as 0 g.
+    ///   - from: First day of the period, inclusive (`yyyy-MM-dd`).
+    ///   - to: Last day of the period, inclusive.
+    ///   - firstDayOfWeekIso: The locale's first weekday, 1 = Monday.
     public static func weekdayAverages(
-        summaries: [DaySummary], firstDayOfWeekIso: Int
+        summaries: [DaySummary], from: String, to: String, firstDayOfWeekIso: Int
     ) -> [Double?] {
-        var columns = [[Double]](repeating: [], count: 7)
+        guard let start = DayResolver.parseDate(from),
+              let end = DayResolver.parseDate(to),
+              start <= end else { return [Double?](repeating: nil, count: 7) }
 
-        for summary in summaries {
-            guard let date = DayResolver.parseDate(summary.date) else { continue }
-            let column = (isoWeekday(of: date) - firstDayOfWeekIso + 7) % 7
-            columns[column].append(summary.totalGrams)
+        let totalsByDate = Dictionary(
+            summaries.map { ($0.date, $0.totalGrams) }, uniquingKeysWith: +
+        )
+
+        var sums = [Double](repeating: 0.0, count: 7)
+        var counts = [Int](repeating: 0, count: 7)
+        var day = start
+        while day <= end {
+            let column = (isoWeekday(of: day) - firstDayOfWeekIso + 7) % 7
+            sums[column] += totalsByDate[DayResolver.formatDate(day)] ?? 0.0
+            counts[column] += 1
+            day = DayResolver.addingDays(1, to: day)
         }
 
-        return columns.map { totals in
-            totals.isEmpty ? nil : totals.reduce(0.0, +) / Double(totals.count)
-        }
+        return (0..<7).map { counts[$0] == 0 ? nil : sums[$0] / Double(counts[$0]) }
     }
 
     /// The ISO weekday (1 = Monday … 7 = Sunday) of a date, read in UTC because
