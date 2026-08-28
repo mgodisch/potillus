@@ -244,6 +244,7 @@ Edit drinks from the list's edit mode
 - The Room schema check reads the version the exported file states.
 - The badge note on running the suites in CI.
 - The security documents name the asset the app's own encryption covers.
+- The time-of-day chart on the iOS statistics screen reads the recorded frame.
 
 ---
 

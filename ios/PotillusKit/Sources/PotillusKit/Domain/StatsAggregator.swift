@@ -72,15 +72,22 @@ public enum StatsAggregator {
 
     // ── Time of day ──────────────────────────────────────────────────────────
 
-    /// Grams per clock hour, 0…23, in the given zone.
+    /// Grams per clock hour, 0…23, each entry read in the frame it was logged in.
+    ///
+    /// `timeZone` is the FALLBACK, for an entry that recorded no frame; see
+    /// `DayResolver.displayTimeZone`. Reading every entry in the current frame
+    /// moved every bar of a travelled or daylight-saving-crossed history by an
+    /// hour, which is the whole reason an entry carries its own offset.
     public static func hourlyGrams(
         entries: [ConsumptionEntry], timeZone: TimeZone
     ) -> [Double] {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = timeZone
 
         var hours = [Double](repeating: 0.0, count: 24)
         for entry in entries {
+            calendar.timeZone = DayResolver.displayTimeZone(
+                utcOffsetSeconds: entry.utcOffsetSeconds, fallback: timeZone
+            )
             let instant = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
             let hour = calendar.component(.hour, from: instant)
             hours[hour] += entry.gramsAlcohol

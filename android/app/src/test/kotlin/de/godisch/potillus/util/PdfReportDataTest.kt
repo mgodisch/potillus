@@ -140,6 +140,25 @@ class PdfReportDataTest {
         assertEquals(1, d.hourlyGrams.count { it > 0.0 })
     }
 
+    @Test fun `hourly histogram reads an entry in its recorded frame`() {
+        // 2026-03-02T00:30Z, logged where the offset was +01:00 — 01:30 there.
+        // The device zone the test runs in must not decide the bucket; only the
+        // recorded frame may, which is the whole point of storing it.
+        val logged = ConsumptionEntry(
+            drinkId = 1,
+            drinkName = "x",
+            volumeMl = 500,
+            alcoholPercent = 5.0,
+            gramsAlcohol = 10.0,
+            timestampMillis = 1_772_411_400_000L,
+            logicalDate = "2026-03-01",
+            utcOffsetSeconds = 3600,
+        )
+        val d = PdfReportData.from(listOf(logged), drinks, settings)
+        assertEquals(10.0, d.hourlyGrams[1], 0.001)
+        assertEquals(0.0, d.hourlyGrams[0], 0.001)
+    }
+
     @Test fun `medians complement the mean KPIs`() {
         val d = build()
         // Per-drink-day totals: 10.0, 19.3, 25.0 → median 19.3.

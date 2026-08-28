@@ -103,6 +103,28 @@ final class StatsAggregatorTests: XCTestCase {
         XCTAssertEqual(hours.reduce(0, +), 10.0, accuracy: 1e-9)
     }
 
+    /// An entry that recorded its own frame is read in THAT frame, not in the
+    /// one the phone is in now. Logged at 20:00 in Berlin (+01:00), read from a
+    /// device in UTC: still 20:00, not 19:00.
+    func testTheHistogramReadsAnEntryInItsRecordedFrame() {
+        var berlinEvening = entry(grams: 10.0, at: midnight + 19 * hour)
+        berlinEvening.utcOffsetSeconds = 3600
+        let hours = StatsAggregator.hourlyGrams(entries: [berlinEvening], timeZone: utc)
+
+        XCTAssertEqual(hours[20], 10.0, accuracy: 1e-9, "20:00 in the recorded frame")
+        XCTAssertEqual(hours[19], 0.0, accuracy: 1e-9, "not the hour the reader is in")
+    }
+
+    /// Without a recorded frame the fallback applies, which is what every entry
+    /// written before the column existed relies on.
+    func testTheHistogramFallsBackWhenNoFrameWasRecorded() {
+        let noFrame = entry(grams: 10.0, at: midnight + 19 * hour)
+        XCTAssertNil(noFrame.utcOffsetSeconds)
+        let hours = StatsAggregator.hourlyGrams(entries: [noFrame], timeZone: utc)
+
+        XCTAssertEqual(hours[19], 10.0, accuracy: 1e-9)
+    }
+
     func testTheEightBucketsCoverThreeHoursEach() {
         let entries = [
             entry(grams: 3.0, at: midnight),               // 00:00 → bucket 0

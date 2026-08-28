@@ -474,3 +474,28 @@ extension ReportDataTests {
         XCTAssertEqual(ReportData.monthKeys(from: "2026-05-30", to: "2026-05-02"), [])
     }
 }
+
+// =============================================================================
+// The recorded local frame
+// =============================================================================
+//
+// In an extension so `type_body_length` stays inside SwiftLint's limit; it
+// belongs to the same suite and runs with it.
+
+extension ReportDataTests {
+
+    /// A recorded frame beats the reader's frame: the `timeZone` argument is the
+    /// fallback for entries that have none, not an override.
+    func testTheHourlyProfileFollowsTheRecordedFrame() {
+        // 2026-03-02T00:30:00Z, logged where the offset was +01:00 — 01:30 there.
+        let millis: Int64 = 1_772_411_400_000
+        var logged = entry(1, drink: 1, date: "2026-03-01", grams: 10, millis: millis)
+        logged.utcOffsetSeconds = 3600
+
+        let hours = ReportData.hourlyGrams(
+            entries: [logged], timeZone: TimeZone(identifier: "UTC")!
+        )
+        XCTAssertEqual(hours[1], 10, accuracy: Self.epsilon, "01:30 in the recorded frame")
+        XCTAssertEqual(hours[0], 0, accuracy: Self.epsilon, "not the reader's hour")
+    }
+}
