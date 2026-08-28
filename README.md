@@ -33,41 +33,36 @@ apply to it are stated in the accompanying COPYING.md file.
 [![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
 
-## About the App (v0.85.0)
+## About the App
 
-**Libellus Potionis** is a privacy-first, open-source, free and ad-free alcohol
+Libellus Potionis is a privacy-first, open-source, free and ad-free alcohol
 consumption tracker designed to help users monitor, pace, and manage their
-drinking habits entirely offline. It requires no invasive device permissions—no
-camera, microphone, or location access—and operates completely without network
-connectivity.
+drinking habits entirely offline. It requires no invasive device permissions,
+no camera, microphone, or location access, and operates completely without
+network connectivity.
 
-It runs on both **Android** and **iOS**, and is available on
+The app runs on both Android and iOS, and is available on
 [F-Droid](https://f-droid.org/packages/de.godisch.potillus), on [Google Play
 (Beta)](https://play.google.com/store/apps/details?id=de.godisch.potillus), and
-on the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK). Libellus
-Potionis consists of two separate native apps in this one repository —
-Kotlin/Jetpack Compose for Android, Swift/SwiftUI for iOS — that share the same
-design, the same feature set, and a common JSON backup format, so a backup
-exported on one platform imports on the other. Their behaviour is kept in
-lock-step by a shared set of golden test vectors.
+on the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK).
 
 ## Key Features
 
-*   Logging: predefine custom beverages or use internationally common presets.
-    Log drinks instantly or retroactively with timestamp corrections.
-*   Concurrent limits: set three boundaries at once: a daily limit in grams of
-    pure alcohol, a rolling 7-day limit in grams, and a maximum number of
-    drinking days per week. Each limit has its own progress bar.
-*   Blood alcohol concentration (BAC): enter your body weight to get a live
-    estimate from the Widmark formula.
-*   Counseling reports: generate a two-page PDF report of your consumption for
-    a counseling appointment.
-*   Data portability: export the dataset as a CSV file for external processing
-    (e.g. in [LibreOffice](https://www.libreoffice.org/) Calc), or create JSON
-    backups to move data between devices.
-*   Adjustments: set your own "day start" time, so that late-night drinks count
-    toward the preceding evening, and an evaluation start date for a clean
-    restart.
+* Predefine custom beverages or use internationally common presets. Log drinks
+  instantly or retroactively with timestamp corrections.
+* Set three boundaries at once: a daily limit in grams of pure alcohol, a
+  rolling 7-day limit in grams, and a maximum number of drinking days per week.
+  Each limit has its own progress bar.
+* Enter your body weight to get a live estimate of your blood alcohol
+  concentration (BAC): from the Widmark formula.
+* Generate a two-page PDF report of your consumption for a counseling
+  appointment.
+* Export the dataset as a CSV file for external processing (e.g. in
+  [LibreOffice](https://www.libreoffice.org/) Calc), or create JSON backups to
+  move data between devices.
+* Adjust the app to set your own "day start" time, so that late-night drinks
+  count toward the preceding evening, or set an evaluation start date for a
+  clean restart.
 
 ## Quick start
 
@@ -90,31 +85,7 @@ lock-step by a shared set of golden test vectors.
    appointment, export a CSV for a spreadsheet, or create a JSON backup to move
    your data to another device.
 
-The in-app User's Guide describes every screen.
-
-## Feedback & Contributing
-
-Feedback, bug reports, and enhancement requests are welcome. The preferred
-channel is the issue tracker of the canonical repository at
-[GitLab](https://gitlab.com/godisch/potillus/-/issues); if you would rather not
-use the tracker, you may instead write to
-[android@godisch.de](mailto:android@godisch.de) or
-[ios@godisch.de](mailto:ios@godisch.de). To report a security vulnerability,
-please do **not** open a public issue. Instead, follow the private,
-PGP-encrypted reporting process described in [`SECURITY.md`](SECURITY.md).
-
-**Translations contributions are where help is most useful.** Of the 21
-interface languages, exactly one is written by a native speaker: German. The
-other 20 — English, Czech, Danish, Greek, Spanish, French, Italian, Japanese,
-Korean, Dutch, Norwegian, Polish, Portuguese (Brazil and Portugal), Romanian,
-Russian, Swedish, Ukrainian, and both written forms of Chinese — are
-machine-generated. They are grammatical, and they may still be wrong: a term of
-art rendered as an everyday word, a register that reads oddly, a phrase that is
-simply not what a person would say. If you speak one of them, a correction to a
-single string is a welcome contribution, and no smaller than any other. The
-workflow is in [`CONTRIBUTING.md`](CONTRIBUTING.md), section 6. All
-participants are expected to follow the project's [Code of
-Conduct](docs/CODE_OF_CONDUCT.md).
+Have a look at the in-app User's Guide which describes every screen.
 
 ## Privacy & Security Architecture
 
@@ -131,37 +102,14 @@ The app's full privacy policy — detailing exactly what is stored on the device
 and confirming that nothing is ever transmitted — is available in
 [`PRIVACY.md`](PRIVACY.md).
 
-## Interface Stability
-
-An app has no API in the usual sense, but it does have interfaces that outlive
-any one install, and those are the ones a version number should speak about.
-For Libellus Potionis there are two, and they are the only things that ever
-leave the device:
-
-- **The JSON backup format.** This is the contract that matters. It is
-  versioned — `BACKUP_VERSION`, currently 3 — and both apps read it, so a
-  backup written on Android imports on iOS and the other way round.
-  **Backward compatibility is the project's aim: a backup written by any
-  released version is intended to remain importable by later versions.** A
-  release that added a field bumps the version so that an older app, which
-  cannot know about the field, declines the file cleanly instead of importing
-  it partially. The reverse direction is the promise: newer apps keep reading
-  older files.
-- **The CSV export.** Column set, ordering, and the ISO-8601 date and time
-  format are treated as a stable interface too, because people build
-  spreadsheets on them. Columns may be added at the end; existing ones are not
-  renamed, reordered, or repurposed without a version change that says so.
-
-Everything else — the Room database schema, the internal module layout, the
-Swift package structure, every Kotlin and Swift type — is internal. It changes
-whenever the app has reason to change it, and no external contract depends on
-it. The database has its own separate freeze and migration rules, documented in
-[`CONTRIBUTING.md`](CONTRIBUTING.md), section 8; those govern upgrades on a
-single device, not interchange between devices.
-
 ## Platform Compatibility
 
-The app runs on **Android 11 (API 30) and newer** and on **iOS 17 and newer**.
+The app runs on Android 11 (API 30) and newer and on iOS 17 and newer. It
+consists of two separate native apps in this one repository — Kotlin/Jetpack
+Compose for Android, Swift/SwiftUI for iOS — that share the same design, the
+same feature set, and a common JSON backup format, so a backup exported on one
+platform imports on the other. Their behaviour is kept in lock-step by a shared
+set of test vectors.
 
 Android API 30 is a deliberate floor: it is the lowest level at which the app
 can save CSV, PDF, and backup files to the public `Downloads` folder via
@@ -183,88 +131,16 @@ Libellus Potionis is distributed through
 age rating. Where the app is offered through the commercial stores, the two
 consoles ask different questions and reach very different age ratings for the
 same app — Apple's App Store at **18+**, Google Play at **3+** — because one
-rates the *content* (a catalogue of alcoholic drinks) and the other the
-*purpose* (a harm-reduction tool that neither sells nor promotes anything).
+rates the _content_ (a catalogue of alcoholic drinks) and the other the
+_purpose_ (a harm-reduction tool that neither sells nor promotes anything).
 What each store asked, what was answered, and why is recorded in
 [`docs/STORE_RATINGS.md`](docs/STORE_RATINGS.md).
 
-The app is tested on a Google Pixel 10 Pro running
-[GrapheneOS](https://grapheneos.org/) (Android 16), a Fairphone 4 (Android 15),
-an iPhone 16e and an iPhone SE (3rd generation), both running iOS 26, and on
-Android and iPhone emulators.
-
-## Accessibility
-
-Libellus Potionis follows Android accessibility best practices: every
-interactive control carries a screen-reader (TalkBack) name — including the
-calendar navigation arrows, the drink-category icon, and each year heat-map day
-cell that holds data — text scales with the system font size (`sp` units), the
-layout mirrors for right-to-left languages, and the under/over-limit palette is
-blue vs. red (not a red/green pair) so it is colour-blind distinguishable. A
-release-check gate (§13) keeps interactive icons from silently losing their
-labels.
-
-On iOS the same principles apply through the platform's own facilities:
-controls carry VoiceOver labels, text scales with Dynamic Type, the layout
-mirrors for right-to-left languages, and the same blue-vs-red limit palette is
-used.
-
-**No formal WCAG conformance level is claimed and no W3C conformance logo is
-used**, because a conformance claim requires meeting all criteria of a level
-under a thorough human evaluation, which has not yet been performed.
-Additionally, there are known open Level AA items, and W3C logos are scoped to
-web pages rather than native apps. The evaluation protocols, one per platform and
-level, are listed in [`docs/ROADMAP.md`](docs/ROADMAP.md#accessibility) and carry
-the measurements and the open questions.
-
 ## Build Infrastructure & Tooling
 
-To build the app from source, follow the step-by-step guides that take a blank
-operating system to a runnable debug build:
-[`docs/INSTALL-ANDROID.md`](docs/INSTALL-ANDROID.md) (debug APK from a fresh
-Debian GNU/Linux install) and [`docs/INSTALL-IOS.md`](docs/INSTALL-IOS.md)
-(debug build in the iPhone Simulator from a fresh macOS install).
-
-The Android build runs on the current Android Gradle Plugin, Gradle and Kotlin
-compiler line. Annotation processing goes through KSP, which Room uses to
-generate its DAO implementations. The UI layer is built on the Jetpack Compose
-BOM together with Jetpack Activity and Jetpack Lifecycle; navigation uses the
-type-safe routes of Navigation Compose, which is why kotlinx-serialization-core
-is on the classpath.
-
-Persistence is Room over a plain SQLite database, protected at rest by
-Android's file-based storage encryption and the per-app sandbox rather than by
-an application-level cipher; data leaves the device only through the
-user-initiated JSON backup export and import. The preferences secret is sealed
-with a key held directly in the hardware-backed Android Keystore, without a
-deprecated crypto wrapper. Core library desugaring makes the `java.time` API
-behave the same down to API 30, independently of the device's ART module
-revision. Tests use the Jetpack test libraries and Turbine.
-
-The exact, pinned versions are deliberately left out of this document so it
-does not drift on every dependency bump; they live in the Gradle build files —
-[`android/gradle/libs.versions.toml`](android/gradle/libs.versions.toml) and
-the module [`android/build.gradle.kts`](android/build.gradle.kts) — which are
-the single source of truth.
-
-## Source Code Documentation
-
-The source code is written to be read. Every file opens with a header stating
-its purpose, and every public type and function carries a doc comment that
-explains why the code is written the way it is: the trade-offs considered, the
-failure modes guarded against, the platform quirks worked around. Inline
-comments accompany the non-obvious lines and leave the obvious ones alone.
-
-A read-only release gate (`tools/release-check.sh`) scans the tree and flags
-missing file headers or undocumented public functions, so the documentation
-cannot rot silently as the code changes. The same gate enforces version
-consistency across the release artifacts and rejects non-English prose in the
-source. It runs as its own CI job on every pipeline, in the `make qa-android`
-and `make qa-ios` batteries, and again with `--release` before a release
-artifact is staged. The daily `make android` and `make ios` runs deliberately
-leave it out — these build the APK/IPA and run the unit tests, lint,
-`check-guides` and the l10n parity check — so the full invariant gate never
-sits in an edit-compile-run loop.
+To build the app from source, follow the step-by-step guides
+[`docs/INSTALL-ANDROID.md`](docs/INSTALL-ANDROID.md) and
+[`docs/INSTALL-IOS.md`](docs/INSTALL-IOS.md).
 
 Changes are documented in [`CHANGELOG.md`](CHANGELOG.md). The project's
 intended direction and its explicit non-goals are described in
@@ -278,6 +154,28 @@ all changes are reviewed and maintained under the same test suites and quality
 standards as human-written code. As with any open-source software provided
 under the GPLv3, the code is provided "as is", and users remain responsible for
 evaluating its suitability for their own use.
+
+## Feedback & Contributing
+
+The preferred channel for feedback, bug reports, and enhancement requests is
+the issue tracker of the canonical repository at
+[GitLab](https://gitlab.com/godisch/potillus/-/issues); if you would rather not
+use the tracker, you may instead write to
+[android@godisch.de](mailto:android@godisch.de) or
+[ios@godisch.de](mailto:ios@godisch.de). To report a security vulnerability,
+please do _not_ open a public issue. Instead, follow the private, PGP-encrypted
+reporting process described in [`SECURITY.md`](SECURITY.md).
+
+Translations contributions are where help is most useful. Most of the 21
+interface languages are machine-generated: Czech, Danish, Greek, Spanish,
+French, Italian, Japanese, Korean, Dutch, Norwegian, Polish, Portuguese (Brazil
+and Portugal), Romanian, Russian, Swedish, Ukrainian, as well as both written
+forms of Chinese. If you speak one of them, corrections are a welcome
+contribution. The workflow is in [`CONTRIBUTING.md`](CONTRIBUTING.md), section
+6.
+
+All contributors are expected to follow the project's [Code of
+Conduct](docs/CODE_OF_CONDUCT.md).
 
 ## License
 
