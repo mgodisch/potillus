@@ -430,9 +430,9 @@ public enum BackupReader {
             alcoholPercent: alcoholPercent,
             gramsAlcohol: gramsAlcohol,
             timestampMillis: timestampMillis,
-            utcOffsetSeconds: utcOffsetSeconds,
             logicalDate: logicalDate,
-            note: object["note"] as? String ?? ""
+            note: object["note"] as? String ?? "",
+            utcOffsetSeconds: utcOffsetSeconds
         )
     }
 
