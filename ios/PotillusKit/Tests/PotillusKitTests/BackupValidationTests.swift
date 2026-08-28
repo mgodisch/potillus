@@ -173,10 +173,6 @@ final class BackupValidationTests: XCTestCase {
         }
     }
 
-    // ── Size limit (Android MAX_BACKUP_BYTES parity) ─────────────────────────
-
-    /// The in-`parse` backstop refuses an over-limit buffer before the JSON
-    /// parser walks it, regardless of how the bytes were obtained.
     // ── Referential integrity (Android BackupManager Guard 5 parity) ─────────
     //
     // An entry naming a drink the file does not define cannot be restored. The
@@ -217,6 +213,10 @@ final class BackupValidationTests: XCTestCase {
         XCTAssertEqual(backup.entries[0].drinkId, 99)
     }
 
+    // ── Size limit (Android MAX_BACKUP_BYTES parity) ─────────────────────────
+
+    /// The in-`parse` backstop refuses an over-limit buffer before the JSON
+    /// parser walks it, regardless of how the bytes were obtained.
     func testOversizedDataIsRejected() {
         let data = Data(count: BackupReader.maxBackupBytes + 1)
         XCTAssertThrowsError(try BackupReader.parse(data)) { error in
