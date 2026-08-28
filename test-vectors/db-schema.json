@@ -1,7 +1,8 @@
 {
   "_comment": [
     "Shared schema contract for the SQLite database, generated from the Android",
-    "Room export (android/app/schemas/.../2.json), which is authoritative.",
+    "Room export (android/app/schemas/.../<schemaVersion>.json), which is",
+    "authoritative.",
     "Android asserts that its exported schema still matches this file; iOS asserts",
     "that the database GRDB creates matches it, by introspecting PRAGMA table_info,",
     "index_list and foreign_key_list. Neither platform can drift.",

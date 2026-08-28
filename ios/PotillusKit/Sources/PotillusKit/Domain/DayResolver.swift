@@ -161,11 +161,6 @@ public enum DayResolver {
 
     // ── Date-string helpers ──────────────────────────────────────────────────
 
-    /// Parses a `yyyy-MM-dd` string into a UTC-noon `Date`. Returns `nil` if the
-    /// string is malformed.
-    ///
-    /// Unlike Kotlin's `LocalDate.parse`, which throws, this returns an optional:
-    /// the Swift idiom for a recoverable parse failure.
     /// The locale's first day of the week, as an ISO-8601 weekday number
     /// (1 = Monday … 7 = Sunday).
     ///
@@ -186,6 +181,10 @@ public enum DayResolver {
     }
 
     /// A `yyyy-MM-dd` logical date, or `nil` when the string is not one.
+    ///
+    /// Where Kotlin's `LocalDate.parse` throws, this returns an optional: the
+    /// Swift idiom for a recoverable parse failure. Callers that must not proceed
+    /// on a malformed date say so at their own call site.
     ///
     /// STRICT BY ROUND TRIP, NOT BY LENIENCY
     ///   What `DateFormatter` does with a day its calendar does not have —

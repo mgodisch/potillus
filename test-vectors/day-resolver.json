@@ -4,7 +4,14 @@
     "(Swift) suites. The logical day boundary decides which day every entry belongs to,",
     "so a divergence here would silently corrupt every downstream figure.",
     "resolve: epochMillis is absolute; zoneId is an IANA identifier. Cases cover DST",
-    "spring-forward/fall-back and cross-timezone instants."
+    "spring-forward/fall-back and cross-timezone instants.",
+    "firstDayOfWeekIso: languageTag is BCP-47; expected is an ISO-8601 weekday number",
+    "(1 = Monday ... 7 = Sunday), the scheme Kotlin's WeekFields returns and the one",
+    "Swift converts to from Calendar.firstWeekday, which counts Sunday as 1. The four",
+    "regions are the ones whose week convention is settled: three that open on Monday",
+    "and one that opens on Sunday, so both branches of the Swift conversion are hit.",
+    "The number feeds the calendar grid's column order and the weekday histogram's bar",
+    "order, so a divergence rotates one platform's week against the other's."
   ],
   "resolve": [
     {
@@ -469,6 +476,28 @@
       "today": "",
       "statsFrom": "",
       "expected": 2
+    }
+  ],
+  "firstDayOfWeekIso": [
+    {
+      "description": "Germany starts the week on Monday",
+      "languageTag": "de-DE",
+      "expected": 1
+    },
+    {
+      "description": "France starts the week on Monday",
+      "languageTag": "fr-FR",
+      "expected": 1
+    },
+    {
+      "description": "the United Kingdom starts the week on Monday",
+      "languageTag": "en-GB",
+      "expected": 1
+    },
+    {
+      "description": "the United States starts the week on Sunday",
+      "languageTag": "en-US",
+      "expected": 7
     }
   ]
 }

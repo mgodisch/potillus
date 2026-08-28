@@ -46,6 +46,7 @@ struct DayResolverVectors: Decodable {
     let windowDays: [WindowDaysCase]
     let computeCurrentAbstinence: [CurrentAbstinenceCase]
     let computeLongestAbstinence: [LongestAbstinenceCase]
+    let firstDayOfWeekIso: [FirstWeekdayCase]
 
     struct ResolveCase: Decodable {
         let description: String
@@ -88,6 +89,14 @@ struct DayResolverVectors: Decodable {
         let dates: [String]
         let today: String
         let statsFrom: String
+        let expected: Int
+    }
+
+    struct FirstWeekdayCase: Decodable {
+        let description: String
+        /// A BCP-47 tag, which `Locale(identifier:)` takes with either separator.
+        let languageTag: String
+        /// ISO-8601: 1 = Monday … 7 = Sunday.
         let expected: Int
     }
 }
@@ -311,5 +320,36 @@ extension DayResolverTests {
         XCTAssertEqual(calendar.component(.hour, from: instant), 22)
         XCTAssertEqual(calendar.component(.minute, from: instant), 30)
         XCTAssertEqual(calendar.component(.day, from: instant), 15)
+    }
+
+    // ── firstDayOfWeekIso ────────────────────────────────────────────────────
+    //
+    // The number that heads column 0 of the calendar grid and orders the report's
+    // weekday histogram. This side reads `Calendar.firstWeekday`, which counts
+    // Sunday as 1, and converts to the ISO numbering Kotlin's `WeekFields`
+    // returns directly. Two schemes, one off-by-one away from rotating the whole
+    // week — and until the 0.85.0 QA round neither platform asserted the
+    // conversion. The shared vectors now do.
+
+    func testFirstDayOfWeekIsoAgainstSharedVectors() {
+        for testCase in vectors.firstDayOfWeekIso {
+            let actual = DayResolver.firstDayOfWeekIso(
+                locale: Locale(identifier: testCase.languageTag)
+            )
+            XCTAssertEqual(actual, testCase.expected, "firstDayOfWeekIso: \(testCase.description)")
+        }
+    }
+
+    /// Whatever the locale, the answer is an ISO weekday. A `Calendar.firstWeekday`
+    /// carried through unconverted would leave the range intact and still be wrong,
+    /// so this guards the shape while the vectors above guard the value.
+    func testFirstDayOfWeekIsoStaysInTheIsoRange() {
+        for identifier in Locale.availableIdentifiers.prefix(200) {
+            let iso = DayResolver.firstDayOfWeekIso(locale: Locale(identifier: identifier))
+            XCTAssertTrue(
+                (1...7).contains(iso),
+                "firstDayOfWeekIso returned \(iso) for \(identifier)"
+            )
+        }
     }
 }

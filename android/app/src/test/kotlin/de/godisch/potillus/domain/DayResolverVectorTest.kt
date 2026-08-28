@@ -47,6 +47,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import java.time.ZoneId
+import java.util.Locale
 
 class DayResolverVectorTest {
 
@@ -163,6 +164,30 @@ class DayResolverVectorTest {
             )
             assertEquals(
                 "computeLongestAbstinence: ${case.getString("description")}",
+                case.getInt("expected"),
+                actual,
+            )
+        }
+    }
+
+    // ── firstDayOfWeekIso ────────────────────────────────────────────────────
+    //
+    // The number that heads column 0 of the calendar grid and orders the report's
+    // weekday histogram. Two numbering schemes meet across the two platforms:
+    // `WeekFields.of(locale).firstDayOfWeek.value` counts Monday as 1, while
+    // Foundation's `Calendar.firstWeekday` counts Sunday as 1 and the Swift side
+    // converts. A conversion nobody asserts is a week rotated by one day on one
+    // platform, which is why the vectors reached this function in the 0.85.0 QA
+    // round: until then neither suite pinned it.
+
+    @Test
+    fun `firstDayOfWeekIso matches the shared vectors`() {
+        VECTORS.getJSONArray("firstDayOfWeekIso").objects().forEach { case ->
+            val actual = DayResolver.firstDayOfWeekIso(
+                Locale.forLanguageTag(case.getString("languageTag")),
+            )
+            assertEquals(
+                "firstDayOfWeekIso: ${case.getString("description")}",
                 case.getInt("expected"),
                 actual,
             )

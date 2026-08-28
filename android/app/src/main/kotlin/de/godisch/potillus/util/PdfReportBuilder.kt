@@ -324,11 +324,10 @@ object PdfReportBuilder {
             val labelIdx = chartLabelIndices(d.chartBuckets.size)
             repeats["BARS"] = d.chartBuckets.map { b ->
                 mapOf(
-                    "BAR_HEIGHT_PCT" to if (b.isAbstinent) {
-                        "0"
-                    } else {
-                        pct(b.avgPerDay, maxVal).coerceAtLeast(2.0).fmt0()
-                    },
+                    // An abstinent bucket draws the green tick instead of a bar, so
+                    // it passes null rather than its (zero) average; every other
+                    // bucket gets the shared floor from [barHeight].
+                    "BAR_HEIGHT_PCT" to barHeight(if (b.isAbstinent) null else b.avgPerDay, maxVal).fmt0(),
                     "BAR_CLASS" to if (AlcoholCalculator.isOverLimit(b.avgPerDay, limit)) "bar over" else "bar",
                     // On-top value, same convention as the page-2 hour/weekday charts:
                     // the bucket's per-day average (one decimal), blank for abstinent
@@ -358,32 +357,21 @@ object PdfReportBuilder {
                 "C_PCT" to "${c.percent} %",
             )
         }
-        // Donut slices (same data, rendered as an SVG ring beside the table). We use
-        // the classic stroke-dasharray technique on concentric <circle>s: with radius
-        // 15.9155 the circumference is ~100, so a slice's dash length is simply its
-        // percentage. PIE_OFFSET = 25 − cumulative rotates the slice so the ring fills
-        // clockwise starting at 12 o'clock. Fractions are taken from grams (not the
-        // rounded integer percents) so the segments butt up exactly.
+        // Donut slices (same data, rendered as an SVG ring beside the table). The
+        // geometry lives in [donutSlices], which the shared vectors pin; this block
+        // supplies the fractions and pairs each segment with its category colour.
+        // Fractions are taken from grams (not the rounded integer percents) so the
+        // segments butt up exactly.
         run {
             val totalCat = d.categories.sumOf { it.grams }
-            var cumulative = 0.0
-
-            // SVG attributes must use a '.' decimal separator regardless of the device
-            // locale. String.format()/Double.format() honour the *default* locale, so a
-            // German device would emit "40,00" — and SVG treats both ',' and ' ' as list
-            // separators, turning stroke-dasharray="40,00 60,00" into four values
-            // (40 0 60 0): a zero gap that paints the whole ring. Locale.ROOT fixes it.
-            fun svg(x: Double): String = String.format(java.util.Locale.ROOT, "%.2f", x)
-            repeats["PIE_SLICES"] = d.categories.map { c ->
-                val fraction = if (totalCat > 0) c.grams / totalCat * 100.0 else 0.0
-                val slice = mapOf(
+            val fractions = d.categories.map { if (totalCat > 0) it.grams / totalCat * 100.0 else 0.0 }
+            repeats["PIE_SLICES"] = d.categories.zip(donutSlices(fractions)) { c, slice ->
+                mapOf(
                     "PIE_FILL" to categoryColor(c.categoryName),
-                    "PIE_DASH" to svg(fraction),
-                    "PIE_GAP" to svg(100.0 - fraction),
-                    "PIE_OFFSET" to svg(25.0 - cumulative),
+                    "PIE_DASH" to slice.dash,
+                    "PIE_GAP" to slice.gap,
+                    "PIE_OFFSET" to slice.offset,
                 )
-                cumulative += fraction
-                slice
             }
         }
 
@@ -398,15 +386,7 @@ object PdfReportBuilder {
             val days = d.totalDays.coerceAtLeast(1)
             repeats["HBARS"] = d.hourlyGrams.map { grams ->
                 mapOf(
-                    // 0 grams → no bar; otherwise at least a 2% sliver so a small-but-
-                    // nonzero hour stays visible.
-                    "H_HEIGHT_PCT" to (
-                        if (grams <= 0.0) {
-                            "0"
-                        } else {
-                            pct(grams, ceiling).coerceAtLeast(2.0).fmt0()
-                        }
-                        ),
+                    "H_HEIGHT_PCT" to barHeight(grams, ceiling).fmt0(),
                     // Average grams per calendar day in this clock hour (blank for an
                     // hour that never saw any drinking).
                     "H_VALUE" to (if (grams <= 0.0) "" else (grams / days).fmt1()),
@@ -424,13 +404,7 @@ object PdfReportBuilder {
             val ceiling = maxWeekday * 1.15
             repeats["WDBARS"] = d.weekdayAverages.map { avg ->
                 mapOf(
-                    "WD_HEIGHT_PCT" to (
-                        if (avg == null || avg <= 0.0) {
-                            "0"
-                        } else {
-                            pct(avg, ceiling).coerceAtLeast(2.0).fmt0()
-                        }
-                        ),
+                    "WD_HEIGHT_PCT" to barHeight(avg, ceiling).fmt0(),
                     // Value above the bar; blank for a weekday that was never a drink day.
                     "WD_VALUE" to (avg?.fmt1() ?: ""),
                 )
@@ -505,6 +479,94 @@ object PdfReportBuilder {
 
     /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
     internal fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
+
+    /**
+     * The smallest bar a non-zero value may draw, in percent of the plot height.
+     *
+     * Without a floor, one beer in a month of heavy drinking scales to a bar of
+     * zero pixels and reads as abstinence. Two percent is the smallest strip the
+     * print resolution still separates from the baseline.
+     */
+    internal const val MINIMUM_VISIBLE_BAR = 2.0
+
+    /**
+     * Height of one chart bar, in percent of the plot area.
+     *
+     * The rule the three bar charts of the report share: a bucket with no value
+     * and a bucket with a zero value both draw nothing, and any amount above zero
+     * draws at least [MINIMUM_VISIBLE_BAR].
+     *
+     * NULL AND ZERO DRAW THE SAME BAR, AND THAT IS DELIBERATE. A weekday that
+     * never occurred in the period and a weekday that occurred and stayed dry are
+     * different facts, but a bar of height zero is the honest picture of both.
+     * What tells them apart is the value printed above the bar, which the callers
+     * leave blank in the first case.
+     *
+     * `internal` rather than private, and a function rather than three inline
+     * expressions: the rule used to be written out once per chart (trend, hour,
+     * weekday), which is three chances for it to drift and no way for
+     * `ReportChartVectorTest` to reach it. `test-vectors/report-chart.json` holds
+     * the `barHeight` cases that the Swift `ReportChart.barHeight` is pinned
+     * against, and this is the function that lets the Kotlin suite assert the
+     * same ones (0.85.0 QA round).
+     *
+     * @param value   The bucket's value, or null when the bucket holds no value.
+     * @param ceiling The value the full plot height stands for; see the headroom
+     *                factors at the call sites.
+     */
+    internal fun barHeight(value: Double?, ceiling: Double): Double {
+        if (value == null || value <= 0.0) return 0.0
+        return pct(value, ceiling).coerceAtLeast(MINIMUM_VISIBLE_BAR)
+    }
+
+    /**
+     * Two decimals with a DOT, whatever the device's locale.
+     *
+     * SVG treats both `,` and ` ` as list separators, so a locale-aware format on
+     * a German device emits `stroke-dasharray="40,00 60,00"`, which the renderer
+     * reads as the four values `40 0 60 0` — a zero gap, and the ring paints
+     * solid. [java.util.Locale.ROOT] is what keeps the separator a dot. The Swift
+     * twin is `ReportChart.svgNumber`.
+     */
+    internal fun svgNumber(value: Double): String = String.format(java.util.Locale.ROOT, "%.2f", value)
+
+    /**
+     * One ring segment of the category donut, as the three SVG attributes the
+     * template expects.
+     */
+    internal data class DonutSlice(val dash: String, val gap: String, val offset: String)
+
+    /**
+     * Turns a list of slice percentages into `stroke-dasharray` segments.
+     *
+     * The classic trick: a circle of radius 15.9155 has a circumference of very
+     * nearly 100, so a slice's dash length IS its percentage, and the gap is what
+     * remains of the ring. The offset `25 − cumulative` rotates each slice past
+     * the ones before it and puts the first one at twelve o'clock, so the ring
+     * fills clockwise.
+     *
+     * The caller passes fractions derived from GRAMS rather than from the rounded
+     * integer percents the table prints, so the segments butt up exactly instead
+     * of leaving a hairline gap at the end of the ring.
+     *
+     * `internal` for the same reason as [barHeight]: the `donut` section of
+     * `test-vectors/report-chart.json` pins this geometry on both platforms, and
+     * the Kotlin suite needs a named function to assert it against.
+     *
+     * @param fractions Slice percentages in drawing order, each in 0..100.
+     */
+    internal fun donutSlices(fractions: List<Double>): List<DonutSlice> {
+        var cumulative = 0.0
+        return fractions.map { fraction ->
+            val slice = DonutSlice(
+                dash = svgNumber(fraction),
+                gap = svgNumber(100.0 - fraction),
+                offset = svgNumber(25.0 - cumulative),
+            )
+            cumulative += fraction
+            slice
+        }
+    }
 
     /**
      * Truncates a weekday name to its first two UTF-16 code units.

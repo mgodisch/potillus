@@ -52,6 +52,47 @@ class ReportChartVectorTest {
             (0 until length()).asSequence().map { getJSONObject(it) }
 
         fun JSONArray.ints(): List<Int> = (0 until length()).map { getInt(it) }
+
+        fun JSONArray.doubles(): List<Double> = (0 until length()).map { getDouble(it) }
+    }
+
+    /**
+     * A bucket with no value and a bucket with a zero value both draw nothing;
+     * anything above zero draws at least the two-percent floor. Until the 0.85.0
+     * QA round the rule was written out once per chart in [PdfReportBuilder] and
+     * this side could not reach it, so these cases ran on the Swift port alone.
+     */
+    @Test
+    fun `barHeight matches the shared vectors`() {
+        VECTORS.getJSONArray("barHeight").objects().forEach { case ->
+            val value = if (case.isNull("value")) null else case.getDouble("value")
+            assertEquals(
+                case.getString("description"),
+                case.getDouble("expected"),
+                PdfReportBuilder.barHeight(value, case.getDouble("ceiling")),
+                EPS,
+            )
+        }
+    }
+
+    /**
+     * The ring's three SVG attributes per slice. Strings, not numbers: the decimal
+     * separator is part of what is pinned, because a comma turns one
+     * `stroke-dasharray` into four values and paints the ring solid.
+     */
+    @Test
+    fun `donutSlices matches the shared vectors`() {
+        VECTORS.getJSONArray("donut").objects().forEach { case ->
+            val expected = case.getJSONArray("expected").objects().toList()
+            val actual = PdfReportBuilder.donutSlices(case.getJSONArray("fractions").doubles())
+            assertEquals(case.getString("description"), expected.size, actual.size)
+            expected.forEachIndexed { index, slice ->
+                val where = "${case.getString("description")} [slice $index]"
+                assertEquals(where, slice.getString("dash"), actual[index].dash)
+                assertEquals(where, slice.getString("gap"), actual[index].gap)
+                assertEquals(where, slice.getString("offset"), actual[index].offset)
+            }
+        }
     }
 
     @Test
@@ -88,13 +129,6 @@ class ReportChartVectorTest {
         }
     }
 
-    /**
-     * The step is a 32-bit Float, and the truncation that follows lands on other
-     * indices than the same arithmetic in Double would. Sixteen of the first four
-     * hundred series lengths differ, `n = 32` — a month of daily buckets — among
-     * them. If this test ever fails, someone widened the Float and the iOS report
-     * now draws a different axis than this one.
-     */
     // ── abbreviateWeekday ────────────────────────────────────────────────────
     //
     // The unit of the two-character cut, not the CLDR names themselves: those come
@@ -113,6 +147,13 @@ class ReportChartVectorTest {
         }
     }
 
+    /**
+     * The step is a 32-bit Float, and the truncation that follows lands on other
+     * indices than the same arithmetic in Double would. Sixteen of the first four
+     * hundred series lengths differ, `n = 32` — a month of daily buckets — among
+     * them. If this test ever fails, someone widened the Float and the iOS report
+     * now draws a different axis than this one.
+     */
     @Test
     fun `the step is a Float and it matters`() {
         assertEquals(
