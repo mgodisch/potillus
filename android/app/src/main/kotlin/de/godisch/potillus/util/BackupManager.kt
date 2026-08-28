@@ -547,6 +547,12 @@ object BackupManager {
                 // would carry it. The value is checked against the mass its own
                 // volume and ABV imply.
                 //
+                // A STATEMENT, NOT A LINK IN THE `.also` CHAIN: the guards above
+                // each check ONE field against its own bounds, which is what makes
+                // them read well as a suffix of the read that produced the value.
+                // This one relates THREE fields, so it stands on its own line and
+                // names all three.
+                //
                 // WHY A TOLERANCE AND NOT EQUALITY: entries written before the
                 // 0.1 g rounding (see AlcoholCalculator.calculateGrams) carry two
                 // decimals — 150 ml at 13.5 % is 15.98 g in such a file where the
@@ -558,11 +564,10 @@ object BackupManager {
                 // WHY NOT RECOMPUTE INSTEAD: gramsAlcohol is what the entry
                 // recorded at log time, and overwriting it would rewrite the
                 // user's history in silence. The importer checks; it does not edit.
-                .also {
-                    val implied = AlcoholCalculator.calculateGrams(entryVolumeMl, entryAlcoholPercent)
-                    require(abs(it - implied) <= GRAMS_TOLERANCE) {
-                        "gramsAlcohol $it does not match $entryVolumeMl ml at $entryAlcoholPercent % (expected $implied)"
-                    }
+                val impliedGrams = AlcoholCalculator.calculateGrams(entryVolumeMl, entryAlcoholPercent)
+                require(abs(gramsAlcohol - impliedGrams) <= GRAMS_TOLERANCE) {
+                    "gramsAlcohol $gramsAlcohol does not match $entryVolumeMl ml " +
+                        "at $entryAlcoholPercent % (expected $impliedGrams)"
                 }
                 val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
