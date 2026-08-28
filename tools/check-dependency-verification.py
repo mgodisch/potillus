@@ -61,6 +61,14 @@ WHAT IT DOES NOT CHECK
     false, so integrity rests on the checksums rather than on publisher keys.
     That is a deliberate scope, documented in SECURITY.md.
 
+WHY IT PARSES THE CATALOGUE ITSELF
+    `tomllib` arrived in Python 3.11, and the Mac runs whatever Xcode ships --
+    3.9 at the time of writing. check-vex.py may skip itself when the module is
+    absent, because its own subject (an empty triage list) is advisory; a gate
+    that silently skips on one of the two machines is not a gate. The catalogue
+    uses three table shapes and nothing else, so they are read directly, and an
+    entry this parser does not recognise is an ERROR rather than a silent miss.
+
 USAGE
     tools/check-dependency-verification.py
     Exit status: 0 when the file covers every catalogue entry, 1 otherwise. Run
@@ -69,7 +77,6 @@ USAGE
 
 import re
 import sys
-import tomllib
 from potillus_repo import repo_root
 
 ROOT = repo_root()
@@ -81,6 +88,56 @@ METADATA = ROOT / "android" / "gradle" / "verification-metadata.xml"
 _COMPONENT = re.compile(
     r'<component\s+group="([^"]+)"\s+name="([^"]+)"\s+version="([^"]+)"'
 )
+
+
+def parse_catalogue(text):
+    """The [versions], [libraries] and [plugins] tables of a Gradle version
+    catalogue, as {table: {key: value}}.
+
+    Deliberately narrow. A value is either a quoted string or an inline table,
+    and an inline table's members are `key = "value"` or the dotted
+    `version.ref = "value"`. That is every form this catalogue uses; anything
+    else raises, so a shape this parser cannot read stops the check instead of
+    quietly passing it.
+    """
+    tables = {"versions": {}, "libraries": {}, "plugins": {}}
+    current = None
+    for number, raw in enumerate(text.splitlines(), 1):
+        line = raw.split("#", 1)[0].strip() if not raw.lstrip().startswith("#") else ""
+        if not line:
+            continue
+        table = re.fullmatch(r"\[(\w+)\]", line)
+        if table:
+            current = table.group(1)
+            continue
+        if current not in tables:
+            continue
+        entry = re.fullmatch(r'([\w.-]+)\s*=\s*(.+)', line)
+        if not entry:
+            raise ValueError(f"{CATALOG.name}:{number}: cannot read {line!r}")
+        key, value = entry.group(1), entry.group(2).strip()
+        tables[current][key] = parse_value(value, number)
+    return tables
+
+
+def parse_value(value, number):
+    """A quoted string, or an inline table as a dict (`version.ref` nested)."""
+    quoted = re.fullmatch(r'"([^"]*)"', value)
+    if quoted:
+        return quoted.group(1)
+    if not (value.startswith("{") and value.endswith("}")):
+        raise ValueError(f"{CATALOG.name}:{number}: cannot read {value!r}")
+    result = {}
+    for member in re.finditer(r'([\w.-]+)\s*=\s*"([^"]*)"', value[1:-1]):
+        name, text = member.group(1), member.group(2)
+        if "." in name:
+            outer, inner = name.split(".", 1)
+            result.setdefault(outer, {})[inner] = text
+        else:
+            result[name] = text
+    if not result:
+        raise ValueError(f"{CATALOG.name}:{number}: empty inline table {value!r}")
+    return result
 
 
 def resolve_version(spec, versions):
@@ -104,8 +161,9 @@ def main():
     if not METADATA.exists():
         print(
             f"check-dependency-verification: {METADATA} is missing -- generate it with\n"
-            "  ./gradlew --write-verification-metadata sha256 assembleRelease "
-            "testDebugUnitTest lintDebug ktlintCheck koverVerify cyclonedxBom",
+            "  ./gradlew --write-verification-metadata sha256 assembleDebug "
+            "assembleRelease bundleRelease testDebugUnitTest lintDebug "
+            "ktlintCheck koverVerify cyclonedxBom",
             file=sys.stderr,
         )
         return 1
@@ -119,7 +177,11 @@ def main():
         )
         return 1
 
-    catalog = tomllib.loads(CATALOG.read_text(encoding="utf-8"))
+    try:
+        catalog = parse_catalogue(CATALOG.read_text(encoding="utf-8"))
+    except ValueError as error:
+        print(f"check-dependency-verification: {error}", file=sys.stderr)
+        return 1
     versions = catalog.get("versions", {})
     components = set(_COMPONENT.findall(xml))
 
@@ -152,8 +214,9 @@ def main():
             print(f"  {line}", file=sys.stderr)
         print(
             "\nRegenerate after every version bump:\n"
-            "  ./gradlew --write-verification-metadata sha256 assembleRelease "
-            "testDebugUnitTest lintDebug ktlintCheck koverVerify cyclonedxBom",
+            "  ./gradlew --write-verification-metadata sha256 assembleDebug "
+            "assembleRelease bundleRelease testDebugUnitTest lintDebug "
+            "ktlintCheck koverVerify cyclonedxBom",
             file=sys.stderr,
         )
         return 1

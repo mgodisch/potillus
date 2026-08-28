@@ -210,6 +210,7 @@ Edit drinks from the list's edit mode
 - Gradle verifies a SHA-256 for every artifact the Android build resolves.
 - `check-dependency-verification` and `check-swift-argument-order`.
 - Swedish and Norwegian spell the drinking day one way.
+- The release checklist names the tasks that resolve every artifact.
 
 ### Removed
 

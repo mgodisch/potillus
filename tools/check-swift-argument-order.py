@@ -67,12 +67,41 @@ from potillus_repo import repo_root
 ROOT = repo_root()
 IOS = ROOT / "ios"
 
+# The project's own Swift, and only that. `ios/` also holds
+# PotillusKit/.build/, where SwiftPM checks out GRDB: scanning it would read a
+# dependency's source as if it were ours, and it contains a DIRECTORY named
+# `GRDB.swift`, which a bare rglob("*.swift") hands to read_text(). These are the
+# same roots ios/.swiftlint.yml lists under `included`.
+SOURCE_ROOTS = (
+    IOS / "Potillus",
+    IOS / "PotillusKit/Sources",
+    IOS / "PotillusKit/Tests",
+    IOS / "PotillusTests",
+    IOS / "PotillusUITests",
+)
+
 # type name -> file declaring it. Both are the record shapes the shared schema
 # contract covers; see the module docstring for why the list is short.
 TYPES = {
     "ConsumptionEntry": IOS / "PotillusKit/Sources/PotillusKit/Domain/Models.swift",
     "Entry": IOS / "PotillusKit/Sources/PotillusKit/Data/Records.swift",
 }
+
+
+def swift_files():
+    """Every .swift FILE under the project's own roots, sorted, deduplicated.
+
+    `is_file()` is not paranoia: a directory may end in `.swift` (GRDB's
+    checkout is one), and rglob matches on the name alone.
+    """
+    seen = {}
+    for root in SOURCE_ROOTS:
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*.swift"):
+            if path.is_file():
+                seen[path.resolve()] = path
+    return [seen[key] for key in sorted(seen)]
 
 
 def declared_labels(path, type_name):
@@ -119,8 +148,9 @@ def call_arguments(source, open_paren):
 def main():
     order = {name: declared_labels(path, name) for name, path in TYPES.items()}
 
+    files = swift_files()
     violations = []
-    for path in sorted(IOS.rglob("*.swift")):
+    for path in files:
         source = path.read_text(encoding="utf-8")
         for name, declaration in order.items():
             for match in re.finditer(r"\b" + re.escape(name) + r"\(", source):
@@ -147,7 +177,7 @@ def main():
 
     print(
         f"check-swift-argument-order: OK ({len(order)} type(s) checked across "
-        f"{sum(1 for _ in IOS.rglob('*.swift'))} file(s))"
+        f"{len(files)} file(s))"
     )
     return 0
 

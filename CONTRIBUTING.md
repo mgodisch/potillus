@@ -641,9 +641,14 @@ Before tagging a new version:
 
       ```
       cd android && ./gradlew --write-verification-metadata sha256 \
-          assembleRelease testDebugUnitTest lintDebug ktlintCheck \
-          koverVerify cyclonedxBom
+          assembleDebug assembleRelease bundleRelease \
+          testDebugUnitTest lintDebug ktlintCheck koverVerify cyclonedxBom
       ```
+
+      `assembleDebug` is in the list for a reason: KSP and the coroutines
+      artifacts it pulls resolve through a detached configuration that a
+      release-only run never touches, so a file written without it fails the
+      first debug build on artifacts nothing had asked for yet.
 
       `make release-android` gates on
       `tools/check-dependency-verification.py`, which fails when a catalogue
