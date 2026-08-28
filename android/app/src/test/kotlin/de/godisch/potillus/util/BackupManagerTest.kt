@@ -198,12 +198,33 @@ class BackupManagerTest {
         assertReadError(BackupManager.parseBackupJson(json))
     }
 
+    // Both grams-vs-volume tests below carry the referenced drink. Guard 5
+    // rejects an entry whose drinkId names no drink in the file, so a bare
+    // `entries = ...` would make the rejecting test pass for the wrong reason
+    // and the accepting one fail for a reason that has nothing to do with grams.
+
     @Test fun `gramsAlcohol that contradicts volume and ABV is rejected as ReadError`() {
         // 500 ml at 5 % is 19.7 g. 999 g is not a rounding artefact, it is a
         // different drink — the kind of value a hand-edited or corrupt file
         // carries into every statistic and into the blood-alcohol estimate.
-        val json = buildBackupJson(entries = listOf(entryJson(gramsAlcohol = 999.0)))
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1)),
+            entries = listOf(entryJson(drinkId = 1, gramsAlcohol = 999.0)),
+        )
         assertReadError(BackupManager.parseBackupJson(json))
+    }
+
+    @Test fun `gramsAlcohol matching volume and ABV is accepted`() {
+        // The counterpart of the test above: same file, the grams its own volume
+        // and ABV imply. Without it a Guard 3b that rejected everything would
+        // still look correct.
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 1)),
+            entries = listOf(entryJson(drinkId = 1, gramsAlcohol = 19.7)),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertNull(result.error)
+        assertEquals(19.7, result.entries.first().gramsAlcohol, 0.001)
     }
 
     @Test fun `gramsAlcohol from before the 0_1 g rounding is accepted`() {
@@ -211,7 +232,10 @@ class BackupManagerTest {
         // grid: 150 ml at 13.5 % stood at 15.98 g where the recomputation now
         // says 16.0 g. A user's own older backup must still import.
         val json = buildBackupJson(
-            entries = listOf(entryJson(volumeMl = 150, alcoholPercent = 13.5, gramsAlcohol = 15.98)),
+            drinks = listOf(drinkJson(id = 1, name = "Wine", volumeMl = 150, alcoholPercent = 13.5, category = "WINE")),
+            entries = listOf(
+                entryJson(drinkId = 1, drinkName = "Wine", volumeMl = 150, alcoholPercent = 13.5, gramsAlcohol = 15.98),
+            ),
         )
         val result = BackupManager.parseBackupJson(json)
         assertNull(result.error)

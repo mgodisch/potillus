@@ -204,8 +204,12 @@ final class TodayModelTests: XCTestCase {
         XCTAssertNil(model.state.bacPermille, "an alcohol-free day has no estimate, not 0.0")
     }
 
-    /// The clock is what makes this assertable: the same entries, read three
-    /// hours later, must give a lower estimate.
+    /// The clock is what makes this assertable: the same entry, read an hour
+    /// later, must give a lower estimate.
+    ///
+    /// An hour, not three: one Pils is 19.3 g, which at 82.5 kg reaches 0.39 per
+    /// mille and is eliminated inside three. The suite would then be asserting a
+    /// decay against an estimate that has already gone away.
     func testTheEstimateDecaysAsTimePasses() async throws {
         try await environment.preferences.update { $0.weightKg = 82.5 }
         let pils = try addDrink("Pils")
@@ -215,12 +219,30 @@ final class TodayModelTests: XCTestCase {
         await atOnce.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening)
         let immediate = try XCTUnwrap(atOnce.state.bacPermille)
 
-        let threeHoursLater = makeModel(at: evening + 3 * 3_600_000)
-        await threeHoursLater.load()
-        let later = try XCTUnwrap(threeHoursLater.state.bacPermille)
+        let anHourLater = makeModel(at: evening + 3_600_000)
+        await anHourLater.load()
+        let later = try XCTUnwrap(anHourLater.state.bacPermille)
 
         XCTAssertLessThan(later, immediate)
-        XCTAssertGreaterThanOrEqual(later, 0.0, "the estimate is never negative")
+        XCTAssertGreaterThan(later, 0.0, "an hour on, the estimate is still standing")
+    }
+
+    /// And once it reaches zero it goes away rather than reading 0.0 per mille.
+    /// A zero would be a claim about the body; an absent row is not.
+    func testTheEstimateGoesAwayRatherThanReadingZero() async throws {
+        try await environment.preferences.update { $0.weightKg = 82.5 }
+        let pils = try addDrink("Pils")
+
+        let atOnce = makeModel(at: evening)
+        await atOnce.load()
+        await atOnce.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening)
+        XCTAssertNotNil(atOnce.state.bacPermille)
+
+        // 19.3 g at 82.5 kg peaks at 0.39 per mille; beta clears that in under
+        // three hours.
+        let muchLater = makeModel(at: evening + 3 * 3_600_000)
+        await muchLater.load()
+        XCTAssertNil(muchLater.state.bacPermille)
     }
 
     /// An alcohol-free drink neither raises the estimate nor anchors the
