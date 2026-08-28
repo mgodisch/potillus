@@ -36,7 +36,6 @@ import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.domain.model.LimitInfo
 import de.godisch.potillus.domain.model.LimitViolations
-import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.Locale
