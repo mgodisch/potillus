@@ -50,14 +50,23 @@ WHAT IT REPORTS
        that are pure format skeletons ("%1$lld ml"), proper nouns, or already
        equal to an Android value are not "unmapped" in this sense, and the
        deliberately unlocalised views (UNLOCALISED_VIEWS) are not scanned at all.
-    3. STALE: map entries whose iOS key or Android name no longer exists.
+    3. STALE: map entries whose iOS key or Android name no longer exists, and
+       platformOnly entries whose iOS key has left the catalogue.
 
 THE MAP
     tools/ui-string-parity.json: {"pairs": {"<iOS catalogue key>": "<android
-    string name>", ...}}. Hand-curated -- semantic equivalence cannot be
-    guessed. A pair means "these must read the same to the user"; the fix for a
-    drift is normally to change the iOS key to Android's wording (and move its
-    translations), which then also lets check-l10n-parity enforce them.
+    string name>", ...}, "platformOnly": {"<iOS catalogue key>": "<reason>", ...}}.
+    Hand-curated -- semantic equivalence cannot be guessed. A pair means "these
+    must read the same to the user"; the fix for a drift is normally to change
+    the iOS key to Android's wording (and move its translations), which then also
+    lets check-l10n-parity enforce them.
+
+    "platformOnly" is for a label with NO Android counterpart at all -- a control
+    that exists on one platform only. Inventing a pair for it would assert an
+    equivalence that does not exist; leaving it out would park it in UNMAPPED
+    forever, where a genuinely new label would drown. Each entry carries the
+    reason there is nothing to pair with, and a key that leaves the catalogue is
+    reported as STALE, so the list cannot rot.
 
 USAGE
     tools/check-ui-string-parity.py
@@ -184,7 +193,9 @@ def main():
     android = android_strings()
     android_values = {normalize(v) for v in android.values()}
     catalog = catalog_source_values()
-    pairs = json.loads(MAP.read_text(encoding="utf-8"))["pairs"] if MAP.exists() else {}
+    raw_map = json.loads(MAP.read_text(encoding="utf-8")) if MAP.exists() else {}
+    pairs = raw_map.get("pairs", {})
+    platform_only = raw_map.get("platformOnly", {})
 
     drift = []
     stale = []
@@ -200,7 +211,11 @@ def main():
         if normalize(ios_text) != normalize(android_text):
             drift.append((ios_key, ios_text, android_name, android_text))
 
-    mapped_keys = set(pairs.keys())
+    for ios_key in sorted(platform_only):
+        if ios_key not in catalog:
+            stale.append(f"platformOnly key not in catalogue: {ios_key!r}")
+
+    mapped_keys = set(pairs.keys()) | set(platform_only.keys())
     unmapped = []
     for key in sorted(used_label_keys()):
         # The catalogue is keyed by the English source string, so the key IS the

@@ -228,6 +228,9 @@ main() {
     echo -e "  ${GREEN}✓  Passed :${NC}  $PASSES"
     echo -e "  ${YELLOW}⚠  Warnings:${NC} $WARNS"
     echo -e "  ${RED}✗  Failed :${NC}  $FAILS"
+    if [[ "$SKIPS" -gt 0 ]]; then
+        echo -e "  ${BLUE}⊘  Skipped :${NC} $SKIPS (input absent — see above)"
+    fi
     echo ""
 
     if [[ "$FAILS" -gt 0 ]]; then

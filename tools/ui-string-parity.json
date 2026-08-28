@@ -12,7 +12,13 @@
     "",
     "Seeded in the 0.83.0 UI-parity pass from the Statistics screen, where the",
     "two vocabularies diverged most (Android 'Average per Day' vs iOS 'Per day',",
-    "etc.). Entries here are the ALIGNMENT WORK LIST, not yet the aligned state."
+    "etc.). Entries here are the ALIGNMENT WORK LIST, not yet the aligned state.",
+    "",
+    "A label with no Android counterpart at all belongs in \"platformOnly\", not in \"pairs\": inventing a pair for it would assert an equivalence that does not exist, and leaving it out keeps it in the UNMAPPED list forever, where a genuinely new label would drown. Each entry states WHY there is nothing to pair with. The tool treats a platformOnly key that has left the catalogue as stale, so the list cannot rot."
   ],
-  "pairs": {}
+  "pairs": {},
+  "platformOnly": {
+    "Edit this day’s entries": "SwiftUI's EditMode is a list-wide state Android's screens do not have: there each row carries its own edit and delete icons, so no Android label names the mode.",
+    "Edit today’s drinks": "Same as the calendar's edit toggle: the mode itself is iOS-only."
+  }
 }

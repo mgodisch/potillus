@@ -58,8 +58,7 @@ check_third_party_notices() {
 
     local sbom="app/build/outputs/sbom/libellus-potionis-sbom.cdx.json"
     if [[ ! -f "$sbom" ]]; then
-        info "SBOM not present ($sbom) — run 'make sbom' first; NOTICE scan skipped"
-        pass "NOTICE scan is SBOM-gated (nothing to verify without the component inventory)"
+        skip "NOTICE scan needs the SBOM ($sbom) — run 'make sbom' to verify third-party notices"
         return
     fi
     if ! command -v python3 >/dev/null 2>&1; then

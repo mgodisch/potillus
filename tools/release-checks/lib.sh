@@ -29,11 +29,25 @@ BLUE='\033[0;34m'; BOLD='\033[1m'; NC='\033[0m'
 # Counters for the final summary
 FAILS=0
 WARNS=0
+SKIPS=0
 
 # coloured, prefixed message.
 pass() { echo -e "  ${GREEN}✓${NC} $*";          PASSES=$(( PASSES + 1 )); }
 fail() { echo -e "  ${RED}✗ FAIL:${NC} $*";      FAILS=$(( FAILS  + 1 )); }
 warn() { echo -e "  ${YELLOW}⚠ WARN:${NC} $*";   WARNS=$(( WARNS  + 1 )); }
+
+# A check that could not run because its INPUT was absent, as opposed to one
+# that ran and found nothing wrong.
+#
+# WHY THIS EXISTS: such a check used to report `pass`, so the summary counted a
+# verification that never happened and a reader saw only a green line. The
+# distinction matters most for the NOTICE scan, which is gated on an SBOM the
+# static run does not build: on a machine without one it verified nothing and
+# said so in an info line, while the counter above said otherwise. A skip does
+# NOT affect the exit code — the release path builds the SBOM first, so a skip
+# there cannot happen — but it is counted and named in the summary, so nobody
+# reads a green run as a complete one.
+skip() { echo -e "  ${BLUE}⊘ SKIP:${NC} $*";     SKIPS=$(( SKIPS  + 1 )); }
 info() { echo -e "  ${BLUE}▶${NC} $*"; }
 
 # Section header – printed before each group of related checks
