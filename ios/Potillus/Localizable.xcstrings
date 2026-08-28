@@ -8014,7 +8014,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Średnia w dzień spożycia"
+            "value" : "Średnia w dzień picia"
           }
         },
         "pt" : {
@@ -8032,13 +8032,13 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Medie pe zi de băut"
+            "value" : "Medie pe zi de consum"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Среднее в день потребления"
+            "value" : "Среднее в день с алкоголем"
           }
         },
         "sv" : {
@@ -12754,7 +12754,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Дней сверх лимита питейных дней"
+            "value" : "Дней сверх лимита дней с алкоголем"
           }
         },
         "sv" : {
@@ -12766,7 +12766,7 @@
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Днів понад ліміт питних днів"
+            "value" : "Днів понад ліміт днів вживання"
           }
         },
         "zh-Hans" : {
@@ -13706,7 +13706,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "dny s alkoholem (posledních 7 dní)"
+            "value" : "dny pití (posledních 7 dní)"
           }
         },
         "da" : {
@@ -13736,19 +13736,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "días de bebida (últimos 7 días)"
+            "value" : "días de consumo (últimos 7 días)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "jours de boisson (7 derniers jours)"
+            "value" : "jours de conso. (7 derniers jours)"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "giorni con alcol (ultimi 7 giorni)"
+            "value" : "giorni di consumo (ultimi 7 giorni)"
           }
         },
         "ja" : {
@@ -13778,7 +13778,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "dni z alkoholem (ostatnie 7 dni)"
+            "value" : "dni picia (ostatnie 7 dni)"
           }
         },
         "pt" : {
@@ -13796,7 +13796,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "zile de băut (ultimele 7 zile)"
+            "value" : "zile de consum (ultimele 7 zile)"
           }
         },
         "ru" : {
@@ -13837,7 +13837,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dny s alkoholem, posledních 7 dní"
+            "value" : "Dny pití, posledních 7 dní"
           }
         },
         "da" : {
@@ -13867,19 +13867,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Días de bebida, últimos 7 días"
+            "value" : "Días de consumo, últimos 7 días"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jours de boisson, 7 derniers jours"
+            "value" : "Jours de conso., 7 derniers jours"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Giorni con alcol, ultimi 7 giorni"
+            "value" : "Giorni di consumo, ultimi 7 giorni"
           }
         },
         "ja" : {
@@ -13909,7 +13909,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dni z alkoholem, ostatnie 7 dni"
+            "value" : "Dni picia, ostatnie 7 dni"
           }
         },
         "pt" : {
@@ -13927,7 +13927,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zile de băut, ultimele 7 zile"
+            "value" : "Zile de consum, ultimele 7 zile"
           }
         },
         "ru" : {
@@ -20304,7 +20304,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jours boisson max./7 j"
+            "value" : "Jours conso. max./7 j"
           }
         },
         "it" : {
@@ -20358,7 +20358,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Max. zile de băut/7 zile"
+            "value" : "Max. zile de consum/7 zile"
           }
         },
         "ru" : {
@@ -20399,7 +20399,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximální počet dnů s alkoholem za sedm dní"
+            "value" : "Maximální počet dnů pití za sedm dní"
           }
         },
         "da" : {
@@ -20429,19 +20429,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Máximo de días de bebida por siete días"
+            "value" : "Máximo de días de consumo por siete días"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nombre maximal de jours de boisson sur sept jours"
+            "value" : "Nombre maximal de jours de conso. sur sept jours"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numero massimo di giorni con alcol su sette giorni"
+            "value" : "Numero massimo di giorni di consumo su sette giorni"
           }
         },
         "ja" : {
@@ -20471,7 +20471,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maksymalna liczba dni z alkoholem na siedem dni"
+            "value" : "Maksymalna liczba dni picia na siedem dni"
           }
         },
         "pt" : {
@@ -20489,7 +20489,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numărul maxim de zile de băut la șapte zile"
+            "value" : "Numărul maxim de zile de consum la șapte zile"
           }
         },
         "ru" : {

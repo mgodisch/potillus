@@ -417,7 +417,7 @@ extension ReportLabels {
         self.riskBingeDays = { "Días binge (>\($0) g)" }
         self.kpiOverDaily = { "Días > diario (\($0) g)" }
         self.kpiOverWeekly = { "Días > 7 días (\($0) g)" }
-        self.kpiOverDrinkDays = { "Días > \($0) días consumo" }
+        self.kpiOverDrinkDays = { "Días > \($0) días de consumo" }
         self.category = { name in
             switch name {
             case "BEER": return "Cerveza"
@@ -473,7 +473,7 @@ extension ReportLabels {
         self.riskBingeDays = { "Jours binge (>\($0) g)" }
         self.kpiOverDaily = { "Jours > jour (\($0) g)" }
         self.kpiOverWeekly = { "Jours > 7 j (\($0) g)" }
-        self.kpiOverDrinkDays = { "Jours > \($0) jours conso." }
+        self.kpiOverDrinkDays = { "Jours > \($0) jours de conso." }
         self.category = { name in
             switch name {
             case "BEER": return "Bière"
@@ -677,18 +677,18 @@ extension ReportLabels {
         self.unitDrinkDaysPerWeek = "zile de consum/săpt."
         self.kpiTotal = "Alcool total"
         self.kpiAvgPerDay = "Medie pe zi"
-        self.kpiAvgPerDrinkDay = "Ø pe zi de băut"
+        self.kpiAvgPerDrinkDay = "Ø pe zi de consum"
         self.kpiMedianPerDay = "Mediană pe zi"
-        self.kpiMedianPerDrinkDay = "Md pe zi de băut"
-        self.kpiDrinkDays = "Zile de băut"
+        self.kpiMedianPerDrinkDay = "Md pe zi de consum"
+        self.kpiDrinkDays = "Zile de consum"
         self.kpiAbstinentDays = "Zile de abstinență"
         self.days = { DayPlural.format($0, language: "ro", forms: DayForms(one: "%1$d zi", few: "%1$d zile", other: "%1$d de zile")) }
         self.kpiMaxPerDay = "Max. pe zi"
         self.kpiMaxPer7Days = "Max. în 7 zile"
-        self.kpiAvgDrinkDaysPerMonth = "Ø zile de băut/lună"
-        self.kpiMedianDrinkDaysPerMonth = "Md zile de băut/lună"
+        self.kpiAvgDrinkDaysPerMonth = "Ø zile de consum/lună"
+        self.kpiMedianDrinkDaysPerMonth = "Md zile de consum/lună"
         self.columnMonth = "Lună"
-        self.columnDrinkDays = "Zile de băut"
+        self.columnDrinkDays = "Zile de consum"
         self.columnTotalGrams = "Total g"
         self.columnAvgPerDay = "Medie g/zi"
         self.columnOverDaily = "> zi"
@@ -789,18 +789,18 @@ extension ReportLabels {
         self.unitDrinkDaysPerWeek = "dni picia/tydz."
         self.kpiTotal = "Łączny alkohol"
         self.kpiAvgPerDay = "Śr. dziennie"
-        self.kpiAvgPerDrinkDay = "Ø w dzień spożycia"
+        self.kpiAvgPerDrinkDay = "Ø w dzień picia"
         self.kpiMedianPerDay = "Mediana dziennie"
-        self.kpiMedianPerDrinkDay = "Md w dzień spożycia"
-        self.kpiDrinkDays = "Dni spożycia"
+        self.kpiMedianPerDrinkDay = "Md w dzień picia"
+        self.kpiDrinkDays = "Dni picia"
         self.kpiAbstinentDays = "Dni abstynencji"
         self.days = { DayPlural.format($0, language: "pl", forms: DayForms(one: "%1$d dzień", few: "%1$d dni", many: "%1$d dni", other: "%1$d dnia")) }
         self.kpiMaxPerDay = "Maks. dziennie"
         self.kpiMaxPer7Days = "Maks. w 7 dni"
-        self.kpiAvgDrinkDaysPerMonth = "Ø dni spożycia/mies."
-        self.kpiMedianDrinkDaysPerMonth = "Md dni spożycia/mies."
+        self.kpiAvgDrinkDaysPerMonth = "Ø dni picia/mies."
+        self.kpiMedianDrinkDaysPerMonth = "Md dni picia/mies."
         self.columnMonth = "Miesiąc"
-        self.columnDrinkDays = "Dni spożycia"
+        self.columnDrinkDays = "Dni picia"
         self.columnTotalGrams = "Łącznie g"
         self.columnAvgPerDay = "Śr. g/dzień"
         self.columnOverDaily = "> dzień"
@@ -842,12 +842,12 @@ extension ReportLabels {
         self.metaCurrentAbstinence = "Текущее воздержание"
         self.unitGramsPerDay = "г/день"
         self.unitGramsPerWeek = "г/7 дней"
-        self.unitDrinkDaysPerWeek = "питейных дней/нед."
+        self.unitDrinkDaysPerWeek = "дней с алкоголем/нед."
         self.kpiTotal = "Всего алкоголя"
         self.kpiAvgPerDay = "Ср. в день"
-        self.kpiAvgPerDrinkDay = "Ø в день потребления"
+        self.kpiAvgPerDrinkDay = "Ø в день с алкоголем"
         self.kpiMedianPerDay = "Медиана в день"
-        self.kpiMedianPerDrinkDay = "Md в день потребления"
+        self.kpiMedianPerDrinkDay = "Md в день с алкоголем"
         self.kpiDrinkDays = "Дней с алкоголем"
         self.kpiAbstinentDays = "Дней без алкоголя"
         self.days = { DayPlural.format($0, language: "ru", forms: DayForms(one: "%1$d день", many: "%1$d дней", other: "%1$d дня")) }
@@ -898,7 +898,7 @@ extension ReportLabels {
         self.metaCurrentAbstinence = "Поточне утримання"
         self.unitGramsPerDay = "г/день"
         self.unitGramsPerWeek = "г/7 днів"
-        self.unitDrinkDaysPerWeek = "питних днів/тиж."
+        self.unitDrinkDaysPerWeek = "днів вживання/тиж."
         self.kpiTotal = "Загальний алкоголь"
         self.kpiAvgPerDay = "Сер. за день"
         self.kpiAvgPerDrinkDay = "Ø за день вживання"

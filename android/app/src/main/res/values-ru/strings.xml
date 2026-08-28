@@ -82,7 +82,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Масса тела</string>
     <string name="pdf_kpi_total">Всего алкоголя</string>
     <string name="pdf_kpi_avg_day">Ср. в день</string>
-    <string name="pdf_kpi_avg_drink_day">Ø в день потребления</string>
+    <string name="pdf_kpi_avg_drink_day">Ø в день с алкоголем</string>
     <string name="pdf_kpi_drink_days">Дней с алкоголем</string>
     <string name="pdf_kpi_abstinent_days">Дней без алкоголя</string>
     <string name="pdf_kpi_binge">Дней бинджа (>%1$s г)</string>
@@ -113,7 +113,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="year">Год</string>
     <string name="total_period">Итого за период</string>
     <string name="avg_per_day">Среднее в день</string>
-    <string name="avg_per_drink_day">Среднее в день потребления</string>
+    <string name="avg_per_drink_day">Среднее в день с алкоголем</string>
     <string name="abstinent_days">Дни воздержания</string>
     <string name="stats_category_breakdown">Категории</string>
     <string name="streak_trend">Воздержание &amp; Тренд</string>
@@ -231,12 +231,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="limit_caption_week">%1$s г/7 дней</string>
     <string name="days_over_daily_limit">Дней сверх дневного лимита</string>
     <string name="days_over_weekly_limit">Дней сверх лимита за 7 дней</string>
-    <string name="days_over_drink_day_limit">Дней сверх лимита питейных дней</string>
+    <string name="days_over_drink_day_limit">Дней сверх лимита дней с алкоголем</string>
     <string name="pdf_unit_g_per_week">г/7 дней</string>
-    <string name="pdf_meta_drink_days_suffix">питейных дней/нед.</string>
+    <string name="pdf_meta_drink_days_suffix">дней с алкоголем/нед.</string>
     <string name="pdf_kpi_over_daily">Дней > день (%1$s г)</string>
     <string name="pdf_kpi_over_weekly">Дней > 7 дней (%1$s г)</string>
-    <string name="pdf_kpi_over_drink_days">Дней > %1$d питейных дней</string>
+    <string name="pdf_kpi_over_drink_days">Дней > %1$d дней с алкоголем</string>
     <string name="pdf_col_over_daily">> день</string>
     <string name="menu">Меню</string>
     <string name="help">Справка</string>
@@ -244,7 +244,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Время суток</string>
     <string name="stats_weekday">День недели</string>
     <string name="pdf_kpi_median_day">Медиана в день</string>
-    <string name="pdf_kpi_median_drink_day">Md в день потребления</string>
+    <string name="pdf_kpi_median_drink_day">Md в день с алкоголем</string>
     <string name="pdf_kpi_avg_drink_days_month">Ø дней с алкоголем/мес.</string>
     <string name="pdf_kpi_median_drink_days_month">Md дней с алкоголем/мес.</string>
     <string name="pdf_kpi_max_day">Макс. в день</string>

@@ -197,13 +197,13 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_grams">Gramy_alkoholu</string>
     <string name="csv_col_note">Poznámka</string>
     <string name="pdf_unit_g_per_day">g/den</string>
-    <string name="drink_days_label">dny s alkoholem (posledních 7 dní)</string>
+    <string name="drink_days_label">dny pití (posledních 7 dní)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>
     <string name="a11y_caption_grams">%1$s: %2$s gramů alkoholu</string>
     <string name="a11y_average_per_day">Průměr za %1$s: %2$s gramů alkoholu za den</string>
     <string name="a11y_limit_grams">%1$s: %2$s z maximálně %3$s gramů alkoholu</string>
     <string name="a11y_limit_plain">%1$s: %2$s z maximálně %3$s</string>
-    <string name="a11y_drink_days_caption">Dny s alkoholem, posledních 7 dní</string>
+    <string name="a11y_drink_days_caption">Dny pití, posledních 7 dní</string>
     <string name="a11y_entry_detail">%1$d mililitrů, %2$s procenta, %3$s gramů alkoholu</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s promile</string>
@@ -221,7 +221,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="day_change_desc">Nápoj zaznamenaný před tímto časem se počítá do předchozího dne.</string>
     <string name="weight_desc">Používá se pouze k odhadu alkoholu v krvi.</string>
     <string name="weight_desc_unset">Bez tělesné hmotnosti se odhad alkoholu v krvi nezobrazuje.</string>
-    <string name="a11y_drink_days_setting">Maximální počet dnů s alkoholem za sedm dní</string>
+    <string name="a11y_drink_days_setting">Maximální počet dnů pití za sedm dní</string>
     <string name="delete_drink">Smazat nápoj</string>
     <string name="drink_days_setting">Max. dní/7 dní</string>
     <string name="personal_data">Osobní údaje</string>

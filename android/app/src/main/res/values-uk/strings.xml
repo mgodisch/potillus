@@ -271,12 +271,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="limit_caption_week">%1$s г/7 днів</string>
     <string name="days_over_daily_limit">Днів понад денний ліміт</string>
     <string name="days_over_weekly_limit">Днів понад ліміт за 7 днів</string>
-    <string name="days_over_drink_day_limit">Днів понад ліміт питних днів</string>
+    <string name="days_over_drink_day_limit">Днів понад ліміт днів вживання</string>
     <string name="pdf_unit_g_per_week">г/7 днів</string>
-    <string name="pdf_meta_drink_days_suffix">питних днів/тиж.</string>
+    <string name="pdf_meta_drink_days_suffix">днів вживання/тиж.</string>
     <string name="pdf_kpi_over_daily">Днів > день (%1$s г)</string>
     <string name="pdf_kpi_over_weekly">Днів > 7 днів (%1$s г)</string>
-    <string name="pdf_kpi_over_drink_days">Днів > %1$d питних днів</string>
+    <string name="pdf_kpi_over_drink_days">Днів > %1$d днів вживання</string>
     <string name="pdf_col_over_daily">> день</string>
     <string name="menu">Меню</string>
     <string name="help">Довідка</string>

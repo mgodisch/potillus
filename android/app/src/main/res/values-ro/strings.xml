@@ -116,12 +116,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_meta_weight">Greutate corporală</string>
     <string name="pdf_kpi_total">Alcool total</string>
     <string name="pdf_kpi_avg_day">Medie pe zi</string>
-    <string name="pdf_kpi_avg_drink_day">Ø pe zi de băut</string>
-    <string name="pdf_kpi_drink_days">Zile de băut</string>
+    <string name="pdf_kpi_avg_drink_day">Ø pe zi de consum</string>
+    <string name="pdf_kpi_drink_days">Zile de consum</string>
     <string name="pdf_kpi_abstinent_days">Zile de abstinență</string>
     <string name="pdf_kpi_binge">Zile binge (>%1$s g)</string>
     <string name="pdf_col_month">Lună</string>
-    <string name="pdf_col_drink_days">Zile de băut</string>
+    <string name="pdf_col_drink_days">Zile de consum</string>
     <string name="pdf_col_total_g">Total g</string>
     <string name="pdf_col_avg_g_day">Medie g/zi</string>
     <string name="pdf_meta_binge_days">Zile binge (>%1$s g)</string>
@@ -151,7 +151,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="year">An</string>
     <string name="total_period">Total în perioadă</string>
     <string name="avg_per_day">Medie pe zi</string>
-    <string name="avg_per_drink_day">Medie pe zi de băut</string>
+    <string name="avg_per_drink_day">Medie pe zi de consum</string>
     <string name="abstinent_days">Zile de abstinență</string>
     <string name="stats_category_breakdown">Categorii</string>
     <string name="streak_trend">Abstinență și tendință</string>
@@ -246,13 +246,13 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_note">Notă</string>
     <string name="pdf_unit_g_per_day">g/zi</string>
     <!-- Drinking-days and weekly gram mode -->
-    <string name="drink_days_label">zile de băut (ultimele 7 zile)</string>
+    <string name="drink_days_label">zile de consum (ultimele 7 zile)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>
     <string name="a11y_caption_grams">%1$s: %2$s grame de alcool</string>
     <string name="a11y_average_per_day">Media pe %1$s: %2$s grame de alcool pe zi</string>
     <string name="a11y_limit_grams">%1$s: %2$s dintr-un maximum de %3$s grame de alcool</string>
     <string name="a11y_limit_plain">%1$s: %2$s dintr-un maximum de %3$s</string>
-    <string name="a11y_drink_days_caption">Zile de băut, ultimele 7 zile</string>
+    <string name="a11y_drink_days_caption">Zile de consum, ultimele 7 zile</string>
     <string name="a11y_entry_detail">%1$d mililitri, %2$s la sută, %3$s grame de alcool</string>
     <string name="a11y_append">, %1$s</string>
     <string name="a11y_caption_permille">%1$s: %2$s la mie</string>
@@ -270,9 +270,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="day_change_desc">O băutură înregistrată înainte de această oră se contorizează pentru ziua precedentă.</string>
     <string name="weight_desc">Folosit doar pentru estimarea alcoolemiei.</string>
     <string name="weight_desc_unset">Fără o greutate corporală nu se afișează nicio estimare a alcoolemiei.</string>
-    <string name="a11y_drink_days_setting">Numărul maxim de zile de băut la șapte zile</string>
+    <string name="a11y_drink_days_setting">Numărul maxim de zile de consum la șapte zile</string>
     <string name="delete_drink">Șterge băutura</string>
-    <string name="drink_days_setting">Max. zile de băut/7 zile</string>
+    <string name="drink_days_setting">Max. zile de consum/7 zile</string>
     <string name="personal_data">Date personale</string>
     <string name="limits">Limite</string>
     <string name="daily_limit_grams">Limită zilnică în grame</string>
@@ -293,9 +293,9 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="stats_time_of_day">Ora zilei</string>
     <string name="stats_weekday">Ziua săptămânii</string>
     <string name="pdf_kpi_median_day">Mediană pe zi</string>
-    <string name="pdf_kpi_median_drink_day">Md pe zi de băut</string>
-    <string name="pdf_kpi_avg_drink_days_month">Ø zile de băut/lună</string>
-    <string name="pdf_kpi_median_drink_days_month">Md zile de băut/lună</string>
+    <string name="pdf_kpi_median_drink_day">Md pe zi de consum</string>
+    <string name="pdf_kpi_avg_drink_days_month">Ø zile de consum/lună</string>
+    <string name="pdf_kpi_median_drink_days_month">Md zile de consum/lună</string>
     <string name="pdf_kpi_max_day">Max. pe zi</string>
     <string name="pdf_kpi_max_7days">Max. în 7 zile</string>
     <string name="lock_app">Blochează aplicația</string>
