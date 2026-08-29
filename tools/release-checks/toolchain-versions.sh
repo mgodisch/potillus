@@ -91,15 +91,20 @@ _toolchain_row_states() {
     fi
 }
 
-# Assert that a sentence of prose carries the value the build uses.
+# Assert that a passage of prose carries the value the build uses.
 #
-# The counterpart of _toolchain_row_states for a file with no table. The
-# sentence is found by an anchor phrase rather than a bold label, which is
-# looser: prose can be reworded, and a rewording that drops the anchor is
-# reported as a missing sentence rather than as a stale value. That is the right
-# way round -- it asks for a look instead of passing quietly.
+# The counterpart of _toolchain_row_states for a file with no table. The passage
+# is found by an anchor phrase rather than a bold label, which is looser: prose
+# can be reworded, and a rewording that drops the anchor is reported as a missing
+# passage rather than as a stale value. That is the right way round -- it asks
+# for a look instead of passing quietly.
 #
-# $1 file, $2 anchor phrase identifying the sentence, $3 the string the sentence
+# The unit compared is the PARAGRAPH the anchor sits in, not its line. Markdown
+# prose is hard-wrapped, so which line a value lands on is a formatting accident;
+# an earlier version of this check read the anchor line alone and failed on a
+# correct README the moment the sentence rewrapped.
+#
+# $1 file, $2 anchor phrase identifying the passage, $3 the string the passage
 # must contain, $4 the source file, named in the failure message.
 _toolchain_prose_states() {
     local doc="$1" anchor="$2" needle="$3" source_file="$4"
@@ -111,11 +116,12 @@ _toolchain_prose_states() {
         skip "$anchor: $doc not found"
         return
     fi
-    local line
-    line=$(grep -F "$anchor" "$doc" | head -1 || true)
-    if [[ -z "$line" ]]; then
-        fail "$(basename "$doc") no longer carries the sentence starting \"$anchor\" — the platform floor it states cannot be compared with $source_file"
-    elif [[ "$line" == *"$needle"* ]]; then
+    # Paragraphs are blank-line separated; RS="" makes awk hand them over whole.
+    local para
+    para=$(awk -v a="$anchor" 'BEGIN { RS = "" } index($0, a) { print; exit }' "$doc")
+    if [[ -z "$para" ]]; then
+        fail "$(basename "$doc") no longer carries the passage starting \"$anchor\" — the platform floor it states cannot be compared with $source_file"
+    elif [[ "$para" == *"$needle"* ]]; then
         pass "\"$needle\" in $(basename "$doc") matches $source_file"
     else
         fail "$source_file gives \"$needle\", and $(basename "$doc") states a different platform floor — the first page a reader sees would be wrong"

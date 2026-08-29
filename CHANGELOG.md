@@ -241,6 +241,9 @@ Edit drinks from the list's edit mode
 - The report chart's arithmetic is `domain/ReportChart.kt`, its palette
   `ReportPalette`.
 - The two-character weekday cut sits with the other l10n helpers.
+- The README states the platform floors, the hardware they imply and a pointer
+  to the settings that define them.
+- The iOS deployment target carries its reasoning in `ios/project.yml`.
 - The install guides state each tool's purpose once.
 - The test-vector index is one line per file, and lists `year-grid.json`.
 
@@ -282,6 +285,8 @@ Edit drinks from the list's edit mode
 - The accessibility justification in the self-assessment names the gaps that
   are open.
 - The coverage exclusions name the JVM tests that reach the excluded code.
+- The README's platform floor is compared paragraph by paragraph, not line by
+  line.
 
 ---
 

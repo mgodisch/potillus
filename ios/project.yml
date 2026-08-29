@@ -27,6 +27,27 @@ name: Potillus
 
 options:
   bundleIdPrefix: de.godisch
+  # deploymentTarget: the oldest iOS the app runs on, and a deliberate floor
+  # rather than a default.
+  #
+  # WHAT SETS IT. Two APIs the port uses throughout are iOS 17 and have no
+  # back-deployed equivalent worth the detour:
+  #   • Observation (`@Observable`, `import Observation`) — every model in
+  #     PotillusKit/Presentation is built on it, twelve types in all. The
+  #     pre-17 alternative is ObservableObject with @Published on each stored
+  #     property, which is a different shape rather than a rewrite of a few
+  #     lines.
+  #   • ContentUnavailableView — the empty states on Calendar and Statistics.
+  #
+  # WHAT DOES NOT SET IT, so nobody re-derives it: the String Catalogs
+  # (Localizable.xcstrings, InfoPlist.xcstrings) are an Xcode format compiled
+  # to .strings/.stringsdict at build time. They need Xcode 15, not iOS 17, and
+  # would not stop the floor from moving down.
+  #
+  # WHAT IT COSTS. iPhone XS (2018) and later, which is every device Apple
+  # still ships updates to. Because the floor is set here rather than worked
+  # around, the port carries no `@available(iOS ...)` annotation anywhere —
+  # the counterpart to Android having no `Build.VERSION.SDK_INT` branch.
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true

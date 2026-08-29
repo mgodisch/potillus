@@ -67,28 +67,7 @@ on the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK).
   font size, right-to-left layouts, and a limit palette that reads without
   telling red from green.
 
-## Quick start
-
-1. Install Libellus Potionis from
-   [F-Droid](https://f-droid.org/packages/de.godisch.potillus), [Google Play
-   (Beta)](https://play.google.com/store/apps/details?id=de.godisch.potillus),
-   or from the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK).
-2. Log your first drink. Open the app: on the Today screen, tap the plus button
-   and pick a beverage. It is logged instantly, and on the Calendar screen you
-   can correct and add drinks you had earlier.
-3. See where you stand. The Today screen shows the grams of pure alcohol you
-   have consumed today, your progress toward the daily and rolling 7-day limits
-   as bars, and your drinking-days count for the week.
-4. Optional: Edit the presets or define your own beverages on the drinks
-   screen.
-5. Optional: Personalize. In Settings you can set the daily, weekly and
-   drinking-days limits, enter your body weight for a live blood-alcohol (BAC)
-   estimate, and enable the fingerprint lock.
-6. Optional: Export. Generate a two-page PDF report for a counseling
-   appointment, export a CSV for a spreadsheet, or create a JSON backup to move
-   your data to another device.
-
-Have a look at the in-app User's Guide which describes every screen.
+Every screen is described in the User's Guide inside the app.
 
 ## Privacy & Security Architecture
 
@@ -107,37 +86,19 @@ and confirming that nothing is ever transmitted — is available in
 
 ## Platform Compatibility
 
-The app runs on Android 11 (API 30) and newer and on iOS 17 and newer. It
-consists of two separate native apps in this one repository — Kotlin/Jetpack
-Compose for Android, Swift/SwiftUI for iOS — that share the same design, the
-same feature set, and a common JSON backup format, so a backup exported on one
-platform imports on the other. Their behaviour is kept in lock-step by a shared
-set of test vectors.
+The app runs on Android 11 (API 30) and newer — a Pixel 5 or Galaxy S21 and
+later — and on iOS 17 and newer, an iPhone XS (2018) and later. It consists of
+two separate native apps in this one repository — Kotlin/Jetpack Compose for
+Android, Swift/SwiftUI for iOS — that share the same design, the same feature
+set, and a common JSON backup format, so a backup exported on one platform
+imports on the other. Their behaviour is kept in lock-step by a shared set of
+test vectors. Why each floor sits where it does is recorded beside the settings
+that define it, in `android/app/build.gradle.kts` and `ios/project.yml`.
 
-Android API 30 is a deliberate floor: it is the lowest level at which the app
-can save CSV, PDF, and backup files to the public `Downloads` folder via
-`MediaStore` *without* requesting any runtime storage permissions, which keeps
-the minimal-permission profile intact. The hardware floor that follows is e.g.
-Google Pixel 5 or Samsung Galaxy S21 and later. The system-level per-app
-language picker requires API 33+, so the app carries its own language selector,
-which works on every supported version.
-
-iOS 17 is a deliberate floor as well: it is where the SwiftUI Observation
-framework and String Catalog localisation the app relies on became available,
-while the pre-iOS-17 installed base is a small, shrinking tail. The hardware
-floor that follows is iPhone XS (2018) and later. The app's own language
-selector works here too, and the JSON backup format is shared with Android, so
-a backup moves between the two platforms unchanged.
-
-Libellus Potionis is distributed through
-[F-Droid](https://f-droid.org/packages/de.godisch.potillus/), which applies no
-age rating. Where the app is offered through the commercial stores, the two
-consoles ask different questions and reach very different age ratings for the
-same app — Apple's App Store at **18+**, Google Play at **3+** — because one
-rates the _content_ (a catalogue of alcoholic drinks) and the other the
-_purpose_ (a harm-reduction tool that neither sells nor promotes anything).
-What each store asked, what was answered, and why is recorded in
-[`docs/STORE_RATINGS.md`](docs/STORE_RATINGS.md).
+F-Droid applies no age rating. The two commercial consoles ask different
+questions and reach different verdicts for the same app — Apple 18+, Google 3+ —
+because one rates the content and the other the purpose; what each asked and
+what was answered is in [`docs/STORE_RATINGS.md`](docs/STORE_RATINGS.md).
 
 ## Build Infrastructure & Tooling
 
@@ -169,13 +130,10 @@ use the tracker, you may instead write to
 please do _not_ open a public issue. Instead, follow the private, PGP-encrypted
 reporting process described in [`SECURITY.md`](SECURITY.md).
 
-Translations contributions are where help is most useful. Most of the 21
-interface languages are machine-generated: Czech, Danish, Greek, Spanish,
-French, Italian, Japanese, Korean, Dutch, Norwegian, Polish, Portuguese (Brazil
-and Portugal), Romanian, Russian, Swedish, Ukrainian, as well as both written
-forms of Chinese. If you speak one of them, corrections are a welcome
-contribution. The workflow is in [`CONTRIBUTING.md`](CONTRIBUTING.md), section
-6.
+Translation contributions are where help is most useful: of the 21 interface
+languages, only English and German are hand-written, and the rest have never
+been read by a native speaker. Which are which, and how to send a correction, is
+in [`CONTRIBUTING.md`](CONTRIBUTING.md), section 6.
 
 All contributors are expected to follow the project's [Code of
 Conduct](docs/CODE_OF_CONDUCT.md).
