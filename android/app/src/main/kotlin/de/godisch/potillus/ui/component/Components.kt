@@ -61,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -159,6 +160,52 @@ fun SectionCard(
             content = content,
         )
     }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SECTION TITLE
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * The heading line of a [SectionCard] — a short, primary-coloured `titleSmall`
+ * that also announces itself as a HEADING to assistive technology.
+ *
+ * WHY THIS IS A COMPONENT AND NOT FIVE `Text` CALLS
+ *   StatsScreen carries five of these, and they were five literal `Text` calls
+ *   with the same style and colour. That is survivable duplication on the
+ *   screen; it is not survivable for the semantics, because the heading role is
+ *   the kind of thing a sixth card would silently be added without. Bundling
+ *   the two makes the role arrive with the look.
+ *
+ * WHY THE HEADING ROLE MATTERS
+ *   A screen reader can navigate a screen heading by heading — TalkBack's
+ *   reading control set to "headings", VoiceOver's rotor on iOS — instead of
+ *   swiping through every element. That only works for nodes that declare
+ *   themselves as headings; a styled `Text` without [heading] is an ordinary
+ *   line to the accessibility tree, however large it is drawn. Without it the
+ *   statistics screen, the longest in the app, offered no stops at all.
+ *   SettingsScreen's own section header sets the same property, and the iOS
+ *   port gets it from SwiftUI's `Section`.
+ *
+ * WHAT IT DELIBERATELY DOES NOT DO
+ *   It sets no [contentDescription]: the visible text IS the announcement, and
+ *   a description here would replace a perfectly good localized string with a
+ *   second one to keep in step.
+ *
+ * @param text     The heading, already resolved (callers pass `stringResource`).
+ * @param modifier Applied to the text, on top of the semantics this adds.
+ */
+@Composable
+fun SectionTitle(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        // `semantics` (additive), not `clearAndSetSemantics`: the node keeps the
+        // text it already exposes and gains the role. Clearing would drop the
+        // text and leave a heading with nothing to announce.
+        modifier = modifier.semantics { heading() },
+    )
 }
 
 // ════════════════════════════════════════════════════════════════════════════

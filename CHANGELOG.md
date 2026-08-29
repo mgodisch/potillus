@@ -58,6 +58,7 @@ Edit drinks from the list's edit mode
 - `check-plural-parity` holds the day-count wording of both platforms
   together.
 - The README's feature list names the app's accessibility support.
+- `SectionTitle`, a card heading that announces its role to screen readers.
 - The release gate holds the OpenPGP fingerprint in SECURITY.md and
   `make/publish.mk` together.
 
@@ -233,6 +234,7 @@ Edit drinks from the list's edit mode
   the release steps once each.
 - The Gradle and AGP findings sit with the settings they describe.
 - The roadmap carries the outstanding work in shorter entries.
+- The statistics screen's card titles are headings.
 
 ### Removed
 

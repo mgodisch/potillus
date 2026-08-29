@@ -426,11 +426,7 @@ fun StatsScreen(
             // ── Streaks & trend ───────────────────────────────────────────
             item {
                 SectionCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        stringResource(R.string.streak_trend),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
+                    SectionTitle(stringResource(R.string.streak_trend))
                     HorizontalDivider()
                     StatRow(
                         stringResource(R.string.current_streak),
@@ -502,11 +498,7 @@ fun StatsScreen(
             if (state.hourBucketAverages.any { it > 0.0 }) {
                 item {
                     SectionCard {
-                        Text(
-                            stringResource(R.string.stats_time_of_day),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        SectionTitle(stringResource(R.string.stats_time_of_day))
                         Spacer(Modifier.height(12.dp))
                         // Resolved here, in composable context, and handed over as
                         // finished text: the chart takes a list, not a lambda.
@@ -539,11 +531,7 @@ fun StatsScreen(
             if (state.weekdayAverages.any { it != null }) {
                 item {
                     SectionCard {
-                        Text(
-                            stringResource(R.string.stats_weekday),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        SectionTitle(stringResource(R.string.stats_weekday))
                         Spacer(Modifier.height(12.dp))
                         // Short weekday names for the axis, in the same rotated
                         // order as the values (locale's first weekday first).
@@ -578,11 +566,7 @@ fun StatsScreen(
             if (state.categoryBreakdown.isNotEmpty()) {
                 item {
                     SectionCard {
-                        Text(
-                            stringResource(R.string.stats_category_breakdown),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        SectionTitle(stringResource(R.string.stats_category_breakdown))
                         Spacer(Modifier.height(12.dp))
                         CategoryDonutChart(data = state.categoryBreakdown)
                     }
@@ -595,11 +579,7 @@ fun StatsScreen(
             // share sheet once the file has been written.
             item {
                 SectionCard {
-                    Text(
-                        stringResource(R.string.export),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
+                    SectionTitle(stringResource(R.string.export))
                     Spacer(Modifier.height(4.dp))
                     Text(
                         stringResource(R.string.export_desc),
