@@ -1062,9 +1062,13 @@ kover {
                 classes("*ComposableSingletons*")
 
                 // Framework entry points and the manual DI factory (which
-                // instantiates Android-scoped ViewModels from PotillusApp) — no
-                // JVM-unit-testable logic. The trailing "*" also drops their
-                // generated nested classes (lambdas, SAM conversions).
+                // instantiates Android-scoped ViewModels from PotillusApp). The
+                // trailing "*" also drops their generated nested classes (lambdas,
+                // SAM conversions). AppViewModelFactory is not entirely beyond a
+                // JVM test — AppViewModelFactoryTest constructs every ViewModel
+                // through it against fakes and pins the else-branch that rejects an
+                // unknown class — but what it does is wiring, and a coverage figure
+                // for wiring says nothing about whether the wiring is right.
                 classes(
                     "de.godisch.potillus.MainActivity*",
                     "de.godisch.potillus.PotillusApp*",
@@ -1077,6 +1081,14 @@ kover {
                 // @Entity data classes in data.db.entity stay IN scope (they are
                 // JVM-unit-tested by EntityMappingTest); only the Room database,
                 // the DAOs, and the generated *_Impl classes are excluded.
+                //
+                // data.prefs is excluded as a PACKAGE, and two Android-free pieces
+                // inside it are covered by JVM tests all the same: the
+                // Preferences → AppSettings mapping (AppPreferencesDefaultsTest)
+                // and the recoverIoAsEmpty flow guard (AppPreferencesIoSafetyTest).
+                // They are tested but not counted. Narrowing the exclusion to the
+                // DataStore-bound declarations would count them; that is a
+                // deliberate open question, not an oversight.
                 packages(
                     "de.godisch.potillus.data.db.dao",
                     "de.godisch.potillus.data.prefs",
@@ -1095,12 +1107,15 @@ kover {
                 classes("de.godisch.potillus.data.repository.BackupRepository*")
 
                 // Android PDF / WebView renderers (android.print / android.graphics
-                // / WebView): exercised by the instrumented ReportExportTest. The
-                // trailing "*" also drops their generated nested classes. What the
-                // builder does NOT hold any more is the chart arithmetic: bar
-                // heights, axis labels and the donut geometry live in
-                // domain/ReportChart.kt, where the JVM suite reaches them and this
-                // exclusion does not.
+                // / WebView): exercised by the instrumented ReportExportTest, and
+                // on the JVM side by PdfReportLangTest and PdfTemplatePlaceholderTest,
+                // which assert the builder's contract with report_template.html
+                // (every placeholder initialised, the lang attribute wired) without
+                // counting toward coverage. The trailing "*" also drops the
+                // generated nested classes. What the builder does NOT hold any more
+                // is the chart arithmetic: bar heights, axis labels and the donut
+                // geometry live in domain/ReportChart.kt, where the JVM suite
+                // reaches them and this exclusion does not.
                 classes(
                     "de.godisch.potillus.util.PdfReportBuilder*",
                     "de.godisch.potillus.util.WebViewPdfPrinter*",

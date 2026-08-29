@@ -281,6 +281,7 @@ Edit drinks from the list's edit mode
 - The weekday chart averages over every occurrence of the weekday.
 - The accessibility justification in the self-assessment names the gaps that
   are open.
+- The coverage exclusions name the JVM tests that reach the excluded code.
 
 ---
 
