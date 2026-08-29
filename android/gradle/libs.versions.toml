@@ -40,6 +40,31 @@
 # KOTLIN NOTE:
 #   "version.ref = ..." refers to a key from [versions].
 #   Missing catalog entries cause Gradle sync to fail.
+#
+# WHAT THIS FILE DOES NOT DO:
+#   It pins every dependency by VERSION, not by content -- nothing checks that
+#   the artifact a repository serves is the one named here. Gradle answers that
+#   with `gradle/verification-metadata.xml`, and the project carried such a file
+#   briefly before taking it out again. What that attempt established, so a next
+#   one does not rediscover it:
+#
+#   The file was generated in the most maintenance-heavy shape Gradle offers --
+#   `verify-metadata` on, `verify-signatures` off -- so every artifact carried a
+#   per-version checksum and EVERY dependency bump invalidated the file.
+#   Regenerating it correctly is harder than it looks: a task Gradle reports as
+#   up to date resolves nothing and records nothing, KSP pulls its processor and
+#   coroutines through a detached configuration at execution time, the CycloneDX
+#   plugin cannot run in the same invocation as the assemble tasks, and an
+#   artifact already in the local cache is reused unread and goes unrecorded.
+#   Four regeneration attempts each failed on a different one of these.
+#
+#   The way out is the configuration, not a better command: prefer
+#   `<trusted-key>` entries over checksums wherever an artifact is signed, since
+#   one key covers every release signed with it and a version bump leaves the
+#   file untouched -- the trade being that a key entry trusts the key rather
+#   than the bytes. Checksums stay for what is unsigned, mostly Gradle Plugin
+#   Portal artifacts. Renovate maintains such a file when it finds one;
+#   Dependabot, which this project runs for advisories only, does not.
 # =============================================================================
 
 [versions]

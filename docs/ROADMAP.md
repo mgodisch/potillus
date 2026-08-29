@@ -84,20 +84,12 @@ the software.
 Forward-looking directions, roughly in priority order:
 
 - **Split the CHANGELOG archive** (repository hygiene). `CHANGELOG.md` has grown
-  past 6,600 lines; every review diff and several release gates read the whole
-  file on each run. Move the older, released entries into a
-  `docs/CHANGELOG-archive.md` and keep only the current and recent versions in
-  the top-level file. This is deferred rather than done because three gates bind
-  the file's structure and must move with it, not break: `md-syntax.py` requires
-  every `## vX.Y.Z` heading to run STRICTLY newest-to-oldest across the whole
-  file (a split would leave each file internally descending, but the archive
-  boundary and the check's per-file scope need adjusting together), while
-  `version-consistency.sh` and `changelog.sh` read the TOP entry and the body
-  beneath it — both must keep resolving to the live file. The archive split is
-  therefore a small, careful change (move entries, retune the monotonicity
-  check's scope, keep the version anchor in the live file) rather than a pure
-  cut, and it earns its keep only once the file is large enough that the read
-  cost bites — which it now is.
+  past 6,600 lines, and every review diff and several release gates read it
+  whole. Moving the released entries into a `docs/CHANGELOG-archive.md` is a
+  careful change rather than a cut: `md-syntax.py` requires the `## vX.Y.Z`
+  headings to descend strictly across the whole file, and `version-consistency.sh`
+  and `changelog.sh` read the top entry and the body beneath it. All three have
+  to move with the split.
 - **Stay current and maintained.** Keep the dependency stack up to date — Android
   Gradle Plugin, Gradle, the Kotlin toolchain, and the AndroidX/Jetpack and
   Compose libraries — and track new stable Android API levels, without
@@ -109,19 +101,14 @@ Forward-looking directions, roughly in priority order:
 - **Small, in-scope UX and feature refinements.** Incremental improvements to the
   existing screens and reports that stay within the app's purpose, without
   expanding its scope or permissions.
-- **Android's colour design on iOS, as an opt-in.** iOS currently draws the
-  status colours from the system semantic palette — `Color.red` and `Color.green`
-  on the Statistics screen, `.green` / `.orange` / `.red` in `TrafficLightDot` —
-  where Android uses hand-tuned hexes picked for WCAG contrast against each theme
-  background, `successColor()` and `warningColor()` in `ui/theme/Color.kt`. The
-  two therefore agree on meaning and differ in shade. This item would carry
-  Android's palette to iOS and put it behind a switch in the Settings screen's
-  Appearance section, so a user who runs both platforms can make them match. Note
-  that this revisits a documented decision rather than filling a gap: the porting
-  stance recorded in `StatsScreen.swift` is that a native app should read the
-  native palette. The scope is a colour source indirection plus one new setting,
-  which brings the settings model, its sanitizer, the backup format's settings
-  block and the shared `backup-settings.json` vector with it.
+- **Android's colour design on iOS, as an opt-in.** iOS draws the status colours
+  from the system semantic palette where Android uses hand-tuned hexes picked for
+  contrast against each theme background. This item would carry Android's palette
+  over and put it behind a switch in the Appearance section, so a user of both
+  platforms can make them match. It revisits the porting stance recorded in
+  `StatsScreen.swift` — that a native app reads the native palette — and its
+  scope is a colour-source indirection plus one setting, which brings the
+  settings model, its sanitizer and the backup settings block with it.
 - **A guided tour on first launch, and from the help menu.** A short walkthrough
   of the main screens shown once after installation, and reachable afterwards
   from the overflow menu's "Help" entry — which today opens the user's guide and
@@ -129,92 +116,44 @@ Forward-looking directions, roughly in priority order:
   sits less in the walkthrough than in its text: every step is user-facing prose
   in 21 languages, in both string catalogues, and the guide itself would need to
   stay in step with it.
-- **Hebrew, and with it the first right-to-left language.** Hebrew is the
-  candidate that would take the app past its Latin/Cyrillic/CJK set: both stores
-  carry it, as `iw-IL` on Play and `he` on the App Store, and
-  `android:supportsRtl="true"` has been set all along. Layout mirroring in
-  Compose and SwiftUI comes free, but three places do not follow: the charts in
-  `ChartComponents.kt` are drawn on a `Canvas` from x coordinates the code
-  computes itself, `report/report_template.html` carries no `dir` attribute, and
-  six Compose call sites pin an explicit alignment. Hebrew also brings the plural
-  category `two`, which no shipped language needs today and which
-  `plural-days.json` and both vector suites would have to learn. One further
-  point wants a device rather than a decision: this file's tag maps to the
-  resource qualifier unchanged, so `he` would give `values-he`, while Android has
-  carried Hebrew under the legacy code `iw` — which of `values-he`, `values-iw`
-  and `values-b+he` actually resolves has to be tried, because the wrong one
-  falls back to English in silence.
+- **Hebrew, and with it the first right-to-left language.** Both stores carry it
+  (`iw-IL` on Play, `he` on the App Store) and `android:supportsRtl="true"` has
+  been set all along, but three places do not mirror by themselves: the `Canvas`
+  charts in `ChartComponents.kt`, the missing `dir` attribute in
+  `report/report_template.html`, and six Compose call sites that pin an explicit
+  alignment. Hebrew also brings the plural category `two`, which
+  `plural-days.json` and both vector suites would have to learn. Which resource
+  qualifier actually resolves — `values-he`, `values-iw` or `values-b+he` — has
+  to be tried on a device, because the wrong one falls back to English silently.
 - **Plausibility guards for the shell gates' own extractions.** Several checks in
-  `tools/release-checks/` derive a set from a source file with a grep pipeline —
-  `locale-consistency.sh`, for one, builds its locale tags from
-  `grep 'Locale("' … | grep -oE … | sort`. Nothing then asks whether the result
-  is the size it should be. Should such a pipeline ever come back short, the
-  check does not report an unreadable input; it reports a content mismatch, and
-  the message actively misleads: one seen in the field claimed a store locale
-  mapped to no shipped translation while the very next line asserted the same
-  translation existed. A single comparison of the extracted count against the
-  number of source lines would turn that class of confusion into a plain "input
-  not read completely". Cheap, and it makes every future failure of these gates
-  mean what it says.
+  `tools/release-checks/` derive a set from a source file with a grep pipeline,
+  and nothing asks whether the result is the size it should be. A pipeline that
+  comes back short is reported as a content mismatch rather than as an unreadable
+  input, and the message misleads: one seen in the field claimed a store locale
+  mapped to no shipped translation while the next line asserted that translation
+  existed. Comparing the extracted count against the number of source lines would
+  turn that into a plain "input not read completely".
 - **Gradle dependency verification, if it is worth its upkeep.** The build pins
-  every dependency by VERSION, not by content: nothing checks that the artifact
-  a repository serves is the one the catalogue names. Gradle answers that with
-  `gradle/verification-metadata.xml`, and the project carried such a file
-  briefly before it was taken out again. What that attempt established, so the
-  next attempt does not rediscover it:
-
-  The file was generated in the most maintenance-heavy configuration Gradle
-  offers — `verify-metadata` on, `verify-signatures` off, so every artifact is
-  covered by a per-version checksum. In that shape EVERY dependency bump
-  invalidates the file, and regenerating it correctly is harder than it looks:
-  a task Gradle reports as up to date resolves nothing and therefore records
-  nothing, KSP pulls its processor and coroutines through a detached
-  configuration at task-execution time, the CycloneDX plugin cannot run in the
-  same invocation as the assemble tasks, and an artifact already in the local
-  cache is reused without being read and so goes unrecorded. Four regeneration
-  attempts each failed on a different one of these, the last of them in CI,
-  where a fresh runner needs exactly what a developer machine had not fetched.
-
-  The way out is not a better regeneration command. It is the configuration:
-  prefer `<trusted-key>` entries over checksums wherever an artifact is signed,
-  because one key covers every release signed with it and a version bump then
-  leaves the file untouched — the trade being that a key entry trusts the key
-  rather than the bytes, so a malicious release signed with a stolen key would
-  pass where a checksum would not. Checksums stay for what is unsigned, in
-  practice mostly Gradle Plugin Portal artifacts. Automated upkeep exists too:
-  Renovate maintains the file when it finds one, which Dependabot (what the
-  project runs today, for advisories only) does not.
-
-  Deferred rather than dropped: the protection is real, and F-Droid rebuilding
-  the published APK from this repository is a good reason to want it. But it is
-  a security decision about whom to trust, not a build chore, and it should be
-  taken deliberately — decide the trust model first, then let the file follow
-  from it.
+  every dependency by version, not by content. Gradle's
+  `gradle/verification-metadata.xml` answers that; the project carried one
+  briefly and took it out again, and what the attempt established is recorded in
+  the header of `android/gradle/libs.versions.toml`. Deferred rather than
+  dropped: F-Droid rebuilding the published APK from this repository is a good
+  reason to want it, but it is a decision about whom to trust rather than a
+  build chore, so decide the trust model first and let the file follow.
 - **Run the test and lint suites in the canonical pipeline.** The GitLab pipeline
   runs the device-free checks and a lockfile SCA scan on a small `python:3-slim`
-  image. What it does not run are the TEST and LINT suites: `./gradlew
-  testDebugUnitTest` and `lintDebug` (Android Lint is enforced locally by the
-  `abortOnError` build gate today), and ideally `swift test` for the Swift package.
-  GitLab's instance runners are a metered allowance, so the question is whether a
-  heavier image fits the monthly compute quota rather than whether it is an
-  imposition. In rising order of cost:
-  1. **A scheduled pipeline** (Build > Pipeline schedules, free plan) would run the
-     existing checks nightly without adding a megabyte.
-  2. **An Android SDK image** would carry `./gradlew testDebugUnitTest`, `lintDebug`
-     and the Kover coverage run. UNIT tests need the SDK but NOT an emulator, so
-     this is a container job, not a virtualisation problem. Pin the image to a
-     version matching the local toolchain to avoid CI-vs-local drift.
-  3. **`make check-reuse` as its own job.** Its exclusion from `check-static` is
-     self-imposed — the aggregate is kept pip-free so the small image needs no
-     install step. A separate job may `pip install reuse`.
-  What stays out of reach, so it is not re-investigated: the Swift suite cannot run
-  on Linux, because PotillusKit's sources import `CryptoKit` and `Security`, and
-  porting the crypto layer to swift-crypto is a change to shipping code for a CI
-  convenience. Instrumented tests need an emulator and thus nested virtualisation,
-  which instance runners do not offer.
-  Note what none of this buys: no badge tier changes. The open badge criteria are
-  people, not pipelines (see "OpenSSF badges" above). The widening is worth doing
-  for the tighter net it gives the maintainer.
+  image; the test and lint suites (`./gradlew testDebugUnitTest`, `lintDebug`,
+  the Kover run) still happen locally. Instance runners are a metered allowance,
+  so the question is what fits the monthly quota. In rising order of cost: a
+  nightly scheduled pipeline over the existing checks; an SDK-bearing image for
+  the unit tests and lint, which need the SDK but no emulator; and
+  `make check-reuse` as its own job, since its exclusion from `check-static` only
+  keeps the small image pip-free. Two things stay out of reach and are not worth
+  re-investigating: the Swift suite cannot run on Linux, because PotillusKit
+  imports `CryptoKit` and `Security`, and instrumented tests need virtualisation
+  the instance runners do not offer. No badge tier changes either way — the open
+  criteria are people, not pipelines.
 - **Unify VEX with the scanner, and publish it as a feed.** The project records
   non-exploitable advisories in a machine-readable VEX document,
   [../openvex.json](../openvex.json) (OpenVEX), kept in step with the scanner's
@@ -261,17 +200,13 @@ Forward-looking directions, roughly in priority order:
   `swift test`/llvm-cov path yields no branch data (the branch column comes back
   empty). Closing that parity gap -- toward the gold `test_branch_coverage80` on both
   ports -- needs a toolchain path that emits Swift branch coverage.
-- **UI / instrumented-test coverage on both platforms** (developer tooling). The
-  coverage gates measure UNIT-test coverage only: Android's Kover over the JVM unit
-  tests (the Compose UI layer and framework entry points are deliberately excluded),
-  and the iOS `cover-check` over PotillusKit via `swift test`. Neither measures the
-  UI/instrumented layer. Enriching both symmetrically -- Android via Kover's
-  `androidTest`/instrumented-coverage integration (un-excluding the UI classes;
-  device-bound) and iOS via `xcodebuild test -enableCodeCoverage` + `xccov`
-  (simulator-bound) -- would give a "coverage incl. UI" figure on each. It is a
-  larger, device-bound change on both sides and buys nothing for the OpenSSF badge
-  (silver is line-only and already met; branch is unobtainable from these paths), so
-  it is deferred rather than folded into the unit-coverage gates.
+- **UI / instrumented-test coverage on both platforms** (developer tooling). Both
+  coverage gates measure unit tests only — Kover over the JVM tests on Android,
+  `cover-check` over PotillusKit on iOS. A "coverage incl. UI" figure would need
+  Kover's instrumented integration on one side and `xcodebuild test
+  -enableCodeCoverage` with `xccov` on the other, both device-bound. Deferred: it
+  buys nothing for the badge, where line coverage is already met and branch
+  coverage is unobtainable from these paths.
 - **iOS on-simulator tests** (`device-tests-ios`; developer tooling). The
   app-target XCTests (`PotillusTests`, `PotillusUITests`) run today only as a side
   effect of the screenshot capture; no target runs them for their own sake. `make
@@ -283,58 +218,19 @@ Forward-looking directions, roughly in priority order:
   universal iPhone-and-iPad build can be added later without a rewrite. It is not
   planned for the first release; the port targets iPhone only for now.
 - **Mac-independent Swift syntax pre-check (developer tooling).** A lightweight
-  brace/delimiter-balance check under `tools/`, run from `gmake ios` beside the
-  existing `check-swift-symbols.py`/`check-swift-tests.py` guards. None of the
-  container checks verifies delimiter balance today, so the one mechanical fault
-  that reached the `ios` branch — an orphaned code fragment leaving two unbalanced
-  `}` in an app file (change-log patch -93) — passed every container check and was
-  caught only by the Mac `xcodebuild`. A pre-check would catch that narrow class
-  where the code is written, one machine and several steps earlier. Low priority:
-  the full Xcode build stays the real syntax gate, so this only shortens the
-  edit→Linux→Mac round-trip for typo-class errors and adds code to maintain.
+  brace-balance check under `tools/`, run from `gmake ios` beside the existing
+  Swift guards. No container check verifies delimiter balance today, and the one
+  mechanical fault that reached the `ios` branch — an orphaned fragment leaving
+  two unbalanced `}` — passed every one of them and was caught only by
+  `xcodebuild`. Low priority: the Xcode build stays the real syntax gate, so this
+  only shortens the round-trip for typo-class errors.
 - **Surface load failures on Calendar, Statistics and Drinks.** On iOS the
   `failure` field of `CalendarModel`, `StatsModel` and `DrinksModel` is recorded
-  and never rendered: a failed load leaves the screen on its last good snapshot
-  without telling the user, and `CalendarScreen` reads the field only as a
-  success predicate after an edit. Today is the exception and shows the shape a
-  fix would take — an alert whose OK button calls `clearFailure()`. Android
-  arrives at the same user-visible outcome from the other direction:
-  `CalendarViewModel` and `StatsViewModel` carry no failure field at all, so
-  there is nothing to show. Whether these screens should gain Today's alert is a
-  product decision, and it belongs to both ports at once; adding it on one side
-  only is exactly the drift the shared vectors exist to prevent. Low priority
-  because every one of these reads runs against a database that has already
-  opened successfully, which makes the realistic trigger narrow — but the KDoc
-  on `CalendarModel.failure` points here, so the decision is recorded rather
-  than implied.
-- **Gradle 10 readiness (build tooling).** Configuring `:app` under Gradle 9.6
-  raises four deprecation warnings for passing a `Project` object as a dependency
-  notation, the form Gradle 10 will reject. None of them originates in this
-  repository's build scripts. Gradle's problems report
-  (`android/build/reports/problems/problems-report.html`, written by any build)
-  attributes one to the Kover plugin — which the 0.9.9 upgrade in this cycle
-  settles — and three to AGP's own `com.android.internal.application`. Nothing
-  here can silence those three, and no AGP release is known to have addressed
-  them yet; re-read the problems report when raising AGP, and again before
-  moving the wrapper to Gradle 10.
-  Raising AGP by a minor version is not the remedy, and it is worth knowing why
-  before spending a cycle on it. The deprecation arrived with Gradle 9.6 and is
-  hitting the plugin ecosystem broadly — Kover and the GraalVM native-build-tools
-  filed the identical warning in May 2026 — and on the native-build-tools issue
-  the Gradle team's answer was that the only way to remove it is a change inside
-  the plugin. So this one clears when Google ships the fix in AGP, on Google's
-  schedule, and until then the warning is a status report rather than a task.
-- **AGP 10 readiness (checked, nothing to do).** A more consequential date than
-  the deprecation above: AGP 9.0 deprecated the previous DSL, and per its release
-  notes the ability to opt out of the new one goes away in AGP 10.0, expected
-  mid-2026. This project is already clear of that migration, verified rather than
-  assumed: `gradle.properties` sets no `newDsl` opt-out (it carries only
-  `android.useAndroidX`), and no build script references the old variant API
-  (`applicationVariants`, `libraryVariants`, `BaseVariant` or a variant's
-  `outputs`). The residual risk is not the project's own scripts but its
-  third-party plugins — cyclonedx, ktlint, kover, ksp — any of which may still
-  reach for interfaces AGP 10 no longer exposes. Re-check their release notes
-  when AGP 10 lands rather than upgrading blind.
+  and never rendered; on Android the two ViewModels carry no such field at all.
+  Today shows the shape a fix would take, an alert whose OK calls
+  `clearFailure()`. Whether the other screens should gain it is a product
+  decision belonging to both ports at once. Low priority: every one of these
+  reads runs against a database that has already opened.
 - **The OpenSSF Scorecard badge.** Scorecard analyses a single repository on
   GitHub or GitLab and publishes a signed result from a CI job, which the move of
   the canonical repository to GitLab makes possible. Two things are missing: a

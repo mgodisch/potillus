@@ -227,6 +227,10 @@ Edit drinks from the list's edit mode
   each.
 - The third-party notices point at the build files for what is not
   redistributed.
+- The contributing guide states the review requirements, the coverage scope and
+  the release steps once each.
+- The Gradle and AGP findings sit with the settings they describe.
+- The roadmap carries the outstanding work in shorter entries.
 
 ### Removed
 

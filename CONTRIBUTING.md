@@ -95,12 +95,10 @@ tracker](https://gitlab.com/godisch/potillus/-/issues) with the `good first
 issue` label; filter by that label to find current ones. Small tasks that fit
 this project especially well include:
 
-- **Translation review.** Of the 21 interface languages, English and German are
-  hand-authored; the other **19 are machine-generated and have never been read
-  by a speaker of the language** (see Section 6). Reviewing and correcting the
-  strings for a language you speak natively is a self-contained contribution
-  that needs no build setup, and a correction to a single string is as welcome
-  as a whole file.
+- **Translation review.** Reviewing the strings for a language you speak
+  natively needs no build setup, and a correction to a single string is as
+  welcome as a whole file. Section 6 says which languages need it and where the
+  files are.
 - **Documentation.** Clarifying or correcting the README, this guide, or the
   in-app user guide.
 - **Test cases.** Adding tests for existing behaviour that is not yet covered.
@@ -190,43 +188,19 @@ git push --force-with-lease
 
 ### Code review requirements
 
-Every change is reviewed before it is merged. Because the project currently has a
-single maintainer, the maintainer is the reviewer and the sole merger; external
-contributions are reviewed as merge requests (or emailed patch series). Automated
-checks run before a merge — the GitLab pipeline ([.gitlab-ci.yml](.gitlab-ci.yml))
-is a required check, and the GitHub mirror adds an Android and an iOS build with
-their lint and test suites, which the canonical pipeline does not carry (see
-[docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md); those are advisory and cannot
-block a merge). What no runner covers — the iOS tests that need a booted
-simulator, and the release gate in full — the reviewer runs locally as part of
-each review.
+Every change is reviewed before it is merged. With a single maintainer, the
+maintainer is the reviewer and the sole merger; external contributions arrive as
+merge requests or emailed patch series. The GitLab pipeline
+([.gitlab-ci.yml](.gitlab-ci.yml)) is a required check, and the GitHub mirror
+adds Android and iOS builds with their lint and test suites, which are advisory
+and cannot block a merge (see [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md)).
+What no runner covers — the iOS tests that need a booted simulator, and the
+release gate in full — the reviewer runs locally.
 
-A change is reviewed against this checklist — the same requirements a contributor
-is expected to have met (Section 2, step 3):
-
-- **Scope and philosophy.** The change fits the project's purpose and
-  privacy-first design, and adds no network access, accounts, tracking, or new
-  permissions (Section 1).
-- **Architecture.** It respects the architecture rules (Section 3).
-- **Code quality.** It follows the coding and KDoc conventions (Section 4) and
-  introduces no new compiler or lint warnings (the build treats warnings as
-  errors).
-- **Tests.** New major functionality is covered by automated tests in the same
-  change (the mandatory test policy, Section 5), and existing tests still pass.
-- **Localization.** Any new or changed user-facing string is complete across all
-  locales per the translation workflow (Section 6), so `LocaleSyncTest` passes.
-- **Licensing.** New source files carry the standard copyright-and-license header
-  (see the file-header convention in Section 4), and the change respects
-  third-party licenses (see COPYING.md).
-- **Provenance.** All commits are signed off under the DCO (see above).
-- **Data safety.** Any change touching persistence honours the schema-freeze
-  rules (Section 8).
-
-To be accepted (merged), a change MUST build cleanly, MUST have `./gradlew test`
-passing and `tools/release-check.sh` green, MUST uphold every item above, and
-MUST be judged a worthwhile improvement free of known defects that would argue
-against its inclusion. Changes that do not yet meet these requirements receive
-review comments and are merged only once resolved.
+The review checks the requirements of step 3 above, one by one. To be merged, a
+change MUST build cleanly, MUST have `./gradlew test` passing and
+`tools/release-check.sh` green, and MUST be judged a worthwhile improvement free
+of known defects. Anything short of that receives review comments first.
 
 ## 3. Architecture rules
 
@@ -283,19 +257,10 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
 
 Every source file the project owns carries the same header: the `vim` modeline,
 the project title and copyright line, the standard GPL-3.0-or-later notice, and a
-generic pointer to any additional permissions granted under section 7 (the App
-Store distribution exception itself lives in `COPYING.md`). The pointer
-paragraph, wrapped to match the rest of the header, reads:
-
-```
-In addition, as permitted by section 7 of the GNU General Public License,
-this program may carry additional permissions; any such permissions that
-apply to it are stated in the accompanying COPYING.md file.
-```
-
-It sits directly after the `If not, see <https://www.gnu.org/licenses/>` line,
-separated by a blank comment line. Only the comment leader changes with the
-file's language — `/* ... */` for Kotlin/Swift, `//` for Gradle Kotlin scripts,
+pointer to any additional permissions granted under section 7 (the App Store
+distribution exception itself lives in `COPYING.md`). Copy it from any existing
+file of the same type. Only the comment leader changes with the file's
+language — `/* ... */` for Kotlin/Swift, `//` for Gradle Kotlin scripts,
 `#` for shell/Python/Make/YAML, `<!-- ... -->` for Markdown/XML — while the
 wording and line breaks stay identical everywhere. New files, including the iOS
 Swift sources, reproduce this header verbatim.
@@ -393,25 +358,15 @@ The project measures test coverage with Kover. Generate a report with:
 ./gradlew :app:koverLog          # prints total coverage to the console
 ```
 
-Coverage is measured over the unit-testable code — the `domain`, `l10n`, and
-repository layers, the pure `util` helpers, and the screen ViewModels. Code that
-requires the Android runtime is excluded, because it is exercised by the
-instrumented tests in `src/androidTest` rather than by JVM unit tests: the
-Compose UI (`ui.theme`, `ui.component`, `ui.nav`, and all `@Composable`
-functions), the app entry points and manual DI factory (`MainActivity`,
-`PotillusApp`, `AppViewModelFactory`), the Room database/DAO layer
-(`data.db.dao`, `AppDatabase`, generated `*_Impl`), the DataStore preferences
-(`data.prefs`), the Keystore access (`data.security`), the Room-transaction
-repository (`BackupRepository`, which uses `db.withTransaction`), the PDF/WebView
-renderers (`PdfReportBuilder`, `WebViewPdfPrinter`), and generated code (`R`,
-`BuildConfig`, Compose `ComposableSingletons`). Individual Android-I/O methods
-inside otherwise-testable classes (the MediaStore export/import in `BackupManager`
-and `CsvExporter`, and the ViewModel export/import actions) are marked with the
-`@AndroidIoBound` annotation and excluded via `annotatedBy(...)`, so the reported
-figure reflects the JVM-unit-testable code. The plain `@Entity` data classes stay in scope. The
-targets are statement coverage >= 80% (silver) and >= 90% (gold), plus branch
-coverage >= 80% (gold); build-breaking enforcement is added once those targets
-are reached.
+Coverage is measured over the unit-testable code — the `domain`, `l10n` and
+repository layers, the pure `util` helpers and the screen ViewModels. Everything
+that needs the Android runtime is excluded and covered by the instrumented tests
+instead; the `kover { excludes { … } }` block in `android/app/build.gradle.kts`
+holds the authoritative list and its reasoning. Individual Android-I/O methods
+inside otherwise-testable classes carry the `@AndroidIoBound` annotation and are
+excluded by it. The targets are statement coverage >= 80% (silver) and >= 90%
+(gold), plus branch coverage >= 80% (gold); build-breaking enforcement is added
+once those targets are reached.
 
 ## 6. Translation workflow
 
@@ -444,13 +399,6 @@ system per-app language picker) must mirror this list exactly. `LocaleSyncTest`
 enforces that `SupportedLocales.ALL`, `locale_config.xml`, and the set of
 `values-<qualifier>/` directories all agree, and that every `strings.xml` is
 complete.
-
-**Translation quality.** Only **English** (`res/values/`) and **German**
-(`res/values-de/`) are written and maintained by the author. **All other
-locales are machine-generated** and shipped as-is without native-speaker review.
-They are therefore likely to contain awkward or incorrect phrasing.
-Native-speaker corrections are very much appreciated — please open an issue or a
-merge request (see Section 2) with the language and the improved string(s).
 
 **Rules:**
 1. Add every new string key to **all** locale files at the same time (the base
@@ -589,15 +537,11 @@ check and follow each store's own format:
   Locale codes follow App Store Connect, which differs from Android in a few
   cases (`no`, `zh-Hans`, `zh-Hant`, `pt-PT`, `pt-BR`).
 
-**Provenance — please read before trusting these.** English and German are the
-author's wording. **The App Store texts for all other languages were produced
-mechanically**: the description reuses the existing (translator-written) Play
-Store text with only the two platform-specific sentences swapped for their iOS
-equivalents, while the **subtitle and keywords were machine-translated from the
-English reference and are unreviewed**. The keyword lists especially are a
-best-effort guess — real App Store search terms are market-specific and are
-exactly the kind of thing a native speaker should refine. Corrections are
-welcome through the same issue/PR path as the in-app strings.
+**Provenance.** Beyond what the note at the top of this section says: the App
+Store description reuses the Play Store text with the two platform-specific
+sentences swapped, while subtitle and keywords were machine-translated from the
+English reference. Real App Store search terms are market-specific, so the
+keyword lists are the place where a native speaker helps most.
 
 ## 7. Versioning & release checklist
 
@@ -635,50 +579,24 @@ Before tagging a new version:
       `git tag -s vX.Y.Z -m "vX.Y.Z"`, signed with the maintainer's key, and push
       it. Tags are verifiable with `git tag -v vX.Y.Z` (see SECURITY.md,
       "Verifying releases").
-- [ ] Build and stage the release artifacts with `make release-android`: it produces the
-      signed APK, the AAB and the CycloneDX SBOM and copies all three into the
-      git-ignored `releases/` directory under their canonical names
-      `de.godisch.potillus_<versionCode>.{apk,aab}` and
-      `de.godisch.potillus_<versionCode>_android_sbom.cdx.json`. It refuses to overwrite a
-      release already staged for this versionCode (clear `releases/` or bump the
-      versionCode first).  The iOS release (`make release-ios`) stages its own
-      CycloneDX SBOM alongside the `.ipa` as
-      `de.godisch.potillus_<versionCode>_ios_sbom.cdx.json`, generated from
-      `ios/PotillusKit/Package.resolved` and normalised by the same tool.
-- [ ] Publish the release on GitLab from the signed tag with
-      `make push-gitlab` (after `make release-android`): it verifies the staged
-      APK's signer against the fingerprint in SECURITY.md, makes a detached
-      OpenPGP signature for each artifact with the maintainer's key, uploads the
-      staged APK, the SBOMs and the signatures into the project's generic package
-      registry, creates the release for the pushed tag over the GitLab API with a
-      permanent asset link per file, and re-downloads each to confirm its sha256
-      matches the staged file — so every released version is accompanied by its
-      software bill of materials, every published file by a signature anyone can
-      check, and the published bytes are verified. The signing key is the one in
-      SECURITY.md; you will be prompted for its passphrase. The target is safe to
-      re-run after a partial failure. The token in
-      `fastlane/gitlab-credentials.txt` needs the `api` scope **and** a project
-      role that satisfies the Protected-tags rule for `v*` — creating a release
-      asks GitLab whether you may create its tag, even for a tag pushed hours
-      earlier. A project access token belongs to a bot user with its own role,
-      Developer by default, which is enough to fill the package registry and not
-      enough to create the release; that role is fixed at creation, so a token
-      with too little of it is replaced rather than adjusted.
-- [ ] Upload the release to Google Play with `make push-playstore-testing`
-      (open-testing track) or `make push-playstore-production` (production
-      track); each verifies the staged AAB's signature and signer first and
-      never builds or stages. Exercise credentials and metadata beforehand with
-      the non-publishing dry run `make push-playstore-testing VALIDATE_ONLY=1`.
-      Play answers every upload with one warning: the bundle carries native code
-      and no debug symbols. It is expected and stays unanswered. The `.so` files
-      come from transitive dependencies rather than from this project, which has
-      no native code of its own, so symbols would name functions in someone
-      else's library; producing them means `debugSymbolLevel` in
-      `build.gradle.kts`, an NDK in the build and a larger bundle, which is a
-      poor trade against a reproducible build F-Droid rebuilds from source.
+- [ ] Build and stage the release artifacts with `make release-android`, and the
+      iOS ones with `make release-ios`. Each produces its signed artifacts and a
+      CycloneDX SBOM under canonical names in the git-ignored `releases/`
+      directory and refuses to overwrite a staged release for the same
+      versionCode.
+- [ ] Publish the GitLab release from the signed tag with `make push-gitlab`. It
+      verifies the staged APK's signer, signs every artifact with the
+      maintainer's OpenPGP key, uploads the files, creates the release, and
+      re-downloads each to compare its sha256 against the staged file. The
+      comment above the target in `make/publish.mk` explains why the upload is
+      two-stage and what the access token needs; read it before the first run.
+- [ ] Upload to Google Play with `make push-playstore-testing` or
+      `make push-playstore-production`; both verify the staged AAB first and
+      never build. `VALIDATE_ONLY=1` is the non-publishing dry run. Play answers
+      every upload with a warning about missing debug symbols for the transitive
+      native code, which stays unanswered — see `make/publish.mk` for why.
 - [ ] Roll the draft release out in the Play Console. Both targets upload as a
-      draft, and rolling out is what sends the release to Google for review — so
-      the console is where a release becomes a release.
+      draft, and rolling out is what sends the release to Google for review.
 - [ ] On a Mac, upload to TestFlight with `make push-appstore-testing` and to the
       App Store listing with `make push-appstore-production`. Neither submits
       anything: assign the TestFlight build to the external group, and select the
