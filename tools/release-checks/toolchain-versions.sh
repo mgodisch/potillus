@@ -190,13 +190,13 @@ check_toolchain_versions() {
     # README also names the Android RELEASE ("Android 11") beside the API level,
     # and no file in this repository maps 30 to 11. Raising minSdk therefore
     # fails this check on the API level and leaves the marketing name to a human.
-    _toolchain_prose_states "$README" "The app runs on Android" \
+    _toolchain_prose_states "$README" "Libellus Potionis runs on Android" \
         "API $(_toolchain_value "$BUILD_GRADLE" 's/^[[:space:]]*minSdk[[:space:]]*=[[:space:]]*([0-9]+).*/\1/p')" \
         "$BUILD_GRADLE (minSdk)"
 
     # project.yml states the deployment target as "17.0"; the README says
     # "iOS 17", which is what a reader needs. Compare the major version.
-    _toolchain_prose_states "$README" "The app runs on Android" \
+    _toolchain_prose_states "$README" "Libellus Potionis runs on Android" \
         "iOS $(_toolchain_value "../ios/project.yml" 's/^[[:space:]]*iOS:[[:space:]]*"?([0-9]+).*/\1/p')" \
         "ios/project.yml (deploymentTarget)"
 }
