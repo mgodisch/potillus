@@ -28,8 +28,13 @@
 
 
 # =============================================================================
-# SECTION 14 – SIGNING-KEY FINGERPRINT (SECURITY.md ↔ release tooling)
+# SECTION 14 – SIGNING-KEY FINGERPRINTS (SECURITY.md ↔ release tooling)
 # =============================================================================
+# TWO KEYS, TWO INVARIANTS. The section covers both fingerprints SECURITY.md
+# publishes: the ANDROID APP-SIGNING certificate (64 hex, checked first) and the
+# maintainer's OPENPGP key (40 hex, checked second). They are pinned by different
+# mechanisms and therefore need different checks -- see each block below.
+#
 # WHY THIS MATTERS:
 #   The publishing targets `push-playstore-*` and `push-gitlab` pin the release
 #   signer to the SHA-256 fingerprint recorded in SECURITY.md ("Verifying
@@ -44,6 +49,18 @@
 #   is the single source that also publishes it to users, so the pin and the
 #   document cannot drift. This section guards the one invariant that coupling
 #   relies on.
+#
+# WHY THE OPENPGP KEY IS CHECKED DIFFERENTLY:
+#   `make/publish.mk` needs its fingerprint BEFORE anything reads a document --
+#   `push-gitlab` asks gpg for the secret key as its first act -- and the
+#   assignment is overridable on the command line for maintainer succession
+#   (`make push-gitlab GPG_SIGNING_KEY=<fingerprint>`). Both argue for a literal
+#   there rather than a grep out of SECURITY.md. So the value IS duplicated, and
+#   what this gate guards is the equality: every OpenPGP fingerprint printed in
+#   SECURITY.md, normalised (spaces dropped, lowercased), must be the one and the
+#   same value, and it must equal GPG_SIGNING_KEY. A reader who fetches the key
+#   from the keyserver named in the document and a release signed by the Makefile
+#   then cannot be talking about different keys.
 # =============================================================================
 check_signing_key_fingerprint() {
     section "14 / 15 — SIGNING-KEY FINGERPRINT"
@@ -79,5 +96,41 @@ check_signing_key_fingerprint() {
         fail "SECURITY.md has no 64-hex signing-key fingerprint — push-playstore-*/push-gitlab cannot pin the signer (see the 'Verifying releases' section)"
     else
         fail "SECURITY.md has $count 64-hex tokens; the release tooling's 'head -1' pin is ambiguous — keep exactly one canonical signing-key fingerprint"
+    fi
+
+    # ── OpenPGP key: every printed form must agree, and agree with the Makefile ──
+    #
+    # SECURITY.md prints the key twice by design, in two shapes a reader needs:
+    # grouped for eyeball comparison against `gpg --fingerprint`, and bare inside
+    # the `--recv-keys` command line. Both are extracted and normalised, so the
+    # check is about the VALUE, not the spelling. The pattern takes ten hex
+    # quartets with optional spacing between them, which covers the bare form as
+    # well; the 64-hex certificate above cannot match it, because a word boundary
+    # is required at both ends.
+    local publish="../make/publish.mk"
+    local -a pgp
+    mapfile -t pgp < <(grep -oiE '\b[0-9a-f]{4}([[:space:]]*[0-9a-f]{4}){9}\b' "$security" \
+                       | tr -d ' \t' | tr 'A-F' 'a-f' | sort -u)
+
+    if [[ ! -f "$publish" ]]; then
+        info "make/publish.mk not found ($publish) — OpenPGP fingerprint equality not checked"
+        pass "OpenPGP fingerprint check is gated on make/publish.mk being present"
+        return
+    fi
+
+    local pin
+    pin=$(grep -oiE '^GPG_SIGNING_KEY[[:space:]]*:=[[:space:]]*[0-9a-f]{40}' "$publish" \
+          | grep -oiE '[0-9a-f]{40}$' | tr 'A-F' 'a-f' | head -1 || true)
+
+    if [[ "${#pgp[@]}" -eq 0 ]]; then
+        fail "SECURITY.md prints no OpenPGP fingerprint — a reporter cannot encrypt and a verifier cannot check the release signatures (see 'Reporting a vulnerability')"
+    elif [[ "${#pgp[@]}" -gt 1 ]]; then
+        fail "SECURITY.md prints ${#pgp[@]} DIFFERENT OpenPGP fingerprints (${pgp[*]}); every printed form must name the same key"
+    elif [[ -z "$pin" ]]; then
+        fail "make/publish.mk has no GPG_SIGNING_KEY assignment to compare against — push-gitlab would sign with whatever gpg picks"
+    elif [[ "$pin" != "${pgp[0]}" ]]; then
+        fail "GPG_SIGNING_KEY in make/publish.mk ($pin) is not the OpenPGP key SECURITY.md publishes (${pgp[0]}) — the released signatures and the documented key would disagree"
+    else
+        pass "SECURITY.md and make/publish.mk name the same OpenPGP signing key"
     fi
 }

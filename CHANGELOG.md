@@ -58,6 +58,8 @@ Edit drinks from the list's edit mode
 - `check-plural-parity` holds the day-count wording of both platforms
   together.
 - The README's feature list names the app's accessibility support.
+- The release gate holds the OpenPGP fingerprint in SECURITY.md and
+  `make/publish.mk` together.
 
 ### Changed
 
