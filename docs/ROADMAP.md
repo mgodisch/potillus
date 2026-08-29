@@ -45,31 +45,28 @@ suffices — and no such evaluation has been performed. There are also verified
 unmet Level AA criteria, and the logos are web-page scoped (WCAG = *Web Content*
 Accessibility Guidelines), which does not map onto a native mobile app.
 
-The evaluation protocols are one document per platform and level, each listing the
-criteria that apply to this app, what has been measured, and what is still open:
-
-| Level | Android | iOS |
-| --- | --- | --- |
-| A | [WCAG_LEVEL_A_ANDROID.md](WCAG_LEVEL_A_ANDROID.md) | [WCAG_LEVEL_A_IOS.md](WCAG_LEVEL_A_IOS.md) |
-| AA | [WCAG_LEVEL_AA_ANDROID.md](WCAG_LEVEL_AA_ANDROID.md) | [WCAG_LEVEL_AA_IOS.md](WCAG_LEVEL_AA_IOS.md) |
-| AAA | [WCAG_LEVEL_AAA_ANDROID.md](WCAG_LEVEL_AAA_ANDROID.md) | [WCAG_LEVEL_AAA_IOS.md](WCAG_LEVEL_AAA_IOS.md) |
-
-None of the six has been walked on device. They are protocols, not results: the
-Android Level A and AA documents carry measurements and recorded decisions from
-the QA reviews, the iOS ones carry what a reading of the source raises, and every
-checkbox in all six is unticked. Whether and when a pass is run is not decided
-here.
-
 What the app supports today is a capability list, not a conformance claim:
 screen-reader names on all interactive controls, a one-line summary on each drawn
 chart — apart from the iOS category ring, which is silent because the legend
 beneath it states every slice in full — a per-app language selector with RTL
-support, `sp`-based text that honours
-the system font scale, and an under/over-limit palette that is blue versus red
-rather than a red/green pair. A regression guard exists in `tools/release-check.sh`
-§13, which fails the build if any `Icon` inside an `IconButton` is left with
-`contentDescription = null`. It is a labelling invariant only and deliberately
-asserts no WCAG conformance, which a static check cannot.
+support, `sp`-based text that honours the system font scale, and an
+under/over-limit palette that is blue versus red rather than a red/green pair.
+Where a measurement or a criterion decided the shape of the code, the reasoning
+sits beside that code, in `ui/theme/Color.kt` and in the views it applies to.
+A regression guard exists in `tools/release-check.sh` §13, which fails the build
+if any `Icon` inside an `IconButton` is left with `contentDescription = null`. It
+is a labelling invariant only and deliberately asserts no WCAG conformance, which
+a static check cannot.
+
+Two things are open:
+
+- **Contrast on iOS is unmeasured.** Android's status palette carries a measured
+  ratio beside every colour; iOS takes the same states from the system palette
+  (`.secondary`, `.orange`, `.red`), where no value has been read in either
+  appearance.
+- **No evaluation has been run on device.** Text at 200 %, reflow at the largest
+  display size, focus order with a keyboard, and a right-to-left pass are
+  untested on both platforms.
 
 ## OpenSSF badges
 

@@ -276,8 +276,7 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
   use `contentDescription = null`. `tools/release-check.sh` §13 enforces this for
   `IconButton` icons and fails the build on a regression. This is a labelling
   invariant only — the project does not claim a WCAG conformance level (see
-  `docs/ROADMAP.md` → Accessibility for the honest status, and
-  `docs/WCAG_LEVEL_AA_ANDROID.md` for the open Level AA gaps).
+  `docs/ROADMAP.md` → Accessibility for the honest status and the open gaps).
 
 
 ### File header

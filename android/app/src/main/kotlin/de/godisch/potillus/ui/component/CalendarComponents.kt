@@ -200,8 +200,8 @@ fun YearCalendarView(
     // lattice of 365 tiles competing with the data drawn on top of it, and the
     // maintainer judged the current balance right on device.
     //
-    // Do not "fix" this from the numbers alone; the decision and its reasoning
-    // are recorded under "Non-text contrast" in docs/ROADMAP.md.
+    // Do not "fix" this from the numbers alone; the decision and the reasoning
+    // behind it are the paragraph above.
     //
     // THE TODAY RING LEFT THAT GROUP. It was drawn in `outline` on top of the
     // cell fill, at 1.06 : 1 dark and 1.20 : 1 light, and on device it was a

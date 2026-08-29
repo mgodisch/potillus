@@ -225,11 +225,10 @@ internal val ErrorColorDark = Color(0xFFCF6679)
 // 8. WHAT IS DELIBERATELY LEFT UNMET
 //    [dangerTextColor] reaches 3.49:1 in the dark theme, short of the 4.5:1 its
 //    text sites would need. Closing it needs a red light enough to read as pink,
-//    which was measured, compared side by side and rejected. The gap is recorded
-//    in docs/ROADMAP.md under "Text contrast", where the open question is not
-//    which red but whether those sites should carry red text at all — a dot or a
-//    bar beside them already carries the state. Do not "fix" this by lightening
-//    the red; that decision has been made and reversed once already.
+//    which was measured, compared side by side and rejected. The open question
+//    is not which red but whether those sites should carry red text at all — a
+//    dot or a bar beside them already carries the state. Do not "fix" this by
+//    lightening the red; that decision has been made and reversed once already.
 //
 // 9. WHEN ADDING A STATUS COLOUR
 //    Declare it as a named constant in both theme blocks above. Work out which
@@ -332,11 +331,10 @@ private fun isDarkTheme() = MaterialTheme.colorScheme.background.luminance() < 0
  *   saturated while the text red moves a step toward the threshold.
  *
  *   3.49 : 1 does not reach 4.5 : 1, and this function does not pretend it does.
- *   The remaining gap is recorded in docs/ROADMAP.md under "Text contrast": the
- *   question left open there is whether those sites should carry red text at
- *   all, given that a dot or a bar beside them already carries the state. Until
- *   that is decided, this is the closest step to the threshold that keeps the
- *   colour recognisably the same red as the dots beside it.
+ *   The question left open is whether those sites should carry red text at all,
+ *   given that a dot or a bar beside them already carries the state. Until that
+ *   is decided, this is the closest step to the threshold that keeps the colour
+ *   recognisably the same red as the dots beside it.
  *
  *   The arrow glyphs are grouped with text, not with graphics, because they are
  *   drawn as characters inside a text run and must match the value they sit next

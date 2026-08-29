@@ -47,7 +47,6 @@ Edit drinks from the list's edit mode
 ### Added
 
 - Shared vectors for how far the statistics screen can page back.
-- Six WCAG 2.2 self-assessment protocols, one per platform and level.
 - `docs/OPENSSF_BADGES.md` with the open badge criteria per tier.
 - The statistics start date has a row that clears it.
 - The backup export has a switch for the settings block.
@@ -59,6 +58,7 @@ Edit drinks from the list's edit mode
   weekday.
 - `check-plural-parity` holds the day-count wording of both platforms
   together.
+- The README's feature list names the app's accessibility support.
 
 ### Changed
 
@@ -69,8 +69,8 @@ Edit drinks from the list's edit mode
 - The three time headers share one arrow control.
 - The PDF report covers the period picked in the export dialog.
 - The report's month table lists every month the period covers.
-- The roadmap, the README, CONTRIBUTING.md and the label gate point at the
-  accessibility protocols and the badge document.
+- The README, CONTRIBUTING.md and the label gate point at the roadmap for
+  accessibility, and the roadmap at the badge document.
 - The roadmap carries the open work only.
 - The roadmap's iOS notes describe the year heat-map the app ships.
 - The `json` gem is at 2.21.2 in `fastlane/Gemfile.lock`.
@@ -218,6 +218,9 @@ Edit drinks from the list's edit mode
 - The iOS backup reader refuses an entry whose drink the file omits.
 - The iOS settings screen names a device-backup setting the database file
   did not take.
+- The contrast decisions in `theme/Color.kt` and the year heat-map stand where
+  the code is.
+- The roadmap names the unmeasured iOS contrast and the pending device pass.
 
 ### Removed
 
@@ -254,6 +257,8 @@ Edit drinks from the list's edit mode
 - The roadmap carries what a dependency-verification attempt established.
 - The time-of-day chart on the iOS statistics screen reads the recorded frame.
 - The weekday chart averages over every occurrence of the weekday.
+- The accessibility justification in the self-assessment names the gaps that
+  are open.
 
 ---
 

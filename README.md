@@ -63,6 +63,9 @@ on the [App Store (Beta)](https://testflight.apple.com/join/sfJvr3VK).
 * Adjust the app to set your own "day start" time, so that late-night drinks
   count toward the preceding evening, or set an evaluation start date for a
   clean restart.
+* Screen-reader names on every interactive control, text that follows the system
+  font size, right-to-left layouts, and a limit palette that reads without
+  telling red from green.
 
 ## Quick start
 

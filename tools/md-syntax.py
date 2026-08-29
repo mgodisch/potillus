@@ -91,7 +91,7 @@ _AUTOLINK = re.compile(r"<(?:https?://|mailto:|[^>\s]+@)[^>\s]*>")
 _LINK_DEST = re.compile(r"\]\([^)]*\)")
 # The LABEL of an inline link -- the "[...]" that carries a "(...)" destination.
 # Its text names the thing linked to, which in this tree is regularly a file
-# ([WCAG_LEVEL_A_CHECKLIST.md](...)), so an identifier there is no more
+# ([docs/ASSURANCE_CASE.md](...)), so an identifier there is no more
 # un-backticked prose than the destination beside it. Matched on the text before
 # neutralise() blanks the destination, which would otherwise take the "(" that
 # tells a label apart from a plain bracketed aside.
