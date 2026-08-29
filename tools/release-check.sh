@@ -87,7 +87,8 @@
 #     reproducible-build-hygiene.sh F-Droid reproducible-build invariants
 #     third-party-notices.sh        SBOM-driven NOTICE/licence reproduction
 #     accessibility-labels.sh       contentDescription discipline
-#     signing-key-fingerprint.sh    the SECURITY.md fingerprint is single-sourced
+#     signing-key-fingerprint.sh    the SECURITY.md fingerprints are pinned
+#     toolchain-versions.sh         install guides state the versions the build uses
 #     bestpractices-complete.sh     the OpenSSF/OSPS self-assessment is complete
 #     coverage.sh                   the opt-in Kover coverage gate (--coverage)
 #
@@ -187,6 +188,7 @@ for _check in \
     third-party-notices \
     accessibility-labels \
     signing-key-fingerprint \
+    toolchain-versions \
     bestpractices-complete \
     coverage; do
     source "$SCRIPT_DIR/release-checks/$_check.sh"
@@ -218,6 +220,7 @@ main() {
     check_third_party_notices
     check_accessibility_labels
     check_signing_key_fingerprint
+    check_toolchain_versions
     check_bestpractices_complete
     check_coverage
 

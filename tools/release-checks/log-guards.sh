@@ -38,7 +38,7 @@
 #   in release builds.  Log calls in test source sets are exempt.
 # =============================================================================
 check_log_guards() {
-    section "6 / 15 — LOG CALL GUARDS"
+    section "6 / 16 — LOG CALL GUARDS"
 
     # Find all Log.* calls in the main source set
     local unguarded=""

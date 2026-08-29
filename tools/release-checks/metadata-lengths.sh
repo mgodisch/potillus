@@ -39,7 +39,7 @@
 #   full_description.txt    ≤ 4000
 #   changelogs/<code>.txt   ≤  500   (the per-release "what's new" note)
 check_metadata_lengths() {
-    section "10 / 15 — STORE METADATA LENGTH LIMITS"
+    section "10 / 16 — STORE METADATA LENGTH LIMITS"
 
     # python3 is already a prerequisite (see §5); reuse it for correct,
     # locale-independent character counting.

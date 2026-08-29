@@ -57,7 +57,7 @@
 #     is caught before release.
 # =============================================================================
 check_version_consistency() {
-    section "1 / 15 — VERSION CONSISTENCY"
+    section "1 / 16 — VERSION CONSISTENCY"
 
     local vname vcode changelog_top readme_version
 

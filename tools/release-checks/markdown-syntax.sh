@@ -45,7 +45,7 @@
 #   runs over an explicit file list (see below), so they are simply not named.
 # =============================================================================
 check_markdown_syntax() {
-    section "9 / 15 — MARKDOWN SYNTAX"
+    section "9 / 16 — MARKDOWN SYNTAX"
 
     # python3 is already a prerequisite (see §5); reuse it here.
     if ! command -v python3 >/dev/null 2>&1; then

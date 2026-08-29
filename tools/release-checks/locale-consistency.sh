@@ -45,7 +45,7 @@
 #   means untranslated strings fall back to the wrong language at runtime.
 # =============================================================================
 check_locale_consistency() {
-    section "4 / 15 — LOCALE CONSISTENCY"
+    section "4 / 16 — LOCALE CONSISTENCY"
 
     # ── Build the three reference sets ───────────────────────────────────────
 

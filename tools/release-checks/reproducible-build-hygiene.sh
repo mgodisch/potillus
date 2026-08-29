@@ -41,7 +41,7 @@
 #   that re-adds the in-APK SBOM task.
 # =============================================================================
 check_reproducible_build_hygiene() {
-    section "11 / 15 — REPRODUCIBLE-BUILD HYGIENE"
+    section "11 / 16 — REPRODUCIBLE-BUILD HYGIENE"
 
     # The in-APK SBOM was wired via a `GenerateSbomAsset` task; its absence is
     # the signal that the SBOM stays out of the APK. (cyclonedxDirectBom, the

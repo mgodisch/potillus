@@ -54,7 +54,7 @@
 #   it cannot produce false failures in environments that lack the inputs.
 # =============================================================================
 check_third_party_notices() {
-    section "12 / 15 — THIRD-PARTY NOTICE FILES"
+    section "12 / 16 — THIRD-PARTY NOTICE FILES"
 
     local sbom="app/build/outputs/sbom/libellus-potionis-sbom.cdx.json"
     if [[ ! -f "$sbom" ]]; then

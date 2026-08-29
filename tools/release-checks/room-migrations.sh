@@ -42,7 +42,7 @@
 #   accompanying migration artefacts as a hard failure.
 # =============================================================================
 check_room_migrations() {
-    section "3 / 15 — ROOM DATABASE MIGRATIONS"
+    section "3 / 16 — ROOM DATABASE MIGRATIONS"
 
     local db_version
 

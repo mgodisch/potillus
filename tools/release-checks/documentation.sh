@@ -53,7 +53,7 @@
 #   i.e. deeper than any top-level, class-member or companion-object member.
 # =============================================================================
 check_documentation() {
-    section "5 / 15 — SOURCE CODE DOCUMENTATION"
+    section "5 / 16 — SOURCE CODE DOCUMENTATION"
 
     # ── 5a: GPL file headers ──────────────────────────────────────────────────
     #

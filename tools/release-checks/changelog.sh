@@ -38,7 +38,7 @@
 #   someone created the heading but forgot to write the actual content.
 # =============================================================================
 check_changelog() {
-    section "2 / 15 — CHANGELOG ENTRY"
+    section "2 / 16 — CHANGELOG ENTRY"
 
     local vname top_entry body_line_count
 

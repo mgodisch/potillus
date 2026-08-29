@@ -62,7 +62,7 @@
 #   file or the map is absent, per the project's gate-design rule.
 # =============================================================================
 check_bestpractices_complete() {
-    section "15 / 15 — BEST-PRACTICES BADGE COMPLETENESS"
+    section "15 / 16 — BEST-PRACTICES BADGE COMPLETENESS"
 
     local answers="../.bestpractices.json"
     local levels="../tools/bestpractices-levels.json"

@@ -63,7 +63,7 @@
 #   then cannot be talking about different keys.
 # =============================================================================
 check_signing_key_fingerprint() {
-    section "14 / 15 — SIGNING-KEY FINGERPRINT"
+    section "14 / 16 — SIGNING-KEY FINGERPRINT"
 
     local security="../SECURITY.md"
     if [[ ! -f "$security" ]]; then

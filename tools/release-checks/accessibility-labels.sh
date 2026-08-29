@@ -46,7 +46,7 @@
 #   It skips gracefully (info) where python3 is unavailable and warns only on a
 #   real finding.
 check_accessibility_labels() {
-    section "13 / 15 — ACCESSIBILITY LABELS"
+    section "13 / 16 — ACCESSIBILITY LABELS"
 
     if ! command -v python3 >/dev/null 2>&1; then
         info "python3 not found — skipping accessibility-label check"

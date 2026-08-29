@@ -43,7 +43,7 @@
 #   not verify that the history is accurate, only that it was edited at all.
 # =============================================================================
 check_backup_version() {
-    section "8 / 15 — BACKUP FORMAT VERSION CONSISTENCY"
+    section "8 / 16 — BACKUP FORMAT VERSION CONSISTENCY"
 
     local backup_version
     backup_version=$(grep 'private const val BACKUP_VERSION\s*=' "$BACKUP_MANAGER_KT" \

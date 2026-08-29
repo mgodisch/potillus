@@ -50,7 +50,7 @@
 #   technical prose are included.
 # =============================================================================
 check_no_german_comments() {
-    section "7 / 15 — NO GERMAN IN SOURCE CODE COMMENTS"
+    section "7 / 16 — NO GERMAN IN SOURCE CODE COMMENTS"
 
     # German words calibrated to produce zero false positives on the current tree.
     # Each entry uses whole-word matching (\b anchors in the grep pattern).
