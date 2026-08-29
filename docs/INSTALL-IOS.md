@@ -59,18 +59,13 @@ every iOS target; project generation comes first there too, matching §5 below.
 | **SwiftLint** | 0.65.0 | Only needed to run the *full* `gmake ios` verification gate. **Not required** to build or run the app. | `brew` (optional) |
 | **osv-scanner** | **2.4.0** | Only needed for `gmake release-ios`, whose SCA gate scans the CycloneDX SBOM against the OSV database. The version is pinned in `make/release.mk` and `.gitlab-ci.yml`; `brew pin osv-scanner` holds it. **Not required** to build or run the app. | `brew` (optional) |
 
-The important idea: the Xcode project is a **build artifact**, not a source
-file. You never edit `Potillus.xcodeproj`; you edit `project.yml` and
-regenerate. This keeps the project definition small, reviewable and free of the
-merge conflicts a checked-in `.xcodeproj` is famous for.
-
-**The one dependency.** GRDB.swift (MIT) is the only iOS dependency, resolved by
-Swift Package Manager. `ios/PotillusKit/Package.resolved` records the exact
-revision and **is committed on purpose**: a checkout of this repository must
-build the same bytes as the release, the same reason the Android build pins its
-dependency versions. Run `swift package update` deliberately, and review the
-resulting diff. GRDB is recorded in `COPYING.md`; its MIT license text must be
-reproduced in the app's about screen before the first App Store submission.
+Two consequences of that table are worth stating outright. The Xcode project is
+a **build artifact**: you never edit `Potillus.xcodeproj`, you edit
+`project.yml` and regenerate, which keeps the definition reviewable and free of
+the merge conflicts a checked-in `.xcodeproj` is famous for. And
+`Package.resolved` is **committed on purpose**, so a checkout builds the same
+bytes as the release — run `swift package update` deliberately and review the
+diff.
 
 ## 2. Install Xcode and the Command Line Tools
 
@@ -109,9 +104,8 @@ untouched). Every `make` command in this guide is therefore written as
 `gmake`.
 
 > SwiftLint is only for the full check gate (§6, optional). Install it later
-> with `brew install swiftlint` if you want that gate; the version is pinned to
-> **0.65.0**, and the gate refuses a different one because lint rules change
-> between releases.
+> with `brew install swiftlint` if you want it; the gate refuses any version
+> but the pinned one, because lint rules change between releases.
 
 ## 4. Get the source
 
@@ -150,16 +144,11 @@ This does two things in the required order:
 You must re-run `gmake -C ios project` whenever `project.yml` or the version
 changes; for a plain build-from-scratch you run it once here.
 
-`Version.xcconfig` carries `MARKETING_VERSION`, taken from the top `## vX.Y.Z`
-entry of `CHANGELOG.md`, and `CURRENT_PROJECT_VERSION`, taken from the Android
-`versionCode`, so the App Store and Play Store builds report the same version and
-the same build number, and neither can drift from the changelog. `gmake -C ios
-version-check` verifies the file exists and is current — suitable for a
-release gate, and worth running by hand after a version bump if you build with
-`xcodebuild` directly rather than through `gmake -C ios project`, which regenerates
-the file anyway. No target depends on it.
-The values must **never** be set in `project.yml` directly: a value in `settings`
-overrides an xcconfig and would silently defeat the generator. To confirm the
+Two rules go with that file. Its values must **never** be set in `project.yml`
+directly — a value in `settings` overrides an xcconfig and would silently defeat
+the generator. And `gmake -C ios version-check` confirms the file is current,
+which is worth running by hand after a version bump if you build with
+`xcodebuild` rather than through `gmake -C ios project`. To see whether the
 values took effect, ask the build system rather than the Xcode UI, where a
 generated project shows the unexpanded `$(MARKETING_VERSION)` placeholder:
 
@@ -189,18 +178,13 @@ To build the same thing without opening the Xcode UI:
         CODE_SIGNING_ALLOWED=NO \
         build
 
-Two details in that command are worth understanding, because getting them
-wrong produces a confusing error:
-
-- **`-destination 'generic/platform=iOS Simulator'`, not `-sdk
-  iphonesimulator`.** With only an SDK and no destination, `xcodebuild` cannot
-  choose an architecture, tries to build both `arm64` and `x86_64`, and fails
-  with `error: Unable to resolve module dependency: 'GRDB'` — which looks like
-  a missing dependency but is really a missing destination. A generic
-  Simulator destination fixes one architecture without pinning a specific
-  simulator device.
-- **`CODE_SIGNING_ALLOWED=NO`** is valid for the Simulator (which does not
-  require signing). Do **not** carry it over to a device build.
+Two details in that command produce a confusing error when they are wrong.
+`-destination 'generic/platform=iOS Simulator'` is required in place of `-sdk
+iphonesimulator`: with only an SDK, `xcodebuild` cannot choose an architecture
+and fails with `error: Unable to resolve module dependency: 'GRDB'`, which looks
+like a missing dependency and is a missing destination. And
+`CODE_SIGNING_ALLOWED=NO` is valid for the Simulator alone — do not carry it
+over to a device build.
 
 ### (Optional) Run the kit's unit tests
 

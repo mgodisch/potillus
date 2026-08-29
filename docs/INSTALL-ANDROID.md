@@ -41,12 +41,8 @@ on purpose.
 
 that you can install on any Android 11 (API 30) or newer device or emulator.
 
-**Relation to `make help`.** This guide is the extended companion to the
-Makefile's `make help`: it walks the build-path targets (`make -C android
-debug-apk`, `make install-debug`) in order, with the *why* behind each. `make
-help`, run from the repository root, is the one-line index of every target
-(build, checks, store assets, release, publishing); the release and publishing
-groups are deliberately out of scope here.
+`make help`, run from the repository root, is the one-line index of every
+target; this guide walks the build path in order and says why each step exists.
 
 ## 1. Why these tools, and nothing else
 
@@ -63,15 +59,11 @@ tool belongs to before installing anything.
 | **python3, make, bash** | any | The `make` targets regenerate a couple of bundled text files (the in-app copyright notice and the localized user guides) with small Python helpers before compiling. | `apt` |
 | **osv-scanner** | **2.4.0** | Only needed for `make release-android`, whose SCA gate scans the CycloneDX SBOM against the OSV database. The version is pinned in `make/release.mk` and `.gitlab-ci.yml`. Prebuilt binaries: <https://github.com/google/osv-scanner/releases>. **Not required** to build or run the app. | manual (optional) |
 
-Two things are deliberately **not** on the list:
-
-- **No NDK.** The app is pure Kotlin/Java. You may see a one-line
-  `stripDebugDebugSymbols` warning about missing native tooling during a
-  release build; it is harmless and never appears for a debug build.
-- **No manual Gradle, AGP, or Kotlin install.** Pinning them in the repository
-  and letting the wrapper and Maven fetch them is what makes the build
-  reproducible: everyone compiles with the same versions regardless of what is
-  installed system-wide.
+Two things are deliberately **not** on the list. There is **no NDK** — the app
+is pure Kotlin/Java, and the one-line `stripDebugDebugSymbols` warning a release
+build may print is harmless. And **nothing installs Gradle, AGP or Kotlin by
+hand**: pinning them in the repository is what makes every checkout compile with
+the same versions.
 
 `minSdk = 30` (Android 11) is the oldest device the APK will run on;
 `targetSdk = 36` (Android 16) is the behaviour level it is optimised for.
@@ -160,19 +152,13 @@ so plain `make` works (only macOS needs a separate `gmake`).
     cd android
     make -C android debug-apk
 
-`make -C android debug-apk` does three things in order, and understanding them turns a failed
-build into an obvious fix:
-
-1. **Prerequisite check** (`prereq`): it verifies `java -version` is 21 and
-   that the four SDK component directories from step 3 exist, then regenerates
-   two bundled text files with `python3` (the in-app copyright notice from the
-   repository's `COPYING.md`/`LICENSE*.md`, and the localized user guides).
-2. **Gradle wrapper bootstrap:** the first `./gradlew` invocation downloads
-   Gradle **9.6.1** into `~/.gradle`. This needs network access and happens
-   only once.
-3. **`./gradlew assembleDebug`:** Gradle downloads AGP 9.2.0, Kotlin 2.4.0 and
-   the app's dependencies from Maven Central (again, first time only), then
-   compiles and packages the APK.
+The target does three things in order, and knowing them turns a failed build
+into an obvious fix. It checks the prerequisites — Java 21 and the four SDK
+component directories from step 3 — and regenerates two bundled text files with
+`python3`. It then bootstraps the Gradle wrapper, which downloads the pinned
+Gradle into `~/.gradle` on the first run. Finally `./gradlew assembleDebug`
+fetches AGP, Kotlin and the app's dependencies from Maven Central, compiles and
+packages. Every download happens once; all of it needs network the first time.
 
 When it finishes you have:
 

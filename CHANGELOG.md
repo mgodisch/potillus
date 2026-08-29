@@ -235,6 +235,8 @@ Edit drinks from the list's edit mode
 - The Gradle and AGP findings sit with the settings they describe.
 - The roadmap carries the outstanding work in shorter entries.
 - The statistics screen's card titles are headings.
+- The install guides state each tool's purpose once.
+- The test-vector index is one line per file, and lists `year-grid.json`.
 
 ### Removed
 

@@ -42,78 +42,42 @@ Android fixes a bug, regenerate the affected vectors and re-check the Swift port
 
 ## Files
 
-- `alcohol-calculator.json` — the Widmark BAC estimate, gram conversion, limit
-  fractions, the traffic-light capacity status, the drink-day gate
-  (`drinkDayLimitReached`, shared by the traffic light and the drink-day bar on
-  both platforms), and the rolling seven-day violation counts. Harvested from
-  `AlcoholCalculatorTest.kt`.
-- `drink-validation.json` — the rules a drink definition must satisfy. The
-  `bounds` block is GENERATED from `domain/DrinkValidator.kt`, and both suites
-  assert it, so a bound narrowed on one platform cannot pass unnoticed on the
-  other. Some cases exist purely to pin string semantics: the name length counts
-  UTF-16 code units (which the languages do NOT share), and the non-breaking
-  spaces trim away on both (which they do share, but only because Kotlin's
-  `isWhitespace` is not Java's).
+One line each; every file carries its own `_comment` with the reasoning, the
+scope and the cases that were deliberately left out.
+
+- `alcohol-calculator.json` — the Widmark estimate, gram conversion, limit
+  fractions, the traffic-light status, the drink-day gate and the rolling
+  seven-day counts.
+- `app-lock.json` — the biometric lock's re-auth threshold, including the
+  boundary itself and the refusal to trust a backwards clock reading.
 - `backup-settings.json` — the clamping every value from a backup's `settings`
-  block passes through, plus the locale catalogue. The `localeTags` array is
-  GENERATED from `l10n/SupportedLocales.kt`; both suites assert against it, so a
-  language added on one platform cannot be forgotten on the other.
-- `csv-export.json` — RFC 4180 field escaping, the OWASP formula-injection
-  guard, and complete CSV documents (CRLF endings included). The `buildCsv` cases
-  carry a `zoneId`, because the `HH:mm` column renders the entry's instant in the
-  device zone; the JVM test pins the default zone, the Swift port takes it as a
-  parameter.
-- `db-schema.json` — the SQLite schema contract (tables, columns, affinities,
-  primary keys, indices, foreign-key actions). Unlike the other files this one is
-  *generated* from Android's Room schema export, which is authoritative. Android
-  asserts its export still matches; iOS introspects the database GRDB builds.
-- `chart-bucketing.json` — `Trend` classification, granularity selection, and the
-  bucketing rules, including the two consequences of the in-progress day (it
-  leaves the bucket's divisor until it becomes a drink day, and its bucket is
-  never marked abstinent). Harvested from `ChartBucketingTest.kt` and
-  `TrendTest.kt`.
-- `day-resolver.json` — the logical-day boundary, effective period length, and
-  the abstinence streaks. Harvested from `DayResolverTest.kt`. The `resolve`
-  cases carry an absolute `epochMillis` plus an IANA `zoneId`, and deliberately
-  include DST transitions (the spring-forward gap and the fall-back repetition)
-  and cross-timezone instants, because the same instant is a different logical
-  day in different zones.
-- `app-lock.json` — the biometric lock's re-auth threshold: given the monotonic
-  reading recorded on backgrounding and the reading on return, must the prompt
-  reappear? Pins the boundary itself ("exactly at the threshold: prompt", `>=`)
-  and the refusal to trust a backwards reading. One-sided (iOS-only) until the
-  0.83.0 QA round, which is exactly how Android's strict `>` diverged unseen;
-  now asserted by `AppLockVectorTest` on both platforms.
-- `stats-window.json` — which days a statistics period covers: the three periods,
-  the adjacent equal-length baseline, and the statistics-start floor raised over
-  both. Added in the 0.84.0 QA round, when the cases existed only as iOS unit
-  tests around `StatsWindow.swift` while Kotlin derived the same windows inline in
-  `StatsViewModel`, out of reach of a JVM test. `invalidToday` holds only inputs
-  both platforms unambiguously reject; the file's `_comment` says which case was
-  left out and why.
-- `month-rollup.json` — the monthly table's cap: the six most recent months in
-  full, everything older folded into one summary row whose average is weighted
-  by the days each month contributed. The seven- and eight-month cases are
-  where the cap starts to bite.
-- `plural-days.json` — the report's day counts in all 21 languages: the forms
-  come from Android's `<plurals name="days">`, the category each count selects
-  from CLDR. Counts 11 to 14 and 21 to 25 are in the list because that is where
-  the Polish, Russian and Ukrainian rules part company with their last digit.
-- `report-chart.json` — the PDF report chart's presentation arithmetic (label
-  picking, bar scaling). The label indices are deliberately computed in 32-bit
-  float, because the Kotlin original truncates differently from Double for some
-  series lengths; the file's `_comment` carries the full story.
-- `report-data.json` — the PDF report's computed dataset, for the slice of
-  `PdfReportData` that does not read the device zone, locale or clock; the
-  file's `_comment` states the scope and why it is not the whole struct.
+  block passes through. `localeTags` is generated from `SupportedLocales.kt`.
+- `chart-bucketing.json` — `Trend` classification, granularity selection and the
+  bucketing rules, including the two consequences of the in-progress day.
+- `csv-export.json` — RFC 4180 escaping, the formula-injection guard and whole
+  CSV documents. The `buildCsv` cases carry a `zoneId`.
+- `day-resolver.json` — the logical-day boundary, period length and abstinence
+  streaks, with DST transitions and cross-timezone instants.
+- `db-schema.json` — the SQLite schema contract, generated from Android's Room
+  export, which is authoritative. iOS introspects what GRDB builds.
+- `drink-validation.json` — the rules a drink definition must satisfy. The
+  `bounds` block is generated from `DrinkValidator.kt`.
+- `month-rollup.json` — the monthly table's cap at six months and the weighted
+  summary row that folds the rest.
+- `plural-days.json` — the report's day counts in all 21 languages, forms from
+  Android's `<plurals>`, categories from CLDR.
+- `report-chart.json` — the report chart's label picking and bar scaling,
+  computed in 32-bit float to match the Kotlin original.
+- `report-data.json` — the report's computed dataset, for the slice of
+  `PdfReportData` that reads no zone, locale or clock.
 - `report-format.json` — the report's number formatting. Every expected string
-  was PRODUCED BY THE JVM (`String.format(locale, …)` on OpenJDK 21), not
-  written by hand, because Kotlin and Swift disagree on half-way rounding and
-  the JVM behaviour is the contract.
-- `template-render.json` — the two-feature template engine that fills
-  `report/report_template.html`: `{{KEY}}` substitution with HTML-escaped
-  values, and `<!-- repeat:NAME -->` row blocks; the trusted template text
-  itself is never escaped.
+  was produced by the JVM, not written by hand.
+- `stats-window.json` — which days a statistics period covers: the three
+  periods, the baseline, and the statistics-start floor over both.
+- `template-render.json` — the two-feature template engine behind
+  `report/report_template.html`.
+- `year-grid.json` — which days the year heat-map draws at all: a day after the
+  logical today, or before the statistics start date, is not drawn.
 
 ## Loading
 
