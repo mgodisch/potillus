@@ -124,9 +124,8 @@ The same key is also part of the `debian-keyring` package. Before trusting the
 key, verify that the fingerprint printed by `gpg --fingerprint` matches the one
 above.
 
-If you are unable to use PGP, still write to android@godisch.de or
-ios@godisch.de; the maintainer will arrange a secure channel before you share
-any sensitive details.
+If you are unable to use PGP, write to the same address unencrypted; the
+maintainer will arrange a secure channel before you share any sensitive details.
 
 As an alternative to e-mail, a report may also be filed through **private
 vulnerability reporting** on the project's GitHub mirror
@@ -178,24 +177,17 @@ welcome to notify the maintainer as well so the dependency can be updated.
 ## Support
 
 Libellus Potionis is maintained by a single volunteer maintainer and follows a
-rolling-release model: only the **latest released version** is supported.
+rolling-release model: only the **latest released version** is supported. Fixes
+ship in a new release rather than being back-ported, so a version stops receiving
+security updates as soon as its successor appears, and users receive fixes by
+updating. Releases are distributed through
+[F-Droid](https://f-droid.org/packages/de.godisch.potillus/) on a best-effort
+basis. Should the project ever be discontinued, that is announced in the README,
+after which no further updates follow.
 
-- **Scope.** Support consists of bug fixes and security updates, delivered in new
-  releases through [F-Droid](https://f-droid.org/packages/de.godisch.potillus/),
-  on a best-effort basis. There are no separate maintenance branches and fixes are
-  not back-ported to older versions; users receive fixes by updating to the newest
-  release.
-- **Duration.** Each release is supported until the next release supersedes it.
-  Security updates are provided for the current release for as long as the project
-  remains active.
-- **End of security updates.** A given version stops receiving security updates as
-  soon as a newer release supersedes it, because security fixes ship in the new
-  release rather than being back-ported. If the project is ever discontinued, that
-  will be announced in the repository (README), after which no further updates —
-  security or otherwise — will be provided.
-- **Obtaining support.** Bug reports and questions go to the
-  [GitLab issue tracker](https://gitlab.com/godisch/potillus/-/issues); suspected
-  vulnerabilities follow the process in "Reporting a vulnerability" above.
+Bug reports and questions go to the
+[GitLab issue tracker](https://gitlab.com/godisch/potillus/-/issues); suspected
+vulnerabilities follow the process in "Reporting a vulnerability" above.
 
 ## Dependency monitoring
 
@@ -225,29 +217,18 @@ downstream consumer or a VEX-aware scanner reads; the `osv-scanner.toml` ignore
 is what actually unblocks the gate, because osv-scanner does not yet consume VEX.
 So the two do not drift, a check ([tools/check-vex.py](tools/check-vex.py), part
 of `make check-static`) fails the build if an advisory is ignored in
-`osv-scanner.toml` without a matching VEX statement. Because the app performs no
-network communication and requests a minimal permission set, the exposure from
-dependency vulnerabilities is limited, but they are tracked and addressed
-regardless. This check is part of the release checklist in
-[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7.
+`osv-scanner.toml` without a matching VEX statement. The release checklist in
+[CONTRIBUTING.md](CONTRIBUTING.md#7-versioning--release-checklist) §7 carries
+this step.
 
-Alongside these two gates there is a third, advisory source: **Dependabot
-alerts** are enabled on the GitHub mirror, so the GitHub Advisory Database is
-consulted in addition to the OSV data osv-scanner uses. An alert is a
-notification only — it gates nothing, and Dependabot's version-update pull
-requests are deliberately disabled, since a pull request on a force-pushed
-mirror cannot be merged. Anything it reports is triaged exactly like an
-osv-scanner finding, in `osv-scanner.toml` and `openvex.json` on the canonical
-repository. See [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md) for the mirror's
-scope and its limits.
-
-Dependency scanning answers what the project *consumes*; the project's own code
-is analysed separately by **CodeQL**, over both Kotlin and Swift, weekly and on
-every change to `main`. Unlike the linters, which judge a file at a time, CodeQL
-follows data flow across functions and files. It too runs on the mirror, it too
-is advisory, and its findings are triaged in GitHub's code-scanning view;
-substantiated ones are recorded in
-[docs/ASSURANCE_CASE.md](docs/ASSURANCE_CASE.md).
+Two advisory sources run alongside these gates, both on the GitHub mirror and
+neither of them blocking: **Dependabot alerts**, which add the GitHub Advisory
+Database to the OSV data osv-scanner reads, and **CodeQL**, which analyses the
+project's own Kotlin and Swift for what a dependency scan cannot see. A
+Dependabot finding is triaged like an osv-scanner one, in `osv-scanner.toml` and
+`openvex.json`; a substantiated CodeQL finding is recorded in
+[docs/ASSURANCE_CASE.md](docs/ASSURANCE_CASE.md). Their scope and their limits
+are in [docs/MIRROR-CHECKS.md](docs/MIRROR-CHECKS.md).
 
 The same discipline applies to dependency licenses: every third-party
 dependency must be under a license compatible with the project's
@@ -363,11 +344,10 @@ You can verify a downloaded or installed release in any of these ways:
   result against the published APK; F-Droid performs exactly this reproducibility
   check before publishing.
 
-- **By verifying the release tag.** Release tags in the Git repository are
-  GPG-signed with the maintainer's key (fingerprint
-  `1842 323B 4FCF 9B90 995F  A17F A350 B991 F05A 4857`, the same key used for
-  security reports above; fetch it from `hkps://keyring.debian.org:443`). After
-  importing the key you can verify a tag with `git tag -v vX.Y.Z`.
+- **By verifying the release tag.** Release tags are GPG-signed with the same
+  OpenPGP key as the `.asc` files above, whose fingerprint and keyserver are
+  under "Reporting a vulnerability". After importing it, verify a tag with
+  `git tag -v vX.Y.Z`.
 
 - **By auditing commit signatures.** All commits are cryptographically signed —
   a documented project policy, enforced by the maintainer at review — so you

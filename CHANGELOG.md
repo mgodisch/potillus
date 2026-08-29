@@ -222,6 +222,11 @@ Edit drinks from the list's edit mode
 - The roadmap names the unmeasured iOS contrast and the pending device pass.
 - The assurance case takes its security requirements from SECURITY.md.
 - The roadmap carries the open badge criteria and the Scorecard prerequisites.
+- The security policy carries the OpenPGP fingerprint once.
+- The security policy states the advisory sources and the support terms once
+  each.
+- The third-party notices point at the build files for what is not
+  redistributed.
 
 ### Removed
 

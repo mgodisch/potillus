@@ -10,16 +10,13 @@ notice are in the repository root (`LICENSE.md` and `COPYING.md`).
 
 ## Third-Party Software (bundled in the Android App)
 
-The libraries below are compiled into the released application package (the
-APK/AAB) and are therefore redistributed together with this program.  They are
-consumed exclusively as Gradle build dependencies (declared in
-`android/gradle/libs.versions.toml`), never as vendored source copies, so each
-is "de-embedded" via build-depends as required.  The authoritative,
-machine-readable inventory — exact Maven coordinates and the versions actually
-resolved for a build — is generated for every release as a CycloneDX Software
-Bill of Materials (`make sbom`; see the `cyclonedxDirectBom` configuration in
-`android/app/build.gradle.kts`).  The list below records the copyright holders
-and licenses that inventory refers to.
+The libraries below are compiled into the released APK/AAB and are therefore
+redistributed with this program.  They are consumed as Gradle dependencies
+(declared in `android/gradle/libs.versions.toml`), never as vendored source, so
+each is "de-embedded" via build-depends as required.  Exact coordinates and
+resolved versions are in the CycloneDX SBOM `make sbom` produces for every
+release; the list below records the copyright holders and licenses that
+inventory refers to.
 
 ### Apache License 2.0
 
@@ -113,40 +110,20 @@ against.
 
 ### Build- and test-time dependencies (NOT redistributed)
 
-The following are used only to build or test the app and are **not** compiled
-into the released APK/AAB, so they carry no redistribution obligation; they are
-listed here for completeness.  Apache-2.0 unless noted:
-`org.jetbrains.kotlin:kotlin-test`,
-`org.jetbrains.kotlinx:kotlinx-coroutines-test`, `app.cash.turbine:turbine`,
-`androidx.compose.ui:ui-tooling` (the debug-only Compose inspector; its sibling
-`ui-tooling-preview` IS on the release classpath and is listed above), the
-AndroidX Test stack (`androidx.test.ext:junit`, `androidx.test:runner`,
-`androidx.test.espresso:espresso-core`,
-`androidx.test.uiautomator:uiautomator`), `androidx.room:room-testing`, the
-Compose UI-test artifacts (`ui-test-junit4`, `ui-test-manifest`) and
-`tools.fastlane:screengrab`; `junit:junit` 4 (Eclipse Public License 1.0);
-`org.json:json` (the "JSON License"); and every Gradle build plugin the app
-module applies — the Android Gradle Plugin `com.android.application`, the Kotlin
-Compose compiler plugin `org.jetbrains.kotlin.plugin.compose`, the Kotlin
-serialization plugin `org.jetbrains.kotlin.plugin.serialization`, the Kotlin
-Symbol Processing plugin `com.google.devtools.ksp`, the CycloneDX SBOM plugin
-`org.cyclonedx.bom`, the ktlint wrapper plugin `org.jlleitschuh.gradle.ktlint`
-and the Kover coverage plugin `org.jetbrains.kotlinx.kover` (all Apache-2.0).
-The list follows the `plugins { }` block of `android/app/build.gradle.kts` in
-its own order, so the two can be read side by side.
+The test stack, the Compose tooling and every Gradle plugin the app module
+applies build or test the app without being compiled into it, so they carry no
+redistribution obligation. They are Apache-2.0 apart from `junit:junit` 4
+(Eclipse Public License 1.0) and `org.json:json` (the "JSON License"). The
+authoritative list is the `plugins { }` block and the test dependencies of
+`android/app/build.gradle.kts` together with `android/gradle/libs.versions.toml`.
 
 ## Third-Party Software (bundled in the iOS application)
 
-The library below is compiled into the released iOS application and is
-therefore redistributed together with this program.  It is consumed exclusively
-as a Swift Package Manager dependency (declared in
-`ios/PotillusKit/Package.swift`, with the resolved revision pinned in
-`ios/PotillusKit/Package.resolved`), never as a vendored source copy, so it is
-"de-embedded" via build-depends as required.  As on Android, an authoritative
-machine-readable inventory is generated for every release as a CycloneDX
-Software Bill of Materials — here from `Package.resolved` by
-`tools/gen-ios-sbom.py` (`make ios-sbom`), normalised by the same
-`tools/sbom-normalize.py`.
+The library below is compiled into the released iOS application and is therefore
+redistributed with this program.  It is consumed as a Swift Package Manager
+dependency (declared in `ios/PotillusKit/Package.swift`, pinned in
+`Package.resolved`), never as vendored source.  The release SBOM is generated
+from `Package.resolved` by `tools/gen-ios-sbom.py` (`make ios-sbom`).
 
 ### MIT License
 
@@ -198,21 +175,11 @@ is distributable under the terms stated at the top of this document.
 
 ### Build- and test-time dependencies (NOT redistributed)
 
-The following build the iOS app but are not compiled into it, so they carry no
-redistribution obligation; they are listed here for the same completeness as
-their Android counterparts above.  All MIT:
-
-  * **XcodeGen** &mdash; generates `ios/Potillus.xcodeproj` from
-    `ios/project.yml`, which is why no `.xcodeproj` is tracked
-    (<[https://github.com/yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)>).
-  * **SwiftLint** &mdash; the style gate `make -C ios lint` pins to version
-    0.65.0
-    (<[https://github.com/realm/SwiftLint](https://github.com/realm/SwiftLint)>).
-  * **fastlane** &copy; The Fastlane Authors &mdash; drives the store uploads
-    for BOTH platforms (the `ios` lanes here, `supply` and `screengrab` on
-    Android; the `tools.fastlane:screengrab` Gradle artifact is a separate,
-    Apache-2.0 library and is listed above)
-    (<[https://github.com/fastlane/fastlane](https://github.com/fastlane/fastlane)>).
+XcodeGen generates `ios/Potillus.xcodeproj` from `ios/project.yml`, SwiftLint is
+the style gate `make -C ios lint` pins, and fastlane drives the store uploads for
+both platforms. None is compiled into the app, and all three are MIT. The
+`tools.fastlane:screengrab` Gradle artifact is a separate, Apache-2.0 library and
+belongs to the Android section above.
 
 ## Third-Party Assets
 
