@@ -372,4 +372,8 @@ qa-ios:
 	qa_step build $(MAKE) -C ios build
 	$(QA_EPILOGUE)
 
-.PHONY: qa-android qa-ios
+# undocumented, for internal use only
+install:
+	$(MAKE) -C .. $@
+
+.PHONY: qa-android qa-ios install
