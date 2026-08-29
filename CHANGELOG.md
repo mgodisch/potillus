@@ -61,7 +61,8 @@ Edit drinks from the list's edit mode
 - `SectionTitle`, a card heading that announces its role to screen readers.
 - The release gate holds the OpenPGP fingerprint in SECURITY.md and
   `make/publish.mk` together.
-- The release gate holds the install guides' tool versions to the build files.
+- The release gate holds the install guides' tool versions and the README's
+  platform floor to the build files.
 
 ### Changed
 
