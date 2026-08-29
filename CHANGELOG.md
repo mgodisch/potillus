@@ -47,7 +47,6 @@ Edit drinks from the list's edit mode
 ### Added
 
 - Shared vectors for how far the statistics screen can page back.
-- `docs/OPENSSF_BADGES.md` with the open badge criteria per tier.
 - The statistics start date has a row that clears it.
 - The backup export has a switch for the settings block.
 - A year heat-map in the calendar, with a month and year toggle, where a month
@@ -70,7 +69,7 @@ Edit drinks from the list's edit mode
 - The PDF report covers the period picked in the export dialog.
 - The report's month table lists every month the period covers.
 - The README, CONTRIBUTING.md and the label gate point at the roadmap for
-  accessibility, and the roadmap at the badge document.
+  accessibility.
 - The roadmap carries the open work only.
 - The roadmap's iOS notes describe the year heat-map the app ships.
 - The `json` gem is at 2.21.2 in `fastlane/Gemfile.lock`.
@@ -221,6 +220,8 @@ Edit drinks from the list's edit mode
 - The contrast decisions in `theme/Color.kt` and the year heat-map stand where
   the code is.
 - The roadmap names the unmeasured iOS contrast and the pending device pass.
+- The assurance case takes its security requirements from SECURITY.md.
+- The roadmap carries the open badge criteria and the Scorecard prerequisites.
 
 ### Removed
 

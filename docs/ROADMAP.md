@@ -71,10 +71,13 @@ Two things are open:
 ## OpenSSF badges
 
 The project holds the OpenSSF Best Practices passing badge and OSPS Baseline
-Levels 1 and 2. What is still open on silver, gold and Level 3, plus the badge
-administration and the Scorecard prerequisites, is in
-[OPENSSF_BADGES.md](OPENSSF_BADGES.md). Most of it needs a second person rather
-than a change to the software.
+Levels 1 and 2. Seven criteria across silver, gold and Level 3 are open; each
+carries its status and its reasoning in
+[../.bestpractices.json](../.bestpractices.json), which `make bestpractices`
+compares against the badge site. Four of the seven — `access_continuity`,
+`bus_factor`, `contributors_unassociated` and `two_person_review`, the last of
+which reappears as `OSPS-QA-07.01` — need a second person rather than a change to
+the software.
 
 ## Longer-term direction (~12 months)
 
@@ -210,8 +213,8 @@ Forward-looking directions, roughly in priority order:
   convenience. Instrumented tests need an emulator and thus nested virtualisation,
   which instance runners do not offer.
   Note what none of this buys: no badge tier changes. The open badge criteria are
-  people, not pipelines (see [OPENSSF_BADGES.md](OPENSSF_BADGES.md)). The widening
-  is worth doing for the tighter net it gives the maintainer.
+  people, not pipelines (see "OpenSSF badges" above). The widening is worth doing
+  for the tighter net it gives the maintainer.
 - **Unify VEX with the scanner, and publish it as a feed.** The project records
   non-exploitable advisories in a machine-readable VEX document,
   [../openvex.json](../openvex.json) (OpenVEX), kept in step with the scanner's
@@ -332,6 +335,16 @@ Forward-looking directions, roughly in priority order:
   third-party plugins — cyclonedx, ktlint, kover, ksp — any of which may still
   reach for interfaces AGP 10 no longer exposes. Re-check their release notes
   when AGP 10 lands rather than upgrading blind.
+- **The OpenSSF Scorecard badge.** Scorecard analyses a single repository on
+  GitHub or GitLab and publishes a signed result from a CI job, which the move of
+  the canonical repository to GitLab makes possible. Two things are missing: a
+  job that runs the analysis and pushes the result, and a re-registration of the
+  bestpractices.dev entry, which still names the old canonical URL. A trial run
+  against the mirror scored 5.2/10, almost entirely a measurement artifact of the
+  mirror topology — the host-dependent checks (Code-Review, CI-Tests,
+  Contributors, Branch-Protection, Signed-Releases) were reading a repository on
+  which nothing happens, while the substantive ones already scored 10. Publishing
+  a score that understates the project would be worse than publishing none.
 
 ## User suggestions
 

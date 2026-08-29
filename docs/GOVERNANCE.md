@@ -32,15 +32,11 @@ made and who holds which role.
 ## Governance model
 
 Libellus Potionis uses a **single-maintainer** (benevolent-dictator) governance
-model. The project was created and is maintained by one person, **Martin A.
-Godisch** (`android@godisch.de`), who is the project owner and lead and makes
-all final decisions about the project — including its scope and direction, the
-software's design and architecture, which contributions are accepted, and when
-and what is released.
-
-This centralized model is deliberate and appropriate for a small, single-author
-teaching project. It may evolve toward a shared model if the project grows and
-additional long-term maintainers join; any such change will be recorded here.
+model. **Martin A. Godisch** (`android@godisch.de`) created the project,
+maintains it, and makes every final decision: scope and direction, design and
+architecture, which contributions are accepted, and when and what is released.
+The model may move toward a shared one if further long-term maintainers join;
+such a change is recorded here.
 
 ## How decisions are made
 
@@ -65,9 +61,8 @@ At present the project has a single role:
   maintaining translations and documentation, and preparing and signing
   releases.
 
-Because the project currently has one maintainer, that person holds every role.
-Detailed responsibilities are listed under "Key roles" above; contributors take
-on no formal ongoing role beyond the individual contributions they submit.
+Contributors take on no formal ongoing role beyond the individual changes they
+submit.
 
 ## Repository access and account security
 
@@ -80,16 +75,13 @@ write access will not be granted to, or retained by, an account without such
 2FA. This protects the integrity of the central repository against account
 takeover.
 
-Escalated permissions to sensitive resources — write/merge access to the
-canonical repository, and access to release secrets or credentials — are granted
-only after the maintainer has reviewed and approved the individual. Review
-considers the contributor's track record in the project (contributions accepted
-through the normal merge-request review process), a justifiable lineage of
-identity, and the 2FA requirement above. Permissions are granted at the lowest
-level needed for the person's role and escalated only as further need is
-demonstrated, and revoked when no longer needed. Until such a grant, all
-contributions are submitted as merge requests and merged only by the maintainer,
-so no contributor holds escalated permissions without this review.
+Escalated permissions — write and merge access, release secrets or credentials —
+are granted only after the maintainer has reviewed the individual, weighing their
+track record under the merge-request process, a justifiable lineage of identity,
+and the 2FA requirement above. They are granted at the lowest level the person's
+role needs, escalated as further need is shown, and revoked when the need ends.
+Until such a grant, every contribution arrives as a merge request that only the
+maintainer merges.
 
 ## Continuity
 
@@ -102,21 +94,13 @@ Google Play or the App Store, and no one else can answer a security report at
 the address in [SECURITY.md](../SECURITY.md). A user should assume that in that
 event the published apps stop receiving updates.
 
-**What does not stop.** The project is deliberately arranged so that its
-disappearance from the stores would not be the end of it:
-
-1. The source is GPL-3.0-or-later. Anyone may fork it, build it, and publish
-   their own build under their own signing identity, without asking.
-2. The canonical repository is public and carries the full history, the
-   documentation, the release tooling and the golden test vectors — everything
-   needed to continue, not merely the sources. The GitHub mirror is a second
-   copy of the same history.
-3. The F-Droid build is reproducible and re-signed by F-Droid from source. That
-   channel therefore does not depend on the maintainer's private signing key,
-   and a successor taking over the repository would not need it handed over.
-4. The app stores no data anywhere but on the device, and its backup format is
-   documented and versioned. A user's data outlives the project: it can be
-   exported and read without this app.
+**What does not stop.** The licence is GPL-3.0-or-later, so anyone may fork the
+project and publish their own build under their own signing identity. The public
+repository carries the history, the documentation, the release tooling and the
+test vectors, and the GitHub mirror is a second copy of it. The F-Droid channel
+re-signs from source, so it needs no hand-over of the maintainer's private key.
+The app stores data only on the device in a documented, versioned backup format,
+so a user's data outlives the project.
 
 **When a successor would be named.** The maintainer will designate a
 co-maintainer or successor once a contributor has established a track record

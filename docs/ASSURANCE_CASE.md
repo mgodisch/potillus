@@ -35,20 +35,13 @@ model").
 
 ## Security requirements (what is claimed)
 
-The security goals, and their explicit limits, are defined in SECURITY.md
-("Security model"). In summary, the app claims to: keep all user data on the
-device (no network transmission), apply least privilege, store data in the app's
-private sandbox with at-rest encryption (an AES-256-GCM key held in the
-hardware-backed Android Keystore on Android, and in the iOS Keychain — a
-`WhenUnlockedThisDeviceOnly` key — on iOS, each sealing the preferences store),
-offer an optional biometric access gate, and perform no tracking. It explicitly
-does **not** claim to protect data on a compromised or rooted/jailbroken device,
-to protect exported files once they leave the app, or to provide more than an
-access gate via biometrics. The claim holds for both native apps in this
-repository — Kotlin/Jetpack Compose on Android and Swift/SwiftUI on iOS — which
-share the same ported domain and data-validation logic; where a guarantee rests
-on a platform facility, the Android and iOS mechanisms are named side by side
-below.
+The security goals and their explicit limits are defined in
+[SECURITY.md](../SECURITY.md) ("Security model") and are not restated here. This
+document takes them as given and argues that they hold. The claim covers both
+native apps in this repository — Kotlin/Jetpack Compose on Android and
+Swift/SwiftUI on iOS — which share the same ported domain and data-validation
+logic; where a guarantee rests on a platform facility, the Android and iOS
+mechanisms are named side by side below.
 
 ## Threat model
 
@@ -59,79 +52,52 @@ below.
 - Application settings, including the body weight, in a preferences store the
   app seals itself.
 
-Note the asymmetry, because reading the two lines above in the other order
-misleads: the asset that matters most carries the WEAKER application-level
-protection. The history rests on the platform — the app sandbox and file-based
-storage encryption — while the settings additionally carry an AES-256-GCM
-envelope whose key lives in the Android Keystore or the iOS Keychain. There is
-no application-level database encryption; SQLCipher was removed in v0.73.0
-(see the CHANGELOG entry for that version). Wherever this
+The asset that matters most carries the weaker application-level protection, a
+point SECURITY.md states in full under "What users cannot expect". Wherever this
 document says "at-rest encryption" as a property of the app rather than of the
 platform, it means the preferences store and not the history.
 
 ### Adversaries and attacks considered in scope
 
-- **Another app on the same device** attempting to read this app's data →
-  countered by the platform application sandbox, reinforced on Android by
-  `allowBackup="false"` and on iOS by excluding the database from device backups
-  (`isExcludedFromBackup`).
-- **A bystander with brief physical access to the running device** (e.g.
-  glancing at the screen, the Recents / app-switcher view, or screenshots) →
-  countered by the optional biometric lock and by hiding the app's contents in
-  the switcher preview. The strength of the screen defence differs by platform
-  and is stated honestly: on Android `FLAG_SECURE` (applied by default from cold
-  start) blocks screenshots, screen recording, and the Recents thumbnail alike;
-  on iOS the app can cover its switcher snapshot but **cannot** block an active
-  screenshot or screen recording, because the platform offers no equivalent of
-  `FLAG_SECURE` (see the residual risk below).
-- **Someone who obtains the locked device** → data at rest is protected by the
-  platform's storage encryption, plus the Keystore-sealed (Android) or
-  Keychain-sealed (iOS) preferences; the iOS key's `ThisDeviceOnly` class keeps
-  it off every backup and off any other device. For the history the platform is
-  the whole of the defence: someone who defeats the device's own encryption
-  reads the database, and the biometric lock does not stand in their way — it
-  gates the app, not the file.
-- **A network attacker** → not applicable on either platform: the app holds no
-  network permission or entitlement and performs no network communication, so
-  there is no network attack surface.
-- **Malformed or malicious input** (imported backup files, user-entered values)
-  → countered by the shared input validation (see below).
+- **Another app on the same device** → the platform sandbox, reinforced against
+  automatic off-device copies by `allowBackup="false"` (Android) and
+  `isExcludedFromBackup` on the database (iOS).
+- **A bystander with brief access to the running device** → the optional
+  biometric lock and the switcher cover. The screen defence differs by platform:
+  Android's `FLAG_SECURE` blocks screenshots, recording and the Recents
+  thumbnail alike, while iOS covers only the switcher snapshot.
+- **Someone who obtains the locked device** → the platform's storage encryption
+  and the sealed preferences, whose iOS key never leaves the device. For the
+  history the platform is the whole of the defence: the biometric lock gates the
+  app, not the file.
+- **A network attacker** → no attack surface; neither app can reach a network.
+- **Malformed or malicious input** (imported backups, entered values) → the
+  shared validation argued below.
 
-### Out of scope (residual risks, stated honestly)
+### Out of scope
 
-- A **rooted, jailbroken, malware-infected, or otherwise compromised device**:
-  the platform guarantees the app relies on can be bypassed; the app cannot
-  defend data there.
-- **Forensic extraction from an unlocked device**: the biometric lock is an
-  access gate, not full-disk encryption.
-- **Active screen capture on iOS**: because iOS exposes no `FLAG_SECURE`
-  equivalent, a screenshot or screen recording the user (or software acting as
-  the user) takes while the app is in the foreground is not prevented; the
-  app-switcher cover addresses only the passive switcher preview.
-- **Exported files** (CSV/PDF/JSON): once written to a user-chosen location they
-  leave the app's control and are the user's responsibility.
+The residual risks are a compromised or jailbroken device, forensic extraction
+from an unlocked one, active screen capture on iOS, and exported files once they
+leave the app. SECURITY.md states each of them and why it is not defended.
 
 ## Trust boundaries
 
 1. **App sandbox boundary** — between this app's private storage and other apps
-   or the wider OS. Enforced by the platform sandbox; reinforced against
-   automatic off-device copies by `allowBackup="false"` (Android) and by
-   `isExcludedFromBackup` on the database (iOS).
+   or the wider OS.
 2. **Key-store boundary** — between application code and the platform key store.
-   The AES-256-GCM key is generated inside the hardware-backed Android Keystore,
-   or held in the iOS Keychain (`WhenUnlockedThisDeviceOnly`); on Android raw key
-   material never crosses into application memory in exportable form.
-3. **Screen/UI boundary** — between sensitive on-screen content and screenshot,
-   screen-recording, and Recents/app-switcher surfaces. Fully enforced on Android
-   by `FLAG_SECURE`; on iOS only the switcher snapshot is covered, and active
-   screen capture is out of scope (see residual risks).
+   On Android raw key material never crosses into application memory in
+   exportable form.
+3. **Screen/UI boundary** — between on-screen content and the screenshot,
+   recording and switcher surfaces. Enforced on Android, partial on iOS.
 4. **User/device authentication boundary** — the device lock screen and the
-   optional in-app biometric gate (fingerprint on Android; Face ID / Touch ID
-   with device-passcode fallback on iOS).
-5. **Export boundary** — data crossing from the app to user-chosen file
-   locations. This is explicitly **outside** the app's trust boundary.
-6. **No network boundary** — no data crosses a network boundary, because neither
-   app has network access.
+   optional in-app biometric gate.
+5. **Export boundary** — data crossing to user-chosen file locations, explicitly
+   **outside** the app's trust boundary.
+6. **No network boundary** — nothing crosses one, because neither app has
+   network access.
+
+Which mechanism enforces which boundary on which platform is named under
+Adversaries above and in SECURITY.md.
 
 ## Argument: secure design principles were applied
 
@@ -164,10 +130,8 @@ Mapped to well-known mobile weakness classes:
   exporter neutralizes spreadsheet formula injection on both platforms (OWASP
   "CSV Injection"), prefixing a cell that begins with `=`, `+`, `-`, `@`, TAB, or
   CR.
-- **Insecure data storage** — private sandbox and at-rest storage encryption on
-  both; an AES-256-GCM-sealed preferences store keyed from the Android Keystore or
-  the iOS Keychain; `allowBackup="false"` (Android) and database backup exclusion
-  (iOS); screen-privacy via `FLAG_SECURE` (Android) and the switcher cover (iOS).
+- **Insecure data storage** — the sandbox, the sealed preferences store, the
+  backup exclusions and the screen-privacy layer named above, on both platforms.
 - **Insufficient cryptography** — AES-256 in GCM (authenticated) with a
   per-encryption random 96-bit nonce from a secure RNG and a 128-bit tag; no weak
   algorithms (no MD5/SHA-1/ECB/DES). Implemented by `KeystoreSecretStore` on
@@ -196,18 +160,13 @@ Mapped to well-known mobile weakness classes:
 
 ## Conclusion
 
-Given the threat model above, the identified trust boundaries are enforced on
-each platform by its sandbox, its key store (the hardware-backed Android Keystore
-or the iOS Keychain), its screen-privacy facility (`FLAG_SECURE` on Android; the
-switcher cover on iOS, with active screen capture stated as a residual risk), the
-device/biometric authentication gate, and the absence of any network surface;
-secure design principles are applied; and the common implementation weakness
-classes relevant to a local, offline mobile app are countered on both. The
-residual risks (a compromised/jailbroken device, forensic access to an unlocked
-device, active screen capture on iOS, and exported files) are stated explicitly
-rather than claimed to be mitigated. On this basis, the security requirements in
-SECURITY.md are met, for both the Android and iOS apps, within the app's intended
-threat model.
+The trust boundaries above are enforced on each platform by its sandbox, its key
+store, its screen-privacy facility, the device and biometric gate, and the
+absence of a network surface; the design principles are applied; and the weakness
+classes relevant to a local, offline app are countered on both. The residual
+risks are stated rather than claimed to be mitigated. On this basis the security
+requirements in SECURITY.md are met, for both apps, within the intended threat
+model.
 
 ## Security review record
 
@@ -229,21 +188,16 @@ biometric gate (`AppLockModelTests`), and schema parity with Android
 (`SchemaParityTests`). A dedicated on-device iOS security-review pass — the
 counterpart of the Android one above — is to be recorded here when performed.
 
-Outcome: the countermeasures described above are in place; the residual risks (a
-compromised device, forensic access to an unlocked device, active screen capture
-on iOS, and exported files) are documented rather than claimed to be mitigated;
-and no unresolved high-severity issues are known. This record is updated whenever
-a further review is performed.
+Outcome: the countermeasures described above are in place, and no unresolved
+high-severity issues are known. This record is updated whenever a further review
+is performed.
 
-Since 2026-07, the manual argument above is complemented by a machine one.
-CodeQL analyses both languages — Kotlin/Java and Swift — weekly and on every
-change to `main`, on the project's GitHub mirror, where the builds each language
-needs can actually run (see [MIRROR-CHECKS.md](MIRROR-CHECKS.md)). This is a
-different kind of evidence from everything else cited in this document: the
-`tools/` checks, ktlint, Android Lint and SwiftLint all reason about one file at
-a time, whereas CodeQL reasons about data flow across functions and files, which
-is the level at which the weakness classes in the section above would actually
-manifest. Its findings are triaged in GitHub's code-scanning view, and anything
-substantiated is recorded here as part of the next review. The analysis is
-advisory and does not gate a merge; the enforcing gate remains the GitLab
-pipeline.
+Since 2026-07, the manual argument above is complemented by a machine one. CodeQL
+analyses Kotlin/Java and Swift on the GitHub mirror (see
+[MIRROR-CHECKS.md](MIRROR-CHECKS.md)). It is a different kind of evidence from
+everything else cited here: the `tools/` checks, ktlint, Android Lint and
+SwiftLint each reason about one file, whereas CodeQL follows data flow across
+functions and files, which is the level at which the weakness classes above would
+manifest. Findings are triaged in the code-scanning view and anything
+substantiated is recorded here at the next review. The analysis is advisory; the
+enforcing gate remains the GitLab pipeline.

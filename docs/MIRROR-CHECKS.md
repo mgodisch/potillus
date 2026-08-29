@@ -35,29 +35,24 @@ importantly — what they are not.
 ## Why anything runs on a mirror at all
 
 The GitLab pipeline ([../.gitlab-ci.yml](../.gitlab-ci.yml)) is deliberately
-device-free: it runs the `tools/` checks, the release gate and an
-osv-scanner source scan, and it never builds. That scope was not chosen out of
-preference. A real Android build needs the SDK and several minutes of metered
-runner time; an iOS build needs macOS and Xcode, which a Linux runner cannot
-provide at all.
-
-A public GitHub repository removes both obstacles: runner minutes are free and
-macOS runners are available. That is the whole argument. The mirror is used as a
-*machine*, not as a second home for the project — the canonical pipeline stays
-the gate, and everything here is an addition to it.
+device-free: it runs the `tools/` checks, the release gate and an osv-scanner
+source scan, and it never builds. An Android build needs the SDK and several
+minutes of metered runner time; an iOS build needs macOS and Xcode, which a Linux
+runner cannot provide at all. A public GitHub repository removes both obstacles:
+runner minutes are free and macOS runners are available. The mirror is used as a
+*machine*, not as a second home — the canonical pipeline stays the gate.
 
 Two GitHub features also have no GitLab equivalent on this project's plan, and
-they are used for the same reason: code scanning (a durable, deduplicated view of
-static-analysis findings, fed by SARIF) and private vulnerability reporting.
+are used for the same reason: code scanning (a deduplicated view of static
+findings, fed by SARIF) and private vulnerability reporting.
 
-One consequence is worth stating plainly. The Swift checks in `tools/`
-(`check-swift-symbols.py`, `check-swift-length.py`, `check-swift-tests.py`)
-exist because the canonical pipeline cannot run SwiftLint or a Swift compiler;
-they approximate both in Python. The macOS runner now runs the real tools
-alongside them. The Python checks are **not** retired by this: they are what
-covers the Swift side on the canonical, blocking pipeline, while the macOS run
-is advisory. The two are complementary, and a disagreement between them is worth
-investigating rather than resolving by deleting one.
+The Swift checks in `tools/` (`check-swift-symbols.py`, `check-swift-length.py`,
+`check-swift-tests.py`) approximate SwiftLint and a compiler in Python, because
+the canonical pipeline can run neither. The macOS runner runs the real tools
+alongside them. The Python checks are **not** retired by this: they cover the
+Swift side on the blocking pipeline, while the macOS run is advisory. A
+disagreement between the two is worth investigating rather than resolving by
+deleting one.
 
 ## What runs
 
@@ -70,33 +65,19 @@ investigating rather than resolving by deleting one.
 | [`codeql.yml`](../.github/workflows/codeql.yml) | CodeQL over Kotlin and Swift — data-flow analysis across functions and files, not the per-file reasoning every other check here does | GitLab: SAST of this depth is a paid-tier feature there |
 | [`qa-logs.yml`](../.github/workflows/qa-logs.yml) | `make qa-android` and `gmake qa-ios` — each platform's whole device-free QA battery in one pass, with the transcript left in the job log | GitLab: it is the Android and the iOS run above, and then some |
 
-`meta.yml`, `android.yml` and `ios.yml` run on a push to **any** branch, so a
-topic branch under review on GitLab gets its verdict while the merge request is
-still open. None of them runs on tags.
+The triggers are in the workflow files; the reasoning behind them is that
+emulator and CodeQL time is the expensive part. `device-tests.yml` therefore runs
+only when something under `android/` changed, and `codeql.yml` only on `main`,
+because a run costs about forty minutes and its findings are research rather than
+build breaks. Both carry a weekly run as the safety net: GitHub updates the query
+packs, so unchanged code can acquire a finding, and no stretch of non-source work
+leaves the analysis older than seven days.
 
-`device-tests.yml` runs per branch too, but only when something under `android/`
-changed, and additionally on a weekly schedule and on demand. Emulator time is
-the most expensive thing here, and a translation or an iOS change cannot alter
-the result.
-
-`codeql.yml` is the exception: it runs on `main` only, and only when something
-under `android/` or `ios/` changed, plus weekly and on demand. A run is about
-forty minutes — two full builds under CodeQL's tracer, on two runner platforms —
-and its findings are research rather than build breaks, so paying that for a
-translation or a documentation change buys nothing. The weekly run is the safety
-net and ignores the path filter: GitHub updates the query packs, so unchanged
-code can acquire a new finding, and no stretch of non-source work leaves the
-analysis older than seven days.
-
-`qa-logs.yml` has no automatic trigger at all: it is dispatched by hand, from
-the workflow's own page in the Actions tab or with `gh workflow run
-qa-logs.yml`, when a QA round or a release wants the complete picture rather
-than a verdict. What distinguishes it from `android.yml` and `ios.yml` is not
-only its larger scope but its failure behaviour — the `qa-*` targets record a
-failing step and carry on, so one dispatch yields every finding instead of
-stopping at the first. The transcript is read afterwards with `gh run view
---log`; nothing is uploaded as an artifact, because `qa_step` tees every line to
-stdout on its way into the log file and the job log therefore already holds it.
+`qa-logs.yml` is dispatched by hand, when a QA round wants the complete picture
+rather than a verdict. Its `qa-*` targets record a failing step and carry on, so
+one dispatch yields every finding instead of stopping at the first. The
+transcript is read with `gh run view --log`; nothing is uploaded as an artifact,
+because `qa_step` tees every line into the job log on its way.
 
 ## What these checks are NOT
 
@@ -116,28 +97,22 @@ stdout on its way into the log file and the job log therefore already holds it.
 
 ## Conventions these workflows follow
 
-- **Every action is pinned to a full commit SHA**, with the release name in a
-  trailing comment. A tag is a movable pointer its author can re-point; a SHA is
-  not. This is the same discipline the project applies to its Gradle and SwiftPM
-  dependencies, and it is what OpenSSF Scorecard's Pinned-Dependencies check
-  asks for. The pinned tools themselves (the `actionlint` container, the `zizmor`
-  release) are pinned by digest or version for the same reason.
-- **Least privilege.** `permissions: contents: read` at the top of every file;
-  any additional scope is declared on the single job that needs it.
-- **`concurrency` with `cancel-in-progress`.** A mirror updates by force-push, so
-  a rebased branch can arrive several times a minute; only the newest run is
-  worth paying for. `qa-logs.yml` is the exception and sets it to `false`:
-  without a push trigger, the only run that can collide with it is a second
-  dispatch on the same ref, which is a second request for the battery rather
-  than a newer verdict superseding an older one.
+The files themselves show *what* is set; these are the reasons.
+
+- **Actions are pinned to a full commit SHA.** A tag is a movable pointer its
+  author can re-point; a SHA is not. Same discipline as the Gradle and SwiftPM
+  dependencies, and what Scorecard's Pinned-Dependencies check asks for.
+- **`concurrency` cancels a run in progress.** A mirror updates by force-push, so
+  a rebased branch can arrive several times a minute. `qa-logs.yml` sets it to
+  `false`: without a push trigger, the only run that can collide with it is a
+  second dispatch, which is a second request rather than a newer verdict.
 - **The workflows call `make`,** never their own `./gradlew` or `xcodebuild`
   lines, so the definition of "build the app" stays in `android/Makefile` and
   `ios/Makefile` alone. On macOS that means `gmake`: the system `make` is 3.81
   and `make/guard.mk` requires 4.3 or newer.
-- **Runner images are named, not floated.** `macos-26` rather than
-  `macos-latest`, so an Xcode generation changes under the project only when the
-  workflow changes. SwiftLint is fetched at the version `ios/Makefile` pins and
-  verified against a recorded checksum before it is unpacked, because its rules
+- **Runner images are named, not floated,** so an Xcode generation changes under
+  the project only when the workflow changes. SwiftLint is fetched at the version
+  `ios/Makefile` pins and verified against a recorded checksum, because its rules
   differ between releases.
 
 ## Repository settings this assumes
