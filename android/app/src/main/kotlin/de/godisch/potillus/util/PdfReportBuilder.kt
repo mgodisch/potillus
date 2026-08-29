@@ -33,9 +33,12 @@ import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.ReportChart
+import de.godisch.potillus.domain.ReportPalette
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
+import de.godisch.potillus.l10n.abbreviateWeekday
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
@@ -312,22 +315,22 @@ object PdfReportBuilder {
         // Replaces the former monthly-average trend chart. Bars are the per-day
         // average within each bucket (day / week / month, chosen by span length);
         // abstinent buckets carry a green tick instead of a bar. The dashed line is
-        // the daily limit. Labels are thinned for dense series (see chartLabelIndices).
+        // the daily limit. Labels are thinned for dense series (see ReportChart.labelIndices).
         scalars["TREND_DISPLAY"] = "block"
         run {
             val limit = d.limitInfo.limitGrams
             val maxAvg = d.chartBuckets.maxOfOrNull { it.avgPerDay } ?: 0.0
             // Headroom of 10% so the tallest bar / limit line never touches the top.
             val maxVal = maxOf(maxAvg, limit) * 1.1
-            scalars["LIMIT_LINE_PCT"] = pct(limit, maxVal).fmt0()
+            scalars["LIMIT_LINE_PCT"] = ReportChart.percent(limit, maxVal).fmt0()
 
-            val labelIdx = chartLabelIndices(d.chartBuckets.size)
+            val labelIdx = ReportChart.labelIndices(d.chartBuckets.size)
             repeats["BARS"] = d.chartBuckets.map { b ->
                 mapOf(
                     // An abstinent bucket draws the green tick instead of a bar, so
                     // it passes null rather than its (zero) average; every other
                     // bucket gets the shared floor from [barHeight].
-                    "BAR_HEIGHT_PCT" to barHeight(if (b.isAbstinent) null else b.avgPerDay, maxVal).fmt0(),
+                    "BAR_HEIGHT_PCT" to ReportChart.barHeight(if (b.isAbstinent) null else b.avgPerDay, maxVal).fmt0(),
                     "BAR_CLASS" to if (AlcoholCalculator.isOverLimit(b.avgPerDay, limit)) "bar over" else "bar",
                     // On-top value, same convention as the page-2 hour/weekday charts:
                     // the bucket's per-day average (one decimal), blank for abstinent
@@ -352,7 +355,7 @@ object PdfReportBuilder {
         repeats["CATEGORIES"] = d.categories.map { c ->
             mapOf(
                 "C_NAME" to categoryLabel(context, c.categoryName),
-                "C_COLOR" to categoryColor(c.categoryName), // swatch = donut colour
+                "C_COLOR" to ReportPalette.color(c.categoryName), // swatch = donut colour
                 "C_G" to c.grams.fmt1(),
                 "C_PCT" to "${c.percent} %",
             )
@@ -365,9 +368,9 @@ object PdfReportBuilder {
         run {
             val totalCat = d.categories.sumOf { it.grams }
             val fractions = d.categories.map { if (totalCat > 0) it.grams / totalCat * 100.0 else 0.0 }
-            repeats["PIE_SLICES"] = d.categories.zip(donutSlices(fractions)) { c, slice ->
+            repeats["PIE_SLICES"] = d.categories.zip(ReportChart.donutSlices(fractions)) { c, slice ->
                 mapOf(
-                    "PIE_FILL" to categoryColor(c.categoryName),
+                    "PIE_FILL" to ReportPalette.color(c.categoryName),
                     "PIE_DASH" to slice.dash,
                     "PIE_GAP" to slice.gap,
                     "PIE_OFFSET" to slice.offset,
@@ -386,7 +389,7 @@ object PdfReportBuilder {
             val days = d.totalDays.coerceAtLeast(1)
             repeats["HBARS"] = d.hourlyGrams.map { grams ->
                 mapOf(
-                    "H_HEIGHT_PCT" to barHeight(grams, ceiling).fmt0(),
+                    "H_HEIGHT_PCT" to ReportChart.barHeight(grams, ceiling).fmt0(),
                     // Average grams per calendar day in this clock hour (blank for an
                     // hour that never saw any drinking).
                     "H_VALUE" to (if (grams <= 0.0) "" else (grams / days).fmt1()),
@@ -404,7 +407,7 @@ object PdfReportBuilder {
             val ceiling = maxWeekday * 1.15
             repeats["WDBARS"] = d.weekdayAverages.map { avg ->
                 mapOf(
-                    "WD_HEIGHT_PCT" to barHeight(avg, ceiling).fmt0(),
+                    "WD_HEIGHT_PCT" to ReportChart.barHeight(avg, ceiling).fmt0(),
                     // Value above the bar; blank for a weekday that was never a drink day.
                     "WD_VALUE" to (avg?.fmt1() ?: ""),
                 )
@@ -457,146 +460,6 @@ object PdfReportBuilder {
             else -> R.string.category_other
         },
     )
-
-    /**
-     * Hex colour for a [DrinkCategory] name, matching the on-screen donut palette
-     * (de.godisch.potillus.ui.component.categoryColors) so the PDF donut and the app
-     * use the same colours. Escape-safe (no `< > & " '`), so it can flow through
-     * SimpleTemplate into an SVG `stroke`/CSS `background`.
-     *
-     * `internal` rather than private: ReportChartVectorTest checks these colours
-     * against the shared vectors that the Swift renderer reads too. They must
-     * match, or the same drinking prints in different colours on the two platforms.
-     */
-    internal fun categoryColor(name: String): String = when (name) {
-        "BEER" -> "#F59E0B" // amber-500
-        "WINE" -> "#9333EA" // purple-600
-        "SPIRITS" -> "#EF4444" // red-500
-        "LONGDRINK" -> "#3B82F6" // blue-500
-        "LIQUEUR" -> "#10B981" // emerald-500
-        else -> "#6B7280" // gray-500 (OTHER)
-    }
-
-    /** Percentage of [value] relative to [max] (0 when [max] is non-positive). */
-    internal fun pct(value: Double, max: Double): Double = if (max > 0) value / max * 100.0 else 0.0
-
-    /**
-     * The smallest bar a non-zero value may draw, in percent of the plot height.
-     *
-     * Without a floor, one beer in a month of heavy drinking scales to a bar of
-     * zero pixels and reads as abstinence. Two percent is the smallest strip the
-     * print resolution still separates from the baseline.
-     */
-    internal const val MINIMUM_VISIBLE_BAR = 2.0
-
-    /**
-     * Height of one chart bar, in percent of the plot area.
-     *
-     * The rule the three bar charts of the report share: a bucket with no value
-     * and a bucket with a zero value both draw nothing, and any amount above zero
-     * draws at least [MINIMUM_VISIBLE_BAR].
-     *
-     * NULL AND ZERO DRAW THE SAME BAR, AND THAT IS DELIBERATE. A weekday that
-     * never occurred in the period and a weekday that occurred and stayed dry are
-     * different facts, but a bar of height zero is the honest picture of both.
-     * What tells them apart is the value printed above the bar, which the callers
-     * leave blank in the first case.
-     *
-     * `internal` rather than private, and a function rather than three inline
-     * expressions: the rule used to be written out once per chart (trend, hour,
-     * weekday), which is three chances for it to drift and no way for
-     * `ReportChartVectorTest` to reach it. `test-vectors/report-chart.json` holds
-     * the `barHeight` cases that the Swift `ReportChart.barHeight` is pinned
-     * against, and this is the function that lets the Kotlin suite assert the
-     * same ones (0.85.0 QA round).
-     *
-     * @param value   The bucket's value, or null when the bucket holds no value.
-     * @param ceiling The value the full plot height stands for; see the headroom
-     *                factors at the call sites.
-     */
-    internal fun barHeight(value: Double?, ceiling: Double): Double {
-        if (value == null || value <= 0.0) return 0.0
-        return pct(value, ceiling).coerceAtLeast(MINIMUM_VISIBLE_BAR)
-    }
-
-    /**
-     * Two decimals with a DOT, whatever the device's locale.
-     *
-     * SVG treats both `,` and ` ` as list separators, so a locale-aware format on
-     * a German device emits `stroke-dasharray="40,00 60,00"`, which the renderer
-     * reads as the four values `40 0 60 0` — a zero gap, and the ring paints
-     * solid. [java.util.Locale.ROOT] is what keeps the separator a dot. The Swift
-     * twin is `ReportChart.svgNumber`.
-     */
-    internal fun svgNumber(value: Double): String = String.format(java.util.Locale.ROOT, "%.2f", value)
-
-    /**
-     * One ring segment of the category donut, as the three SVG attributes the
-     * template expects.
-     */
-    internal data class DonutSlice(val dash: String, val gap: String, val offset: String)
-
-    /**
-     * Turns a list of slice percentages into `stroke-dasharray` segments.
-     *
-     * The classic trick: a circle of radius 15.9155 has a circumference of very
-     * nearly 100, so a slice's dash length IS its percentage, and the gap is what
-     * remains of the ring. The offset `25 − cumulative` rotates each slice past
-     * the ones before it and puts the first one at twelve o'clock, so the ring
-     * fills clockwise.
-     *
-     * The caller passes fractions derived from GRAMS rather than from the rounded
-     * integer percents the table prints, so the segments butt up exactly instead
-     * of leaving a hairline gap at the end of the ring.
-     *
-     * `internal` for the same reason as [barHeight]: the `donut` section of
-     * `test-vectors/report-chart.json` pins this geometry on both platforms, and
-     * the Kotlin suite needs a named function to assert it against.
-     *
-     * @param fractions Slice percentages in drawing order, each in 0..100.
-     */
-    internal fun donutSlices(fractions: List<Double>): List<DonutSlice> {
-        var cumulative = 0.0
-        return fractions.map { fraction ->
-            val slice = DonutSlice(
-                dash = svgNumber(fraction),
-                gap = svgNumber(100.0 - fraction),
-                offset = svgNumber(25.0 - cumulative),
-            )
-            cumulative += fraction
-            slice
-        }
-    }
-
-    /**
-     * Truncates a weekday name to its first two UTF-16 code units.
-     *
-     * Two, because the column is narrow and seven of them must fit. `take(2)` on a
-     * Kotlin String counts UTF-16 code units; Swift's `prefix(2)` counts grapheme
-     * clusters, so `ReportRenderer.abbreviateWeekday` spells the UTF-16 rule out
-     * rather than taking its own default. For every language this app ships the two
-     * rules agree — checked over all 21 in the 0.84.0 QA round — so this is not a
-     * live difference; it is a unit that was chosen implicitly on both sides and is
-     * now chosen on purpose, and pinned by `test-vectors/report-chart.json`.
-     */
-    internal fun abbreviateWeekday(symbol: String): String = symbol.take(2)
-
-    /**
-     * Indices of the buckets that should carry an x-axis label. For a short
-     * series (≤ 12 bars) every bucket is labelled; for longer series a small,
-     * evenly spaced subset (~8 labels) keeps the axis readable. The first and
-     * last buckets are always included.
-     */
-    internal fun chartLabelIndices(n: Int): Set<Int> {
-        if (n <= 0) return emptySet()
-        if (n <= 12) return (0 until n).toSet()
-        val target = 8
-        val step = ((n - 1).toFloat() / (target - 1)).coerceAtLeast(1f)
-        return (0 until target)
-            .map { (it * step).toInt().coerceAtMost(n - 1) }
-            .toSortedSet()
-            .apply { add(n - 1) }
-    }
 
     /**
      * Formats one bucket's first day into a short axis label, chosen by

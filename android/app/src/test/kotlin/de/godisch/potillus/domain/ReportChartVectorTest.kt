@@ -23,9 +23,9 @@
  *
  * =============================================================================
  */
-package de.godisch.potillus.util
+package de.godisch.potillus.domain
 
-import de.godisch.potillus.domain.SharedTestVectors
+import de.godisch.potillus.l10n.abbreviateWeekday
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -59,7 +59,7 @@ class ReportChartVectorTest {
     /**
      * A bucket with no value and a bucket with a zero value both draw nothing;
      * anything above zero draws at least the two-percent floor. Until the 0.85.0
-     * QA round the rule was written out once per chart in [PdfReportBuilder] and
+     * QA round the rule was written out once per chart in the PDF builder and
      * this side could not reach it, so these cases ran on the Swift port alone.
      */
     @Test
@@ -69,7 +69,7 @@ class ReportChartVectorTest {
             assertEquals(
                 case.getString("description"),
                 case.getDouble("expected"),
-                PdfReportBuilder.barHeight(value, case.getDouble("ceiling")),
+                ReportChart.barHeight(value, case.getDouble("ceiling")),
                 EPS,
             )
         }
@@ -84,7 +84,7 @@ class ReportChartVectorTest {
     fun `donutSlices matches the shared vectors`() {
         VECTORS.getJSONArray("donut").objects().forEach { case ->
             val expected = case.getJSONArray("expected").objects().toList()
-            val actual = PdfReportBuilder.donutSlices(case.getJSONArray("fractions").doubles())
+            val actual = ReportChart.donutSlices(case.getJSONArray("fractions").doubles())
             assertEquals(case.getString("description"), expected.size, actual.size)
             expected.forEachIndexed { index, slice ->
                 val where = "${case.getString("description")} [slice $index]"
@@ -101,19 +101,19 @@ class ReportChartVectorTest {
             assertEquals(
                 case.getString("description"),
                 case.getDouble("expected"),
-                PdfReportBuilder.pct(case.getDouble("value"), case.getDouble("max")),
+                ReportChart.percent(case.getDouble("value"), case.getDouble("max")),
                 EPS,
             )
         }
     }
 
     @Test
-    fun `chartLabelIndices matches the shared vectors`() {
+    fun `labelIndices matches the shared vectors`() {
         VECTORS.getJSONArray("labelIndices").objects().forEach { case ->
             assertEquals(
                 case.getString("description"),
                 case.getJSONArray("expected").ints(),
-                PdfReportBuilder.chartLabelIndices(case.getInt("count")).toList(),
+                ReportChart.labelIndices(case.getInt("count")).toList(),
             )
         }
     }
@@ -124,7 +124,7 @@ class ReportChartVectorTest {
             assertEquals(
                 case.getString("categoryName"),
                 case.getString("expected"),
-                PdfReportBuilder.categoryColor(case.getString("categoryName")),
+                ReportPalette.color(case.getString("categoryName")),
             )
         }
     }
@@ -142,7 +142,7 @@ class ReportChartVectorTest {
             assertEquals(
                 case.getString("description"),
                 case.getString("expected"),
-                PdfReportBuilder.abbreviateWeekday(case.getString("symbol")),
+                abbreviateWeekday(case.getString("symbol")),
             )
         }
     }
@@ -158,7 +158,7 @@ class ReportChartVectorTest {
     fun `the step is a Float and it matters`() {
         assertEquals(
             listOf(0, 4, 8, 13, 17, 22, 26, 30, 31),
-            PdfReportBuilder.chartLabelIndices(32).toList(),
+            ReportChart.labelIndices(32).toList(),
         )
 
         val target = 8
@@ -169,9 +169,9 @@ class ReportChartVectorTest {
             .apply { add(31) }
 
         assertNotEquals(
-            "if these ever agree, the Float in chartLabelIndices has been lost",
+            "if these ever agree, the Float in labelIndices has been lost",
             inDouble.toList(),
-            PdfReportBuilder.chartLabelIndices(32).toList(),
+            ReportChart.labelIndices(32).toList(),
         )
     }
 }

@@ -238,6 +238,9 @@ Edit drinks from the list's edit mode
 - The roadmap carries the outstanding work in shorter entries.
 - The statistics screen's card titles are headings.
 - The year heat-map's drawing window is `domain/YearGrid.kt`.
+- The report chart's arithmetic is `domain/ReportChart.kt`, its palette
+  `ReportPalette`.
+- The two-character weekday cut sits with the other l10n helpers.
 - The install guides state each tool's purpose once.
 - The test-vector index is one line per file, and lists `year-grid.json`.
 

@@ -1096,7 +1096,11 @@ kover {
 
                 // Android PDF / WebView renderers (android.print / android.graphics
                 // / WebView): exercised by the instrumented ReportExportTest. The
-                // trailing "*" also drops their generated nested classes.
+                // trailing "*" also drops their generated nested classes. What the
+                // builder does NOT hold any more is the chart arithmetic: bar
+                // heights, axis labels and the donut geometry live in
+                // domain/ReportChart.kt, where the JVM suite reaches them and this
+                // exclusion does not.
                 classes(
                     "de.godisch.potillus.util.PdfReportBuilder*",
                     "de.godisch.potillus.util.WebViewPdfPrinter*",

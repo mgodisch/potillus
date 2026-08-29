@@ -166,3 +166,16 @@ private fun alignDayMonthOrder(stripped: String, locale: Locale): String {
     val (lead, first, mid, second, trail) = m.destructured
     return "$lead$second$mid$first$trail"
 }
+
+/**
+ * Truncates a weekday name to its first two UTF-16 code units.
+ *
+ * Two, because the column is narrow and seven of them must fit. `take(2)` on a
+ * Kotlin String counts UTF-16 code units; Swift's `prefix(2)` counts grapheme
+ * clusters, so `ReportRenderer.abbreviateWeekday` spells the UTF-16 rule out
+ * rather than taking its own default. For every language this app ships the two
+ * rules agree — checked over all 21 in the 0.84.0 QA round — so this is not a
+ * live difference; it is a unit that was chosen implicitly on both sides and is
+ * now chosen on purpose, and pinned by `test-vectors/report-chart.json`.
+ */
+fun abbreviateWeekday(symbol: String): String = symbol.take(2)
