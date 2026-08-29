@@ -66,6 +66,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.YearGrid
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
@@ -75,39 +76,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-
-/**
- * Whether the year heat-map draws the cell for [date].
- *
- * This is the ONE rule the year view has that the month view does not, and it is
- * a function rather than an expression in the composable for a single reason:
- * iOS states the same rule in `YearGrid.isDrawn`, and until 0.85.0 only that side
- * could be tested. `test-vectors/year-grid.json` now pins both.
- *
- * Two spans are not the app's to speak about:
- *
- *   - after [today] lies the future, which cannot have been abstinent yet.
- *   - before [statsFrom] lies the span the user excluded from every statistic.
- *     Entries there are excluded too, so drawing them would show the heat-map
- *     counting what the Statistics screen does not.
- *
- * BOTH BOUNDS ARE INCLUSIVE. [today] itself is drawn and so is [statsFrom]
- * itself; only the day beyond each is not. iOS compares the same two bounds as
- * `yyyy-MM-dd` STRINGS, which is chronological for a zero-padded fixed-width
- * format, so the two implementations agree by construction — but a strict
- * comparison introduced on one side and not the other is silent drift, which is
- * what the shared vector exists to catch.
- *
- * @param date      The cell's logical day.
- * @param today     Logical today, from [de.godisch.potillus.domain.DayResolver].
- * @param statsFrom Statistics start floor, or `null` when none is set.
- * @return `true` when the cell is drawn, `false` when it renders as nothing.
- */
-internal fun isDrawn(date: LocalDate, today: LocalDate, statsFrom: LocalDate?): Boolean {
-    if (date.isAfter(today)) return false
-    if (statsFrom != null && date.isBefore(statsFrom)) return false
-    return true
-}
 
 /**
  * Compact full-year calendar heat-map.
@@ -288,12 +256,12 @@ fun YearCalendarView(
                                     // columns stay aligned, and it carries no click target
                                     // and no semantics: a hidden day is inert and silent to
                                     // a screen reader, like the padding cells always were.
-                                    // The two date bounds are [isDrawn]'s, which is
+                                    // The two date bounds are [YearGrid.isDrawn]'s, which is
                                     // where they are pinned against iOS; only the
                                     // padding case stays here, because a padding cell
                                     // has no date to judge.
                                     val outsideWindow = cellDate == null ||
-                                        !isDrawn(cellDate, today, statsFrom)
+                                        !YearGrid.isDrawn(cellDate, today, statsFrom)
                                     if (outsideWindow) {
                                         // Empty placeholder to preserve grid alignment
                                         Box(Modifier.size(cellSize).padding(cellGap / 2))

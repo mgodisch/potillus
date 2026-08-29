@@ -53,10 +53,10 @@ import Foundation
 //   hides the same two spans in `YearCalendarView`.
 //
 // WHY A TYPE AND NOT A LOOP IN THE VIEW
-//   Android's equivalent lives inside the composable, where no test can reach it.
-//   Here the decision is a pure function of four strings, so it can be asserted
+//   The decision is a pure function of four strings, so it can be asserted
 //   directly, which is what `YearGridTests` does for the boundaries that are easy
 //   to get wrong: the start date itself is drawn, today is drawn, tomorrow is not.
+//   Android states the same rule in `domain/YearGrid.kt`, for the same reason.
 // =============================================================================
 
 /// A year of logical days, arranged as twelve month grids.

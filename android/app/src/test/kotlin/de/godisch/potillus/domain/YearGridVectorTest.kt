@@ -23,7 +23,7 @@
  *
  * =============================================================================
  */
-package de.godisch.potillus.ui.component
+package de.godisch.potillus.domain
 
 // =============================================================================
 // YearGridVectorTest.kt – cross-platform parity suite
@@ -32,11 +32,11 @@ package de.godisch.potillus.ui.component
 // Asserts `isDrawn` against `test-vectors/year-grid.json`, the same file
 // YearGridVectorTest.swift loads for PotillusKit's `YearGrid.isDrawn`.
 //
-// Until the 0.85.0 QA round this rule lived as an expression inside
-// YearCalendarView, where no JVM test could reach it: the two platforms carried
-// the same three-line predicate and only one of them was pinned. The vectors
-// exist so that a bound moved from inclusive to exclusive on either side turns
-// the OTHER side's suite red.
+// The rule lived as an expression inside YearCalendarView until the 0.85.0 QA
+// round, where no JVM test could reach it, and in ui/component until it moved
+// here: the two platforms carried the same three-line predicate and only one of
+// them was pinned. The vectors exist so that a bound moved from inclusive to
+// exclusive on either side turns the OTHER side's suite red.
 //
 // WHY THE DATES ARE PARSED HERE AND COMPARED AS STRINGS ON iOS
 //   Android holds a cell's day as a LocalDate and iOS as a `yyyy-MM-dd` string.
@@ -44,7 +44,6 @@ package de.godisch.potillus.ui.component
 //   own edge — which is precisely the seam a shared vector is for.
 // =============================================================================
 
-import de.godisch.potillus.domain.SharedTestVectors
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -74,7 +73,7 @@ class YearGridVectorTest {
 
         cases.objects().forEach { case ->
             val label = case.getString("description")
-            val actual = isDrawn(
+            val actual = YearGrid.isDrawn(
                 LocalDate.parse(case.getString("date")),
                 LocalDate.parse(case.getString("today")),
                 case.statsFrom(),

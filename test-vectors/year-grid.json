@@ -2,7 +2,7 @@
   "_comment": [
     "Shared golden vectors for the year heat-map's drawing window. Loaded by BOTH",
     "suites: YearGridVectorTest.swift drives PotillusKit's YearGrid.isDrawn, and",
-    "YearGridVectorTest.kt drives ui/component/CalendarComponents.kt's isDrawn.",
+    "YearGridVectorTest.kt drives domain/YearGrid.kt's isDrawn.",
     "",
     "The rule is the one thing the year view has that the month view does not: a",
     "day after the logical today is the future, and a day before the statistics",
