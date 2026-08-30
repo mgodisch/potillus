@@ -24,7 +24,7 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-# Libellus Potionis - User’s Guide
+# Libellus Potionis&mdash;User’s Guide
 
 Libellus Potionis is a diary for logging your own drinking. You log what you
 drink; the app works out how much pure alcohol that was and how close it
@@ -36,8 +36,8 @@ then looking back and taking stock, and finally backups.
 
 Libellus Potionis keeps record. It doesn’t judge and it doesn’t nag. The
 figures it shows are your own entries, converted to grams of pure alcohol. If
-you log every drink, you can look back at your own drinking while sober --
-which is where the app earns its keep.
+you log every drink, you can look back at your own drinking while
+sober&mdash;which is where the app earns its keep.
 
 Libellus Potionis is free software under the GNU General Public License,
 which means its source code is public and any claim about how it handles your
@@ -69,20 +69,20 @@ generation, both on iOS 26{{/ios}}.
 Libellus Potionis has four screens. You move between them with the bar along
 the bottom of the display, which is present on all four:
 
-- {{today}} -- how the current day stands, and what was logged on it,
-- {{calendar}} -- looking back over single days, months and years, and
+- _{{today}}_: how the current day stands, and what was logged on it,
+- _{{calendar}}_: looking back over single days, months and years, and
   correcting their entries where needed,
-- {{statistics}} -- statistical evaluations over weeks, months and years,
-- {{drinks}} -- the catalog of drinks you can log.
+- _{{statistics}}_: statistical evaluations over weeks, months and years,
+- _{{drinks}}_: the catalog of drinks you can log.
 
-Top right on all four screens sits the same menu
-button{{#ios}} “(&middot;&middot;&middot;)”{{/ios}}. It opens
-{{#android}}a “burger” {{/android}}menu holding _{{settings}}, {{help}}_
-(this guide) and the _{{about}}_ page, with information on the app, its
-versions and its licenses. If your device can authenticate you, {{lock_app}}
-stands there as well, and locks the app there and then.
+Top right on all four screens sits the same menu button{{#ios}}
+“(&middot;&middot;&middot;)”{{/ios}}. It opens {{#android}}a “burger”
+{{/android}}menu holding _{{settings}}_, _{{help}}_ (this guide) and the
+_{{about}}_ page, with information on the app, its versions and its licenses.
+If your device can authenticate you, _{{lock_app}}_ stands there as well, and
+locks the app there and then.
 
-_{{settings}}, {{help}}_ and _{{about}}_ open {{#android}}as pages of their
+_{{settings}}_, _{{help}}_ and _{{about}}_ open {{#android}}as pages of their
 own; the device’s back button, or the arrow at the top left, returns you to
 the screen you opened them from{{/android}}{{#ios}}as sheets of their own,
 which you close at the top right{{/ios}}.
@@ -99,16 +99,16 @@ under _{{settings}}_; the remaining settings are covered further down.
 The _{{limits}}_ section holds the values that apply to you, and all three
 apply at once:
 
-- {{daily_limit_grams}} -- the daily limit of pure alcohol in grams,
-- {{weekly_limit_grams}} -- the weekly limit of pure alcohol in grams,
+- _{{daily_limit_grams}}_: the daily limit of pure alcohol in grams,
+- _{{weekly_limit_grams}}_: the weekly limit of pure alcohol in grams,
   counted over a rolling window of seven days,
-- {{drink_days_setting}} -- the weekly limit of drinking days, counted over a
+- _{{drink_days_setting}}_: the weekly limit of drinking days, counted over a
   rolling seven-day window as well.
 
 The third value caps not the amount but the frequency. Set it to four
-drinking days, drink on three of the six days before, and the Today screen
-shows you that the first drink would use up the fourth drinking day, while a
-second drink the same day would use no further one.
+drinking days, drink on three of the six days before, and the _{{today}}_
+screen shows you that the first drink would use up the fourth drinking day,
+while a second drink the same day would use no further one.
 
 For a sense of what numbers are reasonable, look at what the health
 authorities of various countries recommend. They differ widely, and
@@ -121,12 +121,12 @@ The _{{personal_data}}_ section holds the _{{body_weight}}_, and it is
 optional. Until a value is entered, all that stands there is the button that
 adds it; after that you can step it up or down, and a second button removes
 it again. The app works fully without a body weight, only the estimated blood
-alcohol figure on the Today screen is _not_ shown then, because the basis for
-working it out is missing.
+alcohol figure on the _{{today}}_ screen is _not_ shown then, because the
+basis for working it out is missing.
 
 ### When your day begins
 
-_{{statistics}}_ holds _{{day_starts_at}},_ set to four in the morning. This
+_{{statistics}}_ holds _{{day_starts_at}}_, set to four in the morning. This
 setting decides which day a drink counts towards: have a glass at one in the
 morning and it lands on the evening before, where it belongs. The day
 boundary applies throughout the app, in the calendar as much as in the
@@ -136,10 +136,10 @@ The _{{stats_from_label}}_ row sits in the same place. That date is the floor
 under every evaluation: entries before it are ignored in every figure. It
 lets you draw a clean line on the first of January for a new year’s
 resolution without losing what you have logged so far. A fresh install sets
-the date to the day of installation. That is usually right, but it can
-puzzle you when a backup with older data is imported: the old entries are
-there, and none of them count anywhere. The _{{stats_from_clear}}_ button
-lifts the floor again; it appears only while a date is set.
+the date to the day of installation. That is usually right, but it can puzzle
+you when a backup with older data is imported: the old entries are there, and
+none of them count anywhere. The _{{stats_from_clear}}_ button lifts the
+floor again; it appears only while a date is set.
 
 ## The Today screen
 
@@ -169,14 +169,14 @@ Below that stands the list of drinks logged for the current day.
 
 ## Logging a drink
 
-There is more than one place to log a drink from. The “{{today}}” screen
-offers the first, and the “{{calendar}}” and “{{drinks}}” screens offer
+There is more than one place to log a drink from. The _{{today}}_ screen
+offers the first, and the _{{calendar}}_ and _{{drinks}}_ screens offer
 further ones. At the {{#android}}bottom{{/android}}{{#ios}}top{{/ios}} right
-of the “{{today}}” screen sits the plus button; it opens the entry sheet.
+of the _{{today}}_ screen sits the plus button; it opens the entry sheet.
 
 ### The entry sheet
 
-At the top stands the {{drink}} row with the choice from the catalog; with
+At the top stands the _{{drink}}_ row with the choice from the catalog; with
 only one drink defined, its name stands there with nothing to choose. Three
 fields follow:
 
@@ -191,7 +191,7 @@ same kind of drink is markedly stronger one evening, give it its own entry in
 the catalog.
 
 As soon as the volume is in range, the grams of pure alcohol the entry comes
-to stand below the fields{{#ios}}, in the {{alcohol_content}} row{{/ios}}.
+to stand below the fields{{#ios}}, in the _{{alcohol_content}}_ row{{/ios}}.
 This is the figure Libellus Potionis works with, not the milliliters.
 
 Beside the alcohol content sits a colored status dot. It says how many
@@ -215,13 +215,12 @@ same beer, this is the shortest way.
 
 ### Fixing or removing an entry
 
-Tap an entry in the day’s list and it opens as {{edit_entry}}: the same
-fields as when you logged it, and the same bounds. {{#android}}{{delete}}
-removes it, and the app asks once before it
-does,{{/android}}{{#ios}}To remove it, swipe the row left, or tap the row’s
-red badge in edit mode at the top right. Either way you reach {{delete}} and
-the same question,{{/ios}} because an entry deleted by mistake cannot be
-brought back.
+Tap an entry in the day’s list and it opens as _{{edit_entry}}_: the same
+fields as when you logged it, and the same bounds. {{#android}}_{{delete}}_
+removes it, and the app asks once before it does,{{/android}}{{#ios}}To
+remove it, swipe the row left, or tap the row’s red badge in edit mode at the
+top right. Either way you reach _{{delete}}_ and the same question,{{/ios}}
+because an entry deleted by mistake cannot be brought back.
 
 ## The calendar
 
@@ -238,10 +237,10 @@ limits, a red one for a drinking day that broke a limit. Days without an
 entry carry no dot.
 
 A tap selects the day and lists its entries below. There they can be edited
-and deleted exactly as the current day can on the Today screen, and the plus
-button at the {{#android}}bottom{{/android}}{{#ios}}top{{/ios}} right, which
-appears only once a day is selected, logs to the selected day. This is how
-you catch up on what you did not record while drinking.
+and deleted exactly as the current day can on the _{{today}}_ screen, and the
+plus button at the {{#android}}bottom{{/android}}{{#ios}}top{{/ios}} right,
+which appears only once a day is selected, logs to the selected day. This is
+how you catch up on what you did not record while drinking.
 
 ### The year view
 
@@ -255,10 +254,10 @@ the month view for it.
 ## Taking stock: the statistics
 
 The _{{statistics}}_ screen analyzes. The length of the period is chosen at
-the top: {{week}}, {{month}} or {{year}}. Everything below refers to that
-choice. _Week_ always means a rolling seven-day window made up of today and
-the six days before it. Every calculation ignores entries from before the
-{{stats_from_label}}. If there are no entries in the chosen period,
+the top: _{{week}}_, _{{month}}_ or _{{year}}_. Everything below refers to
+that choice. _Week_ always means a rolling seven-day window made up of today
+and the six days before it. Every calculation ignores entries from before the
+_{{stats_from_label}}_. If there are no entries in the chosen period,
 {{#android}}the charts read {{no_data}}{{/android}}{{#ios}}the sections stay
 where they are and show zeroes{{/ios}}.
 
@@ -266,32 +265,32 @@ where they are and show zeroes{{/ios}}.
 
 Below the period buttons, the stretch on display is spelled out as an exact
 range of dates. The current month ends today rather than at month’s end, and
-if a {{stats_from_label}} is set, the range begins there. So what stands
+if a _{{stats_from_label}}_ is set, the range begins there. So what stands
 there is precisely what the figures below cover. An arrow sits either side of
 it. The left one steps a period back, the right one back toward the present.
 
 Everything on this screen follows the chosen period, figures and charts
-alike. {{trend_vs_prev}} always compares with the period of the same length
+alike. _{{trend_vs_prev}}_ always compares with the period of the same length
 directly before it, so March against February.
 
 ### The figures
 
-- {{total_period}}: grams of pure alcohol in the chosen period.
-- {{avg_per_day}}: the average across every calendar day.
-- {{avg_per_drink_day}}: the average across drinking days. The gap to the
+- _{{total_period}}_: grams of pure alcohol in the chosen period.
+- _{{avg_per_day}}_: the average across every calendar day.
+- _{{avg_per_drink_day}}_: the average across drinking days. The gap to the
   figure above says a good deal: a wide gap points to drinking that is rare
   but heavy.
-- {{days_over_daily_limit}}: the number of days on which the daily limit was
-  passed.
-- {{days_over_weekly_limit}}: the number of drinking days on which that day
+- _{{days_over_daily_limit}}_: the number of days on which the daily limit
+  was passed.
+- _{{days_over_weekly_limit}}_: the number of drinking days on which that day
   and the six before it added up to more than the seven-day limit.
-- {{days_over_drink_day_limit}}: drinking days that sat above the
+- _{{days_over_drink_day_limit}}_: drinking days that sat above the
   drinking-day limit within their seven-day window, the fifth drinking day in
   seven, say, when only four are allowed.
-- {{abstinent_days}}: days in the period without entries.
-- {{current_streak}}: counts the days since the last drink.
-- {{longest_streak}}: the longest stretch without alcohol in the period.
-- {{trend_vs_prev}}: shows the trend against the period before.
+- _{{abstinent_days}}_: days in the period without entries.
+- _{{current_streak}}_: counts the days since the last drink.
+- _{{longest_streak}}_: the longest stretch without alcohol in the period.
+- _{{trend_vs_prev}}_: shows the trend against the period before.
 
 ### The charts
 
@@ -301,17 +300,17 @@ the pattern:
 - The first bar chart traces consumption across the chosen period: the chosen
   seven-day window, the chosen month, or the average consumption per day for
   each month of the chosen year.
-- {{stats_time_of_day}} splits the day into eight slots of three hours each
+- _{{stats_time_of_day}}_ splits the day into eight slots of three hours each
   and gives the average in grams per day for each of them. This is where you
   see whether the drinking sits in the evening or runs through the day. The
   section appears only if anything was drunk in the chosen period.
-- {{stats_weekday}} gives the average consumption per day of the week.
-- {{stats_category_breakdown}} shows as a ring how the drinking splits across
-  the six drink categories.
+- _{{stats_weekday}}_ gives the average consumption per day of the week.
+- _{{stats_category_breakdown}}_ shows as a ring how the drinking splits
+  across the six drink categories.
 
 ## The drinks catalog
 
-The “{{drinks}}” screen manages the drinks you choose from when logging. The
+The _{{drinks}}_ screen manages the drinks you choose from when logging. The
 app ships with a selection of common ones; they can be changed, added to and
 deleted.
 
@@ -319,32 +318,33 @@ Each row shows the name, a category symbol, the serving, the strength and the
 grams of pure alcohol those come to, with the favorite star and the status
 dot for that serving ahead of them{{#android}}, and an edit and a delete icon
 after them{{/android}}. The star toggles the favorite: favorites appear in
-the quick buttons on the Today screen.
+the quick buttons on the _{{today}}_ screen.
 
 {{#android}}A tap on the row (not on the icons) opens the entry sheet for
 that drink; this is the third way to log, alongside the plus buttons on the
-Today and the Calendar screens. The two icons on the right open the editor
-and the delete prompt.{{/android}}{{#ios}}A tap on the row opens the entry
-sheet for that drink; this is the third way to log, alongside the plus
-buttons on the Today and the Calendar screens. Editing and deleting belong to
-edit mode, which you turn on at the top right: there the same tap opens the
-editor, and the row’s red badge leads to the delete prompt. A left swipe
-offers both actions as well, in edit mode and outside it.{{/ios}}
+_{{today}}_ and the _{{calendar}}_ screens. The two icons on the right open
+the editor and the delete prompt.{{/android}}{{#ios}}A tap on the row opens
+the entry sheet for that drink; this is the third way to log, alongside the
+plus buttons on the _{{today}}_ and the _{{calendar}}_ screens. Editing and
+deleting belong to edit mode, which you turn on at the top right: there the
+same tap opens the editor, and the row’s red badge leads to the delete
+prompt. A left swipe offers both actions as well, in edit mode and outside
+it.{{/ios}}
 
 ### Adding or changing a drink
 
-The plus button opens _{{add_drink}},_ {{#android}}a row’s pencil
-icon{{/android}}{{#ios}}a tap in edit mode{{/ios}} opens {{edit_drink}}. Both
-sheets ask the same:
+The plus button opens _{{add_drink}}_, {{#android}}a row’s pencil
+icon{{/android}}{{#ios}}a tap in edit mode{{/ios}} opens _{{edit_drink}}_.
+Both sheets ask the same:
 
-- {{drink_name}}: whatever you like, up to 100 characters.
-- {{volume_ml}}: the usual serving, which the entry sheet starts from. From 1
-  to 5,000 milliliters.
-- {{alcohol_percent}}: the usual strength, from 0 to 100 percent.
-- {{category}}: one of six categories: {{category_beer}}, {{category_wine}},
-  {{category_spirits}}, {{category_longdrink}}, {{category_liqueur}} or
-  {{category_other}}. The category changes nothing in the arithmetic; it
-  groups the breakdown on the statistics screen.
+- _{{drink_name}}_: whatever you like, up to 100 characters.
+- _{{volume_ml}}_: the usual serving, which the entry sheet starts from. From
+  1 to 5,000 milliliters.
+- _{{alcohol_percent}}_: the usual strength, from 0 to 100 percent.
+- _{{category}}_: one of six categories: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} or {{category_other}}. The category changes nothing in
+  the arithmetic; it groups the breakdown on the _{{statistics}}_ screen.
 
 ### Why some drinks refuse to be deleted
 
@@ -355,9 +355,9 @@ would otherwise lose what they refer to, leaving the statistics incomplete.
 ## Data export
 
 Both formats ask for a period before the file is written. The dialog starts
-at your {{stats_from_label}} date and today, or, with no such date set, at
+at your _{{stats_from_label}}_ date and today, or, with no such date set, at
 the period on display. The exported range is independent of the period the
-statistics screen shows.
+_{{statistics}}_ screen shows.
 
 ### The PDF report
 
@@ -372,10 +372,10 @@ that something was logged on. Export July having drunk on eleven days and you
 get a report over thirty-one days, with twenty abstinent days and a daily
 average divided by thirty-one. The month table lists every month of the
 period, including one without a single entry. This is what makes the figures
-of the report agree with those of the statistics screen. If the period chosen
-ends today, the report ends yesterday for as long as nothing is logged today:
-an unfinished day would drag the average down and count as abstinent before
-it is over.
+of the report agree with those of the _{{statistics}}_ screen. If the period
+chosen ends today, the report ends yesterday for as long as nothing is logged
+today: an unfinished day would drag the average down and count as abstinent
+before it is over.
 
 For the PDF report, {{#android}}the system print dialog opens, from where you
 can print it or save it as a file.{{/android}}{{#ios}}the system file picker
@@ -385,9 +385,9 @@ or into another app.{{/ios}}
 ### The CSV export
 
 The _{{export_csv}}_ button on the _{{statistics}}_ screen writes a table
-with one row per entry, ready for a spreadsheet such as
-[LibreOffice Calc](https://www.libreoffice.org/). Numbers are written
-machine-readably with a decimal point, whatever language the app is in.
+with one row per entry, ready for a spreadsheet such as [LibreOffice
+Calc](https://www.libreoffice.org/). Numbers are written machine-readably
+with a decimal point, whatever language the app is in.
 
 {{#android}}The CSV file lands in the Downloads folder, and the app offers to
 share it afterwards.{{/android}}{{#ios}}For the CSV file, too, the system
@@ -402,26 +402,26 @@ no device-to-device transfer. **When you change devices, after a factory
 reset or a reinstall, a backup you made yourself is the only way to keep your
 data.** Whatever was not exported is gone then.{{/android}}{{#ios}}Libellus
 Potionis keeps its data out of every device backup, iCloud and computer
-backups alike; the {{device_backup}} switch under {{security}} reverses that
-(see “Access and visibility”). While it is off, a backup you made yourself is
-the only way to keep your data when you change devices, after a factory reset
-or a reinstall.{{/ios}}
+backups alike; the _{{device_backup}}_ switch under _{{security}}_ reverses
+that (see “Access and visibility”). While it is off, a backup you made
+yourself is the only way to keep your data when you change devices, after a
+factory reset or a reinstall.{{/ios}}
 
-A backup is a single JSON file. The {{backup_include_settings}} switch
+A backup is a single JSON file. The _{{backup_include_settings}}_ switch
 decides whether the settings are written into it alongside the drinks catalog
 and the entries. The option is on again every time the settings are opened.
 This is how the data moves to a new device:
 
-1. On the old device, choose _{{settings}}_ -> _{{backup_section}}_ ->
+1. On the old device, choose _{{settings}}_ → _{{backup_section}}_ →
    _{{backup_export}}_. Keep the file somewhere safe, a
    [Signal](https://signal.org/) note to yourself for instance.
 2. Install Libellus Potionis on the new device.
-3. There, restore the data through _{{settings}}_ -> _{{backup_section}}_ ->
+3. There, restore the data through _{{settings}}_ → _{{backup_section}}_ →
    _{{backup_import}}_.
 
-On import the app asks how it should go about it. {{import_replace}} throws
+On import the app asks how it should go about it. _{{import_replace}}_ throws
 away what is on the device: the drinks catalog, the entries, and the
-settings, provided the backup carries any. {{import_merge}} deletes no
+settings, provided the backup carries any. _{{import_merge}}_ deletes no
 existing drink definitions and no entries, and adds what is missing. Entries
 that already exist are not duplicated, and the current settings are not
 overwritten.
@@ -433,34 +433,33 @@ overwritten.
 The _{{security}}_ section holds
 {{#android}}two{{/android}}{{#ios}}three{{/ios}} switches:
 
-- _{{biometric_lock}}_ asks, whenever the app is opened, for
-  {{#android}}a fingerprint, a face, or the device
-  lock.{{/android}}{{#ios}}Face ID, Touch ID or the device
-  passcode.{{/ios}} Turning the lock on or off requires that same
-  authentication. It applies again when you leave the app and come back,
+- _{{biometric_lock}}_ asks, whenever the app is opened, for {{#android}}a
+  fingerprint, a face, or the device lock.{{/android}}{{#ios}}Face ID, Touch
+  ID or the device passcode.{{/ios}} Turning the lock on or off requires that
+  same authentication. It applies again when you leave the app and come back,
   though not if you come back within thirty seconds. The menu at the top
   right also carries _{{lock_app}}_, which locks the app there and then.
 - _{{allow_screenshots}}_ is off by default. While screenshots are off,
   {{#android}}no screenshot can be taken of the app window, and its content
-  stays covered in the list of recently used
-  apps.{{/android}}{{#ios}}the content stays covered in the app
-  switcher.{{/ios}} Someone who picks up your unlocked device and thumbs
-  through the open apps sees nothing there. {{#ios}}A screenshot itself is
-  beyond the reach of the iOS app; iOS offers no interface for preventing
-  one, and this switch does not change that.{{/ios}}
-{{#ios}}- {{device_backup}} is off by default as well. While the switch is
+  stays covered in the list of recently used apps.{{/android}}{{#ios}}the
+  content stays covered in the app switcher.{{/ios}} Someone who picks up
+  your unlocked device and thumbs through the open apps sees nothing there.
+  {{#ios}}A screenshot itself is beyond the reach of the iOS app; iOS offers
+  no interface for preventing one, and this switch does not change
+  that.{{/ios}}
+{{#ios}}- _{{device_backup}}_ is off by default as well. While the switch is
 off, the app’s data stays out of every device backup, iCloud and computer
 backups alike. Turn it on and the data survives restoring a device from its
 backup, but then it also sits wherever that backup sits.{{/ios}}
 
 ### Appearance and language
 
-The {{appearance}} section offers three things:
+The _{{appearance}}_ section offers three things:
 
-- _{{theme_mode}}:_ {{theme_system}}, or {{theme_day}} or {{theme_night}}
+- _{{theme_mode}}_: {{theme_system}}, or {{theme_day}} or {{theme_night}}
   regardless of the system setting.
-- _{{language}}:_ the app’s language, again independent of the system.
-  _{{language_system}}_ follows the system language again.
+- _{{language}}_: the app’s language, again independent of the system.
+  {{language_system}} follows the system language again.
 - _{{alt_status_symbols}}_ gives the status dots a shape as well as a color.
   The three states stay apart that way when red, yellow and green are hard to
   tell apart.
@@ -482,8 +481,8 @@ comparable at all.
 ### The blood alcohol estimate
 
 Given a body weight, Libellus Potionis estimates blood alcohol concentration
-with the
-[Widmark formula](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+with the [Widmark
+formula](https://en.wikipedia.org/wiki/Blood_alcohol_content):
 
 **BAC [per mille] = A / (P × r) − β × t**
 
@@ -504,7 +503,7 @@ and it cannot tell you whether you are fit to drive.
 
 ### The logical day
 
-A drink belongs to the day that began at {{day_starts_at}}, not to the day
+A drink belongs to the day that began at _{{day_starts_at}}_, not to the day
 the clock shows. With the default of four in the morning, a glass at half
 past one still counts toward the day before. The rule holds throughout the
 app, and across clock changes.

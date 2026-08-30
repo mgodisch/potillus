@@ -191,7 +191,9 @@ private val HTML_ENTITIES = mapOf(
     "&copy;" to "©",
     "&reg;" to "®",
     "&trade;" to "™",
+    "&ndash;" to "–",
     "&mdash;" to "—",
+    "&middot;" to "·",
     "&sect;" to "§",
 )
 

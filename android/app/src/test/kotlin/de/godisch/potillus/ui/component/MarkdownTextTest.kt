@@ -60,7 +60,9 @@ class MarkdownTextTest {
         assertEquals("'", decodeHtmlEntities("&apos;"))
         assertEquals("©", decodeHtmlEntities("&copy;"))
         assertEquals("\u00A0", decodeHtmlEntities("&nbsp;"))
+        assertEquals("–", decodeHtmlEntities("&ndash;"))
         assertEquals("—", decodeHtmlEntities("&mdash;"))
+        assertEquals("·", decodeHtmlEntities("&middot;"))
         assertEquals("§", decodeHtmlEntities("&sect;"))
     }
 
