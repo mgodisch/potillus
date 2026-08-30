@@ -314,11 +314,13 @@ davorliegenden Zeitraum gleicher Länge, beim März also mit dem Februar.
 
 ### Die Diagramme
 
-Ein Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum: den
-Alkoholkonsum des gewählten 7-Tage-Fensters bzw. des gewählten Monats bzw.
-den durchschnittlichen Alkoholkonsum pro Tag der Monate des gewählten Jahres.
-Darunter folgen drei Auswertungen hinsichtlich des Musters:
+Unter den Kennzahlen stehen vier Diagramme, das erste zum Verlauf, die
+übrigen zum Muster:
 
+- Das erste Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum: den
+  Alkoholkonsum des gewählten 7-Tage-Fensters bzw. des gewählten Monats bzw.
+  den durchschnittlichen Alkoholkonsum pro Tag der Monate des gewählten
+  Jahres.
 - {{stats_time_of_day}} teilt den Tag in acht Abschnitte von je drei Stunden
   und zeigt für jeden den Durchschnitt in Gramm pro Tag. Hier wird sichtbar,
   ob der Konsum abends stattfindet oder über den Tag verteilt. Dieser

@@ -295,10 +295,12 @@ directly before it, so March against February.
 
 ### The charts
 
-A bar chart traces consumption across the chosen period: the chosen
-seven-day window, the chosen month, or the average consumption per day for
-each month of the chosen year. Three readings of the pattern follow:
+Four charts stand below the figures, the first on the course, the others on
+the pattern:
 
+- The first bar chart traces consumption across the chosen period: the chosen
+  seven-day window, the chosen month, or the average consumption per day for
+  each month of the chosen year.
 - {{stats_time_of_day}} splits the day into eight slots of three hours each
   and gives the average in grams per day for each of them. This is where you
   see whether the drinking sits in the evening or runs through the day. The
