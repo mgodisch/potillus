@@ -84,8 +84,9 @@ Oben rechts befindet sich auf allen vier Ansichten dasselbe Menüsymbol
 {{#ios}} „(&middot;&middot;&middot;)“{{/ios}}. Es öffnet ein
 {{#android}}„Burger“-{{/android}}Menü mit _{{settings}}, {{help}}_ (dieses
 Handbuch) und der Seite _{{about}}_ mit Informationen zur App, zu Versionen
-und Lizenzen. Ist in der App eine Bildschirmsperre konfiguriert, steht dort
-außerdem {{lock_app}}, womit die App unmittelbar gesperrt wird.
+und Lizenzen. Ist auf dem Gerät eine Authentifizierung eingerichtet,
+biometrisch oder per Gerätecode, steht dort außerdem {{lock_app}}, womit die
+App unmittelbar gesperrt wird.
 
 _{{settings}}, {{help}}_ und _{{about}}_ öffnen sich {{#android}}als eigene
 Seiten; der Zurück-Button des Geräts oder der Pfeil oben links führt auf die
@@ -313,12 +314,11 @@ davorliegenden Zeitraum gleicher Länge, beim März also mit dem Februar.
 
 ### Die Diagramme
 
-Ein Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum. Darunter
-folgen drei Auswertungen hinsichtlich des Musters:
+Ein Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum: den
+Alkoholkonsum des gewählten 7-Tage-Fensters bzw. des gewählten Monats bzw.
+den durchschnittlichen Alkoholkonsum pro Tag der Monate des gewählten Jahres.
+Darunter folgen drei Auswertungen hinsichtlich des Musters:
 
-- Diagramm Nr. 1 zeigt den Alkoholkonsum des gewählten 7-Tage-Fensters bzw.
-  des gewählten Monats bzw. den durchschnittlichen Alkoholkonsum pro Tag der
-  Monate des gewählten Jahres.
 - {{stats_time_of_day}} teilt den Tag in acht Abschnitte von je drei Stunden
   und zeigt für jeden den Durchschnitt in Gramm pro Tag. Hier wird sichtbar,
   ob der Konsum abends stattfindet oder über den Tag verteilt. Dieser
@@ -341,15 +341,16 @@ Lösch-Symbol{{/android}}. Der Stern schaltet den Favoritenstatus um:
 Favoriten erscheinen in der Schnellauswahl auf der Heute-Ansicht.
 
 {{#android}}Ein Tippen auf die Zeile (nicht auf die Symbole) öffnet den
-Buchungsdialog mit diesem Getränk; dies ist der zweite Weg zum Einbuchen,
-neben der Plus-Taste auf der Heute-Ansicht. Die beiden Symbole rechts öffnen
-den Editor und die Löschabfrage.{{/android}}{{#ios}}Ein Tippen auf die Zeile
-öffnet den Buchungsdialog mit diesem Getränk; dies ist der dritte Weg zum
-Einbuchen, neben den Plus-Tasten der Heute- und der Kalender-Ansicht. Ändern
-und Löschen gehören in den Bearbeitungsmodus, der oben rechts eingeschaltet
-wird: dort öffnet dasselbe Tippen den Editor, und das rote Zeichen der Zeile
-führt zur Löschabfrage. Ein Wisch nach links bietet beide Aktionen ebenfalls
-an, im Bearbeitungsmodus wie außerhalb.{{/ios}}
+Buchungsdialog mit diesem Getränk; dies ist der dritte Weg zum Einbuchen,
+neben den Plus-Tasten der Heute- und der Kalender-Ansicht. Die beiden Symbole
+rechts öffnen den Editor und die Löschabfrage.{{/android}}{{#ios}}Ein Tippen
+auf die Zeile öffnet den Buchungsdialog mit diesem Getränk; dies ist der
+dritte Weg zum Einbuchen, neben den Plus-Tasten der Heute- und der
+Kalender-Ansicht. Ändern und Löschen gehören in den Bearbeitungsmodus, der
+oben rechts eingeschaltet wird: dort öffnet dasselbe Tippen den Editor, und
+das rote Zeichen der Zeile führt zur Löschabfrage. Ein Wisch nach links
+bietet beide Aktionen ebenfalls an, im Bearbeitungsmodus wie
+außerhalb.{{/ios}}
 
 ### Ein Getränk anlegen oder ändern
 
