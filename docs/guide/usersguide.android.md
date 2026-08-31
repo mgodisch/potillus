@@ -1,10 +1,10 @@
 # Libellus Potionis&mdash;User’s Guide
 
 Libellus Potionis is a diary for logging your own drinking. You log what you
-drink; the app works out how much pure alcohol that was and how close it
-brings you to the limits you set yourself. This guide walks you through the
-app step by step: how it is laid out, how to set it up, how to log a drink,
-then looking back and taking stock, and finally backups.
+drink; the app works out how much pure alcohol that was and whether “la
+petite sœur” is still within the limits you set yourself. This guide walks
+you through the app step by step: how it is laid out, how to set it up, how
+to log a drink, then looking back and taking stock, and finally backups.
 
 ## What the app does, and what it doesn’t
 
@@ -15,8 +15,8 @@ sober&mdash;which is where the app earns its keep.
 
 Libellus Potionis is free software under the GNU General Public License,
 which means its source code is public and any claim about how it handles your
-data can be checked at any time. Privacy is a defining trait of Libellus
-Potionis: it asks for no sensitive permission at all, no camera, no
+data can be checked by anyone at any time. Privacy is a defining trait of
+Libellus Potionis: it asks for no sensitive permission at all, no camera, no
 microphone, no location, no file access, not even network access. Everything
 you enter stays in the app’s private storage on your device, protected by the
 device’s own encryption. You can lock access to the app in the settings using
@@ -47,13 +47,13 @@ the bottom of the display, which is present on all four:
 - _Statistics_: statistical evaluations over weeks, months and years,
 - _Drinks_: the catalog of drinks you can log.
 
-Top right on all four screens sits the same menu button. It opens a “burger”
-menu holding _Settings_, _Help_ (this guide) and the
-_About_ page, with information on the app, its versions and its licenses.
-If your device can authenticate you, _Lock app_ stands there as well, and
-locks the app there and then.
+Top right on all four screens sits the same “burger” menu
+button. It opens a menu holding _Settings, Help_ (this
+guide) and the _About_ page, with information on the app, its versions
+and its licenses. If your device can authenticate you, _Lock app_ stands
+there as well, and locks the app there and then.
 
-_Settings_, _Help_ and _About_ open as pages of their
+_Settings, Help_ and _About_ open as pages of their
 own; the device’s back button, or the arrow at the top left, returns you to
 the screen you opened them from.
 
@@ -78,7 +78,7 @@ apply at once:
 The third value caps not the amount but the frequency. Set it to four
 drinking days, drink on three of the six days before, and the _Today_
 screen shows you that the first drink would use up the fourth drinking day,
-while a second drink the same day would use no further one.
+while a second drink the same day would not use an additional one.
 
 For a sense of what numbers are reasonable, look at what the health
 authorities of various countries recommend. They differ widely, and
@@ -109,7 +109,7 @@ resolution without losing what you have logged so far. A fresh install sets
 the date to the day of installation. That is usually right, but it can puzzle
 you when a backup with older data is imported: the old entries are there, and
 none of them count anywhere. The _Include all history_ button lifts the
-floor again; it appears only while a date is set.
+floor again.
 
 ## The Today screen
 
@@ -119,11 +119,9 @@ as time passes. From the top:
 Two large figures stand side by side: on the
 left the length of the
 current abstinence in days, or the pure alcohol logged today in grams,
-on the right, under “Ø”, the
-average for the current month in grams per day. The monthly figure is the
-only one on this screen that looks beyond the day. A green or red trend arrow
-beside it compares that figure with the month before; with no previous month,
-there is no arrow.
+on the right, as “Ø”, the
+average for the current month in grams per day. A green or red trend arrow
+beside it compares that figure with the month before.
 
 Three quantity bars: the first shows today’s consumption against the daily
 limit you configured, the second the sum of today and the past six days
@@ -208,21 +206,23 @@ how you catch up on what you did not record while drinking.
 
 ### The year view
 
-The year view shows the twelve months of a year as a heat map, a grid of
-small squares, one per day. The year is shown above the grid, with an arrow
-either side for moving between years. The legend below names the three
-states: no entry, under limit,
-over limit. Today carries a ring. A tap on a month opens
-the month view for it.
+The year view can be selected using the button on the top
+right. It shows the twelve months
+of a year as a heat map, a grid of small squares, one per day. The year is
+shown above the grid, with an arrow either side for moving between years. The
+legend below names the three states: no entry,
+under limit, over limit. Today carries a
+ring. A tap on a month opens the month view for it.
 
 ## Taking stock: the statistics
 
 The _Statistics_ screen analyzes. The length of the period is chosen at
 the top: _7 Days_, _Month_ or _Year_. Everything below refers to
-that choice. _Week_ always means a rolling seven-day window made up of today
-and the six days before it. Every calculation ignores entries from before the
-_Statistics From_. If there are no entries in the chosen period,
-the charts read No data for this period..
+that choice. _7 Days_ always means a rolling seven-day window made up of
+today and the six days before it. Every calculation ignores entries from
+before the _Statistics From_ date in _Settings_. If there are no
+entries in the chosen period, the charts read
+“No data for this period.”.
 
 ### Moving back through time
 
@@ -240,9 +240,8 @@ directly before it, so March against February.
 
 - _Total in Period_: grams of pure alcohol in the chosen period.
 - _Average per Day_: the average across every calendar day.
-- _Average per Drinking Day_: the average across drinking days. The gap to the
-  figure above says a good deal: a wide gap points to drinking that is rare
-  but heavy.
+- _Average per Drinking Day_: the average across drinking days. A large gap to
+  the previous figure points to drinking that is rare but heavy.
 - _Days Over Daily Limit_: the number of days on which the daily limit
   was passed.
 - _Days Over 7-Day Limit_: the number of drinking days on which that day
@@ -257,7 +256,7 @@ directly before it, so March against February.
 
 ### The charts
 
-Four charts stand below the figures, the first on the course, the others on
+Four charts complement the figures, the first on the course, the others on
 the pattern:
 
 - The first bar chart traces consumption across the chosen period: the chosen
@@ -305,34 +304,28 @@ Both sheets ask the same:
 
 ### Why some drinks refuse to be deleted
 
-A drink that logged entries already point at cannot be removed; the app then
-tells you how many entries hang off it. The reason is that those entries
-would otherwise lose what they refer to, leaving the statistics incomplete.
+A drink cannot be deleted while entries in your log still refer to it; the
+app then tells you how many do. The reason is that those entries would
+otherwise lose what they refer to, leaving the statistics incomplete.
 
 ## Data export
-
-Both formats ask for a period before the file is written. The dialog starts
-at your _Statistics From_ date and today, or, with no such date set, at
-the period on display. The exported range is independent of the period the
-_Statistics_ screen shows.
 
 ### The PDF report
 
 On the _Statistics_ screen, the _PDF_ button produces a
-two-page report as a PDF: the headline figures, a month by month table, the
-long-term trend, the pattern by category, time of day and day of the week,
-and a section on risky drinking and abstinence. The format suits a
-conversation with an addiction counselor.
+two-page report as a _Portable Document Format (PDF)_ file: the headline
+figures, a month by month table, the long-term trend, the pattern by
+category, time of day and day of the week, and a section on risky drinking
+and abstinence. The format suits a conversation with an addiction counselor.
 
-The report covers exactly the period chosen, not merely the days inside it
-that something was logged on. Export July having drunk on eleven days and you
-get a report over thirty-one days, with twenty abstinent days and a daily
-average divided by thirty-one. The month table lists every month of the
-period, including one without a single entry. This is what makes the figures
-of the report agree with those of the _Statistics_ screen. If the period
-chosen ends today, the report ends yesterday for as long as nothing is logged
-today: an unfinished day would drag the average down and count as abstinent
-before it is over.
+The report covers exactly the period chosen: If you export July after
+drinking on eleven days, you get a report over thirty-one days, with twenty
+abstinent days and a daily average divided by thirty-one. The month table
+lists every month of the period, including one without a single entry. This
+is what makes the figures of the report agree with those of the
+_Statistics_ screen. If the period chosen ends today, the report ends
+yesterday for as long as nothing is logged today: an unfinished day would
+drag the average down and count as abstinent before it is over.
 
 For the PDF report, the system print dialog opens, from where you
 can print it or save it as a file.
@@ -347,9 +340,9 @@ with a decimal point, whatever language the app is in.
 The CSV file lands in the Downloads folder, and the app offers to
 share it afterwards.
 
-### The JSON export (backups)
+### The JSON export &mdash; Backups
 
-**Data you record does not leave this device without your doing.**
+**Data you record does not leave this device without your explicit action.**
 Libellus Potionis takes part in no automatic cloud backup and in
 no device-to-device transfer. **When you change devices, after a factory
 reset or a reinstall, a backup you made yourself is the only way to keep your
@@ -386,11 +379,11 @@ two switches:
   same authentication. It applies again when you leave the app and come back,
   though not if you come back within thirty seconds. The menu at the top
   right also carries _Lock app_, which locks the app there and then.
-- _Allow Screenshots_ is off by default. While screenshots are off,
-  no screenshot can be taken of the app window, and its content
-  stays covered in the list of recently used apps. Someone who picks up
-  your unlocked device and thumbs through the open apps sees nothing there.
-  
+- _Allow Screenshots_ is off by default. While screenshots
+  are off, no screenshot can be taken of the app window, and its content
+  stays covered in the list of recently used
+  apps. Someone who picks up your unlocked device and thumbs
+  through the open apps sees nothing there. 
 
 ### Appearance and language
 
@@ -399,7 +392,7 @@ The _Appearance_ section offers three things:
 - _Color Scheme_: System, or Light or Dark
   regardless of the system setting.
 - _Language_: the app’s language, again independent of the system.
-  (System) follows the system language again.
+  “(System)” follows the system language again.
 - _Alternative Status Symbols_ gives the status dots a shape as well as a color.
   The three states stay apart that way when red, yellow and green are hard to
   tell apart.
@@ -427,7 +420,7 @@ formula](https://en.wikipedia.org/wiki/Blood_alcohol_content):
 **BAC [per mille] = A / (P × r) − β × t**
 
 A is the pure alcohol in grams, P the body weight in kilograms, r the
-distribution coefficient, β the elimination rate of about 0.15 per mille an
+distribution coefficient, β the elimination rate of about 0.15 per mille per
 hour, and t the hours since the first drink.
 
 The app does not record your sex and therefore works deliberately on the

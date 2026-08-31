@@ -28,8 +28,8 @@ apply to it are stated in the accompanying COPYING.md file.
 
 Libellus Potionis ist eine Tagebuch-App zum Protokollieren des eigenen
 Alkoholkonsums. Wer sie benutzt, bucht ein, was er trinkt; die App rechnet
-aus, wie viel reiner Alkohol das war und wie nahe der Konsum an den selbst
-gesetzten Limits liegt. Dieses Handbuch führt schrittweise durch die App:
+aus, wie viel reiner Alkohol das war und ob „la petite sœur“ noch innerhalb
+der gesetzten Limits liegt. Dieses Handbuch führt schrittweise durch die App:
 erst der Aufbau, dann das Einrichten, das Buchen, dann Rückblick und
 Auswertung, schließlich Backups.
 
@@ -80,15 +80,15 @@ eingeblendet ist:
 - _{{statistics}}_: statistische Auswertungen über Wochen, Monate und Jahre,
 - _{{drinks}}_: der Katalog der Getränke, die gebucht werden können.
 
-Oben rechts befindet sich auf allen vier Ansichten dasselbe Menüsymbol
-{{#ios}} „(&middot;&middot;&middot;)“{{/ios}}. Es öffnet ein
-{{#android}}„Burger“-{{/android}}Menü mit _{{settings}}_, _{{help}}_ (dieses
-Handbuch) und der Seite _{{about}}_ mit Informationen zur App, zu Versionen
-und Lizenzen. Ist auf dem Gerät eine Authentifizierung eingerichtet,
-biometrisch oder per Gerätecode, steht dort außerdem _{{lock_app}}_, womit
-die App unmittelbar gesperrt wird.
+Oben rechts befindet sich auf allen vier Ansichten dasselbe
+{{#ios}}Menüsymbol „(&middot;&middot;&middot;)“{{/ios}}
+{{#android}}„Burger“-Menüsymbol{{/android}}. Es öffnet ein Menü mit
+_{{settings}}, {{help}}_ (dieses Handbuch) und der Seite _{{about}}_ mit
+Informationen zur App, zu Versionen und Lizenzen. Ist auf dem Gerät eine
+Authentifizierung eingerichtet, biometrisch oder per Gerätecode, steht dort
+außerdem _{{lock_app}}_, womit die App unmittelbar gesperrt wird.
 
-_{{settings}}_, _{{help}}_ und _{{about}}_ öffnen sich {{#android}}als eigene
+_{{settings}}, {{help}}_ und _{{about}}_ öffnen sich {{#android}}als eigene
 Seiten; der Zurück-Button des Geräts oder der Pfeil oben links führt auf die
 Ansicht zurück, von der aus sie geöffnet wurden{{/android}}{{#ios}}als eigene
 Dialogfenster, die oben rechts wieder geschlossen werden{{/ios}}.
@@ -150,7 +150,7 @@ zu verlieren. Bei einer frischen Installation steht dieses Datum auf dem
 Installationstag. Das ist meist richtig, kann aber irritieren, wenn ein
 Backup mit älteren Daten eingespielt wird: Die alten Einträge sind da, zählen
 aber nirgends mit. Der Knopf _{{stats_from_clear}}_ hebt die Grenze wieder
-auf; er erscheint nur, wenn ein Datum gesetzt ist.
+auf.
 
 ## Die Heute-Ansicht
 
@@ -161,10 +161,8 @@ Zwei große Zahlen stehen {{#android}}nebeneinander:
 Links{{/android}}{{#ios}}untereinander:{{/ios}} die Dauer der aktuellen
 Abstinenzphase in Tagen oder die Summe des heute gebuchten reinen Alkohols in
 Gramm, {{#android}}rechts{{/android}}{{#ios}}darunter{{/ios}} unter „Ø“ der
-Durchschnitt des laufenden Monats in Gramm pro Tag. Der Monatswert ist der
-einzige auf dieser Ansicht, der über den Tag hinausblickt. Steht ein grüner
-oder roter Trendpfeil daneben, vergleicht er diesen Wert mit dem des
-Vormonats; ohne Vormonatswert bleibt er aus.
+Durchschnitt des laufenden Monats in Gramm pro Tag. Steht ein grüner oder
+roter Trendpfeil daneben, vergleicht dieser den Wert mit dem des Vormonats.
 
 Drei Mengenbalken: Der erste zeigt den heutigen Alkoholkonsum gegen das
 konfigurierte Tageslimit, der zweite die Summe des aktuellen und der letzten
@@ -231,12 +229,13 @@ Für das Feierabendbier, das immer das gleiche ist, ist dies der kürzeste Weg.
 
 ### Etwas korrigieren oder löschen
 
-Ein Tippen auf einen Eintrag der Tagesliste öffnet ihn als _{{edit_entry}}_:
-dieselben Felder wie beim Buchen, dieselben Grenzen. {{#android}}Zum
-Entfernen dient _{{delete}}_; die App fragt einmal
-nach,{{/android}}{{#ios}}Zum Entfernen kann die Zeile nach links gewischt
-werden, oder im Bearbeitungsmodus (oben rechts) das rote Zeichen der Zeile
-angetippt werden. Beide Wege führen zu _{{delete}}_ und derselben
+Ein Tippen auf {{#android}}das Stift-Symbol eines
+Eintrags{{/android}}{{#ios}}einen Eintrag{{/ios}} der Tagesliste öffnet
+diesen als _{{edit_entry}}_: dieselben Felder wie beim Buchen, dieselben
+Grenzen. {{#android}}Zum Entfernen dient das Papierkorb-Symbol; die App fragt
+einmal nach,{{/android}}{{#ios}}Zum Entfernen kann die Zeile nach links
+gewischt werden, oder im Bearbeitungsmodus (oben rechts) das rote Zeichen der
+Zeile angetippt werden. Beide Wege führen zu _{{delete}}_ und derselben
 Rückfrage,{{/ios}} weil ein versehentlich gelöschter Eintrag nicht
 zurückzuholen ist.
 
@@ -263,23 +262,25 @@ nachtragen, was während des Trinkens nicht erfasst wurde.
 
 ### Die Jahresansicht
 
-Die Jahresansicht zeigt die zwölf Monate eines Jahres als Heatmap, als Raster
-kleiner Quadrate, eines je Tag. Über dem Raster steht die Jahreszahl, links
-und rechts davon je ein Pfeil, mit dem sich das Jahr wechseln lässt. Die
-Legende darunter nennt die drei Zustände: {{year_calendar_no_entry}},
-{{year_calendar_under_limit}}, {{year_calendar_over_limit}}. Der heutige Tag
-trägt einen Rahmen. Ein Tippen auf einen Monat öffnet dessen Monatsansicht.
+Die Jahresansicht kann über den Button
+{{#android}}rechts{{/android}}{{#ios}}links{{/ios}} oben gewählt werden. Sie
+zeigt die zwölf Monate eines Jahres als Heatmap, als Raster kleiner Quadrate,
+eines je Tag. Über dem Raster steht die Jahreszahl, links und rechts davon je
+ein Pfeil, mit dem sich das Jahr wechseln lässt. Die Legende darunter nennt
+die drei Zustände: {{year_calendar_no_entry}}, {{year_calendar_under_limit}},
+{{year_calendar_over_limit}}. Der heutige Tag trägt einen Rahmen. Ein Tippen
+auf einen Monat öffnet dessen Monatsansicht.
 
 ## Auswerten: die Statistik
 
 Die Ansicht _{{statistics}}_ analysiert. Oben wird die Länge des Zeitraums
 gewählt: _{{week}}_, _{{month}}_ oder _{{year}}_. Alles darunter bezieht sich
-auf diese Wahl. _Woche_ bezieht sich jeweils auf ein gleitendes
+auf diese Wahl. _{{week}}_ bezieht sich jeweils auf ein gleitendes
 7-Tage-Fenster, bestehend aus dem aktuellen Tag und den sechs vorangegangenen
-Tagen. Alle Berechnungen ignorieren Einträge vor dem _{{stats_from_label}}_.
-Gibt es im gewählten Zeitraum keine Einträge, {{#android}}steht in den
-Diagrammen {{no_data}}{{/android}}{{#ios}}bleiben die Abschnitte stehen und
-zeigen Nullen{{/ios}}.
+Tagen. Alle Berechnungen ignorieren Einträge vor dem _{{stats_from_label}}_
+Datum in _{{settings}}_. Gibt es im gewählten Zeitraum keine Einträge,
+{{#android}}steht in den Diagrammen „{{no_data}}“{{/android}}{{#ios}}bleiben
+die Abschnitte stehen und zeigen Nullen{{/ios}}.
 
 ### In der Zeit zurückgehen
 
@@ -298,9 +299,9 @@ davorliegenden Zeitraum gleicher Länge, beim März also mit dem Februar.
 
 - _{{total_period}}_: Gramm reinen Alkohols im gewählten Zeitraum.
 - _{{avg_per_day}}_: Durchschnitt über alle Kalendertage.
-- _{{avg_per_drink_day}}_: Durchschnitt über alle Trinktage. Die Differenz
-  zum vorigen Wert sagt viel: Liegen beide weit auseinander, ist dies ein
-  Hinweis auf seltenen, dann aber intensiven Konsum.
+- _{{avg_per_drink_day}}_: Durchschnitt über alle Trinktage. Eine große
+  Differenz zum vorigen Wert ist ein Hinweis auf seltenen, dann aber
+  intensiven Konsum.
 - _{{days_over_daily_limit}}_: Anzahl der Tage, an denen das Tageslimit
   überschritten wurde.
 - _{{days_over_weekly_limit}}_: Anzahl der Trinktage, an denen die Summe aus
@@ -316,8 +317,8 @@ davorliegenden Zeitraum gleicher Länge, beim März also mit dem Februar.
 
 ### Die Diagramme
 
-Unter den Kennzahlen stehen vier Diagramme, das erste zum Verlauf, die
-übrigen zum Muster:
+Die Kennzahlen werden von vier Diagrammen begleitet, das erste zum Verlauf,
+die übrigen zum Muster:
 
 - Das erste Balkendiagramm zeigt den Konsumverlauf im gewählten Zeitraum: den
   Alkoholkonsum des gewählten 7-Tage-Fensters bzw. des gewählten Monats bzw.
@@ -385,21 +386,20 @@ unvollständig würde.
 ### PDF-Bericht
 
 Auf dem Bildschirm _{{statistics}}_ erzeugt der Button _{{export_pdf}}_ einen
-zweiseitigen Bericht als PDF: Kerndaten, Monatsübersicht, Langzeittrend,
-Konsummuster nach Kategorie, Tageszeit und Wochentag sowie ein Abschnitt zu
-Risikokonsum und Abstinenz. Das Format ist für ein Gespräch mit einer
-Suchtberatung geeignet.
+zweiseitigen Bericht als _Portable Document Format (PDF)_-Datei: Kerndaten,
+Monatsübersicht, Langzeittrend, Konsummuster nach Kategorie, Tageszeit und
+Wochentag sowie ein Abschnitt zu Risikokonsum und Abstinenz. Das Format ist
+für ein Gespräch mit einer Suchtberatung geeignet.
 
-Der Bericht deckt genau den gewählten Zeitraum ab, nicht nur die Tage darin,
-an denen etwas gebucht wurde. Wer den Juli exportiert und darin nur an elf
-Tagen getrunken hat, bekommt einen Bericht über einunddreißig Tage, mit
-zwanzig abstinenten Tagen und einem Tagesdurchschnitt, der durch
-einunddreißig teilt. Die Monatstabelle führt jeden Monat des Zeitraums, auch
-einen ohne jede Buchung. Damit stimmen die Zahlen des Berichts mit denen der
-_{{statistics}}_-Ansicht überein. Endet der gewählte Zeitraum heute, so endet
-der Bericht auf dem gestrigen Tag, solange heute noch nichts gebucht ist: Ein
-angebrochener Tag würde den Durchschnitt drücken und als abstinent zählen,
-bevor er vorüber ist.
+Der Bericht deckt genau den gewählten Zeitraum ab: Wer den Juli exportiert
+und darin nur an elf Tagen getrunken hat, bekommt einen Bericht über
+einunddreißig Tage, mit zwanzig abstinenten Tagen und einem
+Tagesdurchschnitt, der durch einunddreißig teilt. Die Monatstabelle führt
+jeden Monat des Zeitraums, auch einen ohne jede Buchung. Damit stimmen die
+Zahlen des Berichts mit denen der _{{statistics}}_-Ansicht überein. Endet der
+gewählte Zeitraum heute, so endet der Bericht auf dem gestrigen Tag, solange
+heute noch nichts gebucht ist: Ein angebrochener Tag würde den Durchschnitt
+drücken und als abstinent zählen, bevor er vorüber ist.
 
 Für den PDF-Bericht öffnet sich {{#android}}der Druckdialog des Systems, aus
 dem er sich drucken oder als Datei sichern lässt.{{/android}}{{#ios}}die
@@ -419,7 +419,7 @@ sich die Dateiauswahl des Systems, in der bestimmt wird, wo die Datei
 abgelegt werden soll: in „Dateien“, in den Cloud-Speicher oder in eine andere
 App.{{/ios}}
 
-### JSON-Export (Backups)
+### JSON-Export &ndash; Backups
 
 **Erfasste Daten verlassen dieses Gerät nicht ohne Zutun des Anwenders.**
 {{#android}}Libellus Potionis nimmt an keinem automatischen Cloud-Backup und
@@ -428,10 +428,10 @@ Werksreset oder einer Neuinstallation ist eine selbst erstellte Sicherung der
 einzige Weg, die Daten zu behalten.** Was nicht exportiert wurde, ist dann
 verloren.{{/android}}{{#ios}}Libellus Potionis hält die App-Daten aus jeder
 Gerätesicherung heraus, aus iCloud wie aus der Sicherung auf einem Rechner;
-der Schalter _{{device_backup}}_ unter _{{security}}_ kann das umkehren
-(siehe „Zugang und Sichtbarkeit“). Solange er aus ist, ist beim
-Gerätewechsel, nach einem Werksreset oder einer Neuinstallation eine selbst
-erstellte Sicherung der einzige Weg, die Daten zu behalten.{{/ios}}
+der Schalter _{{device_backup}}_ in _{{settings}}_ kann das umkehren (siehe
+„Zugang und Sichtbarkeit“). Solange er aus ist, ist beim Gerätewechsel, nach
+einem Werksreset oder einer Neuinstallation eine selbst erstellte Sicherung
+der einzige Weg, die Daten zu behalten.{{/ios}}
 
 Ein Backup ist eine einzelne JSON-Datei. Der Schalter
 _{{backup_include_settings}}_ entscheidet, ob neben dem Getränkekatalog und
@@ -475,8 +475,7 @@ Schalter:
   App-Übersicht verdeckt.{{/ios}} Wer das entsperrte Gerät in die Hand nimmt
   und durch die offenen Apps blättert, sieht dort nichts. {{#ios}}Ein
   Bildschirmfoto kann die iOS-App dagegen nicht verhindern; iOS stellt hierzu
-  keine Schnittstelle zur Verfügung, und dieser Schalter ändert daran
-  nichts.{{/ios}}
+  keine Schnittstelle zur Verfügung.{{/ios}}
 {{#ios}}- _{{device_backup}}_ ist ebenfalls standardmäßig aus. Solange der
 Schalter aus ist, bleiben die App-Daten aus jeder Gerätesicherung
 ausgeschlossen, aus iCloud wie aus der Sicherung auf einem Rechner. Ist er
@@ -491,7 +490,7 @@ Unter _{{appearance}}_ lässt sich dreierlei einstellen:
 - _{{theme_mode}}_: {{theme_system}}, sowie {{theme_day}} oder
   {{theme_night}} unabhängig von der Systemeinstellung.
 - _{{language}}_: die App-Sprache, ebenfalls unabhängig vom System.
-  {{language_system}} folgt wieder der Systemsprache.
+  „{{language_system}}“ folgt wieder der Systemsprache.
 - _{{alt_status_symbols}}_ zeigt in den Statuspunkten zusätzlich zur Farbe
   ein Symbol an. Damit bleiben die drei Zustände unterscheidbar, wenn rot,
   gelb und grün schwer auseinanderzuhalten sind.
