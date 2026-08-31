@@ -1,17 +1,18 @@
-# Libellus Potionis&mdash;User’s Guide
+# Libellus Potionis—User’s Guide
 
 Libellus Potionis is a diary for logging your own drinking. You log what you
 drink; the app works out how much pure alcohol that was and whether “la
-petite sœur” is still within the limits you set yourself. This guide walks
-you through the app step by step: how it is laid out, how to set it up, how
-to log a drink, then looking back and taking stock, and finally backups.
+petite sœur”, the second beer, is still within the limits you set yourself.
+This guide walks you through the app step by step: how it is laid out, how to
+set it up, how to log a drink, then looking back and taking stock, and
+finally backups.
 
 ## What the app does, and what it doesn’t
 
 Libellus Potionis keeps record. It doesn’t judge and it doesn’t nag. The
 figures it shows are your own entries, converted to grams of pure alcohol. If
-you log every drink, you can look back at your own drinking while
-sober&mdash;which is where the app earns its keep.
+you log every drink, you can look back at your own drinking while sober—which
+is where the app earns its keep.
 
 Libellus Potionis is free software under the GNU General Public License,
 which means its source code is public and any claim about how it handles your
@@ -47,10 +48,11 @@ the bottom of the display, which is present on all four:
 - _Drinks_: the catalog of drinks you can log.
 
 Top right on all four screens sits the same menu button
-“(&middot;&middot;&middot;)”. It opens a menu holding _Settings, Help_ (this
-guide) and the _About_ page, with information on the app, its versions
-and its licenses. If your device can authenticate you, _Lock app_ stands
-there as well, and locks the app there and then.
+“(···)”. It opens a menu
+holding _Settings, Help_ (this guide) and the _About_ page, with
+information on the app, its versions and its licenses. If your device can
+authenticate you, _Lock app_ stands there as well, and locks the app there
+and then.
 
 _Settings, Help_ and _About_ open as sheets of their own,
 which you close at the top right.
@@ -180,11 +182,12 @@ same beer, this is the shortest way.
 
 ### Fixing or removing an entry
 
-Tap an entry in the day’s list and it opens as _Edit Entry_: the same
-fields as when you logged it, and the same bounds. To
-remove it, swipe the row left, or tap the row’s red badge in edit mode at the
-top right. Either way you reach _Delete_ and the same question,
-because an entry deleted by mistake cannot be brought back.
+A tap on an
+entry in the day’s list opens it as _Edit Entry_: the same fields
+as when you logged it, and the same bounds. To remove it,
+swipe the row left, or tap the row’s red badge in edit mode at the top right.
+Either way you reach _Delete_ and the same question, because an
+entry deleted by mistake cannot be brought back.
 
 ## The calendar
 
@@ -345,7 +348,7 @@ For the CSV file, too, the system
 file picker opens, where you decide where the file goes: into Files, into
 cloud storage, or into another app.
 
-### The JSON export &mdash; Backups
+### The JSON export — Backups
 
 **Data you record does not leave this device without your explicit action.**
 Libellus

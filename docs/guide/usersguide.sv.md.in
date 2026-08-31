@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,290 +24,494 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-{{#android}}
-# Libellus Potionis -- Användarguide
-
-Den här sidan beskriver egenskaperna och funktionerna i Libellus Potionis, den
-personliga loggboken för din alkoholkonsumtion.
-
-## Översikt
 
-Libellus Potionis är öppen källkod: källkoden kan granskas och verifieras av
-vem som helst. Appen kräver inga behörigheter, varken till kamera eller
-mikrofon, eller till GPS eller nätverksåtkomst. Dina data stannar i appens
-privata lagring på din enhet, skyddade av enhetens kryptering, och åtkomsten
-till appen kan begränsas med ett fingeravtryck.
-
-Appen talar när som helst om för dig om ”la petite sœur” fortfarande ryms inom
-din budget, så att du kan dosera dig upp till din gräns. Till besök i
-beroendevården tar den på begäran fram en tvåsidig PDF-rapport över dina
-dryckesvanor. Den är gratis och reklamfri.
-
-Libellus Potionis kräver Android 11 eller senare. Den används kontinuerligt av
-upphovspersonen på en Google Pixel 10 Pro med GrapheneOS och testas dessutom på
-en Fairphone 4.
-
-## Skärm ”{{today}}”
-
-På den här skärmen hittar du en lista över de alkoholhaltiga drycker du har
-njutit av i dag. Om du gjorde ett misstag när du registrerade en dryck kan du
-redigera eller ta bort poster här. Använd plusknappen för att lägga till fler
-drycker.
-
-Ovanför drycklistan hittar du en översikt över den aktuella dagen med följande
-information: mängden alkohol som redan konsumerats i dag (i gram), samma mängd i
-förhållande till dina dags- och veckogränser (i gram och som förloppsindikator)
-samt antalet dagar med alkoholkonsumtion hittills denna vecka i förhållande till
-din gräns (som siffra och som förloppsindikator).
-
-Dessutom visar en märkning med ”Ø” din genomsnittliga konsumtion för
-innevarande månad (genomsnittligt antal gram ren alkohol per dag).
-
-## Skärm ”{{calendar}}”
-
-På den här skärmen hittar du kalendern. Dagar då alkohol konsumerades är
-markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
-överskriden). När du väljer en dag visas motsvarande drycker, som vid behov kan
-korrigeras eller tas bort. Det är också möjligt att lägga till konsumerade
-drycker i efterhand.
-
-## Skärm ”{{statistics}}”
-
-Den här skärmen visar statistiska analyser av din alkoholkonsumtion, filtrerbara
-per vecka, månad eller år. En CSV-export finns tillgänglig för att bearbeta data
-vidare i ett kalkylprogram. Dessutom erbjuds en PDF-export som presenterar
-dryckesvanorna i ett format som lämpar sig för beroendevård.
-
-## Skärm ”{{drinks}}”
-
-Den här skärmen innehåller listan över drycker. Appen levereras förkonfigurerad
-med en uppsättning internationellt vanliga drycker. Alla kan ändras eller tas
-bort. Du kan definiera en ny dryck med plusikonen. När du trycker på en dryck
-öppnas en dialogruta för att registrera den som konsumerad.
-
-## Skärm ”{{settings}}”
-
-Inställningsmenyn nås via menyikonen (☰) längst upp till höger. Libellus
-Potionis erbjuder följande konfigurationsalternativ:
-
-### {{personal_data}}
-
-I den här kategorin kan du ange din kroppsvikt för att uppskatta din
-alkoholkoncentration i blodet med hjälp av
-[Widmark-formeln](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Värdet visas sedan på skärmen ”{{today}}”.
-
-Formeln är **BAC [‰] = A / (P × r) − β × t**: A är mängden ren alkohol i gram,
-P kroppsvikten i kilogram, r fördelningskoefficienten, β
-nedbrytningshastigheten på ungefär 0,15 ‰ per timme och t antalet timmar sedan
-den första drycken. Grammen kommer från volym × alkoholhalt × 0,789, etanolens
-densitet.
-
-Appen registrerar inte kön och räknar därför försiktigt: r är fastställt till
-0,6, det minsta av de två klassiska koefficienterna. Ett mindre r fördelar
-samma dos i en mindre volym och ger därmed det högsta av de två värdena, så
-att uppskattningen om möjligt inte hamnar under det som en människa av vilket
-kön som helst faktiskt når. Nedbrytningshastigheten är däremot ett medelvärde:
-individuellt ligger den på ungefär 0,10 till 0,20 ‰ per timme, så den som
-bryter ned alkohol långsamt kan ligga över det visade värdet. Uppskattningen
-är en statistisk modell, inte en mätning.
-
-### {{limits}}
-
-I den här kategorin anger du de gränser som gäller för din alkoholkonsumtion.
-Fälten som ska fyllas i är: maximal daglig gräns i gram ren alkohol, maximal
-veckogräns och högsta antal dryckesdagar per vecka. Alla gränser gäller
-samtidigt. Därför visas tre förloppsindikatorer på skärmen ”{{today}}”. Om du är
-osäker på vad du ska ställa in här kan du hämta inspiration från olika länders
-rekommendationer på Wikipedia.
-
-### {{statistics}}
-
-De statistiska inställningarna låter dig ange vid vilken tidpunkt en ny dag
-börjar (så att till exempel en dryck klockan 01.00 på natten fortfarande räknas
-till föregående dag) och — för nyårslöften — från vilket datum dataanalysen
-ska börja.
-
-### {{backup_section}}
-
-**Dina data lämnar aldrig den här enheten av sig själva.** Libellus Potionis
-sparar allt i appens privata lagring och deltar medvetet inte i någon
-automatisk molnsäkerhetskopiering och inte i någon överföring mellan enheter.
-Om du byter telefon, gör en fabriksåterställning eller installerar om appen är
-**det enda sättet att behålla dina data att själv säkerhetskopiera dem** — det
-finns ingen annan återställningsväg, och data som inte exporterats går inte att
-få tillbaka efteråt.
-
-En säkerhetskopia är en enda JSON-fil som innehåller alla dina drycker och hela
-din logg. Så här flyttar du dina data till en annan telefon:
-
-1. På den gamla telefonen öppnar du ”{{settings}}” → {{backup_section}} →
-   {{backup_export}} och sparar JSON-filen på ett säkert ställe — till exempel
-   din egen molnlagring, ett e-postmeddelande till dig själv eller en
-   USB-överföring.
-2. Installera Libellus Potionis på den nya telefonen.
-3. Öppna ”{{settings}}” → {{backup_section}} → {{backup_import}} och välj den
-   JSON-filen. Välj {{import_replace}} för att skriva över allt, eller
-   {{import_merge}} för att kombinera den med poster som redan finns.
-
-Exportera regelbundet: en säkerhetskopia skyddar bara de data som fanns i det
-ögonblick då du skapade den.
-
-### {{security}}
-
-Den här kategorin skyddar åtkomsten till appen och styr dess synlighet.
-Aktivera {{biometric_lock}} för att kräva ett fingeravtryck eller
-ansiktsigenkänning varje gång appen öppnas. Reglaget {{allow_screenshots}} styr
-om skärmbilder och skärminspelningar av appfönstret tillåts; det är avstängt som
-standard, så att fönstret döljs i skärmbilder och i översikten över de senaste
-apparna.
-
-### {{appearance}}
-
-I den här kategorin kan du ställa in färgtema och språk oberoende av
-systeminställningarna.
-{{/android}}
-
-{{#ios}}
-# Libellus Potionis -- Användarguide
-
-Den här sidan beskriver egenskaperna och funktionerna i Libellus Potionis, den
-personliga loggboken för din alkoholkonsumtion.
-
-## Översikt
-
-Libellus Potionis är öppen källkod: källkoden kan granskas och verifieras av
-vem som helst. Appen kräver inga behörigheter, varken till kamera eller
-mikrofon, eller till GPS eller nätverksåtkomst. Dina data stannar i appens
-privata lagring på din enhet, skyddade av enhetens kryptering, och åtkomsten
-till appen kan begränsas med Face ID eller Touch ID.
-
-Appen talar när som helst om för dig om ”la petite sœur” fortfarande ryms inom
-din budget, så att du kan dosera dig upp till din gräns. Till besök i
-beroendevården tar den på begäran fram en tvåsidig PDF-rapport över dina
-dryckesvanor. Den är gratis och reklamfri.
-
-Libellus Potionis kräver iOS 17.0 eller senare. Den används kontinuerligt av
-upphovspersonen på en iPhone 16E och testas dessutom på en iPhone 17
-Pro-emulator.
-
-## Skärm ”{{today}}”
-
-På den här skärmen hittar du en lista över de alkoholhaltiga drycker du har
-njutit av i dag. Om du gjorde ett misstag när du registrerade en dryck kan du
-redigera eller ta bort poster här. Använd plusknappen för att lägga till fler
-drycker. Tryck på en post för att redigera den, eller svep den åt vänster för att ta bort den. Pennknappen i verktygsfältet visar också ett borttagningsalternativ.
-
-Ovanför drycklistan hittar du en översikt över den aktuella dagen med följande
-information: mängden alkohol som redan konsumerats i dag (i gram), samma mängd i
-förhållande till dina dags- och veckogränser (i gram och som förloppsindikator)
-samt antalet dagar med alkoholkonsumtion hittills denna vecka i förhållande till
-din gräns (som siffra och som förloppsindikator).
-
-Dessutom visar en märkning med ”Ø” din genomsnittliga konsumtion för
-innevarande månad (genomsnittligt antal gram ren alkohol per dag).
-
-## Skärm ”{{calendar}}”
-
-På den här skärmen hittar du kalendern. Dagar då alkohol konsumerades är
-markerade med en blå punkt (icke-kritisk mängd) eller en röd punkt (gränsen
-överskriden). När du väljer en dag visas motsvarande drycker, som vid behov kan
-korrigeras eller tas bort. Det är också möjligt att lägga till konsumerade
-drycker i efterhand. Tryck på en post för att korrigera den, eller svep den åt vänster för att ta bort den; pennknappen i verktygsfältet gör detsamma.
-
-## Skärm ”{{statistics}}”
-
-Den här skärmen visar statistiska analyser av din alkoholkonsumtion, filtrerbara
-per vecka, månad eller år. En CSV-export finns tillgänglig för att bearbeta data
-vidare i ett kalkylprogram. Dessutom erbjuds en PDF-export som presenterar
-dryckesvanorna i ett format som lämpar sig för beroendevård.
-
-## Skärm ”{{drinks}}”
-
-Den här skärmen innehåller listan över drycker. Appen levereras förkonfigurerad
-med en uppsättning internationellt vanliga drycker. Alla kan ändras eller tas
-bort. Du kan definiera en ny dryck med plusikonen. När du trycker på en dryck
-öppnas en dialogruta för att registrera den som konsumerad. För att ändra eller ta bort en dryck trycker du på pennknappen i verktygsfältet: i det läget öppnar ett tryck på en rad dess redigeringsruta, och den röda markeringen tar bort drycken. Ett svep åt vänster ger samma två alternativ.
-
-## Skärm ”{{settings}}”
-
-Inställningsmenyn nås via Mer-knappen (…) längst upp till höger. Libellus
-Potionis erbjuder följande konfigurationsalternativ:
-
-### {{personal_data}}
-
-I den här kategorin kan du ange din kroppsvikt för att uppskatta din
-alkoholkoncentration i blodet med hjälp av
-[Widmark-formeln](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Värdet visas sedan på skärmen ”{{today}}”.
-
-Formeln är **BAC [‰] = A / (P × r) − β × t**: A är mängden ren alkohol i gram,
-P kroppsvikten i kilogram, r fördelningskoefficienten, β
-nedbrytningshastigheten på ungefär 0,15 ‰ per timme och t antalet timmar sedan
-den första drycken. Grammen kommer från volym × alkoholhalt × 0,789, etanolens
-densitet.
-
-Appen registrerar inte kön och räknar därför försiktigt: r är fastställt till
-0,6, det minsta av de två klassiska koefficienterna. Ett mindre r fördelar
-samma dos i en mindre volym och ger därmed det högsta av de två värdena, så
-att uppskattningen om möjligt inte hamnar under det som en människa av vilket
-kön som helst faktiskt når. Nedbrytningshastigheten är däremot ett medelvärde:
-individuellt ligger den på ungefär 0,10 till 0,20 ‰ per timme, så den som
-bryter ned alkohol långsamt kan ligga över det visade värdet. Uppskattningen
-är en statistisk modell, inte en mätning.
-
-### {{limits}}
-
-I den här kategorin anger du de gränser som gäller för din alkoholkonsumtion.
-Fälten som ska fyllas i är: maximal daglig gräns i gram ren alkohol, maximal
-veckogräns och högsta antal dryckesdagar per vecka. Alla gränser gäller
-samtidigt. Därför visas tre förloppsindikatorer på skärmen ”{{today}}”. Om du är
-osäker på vad du ska ställa in här kan du hämta inspiration från olika länders
-rekommendationer på Wikipedia.
-
-### {{statistics}}
-
-De statistiska inställningarna låter dig ange vid vilken tidpunkt en ny dag
-börjar (så att till exempel en dryck klockan 01.00 på natten fortfarande räknas
-till föregående dag) och — för nyårslöften — från vilket datum dataanalysen
-ska börja.
-
-### {{backup_section}}
-
-**Dina data lämnar aldrig den här enheten av sig själva.** Libellus Potionis
-sparar allt i appens privata lagring och deltar medvetet inte i någon
-automatisk molnsäkerhetskopiering och inte i någon överföring mellan enheter.
-Om du byter telefon, gör en fabriksåterställning eller installerar om appen är
-**det enda sättet att behålla dina data att själv säkerhetskopiera dem** — det
-finns ingen annan återställningsväg, och data som inte exporterats går inte att
-få tillbaka efteråt.
-
-En säkerhetskopia är en enda JSON-fil som innehåller alla dina drycker och hela
-din logg. Så här flyttar du dina data till en annan telefon:
-
-1. På den gamla telefonen öppnar du ”{{settings}}” → {{backup_section}} →
-   {{backup_export}} och sparar JSON-filen på ett säkert ställe — till exempel
-   din egen molnlagring, ett e-postmeddelande till dig själv eller en
-   USB-överföring.
-2. Installera Libellus Potionis på den nya telefonen.
-3. Öppna ”{{settings}}” → {{backup_section}} → {{backup_import}} och välj den
-   JSON-filen. Välj {{import_replace}} för att skriva över allt, eller
-   {{import_merge}} för att kombinera den med poster som redan finns.
-
-Exportera regelbundet: en säkerhetskopia skyddar bara de data som fanns i det
-ögonblick då du skapade den.
-
-### {{security}}
-
-Den här kategorin skyddar åtkomsten till appen och styr dess synlighet.
-Aktivera {{biometric_lock}} för att kräva Face ID eller Touch ID varje gång
-appen öppnas. Reglaget {{allow_screenshots}} styr om appens innehåll visas i
-appväxlaren (App Switcher); det är avstängt som standard, så att appen döljs
-där när du lämnar den. iOS låter inte en app blockera skärmbilder eller
-skärminspelningar, så den här inställningen påverkar dem inte.
-
-### {{appearance}}
-
-I den här kategorin kan du ställa in färgtema och språk oberoende av
-systeminställningarna.
-{{/ios}}
+# Libellus Potionis – Användarhandbok
+
+Libellus Potionis är en dagbok där du för bok över ditt eget drickande. Du
+registrerar vad du dricker; appen räknar ut hur mycket ren alkohol det blev
+och om ”la petite sœur”, den andra ölen, fortfarande ryms inom de gränser du
+själv har satt. Den här handboken går igenom appen steg för steg: hur den är
+uppbyggd, hur du ställer in den, hur du registrerar en dryck, sedan
+tillbakablicken och summeringen, och till sist säkerhetskopiorna.
+
+## Vad appen gör – och vad den inte gör
+
+Libellus Potionis för bok. Appen dömer inte och tjatar inte. Siffrorna den
+visar är dina egna poster, omräknade till gram ren alkohol. Registrerar du
+varje dryck kan du i nyktert tillstånd se tillbaka på ditt eget drickande –
+och det är där appen gör nytta.
+
+Libellus Potionis är fri programvara under GNU General Public License.
+Källkoden är därmed offentlig, och varje påstående om hur appen hanterar dina
+uppgifter kan granskas av vem som helst när som helst. Integritet är ett
+bärande drag hos Libellus Potionis: appen begär inte en enda känslig
+behörighet, varken kamera, mikrofon, plats eller filåtkomst, inte ens
+nätverksåtkomst. Allt du matar in stannar i appens privata lagring på din
+enhet, skyddat av enhetens egen kryptering. I inställningarna kan du låsa
+åtkomsten till appen med {{#android}}ditt
+fingeravtryck{{/android}}{{#ios}}Face ID{{/ios}}; det är den enda behörighet
+appen någonsin begär.
+
+Vad Libellus Potionis _inte_ är: appen är varken ett mätinstrument eller en
+medicinteknisk produkt. Promillehalten är en uppskattning ur en statistisk
+modell (se ”Så räknas det”). Ingenting appen säger talar om för dig om du är
+körduglig, och ingenting av det är en diagnos. Vad Libellus Potionis kan: ge
+dig en bild av ditt eget drickande över veckor och månader, och om du vill
+skriva ut den bilden som en tvåsidig PDF på ett papper som du kan ta med till
+ett samtal inom beroendevården.
+
+Libellus Potionis kräver {{#android}}Android 11 eller senare, vilket täcker
+telefoner från ungefär 2020 och framåt. Appen testas regelbundet på en Google
+Pixel 10 Pro med GrapheneOS (Android 16) och på en Fairphone 4 (Android
+15){{/android}}{{#ios}}iOS 17 eller senare, vilket täcker iPhone-modeller
+från ungefär 2018 och framåt. Appen testas regelbundet på en iPhone 16e och
+en iPhone SE 3:e generationen, båda med iOS 26{{/ios}}.
+
+## Så är appen uppbyggd
+
+Libellus Potionis har fyra skärmar. Du växlar mellan dem med raden längst ned
+på skärmen, som finns på alla fyra:
+
+- _{{today}}_: hur den aktuella dagen ligger till och vad som registrerats på
+  den,
+- _{{calendar}}_: tillbakablick på enskilda dagar, månader och år, och
+  rättelse av deras poster där det behövs,
+- _{{statistics}}_: statistiska sammanställningar över veckor, månader och
+  år,
+- _{{drinks}}_: katalogen över de drycker du kan registrera.
+
+Uppe till höger står på alla fyra skärmar samma {{#ios}}menyknapp
+”(···)”{{/ios}}{{#android}}”hamburgar”-menyknapp{{/android}}. Den öppnar en
+meny med _{{settings}}, {{help}}_ (den här handboken) och sidan _{{about}}_
+med uppgifter om appen, versionerna och licenserna. Kan din enhet autentisera
+dig står _{{lock_app}}_ där också, och låser appen på fläcken.
+
+_{{settings}}, {{help}}_ och _{{about}}_ öppnas {{#android}}som egna sidor;
+enhetens bakåtknapp, eller pilen uppe till vänster, för dig tillbaka till
+skärmen du öppnade dem från{{/android}}{{#ios}}som egna rutor, som du stänger
+uppe till höger{{/ios}}.
+
+## Kom igång
+
+Direkt efter installationen har appen ännu inga poster, men den går redan att
+använda: en färdig katalog med drycker som är vanliga världen över låter dig
+registrera den första ölen med en gång. Ändå är det värt att ställa in tre
+saker först. Alla tre finns under _{{settings}}_; de övriga inställningarna
+kommer längre ned.
+
+### Dina gränser
+
+Under _{{limits}}_ står de värden som gäller för dig, och alla tre gäller
+samtidigt:
+
+- _{{daily_limit_grams}}_: den dagliga gränsen för ren alkohol i gram,
+- _{{weekly_limit_grams}}_: veckogränsen för ren alkohol i gram, räknad över
+  ett glidande fönster på sju dagar,
+- _{{drink_days_setting}}_: veckogränsen för dryckesdagar, likaså räknad över
+  ett glidande fönster på sju dagar.
+
+Det tredje värdet begränsar inte mängden utan hur ofta. Ställer du in fyra
+dryckesdagar och har druckit tre av de sex föregående dagarna visar skärmen
+_{{today}}_ att den första drycken förbrukar den fjärde dryckesdagen, medan
+en andra dryck samma dag inte förbrukar någon ytterligare.
+
+Vill du få en känsla för vilka tal som är rimliga kan du se på vad
+hälsomyndigheterna i olika länder rekommenderar. De skiljer sig kraftigt åt,
+och
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+samlar dem.
+
+### Din kroppsvikt
+
+Under _{{personal_data}}_ står _{{body_weight}}_, och den är frivillig. Så
+länge inget värde är ifyllt står där bara knappen som lägger till det;
+därefter kan du stega det upp eller ned, och en andra knapp tar bort det
+igen. Appen fungerar fullt ut utan kroppsvikt, bara den uppskattade
+promillehalten på skärmen _{{today}}_ visas då _inte_, eftersom underlaget
+för att räkna ut den saknas.
+
+### När din dag börjar
+
+Under _{{statistics}}_ står _{{day_starts_at}}_, förinställd på klockan fyra
+på morgonen. Den inställningen avgör vilken dag en dryck räknas till: tar du
+ett glas klockan ett på natten hamnar det på kvällen före, där det hör hemma.
+Dygnsgränsen gäller överallt i appen, i kalendern likaväl som i statistiken
+och i exporterna.
+
+På samma ställe står raden _{{stats_from_label}}_. Det datumet är golvet
+under varje sammanställning: poster före det ignoreras i varje siffra. Så kan
+du dra ett rent streck den 1 januari inför ett nyårslöfte utan att förlora
+det du har registrerat hittills. En färsk installation sätter datumet till
+installationsdagen. Det stämmer oftast, men det kan förbrylla när en
+säkerhetskopia med äldre uppgifter importeras: de gamla posterna finns där,
+och ingen av dem räknas någonstans. Knappen _{{stats_from_clear}}_ lyfter
+golvet igen.
+
+## Skärmen Idag
+
+Ovanför dryckeslistan står en översikt som uppdateras efter varje post och
+allt eftersom tiden går. Uppifrån och ned:
+
+Två stora tal står {{#android}}bredvid varandra: till
+vänster{{/android}}{{#ios}}under varandra:{{/ios}} längden på den aktuella
+nykterheten i dagar, eller den rena alkoholen som registrerats idag, i gram,
+{{#android}}till höger{{/android}}{{#ios}}nedanför{{/ios}}, under ”Ø”,
+genomsnittet för den löpande månaden i gram per dag. En grön eller röd
+trendpil bredvid jämför det talet med månaden före.
+
+Tre mängdstaplar: den första visar dagens förbrukning mot den dagliga gräns
+du ställt in, den andra summan av idag och de sex föregående dagarna mot den
+sjudagarsgräns du ställt in, den tredje antalet dryckesdagar bland idag och
+de sex föregående dagarna mot den gräns du ställt in. Alla tre visar en
+siffra och en stapel.
+
+Den uppskattade promillehalten visas bara om en kroppsvikt är ifylld, och
+bara så länge det räknemässigt fortfarande finns alkohol i blodet. Det är en
+uppskattning, och den kan inte tala om för dig om du är körduglig.
+
+Nedanför står listan över de drycker som registrerats på den aktuella dagen.
+
+## Registrera en dryck
+
+Det finns mer än ett ställe att registrera en dryck från. Skärmen _{{today}}_
+erbjuder det första, och skärmarna _{{calendar}}_ och _{{drinks}}_ erbjuder
+ytterligare två. {{#android}}Nere{{/android}}{{#ios}}Uppe{{/ios}} till höger
+på skärmen _{{today}}_ sitter plusknappen; den öppnar registreringsrutan.
+
+### Registreringsrutan
+
+Överst står raden _{{drink}}_ med valet ur katalogen; är bara en enda dryck
+upplagd står dess namn där utan något att välja. Under den står tre fält:
+
+- den druckna mängden, i milliliter. Från 1 till 5 000 ml; fältet utgår från
+  den valda dryckens vanliga portion.
+- klockslaget, satt till nu. Går att ändra när du registrerar något i
+  efterhand.
+- en anteckning, om du vill, en fri kommentar om tillfället eller sällskapet.
+
+Alkoholhalten hör till drycken och går inte att ange avvikande här. Är samma
+sort en kväll märkbart starkare får den en egen plats i katalogen.
+
+Så snart mängden ligger inom det tillåtna står det under fälten{{#ios}}, på
+raden _{{alcohol_content}}_,{{/ios}} hur många gram ren alkohol posten ger.
+Det är det talet Libellus Potionis räknar med, inte milliliterna.
+
+Bredvid alkoholhalten sitter en färgad statusprick. Den säger hur många
+portioner av den valda drycken som ryms samma dag inom de tre gränserna: grön
+så länge minst två till är möjliga, gul så länge exakt en ryms, röd när nästa
+skulle spränga en eller flera av de satta gränserna. Har du svårt att skilja
+rött från grönt kan du slå på _{{alt_status_symbols}}_ under _{{appearance}}_
+i _{{settings}}_; då bär den färgade pricken även en form som passar.
+
+{{#ios}}Rutan stänger du med någon av de två knapparna överst. Så snart du
+har skrivit något stänger ett svep nedåt den inte längre, så att en halv post
+inte kan försvinna av misstag.{{/ios}}
+
+### Snabbknappar för de drycker du registrerar ofta
+
+Drycker som är markerade som favoriter i katalogen visas på skärmen
+_{{today}}_ som en rad knappar ovanför dagens lista. En tryckning registrerar
+drycken med dess vanliga portion, utan ruta emellan. För ölen efter jobbet,
+som alltid är samma öl, är det den kortaste vägen.
+
+### Rätta eller ta bort en post
+
+En tryckning på {{#android}}en posts pennikon{{/android}}{{#ios}}en
+post{{/ios}} i dagens lista öppnar den som _{{edit_entry}}_: samma fält som
+när du registrerade den, och samma gränser. {{#android}}Papperskorgsikonen
+tar bort den, och appen frågar en gång först,{{/android}}{{#ios}}För att ta
+bort den sveper du raden åt vänster, eller trycker på radens röda märke i
+redigeringsläget uppe till höger. Båda vägarna leder till _{{delete}}_ och
+samma fråga,{{/ios}} för en post som raderats av misstag går inte att få
+tillbaka.
+
+## Kalendern
+
+Skärmen _{{calendar}}_ visar vad som varit. Växeln mellan månadsvyn och årets
+värmekarta sitter uppe till
+{{#android}}höger{{/android}}{{#ios}}vänster{{/ios}}.
+
+### Månadsvyn
+
+Månadsvyn visar ett vanligt månadsrutnät och är den vy du börjar i. Ovanför
+rutnätet står månaden, med en pil på var sida för att bläddra. Dagar med
+poster bär en prick: en blå för en dryckesdag under gränserna, en röd för en
+dryckesdag som spräckt en gräns. Dagar utan poster bär ingen prick.
+
+En tryckning väljer dagen och listar dess poster nedanför. Där går de att
+redigera och radera precis som den aktuella dagen på skärmen _{{today}}_, och
+plusknappen {{#android}}nere{{/android}}{{#ios}}uppe{{/ios}} till höger, som
+dyker upp först när en dag är vald, registrerar på den valda dagen. Så tar du
+igen det du inte hann anteckna medan du drack.
+
+### Årsvyn
+
+Årsvyn väljer du med knappen uppe till
+{{#android}}höger{{/android}}{{#ios}}vänster{{/ios}}. Den visar årets tolv
+månader som en värmekarta, ett rutnät av små kvadrater, en per dag. Ovanför
+rutnätet står årtalet, med en pil på var sida för att byta år.
+Teckenförklaringen nedanför nämner de tre tillstånden:
+{{year_calendar_no_entry}}, {{year_calendar_under_limit}},
+{{year_calendar_over_limit}}. Dagens datum bär en ring. En tryckning på en
+månad öppnar månadsvyn för den.
+
+## Summera: statistiken
+
+Skärmen _{{statistics}}_ analyserar. Överst väljer du periodens längd:
+_{{week}}_, _{{month}}_ eller _{{year}}_. Allt nedanför rättar sig efter det
+valet. _{{week}}_ betyder alltid ett glidande fönster på sju dagar som består
+av idag och de sex dagarna före. Varje beräkning ignorerar poster från före
+datumet _{{stats_from_label}}_ i _{{settings}}_. Finns inga poster i den
+valda perioden {{#android}}står det ”{{no_data}}” i
+diagrammen{{/android}}{{#ios}}står avsnitten kvar och visar nollor{{/ios}}.
+
+### Bakåt i tiden
+
+Under periodknapparna står den visade tidsrymden utskriven som ett exakt
+datumintervall. Den löpande månaden slutar idag och inte vid månadens slut,
+och är en _{{stats_from_label}}_ satt börjar intervallet där. Där står alltså
+precis det som siffrorna nedanför täcker. På var sida sitter en pil. Den
+vänstra går en period bakåt, den högra åter mot nuet.
+
+Allt på den här skärmen följer den valda perioden, både siffror och diagram.
+_{{trend_vs_prev}}_ jämför alltid med perioden av samma längd närmast före,
+mars alltså med februari.
+
+### Siffrorna
+
+- _{{total_period}}_: gram ren alkohol under den valda perioden.
+- _{{avg_per_day}}_: genomsnittet över alla kalenderdagar.
+- _{{avg_per_drink_day}}_: genomsnittet över dryckesdagarna. Ett stort
+  avstånd till föregående siffra pekar på ett drickande som är sällsynt men
+  desto kraftigare.
+- _{{days_over_daily_limit}}_: antalet dagar då den dagliga gränsen
+  överskreds.
+- _{{days_over_weekly_limit}}_: antalet dryckesdagar då den dagen och de sex
+  före tillsammans låg över sjudagarsgränsen.
+- _{{days_over_drink_day_limit}}_: dryckesdagar som låg över gränsen för
+  dryckesdagar inom sitt eget sjudagarsfönster, till exempel den femte
+  dryckesdagen på sju när bara fyra är tillåtna.
+- _{{abstinent_days}}_: dagar under perioden utan poster.
+- _{{current_streak}}_: räknar dagarna sedan den senaste drycken.
+- _{{longest_streak}}_: den längsta sträckan utan alkohol under perioden.
+- _{{trend_vs_prev}}_: visar trenden jämfört med perioden före.
+
+### Diagrammen
+
+Fyra diagram kompletterar siffrorna, det första om förloppet, de övriga om
+mönstret:
+
+- Det första stapeldiagrammet följer drickandet genom den valda perioden: det
+  valda sjudagarsfönstret, den valda månaden, eller den genomsnittliga
+  förbrukningen per dag för varje månad under det valda året.
+- _{{stats_time_of_day}}_ delar dygnet i åtta fack om tre timmar vardera och
+  ger för vart och ett genomsnittet i gram per dag. Här syns om det dricks på
+  kvällen eller sprids ut över dagen. Avsnittet visas bara om något alls
+  dracks under den valda perioden.
+- _{{stats_weekday}}_ ger den genomsnittliga förbrukningen per veckodag.
+- _{{stats_category_breakdown}}_ visar som en ring hur drickandet fördelar
+  sig på de sex dryckeskategorierna.
+
+## Dryckeskatalogen
+
+Skärmen _{{drinks}}_ sköter de drycker du väljer bland när du registrerar.
+Appen levereras med ett urval vanliga drycker; de går att ändra, fylla på och
+radera.
+
+Varje rad visar namnet, en kategorisymbol, portionen, alkoholhalten och de
+gram ren alkohol det ger, med favoritstjärnan och statuspricken för den
+portionen före{{#android}} och en redigerings- och en raderingsikon
+efter{{/android}}. Stjärnan slår om favoritstatusen: favoriter dyker upp i
+snabbknapparna på skärmen _{{today}}_.
+
+{{#android}}En tryckning på raden (inte på ikonerna) öppnar
+registreringsrutan med den drycken; det är den tredje vägen att registrera,
+vid sidan av plusknapparna på skärmarna _{{today}}_ och _{{calendar}}_. De
+två ikonerna till höger öppnar redigeraren och
+raderingsfrågan.{{/android}}{{#ios}}En tryckning på raden öppnar
+registreringsrutan med den drycken; det är den tredje vägen att registrera,
+vid sidan av plusknapparna på skärmarna _{{today}}_ och _{{calendar}}_. Att
+ändra och radera hör till redigeringsläget, som du slår på uppe till höger:
+där öppnar samma tryckning redigeraren, och radens röda märke leder till
+raderingsfrågan. Ett svep åt vänster erbjuder också båda åtgärderna, både i
+redigeringsläget och utanför det.{{/ios}}
+
+### Lägga till eller ändra en dryck
+
+Plusknappen öppnar _{{add_drink}}_, {{#android}}en rads
+pennikon{{/android}}{{#ios}}en tryckning i redigeringsläget{{/ios}} öppnar
+_{{edit_drink}}_. Båda rutorna frågar samma sak:
+
+- _{{drink_name}}_: efter eget val, upp till 100 tecken.
+- _{{volume_ml}}_: den vanliga portionen, som registreringsrutan utgår från.
+  Från 1 till 5 000 milliliter.
+- _{{alcohol_percent}}_: den vanliga alkoholhalten, från 0 till 100 procent.
+- _{{category}}_: en av sex kategorier: {{category_beer}}, {{category_wine}},
+  {{category_spirits}}, {{category_longdrink}}, {{category_liqueur}} eller
+  {{category_other}}. Kategorin ändrar ingenting i räkningen; den grupperar
+  fördelningen på skärmen _{{statistics}}_.
+
+### Varför vissa drycker inte går att radera
+
+En dryck går inte att radera så länge poster i din logg fortfarande hänvisar
+till den; appen säger då hur många. Skälet är att de posterna annars skulle
+mista det de hänvisar till, och statistiken bli ofullständig.
+
+## Dataexport
+
+### PDF-rapporten
+
+På skärmen _{{statistics}}_ tar knappen _{{export_pdf}}_ fram en tvåsidig
+rapport som en _Portable Document Format (PDF)_-fil: nyckeltalen, en tabell
+månad för månad, långtidstrenden, mönstret efter kategori, tid på dygnet och
+veckodag, och ett avsnitt om riskbruk och nykterhet. Formatet passar ett
+samtal inom beroendevården.
+
+Rapporten täcker exakt den valda perioden: exporterar du juli efter att ha
+druckit elva dagar får du en rapport över trettioen dagar, med tjugo nyktra
+dagar och ett dagsgenomsnitt som delar med trettioen. Månadstabellen tar upp
+varje månad i perioden, även en månad utan en enda post. Det är det som gör
+att rapportens siffror stämmer med skärmen _{{statistics}}_. Slutar den valda
+perioden idag slutar rapporten igår så länge inget är registrerat idag: en
+påbörjad dag skulle dra ned genomsnittet och räknas som nykter innan den är
+slut.
+
+För PDF-rapporten öppnas {{#android}}systemets utskriftsdialog, där du kan
+skriva ut den eller spara den som fil.{{/android}}{{#ios}}systemets
+filväljare, där du bestämmer var filen hamnar: i Filer, i molnlagring eller i
+en annan app.{{/ios}}
+
+### CSV-exporten
+
+Knappen _{{export_csv}}_ på skärmen _{{statistics}}_ skriver en tabell med en
+rad per post, färdig för ett kalkylprogram som [LibreOffice
+Calc](https://www.libreoffice.org/). Tal skrivs maskinläsbart med
+decimalpunkt, oavsett vilket språk appen står på.
+
+{{#android}}CSV-filen hamnar i mappen Hämtningar, och appen erbjuder sig
+efteråt att dela den.{{/android}}{{#ios}}Även för CSV-filen öppnas systemets
+filväljare, där du bestämmer var filen hamnar: i Filer, i molnlagring eller i
+en annan app.{{/ios}}
+
+### JSON-exporten – säkerhetskopior
+
+**Uppgifter du registrerar lämnar inte den här enheten utan att du själv gör
+något.** {{#android}}Libellus Potionis deltar varken i automatisk
+molnsäkerhetskopiering eller i överföring från enhet till enhet. **Vid byte
+av enhet, efter en fabriksåterställning eller en ominstallation är en
+säkerhetskopia du själv har gjort det enda sättet att behålla dina
+uppgifter.** Det som inte exporterats är då
+borta.{{/android}}{{#ios}}Libellus Potionis håller sina uppgifter utanför
+varje säkerhetskopia av enheten, både iCloud och säkerhetskopior på en dator;
+reglaget _{{device_backup}}_ under _{{settings}}_ vänder på det (se ”Åtkomst
+och synlighet”). Så länge det är avslaget är en säkerhetskopia du själv har
+gjort det enda sättet att behålla dina uppgifter vid byte av enhet, efter en
+fabriksåterställning eller en ominstallation.{{/ios}}
+
+En säkerhetskopia är en enda JSON-fil. Reglaget _{{backup_include_settings}}_
+avgör om inställningarna skrivs in vid sidan av dryckeskatalogen och
+posterna. Varje gång inställningarna öppnas står det på igen. Så flyttar
+uppgifterna till en ny enhet:
+
+1. Välj på den gamla enheten _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_export}}_. Förvara filen på ett säkert ställe, till exempel i en
+   [Signal](https://signal.org/)-anteckning till dig själv.
+2. Installera Libellus Potionis på den nya enheten.
+3. Återställ uppgifterna där via _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_import}}_.
+
+Vid import frågar appen hur den ska gå till väga. _{{import_replace}}_ kastar
+det som finns på enheten: dryckeskatalogen, posterna och inställningarna, om
+säkerhetskopian har några. _{{import_merge}}_ raderar inga befintliga
+dryckesdefinitioner och inga poster, och lägger till det som saknas. Poster
+som redan finns dubbleras inte, och de aktuella inställningarna skrivs inte
+över.
+
+## Övriga inställningar
+
+### Åtkomst och synlighet
+
+Under _{{security}}_ står {{#android}}två{{/android}}{{#ios}}tre{{/ios}}
+reglage:
+
+- _{{biometric_lock}}_ begär varje gång appen öppnas {{#android}}ett
+  fingeravtryck, ett ansikte eller enhetens skärmlås.{{/android}}{{#ios}}Face
+  ID, Touch ID eller enhetens lösenkod.{{/ios}} Att slå på eller av låset
+  kräver samma autentisering. Det gäller också när du lämnar appen och kommer
+  tillbaka, dock inte vid en återkomst inom trettio sekunder. Menyn uppe till
+  höger bär även _{{lock_app}}_, som låser appen på fläcken.
+- _{{allow_screenshots}}_ är avslaget som standard. Så länge
+  {{#android}}skärmdumpar är avslagna går det inte att ta någon skärmdump av
+  appfönstret, och innehållet förblir övertäckt i översikten över senast
+  använda appar.{{/android}}{{#ios}}reglaget är avslaget förblir innehållet
+  övertäckt i appväxlaren.{{/ios}} Den som tar upp din upplåsta enhet och
+  bläddrar genom de öppna apparna ser ingenting där. {{#ios}}Att förhindra en
+  skärmdump ligger utanför iOS-appens räckvidd; iOS erbjuder inget gränssnitt
+  för det.{{/ios}}
+{{#ios}}- _{{device_backup}}_ är likaså avslaget som standard. Så länge
+reglaget är avslaget hålls appens uppgifter utanför varje säkerhetskopia av
+enheten, både iCloud och säkerhetskopior på en dator. Slår du på det
+överlever uppgifterna en återställning av en enhet från dess säkerhetskopia,
+men då ligger de också där den säkerhetskopian ligger.{{/ios}}
+
+### Utseende och språk
+
+Under _{{appearance}}_ går tre saker att ställa in:
+
+- _{{theme_mode}}_: {{theme_system}}, eller {{theme_day}} eller
+  {{theme_night}} oberoende av systeminställningen.
+- _{{language}}_: appens språk, likaså oberoende av systemet.
+  ”{{language_system}}” följer systemspråket igen.
+- _{{alt_status_symbols}}_ ger statusprickarna en form utöver färgen. Så
+  hålls de tre tillstånden isär när rött, gult och grönt är svåra att skilja
+  åt.
+
+## Så räknas det
+
+### Från milliliter till gram
+
+Varje post räknas om till gram ren alkohol när den sparas:
+
+**gram = milliliter × alkoholhalt × 0,789**
+
+0,789 är etanolens densitet i gram per milliliter. En halv liter öl med 5 %
+ger alltså 500 ml × 0,05 × 0,789 g/ml, ungefär 19,7 g. Varje gräns, varje
+statistik och varje export arbetar med det talet, aldrig med milliliter. Det
+är det enda som över huvud taget gör en öl och ett glas vin jämförbara.
+
+### Uppskattningen av promillehalten
+
+Är en kroppsvikt ifylld uppskattar Libellus Potionis alkoholkoncentrationen i
+blodet med [Widmarks
+formel](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+
+**BAC [‰] = A / (P × r) − β × t**
+
+A är den rena alkoholen i gram, P kroppsvikten i kilogram, r
+fördelningskoefficienten, β nedbrytningstakten på ungefär 0,15 ‰ i timmen,
+och t timmarna sedan den första drycken.
+
+Appen registrerar inte ditt kön och räknar därför medvetet försiktigt: r är
+fast satt till 0,6, den mindre av de två klassiska koefficienterna. Ett
+mindre r fördelar samma alkohol i en mindre volym och ger därmed det högre av
+de två talen: uppskattningen ska hellre ligga för högt än för lågt.
+Nedbrytningstakten är däremot ett medelvärde; individuellt ligger den
+någonstans mellan 0,10 och 0,20 ‰ i timmen. Bryter du ned alkohol långsamt
+ligger du över det visade talet.
+
+Det som kommer ut är en modell, inte en mätning. Den ersätter ingen
+alkomätare, och den kan inte tala om för dig om du är körduglig.
+
+### Den logiska dagen
+
+En dryck hör till den dag som började vid den tid _{{day_starts_at}}_ anger,
+inte till den dag klockan visar. Med förvalet klockan fyra räknas ett glas
+halv två på natten fortfarande till dagen före. Regeln gäller i hela appen,
+också över tidsomställningar.
+
+### Den glidande veckan
+
+Sjudagarsgränsen och dryckesdagarna syftar inte på en kalendervecka utan på
+idag och de sex dagarna före. Fönstret vandrar alltså med dag för dag. En
+tung lördag stannar i bilden tills den är sex dagar gammal, och faller ur
+lördagen därpå.

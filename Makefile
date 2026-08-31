@@ -61,6 +61,13 @@ SHELL       := /bin/bash
 # so the default goal only prints the target list and changes nothing.
 .DEFAULT_GOAL := help
 
+# A recipe that fails must not leave its target behind. Without this, a broken
+# run of a redirection recipe (`cmd > $@`) leaves an EMPTY file that is newer
+# than every prerequisite, so make treats it as up to date for ever. Set here as
+# well as in the two platform makefiles, so a rule added to this file inherits
+# the same protection rather than the 1977 default.
+.DELETE_ON_ERROR:
+
 help:
 	@echo "Libellus Potionis -- repository build tooling"
 	@echo

@@ -43,6 +43,13 @@ SHELL       := /bin/bash
 .ONESHELL:
 .DEFAULT_GOAL := help
 
+# A recipe that fails must not leave its target behind. Without this, a broken
+# run of a redirection recipe (`cmd > $@`) leaves an EMPTY file that is newer
+# than every prerequisite, so make treats it as up to date for ever. That is not
+# theory: it is how the generated guides.d fragment silently disabled every
+# guide rule (see the comment at guides.d below).
+.DELETE_ON_ERROR:
+
 # The default goal, kept at the top so it doubles as this file's target overview:
 # a reader scanning here sees every target, and `make` / `make help` prints the
 # same list. Kept ONLY here (not repeated in a header comment) so the two cannot
@@ -139,8 +146,32 @@ Potillus/Resources/license_gpl3.md: ../LICENSE.md
 # user's-guide templates changed in all 21 languages at once.
 -include guides.d
 
-guides.d: $(wildcard ../docs/guide/usersguide*.md.in) Potillus/Localizable.xcstrings
+# SELF-REPAIR of a truncated fragment. A run that dies between the shell creating
+# guides.d and the renderer writing to it leaves the file EMPTY. Such a fragment
+# is newer than every template, so make never remakes it; IOS_GUIDE_OUTPUTS stays
+# empty, the `ifneq` guard below drops every per-guide rule, and `make guides`
+# answers "Nothing to be done" -- for ever, and with a real template change
+# pending. Only a template made newer than the fragment (`touch
+# ../docs/guide/*.md.in`) breaks the spell, which is a diagnosis nobody should
+# have to make. .DELETE_ON_ERROR now stops such a fragment from being created;
+# this removes one that a Make without it already left behind.
+#
+# Deleting it WHILE THE MAKEFILE IS READ is what repairs the build: the -include
+# remake pass that follows finds guides.d missing, rebuilds it, and make restarts
+# with the rules in place. The `wildcard` guard limits this to a fragment that
+# actually exists, so a rebuild that keeps producing nothing cannot loop.
+ifeq ($(strip $(IOS_GUIDE_OUTPUTS)),)
+ifneq ($(wildcard guides.d),)
+$(shell rm -f guides.d)
+endif
+endif
+
+guides.d: $(wildcard ../docs/guide/usersguide*.md.in) Potillus/Localizable.xcstrings \
+          ../tools/render-guide.py
 	python3 ../tools/render-guide.py --platform ios --make-deps > $@
+	# A fragment without rules is as useless as a missing one, and far harder
+	# to spot: .DELETE_ON_ERROR only fires on a non-zero exit.
+	test -s $@
 
 # Shared recipe for every guide output (prerequisites come from guides.d). Guarded
 # so the empty-goal parse BEFORE guides.d exists is harmless. render-guide.py
@@ -155,7 +186,20 @@ $(IOS_GUIDE_OUTPUTS):
 endif
 
 # Convenience alias: build any stale guide (dependency-driven).
+#
+# The empty branch is not dead code. It is reached when guides.d was read and
+# carried no outputs at all -- and `-include` swallows a failed remake of the
+# fragment without a word, so make would otherwise answer "Nothing to be done"
+# and exit 0 on a build that produced nothing. On a fresh clone the branch is
+# installed too, but never runs: make remakes the missing fragment and RESTARTS,
+# and the parse that matters has the variable populated.
+ifneq ($(IOS_GUIDE_OUTPUTS),)
 guides: $(IOS_GUIDE_OUTPUTS)
+else
+guides:
+	@echo "make: guides.d lists no guides. Run 'rm -f guides.d' and try again." >&2
+	@exit 1
+endif
 
 # check-guides: fail if a committed template or catalogue change would leave a
 # rendered guide stale. READ-ONLY -- it judges, never renders. A guide not rendered

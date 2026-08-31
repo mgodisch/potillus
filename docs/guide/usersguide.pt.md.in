@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,295 +24,508 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-{{#android}}
-# Libellus Potionis -- Manual do utilizador
-
-Esta página descreve as características e funções do Libellus Potionis, o
-registo pessoal do teu consumo de álcool.
-
-## Visão geral
 
-O Libellus Potionis é de código aberto: o código-fonte pode ser consultado e
-verificado por qualquer pessoa. A aplicação não requer quaisquer permissões:
-nem para a câmara ou o microfone, nem para o GPS ou o acesso à rede. Os teus
-dados permanecem no armazenamento privado da aplicação no teu dispositivo,
-protegidos pela cifragem do dispositivo, e o acesso à aplicação pode ser
-restringido através de impressão digital.
-
-A aplicação indica a qualquer momento se «la petite sœur» ainda cabe no teu
-orçamento, para que te possas dosear até ao teu limite. Para uma consulta de
-adições, produz a pedido um relatório PDF de duas páginas sobre os teus hábitos
-de consumo. É gratuita e sem publicidade.
-
-O Libellus Potionis requer o Android 11 ou superior. É utilizado de forma
-contínua pelo autor num Google Pixel 10 Pro com GrapheneOS e testado
-adicionalmente num Fairphone 4.
-
-## Ecrã «{{today}}»
-
-Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
-cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
-aqui. Usa o botão mais para adicionar mais bebidas.
-
-Acima da lista de bebidas encontras uma visão geral do dia atual com as
-seguintes informações: a quantidade de álcool já consumida hoje (em gramas),
-essa mesma quantidade em relação aos teus limites diário e semanal (em gramas e
-como barra de progresso) e o número de dias com consumo de álcool até agora esta
-semana em relação ao teu limite (como número e como barra de progresso).
-
-Além disso, um emblema marcado com «Ø» mostra o teu consumo médio do mês atual
-(média de gramas de álcool puro por dia).
-
-## Ecrã «{{calendar}}»
-
-Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
-assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
-(limite ultrapassado). Ao selecionar um dia, são apresentadas as respetivas
-bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
-adicionar bebidas consumidas de forma retroativa.
-
-## Ecrã «{{statistics}}»
-
-Este ecrã mostra análises estatísticas do teu consumo de álcool, filtráveis por
-semana, mês ou ano. Está disponível uma exportação CSV para continuar a
-processar os dados numa folha de cálculo. Além disso, é fornecida uma exportação
-PDF que apresenta os hábitos de consumo num formato adequado ao acompanhamento
-em adições.
-
-## Ecrã «{{drinks}}»
-
-Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
-conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
-eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
-bebida, abre-se uma caixa de diálogo para a registar como consumida.
-
-## Ecrã «{{settings}}»
-
-O menu de definições é acessível através do ícone de menu (☰) no canto superior direito. O Libellus Potionis disponibiliza as seguintes opções de
-configuração:
-
-### {{personal_data}}
-
-Nesta categoria podes anotar o teu peso corporal para estimar a tua
-concentração de álcool no sangue através da [fórmula de
-Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é depois apresentado no ecrã «{{today}}».
-
-A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
-P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
-eliminação de cerca de 0,15 ‰ por hora e t as horas desde a primeira bebida.
-Os gramas resultam de volume × teor alcoólico × 0,789, a densidade do etanol.
-
-A aplicação não regista o sexo e por isso calcula de forma conservadora: r
-está fixado em 0,6, o menor dos dois coeficientes clássicos. Um r menor
-distribui a mesma dose num volume menor e devolve portanto o maior dos dois
-valores, de modo que a estimativa não fique abaixo do que uma pessoa de
-qualquer sexo realmente alcança. A taxa de eliminação, em contrapartida, é uma
-média: individualmente varia de cerca de 0,10 a 0,20 ‰ por hora, pelo que quem
-metaboliza o álcool devagar pode estar acima do valor apresentado. A
-estimativa é um modelo estatístico, não uma medição.
-
-### {{limits}}
-
-Nesta categoria introduzes os limites que se aplicam ao teu consumo de álcool. Os
-campos a preencher são: o limite diário máximo em gramas de álcool puro, o limite
-semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam em simultâneo. Por conseguinte, no ecrã «{{today}}» são visíveis três
-barras de progresso. Se não tiveres a certeza do que configurar aqui, podes
-inspirar-te nas recomendações de vários países na Wikipédia.
-
-### {{statistics}}
-
-As definições estatísticas permitem-te definir a hora a que começa um novo dia
-(para que, por exemplo, uma bebida à 1:00 da manhã ainda conte para o dia
-anterior) e — para as resoluções de Ano Novo — a data a partir da qual a
-análise dos dados deve começar.
-
-### {{backup_section}}
-
-**Os teus dados nunca saem deste dispositivo por si só.** O Libellus Potionis
-mantém tudo no armazenamento privado da aplicação e, deliberadamente, não
-participa em nenhuma cópia de segurança automática na nuvem nem em nenhuma
-transferência entre dispositivos. Se mudares de telemóvel, fizeres uma
-reposição de fábrica ou reinstalares a aplicação, **a única forma de manter os
-teus dados é fazeres tu próprio uma cópia de segurança** — não existe outra via
-de recuperação, e os dados que não foram exportados não podem ser recuperados
-depois.
-
-Uma cópia de segurança é um único ficheiro JSON que contém todas as tuas
-bebidas e o teu registo completo. Para mover os teus dados para outro
-telemóvel:
-
-1. No telemóvel antigo, abre «{{settings}}» → {{backup_section}} →
-   {{backup_export}} e guarda o ficheiro JSON num local seguro — por exemplo, o
-   teu próprio armazenamento na nuvem, um e-mail para ti mesmo ou uma
-   transferência por USB.
-2. Instala o Libellus Potionis no telemóvel novo.
-3. Abre «{{settings}}» → {{backup_section}} → {{backup_import}} e seleciona
-   esse ficheiro JSON. Escolhe {{import_replace}} para substituir tudo ou
-   {{import_merge}} para o combinar com as entradas já existentes.
-
-Exporta regularmente: uma cópia de segurança só protege os dados que existiam
-no momento em que a criaste.
-
-### {{security}}
-
-Esta categoria protege o acesso à aplicação e controla a sua visibilidade.
-Ativa {{biometric_lock}} para exigir uma impressão digital ou o reconhecimento
-facial sempre que a aplicação é aberta. O interruptor {{allow_screenshots}}
-controla se são permitidas capturas de ecrã e gravações de ecrã da janela da
-aplicação; está desativado por predefinição, pelo que a janela fica oculta nas
-capturas de ecrã e na vista de aplicações recentes.
-
-### {{appearance}}
-
-Nesta categoria podes definir o tema de cores e o idioma independentemente das
-definições do sistema.
-{{/android}}
-
-{{#ios}}
-# Libellus Potionis -- Manual do utilizador
-
-Esta página descreve as características e funções do Libellus Potionis, o
-registo pessoal do teu consumo de álcool.
-
-## Visão geral
-
-O Libellus Potionis é de código aberto: o código-fonte pode ser consultado e
-verificado por qualquer pessoa. A aplicação não requer quaisquer permissões:
-nem para a câmara ou o microfone, nem para o GPS ou o acesso à rede. Os teus
-dados permanecem no armazenamento privado da aplicação no teu dispositivo,
-protegidos pela cifragem do dispositivo, e o acesso à aplicação pode ser
-restringido através de Face ID ou Touch ID.
-
-A aplicação indica a qualquer momento se «la petite sœur» ainda cabe no teu
-orçamento, para que te possas dosear até ao teu limite. Para uma consulta de
-adições, produz a pedido um relatório PDF de duas páginas sobre os teus hábitos
-de consumo. É gratuita e sem publicidade.
-
-O Libellus Potionis requer o iOS 17.0 ou superior. É utilizado de forma
-contínua pelo autor num iPhone 16E e testado adicionalmente num emulador de
-iPhone 17 Pro.
-
-## Ecrã «{{today}}»
-
-Neste ecrã encontras uma lista das bebidas alcoólicas que consumiste hoje. Se
-cometeste um erro ao registar uma bebida, podes editar ou eliminar os registos
-aqui. Usa o botão mais para adicionar mais bebidas. Toca numa entrada para a editar, ou desliza-a para a esquerda para a eliminar. O botão com o lápis na barra de ferramentas também mostra um controlo para eliminar.
-
-Acima da lista de bebidas encontras uma visão geral do dia atual com as
-seguintes informações: a quantidade de álcool já consumida hoje (em gramas),
-essa mesma quantidade em relação aos teus limites diário e semanal (em gramas e
-como barra de progresso) e o número de dias com consumo de álcool até agora esta
-semana em relação ao teu limite (como número e como barra de progresso).
-
-Além disso, um emblema marcado com «Ø» mostra o teu consumo médio do mês atual
-(média de gramas de álcool puro por dia).
-
-## Ecrã «{{calendar}}»
-
-Neste ecrã encontras o calendário. Os dias em que foi consumido álcool estão
-assinalados com um ponto azul (quantidade não crítica) ou um ponto vermelho
-(limite ultrapassado). Ao selecionar um dia, são apresentadas as respetivas
-bebidas, que podem ser corrigidas ou eliminadas se necessário. Também é possível
-adicionar bebidas consumidas de forma retroativa. Toca numa entrada para a corrigir, ou desliza-a para a esquerda para a eliminar; o botão com o lápis na barra de ferramentas oferece o mesmo.
-
-## Ecrã «{{statistics}}»
-
-Este ecrã mostra análises estatísticas do teu consumo de álcool, filtráveis por
-semana, mês ou ano. Está disponível uma exportação CSV para continuar a
-processar os dados numa folha de cálculo. Além disso, é fornecida uma exportação
-PDF que apresenta os hábitos de consumo num formato adequado ao acompanhamento
-em adições.
-
-## Ecrã «{{drinks}}»
-
-Este ecrã contém a lista de bebidas. A aplicação vem pré-configurada com um
-conjunto de bebidas comuns a nível internacional. Todas podem ser alteradas ou
-eliminadas. Podes definir uma nova bebida através do ícone mais. Ao tocar numa
-bebida, abre-se uma caixa de diálogo para a registar como consumida. Para alterar ou eliminar uma bebida, toca no botão com o lápis na barra de ferramentas: nesse modo, tocar numa linha abre a caixa de edição dela e a marca vermelha elimina a bebida. Deslizar a linha para a esquerda oferece as mesmas duas ações.
-
-## Ecrã «{{settings}}»
-
-O menu de definições é acessível através do botão Mais (…) no canto superior direito. O Libellus Potionis disponibiliza as seguintes opções de
-configuração:
-
-### {{personal_data}}
-
-Nesta categoria podes anotar o teu peso corporal para estimar a tua
-concentração de álcool no sangue através da [fórmula de
-Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Esse valor é depois apresentado no ecrã «{{today}}».
-
-A fórmula é **BAC [‰] = A / (P × r) − β × t**: A são os gramas de álcool puro,
-P o peso corporal em quilogramas, r o coeficiente de distribuição, β a taxa de
-eliminação de cerca de 0,15 ‰ por hora e t as horas desde a primeira bebida.
-Os gramas resultam de volume × teor alcoólico × 0,789, a densidade do etanol.
-
-A aplicação não regista o sexo e por isso calcula de forma conservadora: r
-está fixado em 0,6, o menor dos dois coeficientes clássicos. Um r menor
-distribui a mesma dose num volume menor e devolve portanto o maior dos dois
-valores, de modo que a estimativa não fique abaixo do que uma pessoa de
-qualquer sexo realmente alcança. A taxa de eliminação, em contrapartida, é uma
-média: individualmente varia de cerca de 0,10 a 0,20 ‰ por hora, pelo que quem
-metaboliza o álcool devagar pode estar acima do valor apresentado. A
-estimativa é um modelo estatístico, não uma medição.
-
-### {{limits}}
-
-Nesta categoria introduzes os limites que se aplicam ao teu consumo de álcool. Os
-campos a preencher são: o limite diário máximo em gramas de álcool puro, o limite
-semanal máximo e o número máximo de dias de consumo por semana. Todos os limites
-se aplicam em simultâneo. Por conseguinte, no ecrã «{{today}}» são visíveis três
-barras de progresso. Se não tiveres a certeza do que configurar aqui, podes
-inspirar-te nas recomendações de vários países na Wikipédia.
-
-### {{statistics}}
-
-As definições estatísticas permitem-te definir a hora a que começa um novo dia
-(para que, por exemplo, uma bebida à 1:00 da manhã ainda conte para o dia
-anterior) e — para as resoluções de Ano Novo — a data a partir da qual a
-análise dos dados deve começar.
-
-### {{backup_section}}
-
-**Os teus dados nunca saem deste dispositivo por si só.** O Libellus Potionis
-mantém tudo no armazenamento privado da aplicação e, deliberadamente, não
-participa em nenhuma cópia de segurança automática na nuvem nem em nenhuma
-transferência entre dispositivos. Se mudares de telemóvel, fizeres uma
-reposição de fábrica ou reinstalares a aplicação, **a única forma de manter os
-teus dados é fazeres tu próprio uma cópia de segurança** — não existe outra via
-de recuperação, e os dados que não foram exportados não podem ser recuperados
-depois.
-
-Uma cópia de segurança é um único ficheiro JSON que contém todas as tuas
-bebidas e o teu registo completo. Para mover os teus dados para outro
-telemóvel:
-
-1. No telemóvel antigo, abre «{{settings}}» → {{backup_section}} →
-   {{backup_export}} e guarda o ficheiro JSON num local seguro — por exemplo, o
-   teu próprio armazenamento na nuvem, um e-mail para ti mesmo ou uma
-   transferência por USB.
-2. Instala o Libellus Potionis no telemóvel novo.
-3. Abre «{{settings}}» → {{backup_section}} → {{backup_import}} e seleciona
-   esse ficheiro JSON. Escolhe {{import_replace}} para substituir tudo ou
-   {{import_merge}} para o combinar com as entradas já existentes.
-
-Exporta regularmente: uma cópia de segurança só protege os dados que existiam
-no momento em que a criaste.
-
-### {{security}}
-
-Esta categoria protege o acesso à aplicação e controla a sua visibilidade.
-Ativa {{biometric_lock}} para exigir Face ID ou Touch ID sempre que a
-aplicação é aberta. O interruptor {{allow_screenshots}} controla se o conteúdo
-da aplicação aparece no seletor de apps (App Switcher); está desativado por
-predefinição, pelo que a aplicação fica oculta aí quando a deixas. O iOS não
-permite que uma aplicação bloqueie capturas de ecrã ou gravações de ecrã, pelo
-que esta definição não as afeta.
-
-### {{appearance}}
-
-Nesta categoria podes definir o tema de cores e o idioma independentemente das
-definições do sistema.
-{{/ios}}
+# Libellus Potionis – Manual do utilizador
+
+Libellus Potionis é um diário onde regista o seu próprio consumo de álcool.
+Anota o que bebe; a aplicação calcula quanto álcool puro foi isso e se «la
+petite sœur», a segunda cerveja, ainda cabe dentro dos limites que definiu
+para si. Este manual percorre a aplicação passo a passo: como está
+organizada, como se configura, como se regista uma bebida, depois o olhar
+para trás e o balanço, e por fim as cópias de segurança.
+
+## O que a aplicação faz – e o que não faz
+
+Libellus Potionis leva a conta. Não julga e não insiste. Os números que
+mostra são os seus próprios registos, convertidos em gramas de álcool puro.
+Se registar cada bebida, pode olhar em frio para o seu próprio consumo – e é
+aí que a aplicação ganha o seu lugar.
+
+Libellus Potionis é software livre sob a GNU General Public License. O seu
+código-fonte é por isso público, e qualquer afirmação sobre a forma como
+trata os seus dados pode ser verificada por qualquer pessoa a qualquer
+momento. A privacidade é um traço determinante de Libellus Potionis: a
+aplicação não pede uma única permissão sensível, nem câmara, nem microfone,
+nem localização, nem acesso a ficheiros, nem sequer acesso à rede. Tudo o que
+introduz fica no armazenamento privado da aplicação no seu dispositivo,
+protegido pela cifra do próprio dispositivo. Nas definições pode bloquear o
+acesso à aplicação com {{#android}}a sua impressão
+digital{{/android}}{{#ios}}o Face ID{{/ios}}; essa é a única permissão que a
+aplicação alguma vez pede.
+
+O que Libellus Potionis _não_ é: a aplicação não é um instrumento de medida
+nem um dispositivo médico. A alcoolemia é uma estimativa a partir de um
+modelo estatístico (ver «Como são calculados os números»). Nada do que a
+aplicação diz lhe indica se está em condições de conduzir, e nada disso é um
+diagnóstico. O que Libellus Potionis consegue: dar-lhe uma imagem do seu
+próprio consumo ao longo de semanas e meses e, se quiser, imprimir essa
+imagem como um PDF de duas páginas, numa folha que pode levar a uma consulta
+de tratamento de dependências.
+
+Libellus Potionis exige {{#android}}Android 11 ou posterior, o que abrange os
+telemóveis a partir de 2020, sensivelmente. A aplicação é testada com
+regularidade num Google Pixel 10 Pro com GrapheneOS (Android 16) e num
+Fairphone 4 (Android 15){{/android}}{{#ios}}iOS 17 ou posterior, o que
+abrange os iPhone a partir de 2018, sensivelmente. A aplicação é testada com
+regularidade num iPhone 16e e num iPhone SE de 3.ª geração, ambos com iOS
+26{{/ios}}.
+
+## Como a aplicação está organizada
+
+Libellus Potionis tem quatro ecrãs. Passa de um para o outro pela barra na
+margem inferior, presente nos quatro:
+
+- _{{today}}_: como está o dia em curso e o que nele foi registado,
+- _{{calendar}}_: o olhar para trás sobre dias, meses e anos avulsos, e a
+  correção dos seus registos onde for preciso,
+- _{{statistics}}_: as análises estatísticas por semanas, meses e anos,
+- _{{drinks}}_: o catálogo das bebidas que pode registar.
+
+Em cima à direita, os quatro ecrãs trazem o mesmo {{#ios}}botão de menu
+«(···)»{{/ios}}{{#android}}botão de menu «hambúrguer»{{/android}}. Abre um
+menu com _{{settings}}, {{help}}_ (este manual) e a página _{{about}}_, com
+informações sobre a aplicação, as versões e as licenças. Se o seu dispositivo
+o souber autenticar, aparece ali também _{{lock_app}}_, que bloqueia a
+aplicação de imediato.
+
+_{{settings}}, {{help}}_ e _{{about}}_ abrem {{#android}}como páginas
+próprias; o botão de retrocesso do dispositivo, ou a seta em cima à esquerda,
+leva-o de volta ao ecrã a partir do qual as abriu{{/android}}{{#ios}}como
+janelas próprias, que fecha em cima à direita{{/ios}}.
+
+## Primeiros passos
+
+Logo a seguir à instalação a aplicação ainda não tem registos, mas já se pode
+usar: um catálogo predefinido de bebidas correntes em todo o mundo
+permite-lhe registar a primeira cerveja de imediato. Ainda assim, vale a pena
+definir antes três coisas. As três estão em _{{settings}}_; as restantes
+definições são descritas mais abaixo.
+
+### Os seus limites
+
+Em _{{limits}}_ estão os valores que valem para si, e os três valem ao mesmo
+tempo:
+
+- _{{daily_limit_grams}}_: o limite diário de álcool puro em gramas,
+- _{{weekly_limit_grams}}_: o limite semanal de álcool puro em gramas,
+  contado sobre uma janela deslizante de sete dias,
+- _{{drink_days_setting}}_: o limite semanal de dias de consumo, contado
+  igualmente sobre uma janela deslizante de sete dias.
+
+O terceiro valor não limita a quantidade, mas a frequência. Se o puser em
+quatro dias de consumo e tiver bebido em três dos seis dias anteriores, o
+ecrã _{{today}}_ mostra-lhe que a primeira bebida gastaria o quarto dia de
+consumo, ao passo que uma segunda bebida no mesmo dia não gastaria mais
+nenhum.
+
+Para ter uma ideia de que números são razoáveis, veja o que recomendam as
+autoridades de saúde de vários países. Divergem bastante entre si, e a
+[Wikipédia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+reúne-as.
+
+### O seu peso corporal
+
+Em _{{personal_data}}_ está o _{{body_weight}}_, e é facultativo. Enquanto
+não houver um valor introduzido, ali está apenas o botão que o cria; depois
+pode subi-lo ou baixá-lo passo a passo, e um segundo botão volta a retirá-lo.
+A aplicação funciona por inteiro sem peso corporal, só que então a alcoolemia
+estimada no ecrã _{{today}}_ _não_ é mostrada, porque falta a base para a
+calcular.
+
+### Quando começa o seu dia
+
+Em _{{statistics}}_ está _{{day_starts_at}}_, predefinido para as quatro da
+manhã. Esta definição decide a que dia conta uma bebida: se tomar um copo à
+uma da manhã, ele cai na noite anterior, que é onde pertence. O limite do dia
+vale em toda a aplicação, tanto no calendário como nas estatísticas e nas
+exportações.
+
+No mesmo sítio está a linha _{{stats_from_label}}_. Essa data é o chão de
+qualquer análise: os registos anteriores são ignorados em cada número.
+Permite-lhe traçar um risco limpo a 1 de janeiro para uma resolução de ano
+novo sem perder o que registou até aí. Uma instalação nova põe a data no dia
+da instalação. Costuma estar certo, mas pode confundir quando é importada uma
+cópia de segurança com dados mais antigos: os registos antigos estão lá, e
+nenhum conta em lado nenhum. O botão _{{stats_from_clear}}_ volta a levantar
+esse chão.
+
+## O ecrã Hoje
+
+Por cima da lista de bebidas está um resumo que se atualiza depois de cada
+registo e com o passar do tempo. De cima para baixo:
+
+Dois números grandes estão {{#android}}lado a lado: à
+esquerda{{/android}}{{#ios}}um por baixo do outro:{{/ios}} a duração da
+abstinência atual em dias, ou o álcool puro registado hoje em gramas,
+{{#android}}à direita{{/android}}{{#ios}}por baixo{{/ios}}, sob «Ø», a média
+do mês em curso em gramas por dia. Uma seta de tendência verde ou vermelha ao
+lado compara esse número com o do mês anterior.
+
+Três barras de quantidade: a primeira mostra o consumo de hoje face ao limite
+diário que definiu, a segunda a soma de hoje e dos seis dias anteriores face
+ao limite de sete dias que definiu, a terceira o número de dias de consumo
+entre hoje e os seis dias anteriores face ao limite que definiu. As três
+mostram um número e uma barra.
+
+A alcoolemia estimada aparece apenas se houver um peso corporal introduzido,
+e apenas enquanto o cálculo ainda puser álcool no seu sangue. É uma
+estimativa, e não lhe pode dizer se está em condições de conduzir.
+
+Por baixo está a lista das bebidas registadas no dia em curso.
+
+## Registar uma bebida
+
+Há mais do que um sítio de onde registar uma bebida. O ecrã _{{today}}_
+oferece o primeiro, e os ecrãs _{{calendar}}_ e _{{drinks}}_ oferecem outros
+dois. {{#android}}Em baixo{{/android}}{{#ios}}Em cima{{/ios}} à direita do
+ecrã _{{today}}_ está o botão mais; abre a janela de registo.
+
+### A janela de registo
+
+Bem no topo está a linha _{{drink}}_ com a escolha do catálogo; se houver só
+uma bebida definida, está ali o nome dela sem nada a escolher. Por baixo
+estão três campos:
+
+- a quantidade bebida, em mililitros. De 1 a 5 000 ml; o campo parte da dose
+  habitual da bebida escolhida.
+- a hora, definida para agora. Ajustável quando regista algo à posteriori.
+- uma nota, se quiser, um comentário livre sobre a ocasião ou a companhia.
+
+O teor alcoólico pertence à bebida e não pode ser introduzido de outra forma
+aqui. Se a mesma qualidade for numa noite bem mais forte, dê-lhe um lugar
+próprio no catálogo.
+
+Assim que a quantidade estiver dentro do permitido, por baixo dos
+campos{{#ios}}, na linha _{{alcohol_content}}_,{{/ios}} está quantos gramas
+de álcool puro dá o registo. É com esse número que Libellus Potionis calcula,
+não com os mililitros.
+
+Ao lado do teor alcoólico está um ponto de estado colorido. Diz quantas doses
+da bebida escolhida ainda cabem no mesmo dia dentro dos três limites: verde
+enquanto couberem pelo menos mais duas, amarelo enquanto couber exatamente
+uma, vermelho quando a seguinte quebraria um ou mais dos limites definidos.
+Se lhe custar distinguir o vermelho do verde, ligue _{{alt_status_symbols}}_
+em _{{appearance}}_ dentro de _{{settings}}_: o ponto colorido passa então a
+trazer também uma forma correspondente.
+
+{{#ios}}A janela fecha-se com qualquer um dos dois botões do topo. Assim que
+tiver escrito algo, um deslize para baixo já não a fecha, para que meio
+registo não desapareça sem querer.{{/ios}}
+
+### Botões rápidos para as bebidas que regista com frequência
+
+As bebidas marcadas como favoritas no catálogo aparecem no ecrã _{{today}}_
+como uma fila de botões por cima da lista do dia. Um toque regista a bebida
+com a sua dose habitual, sem janela pelo meio. Para a cerveja do fim do dia
+de trabalho, que é sempre a mesma cerveja, este é o caminho mais curto.
+
+### Corrigir ou eliminar um registo
+
+Um toque {{#android}}no ícone de lápis de um registo{{/android}}{{#ios}}num
+registo{{/ios}} da lista do dia abre-o como _{{edit_entry}}_: os mesmos
+campos de quando o registou, e os mesmos limites. {{#android}}O ícone de
+caixote do lixo retira-o, e a aplicação pergunta uma vez
+antes,{{/android}}{{#ios}}Para o retirar, deslize a linha para a esquerda, ou
+toque na marca vermelha da linha no modo de edição, em cima à direita. Ambos
+os caminhos levam a _{{delete}}_ e à mesma pergunta,{{/ios}} porque um
+registo eliminado por engano não se recupera.
+
+## O calendário
+
+O ecrã _{{calendar}}_ mostra o que foi. A passagem entre a vista mensal e o
+mapa de calor anual está em cima à
+{{#android}}direita{{/android}}{{#ios}}esquerda{{/ios}}.
+
+### A vista mensal
+
+A vista mensal mostra uma grelha de mês vulgar e é a vista por onde começa.
+Por cima da grelha está o mês, com uma seta de cada lado para folhear. Os
+dias com registos trazem um ponto: azul para um dia de consumo abaixo dos
+limites, vermelho para um dia de consumo que quebrou um limite. Os dias sem
+registos não trazem ponto.
+
+Um toque seleciona o dia e lista os seus registos por baixo. Aí eles
+editam-se e eliminam-se tal como os do dia em curso no ecrã _{{today}}_, e o
+botão mais em {{#android}}baixo{{/android}}{{#ios}}cima{{/ios}} à direita,
+que só aparece depois de um dia estar selecionado, regista no dia
+selecionado. É assim que recupera o que não anotou enquanto bebia.
+
+### A vista anual
+
+A vista anual escolhe-se com o botão em cima à
+{{#android}}direita{{/android}}{{#ios}}esquerda{{/ios}}. Mostra os doze meses
+de um ano como mapa de calor, uma grelha de quadradinhos, um por dia. Por
+cima da grelha está o ano, com uma seta de cada lado para mudar de ano. A
+legenda por baixo nomeia os três estados: {{year_calendar_no_entry}},
+{{year_calendar_under_limit}}, {{year_calendar_over_limit}}. O dia de hoje
+traz um anel. Um toque num mês abre a vista mensal dele.
+
+## Fazer o balanço: as estatísticas
+
+O ecrã _{{statistics}}_ analisa. O comprimento do período escolhe-se em cima:
+_{{week}}_, _{{month}}_ ou _{{year}}_. Tudo o que está por baixo se refere a
+essa escolha. _{{week}}_ significa sempre uma janela deslizante de sete dias
+formada por hoje e pelos seis dias anteriores. Cada cálculo ignora os
+registos anteriores à data _{{stats_from_label}}_ em _{{settings}}_. Se não
+houver registos no período escolhido, {{#android}}nos gráficos aparece
+«{{no_data}}»{{/android}}{{#ios}}as secções ficam onde estão e mostram
+zeros{{/ios}}.
+
+### Recuar no tempo
+
+Por baixo dos botões de período, o intervalo mostrado está escrito por
+extenso como uma gama de datas exata. O mês em curso acaba hoje e não no fim
+do mês, e se estiver definida uma _{{stats_from_label}}_, a gama começa aí. O
+que ali está é portanto exatamente o que os números de baixo cobrem. De cada
+lado está uma seta. A da esquerda recua um período, a da direita volta na
+direção do presente.
+
+Tudo neste ecrã segue o período escolhido, tanto os números como os gráficos.
+_{{trend_vs_prev}}_ compara sempre com o período do mesmo comprimento
+imediatamente anterior, março portanto com fevereiro.
+
+### Os números
+
+- _{{total_period}}_: gramas de álcool puro no período escolhido.
+- _{{avg_per_day}}_: a média sobre todos os dias do calendário.
+- _{{avg_per_drink_day}}_: a média sobre os dias de consumo. Uma grande
+  distância em relação ao número anterior aponta para um consumo raro mas
+  intenso.
+- _{{days_over_daily_limit}}_: o número de dias em que o limite diário foi
+  ultrapassado.
+- _{{days_over_weekly_limit}}_: o número de dias de consumo em que esse dia e
+  os seis anteriores somaram mais do que o limite de sete dias.
+- _{{days_over_drink_day_limit}}_: dias de consumo que ficaram acima do
+  limite de dias de consumo dentro da sua própria janela de sete dias, por
+  exemplo o quinto dia de consumo em sete quando só quatro são permitidos.
+- _{{abstinent_days}}_: dias do período sem registos.
+- _{{current_streak}}_: conta os dias desde a última bebida.
+- _{{longest_streak}}_: o troço mais longo sem álcool dentro do período.
+- _{{trend_vs_prev}}_: mostra a tendência face ao período anterior.
+
+### Os gráficos
+
+Quatro gráficos completam os números, o primeiro sobre o percurso, os
+restantes sobre o padrão:
+
+- O primeiro gráfico de barras segue o consumo ao longo do período escolhido:
+  a janela de sete dias escolhida, o mês escolhido, ou o consumo médio por
+  dia de cada mês do ano escolhido.
+- _{{stats_time_of_day}}_ divide o dia em oito faixas de três horas e dá para
+  cada uma a média em gramas por dia. Aqui vê-se se se bebe à noite ou se o
+  consumo se reparte ao longo do dia. A secção aparece apenas se no período
+  escolhido se tiver bebido alguma coisa.
+- _{{stats_weekday}}_ dá o consumo médio por dia da semana.
+- _{{stats_category_breakdown}}_ mostra em forma de anel como o consumo se
+  reparte pelas seis categorias de bebidas.
+
+## O catálogo de bebidas
+
+O ecrã _{{drinks}}_ gere as bebidas por que opta ao registar. A aplicação é
+entregue com uma seleção de bebidas correntes; podem ser alteradas,
+acrescentadas e eliminadas.
+
+Cada linha mostra o nome, um símbolo de categoria, a dose, o teor alcoólico e
+os gramas de álcool puro que daí resultam, com a estrela de favoritos e o
+ponto de estado dessa dose à frente{{#android}}, e um ícone de edição e outro
+de eliminação atrás{{/android}}. A estrela comuta o estado de favorito: os
+favoritos aparecem nos botões rápidos do ecrã _{{today}}_.
+
+{{#android}}Um toque na linha (não nos ícones) abre a janela de registo com
+essa bebida; é o terceiro caminho para registar, a par dos botões mais dos
+ecrãs _{{today}}_ e _{{calendar}}_. Os dois ícones da direita abrem o editor
+e a pergunta de eliminação.{{/android}}{{#ios}}Um toque na linha abre a
+janela de registo com essa bebida; é o terceiro caminho para registar, a par
+dos botões mais dos ecrãs _{{today}}_ e _{{calendar}}_. Alterar e eliminar
+pertencem ao modo de edição, que liga em cima à direita: aí o mesmo toque
+abre o editor, e a marca vermelha da linha leva à pergunta de eliminação. Um
+deslize para a esquerda oferece igualmente as duas ações, tanto no modo de
+edição como fora dele.{{/ios}}
+
+### Adicionar ou alterar uma bebida
+
+O botão mais abre _{{add_drink}}_, {{#android}}o ícone de lápis de uma
+linha{{/android}}{{#ios}}um toque no modo de edição{{/ios}} abre
+_{{edit_drink}}_. As duas janelas perguntam o mesmo:
+
+- _{{drink_name}}_: ao seu gosto, até 100 caracteres.
+- _{{volume_ml}}_: a dose habitual, de que parte a janela de registo. De 1 a
+  5 000 mililitros.
+- _{{alcohol_percent}}_: o teor alcoólico habitual, de 0 a 100 por cento.
+- _{{category}}_: uma de seis categorias: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} ou {{category_other}}. A categoria não muda nada no
+  cálculo; agrupa a repartição no ecrã _{{statistics}}_.
+
+### Porque algumas bebidas não se deixam eliminar
+
+Uma bebida não pode ser eliminada enquanto houver registos seus que remetam
+para ela; a aplicação diz então quantos. A razão é que esses registos
+perderiam de outro modo aquilo para que remetem, e as estatísticas ficariam
+incompletas.
+
+## Exportar dados
+
+### O relatório PDF
+
+No ecrã _{{statistics}}_, o botão _{{export_pdf}}_ produz um relatório de
+duas páginas como ficheiro _Portable Document Format (PDF)_: os números
+centrais, uma tabela mês a mês, a tendência de fundo, o padrão por categoria,
+por hora do dia e por dia da semana, e uma secção sobre consumo de risco e
+abstinência. O formato serve para uma conversa numa consulta de dependências.
+
+O relatório cobre exatamente o período escolhido: se exportar julho depois de
+ter bebido em onze dias, obtém um relatório sobre trinta e um dias, com vinte
+dias de abstinência e uma média diária que divide por trinta e um. A tabela
+dos meses inscreve cada mês do período, mesmo um sem um único registo. É isso
+que faz os números do relatório baterem certo com os do ecrã
+_{{statistics}}_. Se o período escolhido acabar hoje, o relatório acaba ontem
+enquanto nada estiver registado hoje: um dia começado puxaria a média para
+baixo e contaria como abstinente antes de estar terminado.
+
+Para o relatório PDF abre-se {{#android}}a caixa de diálogo de impressão do
+sistema, de onde o pode imprimir ou guardar como
+ficheiro.{{/android}}{{#ios}}o seletor de ficheiros do sistema, onde decide
+para onde vai o ficheiro: para Ficheiros, para um armazenamento na nuvem ou
+para outra aplicação.{{/ios}}
+
+### A exportação CSV
+
+O botão _{{export_csv}}_ do ecrã _{{statistics}}_ escreve uma tabela com uma
+linha por registo, pronta para uma folha de cálculo como [LibreOffice
+Calc](https://www.libreoffice.org/). Os números estão escritos de forma
+legível por máquina, com ponto decimal, seja qual for o idioma da aplicação.
+
+{{#android}}O ficheiro CSV vai parar à pasta de transferências, e a aplicação
+oferece-se depois para o partilhar.{{/android}}{{#ios}}Também para o ficheiro
+CSV se abre o seletor de ficheiros do sistema, onde decide para onde vai o
+ficheiro: para Ficheiros, para um armazenamento na nuvem ou para outra
+aplicação.{{/ios}}
+
+### A exportação JSON – as cópias de segurança
+
+**Os dados que regista não saem deste dispositivo sem que faça alguma
+coisa.** {{#android}}Libellus Potionis não participa em nenhuma cópia de
+segurança automática na nuvem nem em nenhuma transferência de dispositivo
+para dispositivo. **Ao mudar de dispositivo, depois de uma reposição de
+fábrica ou de uma reinstalação, uma cópia de segurança feita por si é a única
+maneira de conservar os seus dados.** O que não foi exportado está então
+perdido.{{/android}}{{#ios}}Libellus Potionis mantém os seus dados fora de
+qualquer cópia de segurança do dispositivo, tanto do iCloud como das cópias
+num computador; o interruptor _{{device_backup}}_ em _{{settings}}_ inverte
+isso (ver «Acesso e visibilidade»). Enquanto estiver desligado, uma cópia de
+segurança feita por si é a única maneira de conservar os seus dados ao mudar
+de dispositivo, depois de uma reposição de fábrica ou de uma
+reinstalação.{{/ios}}
+
+Uma cópia de segurança é um único ficheiro JSON. O interruptor
+_{{backup_include_settings}}_ decide se, a par do catálogo de bebidas e dos
+registos, também as definições são escritas para lá. Essa opção fica de novo
+ligada sempre que as definições são abertas. É assim que os dados passam para
+um dispositivo novo:
+
+1. No dispositivo antigo, escolha _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_export}}_. Guarde o ficheiro num sítio seguro, por exemplo numa
+   nota do [Signal](https://signal.org/) para si próprio.
+2. Instale Libellus Potionis no dispositivo novo.
+3. Reponha aí os dados através de _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_import}}_.
+
+Ao importar, a aplicação pergunta como deve proceder. _{{import_replace}}_
+deita fora o que está no dispositivo: o catálogo de bebidas, os registos e as
+definições, na medida em que a cópia de segurança as traga.
+_{{import_merge}}_ não elimina nenhuma definição de bebida existente nem
+nenhum registo, e acrescenta o que falta. Os registos que já existem não são
+duplicados, e as definições atuais não são substituídas.
+
+## Outras definições
+
+### Acesso e visibilidade
+
+Em _{{security}}_ estão {{#android}}dois{{/android}}{{#ios}}três{{/ios}}
+interruptores:
+
+- _{{biometric_lock}}_ pede, sempre que a aplicação é aberta, {{#android}}uma
+  impressão digital, um rosto ou o bloqueio de ecrã do
+  dispositivo.{{/android}}{{#ios}}o Face ID, o Touch ID ou o código do
+  dispositivo.{{/ios}} Ligar ou desligar o bloqueio exige essa mesma
+  autenticação. Vale também quando sai da aplicação e volta, mas não se
+  voltar dentro de trinta segundos. O menu em cima à direita traz também
+  _{{lock_app}}_, que bloqueia a aplicação de imediato.
+- _{{allow_screenshots}}_ está desligado por omissão. Enquanto {{#android}}as
+  capturas de ecrã estiverem desligadas, não se pode fazer nenhuma captura da
+  janela da aplicação, e o conteúdo dela fica tapado na lista das aplicações
+  recentes.{{/android}}{{#ios}}o interruptor estiver desligado, o conteúdo
+  fica tapado no seletor de aplicações.{{/ios}} Quem pegar no seu dispositivo
+  desbloqueado e folhear as aplicações abertas não vê ali nada.
+  {{#ios}}Impedir uma captura de ecrã está fora do alcance da aplicação iOS;
+  o iOS não oferece nenhuma interface para isso.{{/ios}}
+{{#ios}}- _{{device_backup}}_ está igualmente desligado por omissão. Enquanto
+o interruptor estiver desligado, os dados da aplicação ficam fora de qualquer
+cópia de segurança do dispositivo, tanto do iCloud como das cópias num
+computador. Se o ligar, os dados sobrevivem à reposição de um dispositivo a
+partir da cópia de segurança dele, mas passam então a estar também onde essa
+cópia estiver.{{/ios}}
+
+### Aparência e idioma
+
+Em _{{appearance}}_ podem definir-se três coisas:
+
+- _{{theme_mode}}_: {{theme_system}}, ou então {{theme_day}} ou
+  {{theme_night}} independentemente da definição do sistema.
+- _{{language}}_: o idioma da aplicação, também independente do sistema.
+  «{{language_system}}» volta a seguir o idioma do sistema.
+- _{{alt_status_symbols}}_ dá aos pontos de estado uma forma para além da
+  cor. Assim os três estados continuam a distinguir-se quando o vermelho, o
+  amarelo e o verde custam a diferenciar.
+
+## Como são calculados os números
+
+### De mililitros a gramas
+
+Cada registo é convertido em gramas de álcool puro ao ser guardado:
+
+**gramas = mililitros × teor alcoólico × 0,789**
+
+0,789 é a densidade do etanol em gramas por mililitro. Meio litro de cerveja
+a 5 % dá portanto 500 ml × 0,05 × 0,789 g/ml, cerca de 19,7 g. Cada limite,
+cada estatística e cada exportação trabalha com esse número, nunca com os
+mililitros. É a única coisa que torna comparáveis uma cerveja e um copo de
+vinho.
+
+### A estimativa de alcoolemia
+
+Se houver um peso corporal introduzido, Libellus Potionis estima a
+concentração de álcool no sangue pela [fórmula de
+Widmark](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+
+**BAC [‰] = A / (P × r) − β × t**
+
+A é o álcool puro em gramas, P o peso corporal em quilogramas, r o
+coeficiente de distribuição, β a taxa de eliminação de cerca de 0,15 ‰ por
+hora, e t as horas passadas desde a primeira bebida.
+
+A aplicação não regista o seu sexo e calcula por isso deliberadamente do lado
+prudente: r está fixado em 0,6, o menor dos dois coeficientes clássicos. Um r
+menor reparte o mesmo álcool por um volume menor e dá portanto o maior dos
+dois valores: a estimativa deve antes ficar alta do que baixa. A taxa de
+eliminação, pelo contrário, é uma média; individualmente situa-se algures
+entre 0,10 e 0,20 ‰ por hora. Se eliminar o álcool devagar, está acima do
+valor mostrado.
+
+O que sai é um modelo, não uma medição. Não substitui nenhum alcoolímetro, e
+não lhe pode dizer se está em condições de conduzir.
+
+### O dia lógico
+
+Uma bebida pertence ao dia que começou à hora indicada por
+_{{day_starts_at}}_, não ao dia que o relógio mostra. Com a predefinição das
+quatro horas, um copo à uma e meia da manhã conta ainda para o dia anterior.
+A regra vale em toda a aplicação, também através das mudanças de hora.
+
+### A semana deslizante
+
+O limite de sete dias e os dias de consumo não se referem a uma semana do
+calendário, mas a hoje e aos seis dias anteriores. A janela desloca-se
+portanto dia após dia. Um sábado pesado fica à vista até ter seis dias, e sai
+no sábado seguinte.

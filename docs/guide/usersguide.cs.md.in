@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,278 +24,477 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-{{#android}}
-# Libellus Potionis -- Uživatelská příručka
 
-Tato stránka popisuje vlastnosti a funkce aplikace Libellus Potionis, osobního
-deníku vaší spotřeby alkoholu.
+# Libellus Potionis – Uživatelská příručka
+
+Libellus Potionis je deník, do kterého si zaznamenáváte vlastní pití.
+Zapíšete, co pijete; aplikace spočítá, kolik v tom bylo čistého alkoholu a
+jestli se „la petite sœur“, druhé pivo, ještě vejde do limitů, které jste si
+sami stanovili. Tato příručka provede aplikací krok za krokem: jak je
+uspořádána, jak se nastavuje, jak se zaznamená nápoj, pak pohled zpět a
+bilance a nakonec zálohy.
+
+## Co aplikace dělá – a co ne
+
+Libellus Potionis vede záznam. Nehodnotí a nenapomíná. Čísla, která ukazuje,
+jsou vaše vlastní záznamy, přepočtené na gramy čistého alkoholu.
+Zapisujete-li každý nápoj, můžete se na vlastní pití podívat střízlivýma
+očima – a tam si aplikace vydělá na své místo.
+
+Libellus Potionis je svobodný software pod licencí GNU General Public
+License. Její zdrojový kód je tedy veřejný a každé tvrzení o tom, jak nakládá
+s vašimi daty, si může kdykoli kdokoli ověřit. Soukromí je pro Libellus
+Potionis určujícím rysem: aplikace nežádá o jediné citlivé oprávnění, ani o
+fotoaparát, ani o mikrofon, ani o polohu, ani o přístup k souborům, dokonce
+ani o přístup k síti. Všechno, co zadáte, zůstává v soukromém úložišti
+aplikace na vašem zařízení, chráněno šifrováním samotného zařízení. V
+nastavení můžete přístup k aplikaci zamknout {{#android}}otiskem
+prstu{{/android}}{{#ios}}pomocí Face ID{{/ios}}; to je jediné oprávnění, o
+které aplikace kdy požádá.
+
+Co Libellus Potionis _není_: aplikace není měřicí přístroj ani zdravotnický
+prostředek. Hladina alkoholu v krvi je odhad ze statistického modelu (viz
+„Jak se počítá“). Nic z toho, co aplikace říká, vám neřekne, jestli jste
+způsobilí řídit, a nic z toho není diagnóza. Co Libellus Potionis umí: dát
+vám obraz vlastního pití v průběhu týdnů a měsíců a, chcete-li, vytisknout
+ten obraz jako dvoustránkové PDF na list papíru, který si můžete vzít s sebou
+na sezení v adiktologické poradně.
+
+Libellus Potionis vyžaduje {{#android}}Android 11 nebo novější, což pokrývá
+telefony zhruba od roku 2020. Aplikace se pravidelně zkouší na Google Pixel
+10 Pro s GrapheneOS (Android 16) a na Fairphone 4 (Android
+15){{/android}}{{#ios}}iOS 17 nebo novější, což pokrývá iPhony zhruba od roku
+2018. Aplikace se pravidelně zkouší na iPhonu 16e a na iPhonu SE 3. generace,
+obou s iOS 26{{/ios}}.
+
+## Jak je aplikace uspořádána
+
+Libellus Potionis má čtyři obrazovky. Mezi nimi se přechází lištou u dolního
+okraje, která je na všech čtyřech:
+
+- _{{today}}_: jak stojí dnešní den a co se na něj zaznamenalo,
+- _{{calendar}}_: pohled zpět na jednotlivé dny, měsíce a roky a oprava
+  jejich záznamů tam, kde je potřeba,
+- _{{statistics}}_: statistické rozbory za týdny, měsíce a roky,
+- _{{drinks}}_: katalog nápojů, které lze zaznamenat.
+
+Vpravo nahoře nesou všechny čtyři obrazovky totéž {{#ios}}tlačítko nabídky
+„(···)“{{/ios}}{{#android}}tlačítko nabídky „hamburger“{{/android}}. Otevírá
+nabídku s položkami _{{settings}}, {{help}}_ (tato příručka) a se stránkou
+_{{about}}_ s údaji o aplikaci, verzích a licencích. Umí-li vás vaše zařízení
+ověřit, stojí tam navíc _{{lock_app}}_, které aplikaci okamžitě zamkne.
+
+Položky _{{settings}}, {{help}}_ a _{{about}}_ se otevírají {{#android}}jako
+samostatné stránky; tlačítko zpět na zařízení nebo šipka vlevo nahoře vás
+vrátí na obrazovku, ze které jste je otevřeli{{/android}}{{#ios}}jako
+samostatná okna, která zavřete vpravo nahoře{{/ios}}.
+
+## První kroky
+
+Hned po instalaci aplikace ještě nemá žádné záznamy, ale už se dá používat:
+předpřipravený katalog nápojů rozšířených po celém světě vám dovolí
+zaznamenat první pivo hned. Přesto se vyplatí nejdřív nastavit tři věci.
+Všechny tři jsou v _{{settings}}_; ostatní nastavení jsou popsána níže.
+
+### Vaše limity
+
+V _{{limits}}_ stojí hodnoty, které platí pro vás, a všechny tři platí
+současně:
+
+- _{{daily_limit_grams}}_: denní limit čistého alkoholu v gramech,
+- _{{weekly_limit_grams}}_: týdenní limit čistého alkoholu v gramech,
+  počítaný v klouzavém okně sedmi dní,
+- _{{drink_days_setting}}_: týdenní limit dnů pití, počítaný rovněž v
+  klouzavém okně sedmi dní.
+
+Třetí hodnota neomezuje množství, nýbrž četnost. Nastavíte-li čtyři dny pití
+a pili jste ve třech ze šesti předchozích dnů, obrazovka _{{today}}_ vám
+ukáže, že první nápoj spotřebuje čtvrtý den pití, zatímco druhý nápoj téhož
+dne už žádný další nespotřebuje.
+
+Abyste získali představu, jaká čísla jsou rozumná, podívejte se, co
+doporučují zdravotnické úřady různých zemí. Doporučení se hodně rozcházejí a
+[Wikipedie](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+je shromažďuje.
+
+### Vaše tělesná hmotnost
+
+V _{{personal_data}}_ stojí _{{body_weight}}_ a je nepovinná. Dokud není
+zadána hodnota, stojí tam jen tlačítko, které ji založí; potom ji můžete po
+krocích zvyšovat a snižovat a druhé tlačítko ji zase odstraní. Aplikace
+funguje beze zbytku i bez tělesné hmotnosti, jen se pak na obrazovce
+_{{today}}_ odhad alkoholu v krvi _nezobrazuje_, protože chybí podklad pro
+výpočet.
+
+### Kdy začíná váš den
 
-## Přehled
-
-Libellus Potionis je open source: zdrojový kód si může prohlédnout a ověřit
-kdokoli. Aplikace nevyžaduje žádná oprávnění – ani ke kameře či mikrofonu, ani
-k GPS nebo k síti. Vaše data zůstávají v soukromém úložišti aplikace na vašem
-zařízení, chráněná šifrováním zařízení, a přístup k aplikaci lze omezit otiskem
-prstu.
-
-Aplikace vám kdykoli prozradí, zda se „la petite sœur“ ještě vejde do vašeho
-rozpočtu, takže se můžete dávkovat až ke svému limitu. Pro schůzky v poradně
-pro závislosti na požádání vytvoří dvoustránkovou zprávu PDF o vašich pijáckých
-návycích. Je zdarma a bez reklam.
-
-Libellus Potionis vyžaduje Android 11 nebo novější. Autor jej průběžně používá na
-zařízení Google Pixel 10 Pro se systémem GrapheneOS a navíc jej testuje na
-Fairphone 4.
-
-## Obrazovka „{{today}}“
-
-Na této obrazovce najdete seznam alkoholických nápojů, které jste si dnes
-dopřáli. Pokud jste při zaznamenávání nápoje udělali chybu, můžete zde záznamy
-upravit nebo odstranit. Tlačítkem plus přidáte další nápoje.
-
-Nad seznamem nápojů najdete přehled aktuálního dne s následujícími informacemi:
-množství alkoholu již dnes zkonzumovaného (v gramech), totéž množství ve vztahu k
-vašim denním a týdenním limitům (v gramech a jako ukazatel průběhu) a počet dní s
-konzumací alkoholu v tomto týdnu ve vztahu k vašemu limitu (jako číslo a jako
-ukazatel průběhu).
-
-Navíc odznak označený „Ø“ zobrazuje průměrnou spotřebu v aktuálním měsíci
-(průměrný počet gramů čistého alkoholu za den).
-
-## Obrazovka „{{calendar}}“
-
-Na této obrazovce najdete kalendář. Dny, kdy se pil alkohol, jsou označeny modrým
-bodem (nekritické množství) nebo červeným bodem (překročený limit). Po výběru dne
-se zobrazí příslušné nápoje, které lze v případě potřeby opravit nebo odstranit.
-Je také možné zpětně přidat zkonzumované nápoje.
-
-## Obrazovka „{{statistics}}“
-
-Tato obrazovka zobrazuje statistická vyhodnocení vaší spotřeby alkoholu, která
-lze filtrovat podle týdne, měsíce nebo roku. K dispozici je export do CSV pro
-další zpracování dat v tabulkovém procesoru. Kromě toho je nabízen export do PDF,
-který zpracovává pijácké návyky do podoby vhodné pro poradnu pro závislosti.
-
-## Obrazovka „{{drinks}}“
-
-Tato obrazovka obsahuje seznam nápojů. Aplikace se dodává s přednastavenou sadou
-mezinárodně běžných nápojů. Všechny lze upravit nebo odstranit. Pomocí ikony plus
-můžete definovat nový nápoj. Klepnutím na nápoj se otevře dialog pro jeho
-zaznamenání jako zkonzumovaného.
-
-## Obrazovka „{{settings}}“
-
-Nabídka nastavení je dostupná přes ikonu nabídky (☰) vpravo nahoře. Libellus
-Potionis nabízí následující možnosti konfigurace:
-
-### {{personal_data}}
-
-V této kategorii můžete uvést svou tělesnou hmotnost, aby bylo možné přibližně
-vypočítat koncentraci alkoholu v krvi podle [Widmarkova
-vzorce](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Tato hodnota se pak zobrazí na obrazovce „{{today}}“.
-
-Vzorec zní **BAK [‰] = A / (P × r) − β × t**: A je množství čistého alkoholu v
-gramech, P tělesná hmotnost v kilogramech, r distribuční koeficient, β
-rychlost odbourávání přibližně 0,15 ‰ za hodinu a t počet hodin od prvního
-nápoje daného večera. Gramy vycházejí z objemu × obsahu alkoholu × 0,789,
-hustoty ethanolu.
-
-Aplikace pohlaví nezaznamenává, a proto počítá konzervativně: r je pevně
-nastaveno na 0,6, tedy menší ze dvou klasických koeficientů. Menší r rozděluje
-stejnou dávku do menšího objemu, a dává tak vyšší z obou hodnot, takže odhad
-pokud možno neklesne pod to, čeho člověk jakéhokoli pohlaví skutečně dosáhne.
-Rychlost odbourávání je naproti tomu průměr: individuálně se pohybuje asi mezi
-0,10 a 0,20 ‰ za hodinu, takže kdo alkohol odbourává pomalu, může být nad
-zobrazenou hodnotou. Odhad je statistický model, nikoli měření.
-
-### {{limits}}
-
-V této kategorii zadáváte limity, které platí pro vaši spotřebu alkoholu. Pole k
-vyplnění jsou: maximální denní limit v gramech čistého alkoholu, maximální týdenní
-limit a maximální počet dní pití za týden. Všechny limity platí současně. Proto
-jsou na obrazovce „{{today}}“ vidět tři ukazatele průběhu. Pokud si nejste jisti,
-co zde nastavit, můžete se inspirovat doporučeními různých zemí na Wikipedii.
-
-### {{statistics}}
-
-Statistická nastavení umožňují určit, v kolik hodin začíná nový den (aby se
-například nápoj v 1:00 ráno ještě počítal k předchozímu dni) a — pro novoroční
-předsevzetí — datum, od kterého se mají data vyhodnocovat.
-
-### {{backup_section}}
-
-**Tvoje data nikdy neopustí toto zařízení sama od sebe.** Libellus Potionis
-uchovává vše v soukromém úložišti aplikace a záměrně se neúčastní žádného
-automatického zálohování do cloudu ani žádného přenosu mezi zařízeními. Pokud
-změníš telefon, provedeš obnovení do továrního nastavení nebo aplikaci
-přeinstaluješ, **jediným způsobem, jak si data zachovat, je sám si je
-zálohovat** — jiná cesta k obnovení neexistuje a data, která nebyla
-exportována, už později nelze získat zpět.
-
-Záloha je jediný soubor JSON obsahující všechny tvé nápoje a celý tvůj záznam.
-Přenos dat do jiného telefonu:
-
-1. Na starém telefonu otevři „{{settings}}“ → {{backup_section}} →
-   {{backup_export}} a ulož soubor JSON na bezpečné místo — například do
-   vlastního cloudového úložiště, do e-mailu sobě samému nebo přes přenos USB.
-2. Nainstaluj Libellus Potionis na nový telefon.
-3. Otevři „{{settings}}“ → {{backup_section}} → {{backup_import}} a vyber tento
-   soubor JSON. Zvol {{import_replace}} pro přepsání všeho, nebo
-   {{import_merge}} pro sloučení se záznamy, které už existují.
-
-Exportuj pravidelně: záloha chrání pouze data, která existovala v okamžiku
-jejího vytvoření.
-
-### {{security}}
-
-Tato kategorie chrání přístup k aplikaci a řídí její viditelnost. Zapněte
-{{biometric_lock}}, aby se při každém otevření aplikace vyžadoval otisk prstu
-nebo rozpoznání obličeje. Přepínač {{allow_screenshots}} určuje, zda jsou
-povoleny snímky obrazovky a záznamy obrazovky okna aplikace; ve výchozím
-nastavení je vypnutý, takže okno je skryté na snímcích obrazovky i v přehledu
-naposledy použitých aplikací.
-
-### {{appearance}}
-
-V této kategorii můžete nastavit barevné téma a jazyk nezávisle na nastavení
-systému.
-{{/android}}
-
-{{#ios}}
-# Libellus Potionis -- Uživatelská příručka
-
-Tato stránka popisuje vlastnosti a funkce aplikace Libellus Potionis, osobního
-deníku vaší spotřeby alkoholu.
-
-## Přehled
-
-Libellus Potionis je open source: zdrojový kód si může prohlédnout a ověřit
-kdokoli. Aplikace nevyžaduje žádná oprávnění – ani ke kameře či mikrofonu, ani
-k GPS nebo k síti. Vaše data zůstávají v soukromém úložišti aplikace na vašem
-zařízení, chráněná šifrováním zařízení, a přístup k aplikaci lze omezit pomocí
-Face ID nebo Touch ID.
-
-Aplikace vám kdykoli prozradí, zda se „la petite sœur“ ještě vejde do vašeho
-rozpočtu, takže se můžete dávkovat až ke svému limitu. Pro schůzky v poradně
-pro závislosti na požádání vytvoří dvoustránkovou zprávu PDF o vašich pijáckých
-návycích. Je zdarma a bez reklam.
-
-Libellus Potionis vyžaduje iOS 17.0 nebo novější. Autor jej průběžně používá
-na zařízení iPhone 16E a navíc jej testuje na emulátoru iPhone 17 Pro.
-
-## Obrazovka „{{today}}“
-
-Na této obrazovce najdete seznam alkoholických nápojů, které jste si dnes
-dopřáli. Pokud jste při zaznamenávání nápoje udělali chybu, můžete zde záznamy
-upravit nebo odstranit. Tlačítkem plus přidáte další nápoje. Klepnutím na záznam jej upravíš, přejetím doleva jej odstraníš. Tlačítko s tužkou na panelu nástrojů rovněž nabízí možnost odstranění.
-
-Nad seznamem nápojů najdete přehled aktuálního dne s následujícími informacemi:
-množství alkoholu již dnes zkonzumovaného (v gramech), totéž množství ve vztahu k
-vašim denním a týdenním limitům (v gramech a jako ukazatel průběhu) a počet dní s
-konzumací alkoholu v tomto týdnu ve vztahu k vašemu limitu (jako číslo a jako
-ukazatel průběhu).
-
-Navíc odznak označený „Ø“ zobrazuje průměrnou spotřebu v aktuálním měsíci
-(průměrný počet gramů čistého alkoholu za den).
-
-## Obrazovka „{{calendar}}“
-
-Na této obrazovce najdete kalendář. Dny, kdy se pil alkohol, jsou označeny modrým
-bodem (nekritické množství) nebo červeným bodem (překročený limit). Po výběru dne
-se zobrazí příslušné nápoje, které lze v případě potřeby opravit nebo odstranit.
-Je také možné zpětně přidat zkonzumované nápoje. Klepnutím na záznam jej opravíš, přejetím doleva jej odstraníš; tlačítko s tužkou na panelu nástrojů nabízí totéž.
-
-## Obrazovka „{{statistics}}“
-
-Tato obrazovka zobrazuje statistická vyhodnocení vaší spotřeby alkoholu, která
-lze filtrovat podle týdne, měsíce nebo roku. K dispozici je export do CSV pro
-další zpracování dat v tabulkovém procesoru. Kromě toho je nabízen export do PDF,
-který zpracovává pijácké návyky do podoby vhodné pro poradnu pro závislosti.
-
-## Obrazovka „{{drinks}}“
-
-Tato obrazovka obsahuje seznam nápojů. Aplikace se dodává s přednastavenou sadou
-mezinárodně běžných nápojů. Všechny lze upravit nebo odstranit. Pomocí ikony plus
-můžete definovat nový nápoj. Klepnutím na nápoj se otevře dialog pro jeho
-zaznamenání jako zkonzumovaného. Chceš-li nápoj upravit nebo odstranit, klepni na tlačítko s tužkou na panelu nástrojů: v tomto režimu klepnutí na řádek otevře jeho editor a červený odznak nápoj smaže. Přejetí řádku doleva nabízí tytéž dvě akce.
-
-## Obrazovka „{{settings}}“
-
-Nabídka nastavení je dostupná přes tlačítko Více (…) vpravo nahoře. Libellus
-Potionis nabízí následující možnosti konfigurace:
-
-### {{personal_data}}
-
-V této kategorii můžete uvést svou tělesnou hmotnost, aby bylo možné přibližně
-vypočítat koncentraci alkoholu v krvi podle [Widmarkova
-vzorce](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Tato hodnota se pak zobrazí na obrazovce „{{today}}“.
-
-Vzorec zní **BAK [‰] = A / (P × r) − β × t**: A je množství čistého alkoholu v
-gramech, P tělesná hmotnost v kilogramech, r distribuční koeficient, β
-rychlost odbourávání přibližně 0,15 ‰ za hodinu a t počet hodin od prvního
-nápoje daného večera. Gramy vycházejí z objemu × obsahu alkoholu × 0,789,
-hustoty ethanolu.
-
-Aplikace pohlaví nezaznamenává, a proto počítá konzervativně: r je pevně
-nastaveno na 0,6, tedy menší ze dvou klasických koeficientů. Menší r rozděluje
-stejnou dávku do menšího objemu, a dává tak vyšší z obou hodnot, takže odhad
-pokud možno neklesne pod to, čeho člověk jakéhokoli pohlaví skutečně dosáhne.
-Rychlost odbourávání je naproti tomu průměr: individuálně se pohybuje asi mezi
-0,10 a 0,20 ‰ za hodinu, takže kdo alkohol odbourává pomalu, může být nad
-zobrazenou hodnotou. Odhad je statistický model, nikoli měření.
-
-### {{limits}}
-
-V této kategorii zadáváte limity, které platí pro vaši spotřebu alkoholu. Pole k
-vyplnění jsou: maximální denní limit v gramech čistého alkoholu, maximální týdenní
-limit a maximální počet dní pití za týden. Všechny limity platí současně. Proto
-jsou na obrazovce „{{today}}“ vidět tři ukazatele průběhu. Pokud si nejste jisti,
-co zde nastavit, můžete se inspirovat doporučeními různých zemí na Wikipedii.
-
-### {{statistics}}
-
-Statistická nastavení umožňují určit, v kolik hodin začíná nový den (aby se
-například nápoj v 1:00 ráno ještě počítal k předchozímu dni) a — pro novoroční
-předsevzetí — datum, od kterého se mají data vyhodnocovat.
-
-### {{backup_section}}
-
-**Tvoje data nikdy neopustí toto zařízení sama od sebe.** Libellus Potionis
-uchovává vše v soukromém úložišti aplikace a záměrně se neúčastní žádného
-automatického zálohování do cloudu ani žádného přenosu mezi zařízeními. Pokud
-změníš telefon, provedeš obnovení do továrního nastavení nebo aplikaci
-přeinstaluješ, **jediným způsobem, jak si data zachovat, je sám si je
-zálohovat** — jiná cesta k obnovení neexistuje a data, která nebyla
-exportována, už později nelze získat zpět.
-
-Záloha je jediný soubor JSON obsahující všechny tvé nápoje a celý tvůj záznam.
-Přenos dat do jiného telefonu:
-
-1. Na starém telefonu otevři „{{settings}}“ → {{backup_section}} →
-   {{backup_export}} a ulož soubor JSON na bezpečné místo — například do
-   vlastního cloudového úložiště, do e-mailu sobě samému nebo přes přenos USB.
-2. Nainstaluj Libellus Potionis na nový telefon.
-3. Otevři „{{settings}}“ → {{backup_section}} → {{backup_import}} a vyber tento
-   soubor JSON. Zvol {{import_replace}} pro přepsání všeho, nebo
-   {{import_merge}} pro sloučení se záznamy, které už existují.
-
-Exportuj pravidelně: záloha chrání pouze data, která existovala v okamžiku
-jejího vytvoření.
-
-### {{security}}
-
-Tato kategorie chrání přístup k aplikaci a řídí její viditelnost. Zapněte
-{{biometric_lock}}, aby se při každém otevření aplikace vyžadovalo Face ID
-nebo Touch ID. Přepínač {{allow_screenshots}} určuje, zda se obsah aplikace
-zobrazuje v přepínači aplikací (App Switcher); ve výchozím nastavení je
-vypnutý, takže aplikace je tam skrytá, když ji opustíte. iOS neumožňuje
-aplikaci blokovat snímky obrazovky ani záznamy obrazovky, takže toto nastavení
-je neovlivní.
-
-### {{appearance}}
-
-V této kategorii můžete nastavit barevné téma a jazyk nezávisle na nastavení
-systému.
-{{/ios}}
+V _{{statistics}}_ stojí _{{day_starts_at}}_, přednastavené na čtvrtou hodinu
+ranní. Toto nastavení rozhoduje, ke kterému dni se nápoj počítá: vypijete-li
+skleničku v jednu v noci, spadne na předchozí večer, kam patří. Hranice dne
+platí všude v aplikaci, v kalendáři stejně jako ve statistikách a v
+exportech.
+
+Na témže místě stojí řádek _{{stats_from_label}}_. To datum je spodní hranicí
+každého rozboru: záznamy před ním se v žádném čísle neberou v úvahu. Umožní
+vám udělat k 1. lednu čistý řez kvůli novoročnímu předsevzetí, aniž byste
+přišli o to, co jste dosud zaznamenali. Čerstvá instalace nastaví datum na
+den instalace. Bývá to správně, ale může to zmást, když se načte záloha se
+staršími daty: staré záznamy tam jsou a žádný se nikde nepočítá. Tlačítko
+_{{stats_from_clear}}_ tuto hranici zase zruší.
+
+## Obrazovka Dnes
+
+Nad seznamem nápojů stojí přehled, který se obnovuje po každém záznamu a s
+během času. Shora dolů:
+
+Dvě velká čísla stojí {{#android}}vedle sebe: vlevo{{/android}}{{#ios}}pod
+sebou:{{/ios}} délka současné abstinence ve dnech, nebo čistý alkohol
+zaznamenaný dnes v gramech, {{#android}}vpravo{{/android}}{{#ios}}pod
+tím{{/ios}}, pod „Ø“, průměr běžícího měsíce v gramech za den. Zelená nebo
+červená šipka trendu vedle porovnává toto číslo s předchozím měsícem.
+
+Tři sloupce množství: první ukazuje dnešní spotřebu proti dennímu limitu,
+který jste nastavili, druhý součet dneška a šesti předchozích dnů proti
+limitu na sedm dní, který jste nastavili, třetí počet dnů pití mezi dneškem a
+šesti předchozími dny proti limitu, který jste nastavili. Všechny tři ukazují
+číslo a sloupec.
+
+Odhad alkoholu v krvi se objeví jen tehdy, je-li zadána tělesná hmotnost, a
+jen dokud výpočet ještě klade alkohol do vaší krve. Je to odhad a nemůže vám
+říct, jestli jste způsobilí řídit.
+
+Pod tím stojí seznam nápojů zaznamenaných na dnešní den.
+
+## Zaznamenání nápoje
+
+Nápoj lze zaznamenat z více než jednoho místa. Obrazovka _{{today}}_ nabízí
+první možnost, obrazovky _{{calendar}}_ a _{{drinks}}_ nabízejí další dvě.
+{{#android}}Vpravo dole{{/android}}{{#ios}}Vpravo nahoře{{/ios}} na obrazovce
+_{{today}}_ sedí tlačítko plus; otevírá okno záznamu.
+
+### Okno záznamu
+
+Úplně nahoře stojí řádek _{{drink}}_ s výběrem z katalogu; je-li vytvořený
+jediný nápoj, stojí tam jeho název bez čeho vybírat. Pod ním stojí tři pole:
+
+- vypité množství, v mililitrech. Od 1 do 5 000 ml; pole vychází z obvyklé
+  porce zvoleného nápoje.
+- čas, nastavený na teď. Lze jej změnit, zaznamenáváte-li něco dodatečně.
+- poznámka, chcete-li, volná zmínka o příležitosti nebo o společnosti.
+
+Obsah alkoholu patří k nápoji a nelze jej tu zadat jinak. Je-li týž druh
+jeden večer znatelně silnější, dejte mu v katalogu vlastní místo.
+
+Jakmile množství leží v povoleném rozsahu, stojí pod poli{{#ios}}, na řádku
+_{{alcohol_content}}_,{{/ios}} kolik gramů čistého alkoholu ten záznam dává.
+S tímto číslem Libellus Potionis počítá, ne s mililitry.
+
+Vedle obsahu alkoholu sedí barevná tečka stavu. Říká, kolik porcí zvoleného
+nápoje se týž den ještě vejde do tří limitů: zelená, dokud jsou možné alespoň
+dvě další, žlutá, dokud se vejde přesně jedna, červená, když by další
+porušila jeden nebo více ze stanovených limitů. Rozeznáváte-li špatně
+červenou a zelenou, zapněte _{{alt_status_symbols}}_ ve _{{appearance}}_ v
+_{{settings}}_: barevná tečka pak nese i odpovídající tvar.
+
+{{#ios}}Okno zavřete kterýmkoli z obou tlačítek nahoře. Jakmile něco
+napíšete, přejetí dolů je už nezavře, aby polovina záznamu omylem
+nezmizela.{{/ios}}
+
+### Rychlá tlačítka pro nápoje, které zaznamenáváte často
+
+Nápoje označené v katalogu jako oblíbené se objeví na obrazovce _{{today}}_
+jako řada tlačítek nad seznamem dne. Jedno klepnutí zaznamená nápoj v jeho
+obvyklé porci, bez okna mezi tím. Pro pivo po práci, které je vždy tímtéž
+pivem, je to nejkratší cesta.
+
+### Oprava nebo smazání záznamu
+
+Klepnutí na {{#android}}ikonu tužky u
+záznamu{{/android}}{{#ios}}záznam{{/ios}} v seznamu dne jej otevře jako
+_{{edit_entry}}_: tatáž pole jako při zaznamenání a tytéž meze.
+{{#android}}Ikona koše jej odstraní a aplikace se předtím jednou
+zeptá,{{/android}}{{#ios}}Chcete-li jej odstranit, přejeďte řádkem doleva
+nebo klepněte na červenou značku řádku v režimu úprav vpravo nahoře. Obě
+cesty vedou k _{{delete}}_ a k téže otázce,{{/ios}} protože záznam smazaný
+omylem se už nedá vrátit.
+
+## Kalendář
+
+Obrazovka _{{calendar}}_ ukazuje, co bylo. Přepínání mezi měsíčním zobrazením
+a roční teplotní mapou sedí
+{{#android}}vpravo{{/android}}{{#ios}}vlevo{{/ios}} nahoře.
+
+### Měsíční zobrazení
+
+Měsíční zobrazení ukazuje běžnou mřížku měsíce a je tím, kterým začínáte. Nad
+mřížkou stojí měsíc, po každé straně jedna šipka k listování. Dny se záznamy
+nesou tečku: modrou pro den pití pod limity, červenou pro den pití, který
+limit překročil. Dny bez záznamů tečku nenesou.
+
+Klepnutí vybere den a vypíše jeho záznamy pod ním. Tam se dají upravovat a
+mazat přesně jako dnešní den na obrazovce _{{today}}_ a tlačítko plus
+{{#android}}vpravo dole{{/android}}{{#ios}}vpravo nahoře{{/ios}}, které se
+objeví teprve po výběru dne, zaznamenává na vybraný den. Tak doháníte, co
+jste při pití nezachytili.
+
+### Roční zobrazení
+
+Roční zobrazení vyberete tlačítkem
+{{#android}}vpravo{{/android}}{{#ios}}vlevo{{/ios}} nahoře. Ukazuje dvanáct
+měsíců roku jako teplotní mapu, mřížku malých čtverečků, jeden na den. Nad
+mřížkou stojí letopočet, po každé straně jedna šipka ke změně roku. Legenda
+pod ním jmenuje tři stavy: {{year_calendar_no_entry}},
+{{year_calendar_under_limit}}, {{year_calendar_over_limit}}. Dnešní den nese
+prstenec. Klepnutí na měsíc otevře jeho měsíční zobrazení.
+
+## Bilance: statistiky
+
+Obrazovka _{{statistics}}_ rozebírá. Délka období se volí nahoře: _{{week}}_,
+_{{month}}_ nebo _{{year}}_. Vše pod tím se řídí touto volbou. _{{week}}_
+znamená vždy klouzavé okno sedmi dní složené z dneška a šesti předchozích
+dnů. Každý výpočet pomíjí záznamy před datem _{{stats_from_label}}_ v
+_{{settings}}_. Nejsou-li ve zvoleném období žádné záznamy, {{#android}}stojí
+v grafech „{{no_data}}“{{/android}}{{#ios}}zůstávají oddíly na místě a
+ukazují nuly{{/ios}}.
+
+### Zpět v čase
+
+Pod tlačítky období stojí zobrazený úsek vypsaný jako přesný rozsah dat.
+Běžící měsíc končí dneškem, a ne posledním dnem měsíce, a je-li nastavena
+_{{stats_from_label}}_, rozsah začíná tam. Stojí tam tedy přesně to, co čísla
+pod tím pokrývají. Po každé straně sedí jedna šipka. Levá jde o období zpět,
+pravá zase směrem k přítomnosti.
+
+Všechno na této obrazovce se řídí zvoleným obdobím, čísla i grafy.
+_{{trend_vs_prev}}_ porovnává vždy s obdobím téže délky bezprostředně před
+ním, březen tedy s únorem.
+
+### Čísla
+
+- _{{total_period}}_: gramy čistého alkoholu ve zvoleném období.
+- _{{avg_per_day}}_: průměr přes všechny kalendářní dny.
+- _{{avg_per_drink_day}}_: průměr přes dny pití. Velký odstup od předchozího
+  čísla ukazuje na pití vzácné, ale silné.
+- _{{days_over_daily_limit}}_: počet dnů, ve kterých byl překročen denní
+  limit.
+- _{{days_over_weekly_limit}}_: počet dnů pití, ve kterých ten den a šest
+  předchozích daly dohromady víc než limit na sedm dní.
+- _{{days_over_drink_day_limit}}_: dny pití, které ve vlastním okně sedmi dní
+  ležely nad limitem dnů pití, například pátý den pití ze sedmi, když jsou
+  povoleny jen čtyři.
+- _{{abstinent_days}}_: dny období bez záznamů.
+- _{{current_streak}}_: počítá dny od posledního nápoje.
+- _{{longest_streak}}_: nejdelší úsek bez alkoholu v období.
+- _{{trend_vs_prev}}_: ukazuje trend vůči předchozímu období.
+
+### Grafy
+
+Čísla doplňují čtyři grafy, první o průběhu, ostatní o vzorci:
+
+- První sloupcový graf sleduje spotřebu napříč zvoleným obdobím: zvolené okno
+  sedmi dní, zvolený měsíc, nebo průměrnou spotřebu za den pro každý měsíc
+  zvoleného roku.
+- _{{stats_time_of_day}}_ dělí den na osm úseků po třech hodinách a dává pro
+  každý průměr v gramech za den. Tady je vidět, jestli se pije večer, nebo se
+  to rozkládá přes den. Oddíl se objeví jen tehdy, když se ve zvoleném období
+  vůbec pilo.
+- _{{stats_weekday}}_ dává průměrnou spotřebu podle dne v týdnu.
+- _{{stats_category_breakdown}}_ ukazuje jako prstenec, jak se spotřeba
+  rozděluje na šest kategorií nápojů.
+
+## Katalog nápojů
+
+Obrazovka _{{drinks}}_ spravuje nápoje, ze kterých při zaznamenávání
+vybíráte. Aplikace se dodává s výběrem běžných nápojů; dají se měnit,
+doplňovat i mazat.
+
+Každý řádek ukazuje název, symbol kategorie, porci, obsah alkoholu a gramy
+čistého alkoholu, které z toho plynou, před nimi hvězdičku oblíbených a tečku
+stavu pro tuto porci{{#android}}, za nimi ikonu úprav a ikonu
+mazání{{/android}}. Hvězdička přepíná stav oblíbeného: oblíbené se objeví v
+rychlých tlačítkách na obrazovce _{{today}}_.
+
+{{#android}}Klepnutí na řádek (ne na ikony) otevře okno záznamu s tímto
+nápojem; je to třetí cesta k zaznamenání, vedle tlačítek plus na obrazovkách
+_{{today}}_ a _{{calendar}}_. Obě ikony vpravo otevírají editor a dotaz na
+smazání.{{/android}}{{#ios}}Klepnutí na řádek otevře okno záznamu s tímto
+nápojem; je to třetí cesta k zaznamenání, vedle tlačítek plus na obrazovkách
+_{{today}}_ a _{{calendar}}_. Změna a mazání patří do režimu úprav, který
+zapnete vpravo nahoře: tam totéž klepnutí otevře editor a červená značka
+řádku vede k dotazu na smazání. Přejetí doleva nabízí obě akce rovněž, v
+režimu úprav i mimo něj.{{/ios}}
+
+### Přidání nebo změna nápoje
+
+Tlačítko plus otevírá _{{add_drink}}_, {{#android}}ikona tužky u
+řádku{{/android}}{{#ios}}klepnutí v režimu úprav{{/ios}} otevírá
+_{{edit_drink}}_. Obě okna se ptají na totéž:
+
+- _{{drink_name}}_: podle libosti, až 100 znaků.
+- _{{volume_ml}}_: obvyklá porce, ze které okno záznamu vychází. Od 1 do 5
+  000 mililitrů.
+- _{{alcohol_percent}}_: obvyklý obsah alkoholu, od 0 do 100 procent.
+- _{{category}}_: jedna ze šesti kategorií: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} nebo {{category_other}}. Kategorie na výpočtu nic
+  nemění; seskupuje rozklad na obrazovce _{{statistics}}_.
+
+### Proč některé nápoje nelze smazat
+
+Nápoj nelze smazat, dokud na něj záznamy ve vašem deníku ještě odkazují;
+aplikace pak řekne, kolik jich je. Důvod je, že by ty záznamy jinak přišly o
+to, na co odkazují, a statistiky by zůstaly neúplné.
+
+## Export dat
+
+### PDF report
+
+Na obrazovce _{{statistics}}_ vytvoří tlačítko _{{export_pdf}}_ dvoustránkový
+report jako soubor _Portable Document Format (PDF)_: základní čísla, tabulku
+měsíc po měsíci, dlouhodobý trend, vzorec podle kategorie, denní doby a dne v
+týdnu a oddíl o rizikovém pití a abstinenci. Formát se hodí pro rozhovor v
+adiktologické poradně.
+
+Report pokrývá přesně zvolené období: vyexportujete-li červenec poté, co jste
+pili v jedenácti dnech, dostanete report na třicet jedna dnů, s dvaceti dny
+abstinence a denním průměrem, který dělí třiceti jedna. Tabulka měsíců uvádí
+každý měsíc období, i takový bez jediného záznamu. To je to, co dává čísla
+reportu do souladu s čísly na obrazovce _{{statistics}}_. Končí-li zvolené
+období dneškem, končí report včerejškem, dokud dnes není nic zaznamenáno:
+načatý den by táhl průměr dolů a počítal by se jako abstinenční, dřív než
+skončí.
+
+Pro PDF report se otevře {{#android}}systémový tiskový dialog, ze kterého jej
+můžete vytisknout nebo uložit jako soubor.{{/android}}{{#ios}}systémový výběr
+souborů, ve kterém určíte, kam soubor půjde: do Souborů, do cloudového
+úložiště nebo do jiné aplikace.{{/ios}}
+
+### Export CSV
+
+Tlačítko _{{export_csv}}_ na obrazovce _{{statistics}}_ zapíše tabulku s
+jedním řádkem na záznam, připravenou pro tabulkový procesor jako [LibreOffice
+Calc](https://www.libreoffice.org/). Čísla v ní stojí strojově čitelně, s
+desetinnou tečkou, nezávisle na jazyku aplikace.
+
+{{#android}}Soubor CSV přistane ve složce stažených souborů a aplikace pak
+nabídne jeho sdílení.{{/android}}{{#ios}}I pro soubor CSV se otevře systémový
+výběr souborů, ve kterém určíte, kam soubor půjde: do Souborů, do cloudového
+úložiště nebo do jiné aplikace.{{/ios}}
+
+### Export JSON – zálohy
+
+**Data, která zaznamenáte, neopustí toto zařízení bez vašeho přičinění.**
+{{#android}}Libellus Potionis se neúčastní žádné automatické zálohy do cloudu
+ani žádného přenosu ze zařízení na zařízení. **Při výměně zařízení, po
+obnovení továrního nastavení nebo po přeinstalaci je záloha, kterou jste si
+udělali sami, jediná cesta, jak si data zachovat.** Co nebylo vyexportováno,
+je pak pryč.{{/android}}{{#ios}}Libellus Potionis drží svá data mimo každou
+zálohu zařízení, iCloud i zálohy na počítači; přepínač _{{device_backup}}_ v
+_{{settings}}_ to obrací (viz „Přístup a viditelnost“). Dokud je vypnutý, je
+záloha, kterou jste si udělali sami, jediná cesta, jak si data zachovat při
+výměně zařízení, po obnovení továrního nastavení nebo po
+přeinstalaci.{{/ios}}
+
+Záloha je jediný soubor JSON. Přepínač _{{backup_include_settings}}_
+rozhoduje, jestli se vedle katalogu nápojů a záznamů zapíše i nastavení. Tato
+volba je při každém otevření nastavení zase zapnutá. Takto data přejdou na
+nové zařízení:
+
+1. Na starém zařízení zvolte _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_export}}_. Uschovejte soubor na bezpečném místě, například v
+   poznámce [Signal](https://signal.org/) sami sobě.
+2. Nainstalujte Libellus Potionis na nové zařízení.
+3. Tam data obnovte přes _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_import}}_.
+
+Při importu se aplikace zeptá, jak má postupovat. _{{import_replace}}_ zahodí
+to, co je na zařízení: katalog nápojů, záznamy a nastavení, pokud je záloha
+nese. _{{import_merge}}_ nemaže žádné stávající definice nápojů ani žádné
+záznamy a doplní, co chybí. Záznamy, které už jsou, se nezdvojují a stávající
+nastavení se nepřepisuje.
+
+## Ostatní nastavení
+
+### Přístup a viditelnost
+
+V _{{security}}_ stojí {{#android}}dva{{/android}}{{#ios}}tři{{/ios}}
+přepínače:
+
+- _{{biometric_lock}}_ žádá při každém otevření aplikace o {{#android}}otisk
+  prstu, obličej nebo zámek obrazovky zařízení.{{/android}}{{#ios}}Face ID,
+  Touch ID nebo kód zařízení.{{/ios}} Zapnutí i vypnutí zámku vyžaduje totéž
+  ověření. Zámek platí i tehdy, když aplikaci opustíte a vrátíte se, ale ne
+  při návratu do třiceti sekund. Nabídka vpravo nahoře nese také
+  _{{lock_app}}_, které aplikaci okamžitě zamkne.
+- _{{allow_screenshots}}_ je ve výchozím stavu vypnuto. Dokud jsou
+  {{#android}}snímky obrazovky vypnuté, nelze z okna aplikace pořídit snímek
+  a jeho obsah zůstává zakrytý v přehledu naposledy použitých
+  aplikací.{{/android}}{{#ios}}vypnuté, zůstává obsah zakrytý v přepínači
+  aplikací.{{/ios}} Kdo vezme vaše odemčené zařízení a prolistuje otevřené
+  aplikace, nic tam neuvidí. {{#ios}}Zabránit snímku obrazovky je mimo dosah
+  aplikace pro iOS; iOS k tomu nenabízí žádné rozhraní.{{/ios}}
+{{#ios}}- _{{device_backup}}_ je ve výchozím stavu rovněž vypnutý. Dokud je
+přepínač vypnutý, zůstávají data aplikace mimo každou zálohu zařízení, iCloud
+i zálohy na počítači. Zapnete-li jej, data přečkají obnovu zařízení z jeho
+zálohy, ale leží pak i tam, kde leží ta záloha.{{/ios}}
+
+### Vzhled a jazyk
+
+Ve _{{appearance}}_ se dá nastavit trojí:
+
+- _{{theme_mode}}_: {{theme_system}}, nebo {{theme_day}} či {{theme_night}}
+  nezávisle na nastavení systému.
+- _{{language}}_: jazyk aplikace, rovněž nezávisle na systému.
+  „{{language_system}}“ zase následuje jazyk systému.
+- _{{alt_status_symbols}}_ dává tečkám stavu vedle barvy i tvar. Tři stavy
+  tak zůstanou rozlišitelné, když se červená, žlutá a zelená rozeznávají
+  těžko.
+
+## Jak se počítá
+
+### Z mililitrů na gramy
+
+Každý záznam se při uložení přepočítá na gramy čistého alkoholu:
+
+**gramy = mililitry × obsah alkoholu × 0,789**
+
+0,789 je hustota etanolu v gramech na mililitr. Půl litru piva o 5 % dává
+tedy 500 ml × 0,05 × 0,789 g/ml, asi 19,7 g. Každý limit, každá statistika a
+každý export pracuje s tímto číslem, nikdy s mililitry. Je to jediné, co
+vůbec činí pivo a sklenku vína srovnatelnými.
+
+### Odhad alkoholu v krvi
+
+Je-li zadána tělesná hmotnost, odhaduje Libellus Potionis koncentraci
+alkoholu v krvi podle [Widmarkova
+vzorce](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+
+**BAC [‰] = A / (P × r) − β × t**
+
+A je čistý alkohol v gramech, P tělesná hmotnost v kilogramech, r distribuční
+koeficient, β rychlost odbourávání asi 0,15 ‰ za hodinu a t hodiny od prvního
+nápoje.
+
+Aplikace nezaznamenává vaše pohlaví, a počítá proto záměrně na opatrnou
+stranu: r je pevně na 0,6, menším ze dvou klasických koeficientů. Menší r
+rozdělí týž alkohol do menšího objemu, a dává tedy vyšší ze dvou hodnot:
+odhad má ležet spíš vysoko než nízko. Rychlost odbourávání je naproti tomu
+průměr; individuálně leží někde mezi 0,10 a 0,20 ‰ za hodinu. Odbouráváte-li
+alkohol pomalu, jste nad zobrazenou hodnotou.
+
+Co z toho vychází, je model, ne měření. Nenahrazuje žádný dechový analyzátor
+a nemůže vám říct, jestli jste způsobilí řídit.
+
+### Logický den
+
+Nápoj patří ke dni, který začal v hodinu udanou v _{{day_starts_at}}_, ne ke
+dni, který ukazují hodiny. Při výchozím nastavení čtvrté hodiny se sklenka o
+půl druhé v noci počítá ještě k předchozímu dni. Pravidlo platí v celé
+aplikaci, i přes změny času.
+
+### Klouzavý týden
+
+Limit na sedm dní a dny pití se nevztahují ke kalendářnímu týdnu, nýbrž k
+dnešku a šesti předchozím dnům. Okno se tedy posouvá den za dnem. Těžká
+sobota zůstává na očích, dokud jí není šest dní, a vypadne následující
+sobotu.

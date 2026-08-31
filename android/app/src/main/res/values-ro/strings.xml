@@ -107,7 +107,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="pdf_section_daytime">Model de consum: ora zilei</string>
     <string name="pdf_section_weekday">Profil zile săptămână (medie g alcool)</string>
     <string name="pdf_section_risk">Consum de risc și abstinență</string>
-    <string name="pdf_footer1">Estimări – nu reprezintă un diagnostic medical. Nu se foloseşte pentru evaluarea aptitudinii de a conduce sau în scop diagnostic.</string>
+    <string name="pdf_footer1">Estimări – nu reprezintă un diagnostic medical. Nu se folosește pentru evaluarea aptitudinii de a conduce sau în scop diagnostic.</string>
 
     <!-- PDF metadata / KPI labels -->
     <string name="pdf_meta_export_date">Data export</string>
@@ -226,7 +226,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">Versiunea de copie de rezervă %1$d nu este acceptată (max. %2$d).</string>
     <string name="import_error_file_too_large">Fișierul de copie de rezervă este prea mare (max. %1$d MB).</string>
     <string name="import_error_read">Eroare de citire: %1$s</string>
-    <string name="drink_delete_blocked">„{name}” are {count} înregistrări şi nu poate fi şters.</string>
+    <string name="drink_delete_blocked">„{name}” are {count} înregistrări și nu poate fi șters.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Numele băuturii nu poate fi gol.</string>
     <string name="drink_validation_name_too_long">Numele băuturii este prea lung (max. 100 de caractere).</string>

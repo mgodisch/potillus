@@ -657,7 +657,7 @@ extension ReportLabels {
     private mutating func applyro() {
         self.title = "Rezumat alcool"
         self.footer1 =
-            "Estimări – nu reprezintă un diagnostic medical. Nu se foloseşte pentru evaluarea " +
+            "Estimări – nu reprezintă un diagnostic medical. Nu se folosește pentru evaluarea " +
             "aptitudinii de a conduce sau în scop diagnostic."
         self.sectionKpis = "Cifre cheie"
         self.sectionMonths = "Prezentare lunară"

@@ -24,22 +24,22 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-# Libellus Potionis &ndash; Benutzerhandbuch
+# Libellus Potionis – Benutzerhandbuch
 
 Libellus Potionis ist eine Tagebuch-App zum Protokollieren des eigenen
 Alkoholkonsums. Wer sie benutzt, bucht ein, was er trinkt; die App rechnet
-aus, wie viel reiner Alkohol das war und ob „la petite sœur“ noch innerhalb
-der gesetzten Limits liegt. Dieses Handbuch führt schrittweise durch die App:
-erst der Aufbau, dann das Einrichten, das Buchen, dann Rückblick und
-Auswertung, schließlich Backups.
+aus, wie viel reiner Alkohol das war und ob „la petite sœur“, das zweite
+Bier, noch innerhalb der gesetzten Limits liegt. Dieses Handbuch führt
+schrittweise durch die App: erst der Aufbau, dann das Einrichten, das Buchen,
+dann Rückblick und Auswertung, schließlich Backups.
 
-## Was die App leistet &ndash; und was nicht
+## Was die App leistet – und was nicht
 
 Libellus Potionis protokolliert. Die App bewertet nicht und mahnt nicht. Die
 gezeigten Zahlen entsprechen den eigenen Eingaben, umgerechnet in Gramm
 reinen Alkohol. Wer jeden Drink protokolliert, kann in nüchterner Stimmung
-prüfend auf das eigene Trinkverhalten zurückschauen &ndash; dann wird der
-Vorteil dieser App sichtbar.
+prüfend auf das eigene Trinkverhalten zurückschauen – dann wird der Vorteil
+dieser App sichtbar.
 
 Libellus Potionis ist freie Software unter der GNU General Public License,
 das heißt: Der Quellcode der App ist öffentlich einsehbar und Aussagen zum
@@ -80,10 +80,9 @@ eingeblendet ist:
 - _{{statistics}}_: statistische Auswertungen über Wochen, Monate und Jahre,
 - _{{drinks}}_: der Katalog der Getränke, die gebucht werden können.
 
-Oben rechts befindet sich auf allen vier Ansichten dasselbe
-{{#ios}}Menüsymbol „(&middot;&middot;&middot;)“{{/ios}}
-{{#android}}„Burger“-Menüsymbol{{/android}}. Es öffnet ein Menü mit
-_{{settings}}, {{help}}_ (dieses Handbuch) und der Seite _{{about}}_ mit
+Oben rechts befindet sich auf allen vier Ansichten dasselbe {{#ios}}Menüsymbol
+„(···)“{{/ios}}{{#android}}„Burger“-Menüsymbol{{/android}}. Es öffnet ein Menü
+mit _{{settings}}, {{help}}_ (dieses Handbuch) und der Seite _{{about}}_ mit
 Informationen zur App, zu Versionen und Lizenzen. Ist auf dem Gerät eine
 Authentifizierung eingerichtet, biometrisch oder per Gerätecode, steht dort
 außerdem _{{lock_app}}_, womit die App unmittelbar gesperrt wird.
@@ -419,7 +418,7 @@ sich die Dateiauswahl des Systems, in der bestimmt wird, wo die Datei
 abgelegt werden soll: in „Dateien“, in den Cloud-Speicher oder in eine andere
 App.{{/ios}}
 
-### JSON-Export &ndash; Backups
+### JSON-Export – Backups
 
 **Erfasste Daten verlassen dieses Gerät nicht ohne Zutun des Anwenders.**
 {{#android}}Libellus Potionis nimmt an keinem automatischen Cloud-Backup und
@@ -468,12 +467,13 @@ Schalter:
   wenn die App verlassen wird und man dann zurückkehrt, nicht jedoch bei
   einer Rückkehr innerhalb von dreißig Sekunden. Im Menü oben rechts ist
   außerdem _{{lock_app}}_ zu finden, womit die App unmittelbar gesperrt wird.
-- _{{allow_screenshots}}_ ist standardmäßig aus. Solange Screenshots
-  deaktiviert sind, {{#android}}lässt sich vom App-Fenster kein
+- _{{allow_screenshots}}_ ist standardmäßig aus. Solange
+  {{#android}}Screenshots deaktiviert sind, lässt sich vom App-Fenster kein
   Bildschirmfoto anfertigen, und in der Übersicht der zuletzt benutzten Apps
-  bleibt der Inhalt verdeckt.{{/android}}{{#ios}}bleibt der Inhalt in der
-  App-Übersicht verdeckt.{{/ios}} Wer das entsperrte Gerät in die Hand nimmt
-  und durch die offenen Apps blättert, sieht dort nichts. {{#ios}}Ein
+  bleibt der Inhalt verdeckt.{{/android}}{{#ios}}der Schalter aus ist, bleibt
+  der Inhalt in der App-Übersicht verdeckt.{{/ios}} Wer das entsperrte Gerät
+  in die Hand nimmt und durch die offenen Apps blättert, sieht dort nichts.
+  {{#ios}}Ein
   Bildschirmfoto kann die iOS-App dagegen nicht verhindern; iOS stellt hierzu
   keine Schnittstelle zur Verfügung.{{/ios}}
 {{#ios}}- _{{device_backup}}_ ist ebenfalls standardmäßig aus. Solange der

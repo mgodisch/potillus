@@ -44,6 +44,13 @@ SHELL       := /bin/bash
 .ONESHELL:
 .DEFAULT_GOAL := help
 
+# A recipe that fails must not leave its target behind. Without this, a broken
+# run of a redirection recipe (`cmd > $@`) leaves an EMPTY file that is newer
+# than every prerequisite, so make treats it as up to date for ever. That is not
+# theory: it is how the generated guides.d fragment silently disabled every
+# guide rule (see the comment at guides.d below).
+.DELETE_ON_ERROR:
+
 # The default goal, kept at the top so it doubles as this file's target overview:
 # a reader scanning here sees every target, and `make` / `make help` prints the
 # same list. Kept ONLY here (not repeated in a header comment) so the two cannot
@@ -210,6 +217,26 @@ app/src/main/res/raw/license_bsd3.md: ../docs/LICENSE.BSD-3-Clause.md
 # strings.xml or the renderer changes, and pulled in with `-include`.
 -include guides.d
 
+# SELF-REPAIR of a truncated fragment. A run that dies between the shell creating
+# guides.d and the renderer writing to it leaves the file EMPTY. Such a fragment
+# is newer than every template, so make never remakes it; GUIDE_OUTPUTS stays
+# empty, the `ifneq` guard below drops every per-guide rule, and `make guides`
+# answers "Nothing to be done" -- for ever, and with a real template change
+# pending. Only a template made newer than the fragment (`touch
+# ../docs/guide/*.md.in`) breaks the spell, which is a diagnosis nobody should
+# have to make. .DELETE_ON_ERROR now stops such a fragment from being created;
+# this removes one that a Make without it already left behind.
+#
+# Deleting it WHILE THE MAKEFILE IS READ is what repairs the build: the -include
+# remake pass that follows finds guides.d missing, rebuilds it, and make restarts
+# with the rules in place. The `wildcard` guard limits this to a fragment that
+# actually exists, so a rebuild that keeps producing nothing cannot loop.
+ifeq ($(strip $(GUIDE_OUTPUTS)),)
+ifneq ($(wildcard guides.d),)
+$(shell rm -f guides.d)
+endif
+endif
+
 # The guide outputs as prerequisites of `prereq` -- on a SECOND dependency line,
 # placed AFTER the include: make expands a prerequisite list the moment it reads
 # the rule, and on the `prereq:` rule above $(GUIDE_OUTPUTS) is not yet defined and
@@ -219,6 +246,9 @@ prereq: $(GUIDE_OUTPUTS)
 
 guides.d: $(wildcard ../docs/guide/usersguide*.md.in) $(wildcard app/src/main/res/values*/strings.xml) ../tools/render-guide.py
 	python3 ../tools/render-guide.py --platform android --make-deps > $@
+	# A fragment without rules is as useless as a missing one, and far harder
+	# to spot: .DELETE_ON_ERROR only fires on a non-zero exit.
+	test -s $@
 
 # Shared recipe for every guide output (prerequisites come from guides.d). Guarded
 # so the empty-goal parse BEFORE guides.d exists is harmless. render-guide.py
@@ -233,7 +263,20 @@ $(GUIDE_OUTPUTS):
 endif
 
 # Convenience alias: build any stale guide (dependency-driven).
+#
+# The empty branch is not dead code. It is reached when guides.d was read and
+# carried no outputs at all -- and `-include` swallows a failed remake of the
+# fragment without a word, so make would otherwise answer "Nothing to be done"
+# and exit 0 on a build that produced nothing. On a fresh clone the branch is
+# installed too, but never runs: make remakes the missing fragment and RESTARTS,
+# and the parse that matters has the variable populated.
+ifneq ($(GUIDE_OUTPUTS),)
 guides: $(GUIDE_OUTPUTS)
+else
+guides:
+	@echo "make: guides.d lists no guides. Run 'rm -f guides.d' and try again." >&2
+	@exit 1
+endif
 
 # CI helper: fail if the committed guides are out of sync with the templates and
 # strings.xml (writes nothing), and verify each bundled raw/license_*.md still

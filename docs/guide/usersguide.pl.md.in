@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,291 +24,490 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-{{#android}}
-# Libellus Potionis -- Podręcznik użytkownika
-
-Ta strona opisuje cechy i funkcje aplikacji Libellus Potionis, osobistego
-dziennika spożycia alkoholu.
 
-## Przegląd
-
-Libellus Potionis jest oprogramowaniem open source: kod źródłowy może obejrzeć
-i zweryfikować każdy. Aplikacja nie wymaga żadnych uprawnień: ani do aparatu
-czy mikrofonu, ani do GPS czy dostępu do sieci. Twoje dane pozostają w
-prywatnej pamięci aplikacji na Twoim urządzeniu, chronione szyfrowaniem
-urządzenia, a dostęp do aplikacji można ograniczyć odciskiem palca.
-
-Aplikacja w każdej chwili informuje, czy „la petite sœur” wciąż mieści się w
-Twoim budżecie, dzięki czemu możesz dawkować spożycie aż do swojego limitu. Na
-spotkania w poradni leczenia uzależnień przygotowuje na życzenie dwustronicowy
-raport PDF o Twoich nawykach picia. Jest bezpłatna i wolna od reklam.
-
-Libellus Potionis wymaga systemu Android 11 lub nowszego. Autor używa go na
-bieżąco na urządzeniu Google Pixel 10 Pro z GrapheneOS i dodatkowo testuje na
-Fairphone 4.
-
-## Ekran „{{today}}”
-
-Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
-przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
-Użyj przycisku plus, aby dodać kolejne napoje.
-
-Nad listą napojów znajdziesz przegląd bieżącego dnia z następującymi
-informacjami: ilość alkoholu już spożytego dzisiaj (w gramach), ta sama ilość w
-odniesieniu do Twojego limitu dziennego i tygodniowego (w gramach i jako pasek
-postępu) oraz liczba dni ze spożyciem alkoholu w tym tygodniu w odniesieniu do
-Twojego limitu (jako liczba i jako pasek postępu).
-
-Dodatkowo odznaka oznaczona „Ø” pokazuje Twoje średnie spożycie w bieżącym
-miesiącu (średnia liczba gramów czystego alkoholu na dzień).
-
-## Ekran „{{calendar}}”
-
-Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
-niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
-Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby można
-poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
-wsteczną.
-
-## Ekran „{{statistics}}”
-
-Ten ekran przedstawia analizy statystyczne Twojego spożycia alkoholu, z
-możliwością filtrowania według tygodnia, miesiąca lub roku. Dostępny jest eksport
-CSV, aby dalej przetwarzać dane w arkuszu kalkulacyjnym. Ponadto oferowany jest
-eksport PDF, który przedstawia nawyki picia w układzie odpowiednim dla terapii
-uzależnień.
-
-## Ekran „{{drinks}}”
-
-Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
-skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
-można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
-Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty.
-
-## Ekran „{{settings}}”
-
-Menu ustawień jest dostępne przez ikonę menu (☰) w prawym górnym rogu.
-Libellus Potionis udostępnia następujące opcje konfiguracji:
-
-### {{personal_data}}
-
-W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
-stężenie alkoholu we krwi według [wzoru
-Widmarka](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Wartość jest następnie pokazywana na ekranie „{{today}}”.
-
-Wzór brzmi **BAC [‰] = A / (P × r) − β × t**: A to gramy czystego alkoholu, P
-masa ciała w kilogramach, r współczynnik dystrybucji, β tempo eliminacji około
-0,15 ‰ na godzinę, a t liczba godzin od pierwszego napoju. Gramy wynikają z
-objętości × zawartości alkoholu × 0,789, gęstości etanolu.
-
-Aplikacja nie zapisuje płci i dlatego liczy zachowawczo: r jest ustalone na
-0,6, mniejszy z dwóch klasycznych współczynników. Mniejsze r rozprowadza tę
-samą dawkę w mniejszej objętości i daje przez to wyższą z dwóch wartości, tak
-aby oszacowanie w miarę możliwości nie schodziło poniżej tego, co osiąga
-człowiek dowolnej płci. Tempo eliminacji jest natomiast średnią: indywidualnie
-mieści się mniej więcej między 0,10 a 0,20 ‰ na godzinę, więc kto rozkłada
-alkohol wolno, może być powyżej pokazanej wartości. Oszacowanie to model
-statystyczny, a nie pomiar.
-
-### {{limits}}
-
-W tej kategorii wprowadzasz limity obowiązujące dla Twojego spożycia alkoholu.
-Pola do wypełnienia to: maksymalny limit dzienny w gramach czystego alkoholu,
-maksymalny limit tygodniowy oraz maksymalna liczba dni picia w tygodniu.
-Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}”
-widoczne są trzy paski postępu. Jeśli nie wiesz, co tutaj ustawić, możesz
-zainspirować się zaleceniami różnych krajów w Wikipedii.
-
-### {{statistics}}
-
-Ustawienia statystyczne pozwalają określić godzinę, o której rozpoczyna się nowy
-dzień (tak aby na przykład napój o 1:00 w nocy nadal liczył się do dnia
-poprzedniego) oraz — na potrzeby noworocznych postanowień — datę, od której ma
-się rozpoczynać analiza danych.
-
-### {{backup_section}}
-
-**Twoje dane nigdy nie opuszczają tego urządzenia samoczynnie.** Libellus
-Potionis przechowuje wszystko w prywatnej pamięci aplikacji i celowo nie
-uczestniczy w żadnej automatycznej kopii zapasowej w chmurze ani w żadnym
-przesyłaniu między urządzeniami. Jeśli zmienisz telefon, przywrócisz ustawienia
-fabryczne lub ponownie zainstalujesz aplikację, **jedynym sposobem na
-zachowanie danych jest samodzielne wykonanie kopii zapasowej** — nie ma innej
-drogi odzyskania, a danych, których nie wyeksportowano, nie da się później
-odzyskać.
-
-Kopia zapasowa to pojedynczy plik JSON zawierający wszystkie Twoje napoje i
-pełny dziennik. Aby przenieść dane na inny telefon:
-
-1. Na starym telefonie otwórz „{{settings}}” → {{backup_section}} →
-   {{backup_export}} i zapisz plik JSON w bezpiecznym miejscu — na przykład we
-   własnej chmurze, w wiadomości e-mail do samego siebie lub przez transfer
-   USB.
-2. Zainstaluj Libellus Potionis na nowym telefonie.
-3. Otwórz „{{settings}}” → {{backup_section}} → {{backup_import}} i wybierz ten
-   plik JSON. Wybierz {{import_replace}}, aby zastąpić wszystko, lub
-   {{import_merge}}, aby połączyć go z już istniejącymi wpisami.
-
-Eksportuj regularnie: kopia zapasowa chroni tylko dane, które istniały w chwili
-jej utworzenia.
-
-### {{security}}
-
-Ta kategoria chroni dostęp do aplikacji i steruje jej widocznością. Włącz
-{{biometric_lock}}, aby przy każdym otwarciu aplikacji wymagany był odcisk palca
-lub rozpoznawanie twarzy. Przełącznik {{allow_screenshots}} decyduje, czy
-dozwolone są zrzuty ekranu i nagrania ekranu okna aplikacji; domyślnie jest
-wyłączony, więc okno jest ukrywane na zrzutach ekranu oraz w widoku ostatnich
-aplikacji.
-
-### {{appearance}}
-
-W tej kategorii możesz ustawić motyw kolorystyczny i język niezależnie od
-ustawień systemowych.
-{{/android}}
-
-{{#ios}}
-# Libellus Potionis -- Podręcznik użytkownika
-
-Ta strona opisuje cechy i funkcje aplikacji Libellus Potionis, osobistego
-dziennika spożycia alkoholu.
-
-## Przegląd
-
-Libellus Potionis jest oprogramowaniem open source: kod źródłowy może obejrzeć
-i zweryfikować każdy. Aplikacja nie wymaga żadnych uprawnień: ani do aparatu
-czy mikrofonu, ani do GPS czy dostępu do sieci. Twoje dane pozostają w
-prywatnej pamięci aplikacji na Twoim urządzeniu, chronione szyfrowaniem
-urządzenia, a dostęp do aplikacji można ograniczyć za pomocą Face ID lub Touch
-ID.
-
-Aplikacja w każdej chwili informuje, czy „la petite sœur” wciąż mieści się w
-Twoim budżecie, dzięki czemu możesz dawkować spożycie aż do swojego limitu. Na
-spotkania w poradni leczenia uzależnień przygotowuje na życzenie dwustronicowy
-raport PDF o Twoich nawykach picia. Jest bezpłatna i wolna od reklam.
-
-Libellus Potionis wymaga systemu iOS 17.0 lub nowszego. Autor używa go na
-bieżąco na iPhonie 16E i dodatkowo testuje na emulatorze iPhone 17 Pro.
-
-## Ekran „{{today}}”
-
-Na tym ekranie znajdziesz listę napojów alkoholowych spożytych dzisiaj. Jeśli
-przy zapisywaniu napoju popełniłeś błąd, możesz tutaj edytować lub usunąć wpisy.
-Użyj przycisku plus, aby dodać kolejne napoje. Dotknij wpisu, aby go edytować, albo przesuń go w lewo, aby go usunąć. Przycisk z ołówkiem na pasku narzędzi również udostępnia opcję usuwania.
-
-Nad listą napojów znajdziesz przegląd bieżącego dnia z następującymi
-informacjami: ilość alkoholu już spożytego dzisiaj (w gramach), ta sama ilość w
-odniesieniu do Twojego limitu dziennego i tygodniowego (w gramach i jako pasek
-postępu) oraz liczba dni ze spożyciem alkoholu w tym tygodniu w odniesieniu do
-Twojego limitu (jako liczba i jako pasek postępu).
-
-Dodatkowo odznaka oznaczona „Ø” pokazuje Twoje średnie spożycie w bieżącym
-miesiącu (średnia liczba gramów czystego alkoholu na dzień).
-
-## Ekran „{{calendar}}”
-
-Na tym ekranie znajdziesz kalendarz. Dni, w których spożyto alkohol, są oznaczone
-niebieską kropką (ilość niekrytyczna) lub czerwoną kropką (przekroczony limit).
-Po wybraniu dnia wyświetlane są odpowiednie napoje, które w razie potrzeby można
-poprawić lub usunąć. Możliwe jest również dodawanie spożytych napojów z mocą
-wsteczną. Dotknij wpisu, aby go poprawić, albo przesuń go w lewo, aby go usunąć; przycisk z ołówkiem na pasku narzędzi oferuje to samo.
-
-## Ekran „{{statistics}}”
-
-Ten ekran przedstawia analizy statystyczne Twojego spożycia alkoholu, z
-możliwością filtrowania według tygodnia, miesiąca lub roku. Dostępny jest eksport
-CSV, aby dalej przetwarzać dane w arkuszu kalkulacyjnym. Ponadto oferowany jest
-eksport PDF, który przedstawia nawyki picia w układzie odpowiednim dla terapii
-uzależnień.
-
-## Ekran „{{drinks}}”
-
-Ten ekran zawiera listę napojów. Aplikacja jest dostarczana ze wstępnie
-skonfigurowanym zestawem napojów rozpowszechnionych na całym świecie. Wszystkie
-można zmieniać lub usuwać. Za pomocą ikony plus możesz zdefiniować nowy napój.
-Dotknięcie napoju otwiera okno dialogowe, aby zapisać go jako spożyty. Aby zmienić lub usunąć napój, dotknij przycisku z ołówkiem na pasku narzędzi: w tym trybie dotknięcie wiersza otwiera okno edycji, a czerwony znak usuwa napój. Przesunięcie wiersza w lewo oferuje te same dwie akcje.
-
-## Ekran „{{settings}}”
-
-Menu ustawień jest dostępne przez przycisk Więcej (…) w prawym górnym rogu.
-Libellus Potionis udostępnia następujące opcje konfiguracji:
-
-### {{personal_data}}
-
-W tej kategorii możesz podać swoją masę ciała, aby w przybliżeniu obliczyć
-stężenie alkoholu we krwi według [wzoru
-Widmarka](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Wartość jest następnie pokazywana na ekranie „{{today}}”.
-
-Wzór brzmi **BAC [‰] = A / (P × r) − β × t**: A to gramy czystego alkoholu, P
-masa ciała w kilogramach, r współczynnik dystrybucji, β tempo eliminacji około
-0,15 ‰ na godzinę, a t liczba godzin od pierwszego napoju. Gramy wynikają z
-objętości × zawartości alkoholu × 0,789, gęstości etanolu.
-
-Aplikacja nie zapisuje płci i dlatego liczy zachowawczo: r jest ustalone na
-0,6, mniejszy z dwóch klasycznych współczynników. Mniejsze r rozprowadza tę
-samą dawkę w mniejszej objętości i daje przez to wyższą z dwóch wartości, tak
-aby oszacowanie w miarę możliwości nie schodziło poniżej tego, co osiąga
-człowiek dowolnej płci. Tempo eliminacji jest natomiast średnią: indywidualnie
-mieści się mniej więcej między 0,10 a 0,20 ‰ na godzinę, więc kto rozkłada
-alkohol wolno, może być powyżej pokazanej wartości. Oszacowanie to model
-statystyczny, a nie pomiar.
-
-### {{limits}}
-
-W tej kategorii wprowadzasz limity obowiązujące dla Twojego spożycia alkoholu.
-Pola do wypełnienia to: maksymalny limit dzienny w gramach czystego alkoholu,
-maksymalny limit tygodniowy oraz maksymalna liczba dni picia w tygodniu.
-Wszystkie limity obowiązują jednocześnie. W związku z tym na ekranie „{{today}}”
-widoczne są trzy paski postępu. Jeśli nie wiesz, co tutaj ustawić, możesz
-zainspirować się zaleceniami różnych krajów w Wikipedii.
-
-### {{statistics}}
-
-Ustawienia statystyczne pozwalają określić godzinę, o której rozpoczyna się nowy
-dzień (tak aby na przykład napój o 1:00 w nocy nadal liczył się do dnia
-poprzedniego) oraz — na potrzeby noworocznych postanowień — datę, od której ma
-się rozpoczynać analiza danych.
-
-### {{backup_section}}
-
-**Twoje dane nigdy nie opuszczają tego urządzenia samoczynnie.** Libellus
-Potionis przechowuje wszystko w prywatnej pamięci aplikacji i celowo nie
-uczestniczy w żadnej automatycznej kopii zapasowej w chmurze ani w żadnym
-przesyłaniu między urządzeniami. Jeśli zmienisz telefon, przywrócisz ustawienia
-fabryczne lub ponownie zainstalujesz aplikację, **jedynym sposobem na
-zachowanie danych jest samodzielne wykonanie kopii zapasowej** — nie ma innej
-drogi odzyskania, a danych, których nie wyeksportowano, nie da się później
-odzyskać.
-
-Kopia zapasowa to pojedynczy plik JSON zawierający wszystkie Twoje napoje i
-pełny dziennik. Aby przenieść dane na inny telefon:
-
-1. Na starym telefonie otwórz „{{settings}}” → {{backup_section}} →
-   {{backup_export}} i zapisz plik JSON w bezpiecznym miejscu — na przykład we
-   własnej chmurze, w wiadomości e-mail do samego siebie lub przez transfer
-   USB.
-2. Zainstaluj Libellus Potionis na nowym telefonie.
-3. Otwórz „{{settings}}” → {{backup_section}} → {{backup_import}} i wybierz ten
-   plik JSON. Wybierz {{import_replace}}, aby zastąpić wszystko, lub
-   {{import_merge}}, aby połączyć go z już istniejącymi wpisami.
-
-Eksportuj regularnie: kopia zapasowa chroni tylko dane, które istniały w chwili
-jej utworzenia.
-
-### {{security}}
-
-Ta kategoria chroni dostęp do aplikacji i steruje jej widocznością. Włącz
-{{biometric_lock}}, aby przy każdym otwarciu aplikacji wymagane było Face ID
-lub Touch ID. Przełącznik {{allow_screenshots}} decyduje, czy zawartość
-aplikacji pojawia się w przełączniku aplikacji (App Switcher); domyślnie jest
-wyłączony, więc aplikacja jest tam ukryta po jej opuszczeniu. iOS nie pozwala
-aplikacji blokować zrzutów ekranu ani nagrań ekranu, więc to ustawienie nie ma
-na nie wpływu.
-
-### {{appearance}}
-
-W tej kategorii możesz ustawić motyw kolorystyczny i język niezależnie od
-ustawień systemowych.
-{{/ios}}
+# Libellus Potionis – Podręcznik użytkownika
+
+Libellus Potionis to dziennik, w którym zapisujesz własne spożycie alkoholu.
+Notujesz, co pijesz; aplikacja wylicza, ile było w tym czystego alkoholu i
+czy „la petite sœur”, drugie piwo, mieści się jeszcze w limitach, które sam
+sobie wyznaczyłeś. Ten podręcznik przechodzi przez aplikację krok po kroku:
+jak jest zbudowana, jak się ją ustawia, jak się zapisuje napój, potem
+spojrzenie wstecz i podsumowanie, a na końcu kopie zapasowe.
+
+## Co aplikacja robi – a czego nie robi
+
+Libellus Potionis prowadzi rachunek. Nie ocenia i nie truje. Liczby, które
+pokazuje, to Twoje własne wpisy, przeliczone na gramy czystego alkoholu.
+Jeśli zapiszesz każdy napój, możesz na trzeźwo spojrzeć na własne picie – i
+tu aplikacja zarabia na siebie.
+
+Libellus Potionis to wolne oprogramowanie na licencji GNU General Public
+License. Jej kod źródłowy jest więc jawny, a każde twierdzenie o tym, jak
+obchodzi się z Twoimi danymi, może sprawdzić każdy i w każdej chwili.
+Prywatność to cecha wyróżniająca aplikację Libellus Potionis: nie prosi ona o
+ani jedno wrażliwe uprawnienie, ani o aparat, ani o mikrofon, ani o
+położenie, ani o dostęp do plików, ani nawet o dostęp do sieci. Wszystko, co
+wpiszesz, zostaje w prywatnej pamięci aplikacji na Twoim urządzeniu,
+chronione przez szyfrowanie samego urządzenia. W ustawieniach możesz
+zablokować dostęp do aplikacji {{#android}}odciskiem
+palca{{/android}}{{#ios}}przez Face ID{{/ios}}; to jedyne uprawnienie, o
+jakie aplikacja kiedykolwiek prosi.
+
+Czym Libellus Potionis _nie_ jest: aplikacja nie jest ani przyrządem
+pomiarowym, ani wyrobem medycznym. Stężenie alkoholu to szacunek z modelu
+statystycznego (zobacz „Jak się to liczy”). Nic z tego, co mówi aplikacja,
+nie powie Ci, czy nadajesz się do prowadzenia pojazdu, i nic z tego nie jest
+diagnozą. Co Libellus Potionis potrafi: dać Ci obraz własnego picia na
+przestrzeni tygodni i miesięcy, a jeśli chcesz, wydrukować ten obraz jako
+dwustronicowy PDF na kartce, którą możesz zabrać na rozmowę w poradni
+leczenia uzależnień.
+
+Libellus Potionis wymaga {{#android}}Androida 11 lub nowszego, co obejmuje
+telefony mniej więcej od 2020 roku. Aplikacja jest regularnie sprawdzana na
+Google Pixel 10 Pro z GrapheneOS (Android 16) i na Fairphone 4 (Android
+15){{/android}}{{#ios}}iOS 17 lub nowszego, co obejmuje iPhone’y mniej więcej
+od 2018 roku. Aplikacja jest regularnie sprawdzana na iPhonie 16e i iPhonie
+SE 3. generacji, obu z iOS 26{{/ios}}.
+
+## Jak aplikacja jest zbudowana
+
+Libellus Potionis ma cztery ekrany. Przechodzisz między nimi paskiem u dołu,
+obecnym na wszystkich czterech:
+
+- _{{today}}_: jak stoi bieżący dzień i co zostało na nim zapisane,
+- _{{calendar}}_: spojrzenie wstecz na pojedyncze dni, miesiące i lata oraz
+  poprawianie ich wpisów tam, gdzie trzeba,
+- _{{statistics}}_: analizy statystyczne dla tygodni, miesięcy i lat,
+- _{{drinks}}_: katalog napojów, które możesz zapisać.
+
+U góry po prawej wszystkie cztery ekrany mają ten sam {{#ios}}przycisk menu
+„(···)”{{/ios}}{{#android}}przycisk menu „hamburger”{{/android}}. Otwiera on
+menu z pozycjami _{{settings}}, {{help}}_ (ten podręcznik) oraz stroną
+_{{about}}_ z informacjami o aplikacji, wersjach i licencjach. Jeśli Twoje
+urządzenie potrafi Cię uwierzytelnić, stoi tam także _{{lock_app}}_, które
+blokuje aplikację od razu.
+
+Pozycje _{{settings}}, {{help}}_ i _{{about}}_ otwierają się {{#android}}jako
+osobne strony; przycisk wstecz urządzenia albo strzałka u góry po lewej
+odsyła Cię na ekran, z którego je otworzyłeś{{/android}}{{#ios}}jako osobne
+okna, które zamykasz u góry po prawej{{/ios}}.
+
+## Pierwsze kroki
+
+Zaraz po instalacji aplikacja nie ma jeszcze wpisów, ale nadaje się już do
+użytku: gotowy katalog napojów rozpowszechnionych na całym świecie pozwala
+zapisać pierwsze piwo od razu. Mimo to warto najpierw ustawić trzy rzeczy.
+Wszystkie trzy stoją w _{{settings}}_; pozostałe ustawienia opisano niżej.
+
+### Twoje limity
+
+W _{{limits}}_ stoją wartości, które obowiązują dla Ciebie, i wszystkie trzy
+obowiązują naraz:
+
+- _{{daily_limit_grams}}_: dzienny limit czystego alkoholu w gramach,
+- _{{weekly_limit_grams}}_: tygodniowy limit czystego alkoholu w gramach,
+  liczony w ruchomym oknie siedmiu dni,
+- _{{drink_days_setting}}_: tygodniowy limit dni picia, również liczony w
+  ruchomym oknie siedmiu dni.
+
+Trzecia wartość ogranicza nie ilość, lecz częstość. Jeśli ustawisz cztery dni
+picia, a piłeś w trzech z sześciu poprzednich dni, ekran _{{today}}_ pokaże
+Ci, że pierwszy napój zużyje czwarty dzień picia, a drugi napój tego samego
+dnia nie zużyje już następnego.
+
+Żeby wyrobić sobie pogląd, jakie liczby są rozsądne, zobacz, co zalecają
+służby zdrowia różnych krajów. Zalecenia te mocno się rozchodzą, a
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+je zbiera.
+
+### Twoja masa ciała
+
+W _{{personal_data}}_ stoi _{{body_weight}}_ i jest opcjonalna. Dopóki nie ma
+wpisanej wartości, stoi tam tylko przycisk, który ją zakłada; potem możesz ją
+podnosić i obniżać po kroku, a drugi przycisk usuwa ją z powrotem. Aplikacja
+działa w pełni i bez masy ciała, tyle że szacowane stężenie alkoholu na
+ekranie _{{today}}_ _nie_ jest wtedy pokazywane, bo brakuje podstawy do
+obliczeń.
+
+### Kiedy zaczyna się Twój dzień
+
+W _{{statistics}}_ stoi _{{day_starts_at}}_, ustawione domyślnie na czwartą
+rano. To ustawienie rozstrzyga, do którego dnia liczy się napój: jeśli
+wypijesz kieliszek o pierwszej w nocy, trafia on na poprzedni wieczór, gdzie
+jego miejsce. Granica doby obowiązuje wszędzie w aplikacji, w kalendarzu tak
+samo jak w statystykach i w eksportach.
+
+W tym samym miejscu stoi wiersz _{{stats_from_label}}_. Ta data to dolna
+granica każdej analizy: wpisy sprzed niej są pomijane w każdej liczbie.
+Pozwala Ci to postawić czystą kreskę 1 stycznia pod postanowienie noworoczne
+bez utraty tego, co dotąd zapisałeś. Świeża instalacja ustawia datę na dzień
+instalacji. Zwykle jest to trafne, ale może zmylić, gdy wczytasz kopię
+zapasową ze starszymi danymi: stare wpisy są, a żaden nigdzie się nie liczy.
+Przycisk _{{stats_from_clear}}_ zdejmuje tę granicę z powrotem.
+
+## Ekran Dzisiaj
+
+Nad listą napojów stoi podsumowanie, które odświeża się po każdym wpisie i
+wraz z upływem czasu. Od góry do dołu:
+
+Dwie duże liczby stoją {{#android}}obok siebie: po
+lewej{{/android}}{{#ios}}jedna pod drugą:{{/ios}} długość bieżącej
+abstynencji w dniach albo czysty alkohol zapisany dzisiaj w gramach,
+{{#android}}po prawej{{/android}}{{#ios}}poniżej{{/ios}}, pod „Ø”, średnia
+bieżącego miesiąca w gramach na dzień. Zielona lub czerwona strzałka trendu
+obok porównuje tę liczbę z miesiącem poprzednim.
+
+Trzy paski ilości: pierwszy pokazuje dzisiejsze spożycie wobec ustawionego
+limitu dziennego, drugi sumę dzisiaj i sześciu poprzednich dni wobec
+ustawionego limitu na siedem dni, trzeci liczbę dni picia wśród dzisiaj i
+sześciu poprzednich dni wobec ustawionego limitu. Wszystkie trzy pokazują
+liczbę i pasek.
+
+Szacowane stężenie alkoholu pojawia się tylko wtedy, gdy wpisana jest masa
+ciała, i tylko dopóki rachunek umieszcza jeszcze alkohol w Twojej krwi. To
+szacunek i nie powie Ci, czy nadajesz się do prowadzenia pojazdu.
+
+Poniżej stoi lista napojów zapisanych na bieżący dzień.
+
+## Zapisanie napoju
+
+Napój można zapisać z więcej niż jednego miejsca. Ekran _{{today}}_ daje
+pierwszą możliwość, a ekrany _{{calendar}}_ i _{{drinks}}_ dają jeszcze dwie.
+{{#android}}Na dole{{/android}}{{#ios}}U góry{{/ios}} po prawej na ekranie
+_{{today}}_ siedzi przycisk plus; otwiera on okno zapisu.
+
+### Okno zapisu
+
+Na samej górze stoi wiersz _{{drink}}_ z wyborem z katalogu; jeśli
+zdefiniowany jest tylko jeden napój, stoi tam jego nazwa bez niczego do
+wyboru. Poniżej stoją trzy pola:
+
+- wypita ilość, w mililitrach. Od 1 do 5 000 ml; pole wychodzi od zwykłej
+  porcji wybranego napoju.
+- godzina, ustawiona na teraz. Do zmiany, gdy zapisujesz coś po fakcie.
+- notatka, jeśli chcesz, swobodna uwaga o okazji albo o towarzystwie.
+
+Zawartość alkoholu należy do napoju i nie da się jej tu wpisać inaczej. Jeśli
+ten sam gatunek jest pewnego wieczoru wyraźnie mocniejszy, daj mu własne
+miejsce w katalogu.
+
+Gdy tylko ilość mieści się w dopuszczalnym zakresie, pod polami{{#ios}}, w
+wierszu _{{alcohol_content}}_,{{/ios}} stoi, ile gramów czystego alkoholu
+daje ten wpis. To ta liczba, którą liczy Libellus Potionis, a nie mililitry.
+
+Obok zawartości alkoholu siedzi kolorowa kropka stanu. Mówi ona, ile porcji
+wybranego napoju mieści się jeszcze tego samego dnia w trzech limitach:
+zielona, dopóki możliwe są co najmniej dwie kolejne, żółta, dopóki mieści się
+dokładnie jedna, czerwona, gdy następna złamałaby jeden lub kilka z
+ustawionych limitów. Jeśli trudno Ci odróżnić czerwony od zielonego, włącz
+_{{alt_status_symbols}}_ w _{{appearance}}_ w _{{settings}}_: kolorowa kropka
+niesie wtedy także odpowiedni kształt.
+
+{{#ios}}Okno zamykasz jednym z dwóch przycisków u góry. Gdy tylko coś
+wpiszesz, przeciągnięcie w dół już go nie zamyka, żeby zaczęty wpis nie
+przepadł przez przypadek.{{/ios}}
+
+### Szybkie przyciski do napojów zapisywanych często
+
+Napoje oznaczone w katalogu jako ulubione pojawiają się na ekranie
+_{{today}}_ jako rząd przycisków nad listą dnia. Jedno dotknięcie zapisuje
+napój w jego zwykłej porcji, bez okna po drodze. Dla piwa po pracy, które
+zawsze jest tym samym piwem, to najkrótsza droga.
+
+### Poprawienie lub usunięcie wpisu
+
+Dotknięcie {{#android}}ikony ołówka przy
+wpisie{{/android}}{{#ios}}wpisu{{/ios}} na liście dnia otwiera go jako
+_{{edit_entry}}_: te same pola co przy zapisie i te same granice.
+{{#android}}Ikona kosza go usuwa, a aplikacja pyta raz
+wcześniej,{{/android}}{{#ios}}Żeby go usunąć, przeciągnij wiersz w lewo albo
+dotknij czerwonego znaku wiersza w trybie edycji, u góry po prawej. Obie
+drogi prowadzą do _{{delete}}_ i do tego samego pytania,{{/ios}} bo wpisu
+usuniętego przez pomyłkę nie da się odzyskać.
+
+## Kalendarz
+
+Ekran _{{calendar}}_ pokazuje, co było. Przełącznik między widokiem miesiąca
+a roczną mapą ciepła siedzi u góry po
+{{#android}}prawej{{/android}}{{#ios}}lewej{{/ios}}.
+
+### Widok miesiąca
+
+Widok miesiąca pokazuje zwykłą siatkę miesiąca i to od niego zaczynasz. Nad
+siatką stoi miesiąc, po obu stronach po strzałce do przewracania. Dni z
+wpisami noszą kropkę: niebieską dla dnia picia poniżej limitów, czerwoną dla
+dnia picia, który przekroczył limit. Dni bez wpisów nie noszą kropki.
+
+Dotknięcie wybiera dzień i wypisuje jego wpisy poniżej. Tam można je
+poprawiać i usuwać dokładnie tak jak bieżący dzień na ekranie _{{today}}_, a
+przycisk plus {{#android}}na dole{{/android}}{{#ios}}u góry{{/ios}} po
+prawej, który pojawia się dopiero po wybraniu dnia, zapisuje na wybrany
+dzień. Tak nadrabiasz to, czego nie odnotowałeś podczas picia.
+
+### Widok roku
+
+Widok roku wybierasz przyciskiem u góry po
+{{#android}}prawej{{/android}}{{#ios}}lewej{{/ios}}. Pokazuje on dwanaście
+miesięcy roku jako mapę ciepła, siatkę małych kwadratów, po jednym na dzień.
+Nad siatką stoi rok, po obu stronach po strzałce do zmiany roku. Legenda
+poniżej nazywa trzy stany: {{year_calendar_no_entry}},
+{{year_calendar_under_limit}}, {{year_calendar_over_limit}}. Dzisiejszy dzień
+nosi obwódkę. Dotknięcie miesiąca otwiera jego widok miesiąca.
+
+## Podsumowanie: statystyki
+
+Ekran _{{statistics}}_ analizuje. Długość okresu wybiera się u góry:
+_{{week}}_, _{{month}}_ albo _{{year}}_. Wszystko poniżej odnosi się do tego
+wyboru. _{{week}}_ oznacza zawsze ruchome okno siedmiu dni złożone z dzisiaj
+i sześciu dni poprzednich. Każde obliczenie pomija wpisy sprzed daty
+_{{stats_from_label}}_ z _{{settings}}_. Jeśli w wybranym okresie nie ma
+wpisów, {{#android}}na wykresach stoi „{{no_data}}”{{/android}}{{#ios}}sekcje
+zostają na miejscu i pokazują zera{{/ios}}.
+
+### Cofanie się w czasie
+
+Pod przyciskami okresu pokazany przedział stoi wypisany jako dokładny zakres
+dat. Bieżący miesiąc kończy się dzisiaj, a nie na koniec miesiąca, a jeśli
+ustawiona jest _{{stats_from_label}}_, zakres zaczyna się tam. Stoi tam więc
+dokładnie to, co pokrywają liczby poniżej. Po obu stronach siedzi po
+strzałce. Lewa cofa o jeden okres, prawa wraca w stronę teraźniejszości.
+
+Wszystko na tym ekranie idzie za wybranym okresem, zarówno liczby, jak i
+wykresy. _{{trend_vs_prev}}_ porównuje zawsze z okresem tej samej długości
+bezpośrednio wcześniejszym, marzec zatem z lutym.
+
+### Liczby
+
+- _{{total_period}}_: gramy czystego alkoholu w wybranym okresie.
+- _{{avg_per_day}}_: średnia po wszystkich dniach kalendarzowych.
+- _{{avg_per_drink_day}}_: średnia po dniach picia. Duża odległość od
+  poprzedniej liczby wskazuje na picie rzadkie, ale mocne.
+- _{{days_over_daily_limit}}_: liczba dni, w których przekroczony został
+  limit dzienny.
+- _{{days_over_weekly_limit}}_: liczba dni picia, w których ten dzień i sześć
+  poprzednich dały razem więcej niż limit na siedem dni.
+- _{{days_over_drink_day_limit}}_: dni picia, które we własnym oknie siedmiu
+  dni leżały powyżej limitu dni picia, na przykład piąty dzień picia na
+  siedem, gdy dopuszczone są tylko cztery.
+- _{{abstinent_days}}_: dni okresu bez wpisów.
+- _{{current_streak}}_: liczy dni od ostatniego napoju.
+- _{{longest_streak}}_: najdłuższy odcinek bez alkoholu w okresie.
+- _{{trend_vs_prev}}_: pokazuje trend wobec okresu poprzedniego.
+
+### Wykresy
+
+Liczbom towarzyszą cztery wykresy, pierwszy o przebiegu, pozostałe o wzorze:
+
+- Pierwszy wykres słupkowy śledzi spożycie w wybranym okresie: wybrane okno
+  siedmiu dni, wybrany miesiąc albo średnie spożycie na dzień dla każdego
+  miesiąca wybranego roku.
+- _{{stats_time_of_day}}_ dzieli dobę na osiem części po trzy godziny i
+  podaje dla każdej średnią w gramach na dzień. Tu widać, czy pije się
+  wieczorem, czy rozkłada się to na cały dzień. Sekcja pojawia się tylko
+  wtedy, gdy w wybranym okresie w ogóle coś wypito.
+- _{{stats_weekday}}_ podaje średnie spożycie na dzień tygodnia.
+- _{{stats_category_breakdown}}_ pokazuje w postaci pierścienia, jak spożycie
+  rozkłada się na sześć kategorii napojów.
+
+## Katalog napojów
+
+Ekran _{{drinks}}_ zarządza napojami, spośród których wybierasz przy zapisie.
+Aplikacja przychodzi z wyborem powszechnych napojów; można je zmieniać,
+uzupełniać i usuwać.
+
+Każdy wiersz pokazuje nazwę, symbol kategorii, porcję, zawartość alkoholu i
+wynikające z nich gramy czystego alkoholu, a przed nimi gwiazdkę ulubionych i
+kropkę stanu dla tej porcji{{#android}}, za nimi zaś ikonę edycji i ikonę
+usuwania{{/android}}. Gwiazdka przełącza stan ulubionego: ulubione pojawiają
+się w szybkich przyciskach na ekranie _{{today}}_.
+
+{{#android}}Dotknięcie wiersza (nie ikon) otwiera okno zapisu z tym napojem;
+to trzecia droga do zapisu, obok przycisków plus na ekranach _{{today}}_ i
+_{{calendar}}_. Dwie ikony po prawej otwierają edytor i pytanie o
+usunięcie.{{/android}}{{#ios}}Dotknięcie wiersza otwiera okno zapisu z tym
+napojem; to trzecia droga do zapisu, obok przycisków plus na ekranach
+_{{today}}_ i _{{calendar}}_. Zmiana i usuwanie należą do trybu edycji, który
+włączasz u góry po prawej: tam to samo dotknięcie otwiera edytor, a czerwony
+znak wiersza prowadzi do pytania o usunięcie. Przeciągnięcie w lewo też
+oferuje obie czynności, zarówno w trybie edycji, jak i poza nim.{{/ios}}
+
+### Dodanie lub zmiana napoju
+
+Przycisk plus otwiera _{{add_drink}}_, {{#android}}ikona ołówka przy
+wierszu{{/android}}{{#ios}}dotknięcie w trybie edycji{{/ios}} otwiera
+_{{edit_drink}}_. Oba okna pytają o to samo:
+
+- _{{drink_name}}_: dowolnie, do 100 znaków.
+- _{{volume_ml}}_: zwykła porcja, od której wychodzi okno zapisu. Od 1 do 5
+  000 mililitrów.
+- _{{alcohol_percent}}_: zwykła zawartość alkoholu, od 0 do 100 procent.
+- _{{category}}_: jedna z sześciu kategorii: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} albo {{category_other}}. Kategoria nie zmienia nic w
+  rachunku; grupuje ona rozbicie na ekranie _{{statistics}}_.
+
+### Dlaczego niektórych napojów nie da się usunąć
+
+Napoju nie da się usunąć, dopóki wpisy w Twoim dzienniku wciąż się do niego
+odwołują; aplikacja mówi wtedy, ile ich jest. Powód jest taki, że te wpisy
+straciłyby inaczej to, do czego się odwołują, a statystyki zrobiłyby się
+niepełne.
+
+## Eksport danych
+
+### Raport PDF
+
+Na ekranie _{{statistics}}_ przycisk _{{export_pdf}}_ tworzy dwustronicowy
+raport jako plik _Portable Document Format (PDF)_: liczby podstawowe, tabelę
+miesiąc po miesiącu, trend długookresowy, wzór spożycia według kategorii,
+pory dnia i dnia tygodnia oraz sekcję o piciu ryzykownym i abstynencji.
+Format nadaje się na rozmowę w poradni leczenia uzależnień.
+
+Raport obejmuje dokładnie wybrany okres: jeśli wyeksportujesz lipiec po piciu
+w jedenastu dniach, dostaniesz raport na trzydzieści jeden dni, z
+dwudziestoma dniami abstynencji i średnią dzienną, która dzieli przez
+trzydzieści jeden. Tabela miesięcy wymienia każdy miesiąc okresu, także taki
+bez ani jednego wpisu. To sprawia, że liczby raportu zgadzają się z tymi na
+ekranie _{{statistics}}_. Jeśli wybrany okres kończy się dzisiaj, raport
+kończy się na wczoraj, dopóki dzisiaj nic nie jest zapisane: zaczęty dzień
+ciągnąłby średnią w dół i liczyłby się jako abstynencki, zanim się skończy.
+
+Dla raportu PDF otwiera się {{#android}}systemowe okno drukowania, z którego
+możesz go wydrukować albo zapisać jako plik.{{/android}}{{#ios}}systemowy
+wybór plików, w którym decydujesz, dokąd trafia plik: do Plików, do chmury
+albo do innej aplikacji.{{/ios}}
+
+### Eksport CSV
+
+Przycisk _{{export_csv}}_ na ekranie _{{statistics}}_ zapisuje tabelę z
+jednym wierszem na wpis, gotową dla arkusza kalkulacyjnego takiego jak
+[LibreOffice Calc](https://www.libreoffice.org/). Liczby stoją w postaci
+czytelnej dla maszyny, z kropką dziesiętną, niezależnie od języka aplikacji.
+
+{{#android}}Plik CSV ląduje w folderze pobranych, a aplikacja proponuje potem
+udostępnienie go.{{/android}}{{#ios}}Także dla pliku CSV otwiera się
+systemowy wybór plików, w którym decydujesz, dokąd trafia plik: do Plików, do
+chmury albo do innej aplikacji.{{/ios}}
+
+### Eksport JSON – kopie zapasowe
+
+**Dane, które zapisujesz, nie opuszczają tego urządzenia bez Twojego
+działania.** {{#android}}Libellus Potionis nie bierze udziału w żadnej
+automatycznej kopii zapasowej w chmurze ani w żadnym przenoszeniu z
+urządzenia na urządzenie. **Przy zmianie urządzenia, po przywróceniu ustawień
+fabrycznych albo po ponownej instalacji własnoręcznie zrobiona kopia zapasowa
+to jedyny sposób, by zachować dane.** Co nie zostało wyeksportowane, jest
+wtedy stracone.{{/android}}{{#ios}}Libellus Potionis trzyma swoje dane poza
+każdą kopią zapasową urządzenia, zarówno iCloud, jak i kopiami na komputerze;
+przełącznik _{{device_backup}}_ w _{{settings}}_ to odwraca (zobacz „Dostęp i
+widoczność”). Dopóki jest wyłączony, własnoręcznie zrobiona kopia zapasowa to
+jedyny sposób, by zachować dane przy zmianie urządzenia, po przywróceniu
+ustawień fabrycznych albo po ponownej instalacji.{{/ios}}
+
+Kopia zapasowa to jeden plik JSON. Przełącznik _{{backup_include_settings}}_
+rozstrzyga, czy obok katalogu napojów i wpisów zapisywane są też ustawienia.
+Ta opcja jest znów włączona przy każdym otwarciu ustawień. Tak dane przenoszą
+się na nowe urządzenie:
+
+1. Na starym urządzeniu wybierz _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_export}}_. Przechowaj plik w bezpiecznym miejscu, na przykład w
+   notatce [Signal](https://signal.org/) do samego siebie.
+2. Zainstaluj Libellus Potionis na nowym urządzeniu.
+3. Tam przywróć dane przez _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_import}}_.
+
+Przy imporcie aplikacja pyta, jak ma postąpić. _{{import_replace}}_ odrzuca
+to, co jest na urządzeniu: katalog napojów, wpisy i ustawienia, o ile kopia
+zapasowa je niesie. _{{import_merge}}_ nie usuwa żadnych istniejących
+definicji napojów ani żadnych wpisów i dodaje to, czego brakuje. Wpisy, które
+już są, nie są podwajane, a bieżące ustawienia nie są nadpisywane.
+
+## Pozostałe ustawienia
+
+### Dostęp i widoczność
+
+W _{{security}}_ stoją {{#android}}dwa{{/android}}{{#ios}}trzy{{/ios}}
+przełączniki:
+
+- _{{biometric_lock}}_ prosi przy każdym otwarciu aplikacji o
+  {{#android}}odcisk palca, twarz albo blokadę ekranu
+  urządzenia.{{/android}}{{#ios}}Face ID, Touch ID albo kod
+  urządzenia.{{/ios}} Włączenie albo wyłączenie blokady wymaga tego samego
+  uwierzytelnienia. Obowiązuje ona także wtedy, gdy opuścisz aplikację i
+  wrócisz, ale nie przy powrocie w ciągu trzydziestu sekund. Menu u góry po
+  prawej niesie także _{{lock_app}}_, które blokuje aplikację od razu.
+- _{{allow_screenshots}}_ jest domyślnie wyłączone. Dopóki {{#android}}zrzuty
+  ekranu są wyłączone, z okna aplikacji nie da się zrobić zrzutu, a jego
+  treść zostaje zakryta na liście ostatnio używanych
+  aplikacji.{{/android}}{{#ios}}przełącznik jest wyłączony, treść zostaje
+  zakryta w przełączniku aplikacji.{{/ios}} Kto weźmie Twoje odblokowane
+  urządzenie i przewertuje otwarte aplikacje, nic tam nie zobaczy.
+  {{#ios}}Zapobieżenie zrzutowi ekranu leży poza zasięgiem aplikacji iOS; iOS
+  nie udostępnia do tego żadnego interfejsu.{{/ios}}
+{{#ios}}- _{{device_backup}}_ jest tak samo domyślnie wyłączony. Dopóki
+przełącznik jest wyłączony, dane aplikacji zostają poza każdą kopią zapasową
+urządzenia, zarówno iCloud, jak i kopiami na komputerze. Jeśli go włączysz,
+dane przetrwają przywrócenie urządzenia z jego kopii zapasowej, ale leżą
+wtedy także tam, gdzie leży ta kopia.{{/ios}}
+
+### Wygląd i język
+
+W _{{appearance}}_ da się ustawić trzy rzeczy:
+
+- _{{theme_mode}}_: {{theme_system}} albo {{theme_day}} czy {{theme_night}}
+  niezależnie od ustawienia systemu.
+- _{{language}}_: język aplikacji, również niezależny od systemu.
+  „{{language_system}}” znów idzie za językiem systemu.
+- _{{alt_status_symbols}}_ nadaje kropkom stanu kształt obok koloru. Tak trzy
+  stany zostają rozróżnialne, gdy czerwony, żółty i zielony są trudne do
+  odróżnienia.
+
+## Jak się to liczy
+
+### Od mililitrów do gramów
+
+Każdy wpis jest przy zapisie przeliczany na gramy czystego alkoholu:
+
+**gramy = mililitry × zawartość alkoholu × 0,789**
+
+0,789 to gęstość etanolu w gramach na mililitr. Pół litra piwa o 5 % daje
+więc 500 ml × 0,05 × 0,789 g/ml, około 19,7 g. Każdy limit, każda statystyka
+i każdy eksport pracuje z tą liczbą, nigdy z mililitrami. To jedyna rzecz,
+która w ogóle czyni piwo i kieliszek wina porównywalnymi.
+
+### Szacunek stężenia alkoholu
+
+Jeśli wpisana jest masa ciała, Libellus Potionis szacuje stężenie alkoholu we
+krwi wzorem [Widmarka](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+
+**BAC [‰] = A / (P × r) − β × t**
+
+A to czysty alkohol w gramach, P masa ciała w kilogramach, r współczynnik
+rozmieszczenia, β szybkość eliminacji około 0,15 ‰ na godzinę, a t godziny od
+pierwszego napoju.
+
+Aplikacja nie zapisuje Twojej płci i dlatego liczy świadomie po stronie
+ostrożnej: r jest ustalone na 0,6, mniejszy z dwóch klasycznych
+współczynników. Mniejsze r rozkłada ten sam alkohol na mniejszą objętość i
+daje przez to wyższą z dwóch wartości: szacunek ma raczej leżeć za wysoko niż
+za nisko. Szybkość eliminacji jest natomiast średnią; indywidualnie leży
+gdzieś między 0,10 a 0,20 ‰ na godzinę. Jeśli rozkładasz alkohol wolno,
+jesteś powyżej pokazanej wartości.
+
+To, co z tego wychodzi, jest modelem, nie pomiarem. Nie zastępuje alkomatu i
+nie powie Ci, czy nadajesz się do prowadzenia pojazdu.
+
+### Dzień logiczny
+
+Napój należy do dnia, który zaczął się o godzinie wskazanej przez
+_{{day_starts_at}}_, a nie do dnia, który pokazuje zegar. Przy domyślnym
+ustawieniu czwartej kieliszek o wpół do drugiej w nocy liczy się jeszcze do
+dnia poprzedniego. Reguła obowiązuje w całej aplikacji, także przez zmiany
+czasu.
+
+### Ruchomy tydzień
+
+Limit na siedem dni i dni picia odnoszą się nie do tygodnia kalendarzowego,
+lecz do dzisiaj i sześciu dni poprzednich. Okno wędruje więc dzień po dniu.
+Ciężka sobota zostaje w polu widzenia, dopóki nie ma sześciu dni, i wypada w
+następną sobotę.

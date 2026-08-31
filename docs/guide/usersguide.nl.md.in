@@ -1,4 +1,4 @@
-<!-- vim: set et ts=4:
+<!-- vim: set et ts=4 tw=77:
 =============================================================================
 Libellus Potionis - Privacy-Friendly Alcohol Tracker
 Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>
@@ -24,294 +24,512 @@ apply to it are stated in the accompanying COPYING.md file.
 =============================================================================
 -->
 
-{{#android}}
-# Libellus Potionis -- Gebruikershandleiding
-
-Deze pagina beschrijft de kenmerken en functies van Libellus Potionis, het
-persoonlijke logboek voor je alcoholgebruik.
-
-## Overzicht
-
-Libellus Potionis is open source: de broncode kan door iedereen worden bekeken
-en geverifieerd. De app vereist geen toestemmingen, niet voor de camera of
-microfoon en niet voor gps of netwerktoegang. Je gegevens blijven in de
-privéopslag van de app op je apparaat, beschermd door de versleuteling van het
-apparaat, en de toegang tot de app kan met een vingerafdruk worden beperkt.
-
-De app laat je op elk moment weten of “la petite sœur” nog binnen je budget
-past, zodat je gedoseerd tot aan je limiet kunt gaan. Voor een afspraak in de
-verslavingszorg levert ze op verzoek een PDF-rapport van twee pagina’s over je
-drinkgewoonten. Ze is gratis en advertentievrij.
-
-Libellus Potionis vereist Android 11 of hoger. Het wordt door de auteur continu
-gebruikt op een Google Pixel 10 Pro met GrapheneOS en daarnaast getest op een
-Fairphone 4.
-
-## Scherm “{{today}}”
-
-Op dit scherm vind je een lijst met de alcoholische dranken die je vandaag hebt
-genoten. Als je een fout hebt gemaakt bij het registreren van een drankje, kun
-je de items hier bewerken of verwijderen. Gebruik de plusknop om meer dranken
-toe te voegen.
-
-Boven de drankenlijst vind je een overzicht van de huidige dag met de volgende
-informatie: de hoeveelheid alcohol die vandaag al is genuttigd (in gram),
-dezelfde hoeveelheid ten opzichte van je dag- en weeklimiet (in gram en als
-voortgangsbalk) en het aantal dagen met alcoholgebruik tot nu toe deze week ten
-opzichte van je limiet (als getal en als voortgangsbalk).
-
-Daarnaast toont een label met “Ø” je gemiddelde consumptie voor de huidige
-maand (gemiddeld aantal gram pure alcohol per dag).
-
-## Scherm “{{calendar}}”
-
-Op dit scherm vind je de kalender. Dagen waarop alcohol is gebruikt, zijn
-gemarkeerd met een blauwe stip (niet-kritieke hoeveelheid) of een rode stip
-(limiet overschreden). Wanneer je een dag selecteert, worden de bijbehorende
-dranken weergegeven, die zo nodig kunnen worden gecorrigeerd of verwijderd. Het
-is ook mogelijk om met terugwerkende kracht genuttigde dranken toe te voegen.
-
-## Scherm “{{statistics}}”
-
-Dit scherm toont statistische analyses van je alcoholgebruik, te filteren per
-week, maand of jaar. Er is een CSV-export beschikbaar om de gegevens verder te
-verwerken in een spreadsheetprogramma. Daarnaast is er een PDF-export die de
-drinkgewoonten weergeeft in een opmaak die geschikt is voor de
-verslavingszorg.
-
-## Scherm “{{drinks}}”
-
-Dit scherm bevat de lijst met dranken. De app wordt geleverd met een
-voorgeconfigureerde set internationaal gangbare dranken. Deze kunnen allemaal
-worden gewijzigd of verwijderd. Met het pluspictogram kun je een nieuwe drank
-definiëren. Door op een drank te tikken, opent een dialoogvenster om deze als
-genuttigd te registreren.
-
-## Scherm “{{settings}}”
-
-Het instellingenmenu is bereikbaar via het menupictogram (☰) rechtsboven.
-Libellus Potionis biedt de volgende configuratiemogelijkheden:
-
-### {{personal_data}}
-
-In deze categorie kun je je lichaamsgewicht noteren om je
-bloedalcoholconcentratie bij benadering te berekenen met de [formule van
-Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Die waarde wordt daarna op het scherm “{{today}}” getoond.
-
-De formule luidt **BAC [‰] = A / (P × r) − β × t**: A is het aantal gram pure
-alcohol, P het lichaamsgewicht in kilogram, r de verdelingscoëfficiënt, β de
-afbraaksnelheid van ongeveer 0,15 ‰ per uur en t het aantal uren sinds het
-eerste drankje. De grammen volgen uit volume × alcoholpercentage × 0,789, de
-dichtheid van ethanol.
-
-De app registreert het geslacht niet en rekent daarom behoedzaam: r ligt vast
-op 0,6, de kleinste van de twee klassieke coëfficiënten. Een kleinere r
-verdeelt dezelfde dosis over een kleiner volume en geeft dus de hoogste van de
-twee waarden, zodat de schatting zo min mogelijk onder komt te liggen wat een
-mens van welk geslacht dan ook werkelijk bereikt. De afbraaksnelheid is
-daarentegen een gemiddelde: individueel ligt die rond 0,10 tot 0,20 ‰ per uur,
-dus wie alcohol langzaam afbreekt, kan boven de getoonde waarde zitten. De
-schatting is een statistisch model, geen meting.
-
-### {{limits}}
-
-In deze categorie voer je de limieten in die voor jouw alcoholgebruik gelden. De
-in te vullen velden zijn: de maximale daglimiet in gram pure alcohol, de
-maximale weeklimiet en het maximale aantal drinkdagen per week. Alle limieten
-gelden tegelijk. Daardoor zijn op het scherm “{{today}}” drie voortgangsbalken
-zichtbaar. Als je niet weet wat je hier moet instellen, kun je je laten
-inspireren door de aanbevelingen van verschillende landen op Wikipedia.
-
-### {{statistics}}
-
-Met de statistische instellingen kun je bepalen op welk tijdstip een nieuwe dag
-begint (zodat bijvoorbeeld een drankje om 1:00 uur ’s nachts nog meetelt voor de
-vorige dag) en — voor goede voornemens — vanaf welke datum de gegevens moeten
-worden geëvalueerd.
-
-### {{backup_section}}
-
-**Je gegevens verlaten dit apparaat nooit uit zichzelf.** Libellus Potionis
-bewaart alles in de privéopslag van de app en doet bewust niet mee aan
-automatische cloudback-ups en niet aan overdracht tussen apparaten. Als je van
-telefoon wisselt, de fabrieksinstellingen herstelt of de app opnieuw
-installeert, is **de enige manier om je gegevens te behouden ze zelf veilig te
-stellen** — er is geen andere manier van herstel, en gegevens die niet zijn
-geëxporteerd kunnen daarna niet worden teruggehaald.
 
-Een back-up is één JSON-bestand met al je drankjes en je volledige logboek. Zo
-verplaats je je gegevens naar een andere telefoon:
-
-1. Open op de oude telefoon “{{settings}}” → {{backup_section}} →
-   {{backup_export}} en sla het JSON-bestand op een veilige plek op —
-   bijvoorbeeld je eigen cloudopslag, een e-mail aan jezelf of een
-   usb-overdracht.
-2. Installeer Libellus Potionis op de nieuwe telefoon.
-3. Open “{{settings}}” → {{backup_section}} → {{backup_import}} en selecteer
-   dat JSON-bestand. Kies {{import_replace}} om alles te overschrijven, of
-   {{import_merge}} om het samen te voegen met reeds aanwezige items.
-
-Exporteer regelmatig: een back-up beschermt alleen de gegevens die bestonden op
-het moment dat je hem maakte.
-
-### {{security}}
-
-Deze categorie beschermt de toegang tot de app en bepaalt de zichtbaarheid.
-Schakel {{biometric_lock}} in om bij elke keer dat de app wordt geopend een
-vingerafdruk of gezichtsherkenning te vereisen. De schakelaar
-{{allow_screenshots}} bepaalt of schermafbeeldingen en schermopnamen van het
-app-venster zijn toegestaan; deze staat standaard uit, zodat het venster
-verborgen blijft op schermafbeeldingen en in het overzicht van recente apps.
-
-### {{appearance}}
-
-In deze categorie kun je het kleurenthema en de taal onafhankelijk van de
-systeeminstellingen instellen.
-{{/android}}
-
-{{#ios}}
-# Libellus Potionis -- Gebruikershandleiding
-
-Deze pagina beschrijft de kenmerken en functies van Libellus Potionis, het
-persoonlijke logboek voor je alcoholgebruik.
-
-## Overzicht
-
-Libellus Potionis is open source: de broncode kan door iedereen worden bekeken
-en geverifieerd. De app vereist geen toestemmingen, niet voor de camera of
-microfoon en niet voor gps of netwerktoegang. Je gegevens blijven in de
-privéopslag van de app op je apparaat, beschermd door de versleuteling van het
-apparaat, en de toegang tot de app kan met Face ID of Touch ID worden beperkt.
-
-De app laat je op elk moment weten of “la petite sœur” nog binnen je budget
-past, zodat je gedoseerd tot aan je limiet kunt gaan. Voor een afspraak in de
-verslavingszorg levert ze op verzoek een PDF-rapport van twee pagina’s over je
-drinkgewoonten. Ze is gratis en advertentievrij.
-
-Libellus Potionis vereist iOS 17.0 of hoger. Het wordt door de auteur continu
-gebruikt op een iPhone 16E en daarnaast getest op een iPhone 17 Pro-emulator.
-
-## Scherm “{{today}}”
-
-Op dit scherm vind je een lijst met de alcoholische dranken die je vandaag hebt
-genoten. Als je een fout hebt gemaakt bij het registreren van een drankje, kun
-je de items hier bewerken of verwijderen. Gebruik de plusknop om meer dranken
-toe te voegen. Tik op een item om het te bewerken, of veeg het naar links om het te verwijderen. De potloodknop in de werkbalk toont ook een verwijderoptie.
-
-Boven de drankenlijst vind je een overzicht van de huidige dag met de volgende
-informatie: de hoeveelheid alcohol die vandaag al is genuttigd (in gram),
-dezelfde hoeveelheid ten opzichte van je dag- en weeklimiet (in gram en als
-voortgangsbalk) en het aantal dagen met alcoholgebruik tot nu toe deze week ten
-opzichte van je limiet (als getal en als voortgangsbalk).
-
-Daarnaast toont een label met “Ø” je gemiddelde consumptie voor de huidige
-maand (gemiddeld aantal gram pure alcohol per dag).
-
-## Scherm “{{calendar}}”
-
-Op dit scherm vind je de kalender. Dagen waarop alcohol is gebruikt, zijn
-gemarkeerd met een blauwe stip (niet-kritieke hoeveelheid) of een rode stip
-(limiet overschreden). Wanneer je een dag selecteert, worden de bijbehorende
-dranken weergegeven, die zo nodig kunnen worden gecorrigeerd of verwijderd. Het
-is ook mogelijk om met terugwerkende kracht genuttigde dranken toe te voegen. Tik op een item om het te corrigeren, of veeg het naar links om het te verwijderen; de potloodknop in de werkbalk doet hetzelfde.
-
-## Scherm “{{statistics}}”
-
-Dit scherm toont statistische analyses van je alcoholgebruik, te filteren per
-week, maand of jaar. Er is een CSV-export beschikbaar om de gegevens verder te
-verwerken in een spreadsheetprogramma. Daarnaast is er een PDF-export die de
-drinkgewoonten weergeeft in een opmaak die geschikt is voor de
-verslavingszorg.
-
-## Scherm “{{drinks}}”
-
-Dit scherm bevat de lijst met dranken. De app wordt geleverd met een
-voorgeconfigureerde set internationaal gangbare dranken. Deze kunnen allemaal
-worden gewijzigd of verwijderd. Met het pluspictogram kun je een nieuwe drank
-definiëren. Door op een drank te tikken, opent een dialoogvenster om deze als
-genuttigd te registreren. Om een drank te wijzigen of te verwijderen, tik je op de potloodknop in de werkbalk: in die modus opent een tik op een rij het bewerkingsvenster en verwijdert het rode teken de drank. Een veeg naar links biedt dezelfde twee acties.
-
-## Scherm “{{settings}}”
-
-Het instellingenmenu is bereikbaar via de Meer-knop (…) rechtsboven.
-Libellus Potionis biedt de volgende configuratiemogelijkheden:
-
-### {{personal_data}}
-
-In deze categorie kun je je lichaamsgewicht noteren om je
-bloedalcoholconcentratie bij benadering te berekenen met de [formule van
-Widmark](https://de.wikipedia.org/wiki/Blutalkoholkonzentration#Widmark-Formel).
-Die waarde wordt daarna op het scherm “{{today}}” getoond.
-
-De formule luidt **BAC [‰] = A / (P × r) − β × t**: A is het aantal gram pure
-alcohol, P het lichaamsgewicht in kilogram, r de verdelingscoëfficiënt, β de
-afbraaksnelheid van ongeveer 0,15 ‰ per uur en t het aantal uren sinds het
-eerste drankje. De grammen volgen uit volume × alcoholpercentage × 0,789, de
-dichtheid van ethanol.
-
-De app registreert het geslacht niet en rekent daarom behoedzaam: r ligt vast
-op 0,6, de kleinste van de twee klassieke coëfficiënten. Een kleinere r
-verdeelt dezelfde dosis over een kleiner volume en geeft dus de hoogste van de
-twee waarden, zodat de schatting zo min mogelijk onder komt te liggen wat een
-mens van welk geslacht dan ook werkelijk bereikt. De afbraaksnelheid is
-daarentegen een gemiddelde: individueel ligt die rond 0,10 tot 0,20 ‰ per uur,
-dus wie alcohol langzaam afbreekt, kan boven de getoonde waarde zitten. De
-schatting is een statistisch model, geen meting.
-
-### {{limits}}
-
-In deze categorie voer je de limieten in die voor jouw alcoholgebruik gelden. De
-in te vullen velden zijn: de maximale daglimiet in gram pure alcohol, de
-maximale weeklimiet en het maximale aantal drinkdagen per week. Alle limieten
-gelden tegelijk. Daardoor zijn op het scherm “{{today}}” drie voortgangsbalken
-zichtbaar. Als je niet weet wat je hier moet instellen, kun je je laten
-inspireren door de aanbevelingen van verschillende landen op Wikipedia.
-
-### {{statistics}}
-
-Met de statistische instellingen kun je bepalen op welk tijdstip een nieuwe dag
-begint (zodat bijvoorbeeld een drankje om 1:00 uur ’s nachts nog meetelt voor de
-vorige dag) en — voor goede voornemens — vanaf welke datum de gegevens moeten
-worden geëvalueerd.
-
-### {{backup_section}}
-
-**Je gegevens verlaten dit apparaat nooit uit zichzelf.** Libellus Potionis
-bewaart alles in de privéopslag van de app en doet bewust niet mee aan
-automatische cloudback-ups en niet aan overdracht tussen apparaten. Als je van
-telefoon wisselt, de fabrieksinstellingen herstelt of de app opnieuw
-installeert, is **de enige manier om je gegevens te behouden ze zelf veilig te
-stellen** — er is geen andere manier van herstel, en gegevens die niet zijn
-geëxporteerd kunnen daarna niet worden teruggehaald.
-
-Een back-up is één JSON-bestand met al je drankjes en je volledige logboek. Zo
-verplaats je je gegevens naar een andere telefoon:
-
-1. Open op de oude telefoon “{{settings}}” → {{backup_section}} →
-   {{backup_export}} en sla het JSON-bestand op een veilige plek op —
-   bijvoorbeeld je eigen cloudopslag, een e-mail aan jezelf of een
-   usb-overdracht.
-2. Installeer Libellus Potionis op de nieuwe telefoon.
-3. Open “{{settings}}” → {{backup_section}} → {{backup_import}} en selecteer
-   dat JSON-bestand. Kies {{import_replace}} om alles te overschrijven, of
-   {{import_merge}} om het samen te voegen met reeds aanwezige items.
-
-Exporteer regelmatig: een back-up beschermt alleen de gegevens die bestonden op
-het moment dat je hem maakte.
-
-### {{security}}
-
-Deze categorie beschermt de toegang tot de app en bepaalt de zichtbaarheid.
-Schakel {{biometric_lock}} in om bij elke keer dat de app wordt geopend Face
-ID of Touch ID te vereisen. De schakelaar {{allow_screenshots}} bepaalt of de
-inhoud van de app in de App Switcher verschijnt; deze staat standaard uit,
-zodat de app daar verborgen blijft wanneer je hem verlaat. iOS laat een app
-geen schermafbeeldingen of schermopnamen blokkeren, dus deze instelling heeft
-daar geen invloed op.
-
-### {{appearance}}
-
-In deze categorie kun je het kleurenthema en de taal onafhankelijk van de
-systeeminstellingen instellen.
-{{/ios}}
+# Libellus Potionis – Gebruikershandleiding
+
+Libellus Potionis is een dagboek waarin je je eigen alcoholgebruik bijhoudt.
+Je noteert wat je drinkt; de app rekent uit hoeveel pure alcohol dat was en
+of “la petite sœur”, het tweede biertje, nog binnen de limieten past die je
+jezelf hebt gesteld. Deze handleiding loopt de app stap voor stap met je
+door: de opbouw, het instellen, het noteren van een drankje, dan het
+terugkijken en de balans opmaken, en ten slotte de back-ups.
+
+## Wat de app doet – en wat niet
+
+Libellus Potionis houdt bij. De app oordeelt niet en maant niet. De cijfers
+die ze toont zijn je eigen invoer, omgerekend naar gram pure alcohol. Noteer
+je elk drankje, dan kun je in nuchtere toestand terugkijken op je eigen
+drinkgedrag – en daar ligt de winst van deze app.
+
+Libellus Potionis is vrije software onder de GNU General Public License. De
+broncode is dus openbaar, en elke bewering over hoe de app met je gegevens
+omgaat kan door iedereen op elk moment worden nagegaan. Privacy is een
+bepalende eigenschap van Libellus Potionis: de app vraagt geen enkele
+gevoelige toestemming, geen camera, geen microfoon, geen locatie, geen
+toegang tot bestanden, zelfs geen netwerktoegang. Alles wat je invoert blijft
+in de privéopslag van de app op je apparaat, beschermd door de versleuteling
+van het apparaat zelf. In de instellingen kun je de toegang tot de app
+vergrendelen met {{#android}}je vingerafdruk{{/android}}{{#ios}}Face
+ID{{/ios}}; dat is de enige toestemming die de app ooit vraagt.
+
+Wat Libellus Potionis _niet_ is: de app is geen meetinstrument en geen
+medisch hulpmiddel. Het bloedalcoholgehalte is een schatting uit een
+statistisch model (zie “Hoe er gerekend wordt”). Niets van wat de app zegt
+vertelt je of je nog mag rijden, en niets ervan is een diagnose. Wat Libellus
+Potionis wel kan: je een beeld geven van je eigen drinkgedrag over weken en
+maanden, en dat beeld desgewenst afdrukken als een PDF van twee pagina’s, op
+een vel papier dat je meeneemt naar een gesprek bij de verslavingszorg.
+
+Libellus Potionis vereist {{#android}}Android 11 of hoger, wat neerkomt op
+toestellen van ongeveer 2020 en later. De app wordt geregeld getest op een
+Google Pixel 10 Pro met GrapheneOS (Android 16) en op een Fairphone 4
+(Android 15){{/android}}{{#ios}}iOS 17 of hoger, wat neerkomt op iPhones van
+ongeveer 2018 en later. De app wordt geregeld getest op een iPhone 16e en een
+iPhone SE 3e generatie, beide met iOS 26{{/ios}}.
+
+## Hoe de app is opgebouwd
+
+Libellus Potionis heeft vier schermen. Je wisselt ertussen met de balk
+onderaan het beeldscherm, die op alle vier te zien is:
+
+- _{{today}}_: hoe de huidige dag ervoor staat en wat erop is genoteerd,
+- _{{calendar}}_: terugkijken op afzonderlijke dagen, maanden en jaren, en
+  waar nodig hun invoer corrigeren,
+- _{{statistics}}_: statistische analyses over weken, maanden en jaren,
+- _{{drinks}}_: de catalogus met dranken die je kunt noteren.
+
+Rechtsboven staat op alle vier de schermen dezelfde {{#ios}}menuknop
+“(···)”{{/ios}}{{#android}}“hamburger”-menuknop{{/android}}. Die opent een
+menu met _{{settings}}, {{help}}_ (deze handleiding) en de pagina
+_{{about}}_, met informatie over de app, de versies en de licenties. Kan je
+apparaat je authenticeren, dan staat daar ook _{{lock_app}}_, waarmee de app
+op slag wordt vergrendeld.
+
+_{{settings}}, {{help}}_ en _{{about}}_ openen {{#android}}als eigen
+pagina’s; de terugknop van het apparaat, of de pijl linksboven, brengt je
+terug naar het scherm van waaruit je ze opende{{/android}}{{#ios}}als eigen
+vensters, die je rechtsboven weer sluit{{/ios}}.
+
+## Aan de slag
+
+Meteen na de installatie heeft de app nog geen invoer, maar ze is al
+bruikbaar: een vooraf ingerichte catalogus met wereldwijd gangbare dranken
+laat je dat eerste biertje meteen noteren. Toch is het zinvol eerst drie
+dingen in te stellen. Alle drie staan onder _{{settings}}_; de overige
+instellingen komen verderop aan bod.
+
+### Je limieten
+
+Onder _{{limits}}_ staan de waarden die voor jou gelden, en alle drie gelden
+ze tegelijk:
+
+- _{{daily_limit_grams}}_: de daglimiet aan pure alcohol in gram,
+- _{{weekly_limit_grams}}_: de weeklimiet aan pure alcohol in gram, geteld
+  over een voortschrijdend venster van zeven dagen,
+- _{{drink_days_setting}}_: de weeklimiet aan drinkdagen, eveneens geteld
+  over een voortschrijdend venster van zeven dagen.
+
+De derde waarde begrenst niet de hoeveelheid maar de frequentie. Stel je vier
+drinkdagen in en heb je op drie van de zes voorgaande dagen gedronken, dan
+laat het scherm _{{today}}_ zien dat het eerste drankje de vierde drinkdag
+opgebruikt, terwijl een tweede drankje op dezelfde dag er geen extra kost.
+
+Wil je een idee krijgen van welke getallen redelijk zijn, kijk dan naar wat
+de gezondheidsdiensten van verschillende landen aanbevelen. Die lopen sterk
+uiteen;
+[Wikipedia](https://en.wikipedia.org/wiki/Alcohol_consumption_recommendations#Recommended_alcohol_intake_limitations_by_country)
+verzamelt ze.
+
+### Je lichaamsgewicht
+
+Onder _{{personal_data}}_ staat het _{{body_weight}}_, en dat is optioneel.
+Zolang er niets is ingevuld staat daar alleen de knop die een waarde
+aanmaakt; daarna kun je die stap voor stap hoger of lager zetten, en een
+tweede knop haalt de waarde weer weg. De app werkt volledig zonder
+lichaamsgewicht, alleen het geschatte bloedalcoholgehalte op het scherm
+_{{today}}_ wordt dan _niet_ getoond, omdat de grondslag voor de berekening
+ontbreekt.
+
+### Wanneer je dag begint
+
+Onder _{{statistics}}_ staat _{{day_starts_at}}_, ingesteld op vier uur ’s
+ochtends. Deze instelling bepaalt bij welke dag een drankje hoort: drink je
+om een uur ’s nachts nog een glas, dan komt dat op de avond ervoor terecht,
+waar het hoort. Die daggrens geldt overal in de app, in de kalender net zo
+goed als in de statistieken en in de exports.
+
+Op dezelfde plek staat de regel _{{stats_from_label}}_. Die datum is de
+ondergrens onder elke analyse: invoer van daarvoor wordt in elk cijfer
+genegeerd. Zo trek je op 1 januari een schone streep voor een goed voornemen
+zonder kwijt te raken wat je tot dan toe hebt genoteerd. Bij een verse
+installatie staat de datum op de dag van de installatie. Dat klopt meestal,
+maar het kan verwarren wanneer je een back-up met oudere gegevens importeert:
+de oude invoer staat er wel, en telt nergens mee. De knop
+_{{stats_from_clear}}_ haalt de ondergrens weer weg.
+
+## Het scherm Vandaag
+
+Boven de drankenlijst staat een overzicht dat na elke invoer en met het
+verstrijken van de tijd wordt bijgewerkt. Van boven naar beneden:
+
+Twee grote getallen staan {{#android}}naast elkaar:
+links{{/android}}{{#ios}}onder elkaar:{{/ios}} de duur van de huidige
+onthouding in dagen, of de pure alcohol die vandaag is genoteerd in gram,
+{{#android}}rechts{{/android}}{{#ios}}daaronder{{/ios}}, onder “Ø”, het
+gemiddelde van de lopende maand in gram per dag. Een groene of rode trendpijl
+ernaast vergelijkt dat getal met de maand ervoor.
+
+Drie hoeveelheidsbalken: de eerste toont wat je vandaag hebt gedronken tegen
+de daglimiet die je hebt ingesteld, de tweede de som van vandaag en de zes
+voorgaande dagen tegen de zevendaagse limiet die je hebt ingesteld, de derde
+het aantal drinkdagen van vandaag en de zes voorgaande dagen tegen de limiet
+die je hebt ingesteld. Alle drie tonen een getal en een balk.
+
+Het geschatte bloedalcoholgehalte verschijnt alleen als er een
+lichaamsgewicht is ingevuld, en alleen zolang er rekenkundig nog alcohol in
+je bloed zit. Het is een schatting, en die vertelt je niet of je nog mag
+rijden.
+
+Daaronder staat de lijst met dranken die op de huidige dag zijn genoteerd.
+
+## Een drankje noteren
+
+Een drankje noteren kan op meer dan één plek. Het scherm _{{today}}_ biedt de
+eerste mogelijkheid, de schermen _{{calendar}}_ en _{{drinks}}_ bieden er nog
+twee. {{#android}}Rechtsonder{{/android}}{{#ios}}Rechtsboven{{/ios}} op het
+scherm _{{today}}_ zit de plusknop; die opent het invoervenster.
+
+### Het invoervenster
+
+Bovenaan staat de regel _{{drink}}_ met de keuze uit de catalogus; is er maar
+één drank vastgelegd, dan staat daar de naam zonder iets te kiezen. Daaronder
+staan drie velden:
+
+- de gedronken hoeveelheid, in milliliter. Van 1 tot 5.000 ml; het veld
+  begint op de gebruikelijke portie van de gekozen drank.
+- het tijdstip, ingesteld op nu. Aan te passen wanneer je iets achteraf
+  noteert.
+- desgewenst een notitie, een vrije opmerking over de gelegenheid of het
+  gezelschap.
+
+Het alcoholpercentage hoort bij de drank en valt hier niet afwijkend in te
+vullen. Is dezelfde soort op een avond duidelijk sterker, geef die dan een
+eigen plaats in de catalogus.
+
+Zodra de hoeveelheid binnen het toegestane bereik ligt, staat onder de
+velden{{#ios}}, op de regel _{{alcohol_content}}_,{{/ios}} hoeveel gram pure
+alcohol de invoer oplevert. Met dat getal rekent Libellus Potionis, niet met
+de milliliters.
+
+Naast het alcoholpercentage zit een gekleurde statusstip. Die zegt hoeveel
+porties van de gekozen drank er dezelfde dag nog binnen de drie limieten
+passen: groen zolang er nog minstens twee mogelijk zijn, geel zolang er
+precies één past, rood wanneer de volgende een of meer van de gestelde
+limieten zou doorbreken. Kun je rood en groen moeilijk uit elkaar houden, zet
+dan _{{alt_status_symbols}}_ aan onder _{{appearance}}_ in _{{settings}}_;
+dan draagt de gekleurde stip ook een bijpassende vorm.
+
+{{#ios}}Het venster sluit je met een van de twee knoppen bovenaan. Zodra je
+iets hebt ingevuld sluit een veeg naar beneden het niet meer, zodat een halve
+invoer niet per ongeluk verdwijnt.{{/ios}}
+
+### Snelknoppen voor dranken die je vaak noteert
+
+Dranken die in de catalogus als favoriet zijn gemarkeerd, verschijnen op het
+scherm _{{today}}_ als een rij knoppen boven de daglijst. Eén tik noteert de
+drank met de gebruikelijke portie, zonder venster ertussen. Voor het biertje
+na het werk dat altijd hetzelfde biertje is, is dit de kortste weg.
+
+### Een invoer corrigeren of verwijderen
+
+Een tik op {{#android}}het potloodpictogram van een
+invoer{{/android}}{{#ios}}een invoer{{/ios}} in de daglijst opent die als
+_{{edit_entry}}_: dezelfde velden als bij het noteren, en dezelfde grenzen.
+{{#android}}Het prullenbakpictogram haalt de invoer weg, en de app vraagt
+eenmaal na,{{/android}}{{#ios}}Voor het verwijderen veeg je de regel naar
+links, of tik je in de bewerkmodus rechtsboven op het rode teken van de
+regel. Beide wegen leiden naar _{{delete}}_ en dezelfde vraag,{{/ios}} want
+een per ongeluk verwijderde invoer is niet terug te halen.
+
+## De kalender
+
+Het scherm _{{calendar}}_ laat zien wat is geweest. De schakelaar tussen de
+maandweergave en de jaarheatmap zit
+{{#android}}rechtsboven{{/android}}{{#ios}}linksboven{{/ios}}.
+
+### De maandweergave
+
+De maandweergave toont een gewoon maandrooster en is de weergave waarin je
+begint. Boven het rooster staat de maand, met aan weerszijden een pijl om te
+bladeren. Dagen met invoer dragen een stip: een blauwe voor een drinkdag
+onder de limieten, een rode voor een drinkdag die een limiet heeft
+doorbroken. Dagen zonder invoer dragen geen stip.
+
+Een tik selecteert de dag en zet de invoer van die dag eronder. Daar is die
+net zo te bewerken en te verwijderen als de huidige dag op het scherm
+_{{today}}_, en de plusknop
+{{#android}}rechtsonder{{/android}}{{#ios}}rechtsboven{{/ios}}, die pas
+verschijnt zodra er een dag is geselecteerd, noteert op de geselecteerde dag.
+Zo haal je in wat je tijdens het drinken niet hebt vastgelegd.
+
+### De jaarweergave
+
+De jaarweergave kies je met de knop
+{{#android}}rechtsboven{{/android}}{{#ios}}linksboven{{/ios}}. Ze toont de
+twaalf maanden van een jaar als heatmap, een rooster van kleine vierkanten,
+één per dag. Boven het rooster staat het jaartal, met aan weerszijden een
+pijl om van jaar te wisselen. De legenda eronder noemt de drie toestanden:
+{{year_calendar_no_entry}}, {{year_calendar_under_limit}},
+{{year_calendar_over_limit}}. De huidige dag draagt een ring. Een tik op een
+maand opent de maandweergave ervan.
+
+## De balans opmaken: de statistieken
+
+Het scherm _{{statistics}}_ analyseert. Bovenaan kies je de lengte van de
+periode: _{{week}}_, _{{month}}_ of _{{year}}_. Alles daaronder volgt die
+keuze. _{{week}}_ betekent altijd een voortschrijdend venster van zeven
+dagen, bestaande uit vandaag en de zes dagen ervoor. Elke berekening negeert
+invoer van vóór de datum _{{stats_from_label}}_ in _{{settings}}_. Is er in
+de gekozen periode geen invoer, dan {{#android}}staat er in de grafieken
+“{{no_data}}”{{/android}}{{#ios}}blijven de secties staan en tonen ze
+nullen{{/ios}}.
+
+### Terug in de tijd
+
+Onder de periodeknoppen staat het getoonde tijdvak uitgeschreven als een
+exact datumbereik. De lopende maand eindigt vandaag en niet aan het eind van
+de maand, en is er een _{{stats_from_label}}_ ingesteld, dan begint het
+bereik daar. Er staat dus precies wat de cijfers eronder beslaan. Aan
+weerszijden zit een pijl. De linker gaat een periode terug, de rechter weer
+richting het heden.
+
+Alles op dit scherm volgt de gekozen periode, zowel de cijfers als de
+grafieken. _{{trend_vs_prev}}_ vergelijkt altijd met de periode van dezelfde
+lengte er direct voor, maart dus met februari.
+
+### De cijfers
+
+- _{{total_period}}_: gram pure alcohol in de gekozen periode.
+- _{{avg_per_day}}_: het gemiddelde over alle kalenderdagen.
+- _{{avg_per_drink_day}}_: het gemiddelde over de drinkdagen. Een groot
+  verschil met het vorige cijfer wijst op drinken dat zelden gebeurt maar dan
+  zwaar is.
+- _{{days_over_daily_limit}}_: het aantal dagen waarop de daglimiet is
+  overschreden.
+- _{{days_over_weekly_limit}}_: het aantal drinkdagen waarop die dag en de
+  zes ervoor samen boven de zevendaagse limiet uitkwamen.
+- _{{days_over_drink_day_limit}}_: drinkdagen die binnen hun venster van
+  zeven dagen boven de limiet aan drinkdagen lagen, bijvoorbeeld de vijfde
+  drinkdag in zeven wanneer er maar vier zijn toegestaan.
+- _{{abstinent_days}}_: dagen in de periode zonder invoer.
+- _{{current_streak}}_: telt de dagen sinds het laatste drankje.
+- _{{longest_streak}}_: de langste aaneengesloten tijd zonder alcohol in de
+  periode.
+- _{{trend_vs_prev}}_: toont de trend tegenover de periode ervoor.
+
+### De grafieken
+
+Vier grafieken vullen de cijfers aan, de eerste over het verloop, de andere
+over het patroon:
+
+- De eerste staafgrafiek volgt je gebruik over de gekozen periode: het
+  gekozen venster van zeven dagen, de gekozen maand, of het gemiddelde per
+  dag voor elke maand van het gekozen jaar.
+- _{{stats_time_of_day}}_ deelt de dag in acht vakken van drie uur en geeft
+  voor elk het gemiddelde in gram per dag. Hier zie je of er ’s avonds wordt
+  gedronken of over de dag verspreid. Deze sectie verschijnt alleen als er in
+  de gekozen periode iets is gedronken.
+- _{{stats_weekday}}_ geeft het gemiddelde per dag van de week.
+- _{{stats_category_breakdown}}_ toont als ring hoe je gebruik zich over de
+  zes drankcategorieën verdeelt.
+
+## De drankencatalogus
+
+Het scherm _{{drinks}}_ beheert de dranken waaruit je bij het noteren kiest.
+De app wordt geleverd met een selectie gangbare dranken; die zijn te
+wijzigen, aan te vullen en te verwijderen.
+
+Elke regel toont de naam, een categoriesymbool, de portie, het
+alcoholpercentage en het aantal gram pure alcohol dat daaruit volgt, met
+daarvóór de favorietenster en de statusstip voor die portie{{#android}}, en
+daarachter een bewerk- en een verwijderpictogram{{/android}}. De ster zet de
+favorietstatus om: favorieten verschijnen in de snelknoppen op het scherm
+_{{today}}_.
+
+{{#android}}Een tik op de regel (niet op de pictogrammen) opent het
+invoervenster met die drank; dat is de derde weg om te noteren, naast de
+plusknoppen op de schermen _{{today}}_ en _{{calendar}}_. De twee
+pictogrammen rechts openen de editor en de
+verwijdervraag.{{/android}}{{#ios}}Een tik op de regel opent het
+invoervenster met die drank; dat is de derde weg om te noteren, naast de
+plusknoppen op de schermen _{{today}}_ en _{{calendar}}_. Wijzigen en
+verwijderen horen bij de bewerkmodus, die je rechtsboven aanzet: daar opent
+dezelfde tik de editor, en het rode teken van de regel leidt naar de
+verwijdervraag. Een veeg naar links biedt beide handelingen eveneens aan, in
+de bewerkmodus en daarbuiten.{{/ios}}
+
+### Een drank toevoegen of wijzigen
+
+De plusknop opent _{{add_drink}}_, {{#android}}het potloodpictogram van een
+regel{{/android}}{{#ios}}een tik in de bewerkmodus{{/ios}} opent
+_{{edit_drink}}_. Beide vensters vragen hetzelfde:
+
+- _{{drink_name}}_: naar eigen keuze, tot 100 tekens.
+- _{{volume_ml}}_: de gebruikelijke portie, waarmee het invoervenster begint.
+  Van 1 tot 5.000 milliliter.
+- _{{alcohol_percent}}_: het gebruikelijke alcoholpercentage, van 0 tot 100
+  procent.
+- _{{category}}_: een van zes categorieën: {{category_beer}},
+  {{category_wine}}, {{category_spirits}}, {{category_longdrink}},
+  {{category_liqueur}} of {{category_other}}. De categorie verandert niets
+  aan de berekening; ze groepeert de verdeling op het scherm
+  _{{statistics}}_.
+
+### Waarom sommige dranken zich niet laten verwijderen
+
+Een drank is niet te verwijderen zolang er in je logboek invoer naar die
+drank verwijst; de app zegt dan hoeveel. De reden is dat die invoer anders
+kwijtraakt waar ze naar verwijst, waardoor de statistieken onvolledig worden.
+
+## Gegevens exporteren
+
+### Het PDF-rapport
+
+Op het scherm _{{statistics}}_ maakt de knop _{{export_pdf}}_ een rapport van
+twee pagina’s als _Portable Document Format (PDF)_-bestand: de kerncijfers,
+een tabel per maand, de langetermijntrend, het patroon per categorie,
+tijdstip en dag van de week, en een sectie over risicovol drinken en
+onthouding. De opmaak is geschikt voor een gesprek bij de verslavingszorg.
+
+Het rapport beslaat precies de gekozen periode: exporteer je juli nadat je op
+elf dagen hebt gedronken, dan krijg je een rapport over eenendertig dagen,
+met twintig onthoudingsdagen en een daggemiddelde dat door eenendertig deelt.
+De maandtabel voert elke maand van de periode op, ook een maand zonder ook
+maar één invoer. Daardoor stemmen de cijfers van het rapport overeen met die
+van het scherm _{{statistics}}_. Eindigt de gekozen periode vandaag, dan
+eindigt het rapport op gisteren zolang er vandaag niets is genoteerd: een
+aangebroken dag zou het gemiddelde omlaag trekken en als onthoudingsdag
+tellen voordat hij voorbij is.
+
+Voor het PDF-rapport opent {{#android}}het afdrukvenster van het systeem, van
+waaruit je het kunt afdrukken of als bestand kunt
+bewaren.{{/android}}{{#ios}}de bestandskiezer van het systeem, waarin je
+bepaalt waar het bestand terechtkomt: in Bestanden, in cloudopslag of in een
+andere app.{{/ios}}
+
+### De CSV-export
+
+De knop _{{export_csv}}_ op het scherm _{{statistics}}_ schrijft een tabel
+met één regel per invoer, klaar voor een spreadsheetprogramma zoals
+[LibreOffice Calc](https://www.libreoffice.org/). Getallen staan er
+machineleesbaar met een decimale punt, in welke taal de app ook staat.
+
+{{#android}}Het CSV-bestand belandt in de map Downloads, en de app biedt
+daarna aan het te delen.{{/android}}{{#ios}}Ook voor het CSV-bestand opent de
+bestandskiezer van het systeem, waarin je bepaalt waar het bestand
+terechtkomt: in Bestanden, in cloudopslag of in een andere app.{{/ios}}
+
+### De JSON-export – back-ups
+
+**Gegevens die je vastlegt verlaten dit apparaat niet zonder dat je daar zelf
+iets voor doet.** {{#android}}Libellus Potionis doet niet mee aan
+automatische cloudback-ups en niet aan overdracht van apparaat naar apparaat.
+**Wissel je van apparaat, na een fabrieksreset of een herinstallatie, dan is
+een back-up die je zelf hebt gemaakt de enige manier om je gegevens te
+houden.** Wat niet is geëxporteerd is dan weg.{{/android}}{{#ios}}Libellus
+Potionis houdt zijn gegevens buiten elke apparaatback-up, zowel die in iCloud
+als die op een computer; de schakelaar _{{device_backup}}_ onder
+_{{settings}}_ keert dat om (zie “Toegang en zichtbaarheid”). Zolang die uit
+staat, is een back-up die je zelf hebt gemaakt de enige manier om je gegevens
+te houden wanneer je van apparaat wisselt, na een fabrieksreset of een
+herinstallatie.{{/ios}}
+
+Een back-up is één JSON-bestand. De schakelaar _{{backup_include_settings}}_
+bepaalt of naast de drankencatalogus en de invoer ook de instellingen worden
+meegeschreven. Elke keer dat je de instellingen opent staat die optie weer
+aan. Zo verhuizen de gegevens naar een nieuw apparaat:
+
+1. Kies op het oude apparaat _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_export}}_. Bewaar het bestand op een veilige plek, bijvoorbeeld
+   in een [Signal](https://signal.org/)-notitie aan jezelf.
+2. Installeer Libellus Potionis op het nieuwe apparaat.
+3. Herstel daar de gegevens via _{{settings}}_ → _{{backup_section}}_ →
+   _{{backup_import}}_.
+
+Bij het importeren vraagt de app hoe ze te werk moet gaan.
+_{{import_replace}}_ gooit weg wat op het apparaat staat: de
+drankencatalogus, de invoer en de instellingen, voor zover de back-up die
+bevat. _{{import_merge}}_ verwijdert geen bestaande drankdefinities en geen
+invoer, en vult aan wat ontbreekt. Invoer die er al is wordt niet verdubbeld,
+en de huidige instellingen worden niet overschreven.
+
+## Overige instellingen
+
+### Toegang en zichtbaarheid
+
+Onder _{{security}}_ staan {{#android}}twee{{/android}}{{#ios}}drie{{/ios}}
+schakelaars:
+
+- _{{biometric_lock}}_ vraagt bij elke opening van de app om {{#android}}een
+  vingerafdruk, een gezicht of de schermvergrendeling van het
+  apparaat.{{/android}}{{#ios}}Face ID, Touch ID of de toegangscode van het
+  apparaat.{{/ios}} Het slot aan- of uitzetten vraagt dezelfde authenticatie.
+  Het geldt ook wanneer je de app verlaat en terugkeert, alleen niet bij een
+  terugkeer binnen dertig seconden. Het menu rechtsboven draagt ook
+  _{{lock_app}}_, waarmee de app op slag wordt vergrendeld.
+- _{{allow_screenshots}}_ staat standaard uit. Zolang
+  {{#android}}schermafbeeldingen uit staan, is er van het app-venster geen
+  schermafbeelding te maken en blijft de inhoud afgedekt in het overzicht van
+  recent gebruikte apps.{{/android}}{{#ios}}de schakelaar uit staat, blijft
+  de inhoud afgedekt in de app-wisselaar.{{/ios}} Wie je ontgrendelde
+  apparaat oppakt en door de open apps bladert, ziet daar niets. {{#ios}}Een
+  schermafbeelding verhinderen ligt buiten het bereik van de iOS-app; iOS
+  biedt daar geen voorziening voor.{{/ios}}
+{{#ios}}- _{{device_backup}}_ staat eveneens standaard uit. Zolang de
+schakelaar uit staat, blijven de gegevens van de app buiten elke
+apparaatback-up, zowel die in iCloud als die op een computer. Zet je hem aan,
+dan overleven de gegevens het herstellen van een apparaat uit zijn back-up,
+maar dan staan ze ook waar die back-up staat.{{/ios}}
+
+### Weergave en taal
+
+Onder _{{appearance}}_ valt drieërlei in te stellen:
+
+- _{{theme_mode}}_: {{theme_system}}, of {{theme_day}} of {{theme_night}} los
+  van de systeeminstelling.
+- _{{language}}_: de taal van de app, eveneens los van het systeem.
+  “{{language_system}}” volgt weer de systeemtaal.
+- _{{alt_status_symbols}}_ geeft de statusstippen naast een kleur ook een
+  vorm. Zo blijven de drie toestanden uit elkaar te houden wanneer rood, geel
+  en groen moeilijk te onderscheiden zijn.
+
+## Hoe er gerekend wordt
+
+### Van milliliter naar gram
+
+Elke invoer wordt bij het opslaan omgerekend naar gram pure alcohol:
+
+**gram = milliliter × alcoholpercentage × 0,789**
+
+0,789 is de dichtheid van ethanol in gram per milliliter. Een halve liter
+bier van 5 % komt dus op 500 ml × 0,05 × 0,789 g/ml, ongeveer 19,7 g. Elke
+limiet, elke statistiek en elke export werkt met dat getal, nooit met
+milliliters. Alleen zo zijn een bier en een glas wijn met elkaar te
+vergelijken.
+
+### De schatting van het bloedalcoholgehalte
+
+Is er een lichaamsgewicht ingevuld, dan schat Libellus Potionis de
+bloedalcoholconcentratie met de [formule van
+Widmark](https://en.wikipedia.org/wiki/Blood_alcohol_content):
+
+**BAC [‰] = A / (P × r) − β × t**
+
+A is de pure alcohol in gram, P het lichaamsgewicht in kilogram, r de
+verdelingscoëfficiënt, β de afbraaksnelheid van ongeveer 0,15 ‰ per uur en t
+het aantal uren sinds het eerste drankje.
+
+De app legt je geslacht niet vast en rekent daarom bewust aan de voorzichtige
+kant: r ligt vast op 0,6, de kleinste van de twee klassieke coëfficiënten.
+Een kleinere r verdeelt dezelfde alcohol over een kleiner volume en levert
+dus de hoogste van de twee waarden op: de schatting hoort eerder te hoog dan
+te laag uit te vallen. De afbraaksnelheid is daarentegen een gemiddelde;
+individueel ligt die ergens tussen 0,10 en 0,20 ‰ per uur. Breek je alcohol
+langzaam af, dan zit je boven de getoonde waarde.
+
+Wat eruit komt is een model, geen meting. Het vervangt geen blaastest, en het
+kan je niet vertellen of je nog mag rijden.
+
+### De logische dag
+
+Een drankje hoort bij de dag die om _{{day_starts_at}}_ is begonnen, niet bij
+de dag die de klok aanwijst. Met de standaardwaarde van vier uur ’s ochtends
+telt een glas om half twee nog voor de dag ervoor. De regel geldt in de hele
+app, en ook over de omschakeling tussen zomer- en wintertijd heen.
+
+### De voortschrijdende week
+
+De zevendaagse limiet en de drinkdagen slaan niet op een kalenderweek maar op
+vandaag en de zes dagen ervoor. Het venster schuift dus dag na dag mee. Een
+zware zaterdag blijft in beeld tot hij zes dagen oud is, en valt er de
+zaterdag daarna uit.

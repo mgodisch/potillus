@@ -80,6 +80,8 @@ Edit drinks from the list's edit mode
 - The roadmap carries the open work only.
 - The roadmap's iOS notes describe the year heat-map the app ships.
 - The `json` gem is at 2.21.2 in `fastlane/Gemfile.lock`.
+- Every makefile deletes a target whose recipe stops with an error.
+- The iOS guide fragment lists the renderer among its prerequisites.
 - The calendar opens on the current month, with no day selected.
 - The bottom bar is the only way between the four main screens.
 - The statistics window can name a period before the current one.
@@ -87,16 +89,10 @@ Edit drinks from the list's edit mode
   the list surface.
 - Two arrows on the statistics screen move to another period, each a tinted
   tap target that dims at the edge.
-- The users guides describe every screen, switch, gesture and route between
-  screens on both platforms.
-- Every guide token maps to a label the app shows.
-- One template per language feeds both platforms, with `{{#android}}` and
-  `{{#ios}}` blocks.
+- Update all users guides.
 - `render-guide.py --platform` renders Android and iOS from `docs/guide/`,
   called that way by Gradle and by both Makefiles.
 - Platform blocks sit on their own lines or inside a sentence.
-- The English renders live as `docs/guide/usersguide.android.md` and
-  `usersguide.ios.md`.
 - A row tap in the drinks list's edit mode opens the editor.
 - The toolbar's edit toggle shows a pencil and a checkmark.
 - `push-gitlab` creates the release before it signs and uploads.
@@ -117,10 +113,6 @@ Edit drinks from the list's edit mode
 - The About screen's License card links to the source repository.
 - The roadmap carries an opt-in Android palette on iOS and a guided tour.
 - The store descriptions carry the reworked text in all 21 locales.
-- The user's guide states the Widmark formula and its conservative
-  distribution coefficient.
-- Twelve guide locales carry the Widmark link and the master's closing
-  sentence.
 - The roadmap carries Hebrew as the first right-to-left language.
 - `SupportedLocales` names the places an RTL language reaches beyond layout
   mirroring.
@@ -210,7 +202,6 @@ Edit drinks from the list's edit mode
 - Shared vectors pin the year heat-map's drawing window on both platforms.
 - `check-l10n-parity` compares strings that carry format specifiers.
 - App text, report labels and the guide token map spell the apostrophe as `’`.
-- Each user guide quotes and elides in the typography of its language.
 - Store listings follow the same typography.
 - The blood-alcohol estimate spans the day boundary and carries one decimal.
 - A backup entry's grams are checked against its volume and ABV.
@@ -248,8 +239,6 @@ Edit drinks from the list's edit mode
 - The iOS deployment target carries its reasoning in `ios/project.yml`.
 - The install guides state each tool's purpose once.
 - The test-vector index is one line per file, and lists `year-grid.json`.
-- The English user's guide follows the German original in structure and wording.
-- Guide lists name their subject with a colon, and interface labels read italic.
 - A calendar entry carries the instant of the day it was booked onto.
 - The entry sheet opens on the drink whose row was written last.
 
@@ -293,8 +282,8 @@ Edit drinks from the list's edit mode
 - The coverage exclusions name the JVM tests that reach the excluded code.
 - The README's platform floor is compared paragraph by paragraph, not line by
   line.
-- The German guide's lock condition, its third way to log a drink, and its
-  chart count.
+- An empty guide dependency fragment is dropped and rebuilt.
+- `make guides` stops with an error when the fragment carries no rules.
 
 ---
 
