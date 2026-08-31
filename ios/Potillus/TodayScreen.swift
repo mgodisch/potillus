@@ -50,8 +50,13 @@ struct TodayScreen: View {
     /// Owned by the view, rebuilt only when the environment changes.
     @State private var model: TodayModel
 
-    /// Set while the entry sheet is open.
-    @State private var isLogging = false
+    /// The drink the log sheet opens on, and with it the sheet's own presence:
+    /// non-nil while the sheet is up. A Bool would keep the sheet at one fixed
+    /// place in the view tree, where its `@State` outlives every presentation --
+    /// the first sheet's pre-selection then came back on every later tap, whatever
+    /// had been logged since. Keying the presentation on the drink gives each
+    /// tap its own sheet, the way the drinks catalogue already presents this one.
+    @State private var logging: DrinkDefinition?
 
     /// The entry being edited, if any — drives the edit sheet, as on the calendar.
     @State private var editingEntry: ConsumptionEntry?
@@ -97,7 +102,7 @@ struct TodayScreen: View {
                 // floating action button. Same action, native placement.
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        isLogging = true
+                        logging = model.state.preselectionForLogging
                     } label: {
                         // "Add Entry", the wording Android's button, its calendar
                         // twin and the entry dialog all carry. The sheet's own
@@ -145,11 +150,14 @@ struct TodayScreen: View {
                 if phase == .active { Task { await model.load() } }
             }
             .refreshable { await model.load() }
-            .sheet(isPresented: $isLogging) {
+            .sheet(item: $logging) { preselected in
                 EntrySheet(
                     drinks: model.state.drinks,
-                    // People tend to repeat what they just had.
-                    preselected: model.state.lastUsedDrink,
+                    // People tend to repeat what they just had. The drink comes
+                    // from the tap that opened the sheet, not from the state at
+                    // redraw time, so what the button decided is what the sheet
+                    // shows.
+                    preselected: preselected,
                     now: Date(),
                     // The Today model already holds the day's totals and limits,
                     // so the log sheet gets the capacity dot too, as on Android.

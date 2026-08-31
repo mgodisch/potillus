@@ -109,6 +109,19 @@ public struct TodayState: Sendable, Equatable {
     /// Nil when nothing has ever been logged.
     public var lastUsedDrink: DrinkDefinition?
 
+    /// What the log sheet should open on: the drink just logged, or the first of
+    /// the catalogue while there is no history yet. Nil only for an empty
+    /// catalogue, where the button that opens the sheet is disabled anyway.
+    ///
+    /// It lives here rather than in the view for two reasons. Android decides
+    /// the same fallback in its `TodayViewModel`, so the two platforms answer
+    /// the question in the same layer. And the view had no test that could hold
+    /// it: the sheet used to derive the fallback in its own initialiser, where a
+    /// stale value survived every later presentation and no test could see it.
+    public var preselectionForLogging: DrinkDefinition? {
+        lastUsedDrink ?? drinks.first
+    }
+
     public var settings: AppSettings = AppSettings()
 
     public init() {}

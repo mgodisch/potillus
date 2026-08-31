@@ -189,7 +189,34 @@ final class EntryLoggerTests: XCTestCase {
         await model.load()
 
         XCTAssertEqual(model.state.lastUsedDrink?.name, "Wine")
+        XCTAssertEqual(
+            model.state.preselectionForLogging?.name, "Wine",
+            "the sheet opens on what was logged last, not on the head of the catalogue"
+        )
         XCTAssertEqual(model.state.drinks.count, 2, "the sheet can pick from the whole catalogue")
+    }
+
+    /// The fallback the log sheet used to derive on its own: with nothing logged
+    /// yet there is nothing to repeat, so the head of the catalogue stands in.
+    /// The catalogue orders favourites first and the rest by name, so that head
+    /// is "Aperol Spritz" here, not the drink added first.
+    func testAnUnusedCatalogueFallsBackToItsFirstDrink() async throws {
+        _ = try environment.drinks.add(
+            DrinkDefinition(name: "Aperol Spritz", volumeMl: 180, alcoholPercent: 11)
+        )
+        _ = try environment.drinks.add(
+            DrinkDefinition(name: "Ouzo", volumeMl: 40, alcoholPercent: 38)
+        )
+
+        let model = TodayModel(
+            entries: environment.entries, drinks: environment.drinks,
+            preferences: environment.preferences,
+            clock: FixedClock(millis: evening), timeZone: utc
+        )
+        await model.load()
+
+        XCTAssertNil(model.state.lastUsedDrink)
+        XCTAssertEqual(model.state.preselectionForLogging?.name, "Aperol Spritz")
     }
 
     func testAnEmptyLogHasNoPreselection() async throws {
@@ -200,6 +227,10 @@ final class EntryLoggerTests: XCTestCase {
         )
         await model.load()
         XCTAssertNil(model.state.lastUsedDrink)
+        XCTAssertNil(
+            model.state.preselectionForLogging,
+            "nothing to log from, which is why the button that opens the sheet is disabled"
+        )
     }
 
     // ── The observable wrapper ───────────────────────────────────────────────
