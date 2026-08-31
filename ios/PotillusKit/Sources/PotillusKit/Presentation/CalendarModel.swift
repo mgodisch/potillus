@@ -474,23 +474,34 @@ public final class CalendarModel {
     /// - Parameters:
     ///   - drink:           The catalogue drink consumed.
     ///   - volumeMl:        Serving volume in millilitres.
-    ///   - timestampMillis: The instant, as the sheet returned it — it defaults to
-    ///     the moment of typing and the user may adjust it. Taken from the caller
-    ///     rather than read off `clock` here, exactly as Android's
-    ///     `CalendarViewModel.addEntry` takes it from its dialog.
+    ///   - timestampMillis: The instant, as the sheet returned it. Only its
+    ///     wall-clock TIME is used; the date part is the day the sheet was opened
+    ///     on and is replaced by the selected day, see below.
     ///   - note:            Optional free text.
     public func addEntry(
         drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64, note: String = ""
     ) async {
         guard let date = state.selectedDate else { return }
         // Loaded, not read off `state`: CalendarState carries no settings, unlike
-        // TodayState. They are needed only to satisfy `makeEntry`'s signature here
-        // — the day-change fields it would read are bypassed by `logicalDate`.
+        // TodayState. The day-change fields are read here, not just passed on: the
+        // instant below is built from them.
         let settings = await preferences.load()
+
+        // The sheet hands back TODAY at the chosen time, because its picker offers
+        // hours and minutes only. Storing that verbatim gave an entry logged for a
+        // past evening today's instant while its logicalDate said otherwise — the
+        // two facts contradicted each other, and everything reading the instant
+        // (the blood-alcohol estimate, the "most recent entry") believed the wrong
+        // one. The time is kept, the day is the one the user selected.
+        let onSelectedDay = DayResolver.instant(
+            logicalDate: date, matchingTimeOf: timestampMillis,
+            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
+            timeZone: timeZone) ?? timestampMillis
+
         let entry = EntryLogger.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: timestampMillis,
+            timestampMillis: onSelectedDay,
             note: note,
             settings: settings,
             timeZone: timeZone,

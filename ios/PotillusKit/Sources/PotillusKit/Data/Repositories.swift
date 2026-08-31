@@ -109,8 +109,14 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// disagree about what a day's total is.
     func dailySummaries(from: String, to: String) throws -> [DaySummary]
 
-    /// The most recently logged entry, by timestamp, or nil when the log is empty.
-    /// Drives the pre-selected drink in the entry sheet.
+    /// The entry written last, or nil when the log is empty. Drives the
+    /// pre-selected drink in the entry sheet.
+    ///
+    /// By row id, not by timestamp. The two differ for anything logged onto
+    /// another day: the sheet's picker offers a time, and an entry made for last
+    /// Friday evening carries that evening's instant. Ordering by timestamp then
+    /// answers "which drink was consumed latest", which is not what the question
+    /// is — the sheet wants to offer what the user reached for a moment ago.
     func lastEntry() throws -> ConsumptionEntry?
 
     /// Every logical date on which anything was logged, ascending and distinct.
@@ -380,7 +386,7 @@ public struct EntryRepository: EntryRepositoryProtocol {
 
     public func lastEntry() throws -> ConsumptionEntry? {
         try database.read { db in
-            try Entry.order(Column("timestampMillis").desc).fetchOne(db)?.domain
+            try Entry.order(Column("id").desc).fetchOne(db)?.domain
         }
     }
 

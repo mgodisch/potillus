@@ -45,6 +45,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.ZoneId
 import java.util.Locale
@@ -81,6 +82,67 @@ class DayResolverVectorTest {
                 actual,
             )
         }
+    }
+
+    // ── instantOnLogicalDate ─────────────────────────────────────────────────
+
+    @Test
+    fun `instantOnLogicalDate matches the shared vectors`() {
+        VECTORS.getJSONArray("instantOnLogicalDate").objects().forEach { case ->
+            val actual = DayResolver.instantOnLogicalDate(
+                logicalDate = case.getString("logicalDate"),
+                hour = case.getInt("hour"),
+                minute = case.getInt("minute"),
+                changeHour = case.getInt("changeHour"),
+                changeMinute = case.getInt("changeMinute"),
+                zoneId = ZoneId.of(case.getString("zoneId")),
+            )
+            assertEquals(
+                "instantOnLogicalDate: ${case.getString("description")}",
+                case.getLong("expected"),
+                actual,
+            )
+        }
+    }
+
+    /**
+     * [DayResolver.instantOnLogicalDate] and [DayResolver.resolve] are inverses:
+     * an instant built for a logical date must resolve back to it. This is the
+     * property the calendar relies on when it logs to a day other than today.
+     */
+    @Test
+    fun `instantOnLogicalDate round trips through resolve`() {
+        val berlin = ZoneId.of("Europe/Berlin")
+        listOf(20 to 0, 1 to 0, 4 to 0, 3 to 59, 23 to 30).forEach { (hour, minute) ->
+            val millis = DayResolver.instantOnLogicalDate(
+                logicalDate = "2026-08-30",
+                hour = hour,
+                minute = minute,
+                changeHour = 4,
+                changeMinute = 0,
+                zoneId = berlin,
+            )
+            assertEquals(
+                "round trip at $hour:$minute",
+                "2026-08-30",
+                DayResolver.resolve(millis!!, 4, 0, berlin),
+            )
+        }
+    }
+
+    /** A date the parser does not accept yields null rather than a guess. */
+    @Test
+    fun `instantOnLogicalDate rejects a non canonical date`() {
+        assertNull(
+            DayResolver.instantOnLogicalDate(
+                logicalDate = "2026-8-30",
+                hour = 20,
+                minute = 0,
+                changeHour = 4,
+                changeMinute = 0,
+                zoneId = ZoneId.of("Europe/Berlin"),
+            ),
+        )
     }
 
     /**

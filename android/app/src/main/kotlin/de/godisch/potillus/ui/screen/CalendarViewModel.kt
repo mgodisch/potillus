@@ -402,7 +402,20 @@ class CalendarViewModel(
                 }
                 today
             }
-            entryRepo.addFromDrinkWithDate(drink, volumeMl, timestampMillis, note, logicalDate)
+            // The dialog hands back TODAY at the chosen time, because its picker
+            // offers hours and minutes only. Storing that verbatim gave an entry
+            // logged for a past evening today's instant while its logicalDate said
+            // otherwise — the two facts contradicted each other, and everything
+            // reading the instant (the blood-alcohol estimate, the most recent
+            // entry) believed the wrong one. The time is kept, the day is the one
+            // the user selected.
+            val onSelectedDay = DayResolver.instantOnLogicalDate(
+                logicalDate = logicalDate,
+                timestampMillis = timestampMillis,
+                changeHour = settings.dayChangeHour,
+                changeMinute = settings.dayChangeMinute,
+            ) ?: timestampMillis
+            entryRepo.addFromDrinkWithDate(drink, volumeMl, onSelectedDay, note, logicalDate)
         }
     }
 

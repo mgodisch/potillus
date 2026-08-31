@@ -63,6 +63,8 @@ Edit drinks from the list's edit mode
   `make/publish.mk` together.
 - The release gate holds the install guides' tool versions and the README's
   platform floor to the build files.
+- The bundled-document renderer decodes the en dash and the middle dot.
+- `DayResolver` maps a logical date and a wall-clock time to an instant.
 
 ### Changed
 
@@ -246,6 +248,10 @@ Edit drinks from the list's edit mode
 - The iOS deployment target carries its reasoning in `ios/project.yml`.
 - The install guides state each tool's purpose once.
 - The test-vector index is one line per file, and lists `year-grid.json`.
+- The English user's guide follows the German original in structure and wording.
+- Guide lists name their subject with a colon, and interface labels read italic.
+- A calendar entry carries the instant of the day it was booked onto.
+- The entry sheet opens on the drink whose row was written last.
 
 ### Removed
 
@@ -287,6 +293,8 @@ Edit drinks from the list's edit mode
 - The coverage exclusions name the JVM tests that reach the excluded code.
 - The README's platform floor is compared paragraph by paragraph, not line by
   line.
+- The German guide's lock condition, its third way to log a drink, and its
+  chart count.
 
 ---
 

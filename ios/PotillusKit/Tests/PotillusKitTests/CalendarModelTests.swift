@@ -78,11 +78,17 @@ final class CalendarModelTests: XCTestCase {
         let stored = try environment.entries.all()
         XCTAssertEqual(stored.count, 1)
         XCTAssertEqual(stored[0].logicalDate, "2026-01-12", "the day the user picked")
+        // The TIME the user typed, on the DAY they picked. The sheet's picker
+        // offers hours and minutes, so the instant it hands over carries the date
+        // of the day it was opened on; keeping that verbatim filed a January-12
+        // entry under a January-15 instant, and everything reading the instant
+        // believed the latter.
         XCTAssertEqual(
-            stored[0].timestampMillis, midJanuary,
-            "the instant the user typed -- deliberately not the selected day"
+            stored[0].timestampMillis, 1_768_219_200_000,
+            "12:00 on the selected day, not 12:00 today"
         )
     }
+
 
     /// The selected day is honoured whatever the day-change boundary says: a
     /// calendar square is not subject to a 4 a.m. rollover.
@@ -100,6 +106,9 @@ final class CalendarModelTests: XCTestCase {
 
         let stored = try environment.entries.all()
         XCTAssertEqual(stored[0].logicalDate, "2026-01-12")
+        // 02:00 is before the boundary, so it is the small hours of the logical
+        // 12th and therefore lands on the calendar 13th.
+        XCTAssertEqual(stored[0].timestampMillis, 1_768_269_600_000)
     }
 
     func testAddingWithNoSelectionDoesNothing() async throws {

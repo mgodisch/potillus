@@ -88,6 +88,72 @@ object DayResolver {
     }
 
     /**
+     * The inverse of [resolve]: the instant a wall-clock time on a logical date
+     * falls on.
+     *
+     * A logical day runs from the day-change time to the next one, so a time
+     * BEFORE the boundary belongs to the following calendar day: with a 04:00
+     * boundary, 01:00 on the logical 30th is 01:00 on the calendar 31st. Reading
+     * the calendar day off the logical date alone is what put an entry logged for
+     * a past evening on today's clock.
+     *
+     * @param logicalDate  The logical day as "YYYY-MM-DD".
+     * @param hour         Wall-clock hour on that logical day (0–23).
+     * @param minute       Wall-clock minute (0–59).
+     * @param changeHour   Hour of the day-change boundary (0–23).
+     * @param changeMinute Minute of the day-change boundary (0–59).
+     * @param zoneId       Timezone the wall clock is read in.
+     * @return The instant in milliseconds, or null when [logicalDate] is not a
+     *   canonical date. A wall-clock time that does not exist in the zone (the
+     *   spring-forward gap) resolves to the instant the zone offers instead,
+     *   which is what `ZonedDateTime` does with a gap.
+     */
+    fun instantOnLogicalDate(
+        logicalDate: String,
+        hour: Int,
+        minute: Int,
+        changeHour: Int,
+        changeMinute: Int,
+        zoneId: ZoneId = ZoneId.systemDefault(),
+    ): Long? {
+        val day = try {
+            LocalDate.parse(logicalDate, DATE_FORMATTER)
+        } catch (_: DateTimeParseException) {
+            return null
+        }
+
+        val isBeforeChangeTime = hour < changeHour || (hour == changeHour && minute < changeMinute)
+        val calendarDay = if (isBeforeChangeTime) day.plusDays(1) else day
+
+        return calendarDay.atTime(hour, minute).atZone(zoneId).toInstant().toEpochMilli()
+    }
+
+    /**
+     * The same, taking the wall-clock time from an existing instant.
+     *
+     * The entry dialog offers hours and minutes only, so the instant it returns
+     * carries the date of the day it was opened on. The calendar needs the time
+     * off it and the day from elsewhere.
+     */
+    fun instantOnLogicalDate(
+        logicalDate: String,
+        timestampMillis: Long,
+        changeHour: Int,
+        changeMinute: Int,
+        zoneId: ZoneId = ZoneId.systemDefault(),
+    ): Long? {
+        val clockTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), zoneId)
+        return instantOnLogicalDate(
+            logicalDate = logicalDate,
+            hour = clockTime.hour,
+            minute = clockTime.minute,
+            changeHour = changeHour,
+            changeMinute = changeMinute,
+            zoneId = zoneId,
+        )
+    }
+
+    /**
      * Test-only override for the wall clock that [today] reads.
      *
      * PRODUCTION (the default, `null`): [today] reads the real device clock, so

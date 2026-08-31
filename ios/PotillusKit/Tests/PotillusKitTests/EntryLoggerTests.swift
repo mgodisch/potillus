@@ -219,6 +219,36 @@ final class EntryLoggerTests: XCTestCase {
         XCTAssertEqual(model.state.preselectionForLogging?.name, "Aperol Spritz")
     }
 
+    /// The regression this whole chain started from: an entry logged onto ANOTHER
+    /// day carries that day's instant, so ordering by timestamp hands back the
+    /// wrong row forever. The pre-selection follows the row written last.
+    func testAnEntryBackdatedAfterwardsDoesNotWinThePreselection() async throws {
+        let spritzId = try environment.drinks.add(
+            DrinkDefinition(name: "Aperol Spritz", volumeMl: 180, alcoholPercent: 9.25)
+        )
+        let ouzoId = try environment.drinks.add(
+            DrinkDefinition(name: "Ouzo", volumeMl: 40, alcoholPercent: 38)
+        )
+        let catalogue = try environment.drinks.allOnce()
+        let spritz = try XCTUnwrap(catalogue.first { $0.id == spritzId })
+        let ouzo = try XCTUnwrap(catalogue.first { $0.id == ouzoId })
+
+        let logger = makeLogger(at: evening)
+        // The spritz is written FIRST but stamped LATER: the shape a calendar
+        // entry for a past day used to take, and still takes for a future time.
+        _ = try await logger.log(drink: spritz, volumeMl: 180, timestampMillis: evening + 3_600_000)
+        _ = try await logger.log(drink: ouzo, volumeMl: 40, timestampMillis: evening)
+
+        let model = TodayModel(
+            entries: environment.entries, drinks: environment.drinks,
+            preferences: environment.preferences,
+            clock: FixedClock(millis: evening), timeZone: utc
+        )
+        await model.load()
+
+        XCTAssertEqual(model.state.preselectionForLogging?.name, "Ouzo")
+    }
+
     func testAnEmptyLogHasNoPreselection() async throws {
         let model = TodayModel(
             entries: environment.entries, drinks: environment.drinks,

@@ -150,6 +150,73 @@ public enum DayResolver {
         return formatDate(logical)
     }
 
+    /// The inverse of `resolve`: the instant a wall-clock time on a logical date
+    /// falls on.
+    ///
+    /// A logical day runs from the day-change time to the next one, so a time
+    /// BEFORE the boundary belongs to the following calendar day: with a 04:00
+    /// boundary, 01:00 on the logical 30th is 01:00 on the calendar 31st. Reading
+    /// the calendar day off the logical date alone is what put an entry logged
+    /// for a past evening on today's clock.
+    ///
+    /// - Returns: The instant in milliseconds, or nil if `logicalDate` is not a
+    ///   canonical `yyyy-MM-dd` day or the wall-clock time does not exist in the
+    ///   zone (the spring-forward gap).
+    public static func instant(
+        logicalDate: String,
+        hour: Int,
+        minute: Int,
+        changeHour: Int,
+        changeMinute: Int,
+        timeZone: TimeZone = .current
+    ) -> Int64? {
+        guard let day = parseDate(logicalDate) else { return nil }
+
+        let isBeforeChangeTime = hour < changeHour || (hour == changeHour && minute < changeMinute)
+        let calendarDay = isBeforeChangeTime ? addingDays(1, to: day) : day
+
+        var zoned = Calendar(identifier: .gregorian)
+        zoned.timeZone = timeZone
+        let parts = utcCalendar.dateComponents([.year, .month, .day], from: calendarDay)
+
+        var wanted = DateComponents()
+        wanted.year = parts.year
+        wanted.month = parts.month
+        wanted.day = parts.day
+        wanted.hour = hour
+        wanted.minute = minute
+        guard let instant = zoned.date(from: wanted) else { return nil }
+        return Int64((instant.timeIntervalSince1970 * 1000).rounded())
+    }
+
+    /// The same, taking the wall-clock time from an existing instant.
+    ///
+    /// The entry sheet offers hours and minutes only, so the instant it returns
+    /// carries the date of the day it was opened on. The calendar needs the time
+    /// off it and the day from elsewhere.
+    public static func instant(
+        logicalDate: String,
+        matchingTimeOf timestampMillis: Int64,
+        changeHour: Int,
+        changeMinute: Int,
+        timeZone: TimeZone = .current
+    ) -> Int64? {
+        var zoned = Calendar(identifier: .gregorian)
+        zoned.timeZone = timeZone
+        let parts = zoned.dateComponents(
+            [.hour, .minute],
+            from: Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
+        )
+        return instant(
+            logicalDate: logicalDate,
+            hour: parts.hour ?? 0,
+            minute: parts.minute ?? 0,
+            changeHour: changeHour,
+            changeMinute: changeMinute,
+            timeZone: timeZone
+        )
+    }
+
     /// Formats an instant as `yyyy-MM-dd` in the given zone. Fallback path only.
     private static func format(_ instant: Date, in timeZone: TimeZone) -> String {
         let formatter = DateFormatter()

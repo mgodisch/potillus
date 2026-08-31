@@ -207,6 +207,58 @@
       "expected": "2025-05-25"
     }
   ],
+  "instantOnLogicalDate": [
+    {
+      "description": "an evening on a past logical day keeps that calendar day",
+      "logicalDate": "2026-08-30",
+      "hour": 20,
+      "minute": 0,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "Europe/Berlin",
+      "expected": 1788112800000
+    },
+    {
+      "description": "before the boundary belongs to the next calendar day",
+      "logicalDate": "2026-08-30",
+      "hour": 1,
+      "minute": 0,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "Europe/Berlin",
+      "expected": 1788130800000
+    },
+    {
+      "description": "the boundary itself stays on its own calendar day",
+      "logicalDate": "2026-08-30",
+      "hour": 4,
+      "minute": 0,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "Europe/Berlin",
+      "expected": 1788055200000
+    },
+    {
+      "description": "the same wall clock is a different instant in another zone",
+      "logicalDate": "2026-08-30",
+      "hour": 20,
+      "minute": 0,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "America/New_York",
+      "expected": 1788134400000
+    },
+    {
+      "description": "a small-hours entry on the fall-back day lands after the switch",
+      "logicalDate": "2026-10-25",
+      "hour": 2,
+      "minute": 30,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "Europe/Berlin",
+      "expected": 1792978200000
+    }
+  ],
   "effectivePeriodDays": [
     {
       "description": "excludes in-progress day unless it is a drink day",

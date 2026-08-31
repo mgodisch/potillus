@@ -42,6 +42,7 @@ import XCTest
 /// Root of `test-vectors/day-resolver.json`.
 struct DayResolverVectors: Decodable {
     let resolve: [ResolveCase]
+    let instantOnLogicalDate: [InstantCase]
     let effectivePeriodDays: [EffectiveDaysCase]
     let windowDays: [WindowDaysCase]
     let computeCurrentAbstinence: [CurrentAbstinenceCase]
@@ -57,6 +58,18 @@ struct DayResolverVectors: Decodable {
         let changeHour: Int
         let changeMinute: Int
         let expected: String
+    }
+
+    struct InstantCase: Decodable {
+        let description: String
+        let logicalDate: String
+        let hour: Int
+        let minute: Int
+        let changeHour: Int
+        let changeMinute: Int
+        let zoneId: String
+        /// Absolute instant. `Int64` because millisecond epochs overflow `Int32`.
+        let expected: Int64
     }
 
     struct EffectiveDaysCase: Decodable {
@@ -132,6 +145,59 @@ final class DayResolverTests: XCTestCase {
             )
             XCTAssertEqual(actual, testCase.expected, "resolve: \(testCase.description)")
         }
+    }
+
+    // ── instant ──────────────────────────────────────────────────────────────
+
+    func testInstantAgainstSharedVectors() throws {
+        for testCase in vectors.instantOnLogicalDate {
+            let timeZone = try XCTUnwrap(
+                TimeZone(identifier: testCase.zoneId),
+                "Unknown time zone: \(testCase.zoneId)"
+            )
+            let actual = DayResolver.instant(
+                logicalDate: testCase.logicalDate,
+                hour: testCase.hour,
+                minute: testCase.minute,
+                changeHour: testCase.changeHour,
+                changeMinute: testCase.changeMinute,
+                timeZone: timeZone
+            )
+            XCTAssertEqual(actual, testCase.expected, "instant: \(testCase.description)")
+        }
+    }
+
+    /// `instant` and `resolve` are inverses: an instant built for a logical date
+    /// must resolve back to it. This is the property the calendar relies on when
+    /// it logs to a day other than today.
+    func testInstantRoundTripsThroughResolve() throws {
+        let berlin = try XCTUnwrap(TimeZone(identifier: "Europe/Berlin"))
+        for (hour, minute) in [(20, 0), (1, 0), (4, 0), (3, 59), (23, 30)] {
+            let millis = try XCTUnwrap(
+                DayResolver.instant(
+                    logicalDate: "2026-08-30", hour: hour, minute: minute,
+                    changeHour: 4, changeMinute: 0, timeZone: berlin
+                )
+            )
+            XCTAssertEqual(
+                DayResolver.resolve(
+                    timestampMillis: millis, changeHour: 4, changeMinute: 0, timeZone: berlin
+                ),
+                "2026-08-30",
+                "round trip at \(hour):\(minute)"
+            )
+        }
+    }
+
+    /// A date the parser does not accept yields nil rather than a guess.
+    func testInstantRejectsANonCanonicalDate() throws {
+        let berlin = try XCTUnwrap(TimeZone(identifier: "Europe/Berlin"))
+        XCTAssertNil(
+            DayResolver.instant(
+                logicalDate: "2026-8-30", hour: 20, minute: 0,
+                changeHour: 4, changeMinute: 0, timeZone: berlin
+            )
+        )
     }
 
     /// The same instant is a different logical day in different zones. This is

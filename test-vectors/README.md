@@ -56,8 +56,9 @@ scope and the cases that were deliberately left out.
   bucketing rules, including the two consequences of the in-progress day.
 - `csv-export.json` — RFC 4180 escaping, the formula-injection guard and whole
   CSV documents. The `buildCsv` cases carry a `zoneId`.
-- `day-resolver.json` — the logical-day boundary, period length and abstinence
-  streaks, with DST transitions and cross-timezone instants.
+- `day-resolver.json` — the logical-day boundary in both directions, period
+  length and abstinence streaks, with DST transitions and cross-timezone
+  instants.
 - `db-schema.json` — the SQLite schema contract, generated from Android's Room
   export, which is authoritative. iOS introspects what GRDB builds.
 - `drink-validation.json` — the rules a drink definition must satisfy. The
