@@ -1,0 +1,5 @@
+TalkBack citește acum toată aplicația: graficele, zilele din calendar, barele de limită și rândurile băuturilor vorbesc în propoziții întregi, cu unitățile lor, iar calendarul se vede mai bine.
+
+Nou: hartă termică anuală în calendar, abstinența în curs pe Azi, perioadă de statistici prin care poți naviga și zile fără alcool care nu întrerup o serie. Atingerea unei băuturi în modul de editare deschide editorul.
+
+În plus, corecții la navigare, fusuri orare și raport.

@@ -1,0 +1,5 @@
+TalkBack læser nu hele appen: diagrammer, kalenderdage, grænsebjælker og drikkerækker taler i hele sætninger med deres enheder, og kalenderen har fået fokusringe og kraftigere farver.
+
+Nyt: et årsvarmekort i kalenderen, den igangværende afholdenhed på I dag, en statistikperiode du kan bladre i, og alkoholfrie dage, der ikke bryder en stime. Tryk på en drik i redigeringstilstand åbner editoren.
+
+Desuden rettelser af bladring, tidszoner og rapporten.

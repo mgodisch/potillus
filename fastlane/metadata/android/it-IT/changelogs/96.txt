@@ -1,0 +1,5 @@
+TalkBack ora legge tutta l’app: grafici, giorni del calendario, barre dei limiti e righe delle bevande parlano in frasi intere con le loro unità, e il calendario ha anelli di focus e colori più intensi.
+
+Novità: mappa di calore annuale nel calendario, astinenza in corso su Oggi, periodo statistico da sfogliare e giorni senza alcol che non interrompono una serie. Toccare una bevanda in modalità modifica apre l’editor.
+
+Inoltre correzioni a sfogliamento, fusi orari e rapporto.

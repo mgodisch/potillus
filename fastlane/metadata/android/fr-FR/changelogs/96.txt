@@ -1,0 +1,5 @@
+TalkBack lit désormais toute l’application : graphiques, jours du calendrier, barres de limite et boissons parlent en phrases entières avec leurs unités, et le calendrier est plus lisible.
+
+Nouveautés : carte de chaleur annuelle dans le calendrier, abstinence en cours sur Aujourd’hui, période de statistiques à parcourir et jours sans alcool qui ne rompent aucune série. Toucher une boisson en mode édition ouvre l’éditeur.
+
+Corrections du parcours, des fuseaux horaires et du rapport.

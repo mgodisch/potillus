@@ -1,0 +1,5 @@
+TalkBack liest jetzt die ganze App: Diagramme, Kalendertage, Limitbalken und Getränkezeilen sprechen als ganze Sätze mit ihren Einheiten, und der Kalender hat Fokusringe und kräftigere Farben.
+
+Neu: eine Jahres-Heatmap im Kalender, die laufende Abstinenz auf Heute, ein Statistikzeitraum zum Blättern und alkoholfreie Tage, die keine Serie brechen. Ein Tipp auf ein Getränk im Bearbeitenmodus öffnet den Editor.
+
+Dazu Korrekturen an Blättern, Zeitzonen und Bericht.

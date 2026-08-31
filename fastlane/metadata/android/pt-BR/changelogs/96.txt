@@ -1,0 +1,5 @@
+O TalkBack agora lê o app inteiro: gráficos, dias do calendário, barras de limite e linhas de bebidas falam em frases completas com suas unidades, e o calendário ganhou anéis de foco e cores mais fortes.
+
+Novidades: mapa de calor anual no calendário, abstinência em curso em Hoje, período de estatísticas para percorrer e dias sem álcool que não quebram uma sequência. Tocar em uma bebida no modo de edição abre o editor.
+
+Correções de navegação, fusos horários e relatório.

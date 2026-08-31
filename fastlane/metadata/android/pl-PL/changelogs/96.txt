@@ -1,0 +1,5 @@
+TalkBack czyta teraz całą aplikację: wykresy, dni kalendarza, paski limitów i wiersze napojów mówią pełnymi zdaniami wraz z jednostkami, a kalendarz zyskał pierścienie fokusu i mocniejsze kolory.
+
+Nowości: roczna mapa cieplna w kalendarzu, trwająca abstynencja na ekranie Dziś, okres statystyk do przewijania oraz dni bez alkoholu, które nie przerywają serii. Dotknięcie napoju w trybie edycji otwiera edytor.
+
+Ponadto poprawki przewijania, stref czasowych i raportu.

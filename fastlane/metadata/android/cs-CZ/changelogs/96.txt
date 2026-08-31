@@ -1,0 +1,5 @@
+TalkBack nyní čte celou aplikaci: grafy, dny v kalendáři, pruhy limitů a řádky nápojů mluví v celých větách i s jednotkami a kalendář dostal ohraničení zaměření a výraznější barvy.
+
+Novinky: roční heatmapa v kalendáři, probíhající abstinence na obrazovce Dnes, statistické období k listování a nealkoholické dny, které nepřeruší sérii. Klepnutí na nápoj v režimu úprav otevře editor.
+
+Dále opravy listování, časových pásem a zprávy.

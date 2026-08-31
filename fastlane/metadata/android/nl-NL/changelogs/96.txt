@@ -1,0 +1,5 @@
+TalkBack leest nu de hele app: grafieken, kalenderdagen, limietbalken en drankregels spreken als hele zinnen met hun eenheden, en de kalender kreeg focusringen en sterkere kleuren.
+
+Nieuw: een jaarheatmap in de kalender, de lopende onthouding op Vandaag, een statistiekperiode om door te bladeren en alcoholvrije dagen die geen reeks breken. Op een drank tikken in de bewerkmodus opent de editor.
+
+Verder correcties aan bladeren, tijdzones en rapport.

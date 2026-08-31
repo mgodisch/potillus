@@ -15,24 +15,24 @@
 # Format: one "<locale> <version>" per line; blank lines and #-comments ignored.
 # Kept OUTSIDE the locale directories on purpose, so fastlane deliver -- which
 # reads only the per-locale folders -- never uploads it to App Store Connect.
-cs 0.84.0
-da 0.84.0
-de-DE 0.84.0
-el 0.84.0
-en-US 0.84.0
-es-ES 0.84.0
-fr-FR 0.84.0
-it 0.84.0
-ja 0.84.0
-ko 0.84.0
-nl-NL 0.84.0
-no 0.84.0
-pl 0.84.0
-pt-BR 0.84.0
-pt-PT 0.84.0
-ro 0.84.0
-ru 0.84.0
-sv 0.84.0
-uk 0.84.0
-zh-Hans 0.84.0
-zh-Hant 0.84.0
+cs 0.85.0
+da 0.85.0
+de-DE 0.85.0
+el 0.85.0
+en-US 0.85.0
+es-ES 0.85.0
+fr-FR 0.85.0
+it 0.85.0
+ja 0.85.0
+ko 0.85.0
+nl-NL 0.85.0
+no 0.85.0
+pl 0.85.0
+pt-BR 0.85.0
+pt-PT 0.85.0
+ro 0.85.0
+ru 0.85.0
+sv 0.85.0
+uk 0.85.0
+zh-Hans 0.85.0
+zh-Hant 0.85.0

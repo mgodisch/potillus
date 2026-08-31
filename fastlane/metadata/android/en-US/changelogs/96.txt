@@ -1,0 +1,5 @@
+TalkBack now reads the app throughout: charts, calendar days, limit bars and drink rows speak as whole sentences with their units, and the calendar gained focus rings and stronger colours.
+
+New: a year heat-map in the calendar, the running abstinence on Today, a statistics period you can page through, and alcohol-free days that break no streak. Tapping a drink in edit mode opens the editor.
+
+Plus fixes to paging, time zones and the report.

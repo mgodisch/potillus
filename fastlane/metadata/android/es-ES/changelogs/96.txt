@@ -1,0 +1,5 @@
+TalkBack ya lee toda la aplicación: gráficos, días del calendario, barras de límite y filas de bebidas hablan en frases completas con sus unidades, y el calendario se ve mejor.
+
+Novedades: mapa de calor anual en el calendario, abstinencia en curso en Hoy, periodo de estadísticas por el que navegar y días sin alcohol que no rompen una racha. Tocar una bebida en modo de edición abre el editor.
+
+Además, correcciones de navegación, zonas horarias e informe.
