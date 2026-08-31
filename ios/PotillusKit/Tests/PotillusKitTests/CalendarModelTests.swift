@@ -89,7 +89,6 @@ final class CalendarModelTests: XCTestCase {
         )
     }
 
-
     /// The selected day is honoured whatever the day-change boundary says: a
     /// calendar square is not subject to a 4 a.m. rollover.
     func testTheDayChangeBoundaryDoesNotMoveACalendarEntry() async throws {
