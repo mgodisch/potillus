@@ -231,17 +231,20 @@ public struct ReportData: Sendable, Equatable {
     ///   - today: The current logical day. Passed in rather than read from a clock,
     ///     so the figures are reproducible in a test and in a screenshot.
     ///   - timeZone: The zone whose wall clock decides the hour-of-day bucket.
-    ///   - locale: Decides which weekday a week starts on. The default is the
-    ///     DEVICE locale on purpose, and callers are expected to leave it there:
-    ///     the app has no configurable week start, so the column order of the
-    ///     weekday profile follows the region the phone is set to (Monday-first
-    ///     in most of Europe, Sunday-first in the US), not the in-app language.
-    ///     The report's labels and number formatting do follow the in-app
-    ///     language — `ReportRenderer.Context` takes that locale separately —
-    ///     so the two are deliberately different sources, not an oversight at
-    ///     the call site. Android splits them the same way: `PdfReportData`
-    ///     calls `DayResolver.firstDayOfWeekIso()` with no argument while its
-    ///     labels come from the per-app localized context.
+    ///   - locale: Decides which weekday a week starts on. Callers pass the
+    ///     REPORT locale — the one `ReportRenderer.Context` gets for labels and
+    ///     numbers (`Loc.locale(for: settings.language)`) — so the column order
+    ///     of the weekday profile matches the column names printed over it:
+    ///     Monday-first under German or Greek headings, Sunday-first under
+    ///     US-English ones. The app has no configurable week start. Android's
+    ///     `PdfReportData.from` takes the same locale for the same reason (a
+    ///     0.84.0 fix: Sunday-first columns under Greek headings in the store
+    ///     assets). Until the v0.86.0 review this side left the parameter at the
+    ///     DEVICE locale, and the two doc comments each claimed the other port
+    ///     did the same as itself. The SCREENS keep the device locale on both
+    ///     platforms; only the printed report follows its own language. The
+    ///     default exists for tests and stays `.current`; production call
+    ///     sites pass the report locale explicitly.
     /// - Returns: `nil` if `entries` is empty.
     public static func make(
         entries: [ConsumptionEntry],

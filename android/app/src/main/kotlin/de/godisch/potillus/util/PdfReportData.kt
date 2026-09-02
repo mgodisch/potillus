@@ -506,7 +506,10 @@ data class PdfReportData(
             //    under Greek and Russian headings in the 0.84.0 store assets, and
             //    would do the same for anyone whose device language differs from the
             //    language they picked in the app. iOS passes its report locale the
-            //    same way (ReportData.swift: `firstDayOfWeekIso(locale: locale)`).
+            //    same way since the v0.86.0 review (StatsScreenExport.swift hands
+            //    `ReportData.make` the locale it also gives the renderer); before
+            //    it, that side left the device locale in place while this comment
+            //    said otherwise. The SCREENS keep the device locale on both sides.
             val ws = DayResolver.firstDayOfWeekIso(locale)
             val weekdayOrder = WeekdayProfile.order(ws)
             val weekdayAverages = WeekdayProfile.averages(daySummaries, firstDate, lastDate, ws)

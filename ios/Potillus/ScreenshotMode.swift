@@ -134,13 +134,17 @@ enum ScreenshotMode {
             guard !entries.isEmpty else { return }
 
             let settings = await environment.preferences.load()
+            // The report locale, as in StatsScreenExport: it orders the weekday
+            // columns too, so the store screenshots show Monday-first under
+            // German headings whatever the capture host is set to.
             guard let data = ReportData.make(
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),
                 settings: settings,
                 periodStart: periodStart,
                 periodEnd: pinnedDay,
-                today: pinnedDay
+                today: pinnedDay,
+                locale: Loc.locale(for: settings.language)
             ) else {
                 return
             }

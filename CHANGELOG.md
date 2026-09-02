@@ -71,6 +71,8 @@ apply to it are stated in the accompanying COPYING.md file.
   statistics start in place where the backup carries none, as Android does.
 - The report charts' headroom factors live in `ReportChart` on both platforms
   and are pinned by a shared vector.
+- The iOS report orders the weekday columns by the report's language, as
+  Android does, instead of by the device region.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

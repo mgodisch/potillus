@@ -183,28 +183,30 @@ extension StatsScreen {
             // window; asking a clock again could straddle the day-change hour and
             // give the report a different today than the screen behind it.
             let settings = await environment.preferences.load()
-            // `locale` and `timeZone` are left at their defaults deliberately:
-            // both describe the DEVICE, not the in-app language. See the
-            // parameter documentation on `ReportData.make` — the weekday
-            // column order follows the phone's region, while the labels below
-            // follow `settings.language`.
+            // The report follows the UI language, as Android's does: the labels
+            // come from that language, and the same locale drives numbers,
+            // dates, the CJK glyph orthography (REPORT_LANG) AND the weekday
+            // column order, so Monday-first columns stand under German headings
+            // whatever region the phone is set to. An empty tag ("System")
+            // yields English labels and the current locale. `timeZone` stays
+            // the device's: it decides the hour-of-day bucket for entries
+            // without a stored offset. (Until v0.86.0 `locale` was left at its
+            // default here, so a German report on a US phone printed Sunday
+            // first — the drift Android had fixed in 0.84.0.)
+            let reportLocale = Loc.locale(for: settings.language)
             guard let data = ReportData.make(
                 entries: entries,
                 drinks: try environment.drinks.allOnce(),
                 settings: settings,
                 periodStart: from,
                 periodEnd: to,
-                today: model.state.today
+                today: model.state.today,
+                locale: reportLocale
             ) else {
                 exportFailure = Loc.string("No entries in this period.", locale: locale)
                 return
             }
 
-            // The report follows the UI language, as Android's does: the labels come
-            // from that language and the locale drives numbers, dates, and the CJK
-            // glyph orthography (REPORT_LANG). An empty tag ("System") yields English
-            // labels and the current locale.
-            let reportLocale = Loc.locale(for: settings.language)
             let html = ReportRenderer.render(
                 data: data,
                 context: ReportRenderer.Context(
