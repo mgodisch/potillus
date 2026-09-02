@@ -40,6 +40,12 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ---
 
+## v0.86.0
+
+### Changed
+
+- The bundled fastlane was updated to 2.238.0.
+
 ## v0.85.0
 
 Edit drinks from the list's edit mode
