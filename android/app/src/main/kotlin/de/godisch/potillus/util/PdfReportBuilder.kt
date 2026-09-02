@@ -320,8 +320,9 @@ object PdfReportBuilder {
         run {
             val limit = d.limitInfo.limitGrams
             val maxAvg = d.chartBuckets.maxOfOrNull { it.avgPerDay } ?: 0.0
-            // Headroom of 10% so the tallest bar / limit line never touches the top.
-            val maxVal = maxOf(maxAvg, limit) * 1.1
+            // Headroom so the tallest bar / limit line never touches the top; the
+            // factor lives in ReportChart, shared with iOS and pinned by vector.
+            val maxVal = ReportChart.trendCeiling(maxAvg, limit)
             scalars["LIMIT_LINE_PCT"] = ReportChart.percent(limit, maxVal).fmt0()
 
             val labelIdx = ReportChart.labelIndices(d.chartBuckets.size)
@@ -384,8 +385,8 @@ object PdfReportBuilder {
         //    Every hour 0..23 is now labelled (no thinning). Section title set above.
         run {
             val maxHour = d.hourlyGrams.maxOrNull() ?: 0.0
-            // 15 % headroom so the value printed above the tallest bar still fits.
-            val ceiling = maxHour * 1.15
+            // Headroom so the value printed above the tallest bar still fits.
+            val ceiling = ReportChart.barCeiling(maxHour)
             val days = d.totalDays.coerceAtLeast(1)
             repeats["HBARS"] = d.hourlyGrams.map { grams ->
                 mapOf(
@@ -404,7 +405,7 @@ object PdfReportBuilder {
         //    value label above the tallest bar still fits inside the plot height.
         run {
             val maxWeekday = d.weekdayAverages.filterNotNull().maxOrNull() ?: 0.0
-            val ceiling = maxWeekday * 1.15
+            val ceiling = ReportChart.barCeiling(maxWeekday)
             repeats["WDBARS"] = d.weekdayAverages.map { avg ->
                 mapOf(
                     "WD_HEIGHT_PCT" to ReportChart.barHeight(avg, ceiling).fmt0(),

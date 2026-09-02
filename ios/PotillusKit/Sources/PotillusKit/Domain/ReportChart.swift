@@ -52,6 +52,19 @@ public enum ReportChart {
     /// their value above the bar and need room for the text.
     public static let barChartHeadroom = 1.15
 
+    /// The 100 % mark of the trend chart: the taller of the tallest bar and the
+    /// limit line, plus headroom. Pinned by `report-chart.json` (`ceiling`);
+    /// until v0.86.0 Android wrote `* 1.1` inline in its builder while this side
+    /// multiplied by the constants above in three places.
+    public static func trendCeiling(tallest: Double, limit: Double) -> Double {
+        Swift.max(tallest, limit) * trendHeadroom
+    }
+
+    /// The 100 % mark of the hour and weekday charts: the tallest bar plus headroom.
+    public static func barCeiling(tallest: Double) -> Double {
+        tallest * barChartHeadroom
+    }
+
     /// `value` as a percentage of `max`; zero when `max` is not positive.
     public static func percent(value: Double, max: Double) -> Double {
         max > 0 ? value / max * 100.0 : 0.0

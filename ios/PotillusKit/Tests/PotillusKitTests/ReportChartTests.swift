@@ -63,6 +63,16 @@ final class ReportChartTests: XCTestCase {
         }
     }
 
+    /// The 100 % mark of each chart: a `limit` in the case means the trend chart.
+    func testCeilingAgainstSharedVectors() {
+        for testCase in vectors.ceiling {
+            let actual = testCase.limit.map {
+                ReportChart.trendCeiling(tallest: testCase.tallest, limit: $0)
+            } ?? ReportChart.barCeiling(tallest: testCase.tallest)
+            XCTAssertEqual(actual, testCase.expected, accuracy: Self.epsilon, testCase.description)
+        }
+    }
+
     func testLabelIndicesAgainstSharedVectors() {
         for testCase in vectors.labelIndices {
             XCTAssertEqual(

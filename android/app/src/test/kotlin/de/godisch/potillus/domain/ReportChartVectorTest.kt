@@ -75,6 +75,20 @@ class ReportChartVectorTest {
         }
     }
 
+    /** The 100 % mark of each chart: a `limit` in the case means the trend chart. */
+    @Test
+    fun `ceiling matches the shared vectors`() {
+        VECTORS.getJSONArray("ceiling").objects().forEach { case ->
+            val tallest = case.getDouble("tallest")
+            val actual = if (case.has("limit")) {
+                ReportChart.trendCeiling(tallest, case.getDouble("limit"))
+            } else {
+                ReportChart.barCeiling(tallest)
+            }
+            assertEquals(case.getString("description"), case.getDouble("expected"), actual, EPS)
+        }
+    }
+
     /**
      * The ring's three SVG attributes per slice. Strings, not numbers: the decimal
      * separator is part of what is pinned, because a comma turns one

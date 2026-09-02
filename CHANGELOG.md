@@ -69,6 +69,8 @@ apply to it are stated in the accompanying COPYING.md file.
   authenticate, and the import message says when it did not.
 - On iOS a restored backup leaves the local language, body weight and
   statistics start in place where the backup carries none, as Android does.
+- The report charts' headroom factors live in `ReportChart` on both platforms
+  and are pinned by a shared vector.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

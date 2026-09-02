@@ -29,10 +29,17 @@ apply to it are stated in the accompanying COPYING.md file.
   PDF REPORT TEMPLATE  —  THIS FILE DEFINES HOW THE REPORT LOOKS.
   ===========================================================================
   You can edit the LAYOUT of the PDF report here, by hand, WITHOUT touching any
-  Kotlin code: fonts, sizes, colours, spacing, column widths, the order of the
-  sections, and where pages break are all controlled by the CSS in <style> below
-  and by the HTML structure. After editing, just rebuild the app — the report
-  generator (PdfReportBuilder.kt) loads this file from the APK's assets at runtime.
+  Kotlin or Swift code: fonts, sizes, colours, spacing, column widths, the order
+  of the sections, and where pages break are all controlled by the CSS in <style>
+  below and by the HTML structure. After editing, just rebuild the app — the
+  report generator loads this file at runtime.
+
+  ONE FILE, TWO APPS. Android packages it as an asset and fills it from
+  android/.../util/PdfReportBuilder.kt; iOS copies it into the bundle
+  (ios/project.yml) and fills it from ios/PotillusKit/.../Domain/ReportRenderer.swift
+  and ReportRendererRows.swift. The placeholder names below are the contract
+  with BOTH fillers: rename one here, and both must change, or the name is
+  left in one platform's PDF verbatim.
 
   WHAT YOU MUST NOT CHANGE (or the report will break):
     • {{PLACEHOLDER}} tokens — these are filled in with computed numbers and

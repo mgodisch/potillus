@@ -146,6 +146,7 @@ struct ReportChartVectors: Decodable {
     let pct: [PercentCase]
     let labelIndices: [LabelCase]
     let barHeight: [BarCase]
+    let ceiling: [CeilingCase]
     let categoryColor: [ColorCase]
     let donut: [DonutCase]
     let abbreviateWeekday: [AbbreviateCase]
@@ -157,6 +158,14 @@ struct ReportChartVectors: Decodable {
         let description: String
         let symbol: String
         let expected: String
+    }
+
+    struct CeilingCase: Decodable {
+        let description: String
+        let tallest: Double
+        /// Present for the trend chart, absent for the hour and weekday charts.
+        let limit: Double?
+        let expected: Double
     }
 
     struct PercentCase: Decodable {

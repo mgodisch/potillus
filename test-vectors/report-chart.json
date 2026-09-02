@@ -17,7 +17,12 @@
     "Swift's String.prefix(2) counts grapheme clusters. For all 21 shipped",
     "languages the two agree, so nothing visible changed - but the combining-accent",
     "and surrogate-pair cases below are where they part, and they are the reason",
-    "the Swift side now spells UTF-16 out instead of taking its default."
+    "the Swift side now spells UTF-16 out instead of taking its default.",
+    "",
+    "'ceiling' pins the 100 % mark of each chart: trendCeiling(tallest, limit)",
+    "for the trend chart (cases carrying 'limit'), barCeiling(tallest) for the hour",
+    "and weekday charts. Until v0.86.0 Android held the factors as literals in its",
+    "builder; both builders now call these."
   ],
   "pct": [
     {
@@ -350,6 +355,36 @@
       "description": "A surrogate pair is one symbol of two units and survives the cut",
       "symbol": "😀x",
       "expected": "😀"
+    }
+  ],
+  "ceiling": [
+    {
+      "description": "trend: the tallest bar decides when it exceeds the limit",
+      "tallest": 40.0,
+      "limit": 20.0,
+      "expected": 44.0
+    },
+    {
+      "description": "trend: the limit line decides when nothing exceeds it",
+      "tallest": 12.0,
+      "limit": 20.0,
+      "expected": 22.0
+    },
+    {
+      "description": "trend: an empty chart still leaves room for the limit line",
+      "tallest": 0.0,
+      "limit": 20.0,
+      "expected": 22.0
+    },
+    {
+      "description": "bar chart: the tallest bar plus room for its printed value",
+      "tallest": 40.0,
+      "expected": 46.0
+    },
+    {
+      "description": "bar chart: no bars, no ceiling",
+      "tallest": 0.0,
+      "expected": 0.0
     }
   ]
 }

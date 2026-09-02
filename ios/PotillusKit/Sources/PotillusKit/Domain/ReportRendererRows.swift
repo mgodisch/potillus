@@ -138,7 +138,7 @@ extension ReportRenderer {
     /// neither touches the top edge of the plot.
     static func trendCeiling(_ data: ReportData) -> Double {
         let tallest = data.chartBuckets.map(\.avgPerDay).max() ?? 0.0
-        return max(tallest, data.limitInfo.limitGrams) * ReportChart.trendHeadroom
+        return ReportChart.trendCeiling(tallest: tallest, limit: data.limitInfo.limitGrams)
     }
 
     static func trendBarRows(data: ReportData, context: Context) -> [[String: String]] {
@@ -204,7 +204,7 @@ extension ReportRenderer {
     }
 
     static func hourBarRows(data: ReportData, context: Context) -> [[String: String]] {
-        let ceiling = (data.hourlyGrams.max() ?? 0.0) * ReportChart.barChartHeadroom
+        let ceiling = ReportChart.barCeiling(tallest: data.hourlyGrams.max() ?? 0.0)
         // Grams in an hour, spread across the period's days: an average, like every
         // other figure on this page.
         let days = Double(max(data.totalDays, 1))
@@ -220,8 +220,7 @@ extension ReportRenderer {
     }
 
     static func weekdayBarRows(data: ReportData, context: Context) -> [[String: String]] {
-        let ceiling = (data.weekdayAverages.compactMap { $0 }.max() ?? 0.0)
-            * ReportChart.barChartHeadroom
+        let ceiling = ReportChart.barCeiling(tallest: data.weekdayAverages.compactMap { $0 }.max() ?? 0.0)
 
         return data.weekdayAverages.map { average in
             [

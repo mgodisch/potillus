@@ -51,6 +51,29 @@ object ReportChart {
     const val MINIMUM_VISIBLE_BAR = 2.0
 
     /**
+     * Headroom above the tallest bar of the trend chart, so neither it nor the
+     * dashed limit line touches the top edge.
+     */
+    const val TREND_HEADROOM = 1.1
+
+    /**
+     * Headroom above the tallest bar of the hour and weekday charts, which print
+     * their value above the bar and need room for the text.
+     */
+    const val BAR_CHART_HEADROOM = 1.15
+
+    /**
+     * The 100 % mark of the trend chart: the taller of the tallest bar and the
+     * limit line, plus headroom. Pinned by `report-chart.json` (`ceiling`);
+     * until v0.86.0 the builder wrote `* 1.1` and `* 1.15` inline while iOS kept
+     * the factors in its ReportChart — the same numbers, in two places.
+     */
+    fun trendCeiling(tallest: Double, limit: Double): Double = maxOf(tallest, limit) * TREND_HEADROOM
+
+    /** The 100 % mark of the hour and weekday charts: the tallest bar plus headroom. */
+    fun barCeiling(tallest: Double): Double = tallest * BAR_CHART_HEADROOM
+
+    /**
      * Height of one chart bar, in percent of the plot area.
      *
      * The rule the three bar charts of the report share: a bucket with no value
