@@ -117,7 +117,6 @@ class KeystoreSecretStoreTest {
         }
     }
 
-    /** A blob shorter than the IV length is rejected with IllegalArgumentException. */
     /**
      * A truncated blob must throw a [GeneralSecurityException] — the SAME
      * exception family as tampering — because [KeystoreSecretStore.open]'s

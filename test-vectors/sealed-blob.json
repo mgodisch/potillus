@@ -1,0 +1,42 @@
+{
+  "_comment": [
+    "Shared golden vectors for the sealed-preferences byte layout. Loaded by BOTH",
+    "suites: SealedBlobVectorTest.kt drives KeystoreSecretStore.openWithKey with a",
+    "software AES key, SealedBlobVectorTest.swift drives CryptoKit's AES.GCM.open",
+    "over SealedBox(combined:). The layout is nonce(12) || ciphertext || tag(16),",
+    "the claim docs/ASSURANCE_CASE.md makes under 'Insufficient cryptography'.",
+    "Neither side can inject a nonce into its SEALING path (Android's provider",
+    "chooses the IV), so the vectors pin the OPENING direction: a fixed key and a",
+    "fixed blob must open to the same plaintext on both platforms. Whatever one",
+    "side seals, the other must therefore be able to open. A sealing change that",
+    "kept the round-trip but altered the layout would turn the other suite red.",
+    "The blobs were produced by an independent AES-256-GCM implementation, not",
+    "by either port. All byte strings are lower-case hex. 'expected' is the UTF-8",
+    "plaintext; 'expectFailure' true means the tag must NOT authenticate."
+  ],
+  "keyHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "nonceLength": 12,
+  "tagLength": 16,
+  "open": [
+    {
+      "description": "a small JSON document opens to its plaintext",
+      "blobHex": "000102030405060708090a0b3c20b472aa88a76fff28f4cedf881a01e6b2a50e84092a1945b36a9f843ca9287baa87473c75372761",
+      "expected": "{\"biometricEnabled\":true}"
+    },
+    {
+      "description": "an empty plaintext is nonce plus tag alone, 28 bytes",
+      "blobHex": "a1b2c3d4e5f60718293a4b5cf857a9436ee4fe2bc91c00d9b08ba094",
+      "expected": ""
+    },
+    {
+      "description": "one flipped bit in the tag fails authentication",
+      "blobHex": "000102030405060708090a0b3c20b472aa88a76fff28f4cedf881a01e6b2a50e84092a1945b36a9f843ca9287baa87473c75372760",
+      "expectFailure": true
+    },
+    {
+      "description": "a blob shorter than a nonce plus a tag is rejected",
+      "blobHex": "000102030405060708090a0b",
+      "expectFailure": true
+    }
+  ]
+}

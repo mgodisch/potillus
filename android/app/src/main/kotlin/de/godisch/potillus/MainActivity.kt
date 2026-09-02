@@ -36,9 +36,15 @@ package de.godisch.potillus
 //
 // STARTUP SEQUENCE:
 //   1. onCreate() reads the biometric preference from DataStore (one-shot collect).
-//   2. If biometric is enabled AND the device supports it:
+//   2. If biometric is enabled:
 //      a. Set UiGate to BIOMETRIC (blank screen – no UI shown yet).
-//      b. Show the BiometricPrompt.
+//      b. Show the BiometricPrompt — WITHOUT first asking whether the device
+//         can still authenticate. If it cannot (the user removed every
+//         biometric and the screen lock after arming the lock), the prompt
+//         reports an error and step d applies: the app does not open. That is
+//         the FAIL-CLOSED rule SECURITY.md states for both platforms; the iOS
+//         port leaves its cover up in the same case. Until the v0.86.0 review
+//         this path checked isBiometricAvailable() and silently opened.
 //      c. On success: set UiGate to READY.
 //      d. On error/cancel: finish() the Activity.
 //   3. If biometric is disabled: set UiGate to READY immediately.
@@ -248,8 +254,10 @@ class MainActivity : AppCompatActivity() {
             // warm-start hole: a recreated Activity whose process kept the static
             // isAuthenticatedThisSession == true must still re-prompt once enough
             // time has passed (backgroundedAt is process-global — see its KDoc).
+            // No isBiometricAvailable() term here, on purpose: an armed lock on a
+            // device that can no longer authenticate must fail CLOSED (the prompt
+            // errors, the Activity finishes), not open. See STARTUP SEQUENCE 2b.
             if (biometricEnabled &&
-                isBiometricAvailable() &&
                 (!isAuthenticatedThisSession || isReauthDueToInactivity())
             ) {
                 isAuthenticatedThisSession = false
@@ -257,7 +265,7 @@ class MainActivity : AppCompatActivity() {
                 _uiGate.value = UiGate.BIOMETRIC
                 showBiometricPrompt(app)
             } else {
-                // Lock off / unavailable, or already authenticated and still fresh.
+                // Lock off, or already authenticated and still fresh.
                 // Consume any pending background timestamp so a later configuration
                 // change (which skips onStop) cannot read it as stale and re-prompt.
                 backgroundedAt = 0L
@@ -322,6 +330,11 @@ class MainActivity : AppCompatActivity() {
      * Combining [BIOMETRIC_STRONG] with [DEVICE_CREDENTIAL] means users without
      * enrolled biometrics can still unlock the app with their device PIN, so the
      * lock never becomes a dead end on hardware lacking a fingerprint sensor.
+     *
+     * Consulted only where a lock is about to be ARMED ([authenticateForToggle],
+     * [lockNow]) — refusing to arm a lock the device cannot satisfy. It is NOT
+     * consulted where an already-armed lock is enforced ([onCreate], [onStart]):
+     * there the prompt runs regardless and fails closed.
      */
     private fun isBiometricAvailable(): Boolean {
         val mgr = BiometricManager.from(this)
@@ -358,6 +371,10 @@ class MainActivity : AppCompatActivity() {
                  * A terminal authentication error or user cancellation occurred.
                  * In every case the Activity is finished so no data is shown. The
                  * detailed code reference below documents the common [errorCode]s.
+                 * This is also where the fail-closed rule lands when the device
+                 * has no authenticator left: the prompt cannot be satisfied and
+                 * reports NO_BIOMETRICS / NO_DEVICE_CREDENTIAL, and the app closes
+                 * until a screen lock is set again.
                  */
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     // Log the error code in debug builds so developers can
@@ -370,6 +387,8 @@ class MainActivity : AppCompatActivity() {
                     //   BIOMETRIC_ERROR_LOCKOUT (7) – too many failed attempts, 30-second cool-down.
                     //   BIOMETRIC_ERROR_LOCKOUT_PERMANENT (9) – too many lockouts, requires PIN to unlock.
                     //   BIOMETRIC_ERROR_HW_UNAVAILABLE (1) – sensor temporarily busy.
+                    //   BIOMETRIC_ERROR_NO_BIOMETRICS (11) / _NO_DEVICE_CREDENTIAL (14) –
+                    //     nothing enrolled at all: the fail-closed case, see above.
                     //
                     // In all cases we finish() the Activity. A future improvement could
                     // show a brief Toast for lockout errors ("Too many attempts – try again later")
@@ -521,10 +540,12 @@ class MainActivity : AppCompatActivity() {
         if (isReauthDueToInactivity()) {
             isAuthenticatedThisSession = false
             backgroundedAt = 0L
-            if (isBiometricAvailable()) {
-                _uiGate.value = UiGate.BIOMETRIC
-                showBiometricPrompt(application as PotillusApp)
-            }
+            // Unconditionally, as in onCreate: without an authenticator the
+            // prompt fails and the Activity finishes — fail closed. The former
+            // isBiometricAvailable() guard left the gate READY here, i.e. the
+            // diary stayed visible and the lock never re-engaged.
+            _uiGate.value = UiGate.BIOMETRIC
+            showBiometricPrompt(application as PotillusApp)
         } else {
             backgroundedAt = 0L
         }

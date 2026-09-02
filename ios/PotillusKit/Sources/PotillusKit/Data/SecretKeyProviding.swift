@@ -48,11 +48,19 @@ public protocol SecretKeyProviding: Sendable {
 
 /// Everything that can go wrong reaching the Keychain.
 public enum KeychainError: Error, Equatable, CustomStringConvertible {
+    /// The key exists but cannot be read RIGHT NOW: the item's class is
+    /// `WhenUnlocked` and the device is locked (`errSecInteractionNotAllowed`).
+    /// A transient condition, not a lost or wrong key — callers must not treat
+    /// the preferences as unusable on it, or they would overwrite real settings
+    /// with defaults on the next write. See `PreferencesStore.readFromDisk`.
+    case unavailableWhileLocked
     case unexpectedStatus(OSStatus)
     case unexpectedKeySize(Int)
 
     public var description: String {
         switch self {
+        case .unavailableWhileLocked:
+            return "Keychain item is not accessible while the device is locked."
         case .unexpectedStatus(let status):
             return "Keychain operation failed with status \(status)."
         case .unexpectedKeySize(let bytes):
@@ -118,6 +126,8 @@ public struct KeychainKeyProvider: SecretKeyProviding {
             return SymmetricKey(data: data)
         case errSecItemNotFound:
             return nil
+        case errSecInteractionNotAllowed:
+            throw KeychainError.unavailableWhileLocked
         default:
             throw KeychainError.unexpectedStatus(status)
         }
@@ -139,6 +149,18 @@ public struct KeychainKeyProvider: SecretKeyProviding {
         // preferences file becomes unreadable. That is acceptable because the
         // preferences are re-derivable — the JSON backup carries them — while a
         // key that travels in backups would undo the point of encrypting at all.
+        //
+        // Two asymmetries to Android worth knowing:
+        //   - "WhenUnlocked" means a read while the device is LOCKED fails with
+        //     errSecInteractionNotAllowed (mapped to `unavailableWhileLocked`
+        //     above). An Android Keystore key without `setUnlockedDeviceRequired`
+        //     is usable at any time. The store treats the iOS failure as "not
+        //     now", never as "no key".
+        //   - A Keychain item outlives the app: deleting and reinstalling the app
+        //     finds the old key still there, whereas Android's Keystore drops the
+        //     key with the app. Harmless — the file it sealed is gone — but the
+        //     stale item stays until a reinstall creates nothing new (the
+        //     `loadKey` hit above simply reuses it).
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 
         let status = SecItemAdd(attributes as CFDictionary, nil)

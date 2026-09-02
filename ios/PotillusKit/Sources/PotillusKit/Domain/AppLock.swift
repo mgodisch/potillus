@@ -36,9 +36,12 @@ import Foundation
 // sleep and ignores wall-clock changes, so an overnight lock holds.
 //
 // This file is the part of that with no UIKit and no LocalAuthentication in it:
-// the state machine and the one arithmetic decision — has enough background time
-// passed to require another prompt? Everything that needs a screen, a sensor, or
-// a run loop lives in the app shell (BiometricAuthenticator, AppLockController).
+// the `BiometricAuthenticator` protocol, the lock's states, and the one
+// arithmetic decision — has enough background time passed to require another
+// prompt? The state machine that runs the transitions is `AppLockModel` in the
+// kit's Presentation layer; the sensor behind the protocol is
+// `DeviceBiometricAuthenticator` in the app shell, the only file that imports
+// LocalAuthentication.
 //
 // ON THE MONOTONIC CLOCK
 //   The re-auth window is measured against a MONOTONIC source, never the wall

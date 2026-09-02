@@ -61,9 +61,11 @@ import javax.crypto.spec.GCMParameterSpec
  * WHAT "ENVELOPE ENCRYPTION" MEANS HERE
  * ────────────────────────────────────────────────────────────────────────────
  * A symmetric AES-256-GCM key is generated **inside** the Android Keystore
- * under [keyAlias] and never leaves it — the key material lives in the
- * TEE-backed Keystore (minSdk 30 guarantees hardware-backed key storage).
- * Note that it is NOT StrongBox-backed even on devices that have a StrongBox
+ * under [keyAlias] and never leaves it — on every CDD-compliant device the key
+ * material lives in the TEE-backed Keystore. That is a platform requirement,
+ * not something this class verifies: an emulator or a non-compliant build may
+ * keep the key in software, and nothing here probes `KeyInfo.securityLevel`
+ * for it. Note that it is NOT StrongBox-backed even on devices that have a StrongBox
  * secure element: that would require `setIsStrongBoxBacked(true)` at key
  * generation, which this class deliberately does not request — StrongBox is
  * absent on most devices, so requesting it needs an availability-probe /
@@ -93,20 +95,21 @@ import javax.crypto.spec.GCMParameterSpec
  * switch dispatchers themselves — the caller decides; AppPreferences, the sole
  * user, wraps them in `withContext(Dispatchers.Default)`.
  *
- * Concurrent FIRST use is safe here, but not because the platform makes it so:
- * [getOrCreateKey] is a `containsAlias` followed by a `generateKey`, two separate
- * Keystore operations with no atomic check-and-create between them, and a second
- * generation under the same alias would replace the first key and leave anything
- * already sealed under it unreadable. What rules that out is the CALLER. Both
- * entry points are reached only from the DataStore serializer's `readFrom` and
- * `writeTo`, and DataStore runs those under a single writer, so two threads
- * cannot arrive at the check together. A second consumer must either share this
- * instance behind the same guarantee or bring its own mutual exclusion; it may
- * not simply construct another store on the same alias.
+ * Concurrent FIRST use is made safe HERE, not by the caller: [getOrCreateKey]
+ * is a `containsAlias` followed by a `generateKey`, two separate Keystore
+ * operations with no atomic check-and-create between them, and a second
+ * generation under the same alias would replace the first key and leave
+ * anything already sealed under it unreadable. The method is therefore
+ * `@Synchronized` on this instance. (An earlier comment argued that DataStore
+ * serialises `readFrom` and `writeTo` under one writer; whether that holds for
+ * the `data` flow's reads is not something this class should depend on.) Two
+ * INSTANCES on the same alias are still not protected against each other, so a
+ * second consumer must share this instance rather than construct its own.
  *
  * @param keyAlias The Android Keystore alias under which this store's AES-256-GCM
- *                 key is generated and looked up. Use a DISTINCT alias per secret
- *                 so the two secrets can be rotated independently.
+ *                 key is generated and looked up. One alias per secret, so a
+ *                 secret can be rotated on its own; today the preferences blob
+ *                 is the only one.
  */
 class KeystoreSecretStore(private val keyAlias: String) {
 
@@ -125,10 +128,14 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * @param blob The `IV || ciphertext+tag` byte array.
      * @return The original plaintext.
      * @throws java.security.GeneralSecurityException if [blob] is malformed, was
-     *         tampered with (GCM tag mismatch), or the Keystore key is missing
-     *         (e.g. after a factory reset). Callers decide how to react;
-     *         AppPreferences maps this to a DataStore CorruptionException so the
-     *         `ReplaceFileCorruptionHandler` resets the file to its defaults.
+     *         tampered with (GCM tag mismatch), or the Keystore key that sealed it
+     *         is gone (a Keystore wiped or corrupted by an OS update, say — a
+     *         factory reset takes the file with it). In that last case
+     *         [getOrCreateKey] has already generated a NEW key under the alias
+     *         before the decryption fails, so the next [seal] writes under it.
+     *         Callers decide how to react; AppPreferences maps this to a
+     *         DataStore CorruptionException so the `ReplaceFileCorruptionHandler`
+     *         resets the file to its defaults.
      */
     fun open(blob: ByteArray): ByteArray = openWithKey(getOrCreateKey(), blob)
 
@@ -189,7 +196,11 @@ class KeystoreSecretStore(private val keyAlias: String) {
      * too aggressive for secrets read during normal app startup and navigation.
      * Protection relies on the Keystore's own device-unlock policy and the
      * hardware backing of the key.
+     *
+     * `@Synchronized` so that two callers cannot both miss `containsAlias` and
+     * both generate (see THREADING in the class comment).
      */
+    @Synchronized
     private fun getOrCreateKey(): SecretKey {
         val ks = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
         if (!ks.containsAlias(keyAlias)) {

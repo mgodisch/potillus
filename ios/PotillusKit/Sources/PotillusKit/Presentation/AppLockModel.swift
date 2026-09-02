@@ -37,6 +37,15 @@ import Observation
 //   • returning re-locks only if `AppLock.requiresReauth` says the gap was long
 //     enough — otherwise a glance at a notification does not force Face ID
 //   • a cancelled or failed prompt leaves the cover up, with a way to retry
+//   • an armed lock whose device can no longer authenticate — the passcode was
+//     removed, which on iOS also disables Face ID and Touch ID — stays LOCKED.
+//     `onLaunch` and `onForeground` deliberately do not consult `canEvaluate`:
+//     the prompt fails, the cover stays, and the way back in is to set a
+//     device credential again. That is the FAIL-CLOSED rule SECURITY.md states
+//     for both platforms; Android's MainActivity applies the same one by
+//     finishing when the prompt cannot be satisfied. (Until the v0.86.0 review
+//     Android silently opened in this case while this model locked, and
+//     neither side had written the rule down.)
 //
 // It talks to the sensor through `BiometricAuthenticator`, so every path here is
 // testable with a fake. The monotonic clock is injected as a closure for the same

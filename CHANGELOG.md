@@ -42,8 +42,16 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.86.0
 
+### Added
+
+- A shared vector for the sealed-preferences byte layout.
+
 ### Changed
 
+- The biometric lock fails closed on Android when the device has lost every
+  credential, as it already did on iOS.
+- The iOS preferences store no longer treats a Keychain or file that is locked
+  as unusable, so a write can no longer replace settings it could not read.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

@@ -55,6 +55,18 @@ import Foundation
 //   the JSON backup, which is the supported path. The store therefore treats an
 //   unreadable file exactly like a missing one.
 //
+// EXCEPT WHEN THE FILE IS MERELY NOT READABLE YET
+//   Both the key (`WhenUnlocked`) and the file (`completeFileProtection`) are
+//   unreachable while the device is locked. That is a transient state, and it
+//   must not be mistaken for "unusable": if `load()` cached the defaults on it,
+//   the next `update()` would seal those defaults over the user's real settings.
+//   So a read that fails for that reason is `unavailable`: `load()` answers with
+//   defaults but caches nothing, `update()` throws `PreferencesError.unavailable`
+//   instead of writing, and the next call tries the disk again. (Android has no
+//   such state: a Keystore key without `setUnlockedDeviceRequired` is readable
+//   at any time.) Found in the v0.86.0 security review; before it, `readFromDisk`
+//   folded this case into "wrong key".
+//
 // CONCURRENCY
 //   An `actor`, so reads and writes serialise without a lock. Observers receive
 //   an `AsyncStream`, the same shape the repositories expose, so a SwiftUI view
@@ -133,21 +145,33 @@ public actor PreferencesStore: PreferencesStoring {
     // ── Reading ──────────────────────────────────────────────────────────────
 
     public func load() async -> AppSettings {
+        (try? loadOrThrow()) ?? AppSettings()
+    }
+
+    /// `load()` with the transient case kept apart: throws
+    /// `PreferencesError.unavailable` when the disk or the key cannot be read
+    /// RIGHT NOW, so `update()` can refuse to write rather than overwrite.
+    private func loadOrThrow() throws -> AppSettings {
         if let cached { return cached }
         // Asked BEFORE the read, because the seed below turns on THIS and not on
-        // whether the read succeeded. `readFromDisk()` returns nil for a whole
-        // family of reasons — absent, unreadable, wrong key, tampered — and only
-        // the first of them means "this user has never been asked". See
-        // `seedOnFirstLaunch()`. It is the same probe `AppDatabase.openOrCreate`
-        // makes before opening the database, for the same reason.
+        // whether the read succeeded. `readFromDisk()` is `unusable` for a whole
+        // family of reasons — absent, wrong key, tampered — and only the first of
+        // them means "this user has never been asked". See `seedOnFirstLaunch()`.
+        // It is the same probe `AppDatabase.openOrCreate` makes before opening
+        // the database, for the same reason.
         let fileExisted = FileManager.default.fileExists(atPath: fileURL.path)
-        if let stored = readFromDisk() {
+        switch readFromDisk() {
+        case .settings(let stored):
             cached = stored
             return stored
+        case .unavailable:
+            // Nothing is cached: the next call must look at the disk again.
+            throw PreferencesError.unavailable
+        case .unusable:
+            let settings = seedsStatsFloor && !fileExisted ? seedOnFirstLaunch() : AppSettings()
+            cached = settings
+            return settings
         }
-        let settings = seedsStatsFloor && !fileExisted ? seedOnFirstLaunch() : AppSettings()
-        cached = settings
-        return settings
     }
 
     /// Builds the settings a brand-new installation starts with: the defaults,
@@ -180,9 +204,10 @@ public actor PreferencesStore: PreferencesStoring {
     ///   tells a missing key from a key holding "".
     ///
     /// WHY THE FILE'S ABSENCE, AND NOT "THE FILE COULD NOT BE READ"
-    ///   `load()` probes `fileExists` itself rather than treating
-    ///   `readFromDisk() == nil` as "first launch". The two are not the same: a
-    ///   nil read also means unreadable, wrong key, or tampered. The wrong-key
+    ///   `load()` probes `fileExists` itself rather than treating an `unusable`
+    ///   read as "first launch". The two are not the same: `unusable` also
+    ///   means wrong key or tampered (and a merely locked file is `unavailable`,
+    ///   which never reaches the seed at all). The wrong-key
     ///   case is REAL and reachable — the key is `ThisDeviceOnly`, so restoring a
     ///   device backup onto a new phone brings this file back without it. Seeding
     ///   there would set the floor to the RESTORE date; and a user who opted the
@@ -221,22 +246,48 @@ public actor PreferencesStore: PreferencesStoring {
         return settings
     }
 
-    /// Returns nil for "no usable file": absent, unreadable, wrong key, tampered,
-    /// or written by a version whose JSON we cannot decode. Every one of those
-    /// means "start from defaults", and none of them is worth crashing over.
-    private func readFromDisk() -> AppSettings? {
-        guard let blob = try? Data(contentsOf: fileURL), !blob.isEmpty else { return nil }
-        guard let key = try? keyProvider.key() else { return nil }
+    /// The three things a read can come back with.
+    private enum DiskRead {
+        case settings(AppSettings)
+        /// No usable file: absent, empty, wrong key, tampered, or written by a
+        /// version whose JSON we cannot decode. Every one of those means "start
+        /// from defaults", and none of them is worth crashing over.
+        case unusable
+        /// A file that exists but cannot be read NOW, or a key the Keychain holds
+        /// but will not hand over while the device is locked. Not a verdict on
+        /// the file; see EXCEPT WHEN THE FILE IS MERELY NOT READABLE YET above.
+        case unavailable
+    }
+
+    private func readFromDisk() -> DiskRead {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else { return .unusable }
+        // The file is there. A read that still fails is the protection class
+        // (`completeFileProtection`) refusing while locked — or an I/O error, which
+        // is equally not a reason to seal defaults over it.
+        guard let blob = try? Data(contentsOf: fileURL) else { return .unavailable }
+        guard !blob.isEmpty else { return .unusable }
+        let key: SymmetricKey
+        do {
+            key = try keyProvider.key()
+        } catch KeychainError.unavailableWhileLocked {
+            return .unavailable
+        } catch {
+            return .unusable
+        }
         guard let box = try? AES.GCM.SealedBox(combined: blob),
-              let plaintext = try? AES.GCM.open(box, using: key)
-        else { return nil }
-        return try? JSONDecoder().decode(AppSettings.self, from: plaintext)
+              let plaintext = try? AES.GCM.open(box, using: key),
+              let settings = try? JSONDecoder().decode(AppSettings.self, from: plaintext)
+        else { return .unusable }
+        return .settings(settings)
     }
 
     // ── Writing ──────────────────────────────────────────────────────────────
 
     public func update(_ transform: @Sendable (inout AppSettings) -> Void) async throws {
-        var settings = await load()
+        // `loadOrThrow`, not `load`: a transient read failure must not be
+        // patched over with defaults and then written back. The caller gets
+        // `PreferencesError.unavailable` and the file stays as it was.
+        var settings = try loadOrThrow()
         transform(&settings)
         try persist(settings)
     }
@@ -247,7 +298,12 @@ public actor PreferencesStore: PreferencesStoring {
 
     private func persist(_ settings: AppSettings) throws {
         let plaintext = try JSONEncoder().encode(settings)
-        let key = try keyProvider.key()
+        let key: SymmetricKey
+        do {
+            key = try keyProvider.key()
+        } catch KeychainError.unavailableWhileLocked {
+            throw PreferencesError.unavailable // same word as the read side
+        }
         // CryptoKit generates a fresh random nonce per seal; `combined` is
         // nonce || ciphertext || tag, the layout Android writes.
         let sealed = try AES.GCM.seal(plaintext, using: key)
@@ -307,14 +363,19 @@ public actor PreferencesStore: PreferencesStoring {
     }
 }
 
-/// The one failure that is not "fall back to defaults".
+/// The two failures that are not "fall back to defaults".
 public enum PreferencesError: Error, Equatable, CustomStringConvertible {
     case sealFailed
+    /// The file or its key cannot be read right now (device locked). Nothing was
+    /// written; try again once the device is unlocked.
+    case unavailable
 
     public var description: String {
         switch self {
         case .sealFailed:
             return "Could not encrypt the preferences."
+        case .unavailable:
+            return "The preferences cannot be read while the device is locked."
         }
     }
 }

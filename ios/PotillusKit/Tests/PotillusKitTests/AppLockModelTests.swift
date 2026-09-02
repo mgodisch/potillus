@@ -82,6 +82,41 @@ final class AppLockModelTests: XCTestCase {
         XCTAssertEqual(fake.evaluateCount, 0)
     }
 
+    // ── No authenticator behind an armed lock: fail closed ───────────────────
+    //
+    // The passcode was removed after the lock was switched on (which on iOS
+    // disables Face ID and Touch ID too). The lock must NOT open: a cover the
+    // owner asked for does not come down because the device lost its key. These
+    // pin the rule SECURITY.md states for both platforms; Android used to open
+    // silently here.
+
+    func testAnArmedLockWithoutAnAuthenticatorStaysLockedOnLaunch() async {
+        fake.capable = false
+        fake.willSucceed = false
+        let model = makeModel()
+
+        await model.armAndLaunch(enabled: true, reason: "x")
+
+        XCTAssertEqual(model.state, .locked, "no authenticator must not mean no lock")
+        XCTAssertTrue(model.isEnabled)
+        XCTAssertEqual(fake.evaluateCount, 1, "the prompt is attempted and fails")
+    }
+
+    func testAnArmedLockWithoutAnAuthenticatorStaysLockedOnAReturn() async {
+        let model = makeModel()
+        model.isEnabled = true
+        await model.onLaunch() // unlocks: the fake passes
+
+        fake.capable = false // the passcode goes away while the app is backgrounded
+        fake.willSucceed = false
+        model.onBackground()
+        clock.now += AppLock.reauthAfterSeconds
+        await model.onForeground()
+
+        XCTAssertEqual(model.state, .locked)
+        XCTAssertEqual(fake.evaluateCount, 2)
+    }
+
     // ── Launch ───────────────────────────────────────────────────────────────
 
     func testAColdStartBehindTheLockShowsTheCover() async {

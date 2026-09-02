@@ -86,11 +86,20 @@ leave the app. SECURITY.md states each of them and why it is not defended.
    or the wider OS.
 2. **Key-store boundary** — between application code and the platform key store.
    On Android raw key material never crosses into application memory in
-   exportable form.
+   exportable form. On iOS it does, transiently: the Keychain returns the 32
+   key bytes, which live in process memory while the preferences are sealed or
+   opened. The Secure Enclave cannot hold an AES key, so a non-exportable
+   symmetric key is not available on that platform; the boundary there is the
+   Keychain's access class (`WhenUnlockedThisDeviceOnly`), not the key's
+   non-exportability.
 3. **Screen/UI boundary** — between on-screen content and the screenshot,
    recording and switcher surfaces. Enforced on Android, partial on iOS.
 4. **User/device authentication boundary** — the device lock screen and the
-   optional in-app biometric gate.
+   optional in-app biometric gate. The gate fails closed: an armed lock on a
+   device that has lost every credential stays locked rather than opening
+   (SECURITY.md, "Optional biometric lock"); the rule is pinned by
+   `AppLockModelTests` on iOS and enforced by the prompt's own error path on
+   Android.
 5. **Export boundary** — data crossing to user-chosen file locations, explicitly
    **outside** the app's trust boundary.
 6. **No network boundary** — nothing crosses one, because neither app has
@@ -136,7 +145,9 @@ Mapped to well-known mobile weakness classes:
   per-encryption random 96-bit nonce from a secure RNG and a 128-bit tag; no weak
   algorithms (no MD5/SHA-1/ECB/DES). Implemented by `KeystoreSecretStore` on
   Android and by CryptoKit's `AES.GCM` over a `KeychainKeyProvider` 256-bit key on
-  iOS, which write the identical `nonce || ciphertext || tag` layout.
+  iOS, which write the identical `nonce || ciphertext || tag` layout. That
+  identity is pinned by `test-vectors/sealed-blob.json`, which both suites open
+  under a fixed key (`SealedBlobVectorTest` on each side).
 - **Improper input validation** — backup/import data is validated on restore and
   rejected if invalid; numeric inputs are range/format checked; locale-aware
   parsing is regression-tested. The validators are part of the shared domain, so

@@ -73,6 +73,9 @@ scope and the cases that were deliberately left out.
   `PdfReportData` that reads no zone, locale or clock.
 - `report-format.json` — the report's number formatting. Every expected string
   was produced by the JVM, not written by hand.
+- `sealed-blob.json` — the `nonce || ciphertext || tag` layout of the sealed
+  preferences file, opened under a fixed key on both platforms. The blobs were
+  produced by a third AES-GCM implementation, not by either port.
 - `stats-window.json` — which days a statistics period covers: the three
   periods, the baseline, and the statistics-start floor over both.
 - `template-render.json` — the two-feature template engine behind

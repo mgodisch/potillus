@@ -62,8 +62,13 @@ requirements are met — including the threat model and trust boundaries — is 
   the device), and the database is kept out of the device backup by default (see
   "Backup control" below).
 - **Optional biometric lock.** You can enable a lock as a convenience gate against
-  casual physical access to an unlocked device — a fingerprint lock on Android,
-  Face ID or Touch ID (with device-passcode fallback) on iOS.
+  casual physical access to an unlocked device. On both platforms it accepts a
+  strong biometric (fingerprint or face, where the device offers it) or the
+  device credential (PIN, pattern, password, passcode). The lock can only be
+  switched on while the device has such a credential, and it fails closed: if
+  every biometric and the screen lock are removed afterwards, the app stays
+  locked until a device credential is set again — on iOS the lock cover stays
+  up, on Android the app closes when the prompt cannot be satisfied.
 - **App-switcher privacy.** On both platforms the app hides its own contents in
   the app switcher / recents preview by default, so a glance at the running-apps
   list does not reveal the diary; a setting lets you turn this off.

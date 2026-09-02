@@ -195,6 +195,72 @@ final class PreferencesStoreTests: XCTestCase {
         XCTAssertEqual(before, after, "reading an unreadable file must not rewrite it")
     }
 
+    // ── A key the Keychain will not hand over yet ────────────────────────────
+    //
+    // `WhenUnlocked` items are unreadable while the device is locked. That is a
+    // transient state, and until the v0.86.0 review the store folded it into
+    // "wrong key": `load()` cached the defaults, and the next `update()` sealed
+    // those defaults over the user's settings. These pin the separation.
+
+    /// A provider whose Keychain is "locked" until the test says otherwise.
+    private final class LockableKeyProvider: SecretKeyProviding, @unchecked Sendable {
+        var locked = true
+        let stored: SymmetricKey
+        init(key: SymmetricKey) { stored = key }
+        func key() throws -> SymmetricKey {
+            if locked { throw KeychainError.unavailableWhileLocked }
+            return stored
+        }
+    }
+
+    func testALockedKeychainYieldsDefaultsWithoutCachingThem() async throws {
+        try await makeStore().update { $0.dailyLimitGrams = 30.0 }
+        let provider = LockableKeyProvider(key: key)
+        let store = PreferencesStore(fileURL: fileURL, keyProvider: provider)
+
+        let whileLocked = await store.load()
+        XCTAssertEqual(whileLocked, AppSettings(), "nothing better is available yet")
+
+        provider.locked = false
+        let afterUnlock = await store.load()
+        XCTAssertEqual(afterUnlock.dailyLimitGrams, 30.0, "the real settings, not a cached default")
+    }
+
+    func testALockedKeychainRefusesToWriteAndLeavesTheFileAlone() async throws {
+        try await makeStore().update { $0.dailyLimitGrams = 30.0 }
+        let before = try Data(contentsOf: fileURL)
+        let provider = LockableKeyProvider(key: key)
+        let store = PreferencesStore(fileURL: fileURL, keyProvider: provider)
+
+        do {
+            try await store.update { $0.dailyLimitGrams = 10.0 }
+            XCTFail("a write over settings that could not be read must throw")
+        } catch let error as PreferencesError {
+            XCTAssertEqual(error, .unavailable)
+        }
+
+        XCTAssertEqual(try Data(contentsOf: fileURL), before, "the file must not be touched")
+        provider.locked = false
+        let settings = await store.load()
+        XCTAssertEqual(settings.dailyLimitGrams, 30.0)
+    }
+
+    func testALockedKeychainDoesNotCountAsAFirstLaunch() async throws {
+        try await makeStore().update { $0.dailyLimitGrams = 30.0 }
+        let provider = LockableKeyProvider(key: key)
+        let store = PreferencesStore(
+            fileURL: fileURL, keyProvider: provider,
+            seedsStatsFloor: true, clock: FixedClock(millis: 1_766_000_000_000)
+        )
+
+        _ = await store.load()
+        provider.locked = false
+        let settings = await store.load()
+
+        XCTAssertEqual(settings.statsFromDate, "", "no seed was written over the real file")
+        XCTAssertEqual(settings.dailyLimitGrams, 30.0)
+    }
+
     // ── Round trip ───────────────────────────────────────────────────────────
 
     func testFirstLaunchYieldsTheCanonicalDefaults() async {

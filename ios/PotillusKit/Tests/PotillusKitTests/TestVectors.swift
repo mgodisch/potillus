@@ -106,6 +106,24 @@ struct AppLockVectors: Decodable {
     }
 }
 
+/// `sealed-blob.json` — the `nonce || ciphertext || tag` layout of the sealed
+/// preferences, pinned in the opening direction under a fixed key.
+struct SealedBlobVectors: Decodable {
+    let keyHex: String
+    let nonceLength: Int
+    let tagLength: Int
+    let open: [Case]
+
+    struct Case: Decodable {
+        let description: String
+        let blobHex: String
+        /// The UTF-8 plaintext; absent when `expectFailure` is set.
+        let expected: String?
+        /// `true` when the tag must not authenticate.
+        let expectFailure: Bool?
+    }
+}
+
 /// `report-format.json` — how the report prints a number.
 ///
 /// Every expected string was produced by the JVM, not typed by hand.
