@@ -83,6 +83,13 @@ the software.
 
 Forward-looking directions, roughly in priority order:
 
+- **Split the CHANGELOG archive** (repository hygiene). `CHANGELOG.md` has grown
+  past 6,600 lines, and every review diff and several release gates read it
+  whole. Moving the released entries into a `docs/CHANGELOG-archive.md` is a
+  careful change rather than a cut: `md-syntax.py` requires the `## vX.Y.Z`
+  headings to descend strictly across the whole file, and `version-consistency.sh`
+  and `changelog.sh` read the top entry and the body beneath it. All three have
+  to move with the split.
 - **Stay current and maintained.** Keep the dependency stack up to date — Android
   Gradle Plugin, Gradle, the Kotlin toolchain, and the AndroidX/Jetpack and
   Compose libraries — and track new stable Android API levels, without

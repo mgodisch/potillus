@@ -52,22 +52,10 @@
 #   versionName that appears in CHANGELOG.md and its true versionCode, then make
 #   sure the arithmetic above still holds for the current build.
 #
-# WHY THIS ANCHOR SITS AT v1.0.0
-#   CHANGELOG.md was reopened at v1.0.0 for the production release, and the 0.x
-#   entries it held before are gone from it. SECTION 1 reads that file only, so
-#   the previous anchor -- v0.70.0 at versionCode 72, the release the rule was
-#   first baselined on -- names a version the file no longer holds, and the
-#   check fails on a missing anchor rather than on anything being wrong. The
-#   anchor therefore re-baselines onto v1.0.0, the top entry of the reopened
-#   file, at the versionCode that release ships under. The count starts over
-#   with it, the versionCode does not: the 0.x codes stay spent, because Play
-#   and the App Store both require a monotonic build number, so v1.0.0
-#   continues the series at 97 rather than restarting at 1.
-#
 # FORMAT
 #   Two KEY=VALUE lines, no spaces around '='. Lines starting with '#' and blank
 #   lines are ignored by the parser.
 # =============================================================================
 
-ANCHOR_VERSION_NAME=1.0.0
-ANCHOR_VERSION_CODE=97
+ANCHOR_VERSION_NAME=0.70.0
+ANCHOR_VERSION_CODE=72

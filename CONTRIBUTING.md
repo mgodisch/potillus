@@ -551,20 +551,16 @@ bump MINOR. `versionCode` in `build.gradle.kts` increases by at least 1 every
 release. `versionName`, the top `CHANGELOG.md` entry and the `README.md` title
 must always carry the same string — `release-check.sh` §1 enforces this.
 
-**Changelog.** `CHANGELOG.md` is forward-only: it begins at the version it was
-opened on and records what changes from there. It is deliberately *not* the home
-of design rationale — the reasons behind a decision live in the KDoc/comments
-beside the code they explain, so the source stays self-explanatory without the
-changelog.
+**Changelog.** `CHANGELOG.md` is forward-only: it begins at the published baseline
+and records what changes from there. It is deliberately *not* the home of design
+rationale — the reasons behind a decision live in the KDoc/comments beside the code
+they explain, so the source stays self-explanatory without the changelog.
 
 Before tagging a new version:
 
 - [ ] `README.md` header updated to the new version number.
 - [ ] `app/build.gradle.kts` `versionName` and `versionCode` updated.
 - [ ] `CHANGELOG.md` entry written in English.
-- [ ] Store release notes for the new `versionCode`: the per-locale
-      `changelogs/<versionCode>.txt`, and the iOS `release_notes.txt` with its
-      line in `release_notes.versions`.
 - [ ] All new public functions have KDoc.
 - [ ] All new string keys present in every locale file (enforced by LocaleSyncTest).
 - [ ] `locale_config.xml` and `SettingsScreen.kt` language list in sync.
