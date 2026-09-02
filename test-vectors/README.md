@@ -68,6 +68,7 @@ scope and the cases that were deliberately left out.
   `bounds` block is generated from `DrinkValidator.kt`.
 - `limit-gauge.json` — the Today screen's two progress bars: fill (clamped) and
   emphasis (calm, warning, danger) for grams and for drink days.
+- `gpl-notice.json` — the licence lines a backup's `_comment` array carries.
 - `month-grid.json` — the calendar's month alignment: blanks before day 1 under
   the locale's first weekday, day count, and the rows of seven a month needs.
 - `month-rollup.json` — the monthly table's cap at six months and the weighted

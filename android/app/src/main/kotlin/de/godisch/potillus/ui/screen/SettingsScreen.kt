@@ -52,6 +52,7 @@ import androidx.core.app.LocaleManagerCompat
 import androidx.core.app.ShareCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.godisch.potillus.PotillusApp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
@@ -576,8 +577,13 @@ fun SettingsScreen(
                         selected = settings.language,
                         onSelect = { code ->
                             vm.setLanguage(code)
+                            // "(System)" applies the detected system language at once,
+                            // the same tag PotillusApp applies at launch; an empty
+                            // locale list would leave nn → nb and zh-Hant-HK → zh-TW
+                            // to the platform, which folds neither.
+                            val applied = code.ifEmpty { PotillusApp.detectSystemLanguage() }
                             androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                                androidx.core.os.LocaleListCompat.forLanguageTags(code),
+                                androidx.core.os.LocaleListCompat.forLanguageTags(applied),
                             )
                         },
                     )

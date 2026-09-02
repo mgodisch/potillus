@@ -82,8 +82,11 @@ import java.util.Locale
 //     TodayViewModel, kept JVM-testable): read the SAME per-app locale from its
 //     persisted source, `Locale.forLanguageTag(AppSettings.language)`. That tag
 //     and AppCompatDelegate's application locales are always written together
-//     (the Settings language picker and applyLanguageOnFirstLaunch set both), so
-//     this yields the same locale as [formattingLocale] without needing a Context.
+//     (the Settings language picker sets both; while the choice is empty,
+//     PotillusApp.applySystemLanguage applies the detected system language and
+//     the tag stays ""), so this yields the same locale as [formattingLocale]
+//     without needing a Context — up to LocaleDetector's folds for the empty
+//     choice, which format alike.
 //
 //   Use the returned Locale for EVERY java.time formatter and every
 //   getDisplayName(...) call that produces user-visible text. Never pass

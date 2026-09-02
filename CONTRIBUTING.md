@@ -405,7 +405,7 @@ Android resource qualifier (e.g. `values-fr/`, `values-pt-rBR/`,
 [`SupportedLocales`](app/src/main/kotlin/de/godisch/potillus/l10n/SupportedLocales.kt)
 (`SupportedLocales.ALL`). It is consumed by the in-app language selector
 (`LanguageDropdown` in `SettingsScreen`) and by
-`PotillusApp.applyLanguageOnFirstLaunch()`, which derives its candidate set from
+`PotillusApp.applySystemLanguage()`, which derives its candidate set from
 `SupportedLocales.TAGS` (never hard-coded). `res/xml/locale_config.xml` (the
 system per-app language picker) must mirror this list exactly. `LocaleSyncTest`
 enforces that `SupportedLocales.ALL`, `locale_config.xml`, and the set of

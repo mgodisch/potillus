@@ -290,11 +290,13 @@ data class AppSettings(
      * Selected UI language as a BCP-47 tag, or `""` when the user has not chosen
      * one yet.
      *
-     * The empty string is the deliberate "not yet set" sentinel: it matches the
-     * `?:` fallback in [de.godisch.potillus.data.prefs.AppPreferences.settingsFlow]
-     * and is what [de.godisch.potillus.PotillusApp.applyLanguageOnFirstLaunch] and
-     * the device-transfer heuristic test against. A non-empty default such as
-     * `"en"` would contradict the flow fallback and those checks, so it stays empty.
+     * The empty string is the deliberate "follow the system" state, and since
+     * v0.86.0 the normal one on both platforms: it matches the `?:` fallback in
+     * [de.godisch.potillus.data.prefs.AppPreferences.settingsFlow] and is what
+     * [de.godisch.potillus.PotillusApp.applySystemLanguage] tests for before it
+     * applies the detected system language WITHOUT persisting it. A non-empty
+     * default such as `"en"` would contradict the flow fallback and that check,
+     * so it stays empty.
      */
     val language: String = "",
     val weightKg: Double = 0.0,

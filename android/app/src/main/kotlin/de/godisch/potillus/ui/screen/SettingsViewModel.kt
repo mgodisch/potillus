@@ -329,7 +329,7 @@ class SettingsViewModel(
 
                 // Keep the framework per-app locale in lock-step with the restored
                 // language preference, exactly as the Settings language picker and
-                // PotillusApp.applyLanguageOnFirstLaunch do. Writing only the
+                // PotillusApp.applySystemLanguage do. Writing only the
                 // DataStore side (in applyImportedSettings) would desynchronise the
                 // two, because AppCompatDelegate persists its own locale
                 // independently. setApplicationLocales recreates the Activity and

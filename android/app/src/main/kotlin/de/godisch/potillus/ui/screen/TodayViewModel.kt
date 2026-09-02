@@ -275,8 +275,12 @@ class TodayViewModel(
         //   see a German month name next to the French UI labels. Using the BCP-47
         //   tag stored in [AppSettings.language] matches the same locale that the
         //   string resources are resolved in, so labels and values agree. Falls
-        //   back to Locale.getDefault() when no language has been stored yet (empty
-        //   string sentinel on first launch before applyLanguageOnFirstLaunch runs).
+        //   back to Locale.getDefault() while no language is chosen — the "(System)"
+        //   state, which since v0.86.0 is the normal one (PotillusApp.applySystemLanguage
+        //   no longer writes the detected tag into the preferences). The UI then
+        //   runs in LocaleDetector's fold of the system language and the numbers in
+        //   the system locale itself; the two differ only where the fold does (nn →
+        //   nb, zh-Hant-HK → zh-TW), and those pairs format alike.
         //
         // RELATION TO Context.formattingLocale():
         //   Elsewhere the per-app formatting locale is read from a Context's
@@ -284,11 +288,11 @@ class TodayViewModel(
         //   ViewModel deliberately holds NO Context (see the class header — it is
         //   kept Context-free so it stays JVM-unit-testable), so it reads the same
         //   per-app locale from its persisted SOURCE instead: [AppSettings.language]
-        //   and AppCompatDelegate's application locales are always written together
-        //   (SettingsScreen's language picker sets both; applyLanguageOnFirstLaunch
-        //   sets both), so the tag here and Context.formattingLocale() elsewhere
-        //   resolve to the same locale. They are two views of one value, not two
-        //   independent sources — do not "reconcile" them by injecting a Context.
+        //   and AppCompatDelegate's application locales are written together by
+        //   the Settings picker, so a CHOSEN tag here and Context.formattingLocale()
+        //   elsewhere resolve to the same locale. They are two views of one value,
+        //   not two independent sources — do not "reconcile" them by injecting a
+        //   Context. (For the empty choice see the fallback note above.)
         val formattingLocale = if (settings.language.isNotEmpty()) {
             Locale.forLanguageTag(settings.language)
         } else {

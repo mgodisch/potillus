@@ -46,6 +46,7 @@ package de.godisch.potillus
 // =============================================================================
 
 import android.app.Application
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import de.godisch.potillus.data.db.AppDatabase
@@ -66,7 +67,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 /**
  * Application class for Libellus Potionis (Potillus).
@@ -134,7 +134,7 @@ class PotillusApp : Application() {
 
     /**
      * Process entry point. Runs the one-shot startup task that must happen
-     * before the first Activity reads settings: first-launch language detection.
+     * before the first Activity reads settings: the system-language detection.
      *
      * It runs on [Dispatchers.IO] because it reads DataStore; the few
      * UI-thread calls inside switch dispatcher explicitly via [withContext].
@@ -142,22 +142,34 @@ class PotillusApp : Application() {
     override fun onCreate() {
         super.onCreate()
         // Explicitly choose Dispatchers.IO for the DataStore read inside
-        // applyLanguageOnFirstLaunch(). Without a default dispatcher on applicationScope,
+        // applySystemLanguage(). Without a default dispatcher on applicationScope,
         // every consumer must specify the dispatcher at the launch site.
         applicationScope.launch(Dispatchers.IO) {
-            // applyLanguageOnFirstLaunch() needs the startup settings snapshot.
+            // applySystemLanguage() needs the startup settings snapshot.
             val startupSettings = appPreferences.settingsFlow.first()
-            applyLanguageOnFirstLaunch(startupSettings)
+            applySystemLanguage(startupSettings)
         }
     }
 
     /**
-     * On the very first launch (no language stored yet), derive the preferred language
-     * from the system locale and persist it. Falls back to "en" if the system language
-     * is not among the supported ones.
+     * While no language is chosen (`language == ""`, the "(System)" state),
+     * derive the UI language from the SYSTEM locale on every launch and apply it
+     * as the per-app locale — without persisting it. Falls back to "en" if the
+     * system language is not among the supported ones.
      *
-     * This ensures the UI locale matches what the user sees at first start, without
-     * waiting for the user to open Settings.
+     * NOT PERSISTED, SINCE THE v0.86.0 REVIEW. Until then this ran once and wrote
+     * the detected tag into the preferences, so "(System)" was never the state
+     * after the first start: a phone switched from German to French kept a
+     * German app, while iOS — which leaves the choice empty and resolves at
+     * runtime — followed. Both now do the same: an empty choice follows the
+     * system, on every launch, and a backup written here carries "" like an iOS
+     * one. The detection still runs through [LocaleDetector], because the
+     * platform's own resource matching would not fold `nn` onto `nb` or pick
+     * `zh-TW` for `zh-Hant-HK`.
+     *
+     * THE SYSTEM LOCALE, NOT `Locale.getDefault()`. AppCompat sets the process
+     * default to the per-app locale it applied last time, so reading it back
+     * would detect last launch's answer instead of the phone's language.
      *
      * CANDIDATE SET – derived from [SupportedLocales.ALL], never hard-coded:
      *   The candidate set is taken directly from [SupportedLocales.TAGS] rather
@@ -182,15 +194,11 @@ class PotillusApp : Application() {
      *                        startup write; its [AppSettings.language] is the
      *                        "already chosen?" signal.
      */
-    private suspend fun applyLanguageOnFirstLaunch(startupSettings: AppSettings) {
+    private suspend fun applySystemLanguage(startupSettings: AppSettings) {
         val stored = startupSettings.language
-        if (stored.isNotEmpty()) return // already set, nothing to do
+        if (stored.isNotEmpty()) return // chosen explicitly; AppCompat restores it itself
 
-        // Delegate the pure locale-matching logic to LocaleDetector so it can be
-        // unit-tested independently of this Android Application subclass.
-        val chosen = LocaleDetector.detect(Locale.getDefault(), SupportedLocales.TAGS)
-
-        appPreferences.setLanguage(chosen)
+        val chosen = detectSystemLanguage()
         // AppCompatDelegate.setApplicationLocales() internally calls
         // Activity.recreate() and must run on the Main thread. The surrounding
         // coroutine runs on Dispatchers.IO (applicationScope), so we switch
@@ -198,5 +206,17 @@ class PotillusApp : Application() {
         withContext(Dispatchers.Main) {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(chosen))
         }
+    }
+
+    companion object {
+        /**
+         * The supported language the phone's SYSTEM locale maps to, via
+         * [LocaleDetector]. Used at launch while no language is chosen, and by
+         * the Settings picker when the user returns to "(System)", so both
+         * paths apply the same tag. Reads `Resources.getSystem()` rather than
+         * `Locale.getDefault()`; see [applySystemLanguage].
+         */
+        fun detectSystemLanguage(): String =
+            LocaleDetector.detect(Resources.getSystem().configuration.locales[0], SupportedLocales.TAGS)
     }
 }

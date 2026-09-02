@@ -49,6 +49,7 @@ apply to it are stated in the accompanying COPYING.md file.
 - A shared vector for the calendar's month alignment.
 - A shared vector for the statistics screen's hour and category aggregations.
 - A shared vector for the Today screen's two progress bars.
+- A shared vector for the licence header a backup carries.
 
 ### Changed
 
@@ -84,6 +85,11 @@ apply to it are stated in the accompanying COPYING.md file.
 - The Statistics chart samples its axis labels through the same domain
   function as the report on both platforms.
 - TalkBack announces the selected language in the language picker.
+- Android no longer writes the detected language into the preferences at first
+  start; an unset language follows the system, as on iOS.
+- A Nynorsk system language reads the Bokmål catalogue on iOS, as on Android.
+- A backup written on iOS carries the same licence header as one written on
+  Android; the Android day plurals are held to the shared vector too.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

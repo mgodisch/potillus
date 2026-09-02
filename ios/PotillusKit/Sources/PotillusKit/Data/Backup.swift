@@ -523,12 +523,9 @@ public enum BackupWriter {
     /// The GPL notice carried in the file's `_comment` array, matching the one
     /// Android writes. A backup is a document the user may publish; it says what
     /// it is and under what terms.
-    public static let commentLines = [
-        "Libellus Potionis - Privacy-Friendly Alcohol Tracker",
-        "Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>",
-        "License: GNU General Public License v3 or later",
-        "https://www.gnu.org/licenses/",
-    ]
+    /// The `_comment` array: the full notice, the same lines Android writes
+    /// (`GplNotice`, pinned by `test-vectors/gpl-notice.json`).
+    public static let commentLines = GplNotice.headerLines
 
     /// Serialises `backup` to pretty-printed JSON with sorted keys.
     ///

@@ -59,9 +59,18 @@ import SwiftUI
 enum Loc {
 
     /// The chosen language as a `Locale`. Empty (the "System" choice) falls back to
-    /// the system locale, so "System" behaves like ordinary iOS localisation.
+    /// the system locale, so "System" behaves like ordinary iOS localisation —
+    /// with one fold Foundation does not make: a Nynorsk (`nn`) or macrolanguage
+    /// (`no`) system reads the Bokmål catalogue, as Android's
+    /// `LocaleDetector.normalizeLanguage` decides since the v0.86.0 review, because
+    /// Bokmål is the closest shipped language and the English fallback is not.
     static func locale(for language: String) -> Locale {
-        language.isEmpty ? .current : Locale(identifier: language)
+        guard language.isEmpty else { return Locale(identifier: language) }
+        let system = Locale.current
+        switch system.language.languageCode?.identifier {
+        case "nn", "no": return Locale(identifier: "nb")
+        default: return system
+        }
     }
 
     /// Looks up `key` in the chosen language.

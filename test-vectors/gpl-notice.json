@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "The licence notice a backup file carries in its `_comment` array, line by line.",
+    "Loaded by BOTH suites: GplNoticeTest.kt holds Android's GplNotice.HEADER_LINES",
+    "to it, GplNoticeVectorTest.swift the kit's GplNotice.headerLines (which",
+    "BackupWriter embeds). Until the v0.86.0 review iOS wrote a four-line summary",
+    "where Android wrote the full notice, so two exports of the same diary differed",
+    "in their first lines. Both importers ignore the field; this pins the text so",
+    "they do not drift again."
+  ],
+  "headerLines": [
+    "Libellus Potionis - Privacy-Friendly Alcohol Tracker",
+    "Copyright (c) 2026 Martin A. Godisch <martin@godisch.de>",
+    "",
+    "This program is free software: you can redistribute it and/or modify it",
+    "under the terms of the GNU General Public License as published by the",
+    "Free Software Foundation, either version 3 of the License, or (at your",
+    "option) any later version.",
+    "",
+    "This program is distributed in the hope that it will be useful, but",
+    "WITHOUT ANY WARRANTY; without even the implied warranty of",
+    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General",
+    "Public License for more details.",
+    "",
+    "You should have received a copy of the GNU General Public License along",
+    "with this program. If not, see <https://www.gnu.org/licenses/>."
+  ]
+}

@@ -25,6 +25,7 @@
  */
 package de.godisch.potillus.util
 
+import de.godisch.potillus.domain.SharedTestVectors
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -35,6 +36,13 @@ import org.junit.Test
  * by the export formats.
  */
 class GplNoticeTest {
+
+    /** The lines the backup carries are the shared vector's, so iOS writes the same. */
+    @Test
+    fun `header lines match the shared vector`() {
+        val expected = SharedTestVectors.load("gpl-notice").getJSONArray("headerLines")
+        assertEquals((0 until expected.length()).map { expected.getString(it) }, GplNotice.HEADER_LINES)
+    }
 
     @Test fun `header lines expose the GPL notice`() {
         val lines = GplNotice.HEADER_LINES
