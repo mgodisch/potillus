@@ -79,6 +79,8 @@ apply to it are stated in the accompanying COPYING.md file.
   bars' rules live in the Android domain now.
 - Paging the Android calendar clears the selected day, as iOS does.
 - Starring a drink on iOS no longer re-validates it.
+- One contrast figure in the Android colour comments named the predecessor
+  shade; corrected.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

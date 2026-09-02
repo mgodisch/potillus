@@ -33,9 +33,12 @@ import SwiftUI
 // The SwiftUI counterpart of Android's TrafficLightDot. Same three states and
 // the same two styles.
 //
-// COLOUR (always): the dot uses the SAME palette as the Today screen's limit
-//   bars (`Emphasis.tint`) — the app tint for green, orange for one-left, red
-//   for none-left — so a green dot and a calm bar read as the same "you're fine".
+// COLOUR (always): green / orange / red, the three states of a traffic light,
+//   matching Android's TrafficLightDot (successColor / warningColor /
+//   dangerRedColor). NOT `Emphasis.tint`: that palette paints the Today screen's
+//   limit bars, whose calm state is the app tint (blue), and an earlier version
+//   of this dot borrowed it — a "servings remain" dot then read blue here and
+//   green on Android. See `color` below.
 //
 // SYMBOLS (opt-in, Settings → Appearance → alternative status symbols): the dot
 //   adds a glyph that encodes the state by SHAPE as well as hue, for red–green

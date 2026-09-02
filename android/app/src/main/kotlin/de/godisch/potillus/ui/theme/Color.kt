@@ -119,7 +119,9 @@ val NachtWarning = Color(0xFFE8A020) // approaching the limit
 // caption a caption.
 //
 // SchieferSurfaceVariant is not a text background -- it is the progress-bar track
-// only -- so the 3.41 : 1 a caption would have on it does not arise.
+// only -- so the 4.05 : 1 a caption would have on it does not arise. (3.41 : 1,
+// the figure an earlier version of this comment quoted, was the predecessor
+// #6878A0 on that track.)
 
 val SchieferBackground = Color(0xFFEDF0F8) // slate-white canvas
 val SchieferSurface = Color(0xFFFFFFFF) // pure white cards
