@@ -358,6 +358,9 @@ fun CalendarScreen(
         AddEditEntryDialog(
             entry = null,
             drinks = drinks,
+            logicalDay = state.selectedDate,
+            dayChangeHour = state.dayChangeHour,
+            dayChangeMinute = state.dayChangeMinute,
             onSave = { drink, vol, ts, note ->
                 vm.addEntry(drink, vol, ts, note)
                 showAdd = false
@@ -369,6 +372,9 @@ fun CalendarScreen(
         AddEditEntryDialog(
             entry = entry,
             drinks = drinks,
+            logicalDay = entry.logicalDate,
+            dayChangeHour = state.dayChangeHour,
+            dayChangeMinute = state.dayChangeMinute,
             onSave = { drink, vol, ts, note ->
                 vm.updateEntry(
                     entry.copy(

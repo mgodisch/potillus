@@ -190,12 +190,16 @@ struct CalendarScreen: View {
                     // The instant the sheet offers, and Android's dialog too: now.
                     // What makes the entry land on the CHOSEN day is not this
                     // timestamp but the logicalDate the model attaches; the two are
-                    // deliberately separate facts.
-                    now: Date()
+                    // deliberately separate facts. The sheet shows the calendar day
+                    // a typed night-hour time will be stored on (`logicalDay`).
+                    now: Date(),
                     // capacity: omitted, so the sheet hides the capacity dot. Its
                     // figures — today's grams, this week's total, this week's
                     // drinking days — are all about TODAY, and this entry is not.
                     // A dot answering the wrong day's question is worse than none.
+                    logicalDay: model.state.selectedDate,
+                    dayChangeHour: model.state.dayChangeHour,
+                    dayChangeMinute: model.state.dayChangeMinute
                 ) { drink, volume, millis, note in
                     await model.addEntry(
                         drink: drink, volumeMl: volume, timestampMillis: millis, note: note
@@ -204,17 +208,24 @@ struct CalendarScreen: View {
                 }
             }
             // The edit sheet, moved here from the selected-day block: it now hangs
-            // off the List rather than the VStack that block used to be. Its body is
-            // unchanged — a one-element catalogue built from the entry, the same
-            // scope as Android's calendar edit.
+            // off the List rather than the VStack that block used to be. The whole
+            // catalogue with the entry's drink preselected, as Android's calendar
+            // edit offers (v0.86.0; until then a one-element catalogue kept the
+            // drink fixed).
             .sheet(item: $editingEntry) { entry in
                 EntrySheet(
-                    drinks: [drink(from: entry)],
-                    preselected: drink(from: entry),
+                    drinks: model.state.drinks,
+                    preselected: model.state.drinks.first { $0.id == entry.drinkId } ?? drink(from: entry),
                     now: Date(),
-                    editing: entry
+                    editing: entry,
+                    logicalDay: entry.logicalDate,
+                    dayChangeHour: model.state.dayChangeHour,
+                    dayChangeMinute: model.state.dayChangeMinute
                 ) { drink, volume, millis, note in
                     var updated = entry
+                    updated.drinkId = drink.id
+                    updated.drinkName = drink.name
+                    updated.alcoholPercent = drink.alcoholPercent
                     updated.volumeMl = volume
                     updated.timestampMillis = millis
                     updated.note = note
@@ -392,59 +403,6 @@ struct CalendarScreen: View {
         let parts = date.split(separator: "-")
         guard parts.count == 3, let day = Int(parts[2]) else { return "" }
         return String(day)
-    }
-
-    /// The label names the day, its grams and — for a drink day — its limit
-    /// status.
-    ///
-    /// The status used to be left out, on the grounds that it belongs to the dot.
-    /// It does, and that is the problem: the dot carries it in COLOUR alone, which
-    /// is exactly what WCAG 1.4.1 asks a second channel for. A reader who cannot
-    /// see the dot heard the grams and nothing about the limit they sit against.
-    ///
-    /// The status is stated only where a dot is drawn. A day of alcohol-free
-    /// entries reads as "0.0 grams" with no status: naming one over a cell that
-    /// shows none would put label and display at odds. A day with no entries at
-    /// all says so, so an empty cell can be told apart from one whose content
-    /// escaped the reader.
-    ///
-    /// The day arrives as "8 August", not as the stored "2026-08-08": VoiceOver
-    /// read the ISO string out digit group by digit group. Day AND month, because
-    /// the ordinal day alone is spoken as an ordinal in only some of the twenty-one
-    /// languages, while a month name carries in all of them — and the month above
-    /// the grid makes it a repetition, not a surprise.
-    private func accessibilityLabel(_ date: String, summary: DaySummary?) -> String {
-        let spokenDate = dayAndMonth(date)
-        guard let summary else {
-            return Loc.string("%@, nothing logged", spokenDate, locale: locale)
-        }
-        // The grams number is formatted in the in-app locale (one decimal) and
-        // passed as the second positional argument, so VoiceOver reads it in the
-        // same language as the rest of the label.
-        let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
-        guard model.isDrinkDay(date) else {
-            return Loc.string("%1$@, %2$@ grams", spokenDate, grams, locale: locale)
-        }
-        let status = Loc.string(
-            model.isOverLimit(date) ? "over limit" : "under limit",
-            locale: locale
-        )
-        return Loc.string("%@, %@ g, %@", spokenDate, grams, status, locale: locale)
-    }
-
-    /// "2026-08-08" → "8 August", ordered and named by the in-app locale. Parsed
-    /// and formatted in UTC, as `weekRange` is, so the device's zone cannot shift
-    /// the day the grid drew.
-    ///
-    /// Not `private`: the year heat-map in CalendarScreenYear.swift needs the same
-    /// spoken date, and read the raw ISO string until it had this.
-    func dayAndMonth(_ date: String) -> String {
-        guard let day = DayResolver.parseDate(date) else { return date }
-        let formatter = DateFormatter()
-        formatter.locale = locale
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        formatter.setLocalizedDateFormatFromTemplate("dMMMM")
-        return formatter.string(from: day)
     }
 
     // ── Selected day ─────────────────────────────────────────────────────────
@@ -656,8 +614,9 @@ extension CalendarScreen {
         return "\(time) · \(entry.volumeMl) ml · \(percent) % · \(grams) g"
     }
 
-    /// The entry's own drink, rebuilt as a single-item catalogue for the edit
-    /// sheet. Editing does not swap the drink, so the id/category are cosmetic.
+    /// The entry's own drink, rebuilt from what the entry itself records. Used
+    /// as the edit sheet's preselection when the catalogue no longer holds the
+    /// drink; the category is cosmetic, nothing reads it here.
     private func drink(from entry: ConsumptionEntry) -> DrinkDefinition {
         DrinkDefinition(
             id: entry.drinkId,
@@ -704,5 +663,63 @@ extension CalendarScreen {
         guard symbols.count == 7 else { return "" }
         let sundayIndex = iso == 7 ? 0 : iso
         return symbols[sundayIndex]
+    }
+}
+
+// The spoken label sits in an extension rather than in the view body: SwiftLint
+// counts only the body against `type_body_length`, and the view had reached it.
+extension CalendarScreen {
+
+    /// The label names the day, its grams and — for a drink day — its limit
+    /// status.
+    ///
+    /// The status used to be left out, on the grounds that it belongs to the dot.
+    /// It does, and that is the problem: the dot carries it in COLOUR alone, which
+    /// is exactly what WCAG 1.4.1 asks a second channel for. A reader who cannot
+    /// see the dot heard the grams and nothing about the limit they sit against.
+    ///
+    /// The status is stated only where a dot is drawn. A day of alcohol-free
+    /// entries reads as "0.0 grams" with no status: naming one over a cell that
+    /// shows none would put label and display at odds. A day with no entries at
+    /// all says so, so an empty cell can be told apart from one whose content
+    /// escaped the reader.
+    ///
+    /// The day arrives as "8 August", not as the stored "2026-08-08": VoiceOver
+    /// read the ISO string out digit group by digit group. Day AND month, because
+    /// the ordinal day alone is spoken as an ordinal in only some of the twenty-one
+    /// languages, while a month name carries in all of them — and the month above
+    /// the grid makes it a repetition, not a surprise.
+    private func accessibilityLabel(_ date: String, summary: DaySummary?) -> String {
+        let spokenDate = dayAndMonth(date)
+        guard let summary else {
+            return Loc.string("%@, nothing logged", spokenDate, locale: locale)
+        }
+        // The grams number is formatted in the in-app locale (one decimal) and
+        // passed as the second positional argument, so VoiceOver reads it in the
+        // same language as the rest of the label.
+        let grams = Loc.number(summary.totalGrams, fractionDigits: 1, locale: locale)
+        guard model.isDrinkDay(date) else {
+            return Loc.string("%1$@, %2$@ grams", spokenDate, grams, locale: locale)
+        }
+        let status = Loc.string(
+            model.isOverLimit(date) ? "over limit" : "under limit",
+            locale: locale
+        )
+        return Loc.string("%@, %@ g, %@", spokenDate, grams, status, locale: locale)
+    }
+
+    /// "2026-08-08" → "8 August", ordered and named by the in-app locale. Parsed
+    /// and formatted in UTC, as `weekRange` is, so the device's zone cannot shift
+    /// the day the grid drew.
+    ///
+    /// Not `private`: the year heat-map in CalendarScreenYear.swift needs the same
+    /// spoken date, and read the raw ISO string until it had this.
+    func dayAndMonth(_ date: String) -> String {
+        guard let day = DayResolver.parseDate(date) else { return date }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.setLocalizedDateFormatFromTemplate("dMMMM")
+        return formatter.string(from: day)
     }
 }

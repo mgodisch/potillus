@@ -445,22 +445,46 @@ public final class TodayModel {
 
     /// Logs a drink at the given instant, defaulting to now.
     ///
-    /// The grams and the logical date are computed here, not taken from the
-    /// caller: they are derived facts, and a view that could pass its own would
-    /// eventually pass a wrong one.
+    /// The grams are computed here, not taken from the caller: derived facts,
+    /// and a view that could pass its own would eventually pass a wrong one.
+    ///
+    /// THE DAY IS THE SCREEN'S, THE TIME IS THE USER'S (v0.86.0). The sheet offers
+    /// hours and minutes only, so the entry belongs to the logical day this
+    /// screen shows, and the typed time is placed on the calendar day that keeps
+    /// it there: "02:00" logged at 05:00 on the 11th under a 04:00 day change is
+    /// 02:00 on the calendar 12th, still logically the 11th. Before v0.86.0 the
+    /// instant was today's calendar date plus the time, which resolved to
+    /// YESTERDAY and vanished from the screen it was logged on. The calendar has
+    /// always placed its entries this way; the sheet shows the calendar date it
+    /// is about to store when it differs. Android's `TodayViewModel.addEntry`
+    /// applies the same rule.
     public func addEntry(
         drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64? = nil, note: String = ""
     ) async {
+        let typed = timestampMillis ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
+        // Empty until the first load: resolve from the clock in that window rather
+        // than filing the entry under an empty day.
+        let day = state.logicalDate.isEmpty
+            ? DayResolver.resolve(
+                timestampMillis: typed, changeHour: state.settings.dayChangeHour,
+                changeMinute: state.settings.dayChangeMinute, timeZone: timeZone
+            )
+            : state.logicalDate
+        let onToday = DayResolver.instant(
+            logicalDate: day, matchingTimeOf: typed,
+            changeHour: state.settings.dayChangeHour, changeMinute: state.settings.dayChangeMinute,
+            timeZone: timeZone
+        ) ?? typed
         // The derivation lives in `EntryLogger`, so the Drinks screen and this one
         // cannot produce differently-shaped entries.
         let entry = EntryLogger.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: timestampMillis
-                ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded()),
+            timestampMillis: onToday,
             note: note,
             settings: state.settings,
-            timeZone: timeZone
+            timeZone: timeZone,
+            logicalDate: day
         )
 
         // The new row id is discarded explicitly rather than silenced with
@@ -473,16 +497,29 @@ public final class TodayModel {
         await perform { try self.entries.delete(entry) }
     }
 
+    /// Persists edits to `entry`, keeping it on its logical day.
+    ///
+    /// The edited time is placed on the calendar day that keeps the entry on
+    /// `entry.logicalDate` — the same rule as `addEntry` and as the calendar's
+    /// edit, so an edit never moves an entry off the screen it was edited on.
+    /// (Android re-resolved the day from the new time until v0.86.0, and 05:00
+    /// corrected to 02:00 sent the entry to yesterday.) Moving an entry to
+    /// another day is the calendar's job: pick the day there.
     public func updateEntry(_ entry: ConsumptionEntry) async {
+        var stamped = entry
+        stamped.timestampMillis = DayResolver.instant(
+            logicalDate: entry.logicalDate, matchingTimeOf: entry.timestampMillis,
+            changeHour: state.settings.dayChangeHour, changeMinute: state.settings.dayChangeMinute,
+            timeZone: timeZone
+        ) ?? entry.timestampMillis
         // The frame is re-read with the timestamp, unlike the logical date. The
         // two answer different questions: the date is where the user filed the
         // drink, the offset is the frame the time they just typed was typed in.
         // Keeping a stale offset would show the edited entry at an hour the user
         // did not enter. Done here rather than in the view, so no caller can
         // forget it — the shape Android gives its repository.
-        var stamped = entry
         stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
-            timestampMillis: entry.timestampMillis, timeZone: timeZone
+            timestampMillis: stamped.timestampMillis, timeZone: timeZone
         )
         await perform { try self.entries.update(stamped) }
     }

@@ -11,7 +11,11 @@
     "regions are the ones whose week convention is settled: three that open on Monday",
     "and one that opens on Sunday, so both branches of the Swift conversion are hit.",
     "The number feeds the calendar grid's column order and the weekday histogram's bar",
-    "order, so a divergence rotates one platform's week against the other's."
+    "order, so a divergence rotates one platform's week against the other's.",
+    "",
+    "calendarDate: the CALENDAR date an instant falls on in a zone — what the entry",
+    "dialog shows beside a night-hour time that instantOnLogicalDate placed on the",
+    "following calendar day (v0.86.0)."
   ],
   "resolve": [
     {
@@ -598,6 +602,38 @@
       "description": "the United States starts the week on Sunday",
       "languageTag": "en-US",
       "expected": 7
+    }
+  ],
+  "calendarDate": [
+    {
+      "description": "the fall-back instant of the case above is the calendar 26th",
+      "timestampMillis": 1792978200000,
+      "zoneId": "Europe/Berlin",
+      "expected": "2026-10-26"
+    },
+    {
+      "description": "the spring-forward instant is the calendar 29th",
+      "timestampMillis": 1774747800000,
+      "zoneId": "Europe/Berlin",
+      "expected": "2026-03-29"
+    },
+    {
+      "description": "02:00 UTC on the 16th is still the 15th in New York",
+      "timestampMillis": 1786845600000,
+      "zoneId": "America/New_York",
+      "expected": "2026-08-15"
+    },
+    {
+      "description": "the same instant is already the 16th in Tokyo",
+      "timestampMillis": 1786845600000,
+      "zoneId": "Asia/Tokyo",
+      "expected": "2026-08-16"
+    },
+    {
+      "description": "08:00 UTC on the 16th is the evening of the 15th in Honolulu",
+      "timestampMillis": 1786867200000,
+      "zoneId": "Pacific/Honolulu",
+      "expected": "2026-08-15"
     }
   ]
 }

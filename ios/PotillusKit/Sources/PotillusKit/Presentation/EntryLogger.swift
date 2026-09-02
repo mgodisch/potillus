@@ -135,22 +135,63 @@ public struct EntryLogger: Sendable {
         logicalDate: String? = nil
     ) async throws -> ConsumptionEntry {
         let settings = await preferences.load()
+        // The day is the screen's, the time is the user's (v0.86.0): without an
+        // explicit day the entry belongs to TODAY — the logical day now — and
+        // the typed time is placed on the calendar day that keeps it there, so
+        // "02:00" typed in the evening is stored on the next calendar day and
+        // still counts for tonight. `TodayModel.addEntry` applies the same rule.
+        let day = logicalDate ?? DayResolver.resolve(
+            timestampMillis: nowMillis(),
+            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
+            timeZone: timeZone
+        )
+        let typed = timestampMillis ?? nowMillis()
+        let placed = DayResolver.instant(
+            logicalDate: day, matchingTimeOf: typed,
+            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
+            timeZone: timeZone
+        ) ?? typed
         let entry = Self.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: timestampMillis ?? nowMillis(),
+            timestampMillis: placed,
             note: note,
             settings: settings,
             timeZone: timeZone,
-            logicalDate: logicalDate
+            logicalDate: day
         )
         _ = try entries.add(entry)
         return entry
+    }
+
+    /// The logical day an entry logged now would belong to, with the day-change
+    /// time that defines it — what the entry sheet needs to show the calendar
+    /// date a typed time will land on.
+    public func todayContext() async -> LoggingDay {
+        let settings = await preferences.load()
+        return LoggingDay(
+            logical: DayResolver.resolve(
+                timestampMillis: nowMillis(),
+                changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
+                timeZone: timeZone
+            ),
+            changeHour: settings.dayChangeHour,
+            changeMinute: settings.dayChangeMinute
+        )
     }
 }
 
 /// A tiny observable wrapper, so a screen that only logs does not have to own a
 /// whole `TodayModel`.
+/// The day an entry logged now belongs to, and the day-change time that decides
+/// it. A named value rather than a tuple: three members read badly at the call
+/// site, and SwiftLint refuses them.
+public struct LoggingDay: Sendable, Equatable {
+    public let logical: String
+    public let changeHour: Int
+    public let changeMinute: Int
+}
+
 @MainActor
 @Observable
 public final class EntryLogModel {
@@ -173,6 +214,19 @@ public final class EntryLogModel {
 
     /// The instant the sheet should offer as its default.
     public func now() -> Date { Date(timeIntervalSince1970: Double(logger.nowMillis()) / 1000.0) }
+
+    /// The day the next entry belongs to and the day-change time; refreshed by
+    /// `refreshDayContext()` so the sheet can show where a typed time lands.
+    public private(set) var logicalDay: String = ""
+    public private(set) var dayChangeHour: Int = AppSettings().dayChangeHour
+    public private(set) var dayChangeMinute: Int = AppSettings().dayChangeMinute
+
+    public func refreshDayContext() async {
+        let day = await logger.todayContext()
+        logicalDay = day.logical
+        dayChangeHour = day.changeHour
+        dayChangeMinute = day.changeMinute
+    }
 
     /// Returns whether the entry was stored, so a sheet can stay open on failure.
     @discardableResult

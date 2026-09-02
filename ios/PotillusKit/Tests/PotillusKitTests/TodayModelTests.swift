@@ -99,13 +99,14 @@ final class TodayModelTests: XCTestCase {
 
     func testTotalGramsSumsTodaysEntriesOnly() async throws {
         let pils = try addDrink("Pils")
+        // Yesterday: must not count. Seeded through the repository, because logging
+        // it through the model would file it on today (see `addEntry`).
+        _ = try environment.entries.add(entry(pils, at: evening - 86_400_000, on: "2026-01-01"))
         let model = makeModel(at: evening)
         await model.load()
 
         await model.addEntry(drink: pils, volumeMl: 500)
         await model.addEntry(drink: pils, volumeMl: 500)
-        // Yesterday: must not count.
-        await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening - 86_400_000)
 
         XCTAssertEqual(model.state.entries.count, 2)
         XCTAssertEqual(
@@ -118,14 +119,16 @@ final class TodayModelTests: XCTestCase {
     /// The window glides: today plus the six days before it, not a calendar week.
     func testTheWeeklyWindowCoversSevenDaysEndingToday() async throws {
         let pils = try addDrink("Pils")
+        let day: Int64 = 86_400_000
+        // The past days are seeded through the repository: logging them through the
+        // model would file them on today, which is the rule this window is tested against.
+        _ = try environment.entries.add(entry(pils, at: evening - 6 * day, on: "2025-12-27"))
+        // Seven days back: outside the window.
+        _ = try environment.entries.add(entry(pils, at: evening - 7 * day, on: "2025-12-26"))
         let model = makeModel(at: evening)
         await model.load()
 
-        let day: Int64 = 86_400_000
-        await model.addEntry(drink: pils, volumeMl: 500)                       // today
-        await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening - 6 * day)
-        // Seven days back: outside the window.
-        await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: evening - 7 * day)
+        await model.addEntry(drink: pils, volumeMl: 500)  // today
 
         XCTAssertEqual(model.state.drinkDaysThisWeek, 2, "the 7-day-old entry is outside")
         XCTAssertEqual(
@@ -483,9 +486,13 @@ extension TodayModelTests {
 
     /// Builds a consumption entry for a drink at a moment, so a test can write one
     /// straight to the repository. `evening` (2026-01-02 20:14 UTC) resolves to the
-    /// logical date "2026-01-02" under the default 04:00 change hour, so that is
-    /// hard-coded here — these tests only ever write at `evening`.
-    private func entry(_ drink: DrinkDefinition, at millis: Int64) -> ConsumptionEntry {
+    /// logical date "2026-01-02" under the default 04:00 change hour, which is the
+    /// default here; a test seeding an EARLIER day passes its own `on:`. Seeding a
+    /// past day through `TodayModel.addEntry` is not possible by design: that
+    /// method files on the day the screen shows (see its documentation).
+    private func entry(
+        _ drink: DrinkDefinition, at millis: Int64, on logicalDate: String = "2026-01-02"
+    ) -> ConsumptionEntry {
         ConsumptionEntry(
             drinkId: drink.id,
             drinkName: drink.name,
@@ -495,7 +502,7 @@ extension TodayModelTests {
                 volumeMl: drink.volumeMl, alcoholPercent: drink.alcoholPercent
             ),
             timestampMillis: millis,
-            logicalDate: "2026-01-02"
+            logicalDate: logicalDate
         )
     }
 
@@ -599,5 +606,51 @@ extension TodayModelTests {
             "the estimate must not vanish at the day boundary"
         )
         XCTAssertGreaterThan(bac, 0.0)
+    }
+}
+
+// The day-placement cases sit in an extension rather than in the class body:
+// SwiftLint counts only the body against `type_body_length`.
+extension TodayModelTests {
+
+    /// The day is the screen's, the time is the user's: a time typed before the
+    /// day-change boundary is placed on the calendar day that keeps the entry on
+    /// TODAY. "02:00" logged in the evening of the 2nd is 02:00 on the 3rd,
+    /// logically still the 2nd.
+    func testATimeTypedBeforeTheDayChangeStaysOnToday() async throws {
+        let pils = try addDrink("Pils")
+        let model = makeModel(at: evening)  // 2026-01-02, 20:14 UTC
+        await model.load()
+
+        await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: 1_767_319_200_000)  // 2026-01-02 02:00 UTC
+
+        let stored = try XCTUnwrap(model.state.entries.first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-02")
+        XCTAssertEqual(stored.timestampMillis, 1_767_405_600_000, "placed on the calendar 3rd, 02:00 UTC")
+        XCTAssertEqual(
+            DayResolver.calendarDate(
+                timestampMillis: stored.timestampMillis, timeZone: TimeZone(identifier: "UTC")!
+            ),
+            "2026-01-03"
+        )
+    }
+
+    /// Editing keeps the entry on its logical day: 05:00 corrected to 02:00 stays
+    /// on the 2nd, placed on the 3rd. (Android re-resolved the day from the new
+    /// time until v0.86.0 and moved the entry to the day before.)
+    func testEditingATimeAcrossTheDayChangeKeepsTheEntryOnItsDay() async throws {
+        let pils = try addDrink("Pils")
+        let model = makeModel(at: evening)
+        await model.load()
+        await model.addEntry(drink: pils, volumeMl: 500, timestampMillis: 1_767_330_000_000)  // 2026-01-02 05:00 UTC
+        var stored = try XCTUnwrap(model.state.entries.first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-02")
+
+        stored.timestampMillis = 1_767_319_200_000  // typed as 02:00 on the calendar 2nd
+        await model.updateEntry(stored)
+
+        let edited = try XCTUnwrap(model.state.entries.first, "the entry must not leave the screen")
+        XCTAssertEqual(edited.logicalDate, "2026-01-02")
+        XCTAssertEqual(edited.timestampMillis, 1_767_405_600_000)
     }
 }

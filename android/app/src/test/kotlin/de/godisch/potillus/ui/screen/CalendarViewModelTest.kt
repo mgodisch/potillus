@@ -344,6 +344,30 @@ class CalendarViewModelTest {
     }
 
     /**
+     * Editing a calendar entry keeps it on the day it was filed under, and a
+     * time before the day-change boundary is placed on the next calendar day so
+     * the entry's own timestamp still resolves to that day — the rule addEntry
+     * has always applied, and since v0.86.0 the Today screen too.
+     */
+    @Test fun `updateEntry keeps the entry on its logical day`() = runTest {
+        val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
+        drinkRepo = FakeDrinkRepository(listOf(drink))
+        val vm = makeVm()
+        vm.selectDate("2026-01-10")
+        vm.addEntry(drink, 500, System.currentTimeMillis(), note = "")
+        val stored = entryRepo.allEntries.single()
+
+        val twoAm = java.time.LocalDate.parse("2026-01-10").atTime(2, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.updateEntry(stored.copy(timestampMillis = twoAm))
+
+        val edited = entryRepo.allEntries.single()
+        assertEquals("2026-01-10", edited.logicalDate)
+        assertEquals("2026-01-10", DayResolver.resolve(edited.timestampMillis, 4, 0))
+        assertEquals("2026-01-11", DayResolver.calendarDate(edited.timestampMillis))
+    }
+
+    /**
      * addEntry() with invalid volumeMl (≤ 0) is silently rejected and does NOT
      * add an entry to the repository. This mirrors the guard in TodayViewModel.
      */

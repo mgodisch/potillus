@@ -84,6 +84,19 @@ class DayResolverVectorTest {
         }
     }
 
+    // ── calendarDate ─────────────────────────────────────────────────────────
+
+    @Test
+    fun `calendarDate matches the shared vectors`() {
+        VECTORS.getJSONArray("calendarDate").objects().forEach { case ->
+            assertEquals(
+                "calendarDate: ${case.getString("description")}",
+                case.getString("expected"),
+                DayResolver.calendarDate(case.getLong("timestampMillis"), ZoneId.of(case.getString("zoneId"))),
+            )
+        }
+    }
+
     // ── instantOnLogicalDate ─────────────────────────────────────────────────
 
     @Test

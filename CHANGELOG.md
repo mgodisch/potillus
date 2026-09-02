@@ -93,6 +93,11 @@ apply to it are stated in the accompanying COPYING.md file.
 - iOS draws its status colours from the measured palette Android uses, so
   green and amber text and dots are readable in light mode; the empty year
   cell is visible in dark mode.
+- An entry stays on the day it was logged or edited under: a time before the
+  day-change hour is stored on the following calendar day, and the entry
+  dialog shows that date; editing on Android no longer moves an entry to the
+  day before.
+- Editing an entry on iOS lets you change its drink, as on Android.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

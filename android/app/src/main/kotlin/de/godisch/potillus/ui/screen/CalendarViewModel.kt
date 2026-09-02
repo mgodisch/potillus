@@ -111,6 +111,13 @@ data class CalendarUiState(
      * order of the calendar, not any consumption metric.
      */
     val weekStartDay: Int = 1,
+    /**
+     * The day-change time, for the entry dialog: it shows the calendar date a
+     * typed time will be stored on when that differs from the selected day.
+     * Seeded from the defaults like [limitInfo], for the same reason.
+     */
+    val dayChangeHour: Int = AppSettings().dayChangeHour,
+    val dayChangeMinute: Int = AppSettings().dayChangeMinute,
 )
 
 /**
@@ -144,6 +151,8 @@ private data class CalendarParams(
     val from: String,
     val to: String,
     val weekStart: Int,
+    val dayChangeHour: Int,
+    val dayChangeMinute: Int,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -237,7 +246,10 @@ class CalendarViewModel(
             CalendarViewMode.MONTH -> DayResolver.formatDate(month.atDay(1)) to DayResolver.formatDate(month.atEndOfMonth())
             CalendarViewMode.YEAR -> "$year-01-01" to "$year-12-31"
         }
-        CalendarParams(mode, month, year, todayDate, statsFromDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to, DayResolver.firstDayOfWeekIso())
+        CalendarParams(
+            mode, month, year, todayDate, statsFromDate, selDate, AlcoholCalculator.getLimitInfo(settings), from, to,
+            DayResolver.firstDayOfWeekIso(), settings.dayChangeHour, settings.dayChangeMinute,
+        )
     }
         // Swallow the once-per-minute ticks on which nothing — including the
         // logical day — actually changed, so the DB stages below restart only on
@@ -261,6 +273,8 @@ class CalendarViewModel(
                     selectedDate = p.selDate,
                     limitInfo = p.limitInfo,
                     weekStartDay = p.weekStart,
+                    dayChangeHour = p.dayChangeHour,
+                    dayChangeMinute = p.dayChangeMinute,
                 )
             }
         }
@@ -432,12 +446,24 @@ class CalendarViewModel(
     /**
      * Updates a calendar entry, preserving its [ConsumptionEntry.logicalDate].
      *
-     * Unlike [TodayViewModel.updateEntry], this does NOT recalculate logicalDate from
-     * the timestamp, because calendar entries are deliberately assigned to a specific
-     * date that may differ from the wall-clock date of the timestamp.
+     * The edited time is placed on the calendar day that keeps the entry on its
+     * logical day, as [addEntry] does: an entry on the logical 10th edited to
+     * "02:00" is stored at 02:00 on the calendar 11th. Until v0.86.0 the
+     * timestamp was stored as typed, so such an edit left an entry whose own
+     * timestamp resolved to another day than the one it was filed under. The
+     * Today screen applies the same rule since v0.86.0 (`TodayViewModel.updateEntry`).
      */
     fun updateEntry(entry: ConsumptionEntry) {
-        viewModelScope.launch { entryRepo.update(entry) } // preserves logicalDate
+        viewModelScope.launch {
+            val settings = prefs.settingsFlow.first()
+            val onItsDay = DayResolver.instantOnLogicalDate(
+                logicalDate = entry.logicalDate,
+                timestampMillis = entry.timestampMillis,
+                changeHour = settings.dayChangeHour,
+                changeMinute = settings.dayChangeMinute,
+            ) ?: entry.timestampMillis
+            entryRepo.update(entry.copy(timestampMillis = onItsDay)) // preserves logicalDate
+        }
     }
 
     /** Deletes [entry] from the database. @param entry The entry to remove. */

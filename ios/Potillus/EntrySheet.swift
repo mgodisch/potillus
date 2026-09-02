@@ -65,6 +65,16 @@ struct EntrySheet: View {
     /// action adds or updates — so this stays one sheet, as Android keeps one
     /// `AddEditEntryDialog`.
     let editing: ConsumptionEntry?
+    /// The logical day the entry belongs to — today, or the calendar day the
+    /// sheet was opened under — with the day-change time that defines it. When
+    /// given, the sheet shows the CALENDAR date the typed time will be stored
+    /// on whenever it differs: "02:00" on the logical 10th lands on the calendar
+    /// 11th (`DayResolver.instant(logicalDate:matchingTimeOf:…)`), and the user
+    /// sees "11 Mar" under the time before saving. The models do the placing;
+    /// this only says what they will do. `nil` shows nothing.
+    let logicalDay: String?
+    let dayChangeHour: Int
+    let dayChangeMinute: Int
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appLocale) private var locale
@@ -88,6 +98,9 @@ struct EntrySheet: View {
         capacity: DrinkCapacity? = nil,
         useSymbols: Bool = false,
         editing: ConsumptionEntry? = nil,
+        logicalDay: String? = nil,
+        dayChangeHour: Int = 4,
+        dayChangeMinute: Int = 0,
         onSave: @escaping (DrinkDefinition, Int, Int64, String) async -> Bool
     ) {
         self.drinks = drinks
@@ -95,6 +108,9 @@ struct EntrySheet: View {
         self.capacity = capacity
         self.useSymbols = useSymbols
         self.editing = editing
+        self.logicalDay = logicalDay
+        self.dayChangeHour = dayChangeHour
+        self.dayChangeMinute = dayChangeMinute
         self.onSave = onSave
 
         let initial = preselected ?? drinks.first
@@ -207,6 +223,15 @@ struct EntrySheet: View {
                     // actions in place, and the picker has to stay operable.
                     .accessibilityElement(children: .combine)
 
+                    // The calendar date the model will store this time on, when it
+                    // is not the day the sheet was opened under (see `logicalDay`).
+                    if let placedDate {
+                        Text(placedDate)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+
                     TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
                 } footer: {
                     if let volume, !DrinkValidator.volumeMlRange.contains(volume) {
@@ -283,6 +308,25 @@ struct EntrySheet: View {
         // not touch programmatic dismissal, so both buttons keep working
         // (0.84.0 QA round).
         .interactiveDismissDisabled(isDirty)
+    }
+
+    /// The formatted calendar date the typed time lands on, or `nil` while it
+    /// is the sheet's own day (or no day was given).
+    private var placedDate: String? {
+        guard let logicalDay else { return nil }
+        let typed = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
+        guard let placed = DayResolver.instant(
+            logicalDate: logicalDay, matchingTimeOf: typed,
+            changeHour: dayChangeHour, changeMinute: dayChangeMinute
+        ) else { return nil }
+        let calendarDay = DayResolver.calendarDate(timestampMillis: placed)
+        guard calendarDay != logicalDay, let date = DayResolver.parseDate(calendarDay) else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone(identifier: "UTC")  // `parseDate` anchors at noon UTC
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 
     private func save() {

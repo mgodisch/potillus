@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
@@ -483,6 +484,9 @@ fun TodayScreen(
             preSelectedDrink = preSelectedDrink,
             capacity = capacity,
             useStatusSymbols = state.settings.alternativeStatusSymbols,
+            logicalDay = DayResolver.today(state.settings.dayChangeHour, state.settings.dayChangeMinute),
+            dayChangeHour = state.settings.dayChangeHour,
+            dayChangeMinute = state.settings.dayChangeMinute,
             onSave = { drink, vol, ts, note ->
                 vm.addEntry(drink, vol, ts, note)
                 showAdd = false
@@ -499,6 +503,9 @@ fun TodayScreen(
             entry = entry,
             drinks = drinks,
             capacity = capacity,
+            logicalDay = entry.logicalDate,
+            dayChangeHour = state.settings.dayChangeHour,
+            dayChangeMinute = state.settings.dayChangeMinute,
             onSave = { drink, vol, ts, note ->
                 vm.updateEntry(
                     entry.copy(

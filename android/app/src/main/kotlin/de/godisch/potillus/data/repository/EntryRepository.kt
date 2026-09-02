@@ -207,42 +207,16 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
     )
 
     /**
-     * Updates an entry and **recalculates** [ConsumptionEntry.logicalDate] from the
-     * (possibly new) timestamp and the day-change time.
-     *
-     * Used by [de.godisch.potillus.ui.screen.TodayViewModel.updateEntry] when the user
-     * edits an entry on the Today screen and may have changed the time. Recalculating
-     * [logicalDate] ensures that changing the time from 03:00 to 05:00 (crossing
-     * the day boundary) correctly moves the entry to today.
-     *
-     * Contrast with [update] (below), which preserves [logicalDate] as-is.
-     *
-     * @param entry    The updated entry (must carry the correct [ConsumptionEntry.id]).
-     * @param settings Current user settings (provides day-change hour/minute).
-     */
-    override suspend fun updateEntry(entry: ConsumptionEntry, settings: AppSettings) {
-        val newLogicalDate = DayResolver.resolve(
-            entry.timestampMillis,
-            settings.dayChangeHour,
-            settings.dayChangeMinute,
-        )
-        // The timestamp may have moved, so the frame is re-read with it: the user
-        // typed a new wall-clock time on the device they are holding now.
-        dao.update(
-            entry.copy(
-                logicalDate = newLogicalDate,
-                utcOffsetSeconds = DayResolver.utcOffsetSeconds(entry.timestampMillis),
-            ).toEntity(),
-        )
-    }
-
-    /**
      * Updates an entry while **preserving** [ConsumptionEntry.logicalDate].
      *
-     * Used by [de.godisch.potillus.ui.screen.CalendarViewModel.updateEntry] for
-     * calendar entries: the user edits the time-of-day but the logical date
-     * (the calendar day the entry belongs to) must remain unchanged, because
-     * the user deliberately assigned it to that date.
+     * Used by [de.godisch.potillus.ui.screen.CalendarViewModel.updateEntry] and,
+     * since v0.86.0, by [de.godisch.potillus.ui.screen.TodayViewModel.updateEntry]:
+     * the user edits the time-of-day, and the logical date the entry was filed
+     * under stays. The view models place the new time on the calendar day that
+     * keeps that date (`DayResolver.instantOnLogicalDate`) before calling this.
+     * (An `updateEntry(entry, settings)` that re-resolved the date from the new
+     * time existed for the Today screen until v0.86.0; an edit could then move an
+     * entry to yesterday and off the screen.)
      *
      * The LOCAL FRAME is re-read, unlike the date. The two answer different
      * questions: the date is where the user filed the drink, the offset is the

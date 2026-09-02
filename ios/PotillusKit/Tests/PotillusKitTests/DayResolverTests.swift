@@ -43,6 +43,7 @@ import XCTest
 struct DayResolverVectors: Decodable {
     let resolve: [ResolveCase]
     let instantOnLogicalDate: [InstantCase]
+    let calendarDate: [CalendarDateCase]
     let effectivePeriodDays: [EffectiveDaysCase]
     let windowDays: [WindowDaysCase]
     let computeCurrentAbstinence: [CurrentAbstinenceCase]
@@ -57,6 +58,13 @@ struct DayResolverVectors: Decodable {
         let zoneId: String
         let changeHour: Int
         let changeMinute: Int
+        let expected: String
+    }
+
+    struct CalendarDateCase: Decodable {
+        let description: String
+        let timestampMillis: Int64
+        let zoneId: String
         let expected: String
     }
 
@@ -148,6 +156,16 @@ final class DayResolverTests: XCTestCase {
     }
 
     // ── instant ──────────────────────────────────────────────────────────────
+
+    func testCalendarDateAgainstSharedVectors() throws {
+        for testCase in vectors.calendarDate {
+            let timeZone = try XCTUnwrap(TimeZone(identifier: testCase.zoneId), "Unknown time zone: \(testCase.zoneId)")
+            XCTAssertEqual(
+                DayResolver.calendarDate(timestampMillis: testCase.timestampMillis, timeZone: timeZone),
+                testCase.expected, "calendarDate: \(testCase.description)"
+            )
+        }
+    }
 
     func testInstantAgainstSharedVectors() throws {
         for testCase in vectors.instantOnLogicalDate {

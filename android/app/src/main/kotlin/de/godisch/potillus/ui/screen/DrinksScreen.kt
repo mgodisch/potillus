@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.fmtPercent
@@ -409,6 +410,9 @@ fun DrinksScreen(
             preSelectedDrink = drink,
             capacity = capacity,
             useStatusSymbols = todayState.settings.alternativeStatusSymbols,
+            logicalDay = DayResolver.today(todayState.settings.dayChangeHour, todayState.settings.dayChangeMinute),
+            dayChangeHour = todayState.settings.dayChangeHour,
+            dayChangeMinute = todayState.settings.dayChangeMinute,
             onSave = { d, vol, ts, note ->
                 todayVm.addEntry(d, vol, ts, note)
                 logDrink = null

@@ -91,9 +91,8 @@ class EntryRepositoryTest {
         assertEquals("2026-02-02", dao.lastInserted?.logicalDate)
     }
 
-    @Test fun `update variants and delete delegate to the dao`() = runTest {
+    @Test fun `update and delete delegate to the dao`() = runTest {
         val entry = sampleEntry()
-        repo.updateEntry(entry, AppSettings())
         repo.update(entry)
         repo.delete(entry)
         assertTrue(dao.updated)

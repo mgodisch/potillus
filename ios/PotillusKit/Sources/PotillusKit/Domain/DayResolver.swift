@@ -217,6 +217,22 @@ public enum DayResolver {
         )
     }
 
+    /// The CALENDAR date an instant falls on, "YYYY-MM-DD", read in `timeZone`.
+    ///
+    /// Not the logical date — `resolve` answers that. The entry sheet shows this
+    /// beside the time it is about to store when the two dates differ: a drink
+    /// typed as "02:00" on the logical 10th is placed on the calendar 11th by
+    /// `instant(logicalDate:matchingTimeOf:…)`, and the sheet says so, so what
+    /// the user sees is what the row will read. Pinned with Android by
+    /// `day-resolver.json` (`calendarDate`).
+    public static func calendarDate(timestampMillis: Int64, timeZone: TimeZone = .current) -> String {
+        var zoned = Calendar(identifier: .gregorian)
+        zoned.timeZone = timeZone
+        let date = Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
+        let parts = zoned.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
     /// Formats an instant as `yyyy-MM-dd` in the given zone. Fallback path only.
     private static func format(_ instant: Date, in timeZone: TimeZone) -> String {
         let formatter = DateFormatter()

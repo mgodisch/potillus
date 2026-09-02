@@ -93,6 +93,11 @@ public struct CalendarState: Sendable, Equatable {
 
     public var limitInfo: LimitInfo = AlcoholCalculator.getLimitInfo(AppSettings())
 
+    /// The day-change time, for the entry sheet: it shows the calendar date a
+    /// typed time will be stored on when that differs from the selected day.
+    public var dayChangeHour: Int = AppSettings().dayChangeHour
+    public var dayChangeMinute: Int = AppSettings().dayChangeMinute
+
     public init() {}
 }
 
@@ -179,6 +184,8 @@ public final class CalendarModel {
 
         state.today = today
         state.limitInfo = AlcoholCalculator.getLimitInfo(settings)
+        state.dayChangeHour = settings.dayChangeHour
+        state.dayChangeMinute = settings.dayChangeMinute
         state.drinks = (try? drinks.allOnce()) ?? []
         // Kept for the year layout's window. Read on every load, so clearing the
         // date in Settings ("Include all history") reaches an open calendar
@@ -531,25 +538,6 @@ public final class CalendarModel {
     /// and `logicalDate`, so editing volume/percent/time/note updates the row
     /// in place — the same contract as Android's `updateEntry`, which the
     /// repository's `update` preserves.
-    public func updateEntry(_ entry: ConsumptionEntry) async {
-        // The frame is re-read with the timestamp, unlike the logical date. The
-        // two answer different questions: the date is where the user filed the
-        // drink, the offset is the frame the time they just typed was typed in.
-        // Keeping a stale offset would show the edited entry at an hour the user
-        // did not enter. Done here rather than in the view, so no caller can
-        // forget it — the shape Android gives its repository.
-        var stamped = entry
-        stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
-            timestampMillis: entry.timestampMillis, timeZone: timeZone
-        )
-        do {
-            try entries.update(stamped)
-        } catch {
-            failure = String(describing: error)
-            return
-        }
-        await reloadVisiblePeriod()
-    }
 }
 
 // =============================================================================
@@ -626,5 +614,43 @@ extension CalendarModel {
     public func isDrinkDay(_ date: String) -> Bool {
         guard let summary = state.summaries[date] else { return false }
         return AlcoholCalculator.isDrinkDay(totalGrams: summary.totalGrams)
+    }
+}
+
+// Editing sits in an extension rather than in the class body: SwiftLint counts
+// only the body against `type_body_length`, and the model had reached it.
+extension CalendarModel {
+
+    /// Persists edits to `entry`, keeping it on its logical day.
+    ///
+    /// The edited time is placed on the calendar day that keeps the entry on
+    /// `entry.logicalDate`, as `addEntry` does: an entry on the logical 10th
+    /// edited to "02:00" is stored at 02:00 on the calendar 11th. Until v0.86.0 the
+    /// timestamp was stored as typed, so such an edit left an entry whose own
+    /// timestamp resolved to another day than the one it was filed under.
+    public func updateEntry(_ entry: ConsumptionEntry) async {
+        let settings = await preferences.load()
+        var stamped = entry
+        stamped.timestampMillis = DayResolver.instant(
+            logicalDate: entry.logicalDate, matchingTimeOf: entry.timestampMillis,
+            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
+            timeZone: timeZone
+        ) ?? entry.timestampMillis
+        // The frame is re-read with the timestamp, unlike the logical date. The
+        // two answer different questions: the date is where the user filed the
+        // drink, the offset is the frame the time they just typed was typed in.
+        // Keeping a stale offset would show the edited entry at an hour the user
+        // did not enter. Done here rather than in the view, so no caller can
+        // forget it — the shape Android gives its repository.
+        stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
+            timestampMillis: stamped.timestampMillis, timeZone: timeZone
+        )
+        do {
+            try entries.update(stamped)
+        } catch {
+            failure = String(describing: error)
+            return
+        }
+        await reloadVisiblePeriod()
     }
 }

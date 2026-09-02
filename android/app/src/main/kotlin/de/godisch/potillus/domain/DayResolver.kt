@@ -154,6 +154,19 @@ object DayResolver {
     }
 
     /**
+     * The CALENDAR date an instant falls on, "YYYY-MM-DD", read in [zoneId].
+     *
+     * Not the logical date — [resolve] answers that. The entry dialog shows this
+     * beside the time it is about to store when the two dates differ: a
+     * drink typed as "02:00" on the logical 10th is placed on the calendar 11th
+     * by [instantOnLogicalDate], and the dialog says so, so what the user sees
+     * is what the row will read. Pinned with iOS by `day-resolver.json`
+     * (`calendarDate`).
+     */
+    fun calendarDate(timestampMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
+        formatDate(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), zoneId).toLocalDate())
+
+    /**
      * Test-only override for the wall clock that [today] reads.
      *
      * PRODUCTION (the default, `null`): [today] reads the real device clock, so

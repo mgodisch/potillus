@@ -48,13 +48,13 @@ struct TodayScreen: View {
     @Environment(\.scenePhase) private var scenePhase
 
     /// Owned by the view, rebuilt only when the environment changes.
-    @State private var model: TodayModel
+    @State var model: TodayModel
 
     /// Set while the entry sheet is open.
-    @State private var isLogging = false
+    @State var isLogging = false
 
     /// The entry being edited, if any — drives the edit sheet, as on the calendar.
-    @State private var editingEntry: ConsumptionEntry?
+    @State var editingEntry: ConsumptionEntry?
 
     /// The entry a delete gesture is asking to remove, if any. Set by the swipe
     /// or the edit-mode badge and cleared by the confirmation alert; a delete is
@@ -145,52 +145,8 @@ struct TodayScreen: View {
                 if phase == .active { Task { await model.load() } }
             }
             .refreshable { await model.load() }
-            .sheet(isPresented: $isLogging) {
-                EntrySheet(
-                    drinks: model.state.drinks,
-                    // People tend to repeat what they just had.
-                    preselected: model.state.preselectionForLogging,
-                    now: Date(),
-                    // The Today model already holds the day's totals and limits,
-                    // so the log sheet gets the capacity dot too, as on Android.
-                    capacity: DrinkCapacity(
-                        todayGrams: model.state.totalGrams,
-                        dailyLimitGrams: model.state.limitInfo.limitGrams,
-                        weeklyTotalGrams: model.state.weeklyTotalGrams,
-                        weeklyLimitGrams: model.state.limitInfo.weeklyLimitGrams,
-                        drinkDaysThisWeek: model.state.drinkDaysThisWeek,
-                        maxDrinkDaysPerWeek: model.state.limitInfo.maxDrinkDaysPerWeek
-                    ),
-                    useSymbols: model.state.settings.alternativeStatusSymbols
-                ) { drink, volume, millis, note in
-                    await model.addEntry(
-                        drink: drink, volumeMl: volume, timestampMillis: millis, note: note
-                    )
-                    return model.failure == nil
-                }
-            }
-            .sheet(item: $editingEntry) { entry in
-                // Editing keeps the entry's own drink: a one-element catalogue built
-                // from the entry, so the sheet shows the name and lets volume, time
-                // and note change. The same scope, and the same code, as the
-                // calendar's edit — this row is not a lesser row for being today's.
-                EntrySheet(
-                    drinks: [drink(from: entry)],
-                    preselected: drink(from: entry),
-                    now: Date(),
-                    editing: entry
-                ) { drink, volume, millis, note in
-                    var updated = entry
-                    updated.volumeMl = volume
-                    updated.timestampMillis = millis
-                    updated.note = note
-                    updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
-                        volumeMl: volume, alcoholPercent: drink.alcoholPercent
-                    )
-                    await model.updateEntry(updated)
-                    return model.failure == nil
-                }
-            }
+            .sheet(isPresented: $isLogging) { logSheet }
+            .sheet(item: $editingEntry) { entry in editSheet(for: entry) }
             .alert(
                 Loc.string("Something went wrong", locale: locale),
                 isPresented: .constant(model.failure != nil),
@@ -590,7 +546,7 @@ extension TodayScreen {
 
     /// The entry's own drink, rebuilt as a single-item catalogue for the edit
     /// sheet. Editing does not swap the drink, so the id/category are cosmetic.
-    private func drink(from entry: ConsumptionEntry) -> DrinkDefinition {
+    func drink(from entry: ConsumptionEntry) -> DrinkDefinition {
         DrinkDefinition(
             id: entry.drinkId,
             name: entry.drinkName,

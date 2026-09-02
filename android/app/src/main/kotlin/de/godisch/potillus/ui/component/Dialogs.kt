@@ -62,6 +62,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -76,9 +77,12 @@ import de.godisch.potillus.domain.model.DrinkDefinition
 import de.godisch.potillus.l10n.fmt1
 import de.godisch.potillus.l10n.formattingLocale
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 // ════════════════════════════════════════════════════════════════════════════
 // ADD / EDIT ENTRY DIALOG
@@ -107,6 +111,18 @@ fun AddEditEntryDialog(
     preSelectedDrink: DrinkDefinition? = null,
     capacity: DrinkCapacity? = null,
     useStatusSymbols: Boolean = false,
+    /**
+     * The logical day the entry belongs to — today, or the calendar day the
+     * dialog was opened under — with the day-change time that defines it. When
+     * given, the dialog shows the CALENDAR date the typed time will be stored
+     * on whenever it differs: "02:00" on the logical 10th lands on the calendar
+     * 11th (`DayResolver.instantOnLogicalDate`), and the user sees "11 Mar" next
+     * to the time before saving. The view models do the placing; this only
+     * says what they will do. `null` shows nothing.
+     */
+    logicalDay: String? = null,
+    dayChangeHour: Int = 4,
+    dayChangeMinute: Int = 0,
     onSave: (DrinkDefinition, Int, Long, String) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -239,10 +255,18 @@ fun AddEditEntryDialog(
                 // "19:51, button" — with nothing tying the second to the first.
                 // The button carries both, because the button is what a reader
                 // acts on; the caption beside it falls silent.
+                // The calendar date the view model will store this time on, when
+                // it is not the day the dialog was opened under (see `logicalDay`).
+                val placedDate: String? = logicalDay?.let { day ->
+                    DayResolver.instantOnLogicalDate(day, hour, minute, dayChangeHour, dayChangeMinute)
+                        ?.let { DayResolver.calendarDate(it) }
+                        ?.takeIf { it != day }
+                        ?.let { LocalDate.parse(it).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)) }
+                }
                 val spokenTime = stringResource(
                     R.string.a11y_caption_value,
                     stringResource(R.string.time),
-                    "%02d:%02d".format(hour, minute),
+                    "%02d:%02d".format(hour, minute) + (placedDate?.let { ", $it" } ?: ""),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -264,6 +288,18 @@ fun AddEditEntryDialog(
                             modifier = Modifier.semantics { hideFromAccessibility() },
                         )
                     }
+                }
+                if (placedDate != null) {
+                    // Spoken as part of the button above; silent here.
+                    Text(
+                        placedDate,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .semantics { hideFromAccessibility() },
+                        textAlign = TextAlign.End,
+                    )
                 }
 
                 // ── Note ──────────────────────────────────────────────────────
@@ -326,9 +362,11 @@ fun AddEditEntryDialog(
                 onClick = {
                     val drink = selectedDrink ?: return@TextButton
                     val vol = volumeText.toIntOrNull()?.takeIf { it > 0 } ?: return@TextButton
-                    // Build timestamp from today's calendar date + the user-selected time.
-                    // (CalendarScreen overrides logicalDate in the ViewModel; the date component
-                    //  of this timestamp is only relevant for TodayScreen and DrinksScreen.)
+                    // Today's calendar date + the user-selected time. Only the TIME
+                    // counts: every view model places it on the calendar day that
+                    // keeps the entry on the day the dialog was opened under
+                    // (DayResolver.instantOnLogicalDate), and `placedDate` above
+                    // shows that day when it differs.
                     val ts = LocalDateTime.now()
                         .withHour(hour).withMinute(minute).withSecond(0).withNano(0)
                         .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()

@@ -139,14 +139,14 @@ struct DrinksScreen: View {
             .onChange(of: model.state.drinks.isEmpty) { _, empty in
                 if empty { editMode = .inactive }
             }
-            .task { model.start(); capacity.start() }
+            .task { model.start(); capacity.start(); await logger.refreshDayContext() }
             .onDisappear { model.stop(); capacity.stop() }
             // Reload the capacity snapshot on foregrounding; see TodayScreen for
             // the full rationale (onAppear does not fire, the ticker only bounds
             // staleness). `model` needs no counterpart: the catalogue is not a
             // function of time, it changes only when something writes to it.
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { Task { await capacity.load() } }
+                if phase == .active { Task { await capacity.load(); await logger.refreshDayContext() } }
             }
             .sheet(isPresented: $isAdding) {
                 DrinkEditor(drink: nil) { name, volume, percent, category in
@@ -169,7 +169,9 @@ struct DrinksScreen: View {
                 // One drink, so the sheet shows its name instead of a picker.
                 EntrySheet(
                     drinks: [drink], preselected: drink, now: logger.now(),
-                    capacity: capacity.capacity, useSymbols: capacity.useSymbols
+                    capacity: capacity.capacity, useSymbols: capacity.useSymbols,
+                    logicalDay: logger.logicalDay.isEmpty ? nil : logger.logicalDay,
+                    dayChangeHour: logger.dayChangeHour, dayChangeMinute: logger.dayChangeMinute
                 ) { chosen, volume, millis, note in
                     await logger.log(
                         drink: chosen, volumeMl: volume, timestampMillis: millis, note: note

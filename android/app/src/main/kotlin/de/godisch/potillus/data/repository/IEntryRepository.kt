@@ -111,9 +111,6 @@ interface IEntryRepository {
         logicalDate: String,
     ): Long
 
-    /** Updates [entry], recomputing derived values (grams, logicalDate) from [settings]. */
-    suspend fun updateEntry(entry: ConsumptionEntry, settings: AppSettings)
-
     /** Updates [entry] as-is, preserving its existing logicalDate (calendar edits). */
     suspend fun update(entry: ConsumptionEntry)
 

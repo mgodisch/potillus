@@ -410,6 +410,16 @@ class TodayViewModel(
     /**
      * Logs a new consumption entry for the current logical day.
      *
+     * THE DAY IS THE SCREEN'S, THE TIME IS THE USER'S (v0.86.0). The dialog offers
+     * hours and minutes only, so the entry belongs to the logical day this screen
+     * shows — today — and the typed time is placed on the calendar day that keeps
+     * it there: "02:00" logged at 05:00 on the 11th under a 04:00 day change is
+     * 02:00 on the calendar 12th, still logically the 11th. Before v0.86.0 the
+     * instant was today's calendar date plus the time, and the entry then
+     * resolved to YESTERDAY and vanished from the screen it was logged on. The
+     * calendar has always placed its entries this way (`instantOnLogicalDate`);
+     * the dialog shows the calendar date it is about to store when it differs.
+     *
      * Invalid input (non-positive volume or timestamp) is rejected as a
      * belt-and-suspenders guard even though the UI validates first.
      *
@@ -438,18 +448,38 @@ class TodayViewModel(
             // costs one short extra DataStore collection per button tap and is
             // always correct; CalendarViewModel.addEntry uses the same approach.
             val settings = prefs.settingsFlow.first()
-            entryRepo.addFromDrink(drink, volumeMl, timestampMillis, note, settings)
+            val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
+            val onToday = DayResolver.instantOnLogicalDate(
+                logicalDate = today,
+                timestampMillis = timestampMillis,
+                changeHour = settings.dayChangeHour,
+                changeMinute = settings.dayChangeMinute,
+            ) ?: timestampMillis
+            entryRepo.addFromDrinkWithDate(drink, volumeMl, onToday, note, today)
         }
     }
 
     /**
-     * Persists edits to an existing [entry], recomputing derived values from the
-     * current settings. @param entry The modified consumption entry.
+     * Persists edits to an existing [entry], keeping it on its logical day.
+     *
+     * The edited time is placed on the calendar day that keeps the entry on
+     * [ConsumptionEntry.logicalDate] — the same rule as [addEntry] and as the
+     * calendar's edit, so an edit never moves an entry off the screen it was
+     * edited on. Before v0.86.0 this recomputed the logical day from the new
+     * time, and 05:00 corrected to 02:00 sent the entry to yesterday. Moving an
+     * entry to another day is the calendar's job: pick the day there.
      */
     fun updateEntry(entry: ConsumptionEntry) {
         // Same rationale as addEntry – read the authoritative settings snapshot.
         viewModelScope.launch {
-            entryRepo.updateEntry(entry, prefs.settingsFlow.first())
+            val settings = prefs.settingsFlow.first()
+            val onItsDay = DayResolver.instantOnLogicalDate(
+                logicalDate = entry.logicalDate,
+                timestampMillis = entry.timestampMillis,
+                changeHour = settings.dayChangeHour,
+                changeMinute = settings.dayChangeMinute,
+            ) ?: entry.timestampMillis
+            entryRepo.update(entry.copy(timestampMillis = onItsDay))
         }
     }
 

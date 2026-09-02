@@ -148,15 +148,6 @@ class FakeEntryRepository : IEntryRepository {
         ),
     )
 
-    override suspend fun updateEntry(entry: ConsumptionEntry, settings: AppSettings) {
-        val newDate = DayResolver.resolve(
-            entry.timestampMillis,
-            settings.dayChangeHour,
-            settings.dayChangeMinute,
-        )
-        update(entry.copy(logicalDate = newDate))
-    }
-
     override suspend fun update(entry: ConsumptionEntry) {
         _entries.value = _entries.value.map { if (it.id == entry.id) entry else it }
     }

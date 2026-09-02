@@ -133,6 +133,24 @@ final class EntryLoggerTests: XCTestCase {
         XCTAssertEqual(stored.logicalDate, "2026-01-02")
     }
 
+    /// The day is the screen's, the time is the user's: a night-hour time typed
+    /// while logging for today is placed on the calendar day that keeps the
+    /// entry on today (v0.86.0). Here "02:00" typed at 20:14 on the 2nd.
+    func testANightHourTimeStaysOnTodayWhenLoggedFromTheDrinksScreen() async throws {
+        let drinkId = try environment.drinks.add(
+            DrinkDefinition(name: "Pils", volumeMl: 500, alcoholPercent: 4.9)
+        )
+        let drink = try XCTUnwrap(try environment.drinks.allOnce().first { $0.id == drinkId })
+
+        let logger = makeLogger(at: evening)
+        // 1_767_319_200_000 is 2026-01-02, 02:00 UTC.
+        _ = try await logger.log(drink: drink, volumeMl: 500, timestampMillis: 1_767_319_200_000)
+
+        let stored = try XCTUnwrap(try environment.entries.all().first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-02")
+        XCTAssertEqual(stored.timestampMillis, afterMidnight, "placed on the calendar 3rd, 02:00")
+    }
+
     /// The Drinks screen logs the same entry the Today screen would.
     func testBothScreensProduceTheSameEntry() async throws {
         let drinkId = try environment.drinks.add(

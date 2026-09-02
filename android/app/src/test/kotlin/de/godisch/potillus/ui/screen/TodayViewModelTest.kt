@@ -183,6 +183,53 @@ class TodayViewModelTest {
         assertEquals(beer.id, entryRepo.allEntries.first().drinkId)
     }
 
+    /**
+     * The day is the screen's, the time is the user's: a time typed before the
+     * day-change boundary is placed on the calendar day that keeps the entry on
+     * TODAY. Until v0.86.0 "02:00" logged in the small hours resolved to yesterday
+     * and vanished from the screen it was logged on.
+     */
+    @Test fun `addEntry keeps a night-hour time on today`() = runTest(dispatcher) {
+        val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val today = DayResolver.today(4, 0)
+        // 02:00 on today's CALENDAR date — which, resolved, would be yesterday.
+        val typed = java.time.LocalDate.parse(today).atTime(2, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        vm.addEntry(beer, 500, typed, "")
+
+        val stored = entryRepo.allEntries.single()
+        assertEquals(today, stored.logicalDate)
+        assertEquals(today, DayResolver.resolve(stored.timestampMillis, 4, 0))
+        assertEquals(java.time.LocalDate.parse(today).plusDays(1).toString(), DayResolver.calendarDate(stored.timestampMillis))
+    }
+
+    /**
+     * Editing keeps the entry on its logical day: 05:00 corrected to 02:00 stays
+     * today, placed on the next calendar day. Until v0.86.0 the day was re-resolved
+     * from the new time and the entry moved to yesterday.
+     */
+    @Test fun `updateEntry keeps the entry on its logical day`() = runTest(dispatcher) {
+        val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
+        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+        val today = DayResolver.today(4, 0)
+        val fiveAm = java.time.LocalDate.parse(today).atTime(5, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.addEntry(beer, 500, fiveAm, "")
+        val stored = entryRepo.allEntries.single()
+        assertEquals(today, stored.logicalDate)
+
+        val twoAm = java.time.LocalDate.parse(today).atTime(2, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.updateEntry(stored.copy(timestampMillis = twoAm))
+
+        val edited = entryRepo.allEntries.single()
+        assertEquals(today, edited.logicalDate)
+        assertEquals(today, DayResolver.resolve(edited.timestampMillis, 4, 0))
+        assertEquals(2, DayResolver.localDateTime(edited.timestampMillis, edited.utcOffsetSeconds).hour)
+    }
+
     @Test fun `addEntry with volumeMl=0 is rejected by guard`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
         val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
