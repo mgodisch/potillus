@@ -212,10 +212,29 @@ class DayResolverTest {
         assertEquals(0, DayResolver.computeCurrentAbstinence(emptyList(), "2025-05-24", "2025-05-30"))
     }
 
-    @Test fun `computeCurrentAbstinence with entries statsFrom is ignored`() {
-        // Last entry May 21, today May 24 → completed dry days May 22, May 23 = 2
-        // (statsFrom plays no role once drink entries exist).
+    @Test fun `computeCurrentAbstinence a floor before the entries changes nothing`() {
+        // Last entry May 21, today May 24 → completed dry days May 22, May 23 = 2.
         assertEquals(2, DayResolver.computeCurrentAbstinence(listOf("2025-05-21"), "2025-05-24", "2025-01-01"))
+    }
+
+    @Test fun `computeCurrentAbstinence drops drink days before the floor`() {
+        // The April drink lies before the May 1 floor and is invisible: the streak
+        // then runs from the floor, May 1..May 9 = 9 completed dry days. Without
+        // the floor applied inside the function this read 8 (from the April drink).
+        assertEquals(9, DayResolver.computeCurrentAbstinence(listOf("2025-04-01"), "2025-05-10", "2025-05-01"))
+        assertEquals(
+            2,
+            DayResolver.computeCurrentAbstinence(listOf("2025-04-01", "2025-05-07"), "2025-05-10", "2025-05-01"),
+        )
+    }
+
+    @Test fun `computeLongestAbstinence does not open a gap across the floor`() {
+        // Floored to [May 7]: head gap May 1..May 6 = 6, tail May 8..May 9 = 2 → 6.
+        // Unfiltered, the April 1 → May 7 gap would have read 35.
+        assertEquals(
+            6,
+            DayResolver.computeLongestAbstinence(listOf("2025-04-01", "2025-05-07"), "2025-05-10", "2025-05-01"),
+        )
     }
 
     // ── computeLongestAbstinence mit today und statsFrom ─────────────────────

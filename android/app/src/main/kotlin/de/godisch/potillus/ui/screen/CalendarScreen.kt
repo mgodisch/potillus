@@ -58,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.MonthGrid
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
@@ -512,10 +513,12 @@ private fun MonthCalendar(
                 )
             }
         }
-        val firstDay = currentMonth.atDay(1)
-        val totalDays = currentMonth.lengthOfMonth()
-        val startOffset = (firstDay.dayOfWeek.value - weekStart + 7) % 7
-        val rows = (startOffset + totalDays + 6) / 7
+        // Alignment and row count come from the domain, pinned to the iOS grid
+        // by test-vectors/month-grid.json; this composable only lays the cells out.
+        val grid = MonthGrid.of(currentMonth, weekStart)
+        val totalDays = grid.dayCount
+        val startOffset = grid.leadingBlanks
+        val rows = grid.rowCount
 
         // Capture composable color before the loop.
         //

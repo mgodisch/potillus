@@ -449,8 +449,9 @@ class StatsViewModel(
         val effectiveFrom = window.from
         // Drink days only: a day spent on alcohol-free drinks leaves an abstinence
         // streak running (AlcoholCalculator.isDrinkDay). `allDates` above answers a
-        // different question and stays with the navigation ceiling.
-        val streakDates = if (statsFloor.isNotEmpty()) drinkDates.filter { it >= statsFloor } else drinkDates
+        // different question and stays with the navigation ceiling. The floor is
+        // applied by DayResolver itself (it takes `statsFloor`), not here.
+        val streakDates = drinkDates
 
         // The clipped baseline start (v0.81.0 QA fix): before it, only the current
         // period was clipped, so the trend compared against days the user had

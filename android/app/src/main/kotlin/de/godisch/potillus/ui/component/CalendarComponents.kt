@@ -32,8 +32,8 @@ package de.godisch.potillus.ui.component
 // LAYOUT STRATEGY:
 //   The year is split into 4 rows of 3 months (chunked(3)).
 //   Each month is laid out as a grid of week rows (0..5) × day columns (0..6).
-//   Days are aligned to Monday (ISO week start: dayOfWeek.value = 1..7,
-//   where 1 = Monday). `startPad` = number of empty cells before day 1.
+//   Days are aligned to the locale's first weekday (`weekStart`, ISO 1..7);
+//   `startPad` = number of empty cells before day 1, from domain/MonthGrid.
 //
 // DAY-CELL RENDERING:
 //   Each day is a 10 × 10 dp box with 2 dp gaps (padding = cellGap / 2 on each side).
@@ -66,6 +66,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
+import de.godisch.potillus.domain.MonthGrid
 import de.godisch.potillus.domain.YearGrid
 import de.godisch.potillus.domain.model.DaySummary
 import de.godisch.potillus.l10n.fmt1
@@ -94,7 +95,8 @@ import java.time.format.FormatStyle
  * tapping one opens the month view on it, which is where a day gets picked.
  *
  * HOW THE GRID INDEX WORKS:
- *   For month M starting on weekday `startPad` (0 = Mon):
+ *   For month M with `startPad` blanks before day 1 (0 = day 1 is on the
+ *   locale's first weekday):
  *     For week row w (0..5) and day-of-week column d (0..6):
  *       `dayNum = w × 7 + d − startPad + 1`
  *   If `dayNum < 1` or `dayNum > lengthOfMonth`: render an empty placeholder box.
@@ -215,11 +217,11 @@ fun YearCalendarView(
                         )
 
                         // Week alignment: day 1 of the month may not fall on the
-                        // configured first weekday. startPad = empty cells to prepend.
-                        // weekStart is ISO 1..7; (value - weekStart + 7) % 7 maps the
-                        // first day to its column (0 = the configured week-start day).
-                        val firstDay = ym.atDay(1)
-                        val startPad = (firstDay.dayOfWeek.value - weekStart + 7) % 7
+                        // configured first weekday. startPad = empty cells to prepend,
+                        // computed by the domain (MonthGrid, pinned to the iOS grid by
+                        // test-vectors/month-grid.json). The heat-map draws a fixed six
+                        // rows for every month, so only the alignment is read here.
+                        val startPad = MonthGrid.of(ym, weekStart).leadingBlanks
 
                         for (week in 0..5) {
                             Row {

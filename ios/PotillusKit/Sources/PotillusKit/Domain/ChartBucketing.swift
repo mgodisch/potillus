@@ -139,8 +139,11 @@ public enum ChartBucketing {
         else { return [] }
 
         // O(1) lookup of a day's total; days absent here are abstinent (0 g).
+        // Summed rather than overwritten, as `weekdayAverages` does: the caller's
+        // list is one row per day, and a duplicate must not make two charts
+        // disagree (last-wins here, sum there was the state before v0.86.0).
         var gramsByDate: [String: Double] = [:]
-        for summary in summaries { gramsByDate[summary.date] = summary.totalGrams }
+        for summary in summaries { gramsByDate[summary.date, default: 0.0] += summary.totalGrams }
 
         // One day past the period end; the exclusive upper bound when summing.
         let endExclusive = addingDays(1, to: end)

@@ -382,8 +382,8 @@ public final class StatsModel {
         // a dry streak began before the month did. Drink days only — a day spent
         // on alcohol-free drinks leaves the run intact — so this reads its own
         // query rather than `allDates`, which answers the navigation question.
-        let allDrinkDates = try entries.drinkDates()
-        let streakDates = floor.isEmpty ? allDrinkDates : allDrinkDates.filter { $0 >= floor }
+        // The floor is applied by DayResolver itself (it takes `statsFrom`).
+        let streakDates = try entries.drinkDates()
 
         let granularity: ChartGranularity = state.period == .year ? .monthly : .daily
 

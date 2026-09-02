@@ -257,6 +257,16 @@
       "changeMinute": 0,
       "zoneId": "Europe/Berlin",
       "expected": 1792978200000
+    },
+    {
+      "description": "a small-hours entry in the spring-forward gap is moved past it by the gap's length",
+      "logicalDate": "2026-03-28",
+      "hour": 2,
+      "minute": 30,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "zoneId": "Europe/Berlin",
+      "expected": 1774747800000
     }
   ],
   "effectivePeriodDays": [
@@ -428,7 +438,7 @@
       "expected": 0
     },
     {
-      "description": "with entries, statsFrom is ignored",
+      "description": "a floor before the entries changes nothing",
       "dates": [
         "2025-05-07"
       ],
@@ -444,6 +454,25 @@
       "today": "2025-05-10",
       "statsFrom": "",
       "expected": 0
+    },
+    {
+      "description": "a drink before the floor does not count: the streak runs from the floor",
+      "dates": [
+        "2025-04-01"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-01",
+      "expected": 9
+    },
+    {
+      "description": "a drink before the floor is invisible beside one after it",
+      "dates": [
+        "2025-04-01",
+        "2025-05-07"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-01",
+      "expected": 2
     }
   ],
   "computeLongestAbstinence": [
@@ -528,6 +557,25 @@
       "today": "",
       "statsFrom": "",
       "expected": 2
+    },
+    {
+      "description": "a drink before the floor does not open a gap across it",
+      "dates": [
+        "2025-04-01",
+        "2025-05-07"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-01",
+      "expected": 6
+    },
+    {
+      "description": "only drinks before the floor: the whole floored span is dry",
+      "dates": [
+        "2025-04-01"
+      ],
+      "today": "2025-05-10",
+      "statsFrom": "2025-05-01",
+      "expected": 9
     }
   ],
   "firstDayOfWeekIso": [

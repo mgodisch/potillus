@@ -142,7 +142,11 @@ object ChartBucketing {
         if (start.isAfter(end)) return emptyList()
 
         // O(1) lookup of a day's total; days not present here are abstinent (0 g).
-        val gramsByDate: Map<String, Double> = summaries.associate { it.date to it.totalGrams }
+        // Summed rather than overwritten, as WeekdayProfile does: the caller's
+        // list is one row per day, and a duplicate must not make two charts
+        // disagree (last-wins here, sum there was the state before v0.86.0).
+        val gramsByDate = mutableMapOf<String, Double>()
+        summaries.forEach { gramsByDate.merge(it.date, it.totalGrams, Double::plus) }
         // One day past the period end; used as an exclusive upper bound when summing.
         val endExclusive = end.plusDays(1)
 

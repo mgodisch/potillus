@@ -402,14 +402,21 @@ object DayResolver {
      * in between are counted. Consequently the day immediately after a drink day is
      * still 0; the count becomes 1 only on the following day.
      *
-     * [statsFrom] semantics: if the user has never logged a drink, the streak
-     * starts at [statsFrom] (the "recording start" date). This represents the
-     * implicit assumption that all days from [statsFrom] to today were abstinent.
+     * [statsFrom] semantics: the floor. Drink days BEFORE it are dropped here,
+     * inside the function, so a caller cannot forget to; the streak then runs
+     * from the floor as if the history began there. If nothing remains, the
+     * streak starts at [statsFrom] (the "recording start" date) — the implicit
+     * assumption that all days from [statsFrom] to today were abstinent. (Until
+     * the v0.86.0 review the floor was applied by both callers and the vector
+     * pinned "with entries, statsFrom is ignored"; a third caller without the
+     * filter would have counted a streak across the floor.)
      *
      * @param sortedDates  Ascending list of distinct logical dates with ≥1 drink.
+     *                     May include dates before [statsFrom]; they are ignored.
      * @param today        Logical today from [DayResolver.today].
      * @param statsFrom    Optional statistics start date ("YYYY-MM-DD"). When set,
-     *                     used as the streak origin when [sortedDates] is empty.
+     *                     the floor: earlier drink days are dropped, and it is
+     *                     the streak origin when no drink day remains.
      * @return Current abstinence streak in days (≥ 0).
      */
     fun computeCurrentAbstinence(
@@ -417,13 +424,14 @@ object DayResolver {
         today: String,
         statsFrom: String = "",
     ): Int {
-        if (sortedDates.isEmpty()) {
+        val dates = applyingFloor(sortedDates, statsFrom)
+        if (dates.isEmpty()) {
             // No drink history: streak runs from statsFrom to today (exclusive)
             if (statsFrom.isEmpty() || statsFrom >= today) return 0
             return parseDate(statsFrom).datesUntil(parseDate(today)).count().toInt()
         }
         // Drank today (or somehow in the future): streak is 0
-        if (sortedDates.last() >= today) return 0
+        if (dates.last() >= today) return 0
         // Days strictly BETWEEN the last drink day and today, i.e. the completed,
         // alcohol-free days. Both endpoints are non-abstinent and must be excluded:
         //   • `today` is excluded automatically (datesUntil's end is exclusive) —
@@ -432,13 +440,17 @@ object DayResolver {
         //     day, so the `- 1` drops it.
         // The guard above guarantees last < today, so the raw count is >= 1 and the
         // result is >= 0 (coerceAtLeast is defensive).
-        val streak = (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
+        val streak = (parseDate(dates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
             .coerceAtLeast(0)
         // Postcondition (see @return): an abstinence streak is never negative; the
         // coerceAtLeast is the guard and this verifies it under -ea.
         assert(streak >= 0) { "computeCurrentAbstinence: negative streak $streak" }
         return streak
     }
+
+    /** The dates on or after [statsFrom]; all of them when the floor is empty. */
+    private fun applyingFloor(sortedDates: List<String>, statsFrom: String): List<String> =
+        if (statsFrom.isEmpty()) sortedDates else sortedDates.filter { it >= statsFrom }
 
     /**
      * Longest recorded abstinence run in days.
@@ -461,10 +473,13 @@ object DayResolver {
      *    `gap = datesUntil(today).count() − 1` from lastDrink.
      *
      * @param sortedDates  Ascending list of distinct drinking dates ("YYYY-MM-DD").
+     *                     Dates before [statsFrom] are dropped here, as in
+     *                     [computeCurrentAbstinence]: a gap must not span the floor.
      * @param today        Logical today. When provided, the tail gap is included.
      *                     Defaults to "" (tail gap ignored; the conservative behaviour
      *                     for backward-compatible callers).
-     * @param statsFrom    Optional statistics start date. Enables the initial gap.
+     * @param statsFrom    Optional statistics start date. Enables the initial gap
+     *                     and floors the dates.
      * @return Longest abstinence run in days (≥ 0).
      */
     fun computeLongestAbstinence(
@@ -472,8 +487,9 @@ object DayResolver {
         today: String = "",
         statsFrom: String = "",
     ): Int {
+        val dates = applyingFloor(sortedDates, statsFrom)
         // No drink history at all: longest = same as current streak
-        if (sortedDates.isEmpty()) {
+        if (dates.isEmpty()) {
             if (today.isEmpty() || statsFrom.isEmpty() || statsFrom >= today) return 0
             return parseDate(statsFrom).datesUntil(parseDate(today)).count().toInt()
         }
@@ -481,22 +497,22 @@ object DayResolver {
         var max = 0
 
         // 1. Initial gap: statsFrom → first drink
-        if (statsFrom.isNotEmpty() && statsFrom < sortedDates.first()) {
-            val gap = parseDate(statsFrom).datesUntil(parseDate(sortedDates.first())).count().toInt()
+        if (statsFrom.isNotEmpty() && statsFrom < dates.first()) {
+            val gap = parseDate(statsFrom).datesUntil(parseDate(dates.first())).count().toInt()
             max = maxOf(max, gap)
         }
 
         // 2. Inter-drink gaps
-        for (i in 1 until sortedDates.size) {
-            val gap = (parseDate(sortedDates[i - 1]).datesUntil(parseDate(sortedDates[i])).count() - 1).toInt()
+        for (i in 1 until dates.size) {
+            val gap = (parseDate(dates[i - 1]).datesUntil(parseDate(dates[i])).count() - 1).toInt()
             max = maxOf(max, gap)
         }
 
         // 3. Tail gap: last drink → today (same semantics as computeCurrentAbstinence:
         //    both endpoints are non-abstinent, so exclude today via the exclusive end
         //    and the last drink day via `- 1`).
-        if (today.isNotEmpty() && sortedDates.last() < today) {
-            val gap = (parseDate(sortedDates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
+        if (today.isNotEmpty() && dates.last() < today) {
+            val gap = (parseDate(dates.last()).datesUntil(parseDate(today)).count().toInt() - 1)
                 .coerceAtLeast(0)
             max = maxOf(max, gap)
         }

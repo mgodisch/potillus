@@ -45,6 +45,8 @@ apply to it are stated in the accompanying COPYING.md file.
 ### Added
 
 - A shared vector for the sealed-preferences byte layout.
+- A shared vector for the weekday chart.
+- A shared vector for the calendar's month alignment.
 
 ### Changed
 
@@ -52,6 +54,9 @@ apply to it are stated in the accompanying COPYING.md file.
   credential, as it already did on iOS.
 - The iOS preferences store no longer treats a Keychain or file that is locked
   as unusable, so a write can no longer replace settings it could not read.
+- The abstinence streaks apply the statistics floor themselves, so a drink day
+  before the floor can no longer extend a streak across it.
+- Android computes the calendar's month alignment in the domain now.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

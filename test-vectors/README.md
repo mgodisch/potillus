@@ -63,6 +63,8 @@ scope and the cases that were deliberately left out.
   export, which is authoritative. iOS introspects what GRDB builds.
 - `drink-validation.json` — the rules a drink definition must satisfy. The
   `bounds` block is generated from `DrinkValidator.kt`.
+- `month-grid.json` — the calendar's month alignment: blanks before day 1 under
+  the locale's first weekday, day count, and the rows of seven a month needs.
 - `month-rollup.json` — the monthly table's cap at six months and the weighted
   summary row that folds the rest.
 - `plural-days.json` — the report's day counts in all 21 languages, forms from
@@ -80,6 +82,8 @@ scope and the cases that were deliberately left out.
   periods, the baseline, and the statistics-start floor over both.
 - `template-render.json` — the two-feature template engine behind
   `report/report_template.html`.
+- `weekday-profile.json` — the weekday chart's column order and averages, dry
+  occurrences of a weekday included, absent weekdays as `null`.
 - `year-grid.json` — which days the year heat-map draws at all: a day after the
   logical today, or before the statistics start date, is not drawn.
 

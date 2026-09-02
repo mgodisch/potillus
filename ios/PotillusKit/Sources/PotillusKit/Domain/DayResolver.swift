@@ -454,17 +454,22 @@ public enum DayResolver {
     ///
     /// - Parameters:
     ///   - sortedDates: Ascending, distinct logical dates that have ≥ 1 drink.
+    ///     May include dates before `statsFrom`; they are dropped HERE, so a
+    ///     caller cannot forget to, and a streak never runs across the floor.
+    ///     (Until the v0.86.0 review both callers filtered and the vector pinned
+    ///     "with entries, statsFrom is ignored".)
     ///   - today: Logical today.
-    ///   - statsFrom: Optional recording-start date, used as the streak origin
-    ///     when there is no drink history. It represents the assumption that
-    ///     every day from `statsFrom` to today was abstinent.
+    ///   - statsFrom: Optional recording-start date: the floor for the dates,
+    ///     and the streak origin when no drink day remains. It represents the
+    ///     assumption that every day from `statsFrom` to today was abstinent.
     /// - Returns: The current abstinence streak in days, never negative.
     public static func computeCurrentAbstinence(
         sortedDates: [String],
         today: String,
         statsFrom: String = ""
     ) -> Int {
-        guard let lastDrink = sortedDates.last else {
+        let dates = applyingFloor(sortedDates, statsFrom)
+        guard let lastDrink = dates.last else {
             // No drink history: the streak runs from statsFrom to today (exclusive).
             guard !statsFrom.isEmpty, statsFrom < today,
                   let start = parseDate(statsFrom), let end = parseDate(today)
@@ -486,6 +491,11 @@ public enum DayResolver {
         return streak
     }
 
+    /// The dates on or after `statsFrom`; all of them when the floor is empty.
+    private static func applyingFloor(_ sortedDates: [String], _ statsFrom: String) -> [String] {
+        statsFrom.isEmpty ? sortedDates : sortedDates.filter { $0 >= statsFrom }
+    }
+
     /// The longest recorded abstinence run, in days.
     ///
     /// Three kinds of gap are considered:
@@ -498,16 +508,20 @@ public enum DayResolver {
     ///    `computeCurrentAbstinence`: both endpoints are non-abstinent.
     ///
     /// - Parameters:
-    ///   - sortedDates: Ascending, distinct drinking dates.
+    ///   - sortedDates: Ascending, distinct drinking dates. Dates before
+    ///     `statsFrom` are dropped here, as in `computeCurrentAbstinence`: a gap
+    ///     must not span the floor.
     ///   - today: Logical today. When empty, the tail gap is ignored — the
     ///     conservative behaviour for backward-compatible callers.
-    ///   - statsFrom: Optional recording start; enables the initial gap.
+    ///   - statsFrom: Optional recording start; enables the initial gap and
+    ///     floors the dates.
     public static func computeLongestAbstinence(
         sortedDates: [String],
         today: String = "",
         statsFrom: String = ""
     ) -> Int {
-        guard let firstDrink = sortedDates.first, let lastDrink = sortedDates.last else {
+        let dates = applyingFloor(sortedDates, statsFrom)
+        guard let firstDrink = dates.first, let lastDrink = dates.last else {
             // No drink history: the longest run equals the current streak.
             guard !today.isEmpty, !statsFrom.isEmpty, statsFrom < today,
                   let start = parseDate(statsFrom), let end = parseDate(today)
@@ -524,9 +538,9 @@ public enum DayResolver {
         }
 
         // 2. Inter-drink gaps. A single-element list yields the empty range 1..<1.
-        for index in 1..<sortedDates.count {
-            guard let previous = parseDate(sortedDates[index - 1]),
-                  let current = parseDate(sortedDates[index])
+        for index in 1..<dates.count {
+            guard let previous = parseDate(dates[index - 1]),
+                  let current = parseDate(dates[index])
             else { continue }
             longest = max(longest, daysUntil(previous, current) - 1)
         }

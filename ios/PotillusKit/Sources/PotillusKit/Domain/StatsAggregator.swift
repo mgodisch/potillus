@@ -29,10 +29,12 @@ import Foundation
 // StatsAggregator.swift – the arithmetic behind the Statistics screen
 // =============================================================================
 //
-// On Android these four aggregations live inside `StatsViewModel`, where nothing
-// tests them. Ported here as pure functions instead, for the same reason the
-// drink-day gate was extracted: an unnamed calculation buried in a view model is
-// a calculation nobody can check and everybody will copy.
+// On Android the weekday profile has since moved to `domain/WeekdayProfile.kt`
+// and is pinned with this file by `test-vectors/weekday-profile.json`; the
+// category breakdown and the hour histogram still live inside `StatsViewModel`,
+// where nothing tests them. Everything is a pure function here, for the same
+// reason the drink-day gate was extracted: an unnamed calculation buried in a
+// view model is a calculation nobody can check and everybody will copy.
 //
 // TWO CLOCKS, ON PURPOSE
 //   A drink at 01:00 belongs to the previous LOGICAL day — that is how the totals

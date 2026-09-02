@@ -25,6 +25,8 @@
  */
 package de.godisch.potillus.domain.model
 
+import de.godisch.potillus.domain.AlcoholCalculator
+
 // =============================================================================
 // Models.kt – Domain model types for Libellus Potionis
 // =============================================================================
@@ -247,7 +249,7 @@ data class DrinkCapacity(
 ) {
     /** True when today already has > 0 g of alcohol logged, i.e. it is already a drink day. */
     val todayIsDrinkDay: Boolean
-        get() = todayGrams > 0.0
+        get() = AlcoholCalculator.isDrinkDay(todayGrams)
 }
 
 /**

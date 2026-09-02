@@ -37,7 +37,9 @@ import java.time.LocalDate
 //   used to build them itself — the same loop over daily summaries, written out
 //   twice. That is how the two came to divide by different things without anyone
 //   noticing, and why a correction had to be made in two places. iOS keeps the
-//   calculation in `StatsAggregator.weekdayAverages`; this is its Kotlin twin.
+//   calculation in `StatsAggregator.weekdayAverages`; this is its Kotlin twin,
+//   and `test-vectors/weekday-profile.json` holds the two to one answer sheet
+//   (`WeekdayProfileVectorTest` on each side).
 //
 // WHAT A BAR MEANS
 //   EVERY MONDAY IN THE PERIOD IS A MONDAY, including the dry ones. The divisor

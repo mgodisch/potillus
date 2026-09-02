@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "Shared golden vectors for the calendar's month grid: how many empty cells",
+    "precede day 1 under the locale's first weekday, how many days the month has,",
+    "and how many cells the grid needs (whole rows of seven). Loaded by BOTH",
+    "suites: MonthGridVectorTest.swift drives PotillusKit's MonthGrid,",
+    "MonthGridVectorTest.kt drives domain/MonthGrid.kt. Until the v0.86.0 review",
+    "Android computed the alignment twice, inline in two composables, with no",
+    "test; iOS had MonthGrid in the kit. This file is what makes the two the",
+    "same grid. February 2026 starts on a Sunday, which is the case that",
+    "separates a Monday-first from a Sunday-first locale most sharply."
+  ],
+  "cases": [
+    { "description": "February 2026, Monday first: a Sunday start costs six blanks", "year": 2026, "month": 2, "firstDayOfWeekIso": 1, "expected": { "leadingBlanks": 6, "dayCount": 28, "cellCount": 35 } },
+    { "description": "February 2026, Sunday first: no blanks, exactly four rows", "year": 2026, "month": 2, "firstDayOfWeekIso": 7, "expected": { "leadingBlanks": 0, "dayCount": 28, "cellCount": 28 } },
+    { "description": "August 2026, Monday first: a Saturday start and 31 days need six rows", "year": 2026, "month": 8, "firstDayOfWeekIso": 1, "expected": { "leadingBlanks": 5, "dayCount": 31, "cellCount": 42 } },
+    { "description": "August 2026, Saturday first: the same month fits five rows", "year": 2026, "month": 8, "firstDayOfWeekIso": 6, "expected": { "leadingBlanks": 0, "dayCount": 31, "cellCount": 35 } },
+    { "description": "March 2026, Monday first: six blanks and 31 days", "year": 2026, "month": 3, "firstDayOfWeekIso": 1, "expected": { "leadingBlanks": 6, "dayCount": 31, "cellCount": 42 } },
+    { "description": "February 2024, Monday first: a leap month", "year": 2024, "month": 2, "firstDayOfWeekIso": 1, "expected": { "leadingBlanks": 3, "dayCount": 29, "cellCount": 35 } },
+    { "description": "December 2025, Monday first: a month starting on the first weekday", "year": 2025, "month": 12, "firstDayOfWeekIso": 1, "expected": { "leadingBlanks": 0, "dayCount": 31, "cellCount": 35 } }
+  ]
+}

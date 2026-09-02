@@ -1,0 +1,94 @@
+{
+  "_comment": [
+    "Shared golden vectors for the weekday chart. Loaded by BOTH suites:",
+    "WeekdayProfileVectorTest.kt drives domain/WeekdayProfile.kt, and",
+    "WeekdayProfileVectorTest.swift drives StatsAggregator.weekdayAverages and",
+    "StatsAggregator.weekdayOrder in PotillusKit. The Statistics screen and the",
+    "PDF report draw these seven bars on both platforms; until this file the",
+    "Kotlin side had no test of its own and the two ports were compared by eye.",
+    "A bar divides by how often the weekday OCCURS in [from, to], dry days",
+    "included; null means the weekday does not occur at all. Summaries outside",
+    "the range are ignored; a day absent from the list counts as 0 g. The",
+    "period 2026-08-03..2026-08-16 runs Monday to Sunday twice over. Summaries",
+    "are positional [isoDate, grams] pairs, as in chart-bucketing.json."
+  ],
+  "order": [
+    {
+      "firstDayOfWeekIso": 1,
+      "expected": [1, 2, 3, 4, 5, 6, 7]
+    },
+    {
+      "firstDayOfWeekIso": 7,
+      "expected": [7, 1, 2, 3, 4, 5, 6]
+    },
+    {
+      "firstDayOfWeekIso": 6,
+      "expected": [6, 7, 1, 2, 3, 4, 5]
+    }
+  ],
+  "averages": [
+    {
+      "description": "two full weeks, Monday first: each bar is the weekday's mean over both occurrences",
+      "summaries": [
+        ["2026-08-03", 40.0],
+        ["2026-08-05", 0.0],
+        ["2026-08-10", 20.0],
+        ["2026-08-15", 30.0]
+      ],
+      "from": "2026-08-03",
+      "to": "2026-08-16",
+      "firstDayOfWeekIso": 1,
+      "expected": [30.0, 0.0, 0.0, 0.0, 0.0, 15.0, 0.0]
+    },
+    {
+      "description": "the same data, Sunday first: the columns rotate, the values do not",
+      "summaries": [
+        ["2026-08-03", 40.0],
+        ["2026-08-05", 0.0],
+        ["2026-08-10", 20.0],
+        ["2026-08-15", 30.0]
+      ],
+      "from": "2026-08-03",
+      "to": "2026-08-16",
+      "firstDayOfWeekIso": 7,
+      "expected": [0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 15.0]
+    },
+    {
+      "description": "a range shorter than a week: absent weekdays are null, a dry one is zero",
+      "summaries": [
+        ["2026-08-15", 30.0]
+      ],
+      "from": "2026-08-13",
+      "to": "2026-08-16",
+      "firstDayOfWeekIso": 1,
+      "expected": [null, null, null, 0.0, 0.0, 30.0, 0.0]
+    },
+    {
+      "description": "a summary outside the range is ignored",
+      "summaries": [
+        ["2026-08-01", 99.0],
+        ["2026-08-15", 30.0]
+      ],
+      "from": "2026-08-13",
+      "to": "2026-08-16",
+      "firstDayOfWeekIso": 1,
+      "expected": [null, null, null, 0.0, 0.0, 30.0, 0.0]
+    },
+    {
+      "description": "an inverted range yields seven nulls",
+      "summaries": [],
+      "from": "2026-08-16",
+      "to": "2026-08-03",
+      "firstDayOfWeekIso": 1,
+      "expected": [null, null, null, null, null, null, null]
+    },
+    {
+      "description": "a non-canonical date yields seven nulls rather than a crash",
+      "summaries": [],
+      "from": "2026-8-3",
+      "to": "2026-08-16",
+      "firstDayOfWeekIso": 1,
+      "expected": [null, null, null, null, null, null, null]
+    }
+  ]
+}
