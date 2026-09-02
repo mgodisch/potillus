@@ -14,7 +14,16 @@
     "zh-CN); the iOS suite maps each expectation through its canonicalTag,",
     "which rewrites zh-CN to the zh-Hans script tag its String Catalogs use.",
     "Both platforms also ACCEPT the sibling's spelling on import (each side's",
-    "canonicalTag migration), which the zh-Hans/zh-Hant cases below pin."
+    "canonicalTag migration), which the zh-Hans/zh-Hant cases below pin.",
+    "",
+    "'apply' pins what a REPLACE import does with the sanitised block against the",
+    "settings already on the device: the three absence sentinels (language \"\",",
+    "weightKg 0, statsFromDate \"\") leave the local value standing, and",
+    "biometricEnabled is armed only when the device can authenticate, because the",
+    "lock fails closed. Android: SettingsViewModel.applyImportedSettings; iOS:",
+    "BackupImporter.applySettings. Both suites drive their implementation through a",
+    "fake or in-memory preferences store; 'local' is that store's state before the",
+    "import. Only the four fields the rule touches are listed."
   ],
   "defaults": {
     "themeMode": "SYSTEM",
@@ -601,6 +610,123 @@
         "alternativeStatusSymbols": false,
         "language": "zh-CN",
         "weightKg": 0.0
+      }
+    }
+  ],
+  "apply": [
+    {
+      "description": "a concrete value replaces the local one",
+      "local": {
+        "language": "fr",
+        "weightKg": 70.0,
+        "statsFromDate": "2025-06-01",
+        "biometricEnabled": false
+      },
+      "backup": {
+        "language": "de",
+        "weightKg": 82.5,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": false
+      },
+      "deviceCanAuthenticate": true,
+      "expected": {
+        "language": "de",
+        "weightKg": 82.5,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": false,
+        "lockNotRestored": false
+      }
+    },
+    {
+      "description": "the absence sentinels leave the local values standing",
+      "local": {
+        "language": "fr",
+        "weightKg": 70.0,
+        "statsFromDate": "2025-06-01",
+        "biometricEnabled": true
+      },
+      "backup": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": false
+      },
+      "deviceCanAuthenticate": true,
+      "expected": {
+        "language": "fr",
+        "weightKg": 70.0,
+        "statsFromDate": "2025-06-01",
+        "biometricEnabled": false,
+        "lockNotRestored": false
+      }
+    },
+    {
+      "description": "the lock is armed on a device that can authenticate",
+      "local": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": false
+      },
+      "backup": {
+        "language": "de",
+        "weightKg": 80.0,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": true
+      },
+      "deviceCanAuthenticate": true,
+      "expected": {
+        "language": "de",
+        "weightKg": 80.0,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": true,
+        "lockNotRestored": false
+      }
+    },
+    {
+      "description": "the lock is left off, and reported, on a device that cannot authenticate",
+      "local": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": false
+      },
+      "backup": {
+        "language": "de",
+        "weightKg": 80.0,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": true
+      },
+      "deviceCanAuthenticate": false,
+      "expected": {
+        "language": "de",
+        "weightKg": 80.0,
+        "statsFromDate": "2026-01-01",
+        "biometricEnabled": false,
+        "lockNotRestored": true
+      }
+    },
+    {
+      "description": "a backup without the lock has nothing to report, whatever the device can do",
+      "local": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": true
+      },
+      "backup": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": false
+      },
+      "deviceCanAuthenticate": false,
+      "expected": {
+        "language": "",
+        "weightKg": 0.0,
+        "statsFromDate": "",
+        "biometricEnabled": false,
+        "lockNotRestored": false
       }
     }
   ]

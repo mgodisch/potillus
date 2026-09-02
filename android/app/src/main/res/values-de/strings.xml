@@ -207,6 +207,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">Backup-Version %1$d wird nicht unterstützt (max. %2$d).</string>
     <string name="import_error_file_too_large">Backup-Datei zu groß (max. %1$d MB).</string>
     <string name="import_error_read">Lesefehler: %1$s</string>
+    <string name="import_lock_not_restored">Die biometrische Sperre wurde nicht wiederhergestellt: Dieses Gerät hat keine Displaysperre.</string>
     <string name="drink_delete_blocked">„{name}“ weist {count} Einträge auf und kann nicht gelöscht werden.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Der Name des Getränks darf nicht leer sein.</string>

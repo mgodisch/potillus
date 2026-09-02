@@ -51,7 +51,10 @@ scope and the cases that were deliberately left out.
 - `app-lock.json` — the biometric lock's re-auth threshold, including the
   boundary itself and the refusal to trust a backwards clock reading.
 - `backup-settings.json` — the clamping every value from a backup's `settings`
-  block passes through. `localeTags` is generated from `SupportedLocales.kt`.
+  block passes through, and (`apply`) what a REPLACE then does with it against
+  the local settings: absence sentinels leave the local value standing, and the
+  biometric lock is armed only on a device that can authenticate.
+  `localeTags` is generated from `SupportedLocales.kt`.
 - `chart-bucketing.json` — `Trend` classification, granularity selection and the
   bucketing rules, including the two consequences of the in-progress day.
 - `csv-export.json` — RFC 4180 escaping, the formula-injection guard and whole

@@ -178,6 +178,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Il file di backup è troppo grande (max. %1$d MB).</string>
     <string name="import_error_read">Errore di lettura: %1$s</string>
+    <string name="import_lock_not_restored">Il blocco biometrico non è stato ripristinato: questo dispositivo non ha un blocco schermo.</string>
     <string name="drink_delete_blocked">\u00ab{name}\u00bb ha {count} registrazioni e non può essere eliminato.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Il nome della bevanda non può essere vuoto.</string>

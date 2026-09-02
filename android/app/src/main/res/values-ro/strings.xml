@@ -226,6 +226,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">Versiunea de copie de rezervă %1$d nu este acceptată (max. %2$d).</string>
     <string name="import_error_file_too_large">Fișierul de copie de rezervă este prea mare (max. %1$d MB).</string>
     <string name="import_error_read">Eroare de citire: %1$s</string>
+    <string name="import_lock_not_restored">Blocarea biometrică nu a fost restaurată: acest dispozitiv nu are blocare a ecranului.</string>
     <string name="drink_delete_blocked">„{name}” are {count} înregistrări și nu poate fi șters.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Numele băuturii nu poate fi gol.</string>

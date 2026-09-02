@@ -218,6 +218,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">Sikkerhetskopiversjon %1$d støttes ikke (maks. %2$d).</string>
     <string name="import_error_file_too_large">Sikkerhetskopifilen er for stor (maks. %1$d MB).</string>
     <string name="import_error_read">Lesefeil: %1$s</string>
+    <string name="import_lock_not_restored">Den biometriske låsen ble ikke gjenopprettet: denne enheten har ingen skjermlås.</string>
     <string name="drink_delete_blocked">\u00ab{name}\u00bb har {count} registreringer og kan ikke slettes.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Drikknavnet kan ikke være tomt.</string>

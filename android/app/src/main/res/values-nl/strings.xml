@@ -176,6 +176,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Het back-upbestand is te groot (max. %1$d MB).</string>
     <string name="import_error_read">Leesfout: %1$s</string>
+    <string name="import_lock_not_restored">De biometrische vergrendeling is niet hersteld: dit apparaat heeft geen schermvergrendeling.</string>
     <string name="drink_delete_blocked">\u201c{name}\u201d heeft {count} invoer en kan niet worden verwijderd.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">De naam van het drankje mag niet leeg zijn.</string>

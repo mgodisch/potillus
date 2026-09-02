@@ -64,6 +64,7 @@ package de.godisch.potillus
 //   ViewModel is created at most once per Activity lifecycle.
 // =============================================================================
 
+import androidx.biometric.BiometricManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import de.godisch.potillus.l10n.perAppLocalizedContext
@@ -144,6 +145,15 @@ class AppViewModelFactory(private val app: PotillusApp) : ViewModelProvider.Fact
                 // Pass applicationContext explicitly – see SettingsViewModel KDoc for
                 // the rationale why applicationContext is safe in a ViewModel.
                 appContext = app.applicationContext,
+                // The same probe MainActivity uses before arming the lock: a
+                // restored `biometricEnabled` is applied only if it can be
+                // satisfied (SettingsViewModel.applyImportedSettings).
+                deviceCanAuthenticate = {
+                    BiometricManager.from(app).canAuthenticate(
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                            BiometricManager.Authenticators.DEVICE_CREDENTIAL,
+                    ) == BiometricManager.BIOMETRIC_SUCCESS
+                },
                 prefs = app.appPreferences,
                 entryRepo = app.entryRepository,
                 drinkRepo = app.drinkRepository,

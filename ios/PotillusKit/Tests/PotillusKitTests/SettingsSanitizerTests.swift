@@ -44,6 +44,32 @@ import XCTest
 struct SettingsVectors: Decodable {
     let localeTags: [String]
     let sanitize: [SanitizeCase]
+    /// What a REPLACE does with the sanitised block against the local settings;
+    /// driven by `BackupImporterTests.testApplyMatchesTheSharedVectors`.
+    let apply: [ApplyCase]
+
+    struct ApplyCase: Decodable {
+        let description: String
+        let local: ApplyFields
+        let backup: ApplyFields
+        let deviceCanAuthenticate: Bool
+        let expected: ApplyExpected
+    }
+
+    struct ApplyFields: Decodable {
+        let language: String
+        let weightKg: Double
+        let statsFromDate: String
+        let biometricEnabled: Bool
+    }
+
+    struct ApplyExpected: Decodable {
+        let language: String
+        let weightKg: Double
+        let statsFromDate: String
+        let biometricEnabled: Bool
+        let lockNotRestored: Bool
+    }
 
     struct SanitizeCase: Decodable {
         let description: String

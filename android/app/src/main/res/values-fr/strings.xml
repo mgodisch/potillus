@@ -194,6 +194,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Le fichier de sauvegarde est trop volumineux (max. %1$d Mo).</string>
     <string name="import_error_read">Erreur de lecture : %1$s</string>
+    <string name="import_lock_not_restored">Le verrouillage biométrique n’a pas été restauré : cet appareil n’a pas de verrouillage d’écran.</string>
     <string name="drink_delete_blocked">\u00ab\u00a0{name}\u00a0\u00bb a {count} entrées et ne peut pas être supprimé.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Le nom de la boisson ne doit pas être vide.</string>

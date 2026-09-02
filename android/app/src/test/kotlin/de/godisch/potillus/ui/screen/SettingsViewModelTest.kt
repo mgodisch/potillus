@@ -55,6 +55,7 @@ package de.godisch.potillus.ui.screen
 
 import app.cash.turbine.test
 import de.godisch.potillus.data.repository.ImportStats
+import de.godisch.potillus.domain.SharedTestVectors
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeBackupRepository
@@ -105,6 +106,7 @@ class SettingsViewModelTest {
         entryRepo = entryRepo,
         drinkRepo = drinkRepo,
         backupRepo = backupRepo,
+        deviceCanAuthenticate = { true },
     )
 
     @Before fun setUp() {
@@ -257,7 +259,7 @@ class SettingsViewModelTest {
             weightKg = 82.5,
             alternativeStatusSymbols = true,
         )
-        vm.applyImportedSettings(restored)
+        assertTrue(vm.applyImportedSettings(restored, canAuthenticate = true))
         val now = prefs.currentSettings
         assertEquals(ThemeMode.NIGHT, now.themeMode)
         assertEquals(6, now.dayChangeHour)
@@ -278,22 +280,76 @@ class SettingsViewModelTest {
         // setWeightKg (which clamps to >= 1 kg) and fabricate a 1 kg body weight.
         prefs = FakeAppPreferences(AppSettings(weightKg = 0.0))
         val vm = buildVm()
-        vm.applyImportedSettings(AppSettings(weightKg = 0.0))
+        vm.applyImportedSettings(AppSettings(weightKg = 0.0), canAuthenticate = true)
         assertEquals(0.0, prefs.currentSettings.weightKg, 0.0)
     }
 
     @Test fun `applyImportedSettings leaves language untouched when backup language is blank`() = runTest(dispatcher) {
         prefs = FakeAppPreferences(AppSettings(language = "en"))
         val vm = buildVm()
-        vm.applyImportedSettings(AppSettings(language = ""))
+        vm.applyImportedSettings(AppSettings(language = ""), canAuthenticate = true)
         assertEquals("en", prefs.currentSettings.language)
     }
 
     @Test fun `applyImportedSettings leaves stats-from date untouched when backup value is blank`() = runTest(dispatcher) {
         prefs = FakeAppPreferences(AppSettings(statsFromDate = "2020-01-01"))
         val vm = buildVm()
-        vm.applyImportedSettings(AppSettings(statsFromDate = ""))
+        vm.applyImportedSettings(AppSettings(statsFromDate = ""), canAuthenticate = true)
         assertEquals("2020-01-01", prefs.currentSettings.statsFromDate)
+    }
+
+    /**
+     * The lock fails closed (MainActivity), so a restored `biometricEnabled`
+     * must not be armed on a device that cannot authenticate; the helper reports
+     * it so the import message can say so.
+     */
+    @Test fun `applyImportedSettings drops the lock when the device cannot authenticate`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(biometricEnabled = false))
+        val vm = buildVm()
+        assertFalse(vm.applyImportedSettings(AppSettings(biometricEnabled = true), canAuthenticate = false))
+        assertFalse(prefs.currentSettings.biometricEnabled)
+        // A backup without the lock has nothing to drop, whatever the device can do.
+        assertTrue(vm.applyImportedSettings(AppSettings(biometricEnabled = false), canAuthenticate = false))
+    }
+
+    /**
+     * The shared `apply` vectors in backup-settings.json: what a REPLACE does
+     * with the sanitised block against the local settings. The iOS suite drives
+     * `BackupImporter.applySettings` through the same cases.
+     */
+    @Test fun `applyImportedSettings matches the shared apply vectors`() = runTest(dispatcher) {
+        val cases = SharedTestVectors.load("backup-settings").getJSONArray("apply")
+        for (i in 0 until cases.length()) {
+            val case = cases.getJSONObject(i)
+            val description = case.getString("description")
+            val local = case.getJSONObject("local")
+            val backup = case.getJSONObject("backup")
+            val expected = case.getJSONObject("expected")
+            prefs = FakeAppPreferences(
+                AppSettings(
+                    language = local.getString("language"),
+                    weightKg = local.getDouble("weightKg"),
+                    statsFromDate = local.getString("statsFromDate"),
+                    biometricEnabled = local.getBoolean("biometricEnabled"),
+                ),
+            )
+            val vm = buildVm()
+            val applied = vm.applyImportedSettings(
+                AppSettings(
+                    language = backup.getString("language"),
+                    weightKg = backup.getDouble("weightKg"),
+                    statsFromDate = backup.getString("statsFromDate"),
+                    biometricEnabled = backup.getBoolean("biometricEnabled"),
+                ),
+                canAuthenticate = case.getBoolean("deviceCanAuthenticate"),
+            )
+            val now = prefs.currentSettings
+            assertEquals("$description: language", expected.getString("language"), now.language)
+            assertEquals("$description: weightKg", expected.getDouble("weightKg"), now.weightKg, 1e-9)
+            assertEquals("$description: statsFromDate", expected.getString("statsFromDate"), now.statsFromDate)
+            assertEquals("$description: biometricEnabled", expected.getBoolean("biometricEnabled"), now.biometricEnabled)
+            assertEquals("$description: lockNotRestored", expected.getBoolean("lockNotRestored"), !applied)
+        }
     }
 
     // ── setBiometric ──────────────────────────────────────────────────────────

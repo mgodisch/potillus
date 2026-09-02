@@ -176,6 +176,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Säkerhetskopians fil är för stor (max. %1$d MB).</string>
     <string name="import_error_read">Läsfel: %1$s</string>
+    <string name="import_lock_not_restored">Det biometriska låset återställdes inte: den här enheten har inget skärmlås.</string>
     <string name="drink_delete_blocked">\u201d{name}\u201d har {count} poster och kan inte raderas.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Dryckens namn får inte vara tomt.</string>

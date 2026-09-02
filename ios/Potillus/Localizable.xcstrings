@@ -27598,6 +27598,137 @@
         }
       }
     },
+    "The biometric lock was not restored: this device has no screen lock." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biometrický zámek nebyl obnoven: toto zařízení nemá zámek obrazovky."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den biometriske lås blev ikke gendannet: denne enhed har ingen skærmlås."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die biometrische Sperre wurde nicht wiederhergestellt: Dieses Gerät hat keine Displaysperre."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Το βιομετρικό κλείδωμα δεν επαναφέρθηκε: αυτή η συσκευή δεν έχει κλείδωμα οθόνης."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The biometric lock was not restored: this device has no screen lock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El bloqueo biométrico no se restauró: este dispositivo no tiene bloqueo de pantalla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le verrouillage biométrique n’a pas été restauré : cet appareil n’a pas de verrouillage d’écran."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il blocco biometrico non è stato ripristinato: questo dispositivo non ha un blocco schermo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生体認証ロックは復元されませんでした。このデバイスには画面ロックがありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "생체 인식 잠금이 복원되지 않았습니다. 이 기기에는 화면 잠금이 없습니다."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den biometriske låsen ble ikke gjenopprettet: denne enheten har ingen skjermlås."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De biometrische vergrendeling is niet hersteld: dit apparaat heeft geen schermvergrendeling."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokada biometryczna nie została przywrócona: to urządzenie nie ma blokady ekranu."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O bloqueio biométrico não foi restaurado: este dispositivo não tem bloqueio de ecrã."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O bloqueio biométrico não foi restaurado: este dispositivo não tem bloqueio de tela."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocarea biometrică nu a fost restaurată: acest dispozitiv nu are blocare a ecranului."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Биометрическая блокировка не восстановлена: на этом устройстве нет блокировки экрана."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det biometriska låset återställdes inte: den här enheten har inget skärmlås."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Біометричне блокування не відновлено: на цьому пристрої немає блокування екрана."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未恢复生物识别锁定：此设备没有屏幕锁定。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未還原生物辨識鎖定：此裝置沒有螢幕鎖定。"
+          }
+        }
+      }
+    },
     "The drink name is too long (max. 100 characters)." : {
       "extractionState" : "manual",
       "localizations" : {

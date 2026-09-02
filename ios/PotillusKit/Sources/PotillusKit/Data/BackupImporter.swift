@@ -77,10 +77,16 @@ public struct ImportStats: Sendable, Equatable {
     public let imported: Int
     /// Entries recognised as duplicates and skipped. Always 0 for REPLACE.
     public let skipped: Int
+    /// `true` when the backup asked for the biometric lock and it was NOT
+    /// applied because the device cannot authenticate (see `restore`). The
+    /// caller tells the user; silently dropping it would leave them believing
+    /// the backup's lock is on.
+    public let lockNotRestored: Bool
 
-    public init(imported: Int, skipped: Int) {
+    public init(imported: Int, skipped: Int, lockNotRestored: Bool = false) {
         self.imported = imported
         self.skipped = skipped
+        self.lockNotRestored = lockNotRestored
     }
 }
 
@@ -128,13 +134,27 @@ public struct BackupImporter: Sendable {
     ///
     /// Named `restore` rather than `import`: the latter is a Swift keyword, and a
     /// call site full of backticks reads worse than a synonym.
+    ///
+    /// - Parameter deviceCanAuthenticate: Whether the device can satisfy the
+    ///   biometric lock right now (`BiometricAuthenticator.canEvaluate`). The
+    ///   lock fails closed (`AppLockModel`), so a restored `biometricEnabled`
+    ///   is applied only when this is `true`; otherwise it is left off and
+    ///   `ImportStats.lockNotRestored` says so. The kit cannot probe the device
+    ///   itself — LocalAuthentication lives in the app shell — hence the
+    ///   parameter. Android's `SettingsViewModel.applyImportedSettings` applies
+    ///   the same rule.
     @discardableResult
-    public func restore(_ backup: BackupFile, mode: ImportMode) async throws -> ImportStats {
+    public func restore(
+        _ backup: BackupFile, mode: ImportMode, deviceCanAuthenticate: Bool = true
+    ) async throws -> ImportStats {
         let stats = try importData(backup, mode: mode)
-        if mode == .replace {
-            try await applySettings(backup)
-        }
-        return stats
+        guard mode == .replace else { return stats }
+        let lockNotRestored = try await applySettings(
+            backup, deviceCanAuthenticate: deviceCanAuthenticate
+        )
+        return ImportStats(
+            imported: stats.imported, skipped: stats.skipped, lockNotRestored: lockNotRestored
+        )
     }
 
     // ── Data ─────────────────────────────────────────────────────────────────
@@ -233,11 +253,34 @@ public struct BackupImporter: Sendable {
     /// Called only for `.replace`; see `restore(_:mode:)` for why.
     ///
     /// A backup is user-editable JSON, so every value passes through
-    /// `SettingsSanitizer` before it can influence the alcohol maths. `replace`
-    /// rather than a merge: the file describes a complete settings state, and
-    /// mixing it with the local one would produce a state neither device ever had.
-    private func applySettings(_ backup: BackupFile) async throws {
-        guard let preferences, let raw = backup.settings else { return }
-        try await preferences.replace(with: SettingsSanitizer.sanitize(raw))
+    /// `SettingsSanitizer` before it can influence the alcohol maths. The result
+    /// REPLACES the local settings — with three exceptions, and one refusal,
+    /// that Android's `SettingsViewModel.applyImportedSettings` makes as well
+    /// (aligned in the v0.86.0 review; until then this side replaced wholesale, on
+    /// the argument that mixing two states yields one neither device ever had):
+    ///
+    ///   - `language == ""`, `weightKg == 0` and `statsFromDate == ""` are not
+    ///     values but the ABSENCE of one — "follow the system", "not set", "no
+    ///     floor". Writing them would discard a real local value for nothing,
+    ///     and an empty `statsFromDate` would even erase the floor this store
+    ///     seeded at first launch. They leave the local value standing.
+    ///   - `biometricEnabled == true` is applied only if the device can
+    ///     authenticate: the lock fails closed, so arming it without a
+    ///     credential would lock the user out at the next start.
+    ///
+    /// - Returns: `true` when the lock was asked for and not applied.
+    private func applySettings(
+        _ backup: BackupFile, deviceCanAuthenticate: Bool
+    ) async throws -> Bool {
+        guard let preferences, let raw = backup.settings else { return false }
+        let current = await preferences.load()
+        var merged = SettingsSanitizer.sanitize(raw)
+        if merged.language.isEmpty { merged.language = current.language }
+        if merged.weightKg <= 0.0 { merged.weightKg = current.weightKg }
+        if merged.statsFromDate.isEmpty { merged.statsFromDate = current.statsFromDate }
+        let lockNotRestored = merged.biometricEnabled && !deviceCanAuthenticate
+        if lockNotRestored { merged.biometricEnabled = false }
+        try await preferences.replace(with: merged)
+        return lockNotRestored
     }
 }

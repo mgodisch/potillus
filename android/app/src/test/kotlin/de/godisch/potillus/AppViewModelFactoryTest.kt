@@ -150,6 +150,7 @@ class AppViewModelFactoryTest {
             entryRepo = entryRepo,
             drinkRepo = drinkRepo,
             backupRepo = backupRepo,
+            deviceCanAuthenticate = { true },
         )
         assertNotNull(vm)
     }

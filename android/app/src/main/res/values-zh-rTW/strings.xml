@@ -223,6 +223,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">不支援備份版本 %1$d（最高 %2$d）。</string>
     <string name="import_error_file_too_large">備份檔案過大（最大 %1$d MB）。</string>
     <string name="import_error_read">讀取錯誤：%1$s</string>
+    <string name="import_lock_not_restored">未還原生物辨識鎖定：此裝置沒有螢幕鎖定。</string>
     <string name="drink_delete_blocked">\u300c{name}\u300d 有 {count} 筆記錄，無法刪除。</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">飲品名稱不能為空白。</string>

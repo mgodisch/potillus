@@ -183,6 +183,16 @@ enum Loc {
     ) -> String {
         String(localized: "\(imported) entries imported, \(skipped) skipped.", locale: locale)
     }
+
+    /// Appended to the import summary when a REPLACE backup asked for the
+    /// biometric lock and the device has no credential to satisfy it
+    /// (`ImportStats.lockNotRestored`; Android's `import_lock_not_restored`).
+    static func lockNotRestored(locale: Locale) -> String {
+        String(
+            localized: "The biometric lock was not restored: this device has no screen lock.",
+            locale: locale
+        )
+    }
 }
 
 // =============================================================================

@@ -220,6 +220,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">Версія резервної копії %1$d не підтримується (макс. %2$d).</string>
     <string name="import_error_file_too_large">Файл резервної копії завеликий (макс. %1$d МБ).</string>
     <string name="import_error_read">Помилка читання: %1$s</string>
+    <string name="import_lock_not_restored">Біометричне блокування не відновлено: на цьому пристрої немає блокування екрана.</string>
     <string name="drink_delete_blocked">«{name}» має {count} записів і не може бути видалений.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Назва напою не може бути порожньою.</string>

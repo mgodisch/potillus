@@ -221,6 +221,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="import_error_version_too_high">バックアップバージョン %1$d はサポートされていません（最大 %2$d）。</string>
     <string name="import_error_file_too_large">バックアップファイルが大きすぎます（最大 %1$d MB）。</string>
     <string name="import_error_read">読み込みエラー：%1$s</string>
+    <string name="import_lock_not_restored">生体認証ロックは復元されませんでした。このデバイスには画面ロックがありません。</string>
     <string name="drink_delete_blocked">「{name}」には {count} 件の記録があるため削除できません。</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">飲み物の名前を入力してください。</string>

@@ -176,6 +176,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <!-- Defined in the German source of truth and mirrored into every locale. -->
     <string name="import_error_file_too_large">Το αρχείο αντιγράφου ασφαλείας είναι πολύ μεγάλο (μέγ. %1$d MB).</string>
     <string name="import_error_read">Σφάλμα ανάγνωσης: %1$s</string>
+    <string name="import_lock_not_restored">Το βιομετρικό κλείδωμα δεν επαναφέρθηκε: αυτή η συσκευή δεν έχει κλείδωμα οθόνης.</string>
     <string name="drink_delete_blocked">«{name}» έχει {count} εγγραφές και δεν μπορεί να διαγραφεί.</string>
     <!-- Validation error messages for the Add/Edit Drink form -->
     <string name="drink_validation_name_blank">Το όνομα του ποτού δεν μπορεί να είναι κενό.</string>

@@ -68,7 +68,9 @@ requirements are met — including the threat model and trust boundaries — is 
   switched on while the device has such a credential, and it fails closed: if
   every biometric and the screen lock are removed afterwards, the app stays
   locked until a device credential is set again — on iOS the lock cover stays
-  up, on Android the app closes when the prompt cannot be satisfied.
+  up, on Android the app closes when the prompt cannot be satisfied. For the
+  same reason a restored backup arms the lock only on a device that can
+  authenticate, and tells you when it did not.
 - **App-switcher privacy.** On both platforms the app hides its own contents in
   the app switcher / recents preview by default, so a glance at the running-apps
   list does not reveal the diary; a setting lets you turn this off.

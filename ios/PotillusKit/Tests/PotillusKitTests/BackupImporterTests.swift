@@ -256,24 +256,6 @@ final class BackupImporterTests: XCTestCase {
         XCTAssertEqual(stored.language, "fr")
     }
 
-    /// Settings replace rather than merge: the file describes a complete state,
-    /// and mixing it with the local one yields a state neither device ever had.
-    func testSettingsReplaceRatherThanMerge() async throws {
-        try await preferences.update { $0.weightKg = 70.0; $0.biometricEnabled = true }
-
-        let raw = BackupSettings(
-            themeMode: "SYSTEM", dayChangeHour: 4, dayChangeMinute: 0,
-            dailyLimitGrams: 23.0, weeklyLimitGrams: 137.0, maxDrinkDaysPerWeek: 6,
-            statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
-            alternativeStatusSymbols: false, language: "", weightKg: 0.0
-        )
-        try await makeImporter().restore(backup(drinks: [], entries: [], settings: raw), mode: .replace)
-
-        let stored = await preferences.load()
-        XCTAssertEqual(stored.weightKg, 0.0, "the old weight must not survive")
-        XCTAssertFalse(stored.biometricEnabled)
-    }
-
     /// A MERGE must not touch the local settings. Nothing asserted this until the
     /// 0.84.0 review, which is how the two platforms diverged unseen: Android has
     /// always ignored a merged backup's settings, this side applied them.
@@ -341,5 +323,107 @@ final class BackupImporterTests: XCTestCase {
     private func firstValue<T>(_ stream: AsyncThrowingStream<T, Error>) async throws -> T {
         for try await value in stream { return value }
         throw XCTSkip("observation finished without emitting a value")
+    }
+}
+
+// The settings cases sit in an extension rather than in the class body: SwiftLint
+// counts only the body against `type_body_length`, and the suite had reached it.
+extension BackupImporterTests {
+
+    /// Settings replace the local ones — except the three "absent" sentinels,
+    /// which leave the local value standing, as on Android. (Until v0.86.0 this
+    /// side replaced wholesale: a backup with an empty `statsFromDate` erased
+    /// the seeded floor.)
+    func testSettingsReplaceExceptForAbsentSentinels() async throws {
+        try await preferences.update {
+            $0.weightKg = 70.0; $0.language = "fr"; $0.statsFromDate = "2025-06-01"
+            $0.biometricEnabled = true; $0.dailyLimitGrams = 20.0
+        }
+
+        let raw = BackupSettings(
+            themeMode: "SYSTEM", dayChangeHour: 4, dayChangeMinute: 0,
+            dailyLimitGrams: 23.0, weeklyLimitGrams: 137.0, maxDrinkDaysPerWeek: 6,
+            statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
+            alternativeStatusSymbols: false, language: "", weightKg: 0.0
+        )
+        let stats = try await makeImporter().restore(
+            backup(drinks: [], entries: [], settings: raw), mode: .replace
+        )
+
+        let stored = await preferences.load()
+        XCTAssertEqual(stored.dailyLimitGrams, 23.0, accuracy: 1e-9, "a real value replaces")
+        XCTAssertFalse(stored.biometricEnabled, "false is a value, not an absence")
+        XCTAssertEqual(stored.weightKg, 70.0, accuracy: 1e-9, "0 means unset: the local weight stays")
+        XCTAssertEqual(stored.language, "fr", "\"\" means follow the system: the local choice stays")
+        XCTAssertEqual(stored.statsFromDate, "2025-06-01", "\"\" means no floor: the local floor stays")
+        XCTAssertFalse(stats.lockNotRestored)
+    }
+
+    /// The lock fails closed, so a backup's `biometricEnabled` is armed only on
+    /// a device that can authenticate; otherwise it is left off and reported.
+    func testTheLockIsNotRestoredOnADeviceThatCannotAuthenticate() async throws {
+        let raw = BackupSettings(
+            themeMode: "SYSTEM", dayChangeHour: 4, dayChangeMinute: 0,
+            dailyLimitGrams: 20.0, weeklyLimitGrams: 80.0, maxDrinkDaysPerWeek: 4,
+            statsFromDate: "2026-01-01", biometricEnabled: true, allowScreenshots: false,
+            alternativeStatusSymbols: false, language: "de", weightKg: 80.0
+        )
+
+        let refused = try await makeImporter().restore(
+            backup(drinks: [], entries: [], settings: raw), mode: .replace, deviceCanAuthenticate: false
+        )
+        XCTAssertTrue(refused.lockNotRestored)
+        let afterRefusal = await preferences.load()
+        XCTAssertFalse(afterRefusal.biometricEnabled)
+        XCTAssertEqual(afterRefusal.language, "de", "everything else is applied")
+
+        let armed = try await makeImporter().restore(
+            backup(drinks: [], entries: [], settings: raw), mode: .replace, deviceCanAuthenticate: true
+        )
+        XCTAssertFalse(armed.lockNotRestored)
+        let afterArming = await preferences.load()
+        XCTAssertTrue(afterArming.biometricEnabled)
+    }
+
+    /// The shared `apply` vectors in backup-settings.json; Android's
+    /// `SettingsViewModelTest` drives `applyImportedSettings` through the same
+    /// cases.
+    func testApplyMatchesTheSharedVectors() async throws {
+        let vectors = try TestVectors.load("backup-settings", as: SettingsVectors.self)
+        for testCase in vectors.apply {
+            try await preferences.replace(with: AppSettings(
+                statsFromDate: testCase.local.statsFromDate,
+                biometricEnabled: testCase.local.biometricEnabled,
+                language: testCase.local.language,
+                weightKg: testCase.local.weightKg
+            ))
+            let raw = BackupSettings(
+                themeMode: "SYSTEM", dayChangeHour: 4, dayChangeMinute: 0,
+                dailyLimitGrams: 20.0, weeklyLimitGrams: 80.0, maxDrinkDaysPerWeek: 4,
+                statsFromDate: testCase.backup.statsFromDate,
+                biometricEnabled: testCase.backup.biometricEnabled,
+                allowScreenshots: false, alternativeStatusSymbols: false,
+                language: testCase.backup.language, weightKg: testCase.backup.weightKg
+            )
+
+            let stats = try await makeImporter().restore(
+                backup(drinks: [], entries: [], settings: raw), mode: .replace,
+                deviceCanAuthenticate: testCase.deviceCanAuthenticate
+            )
+
+            let stored = await preferences.load()
+            let what = testCase.description
+            XCTAssertEqual(stored.language, testCase.expected.language, "\(what): language")
+            XCTAssertEqual(
+                stored.weightKg, testCase.expected.weightKg, accuracy: 1e-9, "\(what): weightKg"
+            )
+            XCTAssertEqual(stored.statsFromDate, testCase.expected.statsFromDate, "\(what): statsFromDate")
+            XCTAssertEqual(
+                stored.biometricEnabled, testCase.expected.biometricEnabled, "\(what): biometricEnabled"
+            )
+            XCTAssertEqual(
+                stats.lockNotRestored, testCase.expected.lockNotRestored, "\(what): lockNotRestored"
+            )
+        }
     }
 }

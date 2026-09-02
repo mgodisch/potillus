@@ -155,6 +155,15 @@ class SettingsViewModel(
     private val entryRepo: IEntryRepository,
     private val drinkRepo: IDrinkRepository,
     private val backupRepo: IBackupRepository,
+    /**
+     * Whether the device can satisfy the biometric lock right now (a strong
+     * biometric or a device credential is enrolled). Consulted ONLY when a
+     * REPLACE import carries `biometricEnabled = true`: the lock fails closed
+     * (see MainActivity, STARTUP SEQUENCE 2b), so arming it on a device that
+     * cannot authenticate would lock the user out on the next start. The
+     * factory passes `BiometricManager`; tests pass a constant.
+     */
+    private val deviceCanAuthenticate: () -> Boolean,
 ) : ViewModel() {
 
     companion object {
@@ -303,14 +312,19 @@ class SettingsViewModel(
                 // SETTINGS RESTORE note in BackupManager). A pre-v3 backup has
                 // result.settings == null and therefore changes nothing.
                 val restored = result.settings?.takeIf { mode == ImportMode.REPLACE }
-                if (restored != null) applyImportedSettings(restored)
+                val lockDropped = restored != null &&
+                    !applyImportedSettings(restored, canAuthenticate = deviceCanAuthenticate())
 
+                val summary = if (mode == ImportMode.REPLACE) {
+                    quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
+                } else {
+                    quantityStr(R.plurals.import_success_merge, stats.imported, stats.imported, stats.skipped)
+                }
+                // The one restored setting that was NOT applied gets a sentence of
+                // its own: silently dropping it would leave the user believing the
+                // backup's lock is on.
                 _exportStatus.value = ExportStatus.Done(
-                    if (mode == ImportMode.REPLACE) {
-                        quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
-                    } else {
-                        quantityStr(R.plurals.import_success_merge, stats.imported, stats.imported, stats.skipped)
-                    },
+                    if (lockDropped) summary + "\n" + str(R.string.import_lock_not_restored) else summary,
                 )
 
                 // Keep the framework per-app locale in lock-step with the restored
@@ -356,23 +370,31 @@ class SettingsViewModel(
      *
      * All remaining values are written unconditionally; the setters re-clamp
      * every numeric range, so this is idempotent and safe even for a backup that
-     * was hand-edited slightly out of range.
+     * was hand-edited slightly out of range. One exception, since the v0.86.0
+     * review: `biometricEnabled = true` is applied only when [canAuthenticate] —
+     * the lock fails closed, so arming it on a device without a credential
+     * would lock the user out at the next start. iOS applies the same rule.
      *
-     * @param settings The validated preferences parsed from the backup.
+     * @param settings        The validated preferences parsed from the backup.
+     * @param canAuthenticate Whether the device can satisfy the lock right now.
+     * @return `false` when the backup asked for the lock and it was NOT applied,
+     *         so the caller can tell the user; `true` otherwise.
      */
     @VisibleForTesting
-    internal suspend fun applyImportedSettings(settings: AppSettings) {
+    internal suspend fun applyImportedSettings(settings: AppSettings, canAuthenticate: Boolean): Boolean {
         prefs.setTheme(settings.themeMode)
         prefs.setDayChangeTime(settings.dayChangeHour, settings.dayChangeMinute)
         prefs.setDailyLimit(settings.dailyLimitGrams)
         prefs.setWeeklyLimit(settings.weeklyLimitGrams)
         prefs.setMaxDrinkDaysPerWeek(settings.maxDrinkDaysPerWeek)
-        prefs.setBiometric(settings.biometricEnabled)
+        val lockApplied = !settings.biometricEnabled || canAuthenticate
+        prefs.setBiometric(settings.biometricEnabled && canAuthenticate)
         prefs.setAllowScreenshots(settings.allowScreenshots)
         prefs.setAlternativeStatusSymbols(settings.alternativeStatusSymbols)
         if (settings.language.isNotEmpty()) prefs.setLanguage(settings.language)
         if (settings.weightKg > 0.0) prefs.setWeightKg(settings.weightKg)
         if (settings.statsFromDate.isNotBlank()) prefs.setStatsFromDate(settings.statsFromDate)
+        return lockApplied
     }
 
     /** Resolves string resource [id] formatted with [args] via the injected [StringProvider]. */

@@ -618,16 +618,26 @@ extension SettingsScreen {
                 // memory. See `BackupReader.readData`.
                 let data = try BackupReader.readData(from: url)
                 let file = try BackupReader.parse(data)
-                let stats = try await environment.importer.restore(file, mode: mode)
+                // The lock fails closed, so the importer arms a restored
+                // `biometricEnabled` only if this device can authenticate — the
+                // same probe the toggle above uses — and reports when it did not.
+                let stats = try await environment.importer.restore(
+                    file, mode: mode, deviceCanAuthenticate: biometrics.canEvaluate()
+                )
 
                 // Both messages are plurals (see the catalogue): the noun agrees
                 // with the count in every language. The merge form's FIRST count
                 // drives the plural; the replace form has one count.
-                importSummary = stats.skipped > 0
+                let summary = stats.skipped > 0
                     ? Loc.importedMergedPlural(
                         imported: stats.imported, skipped: stats.skipped, locale: locale
                     )
                     : Loc.importedPlural(count: stats.imported, locale: locale)
+                // The one restored setting that was NOT applied gets a sentence
+                // of its own, as on Android.
+                importSummary = stats.lockNotRestored
+                    ? summary + "\n" + Loc.lockNotRestored(locale: locale)
+                    : summary
             } catch {
                 backupFailure = describeBackupFailure(error)
             }
