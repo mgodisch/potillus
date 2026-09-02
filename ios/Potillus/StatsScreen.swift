@@ -589,17 +589,14 @@ extension StatsScreen {
     // twelve months — so the wording follows the period rather than the count.
 
     /// The bucket dates that get a label. All of them while they fit; otherwise
-    /// six evenly spaced, first and last included.
+    /// six evenly spaced, first and last included. The choice is the kit's
+    /// (`ReportChart.labelIndices`, pinned by the shared vectors), so the axis
+    /// samples the same buckets as Android's chart and the report.
     fileprivate var chartAxisDates: [String] {
         let dates = model.state.chartBuckets.map(\.labelDate)
-        guard dates.count > 12 else { return dates }
-
-        let target = 6
-        let step = max(Double(dates.count - 1) / Double(target - 1), 1)
-        let picked = (0..<target).map { min(Int(Double($0) * step), dates.count - 1) }
-        // `Set` would lose the order, and the axis wants them ascending.
-        var seen = Set<Int>()
-        return picked.filter { seen.insert($0).inserted }.map { dates[$0] }
+        return ReportChart
+            .labelIndices(count: dates.count, target: ReportChart.screenAxisLabels)
+            .map { dates[$0] }
     }
 
     /// What one bar says about itself: the weekday over a week, the day of the

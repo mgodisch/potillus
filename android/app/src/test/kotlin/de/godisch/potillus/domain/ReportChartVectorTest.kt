@@ -127,7 +127,7 @@ class ReportChartVectorTest {
             assertEquals(
                 case.getString("description"),
                 case.getJSONArray("expected").ints(),
-                ReportChart.labelIndices(case.getInt("count")).toList(),
+                ReportChart.labelIndices(case.getInt("count"), case.optInt("target", ReportChart.REPORT_AXIS_LABELS)).toList(),
             )
         }
     }

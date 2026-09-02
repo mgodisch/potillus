@@ -22,7 +22,10 @@
     "'ceiling' pins the 100 % mark of each chart: trendCeiling(tallest, limit)",
     "for the trend chart (cases carrying 'limit'), barCeiling(tallest) for the hour",
     "and weekday charts. Until v0.86.0 Android held the factors as literals in its",
-    "builder; both builders now call these."
+    "builder; both builders now call these.",
+    "",
+    "labelIndices cases may carry 'target' (default 8, the report); the Statistics",
+    "screen asks for 6 and reads the same function since v0.86.0."
   ],
   "pct": [
     {
@@ -185,6 +188,45 @@
         260,
         312,
         364
+      ]
+    },
+    {
+      "description": "screen: thirteen buckets get six labels",
+      "count": 13,
+      "target": 6,
+      "expected": [
+        0,
+        2,
+        4,
+        7,
+        9,
+        12
+      ]
+    },
+    {
+      "description": "screen: a month of daily buckets",
+      "count": 31,
+      "target": 6,
+      "expected": [
+        0,
+        6,
+        12,
+        18,
+        24,
+        30
+      ]
+    },
+    {
+      "description": "screen: the length whose Float step differs from Double for the report",
+      "count": 32,
+      "target": 6,
+      "expected": [
+        0,
+        6,
+        12,
+        18,
+        24,
+        31
       ]
     }
   ],

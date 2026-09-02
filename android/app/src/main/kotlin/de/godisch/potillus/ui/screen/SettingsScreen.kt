@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.app.LocaleManagerCompat
@@ -936,6 +937,10 @@ private fun LanguageDropdown(selected: String, onSelect: (String) -> Unit) {
                         onSelect(code)
                         expanded = false
                     },
+                    // The check mark below is decorative; the SELECTED state is what
+                    // TalkBack needs, and it reads it from this property — iOS's
+                    // Picker announces its selection natively.
+                    modifier = Modifier.semantics { this.selected = code == selected },
                     trailingIcon = if (code == selected) {
                         (
                             {

@@ -81,6 +81,9 @@ apply to it are stated in the accompanying COPYING.md file.
 - Starring a drink on iOS no longer re-validates it.
 - One contrast figure in the Android colour comments named the predecessor
   shade; corrected.
+- The Statistics chart samples its axis labels through the same domain
+  function as the report on both platforms.
+- TalkBack announces the selected language in the language picker.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

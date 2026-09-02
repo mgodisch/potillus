@@ -80,10 +80,18 @@ public enum ReportChart {
         return Swift.max(percent(value: value, max: ceiling), minimumVisibleBar)
     }
 
+    /// Labels the report's trend axis carries once a series outgrows twelve bars.
+    public static let reportAxisLabels = 8
+
+    /// Labels the Statistics screen's chart carries once a series outgrows twelve bars.
+    public static let screenAxisLabels = 6
+
     /// Which buckets carry an x-axis label.
     ///
-    /// Up to twelve buckets, all of them. Beyond that, roughly eight evenly spaced
-    /// ones, always including the first and the last.
+    /// Up to twelve buckets, all of them. Beyond that, roughly `target` evenly
+    /// spaced ones, always including the first and the last. The report asks for
+    /// `reportAxisLabels`, the Statistics screen for `screenAxisLabels`; until
+    /// v0.86.0 the screen kept a copy of this loop in its view, in `Double`.
     ///
     /// THE STEP IS A 32-BIT FLOAT, deliberately. Kotlin writes
     /// `((n - 1).toFloat() / (target - 1))`, and the truncation that follows lands
@@ -91,11 +99,10 @@ public enum ReportChart {
     /// the first 400 series lengths, `n = 32` among them, which is a month of daily
     /// buckets. Using `Double` here would print a different axis on iOS than on
     /// Android for the same drinking. The shared vectors would catch it.
-    public static func labelIndices(count: Int) -> [Int] {
+    public static func labelIndices(count: Int, target: Int = reportAxisLabels) -> [Int] {
         guard count > 0 else { return [] }
         guard count > 12 else { return Array(0..<count) }
 
-        let target = 8
         let step = Swift.max(Float(count - 1) / Float(target - 1), 1.0)
 
         var indices = Set<Int>()

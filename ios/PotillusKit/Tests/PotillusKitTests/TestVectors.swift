@@ -178,6 +178,8 @@ struct ReportChartVectors: Decodable {
     struct LabelCase: Decodable {
         let description: String
         let count: Int
+        /// Absent for the report's eight labels; 6 for the Statistics screen.
+        let target: Int?
         let expected: [Int]
     }
 

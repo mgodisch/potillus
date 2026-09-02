@@ -76,7 +76,9 @@ final class ReportChartTests: XCTestCase {
     func testLabelIndicesAgainstSharedVectors() {
         for testCase in vectors.labelIndices {
             XCTAssertEqual(
-                ReportChart.labelIndices(count: testCase.count),
+                ReportChart.labelIndices(
+                    count: testCase.count, target: testCase.target ?? ReportChart.reportAxisLabels
+                ),
                 testCase.expected, testCase.description
             )
         }

@@ -151,16 +151,27 @@ object ReportChart {
         }
     }
 
+    /** Labels the report's trend axis carries once a series outgrows twelve bars. */
+    const val REPORT_AXIS_LABELS = 8
+
+    /** Labels the Statistics screen's chart carries once a series outgrows twelve bars. */
+    const val SCREEN_AXIS_LABELS = 6
+
     /**
      * Indices of the buckets that should carry an x-axis label. For a short
      * series (≤ 12 bars) every bucket is labelled; for longer series a small,
-     * evenly spaced subset (~8 labels) keeps the axis readable. The first and
-     * last buckets are always included.
+     * evenly spaced subset of [target] labels keeps the axis readable. The
+     * first and last buckets are always included. The report asks for
+     * [REPORT_AXIS_LABELS], the Statistics screen for [SCREEN_AXIS_LABELS];
+     * until v0.86.0 the screen kept a copy of this loop in its composable.
+     *
+     * The step is a 32-bit Float on purpose, on both platforms: for 16 of the
+     * first 400 series lengths the truncation lands on other indices than the
+     * same arithmetic in Double would. `report-chart.json` pins the result.
      */
-    fun labelIndices(n: Int): Set<Int> {
+    fun labelIndices(n: Int, target: Int = REPORT_AXIS_LABELS): Set<Int> {
         if (n <= 0) return emptySet()
         if (n <= 12) return (0 until n).toSet()
-        val target = 8
         val step = ((n - 1).toFloat() / (target - 1)).coerceAtLeast(1f)
         return (0 until target)
             .map { (it * step).toInt().coerceAtMost(n - 1) }

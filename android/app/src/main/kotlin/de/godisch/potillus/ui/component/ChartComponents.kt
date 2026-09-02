@@ -77,6 +77,7 @@ import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.ChartBucket
+import de.godisch.potillus.domain.ReportChart
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.l10n.fmt0
 import de.godisch.potillus.l10n.fmt1
@@ -369,12 +370,10 @@ fun AlcoholBarChart(
             }
         }
     } else {
-        // ~6 evenly spaced samples (first … last). Not column-aligned, but readable.
-        val targetLabels = 6
-        val step = ((buckets.size - 1).toFloat() / (targetLabels - 1)).coerceAtLeast(1f)
-        val sampled = (0 until targetLabels)
-            .map { (it * step).toInt().coerceAtMost(buckets.size - 1) }
-            .distinct()
+        // ~6 evenly spaced samples (first … last). Not column-aligned, but
+        // readable. The choice is the domain's (ReportChart.labelIndices, pinned
+        // by test-vectors/report-chart.json), shared with iOS and the report.
+        val sampled = ReportChart.labelIndices(buckets.size, ReportChart.SCREEN_AXIS_LABELS)
             .map { buckets[it] }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             sampled.forEach { bucket ->
