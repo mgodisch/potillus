@@ -29,8 +29,11 @@ import Foundation
 // LimitGauge.swift – what a progress bar should show, without knowing about UI
 // =============================================================================
 //
-// The rules Android's `LimitBar` and `DrinkDaysBar` encode, extracted so they can
-// be tested. The SwiftUI views map `Emphasis` onto colours and nothing else.
+// The rules Android's `LimitBar` and `DrinkDaysBar` draw by, extracted so they
+// can be tested. Since the v0.86.0 review Android keeps them in
+// `domain/LimitGauge.kt` too, and `test-vectors/limit-gauge.json` holds the two
+// to one answer sheet. The SwiftUI views map `Emphasis` onto colours and
+// nothing else.
 //
 // TWO FRACTIONS, NOT ONE
 //   The bar's FILL is clamped to 0...1, or a 130 % day would draw past the track.

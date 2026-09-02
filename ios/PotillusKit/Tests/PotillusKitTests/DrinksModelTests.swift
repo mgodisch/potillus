@@ -107,7 +107,7 @@ final class DrinksModelTests: XCTestCase {
         XCTAssertEqual(try stored().first?.volumeMl, 500, "the old value survives")
     }
 
-    func testTogglingAFavouriteGoesThroughValidation() throws {
+    func testTogglingAFavouriteFlipsTheFlag() throws {
         XCTAssertTrue(model.add(name: "Pils", volumeMl: 500, alcoholPercent: 4.9, category: .beer))
         let drink = try XCTUnwrap(try stored().first)
         XCTAssertFalse(drink.isFavorite)
@@ -117,6 +117,22 @@ final class DrinksModelTests: XCTestCase {
 
         XCTAssertTrue(model.toggleFavorite(try XCTUnwrap(try stored().first)))
         XCTAssertFalse(try XCTUnwrap(try stored().first).isFavorite)
+    }
+
+    /// A stored drink that today's validator would refuse — a name over the
+    /// limit from an older backup, say — can still be starred: the flip is not
+    /// an edit. Android's `setFavorite` behaves the same; until v0.86.0 this side
+    /// routed the flip through `update` and refused.
+    func testTogglingAFavouriteDoesNotRevalidateTheDrink() throws {
+        var legacy = DrinkDefinition(
+            name: String(repeating: "x", count: DrinkValidator.maxNameLength + 1),
+            volumeMl: 500, alcoholPercent: 4.9
+        )
+        legacy.id = try environment.drinks.add(legacy)
+
+        XCTAssertTrue(model.toggleFavorite(legacy))
+        XCTAssertNil(model.violation)
+        XCTAssertTrue(try XCTUnwrap(try stored().first).isFavorite)
     }
 
     // ── Deleting ─────────────────────────────────────────────────────────────

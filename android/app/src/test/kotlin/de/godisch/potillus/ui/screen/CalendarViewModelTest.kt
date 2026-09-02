@@ -284,6 +284,33 @@ class CalendarViewModelTest {
         }
     }
 
+    /**
+     * Paging away from a month drops the selection, as toggling the view mode
+     * and jumping to a month always did (and as iOS does): a selected day the
+     * grid no longer shows would leave the entries list pointing at nothing.
+     */
+    @Test fun `paging to another month clears the selection`() = runTest {
+        val vm = makeVm()
+        vm.uiState.test {
+            awaitItem()
+            vm.selectDate("2026-03-15")
+            assertEquals("2026-03-15", awaitItem().selectedDate)
+
+            vm.nextPeriod()
+            // The month and the cleared selection can arrive as two frames.
+            var afterNext = awaitItem()
+            while (afterNext.selectedDate != null) afterNext = awaitItem()
+
+            vm.selectDate("2026-04-15")
+            assertEquals("2026-04-15", awaitItem().selectedDate)
+
+            vm.prevPeriod()
+            var afterPrev = awaitItem()
+            while (afterPrev.selectedDate != null) afterPrev = awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ── Entry mutations ───────────────────────────────────────────────────────
 
     /**

@@ -1,0 +1,130 @@
+{
+  "_comment": [
+    "Shared golden vectors for the two progress bars of the Today screen: how full",
+    "each bar is (clamped to 0..1) and how it reads (CALM, WARNING, DANGER). Loaded",
+    "by BOTH suites: LimitGaugeVectorTest.kt drives domain/LimitGauge.kt,",
+    "LimitGaugeVectorTest.swift drives PotillusKit's LimitGauge. Until the v0.86.0",
+    "review the Kotlin rules sat inline in two composables, unmeasured and untested.",
+    "The gram bar turns DANGER only when the limit is EXCEEDED (isOverLimit, with its",
+    "epsilon); reaching it exactly stays WARNING. The drink-day bar turns DANGER",
+    "when drinking NOW would spend a day the user does not have",
+    "(drinkDayLimitReached): at the cap with today already a drink day it is",
+    "WARNING, at the cap with today still dry it is DANGER."
+  ],
+  "grams": [
+    {
+      "description": "half way: proportional fill, calm",
+      "totalGrams": 10.0,
+      "limitGrams": 20.0,
+      "fill": 0.5,
+      "emphasis": "CALM"
+    },
+    {
+      "description": "just under the warning band",
+      "totalGrams": 14.9,
+      "limitGrams": 20.0,
+      "fill": 0.745,
+      "emphasis": "CALM"
+    },
+    {
+      "description": "at 75 % the bar turns amber",
+      "totalGrams": 15.0,
+      "limitGrams": 20.0,
+      "fill": 0.75,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "exactly at the limit is allowed: full and amber",
+      "totalGrams": 20.0,
+      "limitGrams": 20.0,
+      "fill": 1.0,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "a total that displays as the limit does not flip red",
+      "totalGrams": 20.000000001,
+      "limitGrams": 20.0,
+      "fill": 1.0,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "over the limit: fill clamped, red",
+      "totalGrams": 26.0,
+      "limitGrams": 20.0,
+      "fill": 1.0,
+      "emphasis": "DANGER"
+    },
+    {
+      "description": "an unconfigured limit draws an empty, calm bar",
+      "totalGrams": 50.0,
+      "limitGrams": 0.0,
+      "fill": 0.0,
+      "emphasis": "CALM"
+    },
+    {
+      "description": "nothing consumed",
+      "totalGrams": 0.0,
+      "limitGrams": 20.0,
+      "fill": 0.0,
+      "emphasis": "CALM"
+    }
+  ],
+  "drinkDays": [
+    {
+      "description": "one of four: calm",
+      "drinkDays": 1,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": false,
+      "fill": 0.25,
+      "emphasis": "CALM"
+    },
+    {
+      "description": "three of four: amber",
+      "drinkDays": 3,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": true,
+      "fill": 0.75,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "three of four with today still dry: the next drink spends the last day, amber",
+      "drinkDays": 3,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": false,
+      "fill": 0.75,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "at the cap with today already a drink day: today is free, amber",
+      "drinkDays": 4,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": true,
+      "fill": 1.0,
+      "emphasis": "WARNING"
+    },
+    {
+      "description": "at the cap with today still dry: the first drink spends a day the user does not have, red",
+      "drinkDays": 4,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": false,
+      "fill": 1.0,
+      "emphasis": "DANGER"
+    },
+    {
+      "description": "over the cap: red either way, fill clamped",
+      "drinkDays": 5,
+      "maxDrinkDays": 4,
+      "todayIsDrinkDay": true,
+      "fill": 1.0,
+      "emphasis": "DANGER"
+    },
+    {
+      "description": "a cap of zero allows no drink day, so an empty bar is already red",
+      "drinkDays": 0,
+      "maxDrinkDays": 0,
+      "todayIsDrinkDay": false,
+      "fill": 0.0,
+      "emphasis": "DANGER"
+    }
+  ]
+}

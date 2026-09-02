@@ -352,6 +352,15 @@ class CalendarViewModel(
         } else {
             _month.value = _month.value.minusYears(1)
         }
+        // A day that is no longer on the grid must not stay selected, or the list
+        // below would show entries the grid cannot point at. The other navigations
+        // (toggleViewMode, showMonth, resetToCurrentMonth) always cleared; paging
+        // did not until v0.86.0. iOS clears on both.
+        //
+        // AFTER the month, not before: both are StateFlows, so either order emits
+        // twice, and this one keeps the pairs a collector sees in the order the
+        // existing navigation tests expect — the month, then the cleared day.
+        _selectedDate.value = null
     }
 
     /** Navigate to the next month (MONTH mode) or next year (YEAR mode). */
@@ -361,6 +370,7 @@ class CalendarViewModel(
         } else {
             _month.value = _month.value.plusYears(1)
         }
+        _selectedDate.value = null // see prevPeriod
     }
 
     /** Selects (or, with `null`, clears) the calendar day [date] ("YYYY-MM-DD"). */

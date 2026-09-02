@@ -30,6 +30,7 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartBucketing
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.StatsAggregator
 import de.godisch.potillus.domain.WeekdayProfile
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -450,14 +451,10 @@ data class PdfReportData(
             //    24 fixed buckets (0..23). Each entry's full gram amount is attributed
             //    to the local clock hour at which it was logged. This drives the report's
             //    24-bar chart, which replaced the older "share before / after 17:00" split.
-            val hourlyGrams = DoubleArray(24)
-            entries.forEach { e ->
-                // The hour the drink was logged at, in the frame it was logged
-                // in. Reading it in the CURRENT device frame moved every bar of
-                // a travelled or daylight-saving-crossed history by an hour.
-                val hour = DayResolver.localDateTime(e.timestampMillis, e.utcOffsetSeconds).hour
-                hourlyGrams[hour] += e.gramsAlcohol
-            }
+            //    The hour is the one the drink was logged at, in its own frame;
+            //    StatsAggregator holds the rule, shared with the Statistics screen
+            //    and pinned by test-vectors/stats-aggregator.json.
+            val hourlyGrams = StatsAggregator.hourlyGrams(entries)
 
             // ── Medians (robust companions to the mean KPIs).
             //    medianPerDay spans EVERY calendar day in the period (abstinent days
@@ -592,7 +589,7 @@ data class PdfReportData(
                 chartBuckets = chartBuckets,
                 chartGranularity = chartGranularity,
                 categories = categories,
-                hourlyGrams = hourlyGrams.toList(),
+                hourlyGrams = hourlyGrams,
                 weekdayOrder = weekdayOrder,
                 weekdayAverages = weekdayAverages,
                 longestAbstinence = longest,

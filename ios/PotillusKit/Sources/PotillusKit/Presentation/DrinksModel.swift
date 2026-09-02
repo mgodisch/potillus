@@ -162,12 +162,18 @@ public final class DrinksModel {
         return perform { try self.drinks.update(canonical) }
     }
 
-    /// Flips the favourite flag. Goes through `update`, so it is validated too.
+    /// Flips the favourite flag — and nothing else, so it does NOT go through
+    /// `update`'s validation: a drink that is already stored stays storable,
+    /// however its name or volume would fare against today's rules (a drink
+    /// from an older backup, say). Android's `setFavorite` writes the same way.
+    /// Until v0.86.0 this went through `update`, and such a drink could not be
+    /// (un)starred here while it could on Android.
     @discardableResult
     public func toggleFavorite(_ drink: DrinkDefinition) -> Bool {
         var flipped = drink
         flipped.isFavorite.toggle()
-        return update(flipped)
+        clearErrors()
+        return perform { try self.drinks.update(flipped) }
     }
 
     /// Deletes a drink, unless entries reference it.

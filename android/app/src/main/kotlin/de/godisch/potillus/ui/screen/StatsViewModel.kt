@@ -55,6 +55,7 @@ import de.godisch.potillus.domain.ChartBucket
 import de.godisch.potillus.domain.ChartBucketing
 import de.godisch.potillus.domain.ChartGranularity
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.StatsAggregator
 import de.godisch.potillus.domain.StatsPeriod
 import de.godisch.potillus.domain.StatsWindows
 import de.godisch.potillus.domain.Trend
@@ -468,8 +469,6 @@ class StatsViewModel(
             entryRepo.getEntriesForPeriod(effectiveFrom, to),
             drinkRepo.drinks,
         ) { current, previous, periodEntries, drinks ->
-            val drinkMap = drinks.associateBy { it.id }
-
             val totalGrams = current.sumOf { it.totalGrams }
             // Drink days in the period, INCLUDING today if a drink was logged today
             // (the daily-summary query is inclusive of `to`, which equals today).
@@ -498,32 +497,16 @@ class StatsViewModel(
                 current.any { it.date == to && AlcoholCalculator.isDrinkDay(it.totalGrams) }
             val effectivePeriodDays = DayResolver.windowDays(effectiveFrom, to, today, todayIsDrinkDay)
 
-            val categoryBreakdown = periodEntries
-                .groupBy { e -> drinkMap[e.drinkId]?.category ?: DrinkCategory.OTHER }
-                .mapValues { (_, es) -> es.sumOf { it.gramsAlcohol } }
-                .filter { it.value > 0.0 }
+            // Both aggregations below come from the domain (StatsAggregator, the
+            // twin of the iOS kit's, pinned by test-vectors/stats-aggregator.json);
+            // until v0.86.0 they were written out here, and the histogram a second
+            // time in PdfReportData.
+            val categoryBreakdown = StatsAggregator.categoryBreakdown(periodEntries, drinks)
 
-            // Hour-of-day histogram: grams of pure alcohol per clock hour (0..23),
-            // built from the period's individual entries. Drives the Statistics
-            // screen's 24-bar time-of-day chart (the same series the PDF uses).
-            val hourlyGrams = DoubleArray(24)
-            periodEntries.forEach { e ->
-                // The hour the drink was logged at, in the frame it was logged
-                // in. Reading it in the CURRENT device frame moved every bar of
-                // a travelled or daylight-saving-crossed history by an hour.
-                val hour = DayResolver.localDateTime(e.timestampMillis, e.utcOffsetSeconds).hour
-                hourlyGrams[hour] += e.gramsAlcohol
-            }
-            // Collapse the 24 clock hours into eight 3-hour buckets (0–3, 3–6 … 21–24)
-            // and express each as the AVERAGE grams per day in the period (sum in the
-            // bucket ÷ effectivePeriodDays), so the eight bars sum to the overall
-            // average grams/day. divisor ≥ 1 guards the empty-period edge case.
-            val periodDaysDiv = effectivePeriodDays.coerceAtLeast(1)
-            val hourBucketAverages = (0 until 8).map { b ->
-                var sum = 0.0
-                for (h in b * 3 until b * 3 + 3) sum += hourlyGrams[h]
-                sum / periodDaysDiv
-            }
+            // Eight 3-hour buckets as average grams per day, so the bars sum to the
+            // period's average grams/day. The clock hour is the one the drink was
+            // logged at, in its own frame (see StatsAggregator).
+            val hourBucketAverages = StatsAggregator.hourBucketAverages(periodEntries, effectivePeriodDays)
 
             // Weekday profile: average grams on each weekday, rotated so the first
             // column is the locale's first weekday. Computed from the daily summaries

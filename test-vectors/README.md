@@ -66,6 +66,8 @@ scope and the cases that were deliberately left out.
   export, which is authoritative. iOS introspects what GRDB builds.
 - `drink-validation.json` — the rules a drink definition must satisfy. The
   `bounds` block is generated from `DrinkValidator.kt`.
+- `limit-gauge.json` — the Today screen's two progress bars: fill (clamped) and
+  emphasis (calm, warning, danger) for grams and for drink days.
 - `month-grid.json` — the calendar's month alignment: blanks before day 1 under
   the locale's first weekday, day count, and the rows of seven a month needs.
 - `month-rollup.json` — the monthly table's cap at six months and the weighted
@@ -81,6 +83,9 @@ scope and the cases that were deliberately left out.
 - `sealed-blob.json` — the `nonce || ciphertext || tag` layout of the sealed
   preferences file, opened under a fixed key on both platforms. The blobs were
   produced by a third AES-GCM implementation, not by either port.
+- `stats-aggregator.json` — the category breakdown, the 24-hour histogram and
+  the eight 3-hour buckets behind the Statistics screen and the report; the
+  clock hour is read in the frame the drink was logged in.
 - `stats-window.json` — which days a statistics period covers: the three
   periods, the baseline, and the statistics-start floor over both.
 - `template-render.json` — the two-feature template engine behind

@@ -70,8 +70,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.godisch.potillus.R
-import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.Emphasis
+import de.godisch.potillus.domain.LimitGauge
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
@@ -481,18 +482,19 @@ fun EntryListItem(entry: ConsumptionEntry, onEdit: () -> Unit, onDelete: () -> U
  * [caption] (e.g. "20 g/day" or "100 g/week").
  *
  * Colour semantics:
- *   - < 75 %  → primary (calm blue)
- *   - 75–99 % → warning (amber)
- *   - ≥ 100 % → error (red)  – limit reached or exceeded
+ *   - < 75 %   → primary (calm blue)
+ *   - 75–100 % → warning (amber); reaching the limit exactly is allowed
+ *   - > 100 %  → error (red) – the limit is exceeded (AlcoholCalculator.isOverLimit)
  *
  * The [LinearProgressIndicator] receives a clamped [0f, 1f] fraction so it never
- * overflows visually, even when [totalGrams] > [limitGrams]. The colour switch at
- * exactly 1.0f still signals the violation.
+ * overflows visually, even when [totalGrams] > [limitGrams]; the colour comes
+ * from the unclamped value, so the overflow still shows. Both are decided by
+ * [de.godisch.potillus.domain.LimitGauge].
  *
  * @param totalGrams  Grams consumed in the current period.
  * @param limitGrams  The threshold to compare against. A non-positive value
  *                    (limit not configured) shows an empty bar — the guard lives
- *                    in [AlcoholCalculator.limitPercent].
+ *                    in [de.godisch.potillus.domain.AlcoholCalculator.limitPercent].
  * @param caption     Right-hand caption shown above the bar (already formatted).
  * @param leftSuffix  Optional text appended to the consumed-grams label on the left,
  *                    e.g. a week range "(25.5.–31.5.)". Empty by default.
@@ -509,23 +511,17 @@ fun LimitBar(
 ) {
     // Per-app locale for the consumed-grams label (see l10n/NumberFormat.kt).
     val locale = LocalContext.current.formattingLocale()
-    // Fill fraction from the domain layer's single source of truth. The guard
-    // for an unconfigured limit (≤ 0 → empty bar instead of NaN) lives THERE,
-    // not here — this composable used to duplicate the division with a subtly
-    // different guard (coerceAtLeast(1.0)), which the v0.78.0 QA review
-    // unified into AlcoholCalculator.limitPercent.
-    val fraction = AlcoholCalculator.limitPercent(totalGrams, limitGrams)
-    // Red only when the limit is *exceeded*, decided by the domain layer's ONE
-    // definition of "over the limit" (AlcoholCalculator.isOverLimit) — the same
-    // check countLimitViolations, the calendar/chart over-limit markers and the
-    // PDF report use. Reaching the limit exactly is allowed (the limit is what
-    // you may consume), so it stays amber; the helper's epsilon keeps a total
-    // that DISPLAYS as exactly the limit from flipping red through binary
-    // floating-point drift (see isOverLimit's KDoc).
-    val barColor = when {
-        AlcoholCalculator.isOverLimit(totalGrams, limitGrams) -> dangerRedColor()
-        fraction < 0.75f -> MaterialTheme.colorScheme.primary
-        else -> warningColor()
+    // Fill and emphasis come from the domain (LimitGauge, the twin of the iOS
+    // kit's, pinned by test-vectors/limit-gauge.json); this composable only
+    // maps the emphasis onto colours. The rules — the ≤ 0 guard, red only when
+    // the limit is EXCEEDED by AlcoholCalculator.isOverLimit's epsilon-guarded
+    // definition, amber from 75 % — used to be written out here, where Kover
+    // does not measure. See LimitGauge.kt for the reasoning behind each.
+    val fraction = LimitGauge.fillFraction(totalGrams, limitGrams)
+    val barColor = when (LimitGauge.emphasis(totalGrams, limitGrams)) {
+        Emphasis.DANGER -> dangerRedColor()
+        Emphasis.WARNING -> warningColor()
+        Emphasis.CALM -> MaterialTheme.colorScheme.primary
     }
     // ONE SENTENCE FOR TALKBACK (v0.85.0 VoiceOver/TalkBack round).
     //   Left to itself this Column is three nodes: the gram figure, the caption,
@@ -593,7 +589,7 @@ fun LimitBar(
         }
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
-            progress = { fraction.coerceIn(0f, 1f) },
+            progress = { fraction },
             // Silent: its ProgressBarRangeInfo would otherwise merge into the row
             // above and add a bare percentage to the sentence.
             modifier = Modifier.fillMaxWidth().height(8.dp).semantics { hideFromAccessibility() },
@@ -796,25 +792,19 @@ fun DrinkDaysBar(
     modifier: Modifier = Modifier,
     weekLabel: String = "",
 ) {
-    val fraction = (drinkDays.toFloat() / maxDrinkDays.toFloat().coerceAtLeast(1f))
-        .coerceAtLeast(0f)
-    // Red exactly when drinking *now* would exceed the allowance, which is the
-    // same question [TrafficLightDot] answers — so both use the same predicate,
-    // [AlcoholCalculator.drinkDayLimitReached].
-    //
-    // A full bar does not settle the question on its own. At 5/5 with today
-    // already a drink day, another drink adds no further drink day: amber, "at
-    // cap, but today is free". At 5/5 with today still dry, the first drink
-    // spends a day the user does not have: red. The bar looks identical in both
-    // cases; the answer does not.
-    //
-    // Before v0.81.0 this used `drinkDays > maxDrinkDays`, which left the bar
-    // amber in the second case while the dot beside it was already red.
-    val barColor = when {
-        AlcoholCalculator.drinkDayLimitReached(drinkDays, maxDrinkDays, todayIsDrinkDay) ->
-            dangerRedColor()
-        fraction < 0.75f -> MaterialTheme.colorScheme.primary
-        else -> warningColor()
+    // Fill and emphasis come from the domain (LimitGauge, pinned by
+    // test-vectors/limit-gauge.json). Red exactly when drinking NOW would
+    // exceed the allowance — the question [TrafficLightDot] answers with the
+    // same predicate, AlcoholCalculator.drinkDayLimitReached: at 5/5 with today
+    // already a drink day the bar is amber ("at cap, but today is free"), at
+    // 5/5 with today still dry it is red. Before v0.81.0 this used
+    // `drinkDays > maxDrinkDays`, which left the bar amber in the second case
+    // while the dot beside it was already red. See LimitGauge.kt.
+    val fraction = LimitGauge.drinkDaysFillFraction(drinkDays, maxDrinkDays)
+    val barColor = when (LimitGauge.drinkDaysEmphasis(drinkDays, maxDrinkDays, todayIsDrinkDay)) {
+        Emphasis.DANGER -> dangerRedColor()
+        Emphasis.WARNING -> warningColor()
+        Emphasis.CALM -> MaterialTheme.colorScheme.primary
     }
     // ONE SENTENCE FOR TALKBACK — see LimitBar for the reasoning. This row had a
     // fault of its own on top of it: the visible label composes "1 / 4", and a
@@ -854,7 +844,7 @@ fun DrinkDaysBar(
         }
         Spacer(Modifier.height(4.dp))
         LinearProgressIndicator(
-            progress = { fraction.coerceIn(0f, 1f) },
+            progress = { fraction },
             // Silent: its ProgressBarRangeInfo would otherwise merge into the row
             // above and add a bare percentage to the sentence.
             modifier = Modifier.fillMaxWidth().height(8.dp).semantics { hideFromAccessibility() },

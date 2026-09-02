@@ -1,0 +1,209 @@
+{
+  "_comment": [
+    "Shared golden vectors for the three aggregations behind the Statistics screen",
+    "and the PDF report: the category breakdown, the 24-hour histogram and the eight",
+    "3-hour buckets. Loaded by BOTH suites: StatsAggregatorVectorTest.kt drives",
+    "domain/StatsAggregator.kt, StatsAggregatorVectorTest.swift drives",
+    "PotillusKit's StatsAggregator. Until the v0.86.0 review the Kotlin side had the",
+    "histogram written out twice (StatsViewModel, PdfReportData) and none of the",
+    "three under test.",
+    "Every entry carries utcOffsetSeconds, so the clock hour is fixed by the file and",
+    "no test depends on the machine's zone: the hour is read in the frame the drink",
+    "was logged in. Entries are objects with drinkId, gramsAlcohol, timestampMillis,",
+    "utcOffsetSeconds; drinks are [id, category] pairs. A drinkId with no drink",
+    "counts as OTHER."
+  ],
+  "cases": [
+    {
+      "description": "three entries in two frames: 20:30 and 23:45 at +02:00, 01:15 at -05:00",
+      "drinks": [
+        [
+          1,
+          "BEER"
+        ],
+        [
+          2,
+          "WINE"
+        ]
+      ],
+      "entries": [
+        {
+          "drinkId": 1,
+          "gramsAlcohol": 10.0,
+          "timestampMillis": 1786818600000,
+          "utcOffsetSeconds": 7200
+        },
+        {
+          "drinkId": 2,
+          "gramsAlcohol": 5.0,
+          "timestampMillis": 1786830300000,
+          "utcOffsetSeconds": 7200
+        },
+        {
+          "drinkId": 9,
+          "gramsAlcohol": 20.0,
+          "timestampMillis": 1786860900000,
+          "utcOffsetSeconds": -18000
+        }
+      ],
+      "effectivePeriodDays": 4,
+      "expected": {
+        "categoryBreakdown": {
+          "BEER": 10.0,
+          "WINE": 5.0,
+          "OTHER": 20.0
+        },
+        "hourlyGrams": [
+          0,
+          20.0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10.0,
+          0,
+          0,
+          5.0
+        ],
+        "hourBucketAverages": [
+          5.0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2.5,
+          1.25
+        ]
+      }
+    },
+    {
+      "description": "an alcohol-free entry leaves its category out and the histogram untouched",
+      "drinks": [
+        [
+          1,
+          "BEER"
+        ],
+        [
+          3,
+          "OTHER"
+        ]
+      ],
+      "entries": [
+        {
+          "drinkId": 3,
+          "gramsAlcohol": 0.0,
+          "timestampMillis": 1786881600000,
+          "utcOffsetSeconds": 0
+        },
+        {
+          "drinkId": 1,
+          "gramsAlcohol": 12.0,
+          "timestampMillis": 1786881600000,
+          "utcOffsetSeconds": 0
+        }
+      ],
+      "effectivePeriodDays": 0,
+      "expected": {
+        "categoryBreakdown": {
+          "BEER": 12.0
+        },
+        "hourlyGrams": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          12.0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hourBucketAverages": [
+          0,
+          0,
+          0,
+          0,
+          12.0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "description": "no entries: nothing, and a zero-day period does not divide by zero",
+      "drinks": [],
+      "entries": [],
+      "effectivePeriodDays": 0,
+      "expected": {
+        "categoryBreakdown": {},
+        "hourlyGrams": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "hourBucketAverages": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ]
+}

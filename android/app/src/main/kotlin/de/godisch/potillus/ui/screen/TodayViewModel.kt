@@ -392,7 +392,7 @@ class TodayViewModel(
                 // record at all: the streak then runs from the day the user chose
                 // to start counting.
                 currentAbstinence = DayResolver.computeCurrentAbstinence(
-                    sortedDates = if (statsFloor.isNotEmpty()) drinkDates.filter { it >= statsFloor } else drinkDates,
+                    sortedDates = drinkDates, // the floor is applied inside
                     today = today,
                     statsFrom = statsFloor,
                 ),

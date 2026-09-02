@@ -351,7 +351,7 @@ public final class TodayModel {
             let floor = settings.statsFromDate
             let drinkDates = try entries.drinkDates()
             next.currentAbstinence = DayResolver.computeCurrentAbstinence(
-                sortedDates: floor.isEmpty ? drinkDates : drinkDates.filter { $0 >= floor },
+                sortedDates: drinkDates,  // the floor is applied inside
                 today: today,
                 statsFrom: floor
             )

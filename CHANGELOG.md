@@ -47,6 +47,8 @@ apply to it are stated in the accompanying COPYING.md file.
 - A shared vector for the sealed-preferences byte layout.
 - A shared vector for the weekday chart.
 - A shared vector for the calendar's month alignment.
+- A shared vector for the statistics screen's hour and category aggregations.
+- A shared vector for the Today screen's two progress bars.
 
 ### Changed
 
@@ -73,6 +75,10 @@ apply to it are stated in the accompanying COPYING.md file.
   and are pinned by a shared vector.
 - The iOS report orders the weekday columns by the report's language, as
   Android does, instead of by the device region.
+- The Statistics screen's hour and category aggregations and the progress
+  bars' rules live in the Android domain now.
+- Paging the Android calendar clears the selected day, as iOS does.
+- Starring a drink on iOS no longer re-validates it.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0
