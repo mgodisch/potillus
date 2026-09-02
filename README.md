@@ -33,7 +33,7 @@ apply to it are stated in the accompanying COPYING.md file.
 [![εxodus: 0 trackers](https://img.shields.io/badge/%CE%B5xodus-0%20trackers-brightgreen)](https://reports.exodus-privacy.eu.org/en/reports/de.godisch.potillus/latest/)
 [![REUSE status](https://api.reuse.software/badge/gitlab.com/godisch/potillus)](https://api.reuse.software/info/gitlab.com/godisch/potillus)
 
-## About the App (v0.85.0)
+## About the App (v0.86.0)
 
 Libellus Potionis is a privacy-first, open-source, free and ad-free alcohol
 consumption tracker designed to help users monitor, pace, and manage their

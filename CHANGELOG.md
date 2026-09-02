@@ -42,6 +42,8 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.86.0
 
+Two apps, one set of rules
+
 ### Added
 
 - A shared vector for the sealed-preferences byte layout.
