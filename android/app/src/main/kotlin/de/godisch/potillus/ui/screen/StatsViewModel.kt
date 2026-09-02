@@ -530,7 +530,13 @@ class StatsViewModel(
             // (one total per day), mirroring PdfReportData so screen and PDF agree.
             val weekStartIso = DayResolver.firstDayOfWeekIso()
             val weekdayOrder = WeekdayProfile.order(weekStartIso)
-            val weekdayAverages = WeekdayProfile.averages(current, effectiveFrom, to, weekStartIso)
+            val weekdayAverages = WeekdayProfile.averages(
+                current,
+                effectiveFrom,
+                to,
+                weekStartIso,
+                inProgressDay = today.takeIf { windowEndsToday },
+            )
 
             // All three limits are evaluated together over the period's days.
             // Daily is a per-day check; the gram and drink-day limits use a gliding
@@ -573,9 +579,9 @@ class StatsViewModel(
             // start clipping its query uses above, so sum and divisor always cover
             // the identical span. When the floor lies after prevTo the range is
             // inverted, prevDays comes out ≤ 0, and the trend degrades to FLAT
-            // (v0.81.0 QA fix; see the effectivePrevFrom derivation above). A
-            // non-positive previous average likewise means "no comparable previous
-            // value" → Trend.FLAT (shown as "–").
+            // (v0.81.0 QA fix; see the effectivePrevFrom derivation above). That
+            // is the ONLY way to FLAT besides equality: a previous period that
+            // exists but was dry is a baseline, and a rise from it is UP.
             val avgPerDay = if (effectivePeriodDays > 0) totalGrams / effectivePeriodDays else 0.0
             val prevSum = previous.sumOf { it.totalGrams }
             val prevDays = (
@@ -583,7 +589,7 @@ class StatsViewModel(
                     DayResolver.parseDate(effectivePrevFrom).toEpochDay() + 1
                 ).toInt()
             val prevAvgPerDay = if (prevDays > 0) prevSum / prevDays else 0.0
-            val trend = Trend.of(avgPerDay, prevAvgPerDay)
+            val trend = Trend.of(avgPerDay, prevAvgPerDay, hasBaseline = prevDays > 0)
 
             StatsUiState(
                 period = period,

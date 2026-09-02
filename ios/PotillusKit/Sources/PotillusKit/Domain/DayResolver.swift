@@ -397,7 +397,13 @@ public enum DayResolver {
     /// Returns `0` when `from` is after `today` (an empty or inverted range);
     /// callers guard against dividing by zero.
     public static func effectivePeriodDays(from: String, today: String, todayIsDrinkDay: Bool) -> Int {
-        guard let start = parseDate(from), let end = parseDate(today), start <= end else { return 0 }
+        // A malformed date is a bug on this side of the sanitizer (CONTRIBUTING §3):
+        // Android throws here, a debug build asserts, a release degrades to 0.
+        guard let start = parseDate(from), let end = parseDate(today) else {
+            assertionFailure("effectivePeriodDays: non-canonical date \(from) / \(today)")
+            return 0
+        }
+        guard start <= end else { return 0 }
         let completedDays = daysUntil(start, end)  // [from, today) — excludes today
         let days = completedDays + (todayIsDrinkDay ? 1 : 0)
         // Postcondition: the range is non-empty here (start <= end), so the count
@@ -438,7 +444,11 @@ public enum DayResolver {
         if to == today {
             return effectivePeriodDays(from: from, today: to, todayIsDrinkDay: todayIsDrinkDay)
         }
-        guard let start = parseDate(from), let end = parseDate(to), start <= end else { return 0 }
+        guard let start = parseDate(from), let end = parseDate(to) else {
+            assertionFailure("windowDays: non-canonical date \(from) / \(to)")
+            return 0
+        }
+        guard start <= end else { return 0 }
         return daysUntil(start, end) + 1  // [from, to] — inclusive
     }
 
@@ -471,16 +481,22 @@ public enum DayResolver {
         let dates = applyingFloor(sortedDates, statsFrom)
         guard let lastDrink = dates.last else {
             // No drink history: the streak runs from statsFrom to today (exclusive).
-            guard !statsFrom.isEmpty, statsFrom < today,
-                  let start = parseDate(statsFrom), let end = parseDate(today)
-            else { return 0 }
+            guard !statsFrom.isEmpty, statsFrom < today else { return 0 }
+            // A malformed date is a bug on this side of the sanitizer (CONTRIBUTING
+            // §3): Android throws here, a debug build asserts, a release degrades.
+            guard let start = parseDate(statsFrom), let end = parseDate(today) else {
+                assertionFailure("computeCurrentAbstinence: non-canonical date \(statsFrom) / \(today)")
+                return 0
+            }
             return daysUntil(start, end)
         }
 
         // Drank today (or, defensively, in the future): no streak has started.
-        guard lastDrink < today,
-              let start = parseDate(lastDrink), let end = parseDate(today)
-        else { return 0 }
+        guard lastDrink < today else { return 0 }
+        guard let start = parseDate(lastDrink), let end = parseDate(today) else {
+            assertionFailure("computeCurrentAbstinence: non-canonical date \(lastDrink) / \(today)")
+            return 0
+        }
 
         // Days strictly between the last drink day and today. `daysUntil` already
         // excludes today; the `- 1` drops the last drink day itself.
@@ -523,32 +539,47 @@ public enum DayResolver {
         let dates = applyingFloor(sortedDates, statsFrom)
         guard let firstDrink = dates.first, let lastDrink = dates.last else {
             // No drink history: the longest run equals the current streak.
-            guard !today.isEmpty, !statsFrom.isEmpty, statsFrom < today,
-                  let start = parseDate(statsFrom), let end = parseDate(today)
-            else { return 0 }
+            guard !today.isEmpty, !statsFrom.isEmpty, statsFrom < today else { return 0 }
+            guard let start = parseDate(statsFrom), let end = parseDate(today) else {
+                assertionFailure("computeLongestAbstinence: non-canonical date \(statsFrom) / \(today)")
+                return 0
+            }
             return daysUntil(start, end)
         }
 
         var longest = 0
 
+        // Every parse below is of a date the database or the sanitizer wrote; a
+        // failure is a bug (CONTRIBUTING §3), so a debug build asserts and a
+        // release build skips the gap, where Android's throw would stop.
+
         // 1. Initial gap: statsFrom → first drink.
-        if !statsFrom.isEmpty, statsFrom < firstDrink,
-           let start = parseDate(statsFrom), let end = parseDate(firstDrink) {
-            longest = max(longest, daysUntil(start, end))
+        if !statsFrom.isEmpty, statsFrom < firstDrink {
+            if let start = parseDate(statsFrom), let end = parseDate(firstDrink) {
+                longest = max(longest, daysUntil(start, end))
+            } else {
+                assertionFailure("computeLongestAbstinence: non-canonical date \(statsFrom) / \(firstDrink)")
+            }
         }
 
         // 2. Inter-drink gaps. A single-element list yields the empty range 1..<1.
         for index in 1..<dates.count {
             guard let previous = parseDate(dates[index - 1]),
                   let current = parseDate(dates[index])
-            else { continue }
+            else {
+                assertionFailure("computeLongestAbstinence: non-canonical date \(dates[index - 1]) / \(dates[index])")
+                continue
+            }
             longest = max(longest, daysUntil(previous, current) - 1)
         }
 
         // 3. Tail gap: last drink → today.
-        if !today.isEmpty, lastDrink < today,
-           let start = parseDate(lastDrink), let end = parseDate(today) {
-            longest = max(longest, max(daysUntil(start, end) - 1, 0))
+        if !today.isEmpty, lastDrink < today {
+            if let start = parseDate(lastDrink), let end = parseDate(today) {
+                longest = max(longest, max(daysUntil(start, end) - 1, 0))
+            } else {
+                assertionFailure("computeLongestAbstinence: non-canonical date \(lastDrink) / \(today)")
+            }
         }
 
         return longest

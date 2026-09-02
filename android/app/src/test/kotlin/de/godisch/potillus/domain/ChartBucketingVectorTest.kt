@@ -62,6 +62,7 @@ class ChartBucketingVectorTest {
             val actual = Trend.of(
                 currentAvg = case.getDouble("currentAvg"),
                 prevAvg = case.getDouble("prevAvg"),
+                hasBaseline = case.getBoolean("hasBaseline"),
             )
             // The JSON stores the Kotlin enum constant name, so valueOf maps directly.
             val expected = Trend.valueOf(case.getString("expected"))

@@ -12,54 +12,77 @@
       "description": "Higher current average is UP",
       "currentAvg": 12.0,
       "prevAvg": 10.0,
+      "hasBaseline": true,
       "expected": "UP"
     },
     {
       "description": "Lower current average is DOWN",
       "currentAvg": 8.0,
       "prevAvg": 10.0,
+      "hasBaseline": true,
       "expected": "DOWN"
     },
     {
       "description": "Equal averages are FLAT",
       "currentAvg": 10.0,
       "prevAvg": 10.0,
+      "hasBaseline": true,
       "expected": "FLAT"
     },
     {
-      "description": "No usable previous value is FLAT",
+      "description": "Before the baseline there is no comparison: FLAT",
       "currentAvg": 10.0,
       "prevAvg": 0.0,
+      "hasBaseline": false,
+      "expected": "FLAT"
+    },
+    {
+      "description": "A previous period that exists but was dry is a baseline: a rise from it is UP",
+      "currentAvg": 10.0,
+      "prevAvg": 0.0,
+      "hasBaseline": true,
+      "expected": "UP"
+    },
+    {
+      "description": "Dry against dry is FLAT",
+      "currentAvg": 0.0,
+      "prevAvg": 0.0,
+      "hasBaseline": true,
       "expected": "FLAT"
     },
     {
       "description": "Negative previous value is FLAT",
       "currentAvg": 10.0,
       "prevAvg": -1.0,
+      "hasBaseline": true,
       "expected": "FLAT"
     },
     {
       "description": "Difference below 0.1 g precision reads as FLAT",
       "currentAvg": 10.04,
       "prevAvg": 10.0,
+      "hasBaseline": true,
       "expected": "FLAT"
     },
     {
       "description": "Difference that rounds up to 0.1 g is UP",
       "currentAvg": 10.05,
       "prevAvg": 10.0,
+      "hasBaseline": true,
       "expected": "UP"
     },
     {
       "description": "Rounding is applied to both sides",
       "currentAvg": 10.04,
       "prevAvg": 10.04999,
+      "hasBaseline": true,
       "expected": "FLAT"
     },
     {
       "description": "Zero current against positive previous is DOWN",
       "currentAvg": 0.0,
       "prevAvg": 5.0,
+      "hasBaseline": true,
       "expected": "DOWN"
     }
   ],

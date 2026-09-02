@@ -50,7 +50,7 @@ package de.godisch.potillus.domain
 //   3. Chinese script/region disambiguation for the remaining zh variants
 //      (Hant script or TW/HK/MO region → "zh-TW", otherwise "zh-CN").
 //   4. Base-language match on the language subtag alone, e.g. "de-AT" → "de"
-//      (with the Norwegian macrolanguage alias "no" folded onto "nb").
+//      (with the Norwegian codes "no" and "nn" folded onto "nb").
 //   5. Fall back to "en" (the base locale present in values/).
 //
 //   Only locales present in [supportedTags] are ever returned; the app never
@@ -90,12 +90,15 @@ object LocaleDetector {
      * 4. Base-language match (e.g. `"de-AT"` → `"de"`).
      * 5. `"en"` as the unconditional fallback.
      *
-     * NORWEGIAN ALIAS: the ISO macrolanguage code `"no"` and the Bokmål code
+     * NORWEGIAN ALIASES: the ISO macrolanguage code `"no"` and the Bokmål code
      * `"nb"` denote the same shipped translation. Android itself reports `nb`,
      * but store-locale codes (Google Play uses `no-NO`) and older sources use
      * `no`; [normalizeLanguage] folds `no` onto `nb` before the language-based
      * steps so both spellings find the `values-nb` translation. (The screenshot
      * suite feeds store locales through this function — see ScreenshotTest.)
+     * Nynorsk (`"nn"`) is folded the same way: the app ships no Nynorsk, and a
+     * Nynorsk reader is far better served by Bokmål than by the English
+     * fallback the base-language step would otherwise reach (v0.86.0 review).
      *
      * @param systemLocale  The JVM locale to match (typically [Locale.getDefault]).
      * @param supportedTags The set of BCP-47 tags the app ships translations for,
@@ -141,10 +144,14 @@ object LocaleDetector {
     /**
      * Folds language-code aliases onto the code the app's resources use.
      *
-     * Currently only Norwegian: `"no"` (the ISO 639 macrolanguage) → `"nb"`
-     * (Bokmål, the code Android reports and `values-nb/` ships under). Android's
-     * own resource matcher treats the two as compatible; this keeps the pure-JVM
-     * detector in line with that behaviour.
+     * Currently only Norwegian: `"no"` (the ISO 639 macrolanguage) and `"nn"`
+     * (Nynorsk) → `"nb"` (Bokmål, the code Android reports and `values-nb/`
+     * ships under). Android's own resource matcher treats `no` and `nb` as
+     * compatible; `nn` is this detector's own choice, because Bokmål is the
+     * closest shipped language and English is not.
      */
-    private fun normalizeLanguage(language: String): String = if (language.equals("no", ignoreCase = true)) "nb" else language.lowercase(Locale.ROOT)
+    private fun normalizeLanguage(language: String): String = when (language.lowercase(Locale.ROOT)) {
+        "no", "nn" -> "nb"
+        else -> language.lowercase(Locale.ROOT)
+    }
 }

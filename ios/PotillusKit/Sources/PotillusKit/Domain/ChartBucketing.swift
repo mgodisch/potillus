@@ -133,10 +133,13 @@ public enum ChartBucketing {
         granularity: ChartGranularity,
         inProgressDay: String? = nil
     ) -> [ChartBucket] {
-        guard let start = DayResolver.parseDate(from),
-              let end = DayResolver.parseDate(to),
-              start <= end
-        else { return [] }
+        // A malformed bound is a bug on this side of the sanitizer (CONTRIBUTING §3):
+        // Android throws here, a debug build asserts, a release degrades to no buckets.
+        guard let start = DayResolver.parseDate(from), let end = DayResolver.parseDate(to) else {
+            assertionFailure("bucketize: non-canonical date \(from) / \(to)")
+            return []
+        }
+        guard start <= end else { return [] }
 
         // O(1) lookup of a day's total; days absent here are abstinent (0 g).
         // Summed rather than overwritten, as `weekdayAverages` does: the caller's
@@ -180,6 +183,10 @@ public enum ChartBucketing {
 
             // See the two consequences documented above.
             var bucketHoldsInProgressDay = false
+            // `inProgressDay` comes from `DayResolver.resolve`, so a parse failure
+            // is a bug (CONTRIBUTING §3); Android's `LocalDate.parse` throws here.
+            assert(inProgressDay.map { DayResolver.parseDate($0) != nil } ?? true,
+                   "bucketize: non-canonical inProgressDay")
             if let inProgressDay, let inProgress = DayResolver.parseDate(inProgressDay) {
                 let isInBucket = inProgress >= bucketStart && inProgress < cappedEndExclusive
                 let isDrinkDay = AlcoholCalculator.isDrinkDay(

@@ -45,6 +45,7 @@ struct ChartBucketingVectors: Decodable {
         let description: String
         let currentAvg: Double
         let prevAvg: Double
+        let hasBaseline: Bool
         let expected: Trend
     }
 
@@ -119,7 +120,10 @@ final class ChartBucketingTests: XCTestCase {
 
     func testTrendAgainstSharedVectors() {
         for testCase in vectors.trend {
-            let actual = Trend.of(currentAvg: testCase.currentAvg, prevAvg: testCase.prevAvg)
+            let actual = Trend.of(
+                currentAvg: testCase.currentAvg, prevAvg: testCase.prevAvg,
+                hasBaseline: testCase.hasBaseline
+            )
             XCTAssertEqual(actual, testCase.expected, "trend: \(testCase.description)")
         }
     }

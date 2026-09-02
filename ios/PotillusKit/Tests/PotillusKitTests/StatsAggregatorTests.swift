@@ -313,6 +313,6 @@ final class StatsAggregatorTests: XCTestCase {
             currentAveragePerDay: 10.04, previousAveragePerDay: 10.00
         )
         XCTAssertEqual(percent, 0.4, accuracy: 1e-9)
-        XCTAssertEqual(Trend.of(currentAvg: 10.04, prevAvg: 10.00), .flat)
+        XCTAssertEqual(Trend.of(currentAvg: 10.04, prevAvg: 10.00, hasBaseline: true), .flat)
     }
 }

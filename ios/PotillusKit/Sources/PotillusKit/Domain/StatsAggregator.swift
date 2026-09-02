@@ -154,13 +154,25 @@ public enum StatsAggregator {
     /// a bar chart must be able to draw the difference between "no Tuesday in
     /// this period" and "Tuesdays were dry".
     ///
+    /// THE RUNNING DAY. A day is only a dry day once it is over, so the running
+    /// day counts towards its weekday's divisor only if it has already seen
+    /// alcohol — the superposition rule `DayResolver.windowDays` and
+    /// `ChartBucketing.bucketize` apply. Before v0.86.0 the running day always
+    /// counted, so Monday morning showed a 0 g Monday bar that the rest of the
+    /// screen still called undecided.
+    ///
     /// - Parameters:
     ///   - summaries: Daily totals; days absent from the list count as 0 g.
     ///   - from: First day of the period, inclusive (`yyyy-MM-dd`).
     ///   - to: Last day of the period, inclusive.
     ///   - firstDayOfWeekIso: The locale's first weekday, 1 = Monday.
+    ///   - inProgressDay: The logical day still running, when it lies in the
+    ///     range (the Statistics screen passes today for a window ending today;
+    ///     a past window and the report pass nothing). Without alcohol it is
+    ///     not counted; with alcohol it is.
     public static func weekdayAverages(
-        summaries: [DaySummary], from: String, to: String, firstDayOfWeekIso: Int
+        summaries: [DaySummary], from: String, to: String, firstDayOfWeekIso: Int,
+        inProgressDay: String? = nil
     ) -> [Double?] {
         guard let start = DayResolver.parseDate(from),
               let end = DayResolver.parseDate(to),
@@ -175,8 +187,13 @@ public enum StatsAggregator {
         var day = start
         while day <= end {
             let column = (isoWeekday(of: day) - firstDayOfWeekIso + 7) % 7
-            sums[column] += totalsByDate[DayResolver.formatDate(day)] ?? 0.0
-            counts[column] += 1
+            let date = DayResolver.formatDate(day)
+            let grams = totalsByDate[date] ?? 0.0
+            sums[column] += grams
+            // The running day is undecided until it is over or has seen alcohol.
+            if date != inProgressDay || AlcoholCalculator.isDrinkDay(totalGrams: grams) {
+                counts[column] += 1
+            }
             day = DayResolver.addingDays(1, to: day)
         }
 

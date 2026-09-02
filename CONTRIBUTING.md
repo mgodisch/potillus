@@ -225,6 +225,18 @@ util/          ← Export helpers (CSV, PDF, JSON backup) and the GPL notice
   `SettingsViewModel` extends `AndroidViewModel` specifically to call
   `Application.getString()` for localised status messages. All other ViewModels
   must remain context-free.
+- **A non-canonical date inside the domain is a bug, not input.**  
+  Dates reach `domain/` as `yyyy-MM-dd` strings written by the app's own
+  database or passed through the backup sanitizer; nothing else produces
+  them. The Kotlin domain therefore throws on a malformed one
+  (`DayResolver.parseDate`, `LocalDate.parse`), and it is the reference. The
+  Swift domain cannot throw from the same signatures, so its `nil` branches
+  carry an `assertionFailure`: a debug build is as loud as Android, a release
+  build degrades to the empty result. Two exceptions degrade on both sides on
+  purpose, because their callers hand them user-facing settings:
+  `WeekdayProfile.averages` / `weekdayAverages`, and `StatsWindows.window` on
+  either side. Validation of dates that come from OUTSIDE belongs in
+  the sanitizer, not here.
 
 ## 4. Coding conventions
 

@@ -10,7 +10,8 @@
     "included; null means the weekday does not occur at all. Summaries outside",
     "the range are ignored; a day absent from the list counts as 0 g. The",
     "period 2026-08-03..2026-08-16 runs Monday to Sunday twice over. Summaries",
-    "are positional [isoDate, grams] pairs, as in chart-bucketing.json."
+    "are positional [isoDate, grams] pairs, as in chart-bucketing.json.",
+    "inProgressDay, when present, names the running day: without alcohol it is not counted, with alcohol it is."
   ],
   "order": [
     {
@@ -89,6 +90,38 @@
       "to": "2026-08-16",
       "firstDayOfWeekIso": 1,
       "expected": [null, null, null, null, null, null, null]
+    },
+    {
+      "description": "the running day without alcohol is undecided: its weekday's divisor excludes it",
+      "summaries": [
+        ["2026-08-03", 40.0]
+      ],
+      "from": "2026-08-03",
+      "to": "2026-08-10",
+      "firstDayOfWeekIso": 1,
+      "inProgressDay": "2026-08-10",
+      "expected": [40.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    {
+      "description": "the running day with alcohol already counts as a day",
+      "summaries": [
+        ["2026-08-03", 40.0],
+        ["2026-08-10", 10.0]
+      ],
+      "from": "2026-08-03",
+      "to": "2026-08-10",
+      "firstDayOfWeekIso": 1,
+      "inProgressDay": "2026-08-10",
+      "expected": [25.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    {
+      "description": "a running day that is the only occurrence of its weekday leaves the column null",
+      "summaries": [],
+      "from": "2026-08-08",
+      "to": "2026-08-10",
+      "firstDayOfWeekIso": 1,
+      "inProgressDay": "2026-08-10",
+      "expected": [null, null, null, null, null, 0.0, 0.0]
     }
   ]
 }

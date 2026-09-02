@@ -50,7 +50,8 @@ final class WeekdayProfileVectorTest: XCTestCase {
             let actual = StatsAggregator.weekdayAverages(
                 summaries: testCase.daySummaries(),
                 from: testCase.from, to: testCase.to,
-                firstDayOfWeekIso: testCase.firstDayOfWeekIso
+                firstDayOfWeekIso: testCase.firstDayOfWeekIso,
+                inProgressDay: testCase.inProgressDay
             )
             XCTAssertEqual(actual.count, testCase.expected.count, "\(testCase.description): column count")
             for (column, expected) in testCase.expected.enumerated() {
@@ -87,6 +88,8 @@ struct WeekdayProfileVectors: Decodable {
         let from: String
         let to: String
         let firstDayOfWeekIso: Int
+        /// The running day, when the case has one.
+        let inProgressDay: String?
         /// `null` marks a weekday the range does not contain.
         let expected: [Double?]
 

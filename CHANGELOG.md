@@ -57,6 +57,11 @@ apply to it are stated in the accompanying COPYING.md file.
 - The abstinence streaks apply the statistics floor themselves, so a drink day
   before the floor can no longer extend a streak across it.
 - Android computes the calendar's month alignment in the domain now.
+- The weekday chart no longer counts a running day without alcohol as a dry
+  day.
+- The trend arrow shows a rise against a previous period that existed but was
+  abstinent.
+- A Nynorsk device locale selects the Bokmål translation on Android.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

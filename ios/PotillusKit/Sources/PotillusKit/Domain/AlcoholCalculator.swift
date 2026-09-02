@@ -499,7 +499,12 @@ public enum AlcoholCalculator {
         let days: [(date: Date, grams: Double)] = summaries
             .filter { isDrinkDay(totalGrams: $0.totalGrams) }
             .compactMap { summary in
-                guard let parsed = IsoDay.parse(summary.date) else { return nil }
+                guard let parsed = IsoDay.parse(summary.date) else {
+                    // Android throws here (CONTRIBUTING §3): a summary date the
+                    // database wrote is canonical by construction.
+                    assertionFailure("countLimitViolations: non-canonical date \(summary.date)")
+                    return nil
+                }
                 return (parsed, summary.totalGrams)
             }
             .sorted { $0.date < $1.date }

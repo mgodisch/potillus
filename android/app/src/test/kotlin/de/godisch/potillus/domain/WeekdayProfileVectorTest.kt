@@ -69,6 +69,7 @@ class WeekdayProfileVectorTest {
                 from = case.getString("from"),
                 to = case.getString("to"),
                 firstDayOfWeekIso = case.getInt("firstDayOfWeekIso"),
+                inProgressDay = case.optString("inProgressDay").takeIf { it.isNotEmpty() },
             )
             val expected = case.getJSONArray("expected")
             assertEquals("$description: column count", expected.length(), actual.size)

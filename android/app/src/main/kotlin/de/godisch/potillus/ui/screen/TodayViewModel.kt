@@ -384,7 +384,7 @@ class TodayViewModel(
                 // Per-day average for the current month (app-wide superposition rule),
                 // plus its trend versus the all-time-before-this-month baseline.
                 monthlyAvgPerDay = curMonthAvg,
-                monthTrend = Trend.of(curMonthAvg, baselineAvg),
+                monthTrend = Trend.of(curMonthAvg, baselineAvg, hasBaseline = hasBaseline),
                 currentMonthLabel = monthLabel,
                 // Same call and same arguments as the Statistics screen's current
                 // streak, so the two screens can only ever show one number. The

@@ -416,7 +416,7 @@ public final class TodayModel {
             let baselineSum = history.filter { $0.date < monthStr }.reduce(0.0) { $0 + $1.totalGrams }
             baselineAvg = baselineDays > 0 ? baselineSum / Double(baselineDays) : 0.0
         }
-        return (average, Trend.of(currentAvg: average, prevAvg: baselineAvg))
+        return (average, Trend.of(currentAvg: average, prevAvg: baselineAvg, hasBaseline: hasBaseline))
     }
 
     /// The Widmark estimate, or nil when it would be a guess.

@@ -423,7 +423,9 @@ public final class StatsModel {
         next.trendPercent = StatsAggregator.trendPercent(
             currentAveragePerDay: averagePerDay, previousAveragePerDay: previousAverage
         )
-        next.trend = Trend.of(currentAvg: averagePerDay, prevAvg: previousAverage)
+        next.trend = Trend.of(
+            currentAvg: averagePerDay, prevAvg: previousAverage, hasBaseline: window.hasBaseline
+        )
         next.categoryBreakdown = StatsAggregator.categoryBreakdown(
             entries: periodEntries, drinks: catalogue
         )
@@ -433,7 +435,8 @@ public final class StatsModel {
         next.weekdayOrder = StatsAggregator.weekdayOrder(firstDayOfWeekIso: firstDayOfWeekIso)
         next.weekdayAverages = StatsAggregator.weekdayAverages(
             summaries: summaries, from: window.from, to: window.to,
-            firstDayOfWeekIso: firstDayOfWeekIso
+            firstDayOfWeekIso: firstDayOfWeekIso,
+            inProgressDay: windowEndsToday ? today : nil
         )
         next.limitInfo = limitInfo
 

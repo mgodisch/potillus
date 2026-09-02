@@ -54,6 +54,14 @@ import java.time.LocalDate
 //   something, seven weekday averages to a week's consumption. Dividing one
 //   chart by a different denominator than the other, with nothing in the caption
 //   to say so, was the earlier behaviour.
+//
+// THE RUNNING DAY
+//   A day is only a dry day once it is over. The running day therefore counts
+//   towards its weekday's divisor only if it has already seen alcohol — the same
+//   superposition rule `DayResolver.windowDays` and `ChartBucketing.bucketize`
+//   apply. Before v0.86.0 the running day always counted, so Monday morning showed
+//   a 0 g Monday bar that the rest of the screen still called undecided, and
+//   the sum relation to the hour chart was off by a day.
 // =============================================================================
 
 /** The weekday chart's seven columns. */
@@ -79,6 +87,11 @@ object WeekdayProfile {
      * @param from             Inclusive first day of the period ("YYYY-MM-DD").
      * @param to               Inclusive last day of the period.
      * @param firstDayOfWeekIso The locale's first weekday, ISO 1 = Monday.
+     * @param inProgressDay    The logical day still running, when it lies in
+     *                         [from]..[to] (the Statistics screen passes today for
+     *                         a window ending today; a past window and the report
+     *                         pass nothing). A running day without alcohol is
+     *                         not counted; with alcohol it is.
      * @return Seven averages, or `null` where the weekday does not occur.
      */
     fun averages(
@@ -86,6 +99,7 @@ object WeekdayProfile {
         from: String,
         to: String,
         firstDayOfWeekIso: Int,
+        inProgressDay: String? = null,
     ): List<Double?> {
         val start = runCatching { DayResolver.parseDate(from) }.getOrNull()
         val end = runCatching { DayResolver.parseDate(to) }.getOrNull()
@@ -103,8 +117,11 @@ object WeekdayProfile {
         var day: LocalDate = start
         while (!day.isAfter(end)) {
             val column = (day.dayOfWeek.value - firstDayOfWeekIso + COLUMNS) % COLUMNS
-            sums[column] += totalsByDate[DayResolver.formatDate(day)] ?: 0.0
-            counts[column]++
+            val date = DayResolver.formatDate(day)
+            val grams = totalsByDate[date] ?: 0.0
+            sums[column] += grams
+            // The running day is undecided until it is over or has seen alcohol.
+            if (date != inProgressDay || AlcoholCalculator.isDrinkDay(grams)) counts[column]++
             day = day.plusDays(1)
         }
 

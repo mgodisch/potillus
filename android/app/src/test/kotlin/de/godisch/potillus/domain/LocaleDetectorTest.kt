@@ -34,7 +34,7 @@ package de.godisch.potillus.domain
 //     1. Exact full-tag match          ("zh-CN"      → "zh-CN")
 //     2. Language+region, script-free  ("zh-Hant-TW" → "zh-TW")
 //     3. Chinese script/region mapping ("zh-Hant-HK" → "zh-TW")
-//     4. Base-language match           ("de-AT"      → "de", alias "no" → "nb")
+//     4. Base-language match           ("de-AT"      → "de", aliases "no"/"nn" → "nb")
 //     5. English fallback              ("ar"         → "en")
 //
 // WHY PURE JVM (no Android, no Robolectric):
@@ -240,5 +240,17 @@ class LocaleDetectorTest {
         assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("no-NO"), withNorwegian))
         // The direct code keeps working, of course.
         assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("nb-NO"), withNorwegian))
+    }
+
+    /**
+     * Nynorsk has no translation of its own; Bokmål is the closest shipped one,
+     * and English — where the base-language step used to land — is not.
+     */
+    @Test fun `nn resolves to nb`() {
+        val withNorwegian = supported + "nb"
+        assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("nn"), withNorwegian))
+        assertEquals("nb", LocaleDetector.detect(Locale.forLanguageTag("nn-NO"), withNorwegian))
+        // Without a Bokmål translation the fallback is still English.
+        assertEquals("en", LocaleDetector.detect(Locale.forLanguageTag("nn"), supported))
     }
 }

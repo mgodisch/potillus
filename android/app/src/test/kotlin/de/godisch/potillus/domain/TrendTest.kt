@@ -31,29 +31,34 @@ import org.junit.Test
 class TrendTest {
 
     @Test fun `lower current average than previous is DOWN`() {
-        assertEquals(Trend.DOWN, Trend.of(currentAvg = 18.8, prevAvg = 20.0))
+        assertEquals(Trend.DOWN, Trend.of(currentAvg = 18.8, prevAvg = 20.0, hasBaseline = true))
     }
 
     @Test fun `higher current average than previous is UP`() {
-        assertEquals(Trend.UP, Trend.of(currentAvg = 22.4, prevAvg = 20.0))
+        assertEquals(Trend.UP, Trend.of(currentAvg = 22.4, prevAvg = 20.0, hasBaseline = true))
     }
 
     @Test fun `equal at 0_1 g precision is FLAT`() {
         // Exactly equal.
-        assertEquals(Trend.FLAT, Trend.of(currentAvg = 20.0, prevAvg = 20.0))
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 20.0, prevAvg = 20.0, hasBaseline = true))
         // Different in the raw value but equal once rounded to 0.1 g (20.04 → 20.0,
         // 19.96 → 20.0) → still FLAT.
-        assertEquals(Trend.FLAT, Trend.of(currentAvg = 20.04, prevAvg = 19.96))
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 20.04, prevAvg = 19.96, hasBaseline = true))
     }
 
     @Test fun `a 0_1 g difference is enough to show a trend`() {
-        assertEquals(Trend.DOWN, Trend.of(currentAvg = 19.9, prevAvg = 20.0))
-        assertEquals(Trend.UP, Trend.of(currentAvg = 20.1, prevAvg = 20.0))
+        assertEquals(Trend.DOWN, Trend.of(currentAvg = 19.9, prevAvg = 20.0, hasBaseline = true))
+        assertEquals(Trend.UP, Trend.of(currentAvg = 20.1, prevAvg = 20.0, hasBaseline = true))
     }
 
-    @Test fun `no previous value is FLAT`() {
-        // prevAvg <= 0 means "no comparable previous month" → no arrow.
-        assertEquals(Trend.FLAT, Trend.of(currentAvg = 18.8, prevAvg = 0.0))
-        assertEquals(Trend.FLAT, Trend.of(currentAvg = 0.0, prevAvg = 0.0))
+    @Test fun `no previous period is FLAT but a dry one is a baseline`() {
+        // No previous period at all (before the statistics floor) → no arrow,
+        // whatever the numbers say.
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 18.8, prevAvg = 0.0, hasBaseline = false))
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 18.8, prevAvg = 20.0, hasBaseline = false))
+        // A previous period that exists but was dry IS a baseline: a rise from it
+        // is UP, dry against dry is FLAT. (Until v0.86.0 both read FLAT.)
+        assertEquals(Trend.UP, Trend.of(currentAvg = 18.8, prevAvg = 0.0, hasBaseline = true))
+        assertEquals(Trend.FLAT, Trend.of(currentAvg = 0.0, prevAvg = 0.0, hasBaseline = true))
     }
 }

@@ -69,8 +69,14 @@ public enum Trend: String, Sendable, Equatable, Codable {
     ///
     /// Returns `.flat` when there is no usable previous value (`prevAvg <= 0`) or
     /// the two are equal once rounded to 0.1 g.
-    public static func of(currentAvg: Double, prevAvg: Double) -> Trend {
-        guard prevAvg > 0.0 else { return .flat }
+    /// - Parameter hasBaseline: Whether the previous period exists at all, i.e.
+    ///   lies on or after the statistics floor (`StatsWindow.hasBaseline`, or the
+    ///   Today card's own check). A previous period that exists but was abstinent
+    ///   is a real baseline, and rising from it is `.up`; the time before the
+    ///   floor is not, and reads `.flat`. Until v0.86.0 a zero previous average
+    ///   always read flat, so a dry month followed by 40 g/day showed "unchanged".
+    public static func of(currentAvg: Double, prevAvg: Double, hasBaseline: Bool) -> Trend {
+        guard hasBaseline, prevAvg >= 0.0 else { return .flat }
         let current = round1(currentAvg)
         let previous = round1(prevAvg)
         if current > previous { return .up }

@@ -41,8 +41,15 @@ package de.godisch.potillus.domain
  *          "worse" direction): rendered as a red ↑.
  * - [DOWN] current average is lower (less alcohol, the "better" direction):
  *          rendered as a green ↓.
- * - [FLAT] equal at 0.1 g precision, OR no comparable previous value exists
- *          (previous average ≤ 0): no arrow is shown.
+ * - [FLAT] equal at 0.1 g precision, OR no comparable previous period exists
+ *          (`hasBaseline` false): no arrow is shown.
+ *
+ * A previous period that EXISTS but was abstinent is a real baseline: rising
+ * from it is [UP]. What is not a baseline is the time before the statistics
+ * floor — the days before installation or before the date the user chose —
+ * which is why the caller must say whether one exists rather than this class
+ * inferring it from a zero. (Until v0.86.0 a zero previous average always read
+ * FLAT, so going from a dry month to 40 g/day showed "unchanged".)
  */
 enum class Trend {
     UP,
@@ -61,11 +68,17 @@ enum class Trend {
 
         /**
          * Classifies [currentAvg] grams/day against [prevAvg] grams/day. Returns
-         * [FLAT] when there is no usable previous value ([prevAvg] ≤ 0) or the two
-         * are equal once rounded to 0.1 g.
+         * [FLAT] when no previous period exists ([hasBaseline] false), when
+         * [prevAvg] is negative (nonsense input), or when the two are equal once
+         * rounded to 0.1 g. A zero [prevAvg] with a baseline is a dry period, and
+         * a positive current average is [UP] against it.
+         *
+         * @param hasBaseline Whether the previous period exists at all, i.e. lies
+         *        on or after the statistics floor (`StatsWindow.hasBaseline`, or
+         *        the Today card's own check).
          */
-        fun of(currentAvg: Double, prevAvg: Double): Trend {
-            if (prevAvg <= 0.0) return FLAT
+        fun of(currentAvg: Double, prevAvg: Double, hasBaseline: Boolean): Trend {
+            if (!hasBaseline || prevAvg < 0.0) return FLAT
             val c = round1(currentAvg)
             val p = round1(prevAvg)
             return when {
