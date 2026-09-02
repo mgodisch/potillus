@@ -363,7 +363,7 @@ struct CalendarScreen: View {
                 // the day list below. An empty day says nothing, rather than
                 // saying zero.
                 Circle()
-                    .fill(model.isOverLimit(date) ? Color.red : Color.accentColor)
+                    .fill(model.isOverLimit(date) ? Color.statusDanger : Color.accentColor)
                     .frame(width: 5, height: 5)
                     .opacity(model.isDrinkDay(date) ? 1 : 0)
             }

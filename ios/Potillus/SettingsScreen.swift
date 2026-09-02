@@ -507,7 +507,7 @@ extension SettingsScreen {
                     "This setting could not be applied to the database file.",
                     locale: locale
                 ))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.statusError)
             }
         } header: {
             Text(Loc.string("Security", locale: locale))

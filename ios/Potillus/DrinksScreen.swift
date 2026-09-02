@@ -484,10 +484,10 @@ private struct DrinkEditor: View {
                         Text(message(for: DrinkValidator.Violation(
                             field: .alcoholPercent, reason: .notFinite
                         )))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.statusError)
                     } else if let violation, !name.isEmpty || !volumeText.isEmpty {
                         Text(message(for: violation))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.statusError)
                     }
                 }
 

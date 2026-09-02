@@ -52,18 +52,18 @@ beneath it states every slice in full — a per-app language selector with RTL
 support, `sp`-based text that honours the system font scale, and an
 under/over-limit palette that is blue versus red rather than a red/green pair.
 Where a measurement or a criterion decided the shape of the code, the reasoning
-sits beside that code, in `ui/theme/Color.kt` and in the views it applies to.
+sits beside that code, in `ui/theme/Color.kt` on Android and in
+`StatusPalette.swift` on iOS, which carries the same six status values as
+Android since the v0.86.0 review — measured against the iOS backgrounds — after
+the system palette it used before was found to fail light mode (system green
+and orange at about 2.2 : 1 on a white card, and green used as text).
 A regression guard exists in `tools/release-check.sh` §13, which fails the build
 if any `Icon` inside an `IconButton` is left with `contentDescription = null`. It
 is a labelling invariant only and deliberately asserts no WCAG conformance, which
 a static check cannot.
 
-Two things are open:
+One thing is open:
 
-- **Contrast on iOS is unmeasured.** Android's status palette carries a measured
-  ratio beside every colour; iOS takes the same states from the system palette
-  (`.secondary`, `.orange`, `.red`), where no value has been read in either
-  appearance.
 - **No evaluation has been run on device.** Text at 200 %, reflow at the largest
   display size, focus order with a keyboard, and a right-to-left pass are
   untested on both platforms.

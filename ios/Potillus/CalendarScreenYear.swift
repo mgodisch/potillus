@@ -207,16 +207,12 @@ extension CalendarScreen {
         // none at all: the heat map is about drinking, and
         // `AlcoholCalculator.isDrinkDay` decides that everywhere in the app.
         guard model.isDrinkDay(date) else { return emptyCellFill }
-        return model.isOverLimit(date) ? .red : .accentColor
+        return model.isOverLimit(date) ? .statusDanger : .accentColor
     }
 
-    /// The fill for a day with nothing logged; see `yearCellColour` for the
-    /// measurements behind the two values.
-    private var emptyCellFill: Color {
-        colorScheme == .dark
-            ? Color(red: 0x24 / 255, green: 0x24 / 255, blue: 0x26 / 255)
-            : Color(red: 0xDD / 255, green: 0xE3 / 255, blue: 0xF0 / 255)
-    }
+    /// The fill for a day with nothing logged; the measurements are in
+    /// `StatusPalette.swift`.
+    private var emptyCellFill: Color { .yearCellEmpty }
 
     private func yearCellLabel(_ date: String, summary: DaySummary?) -> String {
         guard let summary, model.isDrinkDay(date) else { return "" }
@@ -248,7 +244,7 @@ extension CalendarScreen {
             Text(Loc.string("over limit", locale: locale))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-            legendSwatch(.red)
+            legendSwatch(.statusDanger)
         }
         .padding(.horizontal)
         .padding(.top, 4)

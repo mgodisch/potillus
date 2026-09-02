@@ -90,6 +90,9 @@ apply to it are stated in the accompanying COPYING.md file.
 - A Nynorsk system language reads the Bokmål catalogue on iOS, as on Android.
 - A backup written on iOS carries the same licence header as one written on
   Android; the Android day plurals are held to the shared vector too.
+- iOS draws its status colours from the measured palette Android uses, so
+  green and amber text and dots are readable in light mode; the empty year
+  cell is visible in dark mode.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

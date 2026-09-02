@@ -33,8 +33,8 @@ import SwiftUI
 // The SwiftUI counterpart of Android's TrafficLightDot. Same three states and
 // the same two styles.
 //
-// COLOUR (always): green / orange / red, the three states of a traffic light,
-//   matching Android's TrafficLightDot (successColor / warningColor /
+// COLOUR (always): green / amber / red from `StatusPalette`, the measured
+//   values Android's TrafficLightDot draws (successColor / warningColor /
 //   dangerRedColor). NOT `Emphasis.tint`: that palette paints the Today screen's
 //   limit bars, whose calm state is the app tint (blue), and an earlier version
 //   of this dot borrowed it — a "servings remain" dot then read blue here and
@@ -70,9 +70,9 @@ struct TrafficLightDot: View {
         // mapped `.green` to `.accentColor` (blue), so the "servings remain" dot
         // read as blue while Android drew it green (successColor). The three
         // states now match Android's TrafficLightDot: green / amber / red.
-        case .green: return .green
-        case .yellow: return .orange
-        case .red: return .red
+        case .green: return .statusSuccess
+        case .yellow: return .statusWarning
+        case .red: return .statusDanger
         }
     }
 

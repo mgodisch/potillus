@@ -331,7 +331,7 @@ extension TodayScreen {
             if model.state.currentAbstinence > 0 {
                 LabeledContent {
                     headlineValue(Loc.daysPlural(count: model.state.currentAbstinence, locale: locale))
-                        .foregroundStyle(Color.green)
+                        .foregroundStyle(Color.statusSuccess)
                 } label: {
                     Text(Loc.string("Current Abstinence", locale: locale))
                 }
@@ -656,7 +656,7 @@ extension TodayScreen {
 
     /// Down is the good direction — less alcohol. A rising trend is not a success.
     private var monthTrendColor: Color {
-        model.state.monthTrend == .down ? .green : .red
+        model.state.monthTrend == .down ? .statusSuccess : .statusDangerText
     }
 
     /// "7 Days (weekStart–logicalDate)" — the trailing window plus its date range.
@@ -756,8 +756,8 @@ extension Emphasis {
     var tint: Color {
         switch self {
         case .calm: return .accentColor
-        case .warning: return .orange
-        case .danger: return .red
+        case .warning: return .statusWarning
+        case .danger: return .statusDanger
         }
     }
 }

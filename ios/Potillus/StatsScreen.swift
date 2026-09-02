@@ -244,7 +244,7 @@ struct StatsScreen: View {
                 // days-over rows (red/green); this needs green/plain.
                 Text("\(model.state.abstinentDays)")
                     .monospacedDigit()
-                    .foregroundStyle(model.state.abstinentDays > 0 ? Color.green : Color.secondary)
+                    .foregroundStyle(model.state.abstinentDays > 0 ? Color.statusSuccess : Color.secondary)
             }
         }
     }
@@ -309,8 +309,8 @@ struct StatsScreen: View {
     /// Down is good here. A rising trend in alcohol consumption is not a success.
     private var trendColor: Color {
         switch model.state.trend {
-        case .up: return .red
-        case .down: return .green
+        case .up: return .statusDangerText
+        case .down: return .statusSuccess
         case .flat: return .secondary
         }
     }
@@ -462,7 +462,7 @@ extension StatsScreen {
         // same two-colour cue Android's StatRow uses for the days-over rows.
         Text("\(value)")
             .monospacedDigit()
-            .foregroundStyle(value > 0 ? Color.red : Color.green)
+            .foregroundStyle(value > 0 ? Color.statusDangerText : Color.statusSuccess)
     }
 
     /// Like `days`, but green when positive — the achievement colour Android
@@ -480,7 +480,7 @@ extension StatsScreen {
     fileprivate func daysColored(_ value: Int) -> some View {
         Text(Loc.daysPlural(count: value, locale: locale))
             .monospacedDigit()
-            .foregroundStyle(value > 0 ? Color.green : Color.primary)
+            .foregroundStyle(value > 0 ? Color.statusSuccess : Color.primary)
     }
 }
 
@@ -577,7 +577,7 @@ extension StatsScreen {
         // already reads the system semantic colours (the trend arrow, the
         // days-over counts, the dry-day ticks). Same meaning, native palette —
         // the porting stance the rest of the app takes.
-        return over ? Color.red : Color.accentColor
+        return over ? Color.statusDanger : Color.accentColor
     }
 
     // ── The consumption chart's x-axis ───────────────────────────────────────
@@ -651,9 +651,9 @@ extension StatsScreen {
                             Image(systemName: "checkmark")
                                 .font(.caption2.bold())
                                 .imageScale(.small)
-                                .foregroundStyle(Color.green)
+                                .foregroundStyle(Color.statusSuccess)
                         }
-                        .foregroundStyle(Color.green)
+                        .foregroundStyle(Color.statusSuccess)
                         // A dry day states its nought rather than falling silent,
                         // so a reader does not take it for a gap in the series.
                         .accessibilityLabel(bucketSpoken(bucket))
@@ -688,7 +688,7 @@ extension StatsScreen {
                     RuleMark(
                         y: .value("Daily limit", model.state.limitInfo.limitGrams)
                     )
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(Color.statusDanger)
                     .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 3]))
                 }
             }

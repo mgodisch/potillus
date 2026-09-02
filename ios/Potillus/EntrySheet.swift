@@ -224,7 +224,7 @@ struct EntrySheet: View {
                             "The amount must be between 1 ml and 5,000 ml.",
                             locale: locale
                         ))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.statusError)
                     }
                 }
 
