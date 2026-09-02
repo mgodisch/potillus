@@ -157,6 +157,39 @@ class BackupManagerTest {
         )
     }
 
+    /**
+     * Two drinks with one id would send the first one's entries to the second
+     * (the id map is last-wins) without any check noticing; refused since the
+     * v0.86.0 review.
+     */
+    @Test fun `duplicate drink ids are rejected as ReadError`() {
+        val json = buildBackupJson(
+            drinks = listOf(
+                drinkJson(id = 1, name = "Wine", volumeMl = 150, alcoholPercent = 13.0),
+                drinkJson(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0),
+            ),
+            entries = listOf(entryJson(id = 1, drinkId = 1, drinkName = "Wine")),
+        )
+        val result = BackupManager.parseBackupJson(json)
+        assertReadError(result)
+        val error = result.error as ImportError.ReadError
+        assertTrue(
+            "detail should say duplicate, got: ${error.detail}",
+            error.detail?.contains("duplicate") == true,
+        )
+    }
+
+    /** An entry without a drink reference is refused, as on iOS, rather than read as drink 0. */
+    @Test fun `entry without drinkId is rejected as ReadError`() {
+        val json = buildBackupJson(
+            drinks = listOf(drinkJson(id = 0, name = "Wine", volumeMl = 150, alcoholPercent = 13.0)),
+            entries = listOf(
+                """{"id":1,"drinkName":"Wine","volumeMl":150,"alcoholPercent":13.0,"gramsAlcohol":16.0,"timestampMillis":1700000000000,"logicalDate":"2023-11-14"}""",
+            ),
+        )
+        assertReadError(BackupManager.parseBackupJson(json))
+    }
+
     /** The guard must not reject a valid multi-drink backup (ids matched as a set). */
     @Test fun `entries referencing any backup drink pass the referential guard`() {
         val json = buildBackupJson(

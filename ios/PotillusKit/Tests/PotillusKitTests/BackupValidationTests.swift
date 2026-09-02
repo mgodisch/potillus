@@ -115,6 +115,24 @@ final class BackupValidationTests: XCTestCase {
     }
 
     /// Entries written with two decimals predate the 0.1 g grid: 150 ml at
+    /// Two drinks with one id would send the first one's entries to the second
+    /// (the id map is last-wins) without any check noticing; refused since the
+    /// v0.86.0 review, on both platforms.
+    func testDuplicateDrinkIdsAreRejected() throws {
+        let data = try json([
+            "version": 2,
+            "drinks": [
+                ["id": 1, "name": "Wein", "volumeMl": 150, "alcoholPercent": 13.5],
+                ["id": 1, "name": "Pils", "volumeMl": 500, "alcoholPercent": 4.9],
+            ],
+            "entries": [],
+        ])
+        XCTAssertThrowsError(try BackupReader.parse(data)) { error in
+            XCTAssertEqual(error as? BackupError,
+                           .valueOutOfRange(object: "drink", key: "id", value: "1 (duplicate)"))
+        }
+    }
+
     /// 13.5 % stood at 15.98 g where the recomputation now says 16.0 g. A user's
     /// own older backup must still import.
     func testEntryGramsAlcoholFromBeforeTheRoundingChangeIsAccepted() throws {

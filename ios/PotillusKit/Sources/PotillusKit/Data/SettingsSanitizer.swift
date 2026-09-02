@@ -171,8 +171,10 @@ public enum SettingsSanitizer {
 
     /// See rule 2: kept only when it is exactly what the formatter would write.
     private static func canonicalDate(_ raw: String) -> String {
-        let trimmed = raw.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { return "" }
+        // No trimming: Android (`BackupManager.parseSettings`) accepts the exact
+        // canonical string or nothing, and a padded date is not canonical. An
+        // earlier version trimmed and then checked the untrimmed value, which
+        // amounted to the same rule while reading as if it did not.
         guard let parsed = DayResolver.parseDate(raw),
               DayResolver.formatDate(parsed) == raw
         else { return "" }

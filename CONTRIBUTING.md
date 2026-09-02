@@ -696,11 +696,17 @@ The three surfaces and their rules:
   `getXxx`, optional/newer fields use `optXxx(key, default)`.
 - The importer already rejects files newer than it understands
   (`ImportError.VersionTooHigh`). Preserve that guard.
+- `fastlane/demo-backup.json` is a genuine version-2 file; both unit suites
+  import it (`BackupManagerFixtureTest`, `BackupImporterTests`). If a new
+  validation rule makes that test fail, the rule breaks the compatibility
+  guarantee above — widen the rule, not the fixture.
 - The exported field names mirror the entity columns; if you rename a column,
   keep reading the old JSON field name for backward compatibility.
 
 ### 8.4 Identifiers that must never change
 
 - `applicationId` / `namespace` (`de.godisch.potillus`).
-- Database file name (`potillus.db`).
-- DataStore file name and its Keystore alias (`potillus_prefs_key`).
+- Database file name (`potillus.db`; `potillus.sqlite` on iOS).
+- DataStore file name (`potillus_settings`; `prefs.bin` on iOS) and its
+  Keystore alias (`potillus_prefs_key`; the iOS Keychain item of the same
+  name).

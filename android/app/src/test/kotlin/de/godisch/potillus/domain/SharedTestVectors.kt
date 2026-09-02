@@ -61,7 +61,24 @@ object SharedTestVectors {
     }
 
     /** The repository root: two levels above the app module. */
-    private val VECTOR_DIR = File(MODULE_DIR, "../../test-vectors")
+    private val REPO_DIR = File(MODULE_DIR, "../..")
+    private val VECTOR_DIR = File(REPO_DIR, "test-vectors")
+
+    /**
+     * Reads a file the repository already ships, by its path from the root —
+     * for fixtures that are real artefacts rather than vectors, above all
+     * `fastlane/demo-backup.json`, a genuine version-2 backup that the import
+     * compatibility test reads (the iOS suite reads the same file through
+     * `TestVectors.repositoryFile`).
+     */
+    fun repositoryFile(relativePath: String): String {
+        val file = File(REPO_DIR, relativePath)
+        check(file.isFile) {
+            "Repository file not found: ${file.absolutePath}. " +
+                "Run unit tests from the app module, or set -Dpotillus.project.dir=<path to android/app>."
+        }
+        return file.readText()
+    }
 
     /**
      * Loads and parses one vector file.

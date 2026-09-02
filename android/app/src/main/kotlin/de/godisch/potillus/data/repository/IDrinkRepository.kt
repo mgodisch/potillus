@@ -53,7 +53,4 @@ interface IDrinkRepository {
 
     /** Returns how many consumption entries reference [drinkId] (delete guard). */
     suspend fun countEntriesForDrink(drinkId: Long): Int
-
-    /** Deletes all user-created (non-preset) drinks, keeping the built-in presets. */
-    suspend fun deleteUserCreatedDrinks()
 }

@@ -281,11 +281,13 @@ class EntryRepository(private val dao: EntryDao) : IEntryRepository {
     override suspend fun getInRange(from: String, to: String): List<ConsumptionEntry> = dao.getInRange(from, to).map { it.toDomain() }
 
     /**
-     * Deletes all entries. Called at the start of a REPLACE backup import.
+     * Deletes all entries.
      *
-     * IMPORTANT: wrap this in a database transaction together with
-     * [de.godisch.potillus.data.repository.DrinkRepository.deleteUserCreatedDrinks]
-     * so the database is never left in a partially-cleared state.
+     * The REPLACE backup import does not call this: it runs its own
+     * `entryDao.deleteAll()` and `drinkDao.deleteAllDrinks()` inside one Room
+     * transaction ([BackupRepository.importReplace]), so the database is never
+     * left half-cleared. Any other caller that clears drinks afterwards needs the
+     * same transaction, because of the FK RESTRICT on `entries.drinkId`.
      */
     override suspend fun deleteAll() = dao.deleteAll()
 }

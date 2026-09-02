@@ -632,7 +632,10 @@ object BackupManager {
                 entries.add(
                     ConsumptionEntry(
                         id = obj.optLong("id", 0),
-                        drinkId = obj.optLong("drinkId", 0),
+                        // Required, as on iOS: an entry without a drink reference
+                        // cannot be mapped, and defaulting it to 0 would silently
+                        // attach it to whichever drink carries id 0.
+                        drinkId = obj.getLong("drinkId"),
                         drinkName = obj.getString("drinkName"),
                         volumeMl = entryVolumeMl,
                         alcoholPercent = entryAlcoholPercent,
@@ -655,7 +658,14 @@ object BackupManager {
             //    whole transaction with only a generic error. Failing here instead
             //    yields a precise, actionable message — and lets the repository drop
             //    its fallback entirely (v0.79.0 QA fix).
-            val drinkIds = drinks.mapTo(HashSet()) { it.id }
+            // Drink ids must be unique: the importer maps entries through them,
+            // and a duplicate would send every entry of the first drink to the
+            // second one without any check noticing (v0.86.0 review). Own exports
+            // always write distinct ids; this catches a hand-edited file.
+            val drinkIds = HashSet<Long>()
+            drinks.forEach { drink ->
+                require(drinkIds.add(drink.id)) { "duplicate drink id ${drink.id} in the backup's drinks list" }
+            }
             entries.forEach { entry ->
                 require(entry.drinkId in drinkIds) {
                     "entry references drinkId ${entry.drinkId}, which is not in the backup's drinks list"

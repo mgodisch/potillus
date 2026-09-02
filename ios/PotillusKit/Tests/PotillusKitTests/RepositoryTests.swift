@@ -170,20 +170,6 @@ final class RepositoryTests: XCTestCase {
         )
     }
 
-    /// `deleteUserCreatedDrinks()` removes user drinks but keeps presets. (This
-    /// helper is no longer the REPLACE-import path — since v0.83.0 REPLACE wipes
-    /// the whole catalogue; see `BackupImporterTests`. It stays for callers that
-    /// want to clear only the user's own drinks.)
-    func testDeleteUserCreatedDrinksKeepsPresets() async throws {
-        try addDrink("Preset", preset: true)
-        try addDrink("Mine")
-
-        try drinks.deleteUserCreatedDrinks()
-
-        let observed = try await firstValue(drinks.observeDrinks())
-        XCTAssertEqual(observed.map(\.name), ["Preset"])
-    }
-
     /// An unknown category string decays to `.other` rather than throwing, so a
     /// database written by a newer version still opens.
     func testUnknownCategoryDecaysToOther() throws {
@@ -265,20 +251,19 @@ final class RepositoryTests: XCTestCase {
         XCTAssertEqual(try entries.drinkDates(), ["2026-01-02", "2026-01-03"])
     }
 
-    /// Ordered by CONSUMPTION time, not by row id: a back-dated entry logged
-    /// today must not become "the most recent drink".
-    func testMostRecentEntryUsesTimestampNotInsertionOrder() async throws {
+    /// By row id, not by timestamp: the sheet pre-selects what the user reached
+    /// for a moment ago, even when that entry was back-dated. (Android's
+    /// `EntryDao.getMostRecent` states the same rule.)
+    func testLastEntryUsesInsertionOrderNotTimestamp() throws {
         let id = try addDrink("Pils")
         try addEntry(drinkId: id, at: 5_000, on: "2026-01-05")
         try addEntry(drinkId: id, at: 1_000, on: "2026-01-01")  // back-dated, inserted last
 
-        let observed = try await firstValue(entries.observeMostRecentEntry())
-        XCTAssertEqual(observed?.timestampMillis, 5_000)
+        XCTAssertEqual(try entries.lastEntry()?.timestampMillis, 1_000)
     }
 
-    func testMostRecentEntryIsNilOnAnEmptyLog() async throws {
-        let observed = try await firstValue(entries.observeMostRecentEntry())
-        XCTAssertNil(observed)
+    func testLastEntryIsNilOnAnEmptyLog() throws {
+        XCTAssertNil(try entries.lastEntry())
     }
 
     /// The de-duplication guard for MERGE imports: timestamp plus drink.

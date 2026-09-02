@@ -76,9 +76,6 @@ public protocol DrinkRepositoryProtocol: Sendable {
 
     /// How many consumption entries reference `drinkId` (the delete guard).
     func countEntries(forDrink drinkId: Int64) throws -> Int
-
-    /// Deletes every user-created (non-preset) drink. Used by REPLACE imports.
-    func deleteUserCreatedDrinks() throws
 }
 
 /// Reads and writes the consumption log.
@@ -95,9 +92,6 @@ public protocol EntryRepositoryProtocol: Sendable {
 
     /// Entries in an inclusive range, oldest first.
     func observeEntries(from: String, to: String) -> AsyncThrowingStream<[ConsumptionEntry], Error>
-
-    /// The most recently *consumed* entry, or nil when the log is empty.
-    func observeMostRecentEntry() -> AsyncThrowingStream<ConsumptionEntry?, Error>
 
     /// One-shot reads, for exports, backups, and screens that compute a snapshot
     /// rather than observe one.
@@ -117,6 +111,9 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// Friday evening carries that evening's instant. Ordering by timestamp then
     /// answers "which drink was consumed latest", which is not what the question
     /// is — the sheet wants to offer what the user reached for a moment ago.
+    /// (An `observeMostRecentEntry` ordered by timestamp, with the opposite
+    /// argument, existed beside this until v0.86.0; nothing but its tests called
+    /// it. Android's `EntryDao.getMostRecent` states the same rule as this one.)
     func lastEntry() throws -> ConsumptionEntry?
 
     /// Every logical date on which anything was logged, ascending and distinct.
@@ -234,14 +231,6 @@ public struct DrinkRepository: DrinkRepositoryProtocol {
             try Entry.filter(Column("drinkId") == drinkId).fetchCount(db)
         }
     }
-
-    /// Presets are never deleted, only user-created drinks — an old entry must
-    /// always be able to resolve the drink it referenced.
-    public func deleteUserCreatedDrinks() throws {
-        try database.write { db in
-            _ = try Drink.filter(Column("isPreset") == false).deleteAll(db)
-        }
-    }
 }
 
 /// GRDB-backed `EntryRepositoryProtocol`.
@@ -348,19 +337,6 @@ public struct EntryRepository: EntryRepositoryProtocol {
                 .order(Column("timestampMillis").asc)
                 .fetchAll(db)
                 .map(\.domain)
-        }
-    }
-
-    /// `SELECT * FROM entries ORDER BY timestampMillis DESC LIMIT 1`
-    ///
-    /// Ordered by CONSUMPTION time, not by row id: a back-dated entry added today
-    /// must not become "the most recent drink".
-    public func observeMostRecentEntry() -> AsyncThrowingStream<ConsumptionEntry?, Error> {
-        observing(reader: database.reader) { db in
-            try Entry
-                .order(Column("timestampMillis").desc)
-                .fetchOne(db)?
-                .domain
         }
     }
 

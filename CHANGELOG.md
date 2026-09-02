@@ -62,6 +62,9 @@ apply to it are stated in the accompanying COPYING.md file.
 - The trend arrow shows a rise against a previous period that existed but was
   abstinent.
 - A Nynorsk device locale selects the Bokmål translation on Android.
+- A backup with two drinks sharing one id, or an entry without a drink
+  reference, is rejected on both platforms instead of being imported onto the
+  wrong drink.
 - The bundled fastlane was updated to 2.238.0.
 
 ## v0.85.0

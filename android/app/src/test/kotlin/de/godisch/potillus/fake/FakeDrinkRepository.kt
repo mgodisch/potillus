@@ -64,8 +64,4 @@ class FakeDrinkRepository(
     }
 
     override suspend fun countEntriesForDrink(drinkId: Long): Int = entryCounts[drinkId] ?: 0
-
-    override suspend fun deleteUserCreatedDrinks() {
-        _drinks.value = _drinks.value.filter { it.isPreset }
-    }
 }

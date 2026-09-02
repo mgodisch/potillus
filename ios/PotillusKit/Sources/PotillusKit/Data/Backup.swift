@@ -288,7 +288,16 @@ public enum BackupReader {
         // existing case already carries the object, the key and the offending
         // value, which is what a message needs to name. A new case would need a
         // new translated string in every shipped language to say the same thing.
-        let definedDrinkIds = Set(drinks.map(\.id))
+        // Drink ids must be unique: the importer maps entries through them, and a
+        // duplicate would send every entry of the first drink to the second one
+        // without any check noticing (v0.86.0 review). Own exports always write
+        // distinct ids; this catches a hand-edited file.
+        var definedDrinkIds = Set<Int64>()
+        for drink in drinks where !definedDrinkIds.insert(drink.id).inserted {
+            throw BackupError.valueOutOfRange(
+                object: "drink", key: "id", value: "\(drink.id) (duplicate)"
+            )
+        }
         for entry in entries where !definedDrinkIds.contains(entry.drinkId) {
             throw BackupError.valueOutOfRange(
                 object: "entry", key: "drinkId", value: String(entry.drinkId)

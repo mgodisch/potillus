@@ -69,10 +69,8 @@ class DrinkRepositoryTest {
         assertTrue(dao.deleted)
     }
 
-    @Test fun `count and bulk delete delegate to the dao`() = runTest {
+    @Test fun `count delegates to the dao`() = runTest {
         assertEquals(3, repo.countEntriesForDrink(1))
-        repo.deleteUserCreatedDrinks()
-        assertTrue(dao.clearedUserCreated)
     }
 }
 
@@ -84,7 +82,6 @@ private class FakeDrinkDao : DrinkDao {
     var lastInserted: DrinkEntity? = null
     var updated = false
     var deleted = false
-    var clearedUserCreated = false
     var clearedAll = false
 
     private val samples = listOf(
@@ -114,10 +111,6 @@ private class FakeDrinkDao : DrinkDao {
     override suspend fun countEntriesByDrinkId(drinkId: Long): Int = 3
 
     override suspend fun countPresets(): Int = 1
-
-    override suspend fun deleteUserCreatedDrinks() {
-        clearedUserCreated = true
-    }
 
     override suspend fun deleteAllDrinks() {
         clearedAll = true

@@ -174,21 +174,6 @@ interface DrinkDao {
     suspend fun countEntriesByDrinkId(drinkId: Long): Int
 
     /**
-     * Deletes all non-preset (user-created) drinks, keeping the built-in
-     * presets untouched.
-     *
-     * Since v0.83.0 the REPLACE backup import no longer uses this — it wipes the
-     * entire catalogue via [deleteAllDrinks] so the result matches the backup
-     * exactly. This narrower helper remains for callers that want to clear only
-     * the user's own drinks.
-     *
-     * Note: entries referencing these drinks must be deleted BEFORE this runs
-     * because of the FK RESTRICT constraint.
-     */
-    @Query("DELETE FROM drinks WHERE isPreset = 0")
-    suspend fun deleteUserCreatedDrinks()
-
-    /**
      * Deletes EVERY drink row, presets included.
      *
      * Called during a REPLACE backup import to reset the drink catalogue to a
@@ -197,7 +182,8 @@ interface DrinkDao {
      *
      * WHY DELETE PRESETS TOO (v0.83.0 fix)?
      *   REPLACE means "make the catalogue identical to the backup". The earlier
-     *   [deleteUserCreatedDrinks] kept the built-in presets, so a preset that the
+     *   `deleteUserCreatedDrinks` (removed in v0.86.0 as dead code) kept the
+     *   built-in presets, so a preset that the
      *   backup did NOT contain survived the import and reappeared ALONGSIDE the
      *   backup's drinks — most visibly right after a fresh install or a "clear
      *   storage", where the pre-population callback had just seeded the full preset
